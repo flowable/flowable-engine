@@ -102,10 +102,10 @@
             <column name="CASE_DEF_ID_" type="varchar(255)" /> 
             <column name="CASE_INST_ID_" type="varchar(255)" />
             <column name="STAGE_INST_ID_" type="varchar(255)" />
+            <column name="IS_STAGE_" type="boolean" /> 
             <column name="ELEMENT_ID_" type="varchar(255)" />
             <column name="NAME_" type="varchar(255)" />
             <column name="STATE_" type="varchar(255)" />
-            <column name="IS_STAGE_" type="boolean" /> 
             <column name="START_TIME_" type="datetime" />
             <column name="START_USER_ID_" type="varchar(255)" />
             <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />

@@ -35,7 +35,9 @@ public class InitStageOperation extends AbstractPlanItemInstanceOperation {
     @Override
     public void run() {
         Stage stage = getStage(planItemInstanceEntity);
+        
         planItemInstanceEntity.setState(PlanItemInstanceState.ACTIVE);
+        planItemInstanceEntity.setStage(true);
         
         PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
         List<PlanItemInstanceEntity> planItemInstances = new ArrayList<>();
@@ -44,11 +46,12 @@ public class InitStageOperation extends AbstractPlanItemInstanceOperation {
             newPlanItemInstanceEntity.setCaseDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
             newPlanItemInstanceEntity.setCaseInstanceId(planItemInstanceEntity.getCaseInstanceId());
             newPlanItemInstanceEntity.setName(planItem.getName());
-            newPlanItemInstanceEntity.setStartTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
-            newPlanItemInstanceEntity.setTenantId(planItemInstanceEntity.getTenantId());
-            newPlanItemInstanceEntity.setElementId(planItem.getId());
-            newPlanItemInstanceEntity.setStageInstanceId(planItemInstanceEntity.getId());
             newPlanItemInstanceEntity.setState(PlanItemInstanceState.AVAILABLE);
+            newPlanItemInstanceEntity.setStartTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
+            newPlanItemInstanceEntity.setElementId(planItem.getId());
+            newPlanItemInstanceEntity.setStage(false);
+            newPlanItemInstanceEntity.setStageInstanceId(planItemInstanceEntity.getId());
+            newPlanItemInstanceEntity.setTenantId(planItemInstanceEntity.getTenantId());
             planItemInstanceEntityManager.insert(newPlanItemInstanceEntity);
             
             planItemInstances.add(newPlanItemInstanceEntity);
@@ -60,7 +63,7 @@ public class InitStageOperation extends AbstractPlanItemInstanceOperation {
 
     @Override
     public String toString() {
-        return "[Operation] Initialise Stage using plan item " + planItemInstanceEntity.getName() + " (" + planItemInstanceEntity.getId() + ")";
+        return "[Init Stage] Using plan item " + planItemInstanceEntity.getName() + " (" + planItemInstanceEntity.getId() + ")";
     }
 
 }

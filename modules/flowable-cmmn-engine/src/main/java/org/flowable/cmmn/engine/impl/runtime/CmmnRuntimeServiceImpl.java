@@ -15,11 +15,15 @@ package org.flowable.cmmn.engine.impl.runtime;
 import org.flowable.cmmn.engine.CmmnRuntimeService;
 import org.flowable.cmmn.engine.impl.ServiceImpl;
 import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.TriggerPlanItemInstanceCmd;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.cmmn.engine.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.engine.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceQuery;
 
+/**
+ * @author Joram Barrez
+ */
 public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeService {
     
     @Override
@@ -30,6 +34,11 @@ public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeSe
     @Override
     public CaseInstance startCaseInstanceByKey(String caseDefinitionKey) {
         return commandExecutor.execute(new StartCaseInstanceCmd(null, caseDefinitionKey));
+    }
+    
+    @Override
+    public void triggerPlanItemInstance(String planItemInstanceId) {
+        commandExecutor.execute(new TriggerPlanItemInstanceCmd(planItemInstanceId));
     }
     
     @Override

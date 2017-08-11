@@ -25,6 +25,7 @@ import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 
 public class CommandContextUtil {
     
@@ -106,6 +107,14 @@ public class CommandContextUtil {
     
     public static DbSqlSession getDbSqlSession(CommandContext commandContext) {
         return commandContext.getSession(DbSqlSession.class);
+    }
+    
+    public static EntityCache getEntityCache() {
+        return getEntityCache(getCommandContext());
+    }
+    
+    public static EntityCache getEntityCache(CommandContext commandContext) {
+        return commandContext.getSession(EntityCache.class);
     }
     
     public static CommandContext getCommandContext() {

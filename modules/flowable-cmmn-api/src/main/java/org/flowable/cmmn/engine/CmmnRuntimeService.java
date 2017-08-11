@@ -26,6 +26,8 @@ public interface CmmnRuntimeService {
     
     CaseInstance startCaseInstanceByKey(String caseDefinitionKey);
     
+    void triggerPlanItemInstance(String planItemInstanceId);
+    
     CaseInstanceQuery createCaseInstanceQuery();
     
     PlanItemInstanceQuery createPlanItemQuery();

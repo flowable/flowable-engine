@@ -17,6 +17,9 @@ import org.flowable.cmmn.engine.impl.agenda.operation.CmmnOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.CompletePlanItemOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.EvaluateCriteriaOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.InitStageOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.OccurPlanItemOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.TriggerPlanItemOperation;
+import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.engine.common.impl.agenda.AbstractAgenda;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -52,6 +55,11 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     }
     
     @Override
+    public void planEvaluateCriteria(String caseInstanceEntityId, PlanItemLifeCycleEvent lifeCycleEvent) {
+        addOperation(new EvaluateCriteriaOperation(commandContext, caseInstanceEntityId, lifeCycleEvent));
+    }
+    
+    @Override
     public void planActivatePlanItem(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new ActivatePlanItemOperation(commandContext, planItemInstanceEntity));
     }
@@ -59,6 +67,16 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     @Override
     public void planCompletePlanItem(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new CompletePlanItemOperation(commandContext, planItemInstanceEntity));
+    }
+    
+    @Override
+    public void planPlanItemOccurred(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new OccurPlanItemOperation(commandContext, planItemInstanceEntity));
+    }
+    
+    @Override
+    public void planTriggerPlanItem(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new TriggerPlanItemOperation(commandContext, planItemInstanceEntity));
     }
 
 }

@@ -31,6 +31,7 @@ public class PlanItemInstanceEntityImpl extends AbstractEntity implements PlanIt
     protected String caseDefinitionId;
     protected String caseInstanceId;
     protected String stageInstanceId;
+    protected boolean isStage;
     protected String elementId;
     protected String name;
     protected String state;
@@ -48,6 +49,7 @@ public class PlanItemInstanceEntityImpl extends AbstractEntity implements PlanIt
         persistentState.put("caseDefinitionId", caseDefinitionId);
         persistentState.put("caseInstanceId", caseInstanceId);
         persistentState.put("stageInstanceId", stageInstanceId);
+        persistentState.put("isStage", isStage);
         persistentState.put("elementId", elementId);
         persistentState.put("name", name);
         persistentState.put("state", state);
@@ -83,6 +85,12 @@ public class PlanItemInstanceEntityImpl extends AbstractEntity implements PlanIt
     }
     public void setStageInstanceId(String stageInstanceId) {
         this.stageInstanceId = stageInstanceId;
+    }
+    public boolean isStage() {
+        return isStage;
+    }
+    public void setStage(boolean isStage) {
+        this.isStage = isStage;
     }
     public String getElementId() {
         return elementId;

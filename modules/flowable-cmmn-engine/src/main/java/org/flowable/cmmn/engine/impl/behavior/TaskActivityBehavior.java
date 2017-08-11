@@ -15,6 +15,8 @@ package org.flowable.cmmn.engine.impl.behavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
+import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
+import org.flowable.engine.common.api.FlowableException;
 
 /**
  * @author Joram Barrez
@@ -37,7 +39,12 @@ public class TaskActivityBehavior implements CmmnTriggerableActivityBehavior {
 
     @Override
     public void trigger(DelegatePlanItemInstance planItemInstance) {
-        
+        if (isBlocking) {
+            if (!PlanItemInstanceState.ACTIVE.equals(planItemInstance.getState())) {
+                throw new FlowableException("Can only trigger a plan item that is in the ACTIVE state");
+            }
+            CommandContextUtil.getAgenda().planCompletePlanItem((PlanItemInstanceEntity) planItemInstance);
+        }
     }
 
 }

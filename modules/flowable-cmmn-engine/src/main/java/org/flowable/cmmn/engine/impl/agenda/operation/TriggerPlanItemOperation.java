@@ -12,39 +12,37 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
-import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.CmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
  */
-public class ActivatePlanItemOperation extends AbstractPlanItemInstanceOperation {
+public class TriggerPlanItemOperation extends AbstractPlanItemInstanceOperation {
     
-    public ActivatePlanItemOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+    public TriggerPlanItemOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
     }
     
     @Override
     public void run() {
-        if (!PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState())) {
-            planItemInstanceEntity.setState(PlanItemInstanceState.ACTIVE);
-            executeActivityBehavior();
+        Object behaviorObject = planItemInstanceEntity.getPlanItem().getBehavior();
+        if (!(behaviorObject instanceof CmmnTriggerableActivityBehavior)) {
+            throw new FlowableException("Cannot trigger a plan item which activity behavior does not implement the " 
+                    + CmmnTriggerableActivityBehavior.class + " interface");
         }
-    }
-    
-    protected void executeActivityBehavior() {
-        CmmnActivityBehavior activityBehavior = (CmmnActivityBehavior) planItemInstanceEntity.getPlanItem().getBehavior();
-        activityBehavior.execute(planItemInstanceEntity);
+        CmmnTriggerableActivityBehavior behavior = (CmmnTriggerableActivityBehavior) planItemInstanceEntity.getPlanItem().getBehavior();
+        behavior.trigger(planItemInstanceEntity);
     }
     
     @Override
     public String toString() {
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("[Activate Planitem] ");
+        stringBuilder.append("[Trigger Planitem]");
         if (planItem.getName() != null) {
             stringBuilder.append(planItem.getName());
             stringBuilder.append(" (");

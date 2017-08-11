@@ -25,6 +25,7 @@ public interface PlanItemInstance {
     String getCaseDefinitionId();
     String getCaseInstanceId();
     String getStageInstanceId();
+    boolean isStage();
     String getElementId();
     Date getStartTime();
     String getStartUserId();

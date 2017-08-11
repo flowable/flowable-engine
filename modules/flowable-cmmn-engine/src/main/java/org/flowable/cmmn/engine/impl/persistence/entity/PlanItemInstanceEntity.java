@@ -29,6 +29,7 @@ public interface PlanItemInstanceEntity extends DelegatePlanItemInstance, Entity
     void setCaseDefinitionId(String caseDefinitionId);
     void setCaseInstanceId(String caseInstanceId);
     void setStageInstanceId(String stageInstanceId);
+    void setStage(boolean isStage);
     void setElementId(String elementId);
     void setStartTime(Date startTime);
     void setStartUserId(String startUserId);

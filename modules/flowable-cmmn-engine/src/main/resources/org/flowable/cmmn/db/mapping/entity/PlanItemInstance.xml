@@ -5,13 +5,14 @@
 <mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl">
 
     <insert id="insertPlanItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl">
-        insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, ELEMENT_ID_, NAME_, STATE_, START_TIME_, START_USER_ID_, TENANT_ID_)
+        insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, NAME_, STATE_, START_TIME_, START_USER_ID_, TENANT_ID_)
         values (
             #{id ,jdbcType=VARCHAR},
             1,
             #{caseDefinitionId ,jdbcType=VARCHAR},
             #{caseInstanceId ,jdbcType=VARCHAR},
             #{stageInstanceId ,jdbcType=VARCHAR},
+            #{isStage, jdbcType=BOOLEAN},
             #{elementId ,jdbcType=VARCHAR},
             #{name ,jdbcType=VARCHAR},
             #{state ,jdbcType=VARCHAR},
@@ -22,7 +23,7 @@
     </insert>
 	
   <insert id="bulkInsertPlanItemInstance" parameterType="java.util.List">
-    insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, ELEMENT_ID_, NAME_, STATE_, START_TIME_, START_USER_ID_, TENANT_ID_) 
+    insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, NAME_, STATE_, START_TIME_, START_USER_ID_, TENANT_ID_) 
     values 
       <foreach collection="list" item="planItemInstance" index="index" separator=",">
         (
@@ -31,6 +32,7 @@
             #{planItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
             #{planItemInstance.caseInstanceId ,jdbcType=VARCHAR},
             #{planItemInstance.stageInstanceId ,jdbcType=VARCHAR},
+            #{planItemInstance.isStage, jdbcType=BOOLEAN},
             #{planItemInstance.elementId ,jdbcType=VARCHAR},
             #{planItemInstance.name ,jdbcType=VARCHAR},
             #{planItemInstance.state ,jdbcType=VARCHAR},
@@ -44,13 +46,14 @@
     <insert id="bulkInsertPlanItemInstance" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
         <foreach collection="list" item="planItemInstance" index="index">
-            into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, ELEMENT_ID_, NAME_, STATE_, START_TIME_, START_USER_ID_, TENANT_ID_) VALUES
+            into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, NAME_, STATE_, START_TIME_, START_USER_ID_, TENANT_ID_) VALUES
             (
                 #{planItemInstance.id ,jdbcType=VARCHAR},
                 1,
                 #{planItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
                 #{planItemInstance.caseInstanceId ,jdbcType=VARCHAR},
                 #{planItemInstance.stageInstanceId ,jdbcType=VARCHAR},
+                #{planItemInstance.elementId ,jdbcType=VARCHAR},
                 #{planItemInstance.elementId ,jdbcType=VARCHAR},
                 #{planItemInstance.name ,jdbcType=VARCHAR},
                 #{planItemInstance.state ,jdbcType=VARCHAR},
@@ -68,6 +71,7 @@
         CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
         CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR},
         STAGE_INST_ID_ = #{stageInstanceId, jdbcType=VARCHAR},
+        IS_STAGE_ = #{isStage, jdbcType=BOOLEAN},
         ELEMENT_ID_ = #{elementId, jdbcType=VARCHAR},
         NAME_ = #{name, jdbcType=VARCHAR},
         STATE_ = #{state, jdbcType=VARCHAR},
@@ -91,6 +95,7 @@
     <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
     <result property="caseInstanceId" column="CASE_INST_ID_" jdbcType="VARCHAR" />
     <result property="stageInstanceId" column="STAGE_INST_ID_" jdbcType="VARCHAR" />
+    <result property="isStage" column="IS_STAGE_" jdbcType="BOOLEAN" />
     <result property="elementId" column="ELEMENT_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="state" column="STATE_" jdbcType="VARCHAR" />
@@ -135,6 +140,9 @@
         </if>
         <if test="stageInstanceId != null">
             and RES.STAGE_INST_ID_ = #{stageInstanceId}
+        </if>
+        <if test="!includeStagePlanItemInstances">
+           and RES.IS_STAGE_ = #{includeStagePlanItemInstances, jdbcType=BOOLEAN}
         </if>
         <if test="elementId != null">
             and RES.ELEMENT_ID_ = #{elementId}

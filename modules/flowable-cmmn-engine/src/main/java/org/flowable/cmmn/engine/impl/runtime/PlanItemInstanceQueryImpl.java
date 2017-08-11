@@ -39,6 +39,7 @@ public class PlanItemInstanceQueryImpl extends AbstractQuery<PlanItemInstanceQue
     protected String startUserId;
     protected String tenantId;
     protected boolean withoutTenantId;
+    protected boolean includeStagePlanItemInstances;
     
     public PlanItemInstanceQueryImpl() {
         
@@ -147,6 +148,12 @@ public class PlanItemInstanceQueryImpl extends AbstractQuery<PlanItemInstanceQue
         this.withoutTenantId = true;
         return this;
     }
+    
+    @Override
+    public PlanItemInstanceQuery includeStagePlanItemInstances() {
+        this.includeStagePlanItemInstances = true;
+        return this;
+    }
 
     @Override
     public long executeCount(CommandContext commandContext) {
@@ -212,6 +219,10 @@ public class PlanItemInstanceQueryImpl extends AbstractQuery<PlanItemInstanceQue
 
     public boolean isWithoutTenantId() {
         return withoutTenantId;
+    }
+
+    public boolean isIncludeStagePlanItemInstances() {
+        return includeStagePlanItemInstances;
     }
     
 }

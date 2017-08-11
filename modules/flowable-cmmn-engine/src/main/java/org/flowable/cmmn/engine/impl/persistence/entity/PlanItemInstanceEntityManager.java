@@ -28,6 +28,8 @@ public interface PlanItemInstanceEntityManager extends EntityManager<PlanItemIns
     PlanItemInstanceEntity findPlanModelPlanItemInstanceForCaseInstance(String caseInstanceId);
     
     void deleteByCaseDefinitionId(String caseDefinitionId);
+    
+    void deleteCascade(PlanItemInstanceEntity planItemInstanceEntity);
 
     PlanItemInstanceQuery createPlanItemInstanceQuery();
     
