@@ -13,6 +13,7 @@
 package org.flowable.engine.common.impl.event;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 
@@ -21,7 +22,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEvent;
  * 
  * @author Frederik Heremans
  */
-public class FlowableEventImpl implements FlowableEvent {
+public class FlowableEventImpl implements FlowableEngineEvent {
 
     protected FlowableEngineEventType type;
     protected String executionId;

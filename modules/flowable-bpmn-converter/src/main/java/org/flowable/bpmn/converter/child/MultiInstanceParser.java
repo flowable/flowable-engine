@@ -12,12 +12,16 @@
  */
 package org.flowable.bpmn.converter.child;
 
+import java.util.List;
+import java.util.Map;
+
 import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 
 /**
@@ -65,8 +69,20 @@ public class MultiInstanceParser extends BaseChildElementParser {
                 	while (xtr.hasNext() && !(xtr.isEndElement() && ELEMENT_EXTENSIONS.equalsIgnoreCase(xtr.getLocalName()))) {
                 		xtr.next();
                 		if (xtr.isStartElement()) {
+                			ExtensionElement extensionElement = BpmnXMLUtil.parseExtensionElement(xtr);
                 			// advance to next child within extension elements
-                			multiInstanceDef.addExtensionElement(BpmnXMLUtil.parseExtensionElement(xtr));
+                			multiInstanceDef.addExtensionElement(extensionElement);
+                			// collection is specified as a string value
+                            if (ELEMENT_MULTIINSTANCE_COLLECTION.equalsIgnoreCase(extensionElement.getName())) {
+                            	Map<String, List<ExtensionElement>> childElement = extensionElement.getChildElements();
+                            	if (childElement.containsKey(ELEMENT_MULTIINSTANCE_COLLECTION_STRING)) {
+                            		// it is a string value
+                                    multiInstanceDef.setCollectionString((childElement.get(ELEMENT_MULTIINSTANCE_COLLECTION_STRING).get(0)).getElementText());
+                            	} else if (childElement.containsKey(ELEMENT_MULTIINSTANCE_COLLECTION_EXPRESSION)) {
+                            		// it is an expression
+                                    multiInstanceDef.setInputDataItem((childElement.get(ELEMENT_MULTIINSTANCE_COLLECTION_EXPRESSION).get(0)).getElementText());
+                            	}
+                            }
                 		}
                 	}
                 } else if (xtr.isEndElement() && getElementName().equalsIgnoreCase(xtr.getLocalName())) {

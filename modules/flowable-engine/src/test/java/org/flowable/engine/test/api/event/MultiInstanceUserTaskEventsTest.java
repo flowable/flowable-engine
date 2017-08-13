@@ -65,6 +65,27 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("multiInstanceUserTaskEvents");
         assertNotNull(processInstance);
 
+        Execution task1Execution = runtimeService.createExecutionQuery().activityId("task1").singleResult();
+        Execution boundaryExecution = runtimeService.createExecutionQuery().activityId("cancelBoundaryEvent1").singleResult();
+        List<Execution> multiExecutions = runtimeService.createExecutionQuery().activityId("task2").list();
+        assertEquals(2, multiExecutions.size());
+        String multiExecutionId1 = multiExecutions.get(0).getId();
+        String multiExecutionId2 = multiExecutions.get(1).getId();
+        String rootMultiExecutionId = null;
+
+        List<Execution> executions = runtimeService.createExecutionQuery().parentId(processInstance.getId()).list();
+        for (Execution execution: executions)
+        {
+            if (((ExecutionEntity)execution).isMultiInstanceRoot()) {
+                rootMultiExecutionId = execution.getId();
+                break;
+            }
+        }
+        assertNotNull(rootMultiExecutionId);
+        assertNotSame(rootMultiExecutionId, multiExecutionId1);
+        assertNotSame(rootMultiExecutionId, multiExecutionId2);
+        assertNotSame(rootMultiExecutionId, boundaryExecution);
+
         int idx = 0;
         FlowableEvent flowableEvent = testListener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.PROCESS_STARTED, flowableEvent.getType());
@@ -82,6 +103,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
         assertEquals("task1", activityEvent.getActivityId());
+        assertEquals(task1Execution.getId(), activityEvent.getExecutionId());
 
         FlowableEntityEvent entityEvent = (FlowableEntityEvent) testListener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.TASK_CREATED, entityEvent.getType());
@@ -91,6 +113,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
         assertEquals("task2", activityEvent.getActivityId());
+        assertEquals(rootMultiExecutionId, activityEvent.getExecutionId());
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
@@ -132,13 +155,19 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
         assertEquals("task1", activityEvent.getActivityId());
+        assertEquals(task1Execution.getId(), activityEvent.getExecutionId());
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
         assertEquals("endEvent", activityEvent.getActivityType());
         assertEquals("endEvent1", activityEvent.getActivityId());
 
-        // cancelled event for one of the multi-instance user task instances
+        boolean foundMultiExec1 = false;
+        boolean foundMultiExec2 = false;
+        boolean foundRootExec = false;
+        boolean foundBoundaryExec = false;
+
+        // cancelled event for multi-instance user task instances and boundary event
         for (int i = 0; i < 4; i++) {
             activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
             assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
@@ -148,13 +177,29 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
                 assertEquals("task2", cancelledEvent.getActivityId());
                 assertEquals("userTask", cancelledEvent.getActivityType());
                 assertEquals("Multi User Task-${loopCounter}", cancelledEvent.getActivityName());
-
+                String eventExecutionId = activityEvent.getExecutionId();
+                if (multiExecutionId1.equals(eventExecutionId)) {
+                    foundMultiExec1 = true;
+                }
+                else if (multiExecutionId2.equals(eventExecutionId)) {
+                    foundMultiExec2 = true;
+                }
+                else if (rootMultiExecutionId.equals(eventExecutionId)) {
+                    foundRootExec = true;
+                }
             } else if ("cancelBoundaryEvent1".equals(cancelledEvent.getActivityId())) {
                 assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
                 cancelledEvent = (FlowableActivityCancelledEvent) activityEvent;
                 assertEquals("cancelBoundaryEvent1", cancelledEvent.getActivityId());
+                assertEquals(boundaryExecution.getId(), activityEvent.getExecutionId());
+                foundBoundaryExec = true;
             }
         }
+
+        assert(foundMultiExec1);
+        assert(foundMultiExec2);
+        assert(foundRootExec);
+        assert(foundBoundaryExec);
 
         entityEvent = (FlowableEntityEvent) testListener.getEventsReceived().get(idx++);
 
@@ -172,6 +217,27 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
     public void testMultiInstanceCancelledByMessageBoundaryEvent() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("multiInstanceUserTaskEvents");
         assertNotNull(processInstance);
+
+        Execution task1Execution = runtimeService.createExecutionQuery().activityId("task1").singleResult();
+        Execution boundaryExecution = runtimeService.createExecutionQuery().activityId("cancelBoundaryEvent1").singleResult();
+        List<Execution> multiExecutions = runtimeService.createExecutionQuery().activityId("task2").list();
+        assertEquals(2, multiExecutions.size());
+        String multiExecutionId1 = multiExecutions.get(0).getId();
+        String multiExecutionId2 = multiExecutions.get(1).getId();
+        String rootMultiExecutionId = null;
+
+        List<Execution> executions = runtimeService.createExecutionQuery().parentId(processInstance.getId()).list();
+        for (Execution execution: executions)
+        {
+            if (((ExecutionEntity)execution).isMultiInstanceRoot()) {
+                rootMultiExecutionId = execution.getId();
+                break;
+            }
+        }
+        assertNotNull(rootMultiExecutionId);
+        assertNotSame(rootMultiExecutionId, multiExecutionId1);
+        assertNotSame(rootMultiExecutionId, multiExecutionId2);
+        assertNotSame(rootMultiExecutionId, boundaryExecution);
 
         int idx = 0;
         FlowableEvent flowableEvent = testListener.getEventsReceived().get(idx++);
@@ -226,6 +292,9 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         // cancel the multi-instance user task
         runtimeService.messageEventReceived("cancel", cancelMessageExecution.getId());
 
+        boolean foundMultiExec1 = false;
+        boolean foundMultiExec2 = false;
+
         // cancelled event for one of the multi-instance user task instances
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
@@ -233,20 +302,43 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         assertEquals("task2", cancelledEvent.getActivityId());
         assertEquals("userTask", cancelledEvent.getActivityType());
         assertEquals("Multi User Task-${loopCounter}", cancelledEvent.getActivityName());
+        if (multiExecutionId2.equals(activityEvent.getExecutionId())) {
+            foundMultiExec2 = true;            
+        }
+        else if (multiExecutionId1.equals(activityEvent.getExecutionId())) {
+            foundMultiExec1 = true;            
+        }
+        else {
+            fail("Unexpected execution id " + activityEvent.getExecutionId());
+        }       
 
         // cancelled event for one of the multi-instance user task instances
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
         assertEquals("task2", activityEvent.getActivityId());
+        if (multiExecutionId2.equals(activityEvent.getExecutionId())) {
+            foundMultiExec2 = true;            
+        }
+        else if (multiExecutionId1.equals(activityEvent.getExecutionId())) {
+            foundMultiExec1 = true;            
+        }
+        else {
+            fail("Unexpected execution id " + activityEvent.getExecutionId());
+        }
+
+        assertTrue(foundMultiExec1);
+        assertTrue(foundMultiExec2);
 
         // cancelled event for the root of the multi-instance user task
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
         assertEquals("task2", activityEvent.getActivityId());
+        assertEquals(rootMultiExecutionId, activityEvent.getExecutionId());
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
         assertEquals("cancelBoundaryEvent1", activityEvent.getActivityId());
+        assertEquals(boundaryExecution.getId(), activityEvent.getExecutionId());
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
@@ -255,6 +347,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
         assertEquals("task1", activityEvent.getActivityId());
+        assertEquals(task1Execution.getId(), activityEvent.getExecutionId());
 
         entityEvent = (FlowableEntityEvent) testListener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT, entityEvent.getType());

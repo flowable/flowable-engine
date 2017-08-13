@@ -409,11 +409,6 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertNotNull(task);
         assertEquals("User Task1 in Parent", task.getName());
 
-        // PROBLEM:
-        // Test failure because variables are not copied back when external subprocess
-        // is defined with a terminateEnd event. We are expecting the variable to be
-        // copied in this scenario.
-
         // validate that the variable was copied back when Call Activity finished
         assertEquals("Mary Smith", runtimeService.getVariable(processInstance.getId(), "Name"));
 

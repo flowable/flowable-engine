@@ -120,7 +120,6 @@ public class CancelCallActivityTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.ENTITY_CREATED, entityEvent.getType());
         executionEntity = (ExecutionEntity) entityEvent.getEntity();
         assertEquals("cancelBoundaryEvent", executionEntity.getActivityId());
-        String boundaryExecutionId = executionEntity.getId();
 
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(6);
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
@@ -168,6 +167,7 @@ public class CancelCallActivityTest extends PluggableFlowableTestCase {
         FlowableActivityCancelledEvent taskCancelledEvent = (FlowableActivityCancelledEvent) mylistener.getEventsReceived().get(14);
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, taskCancelledEvent.getType());
         assertEquals(taskEntity.getName(), taskCancelledEvent.getActivityName());
+        assertEquals("userTask", taskCancelledEvent.getActivityType());
 
         FlowableCancelledEvent processCancelledEvent = (FlowableCancelledEvent) mylistener.getEventsReceived().get(15);
         assertEquals(FlowableEngineEventType.PROCESS_CANCELLED, processCancelledEvent.getType());
@@ -181,6 +181,7 @@ public class CancelCallActivityTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
         assertEquals("boundaryEvent", activityEvent.getActivityType());
         assertEquals("cancelBoundaryEvent", activityEvent.getActivityId());
+        assertEquals(executionWithMessage.getId(), activityEvent.getExecutionId());
 
         // task in the main definition
         activityEvent = (FlowableActivityEvent) mylistener.getEventsReceived().get(18);
@@ -202,7 +203,6 @@ public class CancelCallActivityTest extends PluggableFlowableTestCase {
 
         public CallActivityEventListener() {
             eventsReceived = new ArrayList<>();
-
         }
 
         public List<FlowableEvent> getEventsReceived() {
