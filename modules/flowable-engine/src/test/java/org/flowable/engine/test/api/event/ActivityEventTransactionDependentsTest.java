@@ -37,7 +37,6 @@ public class ActivityEventTransactionDependentsTest extends PluggableFlowableTes
 
     protected EventLogger databaseEventLogger;
     private StandardFlowableEventListener listener;
-    //    private TransactionFlowableEventListener committingTransactionDependentListener;
     private TransactionFlowableEventListener committedTransactionDependentListener;
 
     @Override
@@ -55,7 +54,7 @@ public class ActivityEventTransactionDependentsTest extends PluggableFlowableTes
         if (listener != null) {
             listener.clearEventsReceived();
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
-            processEngineConfiguration.getEventDispatcher().removeEventListener(committedTransactionDependentListener);
+            processEngineConfiguration.getTransactionDependentEventDispatcher().removeEventListener(committedTransactionDependentListener);
         }
 
         // Remove entries
@@ -74,11 +73,9 @@ public class ActivityEventTransactionDependentsTest extends PluggableFlowableTes
         super.initializeServices();
 
         listener = new StandardFlowableEventListener();
-//        committingTransactionDependentListener = new TransactionFlowableEventListener(TransactionState.COMMITTING.name());
         committedTransactionDependentListener = new TransactionFlowableEventListener(TransactionState.COMMITTED.name());
         processEngineConfiguration.getEventDispatcher().addEventListener(listener);
-//        processEngineConfiguration.getEventDispatcher().addEventListener(committingTransactionDependentListener);
-        processEngineConfiguration.getEventDispatcher().addEventListener(committedTransactionDependentListener);
+        processEngineConfiguration.getTransactionDependentEventDispatcher().addEventListener(committedTransactionDependentListener);
     }
 
     /**

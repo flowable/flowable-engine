@@ -156,6 +156,7 @@ public abstract class AbstractEngineConfiguration {
     protected Map<String, List<FlowableEventListener>> typedEventListeners;
     protected List<EventDispatchAction> additionalEventDispatchActions;
 
+    protected boolean enableTransactionEventDispatcher = true;
     protected TransactionDependentFlowableEventDispatcher transactionDependentEventDispatcher;
     protected List<TransactionDependentFlowableEventListener> transactionDependentEventListeners;
     protected Map<String, List<TransactionDependentFlowableEventListener>> transactionDependentTypedEventListeners;
@@ -1005,6 +1006,15 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setEnableEventDispatcher(boolean enableEventDispatcher) {
         this.enableEventDispatcher = enableEventDispatcher;
+        return this;
+    }
+
+    public boolean isEnableTransactionEventDispatcher() {
+        return enableTransactionEventDispatcher;
+    }
+
+    public AbstractEngineConfiguration setEnableTransactionEventDispatcher(boolean enableTransactionEventDispatcher) {
+        this.enableTransactionEventDispatcher = enableTransactionEventDispatcher;
         return this;
     }
 

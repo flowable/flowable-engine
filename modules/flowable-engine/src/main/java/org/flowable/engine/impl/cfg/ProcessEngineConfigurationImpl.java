@@ -2074,7 +2074,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initEventDispatcher() {
         if (this.eventDispatcher == null) {
             this.eventDispatcher = new FlowableEventDispatcherImpl();
-            ((FlowableEventDispatcherImpl) eventDispatcher).setTransactionFlowableEventDispatcher(transactionDependentEventDispatcher);
         }
         
         if (this.additionalEventDispatchActions == null) {
@@ -2109,7 +2108,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             this.transactionDependentFactory = new DefaultTransactionDependentEventListenerFactory();
         }
 
-        this.transactionDependentEventDispatcher.setEnabled(enableEventDispatcher);
+        this.transactionDependentEventDispatcher.setEnabled(enableTransactionEventDispatcher);
 
         if (transactionDependentEventListeners != null) {
             for (TransactionDependentFlowableEventListener listenerToAdd : transactionDependentEventListeners) {
