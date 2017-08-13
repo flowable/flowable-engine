@@ -24,10 +24,12 @@ import org.flowable.variable.service.impl.types.ValueFields;
 public interface VariableInstance extends ValueFields, Entity, HasRevision {
 
     void setName(String name);
+    
+    void setExecutionId(String executionId);
 
     void setProcessInstanceId(String processInstanceId);
-
-    void setExecutionId(String executionId);
+    
+    void setProcessDefinitionId(String processDefinitionId);
 
     Object getValue();
 
@@ -36,13 +38,15 @@ public interface VariableInstance extends ValueFields, Entity, HasRevision {
     String getTypeName();
 
     void setTypeName(String typeName);
+    
+    String getExecutionId();
 
     String getProcessInstanceId();
+    
+    String getProcessDefinitionId();
 
     String getTaskId();
 
     void setTaskId(String taskId);
-
-    String getExecutionId();
 
 }

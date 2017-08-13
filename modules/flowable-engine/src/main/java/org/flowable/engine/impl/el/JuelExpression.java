@@ -20,11 +20,11 @@ import org.flowable.engine.common.impl.javax.el.MethodNotFoundException;
 import org.flowable.engine.common.impl.javax.el.PropertyNotFoundException;
 import org.flowable.engine.common.impl.javax.el.ValueExpression;
 import org.flowable.engine.delegate.Expression;
-import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.delegate.invocation.ExpressionGetInvocation;
 import org.flowable.engine.impl.delegate.invocation.ExpressionSetInvocation;
 import org.flowable.engine.impl.interceptor.DelegateInterceptor;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.variable.service.delegate.VariableScope;
 
 /**
  * Expression implementation backed by a JUEL {@link ValueExpression}.

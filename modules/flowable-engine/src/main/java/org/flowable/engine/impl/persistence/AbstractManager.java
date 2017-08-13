@@ -32,14 +32,12 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.JobEntityManager;
 import org.flowable.engine.impl.persistence.entity.ModelEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManager;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManager;
 import org.flowable.engine.impl.persistence.entity.SuspendedJobEntityManager;
-import org.flowable.engine.impl.persistence.entity.TaskEntityManager;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntityManager;
 
 /**
@@ -122,10 +120,6 @@ public abstract class AbstractManager {
         return getProcessEngineConfiguration().getExecutionEntityManager();
     }
 
-    protected TaskEntityManager getTaskEntityManager() {
-        return getProcessEngineConfiguration().getTaskEntityManager();
-    }
-
     protected EventSubscriptionEntityManager getEventSubscriptionEntityManager() {
         return getProcessEngineConfiguration().getEventSubscriptionEntityManager();
     }
@@ -156,10 +150,6 @@ public abstract class AbstractManager {
 
     protected HistoricActivityInstanceEntityManager getHistoricActivityInstanceEntityManager() {
         return getProcessEngineConfiguration().getHistoricActivityInstanceEntityManager();
-    }
-
-    protected HistoricTaskInstanceEntityManager getHistoricTaskInstanceEntityManager() {
-        return getProcessEngineConfiguration().getHistoricTaskInstanceEntityManager();
     }
 
     protected AttachmentEntityManager getAttachmentEntityManager() {

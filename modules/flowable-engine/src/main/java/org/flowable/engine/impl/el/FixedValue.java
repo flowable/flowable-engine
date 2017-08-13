@@ -15,7 +15,7 @@ package org.flowable.engine.impl.el;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.delegate.Expression;
-import org.flowable.engine.delegate.VariableScope;
+import org.flowable.variable.service.delegate.VariableScope;
 
 /**
  * Expression that always returns the same value when <code>getValue</code> is called. Setting of the value is not supported.

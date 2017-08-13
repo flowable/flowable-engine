@@ -21,9 +21,9 @@ import org.flowable.engine.common.impl.javax.el.CompositeELResolver;
 import org.flowable.engine.common.impl.javax.el.ELContext;
 import org.flowable.engine.common.impl.javax.el.ELResolver;
 import org.flowable.engine.common.impl.javax.el.PropertyNotWritableException;
-import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.el.DefaultExpressionManager;
 import org.flowable.engine.impl.interceptor.DelegateInterceptor;
+import org.flowable.variable.service.delegate.VariableScope;
 
 /**
  * {@link org.flowable.engine.impl.el.DefaultExpressionManager} that exposes the simulation event in expressions

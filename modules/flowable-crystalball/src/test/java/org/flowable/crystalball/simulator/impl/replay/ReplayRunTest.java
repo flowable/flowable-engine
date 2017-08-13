@@ -1,5 +1,14 @@
 package org.flowable.crystalball.simulator.impl.replay;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 import org.flowable.crystalball.simulator.ReplaySimulationRun;
 import org.flowable.crystalball.simulator.SimulationDebugger;
 import org.flowable.crystalball.simulator.SimulationEvent;
@@ -23,17 +32,8 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.el.NoExecutionVariableScope;
 import org.flowable.engine.parse.BpmnParseHandler;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
+import org.flowable.task.service.Task;
 import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
-import static org.junit.Assert.assertEquals;
 
 /**
  * @author martin.grofcik

@@ -130,6 +130,9 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
     }
+    
+    public void setProcessDefinitionId(String processDefinitionId) {
+    }
 
     public void setExecutionId(String executionId) {
         this.executionId = executionId;
@@ -206,6 +209,10 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
 
     public String getProcessInstanceId() {
         return processInstanceId;
+    }
+    
+    public String getProcessDefinitionId() {
+        return null;
     }
 
     public String getTaskId() {

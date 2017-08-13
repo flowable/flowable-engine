@@ -39,13 +39,12 @@ import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.task.IdentityLinkType;
 import org.activiti.engine.task.Task;
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.model.FlowableListener;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.task.DelegationState;
 import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.task.service.DelegationState;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * @author Tom Baeyens
@@ -898,11 +897,6 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
 
     public void setEventName(String eventName) {
         this.eventName = eventName;
-    }
-
-    @Override
-    public FlowableListener getCurrentFlowableListener() {
-        throw new UnsupportedOperationException();
     }
 
     public void setExecutionId(String executionId) {

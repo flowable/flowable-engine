@@ -15,21 +15,20 @@ package org.flowable.engine.test.api.event;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
 import org.flowable.engine.delegate.event.FlowableCancelledEvent;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
 
@@ -111,10 +110,10 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         taskEntity = (TaskEntity) entityEvent.getEntity();
         assertEquals("Multi User Task-1", taskEntity.getName());
 
-        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(3, tasks.size());
-        Task userTask1 = null;
-        for (Task task : tasks) {
+        org.flowable.task.service.Task userTask1 = null;
+        for (org.flowable.task.service.Task task : tasks) {
             if ("User Task1".equals(task.getName())) {
                 userTask1 = task;
                 break;
@@ -498,9 +497,9 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         testListener.getEventsReceived().clear();
         idx = 0;
 
-        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(1, tasks.size());
-        Task userTask1 = tasks.get(0);
+        org.flowable.task.service.Task userTask1 = tasks.get(0);
         assertEquals("User Task1 in Parent", userTask1.getName());
 
         // complete task1 in parent so we flow to terminate end
@@ -645,10 +644,10 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         testListener.getEventsReceived().clear();
         idx = 0;
 
-        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(3, tasks.size());
-        Task userTask1 = null;
-        for (Task t : tasks) {
+        org.flowable.task.service.Task userTask1 = null;
+        for (org.flowable.task.service.Task t : tasks) {
             if ("User Task1 in Parent".equals(t.getName())) {
                 userTask1 = t;
                 break;

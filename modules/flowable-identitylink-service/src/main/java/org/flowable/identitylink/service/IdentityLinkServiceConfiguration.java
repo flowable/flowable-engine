@@ -15,7 +15,6 @@ package org.flowable.identitylink.service;
 import org.flowable.engine.common.AbstractServiceConfiguration;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.identitylink.service.impl.HistoricIdentityLinkServiceImpl;
-import org.flowable.identitylink.service.impl.ServiceImpl;
 import org.flowable.identitylink.service.impl.IdentityLinkServiceImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManagerImpl;
@@ -61,7 +60,6 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
     // /////////////////////////////////////////////////////////////////////
 
     public void init() {
-        initServices();
         initDataManagers();
         initEntityManagers();
     }
@@ -79,20 +77,6 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
             LOGGER.debug("Current history level: {}", historyLevel);
         }
         return historyLevel != HistoryLevel.NONE;
-    }
-
-    // services
-    // /////////////////////////////////////////////////////////////////
-
-    protected void initServices() {
-        initService(identityLinkService);
-        initService(historicIdentityLinkService);
-    }
-
-    protected void initService(Object service) {
-        if (service instanceof ServiceImpl) {
-            ((ServiceImpl) service).setCommandExecutor(commandExecutor);
-        }
     }
 
     // Data managers

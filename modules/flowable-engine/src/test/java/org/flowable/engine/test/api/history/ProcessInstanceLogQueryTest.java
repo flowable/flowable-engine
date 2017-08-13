@@ -19,13 +19,12 @@ import java.util.Map;
 import org.flowable.engine.common.impl.history.HistoricData;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
-import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.task.Comment;
-import org.flowable.engine.task.Task;
+import org.flowable.task.service.history.HistoricTaskInstance;
 import org.flowable.variable.service.history.HistoricVariableInstance;
 
 /**
@@ -57,7 +56,7 @@ public class ProcessInstanceLogQueryTest extends PluggableFlowableTestCase {
         runtimeService.setVariable(processInstanceId, "var1", "new Value");
 
         // Finish tasks
-        for (Task task : taskService.createTaskQuery().list()) {
+        for (org.flowable.task.service.Task task : taskService.createTaskQuery().list()) {
             taskService.complete(task.getId());
         }
         

@@ -16,12 +16,11 @@ import java.util.List;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.api.event.StaticTestFlowableEventListener;
 import org.flowable.engine.test.api.event.TestFlowableEventListener;
@@ -47,7 +46,7 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testEventListeners");
         assertNotNull(testListenerBean);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         // Check if the listener (defined as bean) received events (only creation, not other events)
@@ -128,7 +127,7 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
     public void testProcessDefinitionListenerDefinitionEntities() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testEventListeners");
         assertNotNull(processInstance);
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         // Attachment entity

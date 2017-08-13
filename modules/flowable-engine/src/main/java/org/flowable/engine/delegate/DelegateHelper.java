@@ -210,23 +210,6 @@ public class DelegateHelper {
         }
     }
 
-    /**
-     * Similar to {@link #getFieldExpression(DelegateExecution, String)}, but for use within a {@link TaskListener}.
-     */
-    public static Expression getFieldExpression(DelegateTask task, String fieldName) {
-        if (task.getCurrentFlowableListener() != null) {
-            List<FieldExtension> fieldExtensions = task.getCurrentFlowableListener().getFieldExtensions();
-            if (fieldExtensions != null && fieldExtensions.size() > 0) {
-                for (FieldExtension fieldExtension : fieldExtensions) {
-                    if (fieldName.equals(fieldExtension.getFieldName())) {
-                        return createExpressionForField(fieldExtension);
-                    }
-                }
-            }
-        }
-        return null;
-    }
-
     public static Expression getFlowElementFieldExpression(DelegateExecution execution, String fieldName) {
         FieldExtension fieldExtension = getFlowElementField(execution, fieldName);
         if (fieldExtension != null) {

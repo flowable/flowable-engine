@@ -34,7 +34,7 @@ import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.impl.context.ExecutionContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.task.Task;
+import org.flowable.task.service.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

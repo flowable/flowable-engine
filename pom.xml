@@ -393,6 +393,11 @@
 				<artifactId>flowable-identitylink-service</artifactId>
 				<version>${project.version}</version>
 			</dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-task-service</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 			<dependency>
 				<groupId>org.flowable</groupId>
 				<artifactId>flowable-camel</artifactId>
@@ -873,6 +878,7 @@
 		<module>modules/flowable-content-api</module>
 		<module>modules/flowable-variable-service</module>
 		<module>modules/flowable-identitylink-service</module>
+        <module>modules/flowable-task-service</module>
 		<module>modules/flowable-engine</module>
 	</modules>
 

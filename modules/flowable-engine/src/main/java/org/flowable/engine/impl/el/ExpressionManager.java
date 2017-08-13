@@ -18,7 +18,7 @@ import java.util.Map;
 import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.common.impl.javax.el.ELContext;
 import org.flowable.engine.delegate.Expression;
-import org.flowable.engine.delegate.VariableScope;
+import org.flowable.variable.service.delegate.VariableScope;
 
 /**
  * Used as an entry point for runtime evaluation of the expressions.

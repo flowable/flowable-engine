@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.IdentityLinkType;
-import org.flowable.identitylink.service.event.FlowableIdentityLinkServiceEventType;
-import org.flowable.identitylink.service.event.impl.FlowableEventBuilder;
+import org.flowable.identitylink.service.event.impl.FlowableIdentityLinkEventBuilder;
 import org.flowable.identitylink.service.impl.persistence.entity.data.IdentityLinkDataManager;
 
 /**
@@ -48,7 +48,7 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
         delete(identityLink, false);
         
         if (getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableIdentityLinkServiceEventType.ENTITY_DELETED, identityLink));
+            getEventDispatcher().dispatchEvent(FlowableIdentityLinkEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, identityLink));
         }
     }
 

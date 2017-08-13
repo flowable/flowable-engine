@@ -44,7 +44,6 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntityManager;
 import org.flowable.engine.impl.persistence.entity.JobEntityManager;
 import org.flowable.engine.impl.persistence.entity.ModelEntityManager;
@@ -54,7 +53,6 @@ import org.flowable.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManager;
 import org.flowable.engine.impl.persistence.entity.SuspendedJobEntityManager;
 import org.flowable.engine.impl.persistence.entity.TableDataManager;
-import org.flowable.engine.impl.persistence.entity.TaskEntityManager;
 import org.flowable.engine.impl.persistence.entity.TimerJobEntityManager;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
@@ -66,6 +64,9 @@ import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntityManager;
+import org.flowable.task.service.HistoricTaskService;
+import org.flowable.task.service.TaskService;
+import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.variable.service.HistoricVariableService;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
@@ -141,6 +142,35 @@ public class CommandContextUtil {
         }
         
         return historicIdentityLinkService;
+    }
+    
+    // TASK SERVICE
+    public static TaskServiceConfiguration getTaskServiceConfiguration() {
+        return getTaskServiceConfiguration(getCommandContext());
+    }
+    
+    public static TaskServiceConfiguration getTaskServiceConfiguration(CommandContext commandContext) {
+        return (TaskServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
+    }
+    
+    public static TaskService getTaskService() {
+        TaskService taskService = null;
+        TaskServiceConfiguration taskServiceConfiguration = getTaskServiceConfiguration();
+        if (taskServiceConfiguration != null) {
+            taskService = taskServiceConfiguration.getTaskService();
+        }
+        
+        return taskService;
+    }
+    
+    public static HistoricTaskService getHistoricTaskService() {
+        HistoricTaskService historicTaskService = null;
+        TaskServiceConfiguration taskServiceConfiguration = getTaskServiceConfiguration();
+        if (taskServiceConfiguration != null) {
+            historicTaskService = taskServiceConfiguration.getHistoricTaskService();
+        }
+        
+        return historicTaskService;
     }
     
     // IDM ENGINE
@@ -379,14 +409,6 @@ public class CommandContextUtil {
         return getProcessEngineConfiguration(commandContext).getExecutionEntityManager();
     }
     
-    public static TaskEntityManager getTaskEntityManager() {
-        return getTaskEntityManager(getCommandContext());
-    }
-    
-    public static TaskEntityManager getTaskEntityManager(CommandContext commandContext) {
-        return getProcessEngineConfiguration(commandContext).getTaskEntityManager();
-    }
-    
     public static JobEntityManager getJobEntityManager() {
         return getJobEntityManager(getCommandContext());
     }
@@ -469,14 +491,6 @@ public class CommandContextUtil {
     
     public static HistoricProcessInstanceEntityManager getHistoricProcessInstanceEntityManager(CommandContext commandContext) {
         return getProcessEngineConfiguration(commandContext).getHistoricProcessInstanceEntityManager();
-    }
-    
-    public static HistoricTaskInstanceEntityManager getHistoricTaskInstanceEntityManager() {
-        return getHistoricTaskInstanceEntityManager(getCommandContext());
-    }
-    
-    public static HistoricTaskInstanceEntityManager getHistoricTaskInstanceEntityManager(CommandContext commandContext) {
-        return getProcessEngineConfiguration(commandContext).getHistoricTaskInstanceEntityManager();
     }
     
     public static HistoricActivityInstanceEntityManager getHistoricActivityInstanceEntityManager() {

@@ -14,7 +14,7 @@ package org.flowable.engine.impl.form;
 
 import org.flowable.engine.common.impl.javax.el.ValueExpression;
 import org.flowable.engine.common.impl.javax.el.VariableMapper;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Tom Baeyens

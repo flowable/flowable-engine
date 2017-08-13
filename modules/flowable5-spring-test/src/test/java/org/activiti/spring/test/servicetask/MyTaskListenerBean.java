@@ -13,8 +13,8 @@
 package org.activiti.spring.test.servicetask;
 
 import org.activiti.engine.impl.el.FixedValue;
-import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * @author Joram Barrez
@@ -25,9 +25,9 @@ public class MyTaskListenerBean implements TaskListener {
     private FixedValue someField;
 
     public void notify(DelegateTask delegateTask) {
-        delegateTask.getExecution().setVariable("taskListenerVar", "working");
+        delegateTask.setVariable("taskListenerVar", "working");
         if (someField != null) {
-            delegateTask.getExecution().setVariable("taskListenerField", someField.getValue(delegateTask));
+            delegateTask.setVariable("taskListenerField", someField.getValue(delegateTask));
         }
     }
 

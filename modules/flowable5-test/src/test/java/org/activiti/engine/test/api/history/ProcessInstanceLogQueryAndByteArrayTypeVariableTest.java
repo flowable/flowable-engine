@@ -22,7 +22,6 @@ import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
-import org.flowable.engine.task.Task;
 import org.flowable.variable.service.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
@@ -57,7 +56,7 @@ public class ProcessInstanceLogQueryAndByteArrayTypeVariableTest extends Pluggab
         this.processInstanceId = runtimeService.startProcessInstanceByKey("twoTasksProcess", vars).getId();
 
         // Finish tasks
-        for (Task task : taskService.createTaskQuery().list()) {
+        for (org.flowable.task.service.Task task : taskService.createTaskQuery().list()) {
             taskService.complete(task.getId());
         }
     }

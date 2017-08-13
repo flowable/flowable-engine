@@ -12,13 +12,13 @@
  */
 package org.flowable.crystalball.simulator.delegate.event.impl;
 
-import org.flowable.crystalball.simulator.SimulationEvent;
-import org.flowable.crystalball.simulator.delegate.event.Function;
-import org.flowable.engine.event.EventLogEntry;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import org.flowable.crystalball.simulator.SimulationEvent;
+import org.flowable.crystalball.simulator.delegate.event.Function;
+import org.flowable.engine.event.EventLogEntry;
 
 /**
  * This class transforms event log events into simulation events

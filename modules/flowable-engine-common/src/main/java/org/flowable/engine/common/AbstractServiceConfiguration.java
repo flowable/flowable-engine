@@ -18,34 +18,50 @@ import java.util.Map;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.impl.event.EventDispatchAction;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.runtime.Clock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers
  */
 public abstract class AbstractServiceConfiguration {
-
-    /** The tenant id indicating 'no tenant' */
-    protected CommandExecutor commandExecutor;
     
+    protected static final Logger LOGGER = LoggerFactory.getLogger(AbstractServiceConfiguration.class);
+    
+    /** The tenant id indicating 'no tenant' */
+    public static final String NO_TENANT_ID = "";
+
     protected boolean enableEventDispatcher = true;
     protected FlowableEventDispatcher eventDispatcher;
     protected List<FlowableEventListener> eventListeners;
     protected Map<String, List<FlowableEventListener>> typedEventListeners;
     protected List<EventDispatchAction> additionalEventDispatchActions;
+    
+    protected HistoryLevel historyLevel;
+    
+    protected ObjectMapper objectMapper;
 
     protected Clock clock;
+    
+    public boolean isHistoryLevelAtLeast(HistoryLevel level) {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Current history level: {}, level required: {}", historyLevel, level);
+        }
+        // Comparing enums actually compares the location of values declared in the enum
+        return historyLevel.isAtLeast(level);
+    }
 
-    public CommandExecutor getCommandExecutor() {
-        return commandExecutor;
+    public boolean isHistoryEnabled() {
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Current history level: {}", historyLevel);
+        }
+        return historyLevel != HistoryLevel.NONE;
     }
-    
-    public AbstractServiceConfiguration setCommandExecutor(CommandExecutor commandExecutor) {
-        this.commandExecutor = commandExecutor;
-        return this;
-    }
-    
+
     public boolean isEnableEventDispatcher() {
         return enableEventDispatcher;
     }
@@ -88,6 +104,24 @@ public abstract class AbstractServiceConfiguration {
 
     public AbstractServiceConfiguration setAdditionalEventDispatchActions(List<EventDispatchAction> additionalEventDispatchActions) {
         this.additionalEventDispatchActions = additionalEventDispatchActions;
+        return this;
+    }
+    
+    public HistoryLevel getHistoryLevel() {
+        return historyLevel;
+    }
+    
+    public AbstractServiceConfiguration setHistoryLevel(HistoryLevel historyLevel) {
+        this.historyLevel = historyLevel;
+        return this;
+    }
+    
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
+
+    public AbstractServiceConfiguration setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
         return this;
     }
 

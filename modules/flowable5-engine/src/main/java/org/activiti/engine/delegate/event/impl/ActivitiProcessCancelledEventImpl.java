@@ -12,8 +12,8 @@
  */
 package org.activiti.engine.delegate.event.impl;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableCancelledEvent;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
  * An {@link FlowableCancelledEvent} implementation.

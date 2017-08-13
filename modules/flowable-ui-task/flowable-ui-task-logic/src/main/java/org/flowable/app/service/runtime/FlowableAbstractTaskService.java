@@ -31,9 +31,9 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.task.TaskInfo;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
+import org.flowable.task.service.TaskInfo;
 import org.flowable.variable.service.history.HistoricVariableInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -17,8 +17,6 @@ import java.util.List;
 import org.flowable.variable.service.HistoricVariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.history.HistoricVariableInstance;
-import org.flowable.variable.service.history.HistoricVariableInstanceQuery;
-import org.flowable.variable.service.history.NativeHistoricVariableInstanceQuery;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
@@ -38,14 +36,6 @@ public class HistoricVariableServiceImpl extends ServiceImpl implements Historic
     
     public HistoricVariableInstanceEntity getHistoricVariableInstance(String id) {
         return getHistoricVariableInstanceEntityManager().findById(id);
-    }
-    
-    public HistoricVariableInstanceQuery createHistoricVariableInstanceQuery() {
-        return new HistoricVariableInstanceQueryImpl(commandExecutor);
-    }
-
-    public NativeHistoricVariableInstanceQuery createNativeHistoricVariableInstanceQuery() {
-        return new NativeHistoricVariableInstanceQueryImpl(commandExecutor);
     }
     
     public List<HistoricVariableInstance> findHistoricVariableInstancesByQueryCriteria(HistoricVariableInstanceQueryImpl query) {
