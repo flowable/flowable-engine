@@ -17,7 +17,6 @@ import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.SignalEventDefinition;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.impl.cfg.TransactionState;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
 import org.flowable.engine.delegate.event.FlowableCancelledEvent;
@@ -50,8 +49,6 @@ import java.util.List;
 public class ActivityEventsTest extends PluggableFlowableTestCase {
 
     private TestFlowableActivityEventListener listener;
-    private TestTransactionDependentFlowableEventListener committingTransactionDependentListener;
-    private TestTransactionDependentFlowableEventListener committedTransactionDependentListener;
 
     protected EventLogger databaseEventLogger;
 
@@ -88,13 +85,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         super.initializeServices();
 
         listener = new TestFlowableActivityEventListener(true);
-        committingTransactionDependentListener = new TestTransactionDependentFlowableEventListener(true);
-        committingTransactionDependentListener.setOnTransaction(TransactionState.COMMITTING.name());
-        committedTransactionDependentListener = new TestTransactionDependentFlowableEventListener(true);
-        committedTransactionDependentListener.setOnTransaction(TransactionState.COMMITTED.name());
         processEngineConfiguration.getEventDispatcher().addEventListener(listener);
-        processEngineConfiguration.getEventDispatcher().addEventListener(committingTransactionDependentListener);
-        processEngineConfiguration.getEventDispatcher().addEventListener(committedTransactionDependentListener);
     }
 
     /**
@@ -105,15 +96,11 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
     public void testActivityEvents() throws Exception {
         // We're interested in the raw events, alter the listener to keep those as well
         listener.setIgnoreRawActivityEvents(false);
-        committingTransactionDependentListener.setIgnoreRawActivityEvents(false);
-        committedTransactionDependentListener.setIgnoreRawActivityEvents(false);
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("activityProcess");
         assertNotNull(processInstance);
 
         assertEquals(3, listener.getEventsReceived().size());
-        assertEquals(3, committingTransactionDependentListener.getEventsReceived().size());
-        assertEquals(3, committedTransactionDependentListener.getEventsReceived().size());
 
         // Start-event activity started
         FlowableActivityEvent activityEvent = (FlowableActivityEvent) listener.getEventsReceived().get(0);
@@ -232,8 +219,6 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         activityEvent = (FlowableActivityEvent) listener.getEventsReceived().get(9);
         assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
         assertEquals("theEnd", activityEvent.getActivityId());
-        assertEquals(18, committingTransactionDependentListener.getEventsReceived().size());
-        assertEquals(18, committedTransactionDependentListener.getEventsReceived().size());
     }
 
     /**

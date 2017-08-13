@@ -12,19 +12,20 @@
  */
 package org.flowable.bpmn.converter.parser;
 
-import java.util.List;
-
-import javax.xml.stream.XMLStreamReader;
-
 import org.flowable.bpmn.constants.BpmnXMLConstants;
-import org.flowable.bpmn.converter.child.FlowableEventListenerParser;
 import org.flowable.bpmn.converter.child.ExecutionListenerParser;
+import org.flowable.bpmn.converter.child.FlowableEventListenerParser;
+import org.flowable.bpmn.converter.child.FlowableTransactionEventListenerParser;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SubProcess;
+
+import java.util.List;
+
+import javax.xml.stream.XMLStreamReader;
 
 /**
  * @author Tijs Rademakers
@@ -48,6 +49,8 @@ public class ExtensionElementsParser implements BpmnXMLConstants {
                     new ExecutionListenerParser().parseChildElement(xtr, parentElement, model);
                 } else if (ELEMENT_EVENT_LISTENER.equals(xtr.getLocalName())) {
                     new FlowableEventListenerParser().parseChildElement(xtr, parentElement, model);
+                } else if (ELEMENT_TRANSACTION_EVENT_LISTENER.equals(xtr.getLocalName())) {
+                    new FlowableTransactionEventListenerParser().parseChildElement(xtr, parentElement, model);
                 } else if (ELEMENT_POTENTIAL_STARTER.equals(xtr.getLocalName())) {
                     new PotentialStarterParser().parse(xtr, activeProcess);
                 } else {

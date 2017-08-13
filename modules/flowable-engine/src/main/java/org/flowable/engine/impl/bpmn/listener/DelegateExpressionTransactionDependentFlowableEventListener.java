@@ -13,8 +13,13 @@
 package org.flowable.engine.impl.bpmn.listener;
 
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
+import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.impl.bpmn.helper.DelegateExpressionUtil;
+import org.flowable.engine.impl.el.NoExecutionVariableScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,10 +31,16 @@ public class DelegateExpressionTransactionDependentFlowableEventListener impleme
     private static final Logger LOGGER = LoggerFactory.getLogger(DelegateExpressionTransactionDependentFlowableEventListener.class);
 
     protected TransactionDependentFlowableEventListener listener;
+    protected Expression expression;
     protected String state;
+    protected boolean failOnException = false;
 
     public DelegateExpressionTransactionDependentFlowableEventListener(TransactionDependentFlowableEventListener listener) {
         this.listener = listener;
+    }
+
+    public DelegateExpressionTransactionDependentFlowableEventListener(Expression expression, Class<?> entityClass) {
+        this.expression = expression;
     }
 
     @Override
@@ -45,7 +56,10 @@ public class DelegateExpressionTransactionDependentFlowableEventListener impleme
 
     public void onEvent(FlowableEvent event) {
         try {
-            listener.onEvent(event);
+            if (null != listener) listener.onEvent(event);
+            else {
+                triggerExpression(event);
+            }
         } catch (Throwable t) {
             if (listener.isFailOnException()) {
                 throw new FlowableException("Exception while executing event-listener", t);
@@ -54,6 +68,25 @@ public class DelegateExpressionTransactionDependentFlowableEventListener impleme
                 // explicitly states that the exception should not bubble up
                 LOGGER.warn("Exception while executing event-listener, which was ignored", t);
             }
+        }
+    }
+
+    private void triggerExpression(FlowableEvent event) {
+        Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, new NoExecutionVariableScope());
+        if (delegate instanceof FlowableEventListener) {
+            // Cache result of isFailOnException() from delegate-instance
+            // until next event is received. This prevents us from having to resolve
+            // the expression twice when an error occurs.
+            failOnException = ((FlowableEventListener) delegate).isFailOnException();
+
+            // Call the delegate
+            ((FlowableEventListener) delegate).onEvent(event);
+        } else {
+
+            // Force failing, since the exception we're about to throw
+            // cannot be ignored, because it did not originate from the listener itself
+            failOnException = true;
+            throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did not resolve to an implementation of " + FlowableEventListener.class.getName());
         }
     }
 

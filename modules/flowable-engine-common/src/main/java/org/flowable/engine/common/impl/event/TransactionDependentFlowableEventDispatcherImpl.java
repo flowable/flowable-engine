@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.delegate.event;
+package org.flowable.engine.common.impl.event;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventType;

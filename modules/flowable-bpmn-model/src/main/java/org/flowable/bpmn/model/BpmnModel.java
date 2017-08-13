@@ -12,15 +12,15 @@
  */
 package org.flowable.bpmn.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import org.apache.commons.lang3.StringUtils;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.lang3.StringUtils;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 /**
  * @author Tijs Rademakers
@@ -51,6 +51,7 @@ public class BpmnModel {
     protected List<String> startEventFormTypes;
     protected int nextFlowIdCounter = 1;
     protected Object eventSupport;
+    protected Object transactionEventSupport;
 
     public Map<String, List<ExtensionAttribute>> getDefinitionsAttributes() {
         return definitionsAttributes;
@@ -563,5 +564,14 @@ public class BpmnModel {
 
     public void setEventSupport(Object eventSupport) {
         this.eventSupport = eventSupport;
+    }
+
+    @JsonIgnore
+    public Object getTransactionEventSupport() {
+        return transactionEventSupport;
+    }
+
+    public void setTransactionEventSupport(Object eventSupport) {
+        this.transactionEventSupport = eventSupport;
     }
 }

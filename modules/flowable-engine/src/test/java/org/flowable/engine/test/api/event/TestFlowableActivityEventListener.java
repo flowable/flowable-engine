@@ -12,13 +12,15 @@
  */
 package org.flowable.engine.test.api.event;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Test event listener that only records events related to activities ( {@link FlowableActivityEvent}s).
@@ -27,6 +29,7 @@ import org.flowable.engine.delegate.event.FlowableEngineEventType;
  */
 public class TestFlowableActivityEventListener implements FlowableEventListener {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestFlowableActivityEventListener.class);
     private List<FlowableEvent> eventsReceived;
     private boolean ignoreRawActivityEvents;
 
@@ -48,6 +51,7 @@ public class TestFlowableActivityEventListener implements FlowableEventListener 
         if (event instanceof FlowableActivityEvent) {
             if (!ignoreRawActivityEvents || (event.getType() != FlowableEngineEventType.ACTIVITY_STARTED && event.getType() != FlowableEngineEventType.ACTIVITY_COMPLETED)) {
                 eventsReceived.add(event);
+                LOGGER.debug("{} standard event triggered ... {}", event.getType(), eventsReceived.size());
             }
         }
     }

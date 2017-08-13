@@ -81,4 +81,14 @@ public interface FlowableEventDispatcher {
      * @return true, if event dispatcher is enabled.
      */
     boolean isEnabled();
+
+    /**
+     * @return true, if transaction event dispatcher is enabled.
+     */
+    boolean isTransactionEnabled();
+
+    /**
+     * @param transactionEnabled true, if transaction event dispatching should be enabled.
+     */
+    void setTransactionEnabled(boolean transactionEnabled);
 }

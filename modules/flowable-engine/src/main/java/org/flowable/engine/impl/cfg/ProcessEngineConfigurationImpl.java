@@ -47,6 +47,7 @@ import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.common.impl.event.FlowableEventDispatcherImpl;
+import org.flowable.engine.common.impl.event.TransactionDependentFlowableEventDispatcherImpl;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -68,7 +69,6 @@ import org.flowable.engine.compatibility.DefaultFlowable5CompatibilityHandlerFac
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandlerFactory;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.delegate.event.TransactionDependentFlowableEventDispatcherImpl;
 import org.flowable.engine.delegate.event.impl.BpmnModelEventDispatchAction;
 import org.flowable.engine.form.AbstractFormType;
 import org.flowable.engine.impl.DynamicBpmnServiceImpl;
@@ -100,6 +100,7 @@ import org.flowable.engine.impl.bpmn.deployer.EventSubscriptionManager;
 import org.flowable.engine.impl.bpmn.deployer.ParsedDeploymentBuilderFactory;
 import org.flowable.engine.impl.bpmn.deployer.ProcessDefinitionDiagramHelper;
 import org.flowable.engine.impl.bpmn.deployer.TimerManager;
+import org.flowable.engine.impl.bpmn.listener.DefaultTransactionDependentEventListenerFactory;
 import org.flowable.engine.impl.bpmn.listener.ListenerNotificationHelper;
 import org.flowable.engine.impl.bpmn.parser.BpmnParseHandlers;
 import org.flowable.engine.impl.bpmn.parser.BpmnParser;
@@ -2073,7 +2074,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initEventDispatcher() {
         if (this.eventDispatcher == null) {
             this.eventDispatcher = new FlowableEventDispatcherImpl();
-            ((FlowableEventDispatcherImpl) eventDispatcher).setTransactioFlowableEventDispatcher(transactionDependentEventDispatcher);
+            ((FlowableEventDispatcherImpl) eventDispatcher).setTransactionFlowableEventDispatcher(transactionDependentEventDispatcher);
         }
         
         if (this.additionalEventDispatchActions == null) {
@@ -2105,6 +2106,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initTransactionDependentEventDispatcher() {
         if (this.transactionDependentEventDispatcher == null) {
             this.transactionDependentEventDispatcher = new TransactionDependentFlowableEventDispatcherImpl();
+            this.transactionDependentFactory = new DefaultTransactionDependentEventListenerFactory();
         }
 
         this.transactionDependentEventDispatcher.setEnabled(enableEventDispatcher);

@@ -30,8 +30,9 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
 
     protected FlowableEventSupport eventSupport;
-    protected TransactionDependentFlowableEventDispatcher transactioFlowableEventDispatcher;
+    protected TransactionDependentFlowableEventDispatcher transactionFlowableEventDispatcher;
     protected boolean enabled = true;
+    protected boolean transactionEnabled = true;
 
     public FlowableEventDispatcherImpl() {
         eventSupport = new FlowableEventSupport();
@@ -43,6 +44,14 @@ public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public boolean isTransactionEnabled() {
+        return transactionEnabled;
+    }
+
+    public void setTransactionEnabled(boolean transactionEnabled) {
+        this.transactionEnabled = transactionEnabled;
     }
 
     @Override
@@ -62,24 +71,26 @@ public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
 
     @Override
     public void addEventListener(TransactionDependentFlowableEventListener listenerToAdd) {
-        transactioFlowableEventDispatcher.addEventListener(listenerToAdd);
+        transactionFlowableEventDispatcher.addEventListener(listenerToAdd);
     }
 
     @Override
     public void addEventListener(TransactionDependentFlowableEventListener listenerToAdd, FlowableEventType... types) {
-        transactioFlowableEventDispatcher.addEventListener(listenerToAdd, types);
+        transactionFlowableEventDispatcher.addEventListener(listenerToAdd, types);
     }
 
     @Override
     public void removeEventListener(TransactionDependentFlowableEventListener listenerToRemove) {
-        transactioFlowableEventDispatcher.removeEventListener(listenerToRemove);
+        transactionFlowableEventDispatcher.removeEventListener(listenerToRemove);
     }
 
     @Override
     public void dispatchEvent(FlowableEvent event) {
         if (enabled) {
             eventSupport.dispatchEvent(event);
-            transactioFlowableEventDispatcher.dispatchEvent(event);
+        }
+        if (transactionEnabled) {
+            transactionFlowableEventDispatcher.dispatchEvent(event);
         }
 
         CommandContext commandContext = Context.getCommandContext();
@@ -93,8 +104,8 @@ public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
         }
     }
 
-    public void setTransactioFlowableEventDispatcher(TransactionDependentFlowableEventDispatcher transactioFlowableEventDispatcher) {
-        this.transactioFlowableEventDispatcher = transactioFlowableEventDispatcher;
+    public void setTransactionFlowableEventDispatcher(TransactionDependentFlowableEventDispatcher transactioFlowableEventDispatcher) {
+        this.transactionFlowableEventDispatcher = transactioFlowableEventDispatcher;
     }
 
     public FlowableEventSupport getEventSupport() {

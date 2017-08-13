@@ -36,7 +36,7 @@ public class TestTransactionDependentFlowableEventListener implements Transactio
 
     public TestTransactionDependentFlowableEventListener(boolean ignoreRawActivityEvents) {
         eventsReceived = new ArrayList<>();
-        this.ignoreRawActivityEvents = ignoreRawActivityEvents;
+//        this.ignoreRawActivityEvents = ignoreRawActivityEvents;
     }
 
 
@@ -48,12 +48,12 @@ public class TestTransactionDependentFlowableEventListener implements Transactio
         eventsReceived.clear();
     }
 
-    @Override
+    //    @Override
     public String getOnTransaction() {
         return onTransaction;
     }
 
-    @Override
+    //    @Override
     public void setOnTransaction(String onTransaction) {
 
         this.onTransaction = onTransaction;
@@ -61,10 +61,11 @@ public class TestTransactionDependentFlowableEventListener implements Transactio
 
     @Override
     public void onEvent(FlowableEvent event) {
+        LOGGER.debug("ELEMENT TRIGGERED");
         if (event instanceof FlowableActivityEvent) {
             if (!ignoreRawActivityEvents || (event.getType() != FlowableEngineEventType.ACTIVITY_STARTED && event.getType() != FlowableEngineEventType.ACTIVITY_COMPLETED)) {
                 eventsReceived.add(event);
-                LOGGER.debug("{} event triggered ... {}", onTransaction, eventsReceived.size());
+                LOGGER.debug("{} {} event triggered ... {}", onTransaction, event.getType(), eventsReceived.size());
             }
         }
     }
