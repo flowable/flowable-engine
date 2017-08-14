@@ -10,27 +10,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine;
+package org.flowable.cmmn.engine.history;
+
+import java.util.Date;
 
 /**
- * Provides access to all services that expose CMMN and case management operations.
- * 
  * @author Joram Barrez
  */
-public interface CmmnEngine {
+public interface HistoricMilestoneInstance {
     
-    /** the version of the flowable CMMN library */
-    public static String VERSION = "6.2.0.0";
-
+    String getId();
     String getName();
-
-    void close();
+    Date getTimeStamp();
+    String getCaseInstanceId();
+    String getCaseDefinitionId();
+    String getElementId();
     
-    CmmnRuntimeService getCmmnRuntimeService();
-    
-    CmmnManagementService getCmmnManagementService();
-    
-    CmmnRepositoryService getCmmnRepositoryService();
-    
-    CmmnHistoryService getCmmnHistoryService();
 }

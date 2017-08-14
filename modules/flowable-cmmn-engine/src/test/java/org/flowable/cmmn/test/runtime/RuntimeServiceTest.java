@@ -17,6 +17,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
+import org.flowable.cmmn.engine.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.engine.repository.CaseDefinition;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.cmmn.engine.runtime.CaseInstanceState;
@@ -43,13 +44,13 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         assertEquals(CaseInstanceState.COMPLETED, caseInstance.getState());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
      
-//        List<MilestoneInstance> milestoneInstances = cmmnRuntimeService.createMilestoneInstanceQuery()
-//                .milestoneInstanceCaseInstanceId(caseInstance.getId())
-//                .orderByMilestoneName().asc()
-//                .list();
-//        assertEquals(2, milestoneInstances.size());
-//        assertEquals("PlanItem Milestone One", milestoneInstances.get(0).getName());
-//        assertEquals("PlanItem Milestone Two", milestoneInstances.get(1).getName());
+        List<HistoricMilestoneInstance> milestoneInstances = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
+                .milestoneInstanceCaseInstanceId(caseInstance.getId())
+                .orderByMilestoneName().asc()
+                .list();
+        assertEquals(2, milestoneInstances.size());
+        assertEquals("PlanItem Milestone One", milestoneInstances.get(0).getName());
+        assertEquals("PlanItem Milestone Two", milestoneInstances.get(1).getName());
     }
     
     @Test

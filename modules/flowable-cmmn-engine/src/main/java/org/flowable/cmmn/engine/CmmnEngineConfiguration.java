@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.flowable.cmmn.engine.impl.CmmnEngineImpl;
+import org.flowable.cmmn.engine.impl.CmmnHistoryServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnRepositoryServiceImpl;
 import org.flowable.cmmn.engine.impl.ServiceImpl;
@@ -31,6 +32,8 @@ import org.flowable.cmmn.engine.impl.db.EntityDependencyOrder;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.deployer.Deployer;
+import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
+import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.interceptor.CmmnCommandInvoker;
 import org.flowable.cmmn.engine.impl.parser.CmmnActivityBehaviorFactory;
 import org.flowable.cmmn.engine.impl.parser.CmmnParser;
@@ -44,6 +47,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityMana
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityManagerImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
@@ -52,12 +57,14 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseDefinitionDataM
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnDeploymentDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnResourceDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricMilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.MilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCaseDefinitionDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCaseInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCmmnDeploymentDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisHistoricMilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisMilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisPlanItemInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
@@ -93,14 +100,16 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     protected CmmnRuntimeService cmmnRuntimeService = new CmmnRuntimeServiceImpl();
     protected CmmnManagementService cmmnManagementService = new CmmnManagementServiceImpl();
     protected CmmnRepositoryService cmmnRepositoryService = new CmmnRepositoryServiceImpl();
+    protected CmmnHistoryService cmmnHistoryService = new CmmnHistoryServiceImpl();
     
+    protected TableDataManager tableDataManager;
     protected CmmnDeploymentDataManager deploymentDataManager;
     protected CmmnResourceDataManager resourceDataManager;
     protected CaseDefinitionDataManager caseDefinitionDataManager;
     protected CaseInstanceDataManager caseInstanceDataManager;
     protected PlanItemInstanceDataManager planItemInstanceDataManager;
     protected MilestoneInstanceDataManager milestoneInstanceDataManager;
-    protected TableDataManager tableDataManager;
+    protected HistoricMilestoneInstanceDataManager historicMilestoneInstanceDataManager;
     
     protected CmmnDeploymentEntityManager cmmnDeploymentEntityManager;
     protected CmmnResourceEntityManager cmmnResourceEntityManager;
@@ -108,8 +117,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     protected CaseInstanceEntityManager caseInstanceEntityManager;
     protected PlanItemInstanceEntityManager planItemInstanceEntityManager;
     protected MilestoneInstanceEntityManager milestoneInstanceEntityManager;
+    protected HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager;
     
     protected CaseInstanceHelper caseInstanceHelper;
+    protected CmmnHistoryManager cmmnHistoryManager;
     
     protected boolean enableSafeCmmnXml;
     protected CmmnActivityBehaviorFactory activityBehaviorFactory;
@@ -185,6 +196,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         initCaseDefinitionCache();
         initDeploymentManager();
         initCaseInstanceHelper();
+        initHistoryManager();
         initClock();
     }
     
@@ -235,6 +247,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         initService(cmmnRuntimeService);
         initService(cmmnManagementService);
         initService(cmmnRepositoryService);
+        initService(cmmnHistoryService);
     }
 
     protected void initService(Object service) {
@@ -266,6 +279,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         if (milestoneInstanceDataManager == null) {
             milestoneInstanceDataManager = new MybatisMilestoneInstanceDataManager(this);
         }
+        if (historicMilestoneInstanceDataManager == null) {
+            historicMilestoneInstanceDataManager = new MybatisHistoricMilestoneInstanceDataManager(this);
+        }
     }
     
     public void initEntityManagers() {
@@ -286,6 +302,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         }
         if (milestoneInstanceEntityManager == null) {
             milestoneInstanceEntityManager = new MilestoneInstanceEntityManagerImpl(this, milestoneInstanceDataManager);
+        }
+        if (historicMilestoneInstanceEntityManager == null) {
+            historicMilestoneInstanceEntityManager = new HistoricMilestoneInstanceEntityManagerImpl(this, historicMilestoneInstanceDataManager);
         }
     }
     
@@ -359,6 +378,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         }
     }
     
+    public void initHistoryManager() {
+        if (cmmnHistoryManager == null) {
+            cmmnHistoryManager = new DefaultCmmnHistoryManager(this);
+        }
+    }
+    
     @Override
     public String getEngineCfgKey() {
         return EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG;
@@ -423,6 +448,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
 
     public CmmnEngineConfiguration setCmmnRepositoryService(CmmnRepositoryService cmmnRepositoryService) {
         this.cmmnRepositoryService = cmmnRepositoryService;
+        return this;
+    }
+    
+    public CmmnHistoryService getCmmnHistoryService() {
+        return cmmnHistoryService;
+    }
+
+    public CmmnEngineConfiguration setCmmnHistoryService(CmmnHistoryService cmmnHistoryService) {
+        this.cmmnHistoryService = cmmnHistoryService;
         return this;
     }
 
@@ -497,6 +531,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.milestoneInstanceDataManager = milestoneInstanceDataManager;
         return this;
     }
+    
+    public HistoricMilestoneInstanceDataManager getHistoricMilestoneInstanceDataManager() {
+        return historicMilestoneInstanceDataManager;
+    }
+
+    public CmmnEngineConfiguration setHistoricMilestoneInstanceDataManager(HistoricMilestoneInstanceDataManager historicMilestoneInstanceDataManager) {
+        this.historicMilestoneInstanceDataManager = historicMilestoneInstanceDataManager;
+        return this;
+    }
 
     public CmmnDeploymentEntityManager getCmmnDeploymentEntityManager() {
         return cmmnDeploymentEntityManager;
@@ -547,8 +590,18 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         return milestoneInstanceEntityManager;
     }
 
-    public void setMilestoneInstanceEntityManager(MilestoneInstanceEntityManager milestoneInstanceEntityManager) {
+    public CmmnEngineConfiguration setMilestoneInstanceEntityManager(MilestoneInstanceEntityManager milestoneInstanceEntityManager) {
         this.milestoneInstanceEntityManager = milestoneInstanceEntityManager;
+        return this;
+    }
+    
+    public HistoricMilestoneInstanceEntityManager getHistoricMilestoneInstanceEntityManager() {
+        return historicMilestoneInstanceEntityManager;
+    }
+
+    public CmmnEngineConfiguration setHistoricMilestoneInstanceEntityManager(HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager) {
+        this.historicMilestoneInstanceEntityManager = historicMilestoneInstanceEntityManager;
+        return this;
     }
 
     public CaseInstanceHelper getCaseInstanceHelper() {
@@ -557,6 +610,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
 
     public CmmnEngineConfiguration setCaseInstanceHelper(CaseInstanceHelper caseInstanceHelper) {
         this.caseInstanceHelper = caseInstanceHelper;
+        return this;
+    }
+    
+    public CmmnHistoryManager getCmmnHistoryManager() {
+        return cmmnHistoryManager;
+    }
+
+    public CmmnEngineConfiguration setCmmnHistoryManager(CmmnHistoryManager cmmnHistoryManager) {
+        this.cmmnHistoryManager = cmmnHistoryManager;
         return this;
     }
 

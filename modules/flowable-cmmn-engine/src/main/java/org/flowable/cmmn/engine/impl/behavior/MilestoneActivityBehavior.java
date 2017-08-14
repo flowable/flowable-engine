@@ -34,7 +34,12 @@ public class MilestoneActivityBehavior implements CmmnActivityBehavior {
     @Override
     public void execute(DelegatePlanItemInstance delegatePlanItemInstance) {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
-        
+        MilestoneInstanceEntity milestoneInstanceEntity = createMilestoneInstance(delegatePlanItemInstance, commandContext);
+        CommandContextUtil.getCmmnHistoryManager(commandContext).recordMilestoneReached(milestoneInstanceEntity);
+        CommandContextUtil.getAgenda(commandContext).planPlanItemOccurred((PlanItemInstanceEntity) delegatePlanItemInstance);
+    }
+
+    protected MilestoneInstanceEntity createMilestoneInstance(DelegatePlanItemInstance delegatePlanItemInstance, CommandContext commandContext) {
         MilestoneInstanceEntityManager milestoneInstanceEntityManager = CommandContextUtil.getMilestoneInstanceEntityManager(commandContext);
         MilestoneInstanceEntity milestoneInstanceEntity = milestoneInstanceEntityManager.create();
         milestoneInstanceEntity.setName(milestoneName);
@@ -43,8 +48,7 @@ public class MilestoneActivityBehavior implements CmmnActivityBehavior {
         milestoneInstanceEntity.setCaseDefinitionId(delegatePlanItemInstance.getCaseDefinitionId());
         milestoneInstanceEntity.setElementId(delegatePlanItemInstance.getElementId());
         milestoneInstanceEntityManager.insert(milestoneInstanceEntity);
-        
-        CommandContextUtil.getAgenda(commandContext).planPlanItemOccurred((PlanItemInstanceEntity) delegatePlanItemInstance);
+        return milestoneInstanceEntity;
     }
     
 }

@@ -14,10 +14,12 @@ package org.flowable.cmmn.engine.impl.util;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
+import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.TableDataManager;
@@ -35,6 +37,14 @@ public class CommandContextUtil {
     
     public static CmmnEngineConfiguration getCmmnEngineConfiguration(CommandContext commandContext) {
         return (CmmnEngineConfiguration) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+    }
+    
+    public static CmmnHistoryManager getCmmnHistoryManager() {
+        return getCmmnHistoryManager(getCommandContext());
+    }
+    
+    public static CmmnHistoryManager getCmmnHistoryManager(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getCmmnHistoryManager();
     }
     
     public static CmmnDeploymentEntityManager getCmmnDeploymentEntityManager() {
@@ -83,6 +93,14 @@ public class CommandContextUtil {
     
     public static MilestoneInstanceEntityManager getMilestoneInstanceEntityManager(CommandContext commandContext) {
         return getCmmnEngineConfiguration(commandContext).getMilestoneInstanceEntityManager();
+    }
+    
+    public static HistoricMilestoneInstanceEntityManager getHistoricMilestoneInstanceEntityManager() {
+        return getHistoricMilestoneInstanceEntityManager(getCommandContext());
+    }
+    
+    public static HistoricMilestoneInstanceEntityManager getHistoricMilestoneInstanceEntityManager(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getHistoricMilestoneInstanceEntityManager();
     }
     
     public static TableDataManager getTableDataManager() {

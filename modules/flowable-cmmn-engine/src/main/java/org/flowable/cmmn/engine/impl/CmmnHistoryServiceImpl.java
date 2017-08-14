@@ -10,27 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine;
+package org.flowable.cmmn.engine.impl;
+
+import org.flowable.cmmn.engine.CmmnHistoryService;
+import org.flowable.cmmn.engine.history.HistoricMilestoneInstanceQuery;
 
 /**
- * Provides access to all services that expose CMMN and case management operations.
- * 
  * @author Joram Barrez
  */
-public interface CmmnEngine {
-    
-    /** the version of the flowable CMMN library */
-    public static String VERSION = "6.2.0.0";
+public class CmmnHistoryServiceImpl extends ServiceImpl implements CmmnHistoryService {
 
-    String getName();
-
-    void close();
+    @Override
+    public HistoricMilestoneInstanceQuery createHistoricMilestoneInstanceQuery() {
+        return cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager().createHistoricMilestoneInstanceQuery();
+    }
     
-    CmmnRuntimeService getCmmnRuntimeService();
-    
-    CmmnManagementService getCmmnManagementService();
-    
-    CmmnRepositoryService getCmmnRepositoryService();
-    
-    CmmnHistoryService getCmmnHistoryService();
 }

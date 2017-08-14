@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl;
 
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.CmmnHistoryService;
 import org.flowable.cmmn.engine.CmmnManagementService;
 import org.flowable.cmmn.engine.CmmnRepositoryService;
 import org.flowable.cmmn.engine.CmmnRuntimeService;
@@ -32,6 +33,7 @@ public class CmmnEngineImpl implements CmmnEngine {
     protected CmmnRuntimeService cmmnRuntimeService;
     protected CmmnManagementService cmmnManagementService;
     protected CmmnRepositoryService cmmnRepositoryService;
+    protected CmmnHistoryService cmmnHistoryService;
     
     public CmmnEngineImpl(CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
@@ -39,6 +41,7 @@ public class CmmnEngineImpl implements CmmnEngine {
         this.cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
         this.cmmnManagementService = cmmnEngineConfiguration.getCmmnManagementService();
         this.cmmnRepositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
+        this.cmmnHistoryService = cmmnEngineConfiguration.getCmmnHistoryService();
 
         LOGGER.info("CmmnEngine {} created", name);
     }
@@ -88,4 +91,12 @@ public class CmmnEngineImpl implements CmmnEngine {
         this.cmmnRepositoryService = cmmnRepositoryService;
     }
 
+    public CmmnHistoryService getCmmnHistoryService() {
+        return cmmnHistoryService;
+    }
+
+    public void setCmmnHistoryService(CmmnHistoryService cmmnHistoryService) {
+        this.cmmnHistoryService = cmmnHistoryService;
+    }
+    
 }

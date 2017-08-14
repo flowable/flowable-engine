@@ -10,27 +10,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine;
+
+package org.flowable.cmmn.engine.impl.persistence.entity;
+
+import java.util.Date;
+
+import org.flowable.cmmn.engine.history.HistoricMilestoneInstance;
+import org.flowable.engine.common.impl.persistence.entity.Entity;
 
 /**
- * Provides access to all services that expose CMMN and case management operations.
- * 
  * @author Joram Barrez
  */
-public interface CmmnEngine {
+public interface HistoricMilestoneInstanceEntity extends Entity, HistoricMilestoneInstance {
     
-    /** the version of the flowable CMMN library */
-    public static String VERSION = "6.2.0.0";
+    void setName(String name);
+    void setTimeStamp(Date timeStamp);
+    void setCaseInstanceId(String caseInstanceId);
+    void setCaseDefinitionId(String caseDefinitionId);
+    void setElementId(String elementId);
 
-    String getName();
-
-    void close();
-    
-    CmmnRuntimeService getCmmnRuntimeService();
-    
-    CmmnManagementService getCmmnManagementService();
-    
-    CmmnRepositoryService getCmmnRepositoryService();
-    
-    CmmnHistoryService getCmmnHistoryService();
 }

@@ -17,6 +17,7 @@ import java.io.InputStream;
 
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.CmmnHistoryService;
 import org.flowable.cmmn.engine.CmmnManagementService;
 import org.flowable.cmmn.engine.CmmnRepositoryService;
 import org.flowable.cmmn.engine.CmmnRuntimeService;
@@ -39,6 +40,7 @@ public class FlowableCmmnTestCase {
     protected CmmnManagementService cmmnManagementService;
     protected CmmnRepositoryService cmmnRepositoryService;
     protected CmmnRuntimeService cmmnRuntimeService;
+    protected CmmnHistoryService cmmnHistoryService;
     
     @BeforeClass
     public static void setupEngine() {
@@ -63,6 +65,7 @@ public class FlowableCmmnTestCase {
         this.cmmnRepositoryService = cmmnEngine.getCmmnRepositoryService();
         this.cmmnManagementService = cmmnEngine.getCmmnManagementService();
         this.cmmnRuntimeService = cmmnEngine.getCmmnRuntimeService();
+        this.cmmnHistoryService = cmmnEngine.getCmmnHistoryService();
     }
     
 }
