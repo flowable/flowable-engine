@@ -72,6 +72,8 @@ public abstract class AbstractActivityBpmnParseHandler<T extends FlowNode> exten
         // activiti:collectionString
         if (StringUtils.isNotEmpty(loopCharacteristics.getCollectionString())) {
             miActivityBehavior.setCollectionString(loopCharacteristics.getCollectionString());
+            miActivityBehavior.setFunctionPrefix(loopCharacteristics.getFunctionPrefix());
+            miActivityBehavior.setFunctionName(loopCharacteristics.getFunctionName());
         }
 
         // activiti:elementVariable

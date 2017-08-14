@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.CompensateEventDefinition;
@@ -26,6 +27,7 @@ import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.Process;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -78,6 +80,8 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     protected String collectionVariable; // Not used anymore. Left here for backwards compatibility.
     protected String collectionElementVariable;
     protected String collectionString;
+	protected String functionPrefix;
+    protected String functionName;
     // default variable name for loop counter for inner instances (as described in the spec)
     protected String collectionElementIndexVariable = "loopCounter";
 
@@ -301,7 +305,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
             }
             
         } else {
-            throw new FlowableIllegalArgumentException("Couldn't resolve collection expression nor variable reference");
+            throw new FlowableIllegalArgumentException("Couldn't resolve collection expression, variable reference or string");
             
         }
     }
@@ -314,8 +318,24 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         } else if (collectionVariable != null) {
             collection = execution.getVariable(collectionVariable);
         } else if (collectionString != null) {
-            // TODO: add dynamic function support for resolving an explicit String value collection here - issue 512
-        	// https://github.com/flowable/flowable-engine/issues/512
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+            ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
+
+            List<FlowableFunctionDelegate> functionDelegates = expressionManager.getFunctionDelegates();
+            for (FlowableFunctionDelegate delegate : functionDelegates) {
+            	delegate.localName();
+            }
+
+            // remove \n and \r characters
+            String escString = getCollectionString().replaceAll("\\r\\n|\\r|\\n"," ");
+
+            // check to see if string is JSON
+            if (functionPrefix.equals("json")) {
+            	// escape the JSON string value because JUEL doesn't support '[]'
+            	escString = StringEscapeUtils.escapeJson(escString);
+            }
+
+            collection = expressionManager.createExpression("${" + functionPrefix + ":" + functionName + "(\"" + escString + "\")}").getValue(execution);
         }
         return collection;
     }
@@ -445,7 +465,23 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         this.collectionString = collectionString;
     }
 
-    public String getCollectionElementIndexVariable() {
+    public String getFunctionPrefix() {
+		return functionPrefix;
+	}
+
+	public void setFunctionPrefix(String functionPrefix) {
+		this.functionPrefix = functionPrefix;
+	}
+
+	public String getFunctionName() {
+		return functionName;
+	}
+
+	public void setFunctionName(String functionName) {
+		this.functionName = functionName;
+	}
+
+	public String getCollectionElementIndexVariable() {
         return collectionElementIndexVariable;
     }
 

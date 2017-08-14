@@ -176,6 +176,7 @@ import org.flowable.engine.impl.db.ProcessDbSchemaManager;
 import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
 import org.flowable.engine.impl.el.DefaultExpressionManager;
 import org.flowable.engine.impl.el.ExpressionManager;
+import org.flowable.engine.impl.el.FlowableCollectionFunctionDelegate;
 import org.flowable.engine.impl.el.FlowableDateFunctionDelegate;
 import org.flowable.engine.impl.event.CompensationEventHandler;
 import org.flowable.engine.impl.event.EventHandler;
@@ -2113,6 +2114,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (this.flowableFunctionDelegates == null) {
             this.flowableFunctionDelegates = new ArrayList<>();
             this.flowableFunctionDelegates.add(new FlowableDateFunctionDelegate());
+            this.flowableFunctionDelegates.add(new FlowableCollectionFunctionDelegate());
         }
 
         if (this.customFlowableFunctionDelegates != null) {

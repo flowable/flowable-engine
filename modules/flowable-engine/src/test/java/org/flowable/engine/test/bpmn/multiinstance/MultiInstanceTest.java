@@ -32,6 +32,8 @@ import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.engine.impl.el.ExpressionManager;
+import org.flowable.engine.impl.el.FlowableCollectionFunctionDelegate;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -255,6 +257,103 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         taskService.complete(tasks.get(2).getId());
         assertEquals(0, taskService.createTaskQuery().count());
         assertProcessEnded(procId);
+    }
+
+    @Deployment
+    public void testParallelUserTasksCustomCollectionStringExtension() {
+    	checkParallelUserTasksCustomCollectionStringExtension("miParallelUserTasksCollection");
+    }
+
+    private void checkParallelUserTasksCustomCollectionStringExtension(String processDefinitionKey) {
+    	ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
+
+        List<Task> tasks = taskService.createTaskQuery().taskCandidateUser("wfuser1").list();
+        assertEquals(1, tasks.size());
+        assertEquals("My Task 0", tasks.get(0).getName());
+
+        tasks = taskService.createTaskQuery().taskCandidateUser("wfuser2").list();
+        assertEquals(1, tasks.size());
+        assertEquals("My Task 1", tasks.get(0).getName());
+
+        // should be 2 tasks total
+        tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
+        assertEquals(2, tasks.size());
+        assertEquals("My Task 0", tasks.get(0).getName());
+        assertEquals("My Task 1", tasks.get(1).getName());
+
+        // Completing 3 tasks will trigger completion condition
+        taskService.complete(tasks.get(0).getId());
+        taskService.complete(tasks.get(1).getId());
+        assertEquals(0, taskService.createTaskQuery().count());
+        assertProcessEnded(processInstance.getProcessInstanceId());
+    }
+
+    @Deployment
+    public void testParallelUserTasksCustomCollectionExpressionExtension() {
+    	checkParallelUserTasksCustomCollectionExpressionExtension("miParallelUserTasksCollection");
+    }
+
+    private void checkParallelUserTasksCustomCollectionExpressionExtension(String processDefinitionKey) {
+        ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
+
+        // add custom function delegate
+        expressionManager.getFunctionDelegates().add(new FlowableCollectionFunctionDelegate());
+
+    	ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
+
+        List<Task> tasks = taskService.createTaskQuery().taskCandidateUser("wfuser1").list();
+        assertEquals(1, tasks.size());
+        assertEquals("My Task 0", tasks.get(0).getName());
+
+        tasks = taskService.createTaskQuery().taskCandidateUser("wfuser2").list();
+        assertEquals(1, tasks.size());
+        assertEquals("My Task 1", tasks.get(0).getName());
+
+        // should be 2 tasks total
+        tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
+        assertEquals(2, tasks.size());
+        assertEquals("My Task 0", tasks.get(0).getName());
+        assertEquals("My Task 1", tasks.get(1).getName());
+
+        // Completing 3 tasks will trigger completion condition
+        taskService.complete(tasks.get(0).getId());
+        taskService.complete(tasks.get(1).getId());
+        assertEquals(0, taskService.createTaskQuery().count());
+        assertProcessEnded(processInstance.getProcessInstanceId());
+    }
+
+    @Deployment
+    public void testParallelUserTasksCustomExtensionsCollection() {
+    	checkParallelUserTasksCustomExtensionsCollection("miParallelUserTasksCollection");
+    }
+
+    private void checkParallelUserTasksCustomExtensionsCollection(String processDefinitionKey) {
+        ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
+
+        // add custom function delegate
+        expressionManager.getFunctionDelegates().add(new FlowableCollectionFunctionDelegate());
+
+    	ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
+
+        List<Task> tasks = taskService.createTaskQuery().taskCandidateUser("wfuser1").list();
+        assertEquals(1, tasks.size());
+        assertEquals("My Task 0", tasks.get(0).getName());
+
+        tasks = taskService.createTaskQuery().taskCandidateUser("wfuser2").list();
+        assertEquals(1, tasks.size());
+        assertEquals("My Task 1", tasks.get(0).getName());
+
+        // should be 2 tasks total
+        tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
+        assertEquals(2, tasks.size());
+        assertEquals("My Task 0", tasks.get(0).getName());
+        assertEquals("My Task 1", tasks.get(1).getName());
+
+        // Completing 3 tasks will trigger completion condition
+        taskService.complete(tasks.get(0).getId());
+        taskService.complete(tasks.get(1).getId());
+        assertEquals(0, taskService.createTaskQuery().count());
+        assertProcessEnded(processInstance.getProcessInstanceId());
     }
 
     @Deployment

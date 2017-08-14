@@ -19,6 +19,8 @@ public class MultiInstanceLoopCharacteristics extends BaseElement {
 
     protected String inputDataItem;
     protected String collectionString;
+	protected String functionPrefix;
+    protected String functionName;
     protected String loopCardinality;
     protected String completionCondition;
     protected String elementVariable;
@@ -40,6 +42,22 @@ public class MultiInstanceLoopCharacteristics extends BaseElement {
     public void setCollectionString(String collectionString) {
         this.collectionString = collectionString;
     }
+
+    public String getFunctionPrefix() {
+		return functionPrefix;
+	}
+
+	public void setFunctionPrefix(String functionPrefix) {
+		this.functionPrefix = functionPrefix;
+	}
+
+	public String getFunctionName() {
+		return functionName;
+	}
+
+	public void setFunctionName(String functionName) {
+		this.functionName = functionName;
+	}
 
     public String getLoopCardinality() {
         return loopCardinality;
