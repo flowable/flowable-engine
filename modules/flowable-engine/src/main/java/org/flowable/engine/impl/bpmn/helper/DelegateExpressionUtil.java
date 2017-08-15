@@ -14,7 +14,7 @@ package org.flowable.engine.impl.bpmn.helper;
 
 import java.util.List;
 
-import org.flowable.engine.delegate.Expression;
+import org.flowable.variable.service.delegate.Expression;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
 import org.flowable.engine.impl.util.CommandContextUtil;

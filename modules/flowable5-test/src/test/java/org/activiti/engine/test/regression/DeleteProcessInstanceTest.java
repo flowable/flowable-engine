@@ -19,9 +19,9 @@ import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.service.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

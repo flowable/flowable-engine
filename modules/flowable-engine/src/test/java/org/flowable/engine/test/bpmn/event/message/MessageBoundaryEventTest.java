@@ -20,8 +20,8 @@ import java.util.concurrent.Callable;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.runtime.TimerJobQuery;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.service.TimerJobQuery;
 
 /**
  * @author Tijs Rademakers

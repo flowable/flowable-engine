@@ -31,6 +31,7 @@ import org.flowable.engine.test.profiler.FlowableProfiler;
 import org.flowable.engine.test.profiler.ProfileSession;
 import org.flowable.engine.test.profiler.ProfilingDbSqlSessionFactory;
 import org.flowable.engine.test.profiler.TotalExecutionTimeCommandInterceptor;
+import org.flowable.job.service.Job;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.junit.Assert;
 
@@ -244,6 +245,37 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
         }
     }
+    
+    public void testAsyncJob() {
+        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
+            deployStartProcessInstanceAndProfile("process06.bpmn20.xml", "process06", false);
+            
+            Job job  = managementService.createJobQuery().singleResult();
+            managementService.executeJob(job.getId());
+            
+            stopProfiling();
+            
+            assertDatabaseSelects("StartProcessInstanceCmd",
+                            "selectLatestProcessDefinitionByKey", 1L);
+            
+            assertDatabaseInserts("StartProcessInstanceCmd",
+                    "JobEntityImpl", 1L,
+                    "ExecutionEntityImpl-bulk-with-2", 1L,
+                    "HistoricActivityInstanceEntityImpl", 1L,
+                    "HistoricProcessInstanceEntityImpl", 1L);
+            assertNoUpdatesAndDeletes("StartProcessInstanceCmd");
+            
+            assertDatabaseInserts("org.flowable.job.service.impl.cmd.ExecuteJobCmd",
+                            "HistoricActivityInstanceEntityImpl-bulk-with-2", 1L);
+            
+            assertDatabaseDeletes("org.flowable.job.service.impl.cmd.ExecuteJobCmd",
+                            "JobEntityImpl", 1L,
+                            "ExecutionEntityImpl", 2L);
+            
+            Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+            Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
+        }
+    }
 
     public void testOneTaskProcess() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
@@ -289,6 +321,35 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
                     "org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl", 1L);
     
             assertDatabaseDeletes("CompleteTaskCmd", "TaskEntityImpl", 1L, "ExecutionEntityImpl", 2L); // execution and processinstance
+        }
+    }
+    
+    public void testOneTaskWithBoundaryTimerProcess() {
+        if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
+            deployStartProcessInstanceAndProfile("process-usertask-02.bpmn20.xml", "process-usertask-02", false);
+            org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+            taskService.complete(task.getId());
+            stopProfiling();
+    
+            assertExecutedCommands("StartProcessInstanceCmd", "org.flowable.task.service.impl.TaskQueryImpl", "CompleteTaskCmd");
+    
+            // Start process instance
+            assertDatabaseSelects("StartProcessInstanceCmd", "selectLatestProcessDefinitionByKey", 1L);
+            assertDatabaseInserts("StartProcessInstanceCmd",
+                    "ExecutionEntityImpl-bulk-with-3", 1L,
+                    "TaskEntityImpl", 1L,
+                    "TimerJobEntityImpl", 1L,
+                    "HistoricActivityInstanceEntityImpl-bulk-with-2", 1L,
+                    "HistoricTaskInstanceEntityImpl", 1L,
+                    "HistoricProcessInstanceEntityImpl", 1L);
+            assertNoUpdatesAndDeletes("StartProcessInstanceCmd");
+    
+            // org.flowable.task.service.Task Complete
+    
+            assertDatabaseDeletes("CompleteTaskCmd", 
+                            "TaskEntityImpl", 1L, 
+                            "TimerJobEntityImpl", 1L,
+                            "ExecutionEntityImpl", 3L); // execution and processinstance
         }
     }
 
@@ -590,6 +651,9 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             
         } else if (className.startsWith("TaskEntityImpl") || className.startsWith("HistoricTaskInstanceEntityImpl")) {
             fullClassName = "org.flowable.task.service.impl.persistence.entity." + className;
+            
+        } else if (className.startsWith("JobEntityImpl") || className.startsWith("TimerJobEntityImpl")) {
+            fullClassName = "org.flowable.job.service.impl.persistence.entity." + className;
             
         } else if (className.startsWith("IdentityLinkEntityImpl") || className.startsWith("HistoricIdentityLinkEntityImpl")) {
             fullClassName = "org.flowable.identitylink.service.impl.persistence.entity." + className;

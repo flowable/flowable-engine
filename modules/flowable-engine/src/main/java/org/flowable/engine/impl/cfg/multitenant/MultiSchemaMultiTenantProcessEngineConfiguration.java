@@ -18,19 +18,21 @@ import javax.sql.DataSource;
 
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.common.impl.cfg.multitenant.TenantAwareDataSource;
+import org.flowable.engine.common.impl.cfg.multitenant.TenantInfoHolder;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.common.impl.persistence.StrongUuidGenerator;
 import org.flowable.engine.impl.SchemaOperationProcessEngineClose;
-import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.engine.impl.asyncexecutor.multitenant.ExecutorPerTenantAsyncExecutor;
-import org.flowable.engine.impl.asyncexecutor.multitenant.SharedExecutorServiceAsyncExecutor;
-import org.flowable.engine.impl.asyncexecutor.multitenant.TenantAwareAsyncExecutor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.DeploymentBuilder;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.multitenant.ExecutorPerTenantAsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.multitenant.SharedExecutorServiceAsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.multitenant.TenantAwareAsyncExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

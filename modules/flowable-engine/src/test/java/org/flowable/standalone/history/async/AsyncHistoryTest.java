@@ -21,11 +21,11 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.history.async.AsyncHistoryJobHandler;
 import org.flowable.engine.impl.history.async.AsyncHistoryJobZippedHandler;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.HistoryJob;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.service.HistoryJob;
+import org.flowable.job.service.Job;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.task.service.history.HistoricTaskInstance;
 
 public class AsyncHistoryTest extends PluggableFlowableTestCase {

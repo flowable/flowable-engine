@@ -31,7 +31,7 @@ import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.Model;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.service.Job;
 
 /**
  * @author Tom Baeyens

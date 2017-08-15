@@ -13,9 +13,9 @@
 package org.activiti.examples.bpmn.event.timer;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.service.Job;
 
 /**
  * @author Joram Barrez

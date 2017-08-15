@@ -20,8 +20,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.activiti.engine.impl.test.ResourceFlowableTestCase;
+import org.flowable.engine.common.impl.calendar.BusinessCalendar;
 import org.flowable.engine.common.runtime.Clock;
-import org.flowable.engine.impl.calendar.BusinessCalendar;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.joda.time.Period;

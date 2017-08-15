@@ -14,7 +14,7 @@
 package org.activiti.engine.impl.el;
 
 import org.activiti.engine.ActivitiException;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.variable.service.delegate.Expression;
 import org.flowable.variable.service.delegate.VariableScope;
 
 /**

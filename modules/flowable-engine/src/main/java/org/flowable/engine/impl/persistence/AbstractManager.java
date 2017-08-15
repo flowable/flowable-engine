@@ -18,27 +18,22 @@ import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.common.runtime.Clock;
-import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.engine.impl.asyncexecutor.JobManager;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityManager;
 import org.flowable.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.flowable.engine.impl.persistence.entity.CommentEntityManager;
-import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntityManager;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityManager;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
-import org.flowable.engine.impl.persistence.entity.JobEntityManager;
 import org.flowable.engine.impl.persistence.entity.ModelEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManager;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManager;
-import org.flowable.engine.impl.persistence.entity.SuspendedJobEntityManager;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntityManager;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 
 /**
  * @author Tom Baeyens
@@ -88,10 +83,6 @@ public abstract class AbstractManager {
         return getProcessEngineConfiguration().getHistoryManager();
     }
 
-    protected JobManager getJobManager() {
-        return getProcessEngineConfiguration().getJobManager();
-    }
-
     protected DeploymentEntityManager getDeploymentEntityManager() {
         return getProcessEngineConfiguration().getDeploymentEntityManager();
     }
@@ -122,22 +113,6 @@ public abstract class AbstractManager {
 
     protected EventSubscriptionEntityManager getEventSubscriptionEntityManager() {
         return getProcessEngineConfiguration().getEventSubscriptionEntityManager();
-    }
-
-    protected JobEntityManager getJobEntityManager() {
-        return getProcessEngineConfiguration().getJobEntityManager();
-    }
-
-    protected TimerJobEntityManager getTimerJobEntityManager() {
-        return getProcessEngineConfiguration().getTimerJobEntityManager();
-    }
-
-    protected SuspendedJobEntityManager getSuspendedJobEntityManager() {
-        return getProcessEngineConfiguration().getSuspendedJobEntityManager();
-    }
-
-    protected DeadLetterJobEntityManager getDeadLetterJobEntityManager() {
-        return getProcessEngineConfiguration().getDeadLetterJobEntityManager();
     }
 
     protected HistoricProcessInstanceEntityManager getHistoricProcessInstanceEntityManager() {

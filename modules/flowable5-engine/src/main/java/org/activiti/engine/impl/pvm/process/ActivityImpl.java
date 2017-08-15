@@ -21,8 +21,8 @@ import java.util.Map;
 import org.activiti.engine.impl.pvm.PvmActivity;
 import org.activiti.engine.impl.pvm.PvmException;
 import org.activiti.engine.impl.pvm.PvmTransition;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
+import org.flowable.variable.service.delegate.Expression;
 
 /**
  * @author Tom Baeyens

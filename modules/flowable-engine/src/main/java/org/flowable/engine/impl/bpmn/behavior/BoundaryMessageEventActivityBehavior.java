@@ -21,7 +21,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.variable.service.delegate.Expression;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;

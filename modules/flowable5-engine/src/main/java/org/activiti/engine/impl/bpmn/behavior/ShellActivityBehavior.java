@@ -27,7 +27,7 @@ import java.util.Map;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.variable.service.delegate.Expression;
 
 public class ShellActivityBehavior extends AbstractBpmnActivityBehavior {
 

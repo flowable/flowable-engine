@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.variable.service.delegate.Expression;
 
 /**
  * A simple data input association between a source and a target with assignments

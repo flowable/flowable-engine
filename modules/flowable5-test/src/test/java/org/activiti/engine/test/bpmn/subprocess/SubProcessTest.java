@@ -23,9 +23,9 @@ import org.activiti.engine.impl.util.CollectionUtil;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.history.HistoricActivityInstance;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.service.Job;
 import org.flowable.task.service.TaskQuery;
 import org.flowable.task.service.history.HistoricTaskInstance;
 

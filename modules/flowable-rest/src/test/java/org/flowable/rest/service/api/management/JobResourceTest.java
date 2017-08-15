@@ -9,7 +9,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.service.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;

@@ -29,8 +29,8 @@ import org.flowable.engine.common.impl.cfg.TransactionContextFactory;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

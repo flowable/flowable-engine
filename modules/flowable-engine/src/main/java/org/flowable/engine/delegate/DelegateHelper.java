@@ -25,11 +25,12 @@ import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.TaskWithFieldExtensions;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
-import org.flowable.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.el.FixedValue;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.variable.service.delegate.Expression;
+import org.flowable.variable.service.impl.el.ExpressionManager;
 
 /**
  * Class that provides helper operations for use in the {@link JavaDelegate}, {@link ActivityBehavior}, {@link ExecutionListener} and {@link TaskListener} interfaces.

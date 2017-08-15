@@ -28,8 +28,8 @@ import org.activiti.engine.impl.interceptor.CommandContextCloseListener;
 import org.activiti.engine.impl.jobexecutor.AsyncJobAddedNotification;
 import org.activiti.engine.impl.persistence.AbstractManager;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.service.Job;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 
 /**
  * @author Tom Baeyens

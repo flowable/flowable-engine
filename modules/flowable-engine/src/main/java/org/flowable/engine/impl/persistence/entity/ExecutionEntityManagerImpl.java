@@ -48,6 +48,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.job.service.JobService;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
@@ -727,50 +728,23 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         // Delete jobs
         if (!enableExecutionRelationshipCounts
                 || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getTimerJobCount() > 0)) {
-            TimerJobEntityManager timerJobEntityManager = getTimerJobEntityManager();
-            Collection<TimerJobEntity> timerJobsForExecution = timerJobEntityManager.findJobsByExecutionId(executionEntity.getId());
-            for (TimerJobEntity job : timerJobsForExecution) {
-                timerJobEntityManager.delete(job);
-                if (getEventDispatcher().isEnabled()) {
-                    getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
-                }
-            }
+            CommandContextUtil.getTimerJobService().deleteTimerJobsByExecutionId(executionEntity.getId());
         }
 
+        JobService jobService = CommandContextUtil.getJobService();
         if (!enableExecutionRelationshipCounts
                 || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getJobCount() > 0)) {
-            JobEntityManager jobEntityManager = getJobEntityManager();
-            Collection<JobEntity> jobsForExecution = jobEntityManager.findJobsByExecutionId(executionEntity.getId());
-            for (JobEntity job : jobsForExecution) {
-                getJobEntityManager().delete(job);
-                if (getEventDispatcher().isEnabled()) {
-                    getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
-                }
-            }
+            jobService.deleteJobsByExecutionId(executionEntity.getId());
         }
 
         if (!enableExecutionRelationshipCounts
                 || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getSuspendedJobCount() > 0)) {
-            SuspendedJobEntityManager suspendedJobEntityManager = getSuspendedJobEntityManager();
-            Collection<SuspendedJobEntity> suspendedJobsForExecution = suspendedJobEntityManager.findJobsByExecutionId(executionEntity.getId());
-            for (SuspendedJobEntity job : suspendedJobsForExecution) {
-                suspendedJobEntityManager.delete(job);
-                if (getEventDispatcher().isEnabled()) {
-                    getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
-                }
-            }
+            jobService.deleteSuspendedJobsByExecutionId(executionEntity.getId());
         }
 
         if (!enableExecutionRelationshipCounts
                 || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getDeadLetterJobCount() > 0)) {
-            DeadLetterJobEntityManager deadLetterJobEntityManager = getDeadLetterJobEntityManager();
-            Collection<DeadLetterJobEntity> deadLetterJobsForExecution = deadLetterJobEntityManager.findJobsByExecutionId(executionEntity.getId());
-            for (DeadLetterJobEntity job : deadLetterJobsForExecution) {
-                deadLetterJobEntityManager.delete(job);
-                if (getEventDispatcher().isEnabled()) {
-                    getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
-                }
-            }
+            jobService.deleteDeadLetterJobsByExecutionId(executionEntity.getId());
         }
 
         // Delete event subscriptions

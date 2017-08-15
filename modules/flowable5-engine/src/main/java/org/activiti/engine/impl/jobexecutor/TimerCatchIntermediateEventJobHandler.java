@@ -19,7 +19,7 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.logging.LogMDC;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.service.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

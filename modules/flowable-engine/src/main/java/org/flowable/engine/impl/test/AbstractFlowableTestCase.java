@@ -47,8 +47,8 @@ import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.runtime.HistoryJob;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.job.service.HistoryJob;
 import org.flowable.task.service.history.HistoricTaskInstance;
 import org.junit.Assert;
 

@@ -20,9 +20,9 @@ import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.service.Job;
 
 /**
  * @author Daniel Meyer

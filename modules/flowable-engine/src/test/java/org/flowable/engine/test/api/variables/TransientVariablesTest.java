@@ -21,7 +21,7 @@ import java.util.Map;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.variable.service.delegate.Expression;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;

@@ -20,12 +20,12 @@ import java.util.List;
 
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.service.Job;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
 

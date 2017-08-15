@@ -23,13 +23,15 @@ import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.engine.impl.persistence.entity.SuspensionStateUtil;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.Execution;
+import org.flowable.job.service.JobService;
+import org.flowable.job.service.TimerJobService;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
@@ -89,21 +91,23 @@ public abstract class AbstractSetProcessInstanceStateCmd implements Command<Void
         }
 
         // All jobs are suspended
+        JobService jobService = CommandContextUtil.getJobService(commandContext);
         if (getNewState() == SuspensionState.ACTIVE) {
-            List<SuspendedJobEntity> suspendedJobs = CommandContextUtil.getSuspendedJobEntityManager(commandContext).findJobsByProcessInstanceId(processInstanceId);
+            List<SuspendedJobEntity> suspendedJobs = jobService.findSuspendedJobsByProcessInstanceId(processInstanceId);
             for (SuspendedJobEntity suspendedJob : suspendedJobs) {
-                CommandContextUtil.getJobManager(commandContext).activateSuspendedJob(suspendedJob);
+                jobService.activateSuspendedJob(suspendedJob);
             }
 
         } else {
-            List<TimerJobEntity> timerJobs = CommandContextUtil.getTimerJobEntityManager(commandContext).findJobsByProcessInstanceId(processInstanceId);
+            TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
+            List<TimerJobEntity> timerJobs = timerJobService.findTimerJobsByProcessInstanceId(processInstanceId);
             for (TimerJobEntity timerJob : timerJobs) {
-                CommandContextUtil.getJobManager(commandContext).moveJobToSuspendedJob(timerJob);
+                jobService.moveJobToSuspendedJob(timerJob);
             }
 
-            List<JobEntity> jobs = CommandContextUtil.getJobEntityManager(commandContext).findJobsByProcessInstanceId(processInstanceId);
+            List<JobEntity> jobs = jobService.findJobsByProcessInstanceId(processInstanceId);
             for (JobEntity job : jobs) {
-                CommandContextUtil.getJobManager(commandContext).moveJobToSuspendedJob(job);
+                jobService.moveJobToSuspendedJob(job);
             }
         }
 

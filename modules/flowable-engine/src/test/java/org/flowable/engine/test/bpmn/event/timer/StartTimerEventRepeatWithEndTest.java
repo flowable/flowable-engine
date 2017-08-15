@@ -22,9 +22,9 @@ import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.impl.util.DefaultClockImpl;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.api.event.TestFlowableEntityEventListener;
+import org.flowable.job.service.Job;
 
 /**
  * @author Vasile Dirla

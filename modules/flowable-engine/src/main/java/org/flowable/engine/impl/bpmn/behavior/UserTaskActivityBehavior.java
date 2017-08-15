@@ -24,15 +24,13 @@ import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.impl.calendar.BusinessCalendar;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
-import org.flowable.engine.impl.calendar.BusinessCalendar;
 import org.flowable.engine.impl.calendar.DueDateBusinessCalendar;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
-import org.flowable.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.IdentityLinkUtil;
@@ -41,6 +39,8 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.event.impl.FlowableTaskEventBuilder;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.variable.service.delegate.Expression;
+import org.flowable.variable.service.impl.el.ExpressionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

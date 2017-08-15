@@ -13,8 +13,8 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.job.service.Job;
 import org.junit.Assert;
 
 /**

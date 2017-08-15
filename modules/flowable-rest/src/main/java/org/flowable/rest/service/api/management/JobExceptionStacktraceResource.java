@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.service.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;

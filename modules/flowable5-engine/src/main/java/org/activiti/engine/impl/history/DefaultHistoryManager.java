@@ -43,7 +43,7 @@ import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
 import org.activiti.engine.task.Event;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.variable.service.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -13,9 +13,9 @@
 
 package org.flowable.engine.impl.bpmn.listener;
 
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.task.service.delegate.DelegateTask;
+import org.flowable.variable.service.delegate.Expression;
 
 /**
  * @author Joram Barrez

@@ -32,6 +32,8 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInitializingList;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -764,7 +766,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
 
     protected void ensureJobsInitialized() {
         if (jobs == null) {
-            jobs = CommandContextUtil.getJobEntityManager().findJobsByExecutionId(id);
+            jobs = CommandContextUtil.getJobService().findJobsByExecutionId(id);
         }
     }
 
@@ -775,7 +777,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
 
     protected void ensureTimerJobsInitialized() {
         if (timerJobs == null) {
-            timerJobs = CommandContextUtil.getTimerJobEntityManager().findJobsByExecutionId(id);
+            timerJobs = CommandContextUtil.getTimerJobService().findTimerJobsByExecutionId(id);
         }
     }
 

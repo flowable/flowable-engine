@@ -13,7 +13,7 @@
 package org.activiti.standalone.escapeclause;
 
 import org.flowable.engine.repository.DeploymentProperties;
-import org.flowable.engine.runtime.TimerJobQuery;
+import org.flowable.job.service.TimerJobQuery;
 
 public class JobQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
 

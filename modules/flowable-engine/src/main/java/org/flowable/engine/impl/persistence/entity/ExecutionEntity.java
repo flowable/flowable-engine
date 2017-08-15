@@ -23,6 +23,8 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**

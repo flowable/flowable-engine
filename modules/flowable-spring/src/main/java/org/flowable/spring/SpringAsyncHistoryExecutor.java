@@ -12,7 +12,7 @@
  */
 package org.flowable.spring;
 
-import org.flowable.engine.impl.history.async.UnacquireAsyncHistoryJobExceptionHandler;
+import org.flowable.job.service.impl.asyncexecutor.UnacquireAsyncHistoryJobExceptionHandler;
 import org.springframework.core.task.TaskExecutor;
 
 public class SpringAsyncHistoryExecutor extends SpringAsyncExecutor {
@@ -37,7 +37,7 @@ public class SpringAsyncHistoryExecutor extends SpringAsyncExecutor {
     @Override
     protected void initializeJobEntityManager() {
         if (jobEntityManager == null) {
-            jobEntityManager = processEngineConfiguration.getHistoryJobEntityManager();
+            jobEntityManager = jobServiceConfiguration.getHistoryJobEntityManager();
         }
     }
 

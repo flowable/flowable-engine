@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.runtime.TimerJobQuery;
+import org.flowable.job.service.TimerJobQuery;
 import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.api.RequestUtil;
 import org.flowable.rest.service.api.RestResponseFactory;

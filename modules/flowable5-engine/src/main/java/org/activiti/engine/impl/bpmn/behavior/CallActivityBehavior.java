@@ -29,9 +29,9 @@ import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti.engine.impl.pvm.delegate.SubProcessActivityBehavior;
 import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.impl.bpmn.data.AbstractDataAssociation;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.variable.service.delegate.Expression;
 
 /**
  * Implementation of the BPMN 2.0 call activity (limited currently to calling a subprocess and not (yet) a global task).

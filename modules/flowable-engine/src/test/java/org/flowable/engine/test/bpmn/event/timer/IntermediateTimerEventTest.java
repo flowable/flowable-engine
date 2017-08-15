@@ -22,10 +22,10 @@ import java.util.Map;
 
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.runtime.TimerJobQuery;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.service.Job;
+import org.flowable.job.service.TimerJobQuery;
 
 public class IntermediateTimerEventTest extends PluggableFlowableTestCase {
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");

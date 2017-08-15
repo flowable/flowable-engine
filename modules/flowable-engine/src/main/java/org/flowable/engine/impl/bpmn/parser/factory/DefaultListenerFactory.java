@@ -43,11 +43,11 @@ import org.flowable.engine.impl.bpmn.listener.ExpressionTaskListener;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
 import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.job.service.Job;
 import org.flowable.task.service.Task;
 
 /**

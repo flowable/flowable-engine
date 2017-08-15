@@ -42,6 +42,8 @@ import org.flowable.engine.impl.util.TimerUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.job.service.TimerJobService;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 
 /**
  * @author Tom Baeyens
@@ -135,15 +137,15 @@ public class DeploymentEntityManagerImpl extends AbstractEntityManager<Deploymen
     }
 
     protected void removeTimerStartJobs(ProcessDefinition processDefinition) {
-        List<TimerJobEntity> timerStartJobs = getTimerJobEntityManager()
-                .findJobsByTypeAndProcessDefinitionId(TimerStartEventJobHandler.TYPE, processDefinition.getId());
+        TimerJobService timerJobService = CommandContextUtil.getTimerJobService();
+        List<TimerJobEntity> timerStartJobs = timerJobService.findJobsByTypeAndProcessDefinitionId(TimerStartEventJobHandler.TYPE, processDefinition.getId());
         if (timerStartJobs != null && timerStartJobs.size() > 0) {
             for (TimerJobEntity timerStartJob : timerStartJobs) {
                 if (getEventDispatcher().isEnabled()) {
                     getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timerStartJob, null, null, processDefinition.getId()));
                 }
 
-                getTimerJobEntityManager().delete(timerStartJob);
+                timerJobService.deleteTimerJob(timerStartJob);
             }
         }
     }
@@ -192,16 +194,16 @@ public class DeploymentEntityManagerImpl extends AbstractEntityManager<Deploymen
                 TimerEventHandler.createConfiguration(startEvent.getId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
 
         if (timer != null) {
-            TimerJobEntity timerJob = getJobManager().createTimerJob((TimerEventDefinition) eventDefinition, false, null, TimerStartEventJobHandler.TYPE,
-                    TimerEventHandler.createConfiguration(startEvent.getId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
-
+            TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, false, null, TimerStartEventJobHandler.TYPE, 
+                            TimerEventHandler.createConfiguration(startEvent.getId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
+            
             timerJob.setProcessDefinitionId(previousProcessDefinition.getId());
 
             if (previousProcessDefinition.getTenantId() != null) {
                 timerJob.setTenantId(previousProcessDefinition.getTenantId());
             }
 
-            getJobManager().scheduleTimerJob(timerJob);
+            CommandContextUtil.getTimerJobService().scheduleTimerJob(timerJob);
         }
     }
 
