@@ -262,6 +262,7 @@
             "DELETE": "Delete this form",
             "CREATE-CONFIRM": "Create new form",
             "DUPLICATE-CONFIRM": "Duplicate the form",
+            "DUPLICATE": "Duplicate this form",
             "OPEN-IN-EDITOR": "Form Editor",
             "EDIT-CONFIRM": "Save",
             "DELETE-CONFIRM": "Delete form",
@@ -329,7 +330,9 @@
         },
         "POPUP": {
             "CREATE-TITLE": "Create a new decision table",
+            "DUPLICATE-TITLE": "Duplicate this decision table",
             "CREATE-DESCRIPTION": "You need to give a name for the new decision table and you may want to add a description at the same time.",
+            "DUPLICATE-DESCRIPTION": "You need to give new name, new key and you may want to add a description at the same time.",
             "SAVE-DESCRIPTION": "You need to give a name and a unique key for the new decision table and you may want to add a description at the same time.",
             "DELETE-TITLE": "Delete decision table",
             "DELETE-DESCRIPTION": "Are you sure you want to delete the decision table \"{{name}}\"?",
