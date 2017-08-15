@@ -15,7 +15,6 @@
     <link href="assets/styles/select.css" media="all" type="text/css" rel="stylesheet" />
     <link href="assets/styles/bootstrap.vertical-tabs.css" media="all" type="text/css" rel="stylesheet" />
     <link href="assets/styles/schema-form-file.css" media="all" type="text/css" rel="stylesheet" />
-    <link href="assets/styles/rds-schemaform-runtime.css" media="all" type="text/css" rel="stylesheet" />
     <link href="assets/styles/rds-schemaform-runtime-vendor.css" media="all" type="text/css" rel="stylesheet" />
 </head>
 
