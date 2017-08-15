@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.flowable.bpmn.model.AbstractFlowableCollectionParser;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.CompensateEventDefinition;
@@ -78,6 +79,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     protected String collectionVariable; // Not used anymore. Left here for backwards compatibility.
     protected String collectionElementVariable;
     protected String collectionString;
+    protected AbstractFlowableCollectionParser parser;
     // default variable name for loop counter for inner instances (as described in the spec)
     protected String collectionElementIndexVariable = "loopCounter";
 
@@ -294,14 +296,19 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
             Object collectionVariable = execution.getVariable((String) obj);
             if (collectionVariable instanceof Collection) {
                 return (Collection) collectionVariable;
-            } else if (collectionVariable == null){
-                throw new FlowableIllegalArgumentException("Variable " + collectionVariable + " is not found");
+            } else if (collectionVariable == null) {
+            	// it may be a complex string, not a variable name
+                if (parser != null) {        	
+                	return parser.parse((String) obj);
+                } else {
+                	throw new FlowableIllegalArgumentException("Variable " + collectionVariable + " is not found");
+                }
             } else {
                 throw new FlowableIllegalArgumentException("Variable " + collectionVariable + "' is not a Collection");
             }
             
         } else {
-            throw new FlowableIllegalArgumentException("Couldn't resolve collection expression nor variable reference");
+            throw new FlowableIllegalArgumentException("Couldn't resolve collection expression, variable reference or string");
             
         }
     }
@@ -314,8 +321,9 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         } else if (collectionVariable != null) {
             collection = execution.getVariable(collectionVariable);
         } else if (collectionString != null) {
-            // TODO: add dynamic function support for resolving an explicit String value collection here - issue 512
-        	// https://github.com/flowable/flowable-engine/issues/512
+            if (parser != null) {        	
+            	collection = parser.parse(collectionString);
+            }
         }
         return collection;
     }
@@ -445,7 +453,15 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         this.collectionString = collectionString;
     }
 
-    public String getCollectionElementIndexVariable() {
+	public AbstractFlowableCollectionParser getParser() {
+		return parser;
+	}
+
+	public void setParser(AbstractFlowableCollectionParser parser) {
+		this.parser = parser;
+	}
+
+	public String getCollectionElementIndexVariable() {
         return collectionElementIndexVariable;
     }
 
