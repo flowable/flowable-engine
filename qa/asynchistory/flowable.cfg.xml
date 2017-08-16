@@ -53,7 +53,7 @@
     <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
   </bean>
   
-  <bean id="asyncHistoryExecutor" class="org.flowable.job.service.impl.history.async.DefaultAsyncHistoryJobExecutor">
+  <bean id="asyncHistoryExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncHistoryJobExecutor">
     <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
   </bean>
   
