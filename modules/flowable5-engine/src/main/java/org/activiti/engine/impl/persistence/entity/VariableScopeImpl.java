@@ -26,8 +26,7 @@ import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.javax.el.ELContext;
-import org.flowable.engine.delegate.VariableScope;
-import org.flowable.engine.impl.persistence.entity.TransientVariableInstance;
+import org.flowable.variable.service.delegate.VariableScope;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.types.VariableType;
 import org.flowable.variable.service.impl.types.VariableTypes;
@@ -726,12 +725,6 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
      */
     public Object setVariableLocal(String variableName, Object value, boolean fetchAllVariables) {
         return setVariableLocal(variableName, value, getSourceActivityExecution(), fetchAllVariables);
-    }
-    
-    @Override
-    public Object setVariableLocal(String variableName, Object value, org.flowable.engine.impl.persistence.entity.ExecutionEntity sourceActivityExecution, boolean fetchAllVariables) {
-        // This method is called from v6 only, v5 will never call this method.
-        throw new UnsupportedOperationException();
     }
     
     public Object setVariableLocal(String variableName, Object value, ExecutionEntity sourceActivityExecution, boolean fetchAllVariables) {

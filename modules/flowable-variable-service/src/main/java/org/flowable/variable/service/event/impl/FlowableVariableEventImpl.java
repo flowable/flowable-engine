@@ -12,8 +12,9 @@
  */
 package org.flowable.variable.service.event.impl;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.impl.event.FlowableEventImpl;
 import org.flowable.variable.service.event.FlowableVariableEvent;
-import org.flowable.variable.service.event.FlowableVariableServiceEventType;
 import org.flowable.variable.service.impl.types.VariableType;
 
 /**
@@ -28,7 +29,7 @@ public class FlowableVariableEventImpl extends FlowableEventImpl implements Flow
     protected VariableType variableType;
     protected String taskId;
 
-    public FlowableVariableEventImpl(FlowableVariableServiceEventType type) {
+    public FlowableVariableEventImpl(FlowableEngineEventType type) {
         super(type);
     }
 

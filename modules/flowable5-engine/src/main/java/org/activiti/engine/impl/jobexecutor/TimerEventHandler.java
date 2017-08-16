@@ -14,7 +14,7 @@ package org.activiti.engine.impl.jobexecutor;
 
 import org.activiti.engine.impl.util.json.JSONException;
 import org.activiti.engine.impl.util.json.JSONObject;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.variable.service.delegate.Expression;
 
 public class TimerEventHandler {
 

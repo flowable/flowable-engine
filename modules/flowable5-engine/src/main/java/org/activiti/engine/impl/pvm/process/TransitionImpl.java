@@ -19,7 +19,7 @@ import java.util.List;
 
 import org.activiti.engine.impl.pvm.PvmTransition;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.variable.service.delegate.Expression;
 
 /**
  * @author Tom Baeyens

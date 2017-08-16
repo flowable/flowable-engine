@@ -34,8 +34,9 @@ public class VariableInstanceEntityImpl extends AbstractEntity implements Variab
     protected VariableType type;
     protected String typeName;
 
-    protected String processInstanceId;
     protected String executionId;
+    protected String processInstanceId;
+    protected String processDefinitionId;
     protected String taskId;
 
     protected Long longValue;
@@ -72,22 +73,20 @@ public class VariableInstanceEntityImpl extends AbstractEntity implements Variab
         return persistentState;
     }
 
-    /*public void setExecution(ExecutionEntity execution) {
-        this.executionId = execution.getId();
-        this.processInstanceId = execution.getProcessInstanceId();
-        forceUpdate();
-    }*/
-
     public void forceUpdate() {
         forcedUpdate = true;
+    }
+    
+    public void setExecutionId(String executionId) {
+        this.executionId = executionId;
     }
 
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
     }
-
-    public void setExecutionId(String executionId) {
-        this.executionId = executionId;
+    
+    public void setProcessDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
     }
 
     // byte array value ///////////////////////////////////////////////////////////
@@ -163,6 +162,10 @@ public class VariableInstanceEntityImpl extends AbstractEntity implements Variab
 
     public String getProcessInstanceId() {
         return processInstanceId;
+    }
+    
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
     }
 
     public String getTaskId() {

@@ -25,7 +25,7 @@ import org.activiti.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.runtime.AtomicOperation;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 
 /**
  * @author Daniel Meyer

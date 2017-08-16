@@ -31,8 +31,8 @@ import org.activiti.engine.impl.pvm.PvmTransition;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
-import org.flowable.engine.delegate.Expression;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.variable.service.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -10,9 +10,9 @@ package org.activiti.spring.test.expression.callactivity;
 
 import org.activiti.spring.impl.test.SpringFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskQuery;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.service.Task;
+import org.flowable.task.service.TaskQuery;
 import org.springframework.test.context.ContextConfiguration;
 
 /**

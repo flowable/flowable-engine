@@ -12,8 +12,9 @@
  */
 package org.flowable.engine.delegate.event.impl;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.impl.event.FlowableEventImpl;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 
 /**
  * Implementation of an {@link FlowableActivityEvent}.

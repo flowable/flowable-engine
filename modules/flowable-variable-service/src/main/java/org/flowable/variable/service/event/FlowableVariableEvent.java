@@ -12,6 +12,7 @@
  */
 package org.flowable.variable.service.event;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.variable.service.impl.types.VariableType;
 
@@ -21,7 +22,7 @@ import org.flowable.variable.service.impl.types.VariableType;
  * @author Frederik Heremans
  * @author Joram Barrez
  */
-public interface FlowableVariableEvent extends FlowableVariableServiceEvent {
+public interface FlowableVariableEvent extends FlowableEngineEvent {
 
     /**
      * @return the name of the variable involved.

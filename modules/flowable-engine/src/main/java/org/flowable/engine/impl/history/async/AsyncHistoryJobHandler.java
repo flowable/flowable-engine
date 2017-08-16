@@ -41,7 +41,7 @@ import org.flowable.engine.impl.history.async.json.transformer.TaskPropertyChang
 import org.flowable.engine.impl.history.async.json.transformer.VariableCreatedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.VariableRemovedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.VariableUpdatedHistoryJsonTransformer;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

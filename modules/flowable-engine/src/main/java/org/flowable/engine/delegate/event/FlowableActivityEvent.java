@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.delegate.event;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 
 /**

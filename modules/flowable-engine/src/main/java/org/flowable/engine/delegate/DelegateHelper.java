@@ -25,11 +25,12 @@ import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.TaskWithFieldExtensions;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
-import org.flowable.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.el.FixedValue;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.variable.service.delegate.Expression;
+import org.flowable.variable.service.impl.el.ExpressionManager;
 
 /**
  * Class that provides helper operations for use in the {@link JavaDelegate}, {@link ActivityBehavior}, {@link ExecutionListener} and {@link TaskListener} interfaces.
@@ -208,23 +209,6 @@ public class DelegateHelper {
         } else {
             return getFlowElementFieldExpression(execution, fieldName);
         }
-    }
-
-    /**
-     * Similar to {@link #getFieldExpression(DelegateExecution, String)}, but for use within a {@link TaskListener}.
-     */
-    public static Expression getFieldExpression(DelegateTask task, String fieldName) {
-        if (task.getCurrentFlowableListener() != null) {
-            List<FieldExtension> fieldExtensions = task.getCurrentFlowableListener().getFieldExtensions();
-            if (fieldExtensions != null && fieldExtensions.size() > 0) {
-                for (FieldExtension fieldExtension : fieldExtensions) {
-                    if (fieldName.equals(fieldExtension.getFieldName())) {
-                        return createExpressionForField(fieldExtension);
-                    }
-                }
-            }
-        }
-        return null;
     }
 
     public static Expression getFlowElementFieldExpression(DelegateExecution execution, String fieldName) {

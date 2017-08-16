@@ -18,8 +18,8 @@ import java.util.concurrent.Callable;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.runtime.TimerJobQuery;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.service.TimerJobQuery;
 import org.junit.Assert;
 
 /**

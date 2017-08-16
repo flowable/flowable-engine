@@ -33,7 +33,7 @@ import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
+import org.flowable.task.service.Task;
 
 /**
  * Bean supporting contextual business process management. This allows us to implement a unit of work, in which a particular CDI scope (Conversation / Request / Thread) is associated with a particular

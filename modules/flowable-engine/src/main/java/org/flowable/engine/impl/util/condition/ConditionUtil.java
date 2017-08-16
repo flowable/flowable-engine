@@ -16,7 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.variable.service.delegate.Expression;
 import org.flowable.engine.impl.Condition;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.el.UelExpressionCondition;

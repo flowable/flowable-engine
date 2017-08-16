@@ -24,8 +24,8 @@ import org.flowable.engine.impl.form.DefaultTaskFormHandler;
 import org.flowable.engine.impl.form.StartFormHandler;
 import org.flowable.engine.impl.form.TaskFormHandler;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Joram Barrez

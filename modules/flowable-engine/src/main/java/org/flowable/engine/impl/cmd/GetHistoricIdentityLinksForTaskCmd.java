@@ -19,13 +19,13 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.identitylink.service.history.HistoricIdentityLink;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
+import org.flowable.task.service.history.HistoricTaskInstance;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 
 /**
  * @author Frederik Heremans
@@ -54,7 +54,7 @@ public class GetHistoricIdentityLinksForTaskCmd implements Command<List<Historic
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected List<HistoricIdentityLink> getLinksForTask(CommandContext commandContext) {
-        HistoricTaskInstanceEntity task = CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext).findById(taskId);
+        HistoricTaskInstanceEntity task = CommandContextUtil.getHistoricTaskService().getHistoricTask(taskId);
 
         if (task == null) {
             throw new FlowableObjectNotFoundException("No historic task exists with the given id: " + taskId, HistoricTaskInstance.class);

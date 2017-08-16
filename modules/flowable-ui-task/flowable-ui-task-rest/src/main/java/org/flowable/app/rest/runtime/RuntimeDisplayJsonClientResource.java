@@ -66,7 +66,7 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.service.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.idm.api.User;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
+import org.flowable.task.service.Task;
 import org.junit.Assert;
 import org.junit.Test;
 

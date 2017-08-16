@@ -12,7 +12,6 @@
  */
 package org.flowable.identitylink.service.impl;
 
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
@@ -32,16 +31,6 @@ public class ServiceImpl {
         this.identityLinkServiceConfiguration = identityLinkServiceConfiguration;
     }
 
-    protected CommandExecutor commandExecutor;
-
-    public CommandExecutor getCommandExecutor() {
-        return commandExecutor;
-    }
-
-    public void setCommandExecutor(CommandExecutor commandExecutor) {
-        this.commandExecutor = commandExecutor;
-    }
-    
     public IdentityLinkEntityManager getIdentityLinkEntityManager() {
         return identityLinkServiceConfiguration.getIdentityLinkEntityManager();
     }

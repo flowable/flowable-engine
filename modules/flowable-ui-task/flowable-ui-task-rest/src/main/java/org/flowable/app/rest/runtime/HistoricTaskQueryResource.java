@@ -12,9 +12,6 @@
  */
 package org.flowable.app.rest.runtime;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -29,14 +26,17 @@ import org.flowable.app.service.exception.NotPermittedException;
 import org.flowable.app.service.runtime.PermissionService;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.HistoryService;
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.history.HistoricTaskInstanceQuery;
 import org.flowable.idm.api.User;
+import org.flowable.task.service.history.HistoricTaskInstance;
+import org.flowable.task.service.history.HistoricTaskInstanceQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @RestController
 public class HistoricTaskQueryResource {

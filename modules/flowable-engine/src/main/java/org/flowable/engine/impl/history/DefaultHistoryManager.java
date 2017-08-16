@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -28,13 +28,15 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.service.HistoricTaskService;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.slf4j.Logger;
@@ -136,7 +138,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             getHistoricDetailEntityManager().deleteHistoricDetailsByProcessInstanceId(processInstanceId);
             CommandContextUtil.getHistoricVariableService().deleteHistoricVariableInstancesByProcessInstanceId(processInstanceId);
             getHistoricActivityInstanceEntityManager().deleteHistoricActivityInstancesByProcessInstanceId(processInstanceId);
-            getHistoricTaskInstanceEntityManager().deleteHistoricTaskInstancesByProcessInstanceId(processInstanceId);
+            TaskHelper.deleteHistoricTaskInstancesByProcessInstanceId(processInstanceId);
             CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricIdentityLinksByProcessInstanceId(processInstanceId);
             getCommentEntityManager().deleteCommentsByProcessInstanceId(processInstanceId);
 
@@ -224,14 +226,24 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     @Override
     public void recordTaskCreated(TaskEntity task, ExecutionEntity execution) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().create(task, execution);
+            HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
+            if (execution != null) {
+                task.setExecutionId(execution.getId());
+                task.setProcessInstanceId(execution.getProcessInstanceId());
+                task.setProcessDefinitionId(execution.getProcessDefinitionId());
+                
+                if (execution.getTenantId() != null) {
+                    task.setTenantId(execution.getTenantId());
+                }
+            }
+            HistoricTaskInstanceEntity historicTaskInstance = historicTaskService.createHistoricTask(task);
             historicTaskInstance.setLastUpdateTime(processEngineConfiguration.getClock().getCurrentTime());
 
             if (execution != null) {
                 historicTaskInstance.setExecutionId(execution.getId());
             }
 
-            getHistoricTaskInstanceEntityManager().insert(historicTaskInstance, false);
+            historicTaskService.insertHistoricTask(historicTaskInstance, false);
         }
 
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
@@ -247,7 +259,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     @Override
     public void recordTaskEnd(TaskEntity task, ExecutionEntity execution, String deleteReason) {
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(task.getId());
+            HistoricTaskInstanceEntity historicTaskInstance = CommandContextUtil.getHistoricTaskService().getHistoricTask(task.getId());
             if (historicTaskInstance != null) {
                 historicTaskInstance.markEnded(deleteReason);
                 historicTaskInstance.setLastUpdateTime(processEngineConfiguration.getClock().getCurrentTime());
@@ -259,7 +271,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     public void recordTaskInfoChange(TaskEntity taskEntity) {
         boolean assigneeChanged = false;
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
-            HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(taskEntity.getId());
+            HistoricTaskInstanceEntity historicTaskInstance = CommandContextUtil.getHistoricTaskService().getHistoricTask(taskEntity.getId());
             if (historicTaskInstance != null) {
                 historicTaskInstance.setName(taskEntity.getName());
                 historicTaskInstance.setDescription(taskEntity.getDescription());
@@ -290,8 +302,8 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
         }
         
         if (assigneeChanged && isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
-            ExecutionEntity executionEntity = taskEntity.getExecution();
-            if (executionEntity != null) {
+            if (taskEntity.getExecutionId() != null) {
+                ExecutionEntity executionEntity = getExecutionEntityManager().findById(taskEntity.getExecutionId());
                 HistoricActivityInstanceEntity historicActivityInstance = findActivityInstance(executionEntity, false, true);
                 if (historicActivityInstance != null) {
                     historicActivityInstance.setAssignee(taskEntity.getAssignee());

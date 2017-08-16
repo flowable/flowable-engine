@@ -15,8 +15,8 @@ package org.flowable.examples.bpmn.tasklistener;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * @author Tijs Rademakers

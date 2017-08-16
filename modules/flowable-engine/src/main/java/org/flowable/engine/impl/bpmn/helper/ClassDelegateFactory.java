@@ -15,7 +15,7 @@ package org.flowable.engine.impl.bpmn.helper;
 import java.util.List;
 
 import org.flowable.bpmn.model.MapExceptionEntry;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.variable.service.delegate.Expression;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 
 /** Constructs {@link ClassDelegate}s. */

@@ -22,11 +22,11 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.task.Attachment;
-import org.flowable.engine.task.Task;
 import org.flowable.rest.service.api.engine.AttachmentRequest;
 import org.flowable.rest.service.api.engine.AttachmentResponse;
+import org.flowable.task.service.Task;
+import org.flowable.task.service.history.HistoricTaskInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;

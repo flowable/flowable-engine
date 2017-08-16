@@ -19,9 +19,9 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.task.Task;
+import org.flowable.task.service.Task;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
 
 public class GetTaskVariableInstanceCmd implements Command<VariableInstance>, Serializable {
@@ -45,7 +45,7 @@ public class GetTaskVariableInstanceCmd implements Command<VariableInstance>, Se
             throw new FlowableIllegalArgumentException("variableName is null");
         }
 
-        TaskEntity task = CommandContextUtil.getTaskEntityManager(commandContext).findById(taskId);
+        TaskEntity task = CommandContextUtil.getTaskService().getTask(taskId);
 
         if (task == null) {
             throw new FlowableObjectNotFoundException("task " + taskId + " doesn't exist", Task.class);

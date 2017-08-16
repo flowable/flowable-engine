@@ -18,7 +18,7 @@ import java.util.Map;
 
 import org.flowable.crystalball.simulator.CrystalballException;
 import org.flowable.crystalball.simulator.SimulationEvent;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.event.logger.handler.Fields;
 

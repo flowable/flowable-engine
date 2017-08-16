@@ -15,8 +15,10 @@ package org.flowable.engine.test.concurrency;
 
 import java.util.Random;
 
-import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.ExecutionHelper;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * Tasklistener that sets some random process and task-variables.
@@ -32,7 +34,8 @@ public class SetRandomVariablesTaskListener implements TaskListener {
         String varName;
         for (int i = 0; i < 5; i++) {
             varName = "variable-" + new Random().nextInt(10);
-            delegateTask.getExecution().setVariable(varName, getRandomValue());
+            ExecutionEntity execution = ExecutionHelper.getExecution(delegateTask.getExecutionId());
+            execution.setVariable(varName, getRandomValue());
         }
 
         for (int i = 0; i < 5; i++) {

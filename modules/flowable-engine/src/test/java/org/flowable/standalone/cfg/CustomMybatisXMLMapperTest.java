@@ -19,7 +19,6 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.Attachment;
-import org.flowable.engine.task.Task;
 
 /**
  * @author Bassam Al-Sarori
@@ -48,10 +47,10 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
         assertEquals("4", customTask.getName());
 
         // test default query as well
-        List<Task> tasks = taskService.createTaskQuery().list();
+        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().list();
         assertEquals(5, tasks.size());
 
-        Task task = taskService.createTaskQuery().taskName("2").singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().taskName("2").singleResult();
         assertEquals("2", task.getName());
 
         // Cleanup
@@ -204,7 +203,7 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
     }
 
     protected String createTask(String name, String owner, String assignee, int priority) {
-        Task task = taskService.newTask();
+        org.flowable.task.service.Task task = taskService.newTask();
         task.setName(name);
         task.setOwner(owner);
         task.setAssignee(assignee);
@@ -218,8 +217,8 @@ public class CustomMybatisXMLMapperTest extends ResourceFlowableTestCase {
         historyService.deleteHistoricTaskInstance(taskId);
     }
 
-    protected void deleteTasks(List<Task> tasks) {
-        for (Task task : tasks)
+    protected void deleteTasks(List<org.flowable.task.service.Task> tasks) {
+        for (org.flowable.task.service.Task task : tasks)
             deleteTask(task.getId());
     }
 

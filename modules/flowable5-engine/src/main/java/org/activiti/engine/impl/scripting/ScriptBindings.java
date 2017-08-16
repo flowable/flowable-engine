@@ -23,7 +23,7 @@ import java.util.Set;
 import javax.script.Bindings;
 import javax.script.SimpleScriptContext;
 
-import org.flowable.engine.delegate.VariableScope;
+import org.flowable.variable.service.delegate.VariableScope;
 
 /**
  * @author Tom Baeyens

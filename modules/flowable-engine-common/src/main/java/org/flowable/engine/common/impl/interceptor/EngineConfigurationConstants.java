@@ -30,6 +30,8 @@ public interface EngineConfigurationConstants {
     
     String KEY_IDENTITY_LINK_SERVICE_CONFIG = "cfg.identityLinkService";
     
+    String KEY_JOB_SERVICE_CONFIG = "cfg.jobService";
+    
     int PRIORITY_ENGINE_IDM = 100000;
     
     int PRIORITY_ENGINE_DMN = PRIORITY_ENGINE_IDM + 100000;

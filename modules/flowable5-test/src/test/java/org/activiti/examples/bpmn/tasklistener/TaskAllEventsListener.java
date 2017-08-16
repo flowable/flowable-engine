@@ -12,8 +12,8 @@
  */
 package org.activiti.examples.bpmn.tasklistener;
 
-import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * @author Frederik Heremans

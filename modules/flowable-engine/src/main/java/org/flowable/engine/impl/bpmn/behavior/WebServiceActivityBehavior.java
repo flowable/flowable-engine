@@ -31,7 +31,6 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.impl.bpmn.data.AbstractDataAssociation;
 import org.flowable.engine.impl.bpmn.data.Assignment;
 import org.flowable.engine.impl.bpmn.data.ClassStructureDefinition;
@@ -50,11 +49,12 @@ import org.flowable.engine.impl.bpmn.webservice.MessageImplicitDataOutputAssocia
 import org.flowable.engine.impl.bpmn.webservice.MessageInstance;
 import org.flowable.engine.impl.bpmn.webservice.Operation;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.webservice.WSOperation;
 import org.flowable.engine.impl.webservice.WSService;
+import org.flowable.variable.service.delegate.Expression;
+import org.flowable.variable.service.impl.el.ExpressionManager;
 
 /**
  * An activity behavior that allows calling Web services

@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.camel.util.Routing;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.service.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;

@@ -28,7 +28,6 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -36,6 +35,7 @@ import org.flowable.form.api.FormService;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.FormFieldTypes;
 import org.flowable.form.model.FormModel;
+import org.flowable.task.service.history.HistoricTaskInstance;
 import org.flowable.variable.service.history.HistoricVariableInstance;
 
 /**
@@ -58,7 +58,7 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");
         }
 
-        HistoricTaskInstance task = processEngineConfiguration.getHistoricTaskInstanceEntityManager().findById(taskId);
+        HistoricTaskInstance task = CommandContextUtil.getHistoricTaskService().getHistoricTask(taskId);
         if (task == null) {
             throw new FlowableObjectNotFoundException("Task not found with id " + taskId);
         }

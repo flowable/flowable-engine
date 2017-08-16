@@ -22,7 +22,7 @@ import org.drools.KnowledgeBase;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.flowable.engine.delegate.BusinessRuleTaskDelegate;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.variable.service.delegate.Expression;
 import org.flowable.engine.impl.rules.RulesAgendaFilter;
 import org.flowable.engine.impl.rules.RulesHelper;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;

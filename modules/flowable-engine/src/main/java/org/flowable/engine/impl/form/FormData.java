@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Tom Baeyens

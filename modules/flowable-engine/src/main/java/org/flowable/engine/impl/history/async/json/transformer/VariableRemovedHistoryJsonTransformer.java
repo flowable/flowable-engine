@@ -14,8 +14,8 @@ package org.flowable.engine.impl.history.async.json.transformer;
 
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.variable.service.HistoricVariableService;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 

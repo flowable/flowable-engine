@@ -28,8 +28,8 @@ import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.ExecutionQueryImpl;
@@ -41,12 +41,16 @@ import org.flowable.engine.impl.persistence.entity.data.ExecutionDataManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.IdentityLinkUtil;
+import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.job.service.JobService;
+import org.flowable.task.service.TaskService;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.slf4j.Logger;
@@ -414,7 +418,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
             }
         }
 
-        getTaskEntityManager().deleteTasksByProcessInstanceId(execution.getId(), deleteReason, deleteHistory);
+        TaskHelper.deleteTasksByProcessInstanceId(execution.getId(), deleteReason, deleteHistory);
 
         if (getEventDispatcher().isEnabled()) {
             getEventDispatcher().dispatchEvent(FlowableEventBuilder.createCancelledEvent(execution.getProcessInstanceId(),
@@ -714,60 +718,33 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         // Delete current user tasks
         if (!enableExecutionRelationshipCounts ||
                 (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getTaskCount() > 0)) {
-            TaskEntityManager taskEntityManager = getTaskEntityManager();
-            Collection<TaskEntity> tasksForExecution = taskEntityManager.findTasksByExecutionId(executionEntity.getId());
+            TaskService taskService = CommandContextUtil.getTaskService();
+            Collection<TaskEntity> tasksForExecution = taskService.findTasksByExecutionId(executionEntity.getId());
             for (TaskEntity taskEntity : tasksForExecution) {
-                taskEntityManager.deleteTask(taskEntity, deleteReason, false, true);
+                TaskHelper.deleteTask(taskEntity, deleteReason, false, true);
             }
         }
 
         // Delete jobs
         if (!enableExecutionRelationshipCounts
                 || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getTimerJobCount() > 0)) {
-            TimerJobEntityManager timerJobEntityManager = getTimerJobEntityManager();
-            Collection<TimerJobEntity> timerJobsForExecution = timerJobEntityManager.findJobsByExecutionId(executionEntity.getId());
-            for (TimerJobEntity job : timerJobsForExecution) {
-                timerJobEntityManager.delete(job);
-                if (getEventDispatcher().isEnabled()) {
-                    getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
-                }
-            }
+            CommandContextUtil.getTimerJobService().deleteTimerJobsByExecutionId(executionEntity.getId());
         }
 
+        JobService jobService = CommandContextUtil.getJobService();
         if (!enableExecutionRelationshipCounts
                 || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getJobCount() > 0)) {
-            JobEntityManager jobEntityManager = getJobEntityManager();
-            Collection<JobEntity> jobsForExecution = jobEntityManager.findJobsByExecutionId(executionEntity.getId());
-            for (JobEntity job : jobsForExecution) {
-                getJobEntityManager().delete(job);
-                if (getEventDispatcher().isEnabled()) {
-                    getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
-                }
-            }
+            jobService.deleteJobsByExecutionId(executionEntity.getId());
         }
 
         if (!enableExecutionRelationshipCounts
                 || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getSuspendedJobCount() > 0)) {
-            SuspendedJobEntityManager suspendedJobEntityManager = getSuspendedJobEntityManager();
-            Collection<SuspendedJobEntity> suspendedJobsForExecution = suspendedJobEntityManager.findJobsByExecutionId(executionEntity.getId());
-            for (SuspendedJobEntity job : suspendedJobsForExecution) {
-                suspendedJobEntityManager.delete(job);
-                if (getEventDispatcher().isEnabled()) {
-                    getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
-                }
-            }
+            jobService.deleteSuspendedJobsByExecutionId(executionEntity.getId());
         }
 
         if (!enableExecutionRelationshipCounts
                 || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getDeadLetterJobCount() > 0)) {
-            DeadLetterJobEntityManager deadLetterJobEntityManager = getDeadLetterJobEntityManager();
-            Collection<DeadLetterJobEntity> deadLetterJobsForExecution = deadLetterJobEntityManager.findJobsByExecutionId(executionEntity.getId());
-            for (DeadLetterJobEntity job : deadLetterJobsForExecution) {
-                deadLetterJobEntityManager.delete(job);
-                if (getEventDispatcher().isEnabled()) {
-                    getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
-                }
-            }
+            jobService.deleteDeadLetterJobsByExecutionId(executionEntity.getId());
         }
 
         // Delete event subscriptions

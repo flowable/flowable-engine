@@ -26,7 +26,6 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.AbstractFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.variable.service.impl.types.EntityManagerSession;
 import org.flowable.variable.service.impl.types.EntityManagerSessionFactory;
@@ -101,7 +100,7 @@ public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
         em.close();
     }
 
-    private Task getTask(ProcessInstance instance) {
+    private org.flowable.task.service.Task getTask(ProcessInstance instance) {
         return processEngine.getTaskService().createTaskQuery().processInstanceId(instance.getProcessInstanceId()).includeProcessVariables().singleResult();
     }
 
@@ -119,7 +118,7 @@ public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
         params.put("propertyEntity", propertyEntity);
         ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey("JPAVariableProcess", params);
 
-        Task task = getTask(instance);
+        org.flowable.task.service.Task task = getTask(instance);
         for (Map.Entry<String, Object> entry : task.getProcessVariables().entrySet()) {
             String name = entry.getKey();
             Object value = entry.getValue();
@@ -147,7 +146,7 @@ public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
         params.put("list2", Arrays.asList(propertyEntity, propertyEntity));
         ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey("JPAVariableProcess", params);
 
-        Task task = getTask(instance);
+        org.flowable.task.service.Task task = getTask(instance);
         List list = (List) task.getProcessVariables().get("list1");
         assertEquals(2, list.size());
         assertTrue(list.get(0) instanceof FieldAccessJPAEntity);

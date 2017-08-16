@@ -35,8 +35,8 @@ import org.activiti.engine.impl.pvm.runtime.AtomicOperation;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
+import org.flowable.variable.service.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

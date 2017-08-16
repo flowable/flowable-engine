@@ -13,6 +13,8 @@
 package org.flowable.engine.history;
 
 import org.flowable.engine.task.Comment;
+import org.flowable.task.service.history.HistoricTaskInstance;
+import org.flowable.task.service.history.HistoricTaskInstanceQuery;
 import org.flowable.variable.service.history.HistoricVariableInstance;
 
 /**

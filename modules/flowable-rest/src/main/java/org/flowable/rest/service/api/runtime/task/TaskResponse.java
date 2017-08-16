@@ -17,10 +17,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.task.DelegationState;
-import org.flowable.engine.task.Task;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.util.DateToStringSerializer;
+import org.flowable.task.service.DelegationState;
+import org.flowable.task.service.Task;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 

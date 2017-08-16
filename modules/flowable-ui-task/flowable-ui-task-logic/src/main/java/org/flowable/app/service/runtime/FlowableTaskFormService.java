@@ -12,8 +12,6 @@
  */
 package org.flowable.app.service.runtime;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,18 +26,20 @@ import org.flowable.app.service.exception.NotPermittedException;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.form.model.FormModel;
 import org.flowable.idm.api.User;
+import org.flowable.task.service.Task;
+import org.flowable.task.service.history.HistoricTaskInstance;
 import org.flowable.variable.service.history.HistoricVariableInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers

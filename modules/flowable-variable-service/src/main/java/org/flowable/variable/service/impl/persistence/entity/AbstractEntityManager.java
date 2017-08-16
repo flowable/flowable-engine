@@ -12,13 +12,13 @@
  */
 package org.flowable.variable.service.impl.persistence.entity;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.variable.service.VariableServiceConfiguration;
-import org.flowable.variable.service.event.FlowableVariableServiceEventType;
-import org.flowable.variable.service.event.impl.FlowableEventBuilder;
+import org.flowable.variable.service.event.impl.FlowableVariableEventBuilder;
 import org.flowable.variable.service.impl.persistence.AbstractManager;
 
 /**
@@ -55,8 +55,8 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
 
         FlowableEventDispatcher eventDispatcher = getEventDispatcher();
         if (fireCreateEvent && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableVariableServiceEventType.ENTITY_CREATED, entity));
-            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableVariableServiceEventType.ENTITY_INITIALIZED, entity));
+            eventDispatcher.dispatchEvent(FlowableVariableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, entity));
+            eventDispatcher.dispatchEvent(FlowableVariableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, entity));
         }
     }
 
@@ -70,7 +70,7 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
         EntityImpl updatedEntity = getDataManager().update(entity);
 
         if (fireUpdateEvent && getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableVariableServiceEventType.ENTITY_UPDATED, entity));
+            getEventDispatcher().dispatchEvent(FlowableVariableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, entity));
         }
 
         return updatedEntity;
@@ -92,7 +92,7 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
         getDataManager().delete(entity);
 
         if (fireDeleteEvent && getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableVariableServiceEventType.ENTITY_DELETED, entity));
+            getEventDispatcher().dispatchEvent(FlowableVariableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, entity));
         }
     }
 

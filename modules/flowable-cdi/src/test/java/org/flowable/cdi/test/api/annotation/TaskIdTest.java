@@ -12,12 +12,12 @@
  */
 package org.flowable.cdi.test.api.annotation;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.flowable.cdi.BusinessProcess;
 import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.engine.test.Deployment;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * 

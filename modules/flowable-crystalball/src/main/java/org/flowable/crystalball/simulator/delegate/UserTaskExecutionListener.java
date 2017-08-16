@@ -12,16 +12,16 @@
  */
 package org.flowable.crystalball.simulator.delegate;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.flowable.crystalball.simulator.SimulationEvent;
 import org.flowable.crystalball.simulator.SimulationRunContext;
 import org.flowable.crystalball.simulator.delegate.event.impl.UserTaskCompleteTransformer;
 import org.flowable.crystalball.simulator.impl.StartReplayProcessEventHandler;
-import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * in the case of task event create simulation event in the event calendar

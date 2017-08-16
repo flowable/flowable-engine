@@ -24,6 +24,7 @@ import org.flowable.engine.history.ProcessInstanceHistoryLog;
 import org.flowable.engine.history.ProcessInstanceHistoryLogQuery;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
 import org.flowable.variable.service.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
@@ -109,8 +110,8 @@ public class ProcessInstanceHistoryLogQueryImpl implements ProcessInstanceHistor
 
         // Tasks
         if (includeTasks) {
-            List<? extends HistoricData> tasks = CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext).findHistoricTaskInstancesByQueryCriteria(
-                    new HistoricTaskInstanceQueryImpl(commandExecutor).processInstanceId(processInstanceId));
+            List<? extends HistoricData> tasks = CommandContextUtil.getHistoricTaskService().findHistoricTaskInstancesByQueryCriteria(
+                            new HistoricTaskInstanceQueryImpl(commandExecutor).processInstanceId(processInstanceId));
             processInstanceHistoryLog.addHistoricData(tasks);
         }
 

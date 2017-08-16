@@ -18,7 +18,7 @@ import java.util.List;
 
 import javax.script.Bindings;
 
-import org.flowable.engine.delegate.VariableScope;
+import org.flowable.variable.service.delegate.VariableScope;
 
 /**
  * @author Tom Baeyens

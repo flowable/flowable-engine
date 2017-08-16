@@ -27,7 +27,7 @@ import org.activiti.engine.impl.persistence.entity.SuspensionState.SuspensionSta
 import org.activiti.engine.impl.persistence.entity.TaskEntity;
 import org.activiti.engine.impl.persistence.entity.TimerJobEntity;
 import org.activiti.engine.runtime.Execution;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.service.Job;
 
 /**
  * @author Daniel Meyer

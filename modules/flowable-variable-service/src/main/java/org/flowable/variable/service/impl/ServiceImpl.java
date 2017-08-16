@@ -12,7 +12,6 @@
  */
 package org.flowable.variable.service.impl;
 
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
@@ -30,16 +29,6 @@ public class ServiceImpl {
 
     public ServiceImpl(VariableServiceConfiguration variableServiceConfiguration) {
         this.variableServiceConfiguration = variableServiceConfiguration;
-    }
-
-    protected CommandExecutor commandExecutor;
-
-    public CommandExecutor getCommandExecutor() {
-        return commandExecutor;
-    }
-
-    public void setCommandExecutor(CommandExecutor commandExecutor) {
-        this.commandExecutor = commandExecutor;
     }
     
     public VariableInstanceEntityManager getVariableInstanceEntityManager() {

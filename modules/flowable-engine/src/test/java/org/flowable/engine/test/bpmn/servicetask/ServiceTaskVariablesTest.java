@@ -18,8 +18,8 @@ import java.io.Serializable;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.service.Job;
 
 /**
  * 

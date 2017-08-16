@@ -15,11 +15,11 @@ package org.flowable.engine.impl.util;
 import java.util.List;
 
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
-import org.flowable.engine.impl.persistence.CountingTaskEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.service.impl.persistence.CountingTaskEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Tijs Rademakers
@@ -80,13 +80,14 @@ public class IdentityLinkUtil {
         
         taskEntity.getIdentityLinks().add(identityLinkEntity);
         if (identityLinkEntity.getUserId() != null && taskEntity.getProcessInstanceId() != null) {
-            for (IdentityLinkEntity identityLink : taskEntity.getProcessInstance().getIdentityLinks()) {
+            ExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager().findById(taskEntity.getProcessInstanceId());
+            for (IdentityLinkEntity identityLink : executionEntity.getIdentityLinks()) {
                 if (identityLink.isUser() && identityLink.getUserId().equals(identityLinkEntity.getUserId())) {
                     return;
                 }
             }
             
-            IdentityLinkUtil.createProcessInstanceIdentityLink(taskEntity.getProcessInstance(), identityLinkEntity.getUserId(), null, IdentityLinkType.PARTICIPANT);
+            IdentityLinkUtil.createProcessInstanceIdentityLink(executionEntity, identityLinkEntity.getUserId(), null, IdentityLinkType.PARTICIPANT);
         }
     }
     

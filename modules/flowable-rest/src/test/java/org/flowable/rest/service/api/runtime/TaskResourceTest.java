@@ -24,14 +24,14 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.DelegationState;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.flowable.task.service.DelegationState;
+import org.flowable.task.service.Task;
+import org.flowable.task.service.history.HistoricTaskInstance;
 import org.flowable.variable.service.history.HistoricVariableInstance;
 
 import com.fasterxml.jackson.databind.JsonNode;

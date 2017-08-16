@@ -23,10 +23,10 @@ import org.activiti.engine.impl.el.ExpressionManager;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.form.AbstractFormType;
 import org.flowable.engine.form.FormProperty;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.variable.service.delegate.Expression;
 
 /**
  * @author Tom Baeyens
