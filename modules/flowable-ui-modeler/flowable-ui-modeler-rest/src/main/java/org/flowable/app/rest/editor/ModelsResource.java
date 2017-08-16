@@ -120,11 +120,27 @@ public class ModelsResource {
         if (model == null) {
             throw new InternalServerErrorException("Error duplicating model : Unknown original model");
         }
+        
+        modelRepresentation.setModelType(model.getModelType());
 
-        if (modelRepresentation.getModelType() != null && modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_FORM)) {
+        if (modelRepresentation.getModelType() != null && modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_FORM_RDS)) {
             // noting to do special for forms (just clone the json)
         } else if (modelRepresentation.getModelType() != null && modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_APP)) {
             // noting to do special for applications (just clone the json)
+        } else if (modelRepresentation.getModelType() != null && modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_DECISION_TABLE)) {
+            // Desision Table model            
+            try {
+                ObjectNode editorNode = (ObjectNode) objectMapper.readTree(json);
+                editorNode.put("name", modelRepresentation.getName());
+                editorNode.put("key", modelRepresentation.getKey());
+                editorNode.put("description", modelRepresentation.getDescription());
+                if (editorNode != null) {
+                  json = editorNode.toString();
+                }  
+            } catch (IOException e) {
+              logger.error("JSON error", e);
+            }
+          
         } else {
             // BPMN model
             ObjectNode editorNode = null;
