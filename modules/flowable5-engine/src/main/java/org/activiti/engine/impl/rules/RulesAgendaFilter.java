@@ -24,7 +24,7 @@ import org.drools.runtime.rule.AgendaFilter;
  */
 public class RulesAgendaFilter implements AgendaFilter {
 
-    protected List<String> suffixList = new ArrayList<String>();
+    protected List<String> suffixList = new ArrayList<>();
     protected boolean accept;
 
     public RulesAgendaFilter() {

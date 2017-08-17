@@ -79,7 +79,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
     protected String category;
 
     protected boolean isIdentityLinksInitialized;
-    protected List<IdentityLinkEntity> taskIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
+    protected List<IdentityLinkEntity> taskIdentityLinkEntities = new ArrayList<>();
 
     protected String executionId;
     protected ExecutionEntity execution;
@@ -110,7 +110,9 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         this.id = taskId;
     }
 
-    /** creates and initializes a new persistent task. */
+    /**
+     * creates and initializes a new persistent task.
+     */
     public static TaskEntity createAndInsert(ActivityExecution execution, boolean fireEvents) {
         TaskEntity task = create(Context.getProcessEngineConfiguration().getClock().getCurrentTime());
         task.insert((ExecutionEntity) execution, fireEvents);
@@ -132,7 +134,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         }
 
         commandContext.getHistoryManager().recordTaskCreated(this, execution);
-        
+
         if (commandContext.getProcessEngineConfiguration().getEventDispatcher().isEnabled() && fireEvents) {
             commandContext.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
                     ActivitiEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, this));
@@ -221,7 +223,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
     }
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("assignee", this.assignee);
         persistentState.put("owner", this.owner);
         persistentState.put("name", this.name);
@@ -292,7 +294,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
 
     @Override
     protected VariableInstanceEntity createVariableInstance(String variableName, Object value,
-            ExecutionEntity sourceActivityExecution) {
+                                                            ExecutionEntity sourceActivityExecution) {
         VariableInstanceEntity result = super.createVariableInstance(variableName, value, sourceActivityExecution);
 
         // Dispatch event, if needed
@@ -306,7 +308,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
 
     @Override
     protected void updateVariableInstance(VariableInstanceEntity variableInstance, Object value,
-            ExecutionEntity sourceActivityExecution) {
+                                          ExecutionEntity sourceActivityExecution) {
         super.updateVariableInstance(variableInstance, value, sourceActivityExecution);
 
         // Dispatch event, if needed
@@ -368,7 +370,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
                 .getIdentityLinkEntityManager()
                 .findIdentityLinkByTaskUserGroupAndType(id, userId, groupId, type);
 
-        List<String> identityLinkIds = new ArrayList<String>();
+        List<String> identityLinkIds = new ArrayList<>();
         for (IdentityLinkEntity identityLink : identityLinks) {
             Context
                     .getCommandContext()
@@ -378,7 +380,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         }
 
         // fix deleteCandidate() in create TaskListener
-        List<IdentityLinkEntity> removedIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
+        List<IdentityLinkEntity> removedIdentityLinkEntities = new ArrayList<>();
         for (IdentityLinkEntity identityLinkEntity : this.getIdentityLinks()) {
             if (IdentityLinkType.CANDIDATE.equals(identityLinkEntity.getType()) &&
                     !identityLinkIds.contains(identityLinkEntity.getId())) {
@@ -398,7 +400,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
     }
 
     public Set<IdentityLink> getCandidates() {
-        Set<IdentityLink> potentialOwners = new HashSet<IdentityLink>();
+        Set<IdentityLink> potentialOwners = new HashSet<>();
         for (IdentityLinkEntity identityLinkEntity : getIdentityLinks()) {
             if (IdentityLinkType.CANDIDATE.equals(identityLinkEntity.getType())) {
                 potentialOwners.add(identityLinkEntity);
@@ -979,7 +981,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
     }
 
     public Map<String, Object> getTaskLocalVariables() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
             for (VariableInstanceEntity variableInstance : queryVariables) {
                 if (variableInstance.getId() != null && variableInstance.getTaskId() != null) {
@@ -991,7 +993,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
     }
 
     public Map<String, Object> getProcessVariables() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
             for (VariableInstanceEntity variableInstance : queryVariables) {
                 if (variableInstance.getId() != null && variableInstance.getTaskId() == null) {

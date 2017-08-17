@@ -99,7 +99,7 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
     }
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         if (longValue != null) {
             persistentState.put("longValue", longValue);
         }
@@ -130,7 +130,7 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
     }
-    
+
     public void setProcessDefinitionId(String processDefinitionId) {
     }
 
@@ -210,7 +210,7 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
     public String getProcessInstanceId() {
         return processInstanceId;
     }
-    
+
     public String getProcessDefinitionId() {
         return null;
     }

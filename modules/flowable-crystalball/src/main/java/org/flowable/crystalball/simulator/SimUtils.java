@@ -16,13 +16,15 @@ import java.util.Random;
 
 /**
  * Simulation utils used in the simulation run and scenario. e.g. random number generator should be centralized for all sim runs.
- * 
+ *
  * @author martin.grofcik
  */
 
 public class SimUtils {
-    /** main random number generator */
-    private static volatile ThreadLocal<Random> randomGenerator = new ThreadLocal<Random>();
+    /**
+     * main random number generator
+     */
+    private static volatile ThreadLocal<Random> randomGenerator = new ThreadLocal<>();
 
     public static void setSeed(long seed) {
         randomGenerator.set(new Random(seed));

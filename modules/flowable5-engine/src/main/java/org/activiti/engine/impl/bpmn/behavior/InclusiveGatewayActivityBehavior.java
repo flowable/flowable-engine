@@ -32,7 +32,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of the Inclusive Gateway/OR gateway/inclusive data-based gateway as defined in the BPMN specification.
- * 
+ *
  * @author Tijs Rademakers
  * @author Tom Van Buskirk
  * @author Joram Barrez
@@ -57,7 +57,7 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
 
             List<ActivityExecution> joinedExecutions = activityExecution.findInactiveConcurrentExecutions(activity);
             String defaultSequenceFlow = (String) activityExecution.getActivity().getProperty("default");
-            List<PvmTransition> transitionsToTake = new ArrayList<PvmTransition>();
+            List<PvmTransition> transitionsToTake = new ArrayList<>();
 
             for (PvmTransition outgoingTransition : activityExecution.getActivity().getOutgoingTransitions()) {
 
@@ -104,7 +104,7 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
     }
 
     List<? extends ActivityExecution> getLeaveExecutions(ActivityExecution parent) {
-        List<ActivityExecution> executionlist = new ArrayList<ActivityExecution>();
+        List<ActivityExecution> executionlist = new ArrayList<>();
         List<? extends ActivityExecution> subExecutions = parent.getExecutions();
         if (subExecutions.isEmpty()) {
             executionlist.add(parent);
@@ -149,7 +149,7 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
     }
 
     protected boolean isReachable(PvmActivity srcActivity,
-            PvmActivity targetActivity, Set<PvmActivity> visitedActivities) {
+                                  PvmActivity targetActivity, Set<PvmActivity> visitedActivities) {
 
         // if source has no outputs, it is the end of the process, and its parent process should be checked.
         if (srcActivity.getOutgoingTransitions().isEmpty()) {

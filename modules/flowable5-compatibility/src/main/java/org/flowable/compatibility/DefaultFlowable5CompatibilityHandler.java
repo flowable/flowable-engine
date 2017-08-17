@@ -13,6 +13,8 @@
 
 package org.flowable.compatibility;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
@@ -72,8 +74,6 @@ import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -264,7 +264,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
 
             // Copy resources
             DeploymentEntity activiti6DeploymentEntity = activiti6DeploymentBuilder.getDeployment();
-            Map<String, org.activiti.engine.impl.persistence.entity.ResourceEntity> activiti5Resources = new HashMap<String, org.activiti.engine.impl.persistence.entity.ResourceEntity>();
+            Map<String, org.activiti.engine.impl.persistence.entity.ResourceEntity> activiti5Resources = new HashMap<>();
             for (String resourceKey : activiti6DeploymentEntity.getResources().keySet()) {
                 ResourceEntity activiti6ResourceEntity = activiti6DeploymentEntity.getResources().get(resourceKey);
 
@@ -312,7 +312,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
     }
 
     public ProcessInstance startProcessInstance(String processDefinitionKey, String processDefinitionId,
-            Map<String, Object> variables, Map<String, Object> transientVariables, String businessKey, String tenantId, String processInstanceName) {
+                                                Map<String, Object> variables, Map<String, Object> transientVariables, String businessKey, String tenantId, String processInstanceName) {
 
         org.activiti.engine.impl.identity.Authentication.setAuthenticatedUserId(Authentication.getAuthenticatedUserId());
 
@@ -351,7 +351,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
     }
 
     public ProcessInstance startProcessInstanceByMessage(String messageName, Map<String, Object> variables,
-            Map<String, Object> transientVariables, String businessKey, String tenantId) {
+                                                         Map<String, Object> transientVariables, String businessKey, String tenantId) {
 
         try {
 

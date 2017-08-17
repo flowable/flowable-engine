@@ -18,7 +18,7 @@ public class ProcessInstanceHistoryLogImpl implements ProcessInstanceHistoryLog 
 
     protected HistoricProcessInstance historicProcessInstance;
 
-    protected List<HistoricData> historicData = new ArrayList<HistoricData>();
+    protected List<HistoricData> historicData = new ArrayList<>();
 
     public ProcessInstanceHistoryLogImpl(HistoricProcessInstance historicProcessInstance) {
         this.historicProcessInstance = historicProcessInstance;

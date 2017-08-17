@@ -49,7 +49,7 @@ public class VariableInstanceEntityManager extends AbstractManager {
     }
 
     public VariableInstanceEntity findVariableInstanceByExecutionAndName(String executionId, String variableName) {
-        Map<String, String> params = new HashMap<String, String>(2);
+        Map<String, String> params = new HashMap<>(2);
         params.put("executionId", executionId);
         params.put("name", variableName);
         return (VariableInstanceEntity) getDbSqlSession().selectOne("selectVariableInstanceByExecutionAndName", params);
@@ -57,14 +57,14 @@ public class VariableInstanceEntityManager extends AbstractManager {
 
     @SuppressWarnings("unchecked")
     public List<VariableInstanceEntity> findVariableInstancesByExecutionAndNames(String executionId, Collection<String> names) {
-        Map<String, Object> params = new HashMap<String, Object>(2);
+        Map<String, Object> params = new HashMap<>(2);
         params.put("executionId", executionId);
         params.put("names", names);
         return getDbSqlSession().selectList("selectVariableInstancesByExecutionAndNames", params);
     }
 
     public VariableInstanceEntity findVariableInstanceByTaskAndName(String taskId, String variableName) {
-        Map<String, String> params = new HashMap<String, String>(2);
+        Map<String, String> params = new HashMap<>(2);
         params.put("taskId", taskId);
         params.put("name", variableName);
         return (VariableInstanceEntity) getDbSqlSession().selectOne("selectVariableInstanceByTaskAndName", params);
@@ -72,7 +72,7 @@ public class VariableInstanceEntityManager extends AbstractManager {
 
     @SuppressWarnings("unchecked")
     public List<VariableInstanceEntity> findVariableInstancesByTaskAndNames(String taskId, Collection<String> names) {
-        Map<String, Object> params = new HashMap<String, Object>(2);
+        Map<String, Object> params = new HashMap<>(2);
         params.put("taskId", taskId);
         params.put("names", names);
         return getDbSqlSession().selectList("selectVariableInstancesByTaskAndNames", params);

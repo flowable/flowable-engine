@@ -24,7 +24,7 @@ import org.springframework.beans.factory.FactoryBean;
  * This class provides thread local clock implementation. Each thread can run its own simulation engine and can behave according to its internal thread local clock
  */
 public class ThreadLocalClock implements Clock {
-    private static volatile ThreadLocal<Clock> THREAD_CLOCK = new ThreadLocal<Clock>();
+    private static volatile ThreadLocal<Clock> THREAD_CLOCK = new ThreadLocal<>();
     protected FactoryBean<Clock> clockFactory;
 
     public ThreadLocalClock(FactoryBean<Clock> clockFactory) {

@@ -81,7 +81,7 @@ public class CommentEntityManager extends AbstractManager {
     @SuppressWarnings("unchecked")
     public List<Comment> findCommentsByTaskIdAndType(String taskId, String type) {
         checkHistoryEnabled();
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("taskId", taskId);
         params.put("type", type);
         return getDbSqlSession().selectListWithRawParameter("selectCommentsByTaskIdAndType", params, 0, Integer.MAX_VALUE);
@@ -123,7 +123,7 @@ public class CommentEntityManager extends AbstractManager {
 
     public List<Comment> findCommentsByProcessInstanceId(String processInstanceId, String type) {
         checkHistoryEnabled();
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("processInstanceId", processInstanceId);
         params.put("type", type);
         return getDbSqlSession().selectListWithRawParameter("selectCommentsByProcessInstanceIdAndType", params, 0, Integer.MAX_VALUE);

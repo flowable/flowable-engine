@@ -35,14 +35,14 @@ import org.flowable.variable.service.delegate.Expression;
 
 /**
  * Implementation of the BPMN 2.0 call activity (limited currently to calling a subprocess and not (yet) a global task).
- * 
+ *
  * @author Joram Barrez
  */
 public class CallActivityBehavior extends AbstractBpmnActivityBehavior implements SubProcessActivityBehavior {
 
     protected String processDefinitonKey;
-    private List<AbstractDataAssociation> dataInputAssociations = new ArrayList<AbstractDataAssociation>();
-    private List<AbstractDataAssociation> dataOutputAssociations = new ArrayList<AbstractDataAssociation>();
+    private List<AbstractDataAssociation> dataInputAssociations = new ArrayList<>();
+    private List<AbstractDataAssociation> dataOutputAssociations = new ArrayList<>();
     private Expression processDefinitionExpression;
     protected List<MapExceptionEntry> mapExceptions;
     protected boolean inheritVariables;

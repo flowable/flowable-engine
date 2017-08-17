@@ -21,7 +21,7 @@ import org.activiti.engine.impl.pvm.PvmProcessElement;
 
 /**
  * common properties for process definition, activity and transition including event listeners.
- * 
+ *
  * @author Tom Baeyens
  */
 public class ProcessElementImpl implements PvmProcessElement {
@@ -39,7 +39,7 @@ public class ProcessElementImpl implements PvmProcessElement {
 
     public void setProperty(String name, Object value) {
         if (properties == null) {
-            properties = new HashMap<String, Object>();
+            properties = new HashMap<>();
         }
         properties.put(name, value);
     }

@@ -51,7 +51,7 @@ public abstract class AbstractClientResource {
 
     protected Map<String, String[]> getRequestParametersWithoutServerId(HttpServletRequest request) {
         Map<String, String[]> parameterMap = request.getParameterMap();
-        Map<String, String[]> resultMap = new HashMap<String, String[]>();
+        Map<String, String[]> resultMap = new HashMap<>();
         resultMap.putAll(parameterMap);
         resultMap.remove(SERVER_ID);
         return resultMap;

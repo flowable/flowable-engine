@@ -46,11 +46,11 @@ public class StandaloneMybatisTransactionContext implements TransactionContext {
 
     public void addTransactionListener(TransactionState transactionState, TransactionListener transactionListener) {
         if (stateTransactionListeners == null) {
-            stateTransactionListeners = new HashMap<TransactionState, List<TransactionListener>>();
+            stateTransactionListeners = new HashMap<>();
         }
         List<TransactionListener> transactionListeners = stateTransactionListeners.get(transactionState);
         if (transactionListeners == null) {
-            transactionListeners = new ArrayList<TransactionListener>();
+            transactionListeners = new ArrayList<>();
             stateTransactionListeners.put(transactionState, transactionListeners);
         }
         transactionListeners.add(transactionListener);
@@ -70,13 +70,11 @@ public class StandaloneMybatisTransactionContext implements TransactionContext {
 
     /**
      * Fires the event for the provided {@link TransactionState}.
-     * 
-     * @param transactionState
-     *            The {@link TransactionState} for which the listeners will be called.
-     * @param executeInNewContext
-     *            If true, the listeners will be called in a new command context. This is needed for example when firing the {@link TransactionState#COMMITTED} event: the transaction is already
-     *            committed and executing logic in the same context could lead to strange behaviour (for example doing a {@link SqlSession#update(String)} would actually roll back the update (as the
-     *            MyBatis context is already committed and the internal flags have not been correctly set).
+     *
+     * @param transactionState    The {@link TransactionState} for which the listeners will be called.
+     * @param executeInNewContext If true, the listeners will be called in a new command context. This is needed for example when firing the {@link TransactionState#COMMITTED} event: the transaction is already
+     *                            committed and executing logic in the same context could lead to strange behaviour (for example doing a {@link SqlSession#update(String)} would actually roll back the update (as the
+     *                            MyBatis context is already committed and the internal flags have not been correctly set).
      */
     protected void fireTransactionEvent(TransactionState transactionState, boolean executeInNewContext) {
         if (stateTransactionListeners == null) {

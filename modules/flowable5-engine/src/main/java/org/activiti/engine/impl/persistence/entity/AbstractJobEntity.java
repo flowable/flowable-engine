@@ -100,7 +100,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
     }
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("retries", retries);
         persistentState.put("duedate", duedate);
         persistentState.put("exceptionMessage", exceptionMessage);

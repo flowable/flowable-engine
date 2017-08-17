@@ -188,7 +188,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
             return;
         }
 
-        Map<String, HistoricActivityInstanceEntity> historicActivityInstancMap = new HashMap<String, HistoricActivityInstanceEntity>();
+        Map<String, HistoricActivityInstanceEntity> historicActivityInstancMap = new HashMap<>();
 
         List<HistoricActivityInstance> historicActivityInstances = new HistoricActivityInstanceQueryImpl(Context.getCommandContext())
                 .processInstanceId(processInstanceId)

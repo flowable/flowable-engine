@@ -33,8 +33,10 @@ public class TransitionImpl extends ProcessElementImpl implements PvmTransition 
     protected List<ExecutionListener> executionListeners;
     protected Expression skipExpression;
 
-    /** Graphical information: a list of waypoints: x1, y1, x2, y2, x3, y3, .. */
-    protected List<Integer> waypoints = new ArrayList<Integer>();
+    /**
+     * Graphical information: a list of waypoints: x1, y1, x2, y2, x3, y3, ..
+     */
+    protected List<Integer> waypoints = new ArrayList<>();
 
     public TransitionImpl(String id, Expression skipExpression, ProcessDefinitionImpl processDefinition) {
         super(id, processDefinition);
@@ -52,7 +54,7 @@ public class TransitionImpl extends ProcessElementImpl implements PvmTransition 
 
     public void addExecutionListener(ExecutionListener executionListener) {
         if (executionListeners == null) {
-            executionListeners = new ArrayList<ExecutionListener>();
+            executionListeners = new ArrayList<>();
         }
         executionListeners.add(executionListener);
     }

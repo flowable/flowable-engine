@@ -13,6 +13,9 @@
 
 package org.activiti.engine.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +31,6 @@ import org.activiti.engine.impl.persistence.entity.SuspensionState;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.DynamicBpmnConstants;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tom Baeyens
@@ -74,7 +74,7 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     protected String tenantIdLike;
     protected boolean withoutTenantId;
 
-    protected List<ProcessInstanceQueryImpl> orQueryObjects = new ArrayList<ProcessInstanceQueryImpl>();
+    protected List<ProcessInstanceQueryImpl> orQueryObjects = new ArrayList<>();
     protected ProcessInstanceQueryImpl currentOrQueryObject;
     protected boolean inOrStatement;
 

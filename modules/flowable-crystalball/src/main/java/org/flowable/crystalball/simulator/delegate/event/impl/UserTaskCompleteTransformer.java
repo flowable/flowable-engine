@@ -40,7 +40,7 @@ public class UserTaskCompleteTransformer extends Flowable2SimulationEventFunctio
         if (FlowableEngineEventType.TASK_COMPLETED == event.getType()) {
             Task task = (Task) ((FlowableEntityEvent) event).getEntity();
 
-            Map<String, Object> properties = new HashMap<String, Object>();
+            Map<String, Object> properties = new HashMap<>();
             properties.put("taskId", task.getId());
             properties.put(TASK_DEFINITION_KEY, task.getTaskDefinitionKey());
             properties.put(PROCESS_INSTANCE_ID, task.getProcessInstanceId());

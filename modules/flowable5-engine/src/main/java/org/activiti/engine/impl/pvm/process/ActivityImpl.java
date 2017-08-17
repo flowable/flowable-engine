@@ -30,10 +30,10 @@ import org.flowable.variable.service.delegate.Expression;
 public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds {
 
     private static final long serialVersionUID = 1L;
-    protected List<TransitionImpl> outgoingTransitions = new ArrayList<TransitionImpl>();
-    protected Map<String, TransitionImpl> namedOutgoingTransitions = new HashMap<String, TransitionImpl>();
+    protected List<TransitionImpl> outgoingTransitions = new ArrayList<>();
+    protected Map<String, TransitionImpl> namedOutgoingTransitions = new HashMap<>();
     protected Map<String, Object> variables;
-    protected List<TransitionImpl> incomingTransitions = new ArrayList<TransitionImpl>();
+    protected List<TransitionImpl> incomingTransitions = new ArrayList<>();
     protected ActivityBehavior activityBehavior;
     protected ScopeImpl parent;
     protected boolean isScope;

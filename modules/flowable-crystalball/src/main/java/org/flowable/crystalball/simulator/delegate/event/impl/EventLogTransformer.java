@@ -31,7 +31,7 @@ public class EventLogTransformer {
     }
 
     public List<SimulationEvent> transform(List<EventLogEntry> eventLog) {
-        List<SimulationEvent> simulationEvents = new ArrayList<SimulationEvent>();
+        List<SimulationEvent> simulationEvents = new ArrayList<>();
         for (EventLogEntry logEntry : eventLog) {
             simulationEvents.addAll(transformEntry(logEntry));
         }
@@ -39,7 +39,7 @@ public class EventLogTransformer {
     }
 
     protected Collection<SimulationEvent> transformEntry(EventLogEntry event) {
-        List<SimulationEvent> simEvents = new ArrayList<SimulationEvent>();
+        List<SimulationEvent> simEvents = new ArrayList<>();
         for (Function<EventLogEntry, SimulationEvent> t : transformers) {
             SimulationEvent simEvent = t.apply(event);
             if (simEvent != null)

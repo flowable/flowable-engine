@@ -178,7 +178,7 @@ public class ExecutionEntityManager extends AbstractManager {
 
     @SuppressWarnings("unchecked")
     public List<ExecutionEntity> findEventScopeExecutionsByActivityId(String activityRef, String parentExecutionId) {
-        Map<String, String> parameters = new HashMap<String, String>();
+        Map<String, String> parameters = new HashMap<>();
         parameters.put("activityId", activityRef);
         parameters.put("parentExecutionId", parentExecutionId);
 
@@ -200,7 +200,7 @@ public class ExecutionEntityManager extends AbstractManager {
     }
 
     public void updateExecutionTenantIdForDeployment(String deploymentId, String newTenantId) {
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
         getDbSqlSession().update("updateExecutionTenantIdForDeployment", params);
@@ -214,7 +214,7 @@ public class ExecutionEntityManager extends AbstractManager {
         lockCal.setTime(expirationTime);
         lockCal.add(Calendar.MILLISECOND, lockMillis);
 
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("id", processInstanceId);
         params.put("lockTime", lockCal.getTime());
         params.put("expirationTime", expirationTime);
@@ -226,7 +226,7 @@ public class ExecutionEntityManager extends AbstractManager {
     }
 
     public void clearProcessInstanceLockTime(String processInstanceId) {
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("id", processInstanceId);
 
         getDbSqlSession().update("clearProcessInstanceLockTime", params);

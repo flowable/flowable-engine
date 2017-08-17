@@ -41,7 +41,7 @@ public class DeploymentCreateTransformer extends Flowable2SimulationEventFunctio
 
             DeploymentEntity deploymentEntity = (DeploymentEntity) ((FlowableEntityEvent) event).getEntity();
 
-            Map<String, Object> simEventProperties = new HashMap<String, Object>();
+            Map<String, Object> simEventProperties = new HashMap<>();
             simEventProperties.put(resourcesKey, deploymentEntity.getResources());
 
             return new SimulationEvent.Builder(simulationEventType).simulationTime(CommandContextUtil.getProcessEngineConfiguration().getClock().getCurrentTime().getTime()).properties(simEventProperties).priority(1).build();

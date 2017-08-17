@@ -45,7 +45,7 @@ public class MessageEventReceivedCmd extends NeedsActiveExecutionCmd<Void> {
             if (processVariables instanceof Serializable) {
                 this.payload = (Serializable) processVariables;
             } else {
-                this.payload = new HashMap<String, Object>(processVariables);
+                this.payload = new HashMap<>(processVariables);
             }
 
         } else {

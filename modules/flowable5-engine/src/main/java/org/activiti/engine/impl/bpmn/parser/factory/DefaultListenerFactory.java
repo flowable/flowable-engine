@@ -45,12 +45,13 @@ import org.flowable.job.service.Job;
 
 /**
  * Default implementation of the {@link ListenerFactory}. Used when no custom {@link ListenerFactory} is injected on the {@link ProcessEngineConfigurationImpl}.
- * 
+ *
  * @author Joram Barrez
  */
 public class DefaultListenerFactory extends AbstractBehaviorFactory implements ListenerFactory {
 
-    public static final Map<String, Class<?>> ENTITY_MAPPING = new HashMap<String, Class<?>>();
+    public static final Map<String, Class<?>> ENTITY_MAPPING = new HashMap<>();
+
     static {
         ENTITY_MAPPING.put("attachment", Attachment.class);
         ENTITY_MAPPING.put("comment", Comment.class);
@@ -128,11 +129,9 @@ public class DefaultListenerFactory extends AbstractBehaviorFactory implements L
     }
 
     /**
-     * @param entityType
-     *            the name of the entity
+     * @param entityType the name of the entity
      * @return
-     * @throws ActivitiIllegalArgumentException
-     *             when the given entity name
+     * @throws ActivitiIllegalArgumentException when the given entity name
      */
     protected Class<?> getEntityType(String entityType) {
         if (entityType != null) {
