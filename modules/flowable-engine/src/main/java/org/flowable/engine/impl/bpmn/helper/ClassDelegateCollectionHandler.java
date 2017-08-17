@@ -17,7 +17,6 @@ import java.util.Collection;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.delegate.FlowableCollectionHandler;
 
@@ -42,8 +41,8 @@ public class ClassDelegateCollectionHandler extends AbstractClassDelegate implem
 
 	@Override
 	@SuppressWarnings("rawtypes")
-	public Collection resolveCollection(DelegateExecution execution, String collectionString) {
-		return getCollectionHandlerInstance().resolveCollection(execution, collectionString);
+	public Collection resolveCollection(String collectionString) {
+		return getCollectionHandlerInstance().resolveCollection(collectionString);
 	}
 
     protected FlowableCollectionHandler getCollectionHandlerInstance() {

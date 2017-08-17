@@ -26,16 +26,18 @@ public class DelegateExpressionCollectionHandler implements FlowableCollectionHa
     
 	private static final long serialVersionUID = 1L;
 
+	protected DelegateExecution execution;
 	protected Expression expression;
 
-    public DelegateExpressionCollectionHandler(Expression expression) {
+    public DelegateExpressionCollectionHandler(DelegateExecution execution, Expression expression) {
+        this.execution = execution;
         this.expression = expression;
     }
 
 	@Override
 	@SuppressWarnings("rawtypes")
-	public Collection resolveCollection(DelegateExecution execution, String collectionString) {
-		return getCollectionHandlerInstance(execution).resolveCollection(execution, collectionString);
+	public Collection resolveCollection(String collectionString) {
+		return getCollectionHandlerInstance(execution).resolveCollection(collectionString);
 	}
 
     protected FlowableCollectionHandler getCollectionHandlerInstance(DelegateExecution execution) {

@@ -304,7 +304,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
             } else if (collectionVariable == null) {
             	// it may be a complex string, not a variable name
                 if (collectionHandler != null ) {        	
-                	return createFlowableCollectionHandler(collectionHandler, execution, (String) obj).resolveCollection(execution, (String) obj);
+                	return createFlowableCollectionHandler(collectionHandler, execution, (String) obj).resolveCollection((String) obj);
                 } else {
                 	throw new FlowableIllegalArgumentException("Variable " + collectionVariable + " is not found");
                 }
@@ -327,7 +327,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
             collection = execution.getVariable(collectionVariable);
         } else if (collectionString != null) {
             if (collectionHandler != null) {        	
-            	collection = createFlowableCollectionHandler(collectionHandler, execution, collectionString).resolveCollection(execution, collectionString);
+            	collection = createFlowableCollectionHandler(collectionHandler, execution, collectionString).resolveCollection(collectionString);
             }
         }
         return collection;
@@ -416,7 +416,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(handler.getImplementationType())) {
         	Object delegate = DelegateExpressionUtil.resolveDelegateExpression(CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(handler.getImplementation()), execution);
             if (delegate instanceof FlowableCollectionHandler) {
-                collectionHandler = new DelegateExpressionCollectionHandler(CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(handler.getImplementation()));   
+                collectionHandler = new DelegateExpressionCollectionHandler(execution, CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(handler.getImplementation()));   
             } else {
                 throw new FlowableIllegalArgumentException("Delegate expression " + handler.getImplementation() + " did not resolve to an implementation of " + FlowableCollectionHandler.class);
             }
