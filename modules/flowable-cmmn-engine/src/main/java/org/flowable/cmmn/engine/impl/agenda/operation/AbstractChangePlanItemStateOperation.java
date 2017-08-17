@@ -83,10 +83,12 @@ public abstract class AbstractChangePlanItemStateOperation extends AbstractPlanI
                 // Cache
                 Map<String, CachedEntity> cachedMilestoneInstanceEntities = CommandContextUtil.getEntityCache()
                         .getAllCachedEntities().get(MilestoneInstanceEntityImpl.class);
-                for (CachedEntity cachedEntity : cachedMilestoneInstanceEntities.values()) {
-                    MilestoneInstanceEntityImpl milestoneInstanceEntity = (MilestoneInstanceEntityImpl) cachedEntity.getEntity();
-                    if (milestoneInstanceEntity.getCaseInstanceId().equals(caseInstanceEntity.getId())) {
-                        milestoneIds.add(milestoneInstanceEntity.getId());
+                if (cachedMilestoneInstanceEntities != null) {
+                    for (CachedEntity cachedEntity : cachedMilestoneInstanceEntities.values()) {
+                        MilestoneInstanceEntityImpl milestoneInstanceEntity = (MilestoneInstanceEntityImpl) cachedEntity.getEntity();
+                        if (milestoneInstanceEntity.getCaseInstanceId().equals(caseInstanceEntity.getId())) {
+                            milestoneIds.add(milestoneInstanceEntity.getId());
+                        }
                     }
                 }
                 
@@ -96,7 +98,10 @@ public abstract class AbstractChangePlanItemStateOperation extends AbstractPlanI
                 
                 PlanItemInstanceEntity planModelPlanItemInstanceEntity = caseInstanceEntity.getPlanModelInstance();
                 CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).deleteCascade(planModelPlanItemInstanceEntity);
-                CommandContextUtil.getCaseInstanceEntityManager(commandContext).delete(planModelPlanItemInstanceEntity.getCaseInstanceId());
+                
+                String caseInstanceId = planModelPlanItemInstanceEntity.getCaseInstanceId();
+                CommandContextUtil.getCaseInstanceEntityManager(commandContext).delete(caseInstanceId);
+                CommandContextUtil.getCmmnHistoryManager(commandContext).recordCaseInstanceEnd(caseInstanceId);
             }
         }
     }

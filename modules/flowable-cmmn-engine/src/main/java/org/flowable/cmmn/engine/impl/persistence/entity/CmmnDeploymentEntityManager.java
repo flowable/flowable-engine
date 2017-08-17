@@ -27,7 +27,7 @@ public interface CmmnDeploymentEntityManager extends EntityManager<CmmnDeploymen
     
     List<String> getDeploymentResourceNames(String deploymentId);
 
-    void deleteDeploymentAndRelatedData(String deploymentId);
+    void deleteDeploymentAndRelatedData(String deploymentId, boolean cascade);
     
     CmmnDeploymentQuery createDeploymentQuery();
     

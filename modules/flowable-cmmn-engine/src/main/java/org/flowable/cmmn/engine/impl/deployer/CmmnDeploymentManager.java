@@ -118,12 +118,12 @@ public class CmmnDeploymentManager {
         if (deployment == null) {
             throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.", CmmnDeploymentEntity.class);
         }
-        deploymentEntityManager.deleteDeploymentAndRelatedData(deploymentId);
         
         for (CaseDefinition caseDefinition : new CaseDefinitionQueryImpl().deploymentId(deploymentId).list()) {
-            caseDefinitionEntityManager.deleteCaseDefinitionAndRelatedData(caseDefinition.getId());
             caseDefinitionCache.remove(caseDefinition.getId());
         }
+        
+        deploymentEntityManager.deleteDeploymentAndRelatedData(deploymentId, true);
     }
 
     public List<Deployer> getDeployers() {

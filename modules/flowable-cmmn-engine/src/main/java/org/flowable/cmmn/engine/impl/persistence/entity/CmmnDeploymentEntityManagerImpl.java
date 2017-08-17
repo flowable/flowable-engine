@@ -51,11 +51,15 @@ public class CmmnDeploymentEntityManagerImpl extends AbstractCmmnEntityManager<C
     }
 
     @Override
-    public void deleteDeploymentAndRelatedData(String deploymentId) {
+    public void deleteDeploymentAndRelatedData(String deploymentId, boolean cascade) {
         CaseDefinitionEntityManager caseDefinitionEntityManager = getCaseDefinitionEntityManager();
         List<CaseDefinition> caseDefinitions = caseDefinitionEntityManager.createCaseDefinitionQuery().deploymentId(deploymentId).list();
         for (CaseDefinition caseDefinition : caseDefinitions) {
-            caseDefinitionEntityManager.deleteCaseDefinitionAndRelatedData(caseDefinition.getId());
+            if (cascade) {
+                caseDefinitionEntityManager.deleteCaseDefinitionAndRelatedData(caseDefinition.getId(), true);
+            } else {
+                caseDefinitionEntityManager.delete(caseDefinition.getId());
+            }
         }
         getCmmnResourceEntityManager().deleteResourcesByDeploymentId(deploymentId);
         delete(findById(deploymentId));

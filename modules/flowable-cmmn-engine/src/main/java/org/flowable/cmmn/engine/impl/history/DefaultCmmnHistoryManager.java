@@ -13,6 +13,9 @@
 package org.flowable.cmmn.engine.impl.history;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.runtime.MilestoneInstance;
@@ -26,6 +29,29 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     
     public DefaultCmmnHistoryManager(CmmnEngineConfiguration cmmnEngineConfiguration) {
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
+    }
+    
+    @Override
+    public void recordCaseInstanceStart(CaseInstanceEntity caseInstanceEntity) {
+        HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
+        HistoricCaseInstanceEntity historicCaseInstanceEntity = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().create();
+        historicCaseInstanceEntity.setId(caseInstanceEntity.getId());
+        historicCaseInstanceEntity.setName(caseInstanceEntity.getName());
+        historicCaseInstanceEntity.setBusinessKey(caseInstanceEntity.getBusinessKey());
+        historicCaseInstanceEntity.setParentId(caseInstanceEntity.getParentId());
+        historicCaseInstanceEntity.setCaseDefinitionId(caseInstanceEntity.getCaseDefinitionId());
+        historicCaseInstanceEntity.setState(caseInstanceEntity.getState());
+        historicCaseInstanceEntity.setStartUserId(caseInstanceEntity.getStartUserId());
+        historicCaseInstanceEntity.setStartTime(cmmnEngineConfiguration.getClock().getCurrentTime());
+        historicCaseInstanceEntity.setTenantId(caseInstanceEntity.getTenantId());
+        historicCaseInstanceEntityManager.insert(historicCaseInstanceEntity);
+    }
+    
+    @Override
+    public void recordCaseInstanceEnd(String caseInstanceId) {
+        HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
+        HistoricCaseInstanceEntity historicCaseInstanceEntity = historicCaseInstanceEntityManager.findById(caseInstanceId);
+        historicCaseInstanceEntity.setEndTime(cmmnEngineConfiguration.getClock().getCurrentTime());
     }
     
     @Override

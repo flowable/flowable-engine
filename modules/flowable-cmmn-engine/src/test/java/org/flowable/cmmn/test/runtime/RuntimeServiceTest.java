@@ -14,9 +14,11 @@ package org.flowable.cmmn.test.runtime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
+import org.flowable.cmmn.engine.history.HistoricCaseInstance;
 import org.flowable.cmmn.engine.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.engine.repository.CaseDefinition;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
@@ -37,12 +39,20 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testStartSimplePassthroughCase() {
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
+        assertEquals("myCase", caseDefinition.getKey());
+        assertNotNull(caseDefinition.getResourceName());
+        assertNotNull(caseDefinition.getDeploymentId());
+        assertTrue(caseDefinition.getVersion() > 0);
+        
         CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceById(caseDefinition.getId());
         assertNotNull(caseInstance);
         assertEquals(caseDefinition.getId(), caseInstance.getCaseDefinitionId());
         assertNotNull(caseInstance.getStartTime());
         assertEquals(CaseInstanceState.COMPLETED, caseInstance.getState());
+        
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
      
         List<HistoricMilestoneInstance> milestoneInstances = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
                 .milestoneInstanceCaseInstanceId(caseInstance.getId())
@@ -59,6 +69,8 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
         CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceById(caseDefinition.getId());
         assertEquals(CaseInstanceState.ACTIVE, caseInstance.getState());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         
         assertEquals(4, cmmnRuntimeService.createPlanItemQuery().caseInstanceId(caseInstance.getId()).count());
         assertEquals(5, cmmnRuntimeService.createPlanItemQuery().caseInstanceId(caseInstance.getId()).includeStagePlanItemInstances().count());
@@ -77,6 +89,12 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         assertEquals(1, mileStones.size());
         assertEquals("PlanItem Milestone One", mileStones.get(0).getName());
         
+        List<HistoricMilestoneInstance> historicMilestoneInstances = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
+                .milestoneInstanceCaseInstanceId(caseInstance.getId())
+                .list();
+        assertEquals(1, historicMilestoneInstances.size());
+        assertEquals("PlanItem Milestone One", historicMilestoneInstances.get(0).getName());
+        
         planItemInstance = cmmnRuntimeService.createPlanItemQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
@@ -86,6 +104,61 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
         
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertEquals(2, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testStartPassthroughCaseWithThreeEntryCriteriaOnParts() {
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
+        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceById(caseDefinition.getId());
+     
+        List<HistoricMilestoneInstance> mileStones = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
+                .milestoneInstanceCaseInstanceId(caseInstance.getId())
+                .orderByMilestoneName().asc()
+                .list();
+        assertEquals(1, mileStones.size());
+        assertEquals("PlanItem Milestone One", mileStones.get(0).getName());
+        
+        HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertNotNull(historicCaseInstance);
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testThreeEntryCriteriaOnPartsForWaitStates() {
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
+        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceById(caseDefinition.getId());
+        assertEquals(0, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+        assertEquals(0L, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+        
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .list();
+        assertEquals(3, planItemInstances.size());
+        
+        for (PlanItemInstance planItemInstance : planItemInstances) {
+            cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+        }
+     
+        HistoricMilestoneInstance mileStone = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
+                .milestoneInstanceCaseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertEquals("PlanItem Milestone One", mileStone.getName());
+        assertEquals(0, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+        
+        HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .singleResult();
+        assertNotNull(historicCaseInstance);
     }
     
 }

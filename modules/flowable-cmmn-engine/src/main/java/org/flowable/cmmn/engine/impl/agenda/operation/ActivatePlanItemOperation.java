@@ -14,6 +14,9 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -30,8 +33,21 @@ public class ActivatePlanItemOperation extends AbstractPlanItemInstanceOperation
     @Override
     public void run() {
         if (!PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState())) {
+            
+            // Sentries are not needed to be kept around, as the plan item is being activated
+            deleteSentryOnPartInstances();
+            
             planItemInstanceEntity.setState(PlanItemInstanceState.ACTIVE);
             executeActivityBehavior();
+        }
+    }
+    
+    protected void deleteSentryOnPartInstances() {
+        SentryOnPartInstanceEntityManager sentryOnPartInstanceEntityManager = CommandContextUtil.getSentryOnPartInstanceEntityManager(commandContext);
+        if (planItemInstanceEntity.getSatisfiedSentryOnPartInstances() != null) {
+            for (SentryOnPartInstanceEntity sentryOnPartInstanceEntity : planItemInstanceEntity.getSatisfiedSentryOnPartInstances()) {
+                sentryOnPartInstanceEntityManager.delete(sentryOnPartInstanceEntity);
+            }
         }
     }
     

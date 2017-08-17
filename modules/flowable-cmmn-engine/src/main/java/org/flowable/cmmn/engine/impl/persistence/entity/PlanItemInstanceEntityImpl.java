@@ -43,6 +43,7 @@ public class PlanItemInstanceEntityImpl extends AbstractEntity implements PlanIt
     protected PlanItem planItem;
     protected List<PlanItemInstanceEntity> children;
     protected PlanItemInstanceEntity stagePlanItemInstance;
+    protected List<SentryOnPartInstanceEntity> satisfiedSentryOnPartInstances;
     
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
@@ -155,5 +156,17 @@ public class PlanItemInstanceEntityImpl extends AbstractEntity implements PlanIt
         }
         return stagePlanItemInstance;
     }
+    
+    @Override
+    public List<SentryOnPartInstanceEntity> getSatisfiedSentryOnPartInstances() {
+        if (satisfiedSentryOnPartInstances == null) {
+            satisfiedSentryOnPartInstances = CommandContextUtil.getSentryOnPartInstanceEntityManager().findSentryOnPartInstancesByPlanItemInstanceId(id);
+        }
+        return satisfiedSentryOnPartInstances;
+    }
 
+    public void setSatisfiedSentryOnPartInstances(List<SentryOnPartInstanceEntity> satisfiedSentryOnPartInstances) {
+        this.satisfiedSentryOnPartInstances = satisfiedSentryOnPartInstances;
+    }
+    
 }

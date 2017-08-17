@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.Date;
@@ -22,55 +21,62 @@ import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 /**
  * @author Joram Barrez
  */
-public class MilestoneInstanceEntityImpl extends AbstractEntity implements MilestoneInstanceEntity {
+public class SentryOnPartInstanceEntityImpl extends AbstractEntity implements SentryOnPartInstanceEntity {
     
-    protected String name;
-    protected Date timeStamp;
-    protected String caseInstanceId;
     protected String caseDefinitionId;
-    protected String elementId;
+    protected String caseInstanceId;
+    protected String planItemInstanceId;
+    protected String onPartId;
+    protected Date timeStamp;
     
-    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
-        persistentState.put("id", id);
-        persistentState.put("name", name);
-        persistentState.put("timeStamp", timeStamp);
-        persistentState.put("caseInstanceId", caseInstanceId);
         persistentState.put("caseDefinitionId", caseDefinitionId);
-        persistentState.put("elementId", elementId);
+        persistentState.put("caseInstanceId", caseInstanceId);
+        persistentState.put("planItemInstanceId", planItemInstanceId);
+        persistentState.put("onPartId", onPartId);
+        persistentState.put("timeStamp", timeStamp);
         return persistentState;
     }
-    
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
-    public Date getTimeStamp() {
-        return timeStamp;
-    }
-    public void setTimeStamp(Date timeStamp) {
-        this.timeStamp = timeStamp;
-    }
-    public String getCaseInstanceId() {
-        return caseInstanceId;
-    }
-    public void setCaseInstanceId(String caseInstanceId) {
-        this.caseInstanceId = caseInstanceId;
-    }
+
     public String getCaseDefinitionId() {
         return caseDefinitionId;
     }
+
     public void setCaseDefinitionId(String caseDefinitionId) {
         this.caseDefinitionId = caseDefinitionId;
     }
-    public String getElementId() {
-        return elementId;
-    }
-    public void setElementId(String elementId) {
-        this.elementId = elementId;
+
+    public String getCaseInstanceId() {
+        return caseInstanceId;
     }
 
+    public void setCaseInstanceId(String caseInstanceId) {
+        this.caseInstanceId = caseInstanceId;
+    }
+
+    public String getPlanItemInstanceId() {
+        return planItemInstanceId;
+    }
+
+    public void setPlanItemInstanceId(String planItemInstanceId) {
+        this.planItemInstanceId = planItemInstanceId;
+    }
+
+    public String getOnPartId() {
+        return onPartId;
+    }
+
+    public void setOnPartId(String onPartId) {
+        this.onPartId = onPartId;
+    }
+
+    public Date getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(Date timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+    
 }

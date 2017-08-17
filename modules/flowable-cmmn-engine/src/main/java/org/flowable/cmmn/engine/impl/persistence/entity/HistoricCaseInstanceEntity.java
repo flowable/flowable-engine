@@ -13,36 +13,23 @@
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.Date;
-import java.util.List;
 
-import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
-import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.engine.history.HistoricCaseInstance;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 
 /**
  * @author Joram Barrez
  */
-public interface PlanItemInstanceEntity extends DelegatePlanItemInstance, Entity {
-    
+public interface HistoricCaseInstanceEntity extends Entity, HistoricCaseInstance {
+
+    void setBusinessKey(String businessKey);
     void setName(String name);
-    void setState(String state);
+    void setParentId(String parentId);
     void setCaseDefinitionId(String caseDefinitionId);
-    void setCaseInstanceId(String caseInstanceId);
-    void setStageInstanceId(String stageInstanceId);
-    void setStage(boolean isStage);
-    void setElementId(String elementId);
+    void setState(String state);
     void setStartTime(Date startTime);
+    void setEndTime(Date endTime);
     void setStartUserId(String startUserId);
     void setTenantId(String tenantId);
-    
-    PlanItem getPlanItem();
-    
-    void setChildren(List<PlanItemInstanceEntity> children);
-    void addChild(PlanItemInstanceEntity planItemInstanceEntity);
-    List<PlanItemInstanceEntity> getChildren();
-    
-    PlanItemInstanceEntity getStagePlanItemInstace();
-    
-    List<SentryOnPartInstanceEntity> getSatisfiedSentryOnPartInstances();
     
 }

@@ -47,27 +47,35 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityMana
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityManagerImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManagerImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseDefinitionDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnDeploymentDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnResourceDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricCaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricMilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.MilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.SentryOnPartInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCaseDefinitionDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCaseInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCmmnDeploymentDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisHistoricCaseInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisHistoricMilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisMilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisPlanItemInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisSentryOnPartInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.TableDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
@@ -108,7 +116,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     protected CaseDefinitionDataManager caseDefinitionDataManager;
     protected CaseInstanceDataManager caseInstanceDataManager;
     protected PlanItemInstanceDataManager planItemInstanceDataManager;
+    protected SentryOnPartInstanceDataManager sentryOnPartInstanceDataManager; 
     protected MilestoneInstanceDataManager milestoneInstanceDataManager;
+    protected HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager;
     protected HistoricMilestoneInstanceDataManager historicMilestoneInstanceDataManager;
     
     protected CmmnDeploymentEntityManager cmmnDeploymentEntityManager;
@@ -116,7 +126,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     protected CaseDefinitionEntityManager caseDefinitionEntityManager;
     protected CaseInstanceEntityManager caseInstanceEntityManager;
     protected PlanItemInstanceEntityManager planItemInstanceEntityManager;
+    protected SentryOnPartInstanceEntityManager sentryOnPartInstanceEntityManager;
     protected MilestoneInstanceEntityManager milestoneInstanceEntityManager;
+    protected HistoricCaseInstanceDataManager historicCaseInstanceDataManager;
     protected HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager;
     
     protected CaseInstanceHelper caseInstanceHelper;
@@ -276,8 +288,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         if (planItemInstanceDataManager == null) {
             planItemInstanceDataManager = new MybatisPlanItemInstanceDataManagerImpl(this);
         }
+        if (sentryOnPartInstanceDataManager == null) {
+            sentryOnPartInstanceDataManager = new MybatisSentryOnPartInstanceDataManagerImpl(this);
+        }
         if (milestoneInstanceDataManager == null) {
             milestoneInstanceDataManager = new MybatisMilestoneInstanceDataManager(this);
+        }
+        if (historicCaseInstanceDataManager == null) {
+            historicCaseInstanceDataManager = new MybatisHistoricCaseInstanceDataManagerImpl(this);
         }
         if (historicMilestoneInstanceDataManager == null) {
             historicMilestoneInstanceDataManager = new MybatisHistoricMilestoneInstanceDataManager(this);
@@ -300,8 +318,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         if (planItemInstanceEntityManager == null) {
             planItemInstanceEntityManager = new PlanItemInstanceEntityManagerImpl(this, planItemInstanceDataManager);
         }
+        if (sentryOnPartInstanceEntityManager == null) {
+            sentryOnPartInstanceEntityManager = new SentryOnPartInstanceEntityManagerImpl(this, sentryOnPartInstanceDataManager);
+        }
         if (milestoneInstanceEntityManager == null) {
             milestoneInstanceEntityManager = new MilestoneInstanceEntityManagerImpl(this, milestoneInstanceDataManager);
+        }
+        if (historicCaseInstanceEntityManager == null) {
+            historicCaseInstanceEntityManager = new HistoricCaseInstanceEntityManagerImpl(this, historicCaseInstanceDataManager);
         }
         if (historicMilestoneInstanceEntityManager == null) {
             historicMilestoneInstanceEntityManager = new HistoricMilestoneInstanceEntityManagerImpl(this, historicMilestoneInstanceDataManager);
@@ -523,6 +547,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
     
+    public SentryOnPartInstanceDataManager getSentryOnPartInstanceDataManager() {
+        return sentryOnPartInstanceDataManager;
+    }
+
+    public CmmnEngineConfiguration setSentryOnPartInstanceDataManager(SentryOnPartInstanceDataManager sentryOnPartInstanceDataManager) {
+        this.sentryOnPartInstanceDataManager = sentryOnPartInstanceDataManager;
+        return this;
+    }
+
     public MilestoneInstanceDataManager getMilestoneInstanceDataManager() {
         return milestoneInstanceDataManager;
     }
@@ -532,6 +565,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
     
+    public HistoricCaseInstanceDataManager getHistoricCaseInstanceDataManager() {
+        return historicCaseInstanceDataManager;
+    }
+
+    public CmmnEngineConfiguration setHistoricCaseInstanceDataManager(HistoricCaseInstanceDataManager historicCaseInstanceDataManager) {
+        this.historicCaseInstanceDataManager = historicCaseInstanceDataManager;
+        return this;
+    }
+
     public HistoricMilestoneInstanceDataManager getHistoricMilestoneInstanceDataManager() {
         return historicMilestoneInstanceDataManager;
     }
@@ -586,6 +628,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
     
+    public SentryOnPartInstanceEntityManager getSentryOnPartInstanceEntityManager() {
+        return sentryOnPartInstanceEntityManager;
+    }
+
+    public CmmnEngineConfiguration setSentryOnPartInstanceEntityManager(SentryOnPartInstanceEntityManager sentryOnPartInstanceEntityManager) {
+        this.sentryOnPartInstanceEntityManager = sentryOnPartInstanceEntityManager;
+        return this;
+    }
+
     public MilestoneInstanceEntityManager getMilestoneInstanceEntityManager() {
         return milestoneInstanceEntityManager;
     }
@@ -595,6 +646,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
     
+    public HistoricCaseInstanceEntityManager getHistoricCaseInstanceEntityManager() {
+        return historicCaseInstanceEntityManager;
+    }
+
+    public CmmnEngineConfiguration setHistoricCaseInstanceEntityManager(HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager) {
+        this.historicCaseInstanceEntityManager = historicCaseInstanceEntityManager;
+        return this;
+    }
+
     public HistoricMilestoneInstanceEntityManager getHistoricMilestoneInstanceEntityManager() {
         return historicMilestoneInstanceEntityManager;
     }

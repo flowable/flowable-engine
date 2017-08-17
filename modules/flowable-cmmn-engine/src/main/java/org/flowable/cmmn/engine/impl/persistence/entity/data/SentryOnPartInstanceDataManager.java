@@ -10,20 +10,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.impl.history;
+package org.flowable.cmmn.engine.impl.persistence.entity.data;
 
-import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
-import org.flowable.cmmn.engine.runtime.MilestoneInstance;
+import java.util.List;
+
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntity;
+import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 
 /**
  * @author Joram Barrez
  */
-public interface CmmnHistoryManager {
+public interface SentryOnPartInstanceDataManager extends DataManager<SentryOnPartInstanceEntity> {
     
-    void recordCaseInstanceStart(CaseInstanceEntity caseInstanceEntity);
+    List<SentryOnPartInstanceEntity> findSentryOnPartInstancesByPlanItemInstanceId(String planItemId);
     
-    void recordCaseInstanceEnd(String caseInstanceId);
-    
-    void recordMilestoneReached(MilestoneInstance milestoneInstance);
-
 }

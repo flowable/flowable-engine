@@ -10,20 +10,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.impl.history;
+package org.flowable.cmmn.engine.history;
 
-import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
-import org.flowable.cmmn.engine.runtime.MilestoneInstance;
+import java.util.Date;
 
 /**
  * @author Joram Barrez
  */
-public interface CmmnHistoryManager {
+public interface HistoricCaseInstance {
     
-    void recordCaseInstanceStart(CaseInstanceEntity caseInstanceEntity);
+    String getId();
+    String getName();
+    String getParentId();
+    String getBusinessKey();
+    String getCaseDefinitionId();
+    String getState();
+    Date getStartTime();
+    Date getEndTime();
+    String getStartUserId();
+    String getTenantId();
     
-    void recordCaseInstanceEnd(String caseInstanceId);
-    
-    void recordMilestoneReached(MilestoneInstance milestoneInstance);
-
 }

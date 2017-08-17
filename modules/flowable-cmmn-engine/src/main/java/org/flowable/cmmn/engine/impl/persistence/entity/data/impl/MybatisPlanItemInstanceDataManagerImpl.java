@@ -12,11 +12,13 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity.data.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
@@ -38,7 +40,13 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
 
     @Override
     public PlanItemInstanceEntity create() {
-        return new PlanItemInstanceEntityImpl();
+        PlanItemInstanceEntityImpl planItemInstanceEntityImpl = new PlanItemInstanceEntityImpl();
+        
+        // Avoid queries being done for new instance
+        planItemInstanceEntityImpl.setChildren(new ArrayList<PlanItemInstanceEntity>(1));
+        planItemInstanceEntityImpl.setSatisfiedSentryOnPartInstances(new ArrayList<SentryOnPartInstanceEntity>(1));
+        
+        return planItemInstanceEntityImpl;
     }
     
     @SuppressWarnings("unchecked")
@@ -58,6 +66,7 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public List<PlanItemInstance> findByCriteria(PlanItemInstanceQueryImpl planItemInstanceQuery) {
         return getDbSqlSession().selectList("selectPlanItemInstancesByQueryCriteria", planItemInstanceQuery);
     }

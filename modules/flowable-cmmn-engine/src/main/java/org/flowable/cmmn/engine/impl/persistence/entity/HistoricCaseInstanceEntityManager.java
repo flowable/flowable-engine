@@ -10,18 +10,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine;
+package org.flowable.cmmn.engine.impl.persistence.entity;
 
+import java.util.List;
+
+import org.flowable.cmmn.engine.history.HistoricCaseInstance;
 import org.flowable.cmmn.engine.history.HistoricCaseInstanceQuery;
-import org.flowable.cmmn.engine.history.HistoricMilestoneInstanceQuery;
+import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 
 /**
  * @author Joram Barrez
  */
-public interface CmmnHistoryService {
+public interface HistoricCaseInstanceEntityManager extends EntityManager<HistoricCaseInstanceEntity> {
     
     HistoricCaseInstanceQuery createHistoricCaseInstanceQuery();
-
-    HistoricMilestoneInstanceQuery createHistoricMilestoneInstanceQuery();
-
+    
+    List<HistoricCaseInstance> findByCriteria(HistoricCaseInstanceQuery query);
+    
+    long countByCriteria(HistoricCaseInstanceQuery query);
+    
+    void deleteByCaseDefinitionId(String caseDefinitionId);
+    
 }
