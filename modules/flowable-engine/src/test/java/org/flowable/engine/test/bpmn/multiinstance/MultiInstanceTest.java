@@ -258,6 +258,81 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
     }
 
     @Deployment
+    public void testParallelUserTasksCustomCollectionStringExtension() {
+    	checkParallelUserTasksCustomCollection("miParallelUserTasksCollection");
+    }
+
+    private void checkParallelUserTasksCustomCollection(String processDefinitionKey) {
+    	ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinitionKey);
+
+        List<Task> tasks = taskService.createTaskQuery().taskCandidateUser("wfuser1").list();
+        assertEquals(1, tasks.size());
+        assertEquals("My Task 0", tasks.get(0).getName());
+
+        tasks = taskService.createTaskQuery().taskCandidateUser("wfuser2").list();
+        assertEquals(1, tasks.size());
+        assertEquals("My Task 1", tasks.get(0).getName());
+
+        // should be 2 tasks total
+        tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
+        assertEquals(2, tasks.size());
+        assertEquals("My Task 0", tasks.get(0).getName());
+        assertEquals("My Task 1", tasks.get(1).getName());
+
+        // Completing 3 tasks will trigger completion condition
+        taskService.complete(tasks.get(0).getId());
+        taskService.complete(tasks.get(1).getId());
+        assertEquals(0, taskService.createTaskQuery().count());
+        assertProcessEnded(processInstance.getProcessInstanceId());
+    }
+
+    @Deployment
+    public void testParallelUserTasksCustomCollectionStringExtensionDelegateExpression() {
+    	checkParallelUserTasksCustomCollectionDelegateExpression("miParallelUserTasksCollection");
+    }
+
+    private void checkParallelUserTasksCustomCollectionDelegateExpression(String processDefinitionKey) {
+    	// Add bean temporary to process engine
+
+    	Map<Object, Object> originalBeans = processEngineConfiguration.getExpressionManager().getBeans();
+
+    	try {
+
+    		Map<Object, Object> newBeans = new HashMap<>();
+    		newBeans.put("collectionHandler", new JSONCollectionHandler());
+    		processEngineConfiguration.getExpressionManager().setBeans(newBeans);
+
+    		checkParallelUserTasksCustomCollection(processDefinitionKey);
+    	} finally {
+
+    		// Put beans back
+    		processEngineConfiguration.getExpressionManager().setBeans(originalBeans);
+
+    	}
+
+    }
+
+    @Deployment
+    public void testParallelUserTasksCustomCollectionExpressionExtension() {
+    	checkParallelUserTasksCustomCollection("miParallelUserTasksCollection");
+    }
+
+    @Deployment
+    public void testParallelUserTasksCustomCollectionExpressionExtensionDelegateExpression() {
+    	checkParallelUserTasksCustomCollectionDelegateExpression("miParallelUserTasksCollection");
+    }
+
+    @Deployment
+    public void testParallelUserTasksCustomExtensionsCollection() {
+    	checkParallelUserTasksCustomCollection("miParallelUserTasksCollection");
+    }
+
+    @Deployment
+    public void testParallelUserTasksCustomExtensionsCollectionDelegateExpression() {
+    	checkParallelUserTasksCustomCollectionDelegateExpression("miParallelUserTasksCollection");
+    }
+
+    @Deployment
     public void testParallelUserTasksCustomExtensions() {
         checkParallelUserTasksCustomExtensions("miParallelUserTasks");
     }
