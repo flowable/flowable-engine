@@ -18,9 +18,11 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
+import org.flowable.bpmn.model.AbstractFlowableCollectionParser;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.ExtensionAttribute;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 
@@ -70,9 +72,8 @@ public class MultiInstanceParser extends BaseChildElementParser {
                 		xtr.next();
                 		if (xtr.isStartElement()) {
                 			ExtensionElement extensionElement = BpmnXMLUtil.parseExtensionElement(xtr);
-                			// advance to next child within extension elements
                 			multiInstanceDef.addExtensionElement(extensionElement);
-                			// collection is specified as a string value
+                			// collection is specified as an element
                             if (ELEMENT_MULTIINSTANCE_COLLECTION.equalsIgnoreCase(extensionElement.getName())) {
                             	Map<String, List<ExtensionElement>> childElement = extensionElement.getChildElements();
                             	if (childElement.containsKey(ELEMENT_MULTIINSTANCE_COLLECTION_STRING)) {
@@ -82,7 +83,26 @@ public class MultiInstanceParser extends BaseChildElementParser {
                             		// it is an expression
                                     multiInstanceDef.setInputDataItem((childElement.get(ELEMENT_MULTIINSTANCE_COLLECTION_EXPRESSION).get(0)).getElementText());
                             	}
-                            }
+                				if (childElement.containsKey(ELEMENT_MULTIINSTANCE_COLLECTION_PARSER)) {
+                					ExtensionElement parserElement = childElement.get(ELEMENT_MULTIINSTANCE_COLLECTION_PARSER).get(0);
+                					Map<String, List<ExtensionAttribute>> attributes = parserElement.getAttributes();
+                					String implementation = null;
+                					String implementationType = null;
+
+                					if (attributes.containsKey(ATTRIBUTE_MULTIINSTANCE_COLLECTION_CLASS)) {
+                						implementationType = String.valueOf(ATTRIBUTE_MULTIINSTANCE_COLLECTION_CLASS);
+                						implementation = attributes.get(ATTRIBUTE_MULTIINSTANCE_COLLECTION_CLASS).get(0).getValue();
+                					} else {
+                						implementationType = String.valueOf(ATTRIBUTE_MULTIINSTANCE_COLLECTION_DELEGATEEXPRESSION);
+                						implementation = attributes.get(ATTRIBUTE_MULTIINSTANCE_COLLECTION_DELEGATEEXPRESSION).get(0).getValue();
+                					}
+
+                					AbstractFlowableCollectionParser parser = (AbstractFlowableCollectionParser) Class.forName(implementation).newInstance();
+                					parser.setImplementationType(implementationType);
+                					parser.setImplementation(implementation);
+                					multiInstanceDef.setParser(parser);
+                				}
+                			}
                 		}
                 	}
                 } else if (xtr.isEndElement() && getElementName().equalsIgnoreCase(xtr.getLocalName())) {

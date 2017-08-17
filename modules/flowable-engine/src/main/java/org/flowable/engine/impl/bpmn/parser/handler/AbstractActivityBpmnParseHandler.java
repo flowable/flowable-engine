@@ -64,25 +64,29 @@ public abstract class AbstractActivityBpmnParseHandler<T extends FlowNode> exten
             miActivityBehavior.setCompletionCondition(loopCharacteristics.getCompletionCondition());
         }
 
-        // activiti:collection
+        // flowable:collection
         if (StringUtils.isNotEmpty(loopCharacteristics.getInputDataItem())) {
             miActivityBehavior.setCollectionExpression(expressionManager.createExpression(loopCharacteristics.getInputDataItem()));
         }
 
-        // activiti:collectionString
+        // flowable:collectionString
         if (StringUtils.isNotEmpty(loopCharacteristics.getCollectionString())) {
             miActivityBehavior.setCollectionString(loopCharacteristics.getCollectionString());
         }
 
-        // activiti:elementVariable
+        // flowable:elementVariable
         if (StringUtils.isNotEmpty(loopCharacteristics.getElementVariable())) {
             miActivityBehavior.setCollectionElementVariable(loopCharacteristics.getElementVariable());
         }
 
-        // activiti:elementIndexVariable
+        // flowable:elementIndexVariable
         if (StringUtils.isNotEmpty(loopCharacteristics.getElementIndexVariable())) {
             miActivityBehavior.setCollectionElementIndexVariable(loopCharacteristics.getElementIndexVariable());
         }
 
+        // flowable:collectionParser
+        if (loopCharacteristics.getParser() != null) {
+            miActivityBehavior.setParser(loopCharacteristics.getParser().clone());
+        }
     }
 }

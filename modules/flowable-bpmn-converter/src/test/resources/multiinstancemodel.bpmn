@@ -32,6 +32,7 @@
       <multiInstanceLoopCharacteristics isSequential="false" flowable:elementVariable="participant">
         <extensionElements>
           <flowable:collection>
+             <flowable:collectionParser flowable:class="org.flowable.bpmn.model.FlowableCollectionParser"/>
              <flowable:string>
                <![CDATA[
                  [
