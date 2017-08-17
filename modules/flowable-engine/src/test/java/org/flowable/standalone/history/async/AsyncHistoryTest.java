@@ -211,11 +211,11 @@ public class AsyncHistoryTest extends PluggableFlowableTestCase {
         }
         
         org.flowable.task.service.Task task = startOneTaskprocess();
-        assertEquals("The org.flowable.task.service.Task", task.getName());
+        assertEquals("The Task", task.getName());
 
         waitForHistoryJobExecutorToProcessAllJobs(5000L, 100L);
         HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().singleResult();
-        assertEquals("The org.flowable.task.service.Task", historicTaskInstance.getName());
+        assertEquals("The Task", historicTaskInstance.getName());
 
         task.setName("new name");
         taskService.saveTask(task);
