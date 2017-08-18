@@ -36,7 +36,7 @@ public class MilestoneActivityBehavior implements CmmnActivityBehavior {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         MilestoneInstanceEntity milestoneInstanceEntity = createMilestoneInstance(delegatePlanItemInstance, commandContext);
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordMilestoneReached(milestoneInstanceEntity);
-        CommandContextUtil.getAgenda(commandContext).planPlanItemOccurred((PlanItemInstanceEntity) delegatePlanItemInstance);
+        CommandContextUtil.getAgenda(commandContext).planOccurPlanItem((PlanItemInstanceEntity) delegatePlanItemInstance);
     }
 
     protected MilestoneInstanceEntity createMilestoneInstance(DelegatePlanItemInstance delegatePlanItemInstance, CommandContext commandContext) {

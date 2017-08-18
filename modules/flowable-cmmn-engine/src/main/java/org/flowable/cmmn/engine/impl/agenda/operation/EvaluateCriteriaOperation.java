@@ -23,6 +23,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEnti
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.Criterion;
+import org.flowable.cmmn.model.HasExitCriteria;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
@@ -67,20 +68,24 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             for (PlanItemInstanceEntity planItemInstanceEntity : stagePlanItemInstanceEntity.getChildren()) {
                 
                 PlanItem planItem = planItemInstanceEntity.getPlanItem();
+                EvaluationResult evaluationResult = null;
                 if (PlanItemInstanceState.AVAILABLE.equals(planItemInstanceEntity.getState())) {
-                    EvaluationResult evaluationResult = entryCriteriaSatisfied(planItemInstanceEntity, planItem);
+                    evaluationResult = evaluateEntryCriteria(planItemInstanceEntity, planItem);
                     if (evaluationResult.equals(EvaluationResult.ALL_FIRED)) {
                         CommandContextUtil.getAgenda(commandContext).planActivatePlanItem(planItemInstanceEntity);  
-                        criteriaFired = true;
-                        
-                    } else if (evaluationResult.equals(EvaluationResult.SOME_FIRED)) {
-                        criteriaFired = true;
-                        
                     }
                     
                 } else if (PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState()) ) {
                     activeChildren++;
+                    evaluationResult = evaluateExitCriteria(planItemInstanceEntity, planItem);
+                    if (evaluationResult.equals(EvaluationResult.ALL_FIRED)) {
+                        CommandContextUtil.getAgenda(commandContext).planExitPlanItem(planItemInstanceEntity);
+                    }
                     
+                }
+                
+                if (evaluationResult != null && !evaluationResult.equals(EvaluationResult.NONE_FIRED)) {
+                    criteriaFired = true;
                 }
                 
             }
@@ -97,7 +102,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         
     }
     
-    protected EvaluationResult entryCriteriaSatisfied(PlanItemInstanceEntity planItemInstanceEntity, PlanItem planItem) {
+    protected EvaluationResult evaluateEntryCriteria(PlanItemInstanceEntity planItemInstanceEntity, PlanItem planItem) {
         List<Criterion> criteria = planItem.getEntryCriteria();
         if (!PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState())) {
             if (criteria == null || criteria.isEmpty()) {
@@ -105,6 +110,14 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             } else {
                 return evaluateCriteria(planItemInstanceEntity, criteria);
             }
+        }
+        return EvaluationResult.NONE_FIRED;
+    }
+    
+    protected EvaluationResult evaluateExitCriteria(PlanItemInstanceEntity planItemInstanceEntity, HasExitCriteria hasExitCriteria) {
+        List<Criterion> criteria = hasExitCriteria.getExitCriteria();
+        if (criteria != null && !criteria.isEmpty()) {
+            return evaluateCriteria(planItemInstanceEntity, criteria);
         }
         return EvaluationResult.NONE_FIRED;
     }

@@ -31,7 +31,9 @@ public interface CmmnEngineAgenda extends Agenda {
 
     void planCompletePlanItem(PlanItemInstanceEntity planItemInstanceEntity);
     
-    void planPlanItemOccurred(PlanItemInstanceEntity planItemInstanceEntity);
+    void planOccurPlanItem(PlanItemInstanceEntity planItemInstanceEntity);
+    
+    void planExitPlanItem(PlanItemInstanceEntity planItemInstanceEntity);
     
     void planTriggerPlanItem(PlanItemInstanceEntity planItemInstanceEntity);
     

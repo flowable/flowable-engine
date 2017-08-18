@@ -42,7 +42,7 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
         historicCaseInstanceEntity.setCaseDefinitionId(caseInstanceEntity.getCaseDefinitionId());
         historicCaseInstanceEntity.setState(caseInstanceEntity.getState());
         historicCaseInstanceEntity.setStartUserId(caseInstanceEntity.getStartUserId());
-        historicCaseInstanceEntity.setStartTime(cmmnEngineConfiguration.getClock().getCurrentTime());
+        historicCaseInstanceEntity.setStartTime(caseInstanceEntity.getStartTime());
         historicCaseInstanceEntity.setTenantId(caseInstanceEntity.getTenantId());
         historicCaseInstanceEntityManager.insert(historicCaseInstanceEntity);
     }

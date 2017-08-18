@@ -13,7 +13,10 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -54,6 +57,15 @@ public abstract class AbstractPlanItemInstanceOperation extends CmmnOperation {
     
     protected Stage getStage(String caseDefinitionId, String stageId) {
         return CaseDefinitionUtil.getCase(caseDefinitionId).findStage(stageId);
+    }
+    
+    protected void deleteSentryOnPartInstances() {
+        SentryOnPartInstanceEntityManager sentryOnPartInstanceEntityManager = CommandContextUtil.getSentryOnPartInstanceEntityManager(commandContext);
+        if (planItemInstanceEntity.getSatisfiedSentryOnPartInstances() != null) {
+            for (SentryOnPartInstanceEntity sentryOnPartInstanceEntity : planItemInstanceEntity.getSatisfiedSentryOnPartInstances()) {
+                sentryOnPartInstanceEntityManager.delete(sentryOnPartInstanceEntity);
+            }
+        }
     }
     
 }
