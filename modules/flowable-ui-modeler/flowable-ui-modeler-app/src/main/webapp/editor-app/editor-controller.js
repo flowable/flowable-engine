@@ -177,6 +177,15 @@ angular.module('flowableModeler')
         	
         	$rootScope.editorHistory.push(historyItem);
         };
+        
+        $rootScope.getStencilSetName = function() {
+            var modelMetaData = editorManager.getBaseModelData();
+            if (modelMetaData.model.stencilset.namespace == 'http://b3mn.org/stencilset/cmmn1.1#') {
+                return 'cmmn1.1';
+            } else {
+                return 'bpmn2.0';
+            }
+        };
 
         /**
          * Initialize the event bus: couple all Oryx events with a dispatch of the
@@ -386,7 +395,16 @@ angular.module('flowableModeler')
     var modelId = $routeParams.modelId;
 	editorManager.setModelId(modelId);
 	//we first initialize the stencilset used by the editor. The editorId is always the modelId.
-	$http.get(FLOWABLE.URL.getStencilSet()).then(function (response) {
+	$http.get(FLOWABLE.URL.getModel(modelId)).then(function (response) {
+	    editorManager.setModelData(response);
+	    return response;
+	}).then(function (modelData) {
+	    if(modelData.data.model.stencilset.namespace == 'http://b3mn.org/stencilset/cmmn1.1#') {
+	       return $http.get(FLOWABLE.URL.getCmmnStencilSet());
+	    } else {
+	       return $http.get(FLOWABLE.URL.getStencilSet());
+	    }
+    }).then(function (response) {
  		var baseUrl = "http://b3mn.org/stencilset/";
 		editorManager.setStencilData(response.data);
 		//the stencilset alters the data ref!
@@ -396,9 +414,9 @@ angular.module('flowableModeler')
 		return $http.get(ORYX.CONFIG.PLUGINS_CONFIG);
 	}).then(function (response) {
 		ORYX._loadPlugins(response.data);
-		return $http.get(FLOWABLE.URL.getModel(modelId));
+		return response;
 	}).then(function (response) {
-		editorManager.bootEditor(response);
+		editorManager.bootEditor();
 	}).catch(function (error) {
 		console.log(error);
 	});

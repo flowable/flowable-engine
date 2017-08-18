@@ -21,6 +21,9 @@ angular.module('flowableModeler')
         if ($scope.model.process) {
             model = $scope.model.process;
             popupType = 'PROCESS';
+        } else if ($scope.model.caseModel) {
+            model = $scope.model.caseModel;
+            popupType = 'CASEMODEL';
         } else if ($scope.model.form) {
             model = $scope.model.form;
             popupType = 'FORM';
@@ -64,6 +67,8 @@ angular.module('flowableModeler')
     			success(function(data, status, headers, config) {
     				if ($scope.model.process) {
     					$scope.model.process = data;
+    				} else if ($scope.model.caseModel) {
+                        $scope.model.caseModel = data;
     				} else if ($scope.model.form) {
     					$scope.model.form = data;
     				} else if ($scope.model.decisionTable) {
@@ -82,6 +87,8 @@ angular.module('flowableModeler')
                         $location.path("/apps/" +  $scope.popup.id);
                     } else if (popupType === 'DECISION-TABLE') {
                         $location.path("/decision-tables/" +  $scope.popup.id);
+                    } else if (popupType === 'CASEMODEL') {
+                        $location.path("/casemodels/" +  $scope.popup.id);
                     } else {
                         $location.path("/processes/" +  $scope.popup.id);
                     }
@@ -108,6 +115,9 @@ angular.module('flowableModeler')
         if ($scope.model.process) {
             model = $scope.model.process;
             popupType = 'PROCESS';
+        } else if ($scope.model.caseModel) {
+            model = $scope.model.caseModel;
+            popupType = 'CASEMODEL';
         } else if ($scope.model.form) {
             model = $scope.model.form;
             popupType = 'FORM';
@@ -174,6 +184,9 @@ angular.module('flowableModeler')
 	if ($scope.model.process) {
 		model = $scope.model.process;
 		popupType = 'PROCESS';
+	} else if ($scope.model.caseModel) {
+        model = $scope.model.caseModel;
+        popupType = 'CASEMODEL';
 	} else if ($scope.model.form) {
         model = $scope.model.form;
         popupType = 'FORM';
@@ -211,6 +224,8 @@ angular.module('flowableModeler')
                         $location.path("/apps/" +  $scope.popup.latestModelId);
                     } else if (popupType === 'DECISION-TABLE') {
                         $location.path("/decision-tables/" +  $scope.popup.latestModelId);
+                    } else if (popupType === 'CASEMODEL') {
+                        $location.path("/casemodels/" +  $scope.popup.latestModelId);
                     } else {
                         $location.path("/processes/" +  $scope.popup.latestModelId);
                     }

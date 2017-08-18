@@ -3,6 +3,7 @@
         "MAIN-TITLE": "Flowable Editor",
         "NAVIGATION" : {
             "PROCESSES": "Processes",
+            "CASEMODELS": "Case models",
             "FORMS": "Forms",
             "DECISION-TABLES": "Decision Tables",
             "APPS": "Apps"
