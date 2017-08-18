@@ -19,6 +19,7 @@ public class MultiInstanceLoopCharacteristics extends BaseElement {
 
     protected String inputDataItem;
     protected String collectionString;
+    protected AbstractFlowableCollectionHandler collectionHandler;
     protected String loopCardinality;
     protected String completionCondition;
     protected String elementVariable;
@@ -41,7 +42,15 @@ public class MultiInstanceLoopCharacteristics extends BaseElement {
         this.collectionString = collectionString;
     }
 
-    public String getLoopCardinality() {
+    public AbstractFlowableCollectionHandler getHandler() {
+		return collectionHandler;
+	}
+
+	public void setHandler(AbstractFlowableCollectionHandler collectionHandler) {
+		this.collectionHandler = collectionHandler;
+	}
+
+	public String getLoopCardinality() {
         return loopCardinality;
     }
 
@@ -89,6 +98,10 @@ public class MultiInstanceLoopCharacteristics extends BaseElement {
 
     public void setValues(MultiInstanceLoopCharacteristics otherLoopCharacteristics) {
         setInputDataItem(otherLoopCharacteristics.getInputDataItem());
+        setCollectionString(otherLoopCharacteristics.getCollectionString());
+        if (otherLoopCharacteristics.getHandler() != null) {
+        	setHandler(otherLoopCharacteristics.getHandler().clone());
+        }
         setLoopCardinality(otherLoopCharacteristics.getLoopCardinality());
         setCompletionCondition(otherLoopCharacteristics.getCompletionCondition());
         setElementVariable(otherLoopCharacteristics.getElementVariable());

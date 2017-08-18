@@ -18,11 +18,13 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import org.flowable.bpmn.model.AbstractFlowableCollectionHandler;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
+import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Process;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -30,10 +32,14 @@ import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
+import org.flowable.engine.impl.bpmn.helper.ClassDelegateCollectionHandler;
+import org.flowable.engine.impl.bpmn.helper.DelegateExpressionCollectionHandler;
+import org.flowable.engine.impl.bpmn.helper.DelegateExpressionUtil;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
+import org.flowable.engine.impl.delegate.FlowableCollectionHandler;
 import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
@@ -78,6 +84,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     protected String collectionVariable; // Not used anymore. Left here for backwards compatibility.
     protected String collectionElementVariable;
     protected String collectionString;
+    protected AbstractFlowableCollectionHandler collectionHandler;
     // default variable name for loop counter for inner instances (as described in the spec)
     protected String collectionElementIndexVariable = "loopCounter";
 
@@ -294,14 +301,19 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
             Object collectionVariable = execution.getVariable((String) obj);
             if (collectionVariable instanceof Collection) {
                 return (Collection) collectionVariable;
-            } else if (collectionVariable == null){
-                throw new FlowableIllegalArgumentException("Variable " + collectionVariable + " is not found");
+            } else if (collectionVariable == null) {
+            	// it may be a complex string, not a variable name
+                if (collectionHandler != null ) {        	
+                	return createFlowableCollectionHandler(collectionHandler, execution, (String) obj).resolveCollection((String) obj);
+                } else {
+                	throw new FlowableIllegalArgumentException("Variable " + collectionVariable + " is not found");
+                }
             } else {
                 throw new FlowableIllegalArgumentException("Variable " + collectionVariable + "' is not a Collection");
             }
             
         } else {
-            throw new FlowableIllegalArgumentException("Couldn't resolve collection expression nor variable reference");
+            throw new FlowableIllegalArgumentException("Couldn't resolve collection expression, variable reference or string");
             
         }
     }
@@ -314,8 +326,9 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         } else if (collectionVariable != null) {
             collection = execution.getVariable(collectionVariable);
         } else if (collectionString != null) {
-            // TODO: add dynamic function support for resolving an explicit String value collection here - issue 512
-        	// https://github.com/flowable/flowable-engine/issues/512
+            if (collectionHandler != null) {        	
+            	collection = createFlowableCollectionHandler(collectionHandler, execution, collectionString).resolveCollection(collectionString);
+            }
         }
         return collection;
     }
@@ -394,6 +407,23 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         return activeValue;
     }
 
+    protected FlowableCollectionHandler createFlowableCollectionHandler(AbstractFlowableCollectionHandler handler, DelegateExecution execution, String collectionString) {
+    	FlowableCollectionHandler collectionHandler = null;
+
+        if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equalsIgnoreCase(handler.getImplementationType())) {
+        	collectionHandler = new ClassDelegateCollectionHandler(handler.getImplementation(), null);
+        
+        } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equalsIgnoreCase(handler.getImplementationType())) {
+        	Object delegate = DelegateExpressionUtil.resolveDelegateExpression(CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(handler.getImplementation()), execution);
+            if (delegate instanceof FlowableCollectionHandler) {
+                collectionHandler = new DelegateExpressionCollectionHandler(execution, CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(handler.getImplementation()));   
+            } else {
+                throw new FlowableIllegalArgumentException("Delegate expression " + handler.getImplementation() + " did not resolve to an implementation of " + FlowableCollectionHandler.class);
+            }
+        }
+        return collectionHandler;
+    }
+    
     // Getters and Setters
     // ///////////////////////////////////////////////////////////
 
@@ -445,7 +475,15 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         this.collectionString = collectionString;
     }
 
-    public String getCollectionElementIndexVariable() {
+	public AbstractFlowableCollectionHandler getHandler() {
+		return collectionHandler;
+	}
+
+	public void setHandler(AbstractFlowableCollectionHandler collectionHandler) {
+		this.collectionHandler = collectionHandler;
+	}
+
+	public String getCollectionElementIndexVariable() {
         return collectionElementIndexVariable;
     }
 

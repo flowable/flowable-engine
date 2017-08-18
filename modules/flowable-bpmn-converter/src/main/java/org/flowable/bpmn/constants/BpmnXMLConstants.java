@@ -174,6 +174,8 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_MULTIINSTANCE_COLLECTION = "collection";
     public static final String ATTRIBUTE_MULTIINSTANCE_VARIABLE = "elementVariable";
     public static final String ATTRIBUTE_MULTIINSTANCE_INDEX_VARIABLE = "elementIndexVariable";
+    public static final String ATTRIBUTE_MULTIINSTANCE_COLLECTION_CLASS = "class";
+    public static final String ATTRIBUTE_MULTIINSTANCE_COLLECTION_DELEGATEEXPRESSION = "delegateExpression";
 
     public static final String ATTRIBUTE_TASK_IMPLEMENTATION = "implementation";
     public static final String ATTRIBUTE_TASK_OPERATION_REF = "operationRef";
