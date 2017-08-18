@@ -311,8 +311,11 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         subProcessInstance.setSuperExecution(superExecutionEntity);
         subProcessInstance.setRootProcessInstanceId(superExecutionEntity.getRootProcessInstanceId());
         subProcessInstance.setScope(true); // process instance is always a scope for all child executions
+
+        String authenticatedUserId = Authentication.getAuthenticatedUserId();
+
         subProcessInstance.setStartActivityId(activityId);
-        subProcessInstance.setStartUserId(Authentication.getAuthenticatedUserId());
+        subProcessInstance.setStartUserId(authenticatedUserId);
         subProcessInstance.setBusinessKey(businessKey);
 
         // Store in database
@@ -324,6 +327,10 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
 
         subProcessInstance.setProcessInstanceId(subProcessInstance.getId());
         superExecutionEntity.setSubProcessInstance(subProcessInstance);
+
+        if (authenticatedUserId != null) {
+            IdentityLinkUtil.createProcessInstanceIdentityLink(subProcessInstance, authenticatedUserId, null, IdentityLinkType.STARTER);
+        }
 
         if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, subProcessInstance));

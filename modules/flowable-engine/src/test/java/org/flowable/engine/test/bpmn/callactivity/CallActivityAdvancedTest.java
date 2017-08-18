@@ -30,7 +30,10 @@ import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.task.service.TaskQuery;
+import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.task.service.Task;
+import org.flowable.task.service.TaskQuery; 
 
 /**
  * @author Joram Barrez
@@ -369,6 +372,27 @@ public class CallActivityAdvancedTest extends PluggableFlowableTestCase {
                 assertNotNull(historicProcessInstance.getEndTime());
             }
         }
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/bpmn/callactivity/CallActivity.testCallSimpleSubProcess.bpmn20.xml", "org/flowable/engine/test/bpmn/callactivity/simpleSubProcess.bpmn20.xml" })
+    public void testAuthenticatedStartUserInCallActivity() {
+        final String authenticatedUser = "user1";
+        identityService.setAuthenticatedUserId(authenticatedUser);
+        final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callSimpleSubProcess");
+
+        TaskQuery taskQuery = taskService.createTaskQuery();
+        Task taskBeforeSubProcess = taskQuery.singleResult();
+        assertEquals("Task before subprocess", taskBeforeSubProcess.getName());
+        // Completing the task continues the process which leads to calling the subprocess
+        taskService.complete(taskBeforeSubProcess.getId());
+
+        ProcessInstance subProcess = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
+
+        assertEquals(authenticatedUser, subProcess.getStartUserId());
+        List<IdentityLink> subProcessIdentityLinks = runtimeService.getIdentityLinksForProcessInstance(subProcess.getId());
+        assertEquals(1, subProcessIdentityLinks.size());
+        assertEquals(IdentityLinkType.STARTER, subProcessIdentityLinks.get(0).getType());
+        assertEquals(authenticatedUser, subProcessIdentityLinks.get(0).getUserId());
     }
 
 }
