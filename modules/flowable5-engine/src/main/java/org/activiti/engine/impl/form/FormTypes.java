@@ -28,7 +28,7 @@ import org.flowable.engine.form.AbstractFormType;
  */
 public class FormTypes {
 
-    protected Map<String, AbstractFormType> formTypes = new HashMap<String, AbstractFormType>();
+    protected Map<String, AbstractFormType> formTypes = new HashMap<>();
 
     public void addFormType(AbstractFormType formType) {
         formTypes.put(formType.getName(), formType);
@@ -42,7 +42,7 @@ public class FormTypes {
 
         } else if ("enum".equals(formProperty.getType())) {
             // ACT-1023: Using linked hashmap to preserve the order in which the entries are defined
-            Map<String, String> values = new LinkedHashMap<String, String>();
+            Map<String, String> values = new LinkedHashMap<>();
             for (FormValue formValue : formProperty.getFormValues()) {
                 values.put(formValue.getId(), formValue.getName());
             }

@@ -63,7 +63,7 @@ public class ReplayRunTest {
         TaskService taskService = processEngine.getTaskService();
         RuntimeService runtimeService = processEngine.getRuntimeService();
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put(TEST_VARIABLE, TEST_VALUE);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(USERTASK_PROCESS, BUSINESS_KEY, variables);
 
@@ -117,14 +117,14 @@ public class ReplayRunTest {
     }
 
     private static List<Function<FlowableEvent, SimulationEvent>> getTransformers() {
-        List<Function<FlowableEvent, SimulationEvent>> transformers = new ArrayList<Function<FlowableEvent, SimulationEvent>>();
+        List<Function<FlowableEvent, SimulationEvent>> transformers = new ArrayList<>();
         transformers.add(new ProcessInstanceCreateTransformer(PROCESS_INSTANCE_START_EVENT_TYPE, PROCESS_DEFINITION_ID_KEY, BUSINESS_KEY, VARIABLES_KEY));
         transformers.add(new UserTaskCompleteTransformer(USER_TASK_COMPLETED_EVENT_TYPE));
         return transformers;
     }
 
     public static Map<String, SimulationEventHandler> getReplayHandlers(String processInstanceId) {
-        Map<String, SimulationEventHandler> handlers = new HashMap<String, SimulationEventHandler>();
+        Map<String, SimulationEventHandler> handlers = new HashMap<>();
         handlers.put(PROCESS_INSTANCE_START_EVENT_TYPE,
                 new StartReplayProcessEventHandler(processInstanceId, PROCESS_INSTANCE_START_EVENT_TYPE, PROCESS_INSTANCE_START_EVENT_TYPE, listener.getSimulationEvents(), PROCESS_DEFINITION_ID_KEY, BUSINESS_KEY, VARIABLES_KEY));
         handlers.put(USER_TASK_COMPLETED_EVENT_TYPE, new PlaybackUserTaskCompleteEventHandler());

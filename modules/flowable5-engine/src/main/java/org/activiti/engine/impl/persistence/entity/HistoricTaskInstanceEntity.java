@@ -80,7 +80,7 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
     // persistence //////////////////////////////////////////////////////////////
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("name", name);
         persistentState.put("owner", owner);
         persistentState.put("assignee", assignee);
@@ -243,7 +243,7 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
     }
 
     public Map<String, Object> getTaskLocalVariables() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
             for (HistoricVariableInstanceEntity variableInstance : queryVariables) {
                 if (variableInstance.getId() != null && variableInstance.getTaskId() != null) {
@@ -255,7 +255,7 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
     }
 
     public Map<String, Object> getProcessVariables() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
             for (HistoricVariableInstanceEntity variableInstance : queryVariables) {
                 if (variableInstance.getId() != null && variableInstance.getTaskId() == null) {

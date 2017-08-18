@@ -48,7 +48,7 @@ public class ProcessInstanceCreateTransformer extends Flowable2SimulationEventFu
             ProcessInstance processInstance = (ProcessInstance) ((FlowableEntityEvent) event).getEntity();
             ExecutionEntity executionEntity = (ExecutionEntity) ((FlowableEntityEvent) event).getEntity();
 
-            Map<String, Object> simEventProperties = new HashMap<String, Object>();
+            Map<String, Object> simEventProperties = new HashMap<>();
             simEventProperties.put(processDefinitionIdKey, processInstance.getProcessDefinitionId());
             simEventProperties.put(businessKey, processInstance.getBusinessKey());
             simEventProperties.put(variablesKey, executionEntity.getVariables());

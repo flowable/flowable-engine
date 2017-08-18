@@ -244,7 +244,7 @@ public class CancelUserTaskTest extends PluggableFlowableTestCase {
         private List<FlowableEvent> eventsReceived;
 
         public UserActivityEventListener() {
-            eventsReceived = new ArrayList<FlowableEvent>();
+            eventsReceived = new ArrayList<>();
         }
 
         public List<FlowableEvent> getEventsReceived() {

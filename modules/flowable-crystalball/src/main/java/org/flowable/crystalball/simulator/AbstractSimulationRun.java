@@ -34,7 +34,7 @@ public abstract class AbstractSimulationRun implements SimulationRun, Simulation
     /**
      * Map for eventType -> event handlers to execute events on simulation engine
      */
-    protected Map<String, SimulationEventHandler> eventHandlerMap = new HashMap<String, SimulationEventHandler>();
+    protected Map<String, SimulationEventHandler> eventHandlerMap = new HashMap<>();
     protected ProcessEngine processEngine;
 
     public AbstractSimulationRun(Map<String, SimulationEventHandler> eventHandlers) {

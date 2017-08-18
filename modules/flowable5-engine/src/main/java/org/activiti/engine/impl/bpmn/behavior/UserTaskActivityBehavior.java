@@ -12,6 +12,9 @@
  */
 package org.activiti.engine.impl.bpmn.behavior;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
@@ -40,12 +43,9 @@ import org.flowable.variable.service.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 /**
  * Activity implementation for the user task.
- * 
+ *
  * @author Joram Barrez
  */
 public class UserTaskActivityBehavior extends TaskActivityBehavior {
@@ -64,7 +64,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
 
     public void execute(DelegateExecution execution) {
         ActivityExecution activityExecution = (ActivityExecution) execution;
-        
+
         Expression activeNameExpression = null;
         Expression activeDescriptionExpression = null;
         Expression activeDueDateExpression = null;
@@ -115,11 +115,11 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             activeCandidateUserExpressions = taskDefinition.getCandidateUserIdExpressions();
             activeCandidateGroupExpressions = taskDefinition.getCandidateGroupIdExpressions();
         }
-        
+
         Expression skipExpression = taskDefinition.getSkipExpression();
         boolean skipUserTask = SkipExpressionUtil.isSkipExpressionEnabled(activityExecution, skipExpression) &&
                 SkipExpressionUtil.shouldSkipFlowElement(activityExecution, skipExpression);
-        
+
         TaskEntity task = TaskEntity.createAndInsert(activityExecution, !skipUserTask);
         task.setExecution(execution);
 
@@ -210,7 +210,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
         if (!skipUserTask) {
             handleAssignments(activeAssigneeExpression, activeOwnerExpression, activeCandidateUserExpressions,
                     activeCandidateGroupExpressions, task, activityExecution);
-            
+
             task.fireEvent(TaskListener.EVENTNAME_CREATE);
 
             // All properties set, now firing 'create' events
@@ -231,9 +231,9 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
         leave(execution);
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
+    @SuppressWarnings({"unchecked", "rawtypes"})
     protected void handleAssignments(Expression assigneeExpression, Expression ownerExpression, Set<Expression> candidateUserExpressions,
-            Set<Expression> candidateGroupExpressions, TaskEntity task, ActivityExecution execution) {
+                                     Set<Expression> candidateGroupExpressions, TaskEntity task, ActivityExecution execution) {
 
         if (assigneeExpression != null) {
             Object assigneeExpressionValue = assigneeExpression.getValue(execution);
@@ -328,7 +328,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
 
     /**
      * Extract a candidate list from a string.
-     * 
+     *
      * @param str
      * @return
      */
@@ -360,7 +360,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                     activeValues = null;
                 } else {
                     ExpressionManager expressionManager = Context.getProcessEngineConfiguration().getExpressionManager();
-                    activeValues = new HashSet<Expression>();
+                    activeValues = new HashSet<>();
                     for (JsonNode valueNode : overrideValuesNode) {
                         activeValues.add(expressionManager.createExpression(valueNode.asText()));
                     }

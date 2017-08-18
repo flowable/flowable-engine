@@ -152,7 +152,7 @@ public abstract class EventSubscriptionEntity implements PersistentObject, HasRe
     }
 
     public Object getPersistentState() {
-        HashMap<String, Object> persistentState = new HashMap<String, Object>();
+        HashMap<String, Object> persistentState = new HashMap<>();
         persistentState.put("executionId", executionId);
         persistentState.put("configuration", configuration);
         return persistentState;

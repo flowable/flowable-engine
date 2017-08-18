@@ -35,7 +35,7 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
     protected String key;
     protected String description;
     protected ActivityImpl initial;
-    protected Map<ActivityImpl, List<ActivityImpl>> initialActivityStacks = new HashMap<ActivityImpl, List<ActivityImpl>>();
+    protected Map<ActivityImpl, List<ActivityImpl>> initialActivityStacks = new HashMap<>();
     protected List<LaneSet> laneSets;
     protected ParticipantProcess participantProcess;
 
@@ -52,7 +52,9 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
         return createProcessInstanceForInitial(initial);
     }
 
-    /** creates a process instance using the provided activity as initial */
+    /**
+     * creates a process instance using the provided activity as initial
+     */
     public PvmProcessInstance createProcessInstanceForInitial(ActivityImpl initial) {
 
         if (initial == null) {
@@ -90,7 +92,7 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
     public synchronized List<ActivityImpl> getInitialActivityStack(ActivityImpl startActivity) {
         List<ActivityImpl> initialActivityStack = initialActivityStacks.get(startActivity);
         if (initialActivityStack == null) {
-            initialActivityStack = new ArrayList<ActivityImpl>();
+            initialActivityStack = new ArrayList<>();
             ActivityImpl activity = startActivity;
             while (activity != null) {
                 initialActivityStack.add(0, activity);
@@ -169,7 +171,7 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
      */
     public List<LaneSet> getLaneSets() {
         if (laneSets == null) {
-            laneSets = new ArrayList<LaneSet>();
+            laneSets = new ArrayList<>();
         }
         return laneSets;
     }

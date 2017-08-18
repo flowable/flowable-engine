@@ -12,6 +12,8 @@
  */
 package org.activiti.engine.impl.event.logger;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,8 +47,6 @@ import org.flowable.engine.common.runtime.Clock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Joram Barrez
  */
@@ -60,7 +60,7 @@ public class EventLogger implements FlowableEventListener {
     protected ObjectMapper objectMapper;
 
     // Mapping of type -> handler
-    protected Map<FlowableEngineEventType, Class<? extends EventLoggerEventHandler>> eventHandlers = new HashMap<FlowableEngineEventType, Class<? extends EventLoggerEventHandler>>();
+    protected Map<FlowableEngineEventType, Class<? extends EventLoggerEventHandler>> eventHandlers = new HashMap<>();
 
     // Listeners for new events
     protected List<EventLoggerListener> listeners;
@@ -172,7 +172,7 @@ public class EventLogger implements FlowableEventListener {
     }
 
     protected EventLoggerEventHandler instantiateEventHandler(FlowableEvent event,
-            Class<? extends EventLoggerEventHandler> eventHandlerClass) {
+                                                              Class<? extends EventLoggerEventHandler> eventHandlerClass) {
         try {
             EventLoggerEventHandler eventHandler = eventHandlerClass.newInstance();
             eventHandler.setTimeStamp(clock.getCurrentTime());
@@ -196,7 +196,7 @@ public class EventLogger implements FlowableEventListener {
 
     public void addEventLoggerListener(EventLoggerListener listener) {
         if (listeners == null) {
-            listeners = new ArrayList<EventLoggerListener>(1);
+            listeners = new ArrayList<>(1);
         }
         listeners.add(listener);
     }

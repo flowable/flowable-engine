@@ -107,7 +107,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     }
 
     public Object getPersistentState() {
-        HashMap<String, Object> persistentState = new HashMap<String, Object>();
+        HashMap<String, Object> persistentState = new HashMap<>();
 
         persistentState.put("textValue", textValue);
         persistentState.put("textValue2", textValue2);

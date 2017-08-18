@@ -63,7 +63,7 @@ public class EventLogUserTaskCompleteTransformer extends EventLog2SimulationEven
             }
             String taskDefinitionKeyValue = (String) data.get(Fields.TASK_DEFINITION_KEY);
 
-            Map<String, Object> properties = new HashMap<String, Object>();
+            Map<String, Object> properties = new HashMap<>();
             properties.put("taskId", taskIdValue);
             properties.put(TASK_DEFINITION_KEY, taskDefinitionKeyValue);
             properties.put(PROCESS_INSTANCE_ID, event.getProcessInstanceId());

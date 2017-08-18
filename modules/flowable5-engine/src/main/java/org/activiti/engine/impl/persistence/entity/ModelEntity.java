@@ -46,7 +46,7 @@ public class ModelEntity implements Model, HasRevision, PersistentObject, Serial
     protected String tenantId = ProcessEngineConfiguration.NO_TENANT_ID;
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("name", this.name);
         persistentState.put("key", key);
         persistentState.put("category", this.category);

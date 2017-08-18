@@ -36,7 +36,7 @@ public class EventLogEntryEntityManager extends AbstractManager {
 
     @SuppressWarnings("unchecked")
     public List<EventLogEntry> findEventLogEntries(long startLogNr, long pageSize) {
-        Map<String, Object> params = new HashMap<String, Object>(2);
+        Map<String, Object> params = new HashMap<>(2);
         params.put("startLogNr", startLogNr);
         if (pageSize > 0) {
             params.put("endLogNr", startLogNr + pageSize + 1);
@@ -46,7 +46,7 @@ public class EventLogEntryEntityManager extends AbstractManager {
 
     @SuppressWarnings("unchecked")
     public List<EventLogEntry> findEventLogEntriesByProcessInstanceId(String processInstanceId) {
-        Map<String, Object> params = new HashMap<String, Object>(2);
+        Map<String, Object> params = new HashMap<>(2);
         params.put("processInstanceId", processInstanceId);
         return getDbSqlSession().selectList("selectEventLogEntriesByProcessInstanceId", params);
     }

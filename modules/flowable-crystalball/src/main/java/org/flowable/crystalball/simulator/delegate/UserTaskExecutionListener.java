@@ -25,7 +25,7 @@ import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * in the case of task event create simulation event in the event calendar
- * 
+ *
  * @author martin.grofcik
  */
 public class UserTaskExecutionListener implements TaskListener {
@@ -44,7 +44,7 @@ public class UserTaskExecutionListener implements TaskListener {
     public void notify(DelegateTask delegateTask) {
         SimulationEvent eventToSimulate = findUserTaskCompleteEvent(delegateTask);
         if (eventToSimulate != null) {
-            Map<String, Object> properties = new HashMap<String, Object>();
+            Map<String, Object> properties = new HashMap<>();
             properties.put("taskId", delegateTask.getId());
             properties.put("variables", eventToSimulate.getProperty(UserTaskCompleteTransformer.TASK_VARIABLES));
             // we were able to resolve event to simulate automatically

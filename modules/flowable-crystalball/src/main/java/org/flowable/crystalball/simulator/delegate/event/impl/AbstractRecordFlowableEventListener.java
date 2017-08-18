@@ -44,7 +44,7 @@ public abstract class AbstractRecordFlowableEventListener implements FlowableEve
     protected abstract void store(Collection<SimulationEvent> simulationEvents);
 
     protected Collection<SimulationEvent> transform(FlowableEvent event) {
-        List<SimulationEvent> simEvents = new ArrayList<SimulationEvent>();
+        List<SimulationEvent> simEvents = new ArrayList<>();
         for (Function<FlowableEvent, SimulationEvent> t : transformers) {
             SimulationEvent simEvent = t.apply(event);
             if (simEvent != null)

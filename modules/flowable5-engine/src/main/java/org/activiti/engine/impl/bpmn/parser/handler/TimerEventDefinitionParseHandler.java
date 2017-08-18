@@ -70,7 +70,7 @@ public class TimerEventDefinitionParseHandler extends AbstractBpmnParseHandler<T
 
             List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) processDefinition.getProperty(PROPERTYNAME_START_TIMER);
             if (timerDeclarations == null) {
-                timerDeclarations = new ArrayList<TimerDeclarationImpl>();
+                timerDeclarations = new ArrayList<>();
                 processDefinition.setProperty(PROPERTYNAME_START_TIMER, timerDeclarations);
             }
             timerDeclarations.add(timerDeclaration);
@@ -165,7 +165,7 @@ public class TimerEventDefinitionParseHandler extends AbstractBpmnParseHandler<T
     protected void addTimerDeclaration(ScopeImpl scope, TimerDeclarationImpl timerDeclaration) {
         List<TimerDeclarationImpl> timerDeclarations = (List<TimerDeclarationImpl>) scope.getProperty(PROPERTYNAME_TIMER_DECLARATION);
         if (timerDeclarations == null) {
-            timerDeclarations = new ArrayList<TimerDeclarationImpl>();
+            timerDeclarations = new ArrayList<>();
             scope.setProperty(PROPERTYNAME_TIMER_DECLARATION, timerDeclarations);
         }
         timerDeclarations.add(timerDeclaration);

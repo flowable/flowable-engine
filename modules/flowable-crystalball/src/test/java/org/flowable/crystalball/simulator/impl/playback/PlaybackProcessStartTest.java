@@ -38,7 +38,7 @@ public class PlaybackProcessStartTest extends AbstractPlaybackTest {
     @CheckStatus(methodName = "demoCheckStatus")
     @Deployment
     public void testDemo() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put(TEST_VARIABLE, TEST_VALUE);
         processEngine.getRuntimeService().startProcessInstanceByKey(SIMPLEST_PROCESS, BUSINESS_KEY, variables);
     }
