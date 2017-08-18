@@ -22,6 +22,7 @@ import org.flowable.app.service.api.UserCache;
 import org.flowable.app.service.api.UserCache.CachedUser;
 import org.flowable.app.service.exception.BadRequestException;
 import org.flowable.app.service.exception.NotFoundException;
+import org.flowable.app.service.exception.NotPermittedException;
 import org.flowable.content.api.ContentService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
@@ -123,6 +124,11 @@ public class FlowableProcessInstanceService {
         }
 
         ProcessDefinition processDefinition = repositoryService.getProcessDefinition(startRequest.getProcessDefinitionId());
+
+        if (!permissionService.canStartProcess(SecurityUtils.getCurrentUserObject(), processDefinition)) {
+            throw new NotPermittedException("User is not listed as potential starter for process definition with id: " + processDefinition.getId());
+        }
+
         ProcessInstance processInstance = runtimeService.startProcessInstanceWithForm(startRequest.getProcessDefinitionId(),
                 startRequest.getOutcome(), startRequest.getValues(), startRequest.getName());
 

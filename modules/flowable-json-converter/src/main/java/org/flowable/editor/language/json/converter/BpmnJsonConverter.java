@@ -253,6 +253,12 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         if (StringUtils.isNoneEmpty(model.getTargetNamespace())) {
             propertiesNode.put(PROPERTY_PROCESS_NAMESPACE, model.getTargetNamespace());
         }
+        if (CollectionUtils.isNotEmpty(mainProcess.getCandidateStarterGroups())) {
+            propertiesNode.put(PROPERTY_PROCESS_POTENTIALSTARTERGROUP, StringUtils.join(mainProcess.getCandidateStarterGroups(), ","));
+        }
+        if (CollectionUtils.isNotEmpty(mainProcess.getCandidateStarterUsers())) {
+            propertiesNode.put(PROPERTY_PROCESS_POTENTIALSTARTERUSER, StringUtils.join(mainProcess.getCandidateStarterUsers(), ","));
+        }
 
         BpmnJsonConverterUtil.convertMessagesToJson(model.getMessages(), propertiesNode);
 
