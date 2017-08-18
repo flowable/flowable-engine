@@ -526,7 +526,12 @@ public abstract class AbstractEngineConfiguration {
     }
 
     protected InputStream getResourceAsStream(String resource) {
-        return getClassLoader().getResourceAsStream(resource);
+        ClassLoader classLoader = getClassLoader();
+        if (classLoader != null) {
+            return getClassLoader().getResourceAsStream(resource);
+        } else {
+            return this.getClass().getClassLoader().getResourceAsStream(resource);
+        }
     }
 
     public abstract InputStream getMyBatisXmlConfigurationStream();
