@@ -20,6 +20,7 @@
 		</flowable.artifact>
 		<flowable.osgi.import.additional>
 			org.springframework*;resolution:=optional,
+            org.apache.commons.codec*;resolution:=optional,
 		</flowable.osgi.import.additional>
 	</properties>
 

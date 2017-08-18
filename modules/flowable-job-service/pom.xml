@@ -90,6 +90,9 @@
 		<flowable.osgi.export.additional>
 			org.flowable.job.db.mapping.entity
 		</flowable.osgi.export.additional>
+        <flowable.osgi.import.additional>
+            javax.enterprise.concurrent;resolution:=optional,
+        </flowable.osgi.import.additional>
 	</properties>
 
 	<build>

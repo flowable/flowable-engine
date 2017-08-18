@@ -94,7 +94,7 @@ public abstract class AbstractEngineConfigurator implements ProcessEngineConfigu
         String cfgPath = getMybatisCfgPath();
         if (cfgPath != null) {
             Set<String> resources = new HashSet<>();
-            try (InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(cfgPath)) {
+            try (InputStream inputStream = processEngineConfiguration.getClassLoader().getResourceAsStream(cfgPath)) {
                 DocumentBuilderFactory docBuilderFactory = createDocumentBuilderFactory();
                 DocumentBuilder docBuilder = docBuilderFactory.newDocumentBuilder();
                 Document document = docBuilder.parse(inputStream);
