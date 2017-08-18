@@ -23,23 +23,24 @@ import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.context.Context;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.impl.calendar.BusinessCalendar;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.TaskListener;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
-import org.flowable.engine.impl.calendar.BusinessCalendar;
 import org.flowable.engine.impl.calendar.DueDateBusinessCalendar;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
-import org.flowable.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
-import org.flowable.engine.impl.persistence.entity.TaskEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.IdentityLinkUtil;
+import org.flowable.engine.impl.util.TaskHelper;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.task.service.TaskService;
+import org.flowable.task.service.event.impl.FlowableTaskEventBuilder;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.variable.service.delegate.Expression;
+import org.flowable.variable.service.impl.el.ExpressionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,11 +62,10 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
     }
 
     public void execute(DelegateExecution execution) {
-        CommandContext commandContext = Context.getCommandContext();
-        TaskEntityManager taskEntityManager = CommandContextUtil.getTaskEntityManager(commandContext);
+        TaskService taskService = CommandContextUtil.getTaskService();
 
-        TaskEntity task = taskEntityManager.create();
-        task.setExecution((ExecutionEntity) execution);
+        TaskEntity task = taskService.createTask();
+        task.setExecutionId(execution.getId());
         task.setTaskDefinitionKey(userTask.getId());
 
         String activeTaskName = null;
@@ -202,31 +202,29 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                     && SkipExpressionUtil.shouldSkipFlowElement(execution, skipExpression);
         }
         
-        taskEntityManager.insert(task, (ExecutionEntity) execution, !skipUserTask);
+        TaskHelper.insertTask(task, (ExecutionEntity) execution, !skipUserTask);
 
         // Handling assignments need to be done after the task is inserted, to have an id
         if (!skipUserTask) {
-            handleAssignments(taskEntityManager, activeTaskAssignee, activeTaskOwner,
+            handleAssignments(taskService, activeTaskAssignee, activeTaskOwner,
                     activeTaskCandidateUsers, activeTaskCandidateGroups, task, expressionManager, execution);
             
             processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_CREATE);
 
             // All properties set, now firing 'create' events
-            if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-                CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
+            if (CommandContextUtil.getTaskServiceConfiguration().getEventDispatcher().isEnabled()) {
+                CommandContextUtil.getTaskServiceConfiguration().getEventDispatcher().dispatchEvent(
+                        FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
             }
             
         } else {
-            taskEntityManager.deleteTask(task, null, false, false);
+            TaskHelper.deleteTask(task, null, false, false);
             leave(execution);
         }
     }
 
     public void trigger(DelegateExecution execution, String signalName, Object signalData) {
-        CommandContext commandContext = Context.getCommandContext();
-        TaskEntityManager taskEntityManager = CommandContextUtil.getTaskEntityManager(commandContext);
-        List<TaskEntity> taskEntities = taskEntityManager.findTasksByExecutionId(execution.getId()); // Should be only one
+        List<TaskEntity> taskEntities = CommandContextUtil.getTaskService().findTasksByExecutionId(execution.getId()); // Should be only one
         for (TaskEntity taskEntity : taskEntities) {
             if (!taskEntity.isDeleted()) {
                 throw new FlowableException("UserTask should not be signalled before complete");
@@ -237,7 +235,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    protected void handleAssignments(TaskEntityManager taskEntityManager, String assignee, String owner, List<String> candidateUsers,
+    protected void handleAssignments(TaskService taskService, String assignee, String owner, List<String> candidateUsers,
             List<String> candidateGroups, TaskEntity task, ExpressionManager expressionManager, DelegateExecution execution) {
 
         if (StringUtils.isNotEmpty(assignee)) {
@@ -247,7 +245,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                 assigneeValue = assigneeExpressionValue.toString();
             }
 
-            taskEntityManager.changeTaskAssignee(task, assigneeValue);
+            TaskHelper.changeTaskAssignee(task, assigneeValue);
         }
 
         if (StringUtils.isNotEmpty(owner)) {
@@ -257,7 +255,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                 ownerValue = ownerExpressionValue.toString();
             }
 
-            taskEntityManager.changeTaskOwner(task, ownerValue);
+            TaskHelper.changeTaskOwner(task, ownerValue);
         }
 
         if (candidateGroups != null && !candidateGroups.isEmpty()) {
@@ -266,9 +264,13 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                 Object value = groupIdExpr.getValue(execution);
                 if (value instanceof String) {
                     List<String> candidates = extractCandidates((String) value);
-                    task.addCandidateGroups(candidates);
+                    List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(task.getId(), candidates);
+                    IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
+                    
                 } else if (value instanceof Collection) {
-                    task.addCandidateGroups((Collection) value);
+                    List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateGroups(task.getId(), (Collection) value);
+                    IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
+                    
                 } else {
                     throw new FlowableIllegalArgumentException("Expression did not resolve to a string or collection of strings");
                 }
@@ -281,9 +283,13 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                 Object value = userIdExpr.getValue(execution);
                 if (value instanceof String) {
                     List<String> candidates = extractCandidates((String) value);
-                    task.addCandidateUsers(candidates);
+                    List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(task.getId(), candidates);
+                    IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
+                    
                 } else if (value instanceof Collection) {
-                    task.addCandidateUsers((Collection) value);
+                    List<IdentityLinkEntity> identityLinkEntities = CommandContextUtil.getIdentityLinkService().addCandidateUsers(task.getId(), (Collection) value);
+                    IdentityLinkUtil.handleTaskIdentityLinkAdditions(task, identityLinkEntities);
+                    
                 } else {
                     throw new FlowableException("Expression did not resolve to a string or collection of strings");
                 }
@@ -299,12 +305,15 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                     if (value instanceof String) {
                         List<String> userIds = extractCandidates((String) value);
                         for (String userId : userIds) {
-                            task.addUserIdentityLink(userId, customUserIdentityLinkType);
+                            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(task.getId(), userId, null, customUserIdentityLinkType);
+                            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
                         }
                     } else if (value instanceof Collection) {
                         Iterator userIdSet = ((Collection) value).iterator();
                         while (userIdSet.hasNext()) {
-                            task.addUserIdentityLink((String) userIdSet.next(), customUserIdentityLinkType);
+                            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
+                                            task.getId(), (String) userIdSet.next(), null, customUserIdentityLinkType);
+                            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
                         }
                     } else {
                         throw new FlowableException("Expression did not resolve to a string or collection of strings");
@@ -325,12 +334,16 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                     if (value instanceof String) {
                         List<String> groupIds = extractCandidates((String) value);
                         for (String groupId : groupIds) {
-                            task.addGroupIdentityLink(groupId, customGroupIdentityLinkType);
+                            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
+                                            task.getId(), null, groupId, customGroupIdentityLinkType);
+                            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
                         }
                     } else if (value instanceof Collection) {
                         Iterator groupIdSet = ((Collection) value).iterator();
                         while (groupIdSet.hasNext()) {
-                            task.addGroupIdentityLink((String) groupIdSet.next(), customGroupIdentityLinkType);
+                            IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(
+                                            task.getId(), null, (String) groupIdSet.next(), customGroupIdentityLinkType);
+                            IdentityLinkUtil.handleTaskIdentityLinkAddition(task, identityLinkEntity);
                         }
                     } else {
                         throw new FlowableException("Expression did not resolve to a string or collection of strings");

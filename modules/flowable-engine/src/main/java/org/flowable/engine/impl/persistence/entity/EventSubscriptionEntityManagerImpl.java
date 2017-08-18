@@ -25,7 +25,11 @@ import org.flowable.engine.impl.event.EventHandler;
 import org.flowable.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.data.EventSubscriptionDataManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.runtime.EventSubscription;
+import org.flowable.job.service.JobService;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
 /**
  * @author Joram Barrez
@@ -115,9 +119,9 @@ public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<Ev
     public void insert(EventSubscriptionEntity entity, boolean fireCreateEvent) {
         super.insert(entity, fireCreateEvent);
 
-        if (entity.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
+        if (entity.getExecutionId() != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
             CountingExecutionEntity executionEntity = (CountingExecutionEntity) entity.getExecution();
-            if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
+            if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(executionEntity)) {
                 executionEntity.setEventSubscriptionCount(executionEntity.getEventSubscriptionCount() + 1);
             }
         }
@@ -125,9 +129,9 @@ public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<Ev
 
     @Override
     public void delete(EventSubscriptionEntity entity, boolean fireDeleteEvent) {
-        if (entity.getExecutionId() != null && isExecutionRelatedEntityCountEnabledGlobally()) {
+        if (entity.getExecutionId() != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
             CountingExecutionEntity executionEntity = (CountingExecutionEntity) entity.getExecution();
-            if (isExecutionRelatedEntityCountEnabled(executionEntity)) {
+            if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(executionEntity)) {
                 executionEntity.setEventSubscriptionCount(executionEntity.getEventSubscriptionCount() - 1);
             }
         }
@@ -272,7 +276,8 @@ public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<Ev
     }
 
     protected void scheduleEventAsync(EventSubscriptionEntity eventSubscriptionEntity, Object payload) {
-        JobEntity message = getJobEntityManager().create();
+        JobService jobService = CommandContextUtil.getJobService();
+        JobEntity message = jobService.createJob();
         message.setJobType(JobEntity.JOB_TYPE_MESSAGE);
         message.setJobHandlerType(ProcessEventJobHandler.TYPE);
         message.setJobHandlerConfiguration(eventSubscriptionEntity.getId());
@@ -283,7 +288,7 @@ public class EventSubscriptionEntityManagerImpl extends AbstractEntityManager<Ev
         // message.setEventPayload(payload);
         // }
 
-        getJobManager().scheduleAsyncJob(message);
+        jobService.scheduleAsyncJob(message);
     }
 
     protected List<SignalEventSubscriptionEntity> toSignalEventSubscriptionEntityList(List<EventSubscriptionEntity> result) {

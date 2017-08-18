@@ -23,8 +23,8 @@ import org.activiti.engine.impl.db.BulkDeleteable;
 import org.activiti.engine.impl.db.HasRevision;
 import org.activiti.engine.impl.db.PersistentObject;
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.impl.variable.ValueFields;
-import org.flowable.engine.impl.variable.VariableType;
+import org.flowable.variable.service.impl.types.ValueFields;
+import org.flowable.variable.service.impl.types.VariableType;
 
 /**
  * @author Christian Lipphardt (camunda)
@@ -107,7 +107,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     }
 
     public Object getPersistentState() {
-        HashMap<String, Object> persistentState = new HashMap<String, Object>();
+        HashMap<String, Object> persistentState = new HashMap<>();
 
         persistentState.put("textValue", textValue);
         persistentState.put("textValue2", textValue2);

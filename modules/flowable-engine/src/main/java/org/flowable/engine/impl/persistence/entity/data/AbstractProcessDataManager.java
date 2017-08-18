@@ -19,13 +19,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.flowable.engine.common.impl.db.AbstractDataManager;
+import org.flowable.engine.common.impl.db.CachedEntityMatcher;
 import org.flowable.engine.common.impl.db.DbSqlSession;
+import org.flowable.engine.common.impl.db.SingleCachedEntityMatcher;
 import org.flowable.engine.common.impl.persistence.cache.CachedEntity;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.CachedEntityMatcher;
-import org.flowable.engine.impl.persistence.SingleCachedEntityMatcher;
 
 /**
  * @author Joram Barrez

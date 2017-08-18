@@ -12,6 +12,10 @@
  */
 package org.flowable.app.service.editor;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.InputStreamReader;
@@ -53,10 +57,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author erikwinlof
@@ -100,7 +100,7 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
             models = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE, ModelSort.NAME_ASC);
         }
 
-        List<DecisionTableRepresentation> reps = new ArrayList<DecisionTableRepresentation>();
+        List<DecisionTableRepresentation> reps = new ArrayList<>();
 
         for (Model model : models) {
             reps.add(new DecisionTableRepresentation(model));
@@ -272,7 +272,7 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
         model.setName(saveRepresentation.getDecisionTableRepresentation().getName());
         model.setKey(decisionKey);
         model.setDescription(saveRepresentation.getDecisionTableRepresentation().getDescription());
-        
+
         saveRepresentation.getDecisionTableRepresentation().getDecisionTableDefinition().setKey(decisionKey);
 
         String editorJson = null;

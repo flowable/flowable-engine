@@ -20,7 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.task.IdentityLinkType;
+import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.rest.service.api.engine.RestIdentityLink;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;

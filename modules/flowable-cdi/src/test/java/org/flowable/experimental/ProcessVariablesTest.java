@@ -31,7 +31,7 @@ public class ProcessVariablesTest extends CdiFlowableTestCase {
     public void testResolveString() {
         BusinessProcess businessProcess = getBeanInstance(BusinessProcess.class);
 
-        Map<String, Object> processVariables = new HashMap<String, Object>();
+        Map<String, Object> processVariables = new HashMap<>();
         businessProcess.setVariable("testKeyString", "testValue");
         businessProcess.startProcessByKey("businessProcessBeanTest", processVariables);
         businessProcess.startTask(taskService.createTaskQuery().singleResult().getId());

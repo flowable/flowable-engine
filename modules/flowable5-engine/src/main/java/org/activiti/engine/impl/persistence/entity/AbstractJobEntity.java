@@ -24,7 +24,7 @@ import org.activiti.engine.impl.db.HasRevision;
 import org.activiti.engine.impl.db.PersistentObject;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.service.Job;
 
 /**
  * Abstract job entity class.
@@ -100,7 +100,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
     }
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("retries", retries);
         persistentState.put("duedate", duedate);
         persistentState.put("exceptionMessage", exceptionMessage);

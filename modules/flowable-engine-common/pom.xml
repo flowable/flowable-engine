@@ -26,6 +26,7 @@
             org.flowable.engine.common.impl.db,
             org.flowable.engine.common.impl.el,
             org.flowable.engine.common.impl.interceptor,
+            org.flowable.engine.common.impl.javax.el,
             org.flowable.engine.common.impl.persistence,
             org.flowable.engine.common.impl.persistence.entity,
             org.flowable.engine.common.impl.persistence.entity.data,
@@ -36,6 +37,7 @@
         </flowable.osgi.export.additional>
         <flowable.osgi.import.additional>
             org.springframework*;resolution:=optional,
+            javax.transaction;resolution:=optional,
         </flowable.osgi.import.additional>
     </properties>
 

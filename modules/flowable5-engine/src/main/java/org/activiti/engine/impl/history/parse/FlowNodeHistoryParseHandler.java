@@ -49,7 +49,7 @@ public class FlowNodeHistoryParseHandler implements BpmnParseHandler {
 
     protected static final ActivityInstanceStartHandler ACTIVITY_INSTANCE_START_LISTENER = new ActivityInstanceStartHandler();
 
-    protected static Set<Class<? extends BaseElement>> supportedElementClasses = new HashSet<Class<? extends BaseElement>>();
+    protected static Set<Class<? extends BaseElement>> supportedElementClasses = new HashSet<>();
 
     static {
         supportedElementClasses.add(EndEvent.class);

@@ -31,22 +31,21 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.asyncexecutor.JobManager;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 
 /**
  * @author Tijs Rademakers
@@ -272,13 +271,11 @@ public class ProcessInstanceHelper {
                     timerExecution.setEventScope(true);
                     timerExecution.setActive(false);
 
-                    JobManager jobManager = CommandContextUtil.getJobManager(commandContext);
-
-                    TimerJobEntity timerJob = jobManager.createTimerJob(timerEventDefinition, false, timerExecution, TriggerTimerEventJobHandler.TYPE,
-                            TimerEventHandler.createConfiguration(startEvent.getId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
-
+                    TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, false, timerExecution, TriggerTimerEventJobHandler.TYPE, 
+                                    TimerEventHandler.createConfiguration(startEvent.getId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
+                    
                     if (timerJob != null) {
-                        jobManager.scheduleTimerJob(timerJob);
+                        CommandContextUtil.getTimerJobService().scheduleTimerJob(timerJob);
                     }
                 }
             }

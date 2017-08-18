@@ -15,7 +15,7 @@ package org.flowable.standalone.event;
 import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertThat;
 
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 
 /**

@@ -12,8 +12,6 @@
  */
 package org.flowable.app.service.runtime;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,16 +23,18 @@ import org.flowable.app.service.exception.BadRequestException;
 import org.flowable.app.service.exception.NotFoundException;
 import org.flowable.app.service.exception.NotPermittedException;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.history.HistoricIdentityLink;
-import org.flowable.engine.task.IdentityLink;
-import org.flowable.engine.task.IdentityLinkType;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskInfo;
+import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.service.history.HistoricIdentityLink;
 import org.flowable.idm.api.User;
+import org.flowable.task.service.Task;
+import org.flowable.task.service.TaskInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
@@ -225,7 +225,7 @@ public class FlowableTaskActionService extends FlowableAbstractTaskService {
 
     protected List<UserRepresentation> getInvolvedUsers(String taskId) {
         List<HistoricIdentityLink> idLinks = historyService.getHistoricIdentityLinksForTask(taskId);
-        List<UserRepresentation> result = new ArrayList<UserRepresentation>(idLinks.size());
+        List<UserRepresentation> result = new ArrayList<>(idLinks.size());
 
         for (HistoricIdentityLink link : idLinks) {
             // Only include users and non-assignee links

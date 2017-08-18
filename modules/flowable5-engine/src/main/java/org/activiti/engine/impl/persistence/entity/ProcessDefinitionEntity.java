@@ -34,9 +34,9 @@ import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
 import org.activiti.engine.impl.task.TaskDefinition;
 import org.activiti.engine.task.IdentityLinkType;
-import org.flowable.engine.delegate.Expression;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.variable.service.delegate.Expression;
 
 /**
  * @author Tom Baeyens
@@ -62,9 +62,9 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     protected boolean hasStartFormKey;
     protected int suspensionState = SuspensionState.ACTIVE.getStateCode();
     protected boolean isIdentityLinksInitialized;
-    protected List<IdentityLinkEntity> definitionIdentityLinkEntities = new ArrayList<IdentityLinkEntity>();
-    protected Set<Expression> candidateStarterUserIdExpressions = new HashSet<Expression>();
-    protected Set<Expression> candidateStarterGroupIdExpressions = new HashSet<Expression>();
+    protected List<IdentityLinkEntity> definitionIdentityLinkEntities = new ArrayList<>();
+    protected Set<Expression> candidateStarterUserIdExpressions = new HashSet<>();
+    protected Set<Expression> candidateStarterGroupIdExpressions = new HashSet<>();
 
     // Backwards compatibility
     protected String engineVersion;
@@ -188,7 +188,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     // getters and setters //////////////////////////////////////////////////////
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("suspensionState", this.suspensionState);
         persistentState.put("category", this.category);
         return persistentState;

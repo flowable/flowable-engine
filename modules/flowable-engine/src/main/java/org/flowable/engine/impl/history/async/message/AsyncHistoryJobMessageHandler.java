@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.history.async.message;
 
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

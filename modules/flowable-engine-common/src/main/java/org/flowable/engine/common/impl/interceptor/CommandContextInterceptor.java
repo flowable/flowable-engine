@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.AbstractServiceConfiguration;
 import org.flowable.engine.common.impl.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
     protected CommandContextFactory commandContextFactory;
     protected String currentEngineConfigurationKey;
     protected Map<String, AbstractEngineConfiguration> engineConfigurations = new HashMap<>();
+    protected Map<String, AbstractServiceConfiguration> serviceConfigurations = new HashMap<>();
 
     public CommandContextInterceptor() {
     }
@@ -51,6 +53,7 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
         if (!config.isContextReusePossible() || context == null || context.getException() != null) {
             context = commandContextFactory.createCommandContext(command);
             context.setEngineConfigurations(engineConfigurations);
+            context.setServiceConfigurations(serviceConfigurations);
             
         } else {
             LOGGER.debug("Valid context found. Reusing it for the current command '{}'", command.getClass().getCanonicalName());
@@ -109,6 +112,14 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
 
     public void setEngineConfigurations(Map<String, AbstractEngineConfiguration> engineConfigurations) {
         this.engineConfigurations = engineConfigurations;
+    }
+    
+    public Map<String, AbstractServiceConfiguration> getServiceConfigurations() {
+        return serviceConfigurations;
+    }
+
+    public void setServiceConfigurations(Map<String, AbstractServiceConfiguration> serviceConfigurations) {
+        this.serviceConfigurations = serviceConfigurations;
     }
     
 }

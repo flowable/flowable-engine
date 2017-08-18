@@ -46,7 +46,7 @@ public class AttachmentEntity implements Attachment, PersistentObject, HasRevisi
     }
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("name", name);
         persistentState.put("description", description);
         return persistentState;

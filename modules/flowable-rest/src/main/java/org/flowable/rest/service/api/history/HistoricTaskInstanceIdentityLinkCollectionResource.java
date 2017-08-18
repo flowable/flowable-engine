@@ -19,7 +19,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.engine.HistoryService;
-import org.flowable.engine.history.HistoricIdentityLink;
+import org.flowable.identitylink.service.history.HistoricIdentityLink;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;

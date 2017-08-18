@@ -19,7 +19,7 @@ import java.util.List;
 
 /**
  * A single lane in a BPMN 2.0 LaneSet, currently only used internally for rendering the diagram. The PVM doesn't actually use the laneSets/lanes.
- * 
+ *
  * @author Frederik Heremans
  */
 public class Lane implements HasDIBounds, Serializable {
@@ -84,7 +84,7 @@ public class Lane implements HasDIBounds, Serializable {
 
     public List<String> getFlowNodeIds() {
         if (flowNodeIds == null) {
-            flowNodeIds = new ArrayList<String>();
+            flowNodeIds = new ArrayList<>();
         }
         return flowNodeIds;
     }

@@ -109,7 +109,7 @@ public class ModelImageService {
 
     protected void calculateWidthForFlowElements(Collection<FlowElement> elementList, BpmnModel bpmnModel, GraphicInfo diagramInfo) {
         for (FlowElement flowElement : elementList) {
-            List<GraphicInfo> graphicInfoList = new ArrayList<GraphicInfo>();
+            List<GraphicInfo> graphicInfoList = new ArrayList<>();
             if (flowElement instanceof SequenceFlow) {
                 List<GraphicInfo> flowGraphics = bpmnModel.getFlowLocationGraphicInfo(flowElement.getId());
                 if (flowGraphics != null && flowGraphics.size() > 0) {
@@ -128,7 +128,7 @@ public class ModelImageService {
 
     protected void calculateWidthForArtifacts(Collection<Artifact> artifactList, BpmnModel bpmnModel, GraphicInfo diagramInfo) {
         for (Artifact artifact : artifactList) {
-            List<GraphicInfo> graphicInfoList = new ArrayList<GraphicInfo>();
+            List<GraphicInfo> graphicInfoList = new ArrayList<>();
             if (artifact instanceof Association) {
                 graphicInfoList.addAll(bpmnModel.getFlowLocationGraphicInfo(artifact.getId()));
             } else {
@@ -155,7 +155,7 @@ public class ModelImageService {
 
     protected void scaleFlowElements(Collection<FlowElement> elementList, BpmnModel bpmnModel, double scaleFactor) {
         for (FlowElement flowElement : elementList) {
-            List<GraphicInfo> graphicInfoList = new ArrayList<GraphicInfo>();
+            List<GraphicInfo> graphicInfoList = new ArrayList<>();
             if (flowElement instanceof SequenceFlow) {
                 List<GraphicInfo> flowList = bpmnModel.getFlowLocationGraphicInfo(flowElement.getId());
                 if (flowList != null) {
@@ -176,7 +176,7 @@ public class ModelImageService {
 
     protected void scaleArtifacts(Collection<Artifact> artifactList, BpmnModel bpmnModel, double scaleFactor) {
         for (Artifact artifact : artifactList) {
-            List<GraphicInfo> graphicInfoList = new ArrayList<GraphicInfo>();
+            List<GraphicInfo> graphicInfoList = new ArrayList<>();
             if (artifact instanceof Association) {
                 List<GraphicInfo> flowList = bpmnModel.getFlowLocationGraphicInfo(artifact.getId());
                 if (flowList != null) {

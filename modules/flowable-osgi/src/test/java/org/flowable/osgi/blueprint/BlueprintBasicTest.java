@@ -32,12 +32,12 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
-import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.osgi.blueprint.bean.ActivityBehaviourBean;
 import org.flowable.osgi.blueprint.bean.SimpleBean;
+import org.flowable.variable.service.history.HistoricVariableInstance;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -60,6 +60,8 @@ import org.osgi.framework.Constants;
 @RunWith(PaxExam.class)
 @ExamReactorStrategy(PerMethod.class)
 public class BlueprintBasicTest {
+    
+    private static final String FLOWABLE_VERSION = "6.2.0-SNAPSHOT";
 
     @Inject
     protected BundleContext ctx;
@@ -79,20 +81,24 @@ public class BlueprintBasicTest {
     @Configuration
     public Option[] createConfiguration() {
         Option[] coreBundles = options(
-                mavenBundle().groupId("org.flowable").artifactId("flowable-bpmn-model").version("6.2.0-SNAPSHOT"),
-                mavenBundle().groupId("org.flowable").artifactId("flowable-engine-common-api").version("6.2.0-SNAPSHOT"),
-                mavenBundle().groupId("org.flowable").artifactId("flowable-engine-common").version("6.2.0-SNAPSHOT"),
-                mavenBundle().groupId("org.flowable").artifactId("flowable-bpmn-converter").version("6.2.0-SNAPSHOT"),
-                mavenBundle().groupId("org.flowable").artifactId("flowable-process-validation").version("6.2.0-SNAPSHOT"),
-                mavenBundle().groupId("org.flowable").artifactId("flowable-image-generator").version("6.2.0-SNAPSHOT"),
-                mavenBundle().groupId("org.flowable").artifactId("flowable-form-model").version("6.2.0-SNAPSHOT"),
-                mavenBundle().groupId("org.flowable").artifactId("flowable-form-api").version("6.2.0-SNAPSHOT"),
-                mavenBundle().groupId("org.flowable").artifactId("flowable-dmn-model").version("6.2.0-SNAPSHOT"),
-                mavenBundle().groupId("org.flowable").artifactId("flowable-dmn-api").version("6.2.0-SNAPSHOT"),
-                mavenBundle().groupId("org.flowable").artifactId("flowable-idm-api").version("6.2.0-SNAPSHOT"),
-                mavenBundle().groupId("org.flowable").artifactId("flowable-idm-engine").version("6.2.0-SNAPSHOT"),
-                mavenBundle().groupId("org.flowable").artifactId("flowable-content-api").version("6.2.0-SNAPSHOT"),
-                mavenBundle().groupId("org.flowable").artifactId("flowable-engine").version("6.2.0-SNAPSHOT"),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-bpmn-model").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-engine-common-api").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-engine-common").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-bpmn-converter").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-process-validation").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-image-generator").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-form-model").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-form-api").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-dmn-model").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-dmn-api").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-idm-api").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-idm-engine").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-content-api").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-variable-service").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-identitylink-service").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-task-service").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-job-service").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-engine").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.apache.commons").artifactId("commons-lang3").version("3.3.2"),
                 mavenBundle().groupId("com.fasterxml.uuid").artifactId("java-uuid-generator").version("3.1.3"),
                 mavenBundle().groupId("com.fasterxml.jackson.core").artifactId("jackson-core").version("2.7.5"),

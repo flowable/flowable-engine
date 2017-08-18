@@ -14,9 +14,8 @@ package org.flowable.engine.impl.jobexecutor;
 
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cmd.ActivateProcessDefinitionCmd;
-import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.impl.util.json.JSONObject;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
 /**
  * @author Joram Barrez
@@ -29,7 +28,7 @@ public class TimerActivateProcessDefinitionHandler extends TimerChangeProcessDef
         return TYPE;
     }
 
-    public void execute(JobEntity job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
+    public void execute(JobEntity job, String configuration, Object execution, CommandContext commandContext) {
         JSONObject cfgJson = new JSONObject(configuration);
         String processDefinitionId = job.getProcessDefinitionId();
         boolean activateProcessInstances = getIncludeProcessInstances(cfgJson);

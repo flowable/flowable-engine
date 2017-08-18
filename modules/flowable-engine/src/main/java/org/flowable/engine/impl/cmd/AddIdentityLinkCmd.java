@@ -15,10 +15,11 @@ package org.flowable.engine.impl.cmd;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
-import org.flowable.engine.task.IdentityLinkType;
+import org.flowable.engine.impl.util.TaskHelper;
+import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Joram Barrez
@@ -87,7 +88,7 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
                 return null;
             }
             
-            CommandContextUtil.getTaskEntityManager(commandContext).changeTaskAssignee(task, identityId);
+            TaskHelper.changeTaskAssignee(task, identityId);
             assignedToNoOne = identityId == null;
             
         } else if (IdentityLinkType.OWNER.equals(identityType)) {
@@ -100,14 +101,14 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
                 return null;
             }
             
-            CommandContextUtil.getTaskEntityManager(commandContext).changeTaskOwner(task, identityId);
+            TaskHelper.changeTaskOwner(task, identityId);
             assignedToNoOne = identityId == null;
 
         } else if (IDENTITY_USER == identityIdType) {
-            task.addUserIdentityLink(identityId, identityType);
+            TaskHelper.addUserIdentityLink(task, identityId, identityType);
             
         } else if (IDENTITY_GROUP == identityIdType) {
-            task.addGroupIdentityLink(identityId, identityType);
+            TaskHelper.addGroupIdentityLink(task, identityId, identityType);
         }
 
         boolean forceNullUserId = false;

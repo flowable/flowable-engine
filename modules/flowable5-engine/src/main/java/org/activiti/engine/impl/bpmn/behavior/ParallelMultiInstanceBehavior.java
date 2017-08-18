@@ -44,7 +44,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         setLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES, 0);
         setLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES, nrOfInstances);
 
-        List<ActivityExecution> concurrentExecutions = new ArrayList<ActivityExecution>();
+        List<ActivityExecution> concurrentExecutions = new ArrayList<>();
         for (int loopCounter = 0; loopCounter < nrOfInstances; loopCounter++) {
             ActivityExecution concurrentExecution = execution.createExecution();
             concurrentExecution.setActive(true);
@@ -132,7 +132,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
             if (joinedExecutions.size() >= nrOfInstances || completionConditionSatisfied(execution)) {
 
                 // Removing all active child executions (ie because completionCondition is true)
-                List<ExecutionEntity> executionsToRemove = new ArrayList<ExecutionEntity>();
+                List<ExecutionEntity> executionsToRemove = new ArrayList<>();
                 for (ActivityExecution childExecution : executionEntity.getParent().getExecutions()) {
                     if (childExecution.isActive()) {
                         executionsToRemove.add((ExecutionEntity) childExecution);

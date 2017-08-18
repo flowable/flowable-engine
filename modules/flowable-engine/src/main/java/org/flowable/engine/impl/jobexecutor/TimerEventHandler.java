@@ -52,7 +52,7 @@ public class TimerEventHandler {
         }
     }
 
-    public static String geCalendarNameFromConfiguration(String jobHandlerConfiguration) {
+    public static String getCalendarNameFromConfiguration(String jobHandlerConfiguration) {
         try {
             JSONObject cfgJson = new JSONObject(jobHandlerConfiguration);
             return cfgJson.get(PROPERTYNAME_CALENDAR_NAME_EXPRESSION).toString();

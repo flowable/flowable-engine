@@ -163,7 +163,7 @@ public class FlowableProcessDefinitionService {
     }
 
     protected List<ProcessDefinitionRepresentation> convertDefinitionList(List<ProcessDefinition> definitions) {
-        List<ProcessDefinitionRepresentation> result = new ArrayList<ProcessDefinitionRepresentation>();
+        List<ProcessDefinitionRepresentation> result = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(definitions)) {
             for (ProcessDefinition processDefinition : definitions) {
                 ProcessDefinitionRepresentation rep = new ProcessDefinitionRepresentation(processDefinition);

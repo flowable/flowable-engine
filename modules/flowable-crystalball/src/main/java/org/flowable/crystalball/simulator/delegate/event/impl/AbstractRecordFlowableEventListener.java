@@ -12,14 +12,14 @@
  */
 package org.flowable.crystalball.simulator.delegate.event.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.flowable.crystalball.simulator.SimulationEvent;
 import org.flowable.crystalball.simulator.delegate.event.Function;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * This class provides abstract base to records engine events
@@ -44,7 +44,7 @@ public abstract class AbstractRecordFlowableEventListener implements FlowableEve
     protected abstract void store(Collection<SimulationEvent> simulationEvents);
 
     protected Collection<SimulationEvent> transform(FlowableEvent event) {
-        List<SimulationEvent> simEvents = new ArrayList<SimulationEvent>();
+        List<SimulationEvent> simEvents = new ArrayList<>();
         for (Function<FlowableEvent, SimulationEvent> t : transformers) {
             SimulationEvent simEvent = t.apply(event);
             if (simEvent != null)

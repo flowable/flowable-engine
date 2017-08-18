@@ -22,9 +22,9 @@ import org.activiti.engine.impl.db.HasRevision;
 import org.activiti.engine.impl.db.PersistentObject;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
-import org.flowable.engine.impl.persistence.entity.VariableInstance;
-import org.flowable.engine.impl.variable.ValueFields;
-import org.flowable.engine.impl.variable.VariableType;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
+import org.flowable.variable.service.impl.types.ValueFields;
+import org.flowable.variable.service.impl.types.VariableType;
 
 /**
  * @author Tom Baeyens
@@ -99,7 +99,7 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
     }
 
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         if (longValue != null) {
             persistentState.put("longValue", longValue);
         }
@@ -129,6 +129,9 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
 
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
+    }
+
+    public void setProcessDefinitionId(String processDefinitionId) {
     }
 
     public void setExecutionId(String executionId) {
@@ -206,6 +209,10 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
 
     public String getProcessInstanceId() {
         return processInstanceId;
+    }
+
+    public String getProcessDefinitionId() {
+        return null;
     }
 
     public String getTaskId() {

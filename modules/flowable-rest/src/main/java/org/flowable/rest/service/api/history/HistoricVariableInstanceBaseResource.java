@@ -20,11 +20,11 @@ import java.util.Map;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.query.QueryProperty;
-import org.flowable.engine.history.HistoricVariableInstanceQuery;
-import org.flowable.engine.impl.HistoricVariableInstanceQueryProperty;
 import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
+import org.flowable.variable.service.history.HistoricVariableInstanceQuery;
+import org.flowable.variable.service.impl.HistoricVariableInstanceQueryProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

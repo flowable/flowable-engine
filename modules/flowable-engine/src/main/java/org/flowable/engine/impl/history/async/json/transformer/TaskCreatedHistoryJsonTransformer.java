@@ -16,10 +16,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.task.service.HistoricTaskService;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -48,15 +48,15 @@ public class TaskCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransf
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-        HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager = CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext);
+        HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
 
         String taskId = getStringFromJson(historicalData, HistoryJsonConstants.ID);
         String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
         
-        HistoricTaskInstanceEntity historicTaskInstance = historicTaskInstanceEntityManager.findById(taskId);
+        HistoricTaskInstanceEntity historicTaskInstance = historicTaskService.getHistoricTask(taskId);
         
         if (historicTaskInstance == null) {
-            historicTaskInstance = historicTaskInstanceEntityManager.create();
+            historicTaskInstance = historicTaskService.createHistoricTask();
             historicTaskInstance.setId(taskId);
             historicTaskInstance.setProcessDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_ID));
             historicTaskInstance.setProcessInstanceId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID));
@@ -74,7 +74,7 @@ public class TaskCreatedHistoryJsonTransformer extends AbstractHistoryJsonTransf
             historicTaskInstance.setTenantId(getStringFromJson(historicalData, HistoryJsonConstants.TENANT_ID));
             historicTaskInstance.setLastUpdateTime(getDateFromJson(historicalData, HistoryJsonConstants.TIMESTAMP));
     
-            historicTaskInstanceEntityManager.insert(historicTaskInstance);
+            historicTaskService.insertHistoricTask(historicTaskInstance, true);
         }
 
         if (StringUtils.isNotEmpty(executionId)) {

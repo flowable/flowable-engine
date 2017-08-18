@@ -35,12 +35,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
+import org.flowable.task.service.delegate.DelegateTask;
+import org.flowable.variable.service.delegate.Expression;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 

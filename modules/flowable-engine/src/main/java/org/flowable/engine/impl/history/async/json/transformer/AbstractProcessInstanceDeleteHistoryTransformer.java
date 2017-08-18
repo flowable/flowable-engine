@@ -19,6 +19,7 @@ import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.TaskHelper;
 
 public abstract class AbstractProcessInstanceDeleteHistoryTransformer extends AbstractHistoryJsonTransformer {
 
@@ -27,10 +28,10 @@ public abstract class AbstractProcessInstanceDeleteHistoryTransformer extends Ab
         HistoricProcessInstanceEntity historicProcessInstance = historicProcessInstanceEntityManager.findById(processInstanceId);
         
         CommandContextUtil.getHistoricDetailEntityManager(commandContext).deleteHistoricDetailsByProcessInstanceId(processInstanceId);
-        CommandContextUtil.getHistoricVariableInstanceEntityManager(commandContext).deleteHistoricVariableInstanceByProcessInstanceId(processInstanceId);
+        CommandContextUtil.getHistoricVariableService().deleteHistoricVariableInstancesByProcessInstanceId(processInstanceId);
         CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext).deleteHistoricActivityInstancesByProcessInstanceId(processInstanceId);
-        CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext).deleteHistoricTaskInstancesByProcessInstanceId(processInstanceId);
-        CommandContextUtil.getHistoricIdentityLinkEntityManager(commandContext).deleteHistoricIdentityLinksByProcInstance(processInstanceId);
+        TaskHelper.deleteHistoricTaskInstancesByProcessInstanceId(processInstanceId);
+        CommandContextUtil.getHistoricIdentityLinkService().deleteHistoricIdentityLinksByProcessInstanceId(processInstanceId);
         CommandContextUtil.getCommentEntityManager(commandContext).deleteCommentsByProcessInstanceId(processInstanceId);
 
         historicProcessInstanceEntityManager.delete(historicProcessInstance, false);

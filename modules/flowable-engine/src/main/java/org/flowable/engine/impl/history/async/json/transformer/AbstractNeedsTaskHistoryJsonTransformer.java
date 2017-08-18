@@ -23,7 +23,7 @@ public abstract class AbstractNeedsTaskHistoryJsonTransformer extends AbstractHi
     @Override
     public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
         String taskId = getStringFromJson(historicalData, HistoryJsonConstants.ID);
-        return CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext).findById(taskId) != null;
+        return CommandContextUtil.getHistoricTaskService().getHistoricTask(taskId) != null;
     }
 
 }

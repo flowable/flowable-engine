@@ -31,18 +31,18 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.history.HistoricTaskInstanceQuery;
-import org.flowable.engine.task.Task;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
+import org.flowable.task.service.Task;
+import org.flowable.task.service.history.HistoricTaskInstance;
+import org.flowable.task.service.history.HistoricTaskInstanceQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Centralized service for all permission-checks.
- * 
+ *
  * @author Frederik Heremans
  */
 @Service
@@ -104,7 +104,7 @@ public class PermissionService {
     }
 
     private List<String> getGroupIdsForUser(User user) {
-        List<String> groupIds = new ArrayList<String>();
+        List<String> groupIds = new ArrayList<>();
         for (Group group : remoteIdmService.getUser(user.getId()).getGroups()) {
             groupIds.add(String.valueOf(group.getId()));
         }

@@ -67,17 +67,19 @@ import org.flowable.engine.impl.cmd.SetTaskDueDateCmd;
 import org.flowable.engine.impl.cmd.SetTaskPriorityCmd;
 import org.flowable.engine.impl.cmd.SetTaskVariablesCmd;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
-import org.flowable.engine.impl.persistence.entity.VariableInstance;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
-import org.flowable.engine.task.IdentityLink;
-import org.flowable.engine.task.IdentityLinkType;
-import org.flowable.engine.task.NativeTaskQuery;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskQuery;
 import org.flowable.form.model.FormModel;
+import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.task.service.NativeTaskQuery;
+import org.flowable.task.service.Task;
+import org.flowable.task.service.TaskQuery;
+import org.flowable.task.service.impl.NativeTaskQueryImpl;
+import org.flowable.task.service.impl.TaskQueryImpl;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
 
 /**
  * @author Tom Baeyens

@@ -24,13 +24,13 @@ import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.task.TaskDefinition;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
-import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.UserTask;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.calendar.DueDateBusinessCalendar;
+import org.flowable.variable.service.delegate.Expression;
 
 /**
  * @author Joram Barrez
@@ -120,7 +120,7 @@ public class UserTaskParseHandler extends AbstractActivityBpmnParseHandler<UserT
 
         // CustomUserIdentityLinks
         for (String customUserIdentityLinkType : userTask.getCustomUserIdentityLinks().keySet()) {
-            Set<Expression> userIdentityLinkExpression = new HashSet<Expression>();
+            Set<Expression> userIdentityLinkExpression = new HashSet<>();
             for (String userIdentityLink : userTask.getCustomUserIdentityLinks().get(customUserIdentityLinkType)) {
                 userIdentityLinkExpression.add(expressionManager.createExpression(userIdentityLink));
             }
@@ -129,7 +129,7 @@ public class UserTaskParseHandler extends AbstractActivityBpmnParseHandler<UserT
 
         // CustomGroupIdentityLinks
         for (String customGroupIdentityLinkType : userTask.getCustomGroupIdentityLinks().keySet()) {
-            Set<Expression> groupIdentityLinkExpression = new HashSet<Expression>();
+            Set<Expression> groupIdentityLinkExpression = new HashSet<>();
             for (String groupIdentityLink : userTask.getCustomGroupIdentityLinks().get(customGroupIdentityLinkType)) {
                 groupIdentityLinkExpression.add(expressionManager.createExpression(groupIdentityLink));
             }

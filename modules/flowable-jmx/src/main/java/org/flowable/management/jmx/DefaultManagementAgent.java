@@ -46,7 +46,7 @@ public class DefaultManagementAgent implements ManagementAgent {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultManagementAgent.class);
 
     protected MBeanServer server;
-    protected final ConcurrentMap<ObjectName, ObjectName> mbeansRegistered = new ConcurrentHashMap<ObjectName, ObjectName>();
+    protected final ConcurrentMap<ObjectName, ObjectName> mbeansRegistered = new ConcurrentHashMap<>();
     protected JMXConfigurator jmxConfigurator;
     protected Registry registry;
     protected JMXConnectorServer cs;

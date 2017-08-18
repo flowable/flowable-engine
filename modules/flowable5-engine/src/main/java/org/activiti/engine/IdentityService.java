@@ -12,6 +12,8 @@
  */
 package org.activiti.engine;
 
+import java.util.List;
+
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.NativeGroupQuery;
@@ -19,8 +21,6 @@ import org.flowable.idm.api.NativeUserQuery;
 import org.flowable.idm.api.Picture;
 import org.flowable.idm.api.User;
 import org.flowable.idm.api.UserQuery;
-
-import java.util.List;
 
 /**
  * Service to manage {@link User}s and {@link Group}s.

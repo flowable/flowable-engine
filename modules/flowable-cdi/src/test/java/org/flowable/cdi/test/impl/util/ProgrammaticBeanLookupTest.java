@@ -2,7 +2,8 @@ package org.flowable.cdi.test.impl.util;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsEqual.equalTo;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import javax.enterprise.inject.Alternative;
 import javax.inject.Named;

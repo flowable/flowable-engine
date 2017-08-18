@@ -86,10 +86,10 @@ import org.flowable.bpmn.model.ThrowEvent;
 import org.flowable.bpmn.model.Transaction;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.delegate.BusinessRuleTaskDelegate;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.impl.bpmn.data.SimpleDataInputAssociation;
 import org.flowable.engine.impl.bpmn.webservice.MessageImplicitDataOutputAssociation;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
+import org.flowable.variable.service.delegate.Expression;
 
 /**
  * Default implementation of the {@link ActivityBehaviorFactory}. Used when no custom {@link ActivityBehaviorFactory} is injected on the {@link ProcessEngineConfigurationImpl}.

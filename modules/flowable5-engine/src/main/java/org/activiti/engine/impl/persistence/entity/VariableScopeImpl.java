@@ -26,11 +26,10 @@ import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.javax.el.ELContext;
-import org.flowable.engine.delegate.VariableScope;
-import org.flowable.engine.impl.persistence.entity.TransientVariableInstance;
-import org.flowable.engine.impl.persistence.entity.VariableInstance;
-import org.flowable.engine.impl.variable.VariableType;
-import org.flowable.engine.impl.variable.VariableTypes;
+import org.flowable.variable.service.delegate.VariableScope;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
+import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.variable.service.impl.types.VariableTypes;
 
 /**
  * @author Tom Baeyens
@@ -46,7 +45,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     protected Map<String, VariableInstanceEntity> variableInstances = null; // needs to be null, the logic depends on it for checking if vars were already fetched
 
     // The cache is used when fetching/setting specific variables
-    protected Map<String, VariableInstanceEntity> usedVariablesCache = new HashMap<String, VariableInstanceEntity>();
+    protected Map<String, VariableInstanceEntity> usedVariablesCache = new HashMap<>();
 
     protected Map<String, VariableInstance> transientVariabes;
 
@@ -62,7 +61,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
 
     protected void ensureVariableInstancesInitialized() {
         if (variableInstances == null) {
-            variableInstances = new HashMap<String, VariableInstanceEntity>();
+            variableInstances = new HashMap<>();
 
             CommandContext commandContext = Context.getCommandContext();
             if (commandContext == null) {
@@ -93,8 +92,8 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
 
     public Map<String, Object> getVariables(Collection<String> variableNames, boolean fetchAllVariables) {
 
-        Map<String, Object> requestedVariables = new HashMap<String, Object>();
-        Set<String> variableNamesToFetch = new HashSet<String>(variableNames);
+        Map<String, Object> requestedVariables = new HashMap<>();
+        Set<String> variableNamesToFetch = new HashSet<>(variableNames);
 
         // Transient variables 'shadow' any existing variables.
         // The values in the fetch-cache will be more recent, so they can override any existing ones
@@ -140,8 +139,8 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
 
     public Map<String, VariableInstance> getVariableInstances(Collection<String> variableNames, boolean fetchAllVariables) {
 
-        Map<String, VariableInstance> requestedVariables = new HashMap<String, VariableInstance>();
-        Set<String> variableNamesToFetch = new HashSet<String>(variableNames);
+        Map<String, VariableInstance> requestedVariables = new HashMap<>();
+        Set<String> variableNamesToFetch = new HashSet<>(variableNames);
 
         // The values in the fetch-cache will be more recent, so they can override any existing ones
         for (String variableName : variableNames) {
@@ -240,11 +239,11 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
 
     /**
      * The same operation as {@link VariableScopeImpl#getVariable(String)}, but with an extra parameter to indicate whether or not all variables need to be fetched.
-     * 
+     * <p>
      * Note that the default Activiti way (because of backwards compatibility) is to fetch all the variables when doing a get/set of variables. So this means 'true' is the default value for this
      * method, and in fact it will simply delegate to {@link #getVariable(String)}. This can also be the most performant, if you're doing a lot of variable gets in the same transaction (eg in service
      * tasks).
-     * 
+     * <p>
      * In case 'false' is used, only the specific variable will be fetched.
      */
     public Object getVariable(String variableName, boolean fetchAllVariables) {
@@ -440,7 +439,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     }
 
     public Map<String, Object> getVariablesLocal() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         ensureVariableInstancesInitialized();
         for (VariableInstanceEntity variableInstance : variableInstances.values()) {
             variables.put(variableInstance.getName(), variableInstance.getValue());
@@ -457,7 +456,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     }
 
     public Map<String, VariableInstance> getVariableInstancesLocal() {
-        Map<String, VariableInstance> variables = new HashMap<String, VariableInstance>();
+        Map<String, VariableInstance> variables = new HashMap<>();
         ensureVariableInstancesInitialized();
         for (VariableInstanceEntity variableInstance : variableInstances.values()) {
             variables.put(variableInstance.getName(), variableInstance);
@@ -480,10 +479,10 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     }
 
     public Map<String, Object> getVariablesLocal(Collection<String> variableNames, boolean fetchAllVariables) {
-        Map<String, Object> requestedVariables = new HashMap<String, Object>();
+        Map<String, Object> requestedVariables = new HashMap<>();
 
         // The values in the fetch-cache will be more recent, so they can override any existing ones
-        Set<String> variableNamesToFetch = new HashSet<String>(variableNames);
+        Set<String> variableNamesToFetch = new HashSet<>(variableNames);
         for (String variableName : variableNames) {
             if (transientVariabes != null && transientVariabes.containsKey(variableName)) {
                 requestedVariables.put(variableName, transientVariabes.get(variableName).getValue());
@@ -514,10 +513,10 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     }
 
     public Map<String, VariableInstance> getVariableInstancesLocal(Collection<String> variableNames, boolean fetchAllVariables) {
-        Map<String, VariableInstance> requestedVariables = new HashMap<String, VariableInstance>();
+        Map<String, VariableInstance> requestedVariables = new HashMap<>();
 
         // The values in the fetch-cache will be more recent, so they can override any existing ones
-        Set<String> variableNamesToFetch = new HashSet<String>(variableNames);
+        Set<String> variableNamesToFetch = new HashSet<>(variableNames);
         for (String variableName : variableNames) {
             if (transientVariabes != null && transientVariabes.containsKey(variableName)) {
                 requestedVariables.put(variableName, transientVariabes.get(variableName));
@@ -550,7 +549,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     protected abstract List<VariableInstanceEntity> getSpecificVariables(Collection<String> variableNames);
 
     public Set<String> getVariableNamesLocal() {
-        Set<String> variableNames = new HashSet<String>();
+        Set<String> variableNames = new HashSet<>();
         if (transientVariabes != null) {
             variableNames.addAll(transientVariabes.keySet());
         }
@@ -594,14 +593,14 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
 
     public void removeVariables() {
         ensureVariableInstancesInitialized();
-        Set<String> variableNames = new HashSet<String>(variableInstances.keySet());
+        Set<String> variableNames = new HashSet<>(variableInstances.keySet());
         for (String variableName : variableNames) {
             removeVariable(variableName);
         }
     }
 
     public void removeVariablesLocal() {
-        List<String> variableNames = new ArrayList<String>(getVariableNamesLocal());
+        List<String> variableNames = new ArrayList<>(getVariableNamesLocal());
         for (String variableName : variableNames) {
             removeVariableLocal(variableName);
         }
@@ -638,16 +637,15 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
 
     /**
      * The default {@link #setVariable(String, Object)} fetches all variables (for historical and backwards compatible reasons) while setting the variables.
-     * 
+     * <p>
      * Setting the fetchAllVariables parameter to true is the default behaviour (ie fetching all variables) Setting the fetchAllVariables parameter to false does not do that.
-     * 
      */
     public void setVariable(String variableName, Object value, boolean fetchAllVariables) {
         setVariable(variableName, value, getSourceActivityExecution(), fetchAllVariables);
     }
 
     protected void setVariable(String variableName, Object value,
-            ExecutionEntity sourceActivityExecution, boolean fetchAllVariables) {
+                               ExecutionEntity sourceActivityExecution, boolean fetchAllVariables) {
 
         if (fetchAllVariables) {
 
@@ -720,20 +718,13 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
 
     /**
      * The default {@link #setVariableLocal(String, Object)} fetches all variables (for historical and backwards compatible reasons) while setting the variables.
-     * 
+     * <p>
      * Setting the fetchAllVariables parameter to true is the default behaviour (ie fetching all variables) Setting the fetchAllVariables parameter to false does not do that.
-     * 
      */
     public Object setVariableLocal(String variableName, Object value, boolean fetchAllVariables) {
         return setVariableLocal(variableName, value, getSourceActivityExecution(), fetchAllVariables);
     }
-    
-    @Override
-    public Object setVariableLocal(String variableName, Object value, org.flowable.engine.impl.persistence.entity.ExecutionEntity sourceActivityExecution, boolean fetchAllVariables) {
-        // This method is called from v6 only, v5 will never call this method.
-        throw new UnsupportedOperationException();
-    }
-    
+
     public Object setVariableLocal(String variableName, Object value, ExecutionEntity sourceActivityExecution, boolean fetchAllVariables) {
 
         if (fetchAllVariables) {
@@ -919,7 +910,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
 
     public void setTransientVariableLocal(String variableName, Object variableValue) {
         if (transientVariabes == null) {
-            transientVariabes = new HashMap<String, VariableInstance>();
+            transientVariabes = new HashMap<>();
         }
         transientVariabes.put(variableName, new TransientVariableInstance(variableName, variableValue));
     }
@@ -948,7 +939,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
 
     public Map<String, Object> getTransientVariablesLocal() {
         if (transientVariabes != null) {
-            Map<String, Object> variables = new HashMap<String, Object>();
+            Map<String, Object> variables = new HashMap<>();
             for (String variableName : transientVariabes.keySet()) {
                 variables.put(variableName, transientVariabes.get(variableName).getValue());
             }

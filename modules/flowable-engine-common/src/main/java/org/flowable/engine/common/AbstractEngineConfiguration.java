@@ -128,6 +128,7 @@ public abstract class AbstractEngineConfiguration {
     protected List<CommandInterceptor> commandInterceptors;
     
     protected Map<String, AbstractEngineConfiguration> engineConfigurations = new HashMap<>();
+    protected Map<String, AbstractServiceConfiguration> serviceConfigurations = new HashMap<>();
 
     protected ClassLoader classLoader;
     /**
@@ -146,7 +147,7 @@ public abstract class AbstractEngineConfiguration {
     /**
      * Some databases have a limit of how many parameters one sql insert can have (eg SQL Server, 2000 params (!= insert statements) ). Tweak this parameter in case of exceptions indicating too much
      * is being put into one bulk insert, or make it higher if your database can cope with it and there are inserts with a huge amount of data.
-     *
+     * <p>
      * By default: 100 (75 for mssql server as it has a hard limit of 2000 parameters in a statement)
      */
     protected int maxNrOfStatementsInBulkInsert = 100;
@@ -430,6 +431,7 @@ public abstract class AbstractEngineConfiguration {
                 CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory);
                 engineConfigurations.put(engineCfgKey, this);
                 commandContextInterceptor.setEngineConfigurations(engineConfigurations);
+                commandContextInterceptor.setServiceConfigurations(serviceConfigurations);
                 commandContextInterceptor.setCurrentEngineConfigurationKey(engineCfgKey);
                 interceptors.add(commandContextInterceptor);
             }
@@ -647,7 +649,12 @@ public abstract class AbstractEngineConfiguration {
     }
 
     protected InputStream getResourceAsStream(String resource) {
-        return this.getClass().getClassLoader().getResourceAsStream(resource);
+        ClassLoader classLoader = getClassLoader();
+        if (classLoader != null) {
+            return getClassLoader().getResourceAsStream(resource);
+        } else {
+            return this.getClass().getClassLoader().getResourceAsStream(resource);
+        }
     }
 
     public abstract InputStream getMyBatisXmlConfigurationStream();
@@ -941,6 +948,22 @@ public abstract class AbstractEngineConfiguration {
             engineConfigurations = new HashMap<>();
         }
         engineConfigurations.put(key, engineConfiguration);
+    }
+    
+    public Map<String, AbstractServiceConfiguration> getServiceConfigurations() {
+        return serviceConfigurations;
+    }
+
+    public AbstractEngineConfiguration setServiceConfigurations(Map<String, AbstractServiceConfiguration> serviceConfigurations) {
+        this.serviceConfigurations = serviceConfigurations;
+        return this;
+    }
+    
+    public void addServiceConfiguration(String key, AbstractServiceConfiguration serviceConfiguration) {
+        if (serviceConfigurations == null) {
+            serviceConfigurations = new HashMap<>();
+        }
+        serviceConfigurations.put(key, serviceConfiguration);
     }
 
     public void setDefaultCommandInterceptors(Collection<? extends CommandInterceptor> defaultCommandInterceptors) {

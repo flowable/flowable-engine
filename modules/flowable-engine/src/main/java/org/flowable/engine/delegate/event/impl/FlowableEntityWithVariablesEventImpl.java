@@ -14,9 +14,9 @@ package org.flowable.engine.delegate.event.impl;
 
 import java.util.Map;
 
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableEntityWithVariablesEvent;
-import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
 
 /**
  * Base class for all {@link FlowableEngineEntityEvent} implementations, related to entities with variables.

@@ -13,6 +13,7 @@
 package org.flowable.engine.delegate;
 
 import org.flowable.engine.impl.delegate.ActivityBehavior;
+import org.flowable.variable.service.delegate.Expression;
 
 public interface BusinessRuleTaskDelegate extends ActivityBehavior {
 

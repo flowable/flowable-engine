@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.common.impl.db.CachedEntityMatcher;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.CachedEntityMatcher;
 import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;

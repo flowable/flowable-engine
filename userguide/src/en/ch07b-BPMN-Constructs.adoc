@@ -3572,8 +3572,8 @@ Http task is implemented as a dedicated <<bpmnJavaServiceTask,Service Task>> and
 ----
 <serviceTask id="httpGet" flowable:type="http">
 ----
-Also its possible to override default Http Task behavior by providing custom implementation.
-Custom implemention should extend org.flowable.http.HttpActivityBehavior and override perform() method.
+Also its possible to override default Http Task behavior by providing a custom implementation.
+Custom implementations should extend org.flowable.http.HttpActivityBehavior and override the perform() method.
 Field 'httpActivityBehaviorClass' should be set in the task definition.
 Default value for this field is 'org.flowable.http.impl.HttpActivityBehaviorImpl'.
 Currently 'HttpActivityBehaviorImpl' is based on Apache Http Client. As Apache Http Client can be customized in many ways, all possible options are not used in Http Client config.
@@ -4599,6 +4599,30 @@ The downside of the +loopDataInputRef+ and +inputDataItem+ is that the names are
 <userTask id="miTasks" name="My Task" flowable:assignee="${assignee}">
   <multiInstanceLoopCharacteristics isSequential="true"
      flowable:collection="${myService.resolveUsersForTask()}" flowable:elementVariable="assignee" >
+  </multiInstanceLoopCharacteristics>
+</userTask>
+----
+
+Note that the +collection+ attribute will be resolved as an expression. When the expression resolves to a String instead of a collection, either because it is a static string value or the expression itself resolves to a String, the resulting value will be used as the variable name for fetching the collection process variable.
+
+For example, in the following snippet the collection is assumed to be stored in the +assigneeList+ process variable:
+
+[source,xml,linenums]
+----
+<userTask id="miTasks" name="My Task" flowable:assignee="${assignee}">
+  <multiInstanceLoopCharacteristics isSequential="true"
+     flowable:collection="assigneeList" flowable:elementVariable="assignee" >
+  </multiInstanceLoopCharacteristics>
+</userTask>
+----
+
+For example, assuming the +myService.getCollectionVariableName()+ returns a String value, that value will be used as variable name to fetch the collection stored as a process variable.
+
+[source,xml,linenums]
+----
+<userTask id="miTasks" name="My Task" flowable:assignee="${assignee}">
+  <multiInstanceLoopCharacteristics isSequential="true"
+     flowable:collection="${myService.getCollectionVariableName()}" flowable:elementVariable="assignee" >
   </multiInstanceLoopCharacteristics>
 </userTask>
 ----

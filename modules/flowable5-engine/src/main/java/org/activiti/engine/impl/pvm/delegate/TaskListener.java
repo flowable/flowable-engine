@@ -13,7 +13,7 @@
 
 package org.activiti.engine.impl.pvm.delegate;
 
-import org.flowable.engine.delegate.DelegateTask;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * @deprecated use org.activiti.engine.delegate.TaskListener instead

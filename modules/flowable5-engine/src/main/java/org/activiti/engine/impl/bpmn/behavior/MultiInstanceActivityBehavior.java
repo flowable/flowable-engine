@@ -35,19 +35,19 @@ import org.activiti.engine.impl.pvm.runtime.AtomicOperation;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
+import org.flowable.variable.service.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of the multi-instance functionality as described in the BPMN 2.0 spec.
- * 
+ * <p>
  * Multi instance functionality is implemented as an {@link ActivityBehavior} that wraps the original {@link ActivityBehavior} of the activity.
- *
+ * <p>
  * Only subclasses of {@link AbstractBpmnActivityBehavior} can have multi-instance behavior. As such, special logic is contained in the {@link AbstractBpmnActivityBehavior} to delegate to the
  * {@link MultiInstanceActivityBehavior} if needed.
- * 
+ *
  * @author Joram Barrez
  * @author Falko Menge
  */
@@ -74,8 +74,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
     /**
      * @param activity
-     * @param innerActivityBehavior
-     *            The original {@link ActivityBehavior} of the activity that will be wrapped inside this behavior.
+     * @param innerActivityBehavior The original {@link ActivityBehavior} of the activity that will be wrapped inside this behavior.
      */
     public MultiInstanceActivityBehavior(ActivityImpl activity, AbstractBpmnActivityBehavior innerActivityBehavior) {
         this.activity = activity;
@@ -244,7 +243,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         List<ExecutionListener> listeners = activity.getExecutionListeners(org.activiti.engine.impl.pvm.PvmEvent.EVENTNAME_START);
 
         if (listeners != null) {
-            List<ExecutionListener> filteredExecutionListeners = new ArrayList<ExecutionListener>(listeners.size());
+            List<ExecutionListener> filteredExecutionListeners = new ArrayList<>(listeners.size());
             // Sad that we have to do this, but it's the only way I could find (which is also safe for backwards compatibility)
 
             for (ExecutionListener executionListener : listeners) {
@@ -269,7 +268,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     }
 
     protected void logLoopDetails(ActivityExecution execution, String custom, int loopCounter,
-            int nrOfCompletedInstances, int nrOfActiveInstances, int nrOfInstances) {
+                                  int nrOfCompletedInstances, int nrOfActiveInstances, int nrOfInstances) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Multi-instance '{}' {}. Details: loopCounter={}, nrOrCompletedInstances={},nrOfActiveInstances={},nrOfInstances={}",
                     execution.getActivity(), custom, loopCounter, nrOfCompletedInstances, nrOfActiveInstances, nrOfInstances);
@@ -337,10 +336,9 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
     /**
      * ACT-1339. Calling ActivityEndListeners within an {@link AtomicOperation} so that an executionContext is present.
-     * 
+     *
      * @author Aris Tzoumas
      * @author Joram Barrez
-     *
      */
     private static final class CallActivityListenersOperation implements AtomicOperation {
 

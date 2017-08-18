@@ -17,12 +17,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.task.Task;
 
 /**
  * @author Tijs Rademakers
@@ -55,7 +54,7 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
         for (int i = 0; i < 4; i++) {
             processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, String.valueOf(i), startMap).getId());
             if (i == 0) {
-                Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(0)).singleResult();
+                org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(0)).singleResult();
                 taskService.complete(task.getId());
             }
         }

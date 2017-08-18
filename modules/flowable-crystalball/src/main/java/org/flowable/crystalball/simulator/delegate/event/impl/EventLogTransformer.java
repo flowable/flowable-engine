@@ -12,13 +12,13 @@
  */
 package org.flowable.crystalball.simulator.delegate.event.impl;
 
-import org.flowable.crystalball.simulator.SimulationEvent;
-import org.flowable.crystalball.simulator.delegate.event.Function;
-import org.flowable.engine.event.EventLogEntry;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+
+import org.flowable.crystalball.simulator.SimulationEvent;
+import org.flowable.crystalball.simulator.delegate.event.Function;
+import org.flowable.engine.event.EventLogEntry;
 
 /**
  * This class transforms event log events into simulation events
@@ -31,7 +31,7 @@ public class EventLogTransformer {
     }
 
     public List<SimulationEvent> transform(List<EventLogEntry> eventLog) {
-        List<SimulationEvent> simulationEvents = new ArrayList<SimulationEvent>();
+        List<SimulationEvent> simulationEvents = new ArrayList<>();
         for (EventLogEntry logEntry : eventLog) {
             simulationEvents.addAll(transformEntry(logEntry));
         }
@@ -39,7 +39,7 @@ public class EventLogTransformer {
     }
 
     protected Collection<SimulationEvent> transformEntry(EventLogEntry event) {
-        List<SimulationEvent> simEvents = new ArrayList<SimulationEvent>();
+        List<SimulationEvent> simEvents = new ArrayList<>();
         for (Function<EventLogEntry, SimulationEvent> t : transformers) {
             SimulationEvent simEvent = t.apply(event);
             if (simEvent != null)

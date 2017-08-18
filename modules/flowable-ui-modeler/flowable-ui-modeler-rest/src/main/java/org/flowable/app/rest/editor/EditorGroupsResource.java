@@ -36,7 +36,7 @@ public class EditorGroupsResource {
 
     @RequestMapping(value = "/rest/editor-groups", method = RequestMethod.GET)
     public ResultListDataRepresentation getGroups(@RequestParam(required = false, value = "filter") String filter) {
-        List<GroupRepresentation> result = new ArrayList<GroupRepresentation>();
+        List<GroupRepresentation> result = new ArrayList<>();
         List<RemoteGroup> groups = remoteIdmService.findGroupsByNameFilter(filter);
         for (RemoteGroup group : groups) {
             result.add(new GroupRepresentation(group));

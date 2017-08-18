@@ -30,17 +30,17 @@ import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
-import org.flowable.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.variable.service.delegate.Expression;
+import org.flowable.variable.service.impl.el.ExpressionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -75,8 +75,9 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     protected Expression loopCardinalityExpression;
     protected String completionCondition;
     protected Expression collectionExpression;
-    protected String collectionVariable;
+    protected String collectionVariable; // Not used anymore. Left here for backwards compatibility.
     protected String collectionElementVariable;
+    protected String collectionString;
     // default variable name for loop counter for inner instances (as described in the spec)
     protected String collectionElementIndexVariable = "loopCounter";
 
@@ -267,7 +268,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     @SuppressWarnings("rawtypes")
     protected void executeOriginalBehavior(DelegateExecution execution, int loopCounter) {
         if (usesCollection() && collectionElementVariable != null) {
-            Collection collection = (Collection) resolveCollection(execution);
+            Collection collection = (Collection) resolveAndValidateCollection(execution);
 
             Object value = null;
             int index = 0;
@@ -286,24 +287,23 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     @SuppressWarnings("rawtypes")
     protected Collection resolveAndValidateCollection(DelegateExecution execution) {
         Object obj = resolveCollection(execution);
-        if (collectionExpression != null) {
-            if (!(obj instanceof Collection)) {
-                throw new FlowableIllegalArgumentException(collectionExpression.getExpressionText() + "' didn't resolve to a Collection");
-            }
-
-        } else if (collectionVariable != null) {
-            if (obj == null) {
+        if (obj instanceof Collection) {
+            return (Collection) obj;
+            
+        } else if (obj instanceof String) {
+            Object collectionVariable = execution.getVariable((String) obj);
+            if (collectionVariable instanceof Collection) {
+                return (Collection) collectionVariable;
+            } else if (collectionVariable == null){
                 throw new FlowableIllegalArgumentException("Variable " + collectionVariable + " is not found");
-            }
-
-            if (!(obj instanceof Collection)) {
+            } else {
                 throw new FlowableIllegalArgumentException("Variable " + collectionVariable + "' is not a Collection");
             }
-
+            
         } else {
             throw new FlowableIllegalArgumentException("Couldn't resolve collection expression nor variable reference");
+            
         }
-        return (Collection) obj;
     }
 
     protected Object resolveCollection(DelegateExecution execution) {
@@ -313,12 +313,15 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
         } else if (collectionVariable != null) {
             collection = execution.getVariable(collectionVariable);
+        } else if (collectionString != null) {
+            // TODO: add dynamic function support for resolving an explicit String value collection here - issue 512
+        	// https://github.com/flowable/flowable-engine/issues/512
         }
         return collection;
     }
 
     protected boolean usesCollection() {
-        return collectionExpression != null || collectionVariable != null;
+        return collectionExpression != null || collectionVariable != null || collectionString != null;
     }
 
     protected boolean isExtraScopeNeeded(FlowNode flowNode) {
@@ -432,6 +435,14 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
     public void setCollectionElementVariable(String collectionElementVariable) {
         this.collectionElementVariable = collectionElementVariable;
+    }
+
+    public String getCollectionString() {
+        return collectionString;
+    }
+
+    public void setCollectionString(String collectionString) {
+        this.collectionString = collectionString;
     }
 
     public String getCollectionElementIndexVariable() {

@@ -22,9 +22,9 @@ import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
+import org.flowable.task.service.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -56,10 +56,10 @@ public class CamelVariableBodyTest extends SpringFlowableTestCase {
         }
     }
 
-    @Deployment(resources = { "process/HelloCamelBody.bpmn20.xml" })
+    @Deployment(resources = {"process/HelloCamelBody.bpmn20.xml"})
     public void testCamelBody() throws Exception {
         service1.expectedBodiesReceived("hello world");
-        Map<String, Object> varMap = new HashMap<String, Object>();
+        Map<String, Object> varMap = new HashMap<>();
         varMap.put("camelBody", "hello world");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("HelloCamel", varMap);
         // Ensure that the variable is equal to the expected value.
