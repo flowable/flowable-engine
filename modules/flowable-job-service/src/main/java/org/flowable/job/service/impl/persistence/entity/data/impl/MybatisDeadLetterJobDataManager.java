@@ -15,13 +15,12 @@ package org.flowable.job.service.impl.persistence.entity.data.impl;
 import java.util.HashMap;
 import java.util.List;
 
+import org.flowable.engine.common.impl.db.AbstractDataManager;
 import org.flowable.engine.common.impl.db.CachedEntityMatcher;
 import org.flowable.job.service.Job;
-import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityImpl;
-import org.flowable.job.service.impl.persistence.entity.data.AbstractDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.DeadLetterJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.DeadLetterJobsByExecutionIdMatcher;
 
@@ -31,10 +30,6 @@ import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.D
 public class MybatisDeadLetterJobDataManager extends AbstractDataManager<DeadLetterJobEntity> implements DeadLetterJobDataManager {
 
     protected CachedEntityMatcher<DeadLetterJobEntity> deadLetterByExecutionIdMatcher = new DeadLetterJobsByExecutionIdMatcher();
-
-    public MybatisDeadLetterJobDataManager(JobServiceConfiguration jobServiceConfiguration) {
-        super(jobServiceConfiguration);
-    }
 
     @Override
     public Class<? extends DeadLetterJobEntity> getManagedEntityClass() {

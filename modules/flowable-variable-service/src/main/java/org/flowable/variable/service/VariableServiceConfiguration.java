@@ -90,13 +90,13 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
 
     public void initDataManagers() {
         if (variableInstanceDataManager == null) {
-            variableInstanceDataManager = new MybatisVariableInstanceDataManager(this);
+            variableInstanceDataManager = new MybatisVariableInstanceDataManager();
         }
         if (byteArrayDataManager == null) {
-            byteArrayDataManager = new MybatisVariableByteArrayDataManager(this);
+            byteArrayDataManager = new MybatisVariableByteArrayDataManager();
         }
         if (historicVariableInstanceDataManager == null) {
-            historicVariableInstanceDataManager = new MybatisHistoricVariableInstanceDataManager(this);
+            historicVariableInstanceDataManager = new MybatisHistoricVariableInstanceDataManager();
         }
     }
 

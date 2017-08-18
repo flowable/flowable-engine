@@ -15,13 +15,12 @@ package org.flowable.variable.service.impl.persistence.entity.data.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.db.AbstractDataManager;
 import org.flowable.engine.common.impl.db.CachedEntityMatcher;
-import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
-import org.flowable.variable.service.impl.persistence.entity.data.AbstractDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.HistoricVariableInstanceDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.HistoricVariableInstanceByProcInstMatcher;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.HistoricVariableInstanceByTaskIdMatcher;
@@ -34,10 +33,6 @@ public class MybatisHistoricVariableInstanceDataManager extends AbstractDataMana
     protected CachedEntityMatcher<HistoricVariableInstanceEntity> historicVariableInstanceByTaskIdMatcher = new HistoricVariableInstanceByTaskIdMatcher();
 
     protected CachedEntityMatcher<HistoricVariableInstanceEntity> historicVariableInstanceByProcInstMatcher = new HistoricVariableInstanceByProcInstMatcher();
-
-    public MybatisHistoricVariableInstanceDataManager(VariableServiceConfiguration variableServiceConfiguration) {
-        super(variableServiceConfiguration);
-    }
 
     @Override
     public Class<? extends HistoricVariableInstanceEntity> getManagedEntityClass() {

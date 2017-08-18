@@ -14,20 +14,15 @@ package org.flowable.job.service.impl.persistence.entity.data.impl;
 
 import java.util.List;
 
-import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.engine.common.impl.db.AbstractDataManager;
 import org.flowable.job.service.impl.persistence.entity.JobByteArrayEntity;
 import org.flowable.job.service.impl.persistence.entity.JobByteArrayEntityImpl;
-import org.flowable.job.service.impl.persistence.entity.data.AbstractDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.JobByteArrayDataManager;
 
 /**
  * @author Joram Barrez
  */
 public class MybatisJobByteArrayDataManager extends AbstractDataManager<JobByteArrayEntity> implements JobByteArrayDataManager {
-
-    public MybatisJobByteArrayDataManager(JobServiceConfiguration jobServiceConfiguration) {
-        super(jobServiceConfiguration);
-    }
 
     @Override
     public JobByteArrayEntity create() {

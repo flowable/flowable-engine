@@ -18,15 +18,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.impl.Page;
+import org.flowable.engine.common.impl.db.AbstractDataManager;
 import org.flowable.engine.common.impl.db.CachedEntityMatcher;
 import org.flowable.job.service.Job;
-import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.TimerJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntityImpl;
-import org.flowable.job.service.impl.persistence.entity.data.AbstractDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.TimerJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.TimerJobsByExecutionIdMatcher;
+import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -35,10 +35,6 @@ import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.T
 public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEntity> implements TimerJobDataManager {
 
     protected CachedEntityMatcher<TimerJobEntity> timerJobsByExecutionIdMatcher = new TimerJobsByExecutionIdMatcher();
-
-    public MybatisTimerJobDataManager(JobServiceConfiguration jobServiceConfiguration) {
-        super(jobServiceConfiguration);
-    }
 
     @Override
     public Class<? extends TimerJobEntity> getManagedEntityClass() {
@@ -65,7 +61,7 @@ public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEnti
     @Override
     @SuppressWarnings("unchecked")
     public List<TimerJobEntity> findTimerJobsToExecute(Page page) {
-        Date now = getClock().getCurrentTime();
+        Date now = CommandContextUtil.getJobServiceConfiguration().getClock().getCurrentTime();
         return getDbSqlSession().selectList("selectTimerJobsToExecute", now, page);
     }
 

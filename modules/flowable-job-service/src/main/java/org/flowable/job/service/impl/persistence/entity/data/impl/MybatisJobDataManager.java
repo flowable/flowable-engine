@@ -18,15 +18,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.impl.Page;
+import org.flowable.engine.common.impl.db.AbstractDataManager;
 import org.flowable.engine.common.impl.db.CachedEntityMatcher;
 import org.flowable.job.service.Job;
-import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntityImpl;
-import org.flowable.job.service.impl.persistence.entity.data.AbstractDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.JobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.JobsByExecutionIdMatcher;
+import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -35,10 +35,6 @@ import org.flowable.job.service.impl.persistence.entity.data.impl.cachematcher.J
 public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implements JobDataManager {
 
     protected CachedEntityMatcher<JobEntity> jobsByExecutionIdMatcher = new JobsByExecutionIdMatcher();
-
-    public MybatisJobDataManager(JobServiceConfiguration jobServiceConfiguration) {
-        super(jobServiceConfiguration);
-    }
 
     @Override
     public Class<? extends JobEntity> getManagedEntityClass() {
@@ -71,9 +67,9 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
     @SuppressWarnings("unchecked")
     public List<JobEntity> findExpiredJobs(Page page) {
         Map<String, Object> params = new HashMap<>();
-        Date now = getClock().getCurrentTime();
+        Date now = CommandContextUtil.getJobServiceConfiguration().getClock().getCurrentTime();
         params.put("now", now);
-        Date maxTimeout = new Date(now.getTime() - getJobServiceConfiguration().getAsyncExecutorResetExpiredJobsMaxTimeout());
+        Date maxTimeout = new Date(now.getTime() - CommandContextUtil.getJobServiceConfiguration().getAsyncExecutorResetExpiredJobsMaxTimeout());
         params.put("maxTimeout", maxTimeout);
         return getDbSqlSession().selectList("selectExpiredJobs", params, page);
     }
@@ -102,7 +98,7 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
     public void resetExpiredJob(String jobId) {
         Map<String, Object> params = new HashMap<>(2);
         params.put("id", jobId);
-        params.put("now", getJobServiceConfiguration().getClock().getCurrentTime());
+        params.put("now", CommandContextUtil.getJobServiceConfiguration().getClock().getCurrentTime());
         getDbSqlSession().update("resetExpiredJob", params);
     }
 

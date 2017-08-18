@@ -55,6 +55,11 @@ public class MilestoneInstanceEntityManagerImpl extends AbstractCmmnEntityManage
     }
     
     @Override
+    public List<MilestoneInstanceEntity> findMilestoneInstancesByCaseInstanceId(String caseInstanceId) {
+        return milestoneInstanceDataManager.findMilestoneInstancesByCaseInstanceId(caseInstanceId);
+    }
+    
+    @Override
     public void deleteByCaseDefinitionId(String caseDefinitionId) {
         milestoneInstanceDataManager.deleteByCaseDefinitionId(caseDefinitionId);
     }

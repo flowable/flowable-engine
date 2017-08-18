@@ -12,23 +12,18 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.CaseInstanceState;
-import org.flowable.cmmn.engine.runtime.MilestoneInstance;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.persistence.cache.CachedEntity;
 
 /**
  * @author Joram Barrez
@@ -68,38 +63,19 @@ public abstract class AbstractChangePlanItemStateOperation extends AbstractPlanI
             
             if (CaseInstanceState.COMPLETED.equals(caseInstanceEntity.getState())) {
                 
-                // TODO: replace with CachedEntityMatcher once changes from Tijs on master are merged in
+                PlanItemInstanceEntity planModelPlanItemInstanceEntity = caseInstanceEntity.getPlanModelInstance();
+                String caseInstanceId = planModelPlanItemInstanceEntity.getCaseInstanceId();
                 
-                Set<String> milestoneIds = new HashSet<>();
-
-                // DB
                 MilestoneInstanceEntityManager milestoneInstanceEntityManager = CommandContextUtil.getMilestoneInstanceEntityManager(commandContext);
-                List<MilestoneInstance> milestones = milestoneInstanceEntityManager.createMilestoneInstanceQuery()
-                        .milestoneInstanceCaseInstanceId(caseInstanceEntity.getId()).list();
-                for (MilestoneInstance milestoneInstance : milestones) {
-                    milestoneInstanceEntityManager.delete(milestoneInstance.getId());
-                }
-                
-                // Cache
-                Map<String, CachedEntity> cachedMilestoneInstanceEntities = CommandContextUtil.getEntityCache()
-                        .getAllCachedEntities().get(MilestoneInstanceEntityImpl.class);
-                if (cachedMilestoneInstanceEntities != null) {
-                    for (CachedEntity cachedEntity : cachedMilestoneInstanceEntities.values()) {
-                        MilestoneInstanceEntityImpl milestoneInstanceEntity = (MilestoneInstanceEntityImpl) cachedEntity.getEntity();
-                        if (milestoneInstanceEntity.getCaseInstanceId().equals(caseInstanceEntity.getId())) {
-                            milestoneIds.add(milestoneInstanceEntity.getId());
-                        }
+                List<MilestoneInstanceEntity> milestoneInstanceEntities = milestoneInstanceEntityManager
+                        .findMilestoneInstancesByCaseInstanceId(caseInstanceId);
+                if (milestoneInstanceEntities != null) {
+                    for (MilestoneInstanceEntity milestoneInstanceEntity : milestoneInstanceEntities) {
+                        milestoneInstanceEntityManager.delete(milestoneInstanceEntity);
                     }
                 }
                 
-                for (String milestoneId : milestoneIds) {
-                    milestoneInstanceEntityManager.delete(milestoneId);
-                }
-                
-                PlanItemInstanceEntity planModelPlanItemInstanceEntity = caseInstanceEntity.getPlanModelInstance();
                 CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).deleteCascade(planModelPlanItemInstanceEntity);
-                
-                String caseInstanceId = planModelPlanItemInstanceEntity.getCaseInstanceId();
                 CommandContextUtil.getCaseInstanceEntityManager(commandContext).delete(caseInstanceId);
                 CommandContextUtil.getCmmnHistoryManager(commandContext).recordCaseInstanceEnd(caseInstanceId);
             }

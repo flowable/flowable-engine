@@ -14,11 +14,10 @@ package org.flowable.identitylink.service.impl.persistence.entity.data.impl;
 
 import java.util.List;
 
+import org.flowable.engine.common.impl.db.AbstractDataManager;
 import org.flowable.engine.common.impl.db.CachedEntityMatcher;
-import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl;
-import org.flowable.identitylink.service.impl.persistence.entity.data.AbstractDataManager;
 import org.flowable.identitylink.service.impl.persistence.entity.data.HistoricIdentityLinkDataManager;
 import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.HistoricIdentityLinksByProcInstMatcher;
 
@@ -28,10 +27,6 @@ import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cache
 public class MybatisHistoricIdentityLinkDataManager extends AbstractDataManager<HistoricIdentityLinkEntity> implements HistoricIdentityLinkDataManager {
 
     protected CachedEntityMatcher<HistoricIdentityLinkEntity> historicIdentityLinksByProcInstMatcher = new HistoricIdentityLinksByProcInstMatcher();
-
-    public MybatisHistoricIdentityLinkDataManager(IdentityLinkServiceConfiguration identityLinkServiceConfiguration) {
-        super(identityLinkServiceConfiguration);
-    }
 
     @Override
     public Class<? extends HistoricIdentityLinkEntity> getManagedEntityClass() {

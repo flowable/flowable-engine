@@ -84,10 +84,10 @@ public class IdentityLinkServiceConfiguration extends AbstractServiceConfigurati
 
     public void initDataManagers() {
         if (identityLinkDataManager == null) {
-            identityLinkDataManager = new MybatisIdentityLinkDataManager(this);
+            identityLinkDataManager = new MybatisIdentityLinkDataManager();
         }
         if (historicIdentityLinkDataManager == null) {
-            historicIdentityLinkDataManager = new MybatisHistoricIdentityLinkDataManager(this);
+            historicIdentityLinkDataManager = new MybatisHistoricIdentityLinkDataManager();
         }
     }
 
