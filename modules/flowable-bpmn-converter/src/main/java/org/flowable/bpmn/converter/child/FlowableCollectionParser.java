@@ -18,7 +18,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.FlowableCollectionHandler;
+import org.flowable.bpmn.model.CollectionHandler;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 
@@ -28,24 +28,28 @@ import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 public class FlowableCollectionParser extends BaseChildElementParser {
 
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
+        if (!(parentElement instanceof MultiInstanceLoopCharacteristics)) {
+            return;
+        }
+        
+        MultiInstanceLoopCharacteristics multiInstanceLoopCharacteristics = (MultiInstanceLoopCharacteristics) parentElement;
 
-        boolean hasCollectionHandler = false;
-    	// if a collection handler is specified
-    	FlowableCollectionHandler collectionHandler = new FlowableCollectionHandler();
-        BpmnXMLUtil.addXMLLocation(collectionHandler, xtr);
+        CollectionHandler collectionHandler = null;
 
         if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_MULTIINSTANCE_COLLECTION_CLASS))) {
+            collectionHandler = new CollectionHandler();
         	collectionHandler.setImplementation(xtr.getAttributeValue(null, ATTRIBUTE_MULTIINSTANCE_COLLECTION_CLASS));
         	collectionHandler.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
-        	hasCollectionHandler = true;
+        	
         } else if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, ATTRIBUTE_MULTIINSTANCE_COLLECTION_DELEGATEEXPRESSION))) {
+            collectionHandler = new CollectionHandler();
         	collectionHandler.setImplementation(xtr.getAttributeValue(null, ATTRIBUTE_MULTIINSTANCE_COLLECTION_DELEGATEEXPRESSION));
         	collectionHandler.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
-        	hasCollectionHandler = true;
         }
 
-        if (hasCollectionHandler)  {
-        	((MultiInstanceLoopCharacteristics) parentElement).setHandler(collectionHandler);
+        if (collectionHandler != null)  {
+            BpmnXMLUtil.addXMLLocation(collectionHandler, xtr);
+            multiInstanceLoopCharacteristics.setHandler(collectionHandler);
         }
 
         boolean readyWithCollection = false;
@@ -54,10 +58,12 @@ public class FlowableCollectionParser extends BaseChildElementParser {
                 xtr.next();
                 if (xtr.isStartElement() && ELEMENT_MULTIINSTANCE_COLLECTION_STRING.equalsIgnoreCase(xtr.getLocalName())) {
             		// it is a string value
-            		((MultiInstanceLoopCharacteristics) parentElement).setCollectionString(xtr.getElementText());
+                    multiInstanceLoopCharacteristics.setCollectionString(xtr.getElementText());
+                    
                 } else if (xtr.isStartElement() && ELEMENT_MULTIINSTANCE_COLLECTION_EXPRESSION.equalsIgnoreCase(xtr.getLocalName())) {
             		// it is an expression
-                	((MultiInstanceLoopCharacteristics) parentElement).setInputDataItem(xtr.getElementText());
+                    multiInstanceLoopCharacteristics.setInputDataItem(xtr.getElementText());
+                    
                 } else if (xtr.isEndElement() && getElementName().equalsIgnoreCase(xtr.getLocalName())) {
                 	readyWithCollection = true;
                 }

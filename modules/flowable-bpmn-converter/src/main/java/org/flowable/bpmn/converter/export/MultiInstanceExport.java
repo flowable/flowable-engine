@@ -20,10 +20,10 @@ import javax.xml.stream.XMLStreamWriter;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
-import org.flowable.bpmn.model.AbstractFlowableCollectionHandler;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
+import org.flowable.bpmn.model.CollectionHandler;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 
 public class MultiInstanceExport implements BpmnXMLConstants {
@@ -53,54 +53,40 @@ public class MultiInstanceExport implements BpmnXMLConstants {
                     xtw.writeEndElement();
                 }
 
-                boolean inExtensions = false;
-                boolean inCollectionElement = false;
                 // check for collection element handler
-                AbstractFlowableCollectionHandler handler = multiInstanceObject.getHandler();
+                CollectionHandler handler = multiInstanceObject.getHandler();
                 if (handler != null) {
                 	// start extensions
                     xtw.writeStartElement(ELEMENT_EXTENSIONS);
-                    inExtensions = true;
-                	
-                	// start collection element
-                    xtw.writeStartElement(ELEMENT_MULTIINSTANCE_COLLECTION);
-                    inCollectionElement = true;
+                    
+                    if (StringUtils.isNotEmpty(multiInstanceObject.getCollectionString())) {
+                        // start collection element
+                        xtw.writeStartElement(ELEMENT_MULTIINSTANCE_COLLECTION);
+                        
+                    	if (StringUtils.isNotEmpty(handler.getImplementationType()) && ATTRIBUTE_MULTIINSTANCE_COLLECTION_CLASS.equals(handler.getImplementationType())) {
+                            BpmnXMLUtil.writeQualifiedAttribute(ATTRIBUTE_MULTIINSTANCE_COLLECTION_CLASS, handler.getImplementation(), xtw);
+                        } else if (StringUtils.isNotEmpty(handler.getImplementationType()) && ATTRIBUTE_MULTIINSTANCE_COLLECTION_DELEGATEEXPRESSION.equals(handler.getImplementationType())) {
+                            BpmnXMLUtil.writeQualifiedAttribute(ATTRIBUTE_MULTIINSTANCE_COLLECTION_DELEGATEEXPRESSION, handler.getImplementation(), xtw);
+                        }
 
-                	if (StringUtils.isNotEmpty(handler.getImplementationType()) && ATTRIBUTE_MULTIINSTANCE_COLLECTION_CLASS.equals(handler.getImplementationType())) {
-                        BpmnXMLUtil.writeQualifiedAttribute(ATTRIBUTE_MULTIINSTANCE_COLLECTION_CLASS, handler.getImplementation(), xtw);
-                    } else if (StringUtils.isNotEmpty(handler.getImplementationType()) && ATTRIBUTE_MULTIINSTANCE_COLLECTION_DELEGATEEXPRESSION.equals(handler.getImplementationType())) {
-                        BpmnXMLUtil.writeQualifiedAttribute(ATTRIBUTE_MULTIINSTANCE_COLLECTION_DELEGATEEXPRESSION, handler.getImplementation(), xtw);
+                        xtw.writeStartElement(FLOWABLE_EXTENSIONS_NAMESPACE, ELEMENT_MULTIINSTANCE_COLLECTION_STRING);
+                        xtw.writeCData(multiInstanceObject.getCollectionString().trim());
+                        xtw.writeEndElement();
+                        
+                        // end collection element
+                        xtw.writeEndElement();
                     }
-
-                }
-
-                // check for string child element
-                if (StringUtils.isNotEmpty(multiInstanceObject.getCollectionString())) {
-                	// this should not happen because anyone who uses a string element should specify a handler
-                	if (!inCollectionElement) {
-                    	// start collection element
-                        xtw.writeStartElement(FLOWABLE_EXTENSIONS_NAMESPACE, ELEMENT_MULTIINSTANCE_COLLECTION);
-                        inCollectionElement = true;
-                	}
-
-                	xtw.writeStartElement(FLOWABLE_EXTENSIONS_NAMESPACE, ELEMENT_MULTIINSTANCE_COLLECTION_STRING);
-                    xtw.writeCData(multiInstanceObject.getCollectionString().trim());
-                    xtw.writeEndElement();
                 }
                 
-            	// end collection element
-            	if (inCollectionElement) {
-            		xtw.writeEndElement();
-            	}
-
+            	
             	// check for extension elements
                 Map<String, List<ExtensionElement>> extensions = multiInstanceObject.getExtensionElements();
                 if (!extensions.isEmpty()) {
-                	BpmnXMLUtil.writeExtensionElements(multiInstanceObject, inExtensions, model.getNamespaces(), xtw);
+                	BpmnXMLUtil.writeExtensionElements(multiInstanceObject, handler != null, model.getNamespaces(), xtw);
                 }
 
             	// end extensions element
-            	if (inExtensions) {
+            	if (handler != null) {
             		xtw.writeEndElement();
             	}
 

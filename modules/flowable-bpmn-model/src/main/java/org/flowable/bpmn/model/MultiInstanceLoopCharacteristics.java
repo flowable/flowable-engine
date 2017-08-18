@@ -19,7 +19,7 @@ public class MultiInstanceLoopCharacteristics extends BaseElement {
 
     protected String inputDataItem;
     protected String collectionString;
-    protected AbstractFlowableCollectionHandler collectionHandler;
+    protected CollectionHandler collectionHandler;
     protected String loopCardinality;
     protected String completionCondition;
     protected String elementVariable;
@@ -42,11 +42,11 @@ public class MultiInstanceLoopCharacteristics extends BaseElement {
         this.collectionString = collectionString;
     }
 
-    public AbstractFlowableCollectionHandler getHandler() {
+    public CollectionHandler getHandler() {
 		return collectionHandler;
 	}
 
-	public void setHandler(AbstractFlowableCollectionHandler collectionHandler) {
+	public void setHandler(CollectionHandler collectionHandler) {
 		this.collectionHandler = collectionHandler;
 	}
 

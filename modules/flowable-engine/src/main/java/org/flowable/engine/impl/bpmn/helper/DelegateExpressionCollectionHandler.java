@@ -36,8 +36,8 @@ public class DelegateExpressionCollectionHandler implements FlowableCollectionHa
 
 	@Override
 	@SuppressWarnings("rawtypes")
-	public Collection resolveCollection(String collectionString) {
-		return getCollectionHandlerInstance(execution).resolveCollection(collectionString);
+	public Collection resolveCollection(Object collectionValue, DelegateExecution execution) {
+		return getCollectionHandlerInstance(execution).resolveCollection(collectionValue, execution);
 	}
 
     protected FlowableCollectionHandler getCollectionHandlerInstance(DelegateExecution execution) {

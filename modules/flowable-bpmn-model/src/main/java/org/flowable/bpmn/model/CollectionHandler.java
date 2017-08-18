@@ -15,7 +15,7 @@ package org.flowable.bpmn.model;
 /**
  * @author Lori Small
  */
-public abstract class AbstractFlowableCollectionHandler extends BaseElement {
+public class CollectionHandler extends BaseElement {
 
     protected String implementationType;
     protected String implementation;
@@ -36,11 +36,15 @@ public abstract class AbstractFlowableCollectionHandler extends BaseElement {
         this.implementation = implementation;
     }
 
-    public abstract AbstractFlowableCollectionHandler clone();
-
-    public void setValues(AbstractFlowableCollectionHandler otherParser) {
+    public void setValues(CollectionHandler otherParser) {
         super.setValues(otherParser);
         setImplementation(otherParser.getImplementation());
         setImplementationType(otherParser.getImplementationType());
+    }
+    
+    public CollectionHandler clone() {
+    	CollectionHandler clone = new CollectionHandler();
+        clone.setValues(this);
+        return clone;
     }
 }

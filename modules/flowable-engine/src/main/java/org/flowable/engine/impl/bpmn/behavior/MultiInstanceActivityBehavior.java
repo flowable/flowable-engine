@@ -18,9 +18,9 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.flowable.bpmn.model.AbstractFlowableCollectionHandler;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.CollectionHandler;
 import org.flowable.bpmn.model.CompensateEventDefinition;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
@@ -84,7 +84,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     protected String collectionVariable; // Not used anymore. Left here for backwards compatibility.
     protected String collectionElementVariable;
     protected String collectionString;
-    protected AbstractFlowableCollectionHandler collectionHandler;
+    protected CollectionHandler collectionHandler;
     // default variable name for loop counter for inner instances (as described in the spec)
     protected String collectionElementIndexVariable = "loopCounter";
 
@@ -294,27 +294,26 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     @SuppressWarnings("rawtypes")
     protected Collection resolveAndValidateCollection(DelegateExecution execution) {
         Object obj = resolveCollection(execution);
-        if (obj instanceof Collection) {
-            return (Collection) obj;
-            
-        } else if (obj instanceof String) {
-            Object collectionVariable = execution.getVariable((String) obj);
-            if (collectionVariable instanceof Collection) {
-                return (Collection) collectionVariable;
-            } else if (collectionVariable == null) {
-            	// it may be a complex string, not a variable name
-                if (collectionHandler != null ) {        	
-                	return createFlowableCollectionHandler(collectionHandler, execution, (String) obj).resolveCollection((String) obj);
-                } else {
-                	throw new FlowableIllegalArgumentException("Variable " + collectionVariable + " is not found");
-                }
-            } else {
-                throw new FlowableIllegalArgumentException("Variable " + collectionVariable + "' is not a Collection");
-            }
-            
+        if (collectionHandler != null ) {           
+            return createFlowableCollectionHandler(collectionHandler, execution).resolveCollection(obj, execution);
         } else {
-            throw new FlowableIllegalArgumentException("Couldn't resolve collection expression, variable reference or string");
-            
+            if (obj instanceof Collection) {
+                return (Collection) obj;
+                
+            } else if (obj instanceof String) {
+                Object collectionVariable = execution.getVariable((String) obj);
+                if (collectionVariable instanceof Collection) {
+                    return (Collection) collectionVariable;
+                } else if (collectionVariable == null) {
+                	throw new FlowableIllegalArgumentException("Variable " + collectionVariable + " is not found");
+                } else {
+                    throw new FlowableIllegalArgumentException("Variable " + collectionVariable + "' is not a Collection");
+                }
+                
+            } else {
+                throw new FlowableIllegalArgumentException("Couldn't resolve collection expression, variable reference or string");
+                
+            }
         }
     }
 
@@ -325,10 +324,9 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
         } else if (collectionVariable != null) {
             collection = execution.getVariable(collectionVariable);
+            
         } else if (collectionString != null) {
-            if (collectionHandler != null) {        	
-            	collection = createFlowableCollectionHandler(collectionHandler, execution, collectionString).resolveCollection(collectionString);
-            }
+            collection = collectionString;
         }
         return collection;
     }
@@ -407,7 +405,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         return activeValue;
     }
 
-    protected FlowableCollectionHandler createFlowableCollectionHandler(AbstractFlowableCollectionHandler handler, DelegateExecution execution, String collectionString) {
+    protected FlowableCollectionHandler createFlowableCollectionHandler(CollectionHandler handler, DelegateExecution execution) {
     	FlowableCollectionHandler collectionHandler = null;
 
         if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equalsIgnoreCase(handler.getImplementationType())) {
@@ -475,11 +473,11 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         this.collectionString = collectionString;
     }
 
-	public AbstractFlowableCollectionHandler getHandler() {
+	public CollectionHandler getHandler() {
 		return collectionHandler;
 	}
 
-	public void setHandler(AbstractFlowableCollectionHandler collectionHandler) {
+	public void setHandler(CollectionHandler collectionHandler) {
 		this.collectionHandler = collectionHandler;
 	}
 

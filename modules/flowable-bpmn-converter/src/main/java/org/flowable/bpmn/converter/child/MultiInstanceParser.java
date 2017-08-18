@@ -69,6 +69,7 @@ public class MultiInstanceParser extends BaseChildElementParser {
                 	Map<String, BaseChildElementParser> childParserMap = new HashMap<String, BaseChildElementParser>();
                 	childParserMap.put(ELEMENT_MULTIINSTANCE_COLLECTION, new FlowableCollectionParser());
                 	BpmnXMLUtil.parseChildElements(ELEMENT_MULTIINSTANCE_COLLECTION, multiInstanceDef, xtr, childParserMap, model);
+                	
                 } else if (xtr.isEndElement() && getElementName().equalsIgnoreCase(xtr.getLocalName())) {
                 	readyWithMultiInstance = true;
                 }
@@ -76,6 +77,7 @@ public class MultiInstanceParser extends BaseChildElementParser {
         } catch (Exception e) {
             LOGGER.warn("Error parsing multi instance definition", e);
         }
+        
         ((Activity) parentElement).setLoopCharacteristics(multiInstanceDef);
     }
 }

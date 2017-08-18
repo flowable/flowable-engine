@@ -16,11 +16,13 @@ package org.flowable.engine.impl.delegate;
 import java.io.Serializable;
 import java.util.Collection;
 
+import org.flowable.engine.delegate.DelegateExecution;
+
 /**
  * @author Lori Small
  */
 public interface FlowableCollectionHandler extends Serializable {
 
     @SuppressWarnings("rawtypes")
-	Collection resolveCollection(String collectionString);
+	Collection resolveCollection(Object collectionValue, DelegateExecution execution);
 }

@@ -15,6 +15,7 @@ package org.flowable.engine.test.bpmn.multiinstance;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.delegate.FlowableCollectionHandler;
 import org.flowable.engine.impl.util.json.JSONArray;
 import org.flowable.engine.impl.util.json.JSONObject;
@@ -28,8 +29,8 @@ public class JSONCollectionHandler implements FlowableCollectionHandler {
 
 	@Override
 	@SuppressWarnings("rawtypes")
-	public Collection resolveCollection(String collectionString) {
-    	JSONArray jsonArray = new JSONArray(collectionString);
+	public Collection resolveCollection(Object collectionValue, DelegateExecution execution) {
+    	JSONArray jsonArray = new JSONArray((String) collectionValue);
     	ArrayList<String> collection = new ArrayList<String>();
     	JSONObject jsonObj = null;
 
