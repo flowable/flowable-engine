@@ -12,6 +12,8 @@
  */
 package org.flowable.dmn.engine.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,8 +46,6 @@ import org.flowable.engine.common.api.FlowableException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Yvo Swillens
  */
@@ -66,13 +66,13 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
     /**
      * Executes the given decision table and creates the outcome results
      *
-     * @param decision       the DMN decision
-     * @param inputVariables map with input variables
+     * @param decision            the DMN decision
+     * @param executeDecisionInfo
      * @return updated execution variables map
      */
     @Override
     public DecisionExecutionAuditContainer execute(Decision decision, ExecuteDecisionInfo executeDecisionInfo) {
-        
+
         if (decision == null) {
             throw new IllegalArgumentException("no decision provided");
         }
@@ -91,16 +91,16 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
 
             // evaluate decision table
             evaluateDecisionTable(currentDecisionTable, executionContext);
-            
+
         } catch (FlowableException fe) {
             LOGGER.error("decision table execution sanity check failed", fe);
             executionContext.getAuditContainer().setFailed();
             executionContext.getAuditContainer().setExceptionMessage(getExceptionMessage(fe));
-            
+
         } finally {
             // end audit trail
             executionContext.getAuditContainer().stopAudit();
-            
+
             DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
             if (dmnEngineConfiguration.isHistoryEnabled()) {
                 HistoricDecisionExecutionEntityManager historicDecisionExecutionEntityManager = dmnEngineConfiguration.getHistoricDecisionExecutionEntityManager();
@@ -113,18 +113,18 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
                 decisionExecutionEntity.setExecutionId(executeDecisionInfo.getExecutionId());
                 decisionExecutionEntity.setActivityId(executeDecisionInfo.getActivityId());
                 decisionExecutionEntity.setTenantId(executeDecisionInfo.getTenantId());
-                
+
                 Boolean failed = executionContext.getAuditContainer().isFailed();
                 if (failed != null) {
                     decisionExecutionEntity.setFailed(failed.booleanValue());
                 }
-                
+
                 try {
                     decisionExecutionEntity.setExecutionJson(objectMapper.writeValueAsString(executionContext.getAuditContainer()));
                 } catch (Exception e) {
                     throw new FlowableException("Error writing execution json", e);
                 }
-                
+
                 historicDecisionExecutionEntityManager.insert(decisionExecutionEntity);
             }
         }
@@ -222,14 +222,14 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
                 executionContext.getAuditContainer().addInputEntry(rule.getRuleNumber(), inputEntryId, conditionResult);
 
                 LOGGER.debug("input entry {} ( {} {} ): {} ", inputEntryId,
-                    conditionContainer.getInputClause().getInputExpression().getText(),
-                    inputEntryText, conditionResult);
-                
+                        conditionContainer.getInputClause().getInputExpression().getText(),
+                        inputEntryText, conditionResult);
+
             } catch (FlowableException ade) {
                 // add failed audit entry and rethrow
                 executionContext.getAuditContainer().addInputEntry(rule.getRuleNumber(), inputEntryId, getExceptionMessage(ade), null);
                 throw ade;
-                
+
             } catch (Exception e) {
                 // add failed audit entry and rethrow
                 executionContext.getAuditContainer().addInputEntry(rule.getRuleNumber(), inputEntryId, getExceptionMessage(e), null);
@@ -294,7 +294,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
                 } else {
                     LOGGER.warn("Could not create conclusion result");
                 }
-                
+
             } catch (FlowableException ade) {
                 // clear result variables
                 executionContext.getRuleResults().clear();
@@ -311,7 +311,7 @@ public class RuleEngineExecutorImpl implements RuleEngineExecutor {
                 executionContext.getAuditContainer().addOutputEntry(ruleNumber, outputEntryExpression.getId(), getExceptionMessage(e), executionVariable);
                 throw new FlowableException(getExceptionMessage(e), e);
             }
-            
+
         } else {
             LOGGER.debug("Expression is empty");
 

@@ -14,18 +14,17 @@ package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 import org.flowable.job.service.Job;
 import org.flowable.job.service.impl.JobQueryImpl;
 
 /**
  * {@link EntityManager} responsible for the {@link JobEntity} class.
- * 
+ *
  * @author Joram Barrez
  */
 public interface JobEntityManager extends EntityManager<JobEntity>, JobInfoEntityManager<JobEntity> {
-    
+
     /**
      * Insert the {@link JobEntity}, similar to {@link #insert(JobEntity)}, but returns a boolean in case the insert did not go through. This could happen if the execution related to the
      * {@link JobEntity} has been removed.
@@ -38,7 +37,7 @@ public interface JobEntityManager extends EntityManager<JobEntity>, JobInfoEntit
     List<Job> findJobsByQueryCriteria(JobQueryImpl jobQuery);
 
     /**
-     * Same as {@link #findJobsByQueryCriteria(JobQueryImpl, Page)}, but only returns a count and not the instances itself.
+     * Same as {@link #findJobsByQueryCriteria(JobQueryImpl)}, but only returns a count and not the instances itself.
      */
     long findJobCountByQueryCriteria(JobQueryImpl jobQuery);
 

@@ -15,8 +15,6 @@ package org.flowable.variable.service.delegate;
 
 import java.io.Serializable;
 
-import org.flowable.variable.service.delegate.VariableScope;
-
 /**
  * @author Frederik Heremans
  */

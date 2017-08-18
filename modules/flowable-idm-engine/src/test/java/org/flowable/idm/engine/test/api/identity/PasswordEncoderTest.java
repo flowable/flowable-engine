@@ -22,7 +22,6 @@ import org.flowable.idm.engine.test.PluggableFlowableIdmTestCase;
 import org.flowable.idm.engine.test.api.identity.authentication.JasyptPasswordEncryptor;
 import org.flowable.idm.engine.test.api.identity.authentication.jBCryptHashing;
 import org.jasypt.util.password.StrongPasswordEncryptor;
-import org.junit.Ignore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +56,7 @@ public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
 
         idmEngineConfiguration.setPasswordEncoder(new ApacheDigester(ApacheDigester.Digester.SHA512));
         validatePassword();
-        
+
         idmEngineConfiguration.setPasswordEncoder(passwordEncoder);
     }
 
@@ -99,10 +98,9 @@ public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
 
         assertFalse(noSalt.equals(salt));
         idmIdentityService.deleteUser("johndoe1");
-        
+
         idmEngineConfiguration.setPasswordEncoder(passwordEncoder);
     }
-
 
 
     public void testValidatePasswordEncoderInstance() {
@@ -110,7 +108,7 @@ public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
         idmEngineConfiguration.setPasswordEncoder(new CustomPasswordEncoder());
         PasswordEncoder customPasswordEncoder = idmEngineConfiguration.getPasswordEncoder();
         assertTrue(customPasswordEncoder instanceof CustomPasswordEncoder);
-        
+
         idmEngineConfiguration.setPasswordEncoder(passwordEncoder);
     }
 

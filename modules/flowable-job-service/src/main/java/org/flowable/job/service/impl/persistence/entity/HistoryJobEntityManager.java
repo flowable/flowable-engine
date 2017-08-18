@@ -14,14 +14,13 @@ package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 import org.flowable.job.service.HistoryJob;
 import org.flowable.job.service.impl.HistoryJobQueryImpl;
 
 /**
  * {@link EntityManager} responsible for the {@link HistoryJobEntity} class.
- * 
+ *
  * @author Tijs Rademakers
  */
 public interface HistoryJobEntityManager extends EntityManager<HistoryJobEntity>, JobInfoEntityManager<HistoryJobEntity> {
@@ -32,14 +31,14 @@ public interface HistoryJobEntityManager extends EntityManager<HistoryJobEntity>
     List<HistoryJob> findHistoryJobsByQueryCriteria(HistoryJobQueryImpl jobQuery);
 
     /**
-     * Same as {@link #findHistoryJobsByQueryCriteria(HistoryJobQueryImpl, Page)}, but only returns a count and not the instances itself.
+     * Same as {@link #findHistoryJobsByQueryCriteria(HistoryJobQueryImpl)}, but only returns a count and not the instances itself.
      */
     long findHistoryJobCountByQueryCriteria(HistoryJobQueryImpl jobQuery);
 
     /**
-    * The default delete method will cascade to the references entities.
-    * This delete doesn't delete the referenced byte array entities (configuration and exception).
-    */
+     * The default delete method will cascade to the references entities.
+     * This delete doesn't delete the referenced byte array entities (configuration and exception).
+     */
     void deleteNoCascade(HistoryJobEntity historyJobEntity);
 
 }

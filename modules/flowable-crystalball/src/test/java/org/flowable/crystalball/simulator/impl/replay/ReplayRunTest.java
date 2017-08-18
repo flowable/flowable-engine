@@ -3,7 +3,7 @@ package org.flowable.crystalball.simulator.impl.replay;
 import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -109,10 +109,10 @@ public class ReplayRunTest {
         ProcessEngineConfigurationImpl configuration = new org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration();
         configuration.setHistory("full").setDatabaseSchemaUpdate("drop-create");
         configuration.setCustomDefaultBpmnParseHandlers(
-                Arrays.<BpmnParseHandler>asList(
+                Collections.<BpmnParseHandler>singletonList(
                         new AddListenerUserTaskParseHandler(TaskListener.EVENTNAME_CREATE,
                                 new UserTaskExecutionListener(USER_TASK_COMPLETED_EVENT_TYPE, USER_TASK_COMPLETED_EVENT_TYPE, listener.getSimulationEvents()))));
-        configuration.setEventListeners(Arrays.<FlowableEventListener>asList(listener));
+        configuration.setEventListeners(Collections.<FlowableEventListener>singletonList(listener));
         return configuration;
     }
 

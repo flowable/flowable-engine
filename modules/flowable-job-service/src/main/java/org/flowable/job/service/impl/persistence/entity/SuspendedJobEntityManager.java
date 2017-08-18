@@ -14,7 +14,6 @@ package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 import org.flowable.job.service.Job;
 import org.flowable.job.service.impl.JobQueryImpl;
@@ -41,7 +40,7 @@ public interface SuspendedJobEntityManager extends EntityManager<SuspendedJobEnt
     List<Job> findJobsByQueryCriteria(SuspendedJobQueryImpl jobQuery);
 
     /**
-     * Same as {@link #findJobsByQueryCriteria(SuspendedJobQueryImpl, Page)}, but only returns a count and not the instances itself.
+     * Same as {@link #findJobsByQueryCriteria(SuspendedJobQueryImpl)}, but only returns a count and not the instances itself.
      */
     long findJobCountByQueryCriteria(SuspendedJobQueryImpl jobQuery);
 
