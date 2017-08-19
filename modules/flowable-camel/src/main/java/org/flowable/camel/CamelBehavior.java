@@ -20,11 +20,9 @@ import java.util.Map;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Endpoint;
 import org.apache.camel.Exchange;
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.bpmn.model.Process;
-import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.common.impl.context.Context;
@@ -37,7 +35,7 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
-import org.flowable.spring.SpringProcessEngineConfiguration;
+import org.flowable.variable.service.delegate.Expression;
 
 /**
  * This abstract class takes the place of the now-deprecated CamelBehaviour class (which can still be used for legacy compatibility) and significantly improves on its flexibility. Additional
@@ -219,45 +217,7 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
         return async;
     }
 
-    protected void setAppropriateCamelContext(DelegateExecution execution) {
-        // Get the appropriate String representation of the CamelContext object
-        // from ActivityExecution (if available).
-        String camelContextValue = getStringFromField(camelContext, execution);
-
-        // If the String representation of the CamelContext object from ActivityExecution is empty, use the default.
-        if (StringUtils.isEmpty(camelContextValue) && camelContextObj != null) {
-            // No processing required. No custom CamelContext & the default is already set.
-
-        } else {
-            // Get the ProcessEngineConfiguration object.
-            ProcessEngineConfiguration engineConfiguration = org.flowable.engine.impl.context.Context.getProcessEngineConfiguration();
-            if ((Context.getCommandContext() != null && Flowable5Util.isFlowable5ProcessDefinitionId(Context.getCommandContext(), execution.getProcessDefinitionId())) ||
-                    (Context.getCommandContext() == null && Flowable5Util.getFlowable5CompatibilityHandler() != null)) {
-
-                Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
-                camelContextObj = (CamelContext) compatibilityHandler.getCamelContextObject(camelContextValue);
-
-            } else {
-                // Convert it to a SpringProcessEngineConfiguration. If this doesn't work, throw a RuntimeException.
-                try {
-                    SpringProcessEngineConfiguration springConfiguration = (SpringProcessEngineConfiguration) engineConfiguration;
-                    if (StringUtils.isEmpty(camelContextValue) && camelContextObj == null) {
-                        camelContextValue = springConfiguration.getDefaultCamelContext();
-                    }
-
-                    // Get the CamelContext object and set the super's member variable.
-                    Object ctx = springConfiguration.getApplicationContext().getBean(camelContextValue);
-                    if (!(ctx instanceof CamelContext)) {
-                        throw new FlowableException("Could not find CamelContext named " + camelContextValue + ".");
-                    }
-                    camelContextObj = (CamelContext) ctx;
-
-                } catch (Exception e) {
-                    throw new FlowableException("Expecting a SpringProcessEngineConfiguration for the Camel module.", e);
-                }
-            }
-        }
-    }
+    protected abstract void setAppropriateCamelContext(DelegateExecution execution);
 
     protected String getStringFromField(Expression expression, DelegateExecution execution) {
         if (expression != null) {

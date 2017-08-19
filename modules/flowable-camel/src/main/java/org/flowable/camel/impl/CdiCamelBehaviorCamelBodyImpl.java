@@ -13,21 +13,20 @@
 
 package org.flowable.camel.impl;
 
+import org.flowable.camel.CdiCamelBehavior;
 import org.flowable.camel.FlowableEndpoint;
-import org.flowable.camel.SpringCamelBehavior;
 
 /**
- * This implementation of the CamelBehavior abstract class works by copying variables into Camel using a Map<String,Object> object in the Camel Exchange body.
+ * Cdi equivalent of {@link CdiCamelBehaviorCamelBodyImpl}
  * 
- * @author Ryan Johnston (@rjfsu), Tijs Rademakers, Saeid Mirzaei
+ * @author Zach Visagie
  */
-public class CamelBehaviorBodyAsMapImpl extends SpringCamelBehavior {
+public class CdiCamelBehaviorCamelBodyImpl extends CdiCamelBehavior {
 
     private static final long serialVersionUID = 1L;
 
     @Override
     protected void setPropertTargetVariable(FlowableEndpoint endpoint) {
-        toTargetType = TargetType.BODY_AS_MAP;
+        toTargetType = TargetType.BODY;
     }
-
 }

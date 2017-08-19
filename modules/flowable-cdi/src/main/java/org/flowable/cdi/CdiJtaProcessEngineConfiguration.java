@@ -13,6 +13,7 @@
 package org.flowable.cdi;
 
 import org.flowable.cdi.impl.CdiCommandInvoker;
+import org.flowable.engine.impl.bpmn.parser.factory.AbstractBehaviorFactory;
 import org.flowable.engine.impl.cfg.JtaProcessEngineConfiguration;
 
 /**
@@ -32,4 +33,14 @@ public class CdiJtaProcessEngineConfiguration extends JtaProcessEngineConfigurat
         }
     }
 
+    @Override
+    public void initBehaviorFactory() {
+        if (activityBehaviorFactory == null) {
+            DefaultCdiActivityBehaviorFactory defaultCdiActivityBehaviorFactory = new DefaultCdiActivityBehaviorFactory();
+            defaultCdiActivityBehaviorFactory.setExpressionManager(expressionManager);
+            activityBehaviorFactory = defaultCdiActivityBehaviorFactory;
+        } else if ((activityBehaviorFactory instanceof AbstractBehaviorFactory) && ((AbstractBehaviorFactory) activityBehaviorFactory).getExpressionManager() == null) {
+            ((AbstractBehaviorFactory) activityBehaviorFactory).setExpressionManager(expressionManager);
+        }
+    }
 }
