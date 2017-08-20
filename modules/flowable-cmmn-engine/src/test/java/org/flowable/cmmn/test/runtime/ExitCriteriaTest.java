@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.cmmn.engine.runtime.PlanItemInstance;
+import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.junit.Test;
@@ -87,6 +88,40 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
         assertEquals(5, planItems.size());
        
         // Triggering A and B exits C, which triggers the exit of D and E
+        cmmnRuntimeService.triggerPlanItemInstance(planItems.get(0).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(planItems.get(1).getId());
+        
+        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testExitPlanModelOnMilestoneReached() {
+        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        List<PlanItemInstance> planItems = cmmnRuntimeService.createPlanItemQuery()
+                .planItemInstanceState(PlanItemInstanceState.AVAILABLE)
+                .orderByName().asc()
+                .list();
+        assertEquals(2, planItems.size());
+        assertEquals("D", planItems.get(0).getName());
+        assertEquals("The Milestone", planItems.get(1).getName());
+        
+         planItems = cmmnRuntimeService.createPlanItemQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .orderByName().asc()
+                .list();
+        assertEquals(3, planItems.size());
+        String[] expectedNames = new String[] {"A", "B", "C"};
+        for (int i=0; i<3; i++) {
+            assertEquals(expectedNames[i], planItems.get(i).getName());
+        }
+        
+        // Triggering A and B enabled the milestone
+        // Completing the milestone exits the whole planmodel
+        
         cmmnRuntimeService.triggerPlanItemInstance(planItems.get(0).getId());
         cmmnRuntimeService.triggerPlanItemInstance(planItems.get(1).getId());
         

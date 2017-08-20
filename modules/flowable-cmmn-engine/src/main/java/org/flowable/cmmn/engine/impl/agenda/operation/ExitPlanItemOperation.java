@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -38,8 +39,19 @@ public class ExitPlanItemOperation extends AbstractChangePlanItemStateOperation 
     
     @Override
     public void run() {
-        super.run();
         deleteSentryOnPartInstances();
+        if (isStage(planItemInstanceEntity)) {
+            completeChildPlanItems();
+        }
+        super.run();
+    }
+
+    protected void completeChildPlanItems() {
+        for (PlanItemInstanceEntity child : planItemInstanceEntity.getChildren()) {
+            if (!PlanItemInstanceState.TERMINATED.equals(child.getState()) && !PlanItemInstanceState.COMPLETED.equals(child.getState())) {
+                CommandContextUtil.getAgenda(commandContext).planExitPlanItem(child);
+            }
+        }
     }
     
 }

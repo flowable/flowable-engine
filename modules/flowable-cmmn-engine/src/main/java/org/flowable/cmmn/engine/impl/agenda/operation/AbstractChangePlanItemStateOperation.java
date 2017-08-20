@@ -61,7 +61,8 @@ public abstract class AbstractChangePlanItemStateOperation extends AbstractPlanI
         if (CaseInstanceState.ACTIVE.equals(caseInstanceEntity.getState())) {
             caseInstanceEntity.setState(getNewState());
             
-            if (CaseInstanceState.COMPLETED.equals(caseInstanceEntity.getState())) {
+            if (CaseInstanceState.COMPLETED.equals(caseInstanceEntity.getState())
+                    || CaseInstanceState.TERMINATED.equals(caseInstanceEntity.getState())) {
                 
                 PlanItemInstanceEntity planModelPlanItemInstanceEntity = caseInstanceEntity.getPlanModelInstance();
                 String caseInstanceId = planModelPlanItemInstanceEntity.getCaseInstanceId();

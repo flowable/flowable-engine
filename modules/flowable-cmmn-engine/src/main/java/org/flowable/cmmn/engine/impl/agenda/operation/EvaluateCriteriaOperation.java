@@ -24,9 +24,11 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.HasExitCriteria;
+import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
+import org.flowable.cmmn.model.Stage;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,8 +56,10 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
     @Override
     public void run() {
         super.run();
-        
-        PlanItemInstanceEntity stagePlanItemInstanceEntity = caseInstanceEntity.getPlanModelInstance();
+        evaluateStagePlanItemInstance(caseInstanceEntity.getPlanModelInstance());
+    }
+
+    protected void evaluateStagePlanItemInstance(PlanItemInstanceEntity stagePlanItemInstanceEntity) {
         
         // Can already be completed by another evaluation. No need to verify it again.
         if (!PlanItemInstanceState.ACTIVE.equals(stagePlanItemInstanceEntity.getState())) {
@@ -84,11 +88,19 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                     
                 }
                 
+                if (planItem.getPlanItemDefinition() instanceof PlanFragment) {
+                    evaluateStagePlanItemInstance(planItemInstanceEntity);
+                }
+                
                 if (evaluationResult != null && !evaluationResult.equals(EvaluationResult.NONE_FIRED)) {
                     criteriaFired = true;
                 }
                 
             }
+        }
+        
+        if (evaluateStageExitCriteria(stagePlanItemInstanceEntity)) {
+            criteriaFired = true;
         }
         
         if (!criteriaFired 
@@ -99,9 +111,8 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             }
             CommandContextUtil.getAgenda(commandContext).planCompletePlanItem(stagePlanItemInstanceEntity);
         }
-        
     }
-    
+
     protected EvaluationResult evaluateEntryCriteria(PlanItemInstanceEntity planItemInstanceEntity, PlanItem planItem) {
         List<Criterion> criteria = planItem.getEntryCriteria();
         if (!PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState())) {
@@ -120,6 +131,22 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             return evaluateCriteria(planItemInstanceEntity, criteria);
         }
         return EvaluationResult.NONE_FIRED;
+    }
+    
+    protected boolean evaluateStageExitCriteria(PlanItemInstanceEntity stagePlanItemInstanceEntity) {
+        Stage stage  = getStage(stagePlanItemInstanceEntity);
+        if (stage.getExitCriteria() != null && !stage.getExitCriteria().isEmpty()) {
+            EvaluationResult evaluationResult = evaluateExitCriteria(stagePlanItemInstanceEntity, stage);
+            if (evaluationResult.equals(EvaluationResult.ALL_FIRED)) {
+                CommandContextUtil.getAgenda(commandContext).planExitPlanItem(stagePlanItemInstanceEntity);
+                return true;
+                
+            } else if (evaluationResult != null && !evaluationResult.equals(EvaluationResult.NONE_FIRED)) {
+                return true;
+                
+            }
+        }
+        return false;
     }
     
     protected EvaluationResult evaluateCriteria(PlanItemInstanceEntity planItemInstanceEntity, List<Criterion> criteria) {
