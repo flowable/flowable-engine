@@ -42,7 +42,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
     
     protected PlanItemLifeCycleEvent planItemLifeCycleEvent;
     
-    private enum EvaluationResult { ALL_FIRED, SOME_FIRED , NONE_FIRED };
+    private enum CriteriaEvaluationResult { ALL, SOME , NONE };
     
     public EvaluateCriteriaOperation(CommandContext commandContext, String caseInstanceEntityId) {
         super(commandContext, caseInstanceEntityId, null);
@@ -66,90 +66,79 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             return;
         }
         
-        int activeChildren = 0;
-        boolean criteriaFired = false;
-        if (stagePlanItemInstanceEntity.getChildren() != null) {
-            for (PlanItemInstanceEntity planItemInstanceEntity : stagePlanItemInstanceEntity.getChildren()) {
-                
-                PlanItem planItem = planItemInstanceEntity.getPlanItem();
-                EvaluationResult evaluationResult = null;
-                if (PlanItemInstanceState.AVAILABLE.equals(planItemInstanceEntity.getState())) {
-                    evaluationResult = evaluateEntryCriteria(planItemInstanceEntity, planItem);
-                    if (evaluationResult.equals(EvaluationResult.ALL_FIRED)) {
-                        CommandContextUtil.getAgenda(commandContext).planActivatePlanItem(planItemInstanceEntity);  
-                    }
-                    
-                } else if (PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState()) ) {
-                    activeChildren++;
-                    evaluationResult = evaluateExitCriteria(planItemInstanceEntity, planItem);
-                    if (evaluationResult.equals(EvaluationResult.ALL_FIRED)) {
-                        CommandContextUtil.getAgenda(commandContext).planExitPlanItem(planItemInstanceEntity);
-                    }
-                    
-                }
-                
-                if (planItem.getPlanItemDefinition() instanceof PlanFragment) {
-                    evaluateStagePlanItemInstance(planItemInstanceEntity);
-                }
-                
-                if (evaluationResult != null && !evaluationResult.equals(EvaluationResult.NONE_FIRED)) {
-                    criteriaFired = true;
-                }
-                
-            }
+        // Check if current stage exit criteria are satisfied
+        Stage stage  = getStage(stagePlanItemInstanceEntity);
+        CriteriaEvaluationResult stageExitCriteriaEvaluationResult = null;
+        stageExitCriteriaEvaluationResult = evaluateExitCriteria(stagePlanItemInstanceEntity, stage);
+        if (stageExitCriteriaEvaluationResult.equals(CriteriaEvaluationResult.ALL)) {
+            CommandContextUtil.getAgenda(commandContext).planExitPlanItem(stagePlanItemInstanceEntity);
         }
         
-        if (evaluateStageExitCriteria(stagePlanItemInstanceEntity)) {
-            criteriaFired = true;
-        }
-        
-        if (!criteriaFired 
-                && PlanItemInstanceState.ACTIVE.equals(stagePlanItemInstanceEntity.getState()) 
-                && activeChildren == 0) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("No active plan items found for stage, planning stage completion");
+        // Check children of stage
+        if (!CriteriaEvaluationResult.ALL.equals(stageExitCriteriaEvaluationResult)) {
+            int activeChildren = 0;
+            boolean criteriaFired = false;
+            if (stagePlanItemInstanceEntity.getChildren() != null) {
+                for (PlanItemInstanceEntity planItemInstanceEntity : stagePlanItemInstanceEntity.getChildren()) {
+                    
+                    PlanItem planItem = planItemInstanceEntity.getPlanItem();
+                    CriteriaEvaluationResult evaluationResult = null;
+                    if (PlanItemInstanceState.AVAILABLE.equals(planItemInstanceEntity.getState())) {
+                        evaluationResult = evaluateEntryCriteria(planItemInstanceEntity, planItem);
+                        if (evaluationResult.equals(CriteriaEvaluationResult.ALL)) {
+                            CommandContextUtil.getAgenda(commandContext).planActivatePlanItem(planItemInstanceEntity);  
+                        }
+                        
+                    } else if (PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState()) ) {
+                        activeChildren++;
+                        evaluationResult = evaluateExitCriteria(planItemInstanceEntity, planItem);
+                        if (evaluationResult.equals(CriteriaEvaluationResult.ALL)) {
+                            CommandContextUtil.getAgenda(commandContext).planExitPlanItem(planItemInstanceEntity);
+                        }
+                        
+                        if (planItem.getPlanItemDefinition() instanceof PlanFragment) {
+                            evaluateStagePlanItemInstance(planItemInstanceEntity);
+                        }
+                        
+                    }
+                    
+                    if (evaluationResult != null && !evaluationResult.equals(CriteriaEvaluationResult.NONE)) {
+                        criteriaFired = true;
+                    }
+                    
+                }
             }
-            CommandContextUtil.getAgenda(commandContext).planCompletePlanItem(stagePlanItemInstanceEntity);
+            
+            if (!criteriaFired 
+                    && PlanItemInstanceState.ACTIVE.equals(stagePlanItemInstanceEntity.getState()) 
+                    && activeChildren == 0) {
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("No active plan items found for stage, planning stage completion");
+                }
+                CommandContextUtil.getAgenda(commandContext).planCompletePlanItem(stagePlanItemInstanceEntity);
+            }
+            
         }
     }
 
-    protected EvaluationResult evaluateEntryCriteria(PlanItemInstanceEntity planItemInstanceEntity, PlanItem planItem) {
+    protected CriteriaEvaluationResult evaluateEntryCriteria(PlanItemInstanceEntity planItemInstanceEntity, PlanItem planItem) {
         List<Criterion> criteria = planItem.getEntryCriteria();
-        if (!PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState())) {
-            if (criteria == null || criteria.isEmpty()) {
-                return EvaluationResult.ALL_FIRED;
-            } else {
-                return evaluateCriteria(planItemInstanceEntity, criteria);
-            }
+        if (criteria == null || criteria.isEmpty()) {
+            return CriteriaEvaluationResult.ALL;
+        } else {
+            return evaluateCriteria(planItemInstanceEntity, criteria);
         }
-        return EvaluationResult.NONE_FIRED;
     }
     
-    protected EvaluationResult evaluateExitCriteria(PlanItemInstanceEntity planItemInstanceEntity, HasExitCriteria hasExitCriteria) {
+    protected CriteriaEvaluationResult evaluateExitCriteria(PlanItemInstanceEntity planItemInstanceEntity, HasExitCriteria hasExitCriteria) {
         List<Criterion> criteria = hasExitCriteria.getExitCriteria();
         if (criteria != null && !criteria.isEmpty()) {
             return evaluateCriteria(planItemInstanceEntity, criteria);
         }
-        return EvaluationResult.NONE_FIRED;
+        return CriteriaEvaluationResult.NONE;
     }
     
-    protected boolean evaluateStageExitCriteria(PlanItemInstanceEntity stagePlanItemInstanceEntity) {
-        Stage stage  = getStage(stagePlanItemInstanceEntity);
-        if (stage.getExitCriteria() != null && !stage.getExitCriteria().isEmpty()) {
-            EvaluationResult evaluationResult = evaluateExitCriteria(stagePlanItemInstanceEntity, stage);
-            if (evaluationResult.equals(EvaluationResult.ALL_FIRED)) {
-                CommandContextUtil.getAgenda(commandContext).planExitPlanItem(stagePlanItemInstanceEntity);
-                return true;
-                
-            } else if (evaluationResult != null && !evaluationResult.equals(EvaluationResult.NONE_FIRED)) {
-                return true;
-                
-            }
-        }
-        return false;
-    }
-    
-    protected EvaluationResult evaluateCriteria(PlanItemInstanceEntity planItemInstanceEntity, List<Criterion> criteria) {
+    protected CriteriaEvaluationResult evaluateCriteria(PlanItemInstanceEntity planItemInstanceEntity, List<Criterion> criteria) {
         for (Criterion entryCriterion : criteria) {
             Sentry sentry = entryCriterion.getSentry();
             
@@ -157,7 +146,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 if (planItemLifeCycleEvent != null) {
                     SentryOnPart sentryOnPart = sentry.getOnParts().get(0);
                     if (sentryOnPartMatchesCurrentLifeCycleEvent(sentryOnPart)) {
-                        return EvaluationResult.ALL_FIRED;
+                        return CriteriaEvaluationResult.ALL;
                     }
                 }
                 
@@ -181,15 +170,15 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 }
                 
                 if (sentry.getOnParts().size() == planItemInstanceEntity.getSatisfiedSentryOnPartInstances().size()) {
-                    return EvaluationResult.ALL_FIRED;
+                    return CriteriaEvaluationResult.ALL;
                 } else if (criteriaSatisfied){
-                    return EvaluationResult.SOME_FIRED;
+                    return CriteriaEvaluationResult.SOME;
                 }
                 
             }
             
         }
-        return EvaluationResult.NONE_FIRED;
+        return CriteriaEvaluationResult.NONE;
     }
     
     public boolean sentryOnPartMatchesCurrentLifeCycleEvent(SentryOnPart sentryOnPart) {
