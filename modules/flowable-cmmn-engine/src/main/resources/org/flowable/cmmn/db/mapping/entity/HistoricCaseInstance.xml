@@ -5,7 +5,7 @@
 <mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl">
 
     <insert id="insertHistoricCaseInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl">
-        insert into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, TENANT_ID_)
+        insert into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, TENANT_ID_)
         values (
             #{id ,jdbcType=VARCHAR},
             1,
@@ -17,12 +17,14 @@
             #{startTime ,jdbcType=TIMESTAMP},
             #{endTime ,jdbcType=TIMESTAMP},
             #{startUserId ,jdbcType=VARCHAR},
+            #{callbackId, jdbcType=VARCHAR},
+            #{callbackType, jdbcType=VARCHAR},
             #{tenantId ,jdbcType=VARCHAR}
         )
     </insert>
 
     <insert id="bulkInsertHistoricCaseInstance" parameterType="java.util.List">
-        insert into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, TENANT_ID_)
+        insert into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, TENANT_ID_)
         values
         <foreach collection="list" item="historicCaseInstance" index="index" separator=",">
             (
@@ -36,6 +38,8 @@
                 #{historicCaseInstance.startTime ,jdbcType=TIMESTAMP},
                 #{historicCaseInstance.endTime ,jdbcType=TIMESTAMP},
                 #{historicCaseInstance.startUserId ,jdbcType=VARCHAR},
+                #{caseInstance.callbackId, jdbcType=VARCHAR},
+                #{caseInstance.callbackType, jdbcType=VARCHAR},
                 #{historicCaseInstance.tenantId ,jdbcType=VARCHAR}
             )
         </foreach>
@@ -44,7 +48,7 @@
     <insert id="bulkInsertHistoricCaseInstance" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
         <foreach collection="list" item="historicCaseInstance" index="index">
-            into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, PARENT_PLAN_ITEM_INST_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, TENANT_ID_) VALUES
+            into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, PARENT_PLAN_ITEM_INST_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, TENANT_ID_) VALUES
             (
                 #{historicCaseInstance.id ,jdbcType=VARCHAR},
                 1,
@@ -56,6 +60,8 @@
                 #{historicCaseInstance.startTime ,jdbcType=TIMESTAMP},
                 #{historicCaseInstance.endTime ,jdbcType=TIMESTAMP},
                 #{historicCaseInstance.startUserId ,jdbcType=VARCHAR},
+                #{caseInstance.callbackId, jdbcType=VARCHAR},
+                #{caseInstance.callbackType, jdbcType=VARCHAR},
                 #{historicCaseInstance.tenantId ,jdbcType=VARCHAR}
             )
         </foreach>
@@ -73,6 +79,8 @@
             START_TIME_ = #{startTime, jdbcType=TIMESTAMP},
             END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
             START_USER_ID_ = #{startUserId, jdbcType=VARCHAR},
+            CALLBACK_ID_ = #{callbackId, jdbcType=VARCHAR},
+            CALLBACK_TYPE_ = #{callbackId, jdbcType=VARCHAR},
             TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
         where ID_ = #{id, jdbcType=VARCHAR}
     </update>
@@ -171,6 +179,12 @@
             </if>
             <if test="startedBy != null">
                 RES.START_USER_ID_ = #{startedBy}
+            </if>
+            <if test="callbackId != null">
+                and RES.CALLBACK_ID_ = #{callbackId}
+            </if>
+            <if test="callbackType != null">
+                and RES.CALLBACK_TYPE_ = #{callbackType}
             </if>
             <if test="tenantId != null">
                 RES.TENANT_ID_ = #{tenantId}

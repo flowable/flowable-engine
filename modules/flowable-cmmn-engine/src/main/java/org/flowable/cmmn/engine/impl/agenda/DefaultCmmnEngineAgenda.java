@@ -14,13 +14,16 @@ package org.flowable.cmmn.engine.impl.agenda;
 
 import org.flowable.cmmn.engine.impl.agenda.operation.ActivatePlanItemOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.CmmnOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.CompleteCaseInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.CompletePlanItemOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.EvaluateCriteriaOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ExitPlanItemOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.InitStageOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.OccurPlanItemOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.TerminateCaseInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TriggerPlanItemOperation;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.engine.common.impl.agenda.AbstractAgenda;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -83,6 +86,21 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     @Override
     public void planTriggerPlanItem(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new TriggerPlanItemOperation(commandContext, planItemInstanceEntity));
+    }
+    
+    @Override
+    public void planCompleteCase(CaseInstanceEntity caseInstanceEntity) {
+        addOperation(new CompleteCaseInstanceOperation(commandContext, caseInstanceEntity));
+    }
+    
+    @Override
+    public void planTerminateCase(String caseInstanceEntityId) {
+        addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntityId));
+    }
+    
+    @Override
+    public void planTerminateCase(CaseInstanceEntity caseInstanceEntity) {
+        addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntity));
     }
 
 }

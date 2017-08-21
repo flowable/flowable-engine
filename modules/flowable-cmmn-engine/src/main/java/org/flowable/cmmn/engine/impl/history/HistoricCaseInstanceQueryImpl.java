@@ -18,7 +18,6 @@ import java.util.Set;
 
 import org.flowable.cmmn.engine.history.HistoricCaseInstance;
 import org.flowable.cmmn.engine.history.HistoricCaseInstanceQuery;
-import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryProperty;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.AbstractQuery;
@@ -47,6 +46,8 @@ public class HistoricCaseInstanceQueryImpl extends AbstractQuery<HistoricCaseIns
     protected Date finishedBefore;
     protected Date finishedAfter;
     protected String startedBy;
+    protected String callbackId;
+    protected String callbackType;
     protected String tenantId;
     protected boolean withoutTenantId;
 
@@ -61,6 +62,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractQuery<HistoricCaseIns
         super(commandExecutor);
     }
 
+    @Override
     public HistoricCaseInstanceQueryImpl caseDefinitionId(String caseDefinitionId) {
         if (caseDefinitionId == null) {
             throw new FlowableIllegalArgumentException("Case definition id is null");
@@ -69,6 +71,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractQuery<HistoricCaseIns
         return this;
     }
 
+    @Override
     public HistoricCaseInstanceQueryImpl caseDefinitionKey(String caseDefinitionKey) {
         if (caseDefinitionKey == null) {
             throw new FlowableIllegalArgumentException("Case definition key is null");
@@ -104,6 +107,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractQuery<HistoricCaseIns
         return this;
     }
 
+    @Override
     public HistoricCaseInstanceQueryImpl caseInstanceId(String caseInstanceId) {
         if (caseInstanceId == null) {
             throw new FlowableIllegalArgumentException("Case instance id is null");
@@ -112,6 +116,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractQuery<HistoricCaseIns
         return this;
     }
 
+    @Override
     public HistoricCaseInstanceQueryImpl caseInstanceBusinessKey(String businessKey) {
         if (businessKey == null) {
             throw new FlowableIllegalArgumentException("Business key is null");
@@ -120,6 +125,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractQuery<HistoricCaseIns
         return this;
     }
 
+    @Override
     public HistoricCaseInstanceQueryImpl caseDefinitionKeys(Set<String> caseDefinitionKeys) {
         if (caseDefinitionKeys == null) {
             throw new FlowableIllegalArgumentException("Case definition keys is null");
@@ -128,24 +134,12 @@ public class HistoricCaseInstanceQueryImpl extends AbstractQuery<HistoricCaseIns
         return this;
     }
 
+    @Override
     public HistoricCaseInstanceQueryImpl caseInstanceParentId(String parentId) {
         if (parentId == null) {
             throw new FlowableIllegalArgumentException("Parent id is null");
         }
         this.caseInstanceParentId = parentId;
-        return this;
-    }
-    
-    public HistoricCaseInstanceQueryImpl caseInstanceTenantId(String tenantId) {
-        if (tenantId == null) {
-            throw new FlowableIllegalArgumentException("caseInstance tenant id is null");
-        }
-        this.tenantId = tenantId;
-        return this;
-    }
-
-    public HistoricCaseInstanceQueryImpl caseInstanceWithoutTenantId() {
-        this.withoutTenantId = true;
         return this;
     }
     
@@ -179,6 +173,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractQuery<HistoricCaseIns
         return this;
     }
 
+    @Override
     public HistoricCaseInstanceQueryImpl startedBefore(Date beforeTime) {
         if (beforeTime == null) {
             throw new FlowableIllegalArgumentException("before time is null");
@@ -187,6 +182,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractQuery<HistoricCaseIns
         return this;
     }
 
+    @Override
     public HistoricCaseInstanceQueryImpl startedAfter(Date afterTime) {
         if (afterTime == null) {
             throw new FlowableIllegalArgumentException("after time is null");
@@ -196,6 +192,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractQuery<HistoricCaseIns
         return this;
     }
 
+    @Override
     public HistoricCaseInstanceQueryImpl startedBy(String userId) {
         if (userId == null) {
             throw new FlowableIllegalArgumentException("user id is null");
@@ -204,19 +201,49 @@ public class HistoricCaseInstanceQueryImpl extends AbstractQuery<HistoricCaseIns
 
         return this;
     }
+    
+    @Override
+    public HistoricCaseInstanceQuery caseInstanceCallbackId(String callbackId) {
+        this.callbackId = callbackId;
+        return this;
+    }
+    
+    @Override
+    public HistoricCaseInstanceQuery caseInstanceCallbackType(String callbackType) {
+        this.callbackType = callbackType;
+        return this;
+    }
+    
+    @Override
+    public HistoricCaseInstanceQueryImpl caseInstanceTenantId(String tenantId) {
+        if (tenantId == null) {
+            throw new FlowableIllegalArgumentException("caseInstance tenant id is null");
+        }
+        this.tenantId = tenantId;
+        return this;
+    }
+
+    @Override
+    public HistoricCaseInstanceQueryImpl caseInstanceWithoutTenantId() {
+        this.withoutTenantId = true;
+        return this;
+    }
 
     // ordering ////////////////////////////////////////////////////
 
+    @Override
     public HistoricCaseInstanceQueryImpl orderByCaseInstanceId() {
         this.orderProperty = HistoricCaseInstanceQueryProperty.CASE_INSTANCE_ID;
         return this;
     }
 
+    @Override
     public HistoricCaseInstanceQueryImpl orderByCaseDefinitionId() {
         this.orderProperty = HistoricCaseInstanceQueryProperty.CASE_DEFINITION_ID;
         return this;
     }
 
+    @Override
     public HistoricCaseInstanceQueryImpl orderByCaseDefinitionKey() {
         this.orderProperty = HistoricCaseInstanceQueryProperty.CASE_DEFINITION_KEY;
         return this;
@@ -234,6 +261,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractQuery<HistoricCaseIns
         return this;
     }
 
+    @Override
     public HistoricCaseInstanceQueryImpl orderByTenantId() {
         this.orderProperty = HistoricCaseInstanceQueryProperty.TENANT_ID;
         return this;
@@ -315,6 +343,14 @@ public class HistoricCaseInstanceQueryImpl extends AbstractQuery<HistoricCaseIns
 
     public String getStartedBy() {
         return startedBy;
+    }
+    
+    public String getCallbackId() {
+        return callbackId;
+    }
+
+    public String getCallbackType() {
+        return callbackType;
     }
 
     public String getTenantId() {

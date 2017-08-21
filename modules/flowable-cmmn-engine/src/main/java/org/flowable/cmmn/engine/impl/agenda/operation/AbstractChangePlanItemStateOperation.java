@@ -12,12 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
-import java.util.List;
-
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.CaseInstanceState;
@@ -59,30 +55,15 @@ public abstract class AbstractChangePlanItemStateOperation extends AbstractPlanI
         CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext)
                 .findById(planItemInstanceEntity.getCaseInstanceId());
         if (CaseInstanceState.ACTIVE.equals(caseInstanceEntity.getState())) {
-            caseInstanceEntity.setState(getNewState());
-            
-            if (CaseInstanceState.COMPLETED.equals(caseInstanceEntity.getState())
-                    || CaseInstanceState.TERMINATED.equals(caseInstanceEntity.getState())) {
-                
-                PlanItemInstanceEntity planModelPlanItemInstanceEntity = caseInstanceEntity.getPlanModelInstance();
-                String caseInstanceId = planModelPlanItemInstanceEntity.getCaseInstanceId();
-                
-                MilestoneInstanceEntityManager milestoneInstanceEntityManager = CommandContextUtil.getMilestoneInstanceEntityManager(commandContext);
-                List<MilestoneInstanceEntity> milestoneInstanceEntities = milestoneInstanceEntityManager
-                        .findMilestoneInstancesByCaseInstanceId(caseInstanceId);
-                if (milestoneInstanceEntities != null) {
-                    for (MilestoneInstanceEntity milestoneInstanceEntity : milestoneInstanceEntities) {
-                        milestoneInstanceEntityManager.delete(milestoneInstanceEntity);
-                    }
-                }
-                
-                CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).deleteCascade(planModelPlanItemInstanceEntity);
-                CommandContextUtil.getCaseInstanceEntityManager(commandContext).delete(caseInstanceId);
-                CommandContextUtil.getCmmnHistoryManager(commandContext).recordCaseInstanceEnd(caseInstanceId);
+            String newState = getNewState();
+            if (CaseInstanceState.COMPLETED.equals(newState)) {
+                CommandContextUtil.getAgenda(commandContext).planCompleteCase(caseInstanceEntity);
+            } else if (CaseInstanceState.TERMINATED.equals(newState)) {
+                CommandContextUtil.getAgenda(commandContext).planTerminateCase(caseInstanceEntity);
             }
         }
     }
-    
+
     protected abstract String getNewState();
     
     protected abstract String getLifeCycleEventType(); 

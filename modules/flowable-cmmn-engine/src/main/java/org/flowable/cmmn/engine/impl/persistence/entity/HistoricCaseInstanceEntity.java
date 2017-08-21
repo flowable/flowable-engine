@@ -30,6 +30,8 @@ public interface HistoricCaseInstanceEntity extends Entity, HistoricCaseInstance
     void setStartTime(Date startTime);
     void setEndTime(Date endTime);
     void setStartUserId(String startUserId);
+    void setCallbackId(String callbackId);
+    void setCallbackType(String callbackType);
     void setTenantId(String tenantId);
     
 }

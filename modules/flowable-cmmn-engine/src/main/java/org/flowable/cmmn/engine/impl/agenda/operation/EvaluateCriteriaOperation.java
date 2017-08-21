@@ -28,7 +28,6 @@ import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
-import org.flowable.cmmn.model.Stage;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -67,9 +66,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         }
         
         // Check if current stage exit criteria are satisfied
-        Stage stage  = getStage(stagePlanItemInstanceEntity);
-        CriteriaEvaluationResult stageExitCriteriaEvaluationResult = null;
-        stageExitCriteriaEvaluationResult = evaluateExitCriteria(stagePlanItemInstanceEntity, stage);
+        CriteriaEvaluationResult stageExitCriteriaEvaluationResult = evaluateExitCriteria(stagePlanItemInstanceEntity, getStage(stagePlanItemInstanceEntity));
         if (stageExitCriteriaEvaluationResult.equals(CriteriaEvaluationResult.ALL)) {
             CommandContextUtil.getAgenda(commandContext).planExitPlanItem(stagePlanItemInstanceEntity);
         }
@@ -112,8 +109,9 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             if (!criteriaFired 
                     && PlanItemInstanceState.ACTIVE.equals(stagePlanItemInstanceEntity.getState()) 
                     && activeChildren == 0) {
+                
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("No active plan items found for stage, planning stage completion");
+                    LOGGER.debug("No active plan items found for stage " + stagePlanItemInstanceEntity.getElementId() +", planning stage completion");
                 }
                 CommandContextUtil.getAgenda(commandContext).planCompletePlanItem(stagePlanItemInstanceEntity);
             }

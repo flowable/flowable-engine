@@ -73,6 +73,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new StageXmlConverter());
         addElementConverter(new MilestoneXmlConverter());
         addElementConverter(new TaskXmlConverter());
+        addElementConverter(new CaseTaskXmlConverter());
         addElementConverter(new PlanItemXmlConverter());
         addElementConverter(new SentryXmlConverter());
         addElementConverter(new EntryCriterionXmlConverter());

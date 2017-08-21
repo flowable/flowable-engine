@@ -33,6 +33,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_STAGE = "stage";    
     String ELEMENT_MILESTONE = "milestone";
     String ELEMENT_TASK = "task";
+    String ELEMENT_CASE_TASK = "caseTask";
     String ELEMENT_PLAN_ITEM = "planItem";
     String ELEMENT_SENTRY = "sentry";
     String ELEMENT_PLAN_ITEM_ON_PART = "planItemOnPart";
@@ -47,5 +48,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_SOURCE_REF = "sourceRef";
     String ATTRIBUTE_SENTRY_REF = "sentryRef";
     String ATTRIBUTE_IS_BLOCKING = "isBlocking";
+    
+    String ATTRIBUTE_CASE_REF = "caseRef";
     
 }

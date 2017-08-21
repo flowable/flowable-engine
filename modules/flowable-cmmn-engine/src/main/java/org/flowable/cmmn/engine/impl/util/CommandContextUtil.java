@@ -25,6 +25,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityM
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.TableDataManager;
+import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -154,6 +155,14 @@ public class CommandContextUtil {
     
     public static EntityCache getEntityCache(CommandContext commandContext) {
         return commandContext.getSession(EntityCache.class);
+    }
+    
+    public static CaseInstanceHelper getCaseInstanceHelper() {
+        return getCaseInstanceHelper(getCommandContext());
+    }
+    
+    public static CaseInstanceHelper getCaseInstanceHelper(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getCaseInstanceHelper();
     }
     
     public static CommandContext getCommandContext() {

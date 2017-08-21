@@ -81,6 +81,8 @@
             <column name="STATE_" type="varchar(255)" />
             <column name="START_TIME_" type="datetime" />
             <column name="START_USER_ID_" type="varchar(255)" />
+            <column name="CALLBACK_ID_" type="varchar(255)" />
+            <column name="CALLBACK_TYPE_" type="varchar(255)" />
             <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
         </createTable>
 
@@ -201,6 +203,8 @@
             <column name="START_TIME_" type="datetime" />
             <column name="END_TIME_" type="datetime" />
             <column name="START_USER_ID_" type="varchar(255)" />
+            <column name="CALLBACK_ID_" type="varchar(255)" />
+            <column name="CALLBACK_TYPE_" type="varchar(255)" />
             <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
         </createTable>
 

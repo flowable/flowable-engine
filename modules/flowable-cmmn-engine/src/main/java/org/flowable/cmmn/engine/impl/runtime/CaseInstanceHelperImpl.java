@@ -12,6 +12,10 @@
  */
 package org.flowable.cmmn.engine.impl.runtime;
 
+import java.util.List;
+import java.util.Map;
+
+import org.flowable.cmmn.engine.impl.callback.CaseInstanceCallback;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
@@ -20,6 +24,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityMa
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.repository.CaseDefinition;
+import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.cmmn.engine.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.Stage;
@@ -63,6 +68,7 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         PlanItemInstanceEntity planModelInstanceEntity = createStagePlanItemInstanceEntity(commandContext, caseInstanceEntity, planModel);
         caseInstanceEntity.setPlanModelInstance(planModelInstanceEntity);
         
+        callCaseInstanceCallbacks(commandContext, caseInstanceEntity, null, CaseInstanceState.ACTIVE);
         CommandContextUtil.getCmmnHistoryManager().recordCaseInstanceStart(caseInstanceEntity);
         CommandContextUtil.getAgenda(commandContext).planInitStageOperation(planModelInstanceEntity);
         
@@ -97,5 +103,16 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         planItemInstanceEntityManager.insert(stagePlanItemInstanceEntity);
         return stagePlanItemInstanceEntity;
     }
-
+    
+    public void callCaseInstanceCallbacks(CommandContext commandContext, CaseInstance caseInstance, String oldState, String newState) {
+        if (caseInstance.getCallbackId() != null && caseInstance.getCallbackType() != null) {
+            Map<String, List<CaseInstanceCallback>> caseInstanceCallbacks = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getCaseInstanceCallbacks();
+            if (caseInstanceCallbacks != null && caseInstanceCallbacks.containsKey(caseInstance.getCallbackType())) {
+                for (CaseInstanceCallback caseInstanceCallback : caseInstanceCallbacks.get(caseInstance.getCallbackType())) {
+                    caseInstanceCallback.stateChanged(caseInstance, oldState, newState);
+                }
+            }
+        }
+    }
+    
 }

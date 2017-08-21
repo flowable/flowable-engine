@@ -31,6 +31,8 @@ public class HistoricCaseInstanceEntityImpl extends AbstractEntity implements Hi
     protected Date startTime;
     protected Date endTime;
     protected String startUserId;
+    protected String callbackId;
+    protected String callbackType;
     protected String tenantId;
     
     public Object getPersistentState() {
@@ -43,6 +45,8 @@ public class HistoricCaseInstanceEntityImpl extends AbstractEntity implements Hi
         persistentState.put("startTime", startTime);
         persistentState.put("endTime", endTime);
         persistentState.put("startUserId", startUserId);
+        persistentState.put("callbackId", callbackId);
+        persistentState.put("callbackType", callbackType);
         persistentState.put("tenantId", tenantId);
         return persistentState;
     }
@@ -94,6 +98,18 @@ public class HistoricCaseInstanceEntityImpl extends AbstractEntity implements Hi
     }
     public void setStartUserId(String startUserId) {
         this.startUserId = startUserId;
+    }
+    public String getCallbackId() {
+        return callbackId;
+    }
+    public void setCallbackId(String callbackId) {
+        this.callbackId = callbackId;
+    }
+    public String getCallbackType() {
+        return callbackType;
+    }
+    public void setCallbackType(String callbackType) {
+        this.callbackType = callbackType;
     }
     public String getTenantId() {
         return tenantId;

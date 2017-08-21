@@ -38,6 +38,8 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
     HistoricCaseInstanceQuery finishedBefore(Date beforeTime);
     HistoricCaseInstanceQuery finishedAfter(Date afterTime);
     HistoricCaseInstanceQuery startedBy(String userId);
+    HistoricCaseInstanceQuery caseInstanceCallbackId(String callbackId);
+    HistoricCaseInstanceQuery caseInstanceCallbackType(String callbackType);
     HistoricCaseInstanceQuery caseInstanceTenantId(String tenantId);
     HistoricCaseInstanceQuery caseInstanceWithoutTenantId();
     

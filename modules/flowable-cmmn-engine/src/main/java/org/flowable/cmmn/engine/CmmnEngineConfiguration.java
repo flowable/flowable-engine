@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.cmmn.engine.impl.CmmnEngineImpl;
 import org.flowable.cmmn.engine.impl.CmmnHistoryServiceImpl;
@@ -26,6 +27,8 @@ import org.flowable.cmmn.engine.impl.ServiceImpl;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaFactory;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaSessionFactory;
 import org.flowable.cmmn.engine.impl.agenda.DefaultCmmnEngineAgendaFactory;
+import org.flowable.cmmn.engine.impl.callback.CaseInstanceCallback;
+import org.flowable.cmmn.engine.impl.callback.ChildCaseInstanceCallback;
 import org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.db.CmmnDbSchemaManager;
 import org.flowable.cmmn.engine.impl.db.EntityDependencyOrder;
@@ -145,6 +148,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     
     protected int caseDefinitionCacheLimit = -1;
     protected DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache;
+
+    protected Map<String, List<CaseInstanceCallback>> caseInstanceCallbacks;
     
     public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResourceDefault() {
         return createCmmnEngineConfigurationFromResource("flowable.cmmn.cfg.xml", "cmmnEngineConfiguration");
@@ -209,6 +214,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         initDeploymentManager();
         initCaseInstanceHelper();
         initHistoryManager();
+        initCaseInstanceCallbacks();
         initClock();
     }
     
@@ -406,6 +412,19 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         if (cmmnHistoryManager == null) {
             cmmnHistoryManager = new DefaultCmmnHistoryManager(this);
         }
+    }
+    
+    public void initCaseInstanceCallbacks() {
+        if (this.caseInstanceCallbacks == null) {
+            this.caseInstanceCallbacks = new HashMap<>();
+        }
+        initDefaultCaseInstanceCallbacks();
+    }
+    
+    protected void initDefaultCaseInstanceCallbacks() {
+        List<CaseInstanceCallback> childCaseInstanceCallbacks = new ArrayList<>(1);
+        childCaseInstanceCallbacks.add(new ChildCaseInstanceCallback());
+        this.caseInstanceCallbacks.put(CaseInstanceCallbackType.CHILD_CASE, childCaseInstanceCallbacks);
     }
     
     @Override
@@ -681,7 +700,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.cmmnHistoryManager = cmmnHistoryManager;
         return this;
     }
-
+    
     public boolean isEnableSafeCmmnXml() {
         return enableSafeCmmnXml;
     }
@@ -772,4 +791,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
+    public Map<String, List<CaseInstanceCallback>> getCaseInstanceCallbacks() {
+        return caseInstanceCallbacks;
+    }
+
+    public CmmnEngineConfiguration setCaseInstanceCallbacks(Map<String, List<CaseInstanceCallback>> caseInstanceCallbacks) {
+        this.caseInstanceCallbacks = caseInstanceCallbacks;
+        return this;
+    }
+    
 }

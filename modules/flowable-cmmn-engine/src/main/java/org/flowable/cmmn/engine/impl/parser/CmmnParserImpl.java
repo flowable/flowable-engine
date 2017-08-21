@@ -26,6 +26,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanFragment;
@@ -112,14 +113,18 @@ public class CmmnParserImpl implements CmmnParser {
                 Stage stage = (Stage) planItemDefinition;
                 planItem.setBehavior(activityBehaviorFactory.createStageActivityBehavoir(planItem, stage));
                 
-            } else if (planItemDefinition instanceof Task) {
-                Task task = (Task) planItemDefinition;
-                planItem.setBehavior(activityBehaviorFactory.createTaskActivityBehavior(planItem, task));
+            } else if (planItemDefinition instanceof CaseTask) {
+                CaseTask caseTask = (CaseTask) planItemDefinition;
+                planItem.setBehavior(activityBehaviorFactory.createCaseTaskActivityBehavior(planItem, caseTask));
                 
             } else if (planItemDefinition instanceof Milestone) {
                 Milestone milestone = (Milestone) planItemDefinition;
                 planItem.setBehavior(activityBehaviorFactory.createMilestoneActivityBehavior(planItem, milestone));
                 
+            } else if (planItemDefinition instanceof Task) {
+                Task task = (Task) planItemDefinition;
+                planItem.setBehavior(activityBehaviorFactory.createTaskActivityBehavior(planItem, task));
+            
             }
             
             if (planItemDefinition instanceof PlanFragment) {
