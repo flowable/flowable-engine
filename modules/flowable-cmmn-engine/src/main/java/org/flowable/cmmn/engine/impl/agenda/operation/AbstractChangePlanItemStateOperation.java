@@ -72,7 +72,7 @@ public abstract class AbstractChangePlanItemStateOperation extends AbstractPlanI
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
-        stringBuilder.append("[Change Planitem state] ");
+        stringBuilder.append("[Change PlanItem state] ");
         if (planItem != null) {
             if (planItem.getName() != null) {
             stringBuilder.append(planItem.getName());

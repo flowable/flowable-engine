@@ -111,7 +111,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                     && activeChildren == 0) {
                 
                 if (LOGGER.isDebugEnabled()) {
-                    LOGGER.debug("No active plan items found for stage " + stagePlanItemInstanceEntity.getElementId() +", planning stage completion");
+                    LOGGER.debug("No active plan items found for stage " + stagePlanItemInstanceEntity.getElementId() + ", planning stage completion");
                 }
                 CommandContextUtil.getAgenda(commandContext).planCompletePlanItem(stagePlanItemInstanceEntity);
             }

@@ -48,7 +48,7 @@ public class ActivatePlanItemOperation extends AbstractPlanItemInstanceOperation
     public String toString() {
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("[Activate Planitem] ");
+        stringBuilder.append("[Activate PlanItem] ");
         if (planItem.getName() != null) {
             stringBuilder.append(planItem.getName());
             stringBuilder.append(" (");

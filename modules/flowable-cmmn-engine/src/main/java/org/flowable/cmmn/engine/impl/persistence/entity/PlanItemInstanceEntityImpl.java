@@ -37,6 +37,8 @@ public class PlanItemInstanceEntityImpl extends AbstractEntity implements PlanIt
     protected String state;
     protected Date startTime;
     protected String startUserId;
+    protected String referenceId;
+    protected String referenceType;
     protected String tenantId;
     
     // Non-persisted
@@ -56,6 +58,8 @@ public class PlanItemInstanceEntityImpl extends AbstractEntity implements PlanIt
         persistentState.put("state", state);
         persistentState.put("startTime", startTime);
         persistentState.put("startUserId", startUserId);
+        persistentState.put("referenceId", referenceId);
+        persistentState.put("referenceType", referenceType);
         persistentState.put("tenantId", tenantId);
         return persistentState;
     }
@@ -122,6 +126,18 @@ public class PlanItemInstanceEntityImpl extends AbstractEntity implements PlanIt
     }
     public void setStartUserId(String startUserId) {
         this.startUserId = startUserId;
+    }
+    public String getReferenceId() {
+        return referenceId;
+    }
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
+    public String getReferenceType() {
+        return referenceType;
+    }
+    public void setReferenceType(String referenceType) {
+        this.referenceType = referenceType;
     }
     public String getTenantId() {
         return tenantId;

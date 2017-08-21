@@ -424,7 +424,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     protected void initDefaultCaseInstanceCallbacks() {
         List<CaseInstanceCallback> childCaseInstanceCallbacks = new ArrayList<>(1);
         childCaseInstanceCallbacks.add(new ChildCaseInstanceCallback());
-        this.caseInstanceCallbacks.put(CaseInstanceCallbackType.CHILD_CASE, childCaseInstanceCallbacks);
+        this.caseInstanceCallbacks.put(PlanItemInstanceCallbackType.CASE, childCaseInstanceCallbacks);
     }
     
     @Override

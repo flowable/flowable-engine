@@ -5,7 +5,8 @@
 <mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl">
 
     <insert id="insertPlanItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl">
-        insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, NAME_, STATE_, START_TIME_, START_USER_ID_, TENANT_ID_)
+        insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, NAME_, STATE_, 
+                                                         START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_)
         values (
             #{id ,jdbcType=VARCHAR},
             1,
@@ -18,12 +19,15 @@
             #{state ,jdbcType=VARCHAR},
             #{startTime ,jdbcType=TIMESTAMP},
             #{startUserId ,jdbcType=VARCHAR},
+            #{referenceId, jdbcType=VARCHAR},
+            #{referenceType, jdbcType=VARCHAR},
             #{tenantId ,jdbcType=VARCHAR}
         )
     </insert>
 	
   <insert id="bulkInsertPlanItemInstance" parameterType="java.util.List">
-    insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, NAME_, STATE_, START_TIME_, START_USER_ID_, TENANT_ID_) 
+    insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, NAME_, STATE_, 
+                                                     START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_) 
     values 
       <foreach collection="list" item="planItemInstance" index="index" separator=",">
         (
@@ -38,6 +42,8 @@
             #{planItemInstance.state ,jdbcType=VARCHAR},
             #{planItemInstance.startTime ,jdbcType=TIMESTAMP},
             #{planItemInstance.startUserId ,jdbcType=VARCHAR},
+            #{planItemInstance.referenceId, jdbcType=VARCHAR},
+            #{planItemInstance.referenceType, jdbcType=VARCHAR},
             #{planItemInstance.tenantId ,jdbcType=VARCHAR}
 		)
       </foreach>
@@ -46,7 +52,8 @@
     <insert id="bulkInsertPlanItemInstance" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
         <foreach collection="list" item="planItemInstance" index="index">
-            into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, NAME_, STATE_, START_TIME_, START_USER_ID_, TENANT_ID_) VALUES
+            into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, NAME_, STATE_, 
+                                                      START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_) VALUES
             (
                 #{planItemInstance.id ,jdbcType=VARCHAR},
                 1,
@@ -59,6 +66,8 @@
                 #{planItemInstance.state ,jdbcType=VARCHAR},
                 #{planItemInstance.startTime ,jdbcType=TIMESTAMP},
                 #{planItemInstance.startUserId ,jdbcType=VARCHAR},
+                #{planItemInstance.referenceId, jdbcType=VARCHAR},
+                #{planItemInstance.referenceType, jdbcType=VARCHAR},
                 #{planItemInstance.tenantId ,jdbcType=VARCHAR}
             )
         </foreach>
@@ -77,6 +86,8 @@
         STATE_ = #{state, jdbcType=VARCHAR},
         START_TIME_ = #{startTime, jdbcType=TIMESTAMP},
         START_USER_ID_ = #{startUserId, jdbcType=VARCHAR},
+        REFERENCE_ID_ = #{referenceId, jdbcType=VARCHAR},
+        REFERENCE_TYPE_ = #{referenceType, jdbcType=VARCHAR},
         TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
     where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
 </update>
@@ -101,6 +112,8 @@
     <result property="state" column="STATE_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
+    <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
+    <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
   </resultMap>
   
@@ -161,6 +174,12 @@
         </if>
         <if test="startUserId != null">
             and RES.START_USER_ID_ = #{startUserId}
+        </if>
+        <if test="referenceId != null">
+            and RES.REFERENCE_ID_ = #{referenceId}
+        </if>
+        <if test="referenceType != null">
+            and RES.REFERENCE_TYPE_ = #{referenceType}
         </if>
         <if test="tenantId != null">
             and RES.TENANT_ID_ = #{tenantId}

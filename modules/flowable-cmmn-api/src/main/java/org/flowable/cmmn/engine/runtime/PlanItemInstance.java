@@ -29,6 +29,8 @@ public interface PlanItemInstance {
     String getElementId();
     Date getStartTime();
     String getStartUserId();
+    String getReferenceId();
+    String getReferenceType();
     String getTenantId();
     
 }

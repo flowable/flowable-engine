@@ -134,4 +134,38 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         assertEquals(2, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }
     
+    @Test
+    @CmmnDeployment
+    public void testRuntimeServiceTriggerCasePlanItemInstance() {
+        cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        assertEquals(2, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertEquals(2, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .orderByName().asc()
+                .list();
+        assertEquals(3, planItemInstances.size());
+        assertEquals("Task One", planItemInstances.get(0).getName());
+        assertEquals("The Case", planItemInstances.get(1).getName());
+        assertEquals("The Task", planItemInstances.get(2).getName());
+        
+        // Triggering the planitem of the case should terminate the case and go to task two
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(1).getId());
+        
+        assertEquals(1, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .orderByName().asc()
+                .list();
+        assertEquals(2, planItemInstances.size());
+        assertEquals("Task One", planItemInstances.get(0).getName());
+        assertEquals("Task Two", planItemInstances.get(1).getName());
+    }
+    
+    
 }
