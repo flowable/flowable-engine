@@ -12,6 +12,10 @@
  */
 package org.flowable.app.conf;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.flowable.app.security.DefaultPrivileges;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Privilege;
@@ -83,17 +87,34 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
     }
 
     protected void initializeDefaultPrivileges(String adminId) {
-        Privilege idmAppPrivilege = identityService.createPrivilege(DefaultPrivileges.ACCESS_IDM);
+        List<Privilege> privileges = identityService.createPrivilegeQuery().list();
+        Map<String, Privilege> privilegeMap = new HashMap<>();
+        for (Privilege privilege : privileges) {
+            privilegeMap.put(privilege.getName(), privilege);
+        }
+        
+        Privilege idmAppPrivilege = findOrCreatePrivilege(DefaultPrivileges.ACCESS_IDM, privilegeMap);
         identityService.addUserPrivilegeMapping(idmAppPrivilege.getId(), adminId);
 
-        Privilege adminAppPrivilege = identityService.createPrivilege(DefaultPrivileges.ACCESS_ADMIN);
+        Privilege adminAppPrivilege = findOrCreatePrivilege(DefaultPrivileges.ACCESS_ADMIN, privilegeMap);
         identityService.addUserPrivilegeMapping(adminAppPrivilege.getId(), adminId);
 
-        Privilege modelerAppPrivilege = identityService.createPrivilege(DefaultPrivileges.ACCESS_MODELER);
+        Privilege modelerAppPrivilege = findOrCreatePrivilege(DefaultPrivileges.ACCESS_MODELER, privilegeMap);
         identityService.addUserPrivilegeMapping(modelerAppPrivilege.getId(), adminId);
 
-        Privilege taskAppPrivilege = identityService.createPrivilege(DefaultPrivileges.ACCESS_TASK);
+        Privilege taskAppPrivilege = findOrCreatePrivilege(DefaultPrivileges.ACCESS_TASK, privilegeMap);
         identityService.addUserPrivilegeMapping(taskAppPrivilege.getId(), adminId);
+    }
+    
+    protected Privilege findOrCreatePrivilege(String privilegeId, Map<String, Privilege> privilegeMap) {
+        Privilege privilege = null;
+        if (privilegeMap.containsKey(privilegeId)) {
+            privilege = privilegeMap.get(privilegeId);
+        } else {
+            privilege = identityService.createPrivilege(privilegeId);
+        }
+        
+        return privilege;
     }
 
 }

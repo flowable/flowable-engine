@@ -147,7 +147,9 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
             } else if (xtr.isEndElement()) {
                 if (ELEMENT_EXTENSIONS.equals(xtr.getLocalName())) {
                     inExtensionElements = false;
-                } else if (elementName.equalsIgnoreCase(xtr.getLocalName())) {
+                }
+                
+                if (elementName.equalsIgnoreCase(xtr.getLocalName())) {
                     readyWithChildElements = true;
                 }
             }
