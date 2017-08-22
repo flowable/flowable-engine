@@ -97,7 +97,7 @@
   
   <sql id="selectUserByQueryCriteriaSql">
     from ${prefix}ACT_ID_USER RES 
-    <if test="groupId != null">
+    <if test="groupId != null || (groupIds != null &amp;&amp; groupIds.size() &gt; 0) ">
       inner join ${prefix}ACT_ID_MEMBERSHIP M on RES.ID_ = M.USER_ID_
       inner join ${prefix}ACT_ID_GROUP G on M.GROUP_ID_ = G.ID_
     </if>
