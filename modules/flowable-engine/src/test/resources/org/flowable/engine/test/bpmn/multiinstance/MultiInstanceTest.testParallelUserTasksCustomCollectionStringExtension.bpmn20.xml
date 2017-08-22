@@ -8,7 +8,6 @@
   <process id="miParallelUserTasksCollection">
   
     <startEvent id="theStart" />
-    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="miTasks" />
     
     <userTask id="miTasks" name="My Task ${loopCounter}" flowable:candidateUsers="${participant}">
       <multiInstanceLoopCharacteristics isSequential="false" flowable:elementVariable="participant">
@@ -35,6 +34,7 @@
       </multiInstanceLoopCharacteristics>
     </userTask>
     
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="miTasks" />
     <sequenceFlow id="flow3" sourceRef="miTasks" targetRef="theEnd" />
     <endEvent id="theEnd" />
     
