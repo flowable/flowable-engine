@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.repository;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipInputStream;
@@ -143,6 +145,9 @@ public class DeploymentCollectionResource {
             throw new FlowableIllegalArgumentException("Multipart request is required");
         }
 
+        String queryString = request.getQueryString();
+        Map<String, String> decodedQueryStrings = splitQueryString(queryString);
+
         MultipartHttpServletRequest multipartRequest = (MultipartHttpServletRequest) request;
 
         if (multipartRequest.getFileMap().size() == 0) {
@@ -167,7 +172,7 @@ public class DeploymentCollectionResource {
                 throw new FlowableIllegalArgumentException("File must be of type .bpmn20.xml, .bpmn, .bar or .zip");
             }
 
-            if (StringUtils.isEmpty(deploymentName)) {
+            if (!decodedQueryStrings.containsKey("deploymentName") || StringUtils.isEmpty(decodedQueryStrings.get("deploymentName"))) {
                 String fileNameWithoutExtension = fileName.split("\\.")[0];
 
                 if (StringUtils.isNotEmpty(fileNameWithoutExtension)) {
@@ -176,11 +181,11 @@ public class DeploymentCollectionResource {
 
                 deploymentBuilder.name(fileName);
             } else {
-                deploymentBuilder.name(deploymentName);
+                deploymentBuilder.name(decodedQueryStrings.get("deploymentName"));
             }
 
-            if (deploymentKey != null) {
-                deploymentBuilder.key(deploymentKey);
+            if (decodedQueryStrings.containsKey("deploymentKey") || StringUtils.isNotEmpty(decodedQueryStrings.get("deploymentKey"))) {
+                deploymentBuilder.key(decodedQueryStrings.get("deploymentKey"));
             }
 
             if (tenantId != null) {
@@ -199,5 +204,24 @@ public class DeploymentCollectionResource {
             }
             throw new FlowableException(e.getMessage(), e);
         }
+    }
+
+    public Map splitQueryString(String queryString) {
+        Map<String, String> queryMap = new HashMap<>();
+        for (String param : queryString.split("&")) {
+            queryMap.put(StringUtils.substringBefore(param, "="), decode(StringUtils.substringAfter(param, "=")));
+        }
+        return queryMap;
+    }
+
+    protected String decode(String string) {
+        if (string != null) {
+            try {
+                return URLDecoder.decode(string, "UTF-8");
+            } catch (UnsupportedEncodingException uee) {
+                throw new IllegalStateException("JVM does not support UTF-8 encoding.", uee);
+            }
+        }
+        return null;
     }
 }

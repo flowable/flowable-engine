@@ -66,7 +66,7 @@ flowableApp
         // .registerAvailableLanguageKeys(['en'], {
         //     'en-*': 'en'
         // })
-        .useSanitizeValueStrategy('sanitizeParameters')
+        .useSanitizeValueStrategy('escapeParameters')
         .uniformLanguageTag('bcp47')
         .determinePreferredLanguage();
     }])
