@@ -25,20 +25,20 @@ import org.flowable.engine.impl.util.json.JSONObject;
  */
 public class JSONCollectionHandler implements FlowableCollectionHandler {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	@Override
-	@SuppressWarnings("rawtypes")
-	public Collection resolveCollection(Object collectionValue, DelegateExecution execution) {
-    	JSONArray jsonArray = new JSONArray((String) collectionValue);
-    	ArrayList<String> collection = new ArrayList<String>();
-    	JSONObject jsonObj = null;
+    @Override
+    @SuppressWarnings("rawtypes")
+    public Collection resolveCollection(Object collectionValue, DelegateExecution execution) {
+        JSONArray jsonArray = new JSONArray((String) collectionValue);
+        ArrayList<String> collection = new ArrayList<>();
+        JSONObject jsonObj = null;
 
-    	for (int i=0; i < jsonArray.length(); i++) {
-    		jsonObj = jsonArray.getJSONObject(i);
-    		collection.add(jsonObj.getString("principal"));
-    	}
+        for (int i = 0; i < jsonArray.length(); i++) {
+            jsonObj = jsonArray.getJSONObject(i);
+            collection.add(jsonObj.getString("principal"));
+        }
 
-		return collection;
-	}
+        return collection;
+    }
 }

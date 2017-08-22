@@ -25,7 +25,7 @@ import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 
 /**
  * Abstract superclass for all native query types.
- * 
+ *
  * @author Bernd Ruecker (camunda)
  */
 public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> extends BaseNativeQuery<T, U> implements Command<Object> {
@@ -113,10 +113,9 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> extend
 
     /**
      * Executes the actual query to retrieve the list of results.
-     * 
-     * @param maxResults
-     * @param firstResult
      *
+     * @param commandContext
+     * @param parameterMap
      */
     public abstract List<U> executeList(CommandContext commandContext, Map<String, Object> parameterMap);
 

@@ -23,7 +23,7 @@ import org.flowable.variable.service.delegate.VariableScope;
 
 /**
  * {@link EntityManager} responsible for {@link TimerJobEntity} instances.
- * 
+ *
  * @author Tijs Rademakers
  * @author Vasile Dirla
  */
@@ -42,7 +42,7 @@ public interface TimerJobEntityManager extends EntityManager<TimerJobEntity> {
 
     /**
      * Returns the {@link TimerJobEntity} for a given process definition.
-     * 
+     * <p>
      * This is for example used when deleting a process definition: it finds the {@link TimerJobEntity} representing the timer start events.
      */
     List<TimerJobEntity> findJobsByTypeAndProcessDefinitionId(String type, String processDefinitionId);
@@ -73,13 +73,13 @@ public interface TimerJobEntityManager extends EntityManager<TimerJobEntity> {
     List<Job> findJobsByQueryCriteria(TimerJobQueryImpl jobQuery);
 
     /**
-     * Same as {@link #findJobsByQueryCriteria(TimerJobQueryImpl, Page)}, but only returns a count and not the instances itself.
+     * Same as {@link #findJobsByQueryCriteria(TimerJobQueryImpl)}, but only returns a count and not the instances itself.
      */
     long findJobCountByQueryCriteria(TimerJobQueryImpl jobQuery);
 
     /**
      * Creates a new {@link TimerJobEntity}, typically when a timer is used in a repeating way. The returns {@link TimerJobEntity} is not yet inserted.
-     * 
+     * <p>
      * Returns null if the timer has finished its repetitions.
      */
     TimerJobEntity createAndCalculateNextTimer(JobEntity timerEntity, VariableScope variableScope);

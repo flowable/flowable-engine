@@ -107,9 +107,9 @@ public class PermissionService {
     }
 
     private List<String> getGroupIdsForUser(User user) {
-        List<String> groupIds = new ArrayList<String>();
+        List<String> groupIds = new ArrayList<>();
         RemoteUser remoteUser = (RemoteUser) user;
-        
+
         for (Group group : remoteUser.getGroups()) {
             groupIds.add(String.valueOf(group.getId()));
         }
@@ -258,7 +258,7 @@ public class PermissionService {
 
         List<String> groupsIds = getGroupIdsForUser(user);
 
-        for (String startGroupId: startGroupIds) {
+        for (String startGroupId : startGroupIds) {
             if (groupsIds.contains(startGroupId)) {
                 return true;
             }
@@ -269,7 +269,7 @@ public class PermissionService {
 
     protected List<String> getPotentialStarterGroupIds(List<IdentityLink> identityLinks) {
         List<String> groupIds = new ArrayList<>();
-        
+
         for (IdentityLink identityLink : identityLinks) {
             if (identityLink.getGroupId() != null && identityLink.getGroupId().length() > 0) {
 
