@@ -41,6 +41,7 @@ import org.flowable.cmmn.model.HasExitCriteria;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
 import org.flowable.cmmn.model.Stage;
@@ -73,12 +74,14 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new StageXmlConverter());
         addElementConverter(new MilestoneXmlConverter());
         addElementConverter(new TaskXmlConverter());
-        addElementConverter(new CaseTaskXmlConverter());
         addElementConverter(new PlanItemXmlConverter());
         addElementConverter(new SentryXmlConverter());
         addElementConverter(new EntryCriterionXmlConverter());
         addElementConverter(new ExitCriterionXmlConverter());
         addElementConverter(new PlanItemOnPartXmlConverter());
+        addElementConverter(new CaseTaskXmlConverter());
+        addElementConverter(new ProcessXmlConverter());
+        addElementConverter(new ProcessTaskXmlConverter());
         
         addTextConverter(new StandardEventXmlConverter());
     }
@@ -296,6 +299,17 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             
             if (planItemDefinition instanceof PlanFragment) {
               processPlanFragment(cmmnModel, (PlanFragment)planItemDefinition );
+                
+            } else if (planItemDefinition instanceof ProcessTask) {
+                ProcessTask processTask = (ProcessTask) planItemDefinition;
+                if (processTask.getProcessRef() != null) {
+                    org.flowable.cmmn.model.Process process = cmmnModel.getProcessById(processTask.getProcessRef());
+                    if (process == null) {
+                        throw new FlowableException("Could not find process element for reference " + processTask.getProcessRef());
+                    } else {
+                        processTask.setProcess(process);
+                    }
+                }
                 
             }
             

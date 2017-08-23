@@ -10,15 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.impl.callback;
-
-import org.flowable.cmmn.engine.runtime.CaseInstance;
+package org.flowable.cmmn.engine.impl.delegate;
 
 /**
  * @author Joram Barrez
  */
-public interface CaseInstanceCallback {
-    
-    void stateChanged(CaseInstance caseInstance, String oldState, String newState);
+public class DefaultCmmnClassDelegateFactory implements CmmnClassDelegateFactory {
+
+    @Override
+    public CmmnClassDelegate create(String className) {
+        return new CmmnClassDelegate(className);
+    }
 
 }

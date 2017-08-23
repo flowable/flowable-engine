@@ -29,6 +29,7 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.history.DeleteReason;
@@ -38,9 +39,11 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.data.ExecutionDataManager;
+import org.flowable.engine.impl.runtime.callback.ProcessInstanceState;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.IdentityLinkUtil;
+import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
@@ -470,6 +473,18 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         if (cancel) {
             dispatchActivityCancelled(executionEntity, cancelActivity != null ? cancelActivity : executionEntity.getCurrentFlowElement());
         }
+        
+        if (executionEntity.isProcessInstanceType() && executionEntity.getCallbackId() != null) {
+            CommandContext commandContext = CommandContextUtil.getCommandContext();
+            ProcessInstanceHelper processInstanceHelper = CommandContextUtil.getProcessInstanceHelper(commandContext);
+            if (cancel) {
+                processInstanceHelper.callCaseInstanceStateChangeCallbacks(commandContext, executionEntity,
+                        ProcessInstanceState.RUNNING, ProcessInstanceState.CANCELLED);
+            } else {
+                processInstanceHelper.callCaseInstanceStateChangeCallbacks(commandContext, executionEntity,
+                        ProcessInstanceState.RUNNING, ProcessInstanceState.COMPLETED);
+            }
+        }
     }
 
     @Override
@@ -479,7 +494,11 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
 
     @Override
     public void deleteProcessInstanceExecutionEntity(String processInstanceId,
-                                                     String currentFlowElementId, String deleteReason, boolean cascade, boolean cancel, boolean fireEvents) {
+                                                     String currentFlowElementId, 
+                                                     String deleteReason, 
+                                                     boolean cascade, 
+                                                     boolean cancel, 
+                                                     boolean fireEvents) {
 
         ExecutionEntity processInstanceEntity = findById(processInstanceId);
 

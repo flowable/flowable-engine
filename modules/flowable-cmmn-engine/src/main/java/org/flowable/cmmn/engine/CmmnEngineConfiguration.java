@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -27,11 +28,12 @@ import org.flowable.cmmn.engine.impl.ServiceImpl;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaFactory;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaSessionFactory;
 import org.flowable.cmmn.engine.impl.agenda.DefaultCmmnEngineAgendaFactory;
-import org.flowable.cmmn.engine.impl.callback.CaseInstanceCallback;
-import org.flowable.cmmn.engine.impl.callback.ChildCaseInstanceCallback;
+import org.flowable.cmmn.engine.impl.callback.ChildCaseInstanceStateChangeCallback;
 import org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.db.CmmnDbSchemaManager;
 import org.flowable.cmmn.engine.impl.db.EntityDependencyOrder;
+import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegateFactory;
+import org.flowable.cmmn.engine.impl.delegate.DefaultCmmnClassDelegateFactory;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.deployer.Deployer;
@@ -81,10 +83,12 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisResourc
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisSentryOnPartInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.TableDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
+import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelperImpl;
 import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
 import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
@@ -139,6 +143,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     
     protected boolean enableSafeCmmnXml;
     protected CmmnActivityBehaviorFactory activityBehaviorFactory;
+    protected CmmnClassDelegateFactory classDelegateFactory;
     protected CmmnParser cmmnParser;
     protected CmmnDeployer cmmnDeployer;
     protected List<Deployer> customPreDeployers;
@@ -149,7 +154,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     protected int caseDefinitionCacheLimit = -1;
     protected DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache;
 
-    protected Map<String, List<CaseInstanceCallback>> caseInstanceCallbacks;
+    protected ProcessInstanceService processInstanceService;
+    protected Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks;
     
     public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResourceDefault() {
         return createCmmnEngineConfigurationFromResource("flowable.cmmn.cfg.xml", "cmmnEngineConfiguration");
@@ -208,6 +214,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         initServices();
         initDataManagers();
         initEntityManagers();
+        initClassDelegateFactory();
         initActivityBehaviorFactory();
         initDeployers();
         initCaseDefinitionCache();
@@ -248,11 +255,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
                 initDbSqlSessionFactory();
             }
             
-            addSessionFactory(new CmmnEngineAgendaSessionFactory(cmmnEngineAgendaFactory));
-
             addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
             commandContextFactory.setSessionFactories(sessionFactories);
         }
+        
+        addSessionFactory(new CmmnEngineAgendaSessionFactory(cmmnEngineAgendaFactory));
 
         if (customSessionFactories != null) {
             for (SessionFactory sessionFactory : customSessionFactories) {
@@ -338,9 +345,17 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         }
     }
     
+    protected void initClassDelegateFactory() {
+        if (classDelegateFactory == null) {
+            classDelegateFactory = new DefaultCmmnClassDelegateFactory();
+        }
+    }
+    
     protected void initActivityBehaviorFactory() {
         if (activityBehaviorFactory == null) {
-            activityBehaviorFactory = new DefaultCmmnActivityBehaviorFactory();
+            DefaultCmmnActivityBehaviorFactory defaultCmmnActivityBehaviorFactory = new DefaultCmmnActivityBehaviorFactory();
+            defaultCmmnActivityBehaviorFactory.setClassDelegateFactory(classDelegateFactory);
+            activityBehaviorFactory = defaultCmmnActivityBehaviorFactory;
         }
     }
     
@@ -415,16 +430,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     }
     
     public void initCaseInstanceCallbacks() {
-        if (this.caseInstanceCallbacks == null) {
-            this.caseInstanceCallbacks = new HashMap<>();
+        if (this.caseInstanceStateChangeCallbacks == null) {
+            this.caseInstanceStateChangeCallbacks = new HashMap<>();
         }
         initDefaultCaseInstanceCallbacks();
     }
     
     protected void initDefaultCaseInstanceCallbacks() {
-        List<CaseInstanceCallback> childCaseInstanceCallbacks = new ArrayList<>(1);
-        childCaseInstanceCallbacks.add(new ChildCaseInstanceCallback());
-        this.caseInstanceCallbacks.put(PlanItemInstanceCallbackType.CASE, childCaseInstanceCallbacks);
+        this.caseInstanceStateChangeCallbacks.put(PlanItemInstanceCallbackType.CHILD_CASE, 
+                Arrays.<RuntimeInstanceStateChangeCallback>asList(new ChildCaseInstanceStateChangeCallback()));
     }
     
     @Override
@@ -772,6 +786,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.activityBehaviorFactory = activityBehaviorFactory;
         return this;
     }
+    
+    public CmmnClassDelegateFactory getClassDelegateFactory() {
+        return classDelegateFactory;
+    }
+
+    public CmmnEngineConfiguration setClassDelegateFactory(CmmnClassDelegateFactory classDelegateFactory) {
+        this.classDelegateFactory = classDelegateFactory;
+        return this;
+    }
 
     public int getCaseDefinitionCacheLimit() {
         return caseDefinitionCacheLimit;
@@ -790,13 +813,22 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.caseDefinitionCache = caseDefinitionCache;
         return this;
     }
-
-    public Map<String, List<CaseInstanceCallback>> getCaseInstanceCallbacks() {
-        return caseInstanceCallbacks;
+    
+    public ProcessInstanceService getProcessInstanceService() {
+        return processInstanceService;
     }
 
-    public CmmnEngineConfiguration setCaseInstanceCallbacks(Map<String, List<CaseInstanceCallback>> caseInstanceCallbacks) {
-        this.caseInstanceCallbacks = caseInstanceCallbacks;
+    public CmmnEngineConfiguration setProcessInstanceService(ProcessInstanceService processInstanceService) {
+        this.processInstanceService = processInstanceService;
+        return this;
+    }
+
+    public Map<String, List<RuntimeInstanceStateChangeCallback>> getCaseInstanceStateChangeCallbacks() {
+        return caseInstanceStateChangeCallbacks;
+    }
+
+    public CmmnEngineConfiguration setCaseInstanceStateChangeCallbacks(Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks) {
+        this.caseInstanceStateChangeCallbacks = caseInstanceStateChangeCallbacks;
         return this;
     }
     

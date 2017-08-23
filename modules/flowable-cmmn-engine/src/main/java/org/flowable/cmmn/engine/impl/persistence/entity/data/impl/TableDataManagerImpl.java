@@ -55,7 +55,7 @@ public class TableDataManagerImpl implements TableDataManager {
     public Map<String, Long> getTableCount() {
         Map<String, Long> counts = new HashMap<>();
         for (String table : getTablesPresentInDatabase()) {
-            counts.put(table, (Long) CommandContextUtil.getDbSqlSession().selectOne("selectTableCount", table));
+            counts.put(table, (Long) CommandContextUtil.getDbSqlSession().selectOne("org.flowable.cmmn.engine.impl.TableData.selectTableCount", table));
         }
         return counts;
     }

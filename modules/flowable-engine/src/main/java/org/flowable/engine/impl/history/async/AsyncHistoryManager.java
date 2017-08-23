@@ -69,6 +69,8 @@ public class AsyncHistoryManager extends AbstractHistoryManager {
             putIfNotNull(data, HistoryJsonConstants.START_USER_ID, processInstance.getStartUserId());
             putIfNotNull(data, HistoryJsonConstants.START_ACTIVITY_ID, processInstance.getStartActivityId());
             putIfNotNull(data, HistoryJsonConstants.SUPER_PROCESS_INSTANCE_ID, processInstance.getSuperExecution() != null ? processInstance.getSuperExecution().getProcessInstanceId() : null);
+            putIfNotNull(data, HistoryJsonConstants.CALLBACK_ID, processInstance.getCallbackId());
+            putIfNotNull(data, HistoryJsonConstants.CALLBACK_TYPE, processInstance.getCallbackType());
             putIfNotNull(data, HistoryJsonConstants.TENANT_ID, processInstance.getTenantId());
 
             getAsyncHistorySession().addHistoricData(HistoryJsonConstants.TYPE_PROCESS_INSTANCE_START, data, processInstance.getTenantId());

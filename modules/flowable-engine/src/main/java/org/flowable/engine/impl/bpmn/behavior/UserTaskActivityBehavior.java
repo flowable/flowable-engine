@@ -25,6 +25,7 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.impl.calendar.BusinessCalendar;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
@@ -62,7 +63,8 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
     }
 
     public void execute(DelegateExecution execution) {
-        TaskService taskService = CommandContextUtil.getTaskService();
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+        TaskService taskService = CommandContextUtil.getTaskService(commandContext);
 
         TaskEntity task = taskService.createTask();
         task.setExecutionId(execution.getId());
@@ -80,10 +82,10 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
         List<String> activeTaskCandidateUsers = null;
         List<String> activeTaskCandidateGroups = null;
 
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
 
-        if (CommandContextUtil.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
+        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).isEnableProcessDefinitionInfoCache()) {
             ObjectNode taskElementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(userTask.getId(), execution.getProcessDefinitionId());
             activeTaskName = getActiveValue(userTask.getName(), DynamicBpmnConstants.USER_TASK_NAME, taskElementProperties);
             activeTaskDescription = getActiveValue(userTask.getDocumentation(), DynamicBpmnConstants.USER_TASK_DESCRIPTION, taskElementProperties);
@@ -146,7 +148,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                         businessCalendarName = DueDateBusinessCalendar.NAME;
                     }
 
-                    BusinessCalendar businessCalendar = CommandContextUtil.getProcessEngineConfiguration().getBusinessCalendarManager()
+                    BusinessCalendar businessCalendar = CommandContextUtil.getProcessEngineConfiguration(commandContext).getBusinessCalendarManager()
                             .getBusinessCalendar(businessCalendarName);
                     task.setDueDate(businessCalendar.resolveDuedate((String) dueDate));
 
@@ -212,8 +214,8 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_CREATE);
 
             // All properties set, now firing 'create' events
-            if (CommandContextUtil.getTaskServiceConfiguration().getEventDispatcher().isEnabled()) {
-                CommandContextUtil.getTaskServiceConfiguration().getEventDispatcher().dispatchEvent(
+            if (CommandContextUtil.getTaskServiceConfiguration(commandContext).getEventDispatcher().isEnabled()) {
+                CommandContextUtil.getTaskServiceConfiguration(commandContext).getEventDispatcher().dispatchEvent(
                         FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
             }
             

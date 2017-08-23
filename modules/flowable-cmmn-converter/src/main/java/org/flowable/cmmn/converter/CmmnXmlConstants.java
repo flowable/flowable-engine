@@ -34,12 +34,17 @@ public interface CmmnXmlConstants {
     String ELEMENT_MILESTONE = "milestone";
     String ELEMENT_TASK = "task";
     String ELEMENT_CASE_TASK = "caseTask";
+    String ELEMENT_PROCESS_TASK = "processTask";
     String ELEMENT_PLAN_ITEM = "planItem";
     String ELEMENT_SENTRY = "sentry";
     String ELEMENT_PLAN_ITEM_ON_PART = "planItemOnPart";
     String ELEMENT_STANDARD_EVENT = "standardEvent";
     String ELEMENT_ENTRY_CRITERION = "entryCriterion";
     String ELEMENT_EXIT_CRITERION = "exitCriterion";
+    
+    String ELEMENT_PROCESS = "process";
+    String ATTRIBUTE_IMPLEMENTATION_TYPE = "implementationType";
+    String ATTRIBUTE_EXTERNAL_REF = "externalRef";
     
     String ATTRIBUTE_ID = "id";
     String ATTRIBUTE_NAME = "name";
@@ -50,5 +55,9 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_IS_BLOCKING = "isBlocking";
     
     String ATTRIBUTE_CASE_REF = "caseRef";
+    String ATTRIBUTE_PROCESS_REF = "processRef";
+    String ATTRIBUTE_PROCESS_REF_EXPRESSION = "processRefExpression";
+    
+    String ATTRIBUTE_CLASS = "class";
     
 }

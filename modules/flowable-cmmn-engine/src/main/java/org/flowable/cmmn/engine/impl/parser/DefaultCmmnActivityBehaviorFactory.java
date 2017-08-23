@@ -15,11 +15,15 @@ package org.flowable.cmmn.engine.impl.parser;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.behavior.CaseTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.MilestoneActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.ProcessTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.StageActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.TaskActivityBehavior;
+import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegate;
+import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegateFactory;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
 
@@ -27,6 +31,8 @@ import org.flowable.cmmn.model.Task;
  * @author Joram Barrez
  */
 public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorFactory {
+    
+    protected CmmnClassDelegateFactory classDelegateFactory;
 
     @Override
     public StageActivityBehavior createStageActivityBehavoir(PlanItem planItem, Stage stage) {
@@ -53,5 +59,23 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     public CaseTaskActivityBehavior createCaseTaskActivityBehavior(PlanItem planItem, CaseTask caseTask) {
         return new CaseTaskActivityBehavior(caseTask.getCaseRef(), caseTask.isBlocking());
     }
+    
+    @Override
+    public ProcessTaskActivityBehavior createProcessTaskActivityBehavior(PlanItem planItem, ProcessTask processTask) {
+        return new ProcessTaskActivityBehavior(processTask.getProcess(), processTask.isBlocking());
+    }
+    
+    @Override
+    public CmmnClassDelegate createCmmnClassDelegate(PlanItem planItem, Task task) {
+        return classDelegateFactory.create(task.getClassName());
+    }
 
+    public CmmnClassDelegateFactory getClassDelegateFactory() {
+        return classDelegateFactory;
+    }
+
+    public void setClassDelegateFactory(CmmnClassDelegateFactory classDelegateFactory) {
+        this.classDelegateFactory = classDelegateFactory;
+    }
+    
 }

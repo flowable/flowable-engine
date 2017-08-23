@@ -71,6 +71,8 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     protected String name;
     protected String nameLike;
     protected String nameLikeIgnoreCase;
+    protected String callbackId;
+    protected String callbackType;
     protected String locale;
     protected boolean withLocalizationFallback;
 
@@ -423,6 +425,26 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
             this.currentOrQueryObject.nameLikeIgnoreCase = nameLikeIgnoreCase.toLowerCase();
         } else {
             this.nameLikeIgnoreCase = nameLikeIgnoreCase.toLowerCase();
+        }
+        return this;
+    }
+    
+    @Override
+    public ProcessInstanceQuery processInstanceCallbackId(String callbackId) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.callbackId = callbackId;
+        } else {
+            this.callbackId = callbackId;
+        }
+        return this;
+    }
+    
+    @Override
+    public ProcessInstanceQuery processInstanceCallbackType(String callbackType) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.callbackType = callbackType;
+        } else {
+            this.callbackType = callbackType;
         }
         return this;
     }
@@ -829,6 +851,14 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     public String getNameLikeIgnoreCase() {
         return nameLikeIgnoreCase;
+    }
+    
+    public String getCallbackId() {
+        return callbackId;
+    }
+
+    public String getCallbackType() {
+        return callbackType;
     }
 
     public List<ProcessInstanceQueryImpl> getOrQueryObjects() {

@@ -45,6 +45,8 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
     protected String businessKey;
     protected String tenantId;
     protected String processInstanceName;
+    protected String callbackId;
+    protected String callbackType;
     protected ProcessInstanceHelper processInstanceHelper;
 
     public StartProcessInstanceCmd(String processDefinitionKey, String processDefinitionId, String businessKey, Map<String, Object> variables) {
@@ -67,6 +69,8 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
                 processInstanceBuilder.getTenantId());
         this.processInstanceName = processInstanceBuilder.getProcessInstanceName();
         this.transientVariables = processInstanceBuilder.getTransientVariables();
+        this.callbackId = processInstanceBuilder.getCallbackId();
+        this.callbackType = processInstanceBuilder.getCallbackType();
     }
 
     public ProcessInstance execute(CommandContext commandContext) {
@@ -100,14 +104,27 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         }
 
         processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
-        ProcessInstance processInstance = createAndStartProcessInstance(processDefinition, businessKey, processInstanceName, variables, transientVariables);
+        ProcessInstance processInstance = createAndStartProcessInstance(processDefinition, businessKey, processInstanceName, 
+                variables, transientVariables, callbackId, callbackType);
 
         return processInstance;
     }
 
-    protected ProcessInstance createAndStartProcessInstance(ProcessDefinition processDefinition, String businessKey, String processInstanceName,
-            Map<String, Object> variables, Map<String, Object> transientVariables) {
-        return processInstanceHelper.createAndStartProcessInstance(processDefinition, businessKey, processInstanceName, variables, transientVariables);
+    protected ProcessInstance createAndStartProcessInstance(ProcessDefinition processDefinition, 
+                                                            String businessKey, 
+                                                            String processInstanceName,
+                                                            Map<String, Object> variables, 
+                                                            Map<String, Object> transientVariables,
+                                                            String callbackId,
+                                                            String callbackType) {
+        return processInstanceHelper.createProcessInstance(processDefinition, 
+                                                                   businessKey, 
+                                                                   processInstanceName, 
+                                                                   variables, 
+                                                                   transientVariables,
+                                                                   callbackId,
+                                                                   callbackType,
+                                                                   true);
     }
 
     protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {

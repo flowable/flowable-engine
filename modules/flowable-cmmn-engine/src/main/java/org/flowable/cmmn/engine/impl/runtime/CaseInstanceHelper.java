@@ -25,6 +25,6 @@ public interface CaseInstanceHelper {
     
     CaseInstanceEntity startCaseInstanceByKey(CommandContext commandContext, String caseDefinitionKey);
     
-    void callCaseInstanceCallbacks(CommandContext commandContext, CaseInstance caseInstance, String oldState, String newState);
+    void callCaseInstanceStateChangeCallbacks(CommandContext commandContext, CaseInstance caseInstance, String oldState, String newState);
     
 }

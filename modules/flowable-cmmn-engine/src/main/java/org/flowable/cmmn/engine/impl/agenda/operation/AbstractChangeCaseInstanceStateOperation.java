@@ -43,7 +43,7 @@ public abstract class AbstractChangeCaseInstanceStateOperation extends AbstractC
         caseInstanceEntity.setState(newState);
         
         deleteCaseInstanceRuntimeData();
-        CommandContextUtil.getCaseInstanceHelper(commandContext).callCaseInstanceCallbacks(commandContext, caseInstanceEntity, previousState, newState);
+        CommandContextUtil.getCaseInstanceHelper(commandContext).callCaseInstanceStateChangeCallbacks(commandContext, caseInstanceEntity, previousState, newState);
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordCaseInstanceEnd(caseInstanceEntityId);
     }
     

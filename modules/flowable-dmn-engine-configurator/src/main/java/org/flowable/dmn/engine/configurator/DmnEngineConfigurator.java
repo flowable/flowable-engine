@@ -58,7 +58,7 @@ public class DmnEngineConfigurator extends AbstractEngineConfigurator {
             dmnEngineConfiguration = new StandaloneInMemDmnEngineConfiguration();
         }
         
-        initialiseCommonProperties(processEngineConfiguration, dmnEngineConfiguration, EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
+        initialiseCommonProperties(processEngineConfiguration, dmnEngineConfiguration);
 
         initDmnEngine();
     }

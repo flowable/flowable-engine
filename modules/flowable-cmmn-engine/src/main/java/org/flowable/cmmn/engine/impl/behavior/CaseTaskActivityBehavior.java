@@ -43,11 +43,11 @@ public class CaseTaskActivityBehavior extends TaskActivityBehavior {
         caseInstanceEntity.setParentId(planItemInstance.getCaseInstanceId());
         
         // Bidirectional storing of reference to avoid queries later on
+        caseInstanceEntity.setCallbackType(PlanItemInstanceCallbackType.CHILD_CASE);
         caseInstanceEntity.setCallbackId(planItemInstance.getId());
-        caseInstanceEntity.setCallbackType(PlanItemInstanceCallbackType.CASE);
         
+        planItemInstance.setReferenceType(PlanItemInstanceCallbackType.CHILD_CASE);
         planItemInstance.setReferenceId(caseInstanceEntity.getId());
-        planItemInstance.setReferenceType(PlanItemInstanceCallbackType.CASE);
         
         if (!isBlocking) {
             CommandContextUtil.getAgenda(commandContext).planCompletePlanItem((PlanItemInstanceEntity) planItemInstance);
@@ -64,7 +64,7 @@ public class CaseTaskActivityBehavior extends TaskActivityBehavior {
             if (planItemInstance.getReferenceId() == null) {
                 throw new FlowableException("Cannot trigger case task plan item instance : no reference id set");
             }
-            if (!PlanItemInstanceCallbackType.CASE.equals(planItemInstance.getReferenceType())) {
+            if (!PlanItemInstanceCallbackType.CHILD_CASE.equals(planItemInstance.getReferenceType())) {
                 throw new FlowableException("Cannot trigger case task plan item instance : reference type '" 
                         + planItemInstance.getReferenceType() + "' not supported");
             }

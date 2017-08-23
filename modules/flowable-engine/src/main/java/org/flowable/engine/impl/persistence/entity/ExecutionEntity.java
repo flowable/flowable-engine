@@ -141,6 +141,10 @@ public interface ExecutionEntity extends DelegateExecution, Execution, ProcessIn
 
     void setStartTime(Date startTime);
     
+    void setCallbackId(String callbackId);
+    
+    void setCallbackType(String callbackType);
+    
     void setVariable(String variableName, Object value, ExecutionEntity sourceExecution, boolean fetchAllVariables);
     
     Object setVariableLocal(String variableName, Object value, ExecutionEntity sourceExecution, boolean fetchAllVariables);

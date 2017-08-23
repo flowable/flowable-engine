@@ -126,7 +126,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
     protected int deadLetterJobCount;
     protected int variableCount;
     protected int identityLinkCount;
-
+    
     /**
      * Persisted reference to the processDefinition.
      * 
@@ -204,8 +204,10 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
     protected boolean forcedUpdate;
 
     protected List<VariableInstanceEntity> queryVariables;
-
-    protected boolean isDeleted; // TODO: should be in entity superclass probably
+    
+    // Callback
+    protected String callbackId;
+    protected String callbackType;
 
     public ExecutionEntityImpl() {
 
@@ -260,6 +262,8 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         persistentState.put("deadLetterJobCount", deadLetterJobCount);
         persistentState.put("variableCount", variableCount);
         persistentState.put("identityLinkCount", identityLinkCount);
+        persistentState.put("callbackId", callbackId);
+        persistentState.put("callbackType", callbackType);
         return persistentState;
     }
 
@@ -997,14 +1001,6 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         this.queryVariables = queryVariables;
     }
 
-    public boolean isDeleted() {
-        return isDeleted;
-    }
-
-    public void setDeleted(boolean isDeleted) {
-        this.isDeleted = isDeleted;
-    }
-
     public String getActivityName() {
         return activityName;
     }
@@ -1095,6 +1091,22 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
 
     public void setIdentityLinkCount(int identityLinkCount) {
         this.identityLinkCount = identityLinkCount;
+    }
+    
+    public String getCallbackId() {
+        return callbackId;
+    }
+
+    public void setCallbackId(String callbackId) {
+        this.callbackId = callbackId;
+    }
+
+    public String getCallbackType() {
+        return callbackType;
+    }
+
+    public void setCallbackType(String callbackType) {
+        this.callbackType = callbackType;
     }
 
     // toString /////////////////////////////////////////////////////////////////

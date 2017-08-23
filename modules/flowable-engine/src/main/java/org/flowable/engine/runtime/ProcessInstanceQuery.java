@@ -268,6 +268,16 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      * Only select process instances with a name like the given value, ignoring upper/lower case.
      */
     ProcessInstanceQuery processInstanceNameLikeIgnoreCase(String nameLikeIgnoreCase);
+    
+    /**
+     * Only select process instances with the given callback id. 
+     */
+    ProcessInstanceQuery processInstanceCallbackId(String callbackId);
+    
+    /**
+     * Only select process instances with the given callback type.
+     */
+    ProcessInstanceQuery processInstanceCallbackType(String callbackType);
 
     /**
      * Localize process name and description to specified locale.

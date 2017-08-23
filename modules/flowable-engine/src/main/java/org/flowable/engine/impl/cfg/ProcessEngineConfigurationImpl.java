@@ -64,6 +64,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
+import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.event.FlowableEventDispatcherImpl;
 import org.flowable.engine.common.impl.history.HistoryLevel;
@@ -660,6 +661,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected HistoryTaskInterface historyTaskInterface;
     protected TaskLocalizationInterface taskLocalizationInterface;
     protected JobScopeInterface jobScopeInterface;
+    
+    protected Map<String, List<RuntimeInstanceStateChangeCallback>> processInstanceStateChangedCallbacks;
 
     /**
      * This flag determines whether variables of the type 'serializable' will be tracked. This means that, when true, in a JavaDelegate you can write
@@ -1755,7 +1758,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         asyncHistoryExecutor.setJobServiceConfiguration(jobServiceConfiguration);
         asyncHistoryExecutor.setAutoActivate(asyncHistoryExecutorActivate);
     }
-
+    
     // history
     // //////////////////////////////////////////////////////////////////
 
@@ -3387,6 +3390,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+        return this;
+    }
+    
+    public Map<String, List<RuntimeInstanceStateChangeCallback>> getProcessInstanceStateChangedCallbacks() {
+        return processInstanceStateChangedCallbacks;
+    }
+
+    public ProcessEngineConfigurationImpl setProcessInstanceStateChangedCallbacks(Map<String, List<RuntimeInstanceStateChangeCallback>> processInstanceStateChangedCallbacks) {
+        this.processInstanceStateChangedCallbacks = processInstanceStateChangedCallbacks;
         return this;
     }
 

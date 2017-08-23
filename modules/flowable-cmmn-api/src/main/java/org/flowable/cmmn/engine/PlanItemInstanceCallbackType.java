@@ -17,6 +17,8 @@ package org.flowable.cmmn.engine;
  */
 public interface PlanItemInstanceCallbackType {
     
-    String CASE = "cmmn-1.1-case";
+    String CHILD_CASE = "cmmn-1.1-child-case";
+    
+    String CHILD_PROCESS = "cmmn-1.1-to-bpmn-2.0-child-process";
 
 }

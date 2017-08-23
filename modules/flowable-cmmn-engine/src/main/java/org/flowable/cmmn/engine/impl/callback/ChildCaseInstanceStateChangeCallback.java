@@ -14,23 +14,30 @@ package org.flowable.cmmn.engine.impl.callback;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.cmmn.engine.runtime.CaseInstanceState;
+import org.flowable.engine.common.impl.callback.CallbackData;
+import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
  */
-public class ChildCaseInstanceCallback implements CaseInstanceCallback {
+public class ChildCaseInstanceStateChangeCallback implements RuntimeInstanceStateChangeCallback {
 
     @Override
-    public void stateChanged(CaseInstance caseInstance, String oldState, String newState) {
-        if (CaseInstanceState.TERMINATED.equals(newState)
-                || CaseInstanceState.COMPLETED.equals(newState)) {
+    public void stateChanged(CallbackData callbackData) {
+        
+        /*
+         * The child case instance has the plan item instance id as callback id stored.
+         * When the child case instance is finished, the plan item of the parent case 
+         * needs to be triggered.
+         */
+        
+        if (CaseInstanceState.TERMINATED.equals(callbackData.getNewState())
+                || CaseInstanceState.COMPLETED.equals(callbackData.getNewState())) {
             CommandContext commandContext = CommandContextUtil.getCommandContext();
-            String planItemInstanceId = caseInstance.getCallbackId();
             PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil
-                    .getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceId);
+                    .getPlanItemInstanceEntityManager(commandContext).findById(callbackData.getCallbackId());
             if (planItemInstanceEntity != null) {
                 CommandContextUtil.getAgenda(commandContext).planTriggerPlanItem(planItemInstanceEntity);
             }

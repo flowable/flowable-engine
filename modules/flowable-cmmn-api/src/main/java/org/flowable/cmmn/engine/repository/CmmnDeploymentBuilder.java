@@ -33,6 +33,8 @@ public interface CmmnDeploymentBuilder {
     CmmnDeploymentBuilder addClasspathResource(String resource);
 
     CmmnDeploymentBuilder addString(String resourceName, String text);
+    
+    CmmnDeploymentBuilder addBytes(String resourceName, byte[] bytes);
 
     /**
      * If called, no XML schema validation against the BPMN 2.0 XSD.
