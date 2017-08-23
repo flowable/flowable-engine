@@ -15,6 +15,7 @@ package org.flowable.rest.service.api.repository;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.ZipInputStream;
@@ -206,7 +207,10 @@ public class DeploymentCollectionResource {
         }
     }
 
-    public Map splitQueryString(String queryString) {
+    public Map<String, String> splitQueryString(String queryString) {
+        if (StringUtils.isEmpty(queryString)) {
+            return Collections.emptyMap();
+        }
         Map<String, String> queryMap = new HashMap<>();
         for (String param : queryString.split("&")) {
             queryMap.put(StringUtils.substringBefore(param, "="), decode(StringUtils.substringAfter(param, "=")));
