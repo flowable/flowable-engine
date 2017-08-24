@@ -20,7 +20,7 @@ import java.util.Map;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
-import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
+import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
@@ -45,7 +45,7 @@ public class CustomConfigRuntimeTest {
     public FlowableDmnRule flowableRule2 = new FlowableDmnRule(ENGINE_CONFIG_2);
 
     @Test
-    @DmnDeploymentAnnotation(resources = "org/flowable/dmn/engine/test/deployment/post_custom_expression_function_expression_1.dmn")
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/post_custom_expression_function_expression_1.dmn")
     public void postCustomExpressionFunction() {
 
         DmnEngine dmnEngine = flowableRule1.getDmnEngine();
@@ -64,7 +64,7 @@ public class CustomConfigRuntimeTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation(resources = "org/flowable/dmn/engine/test/deployment/post_custom_expression_function_expression_1.dmn")
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/post_custom_expression_function_expression_1.dmn")
     public void customExpressionFunctionMissingDefaultFunction() {
 
         DmnEngine dmnEngine = flowableRule2.getDmnEngine();

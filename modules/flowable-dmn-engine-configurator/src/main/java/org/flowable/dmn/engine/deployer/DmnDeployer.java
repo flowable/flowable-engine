@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.api.DmnRepositoryService;
+import org.flowable.dmn.engine.impl.deployer.DmnResourceUtil;
 import org.flowable.engine.impl.persistence.deploy.Deployer;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
@@ -41,7 +42,7 @@ public class DmnDeployer implements Deployer {
 
         Map<String, ResourceEntity> resources = deployment.getResources();
         for (String resourceName : resources.keySet()) {
-            if (resourceName.endsWith(".dmn")) {
+            if (DmnResourceUtil.isDmnResource(resourceName)) {
                 LOGGER.info("DmnDeployer: processing resource {}", resourceName);
                 if (dmnDeploymentBuilder == null) {
                     DmnRepositoryService dmnRepositoryService = CommandContextUtil.getDmnRepositoryService();

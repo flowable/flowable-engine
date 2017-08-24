@@ -24,7 +24,7 @@ import java.util.Map;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
-import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
+import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -38,7 +38,7 @@ public class HitPolicyAnyTest {
     public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void anyHitPolicy() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
@@ -56,7 +56,7 @@ public class HitPolicyAnyTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void anyHitPolicyViolated() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
@@ -75,7 +75,7 @@ public class HitPolicyAnyTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void anyHitPolicyNoValueViolated() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
@@ -94,7 +94,7 @@ public class HitPolicyAnyTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void anyHitPolicyViolatedStrictModeDisabled() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         dmnEngine.getDmnEngineConfiguration().setStrictMode(false);

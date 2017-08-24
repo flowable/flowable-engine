@@ -32,8 +32,6 @@ public class ParsedDeploymentBuilder {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ParsedDeploymentBuilder.class);
 
-    public static final String[] DMN_RESOURCE_SUFFIXES = new String[] { "dmn" };
-
     protected DmnDeploymentEntity deployment;
     protected DmnParseFactory dmnParseFactory;
     protected Map<String, Object> deploymentSettings;
@@ -50,7 +48,7 @@ public class ParsedDeploymentBuilder {
         Map<DecisionTableEntity, DmnResourceEntity> decisionTablesToResourceMap = new LinkedHashMap<>();
 
         for (DmnResourceEntity resource : deployment.getResources().values()) {
-            if (isDmnResource(resource.getName())) {
+            if (DmnResourceUtil.isDmnResource(resource.getName())) {
                 LOGGER.debug("Processing DMN resource {}", resource.getName());
                 DmnParse parse = createDmnParseFromResource(resource);
                 for (DecisionTableEntity decisionTable : parse.getDecisionTables()) {
@@ -88,16 +86,6 @@ public class ParsedDeploymentBuilder {
 
         dmnParse.execute(CommandContextUtil.getDmnEngineConfiguration());
         return dmnParse;
-    }
-
-    protected boolean isDmnResource(String resourceName) {
-        for (String suffix : DMN_RESOURCE_SUFFIXES) {
-            if (resourceName.endsWith(suffix)) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
 }

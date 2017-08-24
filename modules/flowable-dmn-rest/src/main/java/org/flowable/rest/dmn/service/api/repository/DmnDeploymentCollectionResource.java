@@ -32,6 +32,7 @@ import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.api.DmnDeploymentQuery;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.impl.DeploymentQueryProperty;
+import org.flowable.dmn.engine.impl.deployer.DmnResourceUtil;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.query.QueryProperty;
@@ -145,11 +146,11 @@ public class DmnDeploymentCollectionResource {
         try {
             DmnDeploymentBuilder deploymentBuilder = dmnRepositoryService.createDeployment();
             String fileName = file.getOriginalFilename();
-            if (StringUtils.isEmpty(fileName) || !(fileName.endsWith(".dmn"))) {
+            if (StringUtils.isEmpty(fileName) || !DmnResourceUtil.isDmnResource(fileName)) {
                 fileName = file.getName();
             }
 
-            if (fileName.endsWith(".dmn")) {
+            if (DmnResourceUtil.isDmnResource(fileName)) {
                 deploymentBuilder.addInputStream(fileName, file.getInputStream());
             } else {
                 throw new FlowableIllegalArgumentException("File must be of type .dmn");

@@ -20,7 +20,7 @@ import java.util.Map;
 
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
-import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
+import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -34,7 +34,7 @@ public class HitPolicyRuleOrderTest {
     public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void ruleOrderHitPolicy() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 

@@ -29,13 +29,13 @@ import java.lang.annotation.RetentionPolicy;
  * 
  * public class ExampleTest {
  * 
- *   &#64;DmnDeploymentAnnotation
+ *   &#64;DmnDeployment
  *   public void testForADeploymentWithASingleResource() {
  *     // a deployment will be available in the engine repository
  *     // containing the single resource <b>org/example/ExampleTest.testForADeploymentWithASingleResource.bpmn20.xml</b>
  *   }
  * 
- *   &#64;DmnDeploymentAnnotation(resources = { 
+ *   &#64;DmnDeployment(resources = { 
  *     "org/example/decisionOne.dmn",
  *     "org/example/decisionTwo.dmn"})
  *   public void testForADeploymentWithASingleResource() {
@@ -46,7 +46,7 @@ import java.lang.annotation.RetentionPolicy;
  * @author Tijs Rademakers
  */
 @Retention(RetentionPolicy.RUNTIME)
-public @interface DmnDeploymentAnnotation {
+public @interface DmnDeployment {
 
     /** Specify resources that make up the process definition. */
     public String[] resources() default {};

@@ -12,23 +12,24 @@
  */
 package org.flowable.rest.dmn.service.api.decision;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
+import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.rest.dmn.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.rest.dmn.service.api.DmnRestUrls;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Yvo Swillens
  */
 public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
 
-    @DmnDeploymentAnnotation(resources = { "org/flowable/rest/dmn/service/api/decision/multi-hit.dmn" })
+    @DmnDeployment(resources = { "org/flowable/rest/dmn/service/api/decision/multi-hit.dmn" })
     public void testExecutionDecision() throws Exception {
         // Add decision key
         ObjectNode requestNode = objectMapper.createObjectNode();
@@ -58,7 +59,7 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
     }
 
 
-    @DmnDeploymentAnnotation(resources = { "org/flowable/rest/dmn/service/api/decision/single-hit.dmn" })
+    @DmnDeployment(resources = { "org/flowable/rest/dmn/service/api/decision/single-hit.dmn" })
     public void testExecutionDecisionSingleResult() throws Exception {
         // Add decision key
         ObjectNode requestNode = objectMapper.createObjectNode();
@@ -94,7 +95,7 @@ public class DmnRuleServiceResourceTest extends BaseSpringDmnRestTestCase {
     }
 
 
-    @DmnDeploymentAnnotation(resources = { "org/flowable/rest/dmn/service/api/decision/multi-hit.dmn" })
+    @DmnDeployment(resources = { "org/flowable/rest/dmn/service/api/decision/multi-hit.dmn" })
     public void testExecutionDecisionSingleResultViolated() throws Exception {
         // Add decision key
         ObjectNode requestNode = objectMapper.createObjectNode();
