@@ -167,5 +167,36 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         assertEquals("Task Two", planItemInstances.get(1).getName());
     }
     
+    @Test
+    @CmmnDeployment
+    public void testRuntimeServiceTriggerNonBlockingCasePlanItem() {
+        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        assertEquals(2, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertEquals(2, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .orderByName().asc()
+                .singleResult();
+        assertEquals("Task One", planItemInstance.getName());
+        
+        // Triggering the task plan item completes the parent case, but the child case remains
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+        assertEquals(1, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        
+        planItemInstance = cmmnRuntimeService.createPlanItemQuery()
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .orderByName().asc()
+                .singleResult();
+        assertEquals("The Task", planItemInstance.getName());
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(2, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+    }
     
 }

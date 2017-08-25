@@ -15,12 +15,16 @@ package org.flowable.cmmn.engine.configurator.impl.process;
 import org.flowable.cmmn.engine.PlanItemInstanceCallbackType;
 import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.engine.RuntimeService;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.runtime.ProcessInstanceBuilder;
 
 /**
  * @author Joram Barrez
  */
 public class DefaultProcessInstanceService implements ProcessInstanceService {
 
+    private static final String DELETE_REASON = "triggerCmmnProcessTaskPlanItem";
+    
     protected RuntimeService processEngineRuntimeService;
     
     public DefaultProcessInstanceService(RuntimeService runtimeService) {
@@ -28,13 +32,27 @@ public class DefaultProcessInstanceService implements ProcessInstanceService {
     }
     
     @Override
+    public String startProcessInstanceByKey(String processDefinitionKey) {
+        return startProcessInstanceByKey(processDefinitionKey, null);
+    }
+    
+    @Override
     public String startProcessInstanceByKey(String processDefinitionKey, String planItemInstanceId) {
-        return processEngineRuntimeService.createProcessInstanceBuilder()
-            .processDefinitionKey(processDefinitionKey)
-            .callbackId(planItemInstanceId)
-            .callbackType(PlanItemInstanceCallbackType.CHILD_PROCESS)
-            .start()
-            .getId();
+        ProcessInstanceBuilder processInstanceBuilder = processEngineRuntimeService.createProcessInstanceBuilder();
+        processInstanceBuilder.processDefinitionKey(processDefinitionKey);
+        
+        if (planItemInstanceId != null) {
+            processInstanceBuilder.callbackId(planItemInstanceId);
+            processInstanceBuilder.callbackType(PlanItemInstanceCallbackType.CHILD_PROCESS);
+        }
+        
+        ProcessInstance processInstance = processInstanceBuilder.start();
+        return processInstance.getId();
+    }
+    
+    @Override
+    public void deleteProcessInstance(String processInstanceId) {
+        processEngineRuntimeService.deleteProcessInstance(processInstanceId, DELETE_REASON);
     }
 
 }

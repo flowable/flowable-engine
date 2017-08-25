@@ -13,7 +13,6 @@
 package org.flowable.cmmn.engine.impl.callback;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.impl.cmd.TriggerPlanItemInstanceCmd;
 import org.flowable.engine.common.impl.callback.CallbackData;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 
@@ -31,7 +30,7 @@ public class ChildProcessInstanceStateChangeCallback implements RuntimeInstanceS
     @Override
     public void stateChanged(CallbackData callbackData) {
         if ("completed".equals(callbackData.getNewState()) || "cancelled".equals(callbackData.getNewState())) {
-            cmmnEngineConfiguration.getCommandExecutor().execute(new TriggerPlanItemInstanceCmd(callbackData.getCallbackId()));
+            cmmnEngineConfiguration.getCmmnRuntimeService().triggerPlanItemInstance(callbackData.getCallbackId());
         }
     }
     

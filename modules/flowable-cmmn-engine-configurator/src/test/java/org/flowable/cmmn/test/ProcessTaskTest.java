@@ -17,6 +17,7 @@ import static org.junit.Assert.fail;
 
 import java.util.List;
 
+import org.flowable.cmmn.engine.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.cmmn.engine.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
@@ -135,6 +136,68 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         
         // Both case and process should have rolled back
         assertEquals("Task One", planItemInstance.getName());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testTriggerUnfinishedProcessPlanItem() {
+        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .singleResult();
+        assertEquals("The Process", planItemInstance.getName());
+        assertEquals("my task", processEngine.getTaskService().createTaskQuery().singleResult().getName());
+        
+        // Triggering the process plan item should cancel the process instance
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+        assertEquals(0, processEngine.getTaskService().createTaskQuery().count());
+        assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
+
+        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
+        HistoricMilestoneInstance historicMilestoneInstance = cmmnHistoryService.createHistoricMilestoneInstanceQuery().singleResult();
+        assertEquals("Process planitem done", historicMilestoneInstance.getName());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testStartProcessInstanceNonBlockingAndCaseInstanceFinished() {
+        cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        
+        assertEquals(1, processEngine.getTaskService().createTaskQuery().count());
+        assertEquals(1, processEngineRuntimeService.createProcessInstanceQuery().count());
+
+        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
+        HistoricMilestoneInstance historicMilestoneInstance = cmmnHistoryService.createHistoricMilestoneInstanceQuery().singleResult();
+        assertEquals("Process planitem done", historicMilestoneInstance.getName());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testStartMultipleProcessInstancesBlocking() {
+        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .singleResult();
+        assertEquals("Task One", planItemInstance.getName());
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+        
+        assertEquals(4, processEngine.getTaskService().createTaskQuery().count());
+        assertEquals(4, processEngineRuntimeService.createProcessInstanceQuery().count());
+        
+        // Completing all the tasks should lead to the milestone
+        for (Task task : processEngineTaskService.createTaskQuery().list()) {
+            processEngineTaskService.complete(task.getId());
+        }
+        
+        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
+        HistoricMilestoneInstance historicMilestoneInstance = cmmnHistoryService.createHistoricMilestoneInstanceQuery().singleResult();
+        assertEquals("Processes done", historicMilestoneInstance.getName());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }
    
 }

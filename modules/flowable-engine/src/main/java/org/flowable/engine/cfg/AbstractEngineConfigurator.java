@@ -153,6 +153,7 @@ public abstract class AbstractEngineConfigurator implements ProcessEngineConfigu
         initEngineConfigurations(processEngineConfiguration, targetEngineConfiguration);
         initServiceConfigurations(processEngineConfiguration, targetEngineConfiguration);
         initCommandContextFactory(processEngineConfiguration, targetEngineConfiguration);
+        initIdGenerator(processEngineConfiguration, targetEngineConfiguration);
         
         if (targetEngineConfiguration.isUsingRelationalDatabase()) {
             initDataSource(processEngineConfiguration, targetEngineConfiguration);
@@ -175,6 +176,10 @@ public abstract class AbstractEngineConfigurator implements ProcessEngineConfigu
 
     protected void initCommandContextFactory(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
         targetEngineConfiguration.setCommandContextFactory(processEngineConfiguration.getCommandContextFactory());
+    }
+    
+    protected void initIdGenerator(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
+        targetEngineConfiguration.setIdGenerator(processEngineConfiguration.getIdGenerator());
     }
 
     protected void initDataSource(ProcessEngineConfigurationImpl processEngineConfiguration,
