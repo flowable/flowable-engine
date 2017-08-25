@@ -429,7 +429,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
 
         if (getEventDispatcher().isEnabled()) {
             getEventDispatcher().dispatchEvent(FlowableEventBuilder.createCancelledEvent(execution.getProcessInstanceId(),
-                    execution.getProcessInstanceId(), null, deleteReason));
+                    execution.getProcessInstanceId(), execution.getProcessDefinitionId(), deleteReason));
         }
 
         // delete the execution BEFORE we delete the history, otherwise we will
