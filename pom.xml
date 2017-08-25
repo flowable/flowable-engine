@@ -22,6 +22,7 @@
 		<spring.security.version>4.2.3.RELEASE</spring.security.version>
 		<jackson.version>2.7.5</jackson.version>
 		<mule.version>3.8.0</mule.version>
+		<camel.version>2.17.1</camel.version>
 		<cxf.version>3.1.6</cxf.version>
 		<batik.version>1.7</batik.version>
 
@@ -868,7 +869,12 @@
 			<dependency>
 				<groupId>org.apache.camel</groupId>
 				<artifactId>camel-spring</artifactId>
-				<version>2.17.1</version>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-mvel</artifactId>
+				<version>${camel.version}</version>
 			</dependency>
 			<!-- Mule integration -->
 			<dependency>
