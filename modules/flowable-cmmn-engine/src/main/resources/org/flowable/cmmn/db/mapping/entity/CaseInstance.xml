@@ -127,14 +127,14 @@
             inner join ${prefix}ACT_CMMN_RU_CASE_INST CASE_DEF
         </if>
         <where>
+            <if test="caseInstanceId != null">
+                and RES.ID_ = #{caseInstanceId}
+            </if>
             <if test="caseDefinitionId != null">
                 RES.CASE_DEF_ID_ = #{caseDefinitionId}
             </if>
             <if test="caseDefinitionKey != null">
                 and CASE_DEF.KEY_ = #{caseDefinitionId}
-            </if>
-            <if test="caseInstanceId != null">
-                and RES.CASE_INST_ID_ = #{caseInstanceId}
             </if>
             <if test="caseDefinitionIds != null">
                 and RES.CASE_DEF_ID_ IN

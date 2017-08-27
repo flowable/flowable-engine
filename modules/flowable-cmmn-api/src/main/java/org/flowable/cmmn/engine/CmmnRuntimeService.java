@@ -28,6 +28,8 @@ public interface CmmnRuntimeService {
     
     void triggerPlanItemInstance(String planItemInstanceId);
     
+    void terminateCaseInstance(String caseInstanceId);
+    
     CaseInstanceQuery createCaseInstanceQuery();
     
     PlanItemInstanceQuery createPlanItemQuery();

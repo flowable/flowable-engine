@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.flowable.cmmn.engine.history.HistoricMilestoneInstance;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.repository.CaseDefinition;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.cmmn.engine.runtime.CaseInstanceState;
@@ -106,6 +107,43 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         assertEquals(2, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testTerminateCaseInstance() {
+        
+        // Task A active
+        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+        assertCaseInstanceFinished(caseInstance, 0);
+        
+        // Task B active
+        caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        cmmnRuntimeService.triggerPlanItemInstance(cmmnRuntimeService.createPlanItemQuery()
+                .caseInstanceId(caseInstance.getId()).planItemInstanceState(PlanItemInstanceState.ACTIVE).singleResult().getId());
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+        assertCaseInstanceFinished(caseInstance, 1);
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testTerminateCaseInstanceWithNestedStages() {
+        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        
+        // 8 plan items + plan model = 9 plan items
+        assertEquals(9, cmmnRuntimeService.createPlanItemQuery()
+                .caseInstanceId(caseInstance.getId()).includeStagePlanItemInstances().count());
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+        assertCaseInstanceFinished(caseInstance, 0);
+    }
+
+    protected void assertCaseInstanceFinished(CaseInstance caseInstance, int nrOfExpectedMilestones) {
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().caseInstanceId(caseInstance.getId()).count());
+        assertEquals(0, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).finished().count());
+        assertEquals(nrOfExpectedMilestones, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
     }
     
 }
