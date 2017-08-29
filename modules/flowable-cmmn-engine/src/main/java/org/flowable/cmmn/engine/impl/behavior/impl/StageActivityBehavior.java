@@ -58,19 +58,23 @@ public class StageActivityBehavior implements PlanItemActivityBehavior {
     
     @Override
     public void onStateTransition(DelegatePlanItemInstance planItemInstance, String transition) {
-        if (PlanItemTransition.TERMINATE.equals(transition)) {
-            terminateChildPlanItems(planItemInstance);
+        if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
+            handleChildPlanItemInstances(planItemInstance, transition);
         }
     }
 
-    protected void terminateChildPlanItems(DelegatePlanItemInstance planItemInstance) {
+    protected void handleChildPlanItemInstances(DelegatePlanItemInstance planItemInstance, String transition) {
         // The stage plan item will be deleted by the regular TerminatePlanItemOperation
         PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) planItemInstance;
         List<PlanItemInstanceEntity> childPlanItemInstances = planItemInstanceEntity.getChildren();
         if (childPlanItemInstances != null) {
             for (PlanItemInstanceEntity childPlanItemInstance : childPlanItemInstances) {
-                if (StateTransition.isPossible(planItemInstance, PlanItemTransition.TERMINATE)) {
-                    CommandContextUtil.getAgenda().planTerminatePlanItem(childPlanItemInstance);
+                if (StateTransition.isPossible(planItemInstance, transition)) {
+                    if (PlanItemTransition.TERMINATE.equals(transition)) {
+                        CommandContextUtil.getAgenda().planTerminatePlanItem(childPlanItemInstance);
+                    } else if (PlanItemTransition.EXIT.equals(transition)) {
+                        CommandContextUtil.getAgenda().planExitPlanItem(childPlanItemInstance);
+                    }
                 }
             }
         }

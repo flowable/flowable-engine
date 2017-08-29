@@ -147,4 +147,27 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }
     
+    @Test
+    @CmmnDeployment
+    public void testExitPlanModelWithNestedCaseTasks() {
+        
+        String oneTaskCaseDeploymentId = cmmnRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCase.cmmn").deploy().getId();
+        
+        cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        assertEquals(4, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        
+        // Trigger the plan item should satisfy the sentry of the plan model exit criteria
+        PlanItemInstance taskA = cmmnRuntimeService.createPlanItemQuery().planItemInstanceName("Task A").singleResult();
+        assertNotNull(taskA);
+        cmmnRuntimeService.triggerPlanItemInstance(taskA.getId());
+        
+        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(4, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        
+        cmmnRepositoryService.deleteDeploymentAndRelatedData(oneTaskCaseDeploymentId);
+    }
+    
 }

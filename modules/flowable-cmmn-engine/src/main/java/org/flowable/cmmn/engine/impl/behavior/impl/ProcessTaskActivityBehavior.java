@@ -96,7 +96,7 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
     @Override
     public void onStateTransition(DelegatePlanItemInstance planItemInstance, String transition) {
         // The process task plan item will be deleted by the regular TerminatePlanItemOperation
-        if (PlanItemTransition.TERMINATE.equals(transition)) {
+        if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
             deleteProcessInstance(planItemInstance, CommandContextUtil.getCommandContext());
         }
     }

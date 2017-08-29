@@ -199,4 +199,44 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
     }
     
+    @Test
+    @CmmnDeployment
+    public void testTerminateCaseInstanceWithNonBlockingCaseTask() {
+        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertEquals(2, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .singleResult();
+        assertEquals("Task One", planItemInstance.getName());
+        
+        // Terminating the parent case instance should not terminate the child (it's non-blocking)
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        
+        // Terminate child
+        CaseInstance childCaseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceParentId(caseInstance.getId()).singleResult();
+        assertNotNull(childCaseInstance);
+        cmmnRuntimeService.terminateCaseInstance(childCaseInstance.getId());
+        assertEquals(2, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testTerminateCaseInstanceWithNestedCaseTasks() {
+        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertEquals(4, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+        assertEquals(4, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        
+    }
+    
 }

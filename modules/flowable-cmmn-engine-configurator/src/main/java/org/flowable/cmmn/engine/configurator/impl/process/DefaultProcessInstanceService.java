@@ -23,7 +23,7 @@ import org.flowable.engine.runtime.ProcessInstanceBuilder;
  */
 public class DefaultProcessInstanceService implements ProcessInstanceService {
 
-    private static final String DELETE_REASON = "triggerCmmnProcessTaskPlanItem";
+    private static final String DELETE_REASON = "deletedFromCmmnCase";
     
     protected RuntimeService processEngineRuntimeService;
     

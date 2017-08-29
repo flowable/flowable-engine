@@ -17,7 +17,6 @@ import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
-import org.flowable.cmmn.engine.impl.runtime.StateTransition;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
@@ -81,7 +80,7 @@ public class CaseTaskActivityBehavior extends TaskActivityBehavior implements Pl
 
     @Override
     public void onStateTransition(DelegatePlanItemInstance planItemInstance, String transition) {
-        if (PlanItemTransition.TERMINATE.equals(transition)) {
+        if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
             // The plan item will be deleted by the regular TerminatePlanItemOperation
             CommandContextUtil.getAgenda().planTerminateCase(planItemInstance.getReferenceId());
         }

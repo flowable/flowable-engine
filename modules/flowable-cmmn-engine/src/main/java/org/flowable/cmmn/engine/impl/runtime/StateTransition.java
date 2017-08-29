@@ -32,18 +32,43 @@ public class StateTransition {
     
     static {
         addTransition(null, PlanItemTransition.CREATE);
-        addTransition(PlanItemInstanceState.AVAILABLE, PlanItemTransition.START, PlanItemTransition.ENABLE, 
-                PlanItemTransition.PARENT_SUSPEND, PlanItemTransition.EXIT);
-        addTransition(PlanItemInstanceState.ENABLED, PlanItemTransition.DISABLE, PlanItemTransition.MANUAL_START, 
-                PlanItemTransition.PARENT_SUSPEND, PlanItemTransition.EXIT);
-        addTransition(PlanItemInstanceState.DISABLED, PlanItemTransition.REENABLE, PlanItemTransition.PARENT_SUSPEND, 
+        
+        addTransition(PlanItemInstanceState.AVAILABLE, 
+                PlanItemTransition.START, 
+                PlanItemTransition.ENABLE, 
+                PlanItemTransition.PARENT_SUSPEND, 
                 PlanItemTransition.EXIT);
-        addTransition(PlanItemInstanceState.ACTIVE, PlanItemTransition.FAULT, PlanItemTransition.COMPLETE, PlanItemTransition.SUSPEND, 
-                PlanItemTransition.TERMINATE, PlanItemTransition.PARENT_SUSPEND, PlanItemTransition.EXIT);
-        addTransition(PlanItemInstanceState.FAILED, PlanItemTransition.REACTIVATE, PlanItemTransition.EXIT);
-        addTransition(PlanItemInstanceState.SUSPENDED, PlanItemTransition.RESUME, PlanItemTransition.PARENT_RESUME, 
+        
+        addTransition(PlanItemInstanceState.ENABLED, 
+                PlanItemTransition.DISABLE, 
+                PlanItemTransition.MANUAL_START, 
+                PlanItemTransition.PARENT_SUSPEND, 
                 PlanItemTransition.EXIT);
+        
+        addTransition(PlanItemInstanceState.DISABLED, 
+                PlanItemTransition.REENABLE, 
+                PlanItemTransition.PARENT_SUSPEND, 
+                PlanItemTransition.EXIT);
+        
+        addTransition(PlanItemInstanceState.ACTIVE, 
+                PlanItemTransition.FAULT, 
+                PlanItemTransition.COMPLETE, 
+                PlanItemTransition.SUSPEND, 
+                PlanItemTransition.TERMINATE, 
+                PlanItemTransition.PARENT_SUSPEND, 
+                PlanItemTransition.EXIT);
+        
+        addTransition(PlanItemInstanceState.FAILED, 
+                PlanItemTransition.REACTIVATE, 
+                PlanItemTransition.EXIT);
+        
+        addTransition(PlanItemInstanceState.SUSPENDED, 
+                PlanItemTransition.RESUME, 
+                PlanItemTransition.PARENT_RESUME, 
+                PlanItemTransition.EXIT);
+        
         addTransition(PlanItemInstanceState.COMPLETED);
+        
         addTransition(PlanItemInstanceState.TERMINATED);
     }
     
