@@ -42,6 +42,9 @@ public interface TimerJobQuery extends Query<TimerJobQuery, Job> {
      **/
     TimerJobQuery executable();
 
+    /** Select jobs which have given job handler type */
+    TimerJobQuery handlerType(String handlerType);
+
     /**
      * Only select jobs that are timers. Cannot be used together with {@link #messages()}
      */

@@ -38,8 +38,6 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     protected String executionId;
     protected String handlerType;
     protected String processDefinitionId;
-    protected boolean retriesLeft;
-    protected boolean executable;
     protected boolean onlyTimers;
     protected boolean onlyMessages;
     protected Date duedateHigherThan;
@@ -51,7 +49,6 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
-    protected boolean noRetriesLeft;
     protected String lockOwner;
     protected boolean onlyLocked;
     protected boolean onlyUnlocked;
@@ -107,16 +104,6 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return this;
     }
 
-    public JobQuery withRetriesLeft() {
-        retriesLeft = true;
-        return this;
-    }
-
-    public JobQuery executable() {
-        executable = true;
-        return this;
-    }
-
     public JobQuery timers() {
         if (onlyMessages) {
             throw new FlowableIllegalArgumentException("Cannot combine onlyTimers() with onlyMessages() in the same query");
@@ -146,35 +133,6 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
             throw new FlowableIllegalArgumentException("Provided date is null");
         }
         this.duedateLowerThan = date;
-        return this;
-    }
-
-    public JobQuery duedateHigherThen(Date date) {
-        return duedateHigherThan(date);
-    }
-
-    public JobQuery duedateHigherThenOrEquals(Date date) {
-        if (date == null) {
-            throw new FlowableIllegalArgumentException("Provided date is null");
-        }
-        this.duedateHigherThanOrEqual = date;
-        return this;
-    }
-
-    public JobQuery duedateLowerThen(Date date) {
-        return duedateLowerThan(date);
-    }
-
-    public JobQuery duedateLowerThenOrEquals(Date date) {
-        if (date == null) {
-            throw new FlowableIllegalArgumentException("Provided date is null");
-        }
-        this.duedateLowerThanOrEqual = date;
-        return this;
-    }
-
-    public JobQuery noRetriesLeft() {
-        noRetriesLeft = true;
         return this;
     }
 
@@ -279,14 +237,6 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return this.handlerType;
     }
 
-    public boolean getRetriesLeft() {
-        return retriesLeft;
-    }
-
-    public boolean getExecutable() {
-        return executable;
-    }
-
     public Date getNow() {
         return CommandContextUtil.getJobServiceConfiguration().getClock().getCurrentTime();
     }
@@ -345,10 +295,6 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
 
     public Date getDuedateLowerThanOrEqual() {
         return duedateLowerThanOrEqual;
-    }
-
-    public boolean isNoRetriesLeft() {
-        return noRetriesLeft;
     }
 
     public String getLockOwner() {

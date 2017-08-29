@@ -67,6 +67,12 @@
             <if test="processDefinitionId != null">
                 and RES.PROC_DEF_ID_ = #{processDefinitionId}
             </if>
+            <if test="onlyTimers">
+                and RES.TYPE_ = 'timer'
+            </if>
+            <if test="onlyMessages">
+                and RES.TYPE_ = 'message'
+            </if>
             <if test="executable">
                 and RES.DUEDATE_ &lt;= #{now, jdbcType=TIMESTAMP}
             </if>

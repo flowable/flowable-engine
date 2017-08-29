@@ -37,7 +37,6 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
     protected String executionId;
     protected String handlerType;
     protected String processDefinitionId;
-    protected boolean retriesLeft;
     protected boolean executable;
     protected boolean onlyTimers;
     protected boolean onlyMessages;
@@ -50,7 +49,6 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
-    protected boolean noRetriesLeft;
 
     public TimerJobQueryImpl() {
     }
@@ -103,11 +101,6 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
-    public TimerJobQueryImpl withRetriesLeft() {
-        retriesLeft = true;
-        return this;
-    }
-
     public TimerJobQueryImpl executable() {
         executable = true;
         return this;
@@ -142,35 +135,6 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
             throw new FlowableIllegalArgumentException("Provided date is null");
         }
         this.duedateLowerThan = date;
-        return this;
-    }
-
-    public TimerJobQueryImpl duedateHigherThen(Date date) {
-        return duedateHigherThan(date);
-    }
-
-    public TimerJobQueryImpl duedateHigherThenOrEquals(Date date) {
-        if (date == null) {
-            throw new FlowableIllegalArgumentException("Provided date is null");
-        }
-        this.duedateHigherThanOrEqual = date;
-        return this;
-    }
-
-    public TimerJobQueryImpl duedateLowerThen(Date date) {
-        return duedateLowerThan(date);
-    }
-
-    public TimerJobQueryImpl duedateLowerThenOrEquals(Date date) {
-        if (date == null) {
-            throw new FlowableIllegalArgumentException("Provided date is null");
-        }
-        this.duedateLowerThanOrEqual = date;
-        return this;
-    }
-
-    public TimerJobQueryImpl noRetriesLeft() {
-        noRetriesLeft = true;
         return this;
     }
 
@@ -260,10 +224,6 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return handlerType;
     }
 
-    public boolean getRetriesLeft() {
-        return retriesLeft;
-    }
-
     public boolean getExecutable() {
         return executable;
     }
@@ -326,10 +286,6 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
 
     public Date getDuedateLowerThanOrEqual() {
         return duedateLowerThanOrEqual;
-    }
-
-    public boolean isNoRetriesLeft() {
-        return noRetriesLeft;
     }
 
 }
