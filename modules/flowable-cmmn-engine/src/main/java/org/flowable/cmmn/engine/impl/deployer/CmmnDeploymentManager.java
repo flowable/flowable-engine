@@ -69,7 +69,7 @@ public class CmmnDeploymentManager {
         CaseDefinition caseDefinition = caseDefinitionEntityManager.findLatestCaseDefinitionByKey(caseDefinitionKey);
 
         if (caseDefinition == null) {
-            throw new FlowableObjectNotFoundException("no casees deployed with key '" + caseDefinitionKey + "'", CaseDefinition.class);
+            throw new FlowableObjectNotFoundException("no cases deployed with key '" + caseDefinitionKey + "'", CaseDefinition.class);
         }
         caseDefinition = resolveCaseDefinition(caseDefinition).getCaseDefinition();
         return caseDefinition;

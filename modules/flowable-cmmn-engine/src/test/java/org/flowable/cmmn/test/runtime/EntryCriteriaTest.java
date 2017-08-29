@@ -19,12 +19,16 @@ import java.util.List;
 
 import org.flowable.cmmn.engine.history.HistoricCaseInstance;
 import org.flowable.cmmn.engine.history.HistoricMilestoneInstance;
+import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.repository.CaseDefinition;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.cmmn.engine.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.junit.Test;
 
 /**
@@ -83,5 +87,26 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
                 .singleResult();
         assertNotNull(historicCaseInstance);
     }
-
+    
+    @Test
+    @CmmnDeployment
+    public void testTerminateCaseInstanceAfterOneOutOfMultipleOnPartsSatisfied() {
+        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .orderByName().asc()
+                .list();
+        assertEquals(3, planItemInstances.size());
+        
+        // Triggering two plan items = 2 on parts satisfied
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(1).getId());
+        
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
 }

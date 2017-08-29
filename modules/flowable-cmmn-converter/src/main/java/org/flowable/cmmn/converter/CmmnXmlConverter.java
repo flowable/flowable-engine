@@ -170,7 +170,9 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     
                 } else if (xtr.isEndElement()) {
                     currentXmlElement = null;
-                    conversionHelper.setCurrentCmmnElement(null);
+                    if (elementConverters.containsKey(xtr.getLocalName())) {
+                        elementConverters.get(xtr.getLocalName()).elementEnd(xtr, conversionHelper);
+                    }
                     
                 } else if (xtr.isCharacters() && currentXmlElement != null) {
                     if (textConverters.containsKey(currentXmlElement)) {

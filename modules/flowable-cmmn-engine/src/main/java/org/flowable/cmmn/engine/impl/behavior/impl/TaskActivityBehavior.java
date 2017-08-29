@@ -10,8 +10,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.impl.behavior;
+package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import org.flowable.cmmn.engine.impl.behavior.CmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;

@@ -29,8 +29,6 @@ public interface PlanItemInstanceEntityManager extends EntityManager<PlanItemIns
     
     void deleteByCaseDefinitionId(String caseDefinitionId);
     
-    void deleteCascade(PlanItemInstanceEntity planItemInstanceEntity);
-
     PlanItemInstanceQuery createPlanItemInstanceQuery();
     
     long countByCriteria(PlanItemInstanceQuery planItemInstanceQuery);

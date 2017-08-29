@@ -19,7 +19,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.flowable.cmmn.engine.history.HistoricMilestoneInstance;
-import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.repository.CaseDefinition;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.cmmn.engine.runtime.CaseInstanceState;

@@ -13,6 +13,7 @@
 package org.flowable.cmmn.test.runtime;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
@@ -124,6 +125,22 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
         
         cmmnRuntimeService.triggerPlanItemInstance(planItems.get(0).getId());
         cmmnRuntimeService.triggerPlanItemInstance(planItems.get(1).getId());
+        
+        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testExitThreeNestedStagesThroughPlanModel() {
+        cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        assertEquals(9, cmmnRuntimeService.createPlanItemQuery().includeStagePlanItemInstances().count());
+        assertEquals(5, cmmnRuntimeService.createPlanItemQuery().count()); // 4 stages: 3 nested + 1 planmodel (hence 9-4 = 5)
+        
+        PlanItemInstance taskA = cmmnRuntimeService.createPlanItemQuery().planItemInstanceName("Task A").singleResult();
+        assertNotNull(taskA);
+        cmmnRuntimeService.triggerPlanItemInstance(taskA.getId());
         
         assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());

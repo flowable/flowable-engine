@@ -14,6 +14,7 @@ package org.flowable.cmmn.converter;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -40,8 +41,8 @@ public class ConversionHelper {
     protected CmmnModel cmmnModel;
     protected Case currentCase;
     protected CmmnElement currentCmmnElement;
-    protected PlanFragment currentPlanFragment;
-    protected Stage currentStage;
+    protected LinkedList<PlanFragment> planFragmentsStack = new LinkedList<>();
+    protected LinkedList<Stage> stagesStack = new LinkedList<>();
     protected Sentry currentSentry;
     protected SentryOnPart currentSentryOnPart;
     protected PlanItem currentPlanItem;
@@ -105,8 +106,12 @@ public class ConversionHelper {
         addExitCriterion(exitCriterion);
         CmmnElement cmmnElement = getCurrentCmmnElement();
         if (cmmnElement == null) {
-            getCurrentStage().getExitCriteria().add(exitCriterion);
-        } else if (cmmnElement instanceof HasEntryCriteria) {
+            if (getCurrentStage() != null) {
+                getCurrentStage().getExitCriteria().add(exitCriterion);
+            } else {
+                getCurrentCase().getPlanModel().getExitCriteria().add(exitCriterion);
+            }
+        } else if (cmmnElement instanceof HasExitCriteria) {
             HasExitCriteria hasExitCriteria = (HasExitCriteria) cmmnElement;
             hasExitCriteria.getExitCriteria().add(exitCriterion);
         } else {
@@ -169,20 +174,33 @@ public class ConversionHelper {
     }
     
     public PlanFragment getCurrentPlanFragment() {
-        return currentPlanFragment;
+        return planFragmentsStack.peekLast();
     }
     
     public void setCurrentPlanFragment(PlanFragment currentPlanFragment) {
-        this.currentPlanFragment = currentPlanFragment;
+        if (currentPlanFragment != null) {
+            this.planFragmentsStack.add(currentPlanFragment);
+        }
+    }
+    
+    public void removeCurrentPlanFragment() {
+        this.planFragmentsStack.removeLast();
     }
     
     public Stage getCurrentStage() {
-        return currentStage;
+        return stagesStack.peekLast();
     }
     
     public void setCurrentStage(Stage currentStage) {
-        this.currentStage = currentStage;
-        setCurrentPlanFragment(currentStage);
+        if (currentStage != null) {
+            this.stagesStack.add(currentStage);
+            setCurrentPlanFragment(currentStage);
+        }
+    }
+    
+    public void removeCurrentStage() {
+        this.stagesStack.removeLast();
+        removeCurrentPlanFragment();
     }
     
     public void setCurrentCmmnElement(CmmnElement currentCmmnElement) {

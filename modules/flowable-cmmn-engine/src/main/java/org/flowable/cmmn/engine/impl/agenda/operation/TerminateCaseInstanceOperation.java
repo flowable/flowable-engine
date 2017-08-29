@@ -13,13 +13,15 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.CaseInstanceState;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
  */
-public class TerminateCaseInstanceOperation extends AbstractChangeCaseInstanceStateOperation {
+public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOperation {
 
     public TerminateCaseInstanceOperation(CommandContext commandContext, String caseInstanceId) {
         super(commandContext, caseInstanceId);
@@ -32,6 +34,11 @@ public class TerminateCaseInstanceOperation extends AbstractChangeCaseInstanceSt
     @Override
     protected String getNewState() {
         return CaseInstanceState.TERMINATED;
+    }
+    
+    @Override
+    protected void changeStateForChildPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
+        CommandContextUtil.getAgenda(commandContext).planTerminatePlanItem(planItemInstanceEntity);
     }
 
 }

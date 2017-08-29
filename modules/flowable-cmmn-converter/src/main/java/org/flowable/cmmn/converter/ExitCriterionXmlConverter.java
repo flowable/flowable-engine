@@ -29,9 +29,9 @@ public class ExitCriterionXmlConverter extends CriterionXmlConverter {
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        Criterion entryCriterion = (Criterion) super.convert(xtr, conversionHelper);
-        conversionHelper.addExitCriteriaToCurrentElement(entryCriterion);
-        return entryCriterion;
+        Criterion exitCriterion = (Criterion) super.convert(xtr, conversionHelper);
+        conversionHelper.addExitCriteriaToCurrentElement(exitCriterion);
+        return exitCriterion;
     }
     
 }

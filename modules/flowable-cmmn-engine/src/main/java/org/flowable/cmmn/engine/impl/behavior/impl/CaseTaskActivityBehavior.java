@@ -10,22 +10,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.impl.behavior;
+package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import org.flowable.cmmn.engine.PlanItemInstanceCallbackType;
+import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
+import org.flowable.cmmn.engine.impl.runtime.StateTransition;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
  */
-public class CaseTaskActivityBehavior extends TaskActivityBehavior {
+public class CaseTaskActivityBehavior extends TaskActivityBehavior implements PlanItemActivityBehavior {
     
     protected String caseRef;
     
@@ -76,4 +79,12 @@ public class CaseTaskActivityBehavior extends TaskActivityBehavior {
         }
     }
 
+    @Override
+    public void onStateTransition(DelegatePlanItemInstance planItemInstance, String transition) {
+        if (PlanItemTransition.TERMINATE.equals(transition)) {
+            // The plan item will be deleted by the regular TerminatePlanItemOperation
+            CommandContextUtil.getAgenda().planTerminateCase(planItemInstance.getReferenceId());
+        }
+    }
+    
 }

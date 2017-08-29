@@ -33,7 +33,7 @@ public class PlanItemXmlConverter extends CaseElementXmlConverter {
         planItem.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
         planItem.setDefinitionRef(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_DEFINITION_REF));
         
-        conversionHelper.addPlanItemToCurrentPlanFragment(planItem);;
+        conversionHelper.addPlanItemToCurrentPlanFragment(planItem);
         
         return planItem;
     }

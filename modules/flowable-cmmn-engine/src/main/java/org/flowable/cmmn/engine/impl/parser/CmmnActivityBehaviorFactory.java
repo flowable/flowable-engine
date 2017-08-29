@@ -12,11 +12,11 @@
  */
 package org.flowable.cmmn.engine.impl.parser;
 
-import org.flowable.cmmn.engine.impl.behavior.CaseTaskActivityBehavior;
-import org.flowable.cmmn.engine.impl.behavior.MilestoneActivityBehavior;
-import org.flowable.cmmn.engine.impl.behavior.ProcessTaskActivityBehavior;
-import org.flowable.cmmn.engine.impl.behavior.StageActivityBehavior;
-import org.flowable.cmmn.engine.impl.behavior.TaskActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.CaseTaskActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.MilestoneActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.ProcessTaskActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.StageActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.TaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegate;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.Milestone;

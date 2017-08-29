@@ -12,13 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
-import java.util.List;
-
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
@@ -37,32 +32,11 @@ public abstract class AbstractChangeCaseInstanceStateOperation extends AbstractC
     @Override
     public void run() {
         super.run();
-        
-        String previousState = caseInstanceEntity.getState();
-        String newState = getNewState();
-        caseInstanceEntity.setState(newState);
-        
-        deleteCaseInstanceRuntimeData();
-        CommandContextUtil.getCaseInstanceHelper(commandContext).callCaseInstanceStateChangeCallbacks(commandContext, caseInstanceEntity, previousState, newState);
-        CommandContextUtil.getCmmnHistoryManager(commandContext).recordCaseInstanceEnd(caseInstanceEntityId);
-    }
-    
-    protected void deleteCaseInstanceRuntimeData() {
-        PlanItemInstanceEntity planModelPlanItemInstanceEntity = caseInstanceEntity.getPlanModelInstance();
-        
-        MilestoneInstanceEntityManager milestoneInstanceEntityManager = CommandContextUtil.getMilestoneInstanceEntityManager(commandContext);
-        List<MilestoneInstanceEntity> milestoneInstanceEntities = milestoneInstanceEntityManager
-                .findMilestoneInstancesByCaseInstanceId(caseInstanceEntityId);
-        if (milestoneInstanceEntities != null) {
-            for (MilestoneInstanceEntity milestoneInstanceEntity : milestoneInstanceEntities) {
-                milestoneInstanceEntityManager.delete(milestoneInstanceEntity);
-            }
-        }
-        
-        CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).deleteCascade(planModelPlanItemInstanceEntity);
-        CommandContextUtil.getCaseInstanceEntityManager(commandContext).delete(caseInstanceEntityId);
+        caseInstanceEntity.setState(getNewState());
     }
     
     protected abstract String getNewState();
+    
+    protected abstract void changeStateForChildPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity);
 
 }

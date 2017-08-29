@@ -13,7 +13,6 @@
 
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
@@ -55,33 +54,6 @@ public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager
         planItemInstanceDataManager.deleteByCaseDefinitionId(caseDefinitionId);
     }
     
-    @Override
-    public void deleteCascade(PlanItemInstanceEntity planItemInstanceEntity) {
-        List<PlanItemInstanceEntity> children = collectChildPlanItemInstances(planItemInstanceEntity);
-        for (int i=children.size()-1; i>=0; i--) {
-            delete(children.get(i));
-        }
-        delete(planItemInstanceEntity);
-    }
-    
-    protected List<PlanItemInstanceEntity> collectChildPlanItemInstances(PlanItemInstanceEntity entity) {
-        List<PlanItemInstanceEntity> children = new ArrayList<>();
-        collectChildPlanItemInstances(entity, children);
-        return children;
-    }
-
-    protected void collectChildPlanItemInstances(PlanItemInstanceEntity entity, List<PlanItemInstanceEntity> children) {
-        if (entity.getChildren() != null && !entity.getChildren().isEmpty()) {
-            for (PlanItemInstanceEntity child : entity.getChildren()) {
-                children.add(child);
-                if (child.getChildren() != null && !child.getChildren().isEmpty()) {
-                    collectChildPlanItemInstances(child, children);
-                }
-            }
-        }
-    }
-    
-    @Override
     public PlanItemInstanceQuery createPlanItemInstanceQuery() {
         return new PlanItemInstanceQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
     }

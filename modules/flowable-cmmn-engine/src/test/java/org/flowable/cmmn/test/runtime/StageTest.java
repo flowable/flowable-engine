@@ -226,4 +226,17 @@ public class StageTest extends FlowableCmmnTestCase {
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }
     
+    @Test
+    @CmmnDeployment
+    public void testTerminateCaseInstanceNestedStages() {
+        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        assertEquals(9, cmmnRuntimeService.createPlanItemQuery().includeStagePlanItemInstances().count());
+        assertEquals(5, cmmnRuntimeService.createPlanItemQuery().count()); // 4 stages: 3 nested + 1 planmodel
+        
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+    
 }

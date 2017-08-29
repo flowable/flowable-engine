@@ -12,9 +12,30 @@
  */
 package org.flowable.cmmn.engine.impl.behavior;
 
+import org.flowable.cmmn.engine.CmmnRuntimeService;
 import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
+import org.flowable.cmmn.engine.runtime.PlanItemInstance;
+import org.flowable.cmmn.model.PlanItem;
 
 /**
+ * Behavior interface, like {@link CmmnActivityBehavior}, when the CMMN engine 
+ * decides the behavior for a plan item needs to be executed and the behavior 
+ * acts as a wait state. 
+ * 
+ * This means that after the {@link #execute(DelegatePlanItemInstance)} method is called,
+ * the engine will not automatically complete the corresponding {@link PlanItemInstance}
+ * as happens for the {@link CmmnActivityBehavior} implementations.
+ * 
+ * Note that 'triggering' a plan item that acts as a wait state is not part 
+ * of the CMMN specification, but has been added as an explicit concept to mimic
+ * the concept of 'triggering' used by the process engine.
+ * 
+ * Any plan item that implements this interface should be triggereable programmatically 
+ * through the {@link CmmnRuntimeService#triggerPlanItemInstance(String)} method.
+ *
+ * Concrete implementations of this class will be set on the {@link PlanItem}
+ * in the case model during parsing.
+ * 
  * @author Joram Barrez
  */
 public interface CmmnTriggerableActivityBehavior extends CmmnActivityBehavior {
