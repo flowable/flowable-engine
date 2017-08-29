@@ -21,6 +21,7 @@ import org.flowable.task.service.delegate.DelegateTask;
  */
 public class MyTaskListener implements TaskListener {
 
+    @Override
     public void notify(DelegateTask delegateTask) {
         delegateTask.setVariable("calledThroughNotify", delegateTask.getName() + "-notify");
     }

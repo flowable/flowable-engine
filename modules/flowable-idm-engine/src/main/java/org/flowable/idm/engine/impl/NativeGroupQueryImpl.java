@@ -36,10 +36,12 @@ public class NativeGroupQueryImpl extends AbstractNativeQuery<NativeGroupQuery, 
 
     // results ////////////////////////////////////////////////////////////////
 
+    @Override
     public List<Group> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getGroupEntityManager(commandContext).findGroupsByNativeQuery(parameterMap);
     }
 
+    @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getGroupEntityManager(commandContext).findGroupCountByNativeQuery(parameterMap);
     }

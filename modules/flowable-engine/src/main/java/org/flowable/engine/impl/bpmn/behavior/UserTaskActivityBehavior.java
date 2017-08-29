@@ -62,6 +62,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
         this.userTask = userTask;
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         TaskService taskService = CommandContextUtil.getTaskService(commandContext);
@@ -225,6 +226,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
         }
     }
 
+    @Override
     public void trigger(DelegateExecution execution, String signalName, Object signalData) {
         List<TaskEntity> taskEntities = CommandContextUtil.getTaskService().findTasksByExecutionId(execution.getId()); // Should be only one
         for (TaskEntity taskEntity : taskEntities) {

@@ -40,6 +40,7 @@ public class HttpServiceTaskConverterTest extends AbstractConverterTest {
         validateModel(bpmnModel);
     }
 
+    @Override
     protected String getResource() {
         return "test.httpservicetaskmodel.json";
     }

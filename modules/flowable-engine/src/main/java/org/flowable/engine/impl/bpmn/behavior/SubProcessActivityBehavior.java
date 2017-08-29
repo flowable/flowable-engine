@@ -45,6 +45,7 @@ public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior {
         this.isOnlyNoneStartEventAllowed = true;
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
         SubProcess subProcess = getSubProcessFromExecution(execution);
 

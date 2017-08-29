@@ -28,6 +28,7 @@ import org.flowable.engine.common.api.FlowableException;
  */
 public class LocalProcessEngineLookup implements org.flowable.cdi.spi.ProcessEngineLookup {
 
+    @Override
     public int getPrecedence() {
         return 10;
     }

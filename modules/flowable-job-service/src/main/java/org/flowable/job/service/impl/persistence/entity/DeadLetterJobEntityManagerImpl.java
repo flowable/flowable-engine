@@ -113,6 +113,7 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
         return newJobEntity;
     }
 
+    @Override
     protected DeadLetterJobDataManager getDataManager() {
         return jobDataManager;
     }

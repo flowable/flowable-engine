@@ -32,6 +32,7 @@ public class FlowableProcessCancelledEventImpl extends FlowableProcessEventImpl 
         this.cause = cause;
     }
 
+    @Override
     public Object getCause() {
         return cause;
     }

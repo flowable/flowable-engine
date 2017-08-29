@@ -74,6 +74,7 @@ public abstract class AbstractExpressionManager implements ExpressionManager {
         this.expressionFactory = expressionFactory;
     }
 
+    @Override
     public ELContext getElContext(VariableScope variableScope) {
         ELContext elContext = null;
         if (variableScope instanceof VariableScopeImpl) {
@@ -115,18 +116,22 @@ public abstract class AbstractExpressionManager implements ExpressionManager {
         return elResolver;
     }
 
+    @Override
     public Map<Object, Object> getBeans() {
         return beans;
     }
 
+    @Override
     public void setBeans(Map<Object, Object> beans) {
         this.beans = beans;
     }
 
+    @Override
     public List<FlowableFunctionDelegate> getFunctionDelegates() {
         return functionDelegates;
     }
 
+    @Override
     public void setFunctionDelegates(List<FlowableFunctionDelegate> functionDelegates) {
         this.functionDelegates = functionDelegates;
     }

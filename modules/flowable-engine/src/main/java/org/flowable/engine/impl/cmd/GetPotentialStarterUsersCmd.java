@@ -40,6 +40,7 @@ public class GetPotentialStarterUsersCmd implements Command<List<User>>, Seriali
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Override
     public List<User> execute(CommandContext commandContext) {
         ProcessDefinitionEntity processDefinition = CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findById(processDefinitionId);
 

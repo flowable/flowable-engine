@@ -34,6 +34,7 @@ public class AsyncProcessTest extends SpringFlowableTestCase {
     @Autowired
     protected CamelContext camelContext;
 
+    @Override
     public void setUp() throws Exception {
         camelContext.addRoutes(new RouteBuilder() {
 
@@ -50,6 +51,7 @@ public class AsyncProcessTest extends SpringFlowableTestCase {
         });
     }
 
+    @Override
     public void tearDown() throws Exception {
         List<Route> routes = camelContext.getRoutes();
         for (Route r : routes) {

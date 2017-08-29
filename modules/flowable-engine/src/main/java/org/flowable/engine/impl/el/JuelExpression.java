@@ -49,6 +49,7 @@ public class JuelExpression implements Expression {
         this.delegateInterceptor = delegateInterceptor;
     }
 
+    @Override
     public Object getValue(VariableScope variableScope) {
         ELContext elContext = expressionManager.getElContext(variableScope);
         try {
@@ -67,6 +68,7 @@ public class JuelExpression implements Expression {
         }
     }
 
+    @Override
     public void setValue(Object value, VariableScope variableScope) {
         ELContext elContext = expressionManager.getElContext(variableScope);
         try {
@@ -85,6 +87,7 @@ public class JuelExpression implements Expression {
         return super.toString();
     }
 
+    @Override
     public String getExpressionText() {
         return expressionText;
     }

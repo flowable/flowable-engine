@@ -41,6 +41,7 @@ public class AsyncEndEventConverterTest extends AbstractConverterTest {
         deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "asyncendeventmodel.bpmn";
     }

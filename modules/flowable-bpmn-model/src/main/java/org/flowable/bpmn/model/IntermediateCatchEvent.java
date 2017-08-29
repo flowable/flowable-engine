@@ -17,6 +17,7 @@ package org.flowable.bpmn.model;
  */
 public class IntermediateCatchEvent extends Event {
 
+    @Override
     public IntermediateCatchEvent clone() {
         IntermediateCatchEvent clone = new IntermediateCatchEvent();
         clone.setValues(this);

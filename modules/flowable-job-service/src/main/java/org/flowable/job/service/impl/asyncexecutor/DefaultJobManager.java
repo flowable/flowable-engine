@@ -395,6 +395,7 @@ public class DefaultJobManager implements JobManager {
         }
     }
     
+    @Override
     public String getBusinessCalendarName(JobEntity timerEntity, VariableScope variableScope) {
         String calendarValue = null;
         if (StringUtils.isNotEmpty(timerEntity.getJobHandlerConfiguration())) {
@@ -530,6 +531,7 @@ public class DefaultJobManager implements JobManager {
         return jobServiceConfiguration;
     }
 
+    @Override
     public void setJobServiceConfiguration(JobServiceConfiguration jobServiceConfiguration) {
         this.jobServiceConfiguration = jobServiceConfiguration;
     }

@@ -41,6 +41,7 @@ public class CompleteConverterTest extends AbstractConverterTest {
         deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "completemodel.bpmn";
     }

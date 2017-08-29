@@ -51,6 +51,7 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
         this.taskId = taskId;
     }
 
+    @Override
     public FormModel execute(CommandContext commandContext) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         FormService formService = CommandContextUtil.getFormService();

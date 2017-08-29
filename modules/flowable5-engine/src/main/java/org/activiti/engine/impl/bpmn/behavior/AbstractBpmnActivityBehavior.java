@@ -35,6 +35,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
      * Subclasses that call leave() will first pass through this method, before the regular {@link FlowNodeActivityBehavior#leave(ActivityExecution)} is called. This way, we can check if the activity
      * has loop characteristics, and delegate to the behavior if this is the case.
      */
+    @Override
     protected void leave(ActivityExecution execution) {
         if (hasCompensationHandler(execution)) {
             createCompensateEventSubscription(execution);

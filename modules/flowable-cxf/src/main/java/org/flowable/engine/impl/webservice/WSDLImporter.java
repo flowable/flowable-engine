@@ -76,6 +76,7 @@ public class WSDLImporter implements XMLImporter {
         this.namespace = "";
     }
 
+    @Override
     public void importFrom(Import theImport, String sourceSystemId) {
         this.namespace = theImport.getNamespace() == null ? "" : theImport.getNamespace() + ":";
         this.importFrom(theImport.getLocation());
@@ -220,14 +221,17 @@ public class WSDLImporter implements XMLImporter {
         }
     }
 
+    @Override
     public Map<String, StructureDefinition> getStructures() {
         return this.structures;
     }
 
+    @Override
     public Map<String, WSService> getServices() {
         return this.wsServices;
     }
 
+    @Override
     public Map<String, WSOperation> getOperations() {
         return this.wsOperations;
     }

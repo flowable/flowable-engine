@@ -60,11 +60,13 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         super(commandExecutor);
     }
 
+    @Override
     public HistoricVariableInstanceQuery id(String id) {
         this.id = id;
         return this;
     }
 
+    @Override
     public HistoricVariableInstanceQueryImpl processInstanceId(String processInstanceId) {
         if (processInstanceId == null) {
             throw new FlowableIllegalArgumentException("processInstanceId is null");
@@ -73,6 +75,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         return this;
     }
 
+    @Override
     public HistoricVariableInstanceQueryImpl executionId(String executionId) {
         if (executionId == null) {
             throw new FlowableIllegalArgumentException("Execution id is null");
@@ -81,6 +84,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         return this;
     }
 
+    @Override
     public HistoricVariableInstanceQueryImpl executionIds(Set<String> executionIds) {
         if (executionIds == null) {
             throw new FlowableIllegalArgumentException("executionIds is null");
@@ -97,6 +101,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         return this;
     }
 
+    @Override
     public HistoricVariableInstanceQuery taskId(String taskId) {
         if (taskId == null) {
             throw new FlowableIllegalArgumentException("taskId is null");
@@ -108,6 +113,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         return this;
     }
 
+    @Override
     public HistoricVariableInstanceQueryImpl taskIds(Set<String> taskIds) {
         if (taskIds == null) {
             throw new FlowableIllegalArgumentException("taskIds is null");
@@ -134,11 +140,13 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         return this;
     }
 
+    @Override
     public HistoricVariableInstanceQuery excludeVariableInitialization() {
         excludeVariableInitialization = true;
         return this;
     }
 
+    @Override
     public HistoricVariableInstanceQuery variableName(String variableName) {
         if (variableName == null) {
             throw new FlowableIllegalArgumentException("variableName is null");
@@ -147,6 +155,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         return this;
     }
 
+    @Override
     public HistoricVariableInstanceQuery variableValueEquals(String variableName, Object variableValue) {
         if (variableName == null) {
             throw new FlowableIllegalArgumentException("variableName is null");
@@ -159,6 +168,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         return this;
     }
 
+    @Override
     public HistoricVariableInstanceQuery variableValueNotEquals(String variableName, Object variableValue) {
         if (variableName == null) {
             throw new FlowableIllegalArgumentException("variableName is null");
@@ -171,6 +181,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         return this;
     }
 
+    @Override
     public HistoricVariableInstanceQuery variableValueLike(String variableName, String variableValue) {
         if (variableName == null) {
             throw new FlowableIllegalArgumentException("variableName is null");
@@ -183,6 +194,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         return this;
     }
 
+    @Override
     public HistoricVariableInstanceQuery variableValueLikeIgnoreCase(String variableName, String variableValue) {
         if (variableName == null) {
             throw new FlowableIllegalArgumentException("variableName is null");
@@ -195,6 +207,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         return this;
     }
 
+    @Override
     public HistoricVariableInstanceQuery variableNameLike(String variableNameLike) {
         if (variableNameLike == null) {
             throw new FlowableIllegalArgumentException("variableNameLike is null");
@@ -210,12 +223,14 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         }
     }
 
+    @Override
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
         ensureVariablesInitialized();
         return CommandContextUtil.getHistoricVariableInstanceEntityManager(commandContext).findHistoricVariableInstanceCountByQueryCriteria(this);
     }
 
+    @Override
     public List<HistoricVariableInstance> executeList(CommandContext commandContext) {
         checkQueryOk();
         ensureVariablesInitialized();
@@ -243,11 +258,13 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     // order by
     // /////////////////////////////////////////////////////////////////
 
+    @Override
     public HistoricVariableInstanceQuery orderByProcessInstanceId() {
         orderBy(HistoricVariableInstanceQueryProperty.PROCESS_INSTANCE_ID);
         return this;
     }
 
+    @Override
     public HistoricVariableInstanceQuery orderByVariableName() {
         orderBy(HistoricVariableInstanceQueryProperty.VARIABLE_NAME);
         return this;

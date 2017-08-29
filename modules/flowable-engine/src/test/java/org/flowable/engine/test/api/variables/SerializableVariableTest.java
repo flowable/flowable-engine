@@ -44,6 +44,7 @@ public class SerializableVariableTest extends PluggableFlowableTestCase {
 
     public static class TestUpdateSerializableVariableDelegate implements JavaDelegate {
 
+        @Override
         public void execute(DelegateExecution execution) {
             TestSerializableVariable var = (TestSerializableVariable) execution.getVariable("myVar");
             var.setNumber(2);

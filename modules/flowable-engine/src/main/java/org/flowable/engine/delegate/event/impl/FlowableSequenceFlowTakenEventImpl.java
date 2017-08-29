@@ -34,6 +34,7 @@ public class FlowableSequenceFlowTakenEventImpl extends FlowableProcessEventImpl
         super(type);
     }
 
+    @Override
     public String getId() {
         return id;
     }
@@ -42,6 +43,7 @@ public class FlowableSequenceFlowTakenEventImpl extends FlowableProcessEventImpl
         this.id = id;
     }
 
+    @Override
     public String getSourceActivityId() {
         return sourceActivityId;
     }
@@ -50,6 +52,7 @@ public class FlowableSequenceFlowTakenEventImpl extends FlowableProcessEventImpl
         this.sourceActivityId = sourceActivityId;
     }
 
+    @Override
     public String getSourceActivityName() {
         return sourceActivityName;
     }
@@ -58,6 +61,7 @@ public class FlowableSequenceFlowTakenEventImpl extends FlowableProcessEventImpl
         this.sourceActivityName = sourceActivityName;
     }
 
+    @Override
     public String getSourceActivityType() {
         return sourceActivityType;
     }
@@ -66,6 +70,7 @@ public class FlowableSequenceFlowTakenEventImpl extends FlowableProcessEventImpl
         this.sourceActivityType = sourceActivityType;
     }
 
+    @Override
     public String getTargetActivityId() {
         return targetActivityId;
     }
@@ -74,6 +79,7 @@ public class FlowableSequenceFlowTakenEventImpl extends FlowableProcessEventImpl
         this.targetActivityId = targetActivityId;
     }
 
+    @Override
     public String getTargetActivityName() {
         return targetActivityName;
     }
@@ -82,6 +88,7 @@ public class FlowableSequenceFlowTakenEventImpl extends FlowableProcessEventImpl
         this.targetActivityName = targetActivityName;
     }
 
+    @Override
     public String getTargetActivityType() {
         return targetActivityType;
     }
@@ -90,6 +97,7 @@ public class FlowableSequenceFlowTakenEventImpl extends FlowableProcessEventImpl
         this.targetActivityType = targetActivityType;
     }
 
+    @Override
     public String getSourceActivityBehaviorClass() {
         return sourceActivityBehaviorClass;
     }
@@ -98,6 +106,7 @@ public class FlowableSequenceFlowTakenEventImpl extends FlowableProcessEventImpl
         this.sourceActivityBehaviorClass = sourceActivityBehaviorClass;
     }
 
+    @Override
     public String getTargetActivityBehaviorClass() {
         return targetActivityBehaviorClass;
     }

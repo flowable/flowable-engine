@@ -61,6 +61,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
 
     public static class CountDelegate implements JavaDelegate {
 
+        @Override
         public void execute(DelegateExecution execution) {
             serviceTaskInvokedCount++;
 
@@ -73,6 +74,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
 
     public static class CountDelegate2 implements JavaDelegate {
 
+        @Override
         public void execute(DelegateExecution execution) {
             serviceTaskInvokedCount2++;
         }
@@ -1021,6 +1023,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Override
     protected void assertHistoricTasksDeleteReason(ProcessInstance processInstance, String expectedDeleteReason, String... taskNames) {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             for (String taskName : taskNames) {
@@ -1039,6 +1042,7 @@ public class TerminateEndEventTest extends PluggableFlowableTestCase {
         }
     }
 
+    @Override
     protected void assertHistoricActivitiesDeleteReason(ProcessInstance processInstance, String expectedDeleteReason, String... activityIds) {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             for (String activityId : activityIds) {

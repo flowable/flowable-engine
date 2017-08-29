@@ -61,6 +61,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         super(commandExecutor);
     }
 
+    @Override
     public TimerJobQueryImpl jobId(String jobId) {
         if (jobId == null) {
             throw new FlowableIllegalArgumentException("Provided job id is null");
@@ -69,6 +70,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQueryImpl processInstanceId(String processInstanceId) {
         if (processInstanceId == null) {
             throw new FlowableIllegalArgumentException("Provided process instance id is null");
@@ -77,6 +79,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQueryImpl processDefinitionId(String processDefinitionId) {
         if (processDefinitionId == null) {
             throw new FlowableIllegalArgumentException("Provided process definition id is null");
@@ -85,6 +88,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQueryImpl executionId(String executionId) {
         if (executionId == null) {
             throw new FlowableIllegalArgumentException("Provided execution id is null");
@@ -93,6 +97,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
     
+    @Override
     public TimerJobQueryImpl handlerType(String handlerType) {
         if (handlerType == null) {
             throw new FlowableIllegalArgumentException("Provided handlerType is null");
@@ -101,11 +106,13 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQueryImpl executable() {
         executable = true;
         return this;
     }
 
+    @Override
     public TimerJobQueryImpl timers() {
         if (onlyMessages) {
             throw new FlowableIllegalArgumentException("Cannot combine onlyTimers() with onlyMessages() in the same query");
@@ -114,6 +121,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQueryImpl messages() {
         if (onlyTimers) {
             throw new FlowableIllegalArgumentException("Cannot combine onlyTimers() with onlyMessages() in the same query");
@@ -122,6 +130,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQueryImpl duedateHigherThan(Date date) {
         if (date == null) {
             throw new FlowableIllegalArgumentException("Provided date is null");
@@ -130,6 +139,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQueryImpl duedateLowerThan(Date date) {
         if (date == null) {
             throw new FlowableIllegalArgumentException("Provided date is null");
@@ -138,11 +148,13 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQueryImpl withException() {
         this.withException = true;
         return this;
     }
 
+    @Override
     public TimerJobQueryImpl exceptionMessage(String exceptionMessage) {
         if (exceptionMessage == null) {
             throw new FlowableIllegalArgumentException("Provided exception message is null");
@@ -151,6 +163,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQueryImpl jobTenantId(String tenantId) {
         if (tenantId == null) {
             throw new FlowableIllegalArgumentException("Provided tentant id is null");
@@ -159,6 +172,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQueryImpl jobTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
             throw new FlowableIllegalArgumentException("Provided tentant id is null");
@@ -167,6 +181,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQueryImpl jobWithoutTenantId() {
         this.withoutTenantId = true;
         return this;
@@ -174,37 +189,45 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
 
     // sorting //////////////////////////////////////////
 
+    @Override
     public TimerJobQuery orderByJobDuedate() {
         return orderBy(JobQueryProperty.DUEDATE);
     }
 
+    @Override
     public TimerJobQuery orderByExecutionId() {
         return orderBy(JobQueryProperty.EXECUTION_ID);
     }
 
+    @Override
     public TimerJobQuery orderByJobId() {
         return orderBy(JobQueryProperty.JOB_ID);
     }
 
+    @Override
     public TimerJobQuery orderByProcessInstanceId() {
         return orderBy(JobQueryProperty.PROCESS_INSTANCE_ID);
     }
 
+    @Override
     public TimerJobQuery orderByJobRetries() {
         return orderBy(JobQueryProperty.RETRIES);
     }
 
+    @Override
     public TimerJobQuery orderByTenantId() {
         return orderBy(JobQueryProperty.TENANT_ID);
     }
 
     // results //////////////////////////////////////////
 
+    @Override
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
         return CommandContextUtil.getTimerJobEntityManager(commandContext).findJobCountByQueryCriteria(this);
     }
 
+    @Override
     public List<Job> executeList(CommandContext commandContext) {
         checkQueryOk();
         return CommandContextUtil.getTimerJobEntityManager(commandContext).findJobsByQueryCriteria(this);

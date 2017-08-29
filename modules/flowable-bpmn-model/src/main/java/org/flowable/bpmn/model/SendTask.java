@@ -47,6 +47,7 @@ public class SendTask extends TaskWithFieldExtensions {
         this.operationRef = operationRef;
     }
 
+    @Override
     public SendTask clone() {
         SendTask clone = new SendTask();
         clone.setValues(this);

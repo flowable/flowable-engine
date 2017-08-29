@@ -31,6 +31,7 @@ public class PingPongTest extends SpringFlowableTestCase {
     @Autowired
     protected CamelContext camelContext;
 
+    @Override
     public void setUp() throws Exception {
         camelContext.addRoutes(new RouteBuilder() {
 

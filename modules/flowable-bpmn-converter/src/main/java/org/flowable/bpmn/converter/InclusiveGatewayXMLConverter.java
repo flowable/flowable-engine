@@ -25,6 +25,7 @@ import org.flowable.bpmn.model.InclusiveGateway;
  */
 public class InclusiveGatewayXMLConverter extends BaseBpmnXMLConverter {
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return InclusiveGateway.class;
     }

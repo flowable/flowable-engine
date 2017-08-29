@@ -19,22 +19,27 @@ public class DoubleType implements VariableType {
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public String getTypeName() {
         return "double";
     }
 
+    @Override
     public boolean isCachable() {
         return true;
     }
 
+    @Override
     public Object getValue(ValueFields valueFields) {
         return valueFields.getDoubleValue();
     }
 
+    @Override
     public void setValue(Object value, ValueFields valueFields) {
         valueFields.setDoubleValue((Double) value);
     }
 
+    @Override
     public boolean isAbleToStore(Object value) {
         if (value == null) {
             return true;

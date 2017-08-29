@@ -91,6 +91,7 @@ public class LDAPUserQueryImpl extends UserQueryImpl {
         LDAPTemplate ldapTemplate = new LDAPTemplate(ldapConfigurator);
         return ldapTemplate.execute(new LDAPCallBack<UserEntity>() {
 
+            @Override
             public UserEntity executeInContext(InitialDirContext initialDirContext) {
                 try {
 
@@ -120,6 +121,7 @@ public class LDAPUserQueryImpl extends UserQueryImpl {
         LDAPTemplate ldapTemplate = new LDAPTemplate(ldapConfigurator);
         return ldapTemplate.execute(new LDAPCallBack<List<User>>() {
 
+            @Override
             public List<User> executeInContext(InitialDirContext initialDirContext) {
                 List<User> result = new ArrayList<>();
                 try {

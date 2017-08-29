@@ -17,6 +17,7 @@ package org.flowable.bpmn.model;
  */
 public class ManualTask extends Task {
 
+    @Override
     public ManualTask clone() {
         ManualTask clone = new ManualTask();
         clone.setValues(this);

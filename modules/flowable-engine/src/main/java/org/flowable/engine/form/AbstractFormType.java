@@ -27,6 +27,7 @@ public abstract class AbstractFormType implements FormType {
 
     public abstract String convertModelValueToFormValue(Object modelValue);
 
+    @Override
     public Object getInformation(String key) {
         return null;
     }

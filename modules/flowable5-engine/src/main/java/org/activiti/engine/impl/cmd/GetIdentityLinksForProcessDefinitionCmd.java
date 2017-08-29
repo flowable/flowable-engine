@@ -34,6 +34,7 @@ public class GetIdentityLinksForProcessDefinitionCmd implements Command<List<Ide
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     @SuppressWarnings({ "unchecked", "rawtypes" })
     public List<IdentityLink> execute(CommandContext commandContext) {
         ProcessDefinitionEntity processDefinition = commandContext

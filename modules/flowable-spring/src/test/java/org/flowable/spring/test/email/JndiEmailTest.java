@@ -37,6 +37,7 @@ public class JndiEmailTest extends SpringFlowableTestCase {
     private static final Logger LOGGER = LoggerFactory.getLogger(JndiEmailTest.class);
 
     @BeforeClass
+    @Override
     public void setUp() {
         Properties props = new Properties();
         props.put("mail.transport.protocol", "smtp");

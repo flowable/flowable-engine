@@ -35,6 +35,7 @@ public class AcquireTimerJobsCmd implements Command<AcquiredTimerJobEntities> {
         this.asyncExecutor = asyncExecutor;
     }
 
+    @Override
     public AcquiredTimerJobEntities execute(CommandContext commandContext) {
         AcquiredTimerJobEntities acquiredJobs = new AcquiredTimerJobEntities();
         List<TimerJobEntity> timerJobs = CommandContextUtil.getTimerJobEntityManager(commandContext)

@@ -36,6 +36,7 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
 
         String jobId = commandExecutor.execute(new Command<String>() {
 
+            @Override
             public String execute(CommandContext commandContext) {
                 JobEntity message = createTweetMessage("i'm coding a test");
                 CommandContextUtil.getJobService(commandContext).scheduleAsyncJob(message);
@@ -67,6 +68,7 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
 
         String jobId = commandExecutor.execute(new Command<String>() {
 
+            @Override
             public String execute(CommandContext commandContext) {
                 TimerJobEntity timer = createTweetTimer("i'm coding a test", new Date(SOME_TIME + (10 * SECOND)));
                 CommandContextUtil.getTimerJobService(commandContext).scheduleTimerJob(timer);

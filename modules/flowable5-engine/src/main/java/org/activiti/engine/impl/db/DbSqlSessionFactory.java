@@ -216,10 +216,12 @@ public class DbSqlSessionFactory implements SessionFactory {
     protected boolean isDbHistoryUsed = true;
     protected int maxNrOfStatementsInBulkInsert = 100;
 
+    @Override
     public Class<?> getSessionType() {
         return DbSqlSession.class;
     }
 
+    @Override
     public Session openSession() {
         return new DbSqlSession(this);
     }

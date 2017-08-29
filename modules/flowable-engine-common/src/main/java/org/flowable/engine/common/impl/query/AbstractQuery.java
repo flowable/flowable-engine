@@ -50,21 +50,25 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         this.commandContext = commandContext;
     }
 
+    @Override
     public T orderBy(QueryProperty property) {
         this.orderProperty = property;
         return (T) this;
     }
 
+    @Override
     public T orderBy(QueryProperty property, NullHandlingOnOrder nullHandlingOnOrder) {
         orderBy(property);
         this.nullHandlingOnOrder = nullHandlingOnOrder;
         return (T) this;
     }
 
+    @Override
     public T asc() {
         return direction(Direction.ASCENDING);
     }
 
+    @Override
     public T desc() {
         return direction(Direction.DESCENDING);
     }
@@ -87,6 +91,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public U singleResult() {
         this.resultType = ResultType.SINGLE_RESULT;
         if (commandExecutor != null) {
@@ -96,6 +101,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<U> list() {
         this.resultType = ResultType.LIST;
         if (commandExecutor != null) {
@@ -105,6 +111,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<U> listPage(int firstResult, int maxResults) {
         this.firstResult = firstResult;
         this.maxResults = maxResults;
@@ -115,6 +122,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         return executeList(Context.getCommandContext());
     }
 
+    @Override
     public long count() {
         this.resultType = ResultType.COUNT;
         if (commandExecutor != null) {
@@ -123,6 +131,7 @@ public abstract class AbstractQuery<T extends Query<?, ?>, U> extends ListQueryP
         return executeCount(Context.getCommandContext());
     }
 
+    @Override
     public Object execute(CommandContext commandContext) {
         if (resultType == ResultType.LIST) {
             return executeList(commandContext);

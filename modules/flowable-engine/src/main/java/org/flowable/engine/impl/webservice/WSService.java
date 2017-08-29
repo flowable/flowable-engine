@@ -64,6 +64,7 @@ public class WSService implements BpmnInterfaceImplementation {
         return this.client;
     }
 
+    @Override
     public String getName() {
         return this.name;
     }

@@ -95,6 +95,7 @@ public class AsyncJobUtil {
             commandContext.getJobEntityManager().unacquireJob(job.getId());
         } else {
             commandExecutor.execute(new Command<Void>() {
+                @Override
                 public Void execute(CommandContext commandContext) {
                     commandContext.getJobEntityManager().unacquireJob(job.getId());
                     return null;

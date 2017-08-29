@@ -33,26 +33,32 @@ public class PrivilegeMappingEntityImpl extends AbstractEntity implements Privil
         return state;
     }
 
+    @Override
     public String getPrivilegeId() {
         return privilegeId;
     }
 
+    @Override
     public void setPrivilegeId(String privilegeId) {
         this.privilegeId = privilegeId;
     }
 
+    @Override
     public String getUserId() {
         return userId;
     }
 
+    @Override
     public void setUserId(String userId) {
         this.userId = userId;
     }
 
+    @Override
     public String getGroupId() {
         return groupId;
     }
 
+    @Override
     public void setGroupId(String groupId) {
         this.groupId = groupId;
     }

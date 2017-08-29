@@ -43,6 +43,7 @@ public class ChangeActivityStateCmd implements Command<Void> {
         this.startActivityId = changeActivityStateBuilder.getStartActivityId();
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (processInstanceId == null) {
             throw new FlowableIllegalArgumentException("Process instance id is required");

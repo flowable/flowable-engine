@@ -31,6 +31,7 @@ public class DeleteTokenCmd implements Command<Void>, Serializable {
         this.tokenId = tokenId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (tokenId == null) {
             throw new FlowableIllegalArgumentException("tokenId is null");

@@ -48,10 +48,12 @@ public class TimerEventDefinitionParseHandler extends AbstractBpmnParseHandler<T
 
     public static final String PROPERTYNAME_START_TIMER = "timerStart";
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return TimerEventDefinition.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, TimerEventDefinition timerEventDefinition) {
 
         ActivityImpl timerActivity = bpmnParse.getCurrentActivity();

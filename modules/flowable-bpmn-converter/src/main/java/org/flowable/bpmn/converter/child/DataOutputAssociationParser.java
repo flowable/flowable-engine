@@ -25,10 +25,12 @@ import org.flowable.bpmn.model.DataAssociation;
  */
 public class DataOutputAssociationParser extends BaseChildElementParser {
 
+    @Override
     public String getElementName() {
         return ELEMENT_OUTPUT_ASSOCIATION;
     }
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
 
         if (!(parentElement instanceof Activity))

@@ -39,6 +39,7 @@ public class GetFormDefinitionResourceCmd implements Command<InputStream>, Seria
         this.formDefinitionId = formDefinitionId;
     }
 
+    @Override
     public InputStream execute(CommandContext commandContext) {
         FormDefinitionEntity formDefinition = CommandContextUtil.getFormEngineConfiguration().getDeploymentManager()
                 .findDeployedFormDefinitionById(formDefinitionId);

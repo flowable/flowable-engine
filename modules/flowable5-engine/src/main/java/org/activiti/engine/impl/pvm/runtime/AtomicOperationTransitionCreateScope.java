@@ -23,11 +23,13 @@ public class AtomicOperationTransitionCreateScope implements AtomicOperation {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AtomicOperationTransitionCreateScope.class);
 
+    @Override
     public boolean isAsync(InterpretableExecution execution) {
         ActivityImpl activity = (ActivityImpl) execution.getActivity();
         return activity.isAsync();
     }
 
+    @Override
     public void execute(InterpretableExecution execution) {
         InterpretableExecution propagatingExecution = null;
         ActivityImpl activity = (ActivityImpl) execution.getActivity();

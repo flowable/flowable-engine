@@ -28,34 +28,42 @@ import org.flowable.content.engine.impl.cmd.SaveContentItemCmd;
  */
 public class ContentServiceImpl extends ServiceImpl implements ContentService {
 
+    @Override
     public ContentItem newContentItem() {
         return commandExecutor.execute(new CreateContentItemCmd());
     }
 
+    @Override
     public void saveContentItem(ContentItem contentItem) {
         commandExecutor.execute(new SaveContentItemCmd(contentItem));
     }
 
+    @Override
     public void saveContentItem(ContentItem contentItem, InputStream inputStream) {
         commandExecutor.execute(new SaveContentItemCmd(contentItem, inputStream));
     }
 
+    @Override
     public InputStream getContentItemData(String contentItemId) {
         return commandExecutor.execute(new GetContentItemStreamCmd(contentItemId));
     }
 
+    @Override
     public void deleteContentItem(String contentItemId) {
         commandExecutor.execute(new DeleteContentItemCmd(contentItemId));
     }
 
+    @Override
     public void deleteContentItemsByProcessInstanceId(String processInstanceId) {
         commandExecutor.execute(new DeleteContentItemsCmd(processInstanceId, null));
     }
 
+    @Override
     public void deleteContentItemsByTaskId(String taskId) {
         commandExecutor.execute(new DeleteContentItemsCmd(null, taskId));
     }
 
+    @Override
     public ContentItemQuery createContentItemQuery() {
         return new ContentItemQueryImpl(commandExecutor);
     }

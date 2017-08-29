@@ -36,10 +36,12 @@ public class PrimitiveStructureInstance implements StructureInstance {
         return this.primitive;
     }
 
+    @Override
     public Object[] toArray() {
         return new Object[] { this.primitive };
     }
 
+    @Override
     public void loadFrom(Object[] array) {
         for (int i = 0; i < array.length; i++) {
             Object object = array[i];

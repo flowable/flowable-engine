@@ -38,36 +38,43 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
         this.ruleService = ruleService;
     }
 
+    @Override
     public ExecuteDecisionBuilder decisionKey(String decisionKey) {
         this.decisionKey = decisionKey;
         return this;
     }
     
+    @Override
     public ExecuteDecisionBuilder parentDeploymentId(String parentDeploymentId) {
         this.parentDeploymentId = parentDeploymentId;
         return this;
     }
 
+    @Override
     public ExecuteDecisionBuilder instanceId(String instanceId) {
         this.instanceId = instanceId;
         return this;
     }
     
+    @Override
     public ExecuteDecisionBuilder executionId(String executionId) {
         this.executionId = executionId;
         return this;
     }
     
+    @Override
     public ExecuteDecisionBuilder activityId(String activityId) {
         this.activityId = activityId;
         return this;
     }
 
+    @Override
     public ExecuteDecisionBuilder tenantId(String tenantId) {
         this.tenantId = tenantId;
         return this;
     }
 
+    @Override
     public ExecuteDecisionBuilder variables(Map<String, Object> variables) {
         if (this.variables == null) {
             this.variables = new HashMap<>();
@@ -80,6 +87,7 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
         return this;
     }
 
+    @Override
     public ExecuteDecisionBuilder variable(String variableName, Object value) {
         if (this.variables == null) {
             this.variables = new HashMap<>();
@@ -88,14 +96,17 @@ public class ExecuteDecisionBuilderImpl implements ExecuteDecisionBuilder {
         return this;
     }
 
+    @Override
     public List<Map<String, Object>> execute() {
         return ruleService.executeDecision(this);
     }
     
+    @Override
     public Map<String, Object> executeWithSingleResult() {
         return ruleService.executeDecisionWithSingleResult(this);
     }
     
+    @Override
     public DecisionExecutionAuditContainer executeWithAuditTrail() {
         return ruleService.executeDecisionWithAuditTrail(this);
     }

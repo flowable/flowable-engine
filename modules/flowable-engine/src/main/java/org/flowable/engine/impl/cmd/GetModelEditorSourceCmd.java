@@ -31,6 +31,7 @@ public class GetModelEditorSourceCmd implements Command<byte[]>, Serializable {
         this.modelId = modelId;
     }
 
+    @Override
     public byte[] execute(CommandContext commandContext) {
         if (modelId == null) {
             throw new FlowableIllegalArgumentException("modelId is null");

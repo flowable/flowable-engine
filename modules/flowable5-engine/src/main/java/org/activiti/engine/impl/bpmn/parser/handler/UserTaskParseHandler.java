@@ -39,10 +39,12 @@ public class UserTaskParseHandler extends AbstractActivityBpmnParseHandler<UserT
 
     public static final String PROPERTY_TASK_DEFINITION = "taskDefinition";
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return UserTask.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, UserTask userTask) {
         ActivityImpl activity = createActivityOnCurrentScope(bpmnParse, userTask, BpmnXMLConstants.ELEMENT_TASK_USER);
 

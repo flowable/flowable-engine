@@ -65,6 +65,7 @@ public abstract class SpringFlowableIdmTestCase extends AbstractFlowableIdmTestC
         this.idmEngine = engine;
     }
 
+    @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }

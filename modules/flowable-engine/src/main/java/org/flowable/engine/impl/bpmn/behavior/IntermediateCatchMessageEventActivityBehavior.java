@@ -39,6 +39,7 @@ public class IntermediateCatchMessageEventActivityBehavior extends IntermediateC
         this.messageEventDefinition = messageEventDefinition;
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
         CommandContext commandContext = Context.getCommandContext();
         ExecutionEntity executionEntity = (ExecutionEntity) execution;

@@ -34,6 +34,7 @@ public class SaveTokenCmd implements Command<Void>, Serializable {
         this.token = token;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (token == null) {
             throw new FlowableIllegalArgumentException("token is null");

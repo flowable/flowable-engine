@@ -30,6 +30,7 @@ public class SimpleContextProvider implements ContextProvider {
         this(Collections.singletonMap(processName, ctx));
     }
 
+    @Override
     public CamelContext getContext(String processName) {
         return contexts.get(processName);
     }

@@ -62,6 +62,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
     /**
      * Setup starts 4 process instances of oneTaskProcess and 1 instance of oneTaskProcess2
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
@@ -74,6 +75,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_2, "1").getId());
     }
 
+    @Override
     protected void tearDown() throws Exception {
         deleteDeployments();
         super.tearDown();

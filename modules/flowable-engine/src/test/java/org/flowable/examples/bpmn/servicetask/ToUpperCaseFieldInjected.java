@@ -23,6 +23,7 @@ public class ToUpperCaseFieldInjected implements JavaDelegate {
 
     private Expression text;
 
+    @Override
     public void execute(DelegateExecution execution) {
         execution.setVariable("var", ((String) text.getValue(execution)).toUpperCase());
     }

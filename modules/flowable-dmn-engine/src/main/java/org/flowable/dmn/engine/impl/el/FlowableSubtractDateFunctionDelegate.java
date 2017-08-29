@@ -25,18 +25,22 @@ import org.flowable.engine.common.impl.el.AbstractFlowableFunctionDelegate;
  */
 public class FlowableSubtractDateFunctionDelegate extends AbstractFlowableFunctionDelegate {
 
+    @Override
     public String prefix() {
         return "date";
     }
 
+    @Override
     public String localName() {
         return "subtractDate";
     }
 
+    @Override
     public Class<?> functionClass() {
         return DateUtil.class;
     }
 
+    @Override
     public Method functionMethod() {
         return getFourObjectParameterMethod();
     }

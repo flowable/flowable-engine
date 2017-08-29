@@ -33,15 +33,18 @@ public abstract class AbstractAgenda implements Agenda {
         this.commandContext = commandContext;
     }
 
+    @Override
     public boolean isEmpty() {
         return operations.isEmpty();
     }
 
+    @Override
     public Runnable getNextOperation() {
         assertOperationsNotEmpty();
         return operations.poll();
     }
 
+    @Override
     public Runnable peekOperation() {
         assertOperationsNotEmpty();
         return operations.peek();
@@ -56,6 +59,7 @@ public abstract class AbstractAgenda implements Agenda {
     /**
      * Generic method to plan a {@link Runnable}.
      */
+    @Override
     public void planOperation(Runnable operation) {
         operations.add(operation);
         if (LOGGER.isDebugEnabled()) {
@@ -75,10 +79,12 @@ public abstract class AbstractAgenda implements Agenda {
         this.commandContext = commandContext;
     }
     
+    @Override
     public void flush() {
         
     }
 
+    @Override
     public void close() {
         
     }

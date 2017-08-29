@@ -31,6 +31,7 @@ public class HitPolicyAny extends AbstractHitPolicy implements ComposeDecisionRe
         return HitPolicy.ANY.getValue();
     }
 
+    @Override
     public void composeDecisionResults(final ELExecutionContext executionContext) {
         if (CommandContextUtil.getDmnEngineConfiguration().isStrictMode()) {
 

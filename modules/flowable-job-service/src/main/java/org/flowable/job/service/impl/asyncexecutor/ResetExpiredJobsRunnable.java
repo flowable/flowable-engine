@@ -51,6 +51,7 @@ public class ResetExpiredJobsRunnable implements Runnable {
         this.jobEntityManager = jobEntityManager;
     }
 
+    @Override
     public synchronized void run() {
         LOGGER.info("starting to reset expired jobs");
         Thread.currentThread().setName(name);

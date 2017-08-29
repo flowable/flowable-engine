@@ -51,6 +51,7 @@ public class DefaultBusinessCalendar implements BusinessCalendar {
         return resolveDuedate(duedateDescription);
     }
 
+    @Override
     public Date resolveDuedate(String duedate) {
         Date resolvedDuedate = CommandContextUtil.getProcessEngineConfiguration().getClock().getCurrentTime();
 

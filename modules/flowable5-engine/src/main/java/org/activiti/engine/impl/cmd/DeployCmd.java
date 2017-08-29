@@ -43,6 +43,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
         this.deploymentBuilder = deploymentBuilder;
     }
 
+    @Override
     public Deployment execute(CommandContext commandContext) {
         DeploymentEntity deployment = deploymentBuilder.getDeployment();
 

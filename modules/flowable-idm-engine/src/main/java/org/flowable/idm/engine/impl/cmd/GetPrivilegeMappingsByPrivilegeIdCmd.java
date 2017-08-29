@@ -38,6 +38,7 @@ public class GetPrivilegeMappingsByPrivilegeIdCmd implements Command<List<Privil
         this.privilegeId = privilegeId;
     }
 
+    @Override
     public List<PrivilegeMapping> execute(CommandContext commandContext) {
         return CommandContextUtil.getPrivilegeMappingEntityManager(commandContext).getPrivilegeMappingsByPrivilegeId(privilegeId);
     }

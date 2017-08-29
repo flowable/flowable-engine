@@ -32,6 +32,7 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
     /**
      * Setup starts 4 process instances of oneTaskProcess and 1 instance of oneTaskProcess2
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         repositoryService.createDeployment()
@@ -56,6 +57,7 @@ public class ProcessInstanceAndVariablesQueryTest extends PluggableFlowableTestC
         runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_3, "1", startMap);
     }
 
+    @Override
     protected void tearDown() throws Exception {
         for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
             repositoryService.deleteDeployment(deployment.getId(), true);

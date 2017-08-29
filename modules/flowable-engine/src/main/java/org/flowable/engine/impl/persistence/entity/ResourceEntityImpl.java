@@ -34,34 +34,42 @@ public class ResourceEntityImpl extends AbstractEntityNoRevision implements Reso
 
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public byte[] getBytes() {
         return bytes;
     }
 
+    @Override
     public void setBytes(byte[] bytes) {
         this.bytes = bytes;
     }
 
+    @Override
     public String getDeploymentId() {
         return deploymentId;
     }
 
+    @Override
     public void setDeploymentId(String deploymentId) {
         this.deploymentId = deploymentId;
     }
 
+    @Override
     public Object getPersistentState() {
         return ResourceEntityImpl.class;
     }
 
+    @Override
     public void setGenerated(boolean generated) {
         this.generated = generated;
     }
@@ -69,6 +77,7 @@ public class ResourceEntityImpl extends AbstractEntityNoRevision implements Reso
     /**
      * Indicated whether or not the resource has been generated while deploying rather than being actual part of the deployment.
      */
+    @Override
     public boolean isGenerated() {
         return generated;
     }

@@ -22,6 +22,7 @@ public class TaskAssignmentListener implements TaskListener {
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public void notify(DelegateTask delegateTask) {
         delegateTask.setDescription("TaskAssignmentListener is listening: " + delegateTask.getAssignee());
     }

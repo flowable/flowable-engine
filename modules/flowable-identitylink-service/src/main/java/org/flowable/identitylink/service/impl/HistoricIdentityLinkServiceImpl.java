@@ -32,38 +32,47 @@ public class HistoricIdentityLinkServiceImpl extends ServiceImpl implements Hist
         super(identityLinkServiceConfiguration);
     }
     
+    @Override
     public HistoricIdentityLinkEntity getHistoricIdentityLink(String id) {
         return getHistoricIdentityLinkEntityManager().findById(id);
     }
     
+    @Override
     public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByTaskId(String taskId) {
         return getHistoricIdentityLinkEntityManager().findHistoricIdentityLinksByTaskId(taskId);
     }
     
+    @Override
     public List<HistoricIdentityLinkEntity> findHistoricIdentityLinksByProcessInstanceId(String processInstanceId) {
         return getHistoricIdentityLinkEntityManager().findHistoricIdentityLinksByProcessInstanceId(processInstanceId);
     }
     
+    @Override
     public HistoricIdentityLinkEntity createHistoricIdentityLink() {
         return getHistoricIdentityLinkEntityManager().create();
     }
     
+    @Override
     public void insertHistoricIdentityLink(HistoricIdentityLinkEntity identityLink, boolean fireCreateEvent) {
         getHistoricIdentityLinkEntityManager().insert(identityLink, fireCreateEvent);
     }
     
+    @Override
     public void deleteHistoricIdentityLink(String id) {
         getHistoricIdentityLinkEntityManager().delete(id);
     }
     
+    @Override
     public void deleteHistoricIdentityLink(HistoricIdentityLinkEntity identityLink) {
         getHistoricIdentityLinkEntityManager().delete(identityLink);
     }
     
+    @Override
     public void deleteHistoricIdentityLinksByProcessInstanceId(String processInstanceId) {
         getHistoricIdentityLinkEntityManager().deleteHistoricIdentityLinksByProcInstance(processInstanceId);
     }
 
+    @Override
     public void deleteHistoricIdentityLinksByTaskId(String taskId) {
         getHistoricIdentityLinkEntityManager().deleteHistoricIdentityLinksByTaskId(taskId);
     }

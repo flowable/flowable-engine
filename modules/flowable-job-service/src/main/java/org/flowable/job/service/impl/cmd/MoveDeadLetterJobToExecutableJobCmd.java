@@ -41,6 +41,7 @@ public class MoveDeadLetterJobToExecutableJobCmd implements Command<JobEntity>, 
         this.retries = retries;
     }
 
+    @Override
     public JobEntity execute(CommandContext commandContext) {
 
         if (jobId == null) {

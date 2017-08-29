@@ -37,6 +37,7 @@ public class SetDeploymentKeyCmd implements Command<Void> {
         this.key = key;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
 
         if (deploymentId == null) {

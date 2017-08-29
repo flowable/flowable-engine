@@ -40,6 +40,7 @@ public class GetPotentialStarterGroupsCmd implements Command<List<Group>>, Seria
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Override
     public List<Group> execute(CommandContext commandContext) {
         ProcessDefinitionEntity processDefinition = CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findById(processDefinitionId);
 

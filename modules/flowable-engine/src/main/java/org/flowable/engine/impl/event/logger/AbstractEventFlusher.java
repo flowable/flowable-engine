@@ -30,14 +30,17 @@ public abstract class AbstractEventFlusher implements EventFlusher {
         // Not interested in closed
     }
 
+    @Override
     public List<EventLoggerEventHandler> getEventHandlers() {
         return eventHandlers;
     }
 
+    @Override
     public void setEventHandlers(List<EventLoggerEventHandler> eventHandlers) {
         this.eventHandlers = eventHandlers;
     }
 
+    @Override
     public void addEventHandler(EventLoggerEventHandler databaseEventLoggerEventHandler) {
         eventHandlers.add(databaseEventLoggerEventHandler);
     }

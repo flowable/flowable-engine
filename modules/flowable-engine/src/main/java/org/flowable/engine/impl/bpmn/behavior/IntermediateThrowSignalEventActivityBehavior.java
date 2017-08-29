@@ -59,6 +59,7 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
         this.signalEventDefinition = signalEventDefinition;
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
 
         CommandContext commandContext = Context.getCommandContext();

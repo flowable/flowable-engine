@@ -233,6 +233,7 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
             // do some plumbing
             CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
             ProcessDefinition processDefinition = commandExecutor.execute(new Command<ProcessDefinition>() {
+                @Override
                 public ProcessDefinition execute(CommandContext commandContext) {
                     return Context.getProcessEngineConfiguration().getDeploymentManager().findDeployedLatestProcessDefinitionByKey("myProcess");
                 }

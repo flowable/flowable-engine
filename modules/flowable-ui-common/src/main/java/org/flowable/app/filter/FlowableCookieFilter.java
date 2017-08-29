@@ -98,6 +98,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
         tokenCache = CacheBuilder.newBuilder().maximumSize(maxSize).expireAfterWrite(maxAge, TimeUnit.SECONDS).recordStats()
                 .build(new CacheLoader<String, RemoteToken>() {
 
+                    @Override
                     public RemoteToken load(final String tokenId) throws Exception {
                         RemoteToken token = remoteIdmService.getToken(tokenId);
                         if (token != null) {
@@ -116,6 +117,7 @@ public class FlowableCookieFilter extends OncePerRequestFilter {
         userCache = CacheBuilder.newBuilder().maximumSize(userMaxSize).expireAfterWrite(userMaxAge, TimeUnit.SECONDS).recordStats()
                 .build(new CacheLoader<String, FlowableAppUser>() {
 
+                    @Override
                     public FlowableAppUser load(final String userId) throws Exception {
                         RemoteUser user = remoteIdmService.getUser(userId);
                         if (user == null) {

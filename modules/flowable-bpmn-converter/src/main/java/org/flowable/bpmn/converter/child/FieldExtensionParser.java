@@ -28,14 +28,17 @@ import org.flowable.bpmn.model.ServiceTask;
  */
 public class FieldExtensionParser extends BaseChildElementParser {
 
+    @Override
     public String getElementName() {
         return ELEMENT_FIELD;
     }
 
+    @Override
     public boolean accepts(BaseElement element) {
         return ((element instanceof FlowableListener) || (element instanceof ServiceTask) || (element instanceof SendTask));
     }
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
 
         if (!accepts(parentElement))

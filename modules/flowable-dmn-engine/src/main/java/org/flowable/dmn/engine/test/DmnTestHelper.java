@@ -177,6 +177,7 @@ public abstract class DmnTestHelper {
             CommandExecutor commandExecutor = dmnEngine.getDmnEngineConfiguration().getCommandExecutor();
             CommandConfig config = new CommandConfig().transactionNotSupported();
             commandExecutor.execute(config, new Command<Object>() {
+                @Override
                 public Object execute(CommandContext commandContext) {
                     DbSchemaManager dbSchemaManager = CommandContextUtil.getDmnEngineConfiguration().getDbSchemaManager();
                     dbSchemaManager.dbSchemaDrop();

@@ -33,6 +33,7 @@ public class DeleteMembershipCmd implements Command<Void>, Serializable {
         this.groupId = groupId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (userId == null) {
             throw new FlowableIllegalArgumentException("userId is null");

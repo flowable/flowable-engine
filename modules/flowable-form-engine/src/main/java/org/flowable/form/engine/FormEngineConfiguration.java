@@ -327,6 +327,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
         }
     }
 
+    @Override
     public void initDbSqlSessionFactory() {
         if (dbSqlSessionFactory == null) {
             dbSqlSessionFactory = createDbSqlSessionFactory();
@@ -342,6 +343,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
         initDbSqlSessionFactoryEntitySettings();
     }
     
+    @Override
     protected void initDbSqlSessionFactoryEntitySettings() {
         for (Class<? extends Entity> clazz : EntityDependencyOrder.INSERT_ORDER) {
             dbSqlSessionFactory.getInsertionOrder().add(clazz);
@@ -352,6 +354,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
         }
     }
 
+    @Override
     public DbSqlSessionFactory createDbSqlSessionFactory() {
         return new DbSqlSessionFactory();
     }
@@ -359,6 +362,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
     // command executors
     // ////////////////////////////////////////////////////////
 
+    @Override
     public void initCommandExecutors() {
         initDefaultCommandConfig();
         initSchemaCommandConfig();
@@ -367,6 +371,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
         initCommandExecutor();
     }
 
+    @Override
     public void initCommandInterceptors() {
         if (commandInterceptors == null) {
             commandInterceptors = new ArrayList<>();
@@ -386,6 +391,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
         return EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG;
     }
 
+    @Override
     public CommandInterceptor createTransactionInterceptor() {
         return null;
     }
@@ -462,6 +468,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
     // myBatis SqlSessionFactory
     // ////////////////////////////////////////////////
 
+    @Override
     public InputStream getMyBatisXmlConfigurationStream() {
         return getResourceAsStream(DEFAULT_MYBATIS_MAPPING_FILE);
     }
@@ -469,6 +476,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
     // getters and setters
     // //////////////////////////////////////////////////////
 
+    @Override
     public String getEngineName() {
         return formEngineName;
     }
@@ -478,6 +486,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    @Override
     public FormManagementService getFormManagementService() {
         return formManagementService;
     }
@@ -487,6 +496,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    @Override
     public FormRepositoryService getFormRepositoryService() {
         return formRepositoryService;
     }
@@ -496,6 +506,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    @Override
     public FormService getFormService() {
         return formService;
     }

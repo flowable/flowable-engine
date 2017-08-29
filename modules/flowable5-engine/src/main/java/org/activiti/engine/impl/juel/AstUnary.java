@@ -24,6 +24,7 @@ public class AstUnary extends AstRightValue {
     }
 
     public abstract static class SimpleOperator implements Operator {
+        @Override
         public Object eval(Bindings bindings, ELContext context, AstNode node) {
             return apply(bindings, node.eval(bindings, context));
         }
@@ -94,10 +95,12 @@ public class AstUnary extends AstRightValue {
         child.appendStructure(b, bindings);
     }
 
+    @Override
     public int getCardinality() {
         return 1;
     }
 
+    @Override
     public AstNode getChild(int i) {
         return i == 0 ? child : null;
     }

@@ -38,6 +38,7 @@ public class GetExecutionVariableInstanceCmd implements Command<VariableInstance
         this.isLocal = isLocal;
     }
 
+    @Override
     public VariableInstance execute(CommandContext commandContext) {
         if (executionId == null) {
             throw new FlowableIllegalArgumentException("executionId is null");

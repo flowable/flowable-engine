@@ -43,6 +43,7 @@ public class GetDeploymentProcessDiagramCmd implements Command<InputStream>, Ser
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public InputStream execute(CommandContext commandContext) {
         ProcessDefinition processDefinition = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDeploymentManager().findDeployedProcessDefinitionById(processDefinitionId);
         String deploymentId = processDefinition.getDeploymentId();

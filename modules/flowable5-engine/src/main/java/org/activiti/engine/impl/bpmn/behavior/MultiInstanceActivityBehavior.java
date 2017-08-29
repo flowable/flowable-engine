@@ -81,6 +81,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         setInnerActivityBehavior(innerActivityBehavior);
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
         ActivityExecution activityExecution = (ActivityExecution) execution;
         if (getLocalLoopVariable(activityExecution, getCollectionElementIndexVariable()) == null) {
@@ -101,21 +102,25 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     protected abstract void createInstances(ActivityExecution execution);
 
     // Intercepts signals, and delegates it to the wrapped {@link ActivityBehavior}.
+    @Override
     public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
         innerActivityBehavior.signal(execution, signalName, signalData);
     }
 
     // required for supporting embedded subprocesses
+    @Override
     public void lastExecutionEnded(ActivityExecution execution) {
         ScopeUtil.createEventScopeExecution((ExecutionEntity) execution);
         leave(execution);
     }
 
     // required for supporting external subprocesses
+    @Override
     public void completing(DelegateExecution execution, DelegateExecution subProcessInstance) throws Exception {
     }
 
     // required for supporting external subprocesses
+    @Override
     public void completed(ActivityExecution execution) throws Exception {
         leave(execution);
     }

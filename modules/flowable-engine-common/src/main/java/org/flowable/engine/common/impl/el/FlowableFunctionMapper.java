@@ -32,6 +32,7 @@ public class FlowableFunctionMapper extends FunctionMapper {
         this.functionDelegates = functionDelegates;
     }
 
+    @Override
     public Method resolveFunction(String prefix, String localName) {
         if (functionDelegates != null) {
             for (FlowableFunctionDelegate functionDelegate : functionDelegates) {

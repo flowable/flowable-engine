@@ -33,6 +33,7 @@ public class VariableElResolver extends ELResolver {
         this.variables = variables;
     }
 
+    @Override
     public Object getValue(ELContext context, Object base, Object property) {
 
         if (base == null) {
@@ -51,22 +52,27 @@ public class VariableElResolver extends ELResolver {
         return null;
     }
 
+    @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
         return true;
     }
 
+    @Override
     public void setValue(ELContext context, Object base, Object property, Object value) {
         // setting value is not implemented for form value expressions
     }
 
+    @Override
     public Class<?> getCommonPropertyType(ELContext arg0, Object arg1) {
         return Object.class;
     }
 
+    @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext arg0, Object arg1) {
         return null;
     }
 
+    @Override
     public Class<?> getType(ELContext arg0, Object arg1, Object arg2) {
         return Object.class;
     }

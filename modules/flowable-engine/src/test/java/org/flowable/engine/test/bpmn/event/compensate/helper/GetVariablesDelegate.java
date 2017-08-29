@@ -22,6 +22,7 @@ import org.flowable.engine.delegate.JavaDelegate;
  */
 public class GetVariablesDelegate implements JavaDelegate {
 
+    @Override
     public void execute(DelegateExecution execution) {
         Integer nrOfCompletedInstances = (Integer) execution.getVariable("nrOfCompletedInstances");
         Integer variable = SetVariablesDelegate.variablesMap.get(nrOfCompletedInstances);

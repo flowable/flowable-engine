@@ -28,6 +28,7 @@ public class DurationBusinessCalendar extends BusinessCalendarImpl {
         super(clockReader);
     }
 
+    @Override
     public Date resolveDuedate(String duedate, int maxIterations) {
         try {
             DurationHelper dh = new DurationHelper(duedate, clockReader);

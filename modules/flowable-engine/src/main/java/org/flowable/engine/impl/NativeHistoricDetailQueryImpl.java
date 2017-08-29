@@ -36,10 +36,12 @@ public class NativeHistoricDetailQueryImpl extends AbstractNativeQuery<NativeHis
 
     // results ////////////////////////////////////////////////////////////////
 
+    @Override
     public List<HistoricDetail> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getHistoricDetailEntityManager(commandContext).findHistoricDetailsByNativeQuery(parameterMap);
     }
 
+    @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getHistoricDetailEntityManager(commandContext).findHistoricDetailCountByNativeQuery(parameterMap);
     }

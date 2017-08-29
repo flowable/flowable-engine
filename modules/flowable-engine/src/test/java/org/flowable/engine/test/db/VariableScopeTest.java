@@ -266,6 +266,7 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
             this.isLocal = isLocal;
         }
 
+        @Override
         public List<String> execute(CommandContext commandContext) {
             if (executionId == null) {
                 throw new FlowableIllegalArgumentException("executionId is null");

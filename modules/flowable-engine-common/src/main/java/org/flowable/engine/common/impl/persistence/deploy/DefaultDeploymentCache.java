@@ -46,6 +46,7 @@ public class DefaultDeploymentCache<T> implements DeploymentCache<T> {
             // true will keep the 'access-order', which is needed to have a real LRU cache
             private static final long serialVersionUID = 1L;
 
+            @Override
             protected boolean removeEldestEntry(Map.Entry<String, T> eldest) {
                 boolean removeEldest = size() > limit;
                 if (removeEldest && LOGGER.isTraceEnabled()) {
@@ -57,14 +58,17 @@ public class DefaultDeploymentCache<T> implements DeploymentCache<T> {
         });
     }
 
+    @Override
     public T get(String id) {
         return cache.get(id);
     }
 
+    @Override
     public void add(String id, T obj) {
         cache.put(id, obj);
     }
 
+    @Override
     public void remove(String id) {
         cache.remove(id);
     }
@@ -74,6 +78,7 @@ public class DefaultDeploymentCache<T> implements DeploymentCache<T> {
         return cache.containsKey(id);
     }
 
+    @Override
     public void clear() {
         cache.clear();
     }

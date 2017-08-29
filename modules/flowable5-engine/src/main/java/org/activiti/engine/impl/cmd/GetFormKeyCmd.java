@@ -55,6 +55,7 @@ public class GetFormKeyCmd implements Command<String> {
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public String execute(CommandContext commandContext) {
         ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) commandContext
                 .getProcessEngineConfiguration()

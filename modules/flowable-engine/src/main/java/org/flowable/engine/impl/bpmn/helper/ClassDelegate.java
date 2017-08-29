@@ -179,6 +179,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
     }
 
     // Activity Behavior
+    @Override
     public void execute(DelegateExecution execution) {
         if (CommandContextUtil.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
             ObjectNode taskElementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(serviceTaskId, execution.getProcessDefinitionId());
@@ -206,6 +207,7 @@ public class ClassDelegate extends AbstractClassDelegate implements TaskListener
     }
 
     // Signallable activity behavior
+    @Override
     public void trigger(DelegateExecution execution, String signalName, Object signalData) {
         if (activityBehaviorInstance == null) {
             activityBehaviorInstance = getActivityBehaviorInstance();

@@ -41,6 +41,7 @@ public class ScopedConverterTest extends AbstractConverterTest {
         deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "scopedmodel.bpmn";
     }

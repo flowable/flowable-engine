@@ -28,10 +28,12 @@ import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
  */
 public class MultiInstanceParser extends BaseChildElementParser {
 
+    @Override
     public String getElementName() {
         return ELEMENT_MULTIINSTANCE;
     }
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
         if (!(parentElement instanceof Activity))
             return;

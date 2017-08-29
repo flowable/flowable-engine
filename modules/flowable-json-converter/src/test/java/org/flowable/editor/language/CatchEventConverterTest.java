@@ -38,6 +38,7 @@ public class CatchEventConverterTest extends AbstractConverterTest {
         validateModel(bpmnModel);
     }
 
+    @Override
     protected String getResource() {
         return "test.catcheventmodel.json";
     }

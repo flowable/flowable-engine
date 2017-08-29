@@ -50,6 +50,7 @@ public class FlowNodeConverterTest extends AbstractConverterTest {
         assertEquals("sid-07A7E174-8857-4DE9-A7CD-A041706D79C3", gateway.getDefaultFlow());
     }
 
+    @Override
     protected String getResource() {
         return "test.flownodemodel.json";
     }

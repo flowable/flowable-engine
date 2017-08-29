@@ -20,6 +20,7 @@ import org.flowable.task.service.delegate.DelegateTask;
  */
 public class AssigneeAssignment implements TaskListener {
 
+    @Override
     public void notify(DelegateTask delegateTask) {
         delegateTask.setAssignee("kermit");
     }

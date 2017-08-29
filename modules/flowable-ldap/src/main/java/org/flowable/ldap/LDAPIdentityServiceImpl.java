@@ -146,6 +146,7 @@ public class LDAPIdentityServiceImpl extends IdmIdentityServiceImpl {
             LDAPTemplate ldapTemplate = new LDAPTemplate(ldapConfigurator);
             return ldapTemplate.execute(new LDAPCallBack<Boolean>() {
 
+                @Override
                 public Boolean executeInContext(InitialDirContext initialDirContext) {
 
                     if (initialDirContext == null) {

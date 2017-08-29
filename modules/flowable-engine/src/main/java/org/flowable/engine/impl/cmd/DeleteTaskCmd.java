@@ -43,6 +43,7 @@ public class DeleteTaskCmd implements Command<Void>, Serializable {
         this.deleteReason = deleteReason;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (taskId != null) {
             deleteTask(commandContext, taskId);

@@ -54,6 +54,7 @@ public class IdmEngineImpl implements IdmEngine {
         IdmEngines.registerIdmEngine(this);
     }
 
+    @Override
     public void close() {
         IdmEngines.unregister(this);
     }
@@ -61,18 +62,22 @@ public class IdmEngineImpl implements IdmEngine {
     // getters and setters
     // //////////////////////////////////////////////////////
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public IdmIdentityService getIdmIdentityService() {
         return identityService;
     }
 
+    @Override
     public IdmManagementService getIdmManagementService() {
         return managementService;
     }
 
+    @Override
     public IdmEngineConfiguration getIdmEngineConfiguration() {
         return engineConfiguration;
     }

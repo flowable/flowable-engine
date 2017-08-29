@@ -37,6 +37,7 @@ public class IdentityLinkEntityImpl extends AbstractEntityNoRevision implements 
 
     }
 
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("id", this.id);
@@ -65,26 +66,32 @@ public class IdentityLinkEntityImpl extends AbstractEntityNoRevision implements 
         return persistentState;
     }
 
+    @Override
     public boolean isUser() {
         return userId != null;
     }
 
+    @Override
     public boolean isGroup() {
         return groupId != null;
     }
 
+    @Override
     public String getType() {
         return type;
     }
 
+    @Override
     public void setType(String type) {
         this.type = type;
     }
 
+    @Override
     public String getUserId() {
         return userId;
     }
 
+    @Override
     public void setUserId(String userId) {
         if (this.groupId != null && userId != null) {
             throw new FlowableException("Cannot assign a userId to a task assignment that already has a groupId");
@@ -92,10 +99,12 @@ public class IdentityLinkEntityImpl extends AbstractEntityNoRevision implements 
         this.userId = userId;
     }
 
+    @Override
     public String getGroupId() {
         return groupId;
     }
 
+    @Override
     public void setGroupId(String groupId) {
         if (this.userId != null && groupId != null) {
             throw new FlowableException("Cannot assign a groupId to a task assignment that already has a userId");
@@ -103,26 +112,32 @@ public class IdentityLinkEntityImpl extends AbstractEntityNoRevision implements 
         this.groupId = groupId;
     }
 
+    @Override
     public String getTaskId() {
         return taskId;
     }
 
+    @Override
     public void setTaskId(String taskId) {
         this.taskId = taskId;
     }
 
+    @Override
     public String getProcessInstanceId() {
         return processInstanceId;
     }
 
+    @Override
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public String getProcessDefId() {
         return processDefId;
     }
 
+    @Override
     public void setProcessDefId(String processDefId) {
         this.processDefId = processDefId;
     }

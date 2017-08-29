@@ -177,6 +177,7 @@ public abstract class CdiFlowableTestCase {
             return timeLimitExceeded;
         }
 
+        @Override
         public void run() {
             timeLimitExceeded = true;
             thread.interrupt();

@@ -38,6 +38,7 @@ public class CreatePrivilegeCmd implements Command<Privilege>, Serializable {
         this.name = name;
     }
 
+    @Override
     public Privilege execute(CommandContext commandContext) {
         long count = CommandContextUtil.getPrivilegeEntityManager(commandContext).createNewPrivilegeQuery().privilegeName(name).count();
         if (count > 0) {

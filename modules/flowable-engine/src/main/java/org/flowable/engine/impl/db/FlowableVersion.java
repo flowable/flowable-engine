@@ -53,6 +53,7 @@ public class FlowableVersion {
         }
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof FlowableVersion)) {
             return false;

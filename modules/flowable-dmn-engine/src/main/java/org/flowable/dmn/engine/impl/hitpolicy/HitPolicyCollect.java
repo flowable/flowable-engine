@@ -34,6 +34,7 @@ public class HitPolicyCollect extends AbstractHitPolicy implements ComposeDecisi
         return HitPolicy.COLLECT.getValue();
     }
 
+    @Override
     public void composeDecisionResults(ELExecutionContext executionContext) {
         List<Map<String, Object>> decisionResults = new ArrayList<>();
         if (executionContext.getRuleResults() != null && !executionContext.getRuleResults().isEmpty()) {

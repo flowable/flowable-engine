@@ -115,10 +115,12 @@ public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
 
     class CustomPasswordEncoder implements PasswordEncoder {
 
+        @Override
         public String encode(CharSequence rawPassword, PasswordSalt passwordSalt) {
             return null;
         }
 
+        @Override
         public boolean isMatches(CharSequence rawPassword, String encodedPassword, PasswordSalt salt) {
             return false;
         }

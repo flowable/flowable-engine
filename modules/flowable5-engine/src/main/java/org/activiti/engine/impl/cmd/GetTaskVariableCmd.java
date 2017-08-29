@@ -39,6 +39,7 @@ public class GetTaskVariableCmd implements Command<Object>, Serializable {
         this.isLocal = isLocal;
     }
 
+    @Override
     public Object execute(CommandContext commandContext) {
         if (taskId == null) {
             throw new ActivitiIllegalArgumentException("taskId is null");

@@ -34,42 +34,52 @@ public class HistoricVariableServiceImpl extends ServiceImpl implements Historic
         super(variableServiceConfiguration);
     }
     
+    @Override
     public HistoricVariableInstanceEntity getHistoricVariableInstance(String id) {
         return getHistoricVariableInstanceEntityManager().findById(id);
     }
     
+    @Override
     public List<HistoricVariableInstance> findHistoricVariableInstancesByQueryCriteria(HistoricVariableInstanceQueryImpl query) {
         return getHistoricVariableInstanceEntityManager().findHistoricVariableInstancesByQueryCriteria(query);
     }
     
+    @Override
     public HistoricVariableInstanceEntity createHistoricVariableInstance() {
         return getHistoricVariableInstanceEntityManager().create();
     }
     
+    @Override
     public void insertHistoricVariableInstance(HistoricVariableInstanceEntity variable) {
         getHistoricVariableInstanceEntityManager().insert(variable);
     }
     
+    @Override
     public HistoricVariableInstanceEntity copyAndInsert(VariableInstanceEntity variable) {
         return getHistoricVariableInstanceEntityManager().copyAndInsert(variable);
     }
     
+    @Override
     public void copyVariableValue(HistoricVariableInstanceEntity historicVariable, VariableInstanceEntity variable) {
         getHistoricVariableInstanceEntityManager().copyVariableValue(historicVariable, variable);
     }
     
+    @Override
     public void deleteHistoricVariableInstance(String id) {
         getHistoricVariableInstanceEntityManager().delete(id);
     }
     
+    @Override
     public void deleteHistoricVariableInstance(HistoricVariableInstanceEntity historicVariable) {
         getHistoricVariableInstanceEntityManager().delete(historicVariable);
     }
     
+    @Override
     public void deleteHistoricVariableInstancesByProcessInstanceId(String processInstanceId) {
         getHistoricVariableInstanceEntityManager().deleteHistoricVariableInstanceByProcessInstanceId(processInstanceId);
     }
 
+    @Override
     public void deleteHistoricVariableInstancesByTaskId(String taskId) {
         getHistoricVariableInstanceEntityManager().deleteHistoricVariableInstancesByTaskId(taskId);
     }

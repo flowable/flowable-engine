@@ -34,6 +34,7 @@ public class GetUserInfoKeysCmd implements Command<List<String>>, Serializable {
         this.userInfoType = userInfoType;
     }
 
+    @Override
     public List<String> execute(CommandContext commandContext) {
         return CommandContextUtil.getIdentityInfoEntityManager(commandContext).findUserInfoKeysByUserIdAndType(userId, userInfoType);
     }

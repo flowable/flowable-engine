@@ -27,6 +27,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
  */
 public abstract class AbstractEventHandler implements EventHandler {
 
+    @Override
     public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {
         ExecutionEntity execution = eventSubscription.getExecution();
         FlowNode currentFlowElement = (FlowNode) execution.getCurrentFlowElement();

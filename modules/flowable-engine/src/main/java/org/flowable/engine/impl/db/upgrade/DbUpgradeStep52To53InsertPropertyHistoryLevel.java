@@ -18,6 +18,7 @@ package org.flowable.engine.impl.db.upgrade;
  */
 public class DbUpgradeStep52To53InsertPropertyHistoryLevel implements DbUpgradeStep {
 
+    @Override
     public void execute() throws Exception {
         // As of 5.11, the history-setting is no longer stored in the database,
         // so inserting it in this upgrade and removing

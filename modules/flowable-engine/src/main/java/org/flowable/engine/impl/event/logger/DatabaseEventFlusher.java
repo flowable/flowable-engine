@@ -43,10 +43,12 @@ public class DatabaseEventFlusher extends AbstractEventFlusher {
         }
     }
 
+    @Override
     public void afterSessionsFlush(CommandContext commandContext) {
 
     }
 
+    @Override
     public void closeFailure(CommandContext commandContext) {
 
     }

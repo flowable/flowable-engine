@@ -26,10 +26,12 @@ public class AsyncContinuationJobHandler implements JobHandler {
 
     public static final String TYPE = "async-continuation";
 
+    @Override
     public String getType() {
         return TYPE;
     }
 
+    @Override
     public void execute(JobEntity job, String configuration, Object execution, CommandContext commandContext) {
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
         CommandContextUtil.getAgenda(commandContext).planContinueProcessSynchronousOperation(executionEntity);

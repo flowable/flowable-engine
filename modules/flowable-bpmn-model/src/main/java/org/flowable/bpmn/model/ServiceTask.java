@@ -101,6 +101,7 @@ public class ServiceTask extends TaskWithFieldExtensions {
         this.skipExpression = skipExpression;
     }
 
+    @Override
     public ServiceTask clone() {
         ServiceTask clone = new ServiceTask();
         clone.setValues(this);

@@ -38,6 +38,7 @@ public class DelegateExpressionExecutionListener implements ExecutionListener {
         this.fieldDeclarations = fieldDeclarations;
     }
 
+    @Override
     public void notify(DelegateExecution execution) {
         // Note: we can't cache the result of the expression, because the
         // execution can change: eg. delegateExpression='${mySpringBeanFactory.randomSpringBean()}'

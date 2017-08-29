@@ -59,6 +59,7 @@ public class SpringJmsTest {
 
         // Wait until the process is completely finished
         Awaitility.waitAtMost(1, TimeUnit.MINUTES).pollInterval(500, TimeUnit.MILLISECONDS).until(new Callable<Boolean>() {
+            @Override
             public Boolean call() throws Exception {
                 return processEngine.getRuntimeService().createProcessInstanceQuery().count() == 0;
             }

@@ -53,6 +53,7 @@ public class ActivitiVersion {
         }
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof ActivitiVersion)) {
             return false;

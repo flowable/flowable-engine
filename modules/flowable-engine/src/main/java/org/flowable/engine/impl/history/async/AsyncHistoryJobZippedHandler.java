@@ -31,6 +31,7 @@ public class AsyncHistoryJobZippedHandler extends AsyncHistoryJobHandler {
         return JOB_TYPE;
     }
     
+    @Override
     protected byte[] getJobBytes(HistoryJobEntity job) {
         byte[] bytes = job.getAdvancedJobHandlerConfigurationByteArrayRef().getBytes();
         bytes = decompress(bytes);

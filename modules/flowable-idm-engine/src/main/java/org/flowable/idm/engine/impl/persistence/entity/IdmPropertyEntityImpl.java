@@ -31,30 +31,37 @@ public class IdmPropertyEntityImpl extends AbstractEntity implements IdmProperty
     public IdmPropertyEntityImpl() {
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public String getValue() {
         return value;
     }
 
+    @Override
     public void setValue(String value) {
         this.value = value;
     }
 
+    @Override
     public String getId() {
         return name;
     }
 
+    @Override
     public Object getPersistentState() {
         return value;
     }
 
+    @Override
     public void setId(String id) {
         throw new FlowableException("only provided id generation allowed for properties");
     }

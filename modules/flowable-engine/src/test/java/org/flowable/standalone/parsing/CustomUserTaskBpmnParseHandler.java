@@ -21,6 +21,7 @@ import org.flowable.engine.impl.bpmn.parser.handler.UserTaskParseHandler;
  */
 public class CustomUserTaskBpmnParseHandler extends UserTaskParseHandler {
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, UserTask userTask) {
 
         // Do the regular stuff

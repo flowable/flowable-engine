@@ -40,36 +40,43 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
         this.runtimeService = runtimeService;
     }
 
+    @Override
     public ProcessInstanceBuilder processDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
         return this;
     }
 
+    @Override
     public ProcessInstanceBuilder processDefinitionKey(String processDefinitionKey) {
         this.processDefinitionKey = processDefinitionKey;
         return this;
     }
 
+    @Override
     public ProcessInstanceBuilder messageName(String messageName) {
         this.messageName = messageName;
         return this;
     }
 
+    @Override
     public ProcessInstanceBuilder name(String processInstanceName) {
         this.processInstanceName = processInstanceName;
         return this;
     }
 
+    @Override
     public ProcessInstanceBuilder businessKey(String businessKey) {
         this.businessKey = businessKey;
         return this;
     }
 
+    @Override
     public ProcessInstanceBuilder tenantId(String tenantId) {
         this.tenantId = tenantId;
         return this;
     }
 
+    @Override
     public ProcessInstanceBuilder variables(Map<String, Object> variables) {
         if (this.variables == null) {
             this.variables = new HashMap<>();
@@ -82,6 +89,7 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
         return this;
     }
 
+    @Override
     public ProcessInstanceBuilder variable(String variableName, Object value) {
         if (this.variables == null) {
             this.variables = new HashMap<>();
@@ -90,6 +98,7 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
         return this;
     }
 
+    @Override
     public ProcessInstanceBuilder transientVariables(Map<String, Object> transientVariables) {
         if (this.transientVariables == null) {
             this.transientVariables = new HashMap<>();
@@ -102,6 +111,7 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
         return this;
     }
 
+    @Override
     public ProcessInstanceBuilder transientVariable(String variableName, Object value) {
         if (this.transientVariables == null) {
             this.transientVariables = new HashMap<>();
@@ -110,6 +120,7 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
         return this;
     }
 
+    @Override
     public ProcessInstance start() {
         return runtimeService.startProcessInstance(this);
     }

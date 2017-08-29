@@ -27,34 +27,42 @@ public class RemoteUser implements User {
     protected List<RemoteGroup> groups = new ArrayList<>();
     protected List<String> privileges = new ArrayList<>();
 
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public void setId(String id) {
         this.id = id;
     }
 
+    @Override
     public String getFirstName() {
         return firstName;
     }
 
+    @Override
     public void setFirstName(String firstName) {
         this.firstName = firstName;
     }
 
+    @Override
     public String getLastName() {
         return lastName;
     }
 
+    @Override
     public void setLastName(String lastName) {
         this.lastName = lastName;
     }
 
+    @Override
     public String getEmail() {
         return email;
     }
 
+    @Override
     public void setEmail(String email) {
         this.email = email;
     }
@@ -83,15 +91,18 @@ public class RemoteUser implements User {
         this.privileges = privileges;
     }
 
+    @Override
     public String getPassword() {
         // Not supported
         return null;
     }
 
+    @Override
     public void setPassword(String string) {
         // Not supported
     }
 
+    @Override
     public boolean isPictureSet() {
         // Not supported
         return false;

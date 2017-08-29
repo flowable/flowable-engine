@@ -34,16 +34,19 @@ public class ContentEngineFactoryBean implements FactoryBean<ContentEngine>, Dis
     protected ApplicationContext applicationContext;
     protected ContentEngine contentEngine;
 
+    @Override
     public void destroy() throws Exception {
         if (contentEngine != null) {
             contentEngine.close();
         }
     }
 
+    @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
 
+    @Override
     public ContentEngine getObject() throws Exception {
         configureExternallyManagedTransactions();
 
@@ -60,10 +63,12 @@ public class ContentEngineFactoryBean implements FactoryBean<ContentEngine>, Dis
         }
     }
 
+    @Override
     public Class<ContentEngine> getObjectType() {
         return ContentEngine.class;
     }
 
+    @Override
     public boolean isSingleton() {
         return true;
     }

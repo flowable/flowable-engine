@@ -42,16 +42,19 @@ public class TablePageQueryImpl implements TablePageQuery, Command<TablePage>, S
         this.commandExecutor = commandExecutor;
     }
 
+    @Override
     public TablePageQueryImpl tableName(String tableName) {
         this.tableName = tableName;
         return this;
     }
 
+    @Override
     public TablePageQueryImpl orderAsc(String column) {
         addOrder(column, AbstractQuery.SORTORDER_ASC);
         return this;
     }
 
+    @Override
     public TablePageQueryImpl orderDesc(String column) {
         addOrder(column, AbstractQuery.SORTORDER_DESC);
         return this;
@@ -70,12 +73,14 @@ public class TablePageQueryImpl implements TablePageQuery, Command<TablePage>, S
         order = order + column + " " + sortOrder;
     }
 
+    @Override
     public TablePage listPage(int firstResult, int maxResults) {
         this.firstResult = firstResult;
         this.maxResults = maxResults;
         return commandExecutor.execute(this);
     }
 
+    @Override
     public TablePage execute(CommandContext commandContext) {
         return commandContext
                 .getTableDataManager()

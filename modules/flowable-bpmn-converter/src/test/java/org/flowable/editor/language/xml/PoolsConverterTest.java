@@ -40,6 +40,7 @@ public class PoolsConverterTest extends AbstractConverterTest {
         deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "pools.bpmn";
     }

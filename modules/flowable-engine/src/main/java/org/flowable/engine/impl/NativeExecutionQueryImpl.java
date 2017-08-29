@@ -36,10 +36,12 @@ public class NativeExecutionQueryImpl extends AbstractNativeQuery<NativeExecutio
 
     // results ////////////////////////////////////////////////////////////////
 
+    @Override
     public List<Execution> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getExecutionEntityManager(commandContext).findExecutionsByNativeQuery(parameterMap);
     }
 
+    @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getExecutionEntityManager(commandContext).findExecutionCountByNativeQuery(parameterMap);
     }

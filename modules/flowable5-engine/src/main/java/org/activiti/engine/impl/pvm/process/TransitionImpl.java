@@ -43,6 +43,7 @@ public class TransitionImpl extends ProcessElementImpl implements PvmTransition 
         this.skipExpression = skipExpression;
     }
 
+    @Override
     public ActivityImpl getSource() {
         return source;
     }
@@ -59,6 +60,7 @@ public class TransitionImpl extends ProcessElementImpl implements PvmTransition 
         executionListeners.add(executionListener);
     }
 
+    @Override
     public String toString() {
         return "(" + source.getId() + ")--" + (id != null ? id + "-->(" : ">(") + destination.getId() + ")";
     }
@@ -77,6 +79,7 @@ public class TransitionImpl extends ProcessElementImpl implements PvmTransition 
         this.source = source;
     }
 
+    @Override
     public ActivityImpl getDestination() {
         return destination;
     }
@@ -93,6 +96,7 @@ public class TransitionImpl extends ProcessElementImpl implements PvmTransition 
         this.waypoints = waypoints;
     }
 
+    @Override
     public Expression getSkipExpression() {
         return skipExpression;
     }

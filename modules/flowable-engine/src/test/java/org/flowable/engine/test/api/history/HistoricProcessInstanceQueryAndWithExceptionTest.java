@@ -28,6 +28,7 @@ public class HistoricProcessInstanceQueryAndWithExceptionTest extends PluggableF
     private static final String PROCESS_DEFINITION_KEY_WITH_EXCEPTION_1 = "JobErrorCheck";
     private static final String PROCESS_DEFINITION_KEY_WITH_EXCEPTION_2 = "JobErrorDoubleCheck";
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         repositoryService.createDeployment()
@@ -37,6 +38,7 @@ public class HistoricProcessInstanceQueryAndWithExceptionTest extends PluggableF
                 .deploy();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         deleteDeployments();
         super.tearDown();

@@ -39,6 +39,7 @@ public class HasTaskVariableCmd implements Command<Boolean>, Serializable {
         this.isLocal = isLocal;
     }
 
+    @Override
     public Boolean execute(CommandContext commandContext) {
         if (taskId == null) {
             throw new FlowableIllegalArgumentException("taskId is null");
