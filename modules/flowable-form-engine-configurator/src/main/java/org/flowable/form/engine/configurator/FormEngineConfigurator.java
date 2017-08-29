@@ -76,7 +76,7 @@ public class FormEngineConfigurator extends AbstractEngineConfigurator {
             formEngineConfiguration = new StandaloneFormEngineConfiguration();
         }
         
-        initialiseCommonProperties(processEngineConfiguration, formEngineConfiguration, EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
+        initialiseCommonProperties(processEngineConfiguration, formEngineConfiguration);
 
         initFormEngine();
     }

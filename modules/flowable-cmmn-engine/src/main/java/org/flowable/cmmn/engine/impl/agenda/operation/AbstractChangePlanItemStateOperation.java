@@ -12,23 +12,14 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityImpl;
-import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.CaseInstanceState;
-import org.flowable.cmmn.engine.runtime.MilestoneInstance;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.persistence.cache.CachedEntity;
 
 /**
  * @author Joram Barrez
@@ -64,43 +55,15 @@ public abstract class AbstractChangePlanItemStateOperation extends AbstractPlanI
         CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext)
                 .findById(planItemInstanceEntity.getCaseInstanceId());
         if (CaseInstanceState.ACTIVE.equals(caseInstanceEntity.getState())) {
-            caseInstanceEntity.setState(getNewState());
-            
-            if (CaseInstanceState.COMPLETED.equals(caseInstanceEntity.getState())) {
-                
-                // TODO: replace with CachedEntityMatcher once changes from Tijs on master are merged in
-                
-                Set<String> milestoneIds = new HashSet<>();
-
-                // DB
-                MilestoneInstanceEntityManager milestoneInstanceEntityManager = CommandContextUtil.getMilestoneInstanceEntityManager(commandContext);
-                List<MilestoneInstance> milestones = milestoneInstanceEntityManager.createMilestoneInstanceQuery()
-                        .milestoneInstanceCaseInstanceId(caseInstanceEntity.getId()).list();
-                for (MilestoneInstance milestoneInstance : milestones) {
-                    milestoneInstanceEntityManager.delete(milestoneInstance.getId());
-                }
-                
-                // Cache
-                Map<String, CachedEntity> cachedMilestoneInstanceEntities = CommandContextUtil.getEntityCache()
-                        .getAllCachedEntities().get(MilestoneInstanceEntityImpl.class);
-                for (CachedEntity cachedEntity : cachedMilestoneInstanceEntities.values()) {
-                    MilestoneInstanceEntityImpl milestoneInstanceEntity = (MilestoneInstanceEntityImpl) cachedEntity.getEntity();
-                    if (milestoneInstanceEntity.getCaseInstanceId().equals(caseInstanceEntity.getId())) {
-                        milestoneIds.add(milestoneInstanceEntity.getId());
-                    }
-                }
-                
-                for (String milestoneId : milestoneIds) {
-                    milestoneInstanceEntityManager.delete(milestoneId);
-                }
-                
-                PlanItemInstanceEntity planModelPlanItemInstanceEntity = caseInstanceEntity.getPlanModelInstance();
-                CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).deleteCascade(planModelPlanItemInstanceEntity);
-                CommandContextUtil.getCaseInstanceEntityManager(commandContext).delete(planModelPlanItemInstanceEntity.getCaseInstanceId());
+            String newState = getNewState();
+            if (CaseInstanceState.COMPLETED.equals(newState)) {
+                CommandContextUtil.getAgenda(commandContext).planCompleteCase(caseInstanceEntity);
+            } else if (CaseInstanceState.TERMINATED.equals(newState)) {
+                CommandContextUtil.getAgenda(commandContext).planTerminateCase(caseInstanceEntity);
             }
         }
     }
-    
+
     protected abstract String getNewState();
     
     protected abstract String getLifeCycleEventType(); 
@@ -109,7 +72,7 @@ public abstract class AbstractChangePlanItemStateOperation extends AbstractPlanI
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
-        stringBuilder.append("[Change Planitem state] ");
+        stringBuilder.append("[Change PlanItem state] ");
         if (planItem != null) {
             if (planItem.getName() != null) {
             stringBuilder.append(planItem.getName());

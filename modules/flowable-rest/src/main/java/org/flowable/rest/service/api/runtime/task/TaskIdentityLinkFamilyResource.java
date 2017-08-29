@@ -19,10 +19,10 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.task.IdentityLink;
-import org.flowable.engine.task.Task;
+import org.flowable.identitylink.service.IdentityLink;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.rest.service.api.engine.RestIdentityLink;
+import org.flowable.task.service.Task;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

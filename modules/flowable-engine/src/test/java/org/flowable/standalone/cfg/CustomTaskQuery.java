@@ -14,11 +14,11 @@ package org.flowable.standalone.cfg;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.AbstractQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.engine.impl.TaskQueryProperty;
+import org.flowable.engine.common.impl.query.AbstractQuery;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.task.service.impl.TaskQueryProperty;
 
 /**
  * @author Bassam Al-Sarori

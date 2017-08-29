@@ -29,6 +29,8 @@ public interface CaseInstanceEntity extends Entity, CaseInstance {
     void setState(String state);
     void setStartTime(Date startTime);
     void setStartUserId(String startUserId);
+    void setCallbackId(String callbackId);
+    void setCallbackType(String callbackType);
     void setTenantId(String tenantId);
     
     PlanItemInstanceEntity getPlanModelInstance();

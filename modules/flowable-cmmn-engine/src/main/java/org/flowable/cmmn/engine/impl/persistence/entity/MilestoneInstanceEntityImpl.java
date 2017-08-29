@@ -17,12 +17,12 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
+import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 
 /**
  * @author Joram Barrez
  */
-public class MilestoneInstanceEntityImpl extends AbstractEntityNoRevision implements MilestoneInstanceEntity {
+public class MilestoneInstanceEntityImpl extends AbstractEntity implements MilestoneInstanceEntity {
     
     protected String name;
     protected Date timeStamp;

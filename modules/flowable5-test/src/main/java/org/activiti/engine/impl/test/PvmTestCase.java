@@ -13,11 +13,11 @@
 
 package org.activiti.engine.impl.test;
 
-import junit.framework.AssertionFailedError;
-import junit.framework.TestCase;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import junit.framework.AssertionFailedError;
+import junit.framework.TestCase;
 
 /**
  * @author Tom Baeyens

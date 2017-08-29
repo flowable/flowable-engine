@@ -47,17 +47,17 @@ public class BarTransformer {
         String pathHeader;
         JarInputStream jis = new JarInputStream(url.openStream());
         try {
-            Set<String> paths = new TreeSet<String>();
+            Set<String> paths = new TreeSet<>();
             ZipEntry e;
             while ((e = jis.getNextEntry()) != null) {
                 String n = e.getName();
                 int i = n.lastIndexOf('/');
                 if (-1 == i) {// Add root path if the .bpmn20.xml is in the root
-                              // of the bar file and the value is
-                              // example.bpmn20.xml
+                    // of the bar file and the value is
+                    // example.bpmn20.xml
                     paths.add("/"); // Extender#checkBundle calls the
-                                    // HeaderParser#parseHeader and it does not
-                                    // parse an empty string
+                    // HeaderParser#parseHeader and it does not
+                    // parse an empty string
                 } else if (i < n.length() - 1) {
                     paths.add(n.substring(0, i + 1));
                 }
@@ -129,7 +129,7 @@ public class BarTransformer {
     public static String[] extractNameVersionType(String url) {
         Matcher m = ARTIFACT_MATCHER.matcher(url);
         if (!m.matches()) {
-            return new String[] { url, DEFAULT_VERSION };
+            return new String[]{url, DEFAULT_VERSION};
         } else {
             // System.err.println(m.groupCount());
             // for (int i = 1; i <= m.groupCount(); i++) {
@@ -164,7 +164,7 @@ public class BarTransformer {
                     cleanupModifier(v, d5);
                 }
             }
-            return new String[] { d1, v.toString(), d6 };
+            return new String[]{d1, v.toString(), d6};
         }
     }
 

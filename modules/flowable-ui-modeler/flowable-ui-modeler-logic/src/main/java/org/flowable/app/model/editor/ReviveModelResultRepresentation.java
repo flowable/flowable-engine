@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class ReviveModelResultRepresentation {
 
-    private List<UnresolveModelRepresentation> unresolvedModels = new ArrayList<UnresolveModelRepresentation>();
+    private List<UnresolveModelRepresentation> unresolvedModels = new ArrayList<>();
 
     public List<UnresolveModelRepresentation> getUnresolvedModels() {
         return unresolvedModels;

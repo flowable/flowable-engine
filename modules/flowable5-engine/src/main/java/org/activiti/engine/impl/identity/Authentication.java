@@ -18,7 +18,7 @@ package org.activiti.engine.impl.identity;
  */
 public abstract class Authentication {
 
-    static ThreadLocal<String> authenticatedUserIdThreadLocal = new ThreadLocal<String>();
+    static ThreadLocal<String> authenticatedUserIdThreadLocal = new ThreadLocal<>();
 
     public static void setAuthenticatedUserId(String authenticatedUserId) {
         authenticatedUserIdThreadLocal.set(authenticatedUserId);

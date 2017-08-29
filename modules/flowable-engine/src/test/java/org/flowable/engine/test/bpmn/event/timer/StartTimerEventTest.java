@@ -20,15 +20,15 @@ import java.util.concurrent.Callable;
 
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.common.impl.util.IoUtil;
-import org.flowable.engine.impl.cmd.CancelJobsCmd;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
-import org.flowable.engine.runtime.TimerJobQuery;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.service.Job;
+import org.flowable.job.service.TimerJobQuery;
+import org.flowable.job.service.impl.cmd.CancelJobsCmd;
 
 /**
  * @author Joram Barrez

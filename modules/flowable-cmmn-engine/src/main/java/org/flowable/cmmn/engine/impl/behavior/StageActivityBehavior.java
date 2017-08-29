@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.behavior;
 
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
 import org.flowable.cmmn.model.Stage;
 
@@ -28,7 +30,9 @@ public class StageActivityBehavior implements CmmnTriggerableActivityBehavior {
 
     @Override
     public void execute(DelegatePlanItemInstance delegatePlanItemInstance) {
-        
+        PlanItemInstanceEntity stagePlanItemInstanceEntity = (PlanItemInstanceEntity) delegatePlanItemInstance;
+        stagePlanItemInstanceEntity.setName(delegatePlanItemInstance.getPlanItem().getName());
+        CommandContextUtil.getAgenda().planInitStageOperation(stagePlanItemInstanceEntity);
     }
     
     @Override

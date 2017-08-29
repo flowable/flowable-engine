@@ -13,9 +13,9 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
-import org.flowable.cmmn.model.PlanItemDefinition;
-import org.flowable.cmmn.model.Stage;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
@@ -38,22 +38,13 @@ public abstract class AbstractPlanItemInstanceOperation extends CmmnOperation {
         this.planItemInstanceEntity = planItemInstanceEntity;
     }
     
-    protected Stage getStage(PlanItemInstanceEntity planItemInstanceEntity) {
-        if (planItemInstanceEntity.getPlanItem() != null
-                && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() != null) {
-            PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
-            if (planItemDefinition instanceof Stage) {
-                return (Stage) planItemDefinition;
-            } else {
-                return planItemDefinition.getParentStage();
+    protected void deleteSentryOnPartInstances() {
+        SentryOnPartInstanceEntityManager sentryOnPartInstanceEntityManager = CommandContextUtil.getSentryOnPartInstanceEntityManager(commandContext);
+        if (planItemInstanceEntity.getSatisfiedSentryOnPartInstances() != null) {
+            for (SentryOnPartInstanceEntity sentryOnPartInstanceEntity : planItemInstanceEntity.getSatisfiedSentryOnPartInstances()) {
+                sentryOnPartInstanceEntityManager.delete(sentryOnPartInstanceEntity);
             }
-        } else {
-            return getStage(planItemInstanceEntity.getCaseDefinitionId(), planItemInstanceEntity.getElementId());
         }
-    }
-    
-    protected Stage getStage(String caseDefinitionId, String stageId) {
-        return CaseDefinitionUtil.getCase(caseDefinitionId).findStage(stageId);
     }
     
 }

@@ -34,6 +34,8 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
     CaseInstanceQuery caseInstanceStartedBefore(Date beforeTime);
     CaseInstanceQuery caseInstanceStartedAfter(Date afterTime);
     CaseInstanceQuery caseInstanceStartedBy(String userId);
+    CaseInstanceQuery caseInstanceCallbackId(String callbackId);
+    CaseInstanceQuery caseInstanceCallbackType(String callbackType);
     CaseInstanceQuery caseInstanceTenantId(String tenantId);
     CaseInstanceQuery caseInstanceWithoutTenantId();
     

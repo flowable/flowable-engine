@@ -64,7 +64,7 @@ public class FlowableFormService {
     }
 
     public List<FormRepresentation> getForms(String[] formIds) {
-        List<FormRepresentation> formRepresentations = new ArrayList<FormRepresentation>();
+        List<FormRepresentation> formRepresentations = new ArrayList<>();
 
         if (formIds == null || formIds.length == 0) {
             throw new BadRequestException("No formIds provided in the request");

@@ -20,21 +20,21 @@ import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricDetailQuery;
-import org.flowable.engine.history.HistoricIdentityLink;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.history.HistoricTaskInstanceQuery;
-import org.flowable.engine.history.HistoricVariableInstance;
-import org.flowable.engine.history.HistoricVariableInstanceQuery;
 import org.flowable.engine.history.NativeHistoricActivityInstanceQuery;
 import org.flowable.engine.history.NativeHistoricDetailQuery;
 import org.flowable.engine.history.NativeHistoricProcessInstanceQuery;
-import org.flowable.engine.history.NativeHistoricTaskInstanceQuery;
-import org.flowable.engine.history.NativeHistoricVariableInstanceQuery;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;
 import org.flowable.engine.history.ProcessInstanceHistoryLogQuery;
-import org.flowable.engine.task.IdentityLink;
+import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.service.history.HistoricIdentityLink;
+import org.flowable.task.service.history.HistoricTaskInstance;
+import org.flowable.task.service.history.HistoricTaskInstanceQuery;
+import org.flowable.task.service.history.NativeHistoricTaskInstanceQuery;
+import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.variable.service.history.HistoricVariableInstanceQuery;
+import org.flowable.variable.service.history.NativeHistoricVariableInstanceQuery;
 
 /**
  * Service exposing information about ongoing and past process instances. This is different from the runtime information in the sense that this runtime information only contains the actual runtime

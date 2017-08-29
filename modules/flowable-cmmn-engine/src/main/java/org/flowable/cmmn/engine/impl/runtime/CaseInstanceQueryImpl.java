@@ -43,7 +43,8 @@ public class CaseInstanceQueryImpl extends AbstractQuery<CaseInstanceQuery, Case
     protected Date startedBefore;
     protected Date startedAfter;
     protected String startedBy;
-    protected String externalId;
+    protected String callbackId;
+    protected String callbackType;
     protected String tenantId;
     protected boolean withoutTenantId;
 
@@ -58,6 +59,7 @@ public class CaseInstanceQueryImpl extends AbstractQuery<CaseInstanceQuery, Case
         super(commandExecutor);
     }
 
+    @Override
     public CaseInstanceQueryImpl caseDefinitionId(String caseDefinitionId) {
         if (caseDefinitionId == null) {
             throw new FlowableIllegalArgumentException("Case definition id is null");
@@ -66,6 +68,7 @@ public class CaseInstanceQueryImpl extends AbstractQuery<CaseInstanceQuery, Case
         return this;
     }
 
+    @Override
     public CaseInstanceQueryImpl caseDefinitionKey(String caseDefinitionKey) {
         if (caseDefinitionKey == null) {
             throw new FlowableIllegalArgumentException("Case definition key is null");
@@ -101,6 +104,7 @@ public class CaseInstanceQueryImpl extends AbstractQuery<CaseInstanceQuery, Case
         return this;
     }
 
+    @Override
     public CaseInstanceQueryImpl caseInstanceId(String caseInstanceId) {
         if (caseInstanceId == null) {
             throw new FlowableIllegalArgumentException("Case instance id is null");
@@ -109,6 +113,7 @@ public class CaseInstanceQueryImpl extends AbstractQuery<CaseInstanceQuery, Case
         return this;
     }
 
+    @Override
     public CaseInstanceQueryImpl caseInstanceBusinessKey(String businessKey) {
         if (businessKey == null) {
             throw new FlowableIllegalArgumentException("Business key is null");
@@ -117,6 +122,7 @@ public class CaseInstanceQueryImpl extends AbstractQuery<CaseInstanceQuery, Case
         return this;
     }
 
+    @Override
     public CaseInstanceQueryImpl caseDefinitionKeys(Set<String> caseDefinitionKeys) {
         if (caseDefinitionKeys == null) {
             throw new FlowableIllegalArgumentException("Case definition keys is null");
@@ -125,6 +131,7 @@ public class CaseInstanceQueryImpl extends AbstractQuery<CaseInstanceQuery, Case
         return this;
     }
 
+    @Override
     public CaseInstanceQueryImpl caseInstanceParentId(String parentId) {
         if (parentId == null) {
             throw new FlowableIllegalArgumentException("Parent id is null");
@@ -133,19 +140,7 @@ public class CaseInstanceQueryImpl extends AbstractQuery<CaseInstanceQuery, Case
         return this;
     }
     
-    public CaseInstanceQueryImpl caseInstanceTenantId(String tenantId) {
-        if (tenantId == null) {
-            throw new FlowableIllegalArgumentException("caseInstance tenant id is null");
-        }
-        this.tenantId = tenantId;
-        return this;
-    }
-
-    public CaseInstanceQueryImpl caseInstanceWithoutTenantId() {
-        this.withoutTenantId = true;
-        return this;
-    }
-    
+    @Override
     public CaseInstanceQueryImpl caseInstanceStartedBefore(Date beforeTime) {
         if (beforeTime == null) {
             throw new FlowableIllegalArgumentException("before time is null");
@@ -154,6 +149,7 @@ public class CaseInstanceQueryImpl extends AbstractQuery<CaseInstanceQuery, Case
         return this;
     }
 
+    @Override
     public CaseInstanceQueryImpl caseInstanceStartedAfter(Date afterTime) {
         if (afterTime == null) {
             throw new FlowableIllegalArgumentException("after time is null");
@@ -162,6 +158,7 @@ public class CaseInstanceQueryImpl extends AbstractQuery<CaseInstanceQuery, Case
         return this;
     }
 
+    @Override
     public CaseInstanceQueryImpl caseInstanceStartedBy(String userId) {
         if (userId == null) {
             throw new FlowableIllegalArgumentException("user id is null");
@@ -170,26 +167,48 @@ public class CaseInstanceQueryImpl extends AbstractQuery<CaseInstanceQuery, Case
         return this;
     }
     
-    public CaseInstanceQuery caseInstanceExternalId(String externalId) {
-        if (externalId == null) {
-            throw new FlowableIllegalArgumentException("externalId is null");
-        }
-        this.externalId = externalId;
+    @Override
+    public CaseInstanceQuery caseInstanceCallbackId(String callbackId) {
+        this.callbackId = callbackId;
         return this;
     }
-
+    
+    @Override
+    public CaseInstanceQuery caseInstanceCallbackType(String callbackType) {
+        this.callbackType = callbackType;
+        return this;
+    }
+    
+    @Override
+    public CaseInstanceQueryImpl caseInstanceTenantId(String tenantId) {
+        if (tenantId == null) {
+            throw new FlowableIllegalArgumentException("caseInstance tenant id is null");
+        }
+        this.tenantId = tenantId;
+        return this;
+    }
+    
+    @Override
+    public CaseInstanceQueryImpl caseInstanceWithoutTenantId() {
+        this.withoutTenantId = true;
+        return this;
+    }
+    
     // ordering ////////////////////////////////////////////////////
 
+    @Override
     public CaseInstanceQueryImpl orderByCaseInstanceId() {
         this.orderProperty = CaseInstanceQueryProperty.CASE_INSTANCE_ID;
         return this;
     }
 
+    @Override
     public CaseInstanceQueryImpl orderByCaseDefinitionId() {
         this.orderProperty = CaseInstanceQueryProperty.CASE_DEFINITION_ID;
         return this;
     }
 
+    @Override
     public CaseInstanceQueryImpl orderByCaseDefinitionKey() {
         this.orderProperty = CaseInstanceQueryProperty.CASE_DEFINITION_KEY;
         return this;
@@ -201,6 +220,7 @@ public class CaseInstanceQueryImpl extends AbstractQuery<CaseInstanceQuery, Case
         return this;
     }
 
+    @Override
     public CaseInstanceQueryImpl orderByTenantId() {
         this.orderProperty = CaseInstanceQueryProperty.TENANT_ID;
         return this;
@@ -260,14 +280,6 @@ public class CaseInstanceQueryImpl extends AbstractQuery<CaseInstanceQuery, Case
         return caseInstanceParentId;
     }
 
-    public String getTenantId() {
-        return tenantId;
-    }
-
-    public boolean isWithoutTenantId() {
-        return withoutTenantId;
-    }
-    
     public String getCaseInstanceParentId() {
         return caseInstanceParentId;
     }
@@ -283,8 +295,20 @@ public class CaseInstanceQueryImpl extends AbstractQuery<CaseInstanceQuery, Case
     public String getStartedBy() {
         return startedBy;
     }
+    
+    public String getCallbackId() {
+        return callbackId;
+    }
 
-    public String getExternalId() {
-        return externalId;
+    public String getCallbackType() {
+        return callbackType;
+    }
+
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public boolean isWithoutTenantId() {
+        return withoutTenantId;
     }
 }

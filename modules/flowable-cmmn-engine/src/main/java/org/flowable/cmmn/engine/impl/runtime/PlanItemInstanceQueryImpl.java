@@ -37,6 +37,8 @@ public class PlanItemInstanceQueryImpl extends AbstractQuery<PlanItemInstanceQue
     protected Date startedBefore;
     protected Date startedAfter;
     protected String startUserId;
+    protected String referenceId;
+    protected String referenceType;
     protected String tenantId;
     protected boolean withoutTenantId;
     protected boolean includeStagePlanItemInstances;
@@ -126,11 +128,23 @@ public class PlanItemInstanceQueryImpl extends AbstractQuery<PlanItemInstanceQue
     }
 
     @Override
-    public PlanItemInstanceQuery planItemStartUserId(String startUserId) {
+    public PlanItemInstanceQuery planItemInstanceStartUserId(String startUserId) {
         if (startUserId == null) {
             throw new FlowableIllegalArgumentException("Start user id is null");
         }
         this.startUserId = startUserId;
+        return this;
+    }
+    
+    @Override
+    public PlanItemInstanceQuery planItemInstanceReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+        return this;
+    }
+    
+    @Override
+    public PlanItemInstanceQuery planItemInstanceReferenceType(String referenceType) {
+        this.referenceType = referenceType;
         return this;
     }
 
@@ -211,6 +225,14 @@ public class PlanItemInstanceQueryImpl extends AbstractQuery<PlanItemInstanceQue
 
     public String getStartUserId() {
         return startUserId;
+    }
+    
+    public String getReferenceId() {
+        return referenceId;
+    }
+
+    public String getReferenceType() {
+        return referenceType;
     }
 
     public String getTenantId() {

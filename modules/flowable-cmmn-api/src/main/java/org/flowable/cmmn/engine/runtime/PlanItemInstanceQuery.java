@@ -29,7 +29,9 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery planItemInstanceState(String state);
     PlanItemInstanceQuery planItemInstanceStartedBefore(Date startedBefore);
     PlanItemInstanceQuery planItemInstanceStarterAfter(Date startedAfer);
-    PlanItemInstanceQuery planItemStartUserId(String startUserId);
+    PlanItemInstanceQuery planItemInstanceStartUserId(String startUserId);
+    PlanItemInstanceQuery planItemInstanceReferenceId(String referenceId);
+    PlanItemInstanceQuery planItemInstanceReferenceType(String referenceType);
     PlanItemInstanceQuery planItemInstanceTenantId(String tenantId);
     PlanItemInstanceQuery planItemInstanceWithoutTenantId();
     

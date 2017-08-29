@@ -3,23 +3,22 @@ package org.flowable.engine.test.api.event;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
 import org.flowable.engine.delegate.event.FlowableCancelledEvent;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
 import org.flowable.engine.event.EventLogEntry;
-import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.impl.event.logger.EventLogger;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 public class CallActivityTest extends PluggableFlowableTestCase {
 
@@ -76,7 +75,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
 
         // no task should be active in parent process
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(task);
 
         // only active task should be the one defined in the external subprocess
@@ -259,7 +258,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
 
         // no task should be active in parent process
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(task);
 
         // only active task should be the one defined in the external subprocess
@@ -381,7 +380,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
 
         // no task should be active in parent process
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(task);
 
         // only active task should be the one defined in the external subprocess
@@ -409,11 +408,6 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
         assertEquals("User Task1 in Parent", task.getName());
-
-        // PROBLEM:
-        // Test failure because variables are not copied back when external subprocess
-        // is defined with a terminateEnd event. We are expecting the variable to be
-        // copied in this scenario.
 
         // validate that the variable was copied back when Call Activity finished
         assertEquals("Mary Smith", runtimeService.getVariable(processInstance.getId(), "Name"));

@@ -27,6 +27,8 @@ public interface CaseInstance {
     String getState();
     Date getStartTime();
     String getStartUserId();
+    String getCallbackId();
+    String getCallbackType();
     String getTenantId();
     
 }

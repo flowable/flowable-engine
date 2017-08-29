@@ -14,10 +14,10 @@ package org.flowable.engine.impl.history.async.json.transformer;
 
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
-import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.identitylink.service.HistoricIdentityLinkService;
+import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -35,15 +35,15 @@ public class IdentityLinkCreatedHistoryJsonTransformer extends AbstractHistoryJs
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-        HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getHistoricIdentityLinkEntityManager();
-        HistoricIdentityLinkEntity historicIdentityLinkEntity = historicIdentityLinkEntityManager.create();
+        HistoricIdentityLinkService historicIdentityLinkService = CommandContextUtil.getHistoricIdentityLinkService();
+        HistoricIdentityLinkEntity historicIdentityLinkEntity = historicIdentityLinkService.createHistoricIdentityLink();
         historicIdentityLinkEntity.setId(getStringFromJson(historicalData, HistoryJsonConstants.ID));
         historicIdentityLinkEntity.setGroupId(getStringFromJson(historicalData, HistoryJsonConstants.GROUP_ID));
         historicIdentityLinkEntity.setProcessInstanceId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID));
         historicIdentityLinkEntity.setTaskId(getStringFromJson(historicalData, HistoryJsonConstants.TASK_ID));
         historicIdentityLinkEntity.setType(getStringFromJson(historicalData, HistoryJsonConstants.IDENTITY_LINK_TYPE));
         historicIdentityLinkEntity.setUserId(getStringFromJson(historicalData, HistoryJsonConstants.USER_ID));
-        historicIdentityLinkEntityManager.insert(historicIdentityLinkEntity, false);
+        historicIdentityLinkService.insertHistoricIdentityLink(historicIdentityLinkEntity, false);
     }
 
 }

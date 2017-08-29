@@ -12,13 +12,19 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.Criterion;
+import org.flowable.cmmn.model.HasExitCriteria;
+import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
@@ -35,6 +41,8 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
     
     protected PlanItemLifeCycleEvent planItemLifeCycleEvent;
     
+    private enum CriteriaEvaluationResult { ALL, SOME , NONE };
+    
     public EvaluateCriteriaOperation(CommandContext commandContext, String caseInstanceEntityId) {
         super(commandContext, caseInstanceEntityId, null);
     }
@@ -47,75 +55,145 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
     @Override
     public void run() {
         super.run();
+        evaluateStagePlanItemInstance(caseInstanceEntity.getPlanModelInstance());
+    }
+
+    protected void evaluateStagePlanItemInstance(PlanItemInstanceEntity stagePlanItemInstanceEntity) {
         
-        PlanItemInstanceEntity stagePlanItemInstanceEntity = caseInstanceEntity.getPlanModelInstance();
-        int activeChildren = 0;
-        boolean criteriaFired = false;
-        if (stagePlanItemInstanceEntity.getChildren() != null) {
-            for (PlanItemInstanceEntity planItemInstanceEntity : stagePlanItemInstanceEntity.getChildren()) {
-                
-                PlanItem planItem = planItemInstanceEntity.getPlanItem();
-                if (PlanItemInstanceState.AVAILABLE.equals(planItemInstanceEntity.getState())) {
+        // Can already be completed by another evaluation. No need to verify it again.
+        if (!PlanItemInstanceState.ACTIVE.equals(stagePlanItemInstanceEntity.getState())) {
+            return;
+        }
+        
+        // Check if current stage exit criteria are satisfied
+        CriteriaEvaluationResult stageExitCriteriaEvaluationResult = evaluateExitCriteria(stagePlanItemInstanceEntity, getStage(stagePlanItemInstanceEntity));
+        if (stageExitCriteriaEvaluationResult.equals(CriteriaEvaluationResult.ALL)) {
+            CommandContextUtil.getAgenda(commandContext).planExitPlanItem(stagePlanItemInstanceEntity);
+        }
+        
+        // Check children of stage
+        if (!CriteriaEvaluationResult.ALL.equals(stageExitCriteriaEvaluationResult)) {
+            int activeChildren = 0;
+            boolean criteriaFired = false;
+            if (stagePlanItemInstanceEntity.getChildren() != null) {
+                for (PlanItemInstanceEntity planItemInstanceEntity : stagePlanItemInstanceEntity.getChildren()) {
                     
-                    if (evaluatePlanItemInstanceEntryCriteria(planItemInstanceEntity, planItem)) {
+                    PlanItem planItem = planItemInstanceEntity.getPlanItem();
+                    CriteriaEvaluationResult evaluationResult = null;
+                    if (PlanItemInstanceState.AVAILABLE.equals(planItemInstanceEntity.getState())) {
+                        evaluationResult = evaluateEntryCriteria(planItemInstanceEntity, planItem);
+                        if (evaluationResult.equals(CriteriaEvaluationResult.ALL)) {
+                            CommandContextUtil.getAgenda(commandContext).planActivatePlanItem(planItemInstanceEntity);  
+                        }
+                        
+                    } else if (PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState()) ) {
+                        activeChildren++;
+                        evaluationResult = evaluateExitCriteria(planItemInstanceEntity, planItem);
+                        if (evaluationResult.equals(CriteriaEvaluationResult.ALL)) {
+                            CommandContextUtil.getAgenda(commandContext).planExitPlanItem(planItemInstanceEntity);
+                        }
+                        
+                        if (planItem.getPlanItemDefinition() instanceof PlanFragment) {
+                            evaluateStagePlanItemInstance(planItemInstanceEntity);
+                        }
+                        
+                    }
+                    
+                    if (evaluationResult != null && !evaluationResult.equals(CriteriaEvaluationResult.NONE)) {
                         criteriaFired = true;
                     }
                     
-                } else if (PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState()) ) {
-                    activeChildren++;
-                    
                 }
+            }
+            
+            if (!criteriaFired 
+                    && PlanItemInstanceState.ACTIVE.equals(stagePlanItemInstanceEntity.getState()) 
+                    && activeChildren == 0) {
                 
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug("No active plan items found for stage " + stagePlanItemInstanceEntity.getElementId() + ", planning stage completion");
+                }
+                CommandContextUtil.getAgenda(commandContext).planCompletePlanItem(stagePlanItemInstanceEntity);
             }
+            
         }
-        
-        if (!criteriaFired 
-                && PlanItemInstanceState.ACTIVE.equals(stagePlanItemInstanceEntity.getState()) 
-                && activeChildren == 0) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("No active plan items found for stage, planning stage completion");
-            }
-            CommandContextUtil.getAgenda(commandContext).planCompletePlanItem(stagePlanItemInstanceEntity);
-        }
-        
     }
-    
-    protected boolean evaluatePlanItemInstanceEntryCriteria(PlanItemInstanceEntity planItemInstanceEntity, PlanItem planItem) {
+
+    protected CriteriaEvaluationResult evaluateEntryCriteria(PlanItemInstanceEntity planItemInstanceEntity, PlanItem planItem) {
         List<Criterion> criteria = planItem.getEntryCriteria();
-        if (!PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState()) 
-                && (criteria == null || criteria.isEmpty() || evaluateCriteria(planItemInstanceEntity, criteria)) ) {
-            CommandContextUtil.getAgenda(commandContext).planActivatePlanItem(planItemInstanceEntity);
-            return true;
+        if (criteria == null || criteria.isEmpty()) {
+            return CriteriaEvaluationResult.ALL;
+        } else {
+            return evaluateCriteria(planItemInstanceEntity, criteria);
         }
-        return false;
     }
     
-    protected boolean evaluateCriteria(PlanItemInstanceEntity planItemInstanceEntity, List<Criterion> criteria) {
+    protected CriteriaEvaluationResult evaluateExitCriteria(PlanItemInstanceEntity planItemInstanceEntity, HasExitCriteria hasExitCriteria) {
+        List<Criterion> criteria = hasExitCriteria.getExitCriteria();
+        if (criteria != null && !criteria.isEmpty()) {
+            return evaluateCriteria(planItemInstanceEntity, criteria);
+        }
+        return CriteriaEvaluationResult.NONE;
+    }
+    
+    protected CriteriaEvaluationResult evaluateCriteria(PlanItemInstanceEntity planItemInstanceEntity, List<Criterion> criteria) {
         for (Criterion entryCriterion : criteria) {
             Sentry sentry = entryCriterion.getSentry();
             
-            if (sentry.getOnParts().size() == 1) {
+            if (sentry.getOnParts().size() == 1) { // No need to look into the satisfied onparts
                 if (planItemLifeCycleEvent != null) {
                     SentryOnPart sentryOnPart = sentry.getOnParts().get(0);
                     if (sentryOnPartMatchesCurrentLifeCycleEvent(sentryOnPart)) {
-                        return true;
+                        return CriteriaEvaluationResult.ALL;
                     }
                 }
                 
             } else {
                 
-                // TODO: store fired sentries?
-                // TODO: if expressions
+                Set<String> satisfiedSentryOnPartIds = new HashSet<>();
+                for (SentryOnPartInstanceEntity sentryOnPartInstanceEntity : planItemInstanceEntity.getSatisfiedSentryOnPartInstances()) {
+                    satisfiedSentryOnPartIds.add(sentryOnPartInstanceEntity.getOnPartId());
+                }
+                
+                boolean criteriaSatisfied = false;
+                for (SentryOnPart sentryOnPart : sentry.getOnParts()) {
+                    if (!satisfiedSentryOnPartIds.contains(sentryOnPart.getId())) {
+                        if (planItemLifeCycleEvent != null && sentryOnPartMatchesCurrentLifeCycleEvent(sentryOnPart)) {
+                            SentryOnPartInstanceEntity sentryOnPartInstanceEntity = createSentryOnPartInstanceEntity(planItemInstanceEntity, sentryOnPart);
+                            planItemInstanceEntity.getSatisfiedSentryOnPartInstances().add(sentryOnPartInstanceEntity);
+                            satisfiedSentryOnPartIds.add(sentryOnPart.getId());
+                            criteriaSatisfied = true;
+                        } 
+                    }
+                }
+                
+                if (sentry.getOnParts().size() == planItemInstanceEntity.getSatisfiedSentryOnPartInstances().size()) {
+                    return CriteriaEvaluationResult.ALL;
+                } else if (criteriaSatisfied){
+                    return CriteriaEvaluationResult.SOME;
+                }
                 
             }
             
         }
-        return false;
+        return CriteriaEvaluationResult.NONE;
     }
     
     public boolean sentryOnPartMatchesCurrentLifeCycleEvent(SentryOnPart sentryOnPart) {
         return planItemLifeCycleEvent.getPlanItem().getId().equals(sentryOnPart.getSourceRef()) 
                     && planItemLifeCycleEvent.getTransition().equals(sentryOnPart.getStandardEvent());
+    }
+    
+    protected SentryOnPartInstanceEntity createSentryOnPartInstanceEntity(PlanItemInstanceEntity planItemInstanceEntity, SentryOnPart sentryOnPart) {
+        SentryOnPartInstanceEntityManager sentryOnPartInstanceEntityManager = CommandContextUtil.getSentryOnPartInstanceEntityManager(commandContext);
+        SentryOnPartInstanceEntity sentryOnPartInstanceEntity = sentryOnPartInstanceEntityManager.create();
+        sentryOnPartInstanceEntity.setCaseInstanceId(planItemInstanceEntity.getCaseInstanceId());
+        sentryOnPartInstanceEntity.setCaseDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
+        sentryOnPartInstanceEntity.setPlanItemInstanceId(planItemInstanceEntity.getId());
+        sentryOnPartInstanceEntity.setOnPartId(sentryOnPart.getId());
+        sentryOnPartInstanceEntity.setTimeStamp(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
+        sentryOnPartInstanceEntityManager.insert(sentryOnPartInstanceEntity);
+        return sentryOnPartInstanceEntity;
     }
     
     @Override

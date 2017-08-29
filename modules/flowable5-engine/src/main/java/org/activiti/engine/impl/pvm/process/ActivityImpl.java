@@ -21,8 +21,8 @@ import java.util.Map;
 import org.activiti.engine.impl.pvm.PvmActivity;
 import org.activiti.engine.impl.pvm.PvmException;
 import org.activiti.engine.impl.pvm.PvmTransition;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
+import org.flowable.variable.service.delegate.Expression;
 
 /**
  * @author Tom Baeyens
@@ -30,10 +30,10 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
 public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds {
 
     private static final long serialVersionUID = 1L;
-    protected List<TransitionImpl> outgoingTransitions = new ArrayList<TransitionImpl>();
-    protected Map<String, TransitionImpl> namedOutgoingTransitions = new HashMap<String, TransitionImpl>();
+    protected List<TransitionImpl> outgoingTransitions = new ArrayList<>();
+    protected Map<String, TransitionImpl> namedOutgoingTransitions = new HashMap<>();
     protected Map<String, Object> variables;
-    protected List<TransitionImpl> incomingTransitions = new ArrayList<TransitionImpl>();
+    protected List<TransitionImpl> incomingTransitions = new ArrayList<>();
     protected ActivityBehavior activityBehavior;
     protected ScopeImpl parent;
     protected boolean isScope;

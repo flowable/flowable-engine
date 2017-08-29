@@ -18,6 +18,7 @@ package org.flowable.bpmn.model;
 public class MultiInstanceLoopCharacteristics extends BaseElement {
 
     protected String inputDataItem;
+    protected String collectionString;
     protected String loopCardinality;
     protected String completionCondition;
     protected String elementVariable;
@@ -30,6 +31,14 @@ public class MultiInstanceLoopCharacteristics extends BaseElement {
 
     public void setInputDataItem(String inputDataItem) {
         this.inputDataItem = inputDataItem;
+    }
+
+    public String getCollectionString() {
+        return collectionString;
+    }
+
+    public void setCollectionString(String collectionString) {
+        this.collectionString = collectionString;
     }
 
     public String getLoopCardinality() {

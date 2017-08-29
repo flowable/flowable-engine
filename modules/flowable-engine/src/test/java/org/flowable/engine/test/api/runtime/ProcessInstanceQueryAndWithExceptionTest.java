@@ -17,10 +17,10 @@ import java.util.List;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
-import org.flowable.engine.runtime.TimerJobQuery;
+import org.flowable.job.service.Job;
+import org.flowable.job.service.TimerJobQuery;
 
 public class ProcessInstanceQueryAndWithExceptionTest extends PluggableFlowableTestCase {
 

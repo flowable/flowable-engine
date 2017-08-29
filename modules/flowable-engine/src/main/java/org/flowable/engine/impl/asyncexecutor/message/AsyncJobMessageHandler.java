@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.asyncexecutor.message;
 
-import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
 /**
  * An implementation of this interface needs to be injected into an {@link AsyncJobMessageReceiver} instance.

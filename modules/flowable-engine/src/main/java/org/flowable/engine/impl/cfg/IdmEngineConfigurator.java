@@ -70,7 +70,7 @@ public class IdmEngineConfigurator extends AbstractEngineConfigurator {
             idmEngineConfiguration = new StandaloneIdmEngineConfiguration();
         }
         
-        initialiseCommonProperties(processEngineConfiguration, idmEngineConfiguration, EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
+        initialiseCommonProperties(processEngineConfiguration, idmEngineConfiguration);
         
         idmEngineConfiguration.buildIdmEngine();
     }

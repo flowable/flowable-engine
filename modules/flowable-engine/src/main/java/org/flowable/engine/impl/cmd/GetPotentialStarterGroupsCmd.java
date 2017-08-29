@@ -23,7 +23,7 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.task.IdentityLink;
+import org.flowable.identitylink.service.IdentityLink;
 import org.flowable.idm.api.Group;
 
 /**

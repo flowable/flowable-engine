@@ -27,13 +27,13 @@ import org.activiti.engine.runtime.ProcessInstanceQuery;
 import org.activiti.engine.task.Event;
 import org.activiti.engine.task.IdentityLinkType;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.delegate.VariableScope;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.impl.persistence.entity.VariableInstance;
-import org.flowable.engine.task.IdentityLink;
+import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.variable.service.delegate.VariableScope;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
 
 /**
  * 

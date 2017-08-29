@@ -6512,7 +6512,7 @@ GET identity/users
 |firstName|Only return users with the given firstname|String
 |lastName|Only return users with the given lastname|String
 |email|Only return users with the given email|String
-|firstNameLike|Only return userswith a firstname like the given value. Use +%+ as wildcard-character.|String
+|firstNameLike|Only return users with a firstname like the given value. Use +%+ as wildcard-character.|String
 |lastNameLike|Only return users with a lastname like the given value. Use +%+ as wildcard-character.|String
 |emailLike|Only return users with an email like the given value. Use +%+ as wildcard-character.|String
 |memberOfGroup|Only return users which are a member of the given group.|String

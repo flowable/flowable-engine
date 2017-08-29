@@ -32,6 +32,8 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
     protected String messageName;
     protected String processInstanceName;
     protected String businessKey;
+    protected String callbackId;
+    protected String callbackType;
     protected String tenantId;
     protected Map<String, Object> variables;
     protected Map<String, Object> transientVariables;
@@ -62,6 +64,16 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
 
     public ProcessInstanceBuilder businessKey(String businessKey) {
         this.businessKey = businessKey;
+        return this;
+    }
+    
+    public ProcessInstanceBuilder callbackId(String callbackId) {
+        this.callbackId = callbackId;
+        return this;
+    }
+    
+    public ProcessInstanceBuilder callbackType(String callbackType) {
+        this.callbackType = callbackType;
         return this;
     }
 
@@ -132,6 +144,14 @@ public class ProcessInstanceBuilderImpl implements ProcessInstanceBuilder {
 
     public String getBusinessKey() {
         return businessKey;
+    }
+    
+    public String getCallbackId() {
+        return callbackId;
+    }
+
+    public String getCallbackType() {
+        return callbackType;
     }
 
     public String getTenantId() {

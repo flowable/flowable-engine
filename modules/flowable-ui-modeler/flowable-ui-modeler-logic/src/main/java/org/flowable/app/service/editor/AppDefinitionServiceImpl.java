@@ -76,8 +76,8 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
 
     @Override
     public List<AppDefinitionServiceRepresentation> getAppDefinitions() {
-        Map<String, AbstractModel> modelMap = new HashMap<String, AbstractModel>();
-        List<AppDefinitionServiceRepresentation> resultList = new ArrayList<AppDefinitionServiceRepresentation>();
+        Map<String, AbstractModel> modelMap = new HashMap<>();
+        List<AppDefinitionServiceRepresentation> resultList = new ArrayList<>();
 
         List<Model> createdByModels = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_APP, ModelSort.NAME_ASC);
         for (Model model : createdByModels) {
@@ -93,14 +93,14 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
 
     /**
      * Gathers all 'deployable' app definitions for the current user.
-     * 
+     * <p>
      * To find these: - All historical app models are fetched. Only the highest version of each app model is retained. - All historical app models shared with the groups the current user is part of
      * are fetched. Only the highest version of each app model is retained.
      */
     @Override
     public List<AppDefinitionServiceRepresentation> getDeployableAppDefinitions(User user) {
-        Map<String, ModelHistory> modelMap = new HashMap<String, ModelHistory>();
-        List<AppDefinitionServiceRepresentation> resultList = new ArrayList<AppDefinitionServiceRepresentation>();
+        Map<String, ModelHistory> modelMap = new HashMap<>();
+        List<AppDefinitionServiceRepresentation> resultList = new ArrayList<>();
 
         List<ModelHistory> createdByModels = modelHistoryRepository.findByModelTypAndCreatedBy(
                 user.getId(), AbstractModel.MODEL_TYPE_APP);
@@ -181,7 +181,7 @@ public class AppDefinitionServiceImpl implements AppDefinitionService {
             resultInfo.setIcon(appDefinition.getIcon());
             List<AppModelDefinition> models = appDefinition.getModels();
             if (CollectionUtils.isNotEmpty(models)) {
-                List<String> modelIds = new ArrayList<String>();
+                List<String> modelIds = new ArrayList<>();
                 for (AppModelDefinition appModelDef : models) {
                     modelIds.add(appModelDef.getId());
                 }

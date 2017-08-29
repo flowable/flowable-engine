@@ -92,7 +92,7 @@ public class FlowableModelQueryService {
             }
         }
 
-        List<ModelRepresentation> resultList = new ArrayList<ModelRepresentation>();
+        List<ModelRepresentation> resultList = new ArrayList<>();
         List<Model> models = null;
 
         String validFilter = makeValidFilterText(filterText);
@@ -105,7 +105,7 @@ public class FlowableModelQueryService {
         }
 
         if (CollectionUtils.isNotEmpty(models)) {
-            List<String> addedModelIds = new ArrayList<String>();
+            List<String> addedModelIds = new ArrayList<>();
             for (Model model : models) {
                 if (!addedModelIds.contains(model.getId())) {
                     addedModelIds.add(model.getId());
@@ -121,9 +121,9 @@ public class FlowableModelQueryService {
 
     public ResultListDataRepresentation getModelsToIncludeInAppDefinition() {
 
-        List<ModelRepresentation> resultList = new ArrayList<ModelRepresentation>();
+        List<ModelRepresentation> resultList = new ArrayList<>();
 
-        List<String> addedModelIds = new ArrayList<String>();
+        List<String> addedModelIds = new ArrayList<>();
         List<Model> models = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_BPMN, ModelSort.MODIFIED_DESC);
 
         if (CollectionUtils.isNotEmpty(models)) {

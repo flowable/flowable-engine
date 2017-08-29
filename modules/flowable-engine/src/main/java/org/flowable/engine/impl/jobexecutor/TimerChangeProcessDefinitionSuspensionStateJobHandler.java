@@ -13,6 +13,7 @@
 package org.flowable.engine.impl.jobexecutor;
 
 import org.flowable.engine.impl.util.json.JSONObject;
+import org.flowable.job.service.JobHandler;
 
 /**
  * @author Joram Barrez

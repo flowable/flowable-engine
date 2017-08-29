@@ -30,7 +30,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.variable.service.delegate.Expression;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.impl.util.CommandContextUtil;

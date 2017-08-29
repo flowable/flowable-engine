@@ -39,11 +39,11 @@ import org.activiti.engine.impl.event.logger.handler.VariableUpdatedEventHandler
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandContextCloseListener;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.runtime.Clock;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +60,7 @@ public class EventLogger implements FlowableEventListener {
     protected ObjectMapper objectMapper;
 
     // Mapping of type -> handler
-    protected Map<FlowableEngineEventType, Class<? extends EventLoggerEventHandler>> eventHandlers = new HashMap<FlowableEngineEventType, Class<? extends EventLoggerEventHandler>>();
+    protected Map<FlowableEngineEventType, Class<? extends EventLoggerEventHandler>> eventHandlers = new HashMap<>();
 
     // Listeners for new events
     protected List<EventLoggerListener> listeners;
@@ -172,7 +172,7 @@ public class EventLogger implements FlowableEventListener {
     }
 
     protected EventLoggerEventHandler instantiateEventHandler(FlowableEvent event,
-            Class<? extends EventLoggerEventHandler> eventHandlerClass) {
+                                                              Class<? extends EventLoggerEventHandler> eventHandlerClass) {
         try {
             EventLoggerEventHandler eventHandler = eventHandlerClass.newInstance();
             eventHandler.setTimeStamp(clock.getCurrentTime());
@@ -196,7 +196,7 @@ public class EventLogger implements FlowableEventListener {
 
     public void addEventLoggerListener(EventLoggerListener listener) {
         if (listeners == null) {
-            listeners = new ArrayList<EventLoggerListener>(1);
+            listeners = new ArrayList<>(1);
         }
         listeners.add(listener);
     }

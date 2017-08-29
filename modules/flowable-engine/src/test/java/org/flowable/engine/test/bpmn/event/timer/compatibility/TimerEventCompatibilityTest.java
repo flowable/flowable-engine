@@ -21,9 +21,9 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 
 public abstract class TimerEventCompatibilityTest extends PluggableFlowableTestCase {
 

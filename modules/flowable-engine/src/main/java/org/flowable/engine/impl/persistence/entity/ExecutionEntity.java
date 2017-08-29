@@ -22,6 +22,10 @@ import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Tom Baeyens
@@ -136,5 +140,13 @@ public interface ExecutionEntity extends DelegateExecution, Execution, ProcessIn
     Date getStartTime();
 
     void setStartTime(Date startTime);
+    
+    void setCallbackId(String callbackId);
+    
+    void setCallbackType(String callbackType);
+    
+    void setVariable(String variableName, Object value, ExecutionEntity sourceExecution, boolean fetchAllVariables);
+    
+    Object setVariableLocal(String variableName, Object value, ExecutionEntity sourceExecution, boolean fetchAllVariables);
 
 }

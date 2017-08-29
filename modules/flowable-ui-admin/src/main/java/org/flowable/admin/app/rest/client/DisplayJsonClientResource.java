@@ -12,6 +12,11 @@
  */
 package org.flowable.admin.app.rest.client;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -53,11 +58,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 @RestController
 public class DisplayJsonClientResource extends AbstractClientResource {
 
@@ -70,8 +70,8 @@ public class DisplayJsonClientResource extends AbstractClientResource {
     protected ProcessInstanceService processInstanceService;
 
     protected ObjectMapper objectMapper = new ObjectMapper();
-    protected List<String> eventElementTypes = new ArrayList<String>();
-    protected Map<String, InfoMapper> propertyMappers = new HashMap<String, InfoMapper>();
+    protected List<String> eventElementTypes = new ArrayList<>();
+    protected Map<String, InfoMapper> propertyMappers = new HashMap<>();
 
     public DisplayJsonClientResource() {
         eventElementTypes.add("StartEvent");
@@ -128,10 +128,10 @@ public class DisplayJsonClientResource extends AbstractClientResource {
 
             try {
                 GraphicInfo diagramInfo = new GraphicInfo();
-                Set<String> completedElements = new HashSet<String>(completedActivityInstances);
+                Set<String> completedElements = new HashSet<>(completedActivityInstances);
                 completedElements.addAll(completedFlows);
 
-                Set<String> currentElements = new HashSet<String>(currentActivityinstances);
+                Set<String> currentElements = new HashSet<>(currentActivityinstances);
 
                 processProcessElements(config, pojoModel, displayNode, diagramInfo, completedElements, currentElements);
 
@@ -168,7 +168,7 @@ public class DisplayJsonClientResource extends AbstractClientResource {
 
         return displayNode;
     }
-    
+
     @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/history-model-json", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getHistoryProcessInstanceModelJSON(@PathVariable String processInstanceId, @RequestParam(required = true) String processDefinitionId) {
         ObjectNode displayNode = objectMapper.createObjectNode();
@@ -180,13 +180,13 @@ public class DisplayJsonClientResource extends AbstractClientResource {
 
             // Fetch process-instance activities
             List<String> completedActivityInstances = processInstanceService.getCompletedActivityInstancesAndProcessDefinitionId(config, processInstanceId);
-            
+
             // Gather completed flows
             List<String> completedFlows = gatherCompletedFlows(completedActivityInstances, null, pojoModel);
 
             try {
                 GraphicInfo diagramInfo = new GraphicInfo();
-                Set<String> completedElements = new HashSet<String>(completedActivityInstances);
+                Set<String> completedElements = new HashSet<>(completedActivityInstances);
                 completedElements.addAll(completedFlows);
 
                 processProcessElements(config, pojoModel, displayNode, diagramInfo, completedElements, null);
@@ -219,10 +219,10 @@ public class DisplayJsonClientResource extends AbstractClientResource {
     }
 
     protected List<String> gatherCompletedFlows(List<String> completedActivityInstances,
-            List<String> currentActivityinstances, BpmnModel pojoModel) {
+                                                List<String> currentActivityinstances, BpmnModel pojoModel) {
 
-        List<String> completedFlows = new ArrayList<String>();
-        List<String> activities = new ArrayList<String>(completedActivityInstances);
+        List<String> completedFlows = new ArrayList<>();
+        List<String> activities = new ArrayList<>(completedActivityInstances);
         if (currentActivityinstances != null) {
             activities.addAll(currentActivityinstances);
         }
@@ -312,8 +312,8 @@ public class DisplayJsonClientResource extends AbstractClientResource {
     }
 
     protected void processElements(Collection<FlowElement> elementList,
-            BpmnModel model, ArrayNode elementArray, ArrayNode flowArray,
-            GraphicInfo diagramInfo, Set<String> completedElements, Set<String> currentElements) {
+                                   BpmnModel model, ArrayNode elementArray, ArrayNode flowArray,
+                                   GraphicInfo diagramInfo, Set<String> completedElements, Set<String> currentElements) {
 
         for (FlowElement element : elementList) {
 
@@ -436,12 +436,12 @@ public class DisplayJsonClientResource extends AbstractClientResource {
 
     protected void fillGraphicInfo(ObjectNode elementNode, GraphicInfo graphicInfo, boolean includeWidthAndHeight) {
         commonFillGraphicInfo(elementNode, graphicInfo.getX(),
-                graphicInfo.getY(), graphicInfo.getWidth(),
-                graphicInfo.getHeight(), includeWidthAndHeight);
+            graphicInfo.getY(), graphicInfo.getWidth(),
+            graphicInfo.getHeight(), includeWidthAndHeight);
     }
 
     protected void commonFillGraphicInfo(ObjectNode elementNode, double x,
-            double y, double width, double height, boolean includeWidthAndHeight) {
+                                         double y, double width, double height, boolean includeWidthAndHeight) {
 
         elementNode.put("x", x);
         elementNode.put("y", y);

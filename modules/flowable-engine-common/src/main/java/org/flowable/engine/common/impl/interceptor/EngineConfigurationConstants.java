@@ -25,7 +25,14 @@ public interface EngineConfigurationConstants {
     String KEY_CONTENT_ENGINE_CONFIG = "cfg.contentEngine";
     
     String KEY_CMMN_ENGINE_CONFIG = "cfg.cmmnEngine";
+
+    String KEY_TASK_SERVICE_CONFIG = "cfg.taskService";
     
+    String KEY_VARIABLE_SERVICE_CONFIG = "cfg.variableService";
+    
+    String KEY_IDENTITY_LINK_SERVICE_CONFIG = "cfg.identityLinkService";
+    
+    String KEY_JOB_SERVICE_CONFIG = "cfg.jobService";
     
     int PRIORITY_ENGINE_IDM = 100000;
     

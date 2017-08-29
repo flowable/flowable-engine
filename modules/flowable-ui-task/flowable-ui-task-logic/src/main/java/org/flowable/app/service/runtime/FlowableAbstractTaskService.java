@@ -31,10 +31,10 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.history.HistoricVariableInstance;
-import org.flowable.engine.task.TaskInfo;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
+import org.flowable.task.service.TaskInfo;
+import org.flowable.variable.service.history.HistoricVariableInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class FlowableAbstractTaskService {
@@ -82,11 +82,11 @@ public abstract class FlowableAbstractTaskService {
                         }
                     }
 
-                    Map<String, Object> variableMap = new HashMap<String, Object>();
+                    Map<String, Object> variableMap = new HashMap<>();
                     if ((CollectionUtils.isNotEmpty(userTask.getCandidateGroups()) && userTask.getCandidateGroups().size() == 1
                             && userTask.getCandidateGroups().get(0).contains("${taskAssignmentBean.assignTaskToCandidateGroups('"))
                             || (CollectionUtils.isNotEmpty(userTask.getCandidateUsers()) && userTask.getCandidateUsers().size() == 1
-                                    && userTask.getCandidateUsers().get(0).contains("${taskAssignmentBean.assignTaskToCandidateUsers('"))) {
+                            && userTask.getCandidateUsers().get(0).contains("${taskAssignmentBean.assignTaskToCandidateUsers('"))) {
 
                         List<HistoricVariableInstance> processVariables = historyService.createHistoricVariableInstanceQuery().processInstanceId(task.getProcessInstanceId()).list();
                         if (CollectionUtils.isNotEmpty(processVariables)) {
@@ -100,7 +100,7 @@ public abstract class FlowableAbstractTaskService {
                         List<? extends Group> groups = remoteIdmService.getUser(currentUser.getId()).getGroups();
                         if (CollectionUtils.isNotEmpty(groups)) {
 
-                            List<String> groupIds = new ArrayList<String>();
+                            List<String> groupIds = new ArrayList<>();
                             if (userTask.getCandidateGroups().size() == 1 && userTask.getCandidateGroups().get(0).contains("${taskAssignmentBean.assignTaskToCandidateGroups('")) {
 
                                 String candidateGroupString = userTask.getCandidateGroups().get(0);

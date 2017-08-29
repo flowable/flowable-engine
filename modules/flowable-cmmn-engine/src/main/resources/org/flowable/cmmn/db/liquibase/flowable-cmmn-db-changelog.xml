@@ -81,6 +81,8 @@
             <column name="STATE_" type="varchar(255)" />
             <column name="START_TIME_" type="datetime" />
             <column name="START_USER_ID_" type="varchar(255)" />
+            <column name="CALLBACK_ID_" type="varchar(255)" />
+            <column name="CALLBACK_TYPE_" type="varchar(255)" />
             <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
         </createTable>
 
@@ -106,6 +108,8 @@
             <column name="STATE_" type="varchar(255)" />
             <column name="START_TIME_" type="datetime" />
             <column name="START_USER_ID_" type="varchar(255)" />
+            <column name="REFERENCE_ID_" type="varchar(255)" />
+            <column name="REFERENCE_TYPE_" type="varchar(255)" />
             <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
         </createTable>
 
@@ -120,6 +124,38 @@
             referencedColumnNames="ID_" 
             baseTableName="ACT_CMMN_RU_PLAN_ITEM_INST" 
             baseColumnNames="CASE_INST_ID_" />
+
+        <createTable tableName="ACT_CMMN_RU_SENTRY_ON_PART_INST">
+            <column name="ID_" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="REV_" type="integer">
+                <constraints nullable="false" />
+            </column>
+            <column name="CASE_DEF_ID_" type="varchar(255)" />
+            <column name="CASE_INST_ID_" type="varchar(255)" />
+            <column name="PLAN_ITEM_INST_ID_" type="varchar(255)" />
+            <column name="ON_PART_ID_" type="varchar(255)" />
+            <column name="TIME_STAMP_" type="datetime" />
+        </createTable>
+
+        <addForeignKeyConstraint constraintName="ACT_FK_SENTRY_CASE_DEF" 
+            referencedTableName="ACT_CMMN_RE_CASEDEF"
+            referencedColumnNames="ID_" 
+            baseTableName="ACT_CMMN_RU_SENTRY_ON_PART_INST" 
+            baseColumnNames="CASE_DEF_ID_" />
+
+        <addForeignKeyConstraint constraintName="ACT_FK_SENTRY_CASE_INST" 
+            referencedTableName="ACT_CMMN_RU_CASE_INST"
+            referencedColumnNames="ID_" 
+            baseTableName="ACT_CMMN_RU_SENTRY_ON_PART_INST" 
+            baseColumnNames="CASE_INST_ID_" />
+
+        <addForeignKeyConstraint constraintName="ACT_FK_SENTRY_PLAN_ITEM" 
+            referencedTableName="ACT_CMMN_RU_PLAN_ITEM_INST"
+            referencedColumnNames="ID_" 
+            baseTableName="ACT_CMMN_RU_SENTRY_ON_PART_INST" 
+            baseColumnNames="PLAN_ITEM_INST_ID_" />
 
         <createTable tableName="ACT_CMMN_RU_MIL_INST">
             <column name="ID_" type="varchar(255)">
@@ -153,11 +189,33 @@
             referencedColumnNames="ID_" 
             baseTableName="ACT_CMMN_RU_MIL_INST" 
             baseColumnNames="CASE_INST_ID_" />
-            
-            
+
+        <createTable tableName="ACT_CMMN_HI_CASE_INST">
+            <column name="ID_" type="varchar(255)">
+                <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="REV_" type="integer">
+                <constraints nullable="false" />
+            </column>
+            <column name="BUSINESS_KEY_" type="varchar(255)" />
+            <column name="NAME_" type="varchar(255)" />
+            <column name="PARENT_ID_" type="varchar(255)" />
+            <column name="CASE_DEF_ID_" type="varchar(255)" />
+            <column name="STATE_" type="varchar(255)" />
+            <column name="START_TIME_" type="datetime" />
+            <column name="END_TIME_" type="datetime" />
+            <column name="START_USER_ID_" type="varchar(255)" />
+            <column name="CALLBACK_ID_" type="varchar(255)" />
+            <column name="CALLBACK_TYPE_" type="varchar(255)" />
+            <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
+        </createTable>
+
         <createTable tableName="ACT_CMMN_HI_MIL_INST">
             <column name="ID_" type="varchar(255)">
                 <constraints primaryKey="true" nullable="false" />
+            </column>
+            <column name="REV_" type="integer">
+                <constraints nullable="false" />
             </column>
             <column name="NAME_" type="varchar(255)">
                 <constraints nullable="false" />
@@ -174,7 +232,7 @@
             <column name="ELEMENT_ID_" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
-        </createTable>            
+        </createTable>
 
     </changeSet>
 

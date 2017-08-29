@@ -31,6 +31,8 @@ public class CaseInstanceEntityImpl extends AbstractEntity implements CaseInstan
     protected String state;
     protected Date startTime;
     protected String startUserId;
+    protected String callbackId;
+    protected String callbackType;
     protected String tenantId;
     
     // non-persisted
@@ -45,6 +47,8 @@ public class CaseInstanceEntityImpl extends AbstractEntity implements CaseInstan
         persistentState.put("state", state);
         persistentState.put("startTime", startTime);
         persistentState.put("startUserId", startUserId);
+        persistentState.put("callbackId", callbackId);
+        persistentState.put("callbackType", callbackType);
         persistentState.put("tenantId", tenantId);
         return persistentState;
     }
@@ -90,6 +94,18 @@ public class CaseInstanceEntityImpl extends AbstractEntity implements CaseInstan
     }
     public void setStartUserId(String startUserId) {
         this.startUserId = startUserId;
+    }
+    public String getCallbackId() {
+        return callbackId;
+    }
+    public void setCallbackId(String callbackId) {
+        this.callbackId = callbackId;
+    }
+    public String getCallbackType() {
+        return callbackType;
+    }
+    public void setCallbackType(String callbackType) {
+        this.callbackType = callbackType;
     }
     public String getTenantId() {
         return tenantId;

@@ -55,7 +55,7 @@ public class ValidateTaskRelatedEntityCountCfgCmd implements Command<Void> {
                     LOGGER.info("Configuration change: task related entity counting feature was enabled before, but now disabled. "
                             + "Updating all task entities.");
                 }
-                CommandContextUtil.getProcessEngineConfiguration(commandContext).getTaskDataManager().updateAllTaskRelatedEntityCountFlags(configProperty);
+                CommandContextUtil.getTaskService().updateAllTaskRelatedEntityCountFlags(configProperty);
             }
 
             // Update property

@@ -90,6 +90,19 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
         deployment.addResource(resource);
         return this;
     }
+    
+    @Override
+    public CmmnDeploymentBuilder addBytes(String resourceName, byte[] bytes) {
+        if (bytes == null) {
+            throw new FlowableException("bytes array is null");
+        }
+
+        CmmnResourceEntity resource = resourceEntityManager.create();
+        resource.setName(resourceName);
+        resource.setBytes(bytes);
+        deployment.addResource(resource);
+        return this;
+    }
 
     public CmmnDeploymentBuilder addCmmnBytes(String resourceName, byte[] cmmnBytes) {
         if (cmmnBytes == null) {

@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.engine.impl.behavior.CmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -29,20 +30,22 @@ public class TriggerPlanItemOperation extends AbstractPlanItemInstanceOperation 
     
     @Override
     public void run() {
-        Object behaviorObject = planItemInstanceEntity.getPlanItem().getBehavior();
-        if (!(behaviorObject instanceof CmmnTriggerableActivityBehavior)) {
-            throw new FlowableException("Cannot trigger a plan item which activity behavior does not implement the " 
-                    + CmmnTriggerableActivityBehavior.class + " interface");
+        if (PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState())) {
+            Object behaviorObject = planItemInstanceEntity.getPlanItem().getBehavior();
+            if (!(behaviorObject instanceof CmmnTriggerableActivityBehavior)) {
+                throw new FlowableException("Cannot trigger a plan item which activity behavior does not implement the " 
+                        + CmmnTriggerableActivityBehavior.class + " interface");
+            }
+            CmmnTriggerableActivityBehavior behavior = (CmmnTriggerableActivityBehavior) planItemInstanceEntity.getPlanItem().getBehavior();
+            behavior.trigger(planItemInstanceEntity);
         }
-        CmmnTriggerableActivityBehavior behavior = (CmmnTriggerableActivityBehavior) planItemInstanceEntity.getPlanItem().getBehavior();
-        behavior.trigger(planItemInstanceEntity);
     }
     
     @Override
     public String toString() {
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("[Trigger Planitem]");
+        stringBuilder.append("[Trigger PlanItem] ");
         if (planItem.getName() != null) {
             stringBuilder.append(planItem.getName());
             stringBuilder.append(" (");

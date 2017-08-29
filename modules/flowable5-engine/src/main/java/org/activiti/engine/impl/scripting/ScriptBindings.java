@@ -23,7 +23,7 @@ import java.util.Set;
 import javax.script.Bindings;
 import javax.script.SimpleScriptContext;
 
-import org.flowable.engine.delegate.VariableScope;
+import org.flowable.variable.service.delegate.VariableScope;
 
 /**
  * @author Tom Baeyens
@@ -33,10 +33,10 @@ public class ScriptBindings implements Bindings {
 
     /**
      * The script engine implementations put some key/value pairs into the binding. This list contains those keys, such that they wouldn't be stored as process variable.
-     * 
+     * <p>
      * This list contains the keywords for JUEL, Javascript and Groovy.
      */
-    protected static final Set<String> UNSTORED_KEYS = new HashSet<String>(Arrays.asList("out", "out:print", "lang:import", "context", "elcontext", "print", "println", "nashorn.global"));
+    protected static final Set<String> UNSTORED_KEYS = new HashSet<>(Arrays.asList("out", "out:print", "lang:import", "context", "elcontext", "print", "println", "nashorn.global"));
 
     protected List<Resolver> scriptResolvers;
     protected VariableScope variableScope;

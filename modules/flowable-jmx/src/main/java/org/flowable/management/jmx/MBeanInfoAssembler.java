@@ -47,7 +47,7 @@ public class MBeanInfoAssembler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MBeanInfoAssembler.class);
 
-    protected final WeakHashMap<Class<?>, MBeanAttributesAndOperations> cache = new WeakHashMap<Class<?>, MBeanAttributesAndOperations>(10);
+    protected final WeakHashMap<Class<?>, MBeanAttributesAndOperations> cache = new WeakHashMap<>(10);
 
     public MBeanInfoAssembler() {
     }
@@ -63,11 +63,11 @@ public class MBeanInfoAssembler {
         }
 
         // maps and lists to contain information about attributes and operations
-        Map<String, ManagedAttributeInfo> attributes = new LinkedHashMap<String, ManagedAttributeInfo>();
-        Set<ManagedOperationInfo> operations = new LinkedHashSet<ManagedOperationInfo>();
-        Set<ModelMBeanAttributeInfo> mBeanAttributes = new LinkedHashSet<ModelMBeanAttributeInfo>();
-        Set<ModelMBeanOperationInfo> mBeanOperations = new LinkedHashSet<ModelMBeanOperationInfo>();
-        Set<ModelMBeanNotificationInfo> mBeanNotifications = new LinkedHashSet<ModelMBeanNotificationInfo>();
+        Map<String, ManagedAttributeInfo> attributes = new LinkedHashMap<>();
+        Set<ManagedOperationInfo> operations = new LinkedHashSet<>();
+        Set<ModelMBeanAttributeInfo> mBeanAttributes = new LinkedHashSet<>();
+        Set<ModelMBeanOperationInfo> mBeanOperations = new LinkedHashSet<>();
+        Set<ModelMBeanNotificationInfo> mBeanNotifications = new LinkedHashSet<>();
 
         // extract details from default managed bean
         if (defaultManagedBean != null) {
@@ -102,8 +102,8 @@ public class MBeanInfoAssembler {
         if (cached == null) {
             doExtractAttributesAndOperations(managedClass, attributes, operations);
             cached = new MBeanAttributesAndOperations();
-            cached.attributes = new LinkedHashMap<String, ManagedAttributeInfo>(attributes);
-            cached.operations = new LinkedHashSet<ManagedOperationInfo>(operations);
+            cached.attributes = new LinkedHashMap<>(attributes);
+            cached.operations = new LinkedHashSet<>(operations);
 
             // clear before we re-add them
             attributes.clear();

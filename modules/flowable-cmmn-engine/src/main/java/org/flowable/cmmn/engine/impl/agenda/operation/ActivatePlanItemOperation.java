@@ -30,6 +30,10 @@ public class ActivatePlanItemOperation extends AbstractPlanItemInstanceOperation
     @Override
     public void run() {
         if (!PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState())) {
+            
+            // Sentries are not needed to be kept around, as the plan item is being activated
+            deleteSentryOnPartInstances();
+            
             planItemInstanceEntity.setState(PlanItemInstanceState.ACTIVE);
             executeActivityBehavior();
         }
@@ -44,7 +48,7 @@ public class ActivatePlanItemOperation extends AbstractPlanItemInstanceOperation
     public String toString() {
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("[Activate Planitem] ");
+        stringBuilder.append("[Activate PlanItem] ");
         if (planItem.getName() != null) {
             stringBuilder.append(planItem.getName());
             stringBuilder.append(" (");

@@ -32,6 +32,8 @@ public class CmmnModel {
     
     protected List<Case> cases = new ArrayList<>();
     
+    protected List<Process> processes = new ArrayList<>();
+    
     public void addCase(Case caze) {
         cases.add(caze);
     }
@@ -44,6 +46,19 @@ public class CmmnModel {
         for (Case caze : cases) {
             if (id.equals(caze.getId())) {
                 return caze;
+            }
+        }
+        return null;
+    }
+    
+    public void addProcess(Process process) {
+        processes.add(process);
+    }
+    
+    public Process getProcessById(String id) {
+        for (Process process : processes) {
+            if (id.equals(process.getId())) {
+                return process;
             }
         }
         return null;
@@ -102,6 +117,12 @@ public class CmmnModel {
     }
     public void setCases(List<Case> cases) {
         this.cases = cases;
+    }
+    public List<Process> getProcesses() {
+        return processes;
+    }
+    public void setProcesses(List<Process> processes) {
+        this.processes = processes;
     }
     
 }

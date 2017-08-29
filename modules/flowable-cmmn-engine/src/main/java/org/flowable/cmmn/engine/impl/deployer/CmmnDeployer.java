@@ -78,7 +78,7 @@ public class CmmnDeployer implements Deployer {
         updateCachingAndArtifacts(parseResult);
     }
 
-    protected boolean isCmmnResource(String resourceName) {
+    public static boolean isCmmnResource(String resourceName) {
         for (String suffix : CMMN_RESOURCE_SUFFIXES) {
             if (resourceName.endsWith(suffix)) {
                 return true;

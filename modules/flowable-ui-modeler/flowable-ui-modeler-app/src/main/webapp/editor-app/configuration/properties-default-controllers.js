@@ -86,24 +86,31 @@ angular.module('flowableModeler').controller('FlowableBooleanPropertyCtrl', ['$s
  * Text controller
  */
 
-angular.module('flowableModeler').controller('FlowableTextPropertyCtrl', [ '$scope', '$modal', function($scope, $modal) {
+angular.module('flowableModeler').controller('FlowableTextPropertyCtrl', [ '$scope', '$modal', '$timeout', function($scope, $modal, $timeout) {
 
     var opts = {
         template:  'editor-app/configuration/properties/text-popup.html?version=' + Date.now(),
-        scope: $scope
+        scope: $scope,
+        prefixEvent: 'textModalEvent'
     };
-
+    
+     $scope.$on('textModalEvent.hide.before', function() {
+        $timeout(function() {
+            $scope.property.mode = 'read';
+        }, 0);
+    });
+    
     // Open the dialog
     _internalCreateModal(opts, $modal, $scope);
 }]);
 
 angular.module('flowableModeler').controller('FlowableTextPropertyPopupCtrl', ['$scope', function($scope) {
-    
+
     $scope.save = function() {
         $scope.updatePropertyInModel($scope.property);
         $scope.close();
     };
-
+    
     $scope.close = function() {
         $scope.property.mode = 'read';
         $scope.$hide();

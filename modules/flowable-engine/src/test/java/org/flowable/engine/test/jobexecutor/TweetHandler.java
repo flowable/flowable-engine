@@ -16,9 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.jobexecutor.JobHandler;
-import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.JobHandler;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.junit.Assert;
 
 public class TweetHandler implements JobHandler {
@@ -29,7 +28,7 @@ public class TweetHandler implements JobHandler {
         return "tweet";
     }
 
-    public void execute(JobEntity job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
+    public void execute(JobEntity job, String configuration, Object execution, CommandContext commandContext) {
         messages.add(configuration);
         Assert.assertNotNull(commandContext);
     }

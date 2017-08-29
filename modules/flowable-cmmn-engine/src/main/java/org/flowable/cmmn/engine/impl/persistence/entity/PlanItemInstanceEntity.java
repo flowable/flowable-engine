@@ -12,7 +12,6 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
-import java.util.Date;
 import java.util.List;
 
 import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
@@ -24,17 +23,6 @@ import org.flowable.engine.common.impl.persistence.entity.Entity;
  */
 public interface PlanItemInstanceEntity extends DelegatePlanItemInstance, Entity {
     
-    void setName(String name);
-    void setState(String state);
-    void setCaseDefinitionId(String caseDefinitionId);
-    void setCaseInstanceId(String caseInstanceId);
-    void setStageInstanceId(String stageInstanceId);
-    void setStage(boolean isStage);
-    void setElementId(String elementId);
-    void setStartTime(Date startTime);
-    void setStartUserId(String startUserId);
-    void setTenantId(String tenantId);
-    
     PlanItem getPlanItem();
     
     void setChildren(List<PlanItemInstanceEntity> children);
@@ -42,5 +30,7 @@ public interface PlanItemInstanceEntity extends DelegatePlanItemInstance, Entity
     List<PlanItemInstanceEntity> getChildren();
     
     PlanItemInstanceEntity getStagePlanItemInstace();
+    
+    List<SentryOnPartInstanceEntity> getSatisfiedSentryOnPartInstances();
     
 }

@@ -22,18 +22,18 @@ import java.util.Set;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.api.query.NativeQuery;
-import org.flowable.engine.impl.persistence.entity.VariableInstance;
 import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
-import org.flowable.engine.task.DelegationState;
 import org.flowable.engine.task.Event;
-import org.flowable.engine.task.IdentityLink;
-import org.flowable.engine.task.IdentityLinkType;
-import org.flowable.engine.task.NativeTaskQuery;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskQuery;
 import org.flowable.form.model.FormModel;
+import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.task.service.DelegationState;
+import org.flowable.task.service.NativeTaskQuery;
+import org.flowable.task.service.Task;
+import org.flowable.task.service.TaskQuery;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
 
 /**
  * Service which provides access to {@link Task} and form related operations.

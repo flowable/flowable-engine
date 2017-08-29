@@ -20,8 +20,8 @@ import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
-import org.flowable.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.variable.service.impl.el.ExpressionManager;
 
 /**
  * @author Joram Barrez
@@ -66,11 +66,12 @@ public abstract class AbstractActivityBpmnParseHandler<T extends FlowNode> exten
 
         // activiti:collection
         if (StringUtils.isNotEmpty(loopCharacteristics.getInputDataItem())) {
-            if (loopCharacteristics.getInputDataItem().contains("{")) {
-                miActivityBehavior.setCollectionExpression(expressionManager.createExpression(loopCharacteristics.getInputDataItem()));
-            } else {
-                miActivityBehavior.setCollectionVariable(loopCharacteristics.getInputDataItem());
-            }
+            miActivityBehavior.setCollectionExpression(expressionManager.createExpression(loopCharacteristics.getInputDataItem()));
+        }
+
+        // activiti:collectionString
+        if (StringUtils.isNotEmpty(loopCharacteristics.getCollectionString())) {
+            miActivityBehavior.setCollectionString(loopCharacteristics.getCollectionString());
         }
 
         // activiti:elementVariable

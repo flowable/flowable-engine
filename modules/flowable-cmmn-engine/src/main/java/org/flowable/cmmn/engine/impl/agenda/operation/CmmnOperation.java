@@ -12,6 +12,10 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
+import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.Stage;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
@@ -26,6 +30,39 @@ public abstract class CmmnOperation implements Runnable {
 
     public CmmnOperation(CommandContext commandContext) {
         this.commandContext = commandContext;
+    }
+    
+    protected Stage getStage(PlanItemInstanceEntity planItemInstanceEntity) {
+        if (planItemInstanceEntity.getPlanItem() != null
+                && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() != null) {
+            PlanItemDefinition planItemDefinition = planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
+            if (planItemDefinition instanceof Stage) {
+                return (Stage) planItemDefinition;
+            } else {
+                return planItemDefinition.getParentStage();
+            }
+        } else {
+            return getStage(planItemInstanceEntity.getCaseDefinitionId(), planItemInstanceEntity.getElementId());
+        }
+    }
+    
+    protected Stage getStage(String caseDefinitionId, String stageId) {
+        return CaseDefinitionUtil.getCase(caseDefinitionId).findStage(stageId);
+    }
+    
+    protected boolean isStage(PlanItemInstanceEntity planItemInstanceEntity) {
+        return (planItemInstanceEntity.getPlanItem() != null
+                && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() != null
+                && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof Stage)
+               || isPlanModel(planItemInstanceEntity);
+    }
+    
+    protected boolean isPlanModel(PlanItemInstanceEntity stagePlanItemInstanceEntity) {
+        Stage stage = getStage(stagePlanItemInstanceEntity.getCaseDefinitionId(), stagePlanItemInstanceEntity.getElementId());
+        if (stage != null) {
+            return stage.isPlanModel();
+        }
+        return false;
     }
     
 }

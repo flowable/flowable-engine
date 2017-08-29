@@ -59,7 +59,7 @@ public class BoundaryEventActivityBehavior extends FlowNodeActivityBehavior {
 
             executionEntity.setActivity(boundaryActivity);
 
-            interruptedExecutions = new ArrayList<ExecutionEntity>(executionEntity.getExecutions());
+            interruptedExecutions = new ArrayList<>(executionEntity.getExecutions());
             for (ExecutionEntity interruptedExecution : interruptedExecutions) {
                 interruptedExecution.deleteCascade("interrupting boundary event '" + executionEntity.getActivity().getId() + "' fired");
             }

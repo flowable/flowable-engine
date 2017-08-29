@@ -12,12 +12,27 @@
  */
 package org.flowable.cmmn.engine.runtime;
 
+import java.util.Date;
+
 import org.flowable.cmmn.model.PlanItem;
 
 /**
  * @author Joram Barrez
  */
 public interface DelegatePlanItemInstance extends PlanItemInstance {
+    
+    void setName(String name);
+    void setState(String state);
+    void setCaseDefinitionId(String caseDefinitionId);
+    void setCaseInstanceId(String caseInstanceId);
+    void setStageInstanceId(String stageInstanceId);
+    void setStage(boolean isStage);
+    void setElementId(String elementId);
+    void setStartTime(Date startTime);
+    void setStartUserId(String startUserId);
+    void setReferenceId(String referenceId);
+    void setReferenceType(String referenceType);
+    void setTenantId(String tenantId);
     
     PlanItem getPlanItem();
     

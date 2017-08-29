@@ -35,6 +35,9 @@ public abstract class AbstractCaseInstanceOperation extends CmmnOperation {
         if (caseInstanceEntity == null) {
             caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceEntityId);
         }
+        if (caseInstanceEntityId == null) {
+            caseInstanceEntityId = caseInstanceEntity.getId();
+        }
     }
     
 }

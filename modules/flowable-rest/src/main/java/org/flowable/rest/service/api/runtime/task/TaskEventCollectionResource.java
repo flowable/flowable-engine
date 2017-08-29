@@ -17,8 +17,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.rest.service.api.engine.EventResponse;
+import org.flowable.task.service.history.HistoricTaskInstance;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;

@@ -28,7 +28,7 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * Abstract superclass for all native query types.
- * 
+ *
  * @author Bernd Ruecker (camunda)
  */
 public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> implements Command<Object>, NativeQuery<T, U>,
@@ -47,7 +47,7 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> implem
     protected int firstResult;
     protected ResultType resultType;
 
-    private Map<String, Object> parameters = new HashMap<String, Object>();
+    private Map<String, Object> parameters = new HashMap<>();
     private String sqlStatement;
 
     protected AbstractNativeQuery(CommandExecutor commandExecutor) {
@@ -147,10 +147,9 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> implem
 
     /**
      * Executes the actual query to retrieve the list of results.
-     * 
+     *
      * @param maxResults
      * @param firstResult
-     *
      */
     public abstract List<U> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults);
 
@@ -165,7 +164,7 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> implem
     }
 
     private Map<String, Object> getParameterMap() {
-        HashMap<String, Object> parameterMap = new HashMap<String, Object>();
+        HashMap<String, Object> parameterMap = new HashMap<>();
         parameterMap.put("sql", sqlStatement);
         parameterMap.putAll(parameters);
         return parameterMap;

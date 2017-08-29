@@ -12,6 +12,9 @@
  */
 package org.activiti.engine.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -26,9 +29,6 @@ import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.ExecutionQuery;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.repository.ProcessDefinition;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -75,7 +75,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     protected String nameLikeIgnoreCase;
     protected String deploymentId;
     protected List<String> deploymentIds;
-    protected List<ExecutionQueryImpl> orQueryObjects = new ArrayList<ExecutionQueryImpl>();
+    protected List<ExecutionQueryImpl> orQueryObjects = new ArrayList<>();
 
     public ExecutionQueryImpl() {
     }
@@ -238,7 +238,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
             throw new ActivitiIllegalArgumentException("event type is null");
         }
         if (eventSubscriptions == null) {
-            eventSubscriptions = new ArrayList<EventSubscriptionQueryValue>();
+            eventSubscriptions = new ArrayList<>();
         }
         eventSubscriptions.add(new EventSubscriptionQueryValue(eventName, eventType));
         return this;
@@ -316,7 +316,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
                 .findExecutionCountByQueryCriteria(this);
     }
 
-    @SuppressWarnings({ "unchecked" })
+    @SuppressWarnings({"unchecked"})
     public List<Execution> executeList(CommandContext commandContext, Page page) {
         checkQueryOk();
         ensureVariablesInitialized();

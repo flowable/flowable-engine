@@ -26,11 +26,12 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
-import org.flowable.engine.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.task.IdentityLinkType;
+import org.flowable.identitylink.service.IdentityLinkService;
+import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 
 /**
  * Methods for working with deployments. Much of the actual work of {@link BpmnDeployer} is done by orchestrating the different pieces of work this class does; by having them here, we allow other
@@ -172,19 +173,20 @@ public class BpmnDeploymentHelper {
             ProcessDefinitionEntity processDefinition, ExpressionType expressionType) {
 
         if (expressions != null) {
+            IdentityLinkService identityLinkService = CommandContextUtil.getIdentityLinkService();
             Iterator<String> iterator = expressions.iterator();
             while (iterator.hasNext()) {
                 @SuppressWarnings("cast")
                 String expression = iterator.next();
-                IdentityLinkEntity identityLink = CommandContextUtil.getIdentityLinkEntityManager(commandContext).create();
-                identityLink.setProcessDef(processDefinition);
+                IdentityLinkEntity identityLink = identityLinkService.createIdentityLink();
+                identityLink.setProcessDefId(processDefinition.getId());
                 if (expressionType == ExpressionType.USER) {
                     identityLink.setUserId(expression);
                 } else if (expressionType == ExpressionType.GROUP) {
                     identityLink.setGroupId(expression);
                 }
                 identityLink.setType(IdentityLinkType.CANDIDATE);
-                CommandContextUtil.getIdentityLinkEntityManager(commandContext).insert(identityLink);
+                identityLinkService.insertIdentityLink(identityLink);
             }
         }
 

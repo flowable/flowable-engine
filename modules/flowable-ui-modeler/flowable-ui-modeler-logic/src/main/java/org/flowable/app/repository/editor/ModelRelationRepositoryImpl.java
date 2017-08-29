@@ -36,7 +36,7 @@ public class ModelRelationRepositoryImpl implements ModelRelationRepository {
 
     @Override
     public List<ModelRelation> findByParentModelIdAndType(String parentModelId, String type) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("parentModelId", parentModelId);
         params.put("type", type);
         return sqlSessionTemplate.selectList("selectModelRelationByParentModelIdAndType", params);

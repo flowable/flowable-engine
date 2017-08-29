@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.agenda;
 
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.engine.common.impl.agenda.Agenda;
 
@@ -31,8 +32,16 @@ public interface CmmnEngineAgenda extends Agenda {
 
     void planCompletePlanItem(PlanItemInstanceEntity planItemInstanceEntity);
     
-    void planPlanItemOccurred(PlanItemInstanceEntity planItemInstanceEntity);
+    void planOccurPlanItem(PlanItemInstanceEntity planItemInstanceEntity);
+    
+    void planExitPlanItem(PlanItemInstanceEntity planItemInstanceEntity);
     
     void planTriggerPlanItem(PlanItemInstanceEntity planItemInstanceEntity);
+    
+    void planCompleteCase(CaseInstanceEntity caseInstanceEntity);
+    
+    void planTerminateCase(String caseInstanceEntityId);
+    
+    void planTerminateCase(CaseInstanceEntity caseInstanceEntity);
     
 }

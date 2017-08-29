@@ -34,6 +34,22 @@
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-engine-common</artifactId>
 		</dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-variable-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-identitylink-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-task-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-job-service</artifactId>
+        </dependency>
 		<dependency>
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-idm-api</artifactId>
@@ -205,6 +221,7 @@
 			com.sun*;resolution:=optional,
 			javax.activation*;resolution:=optional,
 			javax.persistence*;resolution:=optional,
+            org.apache.commons.codec*;resolution:=optional,
 			org.apache.commons.mail*;resolution:=optional,
 			org.apache.xerces*;resolution:=optional,
 			org.flowable.camel;resolution:=optional,

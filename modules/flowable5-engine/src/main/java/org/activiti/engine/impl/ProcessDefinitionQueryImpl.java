@@ -281,7 +281,7 @@ public class ProcessDefinitionQueryImpl extends AbstractQuery<ProcessDefinitionQ
         if (authorizationUserId != null) {
             IdentityService identityService = Context.getProcessEngineConfiguration().getIdentityService();
             List<Group> groups = identityService.createGroupQuery().groupMember(authorizationUserId).list();
-            List<String> groupIds = new ArrayList<String>();
+            List<String> groupIds = new ArrayList<>();
             for (Group group : groups) {
                 groupIds.add(group.getId());
             }

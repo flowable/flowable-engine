@@ -12,18 +12,24 @@
  */
 package org.flowable.cmmn.engine.impl.runtime;
 
+import java.util.List;
+import java.util.Map;
+
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.repository.CaseDefinition;
+import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.cmmn.engine.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
-import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.callback.CallbackData;
+import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
@@ -63,15 +69,15 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         PlanItemInstanceEntity planModelInstanceEntity = createStagePlanItemInstanceEntity(commandContext, caseInstanceEntity, planModel);
         caseInstanceEntity.setPlanModelInstance(planModelInstanceEntity);
         
+        callCaseInstanceStateChangeCallbacks(commandContext, caseInstanceEntity, null, CaseInstanceState.ACTIVE);
+        CommandContextUtil.getCmmnHistoryManager().recordCaseInstanceStart(caseInstanceEntity);
         CommandContextUtil.getAgenda(commandContext).planInitStageOperation(planModelInstanceEntity);
         
         return caseInstanceEntity;
     }
 
     protected Stage getPlanModel(CommandContext commandContext, CaseDefinition caseDefinition) {
-        Case caze = CommandContextUtil.getCmmnEngineConfiguration(commandContext)
-                .getDeploymentManager().resolveCaseDefinition(caseDefinition).getCase();
-        return caze.getPlanModel();
+        return CaseDefinitionUtil.getCmmnModel(caseDefinition.getId()).getPrimaryCase().getPlanModel();
     }
     
     protected CaseInstanceEntity createCaseInstanceEntity(CommandContext commandContext, CaseDefinition caseDefinition) {
@@ -98,5 +104,21 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         planItemInstanceEntityManager.insert(stagePlanItemInstanceEntity);
         return stagePlanItemInstanceEntity;
     }
-
+    
+    public void callCaseInstanceStateChangeCallbacks(CommandContext commandContext, CaseInstance caseInstance, String oldState, String newState) {
+        if (caseInstance.getCallbackId() != null && caseInstance.getCallbackType() != null) {
+            Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceCallbacks = CommandContextUtil
+                    .getCmmnEngineConfiguration(commandContext).getCaseInstanceStateChangeCallbacks();
+            if (caseInstanceCallbacks != null && caseInstanceCallbacks.containsKey(caseInstance.getCallbackType())) {
+                for (RuntimeInstanceStateChangeCallback caseInstanceCallback : caseInstanceCallbacks.get(caseInstance.getCallbackType())) {
+                    caseInstanceCallback.stateChanged(new CallbackData(caseInstance.getCallbackId(), 
+                                                                       caseInstance.getCallbackType(), 
+                                                                       caseInstance.getId(), 
+                                                                       oldState, 
+                                                                       newState));
+                }
+            }
+        }
+    }
+    
 }

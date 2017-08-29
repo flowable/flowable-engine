@@ -34,10 +34,11 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
     @Override
     public <T> T execute(final CommandConfig config, final Command<T> command) {
         final CommandContext commandContext = Context.getCommandContext();
-        if (commandContext.isReused()) {
+        final CmmnEngineAgenda agenda = CommandContextUtil.getAgenda(commandContext);
+        if (commandContext.isReused() && !agenda.isEmpty()) {
             commandContext.setResult(command.execute(commandContext));
         } else {
-            CommandContextUtil.getAgenda(commandContext).planOperation(new Runnable() {
+            agenda.planOperation(new Runnable() {
                 @Override
                 public void run() {
                     commandContext.setResult(command.execute(commandContext));

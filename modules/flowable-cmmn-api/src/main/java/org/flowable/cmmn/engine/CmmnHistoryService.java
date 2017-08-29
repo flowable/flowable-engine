@@ -12,12 +12,15 @@
  */
 package org.flowable.cmmn.engine;
 
+import org.flowable.cmmn.engine.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.engine.history.HistoricMilestoneInstanceQuery;
 
 /**
  * @author Joram Barrez
  */
 public interface CmmnHistoryService {
+    
+    HistoricCaseInstanceQuery createHistoricCaseInstanceQuery();
 
     HistoricMilestoneInstanceQuery createHistoricMilestoneInstanceQuery();
 

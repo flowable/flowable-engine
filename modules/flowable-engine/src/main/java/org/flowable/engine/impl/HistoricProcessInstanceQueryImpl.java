@@ -29,6 +29,7 @@ import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -76,6 +77,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     protected String name;
     protected String nameLike;
     protected String nameLikeIgnoreCase;
+    protected String callbackId;
+    protected String callbackType;
     protected String locale;
     protected boolean withLocalizationFallback;
     protected List<HistoricProcessInstanceQueryImpl> orQueryObjects = new ArrayList<>();
@@ -398,6 +401,26 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
             this.currentOrQueryObject.nameLikeIgnoreCase = nameLikeIgnoreCase.toLowerCase();
         } else {
             this.nameLikeIgnoreCase = nameLikeIgnoreCase.toLowerCase();
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricProcessInstanceQuery processInstanceCallbackId(String callbackId) {
+        if (inOrStatement) {
+            currentOrQueryObject.callbackId = callbackId;
+        } else {
+            this.callbackId = callbackId;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricProcessInstanceQuery processInstanceCallbackType(String callbackType) {
+        if (inOrStatement) {
+            currentOrQueryObject.callbackType = callbackType;
+        } else {
+            this.callbackType = callbackType;
         }
         return this;
     }
@@ -785,6 +808,14 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
 
     public String getNameLikeIgnoreCase() {
         return nameLikeIgnoreCase;
+    }
+    
+    public String getCallbackId() {
+        return callbackId;
+    }
+
+    public String getCallbackType() {
+        return callbackType;
     }
 
     public List<HistoricProcessInstanceQueryImpl> getOrQueryObjects() {

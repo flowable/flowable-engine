@@ -17,8 +17,14 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
@@ -34,6 +40,12 @@ public class TableDataManagerImpl implements TableDataManager {
         entityToTableNameMap.put(CmmnDeploymentEntity.class, "ACT_CMMN_RE_DEPLOYMENT");
         entityToTableNameMap.put(CmmnResourceEntity.class, "ACT_CMMN_RE_DEPLOYMENT_RESOURCE");
         entityToTableNameMap.put(CaseDefinitionEntity.class, "ACT_CMMN_RE_CASEDEF");
+        entityToTableNameMap.put(CaseInstanceEntity.class, "ACT_CMMN_RU_CASE_INST");
+        entityToTableNameMap.put(PlanItemInstanceEntity.class, "ACT_CMMN_RU_PLAN_ITEM_INST");
+        entityToTableNameMap.put(SentryOnPartInstanceEntity.class, "ACT_CMMN_RU_SENTRY_ON_PART_INST");
+        entityToTableNameMap.put(MilestoneInstanceEntity.class, "ACT_CMMN_RU_MIL_INST");
+        entityToTableNameMap.put(HistoricCaseInstanceEntity.class, "ACT_CMMN_HI_CASE_INST");
+        entityToTableNameMap.put(HistoricMilestoneInstanceEntity.class, "ACT_CMMN_HI_MIL_INST");
     }
 
     public TableDataManagerImpl() {
@@ -43,7 +55,7 @@ public class TableDataManagerImpl implements TableDataManager {
     public Map<String, Long> getTableCount() {
         Map<String, Long> counts = new HashMap<>();
         for (String table : getTablesPresentInDatabase()) {
-            counts.put(table, (Long) CommandContextUtil.getDbSqlSession().selectOne("selectTableCount", table));
+            counts.put(table, (Long) CommandContextUtil.getDbSqlSession().selectOne("org.flowable.cmmn.engine.impl.TableData.selectTableCount", table));
         }
         return counts;
     }

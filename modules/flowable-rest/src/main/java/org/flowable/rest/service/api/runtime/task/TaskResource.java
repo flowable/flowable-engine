@@ -21,9 +21,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.task.Task;
 import org.flowable.rest.exception.FlowableForbiddenException;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
+import org.flowable.task.service.Task;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;

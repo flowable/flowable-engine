@@ -22,14 +22,15 @@ import java.util.Set;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.db.SuspensionState;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.SuspensionState;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
+import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -70,6 +71,8 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
     protected String name;
     protected String nameLike;
     protected String nameLikeIgnoreCase;
+    protected String callbackId;
+    protected String callbackType;
     protected String locale;
     protected boolean withLocalizationFallback;
 
@@ -422,6 +425,26 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
             this.currentOrQueryObject.nameLikeIgnoreCase = nameLikeIgnoreCase.toLowerCase();
         } else {
             this.nameLikeIgnoreCase = nameLikeIgnoreCase.toLowerCase();
+        }
+        return this;
+    }
+    
+    @Override
+    public ProcessInstanceQuery processInstanceCallbackId(String callbackId) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.callbackId = callbackId;
+        } else {
+            this.callbackId = callbackId;
+        }
+        return this;
+    }
+    
+    @Override
+    public ProcessInstanceQuery processInstanceCallbackType(String callbackType) {
+        if (inOrStatement) {
+            this.currentOrQueryObject.callbackType = callbackType;
+        } else {
+            this.callbackType = callbackType;
         }
         return this;
     }
@@ -828,6 +851,14 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
 
     public String getNameLikeIgnoreCase() {
         return nameLikeIgnoreCase;
+    }
+    
+    public String getCallbackId() {
+        return callbackId;
+    }
+
+    public String getCallbackType() {
+        return callbackType;
     }
 
     public List<ProcessInstanceQueryImpl> getOrQueryObjects() {

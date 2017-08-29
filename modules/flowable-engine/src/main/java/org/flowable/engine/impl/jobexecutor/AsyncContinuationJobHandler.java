@@ -14,8 +14,9 @@ package org.flowable.engine.impl.jobexecutor;
 
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.JobHandler;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
 /**
  * 
@@ -29,8 +30,9 @@ public class AsyncContinuationJobHandler implements JobHandler {
         return TYPE;
     }
 
-    public void execute(JobEntity job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
-        CommandContextUtil.getAgenda(commandContext).planContinueProcessSynchronousOperation(execution);
+    public void execute(JobEntity job, String configuration, Object execution, CommandContext commandContext) {
+        ExecutionEntity executionEntity = (ExecutionEntity) execution;
+        CommandContextUtil.getAgenda(commandContext).planContinueProcessSynchronousOperation(executionEntity);
     }
 
 }

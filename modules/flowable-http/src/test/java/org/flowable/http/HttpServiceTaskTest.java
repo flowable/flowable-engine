@@ -12,9 +12,6 @@
  */
 package org.flowable.http;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 import java.net.SocketException;
 import java.util.HashMap;
@@ -23,12 +20,15 @@ import java.util.Map;
 
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.variable.service.history.HistoricVariableInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Harsha Teja Kanna

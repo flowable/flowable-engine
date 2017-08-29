@@ -205,7 +205,7 @@ Following history levels can be configured:
 ----
 
 With the ++asyncHistoryExecutorActivate++ property, the history job executor can be started automatically when booting the Process Engine. This would be only set to false for test cases (or if Async History is not enabled of course).
-The ++asyncHistoryExecutorNumberOfRetries++ property configures the number of retries for an Async History job. This property is a bit different than that for a normal async job, because a history job may need more cycles before it can be handled succesfully. For example, a historic task first has to be created in the ACT_HI_TASK_ table before the assignee can be updated by another history job. The default value for this property is set to 10 in the Process Engine configuration. When the number of retries has been reached, the history job will be ignored (and not written to a deadletter job table).
+The ++asyncHistoryExecutorNumberOfRetries++ property configures the number of retries for an Async History job. This property is a bit different than that for a normal async job, because a history job may need more cycles before it can be handled successfully. For example, a historic task first has to be created in the ACT_HI_TASK_ table before the assignee can be updated by another history job. The default value for this property is set to 10 in the Process Engine configuration. When the number of retries has been reached, the history job will be ignored (and not written to a deadletter job table).
 
 In addition to these properties, the ++asyncHistoryExecutor++ property can be used to configure an AsyncExecutor in a similar way that you can do for the normal async job executor. 
 

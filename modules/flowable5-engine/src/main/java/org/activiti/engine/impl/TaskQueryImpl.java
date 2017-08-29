@@ -12,6 +12,9 @@
  */
 package org.activiti.engine.impl;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -26,12 +29,9 @@ import org.activiti.engine.impl.persistence.entity.SuspensionState;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.flowable.engine.DynamicBpmnConstants;
-import org.flowable.engine.impl.variable.VariableTypes;
-import org.flowable.engine.task.DelegationState;
 import org.flowable.idm.api.Group;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.flowable.task.service.DelegationState;
+import org.flowable.variable.service.impl.types.VariableTypes;
 
 /**
  * @author Joram Barrez
@@ -109,7 +109,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String locale;
     protected boolean withLocalizationFallback;
     protected boolean orActive;
-    protected List<TaskQueryImpl> orQueryObjects = new ArrayList<TaskQueryImpl>();
+    protected List<TaskQueryImpl> orQueryObjects = new ArrayList<>();
     protected TaskQueryImpl currentOrQueryObject;
 
     public TaskQueryImpl() {
@@ -211,7 +211,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
 
         final int nameListSize = nameList.size();
-        final List<String> caseIgnoredNameList = new ArrayList<String>(nameListSize);
+        final List<String> caseIgnoredNameList = new ArrayList<>(nameListSize);
         for (String name : nameList) {
             caseIgnoredNameList.add(name.toLowerCase());
         }
@@ -427,7 +427,9 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return this;
     }
 
-    /** @see #taskUnassigned */
+    /**
+     * @see #taskUnassigned
+     */
     @Deprecated
     public TaskQuery taskUnnassigned() {
         return taskUnassigned();
@@ -1139,7 +1141,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public List<String> getCandidateGroups() {
         if (candidateGroup != null) {
-            List<String> candidateGroupList = new ArrayList<String>(1);
+            List<String> candidateGroupList = new ArrayList<>(1);
             candidateGroupList.add(candidateGroup);
             return candidateGroupList;
 
@@ -1158,7 +1160,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected List<String> getGroupsForCandidateUser(String candidateUser) {
         IdentityService identityService = Context.getProcessEngineConfiguration().getIdentityService();
         List<Group> groups = identityService.createGroupQuery().groupMember(candidateUser).list();
-        List<String> groupIds = new ArrayList<String>();
+        List<String> groupIds = new ArrayList<>();
         for (Group group : groups) {
             groupIds.add(group.getId());
         }

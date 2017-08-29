@@ -19,7 +19,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.runtime.SuspendedJobQuery;
+import org.flowable.job.service.SuspendedJobQuery;
 import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.api.RequestUtil;
 import org.flowable.rest.service.api.RestResponseFactory;

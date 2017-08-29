@@ -12,6 +12,11 @@
  */
 package org.flowable.app.rest.runtime;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -61,7 +66,7 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.service.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.idm.api.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -69,11 +74,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @RestController
 public class RuntimeDisplayJsonClientResource {
@@ -97,8 +97,8 @@ public class RuntimeDisplayJsonClientResource {
     protected DebuggerService debuggerService;
 
     protected ObjectMapper objectMapper = new ObjectMapper();
-    protected List<String> eventElementTypes = new ArrayList<String>();
-    protected Map<String, InfoMapper> propertyMappers = new HashMap<String, InfoMapper>();
+    protected List<String> eventElementTypes = new ArrayList<>();
+    protected Map<String, InfoMapper> propertyMappers = new HashMap<>();
 
     public RuntimeDisplayJsonClientResource() {
         eventElementTypes.add("StartEvent");
@@ -140,8 +140,8 @@ public class RuntimeDisplayJsonClientResource {
         // Fetch process-instance activities
         List<HistoricActivityInstance> activityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).list();
 
-        Set<String> completedActivityInstances = new HashSet<String>();
-        Set<String> currentElements = new HashSet<String>();
+        Set<String> completedActivityInstances = new HashSet<>();
+        Set<String> currentElements = new HashSet<>();
         if (CollectionUtils.isNotEmpty(activityInstances)) {
             for (HistoricActivityInstance activityInstance : activityInstances) {
                 if (activityInstance.getEndTime() != null) {
@@ -155,7 +155,7 @@ public class RuntimeDisplayJsonClientResource {
         List<Job> jobs = managementService.createJobQuery().processInstanceId(processInstanceId).list();
         if (CollectionUtils.isNotEmpty(jobs)) {
             List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstanceId).list();
-            Map<String, Execution> executionMap = new HashMap<String, Execution>();
+            Map<String, Execution> executionMap = new HashMap<>();
             for (Execution execution : executions) {
                 executionMap.put(execution.getId(), execution);
             }
@@ -170,7 +170,7 @@ public class RuntimeDisplayJsonClientResource {
         // Gather completed flows
         List<String> completedFlows = gatherCompletedFlows(completedActivityInstances, currentElements, pojoModel);
 
-        Set<String> completedElements = new HashSet<String>(completedActivityInstances);
+        Set<String> completedElements = new HashSet<>(completedActivityInstances);
         completedElements.addAll(completedFlows);
 
         List<String> breakpoints = new ArrayList<>();
@@ -238,8 +238,8 @@ public class RuntimeDisplayJsonClientResource {
         // Fetch process-instance activities
         List<HistoricActivityInstance> activityInstances = historyService.createHistoricActivityInstanceQuery().processInstanceId(processInstanceId).list();
 
-        Set<String> completedActivityInstances = new HashSet<String>();
-        Set<String> currentActivityinstances = new HashSet<String>();
+        Set<String> completedActivityInstances = new HashSet<>();
+        Set<String> currentActivityinstances = new HashSet<>();
         if (CollectionUtils.isNotEmpty(activityInstances)) {
             for (HistoricActivityInstance activityInstance : activityInstances) {
                 if (activityInstance.getEndTime() != null) {
@@ -549,8 +549,8 @@ public class RuntimeDisplayJsonClientResource {
 
     protected List<String> gatherCompletedFlows(Set<String> completedActivityInstances, Set<String> currentActivityinstances, BpmnModel pojoModel) {
 
-        List<String> completedFlows = new ArrayList<String>();
-        List<String> activities = new ArrayList<String>(completedActivityInstances);
+        List<String> completedFlows = new ArrayList<>();
+        List<String> activities = new ArrayList<>(completedActivityInstances);
         activities.addAll(currentActivityinstances);
 
         // TODO: not a robust way of checking when parallel paths are active, should be revisited

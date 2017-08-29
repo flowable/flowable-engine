@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl">
+
+    <insert id="insertHistoricCaseInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl">
+        insert into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, TENANT_ID_)
+        values (
+            #{id ,jdbcType=VARCHAR},
+            1,
+            #{name ,jdbcType=VARCHAR},
+            #{parentId ,jdbcType=VARCHAR},
+            #{caseDefinitionId ,jdbcType=VARCHAR},
+            #{businessKey ,jdbcType=VARCHAR},
+            #{state ,jdbcType=VARCHAR},
+            #{startTime ,jdbcType=TIMESTAMP},
+            #{endTime ,jdbcType=TIMESTAMP},
+            #{startUserId ,jdbcType=VARCHAR},
+            #{callbackId, jdbcType=VARCHAR},
+            #{callbackType, jdbcType=VARCHAR},
+            #{tenantId ,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <insert id="bulkInsertHistoricCaseInstance" parameterType="java.util.List">
+        insert into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, TENANT_ID_)
+        values
+        <foreach collection="list" item="historicCaseInstance" index="index" separator=",">
+            (
+                #{historicCaseInstance.id ,jdbcType=VARCHAR},
+                1,
+                #{historicCaseInstance.name ,jdbcType=VARCHAR},
+                #{historicCaseInstance.parentId ,jdbcType=VARCHAR},
+                #{historicCaseInstance.caseDefinitionId ,jdbcType=VARCHAR},
+                #{historicCaseInstance.businessKey ,jdbcType=VARCHAR},
+                #{historicCaseInstance.state,jdbcType=VARCHAR},
+                #{historicCaseInstance.startTime ,jdbcType=TIMESTAMP},
+                #{historicCaseInstance.endTime ,jdbcType=TIMESTAMP},
+                #{historicCaseInstance.startUserId ,jdbcType=VARCHAR},
+                #{caseInstance.callbackId, jdbcType=VARCHAR},
+                #{caseInstance.callbackType, jdbcType=VARCHAR},
+                #{historicCaseInstance.tenantId ,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="bulkInsertHistoricCaseInstance" databaseId="oracle" parameterType="java.util.List">
+        INSERT ALL
+        <foreach collection="list" item="historicCaseInstance" index="index">
+            into ${prefix}ACT_CMMN_HI_CASE_INST (ID_, REV_, NAME_, PARENT_ID_, PARENT_PLAN_ITEM_INST_ID_, CASE_DEF_ID_, BUSINESS_KEY_, STATE_, START_TIME_, END_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, TENANT_ID_) VALUES
+            (
+                #{historicCaseInstance.id ,jdbcType=VARCHAR},
+                1,
+                #{historicCaseInstance.name ,jdbcType=VARCHAR},
+                #{historicCaseInstance.parentId ,jdbcType=VARCHAR},
+                #{historicCaseInstance.caseDefinitionId ,jdbcType=VARCHAR},
+                #{historicCaseInstance.businessKey ,jdbcType=VARCHAR},
+                #{historicCaseInstance.state ,jdbcType=VARCHAR},
+                #{historicCaseInstance.startTime ,jdbcType=TIMESTAMP},
+                #{historicCaseInstance.endTime ,jdbcType=TIMESTAMP},
+                #{historicCaseInstance.startUserId ,jdbcType=VARCHAR},
+                #{caseInstance.callbackId, jdbcType=VARCHAR},
+                #{caseInstance.callbackType, jdbcType=VARCHAR},
+                #{historicCaseInstance.tenantId ,jdbcType=VARCHAR}
+            )
+        </foreach>
+        SELECT * FROM dual
+    </insert>
+
+    <update id="updateHistoricCaseInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl">
+        update ${prefix}ACT_CMMN_HI_CASE_INST set
+            REV_ = #{revisionNext, jdbcType=INTEGER},
+            NAME_ = #{name, jdbcType=VARCHAR},
+            PARENT_ID_ = #{parentId, jdbcType=VARCHAR},
+            CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
+            BUSINESS_KEY_ = #{businessKey, jdbcType=VARCHAR},
+            STATE_ = #{state, jdbcType=VARCHAR},
+            START_TIME_ = #{startTime, jdbcType=TIMESTAMP},
+            END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
+            START_USER_ID_ = #{startUserId, jdbcType=VARCHAR},
+            CALLBACK_ID_ = #{callbackId, jdbcType=VARCHAR},
+            CALLBACK_TYPE_ = #{callbackId, jdbcType=VARCHAR},
+            TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+        where ID_ = #{id, jdbcType=VARCHAR}
+    </update>
+
+    <delete id="deleteHistoricCaseInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl">
+        delete from ${prefix}ACT_CMMN_HI_CASE_INST where ID_ = #{id} and REV_ = #{revision}
+    </delete>
+
+    <delete id="deleteHistoricCaseInstanceByCaseDefinitionId" parameterType="string">
+        delete from ${prefix}ACT_CMMN_HI_CASE_INST where CASE_DEF_ID_ = #{value}
+    </delete>
+
+    <resultMap id="historicCaseInstanceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl">
+        <id property="id" column="ID_" jdbcType="VARCHAR" />
+        <result property="revision" column="REV_" jdbcType="INTEGER" />
+        <result property="name" column="NAME_" jdbcType="VARCHAR" />
+        <result property="parentId" column="PARENT_ID_" jdbcType="VARCHAR" />
+        <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
+        <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
+        <result property="state" column="STATE_" jdbcType="VARCHAR" />
+        <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
+        <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
+        <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
+        <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="selectHistoricCaseInstance" parameterType="string" resultMap="historicCaseInstanceResultMap">
+        select * from ${prefix}ACT_CMMN_HI_CASE_INST where ID_ = #{id, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectHistoricCaseInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl"
+        resultMap="historicCaseInstanceResultMap">
+        ${limitBefore}
+        select RES.* ${limitBetween}
+        <include refid="selectHistoricCaseInstancesByQueryCriteriaSql" />
+        ${orderBy}
+        ${limitAfter}
+    </select>
+
+    <select id="selectHistoricCaseInstanceCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.history.HistoricCaseInstanceQueryImpl"
+        resultType="long">
+        select count(RES.ID_)
+        <include refid="selectHistoricCaseInstancesByQueryCriteriaSql" />
+    </select>
+
+    <sql id="selectHistoricCaseInstancesByQueryCriteriaSql">
+        from ${prefix}ACT_CMMN_HI_CASE_INST RES
+        <where>
+            <if test="caseDefinitionKey != null or caseDefinitionKeys != null or caseDefinitionCategory != null or caseDefinitionName != null">
+                inner join ${prefix}ACT_CMMN_RU_CASE_INST CASE_DEF
+            </if>
+            <if test="caseDefinitionId != null">
+                RES.CASE_DEF_ID_ = #{caseDefinitionId}
+            </if>
+            <if test="caseDefinitionKey != null">
+                CASE_DEF.KEY_ = #{caseDefinitionId}
+            </if>
+            <if test="caseInstanceId != null">
+                RES.ID_ = #{caseInstanceId}
+            </if>
+            <if test="caseDefinitionKeys != null">
+                CASE_DEF.KEY_ IN
+                <foreach item="caseDefinitionKey" index="index" collection="caseDefinitionKeys" open="(" separator="," close=")">
+                    #{caseDefinitionKey}
+                </foreach>
+            </if>
+            <if test="caseDefinitionCategory != null">
+                CASE_DEF.CATEGORY_ = #{caseDefinitionCategory}
+            </if>
+            <if test="caseDefinitionName != null">
+                CASE_DEF.NAME_ = #{caseDefinitionName}
+            </if>
+            <if test="caseInstanceParentId != null">
+                RES.PARENT_ID_ = #{caseInstanceParentId}
+            </if>
+            <if test="businessKey != null">
+                RES.BUSINESS_KEY_ = #{businessKey}
+            </if>
+            <if test="finished">
+                and RES.END_TIME_ is not null
+            </if>
+            <if test="unfinished">
+                and RES.END_TIME_ is null
+            </if>
+            <if test="startedBefore != null">
+                and RES.START_TIME_ &lt;= #{startedBefore}
+            </if>
+            <if test="startedAfter != null">
+                and RES.TIME_STAMP_ &gt;= #{startedAfter}
+            </if>
+            <if test="finishedBefore != null">
+                and RES.END_TIME_ &lt;= #{finishedBefore}
+            </if>
+            <if test="finishedAfter != null">
+                and RES.END_TIME_ &gt;= #{finishedAfter}
+            </if>
+            <if test="startedBy != null">
+                RES.START_USER_ID_ = #{startedBy}
+            </if>
+            <if test="callbackId != null">
+                and RES.CALLBACK_ID_ = #{callbackId}
+            </if>
+            <if test="callbackType != null">
+                and RES.CALLBACK_TYPE_ = #{callbackType}
+            </if>
+            <if test="tenantId != null">
+                RES.TENANT_ID_ = #{tenantId}
+            </if>
+            <if test="withoutTenantId">
+                RES.TENANT_ID_ is null or RES.TENANT_ID_ = ''
+            </if>
+        </where>
+    </sql>
+
+</mapper>

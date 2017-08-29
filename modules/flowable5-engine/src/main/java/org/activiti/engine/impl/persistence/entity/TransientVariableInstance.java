@@ -12,8 +12,8 @@
  */
 package org.activiti.engine.impl.persistence.entity;
 
-import org.flowable.engine.delegate.VariableScope;
-import org.flowable.engine.impl.persistence.entity.VariableInstance;
+import org.flowable.variable.service.delegate.VariableScope;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
 
 /**
  * A dummy implementation of {@link VariableInstance}, used for storing transient variables on a {@link VariableScope}, as the {@link VariableScope} works with instances of {@link VariableInstance}
@@ -169,6 +169,11 @@ public class TransientVariableInstance implements VariableInstance {
     public void setProcessInstanceId(String processInstanceId) {
 
     }
+    
+    @Override
+    public void setProcessDefinitionId(String processDefinitionId) {
+
+    }
 
     @Override
     public void setExecutionId(String executionId) {
@@ -197,6 +202,11 @@ public class TransientVariableInstance implements VariableInstance {
 
     @Override
     public String getProcessInstanceId() {
+        return null;
+    }
+    
+    @Override
+    public String getProcessDefinitionId() {
         return null;
     }
 

@@ -12,6 +12,10 @@
  */
 package org.flowable.app.service.editor.mapper;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,16 +23,12 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public abstract class AbstractInfoMapper implements InfoMapper {
 
@@ -77,7 +77,7 @@ public abstract class AbstractInfoMapper implements InfoMapper {
 
     protected void createListenerPropertyNodes(String name, List<FlowableListener> listeners) {
         if (CollectionUtils.isNotEmpty(listeners)) {
-            List<String> listenerValues = new ArrayList<String>();
+            List<String> listenerValues = new ArrayList<>();
             for (FlowableListener listener : listeners) {
                 StringBuilder listenerBuilder = new StringBuilder();
                 listenerBuilder.append(listener.getEvent());
@@ -113,7 +113,7 @@ public abstract class AbstractInfoMapper implements InfoMapper {
 
     protected void createFieldPropertyNodes(String name, List<FieldExtension> fields) {
         if (CollectionUtils.isNotEmpty(fields)) {
-            List<String> fieldValues = new ArrayList<String>();
+            List<String> fieldValues = new ArrayList<>();
             for (FieldExtension field : fields) {
                 StringBuilder fieldBuilder = new StringBuilder();
                 fieldBuilder.append(field.getFieldName());

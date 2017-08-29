@@ -20,6 +20,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.activiti.engine.impl.pvm.PvmActivity;
 import org.activiti.engine.impl.pvm.PvmException;
 import org.activiti.engine.impl.pvm.PvmExecution;
@@ -33,11 +34,10 @@ import org.activiti.engine.impl.pvm.delegate.SignallableActivityBehavior;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.activiti.engine.impl.pvm.process.TransitionImpl;
-import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.FlowElement;
-import org.flowable.engine.impl.persistence.entity.VariableInstance;
-import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,12 +62,16 @@ public class ExecutionImpl implements
 
     protected ProcessDefinitionImpl processDefinition;
 
-    /** current activity */
+    /**
+     * current activity
+     */
     protected ActivityImpl activity;
 
     protected FlowElement currentFlowElement;
 
-    /** current transition. is null when there is no transition being taken. */
+    /**
+     * current transition. is null when there is no transition being taken.
+     */
     protected TransitionImpl transition;
 
     /**
@@ -75,19 +79,29 @@ public class ExecutionImpl implements
      */
     protected ExecutionImpl processInstance;
 
-    /** the parent execution */
+    /**
+     * the parent execution
+     */
     protected ExecutionImpl parent;
 
-    /** nested executions representing scopes or concurrent paths */
+    /**
+     * nested executions representing scopes or concurrent paths
+     */
     protected List<ExecutionImpl> executions;
 
-    /** super execution, not-null if this execution is part of a subprocess */
+    /**
+     * super execution, not-null if this execution is part of a subprocess
+     */
     protected ExecutionImpl superExecution;
 
-    /** reference to a subprocessinstance, not-null if currently subprocess is started from this execution */
+    /**
+     * reference to a subprocessinstance, not-null if currently subprocess is started from this execution
+     */
     protected ExecutionImpl subProcessInstance;
 
-    /** only available until the process instance is started */
+    /**
+     * only available until the process instance is started
+     */
     protected StartingExecution startingExecution;
 
     // state/type of execution //////////////////////////////////////////////////
@@ -124,7 +138,7 @@ public class ExecutionImpl implements
 
     /**
      * when execution structure is pruned during a takeAll, then the original execution has to be resolved to the replaced execution.
-     * 
+     *
      * @see #takeAll(List, List) {@link OutgoingExecution}
      */
     protected ExecutionImpl replacedBy;
@@ -134,7 +148,7 @@ public class ExecutionImpl implements
     /**
      * next operation. process execution is in fact runtime interpretation of the process model. each operation is a logical unit of interpretation of the process. so sequentially processing the
      * operations drives the interpretation or execution of a process.
-     * 
+     *
      * @see AtomicOperation
      * @see #performOperation(AtomicOperation)
      */
@@ -151,7 +165,9 @@ public class ExecutionImpl implements
 
     // lifecycle methods ////////////////////////////////////////////////////////
 
-    /** creates a new execution. properties processDefinition, processInstance and activity will be initialized. */
+    /**
+     * creates a new execution. properties processDefinition, processInstance and activity will be initialized.
+     */
     public ExecutionImpl createExecution() {
         // create the new child execution
         ExecutionImpl createdExecution = newExecution();
@@ -169,7 +185,9 @@ public class ExecutionImpl implements
         return createdExecution;
     }
 
-    /** instantiates a new execution. can be overridden by subclasses */
+    /**
+     * instantiates a new execution. can be overridden by subclasses
+     */
     protected ExecutionImpl newExecution() {
         return new ExecutionImpl();
     }
@@ -231,7 +249,9 @@ public class ExecutionImpl implements
 
     // parent ///////////////////////////////////////////////////////////////////
 
-    /** ensures initialization and returns the parent */
+    /**
+     * ensures initialization and returns the parent
+     */
     public ExecutionImpl getParent() {
         ensureParentInitialized();
         return parent;
@@ -255,7 +275,9 @@ public class ExecutionImpl implements
         return null;
     }
 
-    /** all updates need to go through this setter as subclasses can override this method */
+    /**
+     * all updates need to go through this setter as subclasses can override this method
+     */
     public void setParent(InterpretableExecution parent) {
         this.parent = (ExecutionImpl) parent;
     }
@@ -268,7 +290,9 @@ public class ExecutionImpl implements
 
     // executions ///////////////////////////////////////////////////////////////
 
-    /** ensures initialization and returns the non-null executions list */
+    /**
+     * ensures initialization and returns the non-null executions list
+     */
     public List<ExecutionImpl> getExecutions() {
         ensureExecutionsInitialized();
         return executions;
@@ -318,7 +342,9 @@ public class ExecutionImpl implements
         performOperation(AtomicOperation.ACTIVITY_END);
     }
 
-    /** searches for an execution positioned in the given activity */
+    /**
+     * searches for an execution positioned in the given activity
+     */
     public ExecutionImpl findExecution(String activityId) {
         if ((getActivity() != null)
                 && (getActivity().getId().equals(activityId))) {
@@ -334,7 +360,7 @@ public class ExecutionImpl implements
     }
 
     public List<String> findActiveActivityIds() {
-        List<String> activeActivityIds = new ArrayList<String>();
+        List<String> activeActivityIds = new ArrayList<>();
         collectActiveActivityIds(activeActivityIds);
         return activeActivityIds;
     }
@@ -355,13 +381,15 @@ public class ExecutionImpl implements
      */
     protected void ensureExecutionsInitialized() {
         if (executions == null) {
-            executions = new ArrayList<ExecutionImpl>();
+            executions = new ArrayList<>();
         }
     }
 
     // process definition ///////////////////////////////////////////////////////
 
-    /** ensures initialization and returns the process definition. */
+    /**
+     * ensures initialization and returns the process definition.
+     */
     public ProcessDefinitionImpl getProcessDefinition() {
         ensureProcessDefinitionInitialized();
         return processDefinition;
@@ -381,7 +409,9 @@ public class ExecutionImpl implements
 
     // process instance /////////////////////////////////////////////////////////
 
-    /** ensures initialization and returns the process instance. */
+    /**
+     * ensures initialization and returns the process instance.
+     */
     public ExecutionImpl getProcessInstance() {
         ensureProcessInstanceInitialized();
         return processInstance;
@@ -403,7 +433,9 @@ public class ExecutionImpl implements
         return getProcessInstance().getBusinessKey();
     }
 
-    /** for setting the process instance, this setter must be used as subclasses can override */
+    /**
+     * for setting the process instance, this setter must be used as subclasses can override
+     */
     public void setProcessInstance(InterpretableExecution processInstance) {
         this.processInstance = (ExecutionImpl) processInstance;
     }
@@ -443,7 +475,9 @@ public class ExecutionImpl implements
 
     // activity /////////////////////////////////////////////////////////////////
 
-    /** ensures initialization and returns the activity */
+    /**
+     * ensures initialization and returns the activity
+     */
     public ActivityImpl getActivity() {
         ensureActivityInitialized();
         return activity;
@@ -456,7 +490,9 @@ public class ExecutionImpl implements
         this.activity = activity;
     }
 
-    /** must be called before the activity member field or getActivity() is called */
+    /**
+     * must be called before the activity member field or getActivity() is called
+     */
     protected void ensureActivityInitialized() {
     }
 
@@ -519,8 +555,8 @@ public class ExecutionImpl implements
     }
 
     public List<ActivityExecution> findInactiveConcurrentExecutions(PvmActivity activity) {
-        List<ActivityExecution> inactiveConcurrentExecutionsInActivity = new ArrayList<ActivityExecution>();
-        List<ActivityExecution> otherConcurrentExecutions = new ArrayList<ActivityExecution>();
+        List<ActivityExecution> inactiveConcurrentExecutionsInActivity = new ArrayList<>();
+        List<ActivityExecution> otherConcurrentExecutions = new ArrayList<>();
         if (isConcurrent()) {
             List<? extends ActivityExecution> concurrentExecutions = getParent().getExecutions();
             for (ActivityExecution concurrentExecution : concurrentExecutions) {
@@ -549,8 +585,8 @@ public class ExecutionImpl implements
 
     @SuppressWarnings("unchecked")
     public void takeAll(List<PvmTransition> transitions, List<ActivityExecution> recyclableExecutions) {
-        transitions = new ArrayList<PvmTransition>(transitions);
-        recyclableExecutions = (recyclableExecutions != null ? new ArrayList<ActivityExecution>(recyclableExecutions) : new ArrayList<ActivityExecution>());
+        transitions = new ArrayList<>(transitions);
+        recyclableExecutions = (recyclableExecutions != null ? new ArrayList<>(recyclableExecutions) : new ArrayList<ActivityExecution>());
 
         if (recyclableExecutions.size() > 1) {
             for (ActivityExecution recyclableExecution : recyclableExecutions) {
@@ -561,7 +597,7 @@ public class ExecutionImpl implements
         }
 
         ExecutionImpl concurrentRoot = ((isConcurrent && !isScope) ? getParent() : this);
-        List<ExecutionImpl> concurrentActiveExecutions = new ArrayList<ExecutionImpl>();
+        List<ExecutionImpl> concurrentActiveExecutions = new ArrayList<>();
         for (ExecutionImpl execution : concurrentRoot.getExecutions()) {
             if (execution.isActive()) {
                 concurrentActiveExecutions.add(execution);
@@ -596,7 +632,7 @@ public class ExecutionImpl implements
 
         } else {
 
-            List<OutgoingExecution> outgoingExecutions = new ArrayList<OutgoingExecution>();
+            List<OutgoingExecution> outgoingExecutions = new ArrayList<>();
 
             recyclableExecutions.remove(concurrentRoot);
 
@@ -680,7 +716,7 @@ public class ExecutionImpl implements
     }
 
     public Map<String, Object> getVariables() {
-        Map<String, Object> collectedVariables = new HashMap<String, Object>();
+        Map<String, Object> collectedVariables = new HashMap<>();
         collectVariables(collectedVariables);
         return collectedVariables;
     }
@@ -688,7 +724,7 @@ public class ExecutionImpl implements
     @Override
     public Map<String, Object> getVariables(Collection<String> variableNames) {
         Map<String, Object> allVariables = getVariables();
-        Map<String, Object> filteredVariables = new HashMap<String, Object>();
+        Map<String, Object> filteredVariables = new HashMap<>();
         for (String variableName : variableNames) {
             filteredVariables.put(variableName, allVariables.get(variableName));
         }
@@ -763,7 +799,7 @@ public class ExecutionImpl implements
 
     protected void ensureVariablesInitialized() {
         if (variables == null) {
-            variables = new HashMap<String, Object>();
+            variables = new HashMap<>();
         }
     }
 
@@ -1026,12 +1062,6 @@ public class ExecutionImpl implements
     }
 
     public void setVariablesLocal(Map<String, ? extends Object> variables) {
-    }
-    
-    @Override
-    public Object setVariableLocal(String variableName, Object value, org.flowable.engine.impl.persistence.entity.ExecutionEntity sourceActivityExecution, boolean fetchAllVariables) {
-        // This method is called from v6 only, v5 will never call this method.
-        throw new UnsupportedOperationException();
     }
 
     public boolean isEventScope() {

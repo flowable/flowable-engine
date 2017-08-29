@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.cmmn.converter.CmmnXMLException;
 import org.flowable.cmmn.converter.CmmnXmlConverter;
@@ -26,11 +27,13 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
 import org.flowable.engine.common.api.FlowableException;
@@ -112,14 +115,27 @@ public class CmmnParserImpl implements CmmnParser {
                 Stage stage = (Stage) planItemDefinition;
                 planItem.setBehavior(activityBehaviorFactory.createStageActivityBehavoir(planItem, stage));
                 
-            } else if (planItemDefinition instanceof Task) {
-                Task task = (Task) planItemDefinition;
-                planItem.setBehavior(activityBehaviorFactory.createTaskActivityBehavior(planItem, task));
+            } else if (planItemDefinition instanceof CaseTask) {
+                CaseTask caseTask = (CaseTask) planItemDefinition;
+                planItem.setBehavior(activityBehaviorFactory.createCaseTaskActivityBehavior(planItem, caseTask));
+                
+            } else if (planItemDefinition instanceof ProcessTask) {
+                ProcessTask processTask = (ProcessTask) planItemDefinition;
+                planItem.setBehavior(activityBehaviorFactory.createProcessTaskActivityBehavior(planItem, processTask));
                 
             } else if (planItemDefinition instanceof Milestone) {
                 Milestone milestone = (Milestone) planItemDefinition;
                 planItem.setBehavior(activityBehaviorFactory.createMilestoneActivityBehavior(planItem, milestone));
                 
+            } else if (planItemDefinition instanceof Task) {
+                Task task = (Task) planItemDefinition;
+                
+                if (StringUtils.isEmpty(task.getClassName())) {
+                    planItem.setBehavior(activityBehaviorFactory.createTaskActivityBehavior(planItem, task));
+                } else {
+                    planItem.setBehavior(activityBehaviorFactory.createCmmnClassDelegate(planItem, task));
+                }
+            
             }
             
             if (planItemDefinition instanceof PlanFragment) {

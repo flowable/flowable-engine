@@ -37,12 +37,15 @@ public class PlanItemInstanceEntityImpl extends AbstractEntity implements PlanIt
     protected String state;
     protected Date startTime;
     protected String startUserId;
+    protected String referenceId;
+    protected String referenceType;
     protected String tenantId;
     
     // Non-persisted
     protected PlanItem planItem;
     protected List<PlanItemInstanceEntity> children;
     protected PlanItemInstanceEntity stagePlanItemInstance;
+    protected List<SentryOnPartInstanceEntity> satisfiedSentryOnPartInstances;
     
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
@@ -55,6 +58,8 @@ public class PlanItemInstanceEntityImpl extends AbstractEntity implements PlanIt
         persistentState.put("state", state);
         persistentState.put("startTime", startTime);
         persistentState.put("startUserId", startUserId);
+        persistentState.put("referenceId", referenceId);
+        persistentState.put("referenceType", referenceType);
         persistentState.put("tenantId", tenantId);
         return persistentState;
     }
@@ -122,6 +127,18 @@ public class PlanItemInstanceEntityImpl extends AbstractEntity implements PlanIt
     public void setStartUserId(String startUserId) {
         this.startUserId = startUserId;
     }
+    public String getReferenceId() {
+        return referenceId;
+    }
+    public void setReferenceId(String referenceId) {
+        this.referenceId = referenceId;
+    }
+    public String getReferenceType() {
+        return referenceType;
+    }
+    public void setReferenceType(String referenceType) {
+        this.referenceType = referenceType;
+    }
     public String getTenantId() {
         return tenantId;
     }
@@ -155,5 +172,17 @@ public class PlanItemInstanceEntityImpl extends AbstractEntity implements PlanIt
         }
         return stagePlanItemInstance;
     }
+    
+    @Override
+    public List<SentryOnPartInstanceEntity> getSatisfiedSentryOnPartInstances() {
+        if (satisfiedSentryOnPartInstances == null) {
+            satisfiedSentryOnPartInstances = CommandContextUtil.getSentryOnPartInstanceEntityManager().findSentryOnPartInstancesByPlanItemInstanceId(id);
+        }
+        return satisfiedSentryOnPartInstances;
+    }
 
+    public void setSatisfiedSentryOnPartInstances(List<SentryOnPartInstanceEntity> satisfiedSentryOnPartInstances) {
+        this.satisfiedSentryOnPartInstances = satisfiedSentryOnPartInstances;
+    }
+    
 }

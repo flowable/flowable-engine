@@ -21,9 +21,9 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.HistoryJobService;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -63,13 +63,13 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
     
     protected HistoryJobEntity createAndInsertJobEntity(CommandContext commandContext, AsyncHistorySession asyncHistorySession, String jobType) {
         ProcessEngineConfiguration processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-        HistoryJobEntityManager historyJobEntityManager = CommandContextUtil.getHistoryJobEntityManager(commandContext);
-        HistoryJobEntity currentJobEntity = historyJobEntityManager.create();
+        HistoryJobService historyJobService = CommandContextUtil.getHistoryJobService(commandContext);
+        HistoryJobEntity currentJobEntity = historyJobService.createHistoryJob();
         currentJobEntity.setJobHandlerType(jobType);
         currentJobEntity.setRetries(CommandContextUtil.getProcessEngineConfiguration(commandContext).getAsyncHistoryExecutorNumberOfRetries());
         currentJobEntity.setTenantId(asyncHistorySession.getTenantId());
         currentJobEntity.setCreateTime(processEngineConfiguration.getClock().getCurrentTime());
-        CommandContextUtil.getJobManager(commandContext).scheduleHistoryJob(currentJobEntity);
+        historyJobService.scheduleHistoryJob(currentJobEntity);
         return currentJobEntity;
     }
 

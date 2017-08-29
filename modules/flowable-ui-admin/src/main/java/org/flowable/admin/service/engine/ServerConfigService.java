@@ -12,6 +12,9 @@
  */
 package org.flowable.admin.service.engine;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.flowable.admin.app.rest.dto.ServerConfigRepresentation;
 import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.domain.ServerConfig;
@@ -21,9 +24,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * @author jbarrez
@@ -120,7 +120,7 @@ public class ServerConfigService extends AbstractEncryptingService {
     }
 
     protected List<ServerConfigRepresentation> createServerConfigRepresentation(List<ServerConfig> serverConfigs) {
-        List<ServerConfigRepresentation> serversRepresentations = new ArrayList<ServerConfigRepresentation>();
+        List<ServerConfigRepresentation> serversRepresentations = new ArrayList<>();
         for (ServerConfig serverConfig : serverConfigs) {
             serversRepresentations.add(createServerConfigRepresentation(serverConfig));
         }
@@ -147,53 +147,53 @@ public class ServerConfigService extends AbstractEncryptingService {
 
         switch (endpointType) {
 
-        case PROCESS:
-            serverConfig.setName(environment.getRequiredProperty(REST_PROCESS_APP_NAME));
-            serverConfig.setDescription(environment.getRequiredProperty(REST_PROCESS_APP_DESCRIPTION));
-            serverConfig.setServerAddress(environment.getRequiredProperty(REST_PROCESS_APP_HOST));
-            serverConfig.setPort(environment.getRequiredProperty(REST_PROCESS_APP_PORT, Integer.class));
-            serverConfig.setContextRoot(environment.getRequiredProperty(REST_PROCESS_APP_CONTEXT_ROOT));
-            serverConfig.setRestRoot(environment.getRequiredProperty(REST_PROCESS_APP_REST_ROOT));
-            serverConfig.setUserName(environment.getRequiredProperty(REST_PROCESS_APP_USER));
-            serverConfig.setPassword(environment.getRequiredProperty(REST_PROCESS_APP_PASSWORD));
-            serverConfig.setEndpointType(endpointType.getEndpointCode());
-            break;
+            case PROCESS:
+                serverConfig.setName(environment.getRequiredProperty(REST_PROCESS_APP_NAME));
+                serverConfig.setDescription(environment.getRequiredProperty(REST_PROCESS_APP_DESCRIPTION));
+                serverConfig.setServerAddress(environment.getRequiredProperty(REST_PROCESS_APP_HOST));
+                serverConfig.setPort(environment.getRequiredProperty(REST_PROCESS_APP_PORT, Integer.class));
+                serverConfig.setContextRoot(environment.getRequiredProperty(REST_PROCESS_APP_CONTEXT_ROOT));
+                serverConfig.setRestRoot(environment.getRequiredProperty(REST_PROCESS_APP_REST_ROOT));
+                serverConfig.setUserName(environment.getRequiredProperty(REST_PROCESS_APP_USER));
+                serverConfig.setPassword(environment.getRequiredProperty(REST_PROCESS_APP_PASSWORD));
+                serverConfig.setEndpointType(endpointType.getEndpointCode());
+                break;
 
-        case DMN:
-            serverConfig.setName(environment.getRequiredProperty(REST_DMN_APP_NAME));
-            serverConfig.setDescription(environment.getRequiredProperty(REST_DMN_APP_DESCRIPTION));
-            serverConfig.setServerAddress(environment.getRequiredProperty(REST_DMN_APP_HOST));
-            serverConfig.setPort(environment.getRequiredProperty(REST_DMN_APP_PORT, Integer.class));
-            serverConfig.setContextRoot(environment.getRequiredProperty(REST_DMN_APP_CONTEXT_ROOT));
-            serverConfig.setRestRoot(environment.getRequiredProperty(REST_DMN_APP_REST_ROOT));
-            serverConfig.setUserName(environment.getRequiredProperty(REST_DMN_APP_USER));
-            serverConfig.setPassword(environment.getRequiredProperty(REST_DMN_APP_PASSWORD));
-            serverConfig.setEndpointType(endpointType.getEndpointCode());
-            break;
+            case DMN:
+                serverConfig.setName(environment.getRequiredProperty(REST_DMN_APP_NAME));
+                serverConfig.setDescription(environment.getRequiredProperty(REST_DMN_APP_DESCRIPTION));
+                serverConfig.setServerAddress(environment.getRequiredProperty(REST_DMN_APP_HOST));
+                serverConfig.setPort(environment.getRequiredProperty(REST_DMN_APP_PORT, Integer.class));
+                serverConfig.setContextRoot(environment.getRequiredProperty(REST_DMN_APP_CONTEXT_ROOT));
+                serverConfig.setRestRoot(environment.getRequiredProperty(REST_DMN_APP_REST_ROOT));
+                serverConfig.setUserName(environment.getRequiredProperty(REST_DMN_APP_USER));
+                serverConfig.setPassword(environment.getRequiredProperty(REST_DMN_APP_PASSWORD));
+                serverConfig.setEndpointType(endpointType.getEndpointCode());
+                break;
 
-        case FORM:
-            serverConfig.setName(environment.getRequiredProperty(REST_FORM_APP_NAME));
-            serverConfig.setDescription(environment.getRequiredProperty(REST_FORM_APP_DESCRIPTION));
-            serverConfig.setServerAddress(environment.getRequiredProperty(REST_FORM_APP_HOST));
-            serverConfig.setPort(environment.getRequiredProperty(REST_FORM_APP_PORT, Integer.class));
-            serverConfig.setContextRoot(environment.getRequiredProperty(REST_FORM_APP_CONTEXT_ROOT));
-            serverConfig.setRestRoot(environment.getRequiredProperty(REST_FORM_APP_REST_ROOT));
-            serverConfig.setUserName(environment.getRequiredProperty(REST_FORM_APP_USER));
-            serverConfig.setPassword(environment.getRequiredProperty(REST_FORM_APP_PASSWORD));
-            serverConfig.setEndpointType(endpointType.getEndpointCode());
-            break;
+            case FORM:
+                serverConfig.setName(environment.getRequiredProperty(REST_FORM_APP_NAME));
+                serverConfig.setDescription(environment.getRequiredProperty(REST_FORM_APP_DESCRIPTION));
+                serverConfig.setServerAddress(environment.getRequiredProperty(REST_FORM_APP_HOST));
+                serverConfig.setPort(environment.getRequiredProperty(REST_FORM_APP_PORT, Integer.class));
+                serverConfig.setContextRoot(environment.getRequiredProperty(REST_FORM_APP_CONTEXT_ROOT));
+                serverConfig.setRestRoot(environment.getRequiredProperty(REST_FORM_APP_REST_ROOT));
+                serverConfig.setUserName(environment.getRequiredProperty(REST_FORM_APP_USER));
+                serverConfig.setPassword(environment.getRequiredProperty(REST_FORM_APP_PASSWORD));
+                serverConfig.setEndpointType(endpointType.getEndpointCode());
+                break;
 
-        case CONTENT:
-            serverConfig.setName(environment.getRequiredProperty(REST_CONTENT_APP_NAME));
-            serverConfig.setDescription(environment.getRequiredProperty(REST_CONTENT_APP_DESCRIPTION));
-            serverConfig.setServerAddress(environment.getRequiredProperty(REST_CONTENT_APP_HOST));
-            serverConfig.setPort(environment.getRequiredProperty(REST_CONTENT_APP_PORT, Integer.class));
-            serverConfig.setContextRoot(environment.getRequiredProperty(REST_CONTENT_APP_CONTEXT_ROOT));
-            serverConfig.setRestRoot(environment.getRequiredProperty(REST_CONTENT_APP_REST_ROOT));
-            serverConfig.setUserName(environment.getRequiredProperty(REST_CONTENT_APP_USER));
-            serverConfig.setPassword(environment.getRequiredProperty(REST_CONTENT_APP_PASSWORD));
-            serverConfig.setEndpointType(endpointType.getEndpointCode());
-            break;
+            case CONTENT:
+                serverConfig.setName(environment.getRequiredProperty(REST_CONTENT_APP_NAME));
+                serverConfig.setDescription(environment.getRequiredProperty(REST_CONTENT_APP_DESCRIPTION));
+                serverConfig.setServerAddress(environment.getRequiredProperty(REST_CONTENT_APP_HOST));
+                serverConfig.setPort(environment.getRequiredProperty(REST_CONTENT_APP_PORT, Integer.class));
+                serverConfig.setContextRoot(environment.getRequiredProperty(REST_CONTENT_APP_CONTEXT_ROOT));
+                serverConfig.setRestRoot(environment.getRequiredProperty(REST_CONTENT_APP_REST_ROOT));
+                serverConfig.setUserName(environment.getRequiredProperty(REST_CONTENT_APP_USER));
+                serverConfig.setPassword(environment.getRequiredProperty(REST_CONTENT_APP_PASSWORD));
+                serverConfig.setEndpointType(endpointType.getEndpointCode());
+                break;
         }
 
         return serverConfig;

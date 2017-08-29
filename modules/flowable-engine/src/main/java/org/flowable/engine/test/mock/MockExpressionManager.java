@@ -19,9 +19,9 @@ import org.flowable.engine.common.impl.javax.el.CompositeELResolver;
 import org.flowable.engine.common.impl.javax.el.ELResolver;
 import org.flowable.engine.common.impl.javax.el.ListELResolver;
 import org.flowable.engine.common.impl.javax.el.MapELResolver;
-import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.el.DefaultExpressionManager;
 import org.flowable.engine.impl.el.VariableScopeElResolver;
+import org.flowable.variable.service.delegate.VariableScope;
 
 public class MockExpressionManager extends DefaultExpressionManager {
 

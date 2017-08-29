@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.calendar.BusinessCalendar;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
