@@ -62,4 +62,9 @@ public class DefinitionsXmlConverter extends BaseCmmnXmlConverter {
         return null;
     }
     
+    
+    @Override
+    protected void elementEnd(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+        
+    }
 }

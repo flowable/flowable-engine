@@ -35,8 +35,6 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery planItemInstanceTenantId(String tenantId);
     PlanItemInstanceQuery planItemInstanceWithoutTenantId();
     
-    PlanItemInstanceQuery includeStagePlanItemInstances();
-    
     PlanItemInstanceQuery orderByStartTime();
     PlanItemInstanceQuery orderByName();
     

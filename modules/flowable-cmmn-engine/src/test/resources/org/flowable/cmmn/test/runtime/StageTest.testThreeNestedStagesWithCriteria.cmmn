@@ -18,7 +18,7 @@
 
                 <planItem id="planItem3" name="Task B" definitionRef="rootTask" />
                 <planItem id="planItem4" name="Task C" definitionRef="nestedTask" />
-                <planItem id="planItem5" name="Stage 2" definitionRef="stage2">
+                <planItem id="planItem5" name="Stage B" definitionRef="stage2">
                     <entryCriterion sentryRef="stage2EntrySentry" />
                     <exitCriterion sentryRef="stage2ExitSentry" />
                 </planItem>
@@ -44,7 +44,7 @@
                     <planItem name="Task D" definitionRef="rootTask" />
                     <planItem name="Stage C" definitionRef="stage3" />
 
-                    <stage id="stage3">
+                    <stage id="stage3" name="Nested Stage 3">
 
                         <planItem name="Task E" definitionRef="nestedTask2" />
                         <task id="nestedTask2" name="The Task" isBlocking="true" />

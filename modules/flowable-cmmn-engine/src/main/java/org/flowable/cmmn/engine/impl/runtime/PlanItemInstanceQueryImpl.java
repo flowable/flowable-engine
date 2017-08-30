@@ -41,7 +41,6 @@ public class PlanItemInstanceQueryImpl extends AbstractQuery<PlanItemInstanceQue
     protected String referenceType;
     protected String tenantId;
     protected boolean withoutTenantId;
-    protected boolean includeStagePlanItemInstances;
     
     public PlanItemInstanceQueryImpl() {
         
@@ -164,12 +163,6 @@ public class PlanItemInstanceQueryImpl extends AbstractQuery<PlanItemInstanceQue
     }
     
     @Override
-    public PlanItemInstanceQuery includeStagePlanItemInstances() {
-        this.includeStagePlanItemInstances = true;
-        return this;
-    }
-
-    @Override
     public long executeCount(CommandContext commandContext) {
         return CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).countByCriteria(this);
     }
@@ -243,8 +236,4 @@ public class PlanItemInstanceQueryImpl extends AbstractQuery<PlanItemInstanceQue
         return withoutTenantId;
     }
 
-    public boolean isIncludeStagePlanItemInstances() {
-        return includeStagePlanItemInstances;
-    }
-    
 }

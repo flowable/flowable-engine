@@ -22,6 +22,8 @@ import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
  */
 public interface SentryOnPartInstanceDataManager extends DataManager<SentryOnPartInstanceEntity> {
     
+    List<SentryOnPartInstanceEntity> findSentryOnPartInstancesByCaseInstanceIdAndNullPlanItemInstanceId(String caseInstanceId);
+    
     List<SentryOnPartInstanceEntity> findSentryOnPartInstancesByPlanItemInstanceId(String planItemId);
     
 }

@@ -18,6 +18,7 @@ import org.flowable.cmmn.engine.impl.agenda.operation.CompleteCaseInstanceOperat
 import org.flowable.cmmn.engine.impl.agenda.operation.CompletePlanItemOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.EvaluateCriteriaOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ExitPlanItemOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.InitPlanModelOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.InitStageOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.OccurPlanItemOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TerminateCaseInstanceOperation;
@@ -47,6 +48,11 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Planned " + operation);
         }
+    }
+    
+    @Override
+    public void planInitPlanModelOperation(CaseInstanceEntity caseInstanceEntity) {
+        addOperation(new InitPlanModelOperation(commandContext, caseInstanceEntity));
     }
     
     @Override
@@ -100,13 +106,13 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     }
     
     @Override
-    public void planTerminateCase(String caseInstanceEntityId) {
-        addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntityId));
+    public void planTerminateCase(String caseInstanceEntityId, boolean manualTermination) {
+        addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntityId, manualTermination));
     }
     
     @Override
-    public void planTerminateCase(CaseInstanceEntity caseInstanceEntity) {
-        addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntity));
+    public void planTerminateCase(CaseInstanceEntity caseInstanceEntity, boolean manualTermination) {
+        addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntity, manualTermination));
     }
 
 }

@@ -28,7 +28,7 @@ import org.flowable.cmmn.engine.runtime.PlanItemInstance;
  * @author Joram Barrez
  */
 public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataManager<PlanItemInstanceEntity> implements PlanItemInstanceDataManager {
-
+    
     public MybatisPlanItemInstanceDataManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration) {
         super(cmmnEngineConfiguration);
     }
@@ -51,15 +51,16 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
     
     @SuppressWarnings("unchecked")
     @Override
-    public List<PlanItemInstanceEntity> findChildPlanItemInstancesForStage(String stagePlanItemInstanceId) {
-        return getDbSqlSession().selectList("selectChildPlanItemInstancesForStage", stagePlanItemInstanceId);
+    public List<PlanItemInstanceEntity> findChildPlanItemInstancesForCaseInstance(String caseInstanceId) {
+        return getDbSqlSession().selectList("selectChildPlanItemInstancesByCaseInstanceId", caseInstanceId);
     }
     
+    @SuppressWarnings("unchecked")
     @Override
-    public PlanItemInstanceEntity findPlanModelPlanItemInstanceForCaseInstance(String caseInstanceId) {
-        return (PlanItemInstanceEntity) getDbSqlSession().selectOne("selectPlanModelPlanItemInstanceForCaseInstance", caseInstanceId);
+    public List<PlanItemInstanceEntity> findChildPlanItemInstancesForStage(String stagePlanItemInstanceId) {
+        return getDbSqlSession().selectList("selectChildPlanItemInstancesByStagePlanItemInstanceId", stagePlanItemInstanceId);
     }
-
+    
     @Override
     public long countByCriteria(PlanItemInstanceQueryImpl planItemInstanceQuery) {
         return (Long) getDbSqlSession().selectOne("selectPlanItemInstanceCountByQueryCriteria", planItemInstanceQuery);

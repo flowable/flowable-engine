@@ -73,7 +73,7 @@ public class CaseTaskActivityBehavior extends TaskActivityBehavior implements Pl
             
             // Triggering the plan item (as opposed to a regular complete) terminates the case instance
             CommandContext commandContext = CommandContextUtil.getCommandContext();
-            CommandContextUtil.getAgenda(commandContext).planTerminateCase(planItemInstance.getReferenceId());
+            CommandContextUtil.getAgenda(commandContext).planTerminateCase(planItemInstance.getReferenceId(), true);
             CommandContextUtil.getAgenda(commandContext).planCompletePlanItem((PlanItemInstanceEntity) planItemInstance);
         }
     }
@@ -82,7 +82,7 @@ public class CaseTaskActivityBehavior extends TaskActivityBehavior implements Pl
     public void onStateTransition(DelegatePlanItemInstance planItemInstance, String transition) {
         if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
             // The plan item will be deleted by the regular TerminatePlanItemOperation
-            CommandContextUtil.getAgenda().planTerminateCase(planItemInstance.getReferenceId());
+            CommandContextUtil.getAgenda().planTerminateCase(planItemInstance.getReferenceId(), true);
         }
     }
     

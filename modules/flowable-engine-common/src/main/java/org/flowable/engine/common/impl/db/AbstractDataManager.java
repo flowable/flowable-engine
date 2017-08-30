@@ -117,6 +117,10 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
 
         return null;
     }
+    
+    protected List<EntityImpl> getList(String dbQueryName, Object parameter, CachedEntityMatcher<EntityImpl> cachedEntityMatcher) {
+        return getList(dbQueryName, parameter, cachedEntityMatcher, true);
+    }
 
     /**
      * Gets a list by querying the database and the cache using {@link CachedEntityMatcher}. First, the entities are fetched from the database using the provided query. The cache is then queried for

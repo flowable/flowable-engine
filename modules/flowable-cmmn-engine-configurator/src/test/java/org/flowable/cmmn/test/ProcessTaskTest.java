@@ -13,6 +13,7 @@
 package org.flowable.cmmn.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.util.List;
@@ -204,16 +205,16 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
     @CmmnDeployment
     public void testTerminateCaseInstanceWithBlockingProcessTask() {
         CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
-        assertEquals(9, cmmnRuntimeService.createPlanItemQuery().caseInstanceId(caseInstance.getId()).includeStagePlanItemInstances().count());
-        assertEquals(6, cmmnRuntimeService.createPlanItemQuery().caseInstanceId(caseInstance.getId()).count());
-        assertEquals(4, cmmnRuntimeService.createPlanItemQuery().caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.ACTIVE).includeStagePlanItemInstances().count());
+        assertEquals(8, cmmnRuntimeService.createPlanItemQuery().caseInstanceId(caseInstance.getId()).count());
+        assertEquals(3, cmmnRuntimeService.createPlanItemQuery().caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE).count());
         
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .planItemInstanceName("Task One")
                 .singleResult();
-        assertEquals("Task One", planItemInstance.getName());
+        assertNotNull(planItemInstance);
         
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
         

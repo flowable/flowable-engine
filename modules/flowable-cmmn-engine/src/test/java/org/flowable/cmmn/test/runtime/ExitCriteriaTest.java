@@ -135,8 +135,7 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testExitThreeNestedStagesThroughPlanModel() {
         cmmnRuntimeService.startCaseInstanceByKey("myCase");
-        assertEquals(9, cmmnRuntimeService.createPlanItemQuery().includeStagePlanItemInstances().count());
-        assertEquals(5, cmmnRuntimeService.createPlanItemQuery().count()); // 4 stages: 3 nested + 1 planmodel (hence 9-4 = 5)
+        assertEquals(8, cmmnRuntimeService.createPlanItemQuery().count());
         
         PlanItemInstance taskA = cmmnRuntimeService.createPlanItemQuery().planItemInstanceName("Task A").singleResult();
         assertNotNull(taskA);

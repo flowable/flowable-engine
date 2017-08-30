@@ -23,10 +23,10 @@ import org.flowable.engine.common.impl.persistence.entity.EntityManager;
  */
 public interface PlanItemInstanceEntityManager extends EntityManager<PlanItemInstanceEntity> {
     
+    List<PlanItemInstanceEntity> findChildPlanItemInstancesForCaseInstance(String caseInstance);
+    
     List<PlanItemInstanceEntity> findChildPlanItemInstancesForStage(String stagePlanItemInstanceId);
 
-    PlanItemInstanceEntity findPlanModelPlanItemInstanceForCaseInstance(String caseInstanceId);
-    
     void deleteByCaseDefinitionId(String caseDefinitionId);
     
     PlanItemInstanceQuery createPlanItemInstanceQuery();

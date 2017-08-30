@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import org.flowable.cmmn.model.Case;
@@ -40,7 +41,7 @@ public class ConversionHelper {
 
     protected CmmnModel cmmnModel;
     protected Case currentCase;
-    protected CmmnElement currentCmmnElement;
+    protected LinkedList<CmmnElement> currentCmmnElements = new LinkedList<>();
     protected LinkedList<PlanFragment> planFragmentsStack = new LinkedList<>();
     protected LinkedList<Stage> stagesStack = new LinkedList<>();
     protected Sentry currentSentry;
@@ -89,12 +90,19 @@ public class ConversionHelper {
     
     public void addEntryCriterionToCurrentElement(Criterion entryCriterion) {
         addEntryCriterion(entryCriterion);
-        CmmnElement cmmnElement = getCurrentCmmnElement();
-         if (cmmnElement instanceof HasEntryCriteria) {
-            HasEntryCriteria hasEntryCriteria = (HasEntryCriteria) cmmnElement;
+        
+        ListIterator<CmmnElement> iterator = currentCmmnElements.listIterator(currentCmmnElements.size());
+        HasEntryCriteria hasEntryCriteria = null;
+        while (hasEntryCriteria == null && iterator.hasPrevious()) {
+            CmmnElement cmmnElement = iterator.previous();
+            if (cmmnElement instanceof HasEntryCriteria) {
+                hasEntryCriteria = (HasEntryCriteria) cmmnElement;
+            }
+        }
+        if (hasEntryCriteria != null) {
             hasEntryCriteria.getEntryCriteria().add(entryCriterion);
         } else {
-            throw new FlowableException("Cannot add an entry criteria to " + cmmnElement.getClass());
+            throw new FlowableException("Cannot add an entry criteria " + entryCriterion.getId() + " no matching plan item found to attach it to");
         }
     }
     
@@ -104,18 +112,20 @@ public class ConversionHelper {
     
     public void addExitCriteriaToCurrentElement(Criterion exitCriterion) {
         addExitCriterion(exitCriterion);
-        CmmnElement cmmnElement = getCurrentCmmnElement();
-        if (cmmnElement == null) {
-            if (getCurrentStage() != null) {
-                getCurrentStage().getExitCriteria().add(exitCriterion);
-            } else {
-                getCurrentCase().getPlanModel().getExitCriteria().add(exitCriterion);
+        
+        ListIterator<CmmnElement> iterator = currentCmmnElements.listIterator(currentCmmnElements.size());
+        HasExitCriteria hasExitCriteria = null;
+        while (hasExitCriteria == null && iterator.hasPrevious()) {
+            CmmnElement cmmnElement = iterator.previous();
+            if (cmmnElement instanceof HasExitCriteria) {
+                hasExitCriteria = (HasExitCriteria) cmmnElement;
             }
-        } else if (cmmnElement instanceof HasExitCriteria) {
-            HasExitCriteria hasExitCriteria = (HasExitCriteria) cmmnElement;
+        }
+        
+        if (hasExitCriteria != null) {
             hasExitCriteria.getExitCriteria().add(exitCriterion);
         } else {
-            throw new FlowableException("Cannot add an exit criteria to " + cmmnElement.getClass());
+            getCurrentCase().getPlanModel().getExitCriteria().add(exitCriterion);
         }
     }
     
@@ -170,7 +180,7 @@ public class ConversionHelper {
     }
     
     public CmmnElement getCurrentCmmnElement() {
-        return currentCmmnElement;
+        return currentCmmnElements.peekLast();
     }
     
     public PlanFragment getCurrentPlanFragment() {
@@ -204,7 +214,11 @@ public class ConversionHelper {
     }
     
     public void setCurrentCmmnElement(CmmnElement currentCmmnElement) {
-        this.currentCmmnElement = currentCmmnElement;
+        currentCmmnElements.add(currentCmmnElement);
+    }
+    
+    public void removeCurrentCmmnElement() {
+        currentCmmnElements.removeLast();
     }
     
     public Sentry getCurrentSentry() {

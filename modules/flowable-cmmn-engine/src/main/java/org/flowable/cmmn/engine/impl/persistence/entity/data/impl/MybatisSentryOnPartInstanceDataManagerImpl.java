@@ -19,11 +19,18 @@ import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEnti
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.SentryOnPartInstanceDataManager;
+import org.flowable.engine.common.impl.db.CachedEntityMatcherAdapter;
 
 /**
  * @author Joram Barrez
  */
 public class MybatisSentryOnPartInstanceDataManagerImpl extends AbstractCmmnDataManager<SentryOnPartInstanceEntity> implements SentryOnPartInstanceDataManager {
+    
+    protected SentryOnPartByCaseInstanceIdEntityMatcher sentryOnPartByCaseInstanceIdEntityMatched
+            = new SentryOnPartByCaseInstanceIdEntityMatcher();
+    
+    protected SentryOnPartByPlanItemInstanceIdEntityMatcher sentryOnPartByPlanItemInstanceIdEntityMatched
+            = new SentryOnPartByPlanItemInstanceIdEntityMatcher();
 
     public MybatisSentryOnPartInstanceDataManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration) {
         super(cmmnEngineConfiguration);
@@ -38,11 +45,37 @@ public class MybatisSentryOnPartInstanceDataManagerImpl extends AbstractCmmnData
     public SentryOnPartInstanceEntity create() {
         return new SentryOnPartInstanceEntityImpl();
     }
-
+    
     @Override
-    @SuppressWarnings("unchecked")
-    public List<SentryOnPartInstanceEntity> findSentryOnPartInstancesByPlanItemInstanceId(String planItemInstanceId) {
-        return getDbSqlSession().selectList("selectSentryOnPartInstanceByPlanItemInstanceId", planItemInstanceId);
+    public List<SentryOnPartInstanceEntity> findSentryOnPartInstancesByCaseInstanceIdAndNullPlanItemInstanceId(String caseInstanceId) {
+        return getList("selectSentryOnPartInstanceByCaseInstanceId", caseInstanceId);
     }
 
+    @Override
+    public List<SentryOnPartInstanceEntity> findSentryOnPartInstancesByPlanItemInstanceId(String planItemInstanceId) {
+        return getList("selectSentryOnPartInstanceByPlanItemInstanceId", planItemInstanceId, sentryOnPartByPlanItemInstanceIdEntityMatched);
+    }
+
+    
+    
+    public static class SentryOnPartByCaseInstanceIdEntityMatcher extends CachedEntityMatcherAdapter<SentryOnPartInstanceEntity> {
+        
+        @Override
+        public boolean isRetained(SentryOnPartInstanceEntity sentryOnPartInstanceEntity, Object param) {
+            return sentryOnPartInstanceEntity.getPlanItemInstanceId() == null
+                    && sentryOnPartInstanceEntity.getCaseInstanceId().equals((String) param);
+        }
+        
+    }
+    
+    public static class SentryOnPartByPlanItemInstanceIdEntityMatcher extends CachedEntityMatcherAdapter<SentryOnPartInstanceEntity> {
+        
+        @Override
+        public boolean isRetained(SentryOnPartInstanceEntity sentryOnPartInstanceEntity, Object param) {
+            return sentryOnPartInstanceEntity.getPlanItemInstanceId() != null
+                    && sentryOnPartInstanceEntity.getPlanItemInstanceId().equals((String) param);
+        }
+        
+    }
+    
 }

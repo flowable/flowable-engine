@@ -121,11 +121,11 @@
       select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where ID_ = #{id, jdbcType=VARCHAR}
   </select>
   
-  <select id="selectPlanModelPlanItemInstanceForCaseInstance" parameterType="string" resultMap="planItemInstanceResultMap">
-    select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where CASE_INST_ID_ = #{parameter, jdbcType=VARCHAR} and STAGE_INST_ID_ is null
+  <select id="selectChildPlanItemInstancesByCaseInstanceId" parameterType="string" resultMap="planItemInstanceResultMap">
+    select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where CASE_INST_ID_ = #{parameter, jdbcType=VARCHAR} and STAGE_INST_ID_ is null 
   </select>
   
-  <select id="selectChildPlanItemInstancesForStage" parameterType="string" resultMap="planItemInstanceResultMap">
+  <select id="selectChildPlanItemInstancesByStagePlanItemInstanceId" parameterType="string" resultMap="planItemInstanceResultMap">
     select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where STAGE_INST_ID_ = #{parameter, jdbcType=VARCHAR}
   </select>
   
@@ -153,9 +153,6 @@
         </if>
         <if test="stageInstanceId != null">
             and RES.STAGE_INST_ID_ = #{stageInstanceId}
-        </if>
-        <if test="!includeStagePlanItemInstances">
-           and RES.IS_STAGE_ = #{includeStagePlanItemInstances, jdbcType=BOOLEAN}
         </if>
         <if test="elementId != null">
             and RES.ELEMENT_ID_ = #{elementId}

@@ -22,13 +22,17 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
  * @author Joram Barrez
  */
 public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOperation {
+    
+    protected boolean manualTermination;
 
-    public TerminateCaseInstanceOperation(CommandContext commandContext, String caseInstanceId) {
+    public TerminateCaseInstanceOperation(CommandContext commandContext, String caseInstanceId, boolean manualTermination) {
         super(commandContext, caseInstanceId);
+        this.manualTermination = manualTermination;
     }
 
-    public TerminateCaseInstanceOperation(CommandContext commandContext, CaseInstanceEntity caseInstanceEntity) {
+    public TerminateCaseInstanceOperation(CommandContext commandContext, CaseInstanceEntity caseInstanceEntity, boolean manualTermination) {
         super(commandContext, caseInstanceEntity);
+        this.manualTermination = manualTermination;
     }
 
     @Override
@@ -38,7 +42,11 @@ public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOp
     
     @Override
     protected void changeStateForChildPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
-        CommandContextUtil.getAgenda(commandContext).planTerminatePlanItem(planItemInstanceEntity);
+        if (manualTermination) {
+            CommandContextUtil.getAgenda(commandContext).planTerminatePlanItem(planItemInstanceEntity);
+        } else {
+            CommandContextUtil.getAgenda(commandContext).planExitPlanItem(planItemInstanceEntity);
+        }
     }
 
 }

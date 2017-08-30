@@ -49,7 +49,6 @@ public abstract class AbstractDeleteCaseInstanceOperation extends AbstractChange
     }
     
     protected void deleteCaseInstanceRuntimeData() {
-        PlanItemInstanceEntity planModelPlanItemInstanceEntity = caseInstanceEntity.getPlanModelInstance();
         
         // Runtime milestones related to case instance
         MilestoneInstanceEntityManager milestoneInstanceEntityManager = CommandContextUtil.getMilestoneInstanceEntityManager(commandContext);
@@ -62,7 +61,7 @@ public abstract class AbstractDeleteCaseInstanceOperation extends AbstractChange
         }
         
         // Child plan item instances
-        List<PlanItemInstanceEntity> childPlanItemInstances = planModelPlanItemInstanceEntity.getChildren();
+        List<PlanItemInstanceEntity> childPlanItemInstances = caseInstanceEntity.getChildPlanItemInstances();
         if (childPlanItemInstances != null) {
             for (PlanItemInstanceEntity childPlanItemInstance : childPlanItemInstances) {
                 if (PlanItemInstanceState.ACTIVE.equals(childPlanItemInstance.getState())
@@ -73,7 +72,6 @@ public abstract class AbstractDeleteCaseInstanceOperation extends AbstractChange
         }
         
         // Actual case instance and associated plan item for plan model
-        CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).delete(planModelPlanItemInstanceEntity);
         CommandContextUtil.getCaseInstanceEntityManager(commandContext).delete(caseInstanceEntityId);
     }
     
