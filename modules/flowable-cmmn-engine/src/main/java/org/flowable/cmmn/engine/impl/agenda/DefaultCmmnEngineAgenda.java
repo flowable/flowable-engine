@@ -18,9 +18,11 @@ import org.flowable.cmmn.engine.impl.agenda.operation.CompleteCaseInstanceOperat
 import org.flowable.cmmn.engine.impl.agenda.operation.CompletePlanItemOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.EvaluateCriteriaOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ExitPlanItemOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.InitPlanModelOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.InitStageOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.OccurPlanItemOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TerminateCaseInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.TerminatePlanItemOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TriggerPlanItemOperation;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
@@ -46,6 +48,11 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Planned " + operation);
         }
+    }
+    
+    @Override
+    public void planInitPlanModelOperation(CaseInstanceEntity caseInstanceEntity) {
+        addOperation(new InitPlanModelOperation(commandContext, caseInstanceEntity));
     }
     
     @Override
@@ -84,6 +91,11 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     }
     
     @Override
+    public void planTerminatePlanItem(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new TerminatePlanItemOperation(commandContext, planItemInstanceEntity));
+    }
+    
+    @Override
     public void planTriggerPlanItem(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new TriggerPlanItemOperation(commandContext, planItemInstanceEntity));
     }
@@ -94,13 +106,13 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     }
     
     @Override
-    public void planTerminateCase(String caseInstanceEntityId) {
-        addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntityId));
+    public void planTerminateCase(String caseInstanceEntityId, boolean manualTermination) {
+        addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntityId, manualTermination));
     }
     
     @Override
-    public void planTerminateCase(CaseInstanceEntity caseInstanceEntity) {
-        addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntity));
+    public void planTerminateCase(CaseInstanceEntity caseInstanceEntity, boolean manualTermination) {
+        addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntity, manualTermination));
     }
 
 }

@@ -12,9 +12,27 @@
  */
 package org.flowable.cmmn.engine.impl.behavior;
 
+import org.flowable.cmmn.engine.delegate.PlanItemJavaDelegate;
+import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
+import org.flowable.cmmn.model.PlanItem;
 
 /**
+ * Root interface for all classes implementing logic when the CMMN engine 
+ * decides the behavior for a plan item needs to be executed.
+ * 
+ * The main difference with the {@link PlanItemJavaDelegate} interface is 
+ * that the implementation of this {@link #execute(DelegatePlanItemInstance)} methods
+ * is expected to plan the next operation on the {@link CmmnEngineAgenda}, 
+ * while for the {@link PlanItemJavaDelegate} the engine will automatically
+ * plan a completion after execution the logic.
+ * 
+ * Concrete implementations of this class will be set on the {@link PlanItem}
+ * in the case model during parsing.
+ * 
+ * Implementations of this class are assumed by the engine to not have wait state behavior,
+ * use the {@link CmmnTriggerableActivityBehavior} when this behavior is needed.
+ * 
  * @author Joram Barrez
  */
 public interface CmmnActivityBehavior {

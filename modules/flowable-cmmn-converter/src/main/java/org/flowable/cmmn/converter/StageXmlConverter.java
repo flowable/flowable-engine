@@ -40,4 +40,10 @@ public class StageXmlConverter extends PlanItemDefinitiomXmlConverter {
         return stage;
     }
     
+    @Override
+    protected void elementEnd(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+        super.elementEnd(xtr, conversionHelper);
+        conversionHelper.removeCurrentStage();
+    }
+    
 }

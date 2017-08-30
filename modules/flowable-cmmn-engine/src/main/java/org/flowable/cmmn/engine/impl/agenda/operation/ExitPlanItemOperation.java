@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.runtime.StateTransition;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.PlanItemTransition;
@@ -21,7 +22,7 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 /**
  * @author Joram Barrez
  */
-public class ExitPlanItemOperation extends AbstractChangePlanItemStateOperation {
+public class ExitPlanItemOperation extends AbstractDeletePlanItemOperation {
     
     public ExitPlanItemOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
@@ -33,13 +34,12 @@ public class ExitPlanItemOperation extends AbstractChangePlanItemStateOperation 
     }
     
     @Override
-    protected String getLifeCycleEventType() {
+    protected String getLifeCycleTransition() {
         return PlanItemTransition.EXIT;
     }
     
     @Override
     public void run() {
-        deleteSentryOnPartInstances();
         if (isStage(planItemInstanceEntity)) {
             completeChildPlanItems();
         }
@@ -48,7 +48,7 @@ public class ExitPlanItemOperation extends AbstractChangePlanItemStateOperation 
 
     protected void completeChildPlanItems() {
         for (PlanItemInstanceEntity child : planItemInstanceEntity.getChildren()) {
-            if (!PlanItemInstanceState.TERMINATED.equals(child.getState()) && !PlanItemInstanceState.COMPLETED.equals(child.getState())) {
+            if (StateTransition.isPossible(planItemInstanceEntity, PlanItemTransition.EXIT)) {
                 CommandContextUtil.getAgenda(commandContext).planExitPlanItem(child);
             }
         }

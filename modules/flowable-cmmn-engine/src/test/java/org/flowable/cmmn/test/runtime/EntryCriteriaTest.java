@@ -83,5 +83,26 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
                 .singleResult();
         assertNotNull(historicCaseInstance);
     }
-
+    
+    @Test
+    @CmmnDeployment
+    public void testTerminateCaseInstanceAfterOneOutOfMultipleOnPartsSatisfied() {
+        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .orderByName().asc()
+                .list();
+        assertEquals(3, planItemInstances.size());
+        
+        // Triggering two plan items = 2 on parts satisfied
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(1).getId());
+        
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
 }

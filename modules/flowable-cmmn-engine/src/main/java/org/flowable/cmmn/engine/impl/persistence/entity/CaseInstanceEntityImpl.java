@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
@@ -35,8 +36,9 @@ public class CaseInstanceEntityImpl extends AbstractEntity implements CaseInstan
     protected String callbackType;
     protected String tenantId;
     
-    // non-persisted
-    protected PlanItemInstanceEntity planModelInstance;
+    // non persisted
+    protected List<PlanItemInstanceEntity> childPlanItemInstances;
+    protected List<SentryOnPartInstanceEntity> satisfiedSentryOnPartInstances;
     
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
@@ -114,15 +116,31 @@ public class CaseInstanceEntityImpl extends AbstractEntity implements CaseInstan
         this.tenantId = tenantId;
     }
     
-    public PlanItemInstanceEntity getPlanModelInstance() {
-        if (planModelInstance == null) {
-            planModelInstance = CommandContextUtil.getPlanItemInstanceEntityManager().findPlanModelPlanItemInstanceForCaseInstance(id);
+    @Override
+    public List<PlanItemInstanceEntity> getChildPlanItemInstances() {
+        if (childPlanItemInstances == null) {
+            childPlanItemInstances = CommandContextUtil.getPlanItemInstanceEntityManager().findChildPlanItemInstancesForCaseInstance(id);
         }
-        return planModelInstance;
+        return childPlanItemInstances;
     }
     
-    public void setPlanModelInstance(PlanItemInstanceEntity planModelInstanceEntity) {
-        this.planModelInstance = planModelInstanceEntity;
+    @Override
+    public void setChildPlanItemInstances(List<PlanItemInstanceEntity> childPlanItemInstances) {
+        this.childPlanItemInstances = childPlanItemInstances;
+    }
+    
+    @Override
+    public List<SentryOnPartInstanceEntity> getSatisfiedSentryOnPartInstances() {
+        if (satisfiedSentryOnPartInstances == null) {
+            satisfiedSentryOnPartInstances = CommandContextUtil.getSentryOnPartInstanceEntityManager()
+                    .findSentryOnPartInstancesByCaseInstanceIdAndNullPlanItemInstanceId(id);
+        }
+        return satisfiedSentryOnPartInstances;
+    }
+    
+    @Override
+    public void setSatisfiedSentryOnPartInstances(List<SentryOnPartInstanceEntity> sentryOnPartInstanceEntities) {
+        this.satisfiedSentryOnPartInstances = sentryOnPartInstanceEntities;
     }
     
 }

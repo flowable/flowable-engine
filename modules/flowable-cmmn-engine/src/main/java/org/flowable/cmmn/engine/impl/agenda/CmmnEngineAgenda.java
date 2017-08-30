@@ -22,6 +22,8 @@ import org.flowable.engine.common.impl.agenda.Agenda;
  */
 public interface CmmnEngineAgenda extends Agenda {
     
+    void planInitPlanModelOperation(CaseInstanceEntity caseInstanceEntity);
+    
     void planInitStageOperation(PlanItemInstanceEntity planItemInstanceEntity);
     
     void planEvaluateCriteria(String caseInstanceEntityId);
@@ -36,12 +38,14 @@ public interface CmmnEngineAgenda extends Agenda {
     
     void planExitPlanItem(PlanItemInstanceEntity planItemInstanceEntity);
     
+    void planTerminatePlanItem(PlanItemInstanceEntity planItemInstanceEntity);
+    
     void planTriggerPlanItem(PlanItemInstanceEntity planItemInstanceEntity);
     
     void planCompleteCase(CaseInstanceEntity caseInstanceEntity);
     
-    void planTerminateCase(String caseInstanceEntityId);
+    void planTerminateCase(String caseInstanceEntityId, boolean manualTermination);
     
-    void planTerminateCase(CaseInstanceEntity caseInstanceEntity);
+    void planTerminateCase(CaseInstanceEntity caseInstanceEntity, boolean manualTermination);
     
 }

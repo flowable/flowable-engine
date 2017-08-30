@@ -13,6 +13,7 @@
 package org.flowable.cmmn.test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
 import java.util.List;
@@ -199,5 +200,34 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         assertEquals("Processes done", historicMilestoneInstance.getName());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }
-   
+    
+    @Test
+    @CmmnDeployment
+    public void testTerminateCaseInstanceWithBlockingProcessTask() {
+        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        assertEquals(8, cmmnRuntimeService.createPlanItemQuery().caseInstanceId(caseInstance.getId()).count());
+        assertEquals(3, cmmnRuntimeService.createPlanItemQuery().caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE).count());
+        
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .planItemInstanceName("Task One")
+                .singleResult();
+        assertNotNull(planItemInstance);
+        
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+        
+        assertEquals(4, processEngine.getTaskService().createTaskQuery().count());
+        assertEquals(4, processEngineRuntimeService.createProcessInstanceQuery().count());
+        
+        assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+        
+        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
+        assertEquals(0, processEngine.getTaskService().createTaskQuery().count());
+        assertEquals(0, processEngineRuntimeService.createProcessInstanceQuery().count());
+        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
+    }
+    
 }

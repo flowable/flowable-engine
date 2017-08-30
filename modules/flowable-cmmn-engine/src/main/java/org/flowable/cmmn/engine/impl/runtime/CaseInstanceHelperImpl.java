@@ -12,20 +12,19 @@
  */
 package org.flowable.cmmn.engine.impl.runtime;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
-import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.repository.CaseDefinition;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.cmmn.engine.runtime.CaseInstanceState;
-import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.callback.CallbackData;
@@ -62,16 +61,11 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
     protected CaseInstanceEntity startCaseInstance(CommandContext commandContext, CaseDefinition caseDefinition) {
         CaseInstanceEntity caseInstanceEntity = createCaseInstanceEntity(commandContext, caseDefinition);
         
-        // Create plan item instance representing the stage plan model.
-        // The initStageOperation will take care of initializing all the child plan items of that stage
-        
-        Stage planModel = getPlanModel(commandContext, caseDefinition);
-        PlanItemInstanceEntity planModelInstanceEntity = createStagePlanItemInstanceEntity(commandContext, caseInstanceEntity, planModel);
-        caseInstanceEntity.setPlanModelInstance(planModelInstanceEntity);
-        
         callCaseInstanceStateChangeCallbacks(commandContext, caseInstanceEntity, null, CaseInstanceState.ACTIVE);
         CommandContextUtil.getCmmnHistoryManager().recordCaseInstanceStart(caseInstanceEntity);
-        CommandContextUtil.getAgenda(commandContext).planInitStageOperation(planModelInstanceEntity);
+        
+        // The InitPlanModelOperation will take care of initializing all the child plan items of that stage
+        CommandContextUtil.getAgenda(commandContext).planInitPlanModelOperation(caseInstanceEntity);
         
         return caseInstanceEntity;
     }
@@ -88,21 +82,10 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         caseInstanceEntity.setState(CaseInstanceState.ACTIVE);
         caseInstanceEntity.setTenantId(caseDefinition.getTenantId());
         caseInstanceEntityManager.insert(caseInstanceEntity);
+        
+        caseInstanceEntity.setSatisfiedSentryOnPartInstances(new ArrayList<SentryOnPartInstanceEntity>(1));
+        
         return caseInstanceEntity;
-    }
-    
-    protected PlanItemInstanceEntity createStagePlanItemInstanceEntity(CommandContext commandContext, CaseInstanceEntity caseInstanceEntity, Stage stage) {
-        PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
-        PlanItemInstanceEntity stagePlanItemInstanceEntity = planItemInstanceEntityManager.create();
-        stagePlanItemInstanceEntity.setName(stage.getName());
-        stagePlanItemInstanceEntity.setCaseDefinitionId(caseInstanceEntity.getCaseDefinitionId());
-        stagePlanItemInstanceEntity.setCaseInstanceId(caseInstanceEntity.getId());
-        stagePlanItemInstanceEntity.setStartTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
-        stagePlanItemInstanceEntity.setTenantId(caseInstanceEntity.getTenantId());
-        stagePlanItemInstanceEntity.setElementId(stage.getId());
-        stagePlanItemInstanceEntity.setState(PlanItemInstanceState.AVAILABLE);
-        planItemInstanceEntityManager.insert(stagePlanItemInstanceEntity);
-        return stagePlanItemInstanceEntity;
     }
     
     public void callCaseInstanceStateChangeCallbacks(CommandContext commandContext, CaseInstance caseInstance, String oldState, String newState) {

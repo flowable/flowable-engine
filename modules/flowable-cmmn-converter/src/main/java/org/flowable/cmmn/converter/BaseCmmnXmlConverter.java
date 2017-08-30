@@ -45,4 +45,8 @@ public abstract class BaseCmmnXmlConverter {
     
     protected abstract BaseElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper);
     
+    protected void elementEnd(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+        conversionHelper.removeCurrentCmmnElement();
+    }
+    
 }

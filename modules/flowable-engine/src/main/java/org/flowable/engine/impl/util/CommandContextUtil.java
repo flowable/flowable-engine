@@ -71,7 +71,7 @@ import org.flowable.variable.service.VariableServiceConfiguration;
 
 public class CommandContextUtil {
     
-    public static final String ATTRIBUTE_INVOLVED_EXECUTIONS = "ctx.attribue.involvedExecutions";
+    public static final String ATTRIBUTE_INVOLVED_EXECUTIONS = "ctx.attribute.involvedExecutions";
     
     public static ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
         return getProcessEngineConfiguration(getCommandContext());

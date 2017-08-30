@@ -12,8 +12,16 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -53,16 +61,40 @@ public abstract class CmmnOperation implements Runnable {
     protected boolean isStage(PlanItemInstanceEntity planItemInstanceEntity) {
         return (planItemInstanceEntity.getPlanItem() != null
                 && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() != null
-                && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof Stage)
-               || isPlanModel(planItemInstanceEntity);
+                && planItemInstanceEntity.getPlanItem().getPlanItemDefinition() instanceof Stage);
     }
     
-    protected boolean isPlanModel(PlanItemInstanceEntity stagePlanItemInstanceEntity) {
-        Stage stage = getStage(stagePlanItemInstanceEntity.getCaseDefinitionId(), stagePlanItemInstanceEntity.getElementId());
-        if (stage != null) {
-            return stage.isPlanModel();
+    protected Stage getPlanModel(CaseInstanceEntity caseInstanceEntity) {
+        return CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId()).getPlanModel();
+    }
+    
+    
+    protected List<PlanItemInstanceEntity> createPlanItemInstances(CommandContext commandContext,
+                                                                        List<PlanItem> planItems,
+                                                                        String caseDefinitionId,
+                                                                        String caseInstanceId, 
+                                                                        String stagePlanItemInstanceId, 
+                                                                        String tenantId) {
+        PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
+        List<PlanItemInstanceEntity> planItemInstances = new ArrayList<>();
+        
+        for (PlanItem planItem : planItems) {
+            PlanItemInstanceEntity planItemInstanceEntity = planItemInstanceEntityManager.create();
+            planItemInstanceEntity.setCaseDefinitionId(caseDefinitionId);
+            planItemInstanceEntity.setCaseInstanceId(caseInstanceId);
+            planItemInstanceEntity.setName(planItem.getName());
+            planItemInstanceEntity.setState(PlanItemInstanceState.AVAILABLE);
+            planItemInstanceEntity.setStartTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
+            planItemInstanceEntity.setElementId(planItem.getId());
+            planItemInstanceEntity.setStage(false);
+            planItemInstanceEntity.setStageInstanceId(stagePlanItemInstanceId);
+            planItemInstanceEntity.setTenantId(tenantId);
+         
+            planItemInstanceEntityManager.insert(planItemInstanceEntity);
+            planItemInstances.add(planItemInstanceEntity);
         }
-        return false;
+        
+        return planItemInstances;
     }
-    
+
 }

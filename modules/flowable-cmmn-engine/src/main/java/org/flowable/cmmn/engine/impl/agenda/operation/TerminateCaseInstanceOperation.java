@@ -13,25 +13,40 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.CaseInstanceState;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
  */
-public class TerminateCaseInstanceOperation extends AbstractChangeCaseInstanceStateOperation {
+public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOperation {
+    
+    protected boolean manualTermination;
 
-    public TerminateCaseInstanceOperation(CommandContext commandContext, String caseInstanceId) {
+    public TerminateCaseInstanceOperation(CommandContext commandContext, String caseInstanceId, boolean manualTermination) {
         super(commandContext, caseInstanceId);
+        this.manualTermination = manualTermination;
     }
 
-    public TerminateCaseInstanceOperation(CommandContext commandContext, CaseInstanceEntity caseInstanceEntity) {
+    public TerminateCaseInstanceOperation(CommandContext commandContext, CaseInstanceEntity caseInstanceEntity, boolean manualTermination) {
         super(commandContext, caseInstanceEntity);
+        this.manualTermination = manualTermination;
     }
 
     @Override
     protected String getNewState() {
         return CaseInstanceState.TERMINATED;
+    }
+    
+    @Override
+    protected void changeStateForChildPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
+        if (manualTermination) {
+            CommandContextUtil.getAgenda(commandContext).planTerminatePlanItem(planItemInstanceEntity);
+        } else {
+            CommandContextUtil.getAgenda(commandContext).planExitPlanItem(planItemInstanceEntity);
+        }
     }
 
 }

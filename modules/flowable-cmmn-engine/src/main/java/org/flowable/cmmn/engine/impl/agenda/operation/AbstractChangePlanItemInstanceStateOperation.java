@@ -12,61 +12,46 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
-import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.runtime.StateTransition;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.runtime.CaseInstanceState;
 import org.flowable.cmmn.model.PlanItem;
-import org.flowable.cmmn.model.Stage;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
  */
-public abstract class AbstractChangePlanItemStateOperation extends AbstractPlanItemInstanceOperation {
+public abstract class AbstractChangePlanItemInstanceStateOperation extends AbstractPlanItemInstanceOperation {
     
-    public AbstractChangePlanItemStateOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+    public AbstractChangePlanItemInstanceStateOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
     }
     
     @Override
     public void run() {
-        planItemInstanceEntity.setState(getNewState());
-        if (isPlanModel(planItemInstanceEntity)) {
-            changeCaseInstanceState();
+        
+        if (planItemInstanceEntity.getPlanItem() != null) { // can be null for the plan model
+            Object behavior = planItemInstanceEntity.getPlanItem().getBehavior();
+            if (behavior != null 
+                    && behavior instanceof PlanItemActivityBehavior
+                    && StateTransition.isPossible(planItemInstanceEntity, getLifeCycleTransition())) {
+                ((PlanItemActivityBehavior) behavior).onStateTransition(planItemInstanceEntity, getLifeCycleTransition());  
+            }
         }
+            
+        planItemInstanceEntity.setState(getNewState());
         CommandContextUtil.getAgenda(commandContext).planEvaluateCriteria(planItemInstanceEntity.getCaseInstanceId(), createPlanItemLifeCycleEvent());
     }
     
-    protected boolean isPlanModel(PlanItemInstanceEntity stagePlanItemInstanceEntity) {
-        Stage stage = getStage(stagePlanItemInstanceEntity.getCaseDefinitionId(), stagePlanItemInstanceEntity.getElementId());
-        if (stage != null) {
-            return stage.isPlanModel();
-        }
-        return false;
-    }
-    
     protected PlanItemLifeCycleEvent createPlanItemLifeCycleEvent() {
-        return new PlanItemLifeCycleEvent(planItemInstanceEntity.getPlanItem(), getLifeCycleEventType());
+        return new PlanItemLifeCycleEvent(planItemInstanceEntity.getPlanItem(), getLifeCycleTransition());
     }
     
-    protected void changeCaseInstanceState() {
-        CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext)
-                .findById(planItemInstanceEntity.getCaseInstanceId());
-        if (CaseInstanceState.ACTIVE.equals(caseInstanceEntity.getState())) {
-            String newState = getNewState();
-            if (CaseInstanceState.COMPLETED.equals(newState)) {
-                CommandContextUtil.getAgenda(commandContext).planCompleteCase(caseInstanceEntity);
-            } else if (CaseInstanceState.TERMINATED.equals(newState)) {
-                CommandContextUtil.getAgenda(commandContext).planTerminateCase(caseInstanceEntity);
-            }
-        }
-    }
-
     protected abstract String getNewState();
     
-    protected abstract String getLifeCycleEventType(); 
+    protected abstract String getLifeCycleTransition(); 
     
     @Override
     public String toString() {

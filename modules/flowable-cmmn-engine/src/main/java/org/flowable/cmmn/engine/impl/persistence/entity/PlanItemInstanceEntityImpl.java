@@ -66,7 +66,7 @@ public class PlanItemInstanceEntityImpl extends AbstractEntity implements PlanIt
     
     @Override
     public PlanItem getPlanItem() {
-        if (planItem == null && stageInstanceId != null) { // if stageInstanceId is null, it's the plan model 
+        if (planItem == null) {
             Case caze = CaseDefinitionUtil.getCase(caseDefinitionId);
             return (PlanItem) caze.getAllCaseElements().get(elementId);
         }
@@ -151,26 +151,11 @@ public class PlanItemInstanceEntityImpl extends AbstractEntity implements PlanIt
         this.children = children;
     }
     
-    public void addChild(PlanItemInstanceEntity planItemInstanceEntity) {
-        if (children == null) {
-            throw new RuntimeException("TODO: fetch children");
-        }
-        children.add(planItemInstanceEntity);
-    }
-    
     public List<PlanItemInstanceEntity> getChildren() {
         if (children == null) {
             children = CommandContextUtil.getPlanItemInstanceEntityManager().findChildPlanItemInstancesForStage(id);
         }
         return children;
-    }
-    
-    @Override
-    public PlanItemInstanceEntity getStagePlanItemInstace() {
-        if (stagePlanItemInstance == null && stageInstanceId != null) {
-            stagePlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager().findById(stageInstanceId);
-        }
-        return stagePlanItemInstance;
     }
     
     @Override
@@ -180,7 +165,7 @@ public class PlanItemInstanceEntityImpl extends AbstractEntity implements PlanIt
         }
         return satisfiedSentryOnPartInstances;
     }
-
+    
     public void setSatisfiedSentryOnPartInstances(List<SentryOnPartInstanceEntity> satisfiedSentryOnPartInstances) {
         this.satisfiedSentryOnPartInstances = satisfiedSentryOnPartInstances;
     }

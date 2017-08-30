@@ -20,7 +20,7 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 /**
  * @author Joram Barrez
  */
-public class OccurPlanItemOperation extends AbstractChangePlanItemStateOperation {
+public class OccurPlanItemOperation extends AbstractDeletePlanItemOperation {
 
     public OccurPlanItemOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
@@ -32,8 +32,8 @@ public class OccurPlanItemOperation extends AbstractChangePlanItemStateOperation
     }
     
     @Override
-    protected String getLifeCycleEventType() {
+    protected String getLifeCycleTransition() {
         return PlanItemTransition.OCCUR;
     }
-
+    
 }
