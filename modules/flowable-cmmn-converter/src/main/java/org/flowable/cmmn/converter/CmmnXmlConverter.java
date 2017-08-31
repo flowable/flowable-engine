@@ -12,8 +12,10 @@
  */
 package org.flowable.cmmn.converter;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -23,17 +25,27 @@ import java.util.Set;
 
 import javax.xml.XMLConstants;
 import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
 import javax.xml.transform.stax.StAXSource;
 import javax.xml.transform.stream.StreamSource;
 import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.flowable.cmmn.converter.exception.XMLException;
+import org.flowable.cmmn.converter.export.CaseExport;
+import org.flowable.cmmn.converter.export.CmmnDIExport;
+import org.flowable.cmmn.converter.export.DefinitionsRootExport;
+import org.flowable.cmmn.converter.export.StageExport;
+import org.flowable.cmmn.model.Association;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CaseElement;
+import org.flowable.cmmn.model.CmmnDiEdge;
+import org.flowable.cmmn.model.CmmnDiShape;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.HasEntryCriteria;
@@ -74,6 +86,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new StageXmlConverter());
         addElementConverter(new MilestoneXmlConverter());
         addElementConverter(new TaskXmlConverter());
+        addElementConverter(new HumanTaskXmlConverter());
         addElementConverter(new PlanItemXmlConverter());
         addElementConverter(new SentryXmlConverter());
         addElementConverter(new EntryCriterionXmlConverter());
@@ -82,6 +95,10 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new CaseTaskXmlConverter());
         addElementConverter(new ProcessXmlConverter());
         addElementConverter(new ProcessTaskXmlConverter());
+        addElementConverter(new CmmnDiShapeXmlConverter());
+        addElementConverter(new CmmnDiEdgeXmlConverter());
+        addElementConverter(new CmmnDiBoundsXmlConverter());
+        addElementConverter(new CmmnDiWaypointXmlConverter());
         
         addTextConverter(new StandardEventXmlConverter());
     }
@@ -128,9 +145,9 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 }
             } catch (UnsupportedEncodingException e) {
                 throw new CmmnXMLException("The CMMN 1.1 xml is not properly encoded", e);
-            } catch(XMLStreamException e){
+            } catch (XMLStreamException e){
                 throw new CmmnXMLException("Error while reading the CMMN 1.1 XML", e);
-            } catch(Exception e){
+            } catch (Exception e){
                 throw new CmmnXMLException(e.getMessage(), e);
             }
         }
@@ -226,9 +243,63 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         return schema;
     }
     
+    public byte[] convertToXML(CmmnModel model) {
+        return convertToXML(model, DEFAULT_ENCODING);
+    }
+
+    public byte[] convertToXML(CmmnModel model, String encoding) {
+        try {
+
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+            XMLOutputFactory xof = XMLOutputFactory.newInstance();
+            OutputStreamWriter out = new OutputStreamWriter(outputStream, encoding);
+
+            XMLStreamWriter writer = xof.createXMLStreamWriter(out);
+            XMLStreamWriter xtw = new IndentingXMLStreamWriter(writer);
+
+            DefinitionsRootExport.writeRootElement(model, xtw, encoding);
+            
+            for (Case caseModel : model.getCases()) {
+
+                if (caseModel.getPlanModel().getPlanItems().isEmpty()) {
+                    // empty case, ignore it
+                    continue;
+                }
+
+                CaseExport.writeCase(caseModel, xtw);
+
+                Stage planModel = caseModel.getPlanModel();
+                StageExport.writeStage(planModel, xtw);
+                
+                // end case element
+                xtw.writeEndElement();
+            }
+
+            CmmnDIExport.writeCmmnDI(model, xtw);
+
+            // end definitions root element
+            xtw.writeEndElement();
+            xtw.writeEndDocument();
+
+            xtw.flush();
+
+            outputStream.close();
+
+            xtw.close();
+
+            return outputStream.toByteArray();
+
+        } catch (Exception e) {
+            LOGGER.error("Error writing CMMN XML", e);
+            throw new XMLException("Error writing CMMN XML", e);
+        }
+    }
+    
     protected void processCmmnElements(ConversionHelper conversionHelper) {
-        for (Case caze : conversionHelper.getCmmnModel().getCases()) {
-            processPlanFragment(conversionHelper.getCmmnModel(), caze.getPlanModel());
+        CmmnModel cmmnModel = conversionHelper.getCmmnModel();
+        for (Case caze : cmmnModel.getCases()) {
+            processPlanFragment(cmmnModel, caze.getPlanModel());
         }
         
         // CMMN doesn't mandate ids on many elements ... adding generated ids 
@@ -243,10 +314,25 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         ensureIds(conversionHelper.getPlanItemDefinitions(), "planItemDefinition_");
 
         // Now everything has an id, the map of all case elements can be filled
-        for (Case caze : conversionHelper.getCmmnModel().getCases()) {
+        for (Case caze : cmmnModel.getCases()) {
             for (CaseElement caseElement : conversionHelper.getCaseElements().get(caze)) {
                 caze.getAllCaseElements().put(caseElement.getId(), caseElement);
             }
+        }
+        
+        // set DI elements
+        for (CmmnDiShape diShape : conversionHelper.getDiShapes()) {
+            cmmnModel.addGraphicInfo(diShape.getCmmnElementRef(), diShape.getGraphicInfo());
+        }
+        
+        for (CmmnDiEdge diEdge : conversionHelper.getDiEdges()) {
+            Association association = new Association();
+            association.setId(diEdge.getId());
+            association.setSourceRef(diEdge.getCmmnElementRef());
+            association.setTargetRef(diEdge.getTargetCmmnElementRef());
+            cmmnModel.addAssociation(association);
+            
+            cmmnModel.addFlowGraphicInfoList(association.getId(), diEdge.getWaypoints());
         }
     }
     

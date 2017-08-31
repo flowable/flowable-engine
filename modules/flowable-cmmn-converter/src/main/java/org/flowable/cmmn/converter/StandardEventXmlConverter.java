@@ -25,6 +25,11 @@ public class StandardEventXmlConverter extends CaseElementXmlConverter {
     public String getXMLElementName() {
         return CmmnXmlConstants.ELEMENT_STANDARD_EVENT;
     }
+    
+    @Override
+    public boolean isCmmnElement() {
+        return false;
+    }
 
     @Override
     protected BaseElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {

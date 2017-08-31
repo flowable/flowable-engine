@@ -36,4 +36,9 @@ public class Task extends PlanItemDefinition {
         this.className = className;
     }
     
+    public void setValues(Task otherElement) {
+        super.setValues(otherElement);
+        setBlocking(otherElement.isBlocking());
+        setClassName(otherElement.getClassName());
+    }
 }

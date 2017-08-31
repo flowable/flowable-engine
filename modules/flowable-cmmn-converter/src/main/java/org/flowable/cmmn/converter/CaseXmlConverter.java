@@ -26,6 +26,11 @@ public class CaseXmlConverter extends BaseCmmnXmlConverter {
     public String getXMLElementName() {
         return CmmnXmlConstants.ELEMENT_CASE;
     }
+    
+    @Override
+    public boolean isCmmnElement() {
+        return true;
+    }
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {

@@ -27,6 +27,11 @@ public class TaskXmlConverter extends PlanItemDefinitiomXmlConverter {
     public String getXMLElementName() {
         return CmmnXmlConstants.ELEMENT_TASK;
     }
+    
+    @Override
+    public boolean isCmmnElement() {
+        return true;
+    }
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {

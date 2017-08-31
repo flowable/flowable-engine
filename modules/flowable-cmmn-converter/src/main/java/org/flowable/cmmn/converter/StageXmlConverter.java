@@ -26,6 +26,11 @@ public class StageXmlConverter extends PlanItemDefinitiomXmlConverter {
     public String getXMLElementName() {
         return CmmnXmlConstants.ELEMENT_STAGE;
     }
+    
+    @Override
+    public boolean isCmmnElement() {
+        return true;
+    }
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {

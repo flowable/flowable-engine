@@ -12,14 +12,23 @@
  */
 package org.flowable.cmmn.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * @author Joram Barrez
  */
-public class Criterion extends CaseElement {
+public class Criterion extends CaseElement implements HasAssociations {
     
     protected String name;
     protected String sentryRef;
     protected Sentry sentry;
+    protected String attachedToRefId;
+    protected BaseElement attachedToRef;
+    protected boolean isEntryCriterion;
+    protected boolean isExitCriterion;
+    protected List<Association> incomingAssociations = new ArrayList<>();
+    protected List<Association> outgoingAssociations = new ArrayList<>();
     
     public String getName() {
         return name;
@@ -39,6 +48,46 @@ public class Criterion extends CaseElement {
     public void setSentry(Sentry sentry) {
         this.sentry = sentry;
     }
-    
-    
+    public String getAttachedToRefId() {
+        return attachedToRefId;
+    }
+    public void setAttachedToRefId(String attachedToRefId) {
+        this.attachedToRefId = attachedToRefId;
+    }
+    public BaseElement getAttachedToRef() {
+        return attachedToRef;
+    }
+    public void setAttachedToRef(BaseElement attachedToRef) {
+        this.attachedToRef = attachedToRef;
+    }
+    public boolean isEntryCriterion() {
+        return isEntryCriterion;
+    }
+    public void setEntryCriterion(boolean isEntryCriterion) {
+        this.isEntryCriterion = isEntryCriterion;
+    }
+    public boolean isExitCriterion() {
+        return isExitCriterion;
+    }
+    public void setExitCriterion(boolean isExitCriterion) {
+        this.isExitCriterion = isExitCriterion;
+    }
+    public void addIncomingAssociation(Association association) {
+        this.incomingAssociations.add(association);
+    }
+    public List<Association> getIncomingAssociations() {
+        return incomingAssociations;
+    }
+    public void setIncomingAssociations(List<Association> incomingAssociations) {
+        this.incomingAssociations = incomingAssociations;
+    }
+    public void addOutgoingAssociation(Association association) {
+        this.outgoingAssociations.add(association);
+    }
+    public List<Association> getOutgoingAssociations() {
+        return outgoingAssociations;
+    }
+    public void setOutgoingAssociations(List<Association> outgoingAssociations) {
+        this.outgoingAssociations = outgoingAssociations;
+    }
 }

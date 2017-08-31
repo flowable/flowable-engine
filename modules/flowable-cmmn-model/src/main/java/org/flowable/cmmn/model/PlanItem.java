@@ -18,13 +18,16 @@ import java.util.List;
 /**
  * @author Joram Barrez
  */
-public class PlanItem extends CaseElement implements HasEntryCriteria, HasExitCriteria {
+public class PlanItem extends CaseElement implements HasEntryCriteria, HasExitCriteria, HasAssociations {
     
     protected String name;
     protected String definitionRef;
     protected PlanItemDefinition planItemDefinition;
+    protected List<String> criteriaRefs = new ArrayList<>();
     protected List<Criterion> entryCriteria = new ArrayList<>();
     protected List<Criterion> exitCriteria = new ArrayList<>();
+    protected List<Association> incomingAssociations = new ArrayList<>();
+    protected List<Association> outgoingAssociations = new ArrayList<>();
     
     protected Object behavior;
 
@@ -52,6 +55,22 @@ public class PlanItem extends CaseElement implements HasEntryCriteria, HasExitCr
         this.planItemDefinition = planItemDefinition;
     }
     
+    public void addCriteriaRef(String entryCriteriaRef) {
+        this.criteriaRefs.add(entryCriteriaRef);
+    }
+    
+    public List<String> getCriteriaRefs() {
+        return criteriaRefs;
+    }
+
+    public void setCriteriaRefs(List<String> criteriaRefs) {
+        this.criteriaRefs = criteriaRefs;
+    }
+    
+    public void addEntryCriterion(Criterion entryCriterion) {
+        this.entryCriteria.add(entryCriterion);
+    }
+
     public List<Criterion> getEntryCriteria() {
         return entryCriteria;
     }
@@ -60,12 +79,40 @@ public class PlanItem extends CaseElement implements HasEntryCriteria, HasExitCr
         this.entryCriteria = entryCriteria;
     }
     
+    public void addExitCriterion(Criterion exitCriterion) {
+        this.exitCriteria.add(exitCriterion);
+    }
+    
     public List<Criterion> getExitCriteria() {
         return exitCriteria;
     }
 
     public void setExitCriteria(List<Criterion> exitCriteria) {
         this.exitCriteria = exitCriteria;
+    }
+    
+    public void addIncomingAssociation(Association association) {
+        this.incomingAssociations.add(association);
+    }
+    
+    public List<Association> getIncomingAssociations() {
+        return incomingAssociations;
+    }
+    
+    public void setIncomingAssociations(List<Association> incomingAssociations) {
+        this.incomingAssociations = incomingAssociations;
+    }
+    
+    public void addOutgoingAssociation(Association association) {
+        this.outgoingAssociations.add(association);
+    }
+    
+    public List<Association> getOutgoingAssociations() {
+        return outgoingAssociations;
+    }
+    
+    public void setOutgoingAssociations(List<Association> outgoingAssociations) {
+        this.outgoingAssociations = outgoingAssociations;
     }
 
     public Object getBehavior() {

@@ -39,6 +39,11 @@ public class DefinitionsXmlConverter extends BaseCmmnXmlConverter {
     }
     
     @Override
+    public boolean isCmmnElement() {
+        return false;
+    }
+    
+    @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         CmmnModel model = conversionHelper.getCmmnModel();
         model.setId(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_ID));

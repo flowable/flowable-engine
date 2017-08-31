@@ -26,10 +26,16 @@ public class EntryCriterionXmlConverter extends CriterionXmlConverter {
     public String getXMLElementName() {
         return CmmnXmlConstants.ELEMENT_ENTRY_CRITERION;
     }
+    
+    @Override
+    public boolean isCmmnElement() {
+        return true;
+    }
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         Criterion entryCriterion = (Criterion) super.convert(xtr, conversionHelper);
+        entryCriterion.setEntryCriterion(true);
         conversionHelper.addEntryCriterionToCurrentElement(entryCriterion);
         return entryCriterion;
     }

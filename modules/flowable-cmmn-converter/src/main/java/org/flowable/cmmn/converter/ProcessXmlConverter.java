@@ -26,6 +26,11 @@ public class ProcessXmlConverter extends BaseCmmnXmlConverter {
     public String getXMLElementName() {
         return CmmnXmlConstants.ELEMENT_PROCESS;
     }
+    
+    @Override
+    public boolean isCmmnElement() {
+        return true;
+    }
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {

@@ -26,10 +26,16 @@ public class ExitCriterionXmlConverter extends CriterionXmlConverter {
     public String getXMLElementName() {
         return CmmnXmlConstants.ELEMENT_EXIT_CRITERION;
     }
+    
+    @Override
+    public boolean isCmmnElement() {
+        return true;
+    }
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         Criterion exitCriterion = (Criterion) super.convert(xtr, conversionHelper);
+        exitCriterion.setExitCriterion(true);
         conversionHelper.addExitCriteriaToCurrentElement(exitCriterion);
         return exitCriterion;
     }

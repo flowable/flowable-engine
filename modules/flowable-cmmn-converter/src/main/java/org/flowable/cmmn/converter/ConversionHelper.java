@@ -21,6 +21,8 @@ import java.util.Map;
 
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CaseElement;
+import org.flowable.cmmn.model.CmmnDiEdge;
+import org.flowable.cmmn.model.CmmnDiShape;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
@@ -47,6 +49,8 @@ public class ConversionHelper {
     protected Sentry currentSentry;
     protected SentryOnPart currentSentryOnPart;
     protected PlanItem currentPlanItem;
+    protected CmmnDiShape currentDiShape;
+    protected CmmnDiEdge currentDiEdge;
     
     protected Map<Case, List<CaseElement>> caseElements = new HashMap<>();
     protected List<Stage> stages = new ArrayList<>();
@@ -58,10 +62,10 @@ public class ConversionHelper {
     protected List<PlanItem> planItems = new ArrayList<>();
     protected List<PlanItemDefinition> planItemDefinitions = new ArrayList<>();
     
+    protected List<CmmnDiShape> diShapes = new ArrayList<>();
+    protected List<CmmnDiEdge> diEdges = new ArrayList<>();
+    
     public void addCaseElement(CaseElement caseElement) {
-        if (caseElement == null) {
-            System.out.println("test");
-        }
         if (!caseElements.containsKey(currentCase)) {
             caseElements.put(currentCase, new ArrayList<CaseElement>());
         }
@@ -163,6 +167,16 @@ public class ConversionHelper {
         planItemDefinitions.add(planItemDefinition);
     }
     
+    public void addDiShape(CmmnDiShape diShape) {
+        diShapes.add(diShape);
+        setCurrentDiShape(diShape);
+    }
+    
+    public void addDiEdge(CmmnDiEdge diEdge) {
+        diEdges.add(diEdge);
+        setCurrentDiEdge(diEdge);
+    }
+    
     public CmmnModel getCmmnModel() {
         return cmmnModel;
     }
@@ -245,6 +259,22 @@ public class ConversionHelper {
         this.currentPlanItem = currentPlanItem;
     }
 
+    public CmmnDiShape getCurrentDiShape() {
+        return currentDiShape;
+    }
+
+    public void setCurrentDiShape(CmmnDiShape currentDiShape) {
+        this.currentDiShape = currentDiShape;
+    }
+
+    public CmmnDiEdge getCurrentDiEdge() {
+        return currentDiEdge;
+    }
+
+    public void setCurrentDiEdge(CmmnDiEdge currentDiEdge) {
+        this.currentDiEdge = currentDiEdge;
+    }
+
     public List<Stage> getStages() {
         return stages;
     }
@@ -275,6 +305,14 @@ public class ConversionHelper {
 
     public List<PlanItemDefinition> getPlanItemDefinitions() {
         return planItemDefinitions;
+    }
+    
+    public List<CmmnDiShape> getDiShapes() {
+        return diShapes;
+    }
+    
+    public List<CmmnDiEdge> getDiEdges() {
+        return diEdges;
     }
     
 }

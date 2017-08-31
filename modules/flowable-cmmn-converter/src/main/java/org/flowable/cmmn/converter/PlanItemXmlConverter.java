@@ -26,10 +26,16 @@ public class PlanItemXmlConverter extends CaseElementXmlConverter {
     public String getXMLElementName() {
         return CmmnXmlConstants.ELEMENT_PLAN_ITEM;
     }
+    
+    @Override
+    public boolean isCmmnElement() {
+        return true;
+    }
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         PlanItem planItem = new PlanItem();
+        planItem.setId(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_ID));
         planItem.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
         planItem.setDefinitionRef(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_DEFINITION_REF));
         

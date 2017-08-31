@@ -26,6 +26,11 @@ public class PlanItemOnPartXmlConverter extends BaseCmmnXmlConverter {
     public String getXMLElementName() {
         return CmmnXmlConstants.ELEMENT_PLAN_ITEM_ON_PART;
     }
+    
+    @Override
+    public boolean isCmmnElement() {
+        return true;
+    }
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {

@@ -13,7 +13,9 @@
 package org.flowable.cmmn.model;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -21,14 +23,12 @@ import java.util.List;
 public class PlanFragment extends PlanItemDefinition {
 
     protected Case caze;
-    protected List<PlanItem> planItems = new ArrayList<>();
+    protected Map<String, PlanItem> planItemMap = new LinkedHashMap<>();
     protected List<Sentry> sentries = new ArrayList<>();
     
     public PlanItem findPlanItem(String planItemId) {
-        for (PlanItem planItem : planItems) {
-            if (planItem.getId().equals(planItemId)) {
-                return planItem;
-            }
+        if (planItemMap.containsKey(planItemId)) {
+            return planItemMap.get(planItemId);
         }
         
         PlanFragment parentPlanFragment = getParent();
@@ -55,7 +55,7 @@ public class PlanFragment extends PlanItemDefinition {
     }
     
     public void addPlanItem(PlanItem planItem) {
-        planItems.add(planItem);
+        planItemMap.put(planItem.getId(), planItem);
     }
     
     public void addSentry(Sentry sentry) {
@@ -71,11 +71,15 @@ public class PlanFragment extends PlanItemDefinition {
     }
 
     public List<PlanItem> getPlanItems() {
-        return planItems;
+        return new ArrayList<PlanItem>(planItemMap.values());
     }
 
-    public void setPlanItems(List<PlanItem> planItems) {
-        this.planItems = planItems;
+    public Map<String, PlanItem> getPlanItemMap() {
+        return planItemMap;
+    }
+
+    public void setPlanItemMap(Map<String, PlanItem> planItemMap) {
+        this.planItemMap = planItemMap;
     }
 
     public List<Sentry> getSentries() {

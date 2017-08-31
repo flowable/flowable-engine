@@ -26,6 +26,11 @@ public class MilestoneXmlConverter extends PlanItemDefinitiomXmlConverter {
     public String getXMLElementName() {
         return CmmnXmlConstants.ELEMENT_MILESTONE;
     }
+    
+    @Override
+    public boolean isCmmnElement() {
+        return true;
+    }
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {

@@ -33,4 +33,9 @@ public class CmmnElement extends BaseElement {
         this.documentation = documentation;
     }
 
+    public void setValues(CmmnElement otherElement) {
+        super.setValues(otherElement);
+        setDocumentationTextFormat(otherElement.getDocumentationTextFormat());
+        setDocumentation(otherElement.getDocumentation());
+    }
 }

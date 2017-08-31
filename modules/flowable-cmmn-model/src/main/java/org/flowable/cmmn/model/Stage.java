@@ -13,7 +13,9 @@
 package org.flowable.cmmn.model;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -21,21 +23,20 @@ import java.util.List;
 public class Stage extends PlanFragment implements HasExitCriteria {
     
     protected boolean isPlanModel;
-    protected List<PlanItemDefinition> planItemDefinitions = new ArrayList<>();
+    protected Map<String, PlanItemDefinition> planItemDefinitionMap = new LinkedHashMap<>();
     protected List<Criterion> exitCriteria = new ArrayList<>();
     
     public void addPlanItemDefinition(PlanItemDefinition planItemDefinition) {
-        planItemDefinitions.add(planItemDefinition);
+        planItemDefinitionMap.put(planItemDefinition.getId(), planItemDefinition);
     }
     
     public PlanItemDefinition findPlanItemDefinition(String planItemDefinitionId) {
         if (id != null && id.equals(planItemDefinitionId)) {
             return this;
         }
-        for (PlanItemDefinition planItemDefinition : planItemDefinitions) {
-            if (planItemDefinitionId.equals(planItemDefinition.getId())) {
-                return planItemDefinition;
-            }
+        
+        if (planItemDefinitionMap.containsKey(planItemDefinitionId)) {
+            return planItemDefinitionMap.get(planItemDefinitionId);
         }
         
         Stage parentStage = getParentStage();
@@ -52,6 +53,7 @@ public class Stage extends PlanFragment implements HasExitCriteria {
         return planItemDefinitions;
     }
     
+    @SuppressWarnings("unchecked")
     private <T extends PlanItemDefinition> void internalFindPlanItemDefinitionsOfType(Class<T> clazz, Stage stage, List<T> planItemDefinitions,  boolean recursive) {
         for (PlanItemDefinition planItemDefinition : stage.getPlanItemDefinitions()) {
             if (clazz.isInstance(planItemDefinition)) {
@@ -64,11 +66,15 @@ public class Stage extends PlanFragment implements HasExitCriteria {
     }
 
     public List<PlanItemDefinition> getPlanItemDefinitions() {
-        return planItemDefinitions;
+        return new ArrayList<PlanItemDefinition>(planItemDefinitionMap.values());
     }
 
-    public void setPlanItemDefinitions(List<PlanItemDefinition> planItemDefinitions) {
-        this.planItemDefinitions = planItemDefinitions;
+    public Map<String, PlanItemDefinition> getPlanItemDefinitionMap() {
+        return planItemDefinitionMap;
+    }
+
+    public void setPlanItemDefinitionMap(Map<String, PlanItemDefinition> planItemDefinitionMap) {
+        this.planItemDefinitionMap = planItemDefinitionMap;
     }
 
     public boolean isPlanModel() {

@@ -12,14 +12,22 @@
  */
 package org.flowable.cmmn.model;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author Joram Barrez
  */
-public class BaseElement {
+public class BaseElement implements HasExtensionAttributes {
     
     protected String id;
     protected int xmlRowNumber;
     protected int xmlColumnNumber;
+    protected Map<String, List<ExtensionElement>> extensionElements = new LinkedHashMap<>();
+    /** extension attributes could be part of each element */
+    protected Map<String, List<ExtensionAttribute>> attributes = new LinkedHashMap<>();
 
     public String getId() {
         return id;
@@ -45,4 +53,88 @@ public class BaseElement {
         this.xmlColumnNumber = xmlColumnNumber;
     }
     
+    public Map<String, List<ExtensionElement>> getExtensionElements() {
+        return extensionElements;
+    }
+
+    public void addExtensionElement(ExtensionElement extensionElement) {
+        if (extensionElement != null && extensionElement.getName() != null) {
+            List<ExtensionElement> elementList = null;
+            if (!this.extensionElements.containsKey(extensionElement.getName())) {
+                elementList = new ArrayList<>();
+                this.extensionElements.put(extensionElement.getName(), elementList);
+            }
+            this.extensionElements.get(extensionElement.getName()).add(extensionElement);
+        }
+    }
+
+    public void setExtensionElements(Map<String, List<ExtensionElement>> extensionElements) {
+        this.extensionElements = extensionElements;
+    }
+
+    @Override
+    public Map<String, List<ExtensionAttribute>> getAttributes() {
+        return attributes;
+    }
+
+    @Override
+    public String getAttributeValue(String namespace, String name) {
+        List<ExtensionAttribute> attributes = getAttributes().get(name);
+        if (attributes != null && !attributes.isEmpty()) {
+            for (ExtensionAttribute attribute : attributes) {
+                if ((namespace == null && attribute.getNamespace() == null) || namespace.equals(attribute.getNamespace()))
+                    return attribute.getValue();
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void addAttribute(ExtensionAttribute attribute) {
+        if (attribute != null && attribute.getName() != null) {
+            List<ExtensionAttribute> attributeList = null;
+            if (!this.attributes.containsKey(attribute.getName())) {
+                attributeList = new ArrayList<>();
+                this.attributes.put(attribute.getName(), attributeList);
+            }
+            this.attributes.get(attribute.getName()).add(attribute);
+        }
+    }
+
+    @Override
+    public void setAttributes(Map<String, List<ExtensionAttribute>> attributes) {
+        this.attributes = attributes;
+    }
+
+    public void setValues(BaseElement otherElement) {
+        setId(otherElement.getId());
+
+        extensionElements = new LinkedHashMap<>();
+        if (otherElement.getExtensionElements() != null && !otherElement.getExtensionElements().isEmpty()) {
+            for (String key : otherElement.getExtensionElements().keySet()) {
+                List<ExtensionElement> otherElementList = otherElement.getExtensionElements().get(key);
+                if (otherElementList != null && !otherElementList.isEmpty()) {
+                    List<ExtensionElement> elementList = new ArrayList<>();
+                    for (ExtensionElement extensionElement : otherElementList) {
+                        elementList.add(extensionElement.clone());
+                    }
+                    extensionElements.put(key, elementList);
+                }
+            }
+        }
+
+        attributes = new LinkedHashMap<>();
+        if (otherElement.getAttributes() != null && !otherElement.getAttributes().isEmpty()) {
+            for (String key : otherElement.getAttributes().keySet()) {
+                List<ExtensionAttribute> otherAttributeList = otherElement.getAttributes().get(key);
+                if (otherAttributeList != null && !otherAttributeList.isEmpty()) {
+                    List<ExtensionAttribute> attributeList = new ArrayList<>();
+                    for (ExtensionAttribute extensionAttribute : otherAttributeList) {
+                        attributeList.add(extensionAttribute.clone());
+                    }
+                    attributes.put(key, attributeList);
+                }
+            }
+        }
+    }
 }

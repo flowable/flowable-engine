@@ -26,6 +26,11 @@ public class SentryXmlConverter extends CaseElementXmlConverter {
     public String getXMLElementName() {
         return CmmnXmlConstants.ELEMENT_SENTRY;
     }
+    
+    @Override
+    public boolean isCmmnElement() {
+        return true;
+    }
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {

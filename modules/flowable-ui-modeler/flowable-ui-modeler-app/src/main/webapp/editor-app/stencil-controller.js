@@ -69,7 +69,7 @@ angular.module('flowableModeler')
                                          'CatchTimerEvent', 'ThrowNoneEvent', 'TextAnnotation',
                                          'SequenceFlow', 'Association'];
             }
-            var ignoreForPaletteDefinition = ['SequenceFlow', 'MessageFlow', 'Association', 'DataAssociation', 'DataStore', 'SendTask'];
+            var ignoreForPaletteDefinition = ['SequenceFlow', 'MessageFlow', 'Association', 'DataAssociation', 'DataStore', 'SendTask', 'CasePlanModel'];
             var quickMenuItems = [];
               
             var morphRoles = [];
@@ -90,7 +90,7 @@ angular.module('flowableModeler')
                 }
                 
                 var removed = false;
-                if (data.stencils[stencilIndex].removed || data.stencils[stencilIndex].hide) {
+                if (data.stencils[stencilIndex].removed) {
                     removed = true;
                 }
 
@@ -1025,7 +1025,8 @@ angular.module('flowableModeler')
 
                     if (item.id === 'Lane' || item.id === 'BoundaryErrorEvent' || item.id === 'BoundaryMessageEvent' || 
                             item.id === 'BoundarySignalEvent' || item.id === 'BoundaryTimerEvent' ||
-                            item.id === 'BoundaryCancelEvent' || item.id === 'BoundaryCompensationEvent') {
+                            item.id === 'BoundaryCancelEvent' || item.id === 'BoundaryCompensationEvent' || 
+                            item.id === 'EntryCriterion') {
                         
                         $scope.dragCanContain = false;
                         
@@ -1081,8 +1082,9 @@ angular.module('flowableModeler')
                         }
 
                         var parentItem = $scope.getStencilItemById(parentCandidate.getStencil().idWithoutNs());
+                        
                         if (parentItem.roles.indexOf("Activity") > -1) {
-                            if (item.roles.indexOf("IntermediateEventOnActivityBoundary") > -1) {
+                            if (item.roles.indexOf("IntermediateEventOnActivityBoundary") > -1 || item.roles.indexOf("SentryOnItemBoundary") > -1) {
                                 _canContain = true;
                             }
                             

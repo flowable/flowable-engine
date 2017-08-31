@@ -17,7 +17,18 @@ package org.flowable.cmmn.converter;
  */
 public interface CmmnXmlConstants {
     
+    String CMMN_NAMESPACE = "http://www.omg.org/spec/CMMN/20151109/MODEL";
     String FLOWABLE_EXTENSIONS_NAMESPACE = "http://flowable.org/cmmn";
+    String FLOWABLE_EXTENSIONS_PREFIX = "flowable";
+    String XSI_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance";
+    String XSI_PREFIX = "xsi";
+    String CMMNDI_NAMESPACE = "http://www.omg.org/spec/CMMN/20151109/CMMNDI";
+    String CMMNDI_PREFIX = "cmmndi";
+    String OMGDC_NAMESPACE = "http://www.omg.org/spec/CMMN/20151109/DC";
+    String OMGDC_PREFIX = "dc";
+    String OMGDI_NAMESPACE = "http://www.omg.org/spec/CMMN/20151109/DI";
+    String OMGDI_PREFIX = "di";
+    String CASE_NAMESPACE = "http://www.flowable.org/test";
     
     String ATTRIBUTE_TARGET_NAMESPACE = "targetNamespace";
     String ATTRIBUTE_EXPRESSION_LANGUAGE = "expressionLanguage";
@@ -33,6 +44,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_STAGE = "stage";    
     String ELEMENT_MILESTONE = "milestone";
     String ELEMENT_TASK = "task";
+    String ELEMENT_HUMAN_TASK = "humanTask";
     String ELEMENT_CASE_TASK = "caseTask";
     String ELEMENT_PROCESS_TASK = "processTask";
     String ELEMENT_PLAN_ITEM = "planItem";
@@ -41,6 +53,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_STANDARD_EVENT = "standardEvent";
     String ELEMENT_ENTRY_CRITERION = "entryCriterion";
     String ELEMENT_EXIT_CRITERION = "exitCriterion";
+    String ELEMENT_EXTENSIONS = "extensions";
     
     String ELEMENT_PROCESS = "process";
     String ATTRIBUTE_IMPLEMENTATION_TYPE = "implementationType";
@@ -59,5 +72,19 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_PROCESS_REF_EXPRESSION = "processRefExpression";
     
     String ATTRIBUTE_CLASS = "class";
+    
+    String ELEMENT_DI_CMMN = "CMMNDI";
+    String ELEMENT_DI_DIAGRAM = "CMMNDiagram";
+    String ELEMENT_DI_SHAPE = "CMMNShape";
+    String ELEMENT_DI_EDGE = "CMMNEdge";
+    String ELEMENT_DI_LABEL = "CMMNLabel";
+    String ELEMENT_DI_BOUNDS = "Bounds";
+    String ELEMENT_DI_WAYPOINT = "waypoint";
+    String ATTRIBUTE_DI_CMMN_ELEMENT_REF = "cmmnElementRef";
+    String ATTRIBUTE_DI_TARGET_CMMN_ELEMENT_REF = "targetCMMNElementRef";
+    String ATTRIBUTE_DI_WIDTH = "width";
+    String ATTRIBUTE_DI_HEIGHT = "height";
+    String ATTRIBUTE_DI_X = "x";
+    String ATTRIBUTE_DI_Y = "y";
     
 }

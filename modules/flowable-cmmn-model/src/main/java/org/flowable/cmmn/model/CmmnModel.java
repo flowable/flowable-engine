@@ -14,7 +14,9 @@ package org.flowable.cmmn.model;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -33,6 +35,19 @@ public class CmmnModel {
     protected List<Case> cases = new ArrayList<>();
     
     protected List<Process> processes = new ArrayList<>();
+    
+    protected List<Association> associations = new ArrayList<>();
+    
+    protected Map<String, Criterion> criterionMap = new LinkedHashMap<>();
+
+    protected Map<String, GraphicInfo> locationMap = new LinkedHashMap<>();
+    protected Map<String, GraphicInfo> labelLocationMap = new LinkedHashMap<>();
+    protected Map<String, List<GraphicInfo>> flowLocationMap = new LinkedHashMap<>();
+    
+    protected Map<String, String> namespaceMap = new LinkedHashMap<>();
+    
+    protected int planItemIndex = 0;
+    protected int sentryIndex = 0;
     
     public void addCase(Case caze) {
         cases.add(caze);
@@ -62,6 +77,128 @@ public class CmmnModel {
             }
         }
         return null;
+    }
+    
+    public PlanItemDefinition findPlanItemDefinition(String id) {
+        PlanItemDefinition foundPlanItemDefinition = null;
+        for (Case caseModel : cases) {
+            foundPlanItemDefinition = caseModel.getPlanModel().findPlanItemDefinition(id);
+            if (foundPlanItemDefinition != null) {
+                break;
+            }
+        }
+
+        if (foundPlanItemDefinition == null) {
+            for (Case caseModel : cases) {
+                for (Stage stage : caseModel.getPlanModel().findPlanItemDefinitionsOfType(Stage.class, true)) {
+                    foundPlanItemDefinition = stage.findPlanItemDefinition(id);
+                    if (foundPlanItemDefinition != null) {
+                        break;
+                    }
+                }
+                if (foundPlanItemDefinition != null) {
+                    break;
+                }
+            }
+        }
+
+        return foundPlanItemDefinition;
+    }
+    
+    public PlanItem findPlanItem(String id) {
+        PlanItem foundPlanItem = null;
+        for (Case caseModel : cases) {
+            foundPlanItem = caseModel.getPlanModel().findPlanItem(id);
+            if (foundPlanItem != null) {
+                break;
+            }
+        }
+
+        if (foundPlanItem == null) {
+            for (Case caseModel : cases) {
+                for (Stage stage : caseModel.getPlanModel().findPlanItemDefinitionsOfType(Stage.class, true)) {
+                    foundPlanItem = stage.findPlanItem(id);
+                    if (foundPlanItem != null) {
+                        break;
+                    }
+                }
+                if (foundPlanItem != null) {
+                    break;
+                }
+            }
+        }
+
+        return foundPlanItem;
+    }
+    
+    public void addAssociation(Association association) {
+        associations.add(association);
+    }
+    
+    public int nextPlanItemId() {
+        planItemIndex++;
+        return planItemIndex;
+    }
+    
+    public int nextSentryId() {
+        sentryIndex++;
+        return sentryIndex;
+    }
+    
+    public void addCriterion(String key, Criterion criterion) {
+        criterionMap.put(key, criterion);
+    }
+
+    public Criterion getCriterion(String key) {
+        return criterionMap.get(key);
+    }
+    
+    public void addGraphicInfo(String key, GraphicInfo graphicInfo) {
+        locationMap.put(key, graphicInfo);
+    }
+
+    public GraphicInfo getGraphicInfo(String key) {
+        return locationMap.get(key);
+    }
+
+    public void removeGraphicInfo(String key) {
+        locationMap.remove(key);
+    }
+
+    public List<GraphicInfo> getFlowLocationGraphicInfo(String key) {
+        return flowLocationMap.get(key);
+    }
+
+    public void removeFlowGraphicInfoList(String key) {
+        flowLocationMap.remove(key);
+    }
+
+    public Map<String, GraphicInfo> getLocationMap() {
+        return locationMap;
+    }
+
+    public Map<String, List<GraphicInfo>> getFlowLocationMap() {
+        return flowLocationMap;
+    }
+
+    public GraphicInfo getLabelGraphicInfo(String key) {
+        return labelLocationMap.get(key);
+    }
+
+    public void addLabelGraphicInfo(String key, GraphicInfo graphicInfo) {
+        labelLocationMap.put(key, graphicInfo);
+    }
+
+    public void removeLabelGraphicInfo(String key) {
+        labelLocationMap.remove(key);
+    }
+
+    public Map<String, GraphicInfo> getLabelLocationMap() {
+        return labelLocationMap;
+    }
+
+    public void addFlowGraphicInfoList(String key, List<GraphicInfo> graphicInfoList) {
+        flowLocationMap.put(key, graphicInfoList);
     }
     
     public String getId() {
@@ -124,5 +261,22 @@ public class CmmnModel {
     public void setProcesses(List<Process> processes) {
         this.processes = processes;
     }
-    
+    public List<Association> getAssociations() {
+        return associations;
+    }
+    public void setAssociations(List<Association> associations) {
+        this.associations = associations;
+    }
+    public void addNamespace(String prefix, String uri) {
+        namespaceMap.put(prefix, uri);
+    }
+    public boolean containsNamespacePrefix(String prefix) {
+        return namespaceMap.containsKey(prefix);
+    }
+    public String getNamespace(String prefix) {
+        return namespaceMap.get(prefix);
+    }
+    public Map<String, String> getNamespaces() {
+        return namespaceMap;
+    }
 }
