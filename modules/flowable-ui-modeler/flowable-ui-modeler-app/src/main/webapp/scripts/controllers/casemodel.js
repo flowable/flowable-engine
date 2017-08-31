@@ -39,11 +39,11 @@ angular.module('flowableModeler')
           
           $scope.loadVersions();
 
-          /*$scope.model.bpmn20DownloadUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $routeParams.modelId +
-    			($routeParams.modelHistoryId == undefined ? '' : '/history/' + $routeParams.modelHistoryId) + '/bpmn20?version=' + Date.now();
+          $scope.model.cmmnDownloadUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $routeParams.modelId +
+    			($routeParams.modelHistoryId == undefined ? '' : '/history/' + $routeParams.modelHistoryId) + '/cmmn?version=' + Date.now();
 
 
-        	  $rootScope.$on('$routeChangeStart', function(event, next, current) {
+        	  /*$rootScope.$on('$routeChangeStart', function(event, next, current) {
         		  jQuery('.qtip').qtip('destroy', true);
         	  });
         	  

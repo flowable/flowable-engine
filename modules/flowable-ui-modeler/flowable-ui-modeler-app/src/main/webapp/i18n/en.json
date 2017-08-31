@@ -285,7 +285,7 @@
             "DETAILS": "Show details",
             "EDIT": "Modify model properties",
             "DUPLICATE": "Duplicate this model",
-            "EXPORT_CMMN20": "Export to CMMN 2.0",
+            "EXPORT_CMMN": "Export to CMMN 1.1",
             "DELETE": "Delete this model",
             "CREATE-CONFIRM": "Create new model",
             "DUPLICATE-CONFIRM": "Duplicate the model",
@@ -318,7 +318,7 @@
           "DELETE-PROCESS-RELATION": "Case model",
           "DELETE-FORM-RELATION": "Form model",
           "DELETE-APP-RELATION": "App model",
-          "IMPORT-DESCRIPTION": "Please browse for or drop a CMMN XML definition with an .cmmn or .cmmn20.xml extension",
+          "IMPORT-DESCRIPTION": "Please browse for or drop a CMMN XML definition with an .cmmn or .cmmn.xml extension",
           "IMPORT-TITLE": "Import a case model",
           "USE-AS-NEW-TITLE": "Use as new version",
           "USE-AS-NEW-DESCRIPTION": "Are you sure you want to use version {{version}} to create a new version of \"{{name}}\"?",
@@ -328,7 +328,7 @@
           "PERMISSION": "Permission",
           "ACTIONS": "Actions",
           "IMPORT": {
-              "DROPZONE": "Drop a .cmmn or .cmmn20.xml CMMN XML file",
+              "DROPZONE": "Drop a .cmmn or .cmmn.xml CMMN XML file",
               "CANCEL-UPLOAD": "Cancel the upload",
               "ERROR": "Error while processing the CMMN XML file",
               "NO-DROP": "Drag and drop not supported"
