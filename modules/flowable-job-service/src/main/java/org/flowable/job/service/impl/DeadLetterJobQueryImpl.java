@@ -138,30 +138,6 @@ public class DeadLetterJobQueryImpl extends AbstractQuery<DeadLetterJobQuery, Jo
         return this;
     }
 
-    public DeadLetterJobQueryImpl duedateHigherThen(Date date) {
-        return duedateHigherThan(date);
-    }
-
-    public DeadLetterJobQueryImpl duedateHigherThenOrEquals(Date date) {
-        if (date == null) {
-            throw new FlowableIllegalArgumentException("Provided date is null");
-        }
-        this.duedateHigherThanOrEqual = date;
-        return this;
-    }
-
-    public DeadLetterJobQueryImpl duedateLowerThen(Date date) {
-        return duedateLowerThan(date);
-    }
-
-    public DeadLetterJobQueryImpl duedateLowerThenOrEquals(Date date) {
-        if (date == null) {
-            throw new FlowableIllegalArgumentException("Provided date is null");
-        }
-        this.duedateLowerThanOrEqual = date;
-        return this;
-    }
-
     public DeadLetterJobQueryImpl withException() {
         this.withException = true;
         return this;

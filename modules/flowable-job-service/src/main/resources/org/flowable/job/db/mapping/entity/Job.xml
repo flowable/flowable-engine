@@ -91,9 +91,6 @@
 
     <sql id="selectJobByQueryCriteriaSql">
         from ${prefix}ACT_RU_JOB RES
-        <if test="executable">
-            LEFT OUTER JOIN ${prefix}ACT_RU_EXECUTION PI ON PI.ID_ = RES.PROCESS_INSTANCE_ID_
-        </if>
         <where>
             <if test="id != null">
                 RES.ID_ = #{id}
