@@ -20,12 +20,9 @@ import static org.junit.Assert.assertNotEquals;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.flowable.bpmn.model.FlowNode;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.common.api.delegate.event.*;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
@@ -49,7 +46,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
     /**
      * Test create, update and delete events of process instances.
      */
-    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    @Deployment
     public void testProcessInstanceEvents() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
@@ -57,6 +54,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
         // Check create-event
         assertEquals(6, listener.getEventsReceived().size());
+        assertEquals(6, FilteredStaticTestFlowableEventListener.getEventsReceived().size());
         assertTrue(listener.getEventsReceived().get(0) instanceof FlowableEngineEntityEvent);
 
         // process instance create event
@@ -66,18 +64,21 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         assertEquals(processInstance.getId(), event.getProcessInstanceId());
         assertEquals(processInstance.getId(), event.getExecutionId());
         assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+        assertEventsEqual(event, FilteredStaticTestFlowableEventListener.getEventsReceived().get(0));
 
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
         assertEquals(FlowableEngineEventType.PROCESS_CREATED, event.getType());
         assertEquals(processInstance.getId(), event.getProcessInstanceId());
         assertEquals(processInstance.getId(), event.getExecutionId());
         assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+        assertEventsEqual(event, FilteredStaticTestFlowableEventListener.getEventsReceived().get(1));
 
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(2);
         assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
         assertEquals(processInstance.getId(), event.getProcessInstanceId());
         assertEquals(processInstance.getId(), event.getExecutionId());
         assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+        assertEventsEqual(event, FilteredStaticTestFlowableEventListener.getEventsReceived().get(2));
 
         // start event create event
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(3);
@@ -85,6 +86,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         assertEquals(processInstance.getId(), event.getProcessInstanceId());
         assertNotEquals(processInstance.getId(), event.getExecutionId());
         assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+        assertEventsEqual(event, FilteredStaticTestFlowableEventListener.getEventsReceived().get(3));
 
         // start event create initialized
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(4);
@@ -92,6 +94,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         assertEquals(processInstance.getId(), event.getProcessInstanceId());
         assertNotEquals(processInstance.getId(), event.getExecutionId());
         assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+        assertEventsEqual(event, FilteredStaticTestFlowableEventListener.getEventsReceived().get(4));
 
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(5);
         assertEquals(FlowableEngineEventType.PROCESS_STARTED, event.getType());
@@ -100,37 +103,50 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         assertTrue(event instanceof FlowableProcessStartedEvent);
         assertNull(((FlowableProcessStartedEvent) event).getNestedProcessDefinitionId());
         assertNull(((FlowableProcessStartedEvent) event).getNestedProcessInstanceId());
+        assertEventsEqual(event, FilteredStaticTestFlowableEventListener.getEventsReceived().get(5));
 
         listener.clearEventsReceived();
+        FilteredStaticTestFlowableEventListener.clearEventsReceived();
 
         // Check update event when suspended/activated
         runtimeService.suspendProcessInstanceById(processInstance.getId());
         runtimeService.activateProcessInstanceById(processInstance.getId());
 
         assertEquals(4, listener.getEventsReceived().size());
+        assertEquals(4, FilteredStaticTestFlowableEventListener.getEventsReceived().size());
+
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
         assertEquals(processInstance.getId(), ((ProcessInstance) event.getEntity()).getId());
         assertEquals(FlowableEngineEventType.ENTITY_SUSPENDED, event.getType());
         assertEquals(processInstance.getId(), event.getProcessInstanceId());
         assertEquals(processInstance.getId(), event.getExecutionId());
         assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+        assertEventsEqual(event, FilteredStaticTestFlowableEventListener.getEventsReceived().get(0));
+
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
         assertEquals(FlowableEngineEventType.ENTITY_SUSPENDED, event.getType());
         assertEquals(processInstance.getId(), event.getProcessInstanceId());
         assertNotEquals(processInstance.getId(), event.getExecutionId());
         assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+        assertEventsEqual(event, FilteredStaticTestFlowableEventListener.getEventsReceived().get(1));
+
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(2);
         assertEquals(FlowableEngineEventType.ENTITY_ACTIVATED, event.getType());
         assertEquals(processInstance.getId(), ((ProcessInstance) event.getEntity()).getId());
         assertEquals(processInstance.getId(), event.getProcessInstanceId());
         assertEquals(processInstance.getId(), event.getExecutionId());
         assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+        assertEventsEqual(event, FilteredStaticTestFlowableEventListener.getEventsReceived().get(2));
+
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(3);
         assertEquals(FlowableEngineEventType.ENTITY_ACTIVATED, event.getType());
         assertEquals(processInstance.getId(), event.getProcessInstanceId());
         assertNotEquals(processInstance.getId(), event.getExecutionId());
         assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+        assertEventsEqual(event, FilteredStaticTestFlowableEventListener.getEventsReceived().get(3));
+
         listener.clearEventsReceived();
+        FilteredStaticTestFlowableEventListener.clearEventsReceived();
 
         // Check update event when process-definition is suspended (should
         // cascade suspend/activate all process instances)
@@ -138,40 +154,55 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         repositoryService.activateProcessDefinitionById(processInstance.getProcessDefinitionId(), true, null);
 
         assertEquals(4, listener.getEventsReceived().size());
+        assertEquals(4, FilteredStaticTestFlowableEventListener.getEventsReceived().size());
+
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
         assertEquals(processInstance.getId(), ((ProcessInstance) event.getEntity()).getId());
         assertEquals(FlowableEngineEventType.ENTITY_SUSPENDED, event.getType());
         assertEquals(processInstance.getId(), event.getProcessInstanceId());
         assertEquals(processInstance.getId(), event.getExecutionId());
         assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+        assertEventsEqual(event, FilteredStaticTestFlowableEventListener.getEventsReceived().get(0));
+
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(1);
         assertEquals(FlowableEngineEventType.ENTITY_SUSPENDED, event.getType());
         assertEquals(processInstance.getId(), event.getProcessInstanceId());
         assertNotEquals(processInstance.getId(), event.getExecutionId());
         assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+        assertEventsEqual(event, FilteredStaticTestFlowableEventListener.getEventsReceived().get(1));
+
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(2);
         assertEquals(FlowableEngineEventType.ENTITY_ACTIVATED, event.getType());
         assertEquals(processInstance.getId(), ((ProcessInstance) event.getEntity()).getId());
         assertEquals(processInstance.getId(), event.getProcessInstanceId());
         assertEquals(processInstance.getId(), event.getExecutionId());
         assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+        assertEventsEqual(event, FilteredStaticTestFlowableEventListener.getEventsReceived().get(2));
+
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(3);
         assertEquals(FlowableEngineEventType.ENTITY_ACTIVATED, event.getType());
         assertEquals(processInstance.getId(), event.getProcessInstanceId());
         assertNotEquals(processInstance.getId(), event.getExecutionId());
         assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+        assertEventsEqual(event, FilteredStaticTestFlowableEventListener.getEventsReceived().get(3));
+
         listener.clearEventsReceived();
+        FilteredStaticTestFlowableEventListener.clearEventsReceived();
 
         // Check update-event when business-key is updated
         runtimeService.updateBusinessKey(processInstance.getId(), "thekey");
         assertEquals(1, listener.getEventsReceived().size());
+        assertEquals(1, FilteredStaticTestFlowableEventListener.getEventsReceived().size());
+
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(0);
         assertEquals(processInstance.getId(), ((ProcessInstance) event.getEntity()).getId());
         assertEquals(FlowableEngineEventType.ENTITY_UPDATED, event.getType());
         assertEquals(processInstance.getId(), event.getProcessInstanceId());
         assertEquals(processInstance.getId(), event.getExecutionId());
         assertEquals(processInstance.getProcessDefinitionId(), event.getProcessDefinitionId());
+        assertEventsEqual(event, FilteredStaticTestFlowableEventListener.getEventsReceived().get(0));
         listener.clearEventsReceived();
+        FilteredStaticTestFlowableEventListener.clearEventsReceived();
 
         runtimeService.deleteProcessInstance(processInstance.getId(), "Testing events");
 
@@ -181,7 +212,9 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.PROCESS_CANCELLED, cancelledEvent.getType());
         assertEquals(processInstance.getId(), cancelledEvent.getProcessInstanceId());
         assertEquals(processInstance.getId(), cancelledEvent.getExecutionId());
+        assertEventsEqual(cancelledEvent, FilteredStaticTestFlowableEventListener.filterEvents(FlowableEngineEventType.PROCESS_CANCELLED).get(0));
         listener.clearEventsReceived();
+        FilteredStaticTestFlowableEventListener.clearEventsReceived();
     }
 
     /**
@@ -715,11 +748,17 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         assertEquals(0, processCanceledEvents.size());
     }
 
+    private void assertEventsEqual(FlowableEvent event1, FlowableEvent event2) {
+        assertTrue(EqualsBuilder.reflectionEquals(event1, event2));
+
+    }
+
     @Override
     protected void initializeServices() {
         super.initializeServices();
         this.listener = new TestInitializedEntityEventListener();
         processEngineConfiguration.getEventDispatcher().addEventListener(this.listener);
+        FilteredStaticTestFlowableEventListener.clearEventsReceived();
     }
 
     @Override
@@ -771,6 +810,32 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
             List<FlowableEvent> filteredEvents = new ArrayList<>();
             List<FlowableEvent> eventsReceived = listener.getEventsReceived();
             for (FlowableEvent eventReceived : eventsReceived) {
+                if (eventType == eventReceived.getType()) {
+                    filteredEvents.add(eventReceived);
+                }
+            }
+            return filteredEvents;
+        }
+
+    }
+
+    public static class FilteredStaticTestFlowableEventListener extends StaticTestFlowableEventListener {
+
+        @Override
+        public void onEvent(FlowableEvent event) {
+            if (event instanceof FlowableEntityEvent && ProcessInstance.class.isAssignableFrom(((FlowableEntityEvent) event).getEntity().getClass())) {
+                // check whether entity in the event is initialized before
+                // adding to the list.
+                assertNotNull(((ExecutionEntity) ((FlowableEntityEvent) event).getEntity()).getId());
+                super.onEvent(event);
+            } else if (FlowableEngineEventType.PROCESS_CANCELLED == event.getType() || FlowableEngineEventType.ACTIVITY_CANCELLED == event.getType()) {
+                super.onEvent(event);
+            }
+        }
+
+        static List<FlowableEvent> filterEvents(FlowableEngineEventType eventType) {
+            List<FlowableEvent> filteredEvents = new ArrayList<>();
+            for (FlowableEvent eventReceived : FilteredStaticTestFlowableEventListener.getEventsReceived()) {
                 if (eventType == eventReceived.getType()) {
                     filteredEvents.add(eventReceived);
                 }
