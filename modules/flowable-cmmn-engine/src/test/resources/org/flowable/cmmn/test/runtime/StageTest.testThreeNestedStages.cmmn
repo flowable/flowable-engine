@@ -24,12 +24,12 @@
 
                 <stage id="stage2" name="Nested Stage 2">
 
-                    <planItem name="Task Four" definitionRef="rootTask" />
-                    <planItem name="Stage Three" definitionRef="stage3" />
+                    <planItem id="planItem6" name="Task Four" definitionRef="rootTask" />
+                    <planItem id="planItem7" name="Stage Three" definitionRef="stage3" />
 
                     <stage id="stage3">
 
-                        <planItem name="Task Five" definitionRef="nestedTask2" />
+                        <planItem id="planItem8" name="Task Five" definitionRef="nestedTask2" />
                         <task id="nestedTask2" name="The Task" isBlocking="true" />
 
                     </stage>
