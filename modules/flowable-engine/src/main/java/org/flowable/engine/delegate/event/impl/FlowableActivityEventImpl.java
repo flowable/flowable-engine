@@ -13,7 +13,6 @@
 package org.flowable.engine.delegate.event.impl;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.event.FlowableEventImpl;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
 
 /**
@@ -22,7 +21,7 @@ import org.flowable.engine.delegate.event.FlowableActivityEvent;
  * @author Frederik Heremans
  * @author Joram Barrez
  */
-public class FlowableActivityEventImpl extends FlowableEventImpl implements FlowableActivityEvent {
+public class FlowableActivityEventImpl extends FlowableProcessEventImpl implements FlowableActivityEvent {
 
     protected String activityId;
     protected String activityName;

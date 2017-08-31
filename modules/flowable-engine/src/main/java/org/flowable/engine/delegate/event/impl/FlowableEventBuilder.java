@@ -55,12 +55,12 @@ public class FlowableEventBuilder {
      * @return an {@link FlowableEvent} that doesn't have it's execution context-fields filled, as the event is a global event, independent of any running execution.
      */
     public static FlowableEvent createGlobalEvent(FlowableEngineEventType type) {
-        FlowableEventImpl newEvent = new FlowableEventImpl(type);
+        FlowableEventImpl newEvent = new FlowableProcessEventImpl(type);
         return newEvent;
     }
 
     public static FlowableEvent createEvent(FlowableEngineEventType type, String executionId, String processInstanceId, String processDefinitionId) {
-        FlowableEventImpl newEvent = new FlowableEventImpl(type);
+        FlowableEventImpl newEvent = new FlowableProcessEventImpl(type);
         newEvent.setExecutionId(executionId);
         newEvent.setProcessDefinitionId(processDefinitionId);
         newEvent.setProcessInstanceId(processInstanceId);

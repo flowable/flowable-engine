@@ -21,6 +21,7 @@ import org.flowable.engine.common.impl.event.FlowableEventImpl;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.delegate.event.BaseEntityEventListener;
 import org.flowable.engine.delegate.event.impl.FlowableEntityEventImpl;
+import org.flowable.engine.delegate.event.impl.FlowableProcessEventImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -204,7 +205,7 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
         dispatcher.addEventListener(listener);
         dispatcher.addEventListener(secondListener);
 
-        FlowableEventImpl event = new FlowableEventImpl(FlowableEngineEventType.ENTITY_CREATED);
+        FlowableEventImpl event = new FlowableProcessEventImpl(FlowableEngineEventType.ENTITY_CREATED);
         try {
             dispatcher.dispatchEvent(event);
             assertEquals(1, secondListener.getEventsReceived().size());

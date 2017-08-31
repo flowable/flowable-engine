@@ -24,7 +24,7 @@ import org.flowable.engine.common.impl.event.FlowableEventImpl;
  * 
  * @author Frederik Heremans
  */
-public class FlowableEntityExceptionEventImpl extends FlowableEventImpl implements FlowableEngineEntityEvent, FlowableExceptionEvent {
+public class FlowableEntityExceptionEventImpl extends FlowableProcessEventImpl implements FlowableEngineEntityEvent, FlowableExceptionEvent {
 
     protected Object entity;
     protected Throwable cause;

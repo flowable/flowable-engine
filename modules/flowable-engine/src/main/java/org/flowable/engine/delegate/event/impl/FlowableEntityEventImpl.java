@@ -16,14 +16,13 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.impl.event.FlowableEventImpl;
 
 /**
  * Base class for all {@link FlowableEvent} implementations, related to entities.
  * 
  * @author Frederik Heremans
  */
-public class FlowableEntityEventImpl extends FlowableEventImpl implements FlowableEngineEntityEvent {
+public class FlowableEntityEventImpl extends FlowableProcessEventImpl implements FlowableEngineEntityEvent {
 
     protected Object entity;
 

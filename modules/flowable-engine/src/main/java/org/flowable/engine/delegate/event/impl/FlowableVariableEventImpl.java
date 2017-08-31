@@ -13,7 +13,6 @@
 package org.flowable.engine.delegate.event.impl;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.impl.event.FlowableEventImpl;
 import org.flowable.variable.service.event.FlowableVariableEvent;
 import org.flowable.variable.service.impl.types.VariableType;
 
@@ -22,7 +21,7 @@ import org.flowable.variable.service.impl.types.VariableType;
  * 
  * @author Frederik Heremans
  */
-public class FlowableVariableEventImpl extends FlowableEventImpl implements FlowableVariableEvent {
+public class FlowableVariableEventImpl extends FlowableProcessEventImpl implements FlowableVariableEvent {
 
     protected String variableName;
     protected Object variableValue;
