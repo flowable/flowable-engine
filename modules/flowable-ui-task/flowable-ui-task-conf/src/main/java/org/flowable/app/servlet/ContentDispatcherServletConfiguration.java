@@ -22,7 +22,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 @Configuration
 @ComponentScan({ "org.flowable.rest.content.exception", "org.flowable.rest.content.service.api" })
 @EnableAsync
-public class ContentDispatcherServletConfiguration extends WebMvcConfigurationSupport {
+public class ContentDispatcherServletConfiguration extends BaseDispatcherServletConfiguration {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(ContentDispatcherServletConfiguration.class);
 
