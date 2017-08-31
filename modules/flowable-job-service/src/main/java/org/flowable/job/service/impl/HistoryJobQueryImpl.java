@@ -35,13 +35,11 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
     private static final long serialVersionUID = 1L;
     protected String id;
     protected String handlerType;
-    protected boolean retriesLeft;
     protected boolean withException;
     protected String exceptionMessage;
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
-    protected boolean noRetriesLeft;
     protected String lockOwner;
     protected boolean onlyLocked;
     protected boolean onlyUnlocked;
@@ -70,16 +68,6 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
             throw new FlowableIllegalArgumentException("Provided handlerType is null");
         }
         this.handlerType = handlerType;
-        return this;
-    }
-
-    public HistoryJobQuery withRetriesLeft() {
-        retriesLeft = true;
-        return this;
-    }
-
-    public HistoryJobQuery noRetriesLeft() {
-        noRetriesLeft = true;
         return this;
     }
 
@@ -176,10 +164,6 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
         return this.handlerType;
     }
 
-    public boolean getRetriesLeft() {
-        return retriesLeft;
-    }
-
     public Date getNow() {
         return CommandContextUtil.getJobServiceConfiguration().getClock().getCurrentTime();
     }
@@ -210,10 +194,6 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
 
     public String getId() {
         return id;
-    }
-
-    public boolean isNoRetriesLeft() {
-        return noRetriesLeft;
     }
 
     public String getLockOwner() {
