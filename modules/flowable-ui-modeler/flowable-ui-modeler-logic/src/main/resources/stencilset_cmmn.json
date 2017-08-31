@@ -3,13 +3,13 @@
   "namespace" : "http://b3mn.org/stencilset/cmmn1.1#",
   "description" : "CMMN case editor",
   "propertyPackages" : [ {
-    "name" : "process_idpackage",
+    "name" : "case_idpackage",
     "properties" : [ {
-      "id" : "process_id",
+      "id" : "case_id",
       "type" : "String",
-      "title" : "Process identifier",
-      "value" : "process",
-      "description" : "Unique identifier of the process definition.",
+      "title" : "Case identifier",
+      "value" : "caseModel",
+      "description" : "Unique identifier of the case definition.",
       "popular" : true
     } ]
   }, {
@@ -44,103 +44,33 @@
       "popular" : true
     } ]
   }, {
-    "name" : "process_authorpackage",
+    "name" : "case_authorpackage",
     "properties" : [ {
-      "id" : "process_author",
+      "id" : "case_author",
       "type" : "String",
-      "title" : "Process author",
+      "title" : "Case author",
       "value" : "",
-      "description" : "Author of the process definition.",
+      "description" : "Author of the case definition.",
       "popular" : true
     } ]
   }, {
-    "name" : "process_versionpackage",
+    "name" : "case_versionpackage",
     "properties" : [ {
-      "id" : "process_version",
+      "id" : "case_version",
       "type" : "String",
-      "title" : "Process version string (documentation only)",
+      "title" : "Case version string (documentation only)",
       "value" : "",
       "description" : "Version identifier for documentation purpose.",
       "popular" : true
     } ]
   }, {
-	"name" : "process_potentialstarteruserpackage",
-	"properties" : [ {
-		"id" : "process_potentialstarteruser",
-		"type" : "String",
-		"title" : "Potential starter user",
-		"value" : "",
-		"description" : "Which user, can start the process?",
-		"popular" : true
-		} ]
-  }, {
-	"name" : "process_potentialstartergrouppackage",
-	"properties" : [ {
-		"id" : "process_potentialstartergroup",
-		"type" : "String",
-		"title" : "Potential starter group",
-		"value" : "",
-		"description" : "Which group, can start the process?",
-		"popular" : true
-	} ]
-  }, {
-    "name" : "process_namespacepackage",
+    "name" : "case_namespacepackage",
     "properties" : [ {
-      "id" : "process_namespace",
+      "id" : "case_namespace",
       "type" : "String",
       "title" : "Target namespace",
-      "value" : "http://www.flowable.org/processdef",
-      "description" : "Target namespace for the process definition.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "asynchronousdefinitionpackage",
-    "properties" : [ {
-      "id" : "asynchronousdefinition",
-      "type" : "Boolean",
-      "title" : "Asynchronous",
-      "value" : "false",
-      "description" : "Define the activity as asynchronous.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "exclusivedefinitionpackage",
-    "properties" : [ {
-      "id" : "exclusivedefinition",
-      "type" : "Boolean",
-      "title" : "Exclusive",
-      "value" : "false",
-      "description" : "Define the activity as exclusive.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "executionlistenerspackage",
-    "properties" : [ {
-      "id" : "executionlisteners",
-      "type" : "multiplecomplex",
-      "title" : "Execution listeners",
-      "value" : "",
-      "description" : "Listeners for an activity, process, sequence flow, start and end event.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "tasklistenerspackage",
-    "properties" : [ {
-      "id" : "tasklisteners",
-      "type" : "multiplecomplex",
-      "title" : "Task listeners",
-      "value" : "",
-      "description" : "Listeners for a user task",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "eventlistenerspackage",
-    "properties" : [ {
-      "id" : "eventlisteners",
-      "type" : "multiplecomplex",
-      "title" : "Event listeners",
-      "value" : "",
-      "description" : "Listeners for any event happening in the Flowable Engine. It's also possible to rethrow the event as a signal, message or error event",
+      "value" : "http://www.flowable.org/casedef",
+      "description" : "Target namespace for the case definition.",
       "popular" : true
     } ]
   }, {
@@ -191,16 +121,6 @@
       "title" : "Priority",
       "value" : "",
       "description" : "Priority of the user task.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "duedatedefinitionpackage",
-    "properties" : [ {
-      "id" : "duedatedefinition",
-      "type" : "String",
-      "title" : "Due date",
-      "value" : "",
-      "description" : "Due date of the user task.",
       "popular" : true
     } ]
   }, {
@@ -271,46 +191,6 @@
       "title" : "Script",
       "value" : "",
       "description" : "Script text of the script task.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "ruletask_rulespackage",
-    "properties" : [ {
-      "id" : "ruletask_rules",
-      "type" : "String",
-      "title" : "Rules",
-      "value" : "",
-      "description" : "Rules of the rule task.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "ruletask_variables_inputpackage",
-    "properties" : [ {
-      "id" : "ruletask_variables_input",
-      "type" : "String",
-      "title" : "Input variables",
-      "value" : "",
-      "description" : "Input variables of the rule task.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "ruletask_excludepackage",
-    "properties" : [ {
-      "id" : "ruletask_exclude",
-      "type" : "Boolean",
-      "title" : "Exclude",
-      "value" : "false",
-      "description" : "Use the rules property as exclusion.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "ruletask_resultpackage",
-    "properties" : [ {
-      "id" : "ruletask_result",
-      "type" : "String",
-      "title" : "Result variable",
-      "value" : "",
-      "description" : "Result variable of the rule task.",
       "popular" : true
     } ]
   }, {
@@ -524,238 +404,6 @@
       "popular" : true
     } ]
   }, {
-    "name" : "callactivitycalledelementpackage",
-    "properties" : [ {
-      "id" : "callactivitycalledelement",
-      "type" : "String",
-      "title" : "Called element",
-      "value" : "",
-      "description" : "Process reference.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "callactivityinparameterspackage",
-    "properties" : [ {
-      "id" : "callactivityinparameters",
-      "type" : "Complex",
-      "title" : "In parameters",
-      "value" : "",
-      "description" : "Definition of the input parameters",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "callactivityoutparameterspackage",
-    "properties" : [ {
-      "id" : "callactivityoutparameters",
-      "type" : "Complex",
-      "title" : "Out parameters",
-      "value" : "",
-      "description" : "Definition of the output parameters",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "callactivityinheritvariablespackage",
-    "properties" : [ {
-      "id" : "callactivityinheritvariables",
-      "type" : "Boolean",
-      "title" : "Inherit variables in sub process",
-      "value" : "false",
-      "description" : "Inherit parent process variables in the sub process.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "callactivityinheritbusinesskeypackage",
-    "properties" : [ {
-      "id" : "callactivityinheritbusinesskey",
-      "type" : "Boolean",
-      "title" : "Inherit business key",
-      "value" : "false",
-      "description" : "Inherit the business key from the parent process.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "callactivityuselocalscopeforoutparameterspackage",
-    "properties" : [ {
-      "id" : "callactivityuselocalscopeforoutparameters",
-      "type" : "Boolean",
-      "title" : "Use local scope for out parameters",
-      "value" : "false",
-      "description" : "Use local variable scope for out parameters.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "cameltaskcamelcontextpackage",
-    "properties" : [ {
-      "id" : "cameltaskcamelcontext",
-      "type" : "String",
-      "title" : "Camel context",
-      "value" : "",
-      "description" : "An optional camel context definition, if left empty the default is used.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "muletaskendpointurlpackage",
-    "properties" : [ {
-      "id" : "muletaskendpointurl",
-      "type" : "String",
-      "title" : "Endpoint url",
-      "value" : "",
-      "description" : "A required endpoint url to sent the message to Mule.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "muletasklanguagepackage",
-    "properties" : [ {
-      "id" : "muletasklanguage",
-      "type" : "String",
-      "title" : "Language",
-      "value" : "",
-      "description" : "A required definition for the language to resolve the payload expression, like juel.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "muletaskpayloadexpressionpackage",
-    "properties" : [ {
-      "id" : "muletaskpayloadexpression",
-      "type" : "Text",
-      "title" : "Payload expression",
-      "value" : "",
-      "description" : "A required definition for the payload of the message sent to Mule.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "muletaskresultvariablepackage",
-    "properties" : [ {
-      "id" : "muletaskresultvariable",
-      "type" : "String",
-      "title" : "Result variable",
-      "value" : "",
-      "description" : "An optional result variable for the payload returned.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "conditionsequenceflowpackage",
-    "properties" : [ {
-      "id" : "conditionsequenceflow",
-      "type" : "Complex",
-      "title" : "Flow condition",
-      "value" : "",
-      "description" : "The condition of the sequence flow",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "defaultflowpackage",
-    "properties" : [ {
-      "id" : "defaultflow",
-      "type" : "Boolean",
-      "title" : "Default flow",
-      "value" : "false",
-      "description" : "Define the sequence flow as default",
-      "popular" : true,
-      "refToView" : "default"
-    } ]
-  }, {
-    "name" : "conditionalflowpackage",
-    "properties" : [ {
-      "id" : "conditionalflow",
-      "type" : "Boolean",
-      "title" : "Conditional flow",
-      "value" : "false",
-      "description" : "Define the sequence flow with a condition",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "timercycledefinitionpackage",
-    "properties" : [ {
-      "id" : "timercycledefinition",
-      "type" : "String",
-      "title" : "Time cycle (e.g. R3/PT10H)",
-      "value" : "",
-      "description" : "Define the timer with a ISO-8601 cycle.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "timerdatedefinitionpackage",
-    "properties" : [ {
-      "id" : "timerdatedefinition",
-      "type" : "String",
-      "title" : "Time date in ISO-8601",
-      "value" : "",
-      "description" : "Define the timer with a ISO-8601 date definition.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "timerdurationdefinitionpackage",
-    "properties" : [ {
-      "id" : "timerdurationdefinition",
-      "type" : "String",
-      "title" : "Time duration (e.g. PT5M)",
-      "value" : "",
-      "description" : "Define the timer with a ISO-8601 duration.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "timerenddatedefinitionpackage",
-    "properties" : [ {
-      "id" : "timerenddatedefinition",
-      "type" : "String",
-      "title" : "Time End Date in ISO-8601",
-      "value" : "",
-      "description" : "Define the timer with a ISO-8601 duration.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "messagerefpackage",
-    "properties" : [ {
-      "id" : "messageref",
-      "type" : "String",
-      "title" : "Message reference",
-      "value" : "",
-      "description" : "Define the message name.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "signalrefpackage",
-    "properties" : [ {
-      "id" : "signalref",
-      "type" : "String",
-      "title" : "Signal reference",
-      "value" : "",
-      "description" : "Define the signal name.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "errorrefpackage",
-    "properties" : [ {
-      "id" : "errorref",
-      "type" : "String",
-      "title" : "Error reference",
-      "value" : "",
-      "description" : "Define the error name.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "cancelactivitypackage",
-    "properties" : [ {
-      "id" : "cancelactivity",
-      "type" : "Boolean",
-      "title" : "Cancel activity",
-      "value" : "true",
-      "description" : "Should the activity be cancelled",
-      "popular" : true,
-      "refToView" : [ "frame", "frame2" ]
-    } ]
-  }, {
-    "name" : "initiatorpackage",
-    "properties" : [ {
-      "id" : "initiator",
-      "type" : "String",
-      "title" : "Initiator",
-      "value" : "",
-      "description" : "Initiator of the process.",
-      "popular" : true
-    } ]
-  }, {
     "name" : "textpackage",
     "properties" : [ {
       "id" : "text",
@@ -765,109 +413,6 @@
       "description" : "The text of the text annotation.",
       "popular" : true,
       "refToView" : "text"
-    } ]
-  }, {
-    "name" : "multiinstance_typepackage",
-    "properties" : [ {
-      "id" : "multiinstance_type",
-      "type" : "flowable-multiinstance",
-      "title" : "Multi-instance type",
-      "value" : "None",
-      "description" : "Repeated activity execution (parallel or sequential) can be displayed through different loop types",
-      "popular" : true,
-      "refToView" : "multiinstance"
-    } ]
-  }, {
-    "name" : "multiinstance_cardinalitypackage",
-    "properties" : [ {
-      "id" : "multiinstance_cardinality",
-      "type" : "String",
-      "title" : "Cardinality (Multi-instance)",
-      "value" : "",
-      "description" : "Define the cardinality of multi instance.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "multiinstance_collectionpackage",
-    "properties" : [ {
-      "id" : "multiinstance_collection",
-      "type" : "String",
-      "title" : "Collection (Multi-instance)",
-      "value" : "",
-      "description" : "Define the collection for the multi instance.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "multiinstance_variablepackage",
-    "properties" : [ {
-      "id" : "multiinstance_variable",
-      "type" : "String",
-      "title" : "Element variable (Multi-instance)",
-      "value" : "",
-      "description" : "Define the element variable for the multi instance.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "multiinstance_conditionpackage",
-    "properties" : [ {
-      "id" : "multiinstance_condition",
-      "type" : "String",
-      "title" : "Completion condition (Multi-instance)",
-      "value" : "",
-      "description" : "Define the completion condition for the multi instance.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "isforcompensationpackage",
-    "properties" : [ {
-      "id" : "isforcompensation",
-      "type" : "Boolean",
-      "title" : "Is for compensation",
-      "value" : "false",
-      "description" : "A flag that identifies whether this activity is intended for the purposes of compensation.",
-      "popular" : true,
-      "refToView" : "compensation"
-    } ]
-  }, {
-    "name" : "sequencefloworderpackage",
-    "properties" : [ {
-      "id" : "sequencefloworder",
-      "type" : "Complex",
-      "title" : "Flow order",
-      "value" : "",
-      "description" : "Order outgoing sequence flows.",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "signaldefinitionspackage",
-    "properties" : [ {
-      "id" : "signaldefinitions",
-      "type" : "multiplecomplex",
-      "title" : "Signal definitions",
-      "value" : "",
-      "description" : "Signal definitions",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "messagedefinitionspackage",
-    "properties" : [ {
-      "id" : "messagedefinitions",
-      "type" : "multiplecomplex",
-      "title" : "Message definitions",
-      "value" : "",
-      "description" : "Message definitions",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "istransactionpackage",
-    "properties" : [ {
-      "id" : "istransaction",
-      "type" : "Boolean",
-      "title" : "Is a transaction sub process",
-      "value" : "false",
-      "description" : "A flag that identifies whether this sub process is of type transaction.",
-      "popular" : true,
-      "refToView" : "border"
     } ]
   }, {
     "name" : "formreferencepackage",
@@ -880,16 +425,6 @@
       "popular" : true
     } ]
   }, {
-    "name" : "terminateAllpackage",
-    "properties" : [ {
-      "id" : "terminateAll",
-      "type" : "Boolean",
-      "title" : "Terminate all",
-      "value" : "false",
-      "description" : "Enable to terminate the process instance",
-      "popular" : true
-    } ]
-  }, {
     "name" : "decisiontaskdecisiontablereferencepackage",
     "properties" : [ {
       "id" : "decisiontaskdecisiontablereference",
@@ -897,47 +432,6 @@
       "title" : "Decision table reference",
       "value" : "",
       "description" : "Set the decision table reference",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "interruptingpackage",
-    "properties" : [ {
-      "id" : "interrupting",
-      "type" : "Boolean",
-      "title" : "Interrupting",
-      "value" : "true",
-      "description" : "Should all parent executions be terminated?",
-      "popular" : true,
-      "refToView" : [ "frame" ]
-    } ]
-  }, {
-    "name" : "completionconditionpackage",
-    "properties" : [ {
-      "id" : "completioncondition",
-      "type" : "String",
-      "title" : "Completion condition",
-      "value" : "",
-      "description" : "The completion condition for the adhoc sub process",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "orderingpackage",
-    "properties" : [ {
-      "id" : "ordering",
-      "type" : "flowable-ordering",
-      "title" : "Ordering",
-      "value" : "Parallel",
-      "description" : "The ordering for the adhoc sub process",
-      "popular" : true
-    } ]
-  }, {
-    "name" : "cancelremaininginstancespackage",
-    "properties" : [ {
-      "id" : "cancelremaininginstances",
-      "type" : "Boolean",
-      "title" : "Cancel remaining instances",
-      "value" : "true",
-      "description" : "Cancel the remaining instances for the adhoc sub process?",
       "popular" : true
     } ]
   } ],
@@ -951,7 +445,7 @@
     "groups" : [ "Diagram" ],
     "mayBeRoot" : true,
     "hide" : true,
-    "propertyPackages" : [ "process_idpackage", "namepackage", "documentationpackage", "process_authorpackage", "process_versionpackage", "process_namespacepackage", "executionlistenerspackage", "eventlistenerspackage", "signaldefinitionspackage", "messagedefinitionspackage", "process_potentialstarteruserpackage","process_potentialstartergrouppackage" ],
+    "propertyPackages" : [ "case_idpackage", "namepackage", "documentationpackage", "case_authorpackage", "case_versionpackage", "case_namespacepackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ ]
   }, {
@@ -963,18 +457,18 @@
     "icon" : "containers/caseplanmodel.png",
     "groups" : [ "Containers" ],
     "hide" : true,
-    "propertyPackages" : [ "process_idpackage", "namepackage", "documentationpackage", "process_authorpackage", "process_versionpackage", "process_namespacepackage", "executionlistenerspackage", "eventlistenerspackage", "signaldefinitionspackage", "messagedefinitionspackage", "process_potentialstarteruserpackage","process_potentialstartergrouppackage" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ ]
   }, {
     "type" : "node",
-    "id" : "UserTask",
-    "title" : "User task",
+    "id" : "HumanTask",
+    "title" : "Human task",
     "description" : "A manual task assigned to a specific person",
-    "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n\n   width=\"102\"\n   height=\"82\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n\t<rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"79\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" />\n\t<rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"100\" height=\"80\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\" fill=\"#f9f9f9\" />\n\t\t<text \n\t\t\tfont-size=\"12\" \n\t\t\tid=\"text_name\" \n\t\t\tx=\"50\" \n\t\t\ty=\"40\" \n\t\t\toryx:align=\"middle center\"\n\t\t\toryx:fittoelem=\"text_frame\"\n\t\t\tstroke=\"#373e48\">\n\t\t</text>\n\t\n\t<g id=\"userTask\" transform=\"translate(3,3)\">\n\t\t<path oryx:anchors=\"top left\"\n       \t\tstyle=\"fill:#d1b575;stroke:none;\"\n       \t\t d=\"m 1,17 16,0 0,-1.7778 -5.333332,-3.5555 0,-1.7778 c 1.244444,0 1.244444,-2.3111 1.244444,-2.3111 l 0,-3.0222 C 12.555557,0.8221 9.0000001,1.0001 9.0000001,1.0001 c 0,0 -3.5555556,-0.178 -3.9111111,3.5555 l 0,3.0222 c 0,0 0,2.3111 1.2444443,2.3111 l 0,1.7778 L 1,15.2222 1,17 17,17\" \n         />\n\t\t\n\t</g>\n  \n\t<g id=\"parallel\">\n\t\t<path oryx:anchors=\"bottom\" fill=\"none\" stroke=\"#bbbbbb\" d=\"M46 70 v8 M50 70 v8 M54 70 v8\" stroke-width=\"2\" />\n\t</g>\n\t\n\t<g id=\"sequential\">\n\t\t<path oryx:anchors=\"bottom\" fill=\"none\" stroke=\"#bbbbbb\" stroke-width=\"2\" d=\"M46,76h10M46,72h10 M46,68h10\"/>\n\t</g>\n\t\n\n\t<g id=\"compensation\">\n\t\t<path oryx:anchors=\"bottom\" fill=\"none\" stroke=\"#bbbbbb\" d=\"M 62 74 L 66 70 L 66 78 L 62 74 L 62 70 L 58 74 L 62 78 L 62 74\" stroke-width=\"1\" />\n\t</g>\n  </g>\n</svg>",
+    "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n\n   width=\"102\"\n   height=\"82\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n\t<rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"79\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" />\n\t<rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"100\" height=\"80\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\" fill=\"#f9f9f9\" />\n\t\t<text \n\t\t\tfont-size=\"12\" \n\t\t\tid=\"text_name\" \n\t\t\tx=\"50\" \n\t\t\ty=\"40\" \n\t\t\toryx:align=\"middle center\"\n\t\t\toryx:fittoelem=\"text_frame\"\n\t\t\tstroke=\"#373e48\">\n\t\t</text>\n\t\n\t<g id=\"userTask\" transform=\"translate(3,3)\">\n\t\t<path oryx:anchors=\"top left\"\n       \t\tstyle=\"fill:#d1b575;stroke:none;\"\n       \t\t d=\"m 1,17 16,0 0,-1.7778 -5.333332,-3.5555 0,-1.7778 c 1.244444,0 1.244444,-2.3111 1.244444,-2.3111 l 0,-3.0222 C 12.555557,0.8221 9.0000001,1.0001 9.0000001,1.0001 c 0,0 -3.5555556,-0.178 -3.9111111,3.5555 l 0,3.0222 c 0,0 0,2.3111 1.2444443,2.3111 l 0,1.7778 L 1,15.2222 1,17 17,17\" \n         />\n\t\t\n\t</g></g>\n</svg>",
     "icon" : "activity/humantask.png",
     "groups" : [ "Tasks" ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "asynchronousdefinitionpackage", "exclusivedefinitionpackage", "executionlistenerspackage", "multiinstance_typepackage", "multiinstance_cardinalitypackage", "multiinstance_collectionpackage", "multiinstance_variablepackage", "multiinstance_conditionpackage", "isforcompensationpackage", "usertaskassignmentpackage", "formkeydefinitionpackage", "formreferencepackage", "duedatedefinitionpackage", "prioritydefinitionpackage", "formpropertiespackage", "tasklistenerspackage" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "usertaskassignmentpackage", "formkeydefinitionpackage", "formreferencepackage", "duedatedefinitionpackage", "prioritydefinitionpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "connector_start", "connector_end", "ActivitiesMorph", "all" ]
   }, {
@@ -985,7 +479,7 @@
     "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?> <svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"102\" height=\"82\" version=\"1.0\"> <defs></defs> <oryx:magnets> <oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" /> <oryx:magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" /> <oryx:magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" /> <oryx:magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /> <oryx:magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /> <oryx:magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /> <oryx:magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" /> <oryx:magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" /> <oryx:magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" /> <oryx:magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" /> <oryx:magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" /> <oryx:magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" /> <oryx:magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" /> </oryx:magnets> <g pointer-events=\"fill\" oryx:minimumSize=\"50 40\"> <defs> <radialGradient id=\"background\" cx=\"10%\" cy=\"10%\" r=\"100%\" fx=\"10%\" fy=\"10%\"> <stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/> <stop id=\"fill_el\" offset=\"100%\" stop-color=\"#ffffcc\" stop-opacity=\"1\"/> </radialGradient> </defs> <rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"79\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" /> <rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"100\" height=\"80\" rx=\"10\" ry=\"10\" stroke=\"black\" stroke-width=\"1\" fill=\"url(#background) #ffffcc\" /> <text font-size=\"12\" id=\"text_name\" x=\"50\" y=\"40\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"black\"> </text> <g id=\"caseTask\" transform=\"scale(0.7,0.7) translate(8,8)\"> <path oryx:anchors=\"top left\" style=\"opacity:1;fill:#000000;stroke:#000000\" d=\"M5 4 L9 0 L18 0 L 21 3z\"/> <path oryx:anchors=\"top left\" style=\"opacity:1;fill:#F4F6F7;stroke:#000000\" d=\"M1 23 L1 4 L30 4 L30 23z\"/> </g> <g id=\"manualActivation\" display=\"none\"> <g id=\"b\" oryx:anchors=\"bottom\"> <path oryx:anchors=\"bottom\" fill=\"none\" d=\"M45.5 68 L54 73 L45.5 77 L45.5 69z\" transform=\"translate(-2,0)\"/> </g> </g><g id=\"repetition\" display=\"none\"> <g id=\"b\" oryx:anchors=\"bottom\"> <path oryx:anchors=\"bottom\" fill=\"none\" d=\"M47 68 v10 M50 68 v10 M53 68 v10\" transform=\"translate(10,0)\"/> </g> </g> <g id=\"required\" display=\"none\"> <g id=\"b\" oryx:anchors=\"bottom\" > <path fill=\"none\" oryx:anchors=\"bottom\" d=\"M49 67 L49 74 M49 76 L49 78\" transform=\"translate(-11,0)\"/> </g> </g> </g> </svg>",
     "icon" : "activity/casetask.png",
     "groups" : [ "Tasks" ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "executionlistenerspackage", "initiatorpackage", "formkeydefinitionpackage", "formreferencepackage", "formpropertiespackage" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "connector_start", "connector_end", "ActivitiesMorph", "all" ]
   }, {
@@ -996,7 +490,7 @@
     "view" : "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\" ?><svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"14\"  height=\"22\" version=\"1.0\"> <oryx:magnets><oryx:magnet oryx:cx=\"8\" oryx:cy=\"10\" oryx:default=\"yes\" /></oryx:magnets><oryx:docker oryx:cx=\"16\" oryx:cy=\"16\" /><g pointer-events=\"fill\"><defs><radialGradient id=\"background\" cx=\"10%\" cy=\"10%\" r=\"100%\" fx=\"10%\" fy=\"10%\"><stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/><stop id=\"fill_el\" offset=\"100%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/></radialGradient></defs><polygon id=\"bg_frame\" points=\"7 0  14 11  7 22 0 11\" fill=\"url(#background) #ffffff\" stroke=\"#000000\"/></g></svg>",
     "icon" : "sentry/entry.png",
     "groups" : [ "Sentries" ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "errorrefpackage" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "connector_start", "SentriesMorph", "SentryOnItemBoundary" ]
   }, {

@@ -12,11 +12,6 @@
  */
 package org.flowable.app.service.editor;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -59,6 +54,9 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.cmmn.converter.CmmnXmlConverter;
+import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter;
+import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.editor.language.json.converter.util.JsonConverterUtil;
@@ -69,6 +67,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Service
 @Transactional
@@ -98,6 +101,10 @@ public class ModelServiceImpl implements ModelService {
     protected BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
 
     protected BpmnXMLConverter bpmnXMLConverter = new BpmnXMLConverter();
+    
+    protected CmmnJsonConverter cmmnJsonConverter = new CmmnJsonConverter();
+
+    protected CmmnXmlConverter cmmnXMLConverter = new CmmnXmlConverter();
 
     @Override
     public Model getModel(String modelId) {
@@ -153,6 +160,18 @@ public class ModelServiceImpl implements ModelService {
             }
         }
         byte[] xmlBytes = bpmnXMLConverter.convertToXML(bpmnModel);
+        return xmlBytes;
+    }
+    
+    @Override
+    public byte[] getCmmnXML(AbstractModel model) {
+        CmmnModel cmmnModel = getCmmnModel(model);
+        return getCmmnXML(cmmnModel);
+    }
+
+    @Override
+    public byte[] getCmmnXML(CmmnModel cmmnModel) {
+        byte[] xmlBytes = cmmnXMLConverter.convertToXML(cmmnModel);
         return xmlBytes;
     }
 
@@ -564,6 +583,55 @@ public class ModelServiceImpl implements ModelService {
         } catch (Exception e) {
             LOGGER.error("Could not generate BPMN 2.0 model for {}", model.getId(), e);
             throw new InternalServerErrorException("Could not generate BPMN 2.0 model");
+        }
+    }
+    
+    @Override
+    public CmmnModel getCmmnModel(AbstractModel model) {
+        CmmnModel cmmnModel = null;
+        try {
+            Map<String, Model> formMap = new HashMap<>();
+            Map<String, Model> decisionTableMap = new HashMap<>();
+
+            List<Model> referencedModels = modelRepository.findByParentModelId(model.getId());
+            for (Model childModel : referencedModels) {
+                if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
+                    formMap.put(childModel.getId(), childModel);
+
+                } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
+                    decisionTableMap.put(childModel.getId(), childModel);
+                }
+            }
+
+            cmmnModel = getCmmnModel(model, formMap, decisionTableMap);
+
+        } catch (Exception e) {
+            LOGGER.error("Could not generate CMMN model for {}", model.getId(), e);
+            throw new InternalServerErrorException("Could not generate CMMN model");
+        }
+
+        return cmmnModel;
+    }
+    
+    @Override
+    public CmmnModel getCmmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap) {
+        try {
+            ObjectNode editorJsonNode = (ObjectNode) objectMapper.readTree(model.getModelEditorJson());
+            Map<String, String> formKeyMap = new HashMap<>();
+            for (Model formModel : formMap.values()) {
+                formKeyMap.put(formModel.getId(), formModel.getKey());
+            }
+
+            Map<String, String> decisionTableKeyMap = new HashMap<>();
+            for (Model decisionTableModel : decisionTableMap.values()) {
+                decisionTableKeyMap.put(decisionTableModel.getId(), decisionTableModel.getKey());
+            }
+
+            return cmmnJsonConverter.convertToCmmnModel(editorJsonNode, formKeyMap, decisionTableKeyMap);
+
+        } catch (Exception e) {
+            LOGGER.error("Could not generate CMMN model for {}", model.getId(), e);
+            throw new InternalServerErrorException("Could not generate CMMN model");
         }
     }
 

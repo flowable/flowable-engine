@@ -24,7 +24,7 @@ angular.module('flowableModeler')
 
 	  $scope.model = {
         filters: [
-            {id: 'processes', labelKey: 'PROCESSES'}
+            {id: 'cases', labelKey: 'CASES'}
 		],
 
 		sorts: [
@@ -116,9 +116,9 @@ angular.module('flowableModeler')
 	    }, $modal, $scope);
 	  };
 
-	  $scope.importProcess = function () {
+	  $scope.importCase = function () {
           _internalCreateModal({
-              template: 'views/popup/process-import.html?version=' + Date.now()
+              template: 'views/popup/casemodel-import.html?version=' + Date.now()
           }, $modal, $scope);
 	  };
 
@@ -129,14 +129,14 @@ angular.module('flowableModeler')
 	      }
 	  };
 
-	  $scope.editProcessDetails = function(process) {
-		  if (process) {
+	  $scope.editCaseModelDetails = function(caseModel) {
+		  if (caseModel) {
 		      $rootScope.editorHistory = [];
-              $location.path("/editor/" + process.id);
+              $location.path("/editor/" + caseModel.id);
 		  }
 	  };
 
-	  // Finally, load initial processes
+	  // Finally, load initial cases
 	  $scope.loadCaseModels();
   }]);
 
@@ -195,7 +195,7 @@ angular.module('flowableModeler')
 
     $scope.model = {
        loading: false,
-       process: {
+       caseModel: {
             name: '',
             key: '',
             description: ''
@@ -204,23 +204,23 @@ angular.module('flowableModeler')
 
     if ($scope.originalModel) {
         //clone the model
-        $scope.model.process.name = $scope.originalModel.process.name;
-        $scope.model.process.key = $scope.originalModel.process.key;
-        $scope.model.process.description = $scope.originalModel.process.description;
-        $scope.model.process.id = $scope.originalModel.process.id;
+        $scope.model.caseModel.name = $scope.originalModel.caseModel.name;
+        $scope.model.caseModel.key = $scope.originalModel.caseModel.key;
+        $scope.model.caseModel.description = $scope.originalModel.caseModel.description;
+        $scope.model.caseModel.id = $scope.originalModel.caseModel.id;
     }
 
     $scope.ok = function () {
 
-        if (!$scope.model.process.name || $scope.model.process.name.length == 0 || 
-        	!$scope.model.process.key || $scope.model.process.key.length == 0) {
+        if (!$scope.model.caseModel.name || $scope.model.caseModel.name.length == 0 || 
+        	!$scope.model.caseModel.key || $scope.model.caseModel.key.length == 0) {
         	
             return;
         }
 
         $scope.model.loading = true;
 
-        $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/'+$scope.model.process.id+'/clone', data: $scope.model.process}).
+        $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/'+$scope.model.caseModel.id+'/clone', data: $scope.model.caseModel}).
             success(function(data) {
                 $scope.$hide();
 
@@ -257,9 +257,9 @@ angular.module('flowableModeler')
 
           var url;
           if (isIE) {
-              url = FLOWABLE.CONFIG.contextRoot + '/app/rest/import-process-model/text';
+              url = FLOWABLE.CONFIG.contextRoot + '/app/rest/import-case-model/text';
           } else {
-              url = FLOWABLE.CONFIG.contextRoot + '/app/rest/import-process-model';
+              url = FLOWABLE.CONFIG.contextRoot + '/app/rest/import-case-model';
           }
 
           Upload.upload({
