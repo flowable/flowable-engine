@@ -149,9 +149,11 @@ public abstract class AbstractEngineConfigurator implements ProcessEngineConfigu
         return null;
     }
 
-    protected void initialiseCommonProperties(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractEngineConfiguration targetEngineConfiguration, String engineKey) {
-        initEngineConfigurations(processEngineConfiguration, targetEngineConfiguration, engineKey);
+    protected void initialiseCommonProperties(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
+        initEngineConfigurations(processEngineConfiguration, targetEngineConfiguration);
+        initServiceConfigurations(processEngineConfiguration, targetEngineConfiguration);
         initCommandContextFactory(processEngineConfiguration, targetEngineConfiguration);
+        initIdGenerator(processEngineConfiguration, targetEngineConfiguration);
         
         if (targetEngineConfiguration.isUsingRelationalDatabase()) {
             initDataSource(processEngineConfiguration, targetEngineConfiguration);
@@ -164,12 +166,20 @@ public abstract class AbstractEngineConfigurator implements ProcessEngineConfigu
         initClock(processEngineConfiguration, targetEngineConfiguration);
     }
 
-    protected void initEngineConfigurations(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractEngineConfiguration targetEngineConfiguration, String engineKey) {
+    protected void initEngineConfigurations(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
         targetEngineConfiguration.setEngineConfigurations(processEngineConfiguration.getEngineConfigurations());
+    }
+    
+    protected void initServiceConfigurations(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
+        targetEngineConfiguration.setServiceConfigurations(processEngineConfiguration.getServiceConfigurations());
     }
 
     protected void initCommandContextFactory(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
         targetEngineConfiguration.setCommandContextFactory(processEngineConfiguration.getCommandContextFactory());
+    }
+    
+    protected void initIdGenerator(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
+        targetEngineConfiguration.setIdGenerator(processEngineConfiguration.getIdGenerator());
     }
 
     protected void initDataSource(ProcessEngineConfigurationImpl processEngineConfiguration,

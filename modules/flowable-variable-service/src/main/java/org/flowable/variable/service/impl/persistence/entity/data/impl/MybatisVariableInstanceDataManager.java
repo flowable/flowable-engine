@@ -18,11 +18,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.flowable.engine.common.impl.db.AbstractDataManager;
 import org.flowable.engine.common.impl.db.CachedEntityMatcher;
-import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
-import org.flowable.variable.service.impl.persistence.entity.data.AbstractDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.VariableInstanceDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableByExecutionIdMatcher;
 
@@ -32,10 +31,6 @@ import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematc
 public class MybatisVariableInstanceDataManager extends AbstractDataManager<VariableInstanceEntity> implements VariableInstanceDataManager {
 
     protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceEntity = new VariableByExecutionIdMatcher();
-
-    public MybatisVariableInstanceDataManager(VariableServiceConfiguration variableServiceConfiguration) {
-        super(variableServiceConfiguration);
-    }
 
     @Override
     public Class<? extends VariableInstanceEntity> getManagedEntityClass() {

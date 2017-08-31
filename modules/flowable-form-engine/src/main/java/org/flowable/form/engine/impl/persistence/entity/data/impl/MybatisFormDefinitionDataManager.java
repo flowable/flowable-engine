@@ -22,13 +22,13 @@ import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.FormDefinitionQueryImpl;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntityImpl;
-import org.flowable.form.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.form.engine.impl.persistence.entity.data.AbstractFormDataManager;
 import org.flowable.form.engine.impl.persistence.entity.data.FormDefinitionDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisFormDefinitionDataManager extends AbstractDataManager<FormDefinitionEntity> implements FormDefinitionDataManager {
+public class MybatisFormDefinitionDataManager extends AbstractFormDataManager<FormDefinitionEntity> implements FormDefinitionDataManager {
 
     public MybatisFormDefinitionDataManager(FormEngineConfiguration formEngineConfiguration) {
         super(formEngineConfiguration);

@@ -20,13 +20,13 @@ import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.GroupQueryImpl;
 import org.flowable.idm.engine.impl.persistence.entity.GroupEntity;
 import org.flowable.idm.engine.impl.persistence.entity.GroupEntityImpl;
-import org.flowable.idm.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.idm.engine.impl.persistence.entity.data.AbstractIdmDataManager;
 import org.flowable.idm.engine.impl.persistence.entity.data.GroupDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisGroupDataManager extends AbstractDataManager<GroupEntity> implements GroupDataManager {
+public class MybatisGroupDataManager extends AbstractIdmDataManager<GroupEntity> implements GroupDataManager {
 
     public MybatisGroupDataManager(IdmEngineConfiguration idmEngineConfiguration) {
         super(idmEngineConfiguration);

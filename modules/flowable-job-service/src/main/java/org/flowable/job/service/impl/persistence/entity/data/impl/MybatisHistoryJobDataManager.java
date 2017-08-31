@@ -18,23 +18,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.impl.Page;
+import org.flowable.engine.common.impl.db.AbstractDataManager;
 import org.flowable.engine.common.impl.db.ListQueryParameterObject;
 import org.flowable.job.service.HistoryJob;
-import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.HistoryJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntityImpl;
-import org.flowable.job.service.impl.persistence.entity.data.AbstractDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.HistoryJobDataManager;
+import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
  */
 public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJobEntity> implements HistoryJobDataManager {
-
-    public MybatisHistoryJobDataManager(JobServiceConfiguration jobServiceConfiguration) {
-        super(jobServiceConfiguration);
-    }
 
     @Override
     public Class<? extends HistoryJobEntity> getManagedEntityClass() {
@@ -72,9 +68,9 @@ public class MybatisHistoryJobDataManager extends AbstractDataManager<HistoryJob
     @SuppressWarnings("unchecked")
     public List<HistoryJobEntity> findExpiredJobs(Page page) {
         Map<String, Object> params = new HashMap<>();
-        Date now = getClock().getCurrentTime();
+        Date now = CommandContextUtil.getJobServiceConfiguration().getClock().getCurrentTime();
         params.put("now", now);
-        Date maxTimeout = new Date(now.getTime() - getJobServiceConfiguration().getAsyncExecutorResetExpiredJobsMaxTimeout());
+        Date maxTimeout = new Date(now.getTime() - CommandContextUtil.getJobServiceConfiguration().getAsyncExecutorResetExpiredJobsMaxTimeout());
         params.put("maxTimeout", maxTimeout);
         return getDbSqlSession().selectList("selectExpiredHistoryJobs", params, page);
     }

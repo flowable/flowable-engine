@@ -60,10 +60,16 @@ angular.module('flowableModeler')
              */
             var data = editorManager.getStencilData();
 
-            var quickMenuDefinition = ['UserTask', 'EndNoneEvent', 'ExclusiveGateway', 
+            var quickMenuDefinition = undefined;
+            
+            if (data.namespace == 'http://b3mn.org/stencilset/cmmn1.1#') {
+                quickMenuDefinition = ['UserTask', 'Connector'];
+            } else {
+                quickMenuDefinition = ['UserTask', 'EndNoneEvent', 'ExclusiveGateway', 
                                          'CatchTimerEvent', 'ThrowNoneEvent', 'TextAnnotation',
                                          'SequenceFlow', 'Association'];
-            var ignoreForPaletteDefinition = ['SequenceFlow', 'MessageFlow', 'Association', 'DataAssociation', 'DataStore', 'SendTask'];
+            }
+            var ignoreForPaletteDefinition = ['SequenceFlow', 'MessageFlow', 'Association', 'DataAssociation', 'DataStore', 'SendTask', 'CasePlanModel'];
             var quickMenuItems = [];
               
             var morphRoles = [];
@@ -75,9 +81,9 @@ angular.module('flowableModeler')
             }
           
             // Check all received items
-            for (var stencilIndex = 0; stencilIndex < data.stencils.length; stencilIndex++) 
-            {
-              // Check if the root group is the 'diagram' group. If so, this item should not be shown.
+            for (var stencilIndex = 0; stencilIndex < data.stencils.length; stencilIndex++) {
+            
+                // Check if the root group is the 'diagram' group. If so, this item should not be shown.
                 var currentGroupName = data.stencils[stencilIndex].groups[0];
                 if (currentGroupName === 'Diagram' || currentGroupName === 'Form') {
                     continue;  // go to next item
@@ -129,15 +135,13 @@ angular.module('flowableModeler')
                     'canConnectTo': false,
                     'canConnectAssociation': false};
                 
-                if (data.stencils[stencilIndex].customIconId && data.stencils[stencilIndex].customIconId > 0)
-                {
+                if (data.stencils[stencilIndex].customIconId && data.stencils[stencilIndex].customIconId > 0) {
                     stencilItem.customIcon = true;
                     stencilItem.icon = data.stencils[stencilIndex].customIconId;
                 }
                 
                 if (!removed) {
-                    if (quickMenuDefinition.indexOf(stencilItem.id) >= 0)
-                    {
+                    if (quickMenuDefinition.indexOf(stencilItem.id) >= 0) {
                       quickMenuItems[quickMenuDefinition.indexOf(stencilItem.id)] = stencilItem;
                     }
                 }
@@ -146,25 +150,18 @@ angular.module('flowableModeler')
                   stencilItem.canConnectAssociation = true;
                 }
                 
-                for (var i = 0; i < data.stencils[stencilIndex].roles.length; i++)
-                {
+                for (var i = 0; i < data.stencils[stencilIndex].roles.length; i++) {
                   var stencilRole = data.stencils[stencilIndex].roles[i];
-                  if (stencilRole === 'sequence_start')
-                  {
+                  if (stencilRole === 'sequence_start' || stencilRole === 'connector_start') {
                     stencilItem.canConnect = true;
-                  }
-                  else if (stencilRole === 'sequence_end')
-                  {
+                  } else if (stencilRole === 'sequence_end' || stencilRole === 'connector_end') {
                     stencilItem.canConnectTo = true;
                   }
                   
-                  for (var j = 0; j < morphRoles.length; j++)
-                  {
-                    if (stencilRole === morphRoles[j].role)
-                    {
-                        if (!removed)
-                        {
-                           morphRoles[j].morphOptions.push(stencilItem);
+                  for (var j = 0; j < morphRoles.length; j++) {
+                    if (stencilRole === morphRoles[j].role) {
+                      if (!removed) {
+                        morphRoles[j].morphOptions.push(stencilItem);
                       }
                       stencilItem.morphRole = morphRoles[j].role;
                       break;
@@ -172,17 +169,14 @@ angular.module('flowableModeler')
                   }
                 }
 
-                if (currentGroup)
-                {
+                if (currentGroup) {
                   // Add the stencil item to the correct group
                   currentGroup.items.push(stencilItem);
-                  if (ignoreForPaletteDefinition.indexOf(stencilItem.id) < 0)
-                  {
+                  if (ignoreForPaletteDefinition.indexOf(stencilItem.id) < 0) {
                     currentGroup.paletteItems.push(stencilItem);
                   }
 
-                } else
-                {
+                } else {
                     // It's a root stencil element
                     if (!removed) {
                         stencilItemGroups.push(stencilItem);
@@ -190,10 +184,8 @@ angular.module('flowableModeler')
                 }
             }
             
-            for (var i = 0; i < stencilItemGroups.length; i++) 
-            {
-              if (stencilItemGroups[i].paletteItems && stencilItemGroups[i].paletteItems.length == 0)
-              {
+            for (var i = 0; i < stencilItemGroups.length; i++)  {
+              if (stencilItemGroups[i].paletteItems && stencilItemGroups[i].paletteItems.length == 0) {
                 stencilItemGroups[i].visible = false;
               }
             }
@@ -201,8 +193,7 @@ angular.module('flowableModeler')
             $scope.stencilItemGroups = stencilItemGroups;
 
             var containmentRules = [];
-            for (var i = 0; i < data.rules.containmentRules.length; i++) 
-            {
+            for (var i = 0; i < data.rules.containmentRules.length; i++) {
                 var rule = data.rules.containmentRules[i];
                 containmentRules.push(rule);
             }
@@ -210,8 +201,7 @@ angular.module('flowableModeler')
             
             // remove quick menu items which are not available anymore due to custom pallette
             var availableQuickMenuItems = [];
-            for (var i = 0; i < quickMenuItems.length; i++) 
-            {
+            for (var i = 0; i < quickMenuItems.length; i++) {
                 if (quickMenuItems[i]) {
                     availableQuickMenuItems[availableQuickMenuItems.length] = quickMenuItems[i];
                 }
@@ -235,14 +225,12 @@ angular.module('flowableModeler')
                     var selectedShape = shapes.first();
                     var stencil = selectedShape.getStencil();
                     
-                    if ($rootScope.selectedElementBeforeScrolling && stencil.id().indexOf('BPMNDiagram') !== -1)
-                    {
+                    if ($rootScope.selectedElementBeforeScrolling && stencil.id().indexOf('BPMNDiagram') !== -1 && stencil.id().indexOf('CMMNDiagram') !== -1) {
                       // ignore canvas event because of empty selection when scrolling stops
                       return;
                     }
                     
-                    if ($rootScope.selectedElementBeforeScrolling && $rootScope.selectedElementBeforeScrolling.getId() === selectedShape.getId())
-                    {
+                    if ($rootScope.selectedElementBeforeScrolling && $rootScope.selectedElementBeforeScrolling.getId() === selectedShape.getId()) {
                       $rootScope.selectedElementBeforeScrolling = null;
                       return;
                     }
@@ -865,7 +853,8 @@ angular.module('flowableModeler')
                 option.position = pos;
 	              
                 if (containedStencil.idWithoutNs() !== 'SequenceFlow' && containedStencil.idWithoutNs() !== 'Association' && 
-                        containedStencil.idWithoutNs() !== 'MessageFlow' && containedStencil.idWithoutNs() !== 'DataAssociation') {
+                        containedStencil.idWithoutNs() !== 'MessageFlow' && containedStencil.idWithoutNs() !== 'DataAssociation'
+                        && containedStencil.idWithoutNs() !== 'Connector') {
 	                        
                   var args = { sourceShape: currentSelectedShape, targetStencil: containedStencil };
                   var targetStencil = editorManager.getRules().connectMorph(args);
@@ -1036,7 +1025,8 @@ angular.module('flowableModeler')
 
                     if (item.id === 'Lane' || item.id === 'BoundaryErrorEvent' || item.id === 'BoundaryMessageEvent' || 
                             item.id === 'BoundarySignalEvent' || item.id === 'BoundaryTimerEvent' ||
-                            item.id === 'BoundaryCancelEvent' || item.id === 'BoundaryCompensationEvent') {
+                            item.id === 'BoundaryCancelEvent' || item.id === 'BoundaryCompensationEvent' || 
+                            item.id === 'EntryCriterion') {
                         
                         $scope.dragCanContain = false;
                         
@@ -1092,8 +1082,9 @@ angular.module('flowableModeler')
                         }
 
                         var parentItem = $scope.getStencilItemById(parentCandidate.getStencil().idWithoutNs());
+                        
                         if (parentItem.roles.indexOf("Activity") > -1) {
-                            if (item.roles.indexOf("IntermediateEventOnActivityBoundary") > -1) {
+                            if (item.roles.indexOf("IntermediateEventOnActivityBoundary") > -1 || item.roles.indexOf("SentryOnItemBoundary") > -1) {
                                 _canContain = true;
                             }
                             

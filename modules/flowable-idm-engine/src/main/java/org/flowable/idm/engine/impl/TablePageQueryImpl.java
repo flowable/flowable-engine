@@ -16,10 +16,10 @@ import java.io.Serializable;
 
 import org.flowable.engine.common.api.management.TablePage;
 import org.flowable.engine.common.api.management.TablePageQuery;
+import org.flowable.engine.common.impl.AbstractQuery;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.engine.common.impl.query.AbstractQuery;
 import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**

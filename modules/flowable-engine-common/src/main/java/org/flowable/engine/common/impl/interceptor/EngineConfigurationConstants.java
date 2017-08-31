@@ -24,6 +24,8 @@ public interface EngineConfigurationConstants {
     
     String KEY_CONTENT_ENGINE_CONFIG = "cfg.contentEngine";
     
+    String KEY_CMMN_ENGINE_CONFIG = "cfg.cmmnEngine";
+
     String KEY_TASK_SERVICE_CONFIG = "cfg.taskService";
     
     String KEY_VARIABLE_SERVICE_CONFIG = "cfg.variableService";
@@ -39,5 +41,7 @@ public interface EngineConfigurationConstants {
     int PRIORITY_ENGINE_FORM = PRIORITY_ENGINE_DMN + 100000;
     
     int PRIORITY_ENGINE_CONTENT = PRIORITY_ENGINE_FORM + 100000;
+    
+    int PRIORITY_ENGINE_CMMN = PRIORITY_ENGINE_CONTENT + 100000;
     
 }

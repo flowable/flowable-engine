@@ -17,15 +17,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.db.AbstractDataManager;
+import org.flowable.engine.common.impl.db.CachedEntityMatcher;
 import org.flowable.task.service.Task;
-import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.TaskQueryImpl;
-import org.flowable.task.service.impl.persistence.CachedEntityMatcher;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
-import org.flowable.task.service.impl.persistence.entity.data.AbstractDataManager;
 import org.flowable.task.service.impl.persistence.entity.data.TaskDataManager;
 import org.flowable.task.service.impl.persistence.entity.data.impl.cachematcher.TasksByExecutionIdMatcher;
+import org.flowable.task.service.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -33,10 +33,6 @@ import org.flowable.task.service.impl.persistence.entity.data.impl.cachematcher.
 public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> implements TaskDataManager {
 
     protected CachedEntityMatcher<TaskEntity> tasksByExecutionIdMatcher = new TasksByExecutionIdMatcher();
-
-    public MybatisTaskDataManager(TaskServiceConfiguration taskServiceConfiguration) {
-        super(taskServiceConfiguration);
-    }
 
     @Override
     public Class<? extends TaskEntity> getManagedEntityClass() {
@@ -80,7 +76,7 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
         if (taskQuery.getTaskVariablesLimit() != null) {
             taskQuery.setMaxResults(taskQuery.getTaskVariablesLimit());
         } else {
-            taskQuery.setMaxResults(getTaskServiceConfiguration().getTaskQueryLimit());
+            taskQuery.setMaxResults(CommandContextUtil.getTaskServiceConfiguration().getTaskQueryLimit());
         }
         taskQuery.setFirstResult(0);
 

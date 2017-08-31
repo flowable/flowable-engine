@@ -138,6 +138,10 @@ public interface HistoryJsonConstants {
     String GROUP_ID = "groupId";
 
     String TENANT_ID = "tenantId";
+    
+    String CALLBACK_ID = "callbackId";
+    
+    String CALLBACK_TYPE = "callbackType";
 
     String TIMESTAMP = "__timeStamp"; // Two underscores to avoid clashes with other fields
     

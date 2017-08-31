@@ -18,9 +18,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.AbstractQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.engine.common.impl.query.AbstractQuery;
 import org.flowable.job.service.HistoryJob;
 import org.flowable.job.service.HistoryJobQuery;
 import org.flowable.job.service.impl.util.CommandContextUtil;

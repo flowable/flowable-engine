@@ -46,6 +46,8 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
     protected String processDefinitionName;
     protected Integer processDefinitionVersion;
     protected String deploymentId;
+    protected String callbackId;
+    protected String callbackType;
     protected List<HistoricVariableInstanceEntity> queryVariables;
 
     public HistoricProcessInstanceEntityImpl() {
@@ -66,7 +68,9 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
         startTime = processInstance.getStartTime();
         startUserId = processInstance.getStartUserId();
         superProcessInstanceId = processInstance.getSuperExecution() != null ? processInstance.getSuperExecution().getProcessInstanceId() : null;
-
+        callbackId = processInstance.getCallbackId();
+        callbackType = processInstance.getCallbackType();
+        
         // Inherit tenant id (if applicable)
         if (processInstance.getTenantId() != null) {
             tenantId = processInstance.getTenantId();
@@ -211,6 +215,22 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
 
     public void setDeploymentId(String deploymentId) {
         this.deploymentId = deploymentId;
+    }
+    
+    public String getCallbackId() {
+        return callbackId;
+    }
+
+    public void setCallbackId(String callbackId) {
+        this.callbackId = callbackId;
+    }
+
+    public String getCallbackType() {
+        return callbackType;
+    }
+
+    public void setCallbackType(String callbackType) {
+        this.callbackType = callbackType;
     }
 
     public Map<String, Object> getProcessVariables() {

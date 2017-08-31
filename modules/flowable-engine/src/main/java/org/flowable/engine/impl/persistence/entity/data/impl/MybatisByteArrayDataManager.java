@@ -17,13 +17,13 @@ import java.util.List;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ByteArrayEntity;
 import org.flowable.engine.impl.persistence.entity.ByteArrayEntityImpl;
-import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ByteArrayDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisByteArrayDataManager extends AbstractDataManager<ByteArrayEntity> implements ByteArrayDataManager {
+public class MybatisByteArrayDataManager extends AbstractProcessDataManager<ByteArrayEntity> implements ByteArrayDataManager {
 
     public MybatisByteArrayDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);

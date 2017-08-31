@@ -71,7 +71,7 @@ import org.flowable.variable.service.VariableServiceConfiguration;
 
 public class CommandContextUtil {
     
-    public static final String ATTRIBUTE_INVOLVED_EXECUTIONS = "ctx.attribue.involvedExecutions";
+    public static final String ATTRIBUTE_INVOLVED_EXECUTIONS = "ctx.attribute.involvedExecutions";
     
     public static ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
         return getProcessEngineConfiguration(getCommandContext());
@@ -152,12 +152,15 @@ public class CommandContextUtil {
     }
     
     public static TaskService getTaskService() {
+        return getTaskService(getCommandContext());
+    }
+    
+    public static TaskService getTaskService(CommandContext commandContext) {
         TaskService taskService = null;
-        TaskServiceConfiguration taskServiceConfiguration = getTaskServiceConfiguration();
+        TaskServiceConfiguration taskServiceConfiguration = getTaskServiceConfiguration(commandContext);
         if (taskServiceConfiguration != null) {
             taskService = taskServiceConfiguration.getTaskService();
         }
-        
         return taskService;
     }
     
@@ -552,6 +555,14 @@ public class CommandContextUtil {
     
     public static FailedJobCommandFactory getFailedJobCommandFactory(CommandContext commandContext) {
         return getProcessEngineConfiguration(commandContext).getFailedJobCommandFactory();
+    }
+    
+    public static ProcessInstanceHelper getProcessInstanceHelper() {
+        return getProcessInstanceHelper(getCommandContext());
+    }
+    
+    public static ProcessInstanceHelper getProcessInstanceHelper(CommandContext commandContext) {
+        return getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
     }
     
     public static CommandContext getCommandContext() {

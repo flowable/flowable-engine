@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+  <settings>
+    <setting name="lazyLoadingEnabled" value="false" />
+  </settings>
+  <mappers>
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/TableData.xml" />
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/CmmnDeployment.xml" />
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/CmmnResource.xml" />
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/CaseDefinition.xml" />
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/CaseInstance.xml" />
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/PlanItemInstance.xml" />
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/SentryOnPartInstance.xml"/>
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/MilestoneInstance.xml" />
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/HistoricCaseInstance.xml"/>
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/HistoricMilestoneInstance.xml" />
+  </mappers>
+</configuration>

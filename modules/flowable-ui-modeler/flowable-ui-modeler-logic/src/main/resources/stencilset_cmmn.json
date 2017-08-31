@@ -1,0 +1,555 @@
+{
+  "title" : "CMMN editor",
+  "namespace" : "http://b3mn.org/stencilset/cmmn1.1#",
+  "description" : "CMMN case editor",
+  "propertyPackages" : [ {
+    "name" : "case_idpackage",
+    "properties" : [ {
+      "id" : "case_id",
+      "type" : "String",
+      "title" : "Case identifier",
+      "value" : "caseModel",
+      "description" : "Unique identifier of the case definition.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "overrideidpackage",
+    "properties" : [ {
+      "id" : "overrideid",
+      "type" : "String",
+      "title" : "Id",
+      "value" : "",
+      "description" : "Unique identifier of the element.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "namepackage",
+    "properties" : [ {
+      "id" : "name",
+      "type" : "String",
+      "title" : "Name",
+      "value" : "",
+      "description" : "The descriptive name of the BPMN element.",
+      "popular" : true,
+      "refToView" : "text_name"
+    } ]
+  }, {
+    "name" : "documentationpackage",
+    "properties" : [ {
+      "id" : "documentation",
+      "type" : "Text",
+      "title" : "Documentation",
+      "value" : "",
+      "description" : "The descriptive name of the BPMN element.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "case_authorpackage",
+    "properties" : [ {
+      "id" : "case_author",
+      "type" : "String",
+      "title" : "Case author",
+      "value" : "",
+      "description" : "Author of the case definition.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "case_versionpackage",
+    "properties" : [ {
+      "id" : "case_version",
+      "type" : "String",
+      "title" : "Case version string (documentation only)",
+      "value" : "",
+      "description" : "Version identifier for documentation purpose.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "case_namespacepackage",
+    "properties" : [ {
+      "id" : "case_namespace",
+      "type" : "String",
+      "title" : "Target namespace",
+      "value" : "http://www.flowable.org/casedef",
+      "description" : "Target namespace for the case definition.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "usertaskassignmentpackage",
+    "properties" : [ {
+      "id" : "usertaskassignment",
+      "type" : "Complex",
+      "title" : "Assignments",
+      "value" : "",
+      "description" : "Assignment definition for the user task",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "formpropertiespackage",
+    "properties" : [ {
+      "id" : "formproperties",
+      "type" : "Complex",
+      "title" : "Form properties",
+      "value" : "",
+      "description" : "Definition of the form with a list of form properties",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "formkeydefinitionpackage",
+    "properties" : [ {
+      "id" : "formkeydefinition",
+      "type" : "String",
+      "title" : "Form key",
+      "value" : "",
+      "description" : "Form key that provides a reference to a form.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "duedatedefinitionpackage",
+    "properties" : [ {
+      "id" : "duedatedefinition",
+      "type" : "String",
+      "title" : "Due date",
+      "value" : "",
+      "description" : "Due date of the user task.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "prioritydefinitionpackage",
+    "properties" : [ {
+      "id" : "prioritydefinition",
+      "type" : "String",
+      "title" : "Priority",
+      "value" : "",
+      "description" : "Priority of the user task.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "servicetaskclasspackage",
+    "properties" : [ {
+      "id" : "servicetaskclass",
+      "type" : "String",
+      "title" : "Class",
+      "value" : "",
+      "description" : "Class that implements the service task logic.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "servicetaskexpressionpackage",
+    "properties" : [ {
+      "id" : "servicetaskexpression",
+      "type" : "Text",
+      "title" : "Expression",
+      "value" : "",
+      "description" : "Service task logic defined with an expression.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "servicetaskdelegateexpressionpackage",
+    "properties" : [ {
+      "id" : "servicetaskdelegateexpression",
+      "type" : "Text",
+      "title" : "Delegate expression",
+      "value" : "",
+      "description" : "Service task logic defined with a delegate expression.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "servicetaskfieldspackage",
+    "properties" : [ {
+      "id" : "servicetaskfields",
+      "type" : "Complex",
+      "title" : "Class fields",
+      "value" : "",
+      "description" : "Field extensions",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "servicetaskresultvariablepackage",
+    "properties" : [ {
+      "id" : "servicetaskresultvariable",
+      "type" : "String",
+      "title" : "Result variable name",
+      "value" : "",
+      "description" : "Process variable name to store the service task result.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "scriptformatpackage",
+    "properties" : [ {
+      "id" : "scriptformat",
+      "type" : "String",
+      "title" : "Script format",
+      "value" : "",
+      "description" : "Script format of the script task.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "scripttextpackage",
+    "properties" : [ {
+      "id" : "scripttext",
+      "type" : "Text",
+      "title" : "Script",
+      "value" : "",
+      "description" : "Script text of the script task.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "mailtasktopackage",
+    "properties" : [ {
+      "id" : "mailtaskto",
+      "type" : "Text",
+      "title" : "To",
+      "value" : "",
+      "description" : "The recipients if the e-mail. Multiple recipients are defined in a comma-separated list.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "mailtaskfrompackage",
+    "properties" : [ {
+      "id" : "mailtaskfrom",
+      "type" : "Text",
+      "title" : "From",
+      "value" : "",
+      "description" : "The sender e-mail address. If not provided, the default configured from address is used.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "mailtasksubjectpackage",
+    "properties" : [ {
+      "id" : "mailtasksubject",
+      "type" : "Text",
+      "title" : "Subject",
+      "value" : "",
+      "description" : "The subject of the e-mail.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "mailtaskccpackage",
+    "properties" : [ {
+      "id" : "mailtaskcc",
+      "type" : "Text",
+      "title" : "Cc",
+      "value" : "",
+      "description" : "The cc's of the e-mail. Multiple recipients are defined in a comma-separated list",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "mailtaskbccpackage",
+    "properties" : [ {
+      "id" : "mailtaskbcc",
+      "type" : "Text",
+      "title" : "Bcc",
+      "value" : "",
+      "description" : "The bcc's of the e-mail. Multiple recipients are defined in a comma-separated list",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "mailtasktextpackage",
+    "properties" : [ {
+      "id" : "mailtasktext",
+      "type" : "Text",
+      "title" : "Text",
+      "value" : "",
+      "description" : "The content of the e-mail, in case one needs to send plain none-rich e-mails. Can be used in combination with html, for e-mail clients that don't support rich content. The client will then fall back to this text-only alternative.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "mailtaskhtmlpackage",
+    "properties" : [ {
+      "id" : "mailtaskhtml",
+      "type" : "Text",
+      "title" : "Html",
+      "value" : "",
+      "description" : "A piece of HTML that is the content of the e-mail.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "mailtaskcharsetpackage",
+    "properties" : [ {
+      "id" : "mailtaskcharset",
+      "type" : "String",
+      "title" : "Charset",
+      "value" : "",
+      "description" : "Allows to change the charset of the email, which is necessary for many non-English languages. ",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "httptaskrequestmethodpackage",
+    "properties" : [ {
+      "id" : "httptaskrequestmethod",
+      "type" : "String",
+      "title" : "Request method",
+      "value" : "",
+      "description" : "Request method (For example - GET,POST,PUT etc).",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "httptaskrequesturlpackage",
+    "properties" : [ {
+      "id" : "httptaskrequesturl",
+      "type" : "Text",
+      "title" : "Request URL",
+      "value" : "",
+      "description" : "Request URL (For example - http://flowable.org).",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "httptaskrequestheaderspackage",
+    "properties" : [ {
+      "id" : "httptaskrequestheaders",
+      "type" : "Text",
+      "title" : "Request headers",
+      "value" : "",
+      "description" : "Line separated HTTP request headers (For example - Content-Type: application/json).",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "httptaskrequestbodypackage",
+    "properties" : [ {
+      "id" : "httptaskrequestbody",
+      "type" : "Text",
+      "title" : "Request body",
+      "value" : "",
+      "description" : "Request body (For example- ${sampleBody}).",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "httptaskrequesttimeoutpackage",
+    "properties" : [ {
+      "id" : "httptaskrequesttimeout",
+      "type" : "String",
+      "title" : "Request timeout",
+      "value" : "",
+      "description" : "Timeout in milliseconds for the request (For example - 5000).",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "httptaskdisallowredirectspackage",
+    "properties" : [ {
+      "id" : "httptaskdisallowredirects",
+      "type" : "String",
+      "title" : "Disallow redirects",
+      "value" : "",
+      "description" : "Flag to disallow HTTP redirects.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "httptaskfailstatuscodespackage",
+    "properties" : [ {
+      "id" : "httptaskfailstatuscodes",
+      "type" : "String",
+      "title" : "Fail status codes",
+      "value" : "",
+      "description" : "Comma separated list of HTTP response status codes to retry, for example 400,5XX.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "httptaskhandlestatuscodespackage",
+    "properties" : [ {
+      "id" : "httptaskhandlestatuscodes",
+      "type" : "String",
+      "title" : "Handle status codes",
+      "value" : "",
+      "description" : "Comma separated list of HTTP response status codes to ignore, for example 404,3XX.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "httptaskignoreexceptionpackage",
+    "properties" : [ {
+      "id" : "httptaskignoreexception",
+      "type" : "String",
+      "title" : "Ignore exception",
+      "value" : "",
+      "description" : "Flag to ignore exceptions.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "httptaskresponsevariablenamepackage",
+    "properties" : [ {
+      "id" : "httptaskresponsevariablename",
+      "type" : "String",
+      "title" : "Response variable name",
+      "value" : "",
+      "description" : "Define the variable name to store the http response.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "httptasksaverequestvariablespackage",
+    "properties" : [ {
+      "id" : "httptasksaverequestvariables",
+      "type" : "String",
+      "title" : "Save request variables",
+      "value" : "",
+      "description" : "Flag to save request variables.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "httptasksaveresponseparameterspackage",
+    "properties" : [ {
+      "id" : "httptasksaveresponseparameters",
+      "type" : "String",
+      "title" : "Save response status, headers",
+      "value" : "",
+      "description" : "Flag to save response status, headers etc.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "httptaskresultvariableprefixpackage",
+    "properties" : [ {
+      "id" : "httptaskresultvariableprefix",
+      "type" : "String",
+      "title" : "Result variable prefix",
+      "value" : "",
+      "description" : "Prefix for the execution variable names.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "textpackage",
+    "properties" : [ {
+      "id" : "text",
+      "type" : "String",
+      "title" : "Text",
+      "value" : "",
+      "description" : "The text of the text annotation.",
+      "popular" : true,
+      "refToView" : "text"
+    } ]
+  }, {
+    "name" : "formreferencepackage",
+    "properties" : [ {
+      "id" : "formreference",
+      "type" : "Complex",
+      "title" : "Form reference",
+      "value" : "",
+      "description" : "Reference to a form",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "decisiontaskdecisiontablereferencepackage",
+    "properties" : [ {
+      "id" : "decisiontaskdecisiontablereference",
+      "type" : "Complex",
+      "title" : "Decision table reference",
+      "value" : "",
+      "description" : "Set the decision table reference",
+      "popular" : true
+    } ]
+  } ],
+  "stencils" : [ {
+    "type" : "node",
+    "id" : "CMMNDiagram",
+    "title" : "CMMN-Diagram",
+    "description" : "A CMMN 2.0 diagram.",
+    "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n   width=\"800\"\n   height=\"600\"\n   version=\"1.0\">\n  <defs></defs>\n  <g pointer-events=\"fill\" >\n    <polygon stroke=\"black\" fill=\"black\" stroke-width=\"1\" points=\"0,0 0,590 9,599 799,599 799,9 790,0\" stroke-linecap=\"butt\" stroke-linejoin=\"miter\" stroke-miterlimit=\"10\" />\n    <rect id=\"diagramcanvas\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"790\" height=\"590\" stroke=\"black\" stroke-width=\"2\" fill=\"white\" />\n    \t<text font-size=\"22\" id=\"diagramtext\" x=\"400\" y=\"25\" oryx:align=\"top center\" stroke=\"#373e48\"></text>\n  </g>\n</svg>",
+    "icon" : "diagram.png",
+    "groups" : [ "Diagram" ],
+    "mayBeRoot" : true,
+    "hide" : true,
+    "propertyPackages" : [ "case_idpackage", "namepackage", "documentationpackage", "case_authorpackage", "case_versionpackage", "case_namespacepackage"],
+    "hiddenPropertyPackages" : [ ],
+    "roles" : [ ]
+  }, {
+    "type" : "node",
+    "id" : "CasePlanModel",
+    "title" : "Case plan model",
+    "description" : "A case plan model",
+    "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?> <svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" version=\"1.0\" width=\"580\" height=\"220\"> <g pointer-events=\"fill\" oryx:minimumSize=\"580 220\"> <defs> <radialGradient id=\"background\" cx=\"10%\" cy=\"10%\" r=\"100%\" fx=\"10%\" fy=\"10%\"> <stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/> <stop id=\"fill_el\" offset=\"100%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/> </radialGradient> </defs> <path id=\"input_dependent\" oryx:resize=\"vertical horizontal\" d=\"M7,30 L600 30 L600 250 L7 250 L7 30Z\" stroke=\"black\" fill=\"url(#background) #ffffff\" /> <path id=\"text_path\" d=\"M20 55 L37 34 L275 34 L291 55\" stroke=\"black\" fill=\"url(#background) #ffffff\" transform=\"translate(0,-25)\" oryx:anchors=\"top left\"/> <text id=\"text_name\" font-size=\"12\" x=\"150\" y=\"18\" oryx:fittoelem=\"text_path\" oryx:anchors=\"top left\" oryx:align=\"middle center\" stroke=\"black\"> </text> <g id=\"autoComplete\" display=\"inherit\"> <path d=\"M290 231 L302 231 L302 247 L290 247 L290 233z\" oryx:anchors=\"bottom center\"/> </g> </g> </svg>",
+    "icon" : "containers/caseplanmodel.png",
+    "groups" : [ "Containers" ],
+    "hide" : true,
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage" ],
+    "hiddenPropertyPackages" : [ ],
+    "roles" : [ ]
+  }, {
+    "type" : "node",
+    "id" : "HumanTask",
+    "title" : "Human task",
+    "description" : "A manual task assigned to a specific person",
+    "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n\n   width=\"102\"\n   height=\"82\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n\t<rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"79\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" />\n\t<rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"100\" height=\"80\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\" fill=\"#f9f9f9\" />\n\t\t<text \n\t\t\tfont-size=\"12\" \n\t\t\tid=\"text_name\" \n\t\t\tx=\"50\" \n\t\t\ty=\"40\" \n\t\t\toryx:align=\"middle center\"\n\t\t\toryx:fittoelem=\"text_frame\"\n\t\t\tstroke=\"#373e48\">\n\t\t</text>\n\t\n\t<g id=\"userTask\" transform=\"translate(3,3)\">\n\t\t<path oryx:anchors=\"top left\"\n       \t\tstyle=\"fill:#d1b575;stroke:none;\"\n       \t\t d=\"m 1,17 16,0 0,-1.7778 -5.333332,-3.5555 0,-1.7778 c 1.244444,0 1.244444,-2.3111 1.244444,-2.3111 l 0,-3.0222 C 12.555557,0.8221 9.0000001,1.0001 9.0000001,1.0001 c 0,0 -3.5555556,-0.178 -3.9111111,3.5555 l 0,3.0222 c 0,0 0,2.3111 1.2444443,2.3111 l 0,1.7778 L 1,15.2222 1,17 17,17\" \n         />\n\t\t\n\t</g></g>\n</svg>",
+    "icon" : "activity/humantask.png",
+    "groups" : [ "Tasks" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "usertaskassignmentpackage", "formkeydefinitionpackage", "formreferencepackage", "duedatedefinitionpackage", "prioritydefinitionpackage" ],
+    "hiddenPropertyPackages" : [ ],
+    "roles" : [ "Activity", "connector_start", "connector_end", "ActivitiesMorph", "all" ]
+  }, {
+    "type" : "node",
+    "id" : "CaseTask",
+    "title" : "Case task",
+    "description" : "A start event without a specific trigger",
+    "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?> <svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"102\" height=\"82\" version=\"1.0\"> <defs></defs> <oryx:magnets> <oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" /> <oryx:magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" /> <oryx:magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" /> <oryx:magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /> <oryx:magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /> <oryx:magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /> <oryx:magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" /> <oryx:magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" /> <oryx:magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" /> <oryx:magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" /> <oryx:magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" /> <oryx:magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" /> <oryx:magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" /> </oryx:magnets> <g pointer-events=\"fill\" oryx:minimumSize=\"50 40\"> <defs> <radialGradient id=\"background\" cx=\"10%\" cy=\"10%\" r=\"100%\" fx=\"10%\" fy=\"10%\"> <stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/> <stop id=\"fill_el\" offset=\"100%\" stop-color=\"#ffffcc\" stop-opacity=\"1\"/> </radialGradient> </defs> <rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"79\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" /> <rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"100\" height=\"80\" rx=\"10\" ry=\"10\" stroke=\"black\" stroke-width=\"1\" fill=\"url(#background) #ffffcc\" /> <text font-size=\"12\" id=\"text_name\" x=\"50\" y=\"40\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"black\"> </text> <g id=\"caseTask\" transform=\"scale(0.7,0.7) translate(8,8)\"> <path oryx:anchors=\"top left\" style=\"opacity:1;fill:#000000;stroke:#000000\" d=\"M5 4 L9 0 L18 0 L 21 3z\"/> <path oryx:anchors=\"top left\" style=\"opacity:1;fill:#F4F6F7;stroke:#000000\" d=\"M1 23 L1 4 L30 4 L30 23z\"/> </g> <g id=\"manualActivation\" display=\"none\"> <g id=\"b\" oryx:anchors=\"bottom\"> <path oryx:anchors=\"bottom\" fill=\"none\" d=\"M45.5 68 L54 73 L45.5 77 L45.5 69z\" transform=\"translate(-2,0)\"/> </g> </g><g id=\"repetition\" display=\"none\"> <g id=\"b\" oryx:anchors=\"bottom\"> <path oryx:anchors=\"bottom\" fill=\"none\" d=\"M47 68 v10 M50 68 v10 M53 68 v10\" transform=\"translate(10,0)\"/> </g> </g> <g id=\"required\" display=\"none\"> <g id=\"b\" oryx:anchors=\"bottom\" > <path fill=\"none\" oryx:anchors=\"bottom\" d=\"M49 67 L49 74 M49 76 L49 78\" transform=\"translate(-11,0)\"/> </g> </g> </g> </svg>",
+    "icon" : "activity/casetask.png",
+    "groups" : [ "Tasks" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage"],
+    "hiddenPropertyPackages" : [ ],
+    "roles" : [ "Activity", "connector_start", "connector_end", "ActivitiesMorph", "all" ]
+  }, {
+    "type" : "node",
+    "id" : "EntryCriterion",
+    "title" : "Entry criterion",
+    "description" : "A sentry that defines an entry criterion",
+    "view" : "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\" ?><svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"14\"  height=\"22\" version=\"1.0\"> <oryx:magnets><oryx:magnet oryx:cx=\"8\" oryx:cy=\"10\" oryx:default=\"yes\" /></oryx:magnets><oryx:docker oryx:cx=\"16\" oryx:cy=\"16\" /><g pointer-events=\"fill\"><defs><radialGradient id=\"background\" cx=\"10%\" cy=\"10%\" r=\"100%\" fx=\"10%\" fy=\"10%\"><stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/><stop id=\"fill_el\" offset=\"100%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/></radialGradient></defs><polygon id=\"bg_frame\" points=\"7 0  14 11  7 22 0 11\" fill=\"url(#background) #ffffff\" stroke=\"#000000\"/></g></svg>",
+    "icon" : "sentry/entry.png",
+    "groups" : [ "Sentries" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage" ],
+    "hiddenPropertyPackages" : [ ],
+    "roles" : [ "connector_start", "SentriesMorph", "SentryOnItemBoundary" ]
+  }, {
+    "type" : "edge",
+    "id" : "Connector",
+    "title" : "Connector",
+    "description" : "Associates a text annotation with an element.",
+    "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\r\n<svg\r\n\txmlns=\"http://www.w3.org/2000/svg\"\r\n\txmlns:oryx=\"http://www.b3mn.org/oryx\"\r\n\tversion=\"1.0\"\r\n\toryx:edge=\"edge\" >\r\n\t<g id=\"edge\">\r\n\t    <path id=\"bg_frame\" d=\"M10 50 L210 50\" stroke=\"#585858\" fill=\"none\" stroke-width=\"2\" stroke-dasharray=\"3, 4\" />\r\n\t\t<text id=\"name\" x=\"0\" y=\"0\" oryx:edgePosition=\"midTop\" oryx:offsetTop=\"6\" style=\"font-size:9px;\"/>\r\n\t</g>\r\n</svg>",
+    "icon" : "connection/connector.png",
+    "groups" : [ "Connectors" ],
+    "layout" : [ {
+      "type" : "layout.bpmn2_0.sequenceflow"
+    } ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage" ],
+    "hiddenPropertyPackages" : [ ],
+    "roles" : [ "ConnectingObjectsMorph", "all" ]
+  }],
+  "rules" : {
+    "cardinalityRules" : [ {
+      "role" : "Startevents_all",
+      "incomingEdges" : [ {
+        "role" : "Connector",
+        "maximum" : 0
+      } ]
+    }, {
+      "role" : "Endevents_all",
+      "outgoingEdges" : [ {
+        "role" : "Connector",
+        "maximum" : 0
+      } ]
+    }],
+    "connectionRules" : [ {
+      "role" : "Connector",
+      "connects" : [ {
+        "from" : "connector_start",
+        "to" : [ "connector_end" ]
+      } ]
+    }, {
+      "role" : "SentryOnItemBoundary",
+      "connects" : [ {
+        "from" : "Activity",
+        "to" : [ "SentryOnItemBoundary" ]
+      } ]
+    }],
+    "containmentRules" : [ {
+      "role" : "CaseDiagram",
+      "contains" : [ "CasePlanModel" ]
+    }, {
+      "role" : "CasePlanModel",
+      "contains" : [ "all" ]
+    }],
+    "morphingRules" : [ {
+      "role" : "ActivitiesMorph",
+      "baseMorphs" : [ "CaseTask" ],
+      "preserveBounds" : true
+    }, {
+      "role" : "SentriesMorph",
+      "baseMorphs" : [ "EntryCriterion" ],
+      "preserveBounds" : true
+    }]
+  }
+}

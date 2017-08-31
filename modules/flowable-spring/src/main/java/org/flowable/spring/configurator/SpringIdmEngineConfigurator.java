@@ -12,7 +12,6 @@
  */
 package org.flowable.spring.configurator;
 
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.impl.cfg.IdmEngineConfigurator;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.idm.engine.IdmEngineConfiguration;
@@ -31,7 +30,7 @@ public class SpringIdmEngineConfigurator extends IdmEngineConfigurator {
         if (idmEngineConfiguration == null) {
             idmEngineConfiguration = new SpringIdmEngineConfiguration();
         }
-        initialiseCommonProperties(processEngineConfiguration, idmEngineConfiguration, EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
+        initialiseCommonProperties(processEngineConfiguration, idmEngineConfiguration);
         idmEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
 
         idmEngineConfiguration.buildIdmEngine();

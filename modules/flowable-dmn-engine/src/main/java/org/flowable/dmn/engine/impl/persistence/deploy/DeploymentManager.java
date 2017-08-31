@@ -26,6 +26,7 @@ import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntity;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 
 /**
  * @author Tijs Rademakers

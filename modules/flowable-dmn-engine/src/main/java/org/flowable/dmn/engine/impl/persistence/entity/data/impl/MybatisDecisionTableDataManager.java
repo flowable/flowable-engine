@@ -21,14 +21,14 @@ import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.DecisionTableQueryImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityImpl;
-import org.flowable.dmn.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.dmn.engine.impl.persistence.entity.data.AbstractDmnDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DecisionTableDataManager;
 import org.flowable.engine.common.api.FlowableException;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisDecisionTableDataManager extends AbstractDataManager<DecisionTableEntity> implements DecisionTableDataManager {
+public class MybatisDecisionTableDataManager extends AbstractDmnDataManager<DecisionTableEntity> implements DecisionTableDataManager {
 
     public MybatisDecisionTableDataManager(DmnEngineConfiguration dmnEngineConfiguration) {
         super(dmnEngineConfiguration);

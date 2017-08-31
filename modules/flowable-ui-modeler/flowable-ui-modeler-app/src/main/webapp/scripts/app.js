@@ -64,6 +64,14 @@ flowableModeler
             templateUrl: appResourceRoot + 'views/process.html',
             controller: 'ProcessCtrl'
         })
+        .when('/casemodels', {
+            templateUrl: appResourceRoot + 'views/casemodels.html',
+            controller: 'CaseModelsCtrl'
+        })
+        .when('/casemodels/:modelId', {
+            templateUrl: appResourceRoot + 'views/casemodel.html',
+            controller: 'CaseModelCtrl'
+        })
         .when('/forms', {
             templateUrl: appResourceRoot + 'views/forms.html',
             controller: 'FormsCtrl'
@@ -190,6 +198,11 @@ flowableModeler
                     'id': 'processes',
                     'title': 'GENERAL.NAVIGATION.PROCESSES',
                     'path': '/processes'
+                },
+                {
+                    'id': 'casemodels',
+                    'title': 'GENERAL.NAVIGATION.CASEMODELS',
+                    'path': '/casemodels'
                 },
                 {
                     'id': 'forms',

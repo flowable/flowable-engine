@@ -101,4 +101,14 @@ public interface ProcessInstance extends Execution {
      * Returns the user id of this process instance.
      */
     String getStartUserId();
+    
+    /**
+     * Returns the callback id of this process instance.
+     */
+    String getCallbackId();
+    
+    /**
+     * Returns the callback type of this process instance. 
+     */
+    String getCallbackType();
 }
