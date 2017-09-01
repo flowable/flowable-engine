@@ -83,6 +83,8 @@ create table ACT_RU_EXECUTION (
     DEADLETTER_JOB_COUNT_ integer,
     VAR_COUNT_ integer, 
     ID_LINK_COUNT_ integer,
+    CALLBACK_ID_ varchar(255),
+    CALLBACK_TYPE_ varchar(255),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
