@@ -33,7 +33,9 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 
 public class CmmnDbSchemaManager implements DbSchemaManager {
 
-private static final Logger LOGGER = LoggerFactory.getLogger(CmmnDbSchemaManager.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CmmnDbSchemaManager.class);
+
+    public static final String LIQUIBASE_CHANGELOG = "org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog.xml";
     
     public void initSchema() {
         initSchema(CommandContextUtil.getCmmnEngineConfiguration());
@@ -85,8 +87,11 @@ private static final Logger LOGGER = LoggerFactory.getLogger(CmmnDbSchemaManager
             database.setLiquibaseCatalogName(databaseCatalog);
         }
 
-        Liquibase liquibase = new Liquibase("org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
-        return liquibase;
+        return createLiquibaseInstance(database);
+    }
+
+    public Liquibase createLiquibaseInstance(Database database) throws LiquibaseException {
+        return new Liquibase(LIQUIBASE_CHANGELOG, new ClassLoaderResourceAccessor(), database);
     }
 
     @Override

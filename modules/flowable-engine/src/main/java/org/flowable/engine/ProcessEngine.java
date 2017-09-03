@@ -12,6 +12,8 @@
  */
 package org.flowable.engine;
 
+import org.flowable.engine.common.impl.FlowableVersions;
+
 /**
  * Provides access to all the services that expose the BPM and workflow operations.
  * 
@@ -34,7 +36,7 @@ package org.flowable.engine;
 public interface ProcessEngine {
 
     /** the version of the flowable library */
-    public static String VERSION = "6.2.0.0"; // Note the extra .x at the end. To cater for snapshot releases with different database changes
+    public static String VERSION = FlowableVersions.CURRENT_VERSION;
 
     /**
      * The name as specified in 'process-engine-name' in the flowable.cfg.xml configuration file. The default name for a process engine is 'default

@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine;
 
+import org.flowable.engine.common.impl.FlowableVersions;
+
 /**
  * Provides access to all services that expose CMMN and case management operations.
  * 
@@ -20,7 +22,7 @@ package org.flowable.cmmn.engine;
 public interface CmmnEngine {
     
     /** the version of the flowable CMMN library */
-    public static String VERSION = "6.2.0.0";
+    public static String VERSION = FlowableVersions.CURRENT_VERSION;
 
     String getName();
 
