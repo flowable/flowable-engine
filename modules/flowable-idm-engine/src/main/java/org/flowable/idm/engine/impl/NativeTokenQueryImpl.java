@@ -36,10 +36,12 @@ public class NativeTokenQueryImpl extends AbstractNativeQuery<NativeTokenQuery, 
 
     // results ////////////////////////////////////////////////////////////////
 
+    @Override
     public List<Token> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getTokenEntityManager(commandContext).findTokensByNativeQuery(parameterMap);
     }
 
+    @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getTokenEntityManager(commandContext).findTokenCountByNativeQuery(parameterMap);
     }

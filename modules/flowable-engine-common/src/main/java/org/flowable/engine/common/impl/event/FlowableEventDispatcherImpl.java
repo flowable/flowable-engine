@@ -34,10 +34,12 @@ public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
         eventSupport = new FlowableEventSupport();
     }
 
+    @Override
     public void setEnabled(boolean enabled) {
         this.enabled = enabled;
     }
 
+    @Override
     public boolean isEnabled() {
         return enabled;
     }

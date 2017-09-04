@@ -41,6 +41,7 @@ public class DeleteHistoryJobCmd implements Command<Object>, Serializable {
         this.historyJobId = historyJobId;
     }
 
+    @Override
     public Object execute(CommandContext commandContext) {
         HistoryJobEntity jobToDelete = getJobToDelete(commandContext);
 

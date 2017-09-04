@@ -25,6 +25,7 @@ public class GetTableCountCmd implements Command<Map<String, Long>>, Serializabl
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public Map<String, Long> execute(CommandContext commandContext) {
         return commandContext
                 .getTableDataManager()

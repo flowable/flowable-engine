@@ -36,6 +36,7 @@ public class SpringIdmEngineConfigurator extends IdmEngineConfigurator {
         idmEngineConfiguration.buildIdmEngine();
     }
 
+    @Override
     public IdmEngineConfiguration getIdmEngineConfiguration() {
         return idmEngineConfiguration;
     }

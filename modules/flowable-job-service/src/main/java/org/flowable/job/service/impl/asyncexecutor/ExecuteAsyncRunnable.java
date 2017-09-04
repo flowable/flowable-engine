@@ -65,6 +65,7 @@ public class ExecuteAsyncRunnable implements Runnable {
         this.asyncRunnableExecutionExceptionHandler = asyncRunnableExecutionExceptionHandler;
     }
 
+    @Override
     public void run() {
 
         if (job == null) {
@@ -172,6 +173,7 @@ public class ExecuteAsyncRunnable implements Runnable {
             CommandContextUtil.getJobManager(commandContext).unacquire(job);
         } else {
             jobServiceConfiguration.getCommandExecutor().execute(new Command<Void>() {
+                @Override
                 public Void execute(CommandContext commandContext) {
                     CommandContextUtil.getJobManager(commandContext).unacquire(job);
                     return null;

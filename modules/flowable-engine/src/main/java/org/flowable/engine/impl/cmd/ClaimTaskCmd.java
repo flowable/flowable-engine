@@ -35,6 +35,7 @@ public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
         this.userId = userId;
     }
 
+    @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
         if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
             Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();

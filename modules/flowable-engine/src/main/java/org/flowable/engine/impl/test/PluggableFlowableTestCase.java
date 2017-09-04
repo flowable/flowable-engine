@@ -42,6 +42,7 @@ public abstract class PluggableFlowableTestCase extends AbstractFlowableTestCase
 
     protected static ProcessEngine cachedProcessEngine;
 
+    @Override
     protected void initializeProcessEngine() {
         if (cachedProcessEngine == null) {
             pluggableActivitiTestCaseLogger.info("No cached process engine found for test. Retrieving the default engine.");

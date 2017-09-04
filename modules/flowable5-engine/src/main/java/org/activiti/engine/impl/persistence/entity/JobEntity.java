@@ -123,11 +123,13 @@ public class JobEntity extends AbstractJobEntity {
         }
     }
 
+    @Override
     public void setExecution(ExecutionEntity execution) {
         super.setExecution(execution);
         execution.addJob(this);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public Object getPersistentState() {
         Map<String, Object> persistentState = (Map<String, Object>) super.getPersistentState();

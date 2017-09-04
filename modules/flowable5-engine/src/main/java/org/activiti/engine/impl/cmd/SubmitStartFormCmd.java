@@ -39,6 +39,7 @@ public class SubmitStartFormCmd extends NeedsActiveProcessDefinitionCmd<ProcessI
         this.properties = properties;
     }
 
+    @Override
     protected ProcessInstance execute(CommandContext commandContext, ProcessDefinition processDefinition) {
         ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) processDefinition;
         ExecutionEntity processInstance = null;

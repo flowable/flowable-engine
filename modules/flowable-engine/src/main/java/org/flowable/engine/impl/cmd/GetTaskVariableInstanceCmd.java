@@ -37,6 +37,7 @@ public class GetTaskVariableInstanceCmd implements Command<VariableInstance>, Se
         this.isLocal = isLocal;
     }
 
+    @Override
     public VariableInstance execute(CommandContext commandContext) {
         if (taskId == null) {
             throw new FlowableIllegalArgumentException("taskId is null");

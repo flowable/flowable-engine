@@ -23,15 +23,18 @@ public class BeansResolverFactory implements ResolverFactory, Resolver {
 
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
+    @Override
     public Resolver createResolver(ProcessEngineConfigurationImpl processEngineConfiguration, VariableScope variableScope) {
         this.processEngineConfiguration = processEngineConfiguration;
         return this;
     }
 
+    @Override
     public boolean containsKey(Object key) {
         return processEngineConfiguration.getBeans().containsKey(key);
     }
 
+    @Override
     public Object get(Object key) {
         return processEngineConfiguration.getBeans().get(key);
     }

@@ -27,6 +27,7 @@ public class CreatePrivilegeQueryCmd implements Command<PrivilegeQuery>, Seriali
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public PrivilegeQuery execute(CommandContext commandContext) {
         return CommandContextUtil.getPrivilegeEntityManager(commandContext).createNewPrivilegeQuery();
     }

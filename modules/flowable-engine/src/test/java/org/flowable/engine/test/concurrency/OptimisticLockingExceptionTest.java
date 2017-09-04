@@ -101,6 +101,7 @@ public class OptimisticLockingExceptionTest extends PluggableFlowableTestCase {
             this.executionId = executionid;
         }
 
+        @Override
         public void run() {
             try {
                 processEngine.getManagementService().executeCommand(new TestTriggerCommand(executionId, null));

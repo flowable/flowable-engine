@@ -42,6 +42,7 @@ public class ManagedAsyncJobExecutor extends DefaultAsyncJobExecutor {
         this.threadFactory = threadFactory;
     }
 
+    @Override
     protected void initAsyncJobExecutionThreadPool() {
         if (threadFactory == null) {
             LOGGER.warn("A managed thread factory was not found, falling back to self-managed threads");

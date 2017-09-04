@@ -42,6 +42,7 @@ public class HttpServiceTask2ConverterTest extends AbstractConverterTest {
         deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "httpservicetaskmodel2.bpmn";
     }

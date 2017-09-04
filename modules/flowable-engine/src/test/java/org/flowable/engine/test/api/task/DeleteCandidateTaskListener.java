@@ -18,6 +18,7 @@ import org.flowable.task.service.delegate.DelegateTask;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 public class DeleteCandidateTaskListener implements TaskListener {
+    @Override
     public void notify(DelegateTask delegateTask) {
         TaskHelper.deleteCandidateUser((TaskEntity) delegateTask, "admin");
     }

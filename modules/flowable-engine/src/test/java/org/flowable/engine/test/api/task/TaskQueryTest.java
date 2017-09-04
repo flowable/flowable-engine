@@ -46,6 +46,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
 
     private List<String> taskIds;
 
+    @Override
     public void setUp() throws Exception {
 
         identityService.saveUser(identityService.newUser("kermit"));
@@ -62,6 +63,7 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         taskIds = generateTestTasks();
     }
 
+    @Override
     public void tearDown() throws Exception {
         identityService.deleteGroup("accountancy");
         identityService.deleteGroup("management");

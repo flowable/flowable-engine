@@ -17,6 +17,7 @@ package org.flowable.bpmn.model;
  */
 public class ThrowEvent extends Event {
 
+    @Override
     public ThrowEvent clone() {
         ThrowEvent clone = new ThrowEvent();
         clone.setValues(this);

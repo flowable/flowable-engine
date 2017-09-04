@@ -57,6 +57,7 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
     protected String tenantId = JobServiceConfiguration.NO_TENANT_ID;
     protected String jobType;
 
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("retries", retries);
@@ -74,118 +75,147 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
 
     // getters and setters ////////////////////////////////////////////////////////
     
+    @Override
     public Date getCreateTime() {
         return createTime;
     }
 
+    @Override
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 
+    @Override
     public Date getDuedate() {
         return duedate;
     }
 
+    @Override
     public void setDuedate(Date duedate) {
         this.duedate = duedate;
     }
 
+    @Override
     public String getExecutionId() {
         return executionId;
     }
 
+    @Override
     public void setExecutionId(String executionId) {
         this.executionId = executionId;
     }
 
+    @Override
     public int getRetries() {
         return retries;
     }
 
+    @Override
     public void setRetries(int retries) {
         this.retries = retries;
     }
 
+    @Override
     public String getProcessInstanceId() {
         return processInstanceId;
     }
 
+    @Override
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public boolean isExclusive() {
         return isExclusive;
     }
 
+    @Override
     public void setExclusive(boolean isExclusive) {
         this.isExclusive = isExclusive;
     }
 
+    @Override
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
 
+    @Override
     public void setProcessDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public String getRepeat() {
         return repeat;
     }
 
+    @Override
     public void setRepeat(String repeat) {
         this.repeat = repeat;
     }
 
+    @Override
     public Date getEndDate() {
         return endDate;
     }
 
+    @Override
     public void setEndDate(Date endDate) {
         this.endDate = endDate;
     }
 
+    @Override
     public int getMaxIterations() {
         return maxIterations;
     }
 
+    @Override
     public void setMaxIterations(int maxIterations) {
         this.maxIterations = maxIterations;
     }
 
+    @Override
     public String getJobHandlerType() {
         return jobHandlerType;
     }
 
+    @Override
     public void setJobHandlerType(String jobHandlerType) {
         this.jobHandlerType = jobHandlerType;
     }
 
+    @Override
     public String getJobHandlerConfiguration() {
         return jobHandlerConfiguration;
     }
 
+    @Override
     public void setJobHandlerConfiguration(String jobHandlerConfiguration) {
         this.jobHandlerConfiguration = jobHandlerConfiguration;
     }
 
+    @Override
     public String getJobType() {
         return jobType;
     }
 
+    @Override
     public void setJobType(String jobType) {
         this.jobType = jobType;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 
+    @Override
     public String getExceptionStacktrace() {
         if (exceptionByteArrayRef == null) {
             return null;
@@ -203,6 +233,7 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
         }
     }
 
+    @Override
     public void setExceptionStacktrace(String exception) {
         if (exceptionByteArrayRef == null) {
             exceptionByteArrayRef = new JobByteArrayRef();
@@ -210,14 +241,17 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
         exceptionByteArrayRef.setValue("stacktrace", getUtf8Bytes(exception));
     }
 
+    @Override
     public String getExceptionMessage() {
         return exceptionMessage;
     }
 
+    @Override
     public void setExceptionMessage(String exceptionMessage) {
         this.exceptionMessage = StringUtils.abbreviate(exceptionMessage, JobInfo.MAX_EXCEPTION_MESSAGE_LENGTH);
     }
 
+    @Override
     public JobByteArrayRef getExceptionByteArrayRef() {
         return exceptionByteArrayRef;
     }

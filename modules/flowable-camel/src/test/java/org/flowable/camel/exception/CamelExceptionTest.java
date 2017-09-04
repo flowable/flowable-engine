@@ -46,6 +46,7 @@ public class CamelExceptionTest extends SpringFlowableTestCase {
     @Autowired
     protected ManagementService managementService;
 
+    @Override
     public void setUp() throws Exception {
         ExceptionServiceMock.reset();
         NoExceptionServiceMock.reset();
@@ -58,6 +59,7 @@ public class CamelExceptionTest extends SpringFlowableTestCase {
         });
     }
 
+    @Override
     public void tearDown() throws Exception {
         List<Route> routes = camelContext.getRoutes();
         for (Route r : routes) {

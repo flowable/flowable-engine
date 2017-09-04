@@ -51,6 +51,7 @@ public class FlowableVariableEventImpl extends FlowableEventImpl implements Flow
         this.variableValue = variableValue;
     }
 
+    @Override
     public VariableType getVariableType() {
         return variableType;
     }

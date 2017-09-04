@@ -47,6 +47,7 @@ public class DataObjectConverterTest extends AbstractConverterTest {
         deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "dataobjectmodel.bpmn";
     }

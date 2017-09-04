@@ -32,6 +32,7 @@ public class FlowableActivityCancelledEventImpl extends FlowableActivityEventImp
         this.cause = cause;
     }
 
+    @Override
     public Object getCause() {
         return cause;
     }

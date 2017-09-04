@@ -22,6 +22,7 @@ import org.flowable.variable.service.delegate.VariableScope;
  */
 public class VariableScopeResolverFactory implements ResolverFactory {
 
+    @Override
     public Resolver createResolver(ProcessEngineConfigurationImpl processEngineConfiguration, VariableScope variableScope) {
         if (variableScope != null) {
             return new VariableScopeResolver(processEngineConfiguration, variableScope);

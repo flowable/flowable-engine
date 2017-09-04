@@ -46,6 +46,7 @@ public class SetTimerJobRetriesCmd implements Command<Void>, Serializable {
         this.retries = retries;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         TimerJobEntity job = CommandContextUtil.getTimerJobEntityManager(commandContext).findById(jobId);
         if (job != null) {

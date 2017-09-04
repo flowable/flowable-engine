@@ -30,6 +30,7 @@ public class ProcessInstanceQueryAndWithExceptionTest extends PluggableFlowableT
 
     private org.flowable.engine.repository.Deployment deployment;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         deployment = repositoryService.createDeployment()
@@ -39,6 +40,7 @@ public class ProcessInstanceQueryAndWithExceptionTest extends PluggableFlowableT
                 .deploy();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         repositoryService.deleteDeployment(deployment.getId(), true);
         super.tearDown();
@@ -94,6 +96,7 @@ public class ProcessInstanceQueryAndWithExceptionTest extends PluggableFlowableT
 
     // Test delegate
     public static class TestJavaDelegate implements JavaDelegate {
+        @Override
         public void execute(DelegateExecution execution) {
             throw new RuntimeException();
         }

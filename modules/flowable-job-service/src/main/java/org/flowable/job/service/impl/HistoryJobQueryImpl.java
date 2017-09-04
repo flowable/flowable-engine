@@ -55,6 +55,7 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
         super(commandExecutor);
     }
 
+    @Override
     public HistoryJobQuery jobId(String jobId) {
         if (jobId == null) {
             throw new FlowableIllegalArgumentException("Provided job id is null");
@@ -63,6 +64,7 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
         return this;
     }
 
+    @Override
     public HistoryJobQuery handlerType(String handlerType) {
         if (handlerType == null) {
             throw new FlowableIllegalArgumentException("Provided handlerType is null");
@@ -71,11 +73,13 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
         return this;
     }
 
+    @Override
     public HistoryJobQuery withException() {
         this.withException = true;
         return this;
     }
 
+    @Override
     public HistoryJobQuery exceptionMessage(String exceptionMessage) {
         if (exceptionMessage == null) {
             throw new FlowableIllegalArgumentException("Provided exception message is null");
@@ -84,6 +88,7 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
         return this;
     }
 
+    @Override
     public HistoryJobQuery jobTenantId(String tenantId) {
         if (tenantId == null) {
             throw new FlowableIllegalArgumentException("Provided tenant id is null");
@@ -92,6 +97,7 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
         return this;
     }
 
+    @Override
     public HistoryJobQuery jobTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
             throw new FlowableIllegalArgumentException("Provided tenant id is null");
@@ -100,21 +106,25 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
         return this;
     }
 
+    @Override
     public HistoryJobQuery jobWithoutTenantId() {
         this.withoutTenantId = true;
         return this;
     }
 
+    @Override
     public HistoryJobQuery lockOwner(String lockOwner) {
         this.lockOwner = lockOwner;
         return this;
     }
 
+    @Override
     public HistoryJobQuery locked() {
         this.onlyLocked = true;
         return this;
     }
 
+    @Override
     public HistoryJobQuery unlocked() {
         this.onlyUnlocked = true;
         return this;
@@ -122,37 +132,45 @@ public class HistoryJobQueryImpl extends AbstractQuery<HistoryJobQuery, HistoryJ
 
     // sorting //////////////////////////////////////////
 
+    @Override
     public HistoryJobQuery orderByJobDuedate() {
         return orderBy(JobQueryProperty.DUEDATE);
     }
 
+    @Override
     public HistoryJobQuery orderByExecutionId() {
         return orderBy(JobQueryProperty.EXECUTION_ID);
     }
 
+    @Override
     public HistoryJobQuery orderByJobId() {
         return orderBy(JobQueryProperty.JOB_ID);
     }
 
+    @Override
     public HistoryJobQuery orderByProcessInstanceId() {
         return orderBy(JobQueryProperty.PROCESS_INSTANCE_ID);
     }
 
+    @Override
     public HistoryJobQuery orderByJobRetries() {
         return orderBy(JobQueryProperty.RETRIES);
     }
 
+    @Override
     public HistoryJobQuery orderByTenantId() {
         return orderBy(JobQueryProperty.TENANT_ID);
     }
 
     // results //////////////////////////////////////////
 
+    @Override
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
         return CommandContextUtil.getHistoryJobEntityManager(commandContext).findHistoryJobCountByQueryCriteria(this);
     }
 
+    @Override
     public List<HistoryJob> executeList(CommandContext commandContext) {
         checkQueryOk();
         return CommandContextUtil.getHistoryJobEntityManager(commandContext).findHistoryJobsByQueryCriteria(this);

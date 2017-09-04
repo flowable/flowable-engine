@@ -41,6 +41,7 @@ public class DeleteDeadLetterJobCmd implements Command<Object>, Serializable {
         this.timerJobId = timerJobId;
     }
 
+    @Override
     public Object execute(CommandContext commandContext) {
         DeadLetterJobEntity jobToDelete = getJobToDelete(commandContext);
 

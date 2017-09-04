@@ -79,6 +79,7 @@ public class ShellActivityBehavior extends AbstractBpmnActivityBehavior {
 
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
         ActivityExecution activityExecution = (ActivityExecution) execution;
         readFields(activityExecution);

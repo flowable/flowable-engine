@@ -29,6 +29,7 @@ public class ActivitiErrorEventImpl extends ActivitiActivityEventImpl implements
         super(type);
     }
 
+    @Override
     public String getErrorId() {
         return errorId;
     }

@@ -17,6 +17,7 @@ package org.flowable.bpmn.model;
  */
 public class FlowableHttpResponseHandler extends AbstractFlowableHttpHandler {
 
+    @Override
     public FlowableHttpResponseHandler clone() {
         FlowableHttpResponseHandler clone = new FlowableHttpResponseHandler();
         clone.setValues(this);

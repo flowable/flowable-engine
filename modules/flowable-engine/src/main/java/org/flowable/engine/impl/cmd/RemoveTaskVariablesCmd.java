@@ -36,6 +36,7 @@ public class RemoveTaskVariablesCmd extends NeedsActiveTaskCmd<Void> {
         this.isLocal = isLocal;
     }
 
+    @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
 
         if (task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {

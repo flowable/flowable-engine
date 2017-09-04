@@ -25,6 +25,7 @@ public class DebugFlowableEngineAgendaFactory implements FlowableEngineAgendaFac
         this.debugger = debugger;
     }
 
+    @Override
     public FlowableEngineAgenda createAgenda(CommandContext commandContext) {
         return new DebugFlowableEngineAgenda(commandContext, debugger);
     }

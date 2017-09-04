@@ -32,6 +32,7 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
 
     private static final String GONZO = "gonzo";
 
+    @Override
     public void setUp() throws Exception {
         super.setUp();
 
@@ -53,6 +54,7 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
         identityService.createMembership(GONZO, "sales");
     }
 
+    @Override
     public void tearDown() throws Exception {
         identityService.deleteUser(KERMIT);
         identityService.deleteUser(GONZO);

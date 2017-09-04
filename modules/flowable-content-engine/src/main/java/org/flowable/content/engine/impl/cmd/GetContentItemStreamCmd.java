@@ -37,6 +37,7 @@ public class GetContentItemStreamCmd implements Command<InputStream>, Serializab
         this.contentItemId = contentItemId;
     }
 
+    @Override
     public InputStream execute(CommandContext commandContext) {
         if (contentItemId == null) {
             throw new FlowableIllegalArgumentException("contentItemId is null");

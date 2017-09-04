@@ -37,6 +37,7 @@ public class BpmnDeploymentListener implements ArtifactUrlTransformer {
 
     private DocumentBuilderFactory dbf;
 
+    @Override
     public boolean canHandle(File artifact) {
         try {
             if (artifact.isFile() && artifact.getName().endsWith(".xml")) {
@@ -53,6 +54,7 @@ public class BpmnDeploymentListener implements ArtifactUrlTransformer {
         return false;
     }
 
+    @Override
     public URL transform(URL artifact) {
         try {
             return new URL("bpmn", null, artifact.toString());
@@ -69,12 +71,15 @@ public class BpmnDeploymentListener implements ArtifactUrlTransformer {
         }
         DocumentBuilder db = dbf.newDocumentBuilder();
         db.setErrorHandler(new ErrorHandler() {
+            @Override
             public void warning(SAXParseException exception) throws SAXException {
             }
 
+            @Override
             public void error(SAXParseException exception) throws SAXException {
             }
 
+            @Override
             public void fatalError(SAXParseException exception) throws SAXException {
                 throw exception;
             }

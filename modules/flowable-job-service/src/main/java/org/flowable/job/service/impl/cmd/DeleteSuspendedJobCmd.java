@@ -41,6 +41,7 @@ public class DeleteSuspendedJobCmd implements Command<Object>, Serializable {
         this.suspendedJobId = suspendedJobId;
     }
 
+    @Override
     public Object execute(CommandContext commandContext) {
         SuspendedJobEntity jobToDelete = getJobToDelete(commandContext);
 

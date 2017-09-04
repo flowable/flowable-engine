@@ -23,10 +23,12 @@ import org.flowable.engine.impl.bpmn.parser.BpmnParse;
  */
 public class TimerEventDefinitionParseHandler extends AbstractBpmnParseHandler<TimerEventDefinition> {
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return TimerEventDefinition.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, TimerEventDefinition timerEventDefinition) {
 
         if (bpmnParse.getCurrentFlowElement() instanceof IntermediateCatchEvent) {

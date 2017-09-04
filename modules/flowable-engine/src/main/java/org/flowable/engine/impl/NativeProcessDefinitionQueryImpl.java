@@ -36,10 +36,12 @@ public class NativeProcessDefinitionQueryImpl extends AbstractNativeQuery<Native
 
     // results ////////////////////////////////////////////////////////////////
 
+    @Override
     public List<ProcessDefinition> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findProcessDefinitionsByNativeQuery(parameterMap);
     }
 
+    @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findProcessDefinitionCountByNativeQuery(parameterMap);
     }

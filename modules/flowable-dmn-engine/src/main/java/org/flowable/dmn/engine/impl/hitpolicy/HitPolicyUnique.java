@@ -49,6 +49,7 @@ public class HitPolicyUnique extends AbstractHitPolicy implements EvaluateRuleVa
         }
     }
 
+    @Override
     public void composeDecisionResults(ELExecutionContext executionContext) {
         List<Map<String, Object>> ruleResults = new ArrayList<>(executionContext.getRuleResults().values());
         List<Map<String, Object>> decisionResult = null;

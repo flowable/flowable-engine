@@ -34,10 +34,12 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
  */
 public class CompensationEventHandler implements EventHandler {
 
+    @Override
     public String getEventHandlerType() {
         return CompensateEventSubscriptionEntity.EVENT_TYPE;
     }
 
+    @Override
     public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {
 
         String configuration = eventSubscription.getConfiguration();

@@ -28,18 +28,22 @@ import org.flowable.engine.common.impl.cmd.CustomSqlExecution;
  */
 public class DmnManagementServiceImpl extends ServiceImpl implements DmnManagementService {
 
+    @Override
     public Map<String, Long> getTableCount() {
         return commandExecutor.execute(new GetTableCountCmd());
     }
 
+    @Override
     public String getTableName(Class<?> entityClass) {
         return commandExecutor.execute(new GetTableNameCmd(entityClass));
     }
 
+    @Override
     public TableMetaData getTableMetaData(String tableName) {
         return commandExecutor.execute(new GetTableMetaDataCmd(tableName));
     }
 
+    @Override
     public TablePageQuery createTablePageQuery() {
         return new TablePageQueryImpl(commandExecutor);
     }

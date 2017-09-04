@@ -78,6 +78,7 @@ public class DefaultExpressionManager implements ExpressionManager {
         this.expressionFactory = expressionFactory;
     }
     
+    @Override
     public ELContext getElContext(Map<String, Object> variables) {
         return createElContext(variables);
     }
@@ -105,18 +106,22 @@ public class DefaultExpressionManager implements ExpressionManager {
         return elResolver;
     }
 
+    @Override
     public Map<Object, Object> getBeans() {
         return beans;
     }
 
+    @Override
     public void setBeans(Map<Object, Object> beans) {
         this.beans = beans;
     }
 
+    @Override
     public List<FlowableFunctionDelegate> getFunctionDelegates() {
         return functionDelegates;
     }
 
+    @Override
     public void setFunctionDelegates(List<FlowableFunctionDelegate> functionDelegates) {
         this.functionDelegates = functionDelegates;
     }

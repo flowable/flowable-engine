@@ -47,6 +47,7 @@ public class AcquireAsyncJobsDueRunnable implements Runnable {
         this.jobEntityManager = jobEntityManager;
     }
 
+    @Override
     public synchronized void run() {
         LOGGER.info("starting to acquire async jobs due");
         Thread.currentThread().setName(name);

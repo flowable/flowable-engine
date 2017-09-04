@@ -150,6 +150,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
     protected void makeSureJobDue(final Job job) {
         processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+            @Override
             public Void execute(CommandContext commandContext) {
                 Date currentTime = processEngineConfiguration.getClock().getCurrentTime();
                 CommandContextUtil.getTimerJobService(commandContext).findTimerJobById(job.getId()).setDuedate(new Date(currentTime.getTime() - 10000));
@@ -161,6 +162,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
     protected List<TimerJobEntity> executeAcquireJobsCommand() {
         return processEngineConfiguration.getCommandExecutor().execute(new Command<List<TimerJobEntity>>() {
+            @Override
             public List<TimerJobEntity> execute(CommandContext commandContext) {
                 JobServiceConfiguration jobServiceConfiguration = (JobServiceConfiguration) processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
                 return jobServiceConfiguration.getTimerJobEntityManager().findTimerJobsToExecute(new Page(0, 1));

@@ -26,6 +26,7 @@ import org.flowable.task.service.TaskInfoQueryWrapper;
  */
 public class TaskInfoQueryTest extends PluggableFlowableTestCase {
 
+    @Override
     protected void tearDown() throws Exception {
         for (org.flowable.task.service.Task task : taskService.createTaskQuery().list()) {
             taskService.deleteTask(task.getId(), true);

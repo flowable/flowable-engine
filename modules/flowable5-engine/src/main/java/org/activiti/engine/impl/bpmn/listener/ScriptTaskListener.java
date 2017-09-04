@@ -35,6 +35,7 @@ public class ScriptTaskListener implements TaskListener {
 
     protected boolean autoStoreVariables;
 
+    @Override
     public void notify(DelegateTask delegateTask) {
         if (script == null) {
             throw new IllegalArgumentException("The field 'script' should be set on the TaskListener");

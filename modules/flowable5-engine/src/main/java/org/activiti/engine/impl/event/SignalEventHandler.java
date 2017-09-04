@@ -34,6 +34,7 @@ public class SignalEventHandler extends AbstractEventHandler {
 
     public static final String EVENT_HANDLER_TYPE = "signal";
 
+    @Override
     public String getEventHandlerType() {
         return EVENT_HANDLER_TYPE;
     }

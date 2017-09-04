@@ -25,6 +25,7 @@ import org.flowable.bpmn.model.EndEvent;
  */
 public class EndEventXMLConverter extends BaseBpmnXMLConverter {
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return EndEvent.class;
     }

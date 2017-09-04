@@ -92,6 +92,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return false; // see dynamic query
     }
 
+    @Override
     public ExecutionQueryImpl processDefinitionId(String processDefinitionId) {
         if (processDefinitionId == null) {
             throw new ActivitiIllegalArgumentException("Process definition id is null");
@@ -100,6 +101,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return this;
     }
 
+    @Override
     public ExecutionQueryImpl processDefinitionKey(String processDefinitionKey) {
         if (processDefinitionKey == null) {
             throw new ActivitiIllegalArgumentException("Process definition key is null");
@@ -135,6 +137,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return this;
     }
 
+    @Override
     public ExecutionQueryImpl processInstanceId(String processInstanceId) {
         if (processInstanceId == null) {
             throw new ActivitiIllegalArgumentException("Process instance id is null");
@@ -143,6 +146,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return this;
     }
 
+    @Override
     public ExecutionQuery processInstanceBusinessKey(String businessKey) {
         if (businessKey == null) {
             throw new ActivitiIllegalArgumentException("Business key is null");
@@ -151,6 +155,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return this;
     }
 
+    @Override
     public ExecutionQuery processInstanceBusinessKey(String processInstanceBusinessKey, boolean includeChildExecutions) {
         if (!includeChildExecutions) {
             return processInstanceBusinessKey(processInstanceBusinessKey);
@@ -164,6 +169,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         }
     }
 
+    @Override
     public ExecutionQuery processDefinitionKeys(Set<String> processDefinitionKeys) {
         if (processDefinitionKeys == null) {
             throw new ActivitiIllegalArgumentException("Process definition keys is null");
@@ -172,6 +178,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return this;
     }
 
+    @Override
     public ExecutionQueryImpl executionId(String executionId) {
         if (executionId == null) {
             throw new ActivitiIllegalArgumentException("Execution id is null");
@@ -180,6 +187,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return this;
     }
 
+    @Override
     public ExecutionQueryImpl activityId(String activityId) {
         this.activityId = activityId;
 
@@ -189,6 +197,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return this;
     }
 
+    @Override
     public ExecutionQueryImpl parentId(String parentId) {
         if (parentId == null) {
             throw new ActivitiIllegalArgumentException("Parent id is null");
@@ -197,6 +206,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return this;
     }
 
+    @Override
     public ExecutionQueryImpl executionTenantId(String tenantId) {
         if (tenantId == null) {
             throw new ActivitiIllegalArgumentException("execution tenant id is null");
@@ -205,6 +215,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return this;
     }
 
+    @Override
     public ExecutionQueryImpl executionTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
             throw new ActivitiIllegalArgumentException("execution tenant id is null");
@@ -213,19 +224,23 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return this;
     }
 
+    @Override
     public ExecutionQueryImpl executionWithoutTenantId() {
         this.withoutTenantId = true;
         return this;
     }
 
+    @Override
     public ExecutionQuery signalEventSubscription(String signalName) {
         return eventSubscription("signal", signalName);
     }
 
+    @Override
     public ExecutionQuery signalEventSubscriptionName(String signalName) {
         return eventSubscription("signal", signalName);
     }
 
+    @Override
     public ExecutionQuery messageEventSubscriptionName(String messageName) {
         return eventSubscription("message", messageName);
     }
@@ -244,18 +259,22 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return this;
     }
 
+    @Override
     public ExecutionQuery processVariableValueEquals(String variableName, Object variableValue) {
         return variableValueEquals(variableName, variableValue, false);
     }
 
+    @Override
     public ExecutionQuery processVariableValueEquals(Object variableValue) {
         return variableValueEquals(variableValue, false);
     }
 
+    @Override
     public ExecutionQuery processVariableValueNotEquals(String variableName, Object variableValue) {
         return variableValueNotEquals(variableName, variableValue, false);
     }
 
+    @Override
     public ExecutionQuery processVariableValueEqualsIgnoreCase(String name, String value) {
         return variableValueEqualsIgnoreCase(name, value, false);
     }
@@ -265,10 +284,12 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return variableValueNotEqualsIgnoreCase(name, value, false);
     }
 
+    @Override
     public ExecutionQuery processVariableValueLike(String name, String value) {
         return variableValueLike(name, value, false);
     }
 
+    @Override
     public ExecutionQuery processVariableValueLikeIgnoreCase(String name, String value) {
         return variableValueLikeIgnoreCase(name, value, false);
     }
@@ -279,6 +300,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         return this;
     }
 
+    @Override
     public ExecutionQuery withLocalizationFallback() {
         withLocalizationFallback = true;
         return this;
@@ -286,21 +308,25 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
 
     // ordering ////////////////////////////////////////////////////
 
+    @Override
     public ExecutionQueryImpl orderByProcessInstanceId() {
         this.orderProperty = ExecutionQueryProperty.PROCESS_INSTANCE_ID;
         return this;
     }
 
+    @Override
     public ExecutionQueryImpl orderByProcessDefinitionId() {
         this.orderProperty = ExecutionQueryProperty.PROCESS_DEFINITION_ID;
         return this;
     }
 
+    @Override
     public ExecutionQueryImpl orderByProcessDefinitionKey() {
         this.orderProperty = ExecutionQueryProperty.PROCESS_DEFINITION_KEY;
         return this;
     }
 
+    @Override
     public ExecutionQueryImpl orderByTenantId() {
         this.orderProperty = ExecutionQueryProperty.TENANT_ID;
         return this;
@@ -308,6 +334,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
 
     // results ////////////////////////////////////////////////////
 
+    @Override
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
         ensureVariablesInitialized();
@@ -316,6 +343,7 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
                 .findExecutionCountByQueryCriteria(this);
     }
 
+    @Override
     @SuppressWarnings({"unchecked"})
     public List<Execution> executeList(CommandContext commandContext, Page page) {
         checkQueryOk();

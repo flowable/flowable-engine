@@ -33,6 +33,7 @@ public class HistoryJobMessageListener implements javax.jms.MessageListener {
         this.exceptionHandler = new UnacquireAsyncHistoryJobExceptionHandler();
     }
 
+    @Override
     public void onMessage(final Message message) {
         try {
             if (message instanceof TextMessage) {

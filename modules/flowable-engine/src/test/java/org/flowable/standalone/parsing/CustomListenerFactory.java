@@ -25,6 +25,7 @@ public class CustomListenerFactory extends DefaultListenerFactory {
     @Override
     public TaskListener createExpressionTaskListener(FlowableListener activitiListener) {
         return new TaskListener() {
+            @Override
             public void notify(DelegateTask delegateTask) {
                 CustomListenerFactoryTest.COUNTER.addAndGet(100);
             }

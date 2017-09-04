@@ -38,6 +38,7 @@ public class SetTaskVariablesCmd extends NeedsActiveTaskCmd<Object> {
         this.isLocal = isLocal;
     }
 
+    @Override
     protected Object execute(CommandContext commandContext, TaskEntity task) {
 
         if (task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {

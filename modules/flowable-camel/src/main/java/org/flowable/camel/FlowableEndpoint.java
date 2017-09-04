@@ -78,6 +78,7 @@ public class FlowableEndpoint extends DefaultEndpoint {
         flowableConsumer.getProcessor().process(ex);
     }
 
+    @Override
     public Producer createProducer() throws Exception {
         FlowableProducer producer = new FlowableProducer(this, getTimeout(), getTimeResolution());
         producer.setRuntimeService(runtimeService);
@@ -86,6 +87,7 @@ public class FlowableEndpoint extends DefaultEndpoint {
         return producer;
     }
 
+    @Override
     public Consumer createConsumer(Processor processor) throws Exception {
         return new FlowableConsumer(this, processor);
     }
@@ -101,6 +103,7 @@ public class FlowableEndpoint extends DefaultEndpoint {
         flowableConsumer = null;
     }
 
+    @Override
     public boolean isSingleton() {
         return true;
     }

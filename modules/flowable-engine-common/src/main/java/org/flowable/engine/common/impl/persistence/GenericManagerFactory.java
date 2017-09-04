@@ -36,10 +36,12 @@ public class GenericManagerFactory implements SessionFactory {
         this(implementationClass, implementationClass);
     }
 
+    @Override
     public Class<?> getSessionType() {
         return typeClass;
     }
 
+    @Override
     public Session openSession(CommandContext commandContext) {
         try {
             return implementationClass.newInstance();

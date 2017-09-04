@@ -75,10 +75,12 @@ public class FlowNodeHistoryParseHandler implements BpmnParseHandler {
         supportedElementClasses.add(SubProcess.class);
     }
 
+    @Override
     public Set<Class<? extends BaseElement>> getHandledTypes() {
         return supportedElementClasses;
     }
 
+    @Override
     public void parse(BpmnParse bpmnParse, BaseElement element) {
         ActivityImpl activity = bpmnParse.getCurrentScope().findActivity(element.getId());
         if (element instanceof BoundaryEvent) {

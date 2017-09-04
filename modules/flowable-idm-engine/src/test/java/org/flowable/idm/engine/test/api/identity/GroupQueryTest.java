@@ -27,6 +27,7 @@ import org.flowable.idm.engine.test.PluggableFlowableIdmTestCase;
  */
 public class GroupQueryTest extends PluggableFlowableIdmTestCase {
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
 

@@ -20,6 +20,7 @@ import org.flowable.engine.test.Deployment;
 
 public class FinancialReportProcessTest extends PluggableFlowableTestCase {
 
+    @Override
     public void setUp() throws Exception {
         identityService.saveUser(identityService.newUser("fozzie"));
         identityService.saveUser(identityService.newUser("kermit"));
@@ -31,6 +32,7 @@ public class FinancialReportProcessTest extends PluggableFlowableTestCase {
         identityService.createMembership("kermit", "management");
     }
 
+    @Override
     public void tearDown() throws Exception {
         identityService.deleteUser("fozzie");
         identityService.deleteUser("kermit");

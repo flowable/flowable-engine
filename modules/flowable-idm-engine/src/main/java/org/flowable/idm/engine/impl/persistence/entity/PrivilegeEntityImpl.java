@@ -29,10 +29,12 @@ public class PrivilegeEntityImpl extends AbstractEntity implements PrivilegeEnti
         return state;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }

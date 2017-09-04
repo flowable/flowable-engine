@@ -26,6 +26,7 @@ import org.flowable.dmn.model.InputClause;
  */
 public class InputClauseXMLConverter extends BaseDmnXMLConverter {
 
+    @Override
     public Class<? extends DmnElement> getDmnElementType() {
         return InputClause.class;
     }

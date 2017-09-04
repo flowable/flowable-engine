@@ -37,6 +37,7 @@ public abstract class TimerEventCompatibilityTest extends PluggableFlowableTestC
         final String finalActivityId = activityId;
         commandExecutor.execute(config, new Command<Object>() {
 
+            @Override
             public Object execute(CommandContext commandContext) {
                 DbSqlSession session = CommandContextUtil.getDbSqlSession(commandContext);
                 session.delete(finalJob);
@@ -48,6 +49,7 @@ public abstract class TimerEventCompatibilityTest extends PluggableFlowableTestC
 
         commandExecutor.execute(config, new Command<Object>() {
 
+            @Override
             public Object execute(CommandContext commandContext) {
                 DbSqlSession session = CommandContextUtil.getDbSqlSession(commandContext);
 

@@ -22,6 +22,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
  */
 public class CandidateUserAssignment implements TaskListener {
 
+    @Override
     public void notify(DelegateTask delegateTask) {
         TaskHelper.addCandidateUser((TaskEntity) delegateTask, "kermit");
         TaskHelper.addCandidateUser((TaskEntity) delegateTask, "fozzie");

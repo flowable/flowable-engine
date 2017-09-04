@@ -39,6 +39,7 @@ public class GetEnabledActivitiesForAdhocSubProcessCmd implements Command<List<F
         this.executionId = executionId;
     }
 
+    @Override
     public List<FlowNode> execute(CommandContext commandContext) {
         ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager(commandContext).findById(executionId);
         if (execution == null) {

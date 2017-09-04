@@ -43,6 +43,7 @@ public class SpringDmnEngineConfigurator extends DmnEngineConfigurator {
         initDmnEngine();
     }
 
+    @Override
     protected synchronized DmnEngine initDmnEngine() {
         if (dmnEngineConfiguration == null) {
             throw new FlowableException("DmnEngineConfiguration is required");
@@ -51,6 +52,7 @@ public class SpringDmnEngineConfigurator extends DmnEngineConfigurator {
         return dmnEngineConfiguration.buildDmnEngine();
     }
 
+    @Override
     public SpringDmnEngineConfiguration getDmnEngineConfiguration() {
         return dmnEngineConfiguration;
     }

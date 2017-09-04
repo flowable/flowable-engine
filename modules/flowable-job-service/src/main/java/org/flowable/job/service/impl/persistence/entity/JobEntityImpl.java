@@ -28,6 +28,7 @@ public class JobEntityImpl extends AbstractJobEntityImpl implements JobEntity {
     protected String lockOwner;
     protected Date lockExpirationTime;
 
+    @Override
     @SuppressWarnings("unchecked")
     public Object getPersistentState() {
         Map<String, Object> persistentState = (Map<String, Object>) super.getPersistentState();
@@ -39,18 +40,22 @@ public class JobEntityImpl extends AbstractJobEntityImpl implements JobEntity {
 
     // getters and setters ////////////////////////////////////////////////////////
 
+    @Override
     public String getLockOwner() {
         return lockOwner;
     }
 
+    @Override
     public void setLockOwner(String claimedBy) {
         this.lockOwner = claimedBy;
     }
 
+    @Override
     public Date getLockExpirationTime() {
         return lockExpirationTime;
     }
 
+    @Override
     public void setLockExpirationTime(Date claimedUntil) {
         this.lockExpirationTime = claimedUntil;
     }

@@ -48,10 +48,12 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
         convertersToJsonMap.put(HttpServiceTask.class, ServiceTaskJsonConverter.class);
     }
 
+    @Override
     protected String getStencilId(BaseElement baseElement) {
         return STENCIL_TASK_SERVICE;
     }
 
+    @Override
     protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
         ServiceTask serviceTask = (ServiceTask) baseElement;
 
@@ -121,6 +123,7 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
         }
     }
 
+    @Override
     protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
         ServiceTask task = new ServiceTask();
         if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_SERVICETASK_CLASS, elementNode))) {

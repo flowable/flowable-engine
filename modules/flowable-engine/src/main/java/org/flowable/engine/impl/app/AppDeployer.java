@@ -31,6 +31,7 @@ public class AppDeployer implements Deployer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AppDeployer.class);
 
+    @Override
     public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
         LOGGER.debug("Processing app deployment {}", deployment.getName());
 

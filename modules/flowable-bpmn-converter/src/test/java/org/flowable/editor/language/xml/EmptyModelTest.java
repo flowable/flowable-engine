@@ -39,6 +39,7 @@ public class EmptyModelTest extends AbstractConverterTest {
         }
     }
 
+    @Override
     protected String getResource() {
         return "empty.bpmn";
     }

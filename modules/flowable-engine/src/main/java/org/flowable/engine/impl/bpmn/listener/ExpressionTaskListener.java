@@ -28,6 +28,7 @@ public class ExpressionTaskListener implements TaskListener {
         this.expression = expression;
     }
 
+    @Override
     public void notify(DelegateTask delegateTask) {
         expression.getValue(delegateTask);
     }

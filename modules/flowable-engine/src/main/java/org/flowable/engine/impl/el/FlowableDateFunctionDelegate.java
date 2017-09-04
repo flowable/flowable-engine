@@ -24,18 +24,22 @@ import org.flowable.engine.common.impl.el.AbstractFlowableFunctionDelegate;
  */
 public class FlowableDateFunctionDelegate extends AbstractFlowableFunctionDelegate {
 
+    @Override
     public String prefix() {
         return "date";
     }
 
+    @Override
     public String localName() {
         return "format";
     }
 
+    @Override
     public Class<?> functionClass() {
         return DateUtil.class;
     }
 
+    @Override
     public Method functionMethod() {
         return getSingleObjectParameterMethod();
     }

@@ -43,15 +43,18 @@ public class MybatisGroupDataManager extends AbstractIdmDataManager<GroupEntity>
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<Group> findGroupByQueryCriteria(GroupQueryImpl query) {
         return getDbSqlSession().selectList("selectGroupByQueryCriteria", query);
     }
 
+    @Override
     public long findGroupCountByQueryCriteria(GroupQueryImpl query) {
         return (Long) getDbSqlSession().selectOne("selectGroupCountByQueryCriteria", query);
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<Group> findGroupsByUser(String userId) {
         return getDbSqlSession().selectList("selectGroupsByUserId", userId);
     }
@@ -63,10 +66,12 @@ public class MybatisGroupDataManager extends AbstractIdmDataManager<GroupEntity>
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<Group> findGroupsByNativeQuery(Map<String, Object> parameterMap) {
         return getDbSqlSession().selectListWithRawParameter("selectGroupByNativeQuery", parameterMap);
     }
 
+    @Override
     public long findGroupCountByNativeQuery(Map<String, Object> parameterMap) {
         return (Long) getDbSqlSession().selectOne("selectGroupCountByNativeQuery", parameterMap);
     }

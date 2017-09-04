@@ -34,16 +34,19 @@ public class DmnEngineFactoryBean implements FactoryBean<DmnEngine>, DisposableB
     protected ApplicationContext applicationContext;
     protected DmnEngine dmnEngine;
 
+    @Override
     public void destroy() throws Exception {
         if (dmnEngine != null) {
             dmnEngine.close();
         }
     }
 
+    @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
 
+    @Override
     public DmnEngine getObject() throws Exception {
         configureExpressionManager();
         configureExternallyManagedTransactions();
@@ -67,10 +70,12 @@ public class DmnEngineFactoryBean implements FactoryBean<DmnEngine>, DisposableB
         }
     }
 
+    @Override
     public Class<DmnEngine> getObjectType() {
         return DmnEngine.class;
     }
 
+    @Override
     public boolean isSingleton() {
         return true;
     }

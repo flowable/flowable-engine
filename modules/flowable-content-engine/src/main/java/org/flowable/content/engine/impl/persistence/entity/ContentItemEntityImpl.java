@@ -43,6 +43,7 @@ public class ContentItemEntityImpl extends AbstractEntityNoRevision implements C
     protected String lastModifiedBy;
     protected String tenantId = ContentEngineConfiguration.NO_TENANT_ID;
 
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("name", this.name);
@@ -65,118 +66,147 @@ public class ContentItemEntityImpl extends AbstractEntityNoRevision implements C
     // getters and setters
     // //////////////////////////////////////////////////////
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public String getMimeType() {
         return mimeType;
     }
 
+    @Override
     public void setMimeType(String mimeType) {
         this.mimeType = mimeType;
     }
 
+    @Override
     public String getTaskId() {
         return taskId;
     }
 
+    @Override
     public void setTaskId(String taskId) {
         this.taskId = taskId;
     }
 
+    @Override
     public String getProcessInstanceId() {
         return processInstanceId;
     }
 
+    @Override
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public String getContentStoreId() {
         return contentStoreId;
     }
 
+    @Override
     public void setContentStoreId(String contentStoreId) {
         this.contentStoreId = contentStoreId;
     }
 
+    @Override
     public String getContentStoreName() {
         return contentStoreName;
     }
 
+    @Override
     public void setContentStoreName(String contentStoreName) {
         this.contentStoreName = contentStoreName;
     }
 
+    @Override
     public boolean isContentAvailable() {
         return contentAvailable;
     }
 
+    @Override
     public void setContentAvailable(boolean contentAvailable) {
         this.contentAvailable = contentAvailable;
     }
 
+    @Override
     public String getField() {
         return field;
     }
 
+    @Override
     public void setField(String field) {
         this.field = field;
     }
 
+    @Override
     public Long getContentSize() {
         return contentSize;
     }
 
+    @Override
     public void setContentSize(Long contentSize) {
         this.contentSize = contentSize;
     }
 
+    @Override
     public Date getCreated() {
         return created;
     }
 
+    @Override
     public void setCreated(Date created) {
         this.created = created;
     }
 
+    @Override
     public String getCreatedBy() {
         return createdBy;
     }
 
+    @Override
     public void setCreatedBy(String createdBy) {
         this.createdBy = createdBy;
     }
 
+    @Override
     public Date getLastModified() {
         return lastModified;
     }
 
+    @Override
     public void setLastModified(Date lastModified) {
         this.lastModified = lastModified;
     }
 
+    @Override
     public String getLastModifiedBy() {
         return lastModifiedBy;
     }
 
+    @Override
     public void setLastModifiedBy(String lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 
+    @Override
     public String toString() {
         return "ContentItemEntity[" + id + "]";
     }

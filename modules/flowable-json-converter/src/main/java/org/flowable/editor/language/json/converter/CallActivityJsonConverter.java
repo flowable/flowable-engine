@@ -45,10 +45,12 @@ public class CallActivityJsonConverter extends BaseBpmnJsonConverter {
         convertersToJsonMap.put(CallActivity.class, CallActivityJsonConverter.class);
     }
 
+    @Override
     protected String getStencilId(BaseElement baseElement) {
         return STENCIL_CALL_ACTIVITY;
     }
 
+    @Override
     protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
         CallActivity callActivity = (CallActivity) baseElement;
         if (StringUtils.isNotEmpty(callActivity.getCalledElement())) {
@@ -99,6 +101,7 @@ public class CallActivityJsonConverter extends BaseBpmnJsonConverter {
         propertiesNode.set(propertyName, parametersNode);
     }
 
+    @Override
     protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
         CallActivity callActivity = new CallActivity();
         if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_CALLACTIVITY_CALLEDELEMENT, elementNode))) {

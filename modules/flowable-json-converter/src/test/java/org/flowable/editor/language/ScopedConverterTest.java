@@ -40,6 +40,7 @@ public class ScopedConverterTest extends AbstractConverterTest {
         validateModel(bpmnModel);
     }
 
+    @Override
     protected String getResource() {
         return "test.scopedmodel.json";
     }

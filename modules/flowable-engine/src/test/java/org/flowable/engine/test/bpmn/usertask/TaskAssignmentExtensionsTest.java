@@ -27,6 +27,7 @@ import org.flowable.task.service.TaskQuery;
  */
 public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
 
+    @Override
     public void setUp() throws Exception {
         identityService.saveUser(identityService.newUser("kermit"));
         identityService.saveUser(identityService.newUser("gonzo"));
@@ -40,6 +41,7 @@ public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
         identityService.createMembership("fozzie", "management");
     }
 
+    @Override
     public void tearDown() throws Exception {
         identityService.deleteGroup("accountancy");
         identityService.deleteGroup("management");

@@ -111,6 +111,7 @@ public class FormProperty extends BaseElement {
         this.formValues = formValues;
     }
 
+    @Override
     public FormProperty clone() {
         FormProperty clone = new FormProperty();
         clone.setValues(this);

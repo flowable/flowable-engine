@@ -28,8 +28,10 @@ public interface IdmPropertyEntity extends Entity, HasRevision {
 
     void setValue(String value);
 
+    @Override
     String getId();
 
+    @Override
     Object getPersistentState();
 
 }

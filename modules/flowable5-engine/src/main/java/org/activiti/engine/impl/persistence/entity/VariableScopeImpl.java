@@ -74,22 +74,27 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         }
     }
 
+    @Override
     public Map<String, Object> getVariables() {
         return collectVariables(new HashMap<String, Object>());
     }
 
+    @Override
     public Map<String, VariableInstance> getVariableInstances() {
         return collectVariableInstances(new HashMap<String, VariableInstance>());
     }
 
+    @Override
     public Map<String, Object> getVariables(Collection<String> variableNames) {
         return getVariables(variableNames, true);
     }
 
+    @Override
     public Map<String, VariableInstance> getVariableInstances(Collection<String> variableNames) {
         return getVariableInstances(variableNames, true);
     }
 
+    @Override
     public Map<String, Object> getVariables(Collection<String> variableNames, boolean fetchAllVariables) {
 
         Map<String, Object> requestedVariables = new HashMap<>();
@@ -137,6 +142,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
 
     }
 
+    @Override
     public Map<String, VariableInstance> getVariableInstances(Collection<String> variableNames, boolean fetchAllVariables) {
 
         Map<String, VariableInstance> requestedVariables = new HashMap<>();
@@ -229,10 +235,12 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         return variables;
     }
 
+    @Override
     public Object getVariable(String variableName) {
         return getVariable(variableName, true);
     }
 
+    @Override
     public VariableInstance getVariableInstance(String variableName) {
         return getVariableInstance(variableName, true);
     }
@@ -246,6 +254,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
      * <p>
      * In case 'false' is used, only the specific variable will be fetched.
      */
+    @Override
     public Object getVariable(String variableName, boolean fetchAllVariables) {
         Object value = null;
         VariableInstance variable = getVariableInstance(variableName, fetchAllVariables);
@@ -255,6 +264,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         return value;
     }
 
+    @Override
     public VariableInstance getVariableInstance(String variableName, boolean fetchAllVariables) {
 
         // Transient variable
@@ -312,14 +322,17 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
 
     protected abstract VariableInstanceEntity getSpecificVariable(String variableName);
 
+    @Override
     public Object getVariableLocal(String variableName) {
         return getVariableLocal(variableName, true);
     }
 
+    @Override
     public VariableInstance getVariableInstanceLocal(String variableName) {
         return getVariableInstanceLocal(variableName, true);
     }
 
+    @Override
     public Object getVariableLocal(String variableName, boolean fetchAllVariables) {
         Object value = null;
         VariableInstance variable = getVariableInstanceLocal(variableName, fetchAllVariables);
@@ -329,6 +342,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         return value;
     }
 
+    @Override
     public VariableInstance getVariableInstanceLocal(String variableName, boolean fetchAllVariables) {
 
         if (transientVariabes != null && transientVariabes.containsKey(variableName)) {
@@ -375,6 +389,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         }
     }
 
+    @Override
     public boolean hasVariables() {
         if (transientVariabes != null && !transientVariabes.isEmpty()) {
             return true;
@@ -391,6 +406,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         return false;
     }
 
+    @Override
     public boolean hasVariablesLocal() {
         if (transientVariabes != null && !transientVariabes.isEmpty()) {
             return true;
@@ -399,6 +415,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         return !variableInstances.isEmpty();
     }
 
+    @Override
     public boolean hasVariable(String variableName) {
         if (hasVariableLocal(variableName)) {
             return true;
@@ -410,6 +427,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         return false;
     }
 
+    @Override
     public boolean hasVariableLocal(String variableName) {
         if (transientVariabes != null && transientVariabes.containsKey(variableName)) {
             return true;
@@ -434,10 +452,12 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         return variableNames;
     }
 
+    @Override
     public Set<String> getVariableNames() {
         return collectVariableNames(new HashSet<String>());
     }
 
+    @Override
     public Map<String, Object> getVariablesLocal() {
         Map<String, Object> variables = new HashMap<>();
         ensureVariableInstancesInitialized();
@@ -455,6 +475,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         return variables;
     }
 
+    @Override
     public Map<String, VariableInstance> getVariableInstancesLocal() {
         Map<String, VariableInstance> variables = new HashMap<>();
         ensureVariableInstancesInitialized();
@@ -470,14 +491,17 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         return variables;
     }
 
+    @Override
     public Map<String, Object> getVariablesLocal(Collection<String> variableNames) {
         return getVariablesLocal(variableNames, true);
     }
 
+    @Override
     public Map<String, VariableInstance> getVariableInstancesLocal(Collection<String> variableNames) {
         return getVariableInstancesLocal(variableNames, true);
     }
 
+    @Override
     public Map<String, Object> getVariablesLocal(Collection<String> variableNames, boolean fetchAllVariables) {
         Map<String, Object> requestedVariables = new HashMap<>();
 
@@ -512,6 +536,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         return requestedVariables;
     }
 
+    @Override
     public Map<String, VariableInstance> getVariableInstancesLocal(Collection<String> variableNames, boolean fetchAllVariables) {
         Map<String, VariableInstance> requestedVariables = new HashMap<>();
 
@@ -548,6 +573,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
 
     protected abstract List<VariableInstanceEntity> getSpecificVariables(Collection<String> variableNames);
 
+    @Override
     public Set<String> getVariableNamesLocal() {
         Set<String> variableNames = new HashSet<>();
         if (transientVariabes != null) {
@@ -575,6 +601,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         }
     }
 
+    @Override
     public void setVariables(Map<String, ? extends Object> variables) {
         if (variables != null) {
             for (String variableName : variables.keySet()) {
@@ -583,6 +610,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         }
     }
 
+    @Override
     public void setVariablesLocal(Map<String, ? extends Object> variables) {
         if (variables != null) {
             for (String variableName : variables.keySet()) {
@@ -591,6 +619,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         }
     }
 
+    @Override
     public void removeVariables() {
         ensureVariableInstancesInitialized();
         Set<String> variableNames = new HashSet<>(variableInstances.keySet());
@@ -599,6 +628,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         }
     }
 
+    @Override
     public void removeVariablesLocal() {
         List<String> variableNames = new ArrayList<>(getVariableNamesLocal());
         for (String variableName : variableNames) {
@@ -615,6 +645,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         }
     }
 
+    @Override
     public void removeVariables(Collection<String> variableNames) {
         if (variableNames != null) {
             for (String variableName : variableNames) {
@@ -623,6 +654,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         }
     }
 
+    @Override
     public void removeVariablesLocal(Collection<String> variableNames) {
         if (variableNames != null) {
             for (String variableName : variableNames) {
@@ -631,6 +663,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         }
     }
 
+    @Override
     public void setVariable(String variableName, Object value) {
         setVariable(variableName, value, getSourceActivityExecution(), true);
     }
@@ -640,6 +673,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
      * <p>
      * Setting the fetchAllVariables parameter to true is the default behaviour (ie fetching all variables) Setting the fetchAllVariables parameter to false does not do that.
      */
+    @Override
     public void setVariable(String variableName, Object value, boolean fetchAllVariables) {
         setVariable(variableName, value, getSourceActivityExecution(), fetchAllVariables);
     }
@@ -712,6 +746,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
 
     }
 
+    @Override
     public Object setVariableLocal(String variableName, Object value) {
         return setVariableLocal(variableName, value, getSourceActivityExecution(), true);
     }
@@ -721,6 +756,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
      * <p>
      * Setting the fetchAllVariables parameter to true is the default behaviour (ie fetching all variables) Setting the fetchAllVariables parameter to false does not do that.
      */
+    @Override
     public Object setVariableLocal(String variableName, Object value, boolean fetchAllVariables) {
         return setVariableLocal(variableName, value, getSourceActivityExecution(), fetchAllVariables);
     }
@@ -789,6 +825,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         createVariableInstance(variableName, value, sourceActivityExecution);
     }
 
+    @Override
     public void removeVariable(String variableName) {
         removeVariable(variableName, getSourceActivityExecution());
     }
@@ -809,6 +846,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         }
     }
 
+    @Override
     public void removeVariableLocal(String variableName) {
         removeVariableLocal(variableName, getSourceActivityExecution());
     }
@@ -902,12 +940,14 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
      * Transient variables
      */
 
+    @Override
     public void setTransientVariablesLocal(Map<String, Object> transientVariables) {
         for (String variableName : transientVariables.keySet()) {
             setTransientVariableLocal(variableName, transientVariables.get(variableName));
         }
     }
 
+    @Override
     public void setTransientVariableLocal(String variableName, Object variableValue) {
         if (transientVariabes == null) {
             transientVariabes = new HashMap<>();
@@ -915,12 +955,14 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         transientVariabes.put(variableName, new TransientVariableInstance(variableName, variableValue));
     }
 
+    @Override
     public void setTransientVariables(Map<String, Object> transientVariables) {
         for (String variableName : transientVariables.keySet()) {
             setTransientVariable(variableName, transientVariables.get(variableName));
         }
     }
 
+    @Override
     public void setTransientVariable(String variableName, Object variableValue) {
         VariableScopeImpl parentVariableScope = getParentVariableScope();
         if (parentVariableScope != null) {
@@ -930,6 +972,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         setTransientVariableLocal(variableName, variableValue);
     }
 
+    @Override
     public Object getTransientVariableLocal(String variableName) {
         if (transientVariabes != null) {
             return transientVariabes.get(variableName).getValue();
@@ -937,6 +980,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         return null;
     }
 
+    @Override
     public Map<String, Object> getTransientVariablesLocal() {
         if (transientVariabes != null) {
             Map<String, Object> variables = new HashMap<>();
@@ -949,6 +993,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         }
     }
 
+    @Override
     public Object getTransientVariable(String variableName) {
         if (transientVariabes != null && transientVariabes.containsKey(variableName)) {
             return transientVariabes.get(variableName).getValue();
@@ -962,6 +1007,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         return null;
     }
 
+    @Override
     public Map<String, Object> getTransientVariables() {
         return collectTransientVariables(new HashMap<String, Object>());
     }
@@ -981,18 +1027,21 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         return variables;
     }
 
+    @Override
     public void removeTransientVariableLocal(String variableName) {
         if (transientVariabes != null) {
             transientVariabes.remove(variableName);
         }
     }
 
+    @Override
     public void removeTransientVariablesLocal() {
         if (transientVariabes != null) {
             transientVariabes.clear();
         }
     }
 
+    @Override
     public void removeTransientVariable(String variableName) {
         if (transientVariabes != null && transientVariabes.containsKey(variableName)) {
             removeTransientVariableLocal(variableName);
@@ -1004,6 +1053,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         }
     }
 
+    @Override
     public void removeTransientVariables() {
         removeTransientVariablesLocal();
         VariableScopeImpl parentVariableScope = getParentVariableScope();
@@ -1030,10 +1080,12 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
         this.id = id;
     }
 
+    @Override
     public <T> T getVariable(String variableName, Class<T> variableClass) {
         return variableClass.cast(getVariable(variableName));
     }
 
+    @Override
     public <T> T getVariableLocal(String variableName, Class<T> variableClass) {
         return variableClass.cast(getVariableLocal(variableName));
     }

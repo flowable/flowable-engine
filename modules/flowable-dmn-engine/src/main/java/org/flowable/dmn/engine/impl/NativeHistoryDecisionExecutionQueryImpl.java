@@ -37,10 +37,12 @@ public class NativeHistoryDecisionExecutionQueryImpl extends AbstractNativeQuery
 
     // results ////////////////////////////////////////////////////////////////
 
+    @Override
     public List<DmnHistoricDecisionExecution> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getHistoricDecisionExecutionEntityManager().findHistoricDecisionExecutionsByNativeQuery(parameterMap);
     }
 
+    @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getHistoricDecisionExecutionEntityManager().findHistoricDecisionExecutionCountByNativeQuery(parameterMap);
     }

@@ -39,6 +39,7 @@ public class GetProcessInstanceCommentsCmd implements Command<List<Comment>>, Se
         this.type = type;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<Comment> execute(CommandContext commandContext) {
         if (StringUtils.isNotBlank(type)) {

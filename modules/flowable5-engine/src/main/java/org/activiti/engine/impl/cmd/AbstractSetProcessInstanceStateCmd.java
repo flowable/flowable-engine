@@ -41,6 +41,7 @@ public abstract class AbstractSetProcessInstanceStateCmd implements Command<Void
         this.executionId = executionId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
 
         if (executionId == null) {

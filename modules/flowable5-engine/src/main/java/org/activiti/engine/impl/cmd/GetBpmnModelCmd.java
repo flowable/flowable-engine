@@ -32,6 +32,7 @@ public class GetBpmnModelCmd implements Command<BpmnModel>, Serializable {
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public BpmnModel execute(CommandContext commandContext) {
         if (processDefinitionId == null) {
             throw new ActivitiIllegalArgumentException("processDefinitionId is null");

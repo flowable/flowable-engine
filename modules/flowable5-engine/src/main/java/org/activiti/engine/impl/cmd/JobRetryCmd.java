@@ -60,6 +60,7 @@ public class JobRetryCmd implements Command<Object> {
         this.exception = exception;
     }
 
+    @Override
     public Object execute(CommandContext commandContext) {
         JobEntity job = commandContext.getJobEntityManager().findJobById(jobId);
         if (job == null) {

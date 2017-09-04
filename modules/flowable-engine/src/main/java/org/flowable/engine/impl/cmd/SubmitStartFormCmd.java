@@ -44,6 +44,7 @@ public class SubmitStartFormCmd extends NeedsActiveProcessDefinitionCmd<ProcessI
         this.properties = properties;
     }
 
+    @Override
     protected ProcessInstance execute(CommandContext commandContext, ProcessDefinitionEntity processDefinition) {
         if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
             Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();

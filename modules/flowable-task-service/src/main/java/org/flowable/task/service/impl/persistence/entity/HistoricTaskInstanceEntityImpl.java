@@ -93,6 +93,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements Hi
 
     // persistence //////////////////////////////////////////////////////////////
 
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("name", name);
@@ -115,6 +116,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements Hi
         return persistentState;
     }
     
+    @Override
     public void markEnded(String deleteReason) {
         if (this.endTime == null) {
             this.deleteReason = deleteReason;
@@ -127,62 +129,77 @@ public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements Hi
 
     // getters and setters ////////////////////////////////////////////////////////
 
+    @Override
     public String getExecutionId() {
         return executionId;
     }
 
+    @Override
     public void setExecutionId(String executionId) {
         this.executionId = executionId;
     }
     
+    @Override
     public String getProcessInstanceId() {
         return processInstanceId;
     }
 
+    @Override
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
 
+    @Override
     public Date getStartTime() {
         return startTime;
     }
 
+    @Override
     public Date getEndTime() {
         return endTime;
     }
 
+    @Override
     public Long getDurationInMillis() {
         return durationInMillis;
     }
 
+    @Override
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public void setProcessDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
+    @Override
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
 
+    @Override
     public void setDurationInMillis(Long durationInMillis) {
         this.durationInMillis = durationInMillis;
     }
 
+    @Override
     public String getDeleteReason() {
         return deleteReason;
     }
 
+    @Override
     public void setDeleteReason(String deleteReason) {
         this.deleteReason = deleteReason;
     }
 
+    @Override
     public String getName() {
         if (localizedName != null && localizedName.length() > 0) {
             return localizedName;
@@ -191,14 +208,17 @@ public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements Hi
         }
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public void setLocalizedName(String name) {
         this.localizedName = name;
     }
 
+    @Override
     public String getDescription() {
         if (localizedDescription != null && localizedDescription.length() > 0) {
             return localizedDescription;
@@ -207,26 +227,32 @@ public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements Hi
         }
     }
 
+    @Override
     public void setDescription(String description) {
         this.description = description;
     }
 
+    @Override
     public void setLocalizedDescription(String description) {
         this.localizedDescription = description;
     }
 
+    @Override
     public String getAssignee() {
         return assignee;
     }
 
+    @Override
     public void setAssignee(String assignee) {
         this.assignee = assignee;
     }
 
+    @Override
     public String getTaskDefinitionKey() {
         return taskDefinitionKey;
     }
 
+    @Override
     public void setTaskDefinitionKey(String taskDefinitionKey) {
         this.taskDefinitionKey = taskDefinitionKey;
     }
@@ -236,74 +262,92 @@ public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements Hi
         return getStartTime(); // For backwards compatible reason implemented with createTime and startTime
     }
 
+    @Override
     public String getFormKey() {
         return formKey;
     }
 
+    @Override
     public void setFormKey(String formKey) {
         this.formKey = formKey;
     }
 
+    @Override
     public int getPriority() {
         return priority;
     }
 
+    @Override
     public void setPriority(int priority) {
         this.priority = priority;
     }
 
+    @Override
     public Date getDueDate() {
         return dueDate;
     }
 
+    @Override
     public void setDueDate(Date dueDate) {
         this.dueDate = dueDate;
     }
 
+    @Override
     public String getCategory() {
         return category;
     }
 
+    @Override
     public void setCategory(String category) {
         this.category = category;
     }
 
+    @Override
     public String getOwner() {
         return owner;
     }
 
+    @Override
     public void setOwner(String owner) {
         this.owner = owner;
     }
 
+    @Override
     public String getParentTaskId() {
         return parentTaskId;
     }
 
+    @Override
     public void setParentTaskId(String parentTaskId) {
         this.parentTaskId = parentTaskId;
     }
 
+    @Override
     public Date getClaimTime() {
         return claimTime;
     }
 
+    @Override
     public void setClaimTime(Date claimTime) {
         this.claimTime = claimTime;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 
+    @Override
     public Date getTime() {
         return getStartTime();
     }
 
+    @Override
     public Long getWorkTimeInMillis() {
         if (endTime == null || claimTime == null) {
             return null;
@@ -311,14 +355,17 @@ public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements Hi
         return endTime.getTime() - claimTime.getTime();
     }
 
+    @Override
     public Date getLastUpdateTime() {
         return lastUpdateTime;
     }
 
+    @Override
     public void setLastUpdateTime(Date lastUpdateTime) {
         this.lastUpdateTime = lastUpdateTime;
     }
 
+    @Override
     public Map<String, Object> getTaskLocalVariables() {
         Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
@@ -331,6 +378,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements Hi
         return variables;
     }
 
+    @Override
     public Map<String, Object> getProcessVariables() {
         Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
@@ -343,6 +391,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements Hi
         return variables;
     }
 
+    @Override
     public List<HistoricVariableInstanceEntity> getQueryVariables() {
         if (queryVariables == null && Context.getCommandContext() != null) {
             queryVariables = new HistoricVariableInitializingList();
@@ -350,6 +399,7 @@ public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements Hi
         return queryVariables;
     }
 
+    @Override
     public void setQueryVariables(List<HistoricVariableInstanceEntity> queryVariables) {
         this.queryVariables = queryVariables;
     }

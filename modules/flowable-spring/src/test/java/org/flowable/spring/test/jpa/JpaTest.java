@@ -98,6 +98,7 @@ public class JpaTest extends SpringFlowableTestCase {
             repositoryService.createDeployment().addClasspathResource(pd).deploy();
     }
 
+    @Override
     protected void deleteDeployments() {
         for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
             repositoryService.deleteDeployment(deployment.getId(), true);

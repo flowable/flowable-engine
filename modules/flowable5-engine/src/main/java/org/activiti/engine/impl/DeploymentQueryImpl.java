@@ -51,6 +51,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         super(commandExecutor);
     }
 
+    @Override
     public DeploymentQueryImpl deploymentId(String deploymentId) {
         if (deploymentId == null) {
             throw new ActivitiIllegalArgumentException("Deployment id is null");
@@ -59,6 +60,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl deploymentName(String deploymentName) {
         if (deploymentName == null) {
             throw new ActivitiIllegalArgumentException("deploymentName is null");
@@ -67,6 +69,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl deploymentNameLike(String nameLike) {
         if (nameLike == null) {
             throw new ActivitiIllegalArgumentException("deploymentNameLike is null");
@@ -75,6 +78,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl deploymentCategory(String deploymentCategory) {
         if (deploymentCategory == null) {
             throw new ActivitiIllegalArgumentException("deploymentCategory is null");
@@ -83,6 +87,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl deploymentCategoryNotEquals(String deploymentCategoryNotEquals) {
         if (deploymentCategoryNotEquals == null) {
             throw new ActivitiIllegalArgumentException("deploymentCategoryExclude is null");
@@ -91,6 +96,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl deploymentTenantId(String tenantId) {
         if (tenantId == null) {
             throw new ActivitiIllegalArgumentException("deploymentTenantId is null");
@@ -99,6 +105,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl deploymentTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
             throw new ActivitiIllegalArgumentException("deploymentTenantIdLike is null");
@@ -107,11 +114,13 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl deploymentWithoutTenantId() {
         this.withoutTenantId = true;
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl processDefinitionKey(String key) {
         if (key == null) {
             throw new ActivitiIllegalArgumentException("key is null");
@@ -120,6 +129,7 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
         return this;
     }
 
+    @Override
     public DeploymentQueryImpl processDefinitionKeyLike(String keyLike) {
         if (keyLike == null) {
             throw new ActivitiIllegalArgumentException("keyLike is null");
@@ -130,18 +140,22 @@ public class DeploymentQueryImpl extends AbstractQuery<DeploymentQuery, Deployme
 
     // sorting ////////////////////////////////////////////////////////
 
+    @Override
     public DeploymentQuery orderByDeploymentId() {
         return orderBy(DeploymentQueryProperty.DEPLOYMENT_ID);
     }
 
+    @Override
     public DeploymentQuery orderByDeploymenTime() {
         return orderBy(DeploymentQueryProperty.DEPLOY_TIME);
     }
 
+    @Override
     public DeploymentQuery orderByDeploymentName() {
         return orderBy(DeploymentQueryProperty.DEPLOYMENT_NAME);
     }
 
+    @Override
     public DeploymentQuery orderByTenantId() {
         return orderBy(DeploymentQueryProperty.DEPLOYMENT_TENANT_ID);
     }

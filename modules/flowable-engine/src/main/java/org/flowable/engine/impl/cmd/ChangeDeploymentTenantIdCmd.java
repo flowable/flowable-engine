@@ -41,6 +41,7 @@ public class ChangeDeploymentTenantIdCmd implements Command<Void>, Serializable 
         this.newTenantId = newTenantId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (deploymentId == null) {
             throw new FlowableIllegalArgumentException("deploymentId is null");

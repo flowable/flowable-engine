@@ -39,6 +39,7 @@ public class SubProcessMultiDiagramConverterNoDITest extends AbstractConverterTe
         deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "subprocessmultidiagrammodel-noDI.bpmn";
     }

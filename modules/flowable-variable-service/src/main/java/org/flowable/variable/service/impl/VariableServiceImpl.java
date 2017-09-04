@@ -36,54 +36,67 @@ public class VariableServiceImpl extends ServiceImpl implements VariableService 
         super(variableServiceConfiguration);
     }
     
+    @Override
     public VariableInstanceEntity getVariableInstance(String id) {
         return getVariableInstanceEntityManager().findById(id);
     }
     
+    @Override
     public List<VariableInstanceEntity> findVariableInstancesByTaskId(String taskId) {
         return getVariableInstanceEntityManager().findVariableInstancesByTaskId(taskId);
     }
     
+    @Override
     public List<VariableInstanceEntity> findVariableInstancesByTaskIds(Set<String> taskIds) {
         return getVariableInstanceEntityManager().findVariableInstancesByTaskIds(taskIds);
     }
     
+    @Override
     public List<VariableInstanceEntity> findVariableInstancesByExecutionId(String executionId) {
         return getVariableInstanceEntityManager().findVariableInstancesByExecutionId(executionId);
     }
     
+    @Override
     public List<VariableInstanceEntity> findVariableInstancesByExecutionIds(Set<String> executionIds) {
         return getVariableInstanceEntityManager().findVariableInstancesByExecutionIds(executionIds);
     }
     
+    @Override
     public VariableInstanceEntity findVariableInstanceByTaskAndName(String taskId, String taskName) {
         return getVariableInstanceEntityManager().findVariableInstanceByTaskAndName(taskId, taskName);
     }
     
+    @Override
     public List<VariableInstanceEntity> findVariableInstancesByTaskAndNames(String taskId, Collection<String> taskNames) {
         return getVariableInstanceEntityManager().findVariableInstancesByTaskAndNames(taskId, taskNames);
     }
     
+    @Override
     public VariableInstanceEntity findVariableInstanceByExecutionAndName(String executionId, String taskName) {
         return getVariableInstanceEntityManager().findVariableInstanceByExecutionAndName(executionId, taskName);
     }
     
+    @Override
     public List<VariableInstanceEntity> findVariableInstancesByExecutionAndNames(String executionId, Collection<String> taskNames) {
         return getVariableInstanceEntityManager().findVariableInstancesByExecutionAndNames(executionId, taskNames);
     }
     
+    @Override
     public VariableInstanceEntity createVariableInstance(String name, VariableType type, Object value) {
         return getVariableInstanceEntityManager().create(name, type, value);
     }
     
+    @Override
     public void insertVariableInstance(VariableInstanceEntity variable) {
         getVariableInstanceEntityManager().insert(variable);
     }
     
+    @Override
     public void deleteVariableInstance(VariableInstanceEntity variable) {
         getVariableInstanceEntityManager().delete(variable);
     }
     
+    @Override
     public void deleteVariableInstanceMap(Map<String, VariableInstanceEntity> variableInstances) {
         getVariableInstanceEntityManager().deleteVariableInstanceMap(variableInstances);
     }

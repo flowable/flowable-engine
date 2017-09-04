@@ -33,6 +33,7 @@ public class IsFlowable5ProcessDefinitionCmd implements Command<Boolean>, Serial
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public Boolean execute(CommandContext commandContext) {
         ProcessDefinition processDefinition = CommandContextUtil.getProcessEngineConfiguration(commandContext)
                 .getDeploymentManager()

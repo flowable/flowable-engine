@@ -44,6 +44,7 @@ public class SubmitTaskFormCmd extends NeedsActiveTaskCmd<Void> {
         this.completeTask = completeTask;
     }
 
+    @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
 
         // Backwards compatibility

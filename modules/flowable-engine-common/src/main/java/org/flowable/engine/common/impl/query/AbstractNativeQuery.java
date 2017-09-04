@@ -49,18 +49,21 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> extend
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public T sql(String sqlStatement) {
         this.sqlStatement = sqlStatement;
         return (T) this;
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public T parameter(String name, Object value) {
         parameters.put(name, value);
         return (T) this;
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public U singleResult() {
         this.resultType = ResultType.SINGLE_RESULT;
         if (commandExecutor != null) {
@@ -70,6 +73,7 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> extend
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<U> list() {
         this.resultType = ResultType.LIST;
         if (commandExecutor != null) {
@@ -79,6 +83,7 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> extend
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<U> listPage(int firstResult, int maxResults) {
         this.firstResult = firstResult;
         this.maxResults = maxResults;
@@ -89,6 +94,7 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> extend
         return executeList(Context.getCommandContext(), generateParameterMap());
     }
 
+    @Override
     public long count() {
         this.resultType = ResultType.COUNT;
         if (commandExecutor != null) {
@@ -97,6 +103,7 @@ public abstract class AbstractNativeQuery<T extends NativeQuery<?, ?>, U> extend
         return executeCount(Context.getCommandContext(), generateParameterMap());
     }
 
+    @Override
     public Object execute(CommandContext commandContext) {
         if (resultType == ResultType.LIST) {
             return executeList(commandContext, generateParameterMap());

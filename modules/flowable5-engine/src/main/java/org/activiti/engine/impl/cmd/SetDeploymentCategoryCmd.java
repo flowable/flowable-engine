@@ -34,6 +34,7 @@ public class SetDeploymentCategoryCmd implements Command<Void> {
         this.category = category;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
 
         if (deploymentId == null) {

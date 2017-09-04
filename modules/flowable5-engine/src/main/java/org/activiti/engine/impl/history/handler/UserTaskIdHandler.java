@@ -12,6 +12,7 @@ import org.flowable.task.service.delegate.DelegateTask;
  */
 public class UserTaskIdHandler implements TaskListener {
 
+    @Override
     public void notify(DelegateTask task) {
         Context.getCommandContext().getHistoryManager()
                 .recordTaskId((TaskEntity) task);

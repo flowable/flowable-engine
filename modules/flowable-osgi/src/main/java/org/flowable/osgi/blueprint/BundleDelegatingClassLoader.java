@@ -49,9 +49,11 @@ public class BundleDelegatingClassLoader extends ClassLoader {
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Override
     protected Class findClass(final String name) throws ClassNotFoundException {
         try {
             return AccessController.doPrivileged(new PrivilegedExceptionAction<Class<?>>() {
+                @Override
                 public Class<?> run() throws ClassNotFoundException {
                     return bundle.loadClass(name);
                 }
@@ -67,8 +69,10 @@ public class BundleDelegatingClassLoader extends ClassLoader {
         }
     }
 
+    @Override
     protected URL findResource(final String name) {
         URL resource = AccessController.doPrivileged(new PrivilegedAction<URL>() {
+            @Override
             public URL run() {
                 return bundle.getResource(name);
             }
@@ -80,11 +84,13 @@ public class BundleDelegatingClassLoader extends ClassLoader {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
     protected Enumeration findResources(final String name) throws IOException {
         Enumeration<URL> urls;
         try {
             urls = AccessController.doPrivileged(new PrivilegedExceptionAction<Enumeration<URL>>() {
 
+                @Override
                 public Enumeration<URL> run() throws IOException {
                     return bundle.getResources(name);
                 }
@@ -107,6 +113,7 @@ public class BundleDelegatingClassLoader extends ClassLoader {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
+    @Override
     protected Class loadClass(String name, boolean resolve) throws ClassNotFoundException {
         Class clazz;
         try {

@@ -34,6 +34,7 @@ public class GetAppResourceModelCmd implements Command<AppModel>, Serializable {
         this.deploymentId = deploymentId;
     }
 
+    @Override
     public AppModel execute(CommandContext commandContext) {
         if (deploymentId == null) {
             throw new FlowableIllegalArgumentException("deploymentId is null");

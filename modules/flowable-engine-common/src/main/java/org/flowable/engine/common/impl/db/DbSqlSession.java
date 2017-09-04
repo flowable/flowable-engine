@@ -279,6 +279,7 @@ public class DbSqlSession implements Session {
     // flush
     // ////////////////////////////////////////////////////////////////////
 
+    @Override
     public void flush() {
         determineUpdatedObjects(); // Needs to be done before the removeUnnecessaryOperations, as removeUnnecessaryOperations will remove stuff from the cache
         removeUnnecessaryOperations();
@@ -565,6 +566,7 @@ public class DbSqlSession implements Session {
         }
     }
     
+    @Override
     public void close() {
         sqlSession.close();
     }

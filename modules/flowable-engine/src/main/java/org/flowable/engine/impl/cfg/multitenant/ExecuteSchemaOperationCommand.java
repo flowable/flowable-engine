@@ -35,6 +35,7 @@ public class ExecuteSchemaOperationCommand implements Command<Void> {
         this.schemaOperation = schemaOperation;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         ProcessDbSchemaManager processDbSchemaManager = (ProcessDbSchemaManager) CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager();
         if (ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE.equals(schemaOperation)) {

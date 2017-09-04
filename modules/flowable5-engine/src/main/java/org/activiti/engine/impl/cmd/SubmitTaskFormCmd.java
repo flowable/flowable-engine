@@ -38,6 +38,7 @@ public class SubmitTaskFormCmd extends NeedsActiveTaskCmd<Object> {
         this.completeTask = completeTask;
     }
 
+    @Override
     protected Object execute(CommandContext commandContext, TaskEntity task) {
         commandContext.getHistoryManager().reportFormPropertiesSubmitted(task.getExecution(), properties, taskId);
 

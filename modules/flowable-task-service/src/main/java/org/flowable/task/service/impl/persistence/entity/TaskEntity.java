@@ -32,6 +32,7 @@ public interface TaskEntity extends VariableScope, Task, DelegateTask, Entity, H
 
     void setExecutionId(String executionId);
 
+    @Override
     List<IdentityLinkEntity> getIdentityLinks();
 
     void setCreateTime(Date createTime);
@@ -56,14 +57,17 @@ public interface TaskEntity extends VariableScope, Task, DelegateTask, Entity, H
 
     void forceUpdate();
 
+    @Override
     boolean isDeleted();
 
+    @Override
     void setDeleted(boolean isDeleted);
 
     boolean isCanceled();
 
     void setCanceled(boolean isCanceled);
 
+    @Override
     Date getClaimTime();
 
     void setClaimTime(Date claimTime);

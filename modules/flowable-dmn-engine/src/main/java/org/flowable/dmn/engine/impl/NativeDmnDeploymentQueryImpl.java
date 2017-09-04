@@ -36,10 +36,12 @@ public class NativeDmnDeploymentQueryImpl extends AbstractNativeQuery<NativeDmnD
 
     // results ////////////////////////////////////////////////////////////////
 
+    @Override
     public List<DmnDeployment> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getDeploymentEntityManager(commandContext).findDeploymentsByNativeQuery(parameterMap);
     }
 
+    @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getDeploymentEntityManager(commandContext).findDeploymentCountByNativeQuery(parameterMap);
     }

@@ -41,6 +41,7 @@ public class JuelExpression implements Expression {
         this.expressionText = expressionText;
     }
 
+    @Override
     public Object getValue(VariableScope variableScope) {
         ELContext elContext = Context.getProcessEngineConfiguration().getExpressionManager().getElContext(variableScope);
         try {
@@ -60,6 +61,7 @@ public class JuelExpression implements Expression {
         }
     }
 
+    @Override
     public void setValue(Object value, VariableScope variableScope) {
         ELContext elContext = Context.getProcessEngineConfiguration().getExpressionManager().getElContext(variableScope);
         try {
@@ -80,6 +82,7 @@ public class JuelExpression implements Expression {
         return super.toString();
     }
 
+    @Override
     public String getExpressionText() {
         return expressionText;
     }

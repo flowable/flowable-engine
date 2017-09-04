@@ -22,6 +22,7 @@ public class TaskAllEventsListener implements TaskListener {
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public void notify(DelegateTask delegateTask) {
         String events = (String) delegateTask.getVariable("events");
         if (events == null) {

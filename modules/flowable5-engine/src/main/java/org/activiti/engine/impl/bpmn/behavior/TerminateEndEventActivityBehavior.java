@@ -66,6 +66,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
 
     }
 
+    @Override
     public void execute(DelegateExecution delegateExecution) {
         ActivityExecution execution = (ActivityExecution) delegateExecution;
         ActivityImpl terminateEndEventActivity = (ActivityImpl) execution.getActivity();

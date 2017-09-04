@@ -197,6 +197,7 @@ public class UserTask extends Task {
         this.skipExpression = skipExpression;
     }
 
+    @Override
     public UserTask clone() {
         UserTask clone = new UserTask();
         clone.setValues(this);

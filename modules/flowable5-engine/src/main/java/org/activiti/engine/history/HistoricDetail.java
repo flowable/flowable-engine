@@ -38,5 +38,6 @@ public interface HistoricDetail extends HistoricData {
     String getTaskId();
 
     /** The time when this detail occurred */
+    @Override
     Date getTime();
 }

@@ -38,6 +38,7 @@ public class GetGroupsWithPrivilegeCmd implements Command<List<Group>>, Serializ
         this.name = name;
     }
 
+    @Override
     public List<Group> execute(CommandContext commandContext) {
         return CommandContextUtil.getGroupEntityManager(commandContext).findGroupsByPrivilegeId(name);
     }

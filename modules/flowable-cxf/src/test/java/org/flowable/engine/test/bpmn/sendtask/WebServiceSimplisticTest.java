@@ -24,6 +24,7 @@ import org.flowable.engine.test.bpmn.servicetask.AbstractWebServiceTaskTest;
  */
 public class WebServiceSimplisticTest extends AbstractWebServiceTaskTest {
 
+    @Override
     protected boolean isValidating() {
         return false;
     }

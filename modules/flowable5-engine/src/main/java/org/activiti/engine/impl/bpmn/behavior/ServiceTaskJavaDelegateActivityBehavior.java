@@ -39,6 +39,7 @@ public class ServiceTaskJavaDelegateActivityBehavior extends TaskActivityBehavio
         this.skipExpression = skipExpression;
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
         boolean isSkipExpressionEnabled = SkipExpressionUtil.isSkipExpressionEnabled(execution, skipExpression);
         if (!isSkipExpressionEnabled ||
@@ -52,6 +53,7 @@ public class ServiceTaskJavaDelegateActivityBehavior extends TaskActivityBehavio
         leave((ActivityExecution) execution);
     }
 
+    @Override
     public void notify(DelegateExecution execution) {
         execute(execution);
     }

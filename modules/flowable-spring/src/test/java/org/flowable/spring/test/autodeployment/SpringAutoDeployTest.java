@@ -50,6 +50,7 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         this.repositoryService = applicationContext.getBean(RepositoryService.class);
     }
 
+    @Override
     protected void tearDown() throws Exception {
         removeAllDeployments();
         this.applicationContext = null;

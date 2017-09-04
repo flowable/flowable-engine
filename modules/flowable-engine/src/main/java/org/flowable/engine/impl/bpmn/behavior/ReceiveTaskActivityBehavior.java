@@ -27,10 +27,12 @@ public class ReceiveTaskActivityBehavior extends TaskActivityBehavior {
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public void execute(DelegateExecution execution) {
         // Do nothing: waitstate behavior
     }
 
+    @Override
     public void trigger(DelegateExecution execution, String signalName, Object data) {
         leave(execution);
     }

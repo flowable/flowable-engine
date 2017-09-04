@@ -278,6 +278,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
         }
     }
 
+    @Override
     public void initDbSqlSessionFactory() {
         if (dbSqlSessionFactory == null) {
             dbSqlSessionFactory = createDbSqlSessionFactory();
@@ -293,10 +294,12 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
         initDbSqlSessionFactoryEntitySettings();
     }
 
+    @Override
     public DbSqlSessionFactory createDbSqlSessionFactory() {
         return new DbSqlSessionFactory();
     }
     
+    @Override
     protected void initDbSqlSessionFactoryEntitySettings() {
         for (Class<? extends Entity> clazz : EntityDependencyOrder.INSERT_ORDER) {
             dbSqlSessionFactory.getInsertionOrder().add(clazz);
@@ -310,6 +313,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
     // command executors
     // ////////////////////////////////////////////////////////
 
+    @Override
     public void initCommandExecutors() {
         initDefaultCommandConfig();
         initSchemaCommandConfig();
@@ -318,6 +322,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
         initCommandExecutor();
     }
 
+    @Override
     public void initCommandInterceptors() {
         if (commandInterceptors == null) {
             commandInterceptors = new ArrayList<>();
@@ -337,6 +342,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
         return EngineConfigurationConstants.KEY_CONTENT_ENGINE_CONFIG;
     }
 
+    @Override
     public CommandInterceptor createTransactionInterceptor() {
         return null;
     }
@@ -461,6 +467,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
         return this;
     }
 
+    @Override
     public ContentService getContentService() {
         return contentService;
     }

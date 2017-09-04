@@ -24,11 +24,13 @@ import org.flowable.engine.test.Deployment;
  */
 public class TaskAssignmentCandidateTest extends PluggableFlowableTestCase {
 
+    @Override
     public void setUp() throws Exception {
         identityService.saveGroup(identityService.newGroup("accounting"));
         identityService.saveGroup(identityService.newGroup("management"));
     }
 
+    @Override
     public void tearDown() throws Exception {
         identityService.deleteGroup("accounting");
         identityService.deleteGroup("management");

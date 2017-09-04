@@ -228,6 +228,7 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
         return null;
     }
 
+    @Override
     public Task getTask() {
         if (Context.getCommandContext() != null) {
             throw new FlowableCdiException("Cannot work with tasks in an active command.");
@@ -235,6 +236,7 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
         return getScopedAssociation().getTask();
     }
 
+    @Override
     public void setTask(Task task) {
         if (Context.getCommandContext() != null) {
             throw new FlowableCdiException("Cannot work with tasks in an active command.");

@@ -98,6 +98,7 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
         deleted = true;
     }
 
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         if (longValue != null) {
@@ -121,19 +122,23 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
         return persistentState;
     }
 
+    @Override
     public boolean isDeleted() {
         return deleted;
     }
 
     // lazy initialized relations ///////////////////////////////////////////////
 
+    @Override
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public void setProcessDefinitionId(String processDefinitionId) {
     }
 
+    @Override
     public void setExecutionId(String executionId) {
         this.executionId = executionId;
     }
@@ -152,6 +157,7 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
 
     // value ////////////////////////////////////////////////////////////////////
 
+    @Override
     public Object getValue() {
         if (!type.isCachable() || cachedValue == null) {
             cachedValue = type.getValue(this);
@@ -159,6 +165,7 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
         return cachedValue;
     }
 
+    @Override
     public void setValue(Object value) {
         type.setValue(value, this);
         typeName = type.getTypeName();
@@ -167,10 +174,12 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
 
     // getters and setters //////////////////////////////////////////////////////
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
@@ -191,10 +200,12 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
         this.localizedDescription = localizedDescription;
     }
 
+    @Override
     public String getTypeName() {
         return typeName;
     }
 
+    @Override
     public void setTypeName(String typeName) {
         this.typeName = typeName;
     }
@@ -207,62 +218,77 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
         this.type = type;
     }
 
+    @Override
     public String getProcessInstanceId() {
         return processInstanceId;
     }
 
+    @Override
     public String getProcessDefinitionId() {
         return null;
     }
 
+    @Override
     public String getTaskId() {
         return taskId;
     }
 
+    @Override
     public void setTaskId(String taskId) {
         this.taskId = taskId;
     }
 
+    @Override
     public String getExecutionId() {
         return executionId;
     }
 
+    @Override
     public Long getLongValue() {
         return longValue;
     }
 
+    @Override
     public void setLongValue(Long longValue) {
         this.longValue = longValue;
     }
 
+    @Override
     public Double getDoubleValue() {
         return doubleValue;
     }
 
+    @Override
     public void setDoubleValue(Double doubleValue) {
         this.doubleValue = doubleValue;
     }
 
+    @Override
     public String getTextValue() {
         return textValue;
     }
 
+    @Override
     public void setTextValue(String textValue) {
         this.textValue = textValue;
     }
 
+    @Override
     public String getTextValue2() {
         return textValue2;
     }
 
+    @Override
     public void setTextValue2(String textValue2) {
         this.textValue2 = textValue2;
     }
 
+    @Override
     public Object getCachedValue() {
         return cachedValue;
     }
 
+    @Override
     public void setCachedValue(Object cachedValue) {
         this.cachedValue = cachedValue;
     }

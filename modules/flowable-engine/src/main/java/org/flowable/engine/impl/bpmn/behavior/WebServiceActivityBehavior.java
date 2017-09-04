@@ -81,6 +81,7 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
         itemDefinitionMap.put("http://www.w3.org/2001/XMLSchema:string", new ItemDefinition("http://www.w3.org/2001/XMLSchema:string", new ClassStructureDefinition(String.class)));
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
         BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(execution.getProcessDefinitionId());
         FlowElement flowElement = execution.getCurrentFlowElement();

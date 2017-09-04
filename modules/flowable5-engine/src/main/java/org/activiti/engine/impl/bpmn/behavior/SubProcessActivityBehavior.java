@@ -33,6 +33,7 @@ import org.flowable.engine.delegate.DelegateExecution;
  */
 public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior implements CompositeActivityBehavior {
 
+    @Override
     public void execute(DelegateExecution execution) {
         ActivityExecution activityExecution = (ActivityExecution) execution;
         PvmActivity activity = activityExecution.getActivity();
@@ -55,6 +56,7 @@ public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior imp
         activityExecution.executeActivity(initialActivity);
     }
 
+    @Override
     public void lastExecutionEnded(ActivityExecution execution) {
         ScopeUtil.createEventScopeExecution((ExecutionEntity) execution);
 

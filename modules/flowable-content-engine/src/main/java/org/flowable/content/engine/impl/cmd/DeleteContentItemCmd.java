@@ -35,6 +35,7 @@ public class DeleteContentItemCmd implements Command<Void>, Serializable {
         this.contentItemId = contentItemId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (contentItemId == null) {
             throw new FlowableIllegalArgumentException("contentItemId is null");
