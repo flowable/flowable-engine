@@ -22,6 +22,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
  */
 public class CandidateGroupAssignment implements TaskListener {
 
+    @Override
     public void notify(DelegateTask delegateTask) {
         TaskHelper.addCandidateGroup((TaskEntity) delegateTask, "management");
     }

@@ -38,6 +38,7 @@ public class SimpleSpringProcessTest extends SpringFlowableTestCase {
 
     protected MockEndpoint service2;
 
+    @Override
     public void setUp() throws Exception {
         camelContext.addRoutes(new RouteBuilder() {
 
@@ -59,6 +60,7 @@ public class SimpleSpringProcessTest extends SpringFlowableTestCase {
         service2.reset();
     }
 
+    @Override
     public void tearDown() throws Exception {
         List<Route> routes = camelContext.getRoutes();
         for (Route r : routes) {

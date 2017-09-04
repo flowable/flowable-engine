@@ -273,6 +273,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
      * Mimics a service task that fetches data from a server and stored the whole thing in a transient variable.
      */
     public static class FetchDataServiceTask implements JavaDelegate {
+        @Override
         public void execute(DelegateExecution execution) {
             execution.setTransientVariable("response", "author=kermit;version=3;message=Hello World");
             execution.setTransientVariable("status", 200);
@@ -283,6 +284,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
      * Processes the transient variable and puts the relevant bits in real variables
      */
     public static class ServiceTask02 implements JavaDelegate {
+        @Override
         public void execute(DelegateExecution execution) {
             String response = (String) execution.getTransientVariable("response");
             for (String s : response.split(";")) {
@@ -295,6 +297,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
     }
 
     public static class CombineVariablesExecutionListener implements ExecutionListener {
+        @Override
         public void notify(DelegateExecution execution) {
             String persistentVar1 = (String) execution.getVariable("persistentVar1");
 
@@ -314,6 +317,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
     public static class GetDataDelegate implements JavaDelegate {
         private Expression variableName;
 
+        @Override
         public void execute(DelegateExecution execution) {
             String var = (String) variableName.getValue(execution);
             execution.setTransientVariable(var, "author=kermit;version=3;message=" + var);
@@ -324,6 +328,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
         private Expression dataVariableName;
         private Expression resultVariableName;
 
+        @Override
         public void execute(DelegateExecution execution) {
             String varName = (String) dataVariableName.getValue(execution);
             String resultVar = (String) resultVariableName.getValue(execution);
@@ -339,6 +344,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
     }
 
     public static class MergeTransientVariablesTaskListener implements TaskListener {
+        @Override
         public void notify(DelegateTask delegateTask) {
             Map<String, Object> transientVariables = delegateTask.getTransientVariables();
             List<String> variableNames = new ArrayList(transientVariables.keySet());
@@ -357,6 +363,7 @@ public class TransientVariablesTest extends PluggableFlowableTestCase {
     }
 
     public static class MergeVariableValues implements JavaDelegate {
+        @Override
         public void execute(DelegateExecution execution) {
             Map<String, Object> vars = execution.getVariables();
             List<String> varNames = new ArrayList<>(vars.keySet());

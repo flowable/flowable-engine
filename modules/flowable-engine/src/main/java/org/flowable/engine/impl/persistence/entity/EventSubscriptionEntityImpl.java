@@ -46,6 +46,7 @@ public abstract class EventSubscriptionEntityImpl extends AbstractEntity impleme
         this.created = CommandContextUtil.getProcessEngineConfiguration().getClock().getCurrentTime();
     }
 
+    @Override
     public Object getPersistentState() {
         HashMap<String, Object> persistentState = new HashMap<>();
         persistentState.put("eventName", this.eventName);
@@ -60,30 +61,37 @@ public abstract class EventSubscriptionEntityImpl extends AbstractEntity impleme
 
     // getters & setters ////////////////////////////
 
+    @Override
     public String getEventType() {
         return eventType;
     }
 
+    @Override
     public void setEventType(String eventType) {
         this.eventType = eventType;
     }
 
+    @Override
     public String getEventName() {
         return eventName;
     }
 
+    @Override
     public void setEventName(String eventName) {
         this.eventName = eventName;
     }
 
+    @Override
     public String getExecutionId() {
         return executionId;
     }
 
+    @Override
     public void setExecutionId(String executionId) {
         this.executionId = executionId;
     }
 
+    @Override
     public ExecutionEntity getExecution() {
         if (execution == null && executionId != null) {
             execution = CommandContextUtil.getExecutionEntityManager().findById(executionId);
@@ -91,6 +99,7 @@ public abstract class EventSubscriptionEntityImpl extends AbstractEntity impleme
         return execution;
     }
 
+    @Override
     public void setExecution(ExecutionEntity execution) {
         this.execution = execution;
         if (execution != null) {
@@ -99,50 +108,62 @@ public abstract class EventSubscriptionEntityImpl extends AbstractEntity impleme
         }
     }
 
+    @Override
     public String getProcessInstanceId() {
         return processInstanceId;
     }
 
+    @Override
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public String getConfiguration() {
         return configuration;
     }
 
+    @Override
     public void setConfiguration(String configuration) {
         this.configuration = configuration;
     }
 
+    @Override
     public String getActivityId() {
         return activityId;
     }
 
+    @Override
     public void setActivityId(String activityId) {
         this.activityId = activityId;
     }
 
+    @Override
     public Date getCreated() {
         return created;
     }
 
+    @Override
     public void setCreated(Date created) {
         this.created = created;
     }
 
+    @Override
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
 
+    @Override
     public void setProcessDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }

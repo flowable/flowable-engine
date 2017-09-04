@@ -29,6 +29,7 @@ public class FlowableErrorEventImpl extends FlowableActivityEventImpl implements
         super(type);
     }
 
+    @Override
     public String getErrorId() {
         return errorId;
     }

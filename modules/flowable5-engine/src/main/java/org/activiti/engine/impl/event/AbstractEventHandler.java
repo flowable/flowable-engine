@@ -31,6 +31,7 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
  */
 public abstract class AbstractEventHandler implements EventHandler {
 
+    @Override
     public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {
 
         ExecutionEntity execution = eventSubscription.getExecution();

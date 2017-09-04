@@ -71,6 +71,7 @@ public class EndEventTest extends PluggableFlowableTestCase {
             return succeeded;
         }
 
+        @Override
         public void run() {
             try {
                 taskService.complete(taskId);

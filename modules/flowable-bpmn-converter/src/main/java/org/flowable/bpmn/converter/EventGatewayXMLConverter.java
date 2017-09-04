@@ -25,6 +25,7 @@ import org.flowable.bpmn.model.EventGateway;
  */
 public class EventGatewayXMLConverter extends BaseBpmnXMLConverter {
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return EventGateway.class;
     }

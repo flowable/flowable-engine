@@ -45,6 +45,7 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
         this.transientVariables = transientVariables;
     }
 
+    @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
         // Backwards compatibility
         if (task.getProcessDefinitionId() != null) {

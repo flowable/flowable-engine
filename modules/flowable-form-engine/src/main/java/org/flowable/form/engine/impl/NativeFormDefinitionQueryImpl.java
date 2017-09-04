@@ -36,10 +36,12 @@ public class NativeFormDefinitionQueryImpl extends AbstractNativeQuery<NativeFor
 
     // results ////////////////////////////////////////////////////////////////
 
+    @Override
     public List<FormDefinition> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getFormDefinitionEntityManager(commandContext).findFormDefinitionsByNativeQuery(parameterMap);
     }
 
+    @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getFormDefinitionEntityManager(commandContext).findFormDefinitionCountByNativeQuery(parameterMap);
     }

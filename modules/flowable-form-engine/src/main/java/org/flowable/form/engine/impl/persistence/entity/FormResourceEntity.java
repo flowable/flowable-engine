@@ -32,6 +32,7 @@ public interface FormResourceEntity extends Entity {
 
     void setDeploymentId(String deploymentId);
 
+    @Override
     Object getPersistentState();
 
 }

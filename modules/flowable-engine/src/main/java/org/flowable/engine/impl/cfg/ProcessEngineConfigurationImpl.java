@@ -873,6 +873,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // command executors
     // ////////////////////////////////////////////////////////
 
+    @Override
     public void initCommandExecutors() {
         initDefaultCommandConfig();
         initSchemaCommandConfig();
@@ -881,6 +882,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initCommandExecutor();
     }
 
+    @Override
     public void initCommandInvoker() {
         if (commandInvoker == null) {
             if (enableVerboseExecutionTreeLogging) {
@@ -1129,6 +1131,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     }
 
+    @Override
     protected void initDbSqlSessionFactoryEntitySettings() {
         for (Class<? extends Entity> clazz : EntityDependencyOrder.INSERT_ORDER) {
             // All entities except one of the bpmn engine are bulk inserteable
@@ -2089,16 +2092,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // getters and setters
     // //////////////////////////////////////////////////////
 
+    @Override
     public ProcessEngineConfigurationImpl setEngineName(String processEngineName) {
         this.processEngineName = processEngineName;
         return this;
     }
 
+    @Override
     public ProcessEngineConfigurationImpl setDatabaseSchemaUpdate(String databaseSchemaUpdate) {
         this.databaseSchemaUpdate = databaseSchemaUpdate;
         return this;
     }
 
+    @Override
     public ProcessEngineConfigurationImpl setJdbcUrl(String jdbcUrl) {
         this.jdbcUrl = jdbcUrl;
         return this;
@@ -2116,28 +2122,34 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    @Override
     public List<CommandInterceptor> getCustomPreCommandInterceptors() {
         return customPreCommandInterceptors;
     }
 
+    @Override
     public ProcessEngineConfigurationImpl setCustomPreCommandInterceptors(List<CommandInterceptor> customPreCommandInterceptors) {
         this.customPreCommandInterceptors = customPreCommandInterceptors;
         return this;
     }
 
+    @Override
     public List<CommandInterceptor> getCustomPostCommandInterceptors() {
         return customPostCommandInterceptors;
     }
 
+    @Override
     public ProcessEngineConfigurationImpl setCustomPostCommandInterceptors(List<CommandInterceptor> customPostCommandInterceptors) {
         this.customPostCommandInterceptors = customPostCommandInterceptors;
         return this;
     }
 
+    @Override
     public List<CommandInterceptor> getCommandInterceptors() {
         return commandInterceptors;
     }
 
+    @Override
     public ProcessEngineConfigurationImpl setCommandInterceptors(List<CommandInterceptor> commandInterceptors) {
         this.commandInterceptors = commandInterceptors;
         return this;
@@ -3521,6 +3533,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    @Override
     public ProcessEngineConfigurationImpl setAsyncExecutorActivate(boolean asyncExecutorActivate) {
         this.asyncExecutorActivate = asyncExecutorActivate;
         return this;

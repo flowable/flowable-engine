@@ -21,6 +21,7 @@ import org.flowable.engine.impl.bpmn.parser.BpmnParse;
  */
 public class UserTaskParseHandler extends AbstractActivityBpmnParseHandler<UserTask> {
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return UserTask.class;
     }

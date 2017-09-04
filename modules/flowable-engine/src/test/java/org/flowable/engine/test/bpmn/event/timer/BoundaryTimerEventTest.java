@@ -44,6 +44,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
     public static class MyExecutionListener implements ExecutionListener {
         private static final long serialVersionUID = 1L;
 
+        @Override
         public void notify(DelegateExecution execution) {
             if ("end".equals(execution.getEventName())) {
                 listenerExecutedEndEvent = true;

@@ -26,6 +26,7 @@ public class CommandContextTest extends PluggableFlowableTestCase {
     public void testCommandContextGetCurrentAfterException() {
         try {
             processEngineConfiguration.getCommandExecutor().execute(new Command<Object>() {
+                @Override
                 public Object execute(CommandContext commandContext) {
                     throw new IllegalStateException("here i come!");
                 }

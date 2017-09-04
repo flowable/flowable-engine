@@ -45,6 +45,7 @@ public class ModelEntityImpl extends AbstractEntity implements ModelEntity, Seri
 
     }
 
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("name", this.name);
@@ -63,98 +64,122 @@ public class ModelEntityImpl extends AbstractEntity implements ModelEntity, Seri
 
     // getters and setters ////////////////////////////////////////////////////////
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public String getKey() {
         return key;
     }
 
+    @Override
     public void setKey(String key) {
         this.key = key;
     }
 
+    @Override
     public String getCategory() {
         return category;
     }
 
+    @Override
     public void setCategory(String category) {
         this.category = category;
     }
 
+    @Override
     public Date getCreateTime() {
         return createTime;
     }
 
+    @Override
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 
+    @Override
     public Date getLastUpdateTime() {
         return lastUpdateTime;
     }
 
+    @Override
     public void setLastUpdateTime(Date lastUpdateTime) {
         this.lastUpdateTime = lastUpdateTime;
     }
 
+    @Override
     public Integer getVersion() {
         return version;
     }
 
+    @Override
     public void setVersion(Integer version) {
         this.version = version;
     }
 
+    @Override
     public String getMetaInfo() {
         return metaInfo;
     }
 
+    @Override
     public void setMetaInfo(String metaInfo) {
         this.metaInfo = metaInfo;
     }
 
+    @Override
     public String getDeploymentId() {
         return deploymentId;
     }
 
+    @Override
     public void setDeploymentId(String deploymentId) {
         this.deploymentId = deploymentId;
     }
 
+    @Override
     public String getEditorSourceValueId() {
         return editorSourceValueId;
     }
 
+    @Override
     public void setEditorSourceValueId(String editorSourceValueId) {
         this.editorSourceValueId = editorSourceValueId;
     }
 
+    @Override
     public String getEditorSourceExtraValueId() {
         return editorSourceExtraValueId;
     }
 
+    @Override
     public void setEditorSourceExtraValueId(String editorSourceExtraValueId) {
         this.editorSourceExtraValueId = editorSourceExtraValueId;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 
+    @Override
     public boolean hasEditorSource() {
         return this.editorSourceValueId != null;
     }
 
+    @Override
     public boolean hasEditorSourceExtra() {
         return this.editorSourceExtraValueId != null;
     }

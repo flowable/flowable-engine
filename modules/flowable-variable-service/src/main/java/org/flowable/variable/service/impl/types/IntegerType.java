@@ -19,14 +19,17 @@ public class IntegerType implements VariableType {
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public String getTypeName() {
         return "integer";
     }
 
+    @Override
     public boolean isCachable() {
         return true;
     }
 
+    @Override
     public Object getValue(ValueFields valueFields) {
         if (valueFields.getLongValue() != null) {
             return new Integer(valueFields.getLongValue().intValue());
@@ -34,6 +37,7 @@ public class IntegerType implements VariableType {
         return null;
     }
 
+    @Override
     public void setValue(Object value, ValueFields valueFields) {
         if (value != null) {
             valueFields.setLongValue(((Integer) value).longValue());
@@ -44,6 +48,7 @@ public class IntegerType implements VariableType {
         }
     }
 
+    @Override
     public boolean isAbleToStore(Object value) {
         if (value == null) {
             return true;

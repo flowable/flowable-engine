@@ -65,6 +65,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         this.transientVariables = transientVariables;
     }
 
+    @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
         FormService formService = CommandContextUtil.getFormService();
         if (formService == null) {

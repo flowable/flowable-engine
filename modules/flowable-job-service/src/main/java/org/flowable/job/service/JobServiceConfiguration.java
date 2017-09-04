@@ -121,6 +121,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         initEntityManagers();
     }
     
+    @Override
     public boolean isHistoryLevelAtLeast(HistoryLevel level) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Current history level: {}, level required: {}", historyLevel, level);
@@ -129,6 +130,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         return historyLevel.isAtLeast(level);
     }
 
+    @Override
     public boolean isHistoryEnabled() {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Current history level: {}", historyLevel);
@@ -349,10 +351,12 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         this.commandExecutor = commandExecutor;
     }
 
+    @Override
     public HistoryLevel getHistoryLevel() {
         return historyLevel;
     }
     
+    @Override
     public JobServiceConfiguration setHistoryLevel(HistoryLevel historyLevel) {
         this.historyLevel = historyLevel;
         return this;
@@ -448,10 +452,12 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         return this;
     }
 
+    @Override
     public ObjectMapper getObjectMapper() {
         return objectMapper;
     }
 
+    @Override
     public JobServiceConfiguration setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
         return this;

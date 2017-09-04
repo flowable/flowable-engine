@@ -23,6 +23,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class WebServiceSimplisticTest extends AbstractWebServiceTaskTest {
 
+    @Override
     protected boolean isValidating() {
         return false;
     }

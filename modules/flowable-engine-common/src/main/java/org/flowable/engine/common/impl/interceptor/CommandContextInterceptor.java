@@ -42,6 +42,7 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
         this.commandContextFactory = commandContextFactory;
     }
 
+    @Override
     public <T> T execute(CommandConfig config, Command<T> command) {
         CommandContext commandContext = Context.getCommandContext();
 

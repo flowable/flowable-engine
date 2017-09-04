@@ -23,6 +23,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
  */
 public class DefaultTaskFormHandler extends DefaultFormHandler implements TaskFormHandler {
 
+    @Override
     public TaskFormData createTaskForm(TaskEntity task) {
         TaskFormDataImpl taskFormData = new TaskFormDataImpl();
         

@@ -209,6 +209,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         }
     }
 
+    @Override
     public void delegate(String userId) {
         setDelegationState(DelegationState.PENDING);
         if (getOwner() == null) {
@@ -222,6 +223,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         setAssignee(this.owner, true, true);
     }
 
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("assignee", this.assignee);
@@ -259,6 +261,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         return persistentState;
     }
 
+    @Override
     public int getRevisionNext() {
         return revision + 1;
     }
@@ -399,6 +402,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         getIdentityLinks().removeAll(removedIdentityLinkEntities);
     }
 
+    @Override
     public Set<IdentityLink> getCandidates() {
         Set<IdentityLink> potentialOwners = new HashSet<>();
         for (IdentityLinkEntity identityLinkEntity : getIdentityLinks()) {
@@ -483,12 +487,14 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         }
     }
 
+    @Override
     public String toString() {
         return "Task[id=" + id + ", name=" + name + "]";
     }
 
     // special setters //////////////////////////////////////////////////////////
 
+    @Override
     public void setName(String taskName) {
         this.name = taskName;
 
@@ -505,6 +511,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         this.name = taskName;
     }
 
+    @Override
     public void setDescription(String description) {
         this.description = description;
 
@@ -521,6 +528,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         this.description = description;
     }
 
+    @Override
     public void setAssignee(String assignee) {
         setAssignee(assignee, false, false);
     }
@@ -579,6 +587,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         this.initialAssignee = assignee;
     }
 
+    @Override
     public void setOwner(String owner) {
         setOwner(owner, false);
     }
@@ -616,6 +625,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         this.owner = owner;
     }
 
+    @Override
     public void setDueDate(Date dueDate) {
         setDueDate(dueDate, false);
     }
@@ -642,6 +652,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         this.dueDate = dueDate;
     }
 
+    @Override
     public void setPriority(int priority) {
         setPriority(priority, false);
     }
@@ -668,6 +679,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         this.category = category;
     }
 
+    @Override
     public void setCategory(String category) {
         this.category = category;
 
@@ -683,6 +695,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         this.priority = priority;
     }
 
+    @Override
     public void setParentTaskId(String parentTaskId) {
         this.parentTaskId = parentTaskId;
 
@@ -702,10 +715,12 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         this.taskDefinitionKey = taskDefinitionKey;
     }
 
+    @Override
     public String getFormKey() {
         return formKey;
     }
 
+    @Override
     public void setFormKey(String formKey) {
         this.formKey = formKey;
 
@@ -800,14 +815,17 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
 
     // getters and setters //////////////////////////////////////////////////////
 
+    @Override
     public int getRevision() {
         return revision;
     }
 
+    @Override
     public void setRevision(int revision) {
         this.revision = revision;
     }
 
+    @Override
     public String getName() {
         if (localizedName != null && localizedName.length() > 0) {
             return localizedName;
@@ -820,10 +838,12 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         return localizedName;
     }
 
+    @Override
     public void setLocalizedName(String localizedName) {
         this.localizedName = localizedName;
     }
 
+    @Override
     public String getDescription() {
         if (localizedDescription != null && localizedDescription.length() > 0) {
             return localizedDescription;
@@ -836,18 +856,22 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         return localizedDescription;
     }
 
+    @Override
     public void setLocalizedDescription(String localizedDescription) {
         this.localizedDescription = localizedDescription;
     }
 
+    @Override
     public Date getDueDate() {
         return dueDate;
     }
 
+    @Override
     public int getPriority() {
         return priority;
     }
 
+    @Override
     public Date getCreateTime() {
         return createTime;
     }
@@ -856,14 +880,17 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         this.createTime = createTime;
     }
 
+    @Override
     public String getExecutionId() {
         return executionId;
     }
 
+    @Override
     public String getProcessInstanceId() {
         return processInstanceId;
     }
 
+    @Override
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
@@ -872,6 +899,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public String getAssignee() {
         return assignee;
     }
@@ -880,6 +908,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         this.initialAssignee = assignee;
     }
 
+    @Override
     public String getTaskDefinitionKey() {
         return taskDefinitionKey;
     }
@@ -893,6 +922,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         }
     }
 
+    @Override
     public String getEventName() {
         return eventName;
     }
@@ -927,14 +957,17 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public String getOwner() {
         return owner;
     }
 
+    @Override
     public DelegationState getDelegationState() {
         return delegationState;
     }
 
+    @Override
     public void setDelegationState(DelegationState delegationState) {
         this.delegationState = delegationState;
     }
@@ -955,10 +988,12 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         this.isDeleted = isDeleted;
     }
 
+    @Override
     public String getParentTaskId() {
         return parentTaskId;
     }
 
+    @Override
     public Map<String, VariableInstanceEntity> getVariableInstanceEntities() {
         ensureVariableInstancesInitialized();
         return variableInstances;
@@ -972,14 +1007,17 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         this.suspensionState = suspensionState;
     }
 
+    @Override
     public String getCategory() {
         return category;
     }
 
+    @Override
     public boolean isSuspended() {
         return suspensionState == SuspensionState.SUSPENDED.getStateCode();
     }
 
+    @Override
     public Map<String, Object> getTaskLocalVariables() {
         Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
@@ -992,6 +1030,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         return variables;
     }
 
+    @Override
     public Map<String, Object> getProcessVariables() {
         Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
@@ -1004,10 +1043,12 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
         return variables;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }

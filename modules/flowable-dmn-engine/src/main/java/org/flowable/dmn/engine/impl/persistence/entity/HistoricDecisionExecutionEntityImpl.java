@@ -38,6 +38,7 @@ public class HistoricDecisionExecutionEntityImpl extends AbstractEntityNoRevisio
     protected String tenantId = DmnEngineConfiguration.NO_TENANT_ID;
     protected String executionJson;
 
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("decisionDefinitionId", this.decisionDefinitionId);
@@ -52,86 +53,107 @@ public class HistoricDecisionExecutionEntityImpl extends AbstractEntityNoRevisio
     // getters and setters
     // //////////////////////////////////////////////////////
 
+    @Override
     public String getDecisionDefinitionId() {
         return decisionDefinitionId;
     }
 
+    @Override
     public void setDecisionDefinitionId(String decisionDefinitionId) {
         this.decisionDefinitionId = decisionDefinitionId;
     }
 
+    @Override
     public String getDeploymentId() {
         return deploymentId;
     }
 
+    @Override
     public void setDeploymentId(String deploymentId) {
         this.deploymentId = deploymentId;
     }
 
+    @Override
     public Date getStartTime() {
         return startTime;
     }
 
+    @Override
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
+    @Override
     public Date getEndTime() {
         return endTime;
     }
 
+    @Override
     public void setEndTime(Date endTime) {
         this.endTime = endTime;
     }
 
+    @Override
     public String getInstanceId() {
         return instanceId;
     }
 
+    @Override
     public void setInstanceId(String instanceId) {
         this.instanceId = instanceId;
     }
 
+    @Override
     public String getExecutionId() {
         return executionId;
     }
 
+    @Override
     public void setExecutionId(String executionId) {
         this.executionId = executionId;
     }
 
+    @Override
     public String getActivityId() {
         return activityId;
     }
 
+    @Override
     public void setActivityId(String activityId) {
         this.activityId = activityId;
     }
 
+    @Override
     public boolean isFailed() {
         return failed;
     }
 
+    @Override
     public void setFailed(boolean failed) {
         this.failed = failed;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 
+    @Override
     public String getExecutionJson() {
         return executionJson;
     }
 
+    @Override
     public void setExecutionJson(String executionJson) {
         this.executionJson = executionJson;
     }
     
+    @Override
     public String toString() {
         return "HistoricDecisionExecutionEntity[" + id + "]";
     }

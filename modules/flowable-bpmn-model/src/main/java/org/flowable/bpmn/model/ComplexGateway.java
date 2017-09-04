@@ -17,6 +17,7 @@ package org.flowable.bpmn.model;
  */
 public class ComplexGateway extends Gateway {
 
+    @Override
     public ComplexGateway clone() {
         ComplexGateway clone = new ComplexGateway();
         clone.setValues(this);

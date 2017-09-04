@@ -25,10 +25,12 @@ public class TimerActivateProcessDefinitionHandler extends TimerChangeProcessDef
 
     public static final String TYPE = "activate-processdefinition";
 
+    @Override
     public String getType() {
         return TYPE;
     }
 
+    @Override
     public void execute(Job job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
         JSONObject cfgJson = new JSONObject(configuration);
         String processDefinitionId = job.getProcessDefinitionId();

@@ -38,6 +38,7 @@ public class SpringContentEngineConfigurator extends ContentEngineConfigurator {
         initContentEngine();
     }
 
+    @Override
     protected synchronized ContentEngine initContentEngine() {
         if (contentEngineConfiguration == null) {
             throw new FlowableException("ContentEngineConfiguration is required");
@@ -46,6 +47,7 @@ public class SpringContentEngineConfigurator extends ContentEngineConfigurator {
         return contentEngineConfiguration.buildContentEngine();
     }
 
+    @Override
     public SpringContentEngineConfiguration getContentEngineConfiguration() {
         return contentEngineConfiguration;
     }

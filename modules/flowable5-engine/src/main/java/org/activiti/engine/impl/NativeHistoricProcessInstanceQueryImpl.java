@@ -34,12 +34,14 @@ public class NativeHistoricProcessInstanceQueryImpl extends AbstractNativeQuery<
 
     // results ////////////////////////////////////////////////////////////////
 
+    @Override
     public List<HistoricProcessInstance> executeList(CommandContext commandContext, Map<String, Object> parameterMap, int firstResult, int maxResults) {
         return commandContext
                 .getHistoricProcessInstanceEntityManager()
                 .findHistoricProcessInstancesByNativeQuery(parameterMap, firstResult, maxResults);
     }
 
+    @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
         return commandContext
                 .getHistoricProcessInstanceEntityManager()

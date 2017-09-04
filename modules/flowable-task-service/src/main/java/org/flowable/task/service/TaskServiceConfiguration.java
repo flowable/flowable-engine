@@ -224,21 +224,25 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         return this;
     }
 
+    @Override
     public TaskServiceConfiguration setEnableEventDispatcher(boolean enableEventDispatcher) {
         this.enableEventDispatcher = enableEventDispatcher;
         return this;
     }
 
+    @Override
     public TaskServiceConfiguration setEventDispatcher(FlowableEventDispatcher eventDispatcher) {
         this.eventDispatcher = eventDispatcher;
         return this;
     }
 
+    @Override
     public TaskServiceConfiguration setEventListeners(List<FlowableEventListener> eventListeners) {
         this.eventListeners = eventListeners;
         return this;
     }
 
+    @Override
     public TaskServiceConfiguration setTypedEventListeners(Map<String, List<FlowableEventListener>> typedEventListeners) {
         this.typedEventListeners = typedEventListeners;
         return this;

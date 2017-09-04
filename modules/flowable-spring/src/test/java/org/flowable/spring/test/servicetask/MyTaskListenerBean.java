@@ -26,6 +26,7 @@ public class MyTaskListenerBean implements TaskListener {
 
     private FixedValue someField;
 
+    @Override
     public void notify(DelegateTask delegateTask) {
         ExecutionEntity execution = ExecutionHelper.getExecution(delegateTask.getExecutionId());
         execution.setVariable("taskListenerVar", "working");

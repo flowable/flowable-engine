@@ -151,6 +151,7 @@ public abstract class EventSubscriptionEntity implements PersistentObject, HasRe
         }
     }
 
+    @Override
     public Object getPersistentState() {
         HashMap<String, Object> persistentState = new HashMap<>();
         persistentState.put("executionId", executionId);
@@ -194,22 +195,27 @@ public abstract class EventSubscriptionEntity implements PersistentObject, HasRe
         }
     }
 
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public void setId(String id) {
         this.id = id;
     }
 
+    @Override
     public int getRevision() {
         return revision;
     }
 
+    @Override
     public void setRevision(int revision) {
         this.revision = revision;
     }
 
+    @Override
     public int getRevisionNext() {
         return revision + 1;
     }

@@ -59,6 +59,7 @@ public class RescheduleTimerJobCmd implements Command<TimerJobEntity>, Serializa
         this.calendarName = calendarName;
     }
 
+    @Override
     public TimerJobEntity execute(CommandContext commandContext) {
         TimerEventDefinition ted = new TimerEventDefinition();
         ted.setTimeDate(timeDate);

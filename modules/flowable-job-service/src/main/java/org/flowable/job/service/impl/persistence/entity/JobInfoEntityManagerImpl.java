@@ -39,6 +39,7 @@ public abstract class JobInfoEntityManagerImpl<T extends JobInfoEntity> extends 
         return jobDataManager;
     }
 
+    @Override
     public List<T> findJobsToExecute(Page page) {
         return jobDataManager.findJobsToExecute(page);
     }

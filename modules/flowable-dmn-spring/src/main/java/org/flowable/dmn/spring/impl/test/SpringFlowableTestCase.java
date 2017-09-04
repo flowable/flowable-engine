@@ -62,6 +62,7 @@ public abstract class SpringFlowableTestCase extends AbstractFlowableDmnTestCase
         this.dmnEngine = engine;
     }
 
+    @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }

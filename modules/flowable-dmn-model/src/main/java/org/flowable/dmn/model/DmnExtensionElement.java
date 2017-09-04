@@ -81,6 +81,7 @@ public class DmnExtensionElement extends DmnElement {
         this.childElements = childElements;
     }
 
+    @Override
     public DmnExtensionElement clone() {
         DmnExtensionElement clone = new DmnExtensionElement();
         clone.setValues(this);

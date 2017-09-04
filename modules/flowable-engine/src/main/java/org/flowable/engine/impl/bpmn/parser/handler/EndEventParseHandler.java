@@ -31,6 +31,7 @@ public class EndEventParseHandler extends AbstractActivityBpmnParseHandler<EndEv
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EndEventParseHandler.class);
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return EndEvent.class;
     }

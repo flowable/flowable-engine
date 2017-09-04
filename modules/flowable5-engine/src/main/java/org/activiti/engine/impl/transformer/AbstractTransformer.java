@@ -21,6 +21,7 @@ import org.activiti.engine.ActivitiException;
  */
 public abstract class AbstractTransformer implements Transformer {
 
+    @Override
     public Object transform(Object anObject) {
         try {
             return this.primTransform(anObject);

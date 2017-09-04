@@ -93,6 +93,7 @@ public class DeployInvalidXmlTest extends PluggableFlowableTestCase {
             this.repositoryService = repositoryService;
         }
 
+        @Override
         public void run() {
             try {
                 String deploymentId = repositoryService.createDeployment().addString("test.bpmn20.xml", UNSAFE_XML).deploy().getId();

@@ -30,6 +30,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
  */
 public class CommentEntityManager extends AbstractManager {
 
+    @Override
     public void delete(PersistentObject persistentObject) {
         checkHistoryEnabled();
         super.delete(persistentObject);
@@ -50,6 +51,7 @@ public class CommentEntityManager extends AbstractManager {
         }
     }
 
+    @Override
     public void insert(PersistentObject persistentObject) {
         checkHistoryEnabled();
         super.insert(persistentObject);

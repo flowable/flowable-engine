@@ -20,6 +20,7 @@ public class JobQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     private String deploymentTwoId;
     private String deploymentThreeId;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
 

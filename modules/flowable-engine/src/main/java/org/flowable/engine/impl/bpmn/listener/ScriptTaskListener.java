@@ -35,6 +35,7 @@ public class ScriptTaskListener implements TaskListener {
 
     protected boolean autoStoreVariables;
 
+    @Override
     public void notify(DelegateTask delegateTask) {
         validateParameters();
 

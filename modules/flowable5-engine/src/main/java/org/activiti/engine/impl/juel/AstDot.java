@@ -43,6 +43,7 @@ public class AstDot extends AstProperty {
         b.append(property);
     }
 
+    @Override
     public int getCardinality() {
         return 1;
     }

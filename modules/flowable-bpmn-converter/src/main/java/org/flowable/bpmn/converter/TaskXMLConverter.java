@@ -26,6 +26,7 @@ import org.flowable.bpmn.model.Task;
  */
 public class TaskXMLConverter extends BaseBpmnXMLConverter {
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return Task.class;
     }

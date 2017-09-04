@@ -34,34 +34,42 @@ public class AstMethod extends AstNode {
 		this.params = params;
 	}
 
+	@Override
 	public boolean isLiteralText() {
 		return false;
 	}
 
+	@Override
 	public Class<?> getType(Bindings bindings, ELContext context) {
 		return null;
 	}
 
+	@Override
 	public boolean isReadOnly(Bindings bindings, ELContext context) {
 		return true;
 	}
 
+	@Override
 	public void setValue(Bindings bindings, ELContext context, Object value) {
 		throw new ELException(LocalMessages.get("error.value.set.rvalue", getStructuralId(bindings)));
 	}
 
+	@Override
 	public MethodInfo getMethodInfo(Bindings bindings, ELContext context, Class<?> returnType, Class<?>[] paramTypes) {
 		return null;
 	}
 
+	@Override
 	public boolean isLeftValue() {
 		return false;
 	}
 	
+	@Override
 	public boolean isMethodInvocation() {
 		return true;
 	}
 	
+	@Override
 	public final ValueReference getValueReference(Bindings bindings, ELContext context) {
 		return null;
 	}
@@ -99,14 +107,17 @@ public class AstMethod extends AstNode {
 		return eval(bindings, context, true);
 	}
 
+    @Override
 	public Object invoke(Bindings bindings, ELContext context, Class<?> returnType, Class<?>[] paramTypes, Object[] paramValues) {
 		return eval(bindings, context, false);
 	}
 
+    @Override
 	public int getCardinality() {
 		return 2;
 	}
 
+	@Override
 	public Node getChild(int i) {
 		return i == 0 ? property : i == 1 ? params : null;
 	}

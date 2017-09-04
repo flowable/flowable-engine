@@ -29,30 +29,37 @@ public final class AstText extends AstNode {
 		this.value = value;
 	}
 
+	@Override
 	public boolean isLiteralText() {
 		return true;
 	}
 
+	@Override
 	public boolean isLeftValue() {
 		return false;
 	}
 	
+	@Override
 	public boolean isMethodInvocation() {
 		return false;
 	}
 
+	@Override
 	public Class<?> getType(Bindings bindings, ELContext context) {
 		return null;
 	}
 
+	@Override
 	public boolean isReadOnly(Bindings bindings, ELContext context) {
 		return true;
 	}
 
+	@Override
 	public void setValue(Bindings bindings, ELContext context, Object value) {
 		throw new ELException(LocalMessages.get("error.value.set.rvalue", getStructuralId(bindings)));
 	}
 
+	@Override
 	public ValueReference getValueReference(Bindings bindings, ELContext context) {
 		return null;
 	}
@@ -62,10 +69,12 @@ public final class AstText extends AstNode {
 		return value;
 	}
 
+	@Override
 	public MethodInfo getMethodInfo(Bindings bindings, ELContext context, Class<?> returnType, Class<?>[] paramTypes) {
 		return null;
 	}
 
+	@Override
 	public Object invoke(Bindings bindings, ELContext context, Class<?> returnType, Class<?>[] paramTypes, Object[] paramValues) {
 		return returnType == null ? value : bindings.convert(value, returnType);
 	}
@@ -90,10 +99,12 @@ public final class AstText extends AstNode {
 		}
 	}
 
+	@Override
 	public int getCardinality() {
 		return 0;
 	}
 
+	@Override
 	public AstNode getChild(int i) {
 		return null;
 	}

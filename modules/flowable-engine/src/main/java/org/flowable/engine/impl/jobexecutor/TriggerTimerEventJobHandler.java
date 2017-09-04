@@ -27,10 +27,12 @@ public class TriggerTimerEventJobHandler implements JobHandler {
 
     public static final String TYPE = "trigger-timer";
 
+    @Override
     public String getType() {
         return TYPE;
     }
 
+    @Override
     public void execute(JobEntity job, String configuration, Object execution, CommandContext commandContext) {
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
         CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(executionEntity);

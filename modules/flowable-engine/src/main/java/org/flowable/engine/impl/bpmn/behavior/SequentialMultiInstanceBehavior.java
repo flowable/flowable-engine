@@ -38,6 +38,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
     /**
      * Handles the sequential case of spawning the instances. Will only create one instance, since at most one instance can be active.
      */
+    @Override
     protected int createInstances(DelegateExecution multiInstanceRootExecution) {
 
         int nrOfInstances = resolveNrOfInstances(multiInstanceRootExecution);
@@ -69,6 +70,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
      * Called when the wrapped {@link ActivityBehavior} calls the {@link AbstractBpmnActivityBehavior#leave(DelegateExecution)} method. Handles the completion of one instance, and executes the logic
      * for the sequential behavior.
      */
+    @Override
     public void leave(DelegateExecution execution) {
         DelegateExecution multiInstanceRootExecution = getMultiInstanceRootExecution(execution);
         int loopCounter = getLoopVariable(execution, getCollectionElementIndexVariable()) + 1;

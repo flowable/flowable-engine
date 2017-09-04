@@ -93,6 +93,7 @@ public class LDAPGroupQueryImpl extends GroupQueryImpl {
         LDAPTemplate ldapTemplate = new LDAPTemplate(ldapConfigurator);
         return ldapTemplate.execute(new LDAPCallBack<List<Group>>() {
 
+            @Override
             public List<Group> executeInContext(InitialDirContext initialDirContext) {
 
                 List<Group> groups = new ArrayList<>();

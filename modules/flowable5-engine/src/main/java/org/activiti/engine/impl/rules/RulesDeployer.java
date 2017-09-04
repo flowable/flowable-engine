@@ -36,6 +36,7 @@ public class RulesDeployer implements Deployer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RulesDeployer.class);
 
+    @Override
     public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
         LOGGER.debug("Processing deployment {}", deployment.getName());
 

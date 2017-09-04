@@ -125,6 +125,7 @@ public class ValuedDataObjectWithExtensionsConverterTest extends AbstractConvert
         deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "valueddataobjectmodel_with_extensions.bpmn";
     }

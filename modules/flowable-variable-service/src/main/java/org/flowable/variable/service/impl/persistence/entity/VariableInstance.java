@@ -39,12 +39,15 @@ public interface VariableInstance extends ValueFields, Entity, HasRevision {
 
     void setTypeName(String typeName);
     
+    @Override
     String getExecutionId();
 
+    @Override
     String getProcessInstanceId();
     
     String getProcessDefinitionId();
 
+    @Override
     String getTaskId();
 
     void setTaskId(String taskId);

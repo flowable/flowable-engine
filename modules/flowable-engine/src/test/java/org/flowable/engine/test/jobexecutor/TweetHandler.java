@@ -24,10 +24,12 @@ public class TweetHandler implements JobHandler {
 
     List<String> messages = new ArrayList<>();
 
+    @Override
     public String getType() {
         return "tweet";
     }
 
+    @Override
     public void execute(JobEntity job, String configuration, Object execution, CommandContext commandContext) {
         messages.add(configuration);
         Assert.assertNotNull(commandContext);

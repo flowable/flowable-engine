@@ -42,6 +42,7 @@ public class IntermediateCatchSignalEventActivityBehavior extends IntermediateCa
         this.signal = signal;
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
         CommandContext commandContext = Context.getCommandContext();
         ExecutionEntity executionEntity = (ExecutionEntity) execution;

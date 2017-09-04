@@ -584,6 +584,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         }
     }
 
+    @Override
     public List<ExecutionEntity> collectChildren(ExecutionEntity executionEntity) {
         return collectChildren(executionEntity, null);
     }
@@ -699,6 +700,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         return null;
     }
 
+    @Override
     public void deleteRelatedDataForExecution(ExecutionEntity executionEntity, String deleteReason) {
 
         // To start, deactivate the current incoming execution

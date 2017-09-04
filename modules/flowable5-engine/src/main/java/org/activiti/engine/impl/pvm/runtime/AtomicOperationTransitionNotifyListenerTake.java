@@ -32,10 +32,12 @@ public class AtomicOperationTransitionNotifyListenerTake implements AtomicOperat
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AtomicOperationTransitionNotifyListenerTake.class);
 
+    @Override
     public boolean isAsync(InterpretableExecution execution) {
         return false;
     }
 
+    @Override
     public void execute(InterpretableExecution execution) {
         TransitionImpl transition = execution.getTransition();
 

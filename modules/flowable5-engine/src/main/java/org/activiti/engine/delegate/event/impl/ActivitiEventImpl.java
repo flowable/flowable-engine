@@ -49,6 +49,7 @@ public class ActivitiEventImpl implements FlowableEvent {
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public FlowableEngineEventType getType() {
         return type;
     }

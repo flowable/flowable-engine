@@ -63,6 +63,7 @@ public class TimerEventDefinition extends EventDefinition {
         this.calendarName = calendarName;
     }
 
+    @Override
     public TimerEventDefinition clone() {
         TimerEventDefinition clone = new TimerEventDefinition();
         clone.setValues(this);

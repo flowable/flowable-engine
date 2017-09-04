@@ -42,6 +42,7 @@ public class CompleteConverterTest extends AbstractConverterTest {
         validateModel(bpmnModel);
     }
 
+    @Override
     protected String getResource() {
         return "test.completemodel.json";
     }

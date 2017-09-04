@@ -38,6 +38,7 @@ public interface IdentityLinkEntity extends IdentityLink, Entity {
 
     void setProcessDefId(String processDefId);
 
+    @Override
     String getProcessDefinitionId();
 
 }

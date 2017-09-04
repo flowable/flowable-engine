@@ -26,6 +26,7 @@ import org.flowable.bpmn.model.BusinessRuleTask;
  */
 public class BusinessRuleTaskXMLConverter extends BaseBpmnXMLConverter {
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return BusinessRuleTask.class;
     }

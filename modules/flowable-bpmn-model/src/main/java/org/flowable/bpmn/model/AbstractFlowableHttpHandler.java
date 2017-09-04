@@ -61,6 +61,7 @@ public abstract class AbstractFlowableHttpHandler extends BaseElement {
         this.instance = instance;
     }
 
+    @Override
     public abstract AbstractFlowableHttpHandler clone();
 
     public void setValues(AbstractFlowableHttpHandler otherHandler) {

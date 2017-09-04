@@ -43,19 +43,23 @@ public class MybatisTokenDataManager extends AbstractIdmDataManager<TokenEntity>
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<Token> findTokenByQueryCriteria(TokenQueryImpl query) {
         return getDbSqlSession().selectList("selectTokenByQueryCriteria", query);
     }
 
+    @Override
     public long findTokenCountByQueryCriteria(TokenQueryImpl query) {
         return (Long) getDbSqlSession().selectOne("selectTokenCountByQueryCriteria", query);
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<Token> findTokensByNativeQuery(Map<String, Object> parameterMap) {
         return getDbSqlSession().selectListWithRawParameter("selectTokenByNativeQuery", parameterMap);
     }
 
+    @Override
     public long findTokenCountByNativeQuery(Map<String, Object> parameterMap) {
         return (Long) getDbSqlSession().selectOne("selectTokenCountByNativeQuery", parameterMap);
     }

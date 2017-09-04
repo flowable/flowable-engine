@@ -38,6 +38,7 @@ public class GetUsersWithPrivilegeCmd implements Command<List<User>>, Serializab
         this.name = name;
     }
 
+    @Override
     public List<User> execute(CommandContext commandContext) {
         return CommandContextUtil.getUserEntityManager(commandContext).findUsersByPrivilegeId(name);
     }

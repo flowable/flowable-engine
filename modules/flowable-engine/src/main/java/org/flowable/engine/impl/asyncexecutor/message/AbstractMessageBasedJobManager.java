@@ -93,6 +93,7 @@ public abstract class AbstractMessageBasedJobManager extends DefaultJobManager {
         TransactionContext transactionContext = Context.getTransactionContext();
         if (transactionContext != null) {
             Context.getTransactionContext().addTransactionListener(TransactionState.COMMITTED, new TransactionListener() {
+                @Override
                 public void execute(CommandContext commandContext) {
                     sendMessage(job);
                 }
@@ -102,6 +103,7 @@ public abstract class AbstractMessageBasedJobManager extends DefaultJobManager {
             CommandContext commandContext = Context.getCommandContext();
             AsyncHistorySession asyncHistorySession = commandContext.getSession(AsyncHistorySession.class);
             asyncHistorySession.addAsyncHistoryRunnableAfterCommit(new Runnable() {
+                @Override
                 public void run() {
                     sendMessage(job);
                 }

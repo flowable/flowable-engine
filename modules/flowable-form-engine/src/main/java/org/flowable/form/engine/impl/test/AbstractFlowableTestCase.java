@@ -143,6 +143,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
             CommandExecutor commandExecutor = formEngine.getFormEngineConfiguration().getCommandExecutor();
             CommandConfig config = new CommandConfig().transactionNotSupported();
             commandExecutor.execute(config, new Command<Object>() {
+                @Override
                 public Object execute(CommandContext commandContext) {
                     DbSchemaManager dbSchemaManager = CommandContextUtil.getFormEngineConfiguration(commandContext).getDbSchemaManager();
                     dbSchemaManager.dbSchemaDrop();

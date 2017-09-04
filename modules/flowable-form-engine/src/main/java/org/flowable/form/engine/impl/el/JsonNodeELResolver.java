@@ -86,10 +86,12 @@ public class JsonNodeELResolver extends ELResolver {
             JsonNode node = (JsonNode) base;
             final Iterator<String> keys = node.fieldNames();
             return new Iterator<FeatureDescriptor>() {
+                @Override
                 public boolean hasNext() {
                     return keys.hasNext();
                 }
 
+                @Override
                 public FeatureDescriptor next() {
                     Object key = keys.next();
                     FeatureDescriptor feature = new FeatureDescriptor();
@@ -105,6 +107,7 @@ public class JsonNodeELResolver extends ELResolver {
 
                 }
 
+                @Override
                 public void remove() {
                     throw new UnsupportedOperationException("cannot remove");
                 }

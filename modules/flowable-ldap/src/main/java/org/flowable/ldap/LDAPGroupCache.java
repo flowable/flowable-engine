@@ -47,6 +47,7 @@ public class LDAPGroupCache {
 
             private static final long serialVersionUID = 5207574193173514579L;
 
+            @Override
             protected boolean removeEldestEntry(Map.Entry<String, LDAPGroupCacheEntry> eldest) {
                 boolean removeEldest = size() > cacheSize;
 

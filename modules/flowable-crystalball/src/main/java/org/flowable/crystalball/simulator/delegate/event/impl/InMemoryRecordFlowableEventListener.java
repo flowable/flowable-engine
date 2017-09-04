@@ -32,6 +32,7 @@ public class InMemoryRecordFlowableEventListener extends AbstractRecordFlowableE
         events = new HashSet<>();
     }
 
+    @Override
     public Collection<SimulationEvent> getSimulationEvents() {
         return events;
     }

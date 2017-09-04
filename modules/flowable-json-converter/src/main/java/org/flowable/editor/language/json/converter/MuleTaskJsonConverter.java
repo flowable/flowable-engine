@@ -39,14 +39,17 @@ public class MuleTaskJsonConverter extends BaseBpmnJsonConverter {
     public static void fillBpmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
     }
 
+    @Override
     protected String getStencilId(BaseElement baseElement) {
         return STENCIL_TASK_MULE;
     }
 
+    @Override
     protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
         // done in service task
     }
 
+    @Override
     protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
         ServiceTask task = new ServiceTask();
         task.setType("mule");

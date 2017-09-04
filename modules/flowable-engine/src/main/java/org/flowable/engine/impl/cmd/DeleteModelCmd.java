@@ -31,6 +31,7 @@ public class DeleteModelCmd implements Command<Void>, Serializable {
         this.modelId = modelId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (modelId == null) {
             throw new FlowableIllegalArgumentException("modelId is null");

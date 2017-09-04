@@ -38,6 +38,7 @@ public class GetJobExceptionStacktraceCmd implements Command<String>, Serializab
         this.jobType = jobType;
     }
 
+    @Override
     public String execute(CommandContext commandContext) {
         if (jobId == null) {
             throw new FlowableIllegalArgumentException("jobId is null");

@@ -16,6 +16,7 @@ public class FlowableJobRescheduledEventImpl extends FlowableEntityEventImpl imp
         this.rescheduledJobId = rescheduledJobId;
     }
 
+    @Override
     public String getRescheduledJobId() {
         return rescheduledJobId;
     }

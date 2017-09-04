@@ -21,6 +21,7 @@ import org.flowable.engine.common.api.FlowableException;
  */
 public abstract class AbstractTransformer implements Transformer {
 
+    @Override
     public Object transform(Object anObject) {
         try {
             return this.primTransform(anObject);

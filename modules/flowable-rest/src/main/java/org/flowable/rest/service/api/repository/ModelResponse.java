@@ -75,10 +75,12 @@ public class ModelResponse extends ModelRequest {
         this.deploymentUrl = deploymentUrl;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }

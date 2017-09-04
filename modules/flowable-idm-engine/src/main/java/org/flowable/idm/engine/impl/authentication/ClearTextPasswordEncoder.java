@@ -29,10 +29,12 @@ public final class ClearTextPasswordEncoder implements PasswordEncoder {
         return INSTANCE;
     }
 
+    @Override
     public String encode(CharSequence rawPassword, PasswordSalt passwordSalt) {
         return (null == rawPassword) ? null : rawPassword.toString();
     }
 
+    @Override
     public boolean isMatches(CharSequence rawPassword, String encodedPassword, PasswordSalt salt) {
         return rawPassword.toString().equals(encodedPassword);
     }

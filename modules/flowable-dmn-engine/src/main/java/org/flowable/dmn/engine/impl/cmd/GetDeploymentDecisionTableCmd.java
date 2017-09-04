@@ -32,6 +32,7 @@ public class GetDeploymentDecisionTableCmd implements Command<DecisionTableEntit
         this.decisionTableId = decisionTableId;
     }
 
+    @Override
     public DecisionTableEntity execute(CommandContext commandContext) {
         return CommandContextUtil.getDmnEngineConfiguration().getDeploymentManager().findDeployedDecisionById(decisionTableId);
     }

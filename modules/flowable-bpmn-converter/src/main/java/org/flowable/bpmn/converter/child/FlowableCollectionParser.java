@@ -27,6 +27,7 @@ import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
  */
 public class FlowableCollectionParser extends BaseChildElementParser {
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
         if (!(parentElement instanceof MultiInstanceLoopCharacteristics)) {
             return;

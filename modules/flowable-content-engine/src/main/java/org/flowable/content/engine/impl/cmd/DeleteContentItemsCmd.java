@@ -34,6 +34,7 @@ public class DeleteContentItemsCmd implements Command<Void>, Serializable {
         this.taskId = taskId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (processInstanceId == null && taskId == null) {
             throw new FlowableIllegalArgumentException("taskId and processInstanceId are null");

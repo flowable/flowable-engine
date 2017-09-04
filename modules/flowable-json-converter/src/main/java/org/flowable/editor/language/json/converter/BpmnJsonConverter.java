@@ -384,6 +384,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         return modelNode;
     }
 
+    @Override
     public void processFlowElements(FlowElementsContainer container, BpmnModel model, ArrayNode shapesArrayNode,
             Map<String, ModelInfo> formKeyMap, Map<String, ModelInfo> decisionTableKeyMap, double subProcessX, double subProcessY) {
 
@@ -672,6 +673,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         return bpmnModel;
     }
 
+    @Override
     public void processJsonElements(JsonNode shapesArrayNode, JsonNode modelNode, BaseElement parentElement, Map<String, JsonNode> shapeMap,
             Map<String, String> formMap, Map<String, String> decisionTableMap, BpmnModel bpmnModel) {
 

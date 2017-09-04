@@ -28,18 +28,22 @@ import org.flowable.form.engine.impl.cmd.GetTableNameCmd;
  */
 public class FormManagementServiceImpl extends ServiceImpl implements FormManagementService {
 
+    @Override
     public Map<String, Long> getTableCount() {
         return commandExecutor.execute(new GetTableCountCmd());
     }
 
+    @Override
     public String getTableName(Class<?> flowableEntityClass) {
         return commandExecutor.execute(new GetTableNameCmd(flowableEntityClass));
     }
 
+    @Override
     public TableMetaData getTableMetaData(String tableName) {
         return commandExecutor.execute(new GetTableMetaDataCmd(tableName));
     }
 
+    @Override
     public TablePageQuery createTablePageQuery() {
         return new TablePageQueryImpl(commandExecutor);
     }

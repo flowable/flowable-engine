@@ -46,6 +46,7 @@ public class DeleteMultiInstanceExecutionCmd implements Command<Void>, Serializa
         this.executionIsCompleted = executionIsCompleted;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
         ExecutionEntity execution = executionEntityManager.findById(executionId);

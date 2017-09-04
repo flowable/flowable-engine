@@ -50,6 +50,7 @@ public abstract class AstProperty extends AstNode {
 		return prefix;
 	}
 
+	@Override
 	public ValueReference getValueReference(Bindings bindings, ELContext context) {
 		Object base = prefix.eval(bindings, context);
 		if (base == null) {
@@ -80,18 +81,22 @@ public abstract class AstProperty extends AstNode {
 		return result;
 	}
 
+	@Override
 	public final boolean isLiteralText() {
 		return false;
 	}
 
+	@Override
 	public final boolean isLeftValue() {
 		return lvalue;
 	}
 	
+	@Override
 	public boolean isMethodInvocation() {
 		return false;
 	}
 
+	@Override
 	public Class<?> getType(Bindings bindings, ELContext context) {
 		if (!lvalue) {
 			return null;
@@ -112,6 +117,7 @@ public abstract class AstProperty extends AstNode {
 		return result;
 	}
 
+	@Override
 	public boolean isReadOnly(Bindings bindings, ELContext context) throws ELException {
 		if (!lvalue) {
 			return true;
@@ -132,6 +138,7 @@ public abstract class AstProperty extends AstNode {
 		return result;
 	}
 
+	@Override
 	public void setValue(Bindings bindings, ELContext context, Object value) throws ELException {
 		if (!lvalue) {
 			throw new ELException(LocalMessages.get("error.value.set.rvalue", getStructuralId(bindings)));
@@ -175,6 +182,7 @@ public abstract class AstProperty extends AstNode {
 		return method;
 	}
 	
+	@Override
 	public MethodInfo getMethodInfo(Bindings bindings, ELContext context, Class<?> returnType, Class<?>[] paramTypes) {
 		Object base = prefix.eval(bindings, context);
 		if (base == null) {
@@ -189,6 +197,7 @@ public abstract class AstProperty extends AstNode {
 		return new MethodInfo(method.getName(), method.getReturnType(), paramTypes);
 	}
 
+	@Override
 	public Object invoke(Bindings bindings, ELContext context, Class<?> returnType, Class<?>[] paramTypes, Object[] paramValues) {
 		Object base = prefix.eval(bindings, context);
 		if (base == null) {
@@ -211,6 +220,7 @@ public abstract class AstProperty extends AstNode {
 		}
 	}
 
+	@Override
 	public AstNode getChild(int i) {
 		return i == 0 ? prefix : null;
 	}

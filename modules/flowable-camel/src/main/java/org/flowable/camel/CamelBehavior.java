@@ -102,6 +102,7 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
         }
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
         setAppropriateCamelContext(execution);
 

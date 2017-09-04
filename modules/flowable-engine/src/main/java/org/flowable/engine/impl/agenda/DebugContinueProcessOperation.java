@@ -44,6 +44,7 @@ public class DebugContinueProcessOperation extends ContinueProcessOperation {
         this.debugger = debugger;
     }
 
+    @Override
     protected void continueThroughFlowNode(FlowNode flowNode) {
         if (debugger.isBreakpoint(execution)) {
             breakExecution(flowNode);

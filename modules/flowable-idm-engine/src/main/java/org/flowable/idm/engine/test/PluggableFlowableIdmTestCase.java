@@ -40,6 +40,7 @@ public abstract class PluggableFlowableIdmTestCase extends AbstractFlowableIdmTe
 
     protected static IdmEngine cachedIdmEngine;
 
+    @Override
     protected void initializeIdmEngine() {
         if (cachedIdmEngine == null) {
 

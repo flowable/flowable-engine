@@ -58,6 +58,7 @@ public class BpmnError extends ActivitiException {
         return errorCode;
     }
 
+    @Override
     public String toString() {
         return super.toString() + " (errorCode='" + errorCode + "')";
     }

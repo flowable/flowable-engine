@@ -34,6 +34,7 @@ public class InCompleteSignalConverterTest extends AbstractConverterTest {
         validateModel(bpmnModel);
     }
 
+    @Override
     protected String getResource() {
         return "incompletesignalmodel.bpmn";
     }

@@ -231,6 +231,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
 
     // persistent state /////////////////////////////////////////////////////////
 
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("processDefinitionId", this.processDefinitionId);
@@ -269,6 +270,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
 
     // The current flow element, will be filled during operation execution
 
+    @Override
     public FlowElement getCurrentFlowElement() {
         if (currentFlowElement == null) {
             String processDefinitionId = getProcessDefinitionId();
@@ -280,6 +282,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         return currentFlowElement;
     }
 
+    @Override
     public void setCurrentFlowElement(FlowElement currentFlowElement) {
         this.currentFlowElement = currentFlowElement;
         if (currentFlowElement != null) {
@@ -289,10 +292,12 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         }
     }
 
+    @Override
     public FlowableListener getCurrentFlowableListener() {
         return currentListener;
     }
 
+    @Override
     public void setCurrentFlowableListener(FlowableListener currentListener) {
         this.currentListener = currentListener;
     }
@@ -300,6 +305,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
     // executions ///////////////////////////////////////////////////////////////
 
     /** ensures initialization and returns the non-null executions list */
+    @Override
     public List<ExecutionEntityImpl> getExecutions() {
         ensureExecutionsInitialized();
         return executions;
@@ -321,56 +327,69 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
 
     // business key ////////////////////////////////////////////////////////////
 
+    @Override
     public String getBusinessKey() {
         return businessKey;
     }
 
+    @Override
     public void setBusinessKey(String businessKey) {
         this.businessKey = businessKey;
     }
 
+    @Override
     public String getProcessInstanceBusinessKey() {
         return getProcessInstance().getBusinessKey();
     }
 
     // process definition ///////////////////////////////////////////////////////
 
+    @Override
     public void setProcessDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
 
+    @Override
     public String getProcessDefinitionKey() {
         return processDefinitionKey;
     }
 
+    @Override
     public void setProcessDefinitionKey(String processDefinitionKey) {
         this.processDefinitionKey = processDefinitionKey;
     }
 
+    @Override
     public String getProcessDefinitionName() {
         return processDefinitionName;
     }
 
+    @Override
     public void setProcessDefinitionName(String processDefinitionName) {
         this.processDefinitionName = processDefinitionName;
     }
 
+    @Override
     public Integer getProcessDefinitionVersion() {
         return processDefinitionVersion;
     }
 
+    @Override
     public void setProcessDefinitionVersion(Integer processDefinitionVersion) {
         this.processDefinitionVersion = processDefinitionVersion;
     }
 
+    @Override
     public String getDeploymentId() {
         return deploymentId;
     }
 
+    @Override
     public void setDeploymentId(String deploymentId) {
         this.deploymentId = deploymentId;
     }
@@ -378,6 +397,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
     // process instance /////////////////////////////////////////////////////////
 
     /** ensures initialization and returns the process instance. */
+    @Override
     public ExecutionEntityImpl getProcessInstance() {
         ensureProcessInstanceInitialized();
         return processInstance;
@@ -389,6 +409,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         }
     }
 
+    @Override
     public void setProcessInstance(ExecutionEntity processInstance) {
         this.processInstance = (ExecutionEntityImpl) processInstance;
         if (processInstance != null) {
@@ -396,6 +417,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         }
     }
 
+    @Override
     public boolean isProcessInstanceType() {
         return parentId == null;
     }
@@ -403,6 +425,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
     // parent ///////////////////////////////////////////////////////////////////
 
     /** ensures initialization and returns the parent */
+    @Override
     public ExecutionEntityImpl getParent() {
         ensureParentInitialized();
         return parent;
@@ -414,6 +437,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         }
     }
 
+    @Override
     public void setParent(ExecutionEntity parent) {
         this.parent = (ExecutionEntityImpl) parent;
 
@@ -426,15 +450,18 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
 
     // super- and subprocess executions /////////////////////////////////////////
 
+    @Override
     public String getSuperExecutionId() {
         return superExecutionId;
     }
 
+    @Override
     public ExecutionEntityImpl getSuperExecution() {
         ensureSuperExecutionInitialized();
         return superExecution;
     }
 
+    @Override
     public void setSuperExecution(ExecutionEntity superExecution) {
         this.superExecution = (ExecutionEntityImpl) superExecution;
         if (superExecution != null) {
@@ -454,11 +481,13 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         }
     }
 
+    @Override
     public ExecutionEntityImpl getSubProcessInstance() {
         ensureSubProcessInstanceInitialized();
         return subProcessInstance;
     }
 
+    @Override
     public void setSubProcessInstance(ExecutionEntity subProcessInstance) {
         this.subProcessInstance = (ExecutionEntityImpl) subProcessInstance;
     }
@@ -469,6 +498,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         }
     }
 
+    @Override
     public ExecutionEntity getRootProcessInstance() {
         ensureRootProcessInstanceInitialized();
         return rootProcessInstance;
@@ -480,6 +510,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         }
     }
 
+    @Override
     public void setRootProcessInstance(ExecutionEntity rootProcessInstance) {
         this.rootProcessInstance = (ExecutionEntityImpl) rootProcessInstance;
 
@@ -490,24 +521,29 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         }
     }
 
+    @Override
     public String getRootProcessInstanceId() {
         return rootProcessInstanceId;
     }
 
+    @Override
     public void setRootProcessInstanceId(String rootProcessInstanceId) {
         this.rootProcessInstanceId = rootProcessInstanceId;
     }
 
     // scopes ///////////////////////////////////////////////////////////////////
 
+    @Override
     public boolean isScope() {
         return isScope;
     }
 
+    @Override
     public void setScope(boolean isScope) {
         this.isScope = isScope;
     }
 
+    @Override
     public void forceUpdate() {
         this.forcedUpdate = true;
     }
@@ -541,6 +577,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         setVariable(variableName, value, this, fetchAllVariables);
     }
     
+    @Override
     public void setVariable(String variableName, Object value, ExecutionEntity sourceExecution, boolean fetchAllVariables) {
 
         if (fetchAllVariables) {
@@ -750,6 +787,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
 
     // event subscription support //////////////////////////////////////////////
 
+    @Override
     public List<EventSubscriptionEntity> getEventSubscriptions() {
         ensureEventSubscriptionsInitialized();
         return eventSubscriptions;
@@ -763,6 +801,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
 
     // referenced job entities //////////////////////////////////////////////////
 
+    @Override
     public List<JobEntity> getJobs() {
         ensureJobsInitialized();
         return jobs;
@@ -774,6 +813,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         }
     }
 
+    @Override
     public List<TimerJobEntity> getTimerJobs() {
         ensureTimerJobsInitialized();
         return timerJobs;
@@ -793,6 +833,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         }
     }
 
+    @Override
     public List<TaskEntity> getTasks() {
         ensureTasksInitialized();
         return tasks;
@@ -800,6 +841,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
 
     // identity links ///////////////////////////////////////////////////////////
 
+    @Override
     public List<IdentityLinkEntity> getIdentityLinks() {
         ensureIdentityLinksInitialized();
         return identityLinks;
@@ -813,86 +855,107 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
 
     // getters and setters //////////////////////////////////////////////////////
 
+    @Override
     public String getProcessInstanceId() {
         return processInstanceId;
     }
 
+    @Override
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public String getParentId() {
         return parentId;
     }
 
+    @Override
     public void setParentId(String parentId) {
         this.parentId = parentId;
     }
 
+    @Override
     public String getActivityId() {
         return activityId;
     }
 
+    @Override
     public boolean isConcurrent() {
         return isConcurrent;
     }
 
+    @Override
     public void setConcurrent(boolean isConcurrent) {
         this.isConcurrent = isConcurrent;
     }
 
+    @Override
     public boolean isActive() {
         return isActive;
     }
 
+    @Override
     public void setActive(boolean isActive) {
         this.isActive = isActive;
     }
 
+    @Override
     public void inactivate() {
         this.isActive = false;
     }
 
+    @Override
     public boolean isEnded() {
         return isEnded;
     }
 
+    @Override
     public void setEnded(boolean isEnded) {
         this.isEnded = isEnded;
     }
 
+    @Override
     public String getEventName() {
         return eventName;
     }
 
+    @Override
     public void setEventName(String eventName) {
         this.eventName = eventName;
     }
 
+    @Override
     public String getDeleteReason() {
         return deleteReason;
     }
 
+    @Override
     public void setDeleteReason(String deleteReason) {
         this.deleteReason = deleteReason;
     }
 
+    @Override
     public int getSuspensionState() {
         return suspensionState;
     }
 
+    @Override
     public void setSuspensionState(int suspensionState) {
         this.suspensionState = suspensionState;
     }
 
+    @Override
     public boolean isSuspended() {
         return suspensionState == SuspensionState.SUSPENDED.getStateCode();
     }
 
+    @Override
     public boolean isEventScope() {
         return isEventScope;
     }
 
+    @Override
     public void setEventScope(boolean isEventScope) {
         this.isEventScope = isEventScope;
     }
@@ -917,6 +980,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         this.isCountEnabled = isCountEnabled;
     }
 
+    @Override
     public String getCurrentActivityId() {
         return activityId;
     }
@@ -930,10 +994,12 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         }
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public String getDescription() {
         if (localizedDescription != null && localizedDescription.length() > 0) {
             return localizedDescription;
@@ -942,42 +1008,52 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         }
     }
 
+    @Override
     public void setDescription(String description) {
         this.description = description;
     }
 
+    @Override
     public String getLocalizedName() {
         return localizedName;
     }
 
+    @Override
     public void setLocalizedName(String localizedName) {
         this.localizedName = localizedName;
     }
 
+    @Override
     public String getLocalizedDescription() {
         return localizedDescription;
     }
 
+    @Override
     public void setLocalizedDescription(String localizedDescription) {
         this.localizedDescription = localizedDescription;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 
+    @Override
     public Date getLockTime() {
         return lockTime;
     }
 
+    @Override
     public void setLockTime(Date lockTime) {
         this.lockTime = lockTime;
     }
 
+    @Override
     public Map<String, Object> getProcessVariables() {
         Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
@@ -1005,112 +1081,139 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         return activityName;
     }
 
+    @Override
     public String getStartActivityId() {
         return startActivityId;
     }
 
+    @Override
     public void setStartActivityId(String startActivityId) {
         this.startActivityId = startActivityId;
     }
 
+    @Override
     public String getStartUserId() {
         return startUserId;
     }
 
+    @Override
     public void setStartUserId(String startUserId) {
         this.startUserId = startUserId;
     }
 
+    @Override
     public Date getStartTime() {
         return startTime;
     }
 
+    @Override
     public void setStartTime(Date startTime) {
         this.startTime = startTime;
     }
 
+    @Override
     public int getEventSubscriptionCount() {
         return eventSubscriptionCount;
     }
 
+    @Override
     public void setEventSubscriptionCount(int eventSubscriptionCount) {
         this.eventSubscriptionCount = eventSubscriptionCount;
     }
 
+    @Override
     public int getTaskCount() {
         return taskCount;
     }
 
+    @Override
     public void setTaskCount(int taskCount) {
         this.taskCount = taskCount;
     }
 
+    @Override
     public int getJobCount() {
         return jobCount;
     }
 
+    @Override
     public void setJobCount(int jobCount) {
         this.jobCount = jobCount;
     }
 
+    @Override
     public int getTimerJobCount() {
         return timerJobCount;
     }
 
+    @Override
     public void setTimerJobCount(int timerJobCount) {
         this.timerJobCount = timerJobCount;
     }
 
+    @Override
     public int getSuspendedJobCount() {
         return suspendedJobCount;
     }
 
+    @Override
     public void setSuspendedJobCount(int suspendedJobCount) {
         this.suspendedJobCount = suspendedJobCount;
     }
 
+    @Override
     public int getDeadLetterJobCount() {
         return deadLetterJobCount;
     }
 
+    @Override
     public void setDeadLetterJobCount(int deadLetterJobCount) {
         this.deadLetterJobCount = deadLetterJobCount;
     }
 
+    @Override
     public int getVariableCount() {
         return variableCount;
     }
 
+    @Override
     public void setVariableCount(int variableCount) {
         this.variableCount = variableCount;
     }
 
+    @Override
     public int getIdentityLinkCount() {
         return identityLinkCount;
     }
 
+    @Override
     public void setIdentityLinkCount(int identityLinkCount) {
         this.identityLinkCount = identityLinkCount;
     }
     
+    @Override
     public String getCallbackId() {
         return callbackId;
     }
 
+    @Override
     public void setCallbackId(String callbackId) {
         this.callbackId = callbackId;
     }
 
+    @Override
     public String getCallbackType() {
         return callbackType;
     }
 
+    @Override
     public void setCallbackType(String callbackType) {
         this.callbackType = callbackType;
     }
 
     // toString /////////////////////////////////////////////////////////////////
 
+    @Override
     public String toString() {
         if (isProcessInstanceType()) {
             return "ProcessInstance[" + getId() + "]";

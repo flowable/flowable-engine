@@ -369,6 +369,7 @@ public class TypeConverterImpl implements TypeConverter {
         return getClass().hashCode();
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T convert(Object value, Class<T> type) throws ELException {
         return (T) coerceToType(value, type);

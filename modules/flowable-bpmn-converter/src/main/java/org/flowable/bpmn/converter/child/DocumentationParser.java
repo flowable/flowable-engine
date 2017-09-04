@@ -25,10 +25,12 @@ import org.flowable.bpmn.model.Process;
  */
 public class DocumentationParser extends BaseChildElementParser {
 
+    @Override
     public String getElementName() {
         return "documentation";
     }
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
         String docText = xtr.getElementText();
         if (StringUtils.isNotEmpty(docText)) {

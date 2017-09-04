@@ -39,6 +39,7 @@ public class BoundaryEventActivityBehavior extends FlowNodeActivityBehavior {
         this.activityId = activityId;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public void execute(DelegateExecution execution) {
         ExecutionEntity executionEntity = (ExecutionEntity) execution;

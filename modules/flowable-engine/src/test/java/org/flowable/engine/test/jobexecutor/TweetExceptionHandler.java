@@ -27,10 +27,12 @@ public class TweetExceptionHandler implements JobHandler {
 
     protected int exceptionsRemaining = 2;
 
+    @Override
     public String getType() {
         return "tweet-exception";
     }
 
+    @Override
     public void execute(JobEntity job, String configuration, Object execution, CommandContext commandContext) {
         if (exceptionsRemaining > 0) {
             exceptionsRemaining--;

@@ -301,6 +301,7 @@ public class BaseSpringRestTestCase extends AbstractTestCase {
 
             CommandExecutor commandExecutor = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().getCommandExecutor();
             commandExecutor.execute(new Command<Object>() {
+                @Override
                 public Object execute(CommandContext commandContext) {
                     DbSchemaManager dbSchemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager();
                     dbSchemaManager.dbSchemaDrop();
@@ -423,6 +424,7 @@ public class BaseSpringRestTestCase extends AbstractTestCase {
             return timeLimitExceeded;
         }
 
+        @Override
         public void run() {
             timeLimitExceeded = true;
             thread.interrupt();

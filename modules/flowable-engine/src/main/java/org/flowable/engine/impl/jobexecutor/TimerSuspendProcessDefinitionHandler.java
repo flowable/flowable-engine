@@ -24,10 +24,12 @@ public class TimerSuspendProcessDefinitionHandler extends TimerChangeProcessDefi
 
     public static final String TYPE = "suspend-processdefinition";
 
+    @Override
     public String getType() {
         return TYPE;
     }
 
+    @Override
     public void execute(JobEntity job, String configuration, Object execution, CommandContext commandContext) {
         JSONObject cfgJson = new JSONObject(configuration);
         String processDefinitionId = job.getProcessDefinitionId();

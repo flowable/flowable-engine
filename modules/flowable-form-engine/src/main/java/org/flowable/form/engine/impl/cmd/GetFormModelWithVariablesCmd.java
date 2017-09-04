@@ -84,6 +84,7 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
         this.tenantId = tenantId;
     }
 
+    @Override
     public FormModel execute(CommandContext commandContext) {
         FormDefinitionCacheEntry formCacheEntry = resolveFormDefinition(commandContext);
         FormInstance formInstance = resolveFormInstance(formCacheEntry, commandContext);

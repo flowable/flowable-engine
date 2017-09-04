@@ -39,6 +39,7 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
     /**
      * Setup starts 4 process instances of oneTaskProcess and 1 instance of oneTaskProcess2
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         repositoryService.createDeployment()
@@ -67,6 +68,7 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
         processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_3, "1", startMap).getId());
     }
 
+    @Override
     protected void tearDown() throws Exception {
         deleteDeployments();
         

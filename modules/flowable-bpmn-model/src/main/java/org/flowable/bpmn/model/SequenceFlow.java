@@ -108,10 +108,12 @@ public class SequenceFlow extends FlowElement {
         this.waypoints = waypoints;
     }
 
+    @Override
     public String toString() {
         return sourceRef + " --> " + targetRef;
     }
 
+    @Override
     public SequenceFlow clone() {
         SequenceFlow clone = new SequenceFlow();
         clone.setValues(this);

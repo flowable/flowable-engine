@@ -131,6 +131,7 @@ public class EventLogger implements FlowableEventListener {
                                 }
                             }
 
+                            @Override
                             public void afterSessionsFlush(CommandContext commandContext) {
                             }
 

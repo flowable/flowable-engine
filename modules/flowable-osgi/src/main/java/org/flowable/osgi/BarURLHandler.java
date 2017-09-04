@@ -74,6 +74,7 @@ public class BarURLHandler extends AbstractURLStreamHandlerService {
             final PipedInputStream pin = new PipedInputStream();
             final PipedOutputStream pout = new PipedOutputStream(pin);
             new Thread() {
+                @Override
                 public void run() {
                     try {
                         BarTransformer.transform(barXmlURL, pout);

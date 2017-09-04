@@ -41,6 +41,7 @@ public class ActivitiActivityEventImpl extends ActivitiEventImpl implements Flow
         this.activityId = activityId;
     }
 
+    @Override
     public String getActivityName() {
         return activityName;
     }

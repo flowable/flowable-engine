@@ -32,6 +32,7 @@ public class AdhocSubProcessActivityBehavior extends AbstractBpmnActivityBehavio
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public void execute(DelegateExecution execution) {
         SubProcess subProcess = getSubProcessFromExecution(execution);
         execution.setScope(true);

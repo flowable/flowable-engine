@@ -90,6 +90,7 @@ public class MultiInstanceLoopCharacteristics extends BaseElement {
         this.sequential = sequential;
     }
 
+    @Override
     public MultiInstanceLoopCharacteristics clone() {
         MultiInstanceLoopCharacteristics clone = new MultiInstanceLoopCharacteristics();
         clone.setValues(this);

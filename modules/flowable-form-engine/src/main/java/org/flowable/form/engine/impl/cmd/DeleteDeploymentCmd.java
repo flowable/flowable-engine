@@ -31,6 +31,7 @@ public class DeleteDeploymentCmd implements Command<Void>, Serializable {
         this.deploymentId = deploymentId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (deploymentId == null) {
             throw new FlowableIllegalArgumentException("deploymentId is null");

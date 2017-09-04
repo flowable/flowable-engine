@@ -34,6 +34,7 @@ public class HitPolicyPriority extends AbstractHitPolicy implements ComposeDecis
         return HitPolicy.PRIORITY.getValue();
     }
 
+    @Override
     public void composeDecisionResults(final ELExecutionContext executionContext) {
 
         List<Map<String, Object>> ruleResults = new ArrayList<>(executionContext.getRuleResults().values());
@@ -43,6 +44,7 @@ public class HitPolicyPriority extends AbstractHitPolicy implements ComposeDecis
             boolean noOutputValuesPresent = true;
 
             @SuppressWarnings("unchecked")
+            @Override
             public int compare(Object o1, Object o2) {
                 CompareToBuilder compareToBuilder = new CompareToBuilder();
                 for (Map.Entry<String, List<Object>> entry : executionContext.getOutputValues().entrySet()) {

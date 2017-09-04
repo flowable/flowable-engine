@@ -37,6 +37,7 @@ public class DelegateExpressionTaskListener implements TaskListener {
         this.fieldDeclarations = fieldDeclarations;
     }
 
+    @Override
     public void notify(DelegateTask delegateTask) {
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, delegateTask, fieldDeclarations);
         if (delegate instanceof TaskListener) {

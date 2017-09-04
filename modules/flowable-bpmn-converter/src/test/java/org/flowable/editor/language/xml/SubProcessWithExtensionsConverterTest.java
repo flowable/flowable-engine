@@ -125,6 +125,7 @@ public class SubProcessWithExtensionsConverterTest extends AbstractConverterTest
         deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "subprocessmodel_with_extensions.bpmn";
     }

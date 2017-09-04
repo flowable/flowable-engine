@@ -23,6 +23,7 @@ public class GenerateRandomValueActivity implements JavaDelegate {
 
     private static Random random = new Random();
 
+    @Override
     public void execute(DelegateExecution execution) {
         Integer value = random.nextInt(10);
         execution.setVariable("var", value);

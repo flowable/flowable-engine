@@ -69,6 +69,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     protected JobServiceConfiguration jobServiceConfiguration;
 
+    @Override
     public boolean executeAsyncJob(final JobInfo job) {
         if (isMessageQueueMode) {
             // When running with a message queue based job executor,
@@ -102,6 +103,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     }
 
     /** Starts the async executor */
+    @Override
     public void start() {
         if (isActive) {
             return;
@@ -152,6 +154,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
     }
 
     /** Shuts down the whole job executor */
+    @Override
     public synchronized void shutdown() {
         if (!isActive) {
             return;
@@ -184,22 +187,27 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
 
     /* getters and setters */
 
+    @Override
     public JobServiceConfiguration getJobServiceConfiguration() {
         return jobServiceConfiguration;
     }
 
+    @Override
     public void setJobServiceConfiguration(JobServiceConfiguration jobServiceConfiguration) {
         this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
+    @Override
     public boolean isAutoActivate() {
         return isAutoActivate;
     }
 
+    @Override
     public void setAutoActivate(boolean isAutoActivate) {
         this.isAutoActivate = isAutoActivate;
     }
 
+    @Override
     public boolean isActive() {
         return isActive;
     }
@@ -212,6 +220,7 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
         this.isMessageQueueMode = isMessageQueueMode;
     }
 
+    @Override
     public String getLockOwner() {
         return lockOwner;
     }
@@ -220,50 +229,62 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
         this.lockOwner = lockOwner;
     }
 
+    @Override
     public int getTimerLockTimeInMillis() {
         return timerLockTimeInMillis;
     }
 
+    @Override
     public void setTimerLockTimeInMillis(int timerLockTimeInMillis) {
         this.timerLockTimeInMillis = timerLockTimeInMillis;
     }
 
+    @Override
     public int getAsyncJobLockTimeInMillis() {
         return asyncJobLockTimeInMillis;
     }
 
+    @Override
     public void setAsyncJobLockTimeInMillis(int asyncJobLockTimeInMillis) {
         this.asyncJobLockTimeInMillis = asyncJobLockTimeInMillis;
     }
 
+    @Override
     public int getMaxTimerJobsPerAcquisition() {
         return maxTimerJobsPerAcquisition;
     }
 
+    @Override
     public void setMaxTimerJobsPerAcquisition(int maxTimerJobsPerAcquisition) {
         this.maxTimerJobsPerAcquisition = maxTimerJobsPerAcquisition;
     }
 
+    @Override
     public int getMaxAsyncJobsDuePerAcquisition() {
         return maxAsyncJobsDuePerAcquisition;
     }
 
+    @Override
     public void setMaxAsyncJobsDuePerAcquisition(int maxAsyncJobsDuePerAcquisition) {
         this.maxAsyncJobsDuePerAcquisition = maxAsyncJobsDuePerAcquisition;
     }
 
+    @Override
     public int getDefaultTimerJobAcquireWaitTimeInMillis() {
         return defaultTimerJobAcquireWaitTimeInMillis;
     }
 
+    @Override
     public void setDefaultTimerJobAcquireWaitTimeInMillis(int defaultTimerJobAcquireWaitTimeInMillis) {
         this.defaultTimerJobAcquireWaitTimeInMillis = defaultTimerJobAcquireWaitTimeInMillis;
     }
 
+    @Override
     public int getDefaultAsyncJobAcquireWaitTimeInMillis() {
         return defaultAsyncJobAcquireWaitTimeInMillis;
     }
 
+    @Override
     public void setDefaultAsyncJobAcquireWaitTimeInMillis(int defaultAsyncJobAcquireWaitTimeInMillis) {
         this.defaultAsyncJobAcquireWaitTimeInMillis = defaultAsyncJobAcquireWaitTimeInMillis;
     }
@@ -272,10 +293,12 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
         this.timerJobRunnable = timerJobRunnable;
     }
 
+    @Override
     public int getDefaultQueueSizeFullWaitTimeInMillis() {
         return defaultQueueSizeFullWaitTime;
     }
 
+    @Override
     public void setDefaultQueueSizeFullWaitTimeInMillis(int defaultQueueSizeFullWaitTime) {
         this.defaultQueueSizeFullWaitTime = defaultQueueSizeFullWaitTime;
     }
@@ -304,26 +327,32 @@ public abstract class AbstractAsyncExecutor implements AsyncExecutor {
         this.resetExpiredJobsRunnable = resetExpiredJobsRunnable;
     }
 
+    @Override
     public int getRetryWaitTimeInMillis() {
         return retryWaitTimeInMillis;
     }
 
+    @Override
     public void setRetryWaitTimeInMillis(int retryWaitTimeInMillis) {
         this.retryWaitTimeInMillis = retryWaitTimeInMillis;
     }
 
+    @Override
     public int getResetExpiredJobsInterval() {
         return resetExpiredJobsInterval;
     }
 
+    @Override
     public void setResetExpiredJobsInterval(int resetExpiredJobsInterval) {
         this.resetExpiredJobsInterval = resetExpiredJobsInterval;
     }
 
+    @Override
     public int getResetExpiredJobsPageSize() {
         return resetExpiredJobsPageSize;
     }
 
+    @Override
     public void setResetExpiredJobsPageSize(int resetExpiredJobsPageSize) {
         this.resetExpiredJobsPageSize = resetExpiredJobsPageSize;
     }

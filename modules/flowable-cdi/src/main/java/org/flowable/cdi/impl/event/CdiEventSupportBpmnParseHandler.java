@@ -87,10 +87,12 @@ public class CdiEventSupportBpmnParseHandler implements BpmnParseHandler {
         supportedTypes.add(SequenceFlow.class);
     }
 
+    @Override
     public Set<Class<? extends BaseElement>> getHandledTypes() {
         return supportedTypes;
     }
 
+    @Override
     public void parse(BpmnParse bpmnParse, BaseElement element) {
 
         if (element instanceof SequenceFlow) {

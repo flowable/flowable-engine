@@ -37,6 +37,7 @@ public class CreateTokenCmd implements Command<Token>, Serializable {
         this.tokenId = tokenId;
     }
 
+    @Override
     public Token execute(CommandContext commandContext) {
         return CommandContextUtil.getTokenEntityManager(commandContext).createNewToken(tokenId);
     }

@@ -50,6 +50,7 @@ public class ExecuteDecisionSingleResultCmd extends AbstractExecuteDecisionCmd i
         executeDecisionInfo.setTenantId(tenantId);
     }
 
+    @Override
     public Map<String, Object> execute(CommandContext commandContext) {
         if (getDecisionKey() == null) {
             throw new FlowableIllegalArgumentException("decisionKey is null");

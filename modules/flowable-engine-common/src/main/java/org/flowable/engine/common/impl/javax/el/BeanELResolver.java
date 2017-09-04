@@ -215,10 +215,12 @@ public class BeanELResolver extends ELResolver {
 			return new Iterator<FeatureDescriptor>() {
 				int next = 0;
 
+                @Override
 				public boolean hasNext() {
 					return properties != null && next < properties.length;
 				}
 
+                @Override
 				public FeatureDescriptor next() {
 					PropertyDescriptor property = properties[next++];
 					FeatureDescriptor feature = new FeatureDescriptor();
@@ -233,6 +235,7 @@ public class BeanELResolver extends ELResolver {
 					return feature;
 				}
 
+                @Override
 				public void remove() {
 					throw new UnsupportedOperationException("cannot remove");
 				}

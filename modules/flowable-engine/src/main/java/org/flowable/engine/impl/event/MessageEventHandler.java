@@ -27,6 +27,7 @@ public class MessageEventHandler extends AbstractEventHandler {
 
     public static final String EVENT_HANDLER_TYPE = "message";
 
+    @Override
     public String getEventHandlerType() {
         return EVENT_HANDLER_TYPE;
     }

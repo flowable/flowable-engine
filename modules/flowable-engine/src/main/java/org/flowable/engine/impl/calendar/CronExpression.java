@@ -272,6 +272,7 @@ public class CronExpression implements Serializable, Cloneable {
      * 
      * @return a string representation of the <CODE>CronExpression</CODE>
      */
+    @Override
     public String toString() {
         return cronExpression;
     }

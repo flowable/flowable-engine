@@ -209,6 +209,7 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
         return times;
     }
 
+    @Override
     protected TimerJobDataManager getDataManager() {
         return jobDataManager;
     }

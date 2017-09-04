@@ -59,6 +59,7 @@ public class ExtensionElementConverterTest extends AbstractConverterTest {
         validateModel(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "extensionElements.dmn";
     }

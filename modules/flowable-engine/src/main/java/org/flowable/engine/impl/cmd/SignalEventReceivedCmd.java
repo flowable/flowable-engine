@@ -64,6 +64,7 @@ public class SignalEventReceivedCmd implements Command<Void> {
         this.tenantId = tenantId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
 
         List<SignalEventSubscriptionEntity> signalEvents = null;

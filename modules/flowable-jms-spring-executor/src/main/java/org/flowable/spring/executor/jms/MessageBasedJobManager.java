@@ -30,9 +30,11 @@ public class MessageBasedJobManager extends AbstractMessageBasedJobManager {
     protected JmsTemplate jmsTemplate;
     protected JmsTemplate historyJmsTemplate;
 
+    @Override
     protected void sendMessage(final JobInfo job) {
         JmsTemplate actualJmsTemplate = (job instanceof HistoryJob) ? historyJmsTemplate : jmsTemplate;
         actualJmsTemplate.send(new MessageCreator() {
+            @Override
             public Message createMessage(Session session) throws JMSException {
                 return session.createTextMessage(job.getId());
             }

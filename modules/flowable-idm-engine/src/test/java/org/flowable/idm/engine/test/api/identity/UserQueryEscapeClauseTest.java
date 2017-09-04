@@ -22,6 +22,7 @@ public class UserQueryEscapeClauseTest extends ResourceFlowableIdmTestCase {
         super("escapeclause/flowable.idm.cfg.xml");
     }
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
 
