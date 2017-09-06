@@ -13,14 +13,14 @@
 package org.flowable.engine.delegate.event.impl;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.delegate.event.FlowableCancelledEvent;
+import org.flowable.engine.delegate.event.FlowableProcessCancelledEvent;
 
 /**
  * An {@link org.flowable.engine.delegate.event.FlowableCancelledEvent} implementation.
  * 
  * @author martin.grofcik
  */
-public class FlowableProcessCancelledEventImpl extends FlowableProcessEventImpl implements FlowableCancelledEvent {
+public class FlowableProcessCancelledEventImpl extends FlowableProcessEventImpl implements FlowableProcessCancelledEvent {
 
     protected Object cause;
 
