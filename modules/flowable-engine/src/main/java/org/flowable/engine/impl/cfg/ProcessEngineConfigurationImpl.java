@@ -280,7 +280,7 @@ import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.flowable.job.service.HistoryJobHandler;
 import org.flowable.job.service.JobHandler;
-import org.flowable.job.service.JobScopeInterface;
+import org.flowable.job.service.InternalJobManager;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.AsyncRunnableExecutionExceptionHandler;
@@ -289,14 +289,14 @@ import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
-import org.flowable.task.service.TaskLocalizationInterface;
+import org.flowable.task.service.InternalTaskLocalizationManager;
 import org.flowable.task.service.TaskServiceConfiguration;
-import org.flowable.task.service.TaskVariableScopeInterface;
-import org.flowable.task.service.history.HistoryTaskInterface;
+import org.flowable.task.service.InternalTaskVariableScopeResolver;
+import org.flowable.task.service.history.InternalHistoryTaskManager;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
 import org.flowable.variable.service.VariableServiceConfiguration;
-import org.flowable.variable.service.history.HistoryVariableInterface;
+import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.el.ExpressionManager;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.ByteArrayType;
@@ -656,11 +656,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected List<VariableType> customPostVariableTypes;
     protected VariableTypes variableTypes;
     
-    protected HistoryVariableInterface historyVariableInterface;
-    protected TaskVariableScopeInterface variableScopeInterface;
-    protected HistoryTaskInterface historyTaskInterface;
-    protected TaskLocalizationInterface taskLocalizationInterface;
-    protected JobScopeInterface jobScopeInterface;
+    protected InternalHistoryVariableManager internalHistoryVariableManager;
+    protected InternalTaskVariableScopeResolver internalTaskVariableScopeResolver;
+    protected InternalHistoryTaskManager internalHistoryTaskManager;
+    protected InternalTaskLocalizationManager internalTaskLocalizationManager;
+    protected InternalJobManager internalJobManager;
     
     protected Map<String, List<RuntimeInstanceStateChangeCallback>> processInstanceStateChangedCallbacks;
 
@@ -1249,10 +1249,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         this.variableServiceConfiguration.setVariableTypes(this.variableTypes);
         
-        if (this.historyVariableInterface != null) {
-            this.variableServiceConfiguration.setHistoryVariableInterface(this.historyVariableInterface);
+        if (this.internalHistoryVariableManager != null) {
+            this.variableServiceConfiguration.setInternalHistoryVariableManager(this.internalHistoryVariableManager);
         } else {
-            this.variableServiceConfiguration.setHistoryVariableInterface(new DefaultHistoryVariableManager(this));
+            this.variableServiceConfiguration.setInternalHistoryVariableManager(new DefaultHistoryVariableManager(this));
         }
 
         this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
@@ -1282,22 +1282,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
         
-        if (this.historyTaskInterface != null) {
-            this.taskServiceConfiguration.setHistoryTaskInterface(this.historyTaskInterface);
+        if (this.internalHistoryTaskManager != null) {
+            this.taskServiceConfiguration.setInternalHistoryTaskManager(this.internalHistoryTaskManager);
         } else {
-            this.taskServiceConfiguration.setHistoryTaskInterface(new DefaultHistoryTaskManager(this));
+            this.taskServiceConfiguration.setInternalHistoryTaskManager(new DefaultHistoryTaskManager(this));
         }
         
-        if (this.variableScopeInterface != null) {
-            this.taskServiceConfiguration.setVariableScopeInterface(this.variableScopeInterface);
+        if (this.internalTaskVariableScopeResolver != null) {
+            this.taskServiceConfiguration.setInternalTaskVariableScopeResolver(this.internalTaskVariableScopeResolver);
         } else {
-            this.taskServiceConfiguration.setVariableScopeInterface(new DefaultTaskVariableScopeManager(this));
+            this.taskServiceConfiguration.setInternalTaskVariableScopeResolver(new DefaultTaskVariableScopeResolver(this));
         }
         
-        if (this.taskLocalizationInterface != null) {
-            this.taskServiceConfiguration.setTaskLocalizationInterface(this.taskLocalizationInterface);
+        if (this.internalTaskLocalizationManager != null) {
+            this.taskServiceConfiguration.setInternalTaskLocalizationManager(this.internalTaskLocalizationManager);
         } else {
-            this.taskServiceConfiguration.setTaskLocalizationInterface(new DefaultTaskLocalizationManager(this));
+            this.taskServiceConfiguration.setInternalTaskLocalizationManager(new DefaultTaskLocalizationManager(this));
         }
         
         this.taskServiceConfiguration.setEnableTaskRelationshipCounts(this.performanceSettings.isEnableTaskRelationshipCounts());
@@ -1331,10 +1331,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             this.jobServiceConfiguration.setJobManager(this.jobManager);
         }
         
-        if (this.jobScopeInterface != null) {
-            this.jobServiceConfiguration.setJobScopeInterface(this.jobScopeInterface);
+        if (this.internalJobManager != null) {
+            this.jobServiceConfiguration.setInternalJobManager(this.internalJobManager);
         } else {
-            this.jobServiceConfiguration.setJobScopeInterface(new DefaultJobScopeManager(this));
+            this.jobServiceConfiguration.setInternalJobManager(new DefaultJobScopeManager(this));
         }
         
         this.jobServiceConfiguration.init();
@@ -2446,22 +2446,49 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.variableTypes = variableTypes;
         return this;
     }
-
-    public HistoryVariableInterface getHistoryVariableInterface() {
-        return historyVariableInterface;
+    
+    public InternalHistoryVariableManager getInternalHistoryVariableManager() {
+        return internalHistoryVariableManager;
     }
 
-    public ProcessEngineConfigurationImpl setHistoryVariableInterface(HistoryVariableInterface historyVariableInterface) {
-        this.historyVariableInterface = historyVariableInterface;
+    public ProcessEngineConfigurationImpl setInternalHistoryVariableManager(InternalHistoryVariableManager internalHistoryVariableManager) {
+        this.internalHistoryVariableManager = internalHistoryVariableManager;
         return this;
     }
-    
-    public HistoryTaskInterface getHistoryTaskInterface() {
-        return historyTaskInterface;
+
+    public InternalTaskVariableScopeResolver getInternalTaskVariableScopeResolver() {
+        return internalTaskVariableScopeResolver;
     }
 
-    public ProcessEngineConfigurationImpl setHistoryTaskInterface(HistoryTaskInterface historyTaskInterface) {
-        this.historyTaskInterface = historyTaskInterface;
+    public ProcessEngineConfigurationImpl setInternalTaskVariableScopeResolver(InternalTaskVariableScopeResolver internalTaskVariableScopeResolver) {
+        this.internalTaskVariableScopeResolver = internalTaskVariableScopeResolver;
+        return this;
+    }
+
+    public InternalHistoryTaskManager getInternalHistoryTaskManager() {
+        return internalHistoryTaskManager;
+    }
+
+    public ProcessEngineConfigurationImpl setInternalHistoryTaskManager(InternalHistoryTaskManager internalHistoryTaskManager) {
+        this.internalHistoryTaskManager = internalHistoryTaskManager;
+        return this;
+    }
+
+    public InternalTaskLocalizationManager getInternalTaskLocalizationManager() {
+        return internalTaskLocalizationManager;
+    }
+
+    public ProcessEngineConfigurationImpl setInternalTaskLocalizationManager(InternalTaskLocalizationManager internalTaskLocalizationManager) {
+        this.internalTaskLocalizationManager = internalTaskLocalizationManager;
+        return this;
+    }
+
+    public InternalJobManager getInternalJobManager() {
+        return internalJobManager;
+    }
+
+    public ProcessEngineConfigurationImpl setInternalJobManager(InternalJobManager internalJobManager) {
+        this.internalJobManager = internalJobManager;
         return this;
     }
 

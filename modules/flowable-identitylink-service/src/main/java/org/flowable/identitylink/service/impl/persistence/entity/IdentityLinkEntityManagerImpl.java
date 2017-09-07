@@ -169,16 +169,18 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
         }
 
         // fix deleteCandidate() in create TaskListener
-        for (IdentityLinkEntity identityLinkEntity : currentIdentityLinks) {
-            if (IdentityLinkType.CANDIDATE.equals(identityLinkEntity.getType()) &&
-                    !identityLinkIds.contains(identityLinkEntity.getId())) {
-
-                if ((userId != null && userId.equals(identityLinkEntity.getUserId()))
-                        || (groupId != null && groupId.equals(identityLinkEntity.getGroupId()))) {
-
-                    deleteIdentityLink(identityLinkEntity);
-                    removedIdentityLinkEntities.add(identityLinkEntity);
-
+        if (currentIdentityLinks != null) {
+            for (IdentityLinkEntity identityLinkEntity : currentIdentityLinks) {
+                if (IdentityLinkType.CANDIDATE.equals(identityLinkEntity.getType()) &&
+                        !identityLinkIds.contains(identityLinkEntity.getId())) {
+    
+                    if ((userId != null && userId.equals(identityLinkEntity.getUserId()))
+                            || (groupId != null && groupId.equals(identityLinkEntity.getGroupId()))) {
+    
+                        deleteIdentityLink(identityLinkEntity);
+                        removedIdentityLinkEntities.add(identityLinkEntity);
+    
+                    }
                 }
             }
         }

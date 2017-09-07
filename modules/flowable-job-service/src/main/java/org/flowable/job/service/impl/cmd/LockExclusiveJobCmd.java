@@ -18,7 +18,7 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.job.service.Job;
-import org.flowable.job.service.JobScopeInterface;
+import org.flowable.job.service.InternalJobManager;
 import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,7 +51,7 @@ public class LockExclusiveJobCmd implements Command<Object>, Serializable {
 
         if (job.isExclusive()) {
             if (job.getExecutionId() != null) {
-                JobScopeInterface jobScopeInterface = CommandContextUtil.getJobServiceConfiguration().getJobScopeInterface();
+                InternalJobManager jobScopeInterface = CommandContextUtil.getJobServiceConfiguration().getInternalJobManager();
                 if (jobScopeInterface != null) {
                     jobScopeInterface.updateJobScopeLockTime(job);
                 }

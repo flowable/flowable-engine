@@ -79,10 +79,10 @@ public class ExecuteAsyncRunnable implements Runnable {
         
         if (job instanceof Job) {
             Job jobObject = (Job) job;
-            if (jobServiceConfiguration.getJobScopeInterface() != null && 
-                            jobServiceConfiguration.getJobScopeInterface().isFlowable5ProcessDefinitionId(jobObject.getProcessDefinitionId())) {
+            if (jobServiceConfiguration.getInternalJobManager() != null && 
+                            jobServiceConfiguration.getInternalJobManager().isFlowable5ProcessDefinitionId(jobObject.getProcessDefinitionId())) {
                 
-                jobServiceConfiguration.getJobScopeInterface().executeV5JobWithLockAndRetry(jobObject);
+                jobServiceConfiguration.getInternalJobManager().executeV5JobWithLockAndRetry(jobObject);
                 return;
             }
         }
@@ -208,10 +208,10 @@ public class ExecuteAsyncRunnable implements Runnable {
                 
                 if (job instanceof AbstractRuntimeJobEntity) {
                     AbstractRuntimeJobEntity runtimeJob = (AbstractRuntimeJobEntity) job;
-                    if (runtimeJob.getProcessDefinitionId() != null && jobServiceConfiguration.getJobScopeInterface() != null && 
-                                    jobServiceConfiguration.getJobScopeInterface().isFlowable5ProcessDefinitionId(runtimeJob.getProcessDefinitionId())) {
+                    if (runtimeJob.getProcessDefinitionId() != null && jobServiceConfiguration.getInternalJobManager() != null && 
+                                    jobServiceConfiguration.getInternalJobManager().isFlowable5ProcessDefinitionId(runtimeJob.getProcessDefinitionId())) {
                         
-                        jobServiceConfiguration.getJobScopeInterface().handleFailedJob(runtimeJob, exception);
+                        jobServiceConfiguration.getInternalJobManager().handleFailedJob(runtimeJob, exception);
                         return null;
                     }
                 }

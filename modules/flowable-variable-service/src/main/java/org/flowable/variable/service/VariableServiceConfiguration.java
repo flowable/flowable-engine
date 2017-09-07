@@ -13,7 +13,7 @@
 package org.flowable.variable.service;
 
 import org.flowable.engine.common.AbstractServiceConfiguration;
-import org.flowable.variable.service.history.HistoryVariableInterface;
+import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.HistoricVariableServiceImpl;
 import org.flowable.variable.service.impl.VariableServiceImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManager;
@@ -62,7 +62,7 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
     
     protected VariableTypes variableTypes;
     
-    protected HistoryVariableInterface historyVariableInterface;
+    protected InternalHistoryVariableManager internalHistoryVariableManager;
     
     protected int maxLengthString;
     
@@ -200,12 +200,12 @@ public class VariableServiceConfiguration extends AbstractServiceConfiguration {
         return this;
     }
     
-    public HistoryVariableInterface getHistoryVariableInterface() {
-        return historyVariableInterface;
+    public InternalHistoryVariableManager getInternalHistoryVariableManager() {
+        return internalHistoryVariableManager;
     }
 
-    public VariableServiceConfiguration setHistoryVariableInterface(HistoryVariableInterface historyVariableInterface) {
-        this.historyVariableInterface = historyVariableInterface;
+    public VariableServiceConfiguration setInternalHistoryVariableManager(InternalHistoryVariableManager internalHistoryVariableManager) {
+        this.internalHistoryVariableManager = internalHistoryVariableManager;
         return this;
     }
 

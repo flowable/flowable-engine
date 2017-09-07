@@ -86,74 +86,26 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
 
                 if (StringUtils.isNotEmpty(humanTask.getAssignee())) {
                     ObjectNode assigneeNode = objectMapper.createObjectNode();
-                    if (humanTask.getAssignee().contains("${taskAssignmentBean.assignTaskToAssignee(")) {
-                        idmNode.set("assigneeField", assigneeNode);
-                        idmNode.put("type", "user");
+                    assigneeNode.put("id", humanTask.getAssignee());
+                    idmNode.set("assignee", assigneeNode);
+                    idmNode.put("type", "user");
 
-                        fillProperty("id", "flowable-idm-assignee-field", assigneeNode, humanTask);
-                        fillProperty("name", "assignee-field-info-name", assigneeNode, humanTask);
-
-                    } else {
-                        assigneeNode.put("id", humanTask.getAssignee());
-                        idmNode.set("assignee", assigneeNode);
-                        idmNode.put("type", "user");
-
-                        fillProperty("externalId", "assignee-info-externalid", assigneeNode, humanTask);
-                        fillProperty("email", "assignee-info-email", assigneeNode, humanTask);
-                        fillProperty("firstName", "assignee-info-firstname", assigneeNode, humanTask);
-                        fillProperty("lastName", "assignee-info-lastname", assigneeNode, humanTask);
-                    }
+                    fillProperty("email", "assignee-info-email", assigneeNode, humanTask);
+                    fillProperty("firstName", "assignee-info-firstname", assigneeNode, humanTask);
+                    fillProperty("lastName", "assignee-info-lastname", assigneeNode, humanTask);
                 }
 
                 List<ExtensionElement> idmCandidateUserList = humanTask.getExtensionElements().get("flowable-idm-candidate-user");
                 if (CollectionUtils.isNotEmpty(humanTask.getCandidateUsers()) && CollectionUtils.isNotEmpty(idmCandidateUserList)) {
-
-                    List<String> candidateUserIds = new ArrayList<>();
-
-                    if (humanTask.getCandidateUsers().size() == 1 && humanTask.getCandidateUsers().get(0).contains("${taskAssignmentBean.assignTaskToCandidateUsers(")) {
-                        idmNode.put("type", "users");
-
-                        String candidateUsersString = humanTask.getCandidateUsers().get(0);
-                        candidateUsersString = candidateUsersString.replace("${taskAssignmentBean.assignTaskToCandidateUsers('", "");
-                        candidateUsersString = candidateUsersString.replace("', execution)}", "");
-
-                        List<String> candidateFieldIds = new ArrayList<>();
-
-                        String[] candidateUserArray = candidateUsersString.split(",");
-                        for (String candidate : candidateUserArray) {
-                            if (candidate.contains("field(")) {
-                                candidateFieldIds.add(candidate.trim().substring(6, candidate.length() - 1));
-                            } else {
-                                candidateUserIds.add(candidate.trim());
-                            }
-                        }
-
-                        if (candidateFieldIds.size() > 0) {
-                            ArrayNode candidateUserFieldsNode = objectMapper.createArrayNode();
-                            idmNode.set("candidateUserFields", candidateUserFieldsNode);
-                            for (String fieldId : candidateFieldIds) {
-                                ObjectNode fieldNode = objectMapper.createObjectNode();
-                                fieldNode.put("id", fieldId);
-                                candidateUserFieldsNode.add(fieldNode);
-
-                                fillProperty("name", "user-field-info-name-" + fieldId, fieldNode, humanTask);
-                            }
-                        }
-
-                    } else {
-                        candidateUserIds.addAll(humanTask.getCandidateUsers());
-                    }
-
-                    if (candidateUserIds.size() > 0) {
+                    if (humanTask.getCandidateUsers().size() > 0) {
                         ArrayNode candidateUsersNode = objectMapper.createArrayNode();
                         idmNode.set("candidateUsers", candidateUsersNode);
                         idmNode.put("type", "users");
-                        for (String candidateUser : candidateUserIds) {
+                        for (String candidateUser : humanTask.getCandidateUsers()) {
                             ObjectNode candidateUserNode = objectMapper.createObjectNode();
                             candidateUserNode.put("id", candidateUser);
                             candidateUsersNode.add(candidateUserNode);
 
-                            fillProperty("externalId", "user-info-externalid-" + candidateUser, candidateUserNode, humanTask);
                             fillProperty("email", "user-info-email-" + candidateUser, candidateUserNode, humanTask);
                             fillProperty("firstName", "user-info-firstname-" + candidateUser, candidateUserNode, humanTask);
                             fillProperty("lastName", "user-info-lastname-" + candidateUser, candidateUserNode, humanTask);
@@ -164,52 +116,15 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
                 List<ExtensionElement> idmCandidateGroupList = humanTask.getExtensionElements().get("flowable-idm-candidate-group");
                 if (CollectionUtils.isNotEmpty(humanTask.getCandidateGroups()) && CollectionUtils.isNotEmpty(idmCandidateGroupList)) {
 
-                    List<String> candidateGroupIds = new ArrayList<>();
-
-                    if (humanTask.getCandidateGroups().size() == 1 && humanTask.getCandidateGroups().get(0).contains("${taskAssignmentBean.assignTaskToCandidateGroups(")) {
-                        idmNode.put("type", "groups");
-
-                        String candidateGroupsString = humanTask.getCandidateGroups().get(0);
-                        candidateGroupsString = candidateGroupsString.replace("${taskAssignmentBean.assignTaskToCandidateGroups('", "");
-                        candidateGroupsString = candidateGroupsString.replace("', execution)}", "");
-
-                        List<String> candidateFieldIds = new ArrayList<>();
-
-                        String[] candidateGroupArray = candidateGroupsString.split(",");
-                        for (String candidate : candidateGroupArray) {
-                            if (candidate.contains("field(")) {
-                                candidateFieldIds.add(candidate.trim().substring(6, candidate.length() - 1));
-                            } else {
-                                candidateGroupIds.add(candidate.trim());
-                            }
-                        }
-
-                        if (candidateFieldIds.size() > 0) {
-                            ArrayNode candidateGroupFieldsNode = objectMapper.createArrayNode();
-                            idmNode.set("candidateGroupFields", candidateGroupFieldsNode);
-                            for (String fieldId : candidateFieldIds) {
-                                ObjectNode fieldNode = objectMapper.createObjectNode();
-                                fieldNode.put("id", fieldId);
-                                candidateGroupFieldsNode.add(fieldNode);
-
-                                fillProperty("name", "group-field-info-name-" + fieldId, fieldNode, humanTask);
-                            }
-                        }
-
-                    } else {
-                        candidateGroupIds.addAll(humanTask.getCandidateGroups());
-                    }
-
-                    if (candidateGroupIds.size() > 0) {
+                    if (humanTask.getCandidateGroups().size() > 0) {
                         ArrayNode candidateGroupsNode = objectMapper.createArrayNode();
                         idmNode.set("candidateGroups", candidateGroupsNode);
                         idmNode.put("type", "groups");
-                        for (String candidateGroup : candidateGroupIds) {
+                        for (String candidateGroup : humanTask.getCandidateGroups()) {
                             ObjectNode candidateGroupNode = objectMapper.createObjectNode();
                             candidateGroupNode.put("id", candidateGroup);
                             candidateGroupsNode.add(candidateGroupNode);
 
-                            fillProperty("externalId", "group-info-externalid-" + candidateGroup, candidateGroupNode, humanTask);
                             fillProperty("name", "group-info-name-" + candidateGroup, candidateGroupNode, humanTask);
                         }
                     }
@@ -366,8 +281,6 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
 
     protected void fillAssigneeInfo(JsonNode idmDefNode, JsonNode canCompleteTaskNode, HumanTask task) {
         JsonNode assigneeNode = idmDefNode.get("assignee");
-        JsonNode assigneeFieldNode = idmDefNode.get("assigneeField");
-
         if (assigneeNode != null && !assigneeNode.isNull()) {
             JsonNode idNode = assigneeNode.get("id");
             JsonNode emailNode = assigneeNode.get("email");
@@ -377,7 +290,6 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
                 addExtensionElement("assignee-info-email", emailNode, task);
                 addExtensionElement("assignee-info-firstname", assigneeNode.get("firstName"), task);
                 addExtensionElement("assignee-info-lastname", assigneeNode.get("lastName"), task);
-                addExtensionElement("assignee-info-externalid", assigneeNode.get("externalId"), task);
 
             } else if (emailNode != null && !emailNode.isNull() && StringUtils.isNotEmpty(emailNode.asText())) {
                 task.setAssignee(emailNode.asText());
@@ -388,13 +300,6 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
                 addExtensionElement("flowable-idm-assignee", String.valueOf(true), task);
             }
 
-        } else if (assigneeFieldNode != null && !assigneeFieldNode.isNull()) {
-            JsonNode idNode = assigneeFieldNode.get("id");
-            if (idNode != null && !idNode.isNull() && StringUtils.isNotEmpty(idNode.asText())) {
-                task.setAssignee("${taskAssignmentBean.assignTaskToAssignee('" + idNode.asText() + "', execution)}");
-                addExtensionElement("flowable-idm-assignee-field", idNode.asText(), task);
-                addExtensionElement("assignee-field-info-name", assigneeFieldNode.get("name"), task);
-            }
         }
 
         if (canCompleteTaskNode != null && !canCompleteTaskNode.isNull()) {
@@ -420,7 +325,6 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
                         addExtensionElement("user-info-email-" + id, emailNode, task);
                         addExtensionElement("user-info-firstname-" + id, userNode.get("firstName"), task);
                         addExtensionElement("user-info-lastname-" + id, userNode.get("lastName"), task);
-                        addExtensionElement("user-info-externalid-" + id, userNode.get("externalId"), task);
 
                     } else if (emailNode != null && !emailNode.isNull() && StringUtils.isNotEmpty(emailNode.asText())) {
                         String email = emailNode.asText();
@@ -445,30 +349,8 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
             }
         }
 
-        JsonNode candidateUserFieldsNode = idmDefNode.get("candidateUserFields");
-        if (candidateUserFieldsNode != null && candidateUserFieldsNode.isArray()) {
-            for (JsonNode fieldNode : candidateUserFieldsNode) {
-                JsonNode idNode = fieldNode.get("id");
-                if (idNode != null && !idNode.isNull() && StringUtils.isNotEmpty(idNode.asText())) {
-                    String id = idNode.asText();
-                    candidateUsers.add("field(" + id + ")");
-
-                    addExtensionElement("user-field-info-name-" + id, fieldNode.get("name"), task);
-                }
-            }
-        }
-
         if (candidateUsers.size() > 0) {
-            if (candidateUserFieldsNode != null && candidateUserFieldsNode.isArray() && candidateUserFieldsNode.size() > 0) {
-                String candidateUsersString = StringUtils.join(candidateUsers, ",");
-                candidateUsersString = "${taskAssignmentBean.assignTaskToCandidateUsers('" + candidateUsersString + "', execution)}";
-                candidateUsers.clear();
-                candidateUsers.add(candidateUsersString);
-                task.setCandidateUsers(candidateUsers);
-
-            } else {
-                task.setCandidateUsers(candidateUsers);
-            }
+            task.setCandidateUsers(candidateUsers);
         }
     }
 
@@ -485,38 +367,13 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
                         candidateGroups.add(id);
 
                         addExtensionElement("group-info-name-" + id, nameNode, task);
-                        addExtensionElement("group-info-externalid-" + id, groupNode.get("externalId"), task);
                     }
                 }
             }
         }
 
-        JsonNode candidateGroupFieldsNode = idmDefNode.get("candidateGroupFields");
-        if (candidateGroupFieldsNode != null && candidateGroupFieldsNode.isArray()) {
-            for (JsonNode fieldNode : candidateGroupFieldsNode) {
-                JsonNode idNode = fieldNode.get("id");
-                if (idNode != null && !idNode.isNull() && StringUtils.isNotEmpty(idNode.asText())) {
-                    String id = idNode.asText();
-                    candidateGroups.add("field(" + id + ")");
-
-                    addExtensionElement("group-field-info-name-" + id, fieldNode.get("name"), task);
-                }
-            }
-        }
-
         if (candidateGroups.size() > 0) {
-            if (candidateGroupFieldsNode != null && candidateGroupFieldsNode.isArray() && candidateGroupFieldsNode.size() > 0) {
-                String candidateGroupsString = StringUtils.join(candidateGroups, ",");
-                candidateGroupsString = "${taskAssignmentBean.assignTaskToCandidateGroups('" + candidateGroupsString + "', execution)}";
-                candidateGroups.clear();
-                candidateGroups.add(candidateGroupsString);
-                task.setCandidateGroups(candidateGroups);
-
-            } else {
-                task.setCandidateGroups(candidateGroups);
-            }
-
-            addExtensionElement("flowable-idm-candidate-group", String.valueOf(true), task);
+            task.setCandidateGroups(candidateGroups);
             if (canCompleteTaskNode != null && !canCompleteTaskNode.isNull()) {
                 addInitiatorCanCompleteExtensionElement(Boolean.valueOf(canCompleteTaskNode.asText()), task);
             } else {

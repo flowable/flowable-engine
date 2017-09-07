@@ -820,8 +820,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         
         if ("task".equals(variableScopeType())) {
             VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
-            if (variableServiceConfiguration.getHistoryVariableInterface() != null) {
-                variableServiceConfiguration.getHistoryVariableInterface().recordVariableRemoved(variableInstance);
+            if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
+                variableServiceConfiguration.getInternalHistoryVariableManager().recordVariableRemoved(variableInstance);
             }
         }
     }
@@ -849,8 +849,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         
         VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
         if ("task".equals(variableScopeType())) {
-            if (variableServiceConfiguration.getHistoryVariableInterface() != null) {
-                variableServiceConfiguration.getHistoryVariableInterface().recordVariableUpdate(variableInstance);
+            if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
+                variableServiceConfiguration.getInternalHistoryVariableManager().recordVariableUpdate(variableInstance);
             }
         }
         
@@ -879,8 +879,8 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         
         VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
         if ("task".equals(variableScopeType())) {
-            if (variableServiceConfiguration.getHistoryVariableInterface() != null) {
-                variableServiceConfiguration.getHistoryVariableInterface().recordVariableCreate(variableInstance);
+            if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
+                variableServiceConfiguration.getInternalHistoryVariableManager().recordVariableCreate(variableInstance);
             }
         }
         

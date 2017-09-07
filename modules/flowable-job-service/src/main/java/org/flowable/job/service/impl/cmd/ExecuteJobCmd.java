@@ -60,10 +60,10 @@ public class ExecuteJobCmd implements Command<Object>, Serializable {
         }
 
         JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
-        if (job.getProcessDefinitionId() != null && jobServiceConfiguration.getJobScopeInterface() != null && 
-                        jobServiceConfiguration.getJobScopeInterface().isFlowable5ProcessDefinitionId(job.getProcessDefinitionId())) {
+        if (job.getProcessDefinitionId() != null && jobServiceConfiguration.getInternalJobManager() != null && 
+                        jobServiceConfiguration.getInternalJobManager().isFlowable5ProcessDefinitionId(job.getProcessDefinitionId())) {
         
-            jobServiceConfiguration.getJobScopeInterface().executeV5Job(job);
+            jobServiceConfiguration.getInternalJobManager().executeV5Job(job);
             return null;
         }
 

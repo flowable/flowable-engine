@@ -21,14 +21,17 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.TaskWithFieldExtensions;
+import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.el.FixedValue;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.task.service.delegate.DelegateTask;
 import org.flowable.variable.service.delegate.Expression;
 import org.flowable.variable.service.impl.el.ExpressionManager;
 
@@ -209,6 +212,36 @@ public class DelegateHelper {
         } else {
             return getFlowElementFieldExpression(execution, fieldName);
         }
+    }
+
+    /**
+     * Similar to {@link #getFieldExpression(DelegateExecution, String)}, but for use within a {@link TaskListener}.
+     */
+    public static Expression getFieldExpression(DelegateTask task, String fieldName) {
+        String eventHandlerId = task.getEventHandlerId();
+        if (eventHandlerId != null && task.getProcessDefinitionId() != null) {
+            org.flowable.bpmn.model.Process process = ProcessDefinitionUtil.getProcess(task.getProcessDefinitionId());
+            UserTask userTask = (UserTask) process.getFlowElementMap().get(task.getTaskDefinitionKey());
+            
+            FlowableListener flowableListener = null;
+            for (FlowableListener f : userTask.getTaskListeners()) {
+                if (f.getId() != null && f.getId().equals(eventHandlerId)) {
+                    flowableListener = f;
+                }
+            }
+            
+            if (flowableListener != null) {
+                List<FieldExtension> fieldExtensions = flowableListener.getFieldExtensions();
+                if (fieldExtensions != null && fieldExtensions.size() > 0) {
+                    for (FieldExtension fieldExtension : fieldExtensions) {
+                        if (fieldName.equals(fieldExtension.getFieldName())) {
+                            return createExpressionForField(fieldExtension);
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     public static Expression getFlowElementFieldExpression(DelegateExecution execution, String fieldName) {

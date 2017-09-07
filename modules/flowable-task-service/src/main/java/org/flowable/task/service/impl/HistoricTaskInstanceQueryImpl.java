@@ -143,7 +143,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
         if (tasks != null && taskServiceConfiguration.isEnableLocalization()) {
             for (HistoricTaskInstance task : tasks) {
-                taskServiceConfiguration.getTaskLocalizationInterface().localize(task, locale, withLocalizationFallback);
+                taskServiceConfiguration.getInternalTaskLocalizationManager().localize(task, locale, withLocalizationFallback);
             }
         }
 

@@ -97,7 +97,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     
     protected HistoryLevel historyLevel;
     
-    protected JobScopeInterface jobScopeInterface;
+    protected InternalJobManager internalJobManager;
     
     protected AsyncExecutor asyncExecutor;
     
@@ -362,15 +362,14 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         return this;
     }
     
-    public JobScopeInterface getJobScopeInterface() {
-        return jobScopeInterface;
+    public InternalJobManager getInternalJobManager() {
+        return internalJobManager;
     }
 
-    public JobServiceConfiguration setJobScopeInterface(JobScopeInterface jobScopeInterface) {
-        this.jobScopeInterface = jobScopeInterface;
-        return this;
+    public void setInternalJobManager(InternalJobManager internalJobManager) {
+        this.internalJobManager = internalJobManager;
     }
-    
+
     public AsyncExecutor getAsyncExecutor() {
         return asyncExecutor;
     }

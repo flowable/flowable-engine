@@ -329,7 +329,7 @@ public class DefaultJobManager implements JobManager {
 
         VariableScope variableScope = null;
         if (timerEntity.getExecutionId() != null) {
-            variableScope = jobServiceConfiguration.getJobScopeInterface().resolveVariableScope(timerEntity);
+            variableScope = jobServiceConfiguration.getInternalJobManager().resolveVariableScope(timerEntity);
         }
 
         if (variableScope == null) {
@@ -337,7 +337,7 @@ public class DefaultJobManager implements JobManager {
         }
 
         // set endDate if it was set to the definition
-        jobServiceConfiguration.getJobScopeInterface().restoreJobExtraData(timerEntity, variableScope);
+        jobServiceConfiguration.getInternalJobManager().restoreJobExtraData(timerEntity, variableScope);
 
         if (timerEntity.getDuedate() != null && !isValidTime(timerEntity, timerEntity.getDuedate(), variableScope)) {
             if (LOGGER.isDebugEnabled()) {
@@ -365,7 +365,7 @@ public class DefaultJobManager implements JobManager {
     protected void executeJobHandler(JobEntity jobEntity) {
         VariableScope variableScope = null;
         if (jobEntity.getExecutionId() != null) {
-            variableScope = jobServiceConfiguration.getJobScopeInterface().resolveVariableScope(jobEntity);
+            variableScope = jobServiceConfiguration.getInternalJobManager().resolveVariableScope(jobEntity);
         }
 
         Map<String, JobHandler> jobHandlers = jobServiceConfiguration.getJobHandlers();

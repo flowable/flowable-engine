@@ -49,10 +49,10 @@ public class DeleteJobCmd implements Command<Object>, Serializable {
         JobEntity jobToDelete = getJobToDelete(commandContext);
 
         JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
-        if (jobServiceConfiguration.getJobScopeInterface() != null && 
-                        jobServiceConfiguration.getJobScopeInterface().isFlowable5ProcessDefinitionId(jobToDelete.getProcessDefinitionId())) {
+        if (jobServiceConfiguration.getInternalJobManager() != null && 
+                        jobServiceConfiguration.getInternalJobManager().isFlowable5ProcessDefinitionId(jobToDelete.getProcessDefinitionId())) {
             
-            jobServiceConfiguration.getJobScopeInterface().deleteV5Job(jobToDelete.getId());
+            jobServiceConfiguration.getInternalJobManager().deleteV5Job(jobToDelete.getId());
             return null;
         }
 

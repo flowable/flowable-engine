@@ -20,7 +20,7 @@ import org.flowable.variable.service.delegate.VariableScope;
 /**
  * @author Tijs Rademakers
  */
-public interface JobScopeInterface {
+public interface InternalJobManager {
 
     VariableScope resolveVariableScope(Job job);
     

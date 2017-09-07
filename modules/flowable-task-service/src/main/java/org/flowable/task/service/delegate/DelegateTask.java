@@ -12,9 +12,11 @@
  */
 package org.flowable.task.service.delegate;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.identitylink.service.IdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.task.service.DelegationState;
@@ -91,13 +93,28 @@ public interface DelegateTask extends VariableScope {
      * Returns the event name which triggered the task listener to fire for this task.
      */
     String getEventName();
-
-    //FlowableListener getCurrentFlowableListener();
-
+    
+    /**
+     * Returns the event handler identifier which triggered the task listener to fire for this task. 
+     */
+    String getEventHandlerId();
+    
     /**
      * The current {@link org.flowable.engine.task.DelegationState} for this task.
      */
     DelegationState getDelegationState();
+
+    /** Adds the given user as a candidate user to this task. */
+    void addCandidateUser(String userId);
+
+    /** Adds multiple users as candidate user to this task. */
+    void addCandidateUsers(Collection<String> candidateUsers);
+
+    /** Adds the given group as candidate group to this task */
+    void addCandidateGroup(String groupId);
+
+    /** Adds multiple groups as candidate group to this task. */
+    void addCandidateGroups(Collection<String> candidateGroups);
 
     /** The {@link User.getId() userId} of the person responsible for this task. */
     String getOwner();
@@ -132,9 +149,78 @@ public interface DelegateTask extends VariableScope {
     void setCategory(String category);
 
     /**
+     * Involves a user with a task. The type of identity link is defined by the given identityLinkType.
+     *
+     * @param userId
+     *            id of the user involve, cannot be null.
+     * @param identityLinkType
+     *            type of identityLink, cannot be null (@see {@link IdentityLinkType}).
+     * @throws FlowableObjectNotFoundException
+     *             when the task or user doesn't exist.
+     */
+    void addUserIdentityLink(String userId, String identityLinkType);
+
+    /**
+     * Involves a group with group task. The type of identityLink is defined by the given identityLink.
+     *
+     * @param groupId
+     *            id of the group to involve, cannot be null.
+     * @param identityLinkType
+     *            type of identity, cannot be null (@see {@link IdentityLinkType}).
+     * @throws FlowableObjectNotFoundException
+     *             when the task or group doesn't exist.
+     */
+    void addGroupIdentityLink(String groupId, String identityLinkType);
+
+    /**
+     * Convenience shorthand for {@link #deleteUserIdentityLink(String, String)} ; with type {@link IdentityLinkType#CANDIDATE}
+     *
+     * @param userId
+     *            id of the user to use as candidate, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when the task or user doesn't exist.
+     */
+    void deleteCandidateUser(String userId);
+
+    /**
+     * Convenience shorthand for {@link #deleteGroupIdentityLink(String, String, String)}; with type {@link IdentityLinkType#CANDIDATE}
+     *
+     * @param groupId
+     *            id of the group to use as candidate, cannot be null.
+     * @throws FlowableObjectNotFoundException
+     *             when the task or group doesn't exist.
+     */
+    void deleteCandidateGroup(String groupId);
+
+    /**
+     * Removes the association between a user and a task for the given identityLinkType.
+     *
+     * @param userId
+     *            id of the user involve, cannot be null.
+     * @param identityLinkType
+     *            type of identityLink, cannot be null (@see {@link IdentityLinkType}).
+     * @throws FlowableObjectNotFoundException
+     *             when the task or user doesn't exist.
+     */
+    void deleteUserIdentityLink(String userId, String identityLinkType);
+
+    /**
+     * Removes the association between a group and a task for the given identityLinkType.
+     *
+     * @param groupId
+     *            id of the group to involve, cannot be null.
+     * @param identityLinkType
+     *            type of identity, cannot be null (@see {@link IdentityLinkType}).
+     * @throws FlowableObjectNotFoundException
+     *             when the task or group doesn't exist.
+     */
+    void deleteGroupIdentityLink(String groupId, String identityLinkType);
+
+    /**
      * Retrieves the candidate users and groups associated with the task.
      *
      * @return set of {@link IdentityLink}s of type {@link IdentityLinkType#CANDIDATE}.
      */
     Set<IdentityLink> getCandidates();
+    
 }

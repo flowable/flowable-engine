@@ -121,7 +121,7 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
     }
 
     protected boolean doInsert(TimerJobEntity jobEntity, boolean fireCreateEvent) {
-        boolean handledJob = getJobServiceConfiguration().getJobScopeInterface().handleJobInsert(jobEntity);
+        boolean handledJob = getJobServiceConfiguration().getInternalJobManager().handleJobInsert(jobEntity);
         if (!handledJob) {
             return false;
         }
@@ -137,7 +137,7 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
 
         deleteExceptionByteArrayRef(jobEntity);
         
-        getJobServiceConfiguration().getJobScopeInterface().handleJobDelete(jobEntity);
+        getJobServiceConfiguration().getInternalJobManager().handleJobDelete(jobEntity);
 
         // Send event
         if (getEventDispatcher().isEnabled()) {

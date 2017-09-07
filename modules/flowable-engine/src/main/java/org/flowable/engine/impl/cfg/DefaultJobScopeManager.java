@@ -39,7 +39,7 @@ import org.flowable.engine.impl.util.CountingEntityUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.job.service.Job;
-import org.flowable.job.service.JobScopeInterface;
+import org.flowable.job.service.InternalJobManager;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
@@ -51,7 +51,7 @@ import org.flowable.variable.service.delegate.VariableScope;
 /**
  * @author Tijs Rademakers
  */
-public class DefaultJobScopeManager implements JobScopeInterface {
+public class DefaultJobScopeManager implements InternalJobManager {
     
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
 

@@ -96,6 +96,7 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
     protected boolean isDeleted;
 
     protected String eventName;
+    protected String eventHandlerId;
 
     protected String tenantId = ProcessEngineConfiguration.NO_TENANT_ID;
 
@@ -929,6 +930,15 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
 
     public void setEventName(String eventName) {
         this.eventName = eventName;
+    }
+    
+    @Override
+    public String getEventHandlerId() {
+        return eventHandlerId;
+    }
+
+    public void setEventHandlerId(String eventHandlerId) {
+        this.eventHandlerId = eventHandlerId;
     }
 
     public void setExecutionId(String executionId) {

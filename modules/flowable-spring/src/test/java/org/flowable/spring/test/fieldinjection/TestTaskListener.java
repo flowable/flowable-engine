@@ -14,9 +14,10 @@ package org.flowable.spring.test.fieldinjection;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.flowable.variable.service.delegate.Expression;
+import org.flowable.engine.delegate.DelegateHelper;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.task.service.delegate.DelegateTask;
+import org.flowable.variable.service.delegate.Expression;
 import org.springframework.stereotype.Component;
 
 /**
@@ -36,11 +37,13 @@ public class TestTaskListener implements TaskListener {
 
     @Override
     public void notify(DelegateTask delegateTask) {
-        Number inputValue = (Number) input.getValue(delegateTask);
+        Expression inputExpression = DelegateHelper.getFieldExpression(delegateTask, "input");
+        Number input = (Number) inputExpression.getValue(delegateTask);
 
-        int result = inputValue.intValue() / 2;
+        int result = input.intValue() / 2;
 
-        delegateTask.setVariable(resultVar.getValue(delegateTask).toString(), result);
+        Expression resultVarExpression = DelegateHelper.getFieldExpression(delegateTask, "resultVar");
+        delegateTask.setVariable(resultVarExpression.getValue(delegateTask).toString(), result);
     }
-
+    
 }

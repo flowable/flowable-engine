@@ -1393,7 +1393,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
         if (tasks != null && taskServiceConfiguration.isEnableLocalization()) {
             for (Task task : tasks) {
-                taskServiceConfiguration.getTaskLocalizationInterface().localize(task, locale, withLocalizationFallback);
+                taskServiceConfiguration.getInternalTaskLocalizationManager().localize(task, locale, withLocalizationFallback);
             }
         }
 

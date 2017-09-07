@@ -17,7 +17,7 @@ import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.task.service.Task;
-import org.flowable.task.service.TaskLocalizationInterface;
+import org.flowable.task.service.InternalTaskLocalizationManager;
 import org.flowable.task.service.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 
@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Tijs Rademakers
  */
-public class DefaultTaskLocalizationManager implements TaskLocalizationInterface {
+public class DefaultTaskLocalizationManager implements InternalTaskLocalizationManager {
     
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
 

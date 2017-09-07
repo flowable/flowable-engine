@@ -182,46 +182,6 @@ public class TaskHelper {
         }
     }
     
-    public static void addCandidateUser(TaskEntity taskEntity, String userId) {
-        IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().addCandidateUser(taskEntity.getId(), userId);
-        IdentityLinkUtil.handleTaskIdentityLinkAddition(taskEntity, identityLinkEntity);
-    }
-    
-    public static void addCandidateGroup(TaskEntity taskEntity, String groupId) {
-        IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().addCandidateGroup(taskEntity.getId(), groupId);
-        IdentityLinkUtil.handleTaskIdentityLinkAddition(taskEntity, identityLinkEntity);
-    }
-    
-    public static void addUserIdentityLink(TaskEntity taskEntity, String userId, String identityLinkType) {
-        IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(taskEntity.getId(), userId, null, identityLinkType);
-        IdentityLinkUtil.handleTaskIdentityLinkAddition(taskEntity, identityLinkEntity);
-    }
-    
-    public static void addGroupIdentityLink(TaskEntity taskEntity, String groupId, String identityLinkType) {
-        IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createTaskIdentityLink(taskEntity.getId(), null, groupId, identityLinkType);
-        IdentityLinkUtil.handleTaskIdentityLinkAddition(taskEntity, identityLinkEntity);
-    }
-    
-    public static void deleteCandidateUser(TaskEntity taskEntity, String userId) {
-        deleteUserIdentityLink(taskEntity, userId, IdentityLinkType.CANDIDATE);
-    }
-    
-    public static void deleteCandidateGroup(TaskEntity taskEntity, String groupId) {
-        deleteGroupIdentityLink(taskEntity, groupId, IdentityLinkType.CANDIDATE);
-    }
-    
-    public static void deleteUserIdentityLink(TaskEntity taskEntity, String userId, String identityLinkType) {
-        if (userId != null) {
-            IdentityLinkUtil.deleteTaskIdentityLinks(taskEntity, userId, null, identityLinkType);
-        }
-    }
-    
-    public static void deleteGroupIdentityLink(TaskEntity taskEntity, String groupId, String identityLinkType) {
-        if (groupId != null) {
-            IdentityLinkUtil.deleteTaskIdentityLinks(taskEntity, null, groupId, identityLinkType);
-        }
-    }
-    
     public static void deleteTask(TaskEntity task, String deleteReason, boolean cascade, boolean fireEvents) {
         if (!task.isDeleted()) {
             if (fireEvents) {
