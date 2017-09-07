@@ -29,6 +29,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.flowable.engine.common.EngineInfo;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.util.ReflectUtil;
@@ -152,18 +153,11 @@ public abstract class ContentEngines {
 
         } catch (Throwable e) {
             LOGGER.error("Exception while initializing content engine: {}", e.getMessage(), e);
-            contentEngineInfo = new EngineInfo(null, resourceUrlString, getExceptionString(e));
+            contentEngineInfo = new EngineInfo(null, resourceUrlString, ExceptionUtils.getStackTrace(e));
         }
         contentEngineInfosByResourceUrl.put(resourceUrlString, contentEngineInfo);
         contentEngineInfos.add(contentEngineInfo);
         return contentEngineInfo;
-    }
-
-    private static String getExceptionString(Throwable e) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        return sw.toString();
     }
 
     protected static ContentEngine buildFormEngine(URL resource) {
