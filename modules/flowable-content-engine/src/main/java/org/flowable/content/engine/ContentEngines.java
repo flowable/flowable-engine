@@ -48,7 +48,7 @@ public abstract class ContentEngines {
     protected static List<EngineInfo> contentEngineInfos = new ArrayList<>();
 
     /**
-     * Initializes all dmn engines that can be found on the classpath for resources <code>flowable.content.cfg.xml</code> and for resources <code>flowable-dmn-context.xml</code> (Spring style
+     * Initializes all content engines that can be found on the classpath for resources <code>flowable.content.cfg.xml</code> and for resources <code>flowable-context.xml</code> (Spring style
      * configuration).
      */
     public static synchronized void init() {
@@ -120,17 +120,17 @@ public abstract class ContentEngines {
     }
 
     /**
-     * Unregisters the given dmn engine.
+     * Unregisters the given content engine.
      */
-    public static void unregister(ContentEngine formEngine) {
-        contentEngines.remove(formEngine.getName());
+    public static void unregister(ContentEngine contentEngine) {
+        contentEngines.remove(contentEngine.getName());
     }
 
     private static EngineInfo initContentEngineFromResource(URL resourceUrl) {
         EngineInfo contentEngineInfo = contentEngineInfosByResourceUrl.get(resourceUrl.toString());
-        // if there is an existing dmn engine info
+        // if there is an existing content engine info
         if (contentEngineInfo != null) {
-            // remove that dmn engine from the member fields
+            // remove that content engine from the member fields
             contentEngineInfos.remove(contentEngineInfo);
             if (contentEngineInfo.getException() == null) {
                 String contentEngineName = contentEngineInfo.getName();
@@ -186,7 +186,7 @@ public abstract class ContentEngines {
     }
 
     /**
-     * Get initialization results. Only info will we available for form engines which were added in the {@link ContentEngines#init()}. No
+     * Get initialization results. Only info will we available for content engines which were added in the {@link ContentEngines#init()}. No
      * {@link EngineInfo} is available for engines which were registered programmatically.
      */
     public static EngineInfo getContentEngineInfo(String contentEngineName) {
