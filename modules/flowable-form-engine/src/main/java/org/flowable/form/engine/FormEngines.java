@@ -48,13 +48,13 @@ public abstract class FormEngines {
     protected static List<EngineInfo> formEngineInfos = new ArrayList<>();
 
     /**
-     * Initializes all form engines that can be found on the classpath for resources <code>flowable.form.cfg.xml</code> and for resources <code>flowable-dmn-context.xml</code> (Spring style
+     * Initializes all form engines that can be found on the classpath for resources <code>flowable.form.cfg.xml</code> and for resources <code>flowable-form-context.xml</code> (Spring style
      * configuration).
      */
     public static synchronized void init() {
         if (!isInitialized()) {
             if (formEngines == null) {
-                // Create new map to store dmn engines if current map is null
+                // Create new map to store form engines if current map is null
                 formEngines = new HashMap<>();
             }
             ClassLoader classLoader = FormEngines.class.getClassLoader();
@@ -112,14 +112,14 @@ public abstract class FormEngines {
     }
 
     /**
-     * Registers the given dmn engine. No {@link EngineInfo} will be available for this dmn engine. An engine that is registered will be closed when the {@link FormEngines#destroy()} is called.
+     * Registers the given form engine. No {@link EngineInfo} will be available for this form engine. An engine that is registered will be closed when the {@link FormEngines#destroy()} is called.
      */
     public static void registerFormEngine(FormEngine formEngine) {
         formEngines.put(formEngine.getName(), formEngine);
     }
 
     /**
-     * Unregisters the given dmn engine.
+     * Unregisters the given form engine.
      */
     public static void unregister(FormEngine formEngine) {
         formEngines.remove(formEngine.getName());
@@ -127,9 +127,9 @@ public abstract class FormEngines {
 
     private static EngineInfo initFormEngineFromResource(URL resourceUrl) {
         EngineInfo formEngineInfo = formEngineInfosByResourceUrl.get(resourceUrl.toString());
-        // if there is an existing dmn engine info
+        // if there is an existing form engine info
         if (formEngineInfo != null) {
-            // remove that dmn engine from the member fields
+            // remove that form engine from the member fields
             formEngineInfos.remove(formEngineInfo);
             if (formEngineInfo.getException() == null) {
                 String formEngineName = formEngineInfo.getName();
@@ -141,7 +141,7 @@ public abstract class FormEngines {
 
         String resourceUrlString = resourceUrl.toString();
         try {
-            LOGGER.info("initializing dmn engine for resource {}", resourceUrl);
+            LOGGER.info("initializing form engine for resource {}", resourceUrl);
             FormEngine formEngine = buildFormEngine(resourceUrl);
             String formEngineName = formEngine.getName();
             LOGGER.info("initialised form engine {}", formEngineName);
