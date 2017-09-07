@@ -20,7 +20,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEvent;
  * 
  * @author Frederik Heremans
  */
-public interface FlowableSequenceFlowTakenEvent extends FlowableEngineEvent {
+public interface FlowableSequenceFlowTakenEvent extends FlowableProcessEngineEvent {
 
     String getId();
 
