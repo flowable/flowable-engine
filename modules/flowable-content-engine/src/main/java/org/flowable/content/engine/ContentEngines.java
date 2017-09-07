@@ -14,8 +14,6 @@ package org.flowable.content.engine;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -144,7 +142,7 @@ public abstract class ContentEngines {
         String resourceUrlString = resourceUrl.toString();
         try {
             LOGGER.info("initializing content engine for resource {}", resourceUrl);
-            ContentEngine contentEngine = buildFormEngine(resourceUrl);
+            ContentEngine contentEngine = buildContentEngine(resourceUrl);
             String contentEngineName = contentEngine.getName();
             LOGGER.info("initialised content engine {}", contentEngineName);
             contentEngineInfo = new EngineInfo(contentEngineName, resourceUrlString, null);
@@ -160,7 +158,7 @@ public abstract class ContentEngines {
         return contentEngineInfo;
     }
 
-    protected static ContentEngine buildFormEngine(URL resource) {
+    protected static ContentEngine buildContentEngine(URL resource) {
         InputStream inputStream = null;
         try {
             inputStream = resource.openStream();
