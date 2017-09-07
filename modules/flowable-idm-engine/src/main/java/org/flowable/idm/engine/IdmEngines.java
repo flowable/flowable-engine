@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.flowable.engine.common.EngineInfo;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.util.IoUtil;
@@ -150,18 +151,11 @@ public abstract class IdmEngines {
             idmEngineInfosByName.put(idmEngineName, idmEngineInfo);
         } catch (Throwable e) {
             LOGGER.error("Exception while initializing idm engine: {}", e.getMessage(), e);
-            idmEngineInfo = new EngineInfo(null, resourceUrlString, getExceptionString(e));
+            idmEngineInfo = new EngineInfo(null, resourceUrlString, ExceptionUtils.getStackTrace(e));
         }
         idmEngineInfosByResourceUrl.put(resourceUrlString, idmEngineInfo);
         idmEngineInfos.add(idmEngineInfo);
         return idmEngineInfo;
-    }
-
-    private static String getExceptionString(Throwable e) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        return sw.toString();
     }
 
     protected static IdmEngine buildIdmEngine(URL resource) {
