@@ -113,7 +113,6 @@ alter table ACT_PROCDEF_INFO
 drop index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK;
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR;
     
-drop table if exists ACT_GE_PROPERTY;
 drop table if exists ACT_RU_VARIABLE;
 drop table if exists ACT_GE_BYTEARRAY;
 drop table if exists ACT_RE_DEPLOYMENT;

@@ -46,6 +46,7 @@ import org.flowable.engine.common.impl.cfg.CommandExecutorImpl;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.cfg.TransactionContextFactory;
 import org.flowable.engine.common.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
+import org.flowable.engine.common.impl.db.CommonDbSchemaManager;
 import org.flowable.engine.common.impl.db.CustomMyBatisTypeHandlerConfig;
 import org.flowable.engine.common.impl.db.CustomMybatisTypeAliasConfig;
 import org.flowable.engine.common.impl.db.DbSchemaManager;
@@ -108,6 +109,7 @@ public abstract class AbstractEngineConfiguration {
     protected int jdbcPingConnectionNotUsedFor;
     protected int jdbcDefaultTransactionIsolationLevel;
     protected DataSource dataSource;
+    protected DbSchemaManager commonDbSchemaManager;
     protected DbSchemaManager dbSchemaManager;
 
     protected String databaseSchemaUpdate = DB_SCHEMA_UPDATE_FALSE;
@@ -354,6 +356,12 @@ public abstract class AbstractEngineConfiguration {
             } catch (SQLException e) {
                 LOGGER.error("Exception while closing the Database connection", e);
             }
+        }
+    }
+    
+    public void initDbSchemaManager() { 
+        if (this.commonDbSchemaManager == null) {
+            this.commonDbSchemaManager = new CommonDbSchemaManager();
         }
     }
 
@@ -706,6 +714,15 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setDbSchemaManager(DbSchemaManager dbSchemaManager) {
         this.dbSchemaManager = dbSchemaManager;
+        return this;
+    }
+
+    public DbSchemaManager getCommonDbSchemaManager() {
+        return commonDbSchemaManager;
+    }
+
+    public AbstractEngineConfiguration setCommonDbSchemaManager(DbSchemaManager commonDbSchemaManager) {
+        this.commonDbSchemaManager = commonDbSchemaManager;
         return this;
     }
 

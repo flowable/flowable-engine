@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.flowable.engine.common.api.FlowableException;
+
 /**
  * @author Joram Barrez
  */
@@ -118,6 +120,25 @@ public class FlowableVersions {
             return FLOWABLE_VERSIONS.get(currentVersion - 1);
         }
         return null;
+    }
+    
+    public static int getFlowableVersionForDbVersion(String dbVersion) {
+        int matchingVersionIndex;
+        // Determine index in the sequence of Flowable releases
+        matchingVersionIndex = findMatchingVersionIndex(dbVersion);
+
+        // If no match has been found, but the version starts with '5.x',
+        // we assume it's the last version (see comment in the VERSIONS list)
+        if (matchingVersionIndex < 0 && dbVersion != null && dbVersion.startsWith("5.")) {
+            matchingVersionIndex = findMatchingVersionIndex(FlowableVersions.LAST_V5_VERSION);
+        }
+
+        // Exception when no match was found: unknown/unsupported version
+        if (matchingVersionIndex < 0) {
+            throw new FlowableException("Could not update Flowable database schema: unknown version from database: '" + dbVersion + "'");
+        }
+        
+        return matchingVersionIndex;
     }
 
 }

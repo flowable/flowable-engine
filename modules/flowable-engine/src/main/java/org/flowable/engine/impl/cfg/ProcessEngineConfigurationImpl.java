@@ -806,7 +806,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         if (usingRelationalDatabase) {
             initDataSource();
-            initDbSchemaManager();
+            initDbSchemaManagers();
         }
 
         initHelpers();
@@ -932,7 +932,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
-    public void initDbSchemaManager() {
+    public void initDbSchemaManagers() {
+        super.initDbSchemaManager();
         if (this.dbSchemaManager == null) {
             this.dbSchemaManager = new ProcessDbSchemaManager();
         }

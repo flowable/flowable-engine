@@ -226,6 +226,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     }
     
     public void initDbSchemaManager() {
+        super.initDbSchemaManager();
         if (this.dbSchemaManager == null) {
             this.dbSchemaManager = new CmmnDbSchemaManager();
         }

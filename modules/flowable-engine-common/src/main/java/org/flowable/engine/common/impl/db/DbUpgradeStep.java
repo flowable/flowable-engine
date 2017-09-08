@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.impl.db.upgrade;
+package org.flowable.engine.common.impl.db;
 
 /**
  * @author Tom Baeyens
