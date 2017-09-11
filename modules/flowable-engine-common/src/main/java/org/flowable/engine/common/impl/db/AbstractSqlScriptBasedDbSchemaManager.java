@@ -45,10 +45,6 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
     
     protected static final String SCHEMA_VERSION_PROPERTY = "schema.version";
     
-    protected void dbSchemaUpgrade(final int currentDatabaseVersionsIndex) {
-        dbSchemaUpgrade(null, currentDatabaseVersionsIndex);
-    }
-    
     protected void dbSchemaUpgrade(final String component, final int currentDatabaseVersionsIndex) {
         FlowableVersion version = FlowableVersions.FLOWABLE_VERSIONS.get(currentDatabaseVersionsIndex);
         String dbVersion = version.getMainVersion();
@@ -66,7 +62,12 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
             dbVersion = dbVersion.replace(".", "");
             nextVersion = nextVersion.replace(".", "");
             LOGGER.info("Upgrade needed: {} -> {}. Looking for schema update resource for component '{}'", dbVersion, nextVersion, component);
-            executeSchemaResource("upgrade", component, getResourceForDbOperation("upgrade", "upgradestep." + dbVersion + ".to." + nextVersion, component), true);
+            String databaseType = getDbSqlSession().getDbSqlSessionFactory().getDatabaseType();
+            executeSchemaResource("upgrade", component, getResourceForDbOperation("upgrade", "upgradestep." + dbVersion + ".to." + nextVersion, component, databaseType), true);
+            
+            // To avoid having too much similar scripts, for upgrades the 'all' database is supported and executed for every database type
+            executeSchemaResource("upgrade", component, getResourceForDbOperation("upgrade", "upgradestep." + dbVersion + ".to." + nextVersion, component, "all"), true);
+            
             dbVersion = nextVersion;
         }
     }
@@ -201,10 +202,15 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
         }
     }
     
-    public abstract String getResourceForDbOperation(String directory, String operation, String component);
+    public String getResourceForDbOperation(String directory, String operation, String component, String databaseType) {
+        return getResourcesRootDirectory() + directory + "/flowable." + databaseType + "." + operation + "." + component + ".sql";
+    }
+    
+    protected abstract String getResourcesRootDirectory();
     
     public void executeMandatorySchemaResource(String operation, String component) {
-        executeSchemaResource(operation, component, getResourceForDbOperation(operation, operation, component), false);
+        String databaseType = getDbSqlSession().getDbSqlSessionFactory().getDatabaseType();
+        executeSchemaResource(operation, component, getResourceForDbOperation(operation, operation, component, databaseType), false);
     }
 
     public void executeSchemaResource(String operation, String component, String resourceName, boolean isOptional) {

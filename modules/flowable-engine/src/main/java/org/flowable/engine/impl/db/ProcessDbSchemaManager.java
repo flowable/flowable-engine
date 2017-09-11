@@ -89,6 +89,7 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     public void dbSchemaCreate() {
         
         getCommonDbSchemaManager().dbSchemaCreate();
+        getVariableDbSchemaManager().dbSchemaCreate();
         
         if (isEngineTablePresent()) {
             String dbVersion = getDbVersion();
@@ -115,12 +116,13 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     @Override
     public void dbSchemaDrop() {
         
-        getCommonDbSchemaManager().dbSchemaDrop();
-        
         executeMandatorySchemaResource("drop", "engine");
         if (CommandContextUtil.getDbSqlSession().getDbSqlSessionFactory().isDbHistoryUsed()) {
             executeMandatorySchemaResource("drop", "history");
         }
+     
+        getVariableDbSchemaManager().dbSchemaDrop();
+        getCommonDbSchemaManager().dbSchemaDrop();
     }
 
     public void dbSchemaPrune() {
@@ -133,6 +135,7 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     public String dbSchemaUpdate() {
         
         getCommonDbSchemaManager().dbSchemaUpdate();
+        getVariableDbSchemaManager().dbSchemaUpdate();
 
         String feedback = null;
         boolean isUpgradeNeeded = false;
@@ -282,13 +285,17 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         }
     }
     
-    public String getResourceForDbOperation(String directory, String operation, String component) {
-        String databaseType = getDbSqlSession().getDbSqlSessionFactory().getDatabaseType();
-        return "org/flowable/db/" + directory + "/flowable." + databaseType + "." + operation + "." + component + ".sql";
-    }
-    
     protected DbSchemaManager getCommonDbSchemaManager() {
         return CommandContextUtil.getProcessEngineConfiguration().getCommonDbSchemaManager();
+    }
+    
+    protected DbSchemaManager getVariableDbSchemaManager() {
+        return CommandContextUtil.getProcessEngineConfiguration().getVariableDbSchemaManager();
+    }
+    
+    @Override
+    protected String getResourcesRootDirectory() {
+        return "org/flowable/db/";
     }
 
 }

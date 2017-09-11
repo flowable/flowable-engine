@@ -297,6 +297,7 @@ import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
+import org.flowable.variable.service.impl.db.VariableDbSchemaManager;
 import org.flowable.variable.service.impl.el.ExpressionManager;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.ByteArrayType;
@@ -748,6 +749,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // agenda factory
     protected FlowableEngineAgendaFactory agendaFactory;
+    
+    protected VariableDbSchemaManager variableDbSchemaManager;
 
     // Backwards compatibility //////////////////////////////////////////////////////////////
 
@@ -936,6 +939,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         super.initDbSchemaManager();
         if (this.dbSchemaManager == null) {
             this.dbSchemaManager = new ProcessDbSchemaManager();
+        }
+        if (this.variableDbSchemaManager == null) {
+            this.variableDbSchemaManager = new VariableDbSchemaManager();
         }
     }
 
@@ -3439,6 +3445,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setProcessInstanceStateChangedCallbacks(Map<String, List<RuntimeInstanceStateChangeCallback>> processInstanceStateChangedCallbacks) {
         this.processInstanceStateChangedCallbacks = processInstanceStateChangedCallbacks;
+        return this;
+    }
+    
+    public VariableDbSchemaManager getVariableDbSchemaManager() {
+        return variableDbSchemaManager;
+    }
+
+    public ProcessEngineConfigurationImpl setVariableDbSchemaManager(VariableDbSchemaManager variableDbSchemaManager) {
+        this.variableDbSchemaManager = variableDbSchemaManager;
         return this;
     }
 

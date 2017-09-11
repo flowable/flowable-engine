@@ -116,7 +116,6 @@ drop table ACT_GE_BYTEARRAY;
 drop table ACT_RE_DEPLOYMENT;
 drop table ACT_RE_MODEL;
 drop table ACT_RE_PROCDEF;
-drop table ACT_RU_VARIABLE;
 drop table ACT_RU_IDENTITYLINK;
 drop table ACT_RU_TASK;
 drop table ACT_RU_EXECUTION;

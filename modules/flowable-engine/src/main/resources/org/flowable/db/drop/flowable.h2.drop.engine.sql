@@ -10,7 +10,6 @@ drop table if exists ACT_RU_HISTORY_JOB cascade constraints;
 drop table if exists ACT_RE_PROCDEF cascade constraints;
 drop table if exists ACT_RU_TASK cascade constraints;
 drop table if exists ACT_RU_IDENTITYLINK cascade constraints;
-drop table if exists ACT_RU_VARIABLE cascade constraints;
 drop table if exists ACT_RU_EVENT_SUBSCR cascade constraints;
 drop table if exists ACT_EVT_LOG cascade constraints;
 drop table if exists ACT_PROCDEF_INFO cascade constraints;

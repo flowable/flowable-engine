@@ -12,7 +12,6 @@
  */
 package org.flowable.engine.common.impl.db;
 
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableWrongDbException;
 import org.flowable.engine.common.impl.FlowableVersions;
 
@@ -23,24 +22,23 @@ public class CommonDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager
     
     private static final String COMMON_VERSION_PROPERTY = "common.schema.version";
     
+    private static final String SCHEMA_FILE_COMPONENT = "common";
+    
     @Override
     public void dbSchemaCreate() {
         if (isTablePresent(PROPERTY_TABLE)) {
             String dbVersion = getCommonSchemaVersion();
-            if (dbVersion == null) {
-                throw new FlowableException("No property " + SCHEMA_VERSION_PROPERTY + " found in property table");
-            }
             if (!FlowableVersions.CURRENT_VERSION.equals(dbVersion)) {
                 throw new FlowableWrongDbException(FlowableVersions.CURRENT_VERSION, dbVersion);
             }
         } else {
-            executeMandatorySchemaResource("create", null);
+            executeMandatorySchemaResource("create", SCHEMA_FILE_COMPONENT);
         }
     }
 
     @Override
     public void dbSchemaDrop() {
-        executeMandatorySchemaResource("drop", null);
+        executeMandatorySchemaResource("drop", SCHEMA_FILE_COMPONENT);
     }
 
     @Override
@@ -51,7 +49,7 @@ public class CommonDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager
             int matchingVersionIndex = FlowableVersions.getFlowableVersionForDbVersion(dbVersion);
             boolean isUpgradeNeeded = (matchingVersionIndex != (FlowableVersions.FLOWABLE_VERSIONS.size() - 1));
             if (isUpgradeNeeded) {
-                dbSchemaUpgrade(matchingVersionIndex);
+                dbSchemaUpgrade(SCHEMA_FILE_COMPONENT, matchingVersionIndex);
                 setProperty(COMMON_VERSION_PROPERTY, FlowableVersions.CURRENT_VERSION);
             }
             
@@ -63,10 +61,7 @@ public class CommonDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager
     }
 
     protected String getCommonSchemaVersion() {
-        /*
-         * The 'common.schema.version' was introduced in 6.2.0.
-         * If the property is not found, the schema.version is used (set in pre-6.2.0) 
-         */
+        // The 'common.schema.version' was introduced in 6.2.0.
         String dbVersion = getProperty(COMMON_VERSION_PROPERTY);
         if (dbVersion == null) {
             return "6.1.2.0"; // last version before common.schema.version was added. Start upgrading from this point.
@@ -74,9 +69,9 @@ public class CommonDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManager
         return dbVersion;
     }
     
-    public String getResourceForDbOperation(String directory, String operation, String component) {
-        String databaseType = getDbSqlSession().getDbSqlSessionFactory().getDatabaseType();
-        return "org/flowable/db/" + directory + "/flowable.common." + databaseType + "." + operation + ".sql";
+    @Override
+    protected String getResourcesRootDirectory() {
+        return "org/flowable/db/";
     }
     
 }

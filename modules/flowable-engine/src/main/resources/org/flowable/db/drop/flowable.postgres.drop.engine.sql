@@ -10,7 +10,6 @@ drop table if exists ACT_RU_DEADLETTER_JOB cascade;
 drop table if exists ACT_RU_HISTORY_JOB cascade;
 drop table if exists ACT_RU_TASK cascade;
 drop table if exists ACT_RU_IDENTITYLINK cascade;
-drop table if exists ACT_RU_VARIABLE cascade;
 drop table if exists ACT_RU_EVENT_SUBSCR cascade;
 drop table if exists ACT_EVT_LOG cascade;
 drop table if exists ACT_PROCDEF_INFO cascade;
