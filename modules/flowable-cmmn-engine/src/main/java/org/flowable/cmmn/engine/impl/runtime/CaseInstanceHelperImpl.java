@@ -37,16 +37,12 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 public class CaseInstanceHelperImpl implements CaseInstanceHelper {
     
     @Override
-    public CaseInstanceEntity startCaseInstanceByKey(CommandContext commandContext, String caseDefinitionKey) {
-        CmmnDeploymentManager deploymentManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDeploymentManager();
-        CaseDefinition caseDefinition = deploymentManager.findDeployedLatestCaseDefinitionByKey(caseDefinitionKey);
-        if (caseDefinition == null) {
-            throw new FlowableObjectNotFoundException("No case definition found for key " + caseDefinitionKey, CaseDefinition.class);
-        }
-        return startCaseInstance(commandContext, caseDefinition);
+    public CaseInstanceEntity startCaseInstanceById(CommandContext commandContext, String caseDefinitionId) {
+        return startCaseInstanceById(commandContext, caseDefinitionId, null);
     }
     
-    public CaseInstanceEntity startCaseInstanceById(CommandContext commandContext, String caseDefinitionId) {
+    @Override
+    public CaseInstanceEntity startCaseInstanceById(CommandContext commandContext, String caseDefinitionId, Map<String, Object> variables) {
         CmmnDeploymentManager deploymentManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDeploymentManager();
         CaseDefinition caseDefinition = null;
         if (caseDefinitionId != null) {
@@ -55,11 +51,32 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
                 throw new FlowableObjectNotFoundException("No case definition found for id " + caseDefinitionId, CaseDefinition.class);
             }
         }
-        return startCaseInstance(commandContext, caseDefinition);
+        return startCaseInstance(commandContext, caseDefinition, variables);
     }
-
-    protected CaseInstanceEntity startCaseInstance(CommandContext commandContext, CaseDefinition caseDefinition) {
+    
+    @Override
+    public CaseInstanceEntity startCaseInstanceByKey(CommandContext commandContext, String caseDefinitionKey) {
+        return startCaseInstanceByKey(commandContext, caseDefinitionKey, null);
+    }
+    
+    @Override
+    public CaseInstanceEntity startCaseInstanceByKey(CommandContext commandContext, String caseDefinitionKey, Map<String, Object> variables) {
+        CmmnDeploymentManager deploymentManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDeploymentManager();
+        CaseDefinition caseDefinition = deploymentManager.findDeployedLatestCaseDefinitionByKey(caseDefinitionKey);
+        if (caseDefinition == null) {
+            throw new FlowableObjectNotFoundException("No case definition found for key " + caseDefinitionKey, CaseDefinition.class);
+        }
+        return startCaseInstance(commandContext, caseDefinition, variables);
+    }
+    
+    protected CaseInstanceEntity startCaseInstance(CommandContext commandContext, CaseDefinition caseDefinition, Map<String, Object> variables) {
         CaseInstanceEntity caseInstanceEntity = createCaseInstanceEntity(commandContext, caseDefinition);
+        
+        if (variables != null) {
+            for (String variableName : variables.keySet()) {
+                caseInstanceEntity.setVariable(variableName, variables.get(variableName));
+            }
+        }
         
         callCaseInstanceStateChangeCallbacks(commandContext, caseInstanceEntity, null, CaseInstanceState.ACTIVE);
         CommandContextUtil.getCmmnHistoryManager().recordCaseInstanceStart(caseInstanceEntity);

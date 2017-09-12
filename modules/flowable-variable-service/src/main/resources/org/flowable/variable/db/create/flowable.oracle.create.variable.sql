@@ -6,6 +6,8 @@ create table ACT_RU_VARIABLE (
     EXECUTION_ID_ NVARCHAR2(64),
     PROC_INST_ID_ NVARCHAR2(64),
     TASK_ID_ NVARCHAR2(64),
+    SCOPE_ID_ NVARCHAR2(255),
+    SCOPE_TYPE_ NVARCHAR2(255),
     BYTEARRAY_ID_ NVARCHAR2(64),
     DOUBLE_ NUMBER(*,10),
     LONG_ NUMBER(19,0),
@@ -13,5 +15,7 @@ create table ACT_RU_VARIABLE (
     TEXT2_ NVARCHAR2(2000),
     primary key (ID_)
 );
+
+create index ACT_IDX_RU_VAR_SCOPE_ID_TYPE on ACT_RU_VARIABLE(SCOPE_ID_, SCOPE_TYPE_);
 
 insert into ACT_GE_PROPERTY values ('variable.schema.version', '6.2.0.0', 1);

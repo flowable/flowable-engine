@@ -26,6 +26,9 @@ import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityI
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntityImpl;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
+import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntityImpl;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
 
 /**
  * @author Joram Barrez
@@ -39,6 +42,9 @@ public class EntityDependencyOrder {
 
         DELETE_ORDER.add(HistoricMilestoneInstanceEntityImpl.class);
         DELETE_ORDER.add(HistoricCaseInstanceEntityImpl.class);
+        DELETE_ORDER.add(VariableByteArrayEntityImpl.class);
+        DELETE_ORDER.add(HistoricVariableInstanceEntityImpl.class);
+        DELETE_ORDER.add(VariableInstanceEntityImpl.class);
         DELETE_ORDER.add(MilestoneInstanceEntityImpl.class);
         DELETE_ORDER.add(SentryOnPartInstanceEntityImpl.class);
         DELETE_ORDER.add(PlanItemInstanceEntityImpl.class);

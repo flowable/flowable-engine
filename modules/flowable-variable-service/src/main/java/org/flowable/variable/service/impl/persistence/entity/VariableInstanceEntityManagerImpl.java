@@ -91,6 +91,21 @@ public class VariableInstanceEntityManagerImpl extends AbstractEntityManager<Var
     public List<VariableInstanceEntity> findVariableInstancesByTaskAndNames(String taskId, Collection<String> names) {
         return variableInstanceDataManager.findVariableInstancesByTaskAndNames(taskId, names);
     }
+    
+    @Override
+    public List<VariableInstanceEntity> findVariableInstanceByScopeIdAndScopeType(String scopeId, String scopeType) {
+        return variableInstanceDataManager.findVariableInstanceByScopeIdAndScopeType(scopeId, scopeType);
+    }
+    
+    @Override
+    public VariableInstanceEntity findVariableInstanceByScopeIdAndScopeTypeAndName(String scopeId, String scopeType, String variableName) {
+        return variableInstanceDataManager.findVariableInstanceByScopeIdAndScopeTypeAndName(scopeId, scopeType, variableName);
+    }
+    
+    @Override
+    public List<VariableInstanceEntity> findVariableInstanceByScopeIdAndScopeTypeAndNames(String scopeId, String scopeType, Collection<String> variableNames) {
+        return variableInstanceDataManager.findVariableInstanceByScopeIdAndScopeTypeAndNames(scopeId, scopeType, variableNames);
+    }
 
     @Override
     public void delete(VariableInstanceEntity entity, boolean fireDeleteEvent) {

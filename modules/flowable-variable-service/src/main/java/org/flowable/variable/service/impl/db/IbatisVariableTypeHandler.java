@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.impl.db;
+package org.flowable.variable.service.impl.db;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -21,7 +21,6 @@ import java.sql.SQLException;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.variable.service.impl.types.VariableType;
 import org.flowable.variable.service.impl.types.VariableTypes;
 
@@ -31,11 +30,15 @@ import org.flowable.variable.service.impl.types.VariableTypes;
 public class IbatisVariableTypeHandler implements TypeHandler<VariableType> {
 
     protected VariableTypes variableTypes;
+    
+    public IbatisVariableTypeHandler(VariableTypes variableTypes) {
+        this.variableTypes = variableTypes;
+    }
 
     @Override
     public VariableType getResult(ResultSet rs, String columnName) throws SQLException {
         String typeName = rs.getString(columnName);
-        VariableType type = getVariableTypes().getVariableType(typeName);
+        VariableType type = variableTypes.getVariableType(typeName);
         if (type == null && typeName != null) {
             throw new FlowableException("unknown variable type name " + typeName);
         }
@@ -45,7 +48,7 @@ public class IbatisVariableTypeHandler implements TypeHandler<VariableType> {
     @Override
     public VariableType getResult(CallableStatement cs, int columnIndex) throws SQLException {
         String typeName = cs.getString(columnIndex);
-        VariableType type = getVariableTypes().getVariableType(typeName);
+        VariableType type = variableTypes.getVariableType(typeName);
         if (type == null) {
             throw new FlowableException("unknown variable type name " + typeName);
         }
@@ -58,17 +61,10 @@ public class IbatisVariableTypeHandler implements TypeHandler<VariableType> {
         ps.setString(i, typeName);
     }
 
-    protected VariableTypes getVariableTypes() {
-        if (variableTypes == null) {
-            variableTypes = CommandContextUtil.getProcessEngineConfiguration().getVariableTypes();
-        }
-        return variableTypes;
-    }
-
     @Override
     public VariableType getResult(ResultSet resultSet, int columnIndex) throws SQLException {
         String typeName = resultSet.getString(columnIndex);
-        VariableType type = getVariableTypes().getVariableType(typeName);
+        VariableType type = variableTypes.getVariableType(typeName);
         if (type == null) {
             throw new FlowableException("unknown variable type name " + typeName);
         }

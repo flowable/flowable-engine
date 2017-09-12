@@ -204,5 +204,17 @@ public class HistoricDetailVariableInstanceUpdateEntityImpl extends HistoricDeta
         sb.append("]");
         return sb.toString();
     }
+    
+    // TODO
+
+    @Override
+    public String getScopeId() {
+        return null;
+    }
+
+    @Override
+    public String getScopeType() {
+        return null;
+    }
 
 }

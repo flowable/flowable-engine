@@ -223,6 +223,26 @@ public class TransientVariableInstance implements VariableInstance {
     public String getExecutionId() {
         return null;
     }
+    
+    @Override
+    public String getScopeId() {
+        return null;
+    }
+
+    @Override
+    public String getScopeType() {
+        return null;
+    }
+
+    @Override
+    public void setScopeId(String scopeId) {
+        
+    }
+
+    @Override
+    public void setScopeType(String scopeType) {
+        
+    }
 
     @Override
     public Object getOriginalPersistentState() {

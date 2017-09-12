@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.type.JdbcType;
 import org.flowable.cmmn.engine.impl.CmmnEngineImpl;
 import org.flowable.cmmn.engine.impl.CmmnHistoryServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
@@ -90,6 +92,8 @@ import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
 import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
+import org.flowable.engine.common.impl.db.DbSchemaManager;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
@@ -99,8 +103,32 @@ import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.variable.service.VariableServiceConfiguration;
+import org.flowable.variable.service.impl.db.IbatisVariableTypeHandler;
+import org.flowable.variable.service.impl.db.VariableDbSchemaManager;
+import org.flowable.variable.service.impl.types.BooleanType;
+import org.flowable.variable.service.impl.types.ByteArrayType;
+import org.flowable.variable.service.impl.types.DateType;
+import org.flowable.variable.service.impl.types.DefaultVariableTypes;
+import org.flowable.variable.service.impl.types.DoubleType;
+import org.flowable.variable.service.impl.types.IntegerType;
+import org.flowable.variable.service.impl.types.JodaDateTimeType;
+import org.flowable.variable.service.impl.types.JodaDateType;
+import org.flowable.variable.service.impl.types.JsonType;
+import org.flowable.variable.service.impl.types.LongJsonType;
+import org.flowable.variable.service.impl.types.LongStringType;
+import org.flowable.variable.service.impl.types.LongType;
+import org.flowable.variable.service.impl.types.NullType;
+import org.flowable.variable.service.impl.types.SerializableType;
+import org.flowable.variable.service.impl.types.ShortType;
+import org.flowable.variable.service.impl.types.StringType;
+import org.flowable.variable.service.impl.types.UUIDType;
+import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.variable.service.impl.types.VariableTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     
@@ -140,6 +168,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     
     protected CaseInstanceHelper caseInstanceHelper;
     protected CmmnHistoryManager cmmnHistoryManager;
+    protected ProcessInstanceService processInstanceService;
+    protected Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks;
     
     protected boolean enableSafeCmmnXml;
     protected CmmnActivityBehaviorFactory activityBehaviorFactory;
@@ -153,9 +183,17 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     
     protected int caseDefinitionCacheLimit = -1;
     protected DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache;
+    
+    protected HistoryLevel historyLevel = HistoryLevel.AUDIT;
 
-    protected ProcessInstanceService processInstanceService;
-    protected Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks;
+    // Variable support
+    protected DbSchemaManager variableDbSchemaManager;
+    protected VariableTypes variableTypes;
+    protected List<VariableType> customPreVariableTypes;
+    protected List<VariableType> customPostVariableTypes;
+    protected VariableServiceConfiguration variableServiceConfiguration;
+    protected boolean serializableVariableTypeTrackDeserializedObjects = true;
+    protected ObjectMapper objectMapper = new ObjectMapper();
     
     public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResourceDefault() {
         return createCmmnEngineConfigurationFromResource("flowable.cmmn.cfg.xml", "cmmnEngineConfiguration");
@@ -200,9 +238,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         if (usingRelationalDatabase) {
             initDataSource();
             initDbSchemaManager();
-            initDbSchema();
         }
 
+        initVariableTypes();
         initBeans();
         initTransactionFactory();
         
@@ -223,17 +261,23 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         initHistoryManager();
         initCaseInstanceCallbacks();
         initClock();
+        initVariableServiceConfiguration();
     }
     
+    @Override
     public void initDbSchemaManager() {
         super.initDbSchemaManager();
         if (this.dbSchemaManager == null) {
             this.dbSchemaManager = new CmmnDbSchemaManager();
         }
+        if (this.variableDbSchemaManager == null) {
+            this.variableDbSchemaManager = new VariableDbSchemaManager();
+        }
     }
     
-    public void initDbSchema() {
-        ((CmmnDbSchemaManager) this.dbSchemaManager).initSchema(this);
+    @Override
+    public void initMybatisTypeHandlers(Configuration configuration) {
+        configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler(variableTypes));
     }
     
     public void initCmmnEngineAgendaFactory() {
@@ -242,6 +286,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         }
     }
     
+    @Override
     public void initCommandInvoker() {
         if (commandInvoker == null) {
             commandInvoker = new CmmnCommandInvoker();
@@ -466,6 +511,63 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         for (Class<? extends Entity> clazz : EntityDependencyOrder.DELETE_ORDER) {
             dbSqlSessionFactory.getDeletionOrder().add(clazz);
         }
+    }
+    
+    public void initVariableTypes() {
+        if (variableTypes == null) {
+            variableTypes = new DefaultVariableTypes();
+            if (customPreVariableTypes != null) {
+                for (VariableType customVariableType : customPreVariableTypes) {
+                    variableTypes.addType(customVariableType);
+                }
+            }
+            variableTypes.addType(new NullType());
+            variableTypes.addType(new StringType(getMaxLengthString()));
+            variableTypes.addType(new LongStringType(getMaxLengthString() + 1));
+            variableTypes.addType(new BooleanType());
+            variableTypes.addType(new ShortType());
+            variableTypes.addType(new IntegerType());
+            variableTypes.addType(new LongType());
+            variableTypes.addType(new DateType());
+            variableTypes.addType(new JodaDateType());
+            variableTypes.addType(new JodaDateTimeType());
+            variableTypes.addType(new DoubleType());
+            variableTypes.addType(new UUIDType());
+            variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper));
+            variableTypes.addType(new LongJsonType(getMaxLengthString() + 1, objectMapper));
+            variableTypes.addType(new ByteArrayType());
+            variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects));
+            if (customPostVariableTypes != null) {
+                for (VariableType customVariableType : customPostVariableTypes) {
+                    variableTypes.addType(customVariableType);
+                }
+            }
+        }
+    }
+    
+    public void initVariableServiceConfiguration() {
+        this.variableServiceConfiguration = new VariableServiceConfiguration();
+        
+        this.variableServiceConfiguration.setHistoryLevel(this.historyLevel);
+        this.variableServiceConfiguration.setClock(this.clock);
+        this.variableServiceConfiguration.setObjectMapper(this.objectMapper);
+        this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+
+        this.variableServiceConfiguration.setVariableTypes(this.variableTypes);
+        
+        // TODO
+//        if (this.internalHistoryVariableManager != null) {
+//            this.variableServiceConfiguration.setInternalHistoryVariableManager(this.internalHistoryVariableManager);
+//        } else {
+//            this.variableServiceConfiguration.setInternalHistoryVariableManager(new DefaultHistoryVariableManager(this));
+//        }
+
+        this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
+        this.variableServiceConfiguration.setSerializableVariableTypeTrackDeserializedObjects(this.isSerializableVariableTypeTrackDeserializedObjects());
+
+        this.variableServiceConfiguration.init();
+
+        addServiceConfiguration(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG, this.variableServiceConfiguration);
     }
 
     @Override
@@ -830,6 +932,78 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
 
     public CmmnEngineConfiguration setCaseInstanceStateChangeCallbacks(Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks) {
         this.caseInstanceStateChangeCallbacks = caseInstanceStateChangeCallbacks;
+        return this;
+    }
+    
+    public HistoryLevel getHistoryLevel() {
+        return historyLevel;
+    }
+
+    public CmmnEngineConfiguration setHistoryLevel(HistoryLevel historyLevel) {
+        this.historyLevel = historyLevel;
+        return this;
+    }
+
+    public DbSchemaManager getVariableDbSchemaManager() {
+        return variableDbSchemaManager;
+    }
+
+    public CmmnEngineConfiguration setVariableDbSchemaManager(DbSchemaManager variableDbSchemaManager) {
+        this.variableDbSchemaManager = variableDbSchemaManager;
+        return this;
+    }
+    
+    public VariableTypes getVariableTypes() {
+        return variableTypes;
+    }
+
+    public CmmnEngineConfiguration setVariableTypes(VariableTypes variableTypes) {
+        this.variableTypes = variableTypes;
+        return this;
+    }
+    
+    public List<VariableType> getCustomPreVariableTypes() {
+        return customPreVariableTypes;
+    }
+
+    public CmmnEngineConfiguration setCustomPreVariableTypes(List<VariableType> customPreVariableTypes) {
+        this.customPreVariableTypes = customPreVariableTypes;
+        return this;
+    }
+
+    public List<VariableType> getCustomPostVariableTypes() {
+        return customPostVariableTypes;
+    }
+
+    public CmmnEngineConfiguration setCustomPostVariableTypes(List<VariableType> customPostVariableTypes) {
+        this.customPostVariableTypes = customPostVariableTypes;
+        return this;
+    }
+
+    public VariableServiceConfiguration getVariableServiceConfiguration() {
+        return variableServiceConfiguration;
+    }
+
+    public CmmnEngineConfiguration setVariableServiceConfiguration(VariableServiceConfiguration variableServiceConfiguration) {
+        this.variableServiceConfiguration = variableServiceConfiguration;
+        return this;
+    }
+
+    public boolean isSerializableVariableTypeTrackDeserializedObjects() {
+        return serializableVariableTypeTrackDeserializedObjects;
+    }
+
+    public CmmnEngineConfiguration setSerializableVariableTypeTrackDeserializedObjects(boolean serializableVariableTypeTrackDeserializedObjects) {
+        this.serializableVariableTypeTrackDeserializedObjects = serializableVariableTypeTrackDeserializedObjects;
+        return this;
+    }
+
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
+
+    public CmmnEngineConfiguration setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
         return this;
     }
     

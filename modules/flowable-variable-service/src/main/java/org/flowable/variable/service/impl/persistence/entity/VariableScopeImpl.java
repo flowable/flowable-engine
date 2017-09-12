@@ -75,6 +75,13 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             }
         }
     }
+    
+    /**
+     * Only to be used when creating a new entity, to avoid an extra call to the database.
+     */
+    public void internalSetVariableInstances(Map<String, VariableInstanceEntity> variableInstances) {
+        this.variableInstances = variableInstances;
+    }
 
     @Override
     public Map<String, Object> getVariables() {

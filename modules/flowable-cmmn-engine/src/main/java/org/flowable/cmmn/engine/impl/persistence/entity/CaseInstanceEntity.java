@@ -17,11 +17,12 @@ import java.util.List;
 
 import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.variable.service.delegate.VariableScope;
 
 /**
  * @author Joram Barrez
  */
-public interface CaseInstanceEntity extends Entity, CaseInstance, EntityWithSentryOnPartInstances {
+public interface CaseInstanceEntity extends Entity, CaseInstance, EntityWithSentryOnPartInstances, VariableScope {
 
     void setBusinessKey(String businessKey);
     void setName(String name);

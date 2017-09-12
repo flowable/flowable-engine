@@ -6,6 +6,8 @@ create table ACT_HI_VARINST (
     TASK_ID_ nvarchar(64),
     NAME_ nvarchar(255) not null,
     VAR_TYPE_ nvarchar(100),
+    SCOPE_ID_ nvarchar(255),
+    SCOPE_TYPE_ nvarchar(255),
     BYTEARRAY_ID_ nvarchar(64),
     DOUBLE_ double precision,
     LONG_ numeric(19,0),
@@ -38,3 +40,4 @@ create table ACT_HI_DETAIL (
 create index ACT_IDX_HI_DETAIL_TIME on ACT_HI_DETAIL(TIME_);
 create index ACT_IDX_HI_DETAIL_NAME on ACT_HI_DETAIL(NAME_);
 create index ACT_IDX_HI_PROCVAR_NAME_TYPE on ACT_HI_VARINST(NAME_, VAR_TYPE_);
+create index ACT_IDX_HI_VAR_SCOPE_ID_TYPE on ACT_HI_VARINST(SCOPE_ID_, SCOPE_TYPE_);

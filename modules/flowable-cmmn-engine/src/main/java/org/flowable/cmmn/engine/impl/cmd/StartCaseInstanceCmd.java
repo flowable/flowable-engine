@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.cmd;
 
 import java.io.Serializable;
+import java.util.Map;
 
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
@@ -27,26 +28,28 @@ public class StartCaseInstanceCmd implements Command<CaseInstance>, Serializable
 
     protected String caseDefinitionId;
     protected String caseDefinitionKey;
+    protected Map<String, Object> variables;
     
     // TODO: add params to cmmnruntimeservice
     protected String businessKey;
     protected String initiator;
     protected String tenantId;
 
-    public StartCaseInstanceCmd(String caseDefinitionId, String caseDefinitionKey) {
+    public StartCaseInstanceCmd(String caseDefinitionId, String caseDefinitionKey, Map<String, Object> variables) {
         this.caseDefinitionId = caseDefinitionId;
         this.caseDefinitionKey = caseDefinitionKey;
+        this.variables = variables;
     }
 
     @Override
     public CaseInstance execute(CommandContext commandContext) {
         if (caseDefinitionId != null) {
             return CommandContextUtil.getCmmnEngineConfiguration(commandContext)
-                    .getCaseInstanceHelper().startCaseInstanceById(commandContext, caseDefinitionId);
+                    .getCaseInstanceHelper().startCaseInstanceById(commandContext, caseDefinitionId, variables);
             
         } else if (caseDefinitionKey != null) {
             return CommandContextUtil.getCmmnEngineConfiguration(commandContext)
-                    .getCaseInstanceHelper().startCaseInstanceByKey(commandContext, caseDefinitionKey);
+                    .getCaseInstanceHelper().startCaseInstanceByKey(commandContext, caseDefinitionKey, variables);
             
         } else {
             throw new FlowableIllegalArgumentException("Cannot start case instance: no casedefinition id nor key provided");

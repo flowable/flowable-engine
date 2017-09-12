@@ -34,6 +34,16 @@ public interface ValueFields {
      * @return the execution id of the variable
      */
     String getExecutionId();
+    
+    /**
+     * @return the scope id of the variable
+     */
+    String getScopeId();
+    
+    /**
+     * @return the scope type of the variable
+     */
+    String getScopeType();
 
     /**
      * @return the task id of the variable

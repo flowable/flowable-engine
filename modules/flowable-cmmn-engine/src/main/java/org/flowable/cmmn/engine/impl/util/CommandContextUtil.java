@@ -31,6 +31,8 @@ import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
+import org.flowable.variable.service.VariableService;
+import org.flowable.variable.service.VariableServiceConfiguration;
 
 /**
  * @author Joram Barrez
@@ -131,6 +133,27 @@ public class CommandContextUtil {
     
     public static TableDataManager getTableDataManager(CommandContext commandContext) {
         return getCmmnEngineConfiguration(commandContext).getTableDataManager();
+    }
+    
+    public static VariableService getVariableService() {
+        return getVariableService(getCommandContext());
+    }
+    
+    public static VariableService getVariableService(CommandContext commandContext) {
+        VariableService variableService = null;
+        VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration(commandContext);
+        if (variableServiceConfiguration != null) {
+            variableService = variableServiceConfiguration.getVariableService();
+        }
+        return variableService;
+    }
+    
+    public static VariableServiceConfiguration getVariableServiceConfiguration() {
+        return getVariableServiceConfiguration(getCommandContext());
+    }
+    
+    public static VariableServiceConfiguration getVariableServiceConfiguration(CommandContext commandContext) {
+        return (VariableServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
     }
     
     public static CmmnEngineAgenda getAgenda() {

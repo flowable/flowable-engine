@@ -38,6 +38,8 @@ public class VariableInstanceEntityImpl extends AbstractEntity implements Variab
     protected String processInstanceId;
     protected String processDefinitionId;
     protected String taskId;
+    protected String scopeId;
+    protected String scopeType;
 
     protected Long longValue;
     protected Double doubleValue;
@@ -61,6 +63,8 @@ public class VariableInstanceEntityImpl extends AbstractEntity implements Variab
             persistentState.put("typeName", type.getTypeName());
         }
         persistentState.put("executionId", executionId);
+        persistentState.put("scopeId", scopeId);
+        persistentState.put("scopeType", scopeType);
         persistentState.put("longValue", longValue);
         persistentState.put("doubleValue", doubleValue);
         persistentState.put("textValue", textValue);
@@ -197,6 +201,26 @@ public class VariableInstanceEntityImpl extends AbstractEntity implements Variab
     @Override
     public String getExecutionId() {
         return executionId;
+    }
+    
+    @Override
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    @Override
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    @Override
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    @Override
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
     }
 
     @Override

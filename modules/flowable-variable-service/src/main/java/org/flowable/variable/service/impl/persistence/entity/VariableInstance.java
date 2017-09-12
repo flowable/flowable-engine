@@ -30,6 +30,7 @@ public interface VariableInstance extends ValueFields, Entity, HasRevision {
     void setProcessInstanceId(String processInstanceId);
     
     void setProcessDefinitionId(String processDefinitionId);
+    String getProcessDefinitionId();
 
     Object getValue();
 
@@ -38,18 +39,11 @@ public interface VariableInstance extends ValueFields, Entity, HasRevision {
     String getTypeName();
 
     void setTypeName(String typeName);
-    
-    @Override
-    String getExecutionId();
-
-    @Override
-    String getProcessInstanceId();
-    
-    String getProcessDefinitionId();
-
-    @Override
-    String getTaskId();
 
     void setTaskId(String taskId);
+    
+    void setScopeId(String scopeId);
+    
+    void setScopeType(String scopeType);
 
 }

@@ -21,14 +21,6 @@ import org.flowable.variable.service.impl.types.VariableType;
  */
 public interface VariableInstanceEntity extends VariableInstance {
 
-    @Override
-    void setDeleted(boolean isDeleted);
-
-    @Override
-    boolean isDeleted();
-
-    //void setExecution(ExecutionEntity execution);
-
     void forceUpdate();
 
     VariableByteArrayRef getByteArrayRef();

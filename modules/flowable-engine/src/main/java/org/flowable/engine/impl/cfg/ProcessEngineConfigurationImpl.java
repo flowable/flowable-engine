@@ -14,7 +14,6 @@
 package org.flowable.engine.impl.cfg;
 
 import java.io.InputStream;
-import java.io.Reader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -35,8 +33,6 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.xml.namespace.QName;
 
-import org.apache.ibatis.builder.xml.XMLConfigBuilder;
-import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
@@ -161,7 +157,6 @@ import org.flowable.engine.impl.cmd.ValidateTaskRelatedEntityCountCfgCmd;
 import org.flowable.engine.impl.cmd.ValidateV5EntitiesCmd;
 import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.impl.db.EntityDependencyOrder;
-import org.flowable.engine.impl.db.IbatisVariableTypeHandler;
 import org.flowable.engine.impl.db.ProcessDbSchemaManager;
 import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
 import org.flowable.engine.impl.el.DefaultExpressionManager;
@@ -279,8 +274,8 @@ import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.flowable.job.service.HistoryJobHandler;
-import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.InternalJobManager;
+import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.AsyncRunnableExecutionExceptionHandler;
@@ -290,13 +285,14 @@ import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
 import org.flowable.task.service.InternalTaskLocalizationManager;
-import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
+import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
+import org.flowable.variable.service.impl.db.IbatisVariableTypeHandler;
 import org.flowable.variable.service.impl.db.VariableDbSchemaManager;
 import org.flowable.variable.service.impl.el.ExpressionManager;
 import org.flowable.variable.service.impl.types.BooleanType;
@@ -339,9 +335,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public static final String DEFAULT_WS_SYNC_FACTORY = "org.flowable.engine.impl.webservice.CxfWebServiceClientFactory";
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/db/mapping/mappings.xml";
-
-    public static final int DEFAULT_GENERIC_MAX_LENGTH_STRING = 4000;
-    public static final int DEFAULT_ORACLE_MAX_LENGTH_STRING = 2000;
 
     // SERVICES /////////////////////////////////////////////////////////////////
 
@@ -729,11 +722,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected DelegateExpressionFieldInjectionMode delegateExpressionFieldInjectionMode = DelegateExpressionFieldInjectionMode.MIXED;
 
     /**
-     * Define a max length for storing String variable types in the database. Mainly used for the Oracle NVARCHAR2 limit of 2000 characters
-     */
-    protected int maxLengthStringVariableType = -1;
-
-    /**
      * If set to true, enables bulk insert (grouping sql inserts together). Default true. For some databases (eg DB2 on Zos: https://activiti.atlassian.net/browse/ACT-4042) needs to be set to false
      */
     protected boolean isBulkInsertEnabled = true;
@@ -945,26 +933,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
-    @Override
-    public Configuration initMybatisConfiguration(Environment environment, Reader reader, Properties properties) {
-        XMLConfigBuilder parser = new XMLConfigBuilder(reader, "", properties);
-        Configuration configuration = parser.getConfiguration();
-
-        if (databaseType != null) {
-            configuration.setDatabaseId(databaseType);
-        }
-
-        configuration.setEnvironment(environment);
-
-        initMybatisTypeHandlers(configuration);
-        initCustomMybatisMappers(configuration);
-
-        configuration = parseMybatisConfiguration(parser);
-        return configuration;
-    }
-
     public void initMybatisTypeHandlers(Configuration configuration) {
-        configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler());
+        configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler(variableTypes));
     }
 
     @Override
@@ -1847,18 +1817,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                     variableTypes.addType(customVariableType);
                 }
             }
-        }
-    }
-
-    public int getMaxLengthString() {
-        if (maxLengthStringVariableType == -1) {
-            if ("oracle".equalsIgnoreCase(databaseType)) {
-                return DEFAULT_ORACLE_MAX_LENGTH_STRING;
-            } else {
-                return DEFAULT_GENERIC_MAX_LENGTH_STRING;
-            }
-        } else {
-            return maxLengthStringVariableType;
         }
     }
 
@@ -2970,15 +2928,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setEnableDatabaseEventLogging(boolean enableDatabaseEventLogging) {
         this.enableDatabaseEventLogging = enableDatabaseEventLogging;
-        return this;
-    }
-
-    public int getMaxLengthStringVariableType() {
-        return maxLengthStringVariableType;
-    }
-
-    public ProcessEngineConfigurationImpl setMaxLengthStringVariableType(int maxLengthStringVariableType) {
-        this.maxLengthStringVariableType = maxLengthStringVariableType;
         return this;
     }
 

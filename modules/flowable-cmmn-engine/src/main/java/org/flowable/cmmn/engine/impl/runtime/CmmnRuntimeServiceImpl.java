@@ -12,8 +12,14 @@
  */
 package org.flowable.cmmn.engine.impl.runtime;
 
+import java.util.Map;
+
 import org.flowable.cmmn.engine.CmmnRuntimeService;
 import org.flowable.cmmn.engine.impl.ServiceImpl;
+import org.flowable.cmmn.engine.impl.cmd.GetVariableCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetVariablesCmd;
+import org.flowable.cmmn.engine.impl.cmd.RemoveVariableCmd;
+import org.flowable.cmmn.engine.impl.cmd.SetVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TerminateCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TriggerPlanItemInstanceCmd;
@@ -29,12 +35,22 @@ public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeSe
     
     @Override
     public CaseInstance startCaseInstanceById(String caseDefinitionId) {
-        return commandExecutor.execute(new StartCaseInstanceCmd(caseDefinitionId, null));
+        return commandExecutor.execute(new StartCaseInstanceCmd(caseDefinitionId, null, null));
+    }
+    
+    @Override
+    public CaseInstance startCaseInstanceById(String caseDefinitionId, Map<String, Object> variables) {
+        return commandExecutor.execute(new StartCaseInstanceCmd(caseDefinitionId, null, variables));
     }
     
     @Override
     public CaseInstance startCaseInstanceByKey(String caseDefinitionKey) {
-        return commandExecutor.execute(new StartCaseInstanceCmd(null, caseDefinitionKey));
+        return commandExecutor.execute(new StartCaseInstanceCmd(null, caseDefinitionKey, null));
+    }
+    
+    @Override
+    public CaseInstance startCaseInstanceByKey(String caseDefinitionKey, Map<String, Object> variables) {
+        return commandExecutor.execute(new StartCaseInstanceCmd(null, caseDefinitionKey, variables));
     }
     
     @Override
@@ -45,6 +61,26 @@ public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeSe
     @Override
     public void terminateCaseInstance(String caseInstanceId) {
         commandExecutor.execute(new TerminateCaseInstanceCmd(caseInstanceId));
+    }
+    
+    @Override
+    public Map<String, Object> getVariables(String caseInstanceId) {
+        return commandExecutor.execute(new GetVariablesCmd(caseInstanceId));
+    }
+    
+    @Override
+    public Object getVariable(String caseInstanceId, String variableName) {
+        return commandExecutor.execute(new GetVariableCmd(caseInstanceId, variableName));
+    }
+    
+    @Override
+    public void setVariables(String caseInstanceId, Map<String, Object> variables) {
+        commandExecutor.execute(new SetVariablesCmd(caseInstanceId, variables));
+    }
+    
+    @Override
+    public void removeVariable(String caseInstanceId, String variableName) {
+        commandExecutor.execute(new RemoveVariableCmd(caseInstanceId, variableName));
     }
     
     @Override
