@@ -20,7 +20,6 @@ import org.flowable.cmmn.engine.CmmnManagementService;
 import org.flowable.cmmn.engine.CmmnRepositoryService;
 import org.flowable.cmmn.engine.CmmnRuntimeService;
 import org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator;
-import org.flowable.cmmn.engine.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
@@ -43,16 +42,16 @@ public abstract class AbstractProcessEngineIntegrationTest {
 
     protected static CmmnEngine cmmnEngine;
     protected static ProcessEngine processEngine;
-    
+
     protected CmmnRepositoryService cmmnRepositoryService;
     protected CmmnRuntimeService cmmnRuntimeService;
     protected CmmnHistoryService cmmnHistoryService;
     protected CmmnManagementService cmmnManagementService;
-    
+
     protected RepositoryService processEngineRepositoryService;
     protected RuntimeService processEngineRuntimeService;
     protected TaskService processEngineTaskService;
-    
+
     @BeforeClass
     public static void bootProcessEngine() {
         if (processEngine == null) {
@@ -73,12 +72,12 @@ public abstract class AbstractProcessEngineIntegrationTest {
         this.cmmnRuntimeService = cmmnEngine.getCmmnRuntimeService();
         this.cmmnHistoryService = cmmnEngine.getCmmnHistoryService();
         this.cmmnManagementService = cmmnEngine.getCmmnManagementService();
-        
+
         this.processEngineRepositoryService = processEngine.getRepositoryService();
         this.processEngineRuntimeService = processEngine.getRuntimeService();
         this.processEngineTaskService = processEngine.getTaskService();
     }
-    
+
     @After
     public void cleanup() {
         for (Deployment deployment : processEngineRepositoryService.createDeploymentQuery().list()) {

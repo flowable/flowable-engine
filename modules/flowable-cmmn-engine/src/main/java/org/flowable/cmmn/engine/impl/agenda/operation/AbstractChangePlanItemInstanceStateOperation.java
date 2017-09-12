@@ -24,35 +24,34 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
  * @author Joram Barrez
  */
 public abstract class AbstractChangePlanItemInstanceStateOperation extends AbstractPlanItemInstanceOperation {
-    
+
     public AbstractChangePlanItemInstanceStateOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
     }
-    
+
     @Override
     public void run() {
-        
+
         if (planItemInstanceEntity.getPlanItem() != null) { // can be null for the plan model
             Object behavior = planItemInstanceEntity.getPlanItem().getBehavior();
-            if (behavior != null 
-                    && behavior instanceof PlanItemActivityBehavior
+            if (behavior instanceof PlanItemActivityBehavior
                     && StateTransition.isPossible(planItemInstanceEntity, getLifeCycleTransition())) {
-                ((PlanItemActivityBehavior) behavior).onStateTransition(planItemInstanceEntity, getLifeCycleTransition());  
+                ((PlanItemActivityBehavior) behavior).onStateTransition(planItemInstanceEntity, getLifeCycleTransition());
             }
         }
-            
+
         planItemInstanceEntity.setState(getNewState());
         CommandContextUtil.getAgenda(commandContext).planEvaluateCriteria(planItemInstanceEntity.getCaseInstanceId(), createPlanItemLifeCycleEvent());
     }
-    
+
     protected PlanItemLifeCycleEvent createPlanItemLifeCycleEvent() {
         return new PlanItemLifeCycleEvent(planItemInstanceEntity.getPlanItem(), getLifeCycleTransition());
     }
-    
+
     protected abstract String getNewState();
-    
-    protected abstract String getLifeCycleTransition(); 
-    
+
+    protected abstract String getLifeCycleTransition();
+
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
@@ -60,19 +59,19 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
         stringBuilder.append("[Change PlanItem state] ");
         if (planItem != null) {
             if (planItem.getName() != null) {
-            stringBuilder.append(planItem.getName());
-            stringBuilder.append("(");
-            stringBuilder.append(planItem.getId());
-            stringBuilder.append(")");
+                stringBuilder.append(planItem.getName());
+                stringBuilder.append("(");
+                stringBuilder.append(planItem.getId());
+                stringBuilder.append(")");
             } else {
                 stringBuilder.append(planItem.getId());
             }
         } else {
-            stringBuilder.append("(plan item instance with id " + planItemInstanceEntity.getId() + ")");
+            stringBuilder.append("(plan item instance with id ").append(planItemInstanceEntity.getId()).append(")");
         }
         stringBuilder.append(": ");
-        stringBuilder.append("new state: [" + getNewState() + "]");
+        stringBuilder.append("new state: [").append(getNewState()).append("]");
         return stringBuilder.toString();
     }
-    
+
 }
