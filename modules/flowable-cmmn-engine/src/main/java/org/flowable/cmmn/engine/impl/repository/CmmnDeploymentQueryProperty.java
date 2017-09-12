@@ -25,7 +25,7 @@ public class CmmnDeploymentQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, CmmnDeploymentQueryProperty> properties = new HashMap<String, CmmnDeploymentQueryProperty>();
+    private static final Map<String, CmmnDeploymentQueryProperty> properties = new HashMap<>();
 
     public static final CmmnDeploymentQueryProperty DEPLOYMENT_ID = new CmmnDeploymentQueryProperty("RES.ID_");
     public static final CmmnDeploymentQueryProperty DEPLOYMENT_NAME = new CmmnDeploymentQueryProperty("RES.NAME_");

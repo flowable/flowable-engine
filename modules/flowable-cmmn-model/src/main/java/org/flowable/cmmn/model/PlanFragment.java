@@ -25,43 +25,43 @@ public class PlanFragment extends PlanItemDefinition {
     protected Case caze;
     protected Map<String, PlanItem> planItemMap = new LinkedHashMap<>();
     protected List<Sentry> sentries = new ArrayList<>();
-    
+
     public PlanItem findPlanItem(String planItemId) {
         if (planItemMap.containsKey(planItemId)) {
             return planItemMap.get(planItemId);
         }
-        
+
         PlanFragment parentPlanFragment = getParent();
         if (parentPlanFragment != null) {
             return parentPlanFragment.findPlanItem(planItemId);
         }
-        
+
         return null;
     }
-    
+
     public Sentry findSentry(String sentryId) {
         for (Sentry sentry : sentries) {
             if (sentry.getId().equals(sentryId)) {
                 return sentry;
             }
         }
-        
+
         PlanFragment parentPlanFragment = getParent();
         if (parentPlanFragment != null) {
             return parentPlanFragment.findSentry(sentryId);
         }
-        
+
         return null;
     }
-    
+
     public void addPlanItem(PlanItem planItem) {
         planItemMap.put(planItem.getId(), planItem);
     }
-    
+
     public void addSentry(Sentry sentry) {
         sentries.add(sentry);
     }
-    
+
     public Case getCase() {
         return caze;
     }
@@ -71,7 +71,7 @@ public class PlanFragment extends PlanItemDefinition {
     }
 
     public List<PlanItem> getPlanItems() {
-        return new ArrayList<PlanItem>(planItemMap.values());
+        return new ArrayList<>(planItemMap.values());
     }
 
     public Map<String, PlanItem> getPlanItemMap() {
@@ -89,5 +89,5 @@ public class PlanFragment extends PlanItemDefinition {
     public void setSentries(List<Sentry> sentries) {
         this.sentries = sentries;
     }
-    
+
 }

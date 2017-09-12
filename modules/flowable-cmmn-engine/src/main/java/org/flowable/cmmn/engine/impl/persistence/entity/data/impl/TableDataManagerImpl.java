@@ -33,8 +33,8 @@ import org.flowable.engine.common.impl.persistence.entity.Entity;
  * @author Joram Barrez
  */
 public class TableDataManagerImpl implements TableDataManager {
-    
-    public static Map<Class<? extends Entity>, String> entityToTableNameMap = new HashMap<Class<? extends Entity>, String>();
+
+    public static Map<Class<? extends Entity>, String> entityToTableNameMap = new HashMap<>();
 
     static {
         entityToTableNameMap.put(CmmnDeploymentEntity.class, "ACT_CMMN_RE_DEPLOYMENT");

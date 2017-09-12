@@ -25,7 +25,7 @@ public class MilestoneInstanceQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, MilestoneInstanceQueryProperty> properties = new HashMap<String, MilestoneInstanceQueryProperty>();
+    private static final Map<String, MilestoneInstanceQueryProperty> properties = new HashMap<>();
 
     public static final MilestoneInstanceQueryProperty MILESTONE_NAME = new MilestoneInstanceQueryProperty("RES.NAME_");
     public static final MilestoneInstanceQueryProperty MILESTONE_TIMESTAMP = new MilestoneInstanceQueryProperty("RES.TIME_STAMP_");

@@ -14,8 +14,8 @@ package org.flowable.cmmn.engine;
 
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -103,31 +103,31 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
-    
+
     protected static final Logger LOGGER = LoggerFactory.getLogger(CmmnEngineConfiguration.class);
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/cmmn/db/mapping/mappings.xml";
     public static final String LIQUIBASE_CHANGELOG_PREFIX = "ACT_CMMN_";
-    
+
     protected String cmmnEngineName = "default";
-    
+
     protected CmmnEngineAgendaFactory cmmnEngineAgendaFactory;
-    
+
     protected CmmnRuntimeService cmmnRuntimeService = new CmmnRuntimeServiceImpl();
     protected CmmnManagementService cmmnManagementService = new CmmnManagementServiceImpl();
     protected CmmnRepositoryService cmmnRepositoryService = new CmmnRepositoryServiceImpl();
     protected CmmnHistoryService cmmnHistoryService = new CmmnHistoryServiceImpl();
-    
+
     protected TableDataManager tableDataManager;
     protected CmmnDeploymentDataManager deploymentDataManager;
     protected CmmnResourceDataManager resourceDataManager;
     protected CaseDefinitionDataManager caseDefinitionDataManager;
     protected CaseInstanceDataManager caseInstanceDataManager;
     protected PlanItemInstanceDataManager planItemInstanceDataManager;
-    protected SentryOnPartInstanceDataManager sentryOnPartInstanceDataManager; 
+    protected SentryOnPartInstanceDataManager sentryOnPartInstanceDataManager;
     protected MilestoneInstanceDataManager milestoneInstanceDataManager;
     protected HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager;
     protected HistoricMilestoneInstanceDataManager historicMilestoneInstanceDataManager;
-    
+
     protected CmmnDeploymentEntityManager cmmnDeploymentEntityManager;
     protected CmmnResourceEntityManager cmmnResourceEntityManager;
     protected CaseDefinitionEntityManager caseDefinitionEntityManager;
@@ -137,10 +137,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     protected MilestoneInstanceEntityManager milestoneInstanceEntityManager;
     protected HistoricCaseInstanceDataManager historicCaseInstanceDataManager;
     protected HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager;
-    
+
     protected CaseInstanceHelper caseInstanceHelper;
     protected CmmnHistoryManager cmmnHistoryManager;
-    
+
     protected boolean enableSafeCmmnXml;
     protected CmmnActivityBehaviorFactory activityBehaviorFactory;
     protected CmmnClassDelegateFactory classDelegateFactory;
@@ -150,13 +150,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     protected List<Deployer> customPostDeployers;
     protected List<Deployer> deployers;
     protected CmmnDeploymentManager deploymentManager;
-    
+
     protected int caseDefinitionCacheLimit = -1;
     protected DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache;
 
     protected ProcessInstanceService processInstanceService;
     protected Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks;
-    
+
     public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResourceDefault() {
         return createCmmnEngineConfigurationFromResource("flowable.cmmn.cfg.xml", "cmmnEngineConfiguration");
     }
@@ -184,12 +184,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     public static CmmnEngineConfiguration createStandaloneInMemCmmnEngineConfiguration() {
         return new StandaloneInMemCmmnEngineConfiguration();
     }
-    
+
     public CmmnEngine buildCmmnEngine() {
         init();
         return new CmmnEngineImpl(this);
     }
-    
+
     protected void init() {
         initCommandContextFactory();
         initTransactionContextFactory();
@@ -205,11 +205,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
 
         initBeans();
         initTransactionFactory();
-        
+
         if (usingRelationalDatabase) {
             initSqlSessionFactory();
         }
-        
+
         initSessionFactories();
         initServices();
         initDataManagers();
@@ -224,29 +224,29 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         initCaseInstanceCallbacks();
         initClock();
     }
-    
+
     public void initDbSchemaManager() {
         if (this.dbSchemaManager == null) {
             this.dbSchemaManager = new CmmnDbSchemaManager();
         }
     }
-    
+
     public void initDbSchema() {
         ((CmmnDbSchemaManager) this.dbSchemaManager).initSchema(this);
     }
-    
+
     public void initCmmnEngineAgendaFactory() {
         if (cmmnEngineAgendaFactory == null) {
             cmmnEngineAgendaFactory = new DefaultCmmnEngineAgendaFactory();
         }
     }
-    
+
     public void initCommandInvoker() {
         if (commandInvoker == null) {
             commandInvoker = new CmmnCommandInvoker();
         }
     }
-    
+
     public void initSessionFactories() {
         if (sessionFactories == null) {
             sessionFactories = new HashMap<>();
@@ -254,11 +254,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
             if (usingRelationalDatabase) {
                 initDbSqlSessionFactory();
             }
-            
+
             addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
             commandContextFactory.setSessionFactories(sessionFactories);
         }
-        
+
         addSessionFactory(new CmmnEngineAgendaSessionFactory(cmmnEngineAgendaFactory));
 
         if (customSessionFactories != null) {
@@ -267,7 +267,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
             }
         }
     }
-    
+
     protected void initServices() {
         initService(cmmnRuntimeService);
         initService(cmmnManagementService);
@@ -281,7 +281,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
             ((ServiceImpl) service).setCommandExecutor(commandExecutor);
         }
     }
-    
+
     public void initDataManagers() {
         if (tableDataManager == null) {
             tableDataManager = new TableDataManagerImpl();
@@ -314,7 +314,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
             historicMilestoneInstanceDataManager = new MybatisHistoricMilestoneInstanceDataManager(this);
         }
     }
-    
+
     public void initEntityManagers() {
         if (cmmnDeploymentEntityManager == null) {
             cmmnDeploymentEntityManager = new CmmnDeploymentEntityManagerImpl(this, deploymentDataManager);
@@ -344,13 +344,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
             historicMilestoneInstanceEntityManager = new HistoricMilestoneInstanceEntityManagerImpl(this, historicMilestoneInstanceDataManager);
         }
     }
-    
+
     protected void initClassDelegateFactory() {
         if (classDelegateFactory == null) {
             classDelegateFactory = new DefaultCmmnClassDelegateFactory();
         }
     }
-    
+
     protected void initActivityBehaviorFactory() {
         if (activityBehaviorFactory == null) {
             DefaultCmmnActivityBehaviorFactory defaultCmmnActivityBehaviorFactory = new DefaultCmmnActivityBehaviorFactory();
@@ -358,10 +358,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
             activityBehaviorFactory = defaultCmmnActivityBehaviorFactory;
         }
     }
-    
+
     protected void initDeployers() {
         if (this.cmmnDeployer == null) {
-            this.deployers = new ArrayList<Deployer>();
+            this.deployers = new ArrayList<>();
             if (customPreDeployers != null) {
                 this.deployers.addAll(customPreDeployers);
             }
@@ -371,9 +371,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
             }
         }
     }
-    
+
     public Collection<? extends Deployer> getDefaultDeployers() {
-        List<Deployer> defaultDeployers = new ArrayList<Deployer>();
+        List<Deployer> defaultDeployers = new ArrayList<>();
 
         if (cmmnDeployer == null) {
             cmmnDeployer = new CmmnDeployer();
@@ -391,13 +391,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     protected void initCaseDefinitionCache() {
         if (caseDefinitionCache == null) {
             if (caseDefinitionCacheLimit <= 0) {
-                caseDefinitionCache = new DefaultDeploymentCache<CaseDefinitionCacheEntry>();
+                caseDefinitionCache = new DefaultDeploymentCache<>();
             } else {
-                caseDefinitionCache = new DefaultDeploymentCache<CaseDefinitionCacheEntry>(caseDefinitionCacheLimit);
+                caseDefinitionCache = new DefaultDeploymentCache<>(caseDefinitionCacheLimit);
             }
         }
     }
-    
+
     protected void initDeploymentManager() {
         if (deploymentManager == null) {
             deploymentManager = new CmmnDeploymentManager();
@@ -408,7 +408,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
             deploymentManager.setDeploymentEntityManager(cmmnDeploymentEntityManager);
         }
     }
-    
+
     public void initCmmnParser() {
         if (cmmnParser == null) {
             CmmnParserImpl cmmnParserImpl = new CmmnParserImpl();
@@ -416,31 +416,31 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
             cmmnParser = cmmnParserImpl;
         }
     }
-    
+
     public void initCaseInstanceHelper() {
         if (caseInstanceHelper == null) {
             caseInstanceHelper = new CaseInstanceHelperImpl();
         }
     }
-    
+
     public void initHistoryManager() {
         if (cmmnHistoryManager == null) {
             cmmnHistoryManager = new DefaultCmmnHistoryManager(this);
         }
     }
-    
+
     public void initCaseInstanceCallbacks() {
         if (this.caseInstanceStateChangeCallbacks == null) {
             this.caseInstanceStateChangeCallbacks = new HashMap<>();
         }
         initDefaultCaseInstanceCallbacks();
     }
-    
+
     protected void initDefaultCaseInstanceCallbacks() {
-        this.caseInstanceStateChangeCallbacks.put(PlanItemInstanceCallbackType.CHILD_CASE, 
-                Arrays.<RuntimeInstanceStateChangeCallback>asList(new ChildCaseInstanceStateChangeCallback()));
+        this.caseInstanceStateChangeCallbacks.put(PlanItemInstanceCallbackType.CHILD_CASE,
+                Collections.<RuntimeInstanceStateChangeCallback>singletonList(new ChildCaseInstanceStateChangeCallback()));
     }
-    
+
     @Override
     public String getEngineCfgKey() {
         return EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG;
@@ -450,18 +450,18 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     public CommandInterceptor createTransactionInterceptor() {
         return null;
     }
-    
+
     @Override
     public InputStream getMyBatisXmlConfigurationStream() {
         return getResourceAsStream(DEFAULT_MYBATIS_MAPPING_FILE);
     }
-    
+
     @Override
     protected void initDbSqlSessionFactoryEntitySettings() {
         for (Class<? extends Entity> clazz : EntityDependencyOrder.INSERT_ORDER) {
             dbSqlSessionFactory.getInsertionOrder().add(clazz);
         }
-        
+
         for (Class<? extends Entity> clazz : EntityDependencyOrder.DELETE_ORDER) {
             dbSqlSessionFactory.getDeletionOrder().add(clazz);
         }
@@ -480,7 +480,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.cmmnEngineName = cmmnEngineName;
         return this;
     }
-    
+
     public CmmnRuntimeService getCmmnRuntimeService() {
         return cmmnRuntimeService;
     }
@@ -507,7 +507,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.cmmnRepositoryService = cmmnRepositoryService;
         return this;
     }
-    
+
     public CmmnHistoryService getCmmnHistoryService() {
         return cmmnHistoryService;
     }
@@ -525,7 +525,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.cmmnEngineAgendaFactory = cmmnEngineAgendaFactory;
         return this;
     }
-    
+
     public TableDataManager getTableDataManager() {
         return tableDataManager;
     }
@@ -561,7 +561,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.caseDefinitionDataManager = caseDefinitionDataManager;
         return this;
     }
-    
+
     public CaseInstanceDataManager getCaseInstanceDataManager() {
         return caseInstanceDataManager;
     }
@@ -579,7 +579,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.planItemInstanceDataManager = planItemInstanceDataManager;
         return this;
     }
-    
+
     public SentryOnPartInstanceDataManager getSentryOnPartInstanceDataManager() {
         return sentryOnPartInstanceDataManager;
     }
@@ -597,7 +597,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.milestoneInstanceDataManager = milestoneInstanceDataManager;
         return this;
     }
-    
+
     public HistoricCaseInstanceDataManager getHistoricCaseInstanceDataManager() {
         return historicCaseInstanceDataManager;
     }
@@ -642,7 +642,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.caseDefinitionEntityManager = caseDefinitionEntityManager;
         return this;
     }
-    
+
     public CaseInstanceEntityManager getCaseInstanceEntityManager() {
         return caseInstanceEntityManager;
     }
@@ -651,7 +651,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.caseInstanceEntityManager = caseInstanceEntityManager;
         return this;
     }
-    
+
     public PlanItemInstanceEntityManager getPlanItemInstanceEntityManager() {
         return planItemInstanceEntityManager;
     }
@@ -660,7 +660,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.planItemInstanceEntityManager = planItemInstanceEntityManager;
         return this;
     }
-    
+
     public SentryOnPartInstanceEntityManager getSentryOnPartInstanceEntityManager() {
         return sentryOnPartInstanceEntityManager;
     }
@@ -678,7 +678,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.milestoneInstanceEntityManager = milestoneInstanceEntityManager;
         return this;
     }
-    
+
     public HistoricCaseInstanceEntityManager getHistoricCaseInstanceEntityManager() {
         return historicCaseInstanceEntityManager;
     }
@@ -705,7 +705,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.caseInstanceHelper = caseInstanceHelper;
         return this;
     }
-    
+
     public CmmnHistoryManager getCmmnHistoryManager() {
         return cmmnHistoryManager;
     }
@@ -714,7 +714,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.cmmnHistoryManager = cmmnHistoryManager;
         return this;
     }
-    
+
     public boolean isEnableSafeCmmnXml() {
         return enableSafeCmmnXml;
     }
@@ -768,7 +768,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.deployers = deployers;
         return this;
     }
-    
+
     public CmmnDeploymentManager getDeploymentManager() {
         return deploymentManager;
     }
@@ -786,7 +786,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.activityBehaviorFactory = activityBehaviorFactory;
         return this;
     }
-    
+
     public CmmnClassDelegateFactory getClassDelegateFactory() {
         return classDelegateFactory;
     }
@@ -813,7 +813,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.caseDefinitionCache = caseDefinitionCache;
         return this;
     }
-    
+
     public ProcessInstanceService getProcessInstanceService() {
         return processInstanceService;
     }
@@ -831,5 +831,5 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.caseInstanceStateChangeCallbacks = caseInstanceStateChangeCallbacks;
         return this;
     }
-    
+
 }

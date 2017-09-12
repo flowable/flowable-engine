@@ -25,7 +25,7 @@ public class CaseDefinitionQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, CaseDefinitionQueryProperty> properties = new HashMap<String, CaseDefinitionQueryProperty>();
+    private static final Map<String, CaseDefinitionQueryProperty> properties = new HashMap<>();
 
     public static final CaseDefinitionQueryProperty CASE_DEFINITION_KEY = new CaseDefinitionQueryProperty("RES.KEY_");
     public static final CaseDefinitionQueryProperty CASE_DEFINITION_CATEGORY = new CaseDefinitionQueryProperty("RES.CATEGORY_");
