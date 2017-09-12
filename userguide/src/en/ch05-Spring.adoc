@@ -855,3 +855,21 @@ Obviously, there is a lot about Spring Boot that hasn't been touched upon yet, l
 * Spring Integration support
 * Rest API integration: boot up the Flowable Rest API embedded within the Spring application
 * Spring Security support
+
+==== Advanced Configuration
+
+It's possible to get a hold of the process engine configuration by implementing the _org.flowable.spring.boot.ProcessEngineConfigurationConfigurer_ interface. This can be useful for advanced configuration settings or simply because a property has not (yet) exposed. For example:
+
+[source, java, linenums]
+----
+public class MyConfigurer implements ProcessEngineConfigurationConfigurer {
+
+    public void configure(SpringProcessEngineConfiguration processEngineConfiguration) {
+        // advanced configuration
+    }
+    
+}
+----
+
+By exposing an instance of this class as an _@Bean_ in the Spring Boot configuration, the instance will be called before the process engine is fully created.
+
