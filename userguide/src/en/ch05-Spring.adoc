@@ -858,7 +858,7 @@ Obviously, there is a lot about Spring Boot that hasn't been touched upon yet, l
 
 ==== Advanced Configuration
 
-It's possible to get a hold of the process engine configuration by implementing the _org.flowable.spring.boot.ProcessEngineConfigurationConfigurer_ interface. This can be useful for advanced configuration settings or simply because a property has not (yet) exposed. For example:
+It's possible to get a hold of the process engine configuration by implementing the _org.flowable.spring.boot.ProcessEngineConfigurationConfigurer_ interface. This can be useful for advanced configuration settings or simply because a property has not been exposed (yet). For example:
 
 [source, java, linenums]
 ----
