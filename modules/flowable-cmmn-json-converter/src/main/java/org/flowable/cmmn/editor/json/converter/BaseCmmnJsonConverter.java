@@ -58,7 +58,7 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Sten
         PlanItem planItem = (PlanItem) baseElement;
         PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
         
-        GraphicInfo graphicInfo = model.getGraphicInfo(planItemDefinition.getId());
+        GraphicInfo graphicInfo = model.getGraphicInfo(planItem.getId());
 
         String stencilId = getStencilId(baseElement);
         
@@ -76,17 +76,17 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Sten
             propertiesNode.put(PROPERTY_DOCUMENTATION, planItemDefinition.getDocumentation());
         }
         
-        convertElementToJson(planItemNode, propertiesNode, baseElement, model);
+        convertElementToJson(planItemNode, propertiesNode, processor, baseElement, model);
 
         planItemNode.set(EDITOR_SHAPE_PROPERTIES, propertiesNode);
         ArrayNode outgoingArrayNode = objectMapper.createArrayNode();
         
         if (CollectionUtils.isNotEmpty(planItem.getEntryCriteria())) {
-            convertCriteria(planItem.getEntryCriteria(), model, shapesArrayNode, outgoingArrayNode, subProcessX, subProcessY);
+            convertCriteria(planItem.getEntryCriteria(), model, processor, shapesArrayNode, outgoingArrayNode, subProcessX, subProcessY);
         }
         
         if (CollectionUtils.isNotEmpty(planItem.getExitCriteria())) {
-            convertCriteria(planItem.getExitCriteria(), model, shapesArrayNode, outgoingArrayNode, subProcessX, subProcessY);
+            convertCriteria(planItem.getExitCriteria(), model, processor, shapesArrayNode, outgoingArrayNode, subProcessX, subProcessY);
         }
         
         if (CollectionUtils.isNotEmpty(planItem.getOutgoingAssociations())) {
@@ -100,7 +100,7 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Sten
 
     public void convertToCmmnModel(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel) {
 
-        BaseElement baseElement = convertJsonToElement(elementNode, modelNode, parentElement, shapeMap, cmmnModel);
+        BaseElement baseElement = convertJsonToElement(elementNode, modelNode, processor, parentElement, shapeMap, cmmnModel);
         baseElement.setId(CmmnJsonConverterUtil.getElementId(elementNode));
 
         if (baseElement instanceof PlanItemDefinition) {
@@ -131,16 +131,18 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Sten
             planItemDefinition.setPlanItemRef(planItem.getId());
             
             stage.addPlanItem(planItem);
+            planItem.setParent(stage);
         }
     }
 
-    protected abstract void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, BaseElement baseElement, CmmnModel cmmnModel);
+    protected abstract void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel);
 
-    protected abstract BaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel);
+    protected abstract BaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, 
+                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel);
 
     protected abstract String getStencilId(BaseElement baseElement);
     
-    protected void convertCriteria(List<Criterion> criteria, CmmnModel model, ArrayNode shapesArrayNode, ArrayNode outgoingArrayNode, double subProcessX, double subProcessY) {
+    protected void convertCriteria(List<Criterion> criteria, CmmnModel model, ActivityProcessor processor, ArrayNode shapesArrayNode, ArrayNode outgoingArrayNode, double subProcessX, double subProcessY) {
         for (Criterion criterion : criteria) {
             GraphicInfo criterionGraphicInfo = model.getGraphicInfo(criterion.getId());
             ObjectNode criterionNode = CmmnJsonConverterUtil.createChildShape(criterion.getId(), criterion.isEntryCriterion() ? STENCIL_ENTRY_CRITERION : STENCIL_EXIT_CRITERION, 
@@ -150,7 +152,7 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Sten
             shapesArrayNode.add(criterionNode);
             ObjectNode criterionPropertiesNode = objectMapper.createObjectNode();
             criterionPropertiesNode.put(PROPERTY_OVERRIDE_ID, criterion.getId());
-            new CriterionJsonConverter().convertElementToJson(criterionNode, criterionPropertiesNode, criterion, model);
+            new CriterionJsonConverter().convertElementToJson(criterionNode, criterionPropertiesNode, processor, criterion, model);
             criterionNode.set(EDITOR_SHAPE_PROPERTIES, criterionPropertiesNode);
             
             if (CollectionUtils.isNotEmpty(criterion.getOutgoingAssociations())) {

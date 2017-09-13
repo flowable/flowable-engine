@@ -71,7 +71,7 @@ public class AssociationJsonConverter extends BaseCmmnJsonConverter {
         }
 
         PlanItem planItem = model.findPlanItem(association.getTargetRef());
-        GraphicInfo targetGraphicInfo = model.getGraphicInfo(planItem.getPlanItemDefinition().getId());
+        GraphicInfo targetGraphicInfo = model.getGraphicInfo(planItem.getId());
         GraphicInfo flowGraphicInfo = graphicInfoList.get(graphicInfoList.size() - 1);
 
         double diffTopY = Math.abs(flowGraphicInfo.getY() - targetGraphicInfo.getY());
@@ -111,12 +111,14 @@ public class AssociationJsonConverter extends BaseCmmnJsonConverter {
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, BaseElement baseElement, CmmnModel cmmnModel) {
+    protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel) {
         // nothing to do
     }
 
     @Override
-    protected Association convertJsonToElement(JsonNode elementNode, JsonNode modelNode, BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel) {
+    protected Association convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, 
+                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel) {
+        
         Association association = new Association();
 
         association.setId(CmmnJsonConverterUtil.getElementId(elementNode));

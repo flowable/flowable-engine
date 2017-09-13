@@ -20,6 +20,7 @@ import java.util.List;
  */
 public class Criterion extends CaseElement implements HasAssociations {
     
+    protected String technicalId;
     protected String name;
     protected String sentryRef;
     protected Sentry sentry;
@@ -30,6 +31,12 @@ public class Criterion extends CaseElement implements HasAssociations {
     protected List<Association> incomingAssociations = new ArrayList<>();
     protected List<Association> outgoingAssociations = new ArrayList<>();
     
+    public String getTechnicalId() {
+        return technicalId;
+    }
+    public void setTechnicalId(String technicalId) {
+        this.technicalId = technicalId;
+    }
     public String getName() {
         return name;
     }

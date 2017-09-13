@@ -14,6 +14,7 @@ package org.flowable.cmmn.model;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -39,6 +40,7 @@ public class CmmnModel {
     protected List<Association> associations = new ArrayList<>();
     
     protected Map<String, Criterion> criterionMap = new LinkedHashMap<>();
+    protected Map<String, String> criterionTechnicalIdMap = new HashMap<>();
 
     protected Map<String, GraphicInfo> locationMap = new LinkedHashMap<>();
     protected Map<String, GraphicInfo> labelLocationMap = new LinkedHashMap<>();
@@ -48,6 +50,7 @@ public class CmmnModel {
     
     protected int planItemIndex = 0;
     protected int sentryIndex = 0;
+    protected int sentryOnPartIndex = 0;
     
     public void addCase(Case caze) {
         cases.add(caze);
@@ -145,12 +148,25 @@ public class CmmnModel {
         return sentryIndex;
     }
     
+    public int nextSentryOnPartId() {
+        sentryOnPartIndex++;
+        return sentryOnPartIndex;
+    }
+    
     public void addCriterion(String key, Criterion criterion) {
         criterionMap.put(key, criterion);
     }
 
     public Criterion getCriterion(String key) {
         return criterionMap.get(key);
+    }
+    
+    public void addCriterionTechnicalId(String technicalId, String id) {
+        criterionTechnicalIdMap.put(technicalId, id);
+    }
+
+    public String getCriterionId(String technicalId) {
+        return criterionTechnicalIdMap.get(technicalId);
     }
     
     public void addGraphicInfo(String key, GraphicInfo graphicInfo) {

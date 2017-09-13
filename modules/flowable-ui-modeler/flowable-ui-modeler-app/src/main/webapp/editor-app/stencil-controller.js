@@ -61,15 +61,20 @@ angular.module('flowableModeler')
             var data = editorManager.getStencilData();
 
             var quickMenuDefinition = undefined;
+            var ignoreForPaletteDefinition = undefined;
             
             if (data.namespace == 'http://b3mn.org/stencilset/cmmn1.1#') {
-                quickMenuDefinition = ['UserTask', 'Connector'];
+                quickMenuDefinition = ['HumanTask', 'Association'];
+                ignoreForPaletteDefinition = ['CasePlanModel'];
+                
             } else {
                 quickMenuDefinition = ['UserTask', 'EndNoneEvent', 'ExclusiveGateway', 
                                          'CatchTimerEvent', 'ThrowNoneEvent', 'TextAnnotation',
                                          'SequenceFlow', 'Association'];
+                                         
+                ignoreForPaletteDefinition = ['SequenceFlow', 'MessageFlow', 'Association', 'DataAssociation', 'DataStore', 'SendTask'];
             }
-            var ignoreForPaletteDefinition = ['SequenceFlow', 'MessageFlow', 'Association', 'DataAssociation', 'DataStore', 'SendTask', 'CasePlanModel'];
+             
             var quickMenuItems = [];
               
             var morphRoles = [];
@@ -152,10 +157,19 @@ angular.module('flowableModeler')
                 
                 for (var i = 0; i < data.stencils[stencilIndex].roles.length; i++) {
                   var stencilRole = data.stencils[stencilIndex].roles[i];
-                  if (stencilRole === 'sequence_start' || stencilRole === 'connector_start') {
-                    stencilItem.canConnect = true;
-                  } else if (stencilRole === 'sequence_end' || stencilRole === 'connector_end') {
-                    stencilItem.canConnectTo = true;
+                  if (data.namespace == 'http://b3mn.org/stencilset/cmmn1.1#') {
+                      if (stencilRole === 'association_start') {
+                        stencilItem.canConnect = true;
+                      } else if (stencilRole === 'association_end') {
+                        stencilItem.canConnectTo = true;
+                      }
+                      
+                  } else {
+                      if (stencilRole === 'sequence_start') {
+                        stencilItem.canConnect = true;
+                      } else if (stencilRole === 'sequence_end') {
+                        stencilItem.canConnectTo = true;
+                      }
                   }
                   
                   for (var j = 0; j < morphRoles.length; j++) {
@@ -853,8 +867,7 @@ angular.module('flowableModeler')
                 option.position = pos;
 	              
                 if (containedStencil.idWithoutNs() !== 'SequenceFlow' && containedStencil.idWithoutNs() !== 'Association' && 
-                        containedStencil.idWithoutNs() !== 'MessageFlow' && containedStencil.idWithoutNs() !== 'DataAssociation'
-                        && containedStencil.idWithoutNs() !== 'Connector') {
+                        containedStencil.idWithoutNs() !== 'MessageFlow' && containedStencil.idWithoutNs() !== 'DataAssociation') {
 	                        
                   var args = { sourceShape: currentSelectedShape, targetStencil: containedStencil };
                   var targetStencil = editorManager.getRules().connectMorph(args);

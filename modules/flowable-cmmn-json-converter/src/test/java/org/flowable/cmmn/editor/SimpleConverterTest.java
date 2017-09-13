@@ -78,7 +78,7 @@ public class SimpleConverterTest extends AbstractConverterTest {
         assertEquals(1, planItem.getEntryCriteria().size());
         assertEquals(0, planItem.getExitCriteria().size());
         
-        graphicInfo = model.getGraphicInfo("task1");
+        graphicInfo = model.getGraphicInfo("planItem1");
         assertEquals(435.0, graphicInfo.getX(), 0.1);
         assertEquals(120.0, graphicInfo.getY(), 0.1);
         assertEquals(100.0, graphicInfo.getWidth(), 0.1);

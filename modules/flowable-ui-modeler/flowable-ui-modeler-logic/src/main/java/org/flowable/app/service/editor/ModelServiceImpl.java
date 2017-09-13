@@ -232,7 +232,7 @@ public class ModelServiceImpl implements ModelService {
             stencilSetNode.put("namespace", "http://b3mn.org/stencilset/cmmn1.1#");
             editorNode.set("stencilset", stencilSetNode);
             ObjectNode propertiesNode = objectMapper.createObjectNode();
-            propertiesNode.put("process_id", model.getKey());
+            propertiesNode.put("case_id", model.getKey());
             propertiesNode.put("name", model.getName());
             if (StringUtils.isNotEmpty(model.getDescription())) {
                 propertiesNode.put("documentation", model.getDescription());
@@ -256,7 +256,7 @@ public class ModelServiceImpl implements ModelService {
             childNode.set("childShapes", objectMapper.createArrayNode());
             childNode.set("dockers", objectMapper.createArrayNode());
             childNode.set("outgoing", objectMapper.createArrayNode());
-            childNode.put("resourceId", "startEvent1");
+            childNode.put("resourceId", "casePlanModel");
             ObjectNode stencilNode = objectMapper.createObjectNode();
             childNode.set("stencil", stencilNode);
             stencilNode.put("id", "CasePlanModel");

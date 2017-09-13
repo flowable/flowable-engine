@@ -31,5 +31,5 @@ public interface ActivityProcessor {
             Map<String, ModelInfo> formKeyMap, Map<String, ModelInfo> decisionTableKeyMap, double subProcessX, double subProcessY);
 
     public void processJsonElements(JsonNode shapesArrayNode, JsonNode modelNode, BaseElement parentElement,
-            Map<String, JsonNode> shapeMap, Map<String, String> formKeyMap, Map<String, String> decisionTableMap, CmmnModel bpmnModel);
+            Map<String, JsonNode> shapeMap, Map<String, String> formMap, Map<String, String> decisionTableMap, CmmnModel bpmnModel);
 }

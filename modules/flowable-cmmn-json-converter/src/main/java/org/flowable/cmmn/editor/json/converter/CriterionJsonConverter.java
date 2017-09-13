@@ -19,6 +19,8 @@ import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.GraphicInfo;
+import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemDefinition;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -57,20 +59,26 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
         return STENCIL_ENTRY_CRITERION;
     }
 
-    protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, BaseElement baseElement, CmmnModel cmmnModel) {
+    protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel) {
         Criterion criterion = (Criterion) baseElement;
         ArrayNode dockersArrayNode = objectMapper.createArrayNode();
         ObjectNode dockNode = objectMapper.createObjectNode();
         GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(criterion.getId());
-        GraphicInfo parentGraphicInfo = cmmnModel.getGraphicInfo(criterion.getAttachedToRefId());
+        
+        PlanItemDefinition parentPlanItemDefinition = cmmnModel.findPlanItemDefinition(criterion.getAttachedToRefId());
+        PlanItem parentPlanItem = cmmnModel.findPlanItem(parentPlanItemDefinition.getPlanItemRef());
+        GraphicInfo parentGraphicInfo = cmmnModel.getGraphicInfo(parentPlanItem.getId());
         dockNode.put(EDITOR_BOUNDS_X, graphicInfo.getX() - parentGraphicInfo.getX());
         dockNode.put(EDITOR_BOUNDS_Y, graphicInfo.getY() - parentGraphicInfo.getY());
         dockersArrayNode.add(dockNode);
         elementNode.set("dockers", dockersArrayNode);
     }
 
-    protected CaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel) {
+    protected CaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, 
+                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel) {
+        
         Criterion criterion = new Criterion();
+        criterion.setTechnicalId(CmmnJsonConverterUtil.getShapeId(elementNode));
         String stencilId = CmmnJsonConverterUtil.getStencilId(elementNode);
         if (STENCIL_ENTRY_CRITERION.equals(stencilId)) {
             criterion.setEntryCriterion(true);
@@ -84,6 +92,7 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
         if (criterion.getAttachedToRefId() != null) {
             String criterionId = CmmnJsonConverterUtil.getElementId(elementNode);
             cmmnModel.addCriterion(criterionId, criterion);
+            cmmnModel.addCriterionTechnicalId(criterion.getTechnicalId(), criterionId);
         }
         
         return criterion;

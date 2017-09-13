@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:oryx="http://www.b3mn.org/oryx"
+   width="146"
+   height="54"
+   version="1.0">
+  <oryx:magnets>
+    <oryx:magnet oryx:cx="1" oryx:cy="27" oryx:anchors="left" />
+
+    <oryx:magnet oryx:cx="36" oryx:cy="53" oryx:anchors="bottom" />
+    <oryx:magnet oryx:cx="72" oryx:cy="53" oryx:anchors="bottom" />
+    <oryx:magnet oryx:cx="108" oryx:cy="53" oryx:anchors="bottom" />
+
+    <oryx:magnet oryx:cx="145" oryx:cy="27" oryx:anchors="right" />
+
+    <oryx:magnet oryx:cx="36" oryx:cy="1" oryx:anchors="top" />
+    <oryx:magnet oryx:cx="72" oryx:cy="1" oryx:anchors="top" />
+    <oryx:magnet oryx:cx="108" oryx:cy="1" oryx:anchors="top" />
+    
+    <oryx:magnet oryx:cx="72" oryx:cy="27" oryx:default="yes" />
+  </oryx:magnets>
+  <g pointer-events="fill" oryx:minimumSize="146 54" oryx:maximumSize="400 54">
+    <rect id="mileStone" oryx:resize="horizontal" x="0" y="0" width="146" height="54" rx="24" ry="30" stroke="black" fill="#ffffff"/>
+    <text 
+            font-size="12" 
+            id="text_name" 
+            x="73" 
+            y="26" 
+            oryx:align="middle center"
+            oryx:fittoelem="mileStone"
+            stroke="black">
+        </text>
+    
+    <g id="required" display="none">
+         <path d="M68 40 L68 47 M68 49 L68 51 " fill="none" oryx:anchors="bottom"/>
+    </g>
+    
+    <g id="repetition" display="none">
+         <path d="M64 40 v11 M67 40 v11 M70 40 v11" fill="none" oryx:anchors="bottom" transform="translate(13,0)"/>
+    </g>
+    
+  </g>
+</svg>
