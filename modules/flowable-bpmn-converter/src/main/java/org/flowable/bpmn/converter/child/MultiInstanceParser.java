@@ -28,10 +28,12 @@ import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
  */
 public class MultiInstanceParser extends BaseChildElementParser {
 
+    @Override
     public String getElementName() {
         return ELEMENT_MULTIINSTANCE;
     }
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
         if (!(parentElement instanceof Activity))
             return;
@@ -65,10 +67,10 @@ public class MultiInstanceParser extends BaseChildElementParser {
 
                 } else if (xtr.isStartElement() && ELEMENT_EXTENSIONS.equalsIgnoreCase(xtr.getLocalName())) {
                     // parse extension elements
-                	  // initialize collection element parser in case it exists
-                	  Map<String, BaseChildElementParser> childParserMap = new HashMap<String, BaseChildElementParser>();
-                	  childParserMap.put(ELEMENT_MULTIINSTANCE_COLLECTION, new FlowableCollectionParser());
-                	  BpmnXMLUtil.parseChildElements(ELEMENT_EXTENSIONS, multiInstanceDef, xtr, childParserMap, model);
+                    // initialize collection element parser in case it exists
+                    Map<String, BaseChildElementParser> childParserMap = new HashMap<>();
+                    childParserMap.put(ELEMENT_MULTIINSTANCE_COLLECTION, new FlowableCollectionParser());
+                    BpmnXMLUtil.parseChildElements(ELEMENT_EXTENSIONS, multiInstanceDef, xtr, childParserMap, model);
 
                 } else if (xtr.isEndElement() && getElementName().equalsIgnoreCase(xtr.getLocalName())) {
                     readyWithMultiInstance = true;

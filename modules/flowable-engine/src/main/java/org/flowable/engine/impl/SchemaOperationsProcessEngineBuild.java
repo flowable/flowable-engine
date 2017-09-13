@@ -23,6 +23,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
  */
 public class SchemaOperationsProcessEngineBuild implements Command<Object> {
 
+    @Override
     public Object execute(CommandContext commandContext) {
         ((ProcessDbSchemaManager) CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager()).performSchemaOperationsProcessEngineBuild();
         return null;

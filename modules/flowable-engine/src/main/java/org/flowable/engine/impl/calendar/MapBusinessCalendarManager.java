@@ -38,6 +38,7 @@ public class MapBusinessCalendarManager implements BusinessCalendarManager {
         this.businessCalendars = new HashMap<>(businessCalendars);
     }
 
+    @Override
     public BusinessCalendar getBusinessCalendar(String businessCalendarRef) {
         BusinessCalendar businessCalendar = businessCalendars.get(businessCalendarRef);
         if (businessCalendar == null) {

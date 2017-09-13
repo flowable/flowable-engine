@@ -41,10 +41,12 @@ public class EntityManagerSessionFactory implements SessionFactory {
         this.closeEntityManager = closeEntityManager;
     }
 
+    @Override
     public Class<?> getSessionType() {
         return EntityManagerSession.class;
     }
 
+    @Override
     public Session openSession() {
         return new EntityManagerSessionImpl(entityManagerFactory, handleTransactions, closeEntityManager);
     }

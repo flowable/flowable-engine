@@ -34,6 +34,7 @@ public class SetTaskDueDateCmd extends NeedsActiveTaskCmd<Void> {
         this.dueDate = dueDate;
     }
 
+    @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
         if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
             Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();

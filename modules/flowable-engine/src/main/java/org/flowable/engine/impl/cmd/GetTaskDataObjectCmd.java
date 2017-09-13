@@ -56,6 +56,7 @@ public class GetTaskDataObjectCmd implements Command<DataObject>, Serializable {
         this.withLocalizationFallback = withLocalizationFallback;
     }
 
+    @Override
     public DataObject execute(CommandContext commandContext) {
         if (taskId == null) {
             throw new FlowableIllegalArgumentException("taskId is null");

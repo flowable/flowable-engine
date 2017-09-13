@@ -26,6 +26,7 @@ import org.activiti.engine.impl.javax.el.FunctionMapper;
  */
 public class ActivitiFunctionMapper extends FunctionMapper {
 
+    @Override
     public Method resolveFunction(String prefix, String localName) {
         return null;
     }

@@ -27,6 +27,7 @@ import org.flowable.bpmn.model.alfresco.AlfrescoStartEvent;
  */
 public class StartEventXMLConverter extends BaseBpmnXMLConverter {
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return StartEvent.class;
     }

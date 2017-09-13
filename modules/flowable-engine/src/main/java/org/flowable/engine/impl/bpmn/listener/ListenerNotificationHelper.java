@@ -118,6 +118,7 @@ public class ListenerNotificationHelper {
                     planTransactionDependentTaskListener(ExecutionHelper.getExecution(taskEntity.getExecutionId()), (TransactionDependentTaskListener) taskListener, listener);
                 } else {
                     taskEntity.setEventName(eventType);
+                    taskEntity.setEventHandlerId(listener.getId());
                     
                     try {
                         CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor()

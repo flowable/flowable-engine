@@ -32,10 +32,12 @@ public class ErrorEventDefinitionParseHandler extends AbstractBpmnParseHandler<E
 
     public static final String PROPERTYNAME_INITIAL = "initial";
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return ErrorEventDefinition.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, ErrorEventDefinition eventDefinition) {
 
         ErrorEventDefinition modelErrorEvent = eventDefinition;

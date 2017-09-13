@@ -45,6 +45,7 @@ public class Pool extends BaseElement {
         this.executable = executable;
     }
 
+    @Override
     public Pool clone() {
         Pool clone = new Pool();
         clone.setValues(this);

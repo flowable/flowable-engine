@@ -43,6 +43,7 @@ public class AdditionalConverterTest extends AbstractConverterTest {
         validateModel(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "full.dmn";
     }

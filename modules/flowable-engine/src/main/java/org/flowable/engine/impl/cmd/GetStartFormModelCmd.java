@@ -53,6 +53,7 @@ public class GetStartFormModelCmd implements Command<FormModel>, Serializable {
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public FormModel execute(CommandContext commandContext) {
         FormService formService = CommandContextUtil.getFormService();
         if (formService == null) {

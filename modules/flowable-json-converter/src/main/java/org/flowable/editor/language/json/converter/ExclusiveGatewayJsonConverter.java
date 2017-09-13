@@ -40,13 +40,16 @@ public class ExclusiveGatewayJsonConverter extends BaseBpmnJsonConverter {
         convertersToJsonMap.put(ExclusiveGateway.class, ExclusiveGatewayJsonConverter.class);
     }
 
+    @Override
     protected String getStencilId(BaseElement baseElement) {
         return STENCIL_GATEWAY_EXCLUSIVE;
     }
 
+    @Override
     protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
     }
 
+    @Override
     protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
         ExclusiveGateway gateway = new ExclusiveGateway();
         return gateway;

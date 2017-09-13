@@ -17,6 +17,7 @@ package org.flowable.bpmn.model;
  */
 public class ReceiveTask extends Task {
 
+    @Override
     public ReceiveTask clone() {
         ReceiveTask clone = new ReceiveTask();
         clone.setValues(this);

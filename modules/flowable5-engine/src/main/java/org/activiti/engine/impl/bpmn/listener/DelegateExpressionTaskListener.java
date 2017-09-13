@@ -37,6 +37,7 @@ public class DelegateExpressionTaskListener implements TaskListener {
         this.fieldDeclarations = fieldDeclarations;
     }
 
+    @Override
     public void notify(DelegateTask delegateTask) {
         // Note: we can't cache the result of the expression, because the
         // execution can change: eg. delegateExpression='${mySpringBeanFactory.randomSpringBean()}'

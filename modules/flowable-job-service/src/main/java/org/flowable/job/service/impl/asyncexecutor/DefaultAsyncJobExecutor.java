@@ -73,6 +73,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
      */
     protected long secondsToWaitOnShutdown = 60L;
 
+    @Override
     protected boolean executeAsyncJob(final JobInfo job, Runnable runnable) {
         try {
             executorService.execute(runnable);
@@ -95,6 +96,7 @@ public class DefaultAsyncJobExecutor extends AbstractAsyncExecutor {
 
             } else {
                 jobServiceConfiguration.getCommandExecutor().execute(new Command<Void>() {
+                    @Override
                     public Void execute(CommandContext commandContext) {
                         CommandContextUtil.getJobManager(commandContext).unacquire(job);
                         return null;

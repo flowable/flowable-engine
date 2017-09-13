@@ -309,6 +309,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         }
     }
 
+    @Override
     public void initDbSqlSessionFactory() {
         if (dbSqlSessionFactory == null) {
             dbSqlSessionFactory = createDbSqlSessionFactory();
@@ -324,10 +325,12 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         initDbSqlSessionFactoryEntitySettings();
     }
     
+    @Override
     public DbSqlSessionFactory createDbSqlSessionFactory() {
         return new DbSqlSessionFactory();
     }
     
+    @Override
     protected void initDbSqlSessionFactoryEntitySettings() {
         for (Class<? extends Entity> clazz : EntityDependencyOrder.INSERT_ORDER) {
             dbSqlSessionFactory.getInsertionOrder().add(clazz);
@@ -351,6 +354,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     // command executors
     // ////////////////////////////////////////////////////////
 
+    @Override
     public void initCommandExecutors() {
         initDefaultCommandConfig();
         initSchemaCommandConfig();
@@ -359,6 +363,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         initCommandExecutor();
     }
 
+    @Override
     public void initCommandInterceptors() {
         if (commandInterceptors == null) {
             commandInterceptors = new ArrayList<>();
@@ -378,6 +383,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         return EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG;
     }
 
+    @Override
     public CommandInterceptor createTransactionInterceptor() {
         // Should be overridden by subclasses
         return null;
@@ -386,6 +392,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     // OTHER
     // ////////////////////////////////////////////////////////////////////
 
+    @Override
     public InputStream getMyBatisXmlConfigurationStream() {
         return getResourceAsStream(DEFAULT_MYBATIS_MAPPING_FILE);
     }
@@ -419,6 +426,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     // getters and setters
     // //////////////////////////////////////////////////////
 
+    @Override
     public String getEngineName() {
         return idmEngineName;
     }
@@ -429,81 +437,97 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     }
 
 
+    @Override
     public IdmEngineConfiguration setJdbcPassword(String jdbcPassword) {
         this.jdbcPassword = jdbcPassword;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setJdbcMaxActiveConnections(int jdbcMaxActiveConnections) {
         this.jdbcMaxActiveConnections = jdbcMaxActiveConnections;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setJdbcMaxIdleConnections(int jdbcMaxIdleConnections) {
         this.jdbcMaxIdleConnections = jdbcMaxIdleConnections;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setJdbcMaxCheckoutTime(int jdbcMaxCheckoutTime) {
         this.jdbcMaxCheckoutTime = jdbcMaxCheckoutTime;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setJdbcMaxWaitTime(int jdbcMaxWaitTime) {
         this.jdbcMaxWaitTime = jdbcMaxWaitTime;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setJdbcPingEnabled(boolean jdbcPingEnabled) {
         this.jdbcPingEnabled = jdbcPingEnabled;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setJdbcPingConnectionNotUsedFor(int jdbcPingConnectionNotUsedFor) {
         this.jdbcPingConnectionNotUsedFor = jdbcPingConnectionNotUsedFor;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setJdbcDefaultTransactionIsolationLevel(int jdbcDefaultTransactionIsolationLevel) {
         this.jdbcDefaultTransactionIsolationLevel = jdbcDefaultTransactionIsolationLevel;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setJdbcPingQuery(String jdbcPingQuery) {
         this.jdbcPingQuery = jdbcPingQuery;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setDataSourceJndiName(String dataSourceJndiName) {
         this.dataSourceJndiName = dataSourceJndiName;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setSchemaCommandConfig(CommandConfig schemaCommandConfig) {
         this.schemaCommandConfig = schemaCommandConfig;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setTransactionsExternallyManaged(boolean transactionsExternallyManaged) {
         this.transactionsExternallyManaged = transactionsExternallyManaged;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setIdGenerator(IdGenerator idGenerator) {
         this.idGenerator = idGenerator;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setXmlEncoding(String xmlEncoding) {
         this.xmlEncoding = xmlEncoding;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setBeans(Map<Object, Object> beans) {
         this.beans = beans;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setDefaultCommandConfig(CommandConfig defaultCommandConfig) {
         this.defaultCommandConfig = defaultCommandConfig;
         return this;
@@ -702,56 +726,67 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
         this.sqlSessionFactory = sqlSessionFactory;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setTransactionFactory(TransactionFactory transactionFactory) {
         this.transactionFactory = transactionFactory;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setCustomMybatisMappers(Set<Class<?>> customMybatisMappers) {
         this.customMybatisMappers = customMybatisMappers;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setCustomMybatisXMLMappers(Set<String> customMybatisXMLMappers) {
         this.customMybatisXMLMappers = customMybatisXMLMappers;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setCustomSessionFactories(List<SessionFactory> customSessionFactories) {
         this.customSessionFactories = customSessionFactories;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setUsingRelationalDatabase(boolean usingRelationalDatabase) {
         this.usingRelationalDatabase = usingRelationalDatabase;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setDatabaseTablePrefix(String databaseTablePrefix) {
         this.databaseTablePrefix = databaseTablePrefix;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setDatabaseWildcardEscapeCharacter(String databaseWildcardEscapeCharacter) {
         this.databaseWildcardEscapeCharacter = databaseWildcardEscapeCharacter;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setDatabaseCatalog(String databaseCatalog) {
         this.databaseCatalog = databaseCatalog;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setDatabaseSchema(String databaseSchema) {
         this.databaseSchema = databaseSchema;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setTablePrefixIsSchema(boolean tablePrefixIsSchema) {
         this.tablePrefixIsSchema = tablePrefixIsSchema;
         return this;
@@ -775,36 +810,43 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setSessionFactories(Map<Class<?>, SessionFactory> sessionFactories) {
         this.sessionFactories = sessionFactories;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setDatabaseSchemaUpdate(String databaseSchemaUpdate) {
         this.databaseSchemaUpdate = databaseSchemaUpdate;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setEnableEventDispatcher(boolean enableEventDispatcher) {
         this.enableEventDispatcher = enableEventDispatcher;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setEventDispatcher(FlowableEventDispatcher eventDispatcher) {
         this.eventDispatcher = eventDispatcher;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setEventListeners(List<FlowableEventListener> eventListeners) {
         this.eventListeners = eventListeners;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setTypedEventListeners(Map<String, List<FlowableEventListener>> typedEventListeners) {
         this.typedEventListeners = typedEventListeners;
         return this;
     }
 
+    @Override
     public IdmEngineConfiguration setClock(Clock clock) {
         this.clock = clock;
         return this;

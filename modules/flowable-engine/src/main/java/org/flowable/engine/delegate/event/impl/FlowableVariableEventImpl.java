@@ -50,6 +50,7 @@ public class FlowableVariableEventImpl extends FlowableProcessEventImpl implemen
         this.variableValue = variableValue;
     }
 
+    @Override
     public VariableType getVariableType() {
         return variableType;
     }

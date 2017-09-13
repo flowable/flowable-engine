@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.db;
+package org.flowable.engine.common.impl;
 
 import java.util.Collections;
 import java.util.List;
@@ -22,7 +22,7 @@ import java.util.List;
  * 
  * Since sometimes in the past, a version is ambiguous (eg. 5.12 => 5.12, 5.12.1, 5.12T) this class act as a wrapper with a smarter matches() method.
  * 
- * @author jbarrez
+ * @author Joram Barrez 
  */
 public class FlowableVersion {
 
@@ -53,6 +53,7 @@ public class FlowableVersion {
         }
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof FlowableVersion)) {
             return false;

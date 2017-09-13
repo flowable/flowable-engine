@@ -196,6 +196,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         }
     }
 
+    @Override
     protected void tearDown() throws Exception {
         for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
             repositoryService.deleteDeployment(deployment.getId(), true);

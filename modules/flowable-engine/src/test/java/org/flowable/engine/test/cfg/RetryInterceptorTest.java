@@ -73,6 +73,7 @@ public class RetryInterceptorTest {
 
     protected class CommandThrowingOptimisticLockingException implements Command<Void> {
 
+        @Override
         public Void execute(CommandContext commandContext) {
 
             counter.incrementAndGet();

@@ -38,6 +38,7 @@ public class FlowableProcessTerminatedEventImpl extends FlowableEntityEventImpl 
         this.cause = cause;
     }
 
+    @Override
     public Object getCause() {
         return cause;
     }

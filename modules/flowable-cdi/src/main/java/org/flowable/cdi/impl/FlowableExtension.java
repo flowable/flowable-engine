@@ -82,6 +82,7 @@ public class FlowableExtension implements Extension {
         }
 
         Collections.sort(discoveredLookups, new Comparator<ProcessEngineLookup>() {
+            @Override
             public int compare(ProcessEngineLookup o1, ProcessEngineLookup o2) {
                 return (-1) * ((Integer) o1.getPrecedence()).compareTo(o2.getPrecedence());
             }

@@ -48,6 +48,7 @@ public class EntityManagerSessionImpl implements EntityManagerSession {
         this.closeEntityManager = closeEntityManager;
     }
 
+    @Override
     public void flush() {
         if (entityManager != null && (!handleTransactions || isTransactionActive())) {
             try {
@@ -69,6 +70,7 @@ public class EntityManagerSessionImpl implements EntityManagerSession {
         return false;
     }
 
+    @Override
     public void close() {
         if (closeEntityManager && entityManager != null && !entityManager.isOpen()) {
             try {
@@ -79,6 +81,7 @@ public class EntityManagerSessionImpl implements EntityManagerSession {
         }
     }
 
+    @Override
     public EntityManager getEntityManager() {
         if (entityManager == null) {
             entityManager = getEntityManagerFactory().createEntityManager();
@@ -86,6 +89,7 @@ public class EntityManagerSessionImpl implements EntityManagerSession {
             if (handleTransactions) {
                 // Add transaction listeners, if transactions should be handled
                 TransactionListener jpaTransactionCommitListener = new TransactionListener() {
+                    @Override
                     public void execute(CommandContext commandContext) {
                         if (isTransactionActive()) {
                             entityManager.getTransaction().commit();
@@ -94,6 +98,7 @@ public class EntityManagerSessionImpl implements EntityManagerSession {
                 };
 
                 TransactionListener jpaTransactionRollbackListener = new TransactionListener() {
+                    @Override
                     public void execute(CommandContext commandContext) {
                         if (isTransactionActive()) {
                             entityManager.getTransaction().rollback();

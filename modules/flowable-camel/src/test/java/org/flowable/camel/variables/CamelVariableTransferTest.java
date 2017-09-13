@@ -42,6 +42,7 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
 
     protected MockEndpoint service1;
 
+    @Override
     public void setUp() throws Exception {
         camelContext.addRoutes(new RouteBuilder() {
 
@@ -94,6 +95,7 @@ public class CamelVariableTransferTest extends SpringFlowableTestCase {
         });
     }
 
+    @Override
     public void tearDown() throws Exception {
         List<Route> routes = camelContext.getRoutes();
         for (Route r : routes) {

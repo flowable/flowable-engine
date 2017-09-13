@@ -14,10 +14,10 @@
 package org.flowable.engine.impl.history;
 
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.task.service.history.HistoryTaskInterface;
+import org.flowable.task.service.history.InternalHistoryTaskManager;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
-public class DefaultHistoryTaskManager implements HistoryTaskInterface {
+public class DefaultHistoryTaskManager implements InternalHistoryTaskManager {
     
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
 

@@ -30,11 +30,13 @@ public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
 
     private CommandExecutor commandExecutor;
 
+    @Override
     public void setUp() throws Exception {
         processEngineConfiguration.getJobHandlers().put(tweetExceptionHandler.getType(), tweetExceptionHandler);
         this.commandExecutor = processEngineConfiguration.getCommandExecutor();
     }
 
+    @Override
     public void tearDown() throws Exception {
         processEngineConfiguration.getJobHandlers().remove(tweetExceptionHandler.getType());
     }
@@ -42,6 +44,7 @@ public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
     public void testJobCommandsWith2Exceptions() {
         commandExecutor.execute(new Command<String>() {
 
+            @Override
             public String execute(CommandContext commandContext) {
                 JobEntity message = createTweetExceptionMessage();
                 CommandContextUtil.getJobService(commandContext).scheduleAsyncJob(message);
@@ -82,6 +85,7 @@ public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
 
         commandExecutor.execute(new Command<String>() {
 
+            @Override
             public String execute(CommandContext commandContext) {
                 JobEntity message = createTweetExceptionMessage();
                 CommandContextUtil.getJobService(commandContext).scheduleAsyncJob(message);

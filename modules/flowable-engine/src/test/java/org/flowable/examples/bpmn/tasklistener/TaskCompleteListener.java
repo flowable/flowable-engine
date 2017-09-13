@@ -27,6 +27,7 @@ public class TaskCompleteListener implements TaskListener {
     private Expression greeter;
     private Expression shortName;
 
+    @Override
     public void notify(DelegateTask delegateTask) {
         ExecutionEntity execution = ExecutionHelper.getExecution(delegateTask.getExecutionId());
         execution.setVariable("greeting", "Hello from " + greeter.getValue(execution));

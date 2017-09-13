@@ -26,6 +26,7 @@ import org.flowable.bpmn.model.DataStoreReference;
  */
 public class DataStoreReferenceXMLConverter extends BaseBpmnXMLConverter {
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return DataStoreReference.class;
     }

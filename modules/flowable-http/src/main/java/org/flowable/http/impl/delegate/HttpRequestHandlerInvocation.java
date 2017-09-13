@@ -39,10 +39,12 @@ public class HttpRequestHandlerInvocation extends DelegateInvocation {
         this.client = client;
     }
 
+    @Override
     protected void invoke() {
         httpRequestHandlerInstance.handleHttpRequest(delegateExecution, httpRequest, client);
     }
 
+    @Override
     public Object getTarget() {
         return httpRequestHandlerInstance;
     }

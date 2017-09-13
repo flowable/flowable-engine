@@ -13,18 +13,17 @@
 package org.flowable.examples.bpmn.tasklistener;
 
 import org.flowable.engine.delegate.TaskListener;
-import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.task.service.delegate.DelegateTask;
-import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Joram Barrez
  */
 public class CandidateUserAssignment implements TaskListener {
 
+    @Override
     public void notify(DelegateTask delegateTask) {
-        TaskHelper.addCandidateUser((TaskEntity) delegateTask, "kermit");
-        TaskHelper.addCandidateUser((TaskEntity) delegateTask, "fozzie");
+        delegateTask.addCandidateUser("kermit");
+        delegateTask.addCandidateUser("fozzie");
     }
 
 }

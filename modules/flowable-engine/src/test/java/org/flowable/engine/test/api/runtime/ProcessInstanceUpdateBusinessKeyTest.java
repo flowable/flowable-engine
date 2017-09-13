@@ -65,6 +65,7 @@ public class ProcessInstanceUpdateBusinessKeyTest extends PluggableFlowableTestC
 
         private static final long serialVersionUID = 1L;
 
+        @Override
         public void notify(DelegateExecution delegateExecution) {
             CommandContextUtil.getExecutionEntityManager().updateProcessInstanceBusinessKey((ExecutionEntity) delegateExecution, "bzKey");
         }

@@ -34,22 +34,10 @@ angular.module('flowableModeler')
 		        {id: 'nameDesc', labelKey: 'NAME-DESC'}
 		]
 	  };
-
-	  if ($rootScope.modelFilter) {
-		  $scope.model.activeFilter = $rootScope.modelFilter.filter;
-		  $scope.model.activeSort = $rootScope.modelFilter.sort;
-		  $scope.model.filterText = $rootScope.modelFilter.filterText;
-
-	  } else {
-		  // By default, show first filter and use first sort
-	      $scope.model.activeFilter = $scope.model.filters[0];
-	      $scope.model.activeSort = $scope.model.sorts[0];
-	      $rootScope.modelFilter = {
-	        filter: $scope.model.activeFilter,
-	        sort: $scope.model.activeSort,
-	        filterText: ''
-	      };
-	  }
+	  
+	  // By default, show first filter and use first sort
+      $scope.model.activeFilter = $scope.model.filters[0];
+      $scope.model.activeSort = $scope.model.sorts[0];
 
 	  $scope.activateFilter = function(filter) {
 		  $scope.model.activeFilter = filter;
@@ -174,7 +162,7 @@ angular.module('flowableModeler')
 
                 $scope.model.loading = false;
                 $rootScope.editorHistory = [];
-                $location.path("/editor/" + data.id);
+                $location.path("/case-editor/" + data.id);
             }).
             error(function(data, status, headers, config) {
                 $scope.model.loading = false;
@@ -208,6 +196,7 @@ angular.module('flowableModeler')
         $scope.model.caseModel.key = $scope.originalModel.caseModel.key;
         $scope.model.caseModel.description = $scope.originalModel.caseModel.description;
         $scope.model.caseModel.id = $scope.originalModel.caseModel.id;
+        $scope.model.caseModel.modelType = $scope.originalModel.caseModel.modelType;
     }
 
     $scope.ok = function () {
@@ -228,9 +217,9 @@ angular.module('flowableModeler')
                 $rootScope.editorHistory = [];
                 $location.path("/editor/" + data.id);
             }).
-            error(function() {
+            error(function(data, status, headers, config) {
                 $scope.model.loading = false;
-                $modal.$hide();
+                $scope.model.errorMessage = data.message;
             });
     };
 

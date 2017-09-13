@@ -16,10 +16,12 @@
 package org.flowable.engine.common.impl.de.odysseus.el.tree.impl.ast;
 
 public abstract class AstLiteral extends AstRightValue {
+    @Override
 	public final int getCardinality() {
 		return 0;
 	}
 
+    @Override
 	public final AstNode getChild(int i) {
 		return null;
 	}

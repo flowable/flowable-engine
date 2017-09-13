@@ -46,6 +46,7 @@ public class AcquireJobsCmd implements Command<AcquiredJobEntities> {
         this.jobEntityManager = jobEntityManager;
     }
 
+    @Override
     public AcquiredJobEntities execute(CommandContext commandContext) {
         int maxResults = Math.min(remainingCapacity, asyncExecutor.getMaxAsyncJobsDuePerAcquisition());
 

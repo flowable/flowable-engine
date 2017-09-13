@@ -42,6 +42,7 @@ public class CollectionHandler extends BaseElement {
         setImplementationType(otherParser.getImplementationType());
     }
     
+    @Override
     public CollectionHandler clone() {
     	CollectionHandler clone = new CollectionHandler();
         clone.setValues(this);

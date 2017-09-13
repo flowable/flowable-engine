@@ -26,10 +26,12 @@ public class HttpServiceTaskParseHandler extends AbstractActivityBpmnParseHandle
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpServiceTaskParseHandler.class);
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return HttpServiceTask.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, ServiceTask serviceTask) {
         serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createHttpActivityBehavior(serviceTask));
     }

@@ -116,12 +116,11 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
                         ArrayNode candidateUsersNode = objectMapper.createArrayNode();
                         idmNode.set("candidateUsers", candidateUsersNode);
                         idmNode.put("type", "users");
-                        for (String candidateUser : candidateUserIds) {
+                        for (String candidateUser : humanTask.getCandidateUsers()) {
                             ObjectNode candidateUserNode = objectMapper.createObjectNode();
                             candidateUserNode.put("id", candidateUser);
                             candidateUsersNode.add(candidateUserNode);
 
-                            fillProperty("externalId", "user-info-externalid-" + candidateUser, candidateUserNode, humanTask);
                             fillProperty("email", "user-info-email-" + candidateUser, candidateUserNode, humanTask);
                             fillProperty("firstName", "user-info-firstname-" + candidateUser, candidateUserNode, humanTask);
                             fillProperty("lastName", "user-info-lastname-" + candidateUser, candidateUserNode, humanTask);
@@ -151,12 +150,11 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
                         ArrayNode candidateGroupsNode = objectMapper.createArrayNode();
                         idmNode.set("candidateGroups", candidateGroupsNode);
                         idmNode.put("type", "groups");
-                        for (String candidateGroup : candidateGroupIds) {
+                        for (String candidateGroup : humanTask.getCandidateGroups()) {
                             ObjectNode candidateGroupNode = objectMapper.createObjectNode();
                             candidateGroupNode.put("id", candidateGroup);
                             candidateGroupsNode.add(candidateGroupNode);
 
-                            fillProperty("externalId", "group-info-externalid-" + candidateGroup, candidateGroupNode, humanTask);
                             fillProperty("name", "group-info-name-" + candidateGroup, candidateGroupNode, humanTask);
                         }
                     }
@@ -315,7 +313,6 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
 
     protected void fillAssigneeInfo(JsonNode idmDefNode, JsonNode canCompleteTaskNode, HumanTask task) {
         JsonNode assigneeNode = idmDefNode.get("assignee");
-        
         if (assigneeNode != null && !assigneeNode.isNull()) {
             JsonNode idNode = assigneeNode.get("id");
             JsonNode emailNode = assigneeNode.get("email");
@@ -326,7 +323,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
                 addExtensionElement("assignee-info-firstname", assigneeNode.get("firstName"), task);
                 addExtensionElement("assignee-info-lastname", assigneeNode.get("lastName"), task);
             } 
-        } 
+        }
 
         if (canCompleteTaskNode != null && !canCompleteTaskNode.isNull()) {
             addInitiatorCanCompleteExtensionElement(Boolean.valueOf(canCompleteTaskNode.asText()), task);
@@ -400,8 +397,8 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
 
         if (candidateGroups.size() > 0) {
             task.setCandidateGroups(candidateGroups);
-
             addExtensionElement("flowable-idm-candidate-group", String.valueOf(true), task);
+
             if (canCompleteTaskNode != null && !canCompleteTaskNode.isNull()) {
                 addInitiatorCanCompleteExtensionElement(Boolean.valueOf(canCompleteTaskNode.asText()), task);
             } else {

@@ -44,6 +44,7 @@ public class TriggerCmd extends NeedsActiveExecutionCmd<Object> {
         this.transientVariables = transientVariables;
     }
 
+    @Override
     protected Object execute(CommandContext commandContext, ExecutionEntity execution) {
         if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
             Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();

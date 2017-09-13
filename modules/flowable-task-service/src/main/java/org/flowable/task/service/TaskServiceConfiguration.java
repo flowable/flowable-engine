@@ -19,7 +19,7 @@ import org.flowable.engine.common.AbstractServiceConfiguration;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.idm.api.IdmIdentityService;
-import org.flowable.task.service.history.HistoryTaskInterface;
+import org.flowable.task.service.history.InternalHistoryTaskManager;
 import org.flowable.task.service.impl.HistoricTaskServiceImpl;
 import org.flowable.task.service.impl.TaskServiceImpl;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityManager;
@@ -56,9 +56,9 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
     protected TaskEntityManager taskEntityManager;
     protected HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager;
     
-    protected TaskVariableScopeInterface variableScopeInterface;
-    protected HistoryTaskInterface historyTaskInterface;
-    protected TaskLocalizationInterface taskLocalizationInterface;
+    protected InternalTaskVariableScopeResolver internalTaskVariableScopeResolver;
+    protected InternalHistoryTaskManager internalHistoryTaskManager;
+    protected InternalTaskLocalizationManager internalTaskLocalizationManager;
     
     protected boolean enableTaskRelationshipCounts;
     protected boolean enableLocalization;
@@ -161,31 +161,28 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         return this;
     }
 
-    public TaskVariableScopeInterface getVariableScopeInterface() {
-        return variableScopeInterface;
+    public InternalTaskVariableScopeResolver getInternalTaskVariableScopeResolver() {
+        return internalTaskVariableScopeResolver;
     }
 
-    public TaskServiceConfiguration setVariableScopeInterface(TaskVariableScopeInterface variableScopeInterface) {
-        this.variableScopeInterface = variableScopeInterface;
-        return this;
+    public void setInternalTaskVariableScopeResolver(InternalTaskVariableScopeResolver internalTaskVariableScopeResolver) {
+        this.internalTaskVariableScopeResolver = internalTaskVariableScopeResolver;
     }
 
-    public HistoryTaskInterface getHistoryTaskInterface() {
-        return historyTaskInterface;
+    public InternalHistoryTaskManager getInternalHistoryTaskManager() {
+        return internalHistoryTaskManager;
     }
 
-    public TaskServiceConfiguration setHistoryTaskInterface(HistoryTaskInterface historyTaskInterface) {
-        this.historyTaskInterface = historyTaskInterface;
-        return this;
+    public void setInternalHistoryTaskManager(InternalHistoryTaskManager internalHistoryTaskManager) {
+        this.internalHistoryTaskManager = internalHistoryTaskManager;
     }
 
-    public TaskLocalizationInterface getTaskLocalizationInterface() {
-        return taskLocalizationInterface;
+    public InternalTaskLocalizationManager getInternalTaskLocalizationManager() {
+        return internalTaskLocalizationManager;
     }
 
-    public TaskServiceConfiguration setTaskLocalizationInterface(TaskLocalizationInterface taskLocalizationInterface) {
-        this.taskLocalizationInterface = taskLocalizationInterface;
-        return this;
+    public void setInternalTaskLocalizationManager(InternalTaskLocalizationManager internalTaskLocalizationManager) {
+        this.internalTaskLocalizationManager = internalTaskLocalizationManager;
     }
 
     public boolean isEnableTaskRelationshipCounts() {
@@ -224,21 +221,25 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
         return this;
     }
 
+    @Override
     public TaskServiceConfiguration setEnableEventDispatcher(boolean enableEventDispatcher) {
         this.enableEventDispatcher = enableEventDispatcher;
         return this;
     }
 
+    @Override
     public TaskServiceConfiguration setEventDispatcher(FlowableEventDispatcher eventDispatcher) {
         this.eventDispatcher = eventDispatcher;
         return this;
     }
 
+    @Override
     public TaskServiceConfiguration setEventListeners(List<FlowableEventListener> eventListeners) {
         this.eventListeners = eventListeners;
         return this;
     }
 
+    @Override
     public TaskServiceConfiguration setTypedEventListeners(Map<String, List<FlowableEventListener>> typedEventListeners) {
         this.typedEventListeners = typedEventListeners;
         return this;

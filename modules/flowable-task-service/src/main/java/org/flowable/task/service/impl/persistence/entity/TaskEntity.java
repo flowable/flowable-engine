@@ -32,6 +32,7 @@ public interface TaskEntity extends VariableScope, Task, DelegateTask, Entity, H
 
     void setExecutionId(String executionId);
 
+    @Override
     List<IdentityLinkEntity> getIdentityLinks();
 
     void setCreateTime(Date createTime);
@@ -39,10 +40,8 @@ public interface TaskEntity extends VariableScope, Task, DelegateTask, Entity, H
     void setProcessDefinitionId(String processDefinitionId);
 
     void setEventName(String eventName);
-
-    //void setCurrentFlowableListener(FlowableListener currentListener);
-
-    //ExecutionEntity getProcessInstance();
+    
+    void setEventHandlerId(String eventHandlerId);
 
     void setProcessInstanceId(String processInstanceId);
 
@@ -56,15 +55,9 @@ public interface TaskEntity extends VariableScope, Task, DelegateTask, Entity, H
 
     void forceUpdate();
 
-    boolean isDeleted();
-
-    void setDeleted(boolean isDeleted);
-
     boolean isCanceled();
 
     void setCanceled(boolean isCanceled);
-
-    Date getClaimTime();
 
     void setClaimTime(Date claimTime);
 }

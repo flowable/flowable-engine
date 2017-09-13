@@ -84,6 +84,8 @@ create table ACT_RU_EXECUTION (
     DEADLETTER_JOB_COUNT_ int,
     VAR_COUNT_ int, 
     ID_LINK_COUNT_ int,
+    CALLBACK_ID_ nvarchar(255),
+    CALLBACK_TYPE_ nvarchar(255),
     primary key (ID_)
 );
 

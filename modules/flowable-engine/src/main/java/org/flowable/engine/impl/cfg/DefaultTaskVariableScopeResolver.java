@@ -15,18 +15,18 @@ package org.flowable.engine.impl.cfg;
 
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
-import org.flowable.task.service.TaskVariableScopeInterface;
+import org.flowable.task.service.InternalTaskVariableScopeResolver;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
 /**
  * @author Tijs Rademakers
  */
-public class DefaultTaskVariableScopeManager implements TaskVariableScopeInterface {
+public class DefaultTaskVariableScopeResolver implements InternalTaskVariableScopeResolver {
     
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
-    public DefaultTaskVariableScopeManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public DefaultTaskVariableScopeResolver(ProcessEngineConfigurationImpl processEngineConfiguration) {
         this.processEngineConfiguration = processEngineConfiguration;
     }
 

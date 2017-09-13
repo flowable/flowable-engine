@@ -28,6 +28,7 @@ public class PrimitiveStructureDefinition implements StructureDefinition {
         this.primitiveClass = primitiveClass;
     }
 
+    @Override
     public String getId() {
         return this.id;
     }
@@ -36,6 +37,7 @@ public class PrimitiveStructureDefinition implements StructureDefinition {
         return primitiveClass;
     }
 
+    @Override
     public StructureInstance createInstance() {
         return new PrimitiveStructureInstance(this);
     }

@@ -80,6 +80,7 @@ public class JSONObject {
          * 
          * @return NULL.
          */
+        @Override
         protected final Object clone() {
             return this;
         }
@@ -91,6 +92,7 @@ public class JSONObject {
          *            An object to test for nullness.
          * @return true if the object parameter is the JSONObject.NULL object or null.
          */
+        @Override
         public boolean equals(Object object) {
             return object == null || object == this;
         }
@@ -100,6 +102,7 @@ public class JSONObject {
          * 
          * @return The string "null".
          */
+        @Override
         public String toString() {
             return "null";
         }
@@ -1198,6 +1201,7 @@ public class JSONObject {
      * @return a printable, displayable, portable, transmittable representation of the object, beginning with <code>{</code>&nbsp;<small>(left brace)</small> and ending with <code>}</code>
      *         &nbsp;<small>(right brace)</small>.
      */
+    @Override
     public String toString() {
         try {
             Iterator keys = keys();

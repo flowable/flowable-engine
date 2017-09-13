@@ -27,26 +27,37 @@ public interface UserEntity extends User, Entity, HasRevision {
 
     void setPicture(Picture picture);
 
+    @Override
     String getId();
 
+    @Override
     void setId(String id);
 
+    @Override
     String getFirstName();
 
+    @Override
     void setFirstName(String firstName);
 
+    @Override
     String getLastName();
 
+    @Override
     void setLastName(String lastName);
 
+    @Override
     String getEmail();
 
+    @Override
     void setEmail(String email);
 
+    @Override
     String getPassword();
 
+    @Override
     void setPassword(String password);
 
+    @Override
     boolean isPictureSet();
 
     ByteArrayRef getPictureByteArrayRef();

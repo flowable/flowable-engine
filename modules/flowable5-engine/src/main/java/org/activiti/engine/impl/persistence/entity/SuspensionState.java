@@ -41,6 +41,7 @@ public interface SuspensionState {
             this.name = string;
         }
 
+        @Override
         public int getStateCode() {
             return stateCode;
         }

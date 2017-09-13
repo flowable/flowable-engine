@@ -36,10 +36,12 @@ public class NativeHistoricActivityInstanceQueryImpl extends AbstractNativeQuery
 
     // results ////////////////////////////////////////////////////////////////
 
+    @Override
     public List<HistoricActivityInstance> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext).findHistoricActivityInstancesByNativeQuery(parameterMap);
     }
 
+    @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext).findHistoricActivityInstanceCountByNativeQuery(parameterMap);
     }

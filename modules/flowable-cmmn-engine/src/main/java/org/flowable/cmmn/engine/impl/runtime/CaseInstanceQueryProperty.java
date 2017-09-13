@@ -25,7 +25,7 @@ public class CaseInstanceQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, CaseInstanceQueryProperty> properties = new HashMap<String, CaseInstanceQueryProperty>();
+    private static final Map<String, CaseInstanceQueryProperty> properties = new HashMap<>();
 
     public static final CaseInstanceQueryProperty CASE_INSTANCE_ID = new CaseInstanceQueryProperty("RES.ID_");
     public static final CaseInstanceQueryProperty CASE_DEFINITION_KEY = new CaseInstanceQueryProperty("CaseDefinitionKey");

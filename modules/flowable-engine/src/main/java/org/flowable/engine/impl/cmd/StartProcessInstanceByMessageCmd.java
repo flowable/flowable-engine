@@ -59,6 +59,7 @@ public class StartProcessInstanceByMessageCmd implements Command<ProcessInstance
         this.callbackType = processInstanceBuilder.getCallbackType();
     }
 
+    @Override
     public ProcessInstance execute(CommandContext commandContext) {
 
         if (messageName == null) {

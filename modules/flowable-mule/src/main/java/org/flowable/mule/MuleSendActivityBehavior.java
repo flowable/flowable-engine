@@ -58,6 +58,7 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
     private Expression username;
     private Expression password;
 
+    @Override
     public void execute(DelegateExecution execution) {
         String endpointUrlValue = this.getStringFromField(this.endpointUrl, execution);
         String languageValue = this.getStringFromField(this.language, execution);

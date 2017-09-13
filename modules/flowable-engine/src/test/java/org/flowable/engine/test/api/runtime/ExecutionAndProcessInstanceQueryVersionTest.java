@@ -22,6 +22,7 @@ public class ExecutionAndProcessInstanceQueryVersionTest extends PluggableFlowab
     private org.flowable.engine.repository.Deployment oldDeployment;
     private org.flowable.engine.repository.Deployment newDeployment;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         oldDeployment = repositoryService.createDeployment()
@@ -37,6 +38,7 @@ public class ExecutionAndProcessInstanceQueryVersionTest extends PluggableFlowab
         runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         repositoryService.deleteDeployment(oldDeployment.getId(), true);
         repositoryService.deleteDeployment(newDeployment.getId(), true);

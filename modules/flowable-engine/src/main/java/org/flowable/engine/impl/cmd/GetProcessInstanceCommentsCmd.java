@@ -41,6 +41,7 @@ public class GetProcessInstanceCommentsCmd implements Command<List<Comment>>, Se
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<Comment> execute(CommandContext commandContext) {
         if (StringUtils.isNotBlank(type)) {
             List<Comment> commentsByProcessInstanceId = CommandContextUtil.getCommentEntityManager(commandContext).findCommentsByProcessInstanceId(processInstanceId, type);

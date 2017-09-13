@@ -30,6 +30,7 @@ public class GetPropertiesCmd implements Command<Map<String, String>>, Serializa
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public Map<String, String> execute(CommandContext commandContext) {
         List<IdmPropertyEntity> propertyEntities = CommandContextUtil.getPropertyEntityManager(commandContext).findAll();
 

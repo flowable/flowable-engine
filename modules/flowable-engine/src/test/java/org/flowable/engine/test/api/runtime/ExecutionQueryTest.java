@@ -65,6 +65,7 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
     private List<String> concurrentProcessInstanceIds;
     private List<String> sequentialProcessInstanceIds;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
@@ -79,6 +80,7 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
         sequentialProcessInstanceIds.add(runtimeService.startProcessInstanceByKey(SEQUENTIAL_PROCESS_KEY).getId());
     }
 
+    @Override
     protected void tearDown() throws Exception {
         for (org.flowable.engine.repository.Deployment deployment : repositoryService.createDeploymentQuery().list()) {
             repositoryService.deleteDeployment(deployment.getId(), true);

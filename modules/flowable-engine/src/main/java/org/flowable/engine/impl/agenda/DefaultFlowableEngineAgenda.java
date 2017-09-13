@@ -45,6 +45,7 @@ public class DefaultFlowableEngineAgenda extends AbstractAgenda implements Flowa
     /**
      * Generic method to plan a {@link Runnable}.
      */
+    @Override
     public void planOperation(Runnable operation, ExecutionEntity executionEntity) {
         operations.add(operation);
         LOGGER.debug("Operation {} added to agenda", operation.getClass());
@@ -56,38 +57,47 @@ public class DefaultFlowableEngineAgenda extends AbstractAgenda implements Flowa
 
     /* SPECIFIC operations */
 
+    @Override
     public void planContinueProcessOperation(ExecutionEntity execution) {
         planOperation(new ContinueProcessOperation(commandContext, execution), execution);
     }
 
+    @Override
     public void planContinueProcessSynchronousOperation(ExecutionEntity execution) {
         planOperation(new ContinueProcessOperation(commandContext, execution, true, false), execution);
     }
 
+    @Override
     public void planContinueProcessInCompensation(ExecutionEntity execution) {
         planOperation(new ContinueProcessOperation(commandContext, execution, false, true), execution);
     }
 
+    @Override
     public void planContinueMultiInstanceOperation(ExecutionEntity execution, int loopCounter) {
         planOperation(new ContinueMultiInstanceOperation(commandContext, execution, loopCounter), execution);
     }
 
+    @Override
     public void planTakeOutgoingSequenceFlowsOperation(ExecutionEntity execution, boolean evaluateConditions) {
         planOperation(new TakeOutgoingSequenceFlowsOperation(commandContext, execution, evaluateConditions), execution);
     }
 
+    @Override
     public void planEndExecutionOperation(ExecutionEntity execution) {
         planOperation(new EndExecutionOperation(commandContext, execution), execution);
     }
 
+    @Override
     public void planTriggerExecutionOperation(ExecutionEntity execution) {
         planOperation(new TriggerExecutionOperation(commandContext, execution), execution);
     }
 
+    @Override
     public void planDestroyScopeOperation(ExecutionEntity execution) {
         planOperation(new DestroyScopeOperation(commandContext, execution), execution);
     }
 
+    @Override
     public void planExecuteInactiveBehaviorsOperation() {
         planOperation(new ExecuteInactiveBehaviorsOperation(commandContext));
     }

@@ -33,6 +33,7 @@ public class Assignment extends BaseElement {
         this.to = to;
     }
 
+    @Override
     public Assignment clone() {
         Assignment clone = new Assignment();
         clone.setValues(this);

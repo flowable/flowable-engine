@@ -55,6 +55,7 @@ public class HitPolicyOutputOrder extends AbstractHitPolicy implements ComposeDe
         // sort on predefined list(s) of output values
         Collections.sort(ruleResults, new Comparator<Map<String, Object>>() {
 
+            @Override
             public int compare(Map<String, Object> o1, Map<String, Object> o2) {
                 
                 CompareToBuilder compareToBuilder = new CompareToBuilder();

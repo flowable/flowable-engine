@@ -64,6 +64,7 @@ public abstract class AbstractBpmnParseHandler<T extends BaseElement> implements
 
     public static final String PROPERTYNAME_TIMER_DECLARATION = "timerDeclarations";
 
+    @Override
     public Set<Class<? extends BaseElement>> getHandledTypes() {
         Set<Class<? extends BaseElement>> types = new HashSet<>();
         types.add(getHandledType());
@@ -72,6 +73,7 @@ public abstract class AbstractBpmnParseHandler<T extends BaseElement> implements
 
     protected abstract Class<? extends BaseElement> getHandledType();
 
+    @Override
     @SuppressWarnings("unchecked")
     public void parse(BpmnParse bpmnParse, BaseElement element) {
         T baseElement = (T) element;

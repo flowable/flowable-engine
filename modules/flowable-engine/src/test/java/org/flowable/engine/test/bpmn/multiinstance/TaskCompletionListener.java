@@ -21,6 +21,7 @@ import org.flowable.task.service.delegate.DelegateTask;
  */
 public class TaskCompletionListener implements TaskListener {
 
+    @Override
     public void notify(DelegateTask delegateTask) {
         Integer counter = (Integer) delegateTask.getVariable("taskListenerCounter");
         if (counter == null) {

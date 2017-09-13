@@ -85,6 +85,7 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
 
         moveByMinutes(5);
         waitForJobExecutorOnCondition(10000, 500, new Callable<Boolean>() {
+            @Override
             public Boolean call() throws Exception {
                 return 1 == piq.count();
             }
@@ -94,6 +95,7 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
 
         moveByMinutes(5);
         waitForJobExecutorOnCondition(10000, 500, new Callable<Boolean>() {
+            @Override
             public Boolean call() throws Exception {
                 return 2 == piq.count();
             }
@@ -160,6 +162,7 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
 
         moveByMinutes(5);
         waitForJobExecutorOnCondition(10000, 500, new Callable<Boolean>() {
+            @Override
             public Boolean call() throws Exception {
                 // we check that correct version was started
                 ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample").singleResult();

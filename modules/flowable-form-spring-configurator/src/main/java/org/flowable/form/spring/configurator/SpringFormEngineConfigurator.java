@@ -38,6 +38,7 @@ public class SpringFormEngineConfigurator extends FormEngineConfigurator {
         initFormEngine();
     }
 
+    @Override
     protected synchronized FormEngine initFormEngine() {
         if (formEngineConfiguration == null) {
             throw new FlowableException("FormEngineConfiguration is required");
@@ -46,6 +47,7 @@ public class SpringFormEngineConfigurator extends FormEngineConfigurator {
         return formEngineConfiguration.buildFormEngine();
     }
 
+    @Override
     public SpringFormEngineConfiguration getFormEngineConfiguration() {
         return formEngineConfiguration;
     }

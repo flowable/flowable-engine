@@ -34,6 +34,7 @@ public class AddEditorSourceExtraForModelCmd implements Command<Object>, Seriali
         this.bytes = bytes;
     }
 
+    @Override
     public Object execute(CommandContext commandContext) {
         CommandContextUtil.getModelEntityManager(commandContext).insertEditorSourceExtraForModel(modelId, bytes);
 

@@ -116,6 +116,10 @@ flowableModeler
             templateUrl: appResourceRoot + 'views/form-builder.html',
             controller: 'FormBuilderController'
         })
+        .when('/case-editor/:modelId', {
+            templateUrl: appResourceRoot + 'editor-app/editor.html',
+            controller: 'EditorController'
+        })
         .when('/decision-table-editor/:modelId', {
             templateUrl: appResourceRoot + 'views/decision-table-editor.html',
             controller: 'DecisionTableEditorController'

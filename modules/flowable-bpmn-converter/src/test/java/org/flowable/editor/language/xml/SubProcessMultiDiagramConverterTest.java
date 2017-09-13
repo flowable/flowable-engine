@@ -53,6 +53,7 @@ public class SubProcessMultiDiagramConverterTest extends AbstractConverterTest {
 //        deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "subprocessmultidiagrammodel.bpmn";
     }

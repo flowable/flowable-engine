@@ -28,12 +28,14 @@ import org.flowable.variable.service.history.HistoricVariableInstance;
  */
 public class StandaloneTaskTest extends PluggableFlowableTestCase {
 
+    @Override
     public void setUp() throws Exception {
         super.setUp();
         identityService.saveUser(identityService.newUser("kermit"));
         identityService.saveUser(identityService.newUser("gonzo"));
     }
 
+    @Override
     public void tearDown() throws Exception {
         identityService.deleteUser("kermit");
         identityService.deleteUser("gonzo");

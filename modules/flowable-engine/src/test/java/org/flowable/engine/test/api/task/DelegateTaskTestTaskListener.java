@@ -24,6 +24,7 @@ public class DelegateTaskTestTaskListener implements TaskListener {
     public static final String VARNAME_CANDIDATE_USERS = "candidateUsers";
     public static final String VARNAME_CANDIDATE_GROUPS = "candidateGroups";
 
+    @Override
     public void notify(DelegateTask delegateTask) {
         Set<IdentityLink> candidates = delegateTask.getCandidates();
         Set<String> candidateUsers = new HashSet<>();

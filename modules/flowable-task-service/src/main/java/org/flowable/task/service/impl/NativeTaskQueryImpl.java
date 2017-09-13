@@ -35,10 +35,12 @@ public class NativeTaskQueryImpl extends AbstractNativeQuery<NativeTaskQuery, Ta
 
     // results ////////////////////////////////////////////////////////////////
 
+    @Override
     public List<Task> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getTaskEntityManager(commandContext).findTasksByNativeQuery(parameterMap);
     }
 
+    @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getTaskEntityManager(commandContext).findTaskCountByNativeQuery(parameterMap);
     }

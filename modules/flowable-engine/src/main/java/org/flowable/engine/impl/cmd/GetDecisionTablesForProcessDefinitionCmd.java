@@ -45,6 +45,7 @@ public class GetDecisionTablesForProcessDefinitionCmd implements Command<List<Dm
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public List<DmnDecisionTable> execute(CommandContext commandContext) {
         ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
 

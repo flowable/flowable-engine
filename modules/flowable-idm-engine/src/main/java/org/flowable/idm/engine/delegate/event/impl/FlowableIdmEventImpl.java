@@ -35,6 +35,7 @@ public class FlowableIdmEventImpl implements FlowableEvent {
         this.type = type;
     }
 
+    @Override
     public FlowableIdmEventType getType() {
         return type;
     }

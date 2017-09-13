@@ -41,6 +41,7 @@ public class FlowableActivityEventImpl extends FlowableProcessEventImpl implemen
         this.activityId = activityId;
     }
 
+    @Override
     public String getActivityName() {
         return activityName;
     }
@@ -58,6 +59,7 @@ public class FlowableActivityEventImpl extends FlowableProcessEventImpl implemen
         this.activityType = activityType;
     }
 
+    @Override
     public String getBehaviorClass() {
         return behaviorClass;
     }

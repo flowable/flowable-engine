@@ -50,6 +50,7 @@ public class ActivitiVariableEventImpl extends ActivitiEventImpl implements Flow
         this.variableValue = variableValue;
     }
 
+    @Override
     public VariableType getVariableType() {
         return variableType;
     }

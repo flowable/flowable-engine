@@ -44,10 +44,12 @@ public class VariableScopeResolver implements Resolver {
         this.variableScope = variableScope;
     }
 
+    @Override
     public boolean containsKey(Object key) {
         return variableScopeKey.equals(key) || variableScope.hasVariable((String) key);
     }
 
+    @Override
     public Object get(Object key) {
         if (variableScopeKey.equals(key)) {
             return variableScope;

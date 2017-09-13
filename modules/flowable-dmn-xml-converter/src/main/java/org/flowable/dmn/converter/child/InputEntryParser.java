@@ -27,10 +27,12 @@ import org.flowable.dmn.model.UnaryTests;
  */
 public class InputEntryParser extends BaseChildElementParser {
 
+    @Override
     public String getElementName() {
         return ELEMENT_INPUT_ENTRY;
     }
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, DmnElement parentElement, DecisionTable decisionTable) throws Exception {
         if (!(parentElement instanceof DecisionRule))
             return;

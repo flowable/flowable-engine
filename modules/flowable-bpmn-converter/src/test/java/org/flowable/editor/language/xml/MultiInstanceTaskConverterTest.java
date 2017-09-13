@@ -58,6 +58,7 @@ public class MultiInstanceTaskConverterTest extends AbstractConverterTest {
         deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "multiinstancemodel.bpmn";
     }

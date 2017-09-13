@@ -94,6 +94,7 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
                 builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
                 httpClientBuilder.setSSLSocketFactory(
                         new SSLConnectionSocketFactory(builder.build(), new HostnameVerifier() {
+                            @Override
                             public boolean verify(String s, SSLSession sslSession) {
                                 return true;
                             }

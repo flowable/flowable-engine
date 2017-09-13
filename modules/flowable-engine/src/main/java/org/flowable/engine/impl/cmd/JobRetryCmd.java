@@ -54,6 +54,7 @@ public class JobRetryCmd implements Command<Object> {
         this.exception = exception;
     }
 
+    @Override
     public Object execute(CommandContext commandContext) {
         JobService jobService = CommandContextUtil.getJobService(commandContext);
         TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);

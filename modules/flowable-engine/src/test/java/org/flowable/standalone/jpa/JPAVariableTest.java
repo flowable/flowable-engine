@@ -69,6 +69,7 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
 
     private static EntityManagerFactory entityManagerFactory;
 
+    @Override
     protected void initializeProcessEngine() {
         if (cachedProcessEngine == null) {
             ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration

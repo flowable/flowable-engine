@@ -53,7 +53,7 @@ public class JobEntityManagerImpl extends JobInfoEntityManagerImpl<JobEntity> im
     }
 
     protected boolean doInsert(JobEntity jobEntity, boolean fireCreateEvent) {
-        boolean handledJob = getJobServiceConfiguration().getJobScopeInterface().handleJobInsert(jobEntity);
+        boolean handledJob = getJobServiceConfiguration().getInternalJobManager().handleJobInsert(jobEntity);
         if (!handledJob) {
             return false;
         }
@@ -87,7 +87,7 @@ public class JobEntityManagerImpl extends JobInfoEntityManagerImpl<JobEntity> im
 
     @Override
     public void delete(JobEntity entity, boolean fireDeleteEvent) {
-        getJobServiceConfiguration().getJobScopeInterface().handleJobDelete(entity);
+        getJobServiceConfiguration().getInternalJobManager().handleJobDelete(entity);
         super.delete(entity, fireDeleteEvent);
     }
 
@@ -101,6 +101,7 @@ public class JobEntityManagerImpl extends JobInfoEntityManagerImpl<JobEntity> im
         }
     }
 
+    @Override
     public JobDataManager getJobDataManager() {
         return jobDataManager;
     }

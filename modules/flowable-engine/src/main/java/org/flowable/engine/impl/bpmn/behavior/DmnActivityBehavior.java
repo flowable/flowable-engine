@@ -47,6 +47,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         this.task = task;
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
         FieldExtension fieldExtension = DelegateHelper.getFlowElementField(execution, EXPRESSION_DECISION_TABLE_REFERENCE_KEY);
         if (fieldExtension == null || ((fieldExtension.getStringValue() == null || fieldExtension.getStringValue().length() == 0) &&

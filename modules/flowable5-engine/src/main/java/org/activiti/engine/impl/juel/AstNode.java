@@ -21,6 +21,7 @@ public abstract class AstNode implements ExpressionNode {
     /**
      * evaluate and return the (optionally coerced) result.
      */
+    @Override
     public final Object getValue(Bindings bindings, ELContext context, Class<?> type) {
         Object value = eval(bindings, context);
         if (type != null) {
@@ -33,6 +34,7 @@ public abstract class AstNode implements ExpressionNode {
 
     public abstract Object eval(Bindings bindings, ELContext context);
 
+    @Override
     public final String getStructuralId(Bindings bindings) {
         StringBuilder builder = new StringBuilder();
         appendStructure(builder, bindings);

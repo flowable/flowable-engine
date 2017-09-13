@@ -14,7 +14,7 @@ package org.flowable.variable.service.history;
 
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
-public interface HistoryVariableInterface {
+public interface InternalHistoryVariableManager {
 
     /**
      * Record a variable has been created, if audit history is enabled.

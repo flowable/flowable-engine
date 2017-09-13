@@ -90,6 +90,7 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
     }
 
     // Execution listener
+    @Override
     public void notify(DelegateExecution execution) {
         if (executionListenerInstance == null) {
             executionListenerInstance = getExecutionListenerInstance();
@@ -111,6 +112,7 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
     }
 
     // Task listener
+    @Override
     public void notify(DelegateTask delegateTask) {
         if (taskListenerInstance == null) {
             taskListenerInstance = getTaskListenerInstance();
@@ -134,6 +136,7 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
     }
 
     // Activity Behavior
+    @Override
     public void execute(DelegateExecution execution) {
         ActivityExecution activityExecution = (ActivityExecution) execution;
 
@@ -163,6 +166,7 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
     }
 
     // Signallable activity behavior
+    @Override
     public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
         if (activityBehaviorInstance == null) {
             activityBehaviorInstance = getActivityBehaviorInstance(execution);

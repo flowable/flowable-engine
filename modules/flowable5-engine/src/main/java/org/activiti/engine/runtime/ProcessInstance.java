@@ -59,6 +59,7 @@ public interface ProcessInstance extends Execution {
     /**
      * returns true if the process instance is suspended
      */
+    @Override
     boolean isSuspended();
 
     /**
@@ -69,6 +70,7 @@ public interface ProcessInstance extends Execution {
     /**
      * The tenant identifier of this process instance
      */
+    @Override
     String getTenantId();
 
     /**

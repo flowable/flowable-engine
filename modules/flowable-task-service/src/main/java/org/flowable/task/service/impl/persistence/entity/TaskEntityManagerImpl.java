@@ -60,7 +60,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
             taskEntity.setAssignee(assignee);
             
             if (taskEntity.getId() != null) {
-                getTaskServiceConfiguration().getHistoryTaskInterface().recordTaskInfoChange(taskEntity);
+                getTaskServiceConfiguration().getInternalHistoryTaskManager().recordTaskInfoChange(taskEntity);
                 update(taskEntity);
             }
         }
@@ -74,7 +74,7 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
             taskEntity.setOwner(owner);
 
             if (taskEntity.getId() != null) {
-                getTaskServiceConfiguration().getHistoryTaskInterface().recordTaskInfoChange(taskEntity);
+                getTaskServiceConfiguration().getInternalHistoryTaskManager().recordTaskInfoChange(taskEntity);
                 update(taskEntity);
             }
         }

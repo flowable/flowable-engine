@@ -33,6 +33,7 @@ public class DeleteUserInfoCmd implements Command<Object>, Serializable {
         this.key = key;
     }
 
+    @Override
     public String execute(CommandContext commandContext) {
         CommandContextUtil.getIdentityInfoEntityManager(commandContext).deleteUserInfoByUserIdAndKey(userId, key);
         return null;

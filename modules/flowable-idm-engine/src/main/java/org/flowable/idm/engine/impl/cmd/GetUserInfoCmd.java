@@ -34,6 +34,7 @@ public class GetUserInfoCmd implements Command<String>, Serializable {
         this.key = key;
     }
 
+    @Override
     public String execute(CommandContext commandContext) {
         IdentityInfoEntity identityInfo = CommandContextUtil.getIdentityInfoEntityManager(commandContext).findUserInfoByUserIdAndKey(userId, key);
 

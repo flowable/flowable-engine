@@ -32,6 +32,7 @@ public class DisabledDefinitionInfoCacheTest extends AbstractFlowableTestCase {
 
     protected static ProcessEngine cachedProcessEngine;
 
+    @Override
     protected void initializeProcessEngine() {
         if (cachedProcessEngine == null) {
             ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration

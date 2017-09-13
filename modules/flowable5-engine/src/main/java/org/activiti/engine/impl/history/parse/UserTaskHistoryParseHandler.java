@@ -31,10 +31,12 @@ public class UserTaskHistoryParseHandler extends AbstractBpmnParseHandler<UserTa
 
     protected static final UserTaskIdHandler USER_TASK_ID_HANDLER = new UserTaskIdHandler();
 
+    @Override
     protected Class<? extends BaseElement> getHandledType() {
         return UserTask.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, UserTask element) {
         TaskDefinition taskDefinition = (TaskDefinition) bpmnParse.getCurrentActivity().getProperty(UserTaskParseHandler.PROPERTY_TASK_DEFINITION);
         taskDefinition.addTaskListener(TaskListener.EVENTNAME_ASSIGNMENT, USER_TASK_ASSIGNMENT_HANDLER);

@@ -17,6 +17,7 @@ import org.flowable.engine.delegate.JavaDelegate;
 
 public class ChangeVariableType implements JavaDelegate {
 
+    @Override
     public void execute(DelegateExecution execution) {
         // Initially set to null, stored as NullType
         execution.setVariable("myVar", null);

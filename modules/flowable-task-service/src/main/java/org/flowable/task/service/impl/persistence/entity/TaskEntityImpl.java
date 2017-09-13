@@ -30,6 +30,7 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.identitylink.service.IdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
 import org.flowable.task.service.DelegationState;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
@@ -88,17 +89,19 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     private boolean isCountEnabled;
     private int variableCount;
     private int identityLinkCount;
+    
 
-    protected String eventName;
+    protected Date claimTime;
 
     protected String tenantId = TaskServiceConfiguration.NO_TENANT_ID;
 
+    // Non-persisted
+    protected String eventName;
+    protected String eventHandlerId;
     protected List<VariableInstanceEntity> queryVariables;
     protected List<IdentityLinkEntity> queryIdentityLinks;
-
     protected boolean forcedUpdate;
 
-    protected Date claimTime;
 
     public TaskEntityImpl() {
 
@@ -162,7 +165,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
 
     @Override
     protected VariableScopeImpl getParentVariableScope() {
-        return CommandContextUtil.getTaskServiceConfiguration().getVariableScopeInterface().resolveParentVariableScope(this);
+        return CommandContextUtil.getTaskServiceConfiguration().getInternalTaskVariableScopeResolver().resolveParentVariableScope(this);
     }
 
     @Override
@@ -257,6 +260,40 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     @Override
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    @Override
+    public void addUserIdentityLink(String userId, String identityLinkType) {
+        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
+        identityLinkEntityManager.addTaskIdentityLink(this.id, userId, null, identityLinkType);
+    }
+
+    @Override
+    public void addGroupIdentityLink(String groupId, String identityLinkType) {
+        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
+        identityLinkEntityManager.addTaskIdentityLink(this.id, null, groupId, identityLinkType);
+    }
+
+    @Override
+    public void deleteCandidateUser(String userId) {
+        deleteUserIdentityLink(userId, IdentityLinkType.CANDIDATE);
+    }
+
+    @Override
+    public void deleteCandidateGroup(String groupId) {
+        deleteGroupIdentityLink(groupId, IdentityLinkType.CANDIDATE);
+    }
+    
+    @Override
+    public void deleteUserIdentityLink(String userId, String identityLinkType) {
+        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
+        identityLinkEntityManager.deleteTaskIdentityLink(this.id, getIdentityLinks(), userId, null, identityLinkType);
+    }
+    
+    @Override
+    public void deleteGroupIdentityLink(String groupId, String identityLinkType) {
+        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
+        identityLinkEntityManager.deleteTaskIdentityLink(this.id, getIdentityLinks(), null, groupId,identityLinkType);
     }
 
     @Override
@@ -413,6 +450,16 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     public void setEventName(String eventName) {
         this.eventName = eventName;
     }
+    
+    @Override
+    public String getEventHandlerId() {
+        return eventHandlerId;
+    }
+    
+    @Override
+    public void setEventHandlerId(String eventHandlerId) {
+        this.eventHandlerId = eventHandlerId;
+    }
 
     @Override
     public void setExecutionId(String executionId) {
@@ -432,6 +479,30 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     @Override
     public DelegationState getDelegationState() {
         return delegationState;
+    }
+    
+    @Override
+    public void addCandidateUser(String userId) {
+        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
+        identityLinkEntityManager.addCandidateUser(this.id, userId);
+    }
+    
+    @Override
+    public void addCandidateUsers(Collection<String> candidateUsers) {
+        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
+        identityLinkEntityManager.addCandidateUsers(this.id, candidateUsers);        
+    }
+    
+    @Override
+    public void addCandidateGroup(String groupId) {
+        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
+        identityLinkEntityManager.addCandidateGroup(this.id, groupId);
+    }
+    
+    @Override
+    public void addCandidateGroups(Collection<String> candidateGroups) {
+        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager();
+        identityLinkEntityManager.addCandidateGroups(this.id, candidateGroups);
     }
 
     @Override
@@ -566,6 +637,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         this.claimTime = claimTime;
     }
 
+    @Override
     public String toString() {
         return "Task[id=" + id + ", name=" + name + "]";
     }

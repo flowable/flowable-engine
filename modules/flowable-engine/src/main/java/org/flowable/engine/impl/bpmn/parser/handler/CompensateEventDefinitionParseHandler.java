@@ -24,10 +24,12 @@ import org.flowable.engine.impl.bpmn.parser.BpmnParse;
  */
 public class CompensateEventDefinitionParseHandler extends AbstractBpmnParseHandler<CompensateEventDefinition> {
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return CompensateEventDefinition.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, CompensateEventDefinition eventDefinition) {
 
         if (bpmnParse.getCurrentFlowElement() instanceof ThrowEvent) {

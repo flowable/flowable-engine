@@ -49,6 +49,7 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
     protected Date lockExpirationTime;
     protected Date createTime;
 
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("retries", retries);
@@ -72,34 +73,42 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
     // getters and setters
     // ////////////////////////////////////////////////////////
 
+    @Override
     public int getRetries() {
         return retries;
     }
 
+    @Override
     public void setRetries(int retries) {
         this.retries = retries;
     }
 
+    @Override
     public String getJobHandlerType() {
         return jobHandlerType;
     }
 
+    @Override
     public void setJobHandlerType(String jobHandlerType) {
         this.jobHandlerType = jobHandlerType;
     }
 
+    @Override
     public String getJobHandlerConfiguration() {
         return jobHandlerConfiguration;
     }
 
+    @Override
     public void setJobHandlerConfiguration(String jobHandlerConfiguration) {
         this.jobHandlerConfiguration = jobHandlerConfiguration;
     }
 
+    @Override
     public JobByteArrayRef getAdvancedJobHandlerConfigurationByteArrayRef() {
         return advancedJobHandlerConfigurationByteArrayRef;
     }
 
+    @Override
     public String getAdvancedJobHandlerConfiguration() {
         if (advancedJobHandlerConfigurationByteArrayRef == null) {
             return null;
@@ -122,6 +131,7 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
          this.advancedJobHandlerConfigurationByteArrayRef = configurationByteArrayRef;
     }
 
+    @Override
     public void setAdvancedJobHandlerConfiguration(String jobHandlerConfiguration) {
         if (advancedJobHandlerConfigurationByteArrayRef == null) {
             advancedJobHandlerConfigurationByteArrayRef = new JobByteArrayRef();
@@ -142,10 +152,12 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
         this.exceptionByteArrayRef = exceptionByteArrayRef;
     }
 
+    @Override
     public JobByteArrayRef getExceptionByteArrayRef() {
         return exceptionByteArrayRef;
     }
 
+    @Override
     public String getExceptionStacktrace() {
         if (exceptionByteArrayRef == null) {
             return null;
@@ -163,6 +175,7 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
         }
     }
 
+    @Override
     public void setExceptionStacktrace(String exception) {
         if (exceptionByteArrayRef == null) {
             exceptionByteArrayRef = new JobByteArrayRef();
@@ -170,42 +183,52 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
         exceptionByteArrayRef.setValue("stacktrace", getUtf8Bytes(exception));
     }
 
+    @Override
     public String getExceptionMessage() {
         return exceptionMessage;
     }
 
+    @Override
     public void setExceptionMessage(String exceptionMessage) {
         this.exceptionMessage = StringUtils.abbreviate(exceptionMessage, JobInfo.MAX_EXCEPTION_MESSAGE_LENGTH);
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 
+    @Override
     public Date getCreateTime() {
         return createTime;
     }
 
+    @Override
     public void setCreateTime(Date createTime) {
         this.createTime = createTime;
     }
 
+    @Override
     public String getLockOwner() {
         return lockOwner;
     }
 
+    @Override
     public void setLockOwner(String claimedBy) {
         this.lockOwner = claimedBy;
     }
 
+    @Override
     public Date getLockExpirationTime() {
         return lockExpirationTime;
     }
 
+    @Override
     public void setLockExpirationTime(Date claimedUntil) {
         this.lockExpirationTime = claimedUntil;
     }

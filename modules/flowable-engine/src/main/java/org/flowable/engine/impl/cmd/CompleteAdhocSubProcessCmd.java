@@ -38,6 +38,7 @@ public class CompleteAdhocSubProcessCmd implements Command<Void>, Serializable {
         this.executionId = executionId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         ExecutionEntity execution = executionEntityManager.findById(executionId);

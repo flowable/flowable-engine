@@ -29,6 +29,7 @@ public class ProcessDefinitionFormType extends AbstractFormType {
 
     public static final String TYPE_NAME = "processDefinition";
 
+    @Override
     public String getName() {
         return TYPE_NAME;
     }

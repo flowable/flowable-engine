@@ -78,6 +78,7 @@ public class ExtensionElement extends BaseElement {
         this.childElements = childElements;
     }
 
+    @Override
     public ExtensionElement clone() {
         ExtensionElement clone = new ExtensionElement();
         clone.setValues(this);

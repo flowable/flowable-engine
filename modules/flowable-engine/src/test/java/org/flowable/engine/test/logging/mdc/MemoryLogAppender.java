@@ -24,10 +24,12 @@ public class MemoryLogAppender extends ConsoleAppender {
 
     StringWriter stringWriter = new StringWriter();
 
+    @Override
     public void activateOptions() {
         setWriter(stringWriter);
     }
 
+    @Override
     public String toString() {
         return stringWriter.toString();
     }

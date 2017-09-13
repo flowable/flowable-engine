@@ -39,6 +39,7 @@ public class CallActivityConverterTest extends AbstractConverterTest {
         validateModel(bpmnModel);
     }
 
+    @Override
     protected String getResource() {
         return "test.callactivitymodel.json";
     }

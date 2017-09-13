@@ -34,6 +34,7 @@ public class FlowableMessageEventImpl extends FlowableActivityEventImpl implemen
         this.messageName = messageName;
     }
 
+    @Override
     public String getMessageName() {
         return messageName;
     }
@@ -42,6 +43,7 @@ public class FlowableMessageEventImpl extends FlowableActivityEventImpl implemen
         this.messageData = messageData;
     }
 
+    @Override
     public Object getMessageData() {
         return messageData;
     }

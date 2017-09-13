@@ -36,6 +36,7 @@ public class DefaultManagementMBeanAssembler implements ManagementMBeanAssembler
         this.assembler = new MBeanInfoAssembler();
     }
 
+    @Override
     public ModelMBean assemble(Object obj, ObjectName name) throws JMException {
         ModelMBeanInfo mbi = null;
 

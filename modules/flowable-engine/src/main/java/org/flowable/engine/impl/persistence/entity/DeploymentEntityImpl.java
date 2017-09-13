@@ -52,6 +52,7 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
 
     }
 
+    @Override
     public void addResource(ResourceEntity resource) {
         if (resources == null) {
             resources = new HashMap<>();
@@ -61,6 +62,7 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
 
     // lazy loading ///////////////////////////////////////////////////////////////
 
+    @Override
     public Map<String, ResourceEntity> getResources() {
         if (resources == null && id != null) {
             List<ResourceEntity> resourcesList = CommandContextUtil.getResourceEntityManager().findResourcesByDeploymentId(id);
@@ -72,6 +74,7 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
         return resources;
     }
 
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("category", this.category);
@@ -82,6 +85,7 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
 
     // Deployed artifacts manipulation ////////////////////////////////////////////
 
+    @Override
     public void addDeployedArtifact(Object deployedArtifact) {
         if (deployedArtifacts == null) {
             deployedArtifacts = new HashMap<>();
@@ -97,6 +101,7 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
         artifacts.add(deployedArtifact);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T> List<T> getDeployedArtifacts(Class<T> clazz) {
         for (Class<?> deployedArtifactsClass : deployedArtifacts.keySet()) {
@@ -109,62 +114,77 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
 
     // getters and setters ////////////////////////////////////////////////////////
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public String getCategory() {
         return category;
     }
 
+    @Override
     public void setCategory(String category) {
         this.category = category;
     }
 
+    @Override
     public String getKey() {
         return key;
     }
 
+    @Override
     public void setKey(String key) {
         this.key = key;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 
+    @Override
     public void setResources(Map<String, ResourceEntity> resources) {
         this.resources = resources;
     }
 
+    @Override
     public Date getDeploymentTime() {
         return deploymentTime;
     }
 
+    @Override
     public void setDeploymentTime(Date deploymentTime) {
         this.deploymentTime = deploymentTime;
     }
 
+    @Override
     public boolean isNew() {
         return isNew;
     }
 
+    @Override
     public void setNew(boolean isNew) {
         this.isNew = isNew;
     }
 
+    @Override
     public String getEngineVersion() {
         return engineVersion;
     }
 
+    @Override
     public void setEngineVersion(String engineVersion) {
         this.engineVersion = engineVersion;
     }

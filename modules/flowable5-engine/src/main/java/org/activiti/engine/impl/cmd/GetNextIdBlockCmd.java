@@ -29,6 +29,7 @@ public class GetNextIdBlockCmd implements Command<IdBlock> {
         this.idBlockSize = idBlockSize;
     }
 
+    @Override
     public IdBlock execute(CommandContext commandContext) {
         PropertyEntity property = commandContext
                 .getPropertyEntityManager()

@@ -43,6 +43,7 @@ public class JobAddedTransactionListener implements TransactionListener {
         CommandExecutor commandExecutor = CommandContextUtil.getJobServiceConfiguration(commandContext).getCommandExecutor();
         CommandConfig commandConfig = new CommandConfig(false, TransactionPropagation.REQUIRES_NEW);
         commandExecutor.execute(commandConfig, new Command<Void>() {
+            @Override
             public Void execute(CommandContext commandContext) {
                 if (LOGGER.isTraceEnabled()) {
                     LOGGER.trace("notifying job executor of new job");

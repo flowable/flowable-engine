@@ -39,6 +39,7 @@ public class GetDeploymentDmnResourceCmd implements Command<InputStream>, Serial
         this.decisionTableId = decisionTableId;
     }
 
+    @Override
     public InputStream execute(CommandContext commandContext) {
         DecisionTableEntity decisionTable = CommandContextUtil.getDmnEngineConfiguration().getDeploymentManager().findDeployedDecisionById(decisionTableId);
         String deploymentId = decisionTable.getDeploymentId();

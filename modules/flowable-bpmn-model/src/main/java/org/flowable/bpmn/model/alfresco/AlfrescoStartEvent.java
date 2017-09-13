@@ -35,6 +35,7 @@ public class AlfrescoStartEvent extends StartEvent {
         this.scriptProcessor = scriptProcessor;
     }
 
+    @Override
     public AlfrescoStartEvent clone() {
         AlfrescoStartEvent clone = new AlfrescoStartEvent();
         clone.setValues(this);

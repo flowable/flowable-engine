@@ -65,7 +65,7 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
 
     @Override
     public void insert(SuspendedJobEntity jobEntity, boolean fireCreateEvent) {
-        getJobServiceConfiguration().getJobScopeInterface().handleJobInsert(jobEntity);
+        getJobServiceConfiguration().getInternalJobManager().handleJobInsert(jobEntity);
 
         jobEntity.setCreateTime(getJobServiceConfiguration().getClock().getCurrentTime());
         super.insert(jobEntity, fireCreateEvent);
@@ -82,7 +82,7 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
 
         deleteExceptionByteArrayRef(jobEntity);
 
-        getJobServiceConfiguration().getJobScopeInterface().handleJobDelete(jobEntity);
+        getJobServiceConfiguration().getInternalJobManager().handleJobDelete(jobEntity);
 
         // Send event
         if (getEventDispatcher().isEnabled()) {
@@ -118,6 +118,7 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
         return newSuspendedJobEntity;
     }
 
+    @Override
     protected SuspendedJobDataManager getDataManager() {
         return jobDataManager;
     }

@@ -23,6 +23,7 @@ import org.flowable.engine.delegate.ExecutionListener;
  */
 public class ProcessInstanceEndHandler implements ExecutionListener {
 
+    @Override
     public void notify(DelegateExecution execution) {
         Context.getCommandContext().getHistoryManager().recordProcessInstanceEnd(
                 execution.getProcessInstanceId(), ((ExecutionEntity) execution).getDeleteReason(), ((ExecutionEntity) execution).getActivityId());

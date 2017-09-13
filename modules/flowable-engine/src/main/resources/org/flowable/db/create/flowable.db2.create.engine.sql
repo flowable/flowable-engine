@@ -84,6 +84,8 @@ create table ACT_RU_EXECUTION (
     DEADLETTER_JOB_COUNT_ integer,
     VAR_COUNT_ integer, 
     ID_LINK_COUNT_ integer,
+    CALLBACK_ID_ varchar(255),
+    CALLBACK_TYPE_ varchar(255),
     primary key (ID_)
 );
 
@@ -250,7 +252,7 @@ create table ACT_RU_VARIABLE (
     TYPE_ varchar(255) not null,
     NAME_ varchar(255) not null,
     EXECUTION_ID_ varchar(64),
-	PROC_INST_ID_ varchar(64),
+    PROC_INST_ID_ varchar(64),
     TASK_ID_ varchar(64),
     BYTEARRAY_ID_ varchar(64),
     DOUBLE_ double precision,

@@ -36,6 +36,7 @@ public class CamelVariableBodyTest extends SpringFlowableTestCase {
 
     protected MockEndpoint service1;
 
+    @Override
     public void setUp() throws Exception {
         camelContext.addRoutes(new RouteBuilder() {
 
@@ -48,6 +49,7 @@ public class CamelVariableBodyTest extends SpringFlowableTestCase {
         service1.reset();
     }
 
+    @Override
     public void tearDown() throws Exception {
         List<Route> routes = camelContext.getRoutes();
         for (Route r : routes) {

@@ -140,5 +140,6 @@ public abstract class BaseElement implements HasExtensionAttributes {
         }
     }
 
+    @Override
     public abstract BaseElement clone();
 }

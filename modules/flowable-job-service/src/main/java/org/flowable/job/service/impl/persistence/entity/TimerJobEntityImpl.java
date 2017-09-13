@@ -28,6 +28,7 @@ public class TimerJobEntityImpl extends AbstractJobEntityImpl implements TimerJo
     protected Date lockExpirationTime;
 
     @SuppressWarnings("unchecked")
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = (Map<String, Object>) super.getPersistentState();
         persistentState.put("lockOwner", lockOwner);
@@ -38,18 +39,22 @@ public class TimerJobEntityImpl extends AbstractJobEntityImpl implements TimerJo
 
     // getters and setters ////////////////////////////////////////////////////////
 
+    @Override
     public String getLockOwner() {
         return lockOwner;
     }
 
+    @Override
     public void setLockOwner(String claimedBy) {
         this.lockOwner = claimedBy;
     }
 
+    @Override
     public Date getLockExpirationTime() {
         return lockExpirationTime;
     }
 
+    @Override
     public void setLockExpirationTime(Date claimedUntil) {
         this.lockExpirationTime = claimedUntil;
     }

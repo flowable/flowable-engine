@@ -35,6 +35,7 @@ public class JobExecutorTest extends JobExecutorTestCase {
     public void testBasicJobExecutorOperation() throws Exception {
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
         commandExecutor.execute(new Command<Void>() {
+            @Override
             public Void execute(CommandContext commandContext) {
                 JobServiceConfiguration jobServiceConfiguration = (JobServiceConfiguration) processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
                 JobManager jobManager = jobServiceConfiguration.getJobManager();

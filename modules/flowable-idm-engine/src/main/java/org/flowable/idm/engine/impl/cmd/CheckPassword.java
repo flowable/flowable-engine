@@ -35,6 +35,7 @@ public class CheckPassword implements Command<Boolean>, Serializable {
         this.password = password;
     }
 
+    @Override
     public Boolean execute(CommandContext commandContext) {
         PasswordEncoder passwordEncoder = CommandContextUtil.getIdmEngineConfiguration().getPasswordEncoder();
         PasswordSalt passwordSalt = CommandContextUtil.getIdmEngineConfiguration().getPasswordSalt();

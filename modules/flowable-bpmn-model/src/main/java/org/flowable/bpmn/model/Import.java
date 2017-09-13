@@ -42,6 +42,7 @@ public class Import extends BaseElement {
         this.namespace = namespace;
     }
 
+    @Override
     public Import clone() {
         Import clone = new Import();
         clone.setValues(this);

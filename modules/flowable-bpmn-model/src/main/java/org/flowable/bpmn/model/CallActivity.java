@@ -84,6 +84,7 @@ public class CallActivity extends Activity {
         this.useLocalScopeForOutParameters = useLocalScopeForOutParameters;
     }
 
+    @Override
     public CallActivity clone() {
         CallActivity clone = new CallActivity();
         clone.setValues(this);

@@ -38,6 +38,7 @@ public class DeleteCommentCmd implements Command<Void>, Serializable {
         this.commentId = commentId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         CommentEntityManager commentManager = commandContext.getCommentEntityManager();
 

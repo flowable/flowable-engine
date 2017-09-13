@@ -21,40 +21,40 @@ import java.util.Map;
  * @author Joram Barrez
  */
 public class Stage extends PlanFragment implements HasExitCriteria {
-    
+
     protected boolean isPlanModel;
     protected Map<String, PlanItemDefinition> planItemDefinitionMap = new LinkedHashMap<>();
     protected List<Criterion> exitCriteria = new ArrayList<>();
-    
+
     public void addPlanItemDefinition(PlanItemDefinition planItemDefinition) {
         planItemDefinitionMap.put(planItemDefinition.getId(), planItemDefinition);
     }
-    
+
     public PlanItemDefinition findPlanItemDefinition(String planItemDefinitionId) {
         if (id != null && id.equals(planItemDefinitionId)) {
             return this;
         }
-        
+
         if (planItemDefinitionMap.containsKey(planItemDefinitionId)) {
             return planItemDefinitionMap.get(planItemDefinitionId);
         }
-        
+
         Stage parentStage = getParentStage();
         if (parentStage != null) {
             return parentStage.findPlanItemDefinition(planItemDefinitionId);
         }
-        
+
         return null;
     }
-    
+
     public <T extends PlanItemDefinition> List<T> findPlanItemDefinitionsOfType(Class<T> clazz, boolean recursive) {
         List<T> planItemDefinitions = new ArrayList<>();
         internalFindPlanItemDefinitionsOfType(clazz, this, planItemDefinitions, recursive);
         return planItemDefinitions;
     }
-    
+
     @SuppressWarnings("unchecked")
-    private <T extends PlanItemDefinition> void internalFindPlanItemDefinitionsOfType(Class<T> clazz, Stage stage, List<T> planItemDefinitions,  boolean recursive) {
+    private <T extends PlanItemDefinition> void internalFindPlanItemDefinitionsOfType(Class<T> clazz, Stage stage, List<T> planItemDefinitions, boolean recursive) {
         for (PlanItemDefinition planItemDefinition : stage.getPlanItemDefinitions()) {
             if (clazz.isInstance(planItemDefinition)) {
                 planItemDefinitions.add((T) planItemDefinition);
@@ -66,7 +66,7 @@ public class Stage extends PlanFragment implements HasExitCriteria {
     }
 
     public List<PlanItemDefinition> getPlanItemDefinitions() {
-        return new ArrayList<PlanItemDefinition>(planItemDefinitionMap.values());
+        return new ArrayList<>(planItemDefinitionMap.values());
     }
 
     public Map<String, PlanItemDefinition> getPlanItemDefinitionMap() {
@@ -92,5 +92,5 @@ public class Stage extends PlanFragment implements HasExitCriteria {
     public void setExitCriteria(List<Criterion> exitCriteria) {
         this.exitCriteria = exitCriteria;
     }
-    
+
 }

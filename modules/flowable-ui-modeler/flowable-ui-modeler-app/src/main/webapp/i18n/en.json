@@ -421,6 +421,8 @@
             "CREATE-TITLE": "Create a new decision table",
             "CREATE-DESCRIPTION": "You need to give a name for the new decision table and you may want to add a description at the same time.",
             "SAVE-DESCRIPTION": "You need to give a name and a unique key for the new decision table and you may want to add a description at the same time.",
+            "DUPLICATE-TITLE": "Duplicate decision table",
+            "DUPLICATE-DESCRIPTION": "You need to give a name for the new decision table and you may want to add a description at the same time.",
             "DELETE-TITLE": "Delete decision table",
             "DELETE-DESCRIPTION": "Are you sure you want to delete the decision table \"{{name}}\"?",
             "SAVE-DECISION-TABLE-TITLE": "Save decision table",

@@ -24,6 +24,7 @@ import org.flowable.task.service.delegate.DelegateTask;
  */
 public class AssigneeOverwriteFromVariable implements TaskListener {
 
+    @Override
     @SuppressWarnings("unchecked")
     public void notify(DelegateTask delegateTask) {
         // get mapping table from variable

@@ -101,6 +101,7 @@ public class HistoricProcessInstanceCollectionResourceTest extends BaseSpringRes
         assertEquals(processInstance3.getId(), dataNode.get(2).get("id").asText());
     }
 
+    @Override
     protected void assertResultsPresentInDataResponse(String url, String... expectedResourceIds) throws JsonProcessingException, IOException {
         int numberOfResultsExpected = expectedResourceIds.length;
 

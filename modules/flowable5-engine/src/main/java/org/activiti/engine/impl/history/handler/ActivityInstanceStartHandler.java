@@ -25,6 +25,7 @@ import org.flowable.engine.delegate.ExecutionListener;
  */
 public class ActivityInstanceStartHandler implements ExecutionListener {
 
+    @Override
     public void notify(DelegateExecution execution) {
         Context.getCommandContext().getHistoryManager()
                 .recordActivityStart((ExecutionEntity) execution);

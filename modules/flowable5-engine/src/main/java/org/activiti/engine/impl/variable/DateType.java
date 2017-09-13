@@ -22,14 +22,17 @@ import org.flowable.variable.service.impl.types.VariableType;
  */
 public class DateType implements VariableType {
 
+    @Override
     public String getTypeName() {
         return "date";
     }
 
+    @Override
     public boolean isCachable() {
         return true;
     }
 
+    @Override
     public boolean isAbleToStore(Object value) {
         if (value == null) {
             return true;
@@ -37,6 +40,7 @@ public class DateType implements VariableType {
         return Date.class.isAssignableFrom(value.getClass());
     }
 
+    @Override
     public Object getValue(ValueFields valueFields) {
         Long longValue = valueFields.getLongValue();
         if (longValue != null) {
@@ -45,6 +49,7 @@ public class DateType implements VariableType {
         return null;
     }
 
+    @Override
     public void setValue(Object value, ValueFields valueFields) {
         if (value != null) {
             valueFields.setLongValue(((Date) value).getTime());

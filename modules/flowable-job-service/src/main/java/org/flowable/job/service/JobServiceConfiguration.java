@@ -97,7 +97,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     
     protected HistoryLevel historyLevel;
     
-    protected JobScopeInterface jobScopeInterface;
+    protected InternalJobManager internalJobManager;
     
     protected AsyncExecutor asyncExecutor;
     
@@ -121,6 +121,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         initEntityManagers();
     }
     
+    @Override
     public boolean isHistoryLevelAtLeast(HistoryLevel level) {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Current history level: {}, level required: {}", historyLevel, level);
@@ -129,6 +130,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         return historyLevel.isAtLeast(level);
     }
 
+    @Override
     public boolean isHistoryEnabled() {
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Current history level: {}", historyLevel);
@@ -349,24 +351,25 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         this.commandExecutor = commandExecutor;
     }
 
+    @Override
     public HistoryLevel getHistoryLevel() {
         return historyLevel;
     }
     
+    @Override
     public JobServiceConfiguration setHistoryLevel(HistoryLevel historyLevel) {
         this.historyLevel = historyLevel;
         return this;
     }
     
-    public JobScopeInterface getJobScopeInterface() {
-        return jobScopeInterface;
+    public InternalJobManager getInternalJobManager() {
+        return internalJobManager;
     }
 
-    public JobServiceConfiguration setJobScopeInterface(JobScopeInterface jobScopeInterface) {
-        this.jobScopeInterface = jobScopeInterface;
-        return this;
+    public void setInternalJobManager(InternalJobManager internalJobManager) {
+        this.internalJobManager = internalJobManager;
     }
-    
+
     public AsyncExecutor getAsyncExecutor() {
         return asyncExecutor;
     }
@@ -448,10 +451,12 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         return this;
     }
 
+    @Override
     public ObjectMapper getObjectMapper() {
         return objectMapper;
     }
 
+    @Override
     public JobServiceConfiguration setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
         return this;

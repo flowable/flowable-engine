@@ -36,6 +36,7 @@ public interface Comment extends HistoricData {
     void setUserId(String userId);
 
     /** time and date when the user made the comment */
+    @Override
     Date getTime();
     
     void setTime(Date time);

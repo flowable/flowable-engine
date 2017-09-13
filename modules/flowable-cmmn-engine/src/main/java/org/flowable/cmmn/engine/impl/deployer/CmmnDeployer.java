@@ -39,14 +39,14 @@ import org.slf4j.LoggerFactory;
 
 /**
  * TODO: many similarities with BpmnDeployer, see if it can be merged to the common module
- * 
+ *
  * @author Joram Barrez
  */
 public class CmmnDeployer implements Deployer {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CmmnDeployer.class);
-    
-    public static final String[] CMMN_RESOURCE_SUFFIXES = new String[] { ".cmmn", ".cmmn11", ".cmmn.xml", ".cmmn11.xml" };
+
+    public static final String[] CMMN_RESOURCE_SUFFIXES = new String[]{".cmmn", ".cmmn11", ".cmmn.xml", ".cmmn11.xml"};
 
     protected IdGenerator idGenerator;
     protected CmmnParser cmmnParser;
@@ -88,7 +88,7 @@ public class CmmnDeployer implements Deployer {
     }
 
     protected Map<CaseDefinitionEntity, CaseDefinitionEntity> getPreviousVersionsOfCaseDefinitions(CmmnParseResult parseResult) {
-        Map<CaseDefinitionEntity, CaseDefinitionEntity> result = new LinkedHashMap<CaseDefinitionEntity, CaseDefinitionEntity>();
+        Map<CaseDefinitionEntity, CaseDefinitionEntity> result = new LinkedHashMap<>();
         for (CaseDefinitionEntity newDefinition : parseResult.getAllCaseDefinitions()) {
             CaseDefinitionEntity existingDefinition = getMostRecentVersionOfCaseDefinition(newDefinition);
             if (existingDefinition != null) {
@@ -126,12 +126,12 @@ public class CmmnDeployer implements Deployer {
             }
         }
     }
-    
+
     protected void verifyCaseDefinitionsDoNotShareKeys(Collection<CaseDefinitionEntity> caseDefinitionEntities) {
-        Set<String> keySet = new LinkedHashSet<String>();
+        Set<String> keySet = new LinkedHashSet<>();
         for (CaseDefinitionEntity caseDefinitionEntity : caseDefinitionEntities) {
             if (keySet.contains(caseDefinitionEntity.getKey())) {
-                throw new FlowableException( "The deployment contains case definitions with the same key (case id attribute), this is not allowed");
+                throw new FlowableException("The deployment contains case definitions with the same key (case id attribute), this is not allowed");
             }
             keySet.add(caseDefinitionEntity.getKey());
         }
@@ -175,7 +175,7 @@ public class CmmnDeployer implements Deployer {
         if (StringUtils.isEmpty(caseDefinitionEntity.getDeploymentId())) {
             throw new IllegalStateException("Provided case definition must have a deployment id.");
         }
-        
+
         CaseDefinitionEntityManager caseDefinitionEntityManager = CommandContextUtil.getCaseDefinitionEntityManager();
         CaseDefinitionEntity persistedCaseDefinitionEntity = null;
         if (caseDefinitionEntity.getTenantId() == null || CmmnEngineConfiguration.NO_TENANT_ID.equals(caseDefinitionEntity.getTenantId())) {
@@ -185,7 +185,7 @@ public class CmmnDeployer implements Deployer {
         }
         return persistedCaseDefinitionEntity;
     }
-    
+
     protected void updateCachingAndArtifacts(CmmnParseResult parseResult) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
         DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache = cmmnEngineConfiguration.getCaseDefinitionCache();
@@ -216,5 +216,5 @@ public class CmmnDeployer implements Deployer {
     public void setCmmnParser(CmmnParser cmmnParser) {
         this.cmmnParser = cmmnParser;
     }
-    
+
 }

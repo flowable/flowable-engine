@@ -29,6 +29,7 @@ public class JobMessageListener implements javax.jms.MessageListener {
 
     protected JobServiceConfiguration jobServiceConfiguration;
 
+    @Override
     public void onMessage(final Message message) {
         try {
             if (message instanceof TextMessage) {

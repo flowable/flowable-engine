@@ -45,6 +45,7 @@ public class BusinessRuleTaskActivityBehavior extends TaskActivityBehavior imple
     public BusinessRuleTaskActivityBehavior() {
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
         ActivityExecution activityExecution = (ActivityExecution) execution;
         PvmProcessDefinition processDefinition = activityExecution.getActivity().getProcessDefinition();
@@ -85,18 +86,22 @@ public class BusinessRuleTaskActivityBehavior extends TaskActivityBehavior imple
         leave(activityExecution);
     }
 
+    @Override
     public void addRuleVariableInputIdExpression(Expression inputId) {
         this.variablesInputExpressions.add(inputId);
     }
 
+    @Override
     public void addRuleIdExpression(Expression inputId) {
         this.rulesExpressions.add(inputId);
     }
 
+    @Override
     public void setExclude(boolean exclude) {
         this.exclude = exclude;
     }
 
+    @Override
     public void setResultVariable(String resultVariableName) {
         this.resultVariable = resultVariableName;
     }

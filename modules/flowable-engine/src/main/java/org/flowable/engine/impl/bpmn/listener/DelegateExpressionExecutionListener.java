@@ -38,6 +38,7 @@ public class DelegateExpressionExecutionListener implements ExecutionListener {
         this.fieldDeclarations = fieldDeclarations;
     }
 
+    @Override
     public void notify(DelegateExecution execution) {
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, execution, fieldDeclarations);
         if (delegate instanceof ExecutionListener) {

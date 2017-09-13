@@ -32,6 +32,7 @@ public interface DmnResourceEntity extends Entity {
 
     void setDeploymentId(String deploymentId);
 
+    @Override
     Object getPersistentState();
 
 }

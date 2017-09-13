@@ -14,10 +14,10 @@
 package org.flowable.engine.impl.history;
 
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.variable.service.history.HistoryVariableInterface;
+import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
-public class DefaultHistoryVariableManager implements HistoryVariableInterface {
+public class DefaultHistoryVariableManager implements InternalHistoryVariableManager {
     
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
 

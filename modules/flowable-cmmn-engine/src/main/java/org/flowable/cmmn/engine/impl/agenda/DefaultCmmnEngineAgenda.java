@@ -36,80 +36,80 @@ import org.slf4j.LoggerFactory;
  * @author Joram Barrez
  */
 public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngineAgenda {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultCmmnEngineAgenda.class);
 
     public DefaultCmmnEngineAgenda(CommandContext commandContext) {
         super(commandContext);
     }
-    
+
     public void addOperation(CmmnOperation operation) {
         operations.add(operation);
         if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Planned " + operation);
+            LOGGER.debug("Planned {}", operation);
         }
     }
-    
+
     @Override
     public void planInitPlanModelOperation(CaseInstanceEntity caseInstanceEntity) {
         addOperation(new InitPlanModelOperation(commandContext, caseInstanceEntity));
     }
-    
+
     @Override
     public void planInitStageOperation(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new InitStageOperation(commandContext, planItemInstanceEntity));
     }
-    
+
     @Override
     public void planEvaluateCriteria(String caseInstanceEntityId) {
         addOperation(new EvaluateCriteriaOperation(commandContext, caseInstanceEntityId));
     }
-    
+
     @Override
     public void planEvaluateCriteria(String caseInstanceEntityId, PlanItemLifeCycleEvent lifeCycleEvent) {
         addOperation(new EvaluateCriteriaOperation(commandContext, caseInstanceEntityId, lifeCycleEvent));
     }
-    
+
     @Override
     public void planActivatePlanItem(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new ActivatePlanItemOperation(commandContext, planItemInstanceEntity));
     }
-    
+
     @Override
     public void planCompletePlanItem(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new CompletePlanItemOperation(commandContext, planItemInstanceEntity));
     }
-    
+
     @Override
     public void planOccurPlanItem(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new OccurPlanItemOperation(commandContext, planItemInstanceEntity));
     }
-    
+
     @Override
     public void planExitPlanItem(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new ExitPlanItemOperation(commandContext, planItemInstanceEntity));
     }
-    
+
     @Override
     public void planTerminatePlanItem(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new TerminatePlanItemOperation(commandContext, planItemInstanceEntity));
     }
-    
+
     @Override
     public void planTriggerPlanItem(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new TriggerPlanItemOperation(commandContext, planItemInstanceEntity));
     }
-    
+
     @Override
     public void planCompleteCase(CaseInstanceEntity caseInstanceEntity) {
         addOperation(new CompleteCaseInstanceOperation(commandContext, caseInstanceEntity));
     }
-    
+
     @Override
     public void planTerminateCase(String caseInstanceEntityId, boolean manualTermination) {
         addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntityId, manualTermination));
     }
-    
+
     @Override
     public void planTerminateCase(CaseInstanceEntity caseInstanceEntity, boolean manualTermination) {
         addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntity, manualTermination));

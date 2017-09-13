@@ -37,6 +37,7 @@ public class DmnDeployer implements Deployer {
     protected DmnDeploymentHelper dmnDeploymentHelper;
     protected CachingAndArtifactsManager cachingAndArtifactsManager;
 
+    @Override
     public void deploy(DmnDeploymentEntity deployment, Map<String, Object> deploymentSettings) {
         LOGGER.debug("Processing deployment {}", deployment.getName());
 

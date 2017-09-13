@@ -38,6 +38,7 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
     public void testQueryByEventName() {
 
         processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+            @Override
             public Void execute(CommandContext commandContext) {
 
                 MessageEventSubscriptionEntity messageEventSubscriptionEntity1 = CommandContextUtil.getEventSubscriptionEntityManager(commandContext).createMessageEventSubscription();
@@ -69,6 +70,7 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
     public void testQueryByEventType() {
 
         processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+            @Override
             public Void execute(CommandContext commandContext) {
 
                 MessageEventSubscriptionEntity messageEventSubscriptionEntity1 = CommandContextUtil.getEventSubscriptionEntityManager(commandContext).createMessageEventSubscription();
@@ -100,6 +102,7 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
     public void testQueryByActivityId() {
 
         processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+            @Override
             public Void execute(CommandContext commandContext) {
 
                 MessageEventSubscriptionEntity messageEventSubscriptionEntity1 = CommandContextUtil.getEventSubscriptionEntityManager(commandContext).createMessageEventSubscription();
@@ -134,6 +137,7 @@ public class EventSubscriptionQueryTest extends PluggableFlowableTestCase {
     public void testQueryByEventSubscriptionId() {
 
         processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
+            @Override
             public Void execute(CommandContext commandContext) {
 
                 MessageEventSubscriptionEntity messageEventSubscriptionEntity1 = CommandContextUtil.getEventSubscriptionEntityManager(commandContext).createMessageEventSubscription();

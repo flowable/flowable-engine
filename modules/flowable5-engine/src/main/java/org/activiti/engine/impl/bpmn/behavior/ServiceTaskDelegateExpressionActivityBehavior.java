@@ -70,6 +70,7 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
         }
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
         ActivityExecution activityExecution = (ActivityExecution) execution;
         try {

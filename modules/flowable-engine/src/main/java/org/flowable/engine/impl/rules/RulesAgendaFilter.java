@@ -30,6 +30,7 @@ public class RulesAgendaFilter implements AgendaFilter {
     public RulesAgendaFilter() {
     }
 
+    @Override
     public boolean accept(Activation activation) {
         String ruleName = activation.getRule().getName();
         for (String suffix : suffixList) {

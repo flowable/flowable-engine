@@ -37,6 +37,7 @@ public class UuidGeneratorTest extends ResourceFlowableTestCase {
         // Start processes
         for (int i = 0; i < 50; i++) {
             executorService.execute(new Runnable() {
+                @Override
                 public void run() {
                     try {
                         runtimeService.startProcessInstanceByKey("simpleProcess");
@@ -51,6 +52,7 @@ public class UuidGeneratorTest extends ResourceFlowableTestCase {
         // Complete tasks
         executorService.execute(new Runnable() {
 
+            @Override
             public void run() {
                 boolean tasksFound = true;
                 while (tasksFound) {

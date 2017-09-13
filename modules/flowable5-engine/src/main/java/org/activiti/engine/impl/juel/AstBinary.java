@@ -23,6 +23,7 @@ public class AstBinary extends AstRightValue {
     }
 
     public abstract static class SimpleOperator implements Operator {
+        @Override
         public Object eval(Bindings bindings, ELContext context, AstNode left, AstNode right) {
             return apply(bindings, left.eval(bindings, context), right.eval(bindings, context));
         }
@@ -42,6 +43,7 @@ public class AstBinary extends AstRightValue {
         }
     };
     public static final Operator AND = new Operator() {
+        @Override
         public Object eval(Bindings bindings, ELContext context, AstNode left, AstNode right) {
             Boolean l = bindings.convert(left.eval(bindings, context), Boolean.class);
             return Boolean.TRUE.equals(l) ? bindings.convert(right.eval(bindings, context), Boolean.class) : Boolean.FALSE;
@@ -152,6 +154,7 @@ public class AstBinary extends AstRightValue {
         }
     };
     public static final Operator OR = new Operator() {
+        @Override
         public Object eval(Bindings bindings, ELContext context, AstNode left, AstNode right) {
             Boolean l = bindings.convert(left.eval(bindings, context), Boolean.class);
             return Boolean.TRUE.equals(l) ? Boolean.TRUE : bindings.convert(right.eval(bindings, context), Boolean.class);
@@ -207,10 +210,12 @@ public class AstBinary extends AstRightValue {
         right.appendStructure(b, bindings);
     }
 
+    @Override
     public int getCardinality() {
         return 2;
     }
 
+    @Override
     public AstNode getChild(int i) {
         return i == 0 ? left : i == 1 ? right : null;
     }

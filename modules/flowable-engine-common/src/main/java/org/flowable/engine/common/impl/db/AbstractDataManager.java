@@ -74,6 +74,7 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
         getDbSqlSession().insert(entity);
     }
 
+    @Override
     public EntityImpl update(EntityImpl entity) {
         getDbSqlSession().update(entity);
         return entity;

@@ -21,10 +21,12 @@ import org.flowable.dmn.api.NativeHistoricDecisionExecutionQuery;
  */
 public class DmnHistoryServiceImpl extends ServiceImpl implements DmnHistoryService {
 
+    @Override
     public DmnHistoricDecisionExecutionQuery createHistoricDecisionExecutionQuery() {
         return new HistoricDecisionExecutionQueryImpl(commandExecutor);
     }
 
+    @Override
     public NativeHistoricDecisionExecutionQuery createNativeHistoricDecisionExecutionQuery() {
         return new NativeHistoryDecisionExecutionQueryImpl(commandExecutor);
     }

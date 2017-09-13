@@ -27,10 +27,12 @@ import org.flowable.engine.impl.bpmn.data.IOSpecification;
  */
 public class SubProcessParseHandler extends AbstractActivityBpmnParseHandler<SubProcess> {
 
+    @Override
     protected Class<? extends BaseElement> getHandledType() {
         return SubProcess.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, SubProcess subProcess) {
 
         ActivityImpl activity = createActivityOnScope(bpmnParse, subProcess, BpmnXMLConstants.ELEMENT_SUBPROCESS, bpmnParse.getCurrentScope());

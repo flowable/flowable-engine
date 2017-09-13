@@ -42,6 +42,7 @@ public class JuelExpression implements Expression {
         this.expressionManager = expressionManager;
     }
 
+    @Override
     public Object getValue(Map<String, Object> variables) {
         ELContext elContext = expressionManager.getElContext(variables);
         try {
@@ -66,6 +67,7 @@ public class JuelExpression implements Expression {
         return super.toString();
     }
 
+    @Override
     public String getExpressionText() {
         return expressionText;
     }

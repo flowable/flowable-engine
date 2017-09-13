@@ -29,6 +29,7 @@ public class GetPropertiesCmd implements Command<Map<String, String>>, Serializa
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     @SuppressWarnings("unchecked")
     public Map<String, String> execute(CommandContext commandContext) {
         List<PropertyEntity> propertyEntities = commandContext

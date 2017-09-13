@@ -28,10 +28,12 @@ public class SendTaskParseHandler extends AbstractActivityBpmnParseHandler<SendT
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SendTaskParseHandler.class);
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return SendTask.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, SendTask sendTask) {
 
         if (StringUtils.isNotEmpty(sendTask.getType())) {

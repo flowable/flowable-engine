@@ -1427,6 +1427,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
 
     // toString /////////////////////////////////////////////////////////////////
 
+    @Override
     public String toString() {
         if (isProcessInstanceType()) {
             return "ProcessInstance[" + getToStringIdentity() + "]";

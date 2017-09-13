@@ -45,6 +45,7 @@ public class SignalEventDefinition extends EventDefinition {
         this.async = async;
     }
 
+    @Override
     public SignalEventDefinition clone() {
         SignalEventDefinition clone = new SignalEventDefinition();
         clone.setValues(this);

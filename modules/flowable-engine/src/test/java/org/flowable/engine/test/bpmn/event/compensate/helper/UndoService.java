@@ -24,6 +24,7 @@ public class UndoService implements JavaDelegate {
 
     private Expression counterName;
 
+    @Override
     public void execute(DelegateExecution execution) {
         String variableName = (String) counterName.getValue(execution);
         Object variable = execution.getVariable(variableName);

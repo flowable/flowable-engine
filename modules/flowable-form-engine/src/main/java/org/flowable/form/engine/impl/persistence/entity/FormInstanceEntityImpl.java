@@ -38,6 +38,7 @@ public class FormInstanceEntityImpl extends AbstractEntityNoRevision implements 
     protected ResourceRef resourceRef;
     protected String tenantId = FormEngineConfiguration.NO_TENANT_ID;
 
+    @Override
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         if (resourceRef != null && resourceRef.getId() != null) {
@@ -49,75 +50,93 @@ public class FormInstanceEntityImpl extends AbstractEntityNoRevision implements 
     // getters and setters
     // //////////////////////////////////////////////////////
 
+    @Override
     public String getFormDefinitionId() {
         return formDefinitionId;
     }
 
+    @Override
     public void setFormDefinitionId(String formDefinitionId) {
         this.formDefinitionId = formDefinitionId;
     }
 
+    @Override
     public String getTaskId() {
         return taskId;
     }
 
+    @Override
     public void setTaskId(String taskId) {
         this.taskId = taskId;
     }
 
+    @Override
     public String getProcessInstanceId() {
         return processInstanceId;
     }
 
+    @Override
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
 
+    @Override
     public void setProcessDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public Date getSubmittedDate() {
         return submittedDate;
     }
 
+    @Override
     public void setSubmittedDate(Date submittedDate) {
         this.submittedDate = submittedDate;
     }
 
+    @Override
     public String getSubmittedBy() {
         return submittedBy;
     }
 
+    @Override
     public void setSubmittedBy(String submittedBy) {
         this.submittedBy = submittedBy;
     }
 
+    @Override
     public String getFormValuesId() {
         return formValuesId;
     }
 
+    @Override
     public void setFormValuesId(String formValuesId) {
         this.formValuesId = formValuesId;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 
+    @Override
     public byte[] getFormValueBytes() {
         ensureResourceRefInitialized();
         return resourceRef.getBytes();
     }
 
+    @Override
     public void setFormValueBytes(byte[] bytes) {
         ensureResourceRefInitialized();
         resourceRef.setValue("form-" + formDefinitionId, bytes);
@@ -133,6 +152,7 @@ public class FormInstanceEntityImpl extends AbstractEntityNoRevision implements 
         }
     }
 
+    @Override
     public String toString() {
         return "SubmittedFormEntity[" + id + "]";
     }

@@ -26,6 +26,7 @@ public class CreateContentItemCmd implements Command<ContentItem>, Serializable 
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public ContentItem execute(CommandContext commandContext) {
         return CommandContextUtil.getContentItemEntityManager().create();
     }

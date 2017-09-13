@@ -43,6 +43,7 @@ public class DelegateExpressionHttpHandler implements HttpRequestHandler, HttpRe
         this.fieldDeclarations = fieldDeclarations;
     }
 
+    @Override
     public void handleHttpRequest(DelegateExecution execution, HttpRequest httpRequest, HttpClient client) {
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, execution, fieldDeclarations);
         if (delegate instanceof HttpRequestHandler) {
@@ -53,6 +54,7 @@ public class DelegateExpressionHttpHandler implements HttpRequestHandler, HttpRe
         }
     }
     
+    @Override
     public void handleHttpResponse(DelegateExecution execution, HttpResponse httpResponse) {
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, execution, fieldDeclarations);
         if (delegate instanceof HttpResponseHandler) {

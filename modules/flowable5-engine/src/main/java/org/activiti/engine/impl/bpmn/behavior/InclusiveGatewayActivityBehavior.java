@@ -43,6 +43,7 @@ public class InclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(InclusiveGatewayActivityBehavior.class.getName());
 
+    @Override
     public void execute(DelegateExecution execution) {
         ActivityExecution activityExecution = (ActivityExecution) execution;
         activityExecution.inactivate();
