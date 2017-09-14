@@ -13,14 +13,18 @@
 package org.flowable.engine.test.api.event;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
+import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -239,11 +243,22 @@ public class CancelUserTaskTest extends PluggableFlowableTestCase {
         assertEquals(12, testListener.getEventsReceived().size());
     }
 
-    class UserActivityEventListener implements FlowableEventListener {
+    class UserActivityEventListener extends AbstractFlowableEngineEventListener {
 
         private List<FlowableEvent> eventsReceived;
 
         public UserActivityEventListener() {
+            super(new HashSet<>(Arrays.asList(
+                    FlowableEngineEventType.ACTIVITY_STARTED,
+                    FlowableEngineEventType.ACTIVITY_COMPLETED,
+                    FlowableEngineEventType.ACTIVITY_CANCELLED,
+                    FlowableEngineEventType.TASK_CREATED,
+                    FlowableEngineEventType.TASK_COMPLETED,
+                    FlowableEngineEventType.PROCESS_STARTED,
+                    FlowableEngineEventType.PROCESS_COMPLETED,
+                    FlowableEngineEventType.PROCESS_CANCELLED,
+                    FlowableEngineEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT
+            )));
             eventsReceived = new ArrayList<>();
         }
 
@@ -256,24 +271,48 @@ public class CancelUserTaskTest extends PluggableFlowableTestCase {
         }
 
         @Override
-        public void onEvent(FlowableEvent event) {
+        protected void activityStarted(FlowableActivityEvent event) {
+            eventsReceived.add(event);
+        }
 
-            FlowableEngineEventType engineEventType = (FlowableEngineEventType) event.getType();
-            switch (engineEventType) {
-            case ACTIVITY_STARTED:
-            case ACTIVITY_COMPLETED:
-            case ACTIVITY_CANCELLED:
-            case TASK_CREATED:
-            case TASK_COMPLETED:
-            case PROCESS_STARTED:
-            case PROCESS_COMPLETED:
-            case PROCESS_CANCELLED:
-            case PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT:
-                eventsReceived.add(event);
-                break;
-            default:
-                break;
-            }
+        @Override
+        protected void activityCompleted(FlowableActivityEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void activityCancelled(FlowableActivityCancelledEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void taskCreated(FlowableEngineEntityEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void taskCompleted(FlowableEntityEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void processStarted(FlowableProcessStartedEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void processCompleted(FlowableEngineEntityEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void processCompletedWithTerminateEnd(FlowableEngineEntityEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void processCancelled(FlowableCancelledEvent event) {
+            eventsReceived.add(event);
         }
 
         @Override
