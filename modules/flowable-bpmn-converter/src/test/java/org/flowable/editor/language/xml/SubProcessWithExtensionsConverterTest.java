@@ -125,6 +125,7 @@ public class SubProcessWithExtensionsConverterTest extends AbstractConverterTest
         deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "subprocessmodel_with_extensions.bpmn";
     }
@@ -195,7 +196,7 @@ public class SubProcessWithExtensionsConverterTest extends AbstractConverterTest
             List<ExtensionElement> attributesExtension = bObj.getExtensionElements().get(ELEMENT_ATTRIBUTES);
 
             if (null != attributesExtension && !attributesExtension.isEmpty()) {
-                attributes = new HashMap<String, String>();
+                attributes = new HashMap<>();
                 List<ExtensionElement> attributeExtensions = attributesExtension.get(0).getChildElements().get(ELEMENT_ATTRIBUTE);
 
                 for (ExtensionElement attributeExtension : attributeExtensions) {

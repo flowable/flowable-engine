@@ -15,8 +15,9 @@ package org.flowable.idm.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.idm.engine.impl.interceptor.Command;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -30,11 +31,12 @@ public class DeleteTokenCmd implements Command<Void>, Serializable {
         this.tokenId = tokenId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (tokenId == null) {
             throw new FlowableIllegalArgumentException("tokenId is null");
         }
-        commandContext.getTokenEntityManager().delete(tokenId);
+        CommandContextUtil.getTokenEntityManager(commandContext).delete(tokenId);
 
         return null;
     }

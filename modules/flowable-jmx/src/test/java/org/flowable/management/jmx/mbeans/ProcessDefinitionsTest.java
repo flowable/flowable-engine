@@ -83,7 +83,7 @@ public class ProcessDefinitionsTest {
     public void testGetProcessDefinitions() {
 
         when(repositoryService.createProcessDefinitionQuery()).thenReturn(processDefinitionQuery);
-        List<ProcessDefinition> processDefinitionList = new ArrayList<ProcessDefinition>();
+        List<ProcessDefinition> processDefinitionList = new ArrayList<>();
         ProcessDefinitionEntity pd = new ProcessDefinitionEntityImpl();
         pd.setId("testId");
         pd.setName("testName");
@@ -116,7 +116,7 @@ public class ProcessDefinitionsTest {
     public void testDeployments() {
         when(repositoryService.createDeploymentQuery()).thenReturn(deploymentQuery);
         DeploymentEntity deployment = new DeploymentEntityImpl();
-        List<Deployment> deploymentList = new ArrayList<Deployment>();
+        List<Deployment> deploymentList = new ArrayList<>();
         deployment.setId("testDeploymentId");
         deployment.setName("testDeploymentName");
         deployment.setTenantId("tenantId");

@@ -13,19 +13,19 @@
 
 package org.flowable.spring.test.executionListener;
 
-import org.flowable.bpmn.model.FlowElement;
-import org.flowable.engine.delegate.TransactionDependentExecutionListener;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.engine.delegate.TransactionDependentExecutionListener;
 
 /**
  * @author Yvo Swillens
  */
 public class MyTransactionDependentExecutionListener implements TransactionDependentExecutionListener {
 
-    protected List<CurrentActivity> currentActivities = new ArrayList<CurrentActivity>();
+    protected List<CurrentActivity> currentActivities = new ArrayList<>();
 
     @Override
     public void notify(String processInstanceId, String executionId, FlowElement currentFlowElement, Map<String, Object> executionVariables, Map<String, Object> customPropertiesMap) {

@@ -17,10 +17,10 @@ import java.util.List;
 
 import org.flowable.app.model.common.AbstractRepresentation;
 import org.flowable.app.model.common.UserRepresentation;
-import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskInfo;
+import org.flowable.task.service.Task;
+import org.flowable.task.service.TaskInfo;
+import org.flowable.task.service.history.HistoricTaskInstance;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;

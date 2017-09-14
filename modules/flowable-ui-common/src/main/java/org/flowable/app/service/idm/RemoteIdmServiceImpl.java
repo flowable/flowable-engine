@@ -12,10 +12,6 @@
  */
 package org.flowable.app.service.idm;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
@@ -30,6 +26,7 @@ import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -44,6 +41,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 @Service
 public class RemoteIdmServiceImpl implements RemoteIdmService {
@@ -108,7 +109,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
         if (json != null) {
             return parseUsersInfo(json);
         }
-        return new ArrayList<RemoteUser>();
+        return new ArrayList<>();
     }
 
     @Override
@@ -117,7 +118,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
         if (json != null) {
             return parseUsersInfo(json);
         }
-        return new ArrayList<RemoteUser>();
+        return new ArrayList<>();
     }
 
     @Override
@@ -135,13 +136,36 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
         if (json != null) {
             return parseGroupsInfo(json);
         }
-        return new ArrayList<RemoteGroup>();
+        return new ArrayList<>();
     }
 
     protected JsonNode callRemoteIdmService(String url, String username, String password) {
-        return HttpRequestHelper.executeHttpGet(url, username, password, new Function<HttpResponse, JsonNode>() {
-            @Override
-            public JsonNode apply(HttpResponse httpResponse) {
+        HttpGet httpGet = new HttpGet(url);
+        httpGet.setHeader(HttpHeaders.AUTHORIZATION, "Basic " + new String(
+                Base64.encodeBase64((username + ":" + password).getBytes(Charset.forName("UTF-8")))));
+
+        HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+        SSLConnectionSocketFactory sslsf = null;
+        try {
+            SSLContextBuilder builder = new SSLContextBuilder();
+            builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+            sslsf = new SSLConnectionSocketFactory(builder.build(), NoopHostnameVerifier.INSTANCE);
+            clientBuilder.setSSLSocketFactory(sslsf);
+        } catch (Exception e) {
+            LOGGER.warn("Could not configure SSL for http client", e);
+        }
+
+        CloseableHttpClient client = clientBuilder.build();
+
+        try {
+            HttpResponse response = client.execute(httpGet);
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                return objectMapper.readTree(response.getEntity().getContent());
+            }
+        } catch (Exception e) {
+            LOGGER.warn("Exception while getting token", e);
+        } finally {
+            if (client != null) {
                 try {
                     return objectMapper.readTree(httpResponse.getEntity().getContent());
                 } catch (IOException e) {
@@ -152,7 +176,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
     }
 
     protected List<RemoteUser> parseUsersInfo(JsonNode json) {
-        List<RemoteUser> result = new ArrayList<RemoteUser>();
+        List<RemoteUser> result = new ArrayList<>();
         if (json != null && json.isArray()) {
             ArrayNode array = (ArrayNode) json;
             for (JsonNode userJson : array) {
@@ -186,7 +210,7 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
     }
 
     protected List<RemoteGroup> parseGroupsInfo(JsonNode json) {
-        List<RemoteGroup> result = new ArrayList<RemoteGroup>();
+        List<RemoteGroup> result = new ArrayList<>();
         if (json != null && json.isArray()) {
             ArrayNode array = (ArrayNode) json;
             for (JsonNode userJson : array) {

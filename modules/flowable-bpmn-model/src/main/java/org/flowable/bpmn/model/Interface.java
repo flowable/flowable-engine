@@ -19,7 +19,7 @@ public class Interface extends BaseElement {
 
     protected String name;
     protected String implementationRef;
-    protected List<Operation> operations = new ArrayList<Operation>();
+    protected List<Operation> operations = new ArrayList<>();
 
     public String getName() {
         return name;
@@ -45,6 +45,7 @@ public class Interface extends BaseElement {
         this.operations = operations;
     }
 
+    @Override
     public Interface clone() {
         Interface clone = new Interface();
         clone.setValues(this);
@@ -56,7 +57,7 @@ public class Interface extends BaseElement {
         setName(otherElement.getName());
         setImplementationRef(otherElement.getImplementationRef());
 
-        operations = new ArrayList<Operation>();
+        operations = new ArrayList<>();
         if (otherElement.getOperations() != null && !otherElement.getOperations().isEmpty()) {
             for (Operation operation : otherElement.getOperations()) {
                 operations.add(operation.clone());

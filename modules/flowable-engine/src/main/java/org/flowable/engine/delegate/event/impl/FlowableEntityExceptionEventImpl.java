@@ -13,17 +13,17 @@
 package org.flowable.engine.delegate.event.impl;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableExceptionEvent;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.impl.delegate.event.FlowableEngineEntityEvent;
 
 /**
  * Base class for all {@link FlowableEvent} implementations, represents an exception occurred, related to an entity.
- * 
+ *
  * @author Frederik Heremans
  */
-public class FlowableEntityExceptionEventImpl extends FlowableEventImpl implements FlowableEngineEntityEvent, FlowableExceptionEvent {
+public class FlowableEntityExceptionEventImpl extends FlowableProcessEventImpl implements FlowableEngineEntityEvent, FlowableExceptionEvent {
 
     protected Object entity;
     protected Throwable cause;

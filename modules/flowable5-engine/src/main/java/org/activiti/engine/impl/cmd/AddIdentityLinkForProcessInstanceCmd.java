@@ -59,6 +59,7 @@ public class AddIdentityLinkForProcessInstanceCmd implements Command<Void>, Seri
 
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
 
         ExecutionEntity processInstance = commandContext.getExecutionEntityManager().findExecutionById(processInstanceId);

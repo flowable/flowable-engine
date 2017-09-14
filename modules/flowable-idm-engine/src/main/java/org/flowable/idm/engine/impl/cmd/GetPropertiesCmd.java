@@ -18,9 +18,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.idm.engine.impl.interceptor.Command;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
-import org.flowable.idm.engine.impl.persistence.entity.PropertyEntity;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.idm.engine.impl.persistence.entity.IdmPropertyEntity;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -29,11 +30,12 @@ public class GetPropertiesCmd implements Command<Map<String, String>>, Serializa
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public Map<String, String> execute(CommandContext commandContext) {
-        List<PropertyEntity> propertyEntities = commandContext.getPropertyEntityManager().findAll();
+        List<IdmPropertyEntity> propertyEntities = CommandContextUtil.getPropertyEntityManager(commandContext).findAll();
 
-        Map<String, String> properties = new HashMap<String, String>();
-        for (PropertyEntity propertyEntity : propertyEntities) {
+        Map<String, String> properties = new HashMap<>();
+        for (IdmPropertyEntity propertyEntity : propertyEntities) {
             properties.put(propertyEntity.getName(), propertyEntity.getValue());
         }
         return properties;

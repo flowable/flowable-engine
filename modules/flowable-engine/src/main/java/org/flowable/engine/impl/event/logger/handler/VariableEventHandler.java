@@ -12,28 +12,28 @@
  */
 package org.flowable.engine.impl.event.logger.handler;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-import org.flowable.engine.delegate.event.FlowableVariableEvent;
-import org.flowable.engine.impl.variable.BooleanType;
-import org.flowable.engine.impl.variable.DateType;
-import org.flowable.engine.impl.variable.DoubleType;
-import org.flowable.engine.impl.variable.IntegerType;
-import org.flowable.engine.impl.variable.LongStringType;
-import org.flowable.engine.impl.variable.LongType;
-import org.flowable.engine.impl.variable.SerializableType;
-import org.flowable.engine.impl.variable.ShortType;
-import org.flowable.engine.impl.variable.StringType;
-import org.flowable.engine.impl.variable.UUIDType;
-import org.flowable.engine.impl.variable.VariableType;
+import org.flowable.variable.service.event.FlowableVariableEvent;
+import org.flowable.variable.service.impl.types.BooleanType;
+import org.flowable.variable.service.impl.types.DateType;
+import org.flowable.variable.service.impl.types.DoubleType;
+import org.flowable.variable.service.impl.types.IntegerType;
+import org.flowable.variable.service.impl.types.LongStringType;
+import org.flowable.variable.service.impl.types.LongType;
+import org.flowable.variable.service.impl.types.SerializableType;
+import org.flowable.variable.service.impl.types.ShortType;
+import org.flowable.variable.service.impl.types.StringType;
+import org.flowable.variable.service.impl.types.UUIDType;
+import org.flowable.variable.service.impl.types.VariableType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Joram Barrez
@@ -53,7 +53,7 @@ public abstract class VariableEventHandler extends AbstractDatabaseEventLoggerEv
     public static final String TYPE_JSON = "json";
 
     protected Map<String, Object> createData(FlowableVariableEvent variableEvent) {
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
         putInMapIfNotNull(data, Fields.NAME, variableEvent.getVariableName());
         putInMapIfNotNull(data, Fields.PROCESS_DEFINITION_ID, variableEvent.getProcessDefinitionId());
         putInMapIfNotNull(data, Fields.PROCESS_INSTANCE_ID, variableEvent.getProcessInstanceId());

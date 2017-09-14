@@ -27,7 +27,7 @@ public class FormDataResponse {
     protected String processDefinitionUrl;
     protected String taskId;
     protected String taskUrl;
-    protected List<RestFormProperty> formProperties = new ArrayList<RestFormProperty>();
+    protected List<RestFormProperty> formProperties = new ArrayList<>();
 
     public String getFormKey() {
         return formKey;

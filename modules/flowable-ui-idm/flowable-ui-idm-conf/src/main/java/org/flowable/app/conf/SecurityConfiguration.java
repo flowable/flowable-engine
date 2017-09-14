@@ -45,7 +45,7 @@ import org.springframework.security.web.header.writers.XXssProtectionHeaderWrite
 
 /**
  * Based on http://docs.spring.io/spring-security/site/docs/3.2.x/reference/htmlsingle/#multiple-httpsecurity
- * 
+ *
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
@@ -59,10 +59,10 @@ public class SecurityConfiguration {
     //
     // GLOBAL CONFIG
     //
-    
+
     @Autowired
     protected IdmIdentityService identityService;
-    
+
     @Autowired
     protected PasswordEncoder passwordEncoder;
 
@@ -79,7 +79,7 @@ public class SecurityConfiguration {
             } catch (Exception e) {
                 LOGGER.error("Could not configure ldap authentication mechanism:", e);
             }
-            
+
         } else {
             // Default auth (database backed)
             try {
@@ -104,7 +104,7 @@ public class SecurityConfiguration {
         daoAuthenticationProvider.setPasswordEncoder(passwordEncoder);
         return daoAuthenticationProvider;
     }
-    
+
     @Bean(name = "ldapAuthenticationProvider")
     public AuthenticationProvider ldapAuthenticationProvider() {
         CustomLdapAuthenticationProvider ldapAuthenticationProvider = new CustomLdapAuthenticationProvider(
@@ -138,36 +138,36 @@ public class SecurityConfiguration {
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http
-                .exceptionHandling()
-                .authenticationEntryPoint(authenticationEntryPoint)
-                .and()
+                    .exceptionHandling()
+                    .authenticationEntryPoint(authenticationEntryPoint)
+                    .and()
                     .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+                    .and()
                     .rememberMe()
                     .rememberMeServices(rememberMeServices())
                     .key(env.getProperty("security.rememberme.key"))
-                .and()
+                    .and()
                     .logout()
                     .logoutUrl("/app/logout")
                     .logoutSuccessHandler(ajaxLogoutSuccessHandler)
                     .addLogoutHandler(new ClearFlowableCookieLogoutHandler())
                     .permitAll()
-                .and()
+                    .and()
                     .csrf()
                     .disable() // Disabled, cause enabling it will cause sessions
                     .headers()
                     .frameOptions()
                     .sameOrigin()
                     .addHeaderWriter(new XXssProtectionHeaderWriter())
-                .and()
+                    .and()
                     .authorizeRequests()
                     .antMatchers("/*").permitAll()
                     .antMatchers("/app/rest/authenticate").permitAll()
                     .antMatchers("/app/**").hasAuthority(DefaultPrivileges.ACCESS_IDM);
 
             // Custom login form configurer to allow for non-standard HTTP-methods (eg. LOCK)
-            CustomFormLoginConfig<HttpSecurity> loginConfig = new CustomFormLoginConfig<HttpSecurity>();
+            CustomFormLoginConfig<HttpSecurity> loginConfig = new CustomFormLoginConfig<>();
             loginConfig.loginProcessingUrl("/app/authentication")
                     .successHandler(ajaxAuthenticationSuccessHandler)
                     .failureHandler(ajaxAuthenticationFailureHandler)
@@ -200,15 +200,15 @@ public class SecurityConfiguration {
         protected void configure(HttpSecurity http) throws Exception {
 
             http
-                .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
+                    .sessionManagement()
+                    .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                    .and()
                     .csrf()
                     .disable()
                     .antMatcher("/api" + "/**")
                     .authorizeRequests()
                     .antMatchers("/api" + "/**").authenticated()
-                .and().httpBasic();
+                    .and().httpBasic();
         }
     }
 

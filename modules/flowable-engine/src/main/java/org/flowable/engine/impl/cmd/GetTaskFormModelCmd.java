@@ -23,17 +23,20 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.content.api.ContentItem;
+import org.flowable.content.api.ContentService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.history.HistoricVariableInstance;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.form.api.FormService;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.FormFieldTypes;
 import org.flowable.form.model.FormModel;
+import org.flowable.task.service.history.HistoricTaskInstance;
+import org.flowable.variable.service.history.HistoricVariableInstance;
 
 /**
  * @author Tijs Rademakers
@@ -48,18 +51,20 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
         this.taskId = taskId;
     }
 
+    @Override
     public FormModel execute(CommandContext commandContext) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-        if (!processEngineConfiguration.isFormEngineInitialized()) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        FormService formService = CommandContextUtil.getFormService();
+        if (formService == null) {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");
         }
 
-        HistoricTaskInstance task = processEngineConfiguration.getHistoricTaskInstanceEntityManager().findById(taskId);
+        HistoricTaskInstance task = CommandContextUtil.getHistoricTaskService().getHistoricTask(taskId);
         if (task == null) {
             throw new FlowableObjectNotFoundException("Task not found with id " + taskId);
         }
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         if (task.getProcessInstanceId() != null) {
             List<HistoricVariableInstance> variableInstances = processEngineConfiguration.getHistoryService()
                     .createHistoricVariableInstanceQuery()
@@ -80,13 +85,11 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
 
         FormModel formModel = null;
         if (task.getEndTime() != null) {
-            formModel = processEngineConfiguration.getFormEngineFormService()
-                    .getFormInstanceModelByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId,
+            formModel = formService.getFormInstanceModelByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId,
                             taskId, task.getProcessInstanceId(), variables, task.getTenantId());
 
         } else {
-            formModel = processEngineConfiguration.getFormEngineFormService()
-                    .getFormModelWithVariablesByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId,
+            formModel = formService.getFormModelWithVariablesByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId,
                             task.getProcessInstanceId(), taskId, variables, task.getTenantId());
         }
 
@@ -95,13 +98,14 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
             throw new FlowableObjectNotFoundException("Form model for task " + task.getTaskDefinitionKey() + " cannot be found for form key " + task.getFormKey());
         }
 
-        fetchRelatedContentInfoIfNeeded(formModel, processEngineConfiguration);
+        fetchRelatedContentInfoIfNeeded(formModel);
 
         return formModel;
     }
 
-    protected void fetchRelatedContentInfoIfNeeded(FormModel formModel, ProcessEngineConfigurationImpl processEngineConfiguration) {
-        if (!processEngineConfiguration.isContentEngineInitialized()) {
+    protected void fetchRelatedContentInfoIfNeeded(FormModel formModel) {
+        ContentService contentService = CommandContextUtil.getContentService();
+        if (contentService == null) {
             return;
         }
 
@@ -115,15 +119,14 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
 
                     } else if (formField.getValue() instanceof String) {
                         String[] splittedString = ((String) formField.getValue()).split(",");
-                        contentItemIds = new ArrayList<String>();
+                        contentItemIds = new ArrayList<>();
                         Collections.addAll(contentItemIds, splittedString);
                     }
 
                     if (contentItemIds != null) {
                         Set<String> contentItemIdSet = new HashSet<>(contentItemIds);
 
-                        List<ContentItem> contentItems = processEngineConfiguration.getContentService()
-                                .createContentItemQuery()
+                        List<ContentItem> contentItems = contentService.createContentItemQuery()
                                 .ids(contentItemIdSet)
                                 .list();
 

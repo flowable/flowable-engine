@@ -26,7 +26,7 @@ public class EventSubscriptionQueryProperties {
     public static Map<String, QueryProperty> PROPERTIES;
 
     static {
-        PROPERTIES = new HashMap<String, QueryProperty>();
+        PROPERTIES = new HashMap<>();
         PROPERTIES.put("id", EventSubscriptionQueryProperty.ID);
         PROPERTIES.put("created", EventSubscriptionQueryProperty.CREATED);
         PROPERTIES.put("executionId", EventSubscriptionQueryProperty.EXECUTION_ID);

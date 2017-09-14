@@ -14,14 +14,14 @@ package org.flowable.rest.service.api.runtime.process;
 
 import java.util.List;
 
-import io.swagger.annotations.ApiModelProperty;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+
+import io.swagger.annotations.ApiModelProperty;
 
 public class SignalEventReceivedRequest {
 

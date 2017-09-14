@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.app.model.common.RemoteUser;
 import org.flowable.app.service.exception.NotFoundException;
 import org.flowable.app.service.exception.NotPermittedException;
 import org.flowable.app.service.idm.RemoteIdmService;
@@ -31,18 +32,20 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.history.HistoricTaskInstanceQuery;
-import org.flowable.engine.task.Task;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.identitylink.service.IdentityLink;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
+import org.flowable.task.service.Task;
+import org.flowable.task.service.history.HistoricTaskInstance;
+import org.flowable.task.service.history.HistoricTaskInstanceQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Centralized service for all permission-checks.
- * 
+ *
  * @author Frederik Heremans
  */
 @Service
@@ -104,8 +107,10 @@ public class PermissionService {
     }
 
     private List<String> getGroupIdsForUser(User user) {
-        List<String> groupIds = new ArrayList<String>();
-        for (Group group : remoteIdmService.getUser(user.getId()).getGroups()) {
+        List<String> groupIds = new ArrayList<>();
+        RemoteUser remoteUser = (RemoteUser) user;
+
+        for (Group group : remoteUser.getGroups()) {
             groupIds.add(String.valueOf(group.getId()));
         }
         return groupIds;
@@ -235,6 +240,61 @@ public class PermissionService {
         }
 
         return canDelete;
+    }
+
+    public boolean canStartProcess(User user, ProcessDefinition definition) {
+        List<IdentityLink> identityLinks = repositoryService.getIdentityLinksForProcessDefinition(definition.getId());
+        List<String> startUserIds = getPotentialStarterUserIds(identityLinks);
+        List<String> startGroupIds = getPotentialStarterGroupIds(identityLinks);
+
+        // If no potential starters are defined then every user can start the process
+        if (startUserIds.isEmpty() && startGroupIds.isEmpty()) {
+            return true;
+        }
+
+        if (startUserIds.contains(user.getId())) {
+            return true;
+        }
+
+        List<String> groupsIds = getGroupIdsForUser(user);
+
+        for (String startGroupId : startGroupIds) {
+            if (groupsIds.contains(startGroupId)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    protected List<String> getPotentialStarterGroupIds(List<IdentityLink> identityLinks) {
+        List<String> groupIds = new ArrayList<>();
+
+        for (IdentityLink identityLink : identityLinks) {
+            if (identityLink.getGroupId() != null && identityLink.getGroupId().length() > 0) {
+
+                if (!groupIds.contains(identityLink.getGroupId())) {
+                    groupIds.add(identityLink.getGroupId());
+                }
+            }
+        }
+
+        return groupIds;
+    }
+
+    protected List<String> getPotentialStarterUserIds(List<IdentityLink> identityLinks) {
+        List<String> userIds = new ArrayList<>();
+        for (IdentityLink identityLink : identityLinks) {
+            if (identityLink.getUserId() != null && identityLink.getUserId().length() > 0) {
+
+                if (!userIds.contains(identityLink.getUserId())) {
+                    userIds.add(identityLink.getUserId());
+                }
+            }
+        }
+
+        return userIds;
+
     }
 
 }

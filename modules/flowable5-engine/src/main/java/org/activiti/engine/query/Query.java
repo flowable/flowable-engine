@@ -15,6 +15,8 @@ package org.activiti.engine.query;
 
 import java.util.List;
 
+import org.activiti.engine.ActivitiException;
+
 /**
  * Describes basic methods for querying.
  * 

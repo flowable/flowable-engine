@@ -20,15 +20,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
+import org.flowable.engine.common.impl.db.CachedEntityMatcher;
+import org.flowable.engine.common.impl.db.SingleCachedEntityMatcher;
 import org.flowable.engine.impl.ExecutionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.PerformanceSettings;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.CachedEntityMatcher;
-import org.flowable.engine.impl.persistence.SingleCachedEntityMatcher;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
-import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ExecutionDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.ExecutionByProcessInstanceMatcher;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.ExecutionsByParentExecutionIdAndActivityIdEntityMatcher;
@@ -47,7 +47,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 /**
  * @author Joram Barrez
  */
-public class MybatisExecutionDataManager extends AbstractDataManager<ExecutionEntity> implements ExecutionDataManager {
+public class MybatisExecutionDataManager extends AbstractProcessDataManager<ExecutionEntity> implements ExecutionDataManager {
 
     protected PerformanceSettings performanceSettings;
 
@@ -151,7 +151,7 @@ public class MybatisExecutionDataManager extends AbstractDataManager<ExecutionEn
 
     @Override
     public List<ExecutionEntity> findExecutionsByParentExecutionAndActivityIds(final String parentExecutionId, final Collection<String> activityIds) {
-        Map<String, Object> parameters = new HashMap<String, Object>(2);
+        Map<String, Object> parameters = new HashMap<>(2);
         parameters.put("parentExecutionId", parentExecutionId);
         parameters.put("activityIds", activityIds);
 
@@ -185,7 +185,7 @@ public class MybatisExecutionDataManager extends AbstractDataManager<ExecutionEn
 
     @Override
     public Collection<ExecutionEntity> findInactiveExecutionsByProcessInstanceId(final String processInstanceId) {
-        HashMap<String, Object> params = new HashMap<String, Object>(2);
+        HashMap<String, Object> params = new HashMap<>(2);
         params.put("processInstanceId", processInstanceId);
         params.put("isActive", false);
 
@@ -199,7 +199,7 @@ public class MybatisExecutionDataManager extends AbstractDataManager<ExecutionEn
 
     @Override
     public Collection<ExecutionEntity> findInactiveExecutionsByActivityIdAndProcessInstanceId(final String activityId, final String processInstanceId) {
-        HashMap<String, Object> params = new HashMap<String, Object>(3);
+        HashMap<String, Object> params = new HashMap<>(3);
         params.put("activityId", activityId);
         params.put("processInstanceId", processInstanceId);
         params.put("isActive", false);
@@ -306,7 +306,7 @@ public class MybatisExecutionDataManager extends AbstractDataManager<ExecutionEn
 
     @Override
     public void updateExecutionTenantIdForDeployment(String deploymentId, String newTenantId) {
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
         getDbSqlSession().update("updateExecutionTenantIdForDeployment", params);
@@ -314,7 +314,7 @@ public class MybatisExecutionDataManager extends AbstractDataManager<ExecutionEn
 
     @Override
     public void updateProcessInstanceLockTime(String processInstanceId, Date lockDate, Date expirationTime) {
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("id", processInstanceId);
         params.put("lockTime", lockDate);
         params.put("expirationTime", expirationTime);
@@ -332,7 +332,7 @@ public class MybatisExecutionDataManager extends AbstractDataManager<ExecutionEn
 
     @Override
     public void clearProcessInstanceLockTime(String processInstanceId) {
-        HashMap<String, Object> params = new HashMap<String, Object>();
+        HashMap<String, Object> params = new HashMap<>();
         params.put("id", processInstanceId);
         getDbSqlSession().update("clearProcessInstanceLockTime", params);
     }

@@ -14,6 +14,8 @@ create table ACT_HI_PROCINST (
     DELETE_REASON_ nvarchar(4000),
     TENANT_ID_ nvarchar(255) default '',
     NAME_ nvarchar(255),
+    CALLBACK_ID_ nvarchar(255),
+    CALLBACK_TYPE_ nvarchar(255),
     primary key (ID_),
     unique (PROC_INST_ID_)
 );

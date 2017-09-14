@@ -25,13 +25,13 @@ import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.api.UserCache.CachedUser;
 import org.flowable.app.service.exception.NotFoundException;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.history.HistoricIdentityLink;
-import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.task.IdentityLinkType;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskInfo;
+import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.service.history.HistoricIdentityLink;
 import org.flowable.idm.api.User;
+import org.flowable.task.service.Task;
+import org.flowable.task.service.TaskInfo;
+import org.flowable.task.service.history.HistoricTaskInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -80,7 +80,7 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
 
     protected List<UserRepresentation> getInvolvedUsers(String taskId) {
         List<HistoricIdentityLink> idLinks = historyService.getHistoricIdentityLinksForTask(taskId);
-        List<UserRepresentation> result = new ArrayList<UserRepresentation>(idLinks.size());
+        List<UserRepresentation> result = new ArrayList<>(idLinks.size());
 
         for (HistoricIdentityLink link : idLinks) {
             // Only include users and non-assignee links

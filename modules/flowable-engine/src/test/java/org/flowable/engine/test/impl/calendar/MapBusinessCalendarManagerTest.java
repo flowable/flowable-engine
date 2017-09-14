@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.calendar.BusinessCalendar;
+import org.flowable.engine.common.impl.calendar.BusinessCalendar;
 import org.flowable.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.engine.impl.calendar.MapBusinessCalendarManager;
 
@@ -33,7 +33,7 @@ import junit.framework.TestCase;
 public class MapBusinessCalendarManagerTest extends TestCase {
 
     public void testMapConstructor() {
-        Map<String, BusinessCalendar> calendars = new HashMap<String, BusinessCalendar>(1);
+        Map<String, BusinessCalendar> calendars = new HashMap<>(1);
         CycleBusinessCalendar calendar = new CycleBusinessCalendar(null);
         calendars.put("someKey", calendar);
         MapBusinessCalendarManager businessCalendarManager = new MapBusinessCalendarManager(calendars);

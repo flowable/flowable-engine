@@ -34,6 +34,7 @@ public class AsyncProcessRevisitedTest extends SpringFlowableTestCase {
     @Autowired
     protected CamelContext camelContext;
 
+    @Override
     public void setUp() throws Exception {
         camelContext.addRoutes(new RouteBuilder() {
 

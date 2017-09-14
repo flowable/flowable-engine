@@ -17,10 +17,10 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.FieldExtension;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
-import org.flowable.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.el.FixedValue;
+import org.flowable.variable.service.delegate.Expression;
+import org.flowable.variable.service.impl.el.ExpressionManager;
 
 /**
  * @author Joram Barrez
@@ -30,7 +30,7 @@ public abstract class AbstractBehaviorFactory {
     protected ExpressionManager expressionManager;
 
     public List<FieldDeclaration> createFieldDeclarations(List<FieldExtension> fieldList) {
-        List<FieldDeclaration> fieldDeclarations = new ArrayList<FieldDeclaration>();
+        List<FieldDeclaration> fieldDeclarations = new ArrayList<>();
 
         for (FieldExtension fieldExtension : fieldList) {
             FieldDeclaration fieldDeclaration = null;

@@ -15,8 +15,10 @@ package org.flowable.engine.impl;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.AbstractNativeQuery;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.NativeModelQuery;
 
@@ -34,12 +36,14 @@ public class NativeModelQueryImpl extends AbstractNativeQuery<NativeModelQuery, 
 
     // results ////////////////////////////////////////////////////////////////
 
+    @Override
     public List<Model> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return commandContext.getModelEntityManager().findModelsByNativeQuery(parameterMap);
+        return CommandContextUtil.getModelEntityManager(commandContext).findModelsByNativeQuery(parameterMap);
     }
 
+    @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return commandContext.getModelEntityManager().findModelCountByNativeQuery(parameterMap);
+        return CommandContextUtil.getModelEntityManager(commandContext).findModelCountByNativeQuery(parameterMap);
     }
 
 }

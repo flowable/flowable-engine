@@ -12,14 +12,16 @@
  */
 package org.flowable.rest.dmn.service.api.decision;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.ExecuteDecisionBuilder;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.rest.dmn.service.api.DmnRestResponseFactory;
@@ -31,11 +33,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Yvo Swillens
@@ -65,22 +68,20 @@ public class DmnRuleServiceResource {
 
         try {
             // TODO: add audit trail info
-
-            List<Map<String, Object>> executionResult;
-            if (StringUtils.isNotEmpty(request.getTenantId())) {
-                if (StringUtils.isNotEmpty(request.getParentDeploymentId())) {
-                    executionResult = dmnRuleService.executeDecisionByKeyParentDeploymentIdAndTenantId(
-                        request.getDecisionKey(), request.getParentDeploymentId(), inputVariables, request.getTenantId());
-                } else {
-                    executionResult = dmnRuleService.executeDecisionByKeyAndTenantId(request.getDecisionKey(), inputVariables, request.getTenantId());
-                }
-            } else {
-                if (StringUtils.isNotEmpty(request.getParentDeploymentId())) {
-                    executionResult = dmnRuleService.executeDecisionByKeyAndParentDeploymentId(request.getDecisionKey(), request.getParentDeploymentId(), inputVariables);
-                } else {
-                    executionResult = dmnRuleService.executeDecisionByKey(request.getDecisionKey(), inputVariables);
-                }
+            
+            ExecuteDecisionBuilder decisionBuilder = dmnRuleService.createExecuteDecisionBuilder();
+            decisionBuilder.decisionKey(request.getDecisionKey()).variables(inputVariables);
+            
+            if (StringUtils.isNotEmpty(request.getParentDeploymentId())) {
+                decisionBuilder.parentDeploymentId(request.getParentDeploymentId());
             }
+            
+            if (StringUtils.isNotEmpty(request.getTenantId())) {
+                decisionBuilder.tenantId(request.getTenantId());
+            }
+
+            List<Map<String, Object>> executionResult = decisionBuilder.execute();
+            
             response.setStatus(HttpStatus.CREATED.value());
 
             return dmnRestResponseFactory.createDmnRuleServiceResponse(executionResult);
@@ -105,21 +106,20 @@ public class DmnRuleServiceResource {
 
         try {
             // TODO: add audit trail info
-            Map<String, Object> executionResult;
-            if (StringUtils.isNotEmpty(request.getTenantId())) {
-                if (StringUtils.isNotEmpty(request.getParentDeploymentId())) {
-                    executionResult = dmnRuleService.executeDecisionByKeyParentDeploymentIdAndTenantIdSingleResult(
-                        request.getDecisionKey(), request.getParentDeploymentId(), inputVariables, request.getTenantId());
-                } else {
-                    executionResult = dmnRuleService.executeDecisionByKeyAndTenantIdSingleResult(request.getDecisionKey(), inputVariables, request.getTenantId());
-                }
-            } else {
-                if (StringUtils.isNotEmpty(request.getParentDeploymentId())) {
-                    executionResult = dmnRuleService.executeDecisionByKeyAndParentDeploymentIdSingleResult(request.getDecisionKey(), request.getParentDeploymentId(), inputVariables);
-                } else {
-                    executionResult = dmnRuleService.executeDecisionByKeySingleResult(request.getDecisionKey(), inputVariables);
-                }
+            
+            ExecuteDecisionBuilder decisionBuilder = dmnRuleService.createExecuteDecisionBuilder();
+            decisionBuilder.decisionKey(request.getDecisionKey()).variables(inputVariables);
+            
+            if (StringUtils.isNotEmpty(request.getParentDeploymentId())) {
+                decisionBuilder.parentDeploymentId(request.getParentDeploymentId());
             }
+            
+            if (StringUtils.isNotEmpty(request.getTenantId())) {
+                decisionBuilder.tenantId(request.getTenantId());
+            }
+            
+            Map<String, Object> executionResult = decisionBuilder.executeWithSingleResult();
+            
             response.setStatus(HttpStatus.CREATED.value());
 
             return dmnRestResponseFactory.createDmnRuleServiceResponse(executionResult);

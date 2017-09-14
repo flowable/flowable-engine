@@ -26,9 +26,9 @@ public class DmnExtensionElement extends DmnElement {
     protected String namespacePrefix;
     protected String namespace;
     protected String elementText;
-    protected Map<String, List<DmnExtensionElement>> childElements = new LinkedHashMap<String, List<DmnExtensionElement>>();
+    protected Map<String, List<DmnExtensionElement>> childElements = new LinkedHashMap<>();
     /** extension attributes could be part of each element */
-    protected Map<String, List<DmnExtensionAttribute>> attributes = new LinkedHashMap<String, List<DmnExtensionAttribute>>();
+    protected Map<String, List<DmnExtensionAttribute>> attributes = new LinkedHashMap<>();
 
     public String getElementText() {
         return elementText;
@@ -70,7 +70,7 @@ public class DmnExtensionElement extends DmnElement {
         if (childElement != null && childElement.getName() != null && !childElement.getName().trim().isEmpty()) {
             List<DmnExtensionElement> elementList = null;
             if (!this.childElements.containsKey(childElement.getName())) {
-                elementList = new ArrayList<DmnExtensionElement>();
+                elementList = new ArrayList<>();
                 this.childElements.put(childElement.getName(), elementList);
             }
             this.childElements.get(childElement.getName()).add(childElement);
@@ -81,6 +81,7 @@ public class DmnExtensionElement extends DmnElement {
         this.childElements = childElements;
     }
 
+    @Override
     public DmnExtensionElement clone() {
         DmnExtensionElement clone = new DmnExtensionElement();
         clone.setValues(this);
@@ -94,12 +95,12 @@ public class DmnExtensionElement extends DmnElement {
         setElementText(otherElement.getElementText());
         setAttributes(otherElement.getAttributes());
 
-        childElements = new LinkedHashMap<String, List<DmnExtensionElement>>();
+        childElements = new LinkedHashMap<>();
         if (otherElement.getChildElements() != null && !otherElement.getChildElements().isEmpty()) {
             for (String key : otherElement.getChildElements().keySet()) {
                 List<DmnExtensionElement> otherElementList = otherElement.getChildElements().get(key);
                 if (otherElementList != null && !otherElementList.isEmpty()) {
-                    List<DmnExtensionElement> elementList = new ArrayList<DmnExtensionElement>();
+                    List<DmnExtensionElement> elementList = new ArrayList<>();
                     for (DmnExtensionElement dmnExtensionElement : otherElementList) {
                         elementList.add(dmnExtensionElement.clone());
                     }

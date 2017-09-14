@@ -22,12 +22,12 @@ import java.util.Map.Entry;
 
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -40,7 +40,7 @@ public class ScopeUtil {
      */
     public static void throwCompensationEvent(List<CompensateEventSubscriptionEntity> eventSubscriptions, DelegateExecution execution, boolean async) {
 
-        ExecutionEntityManager executionEntityManager = Context.getCommandContext().getExecutionEntityManager();
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
 
         // first spawn the compensating executions
         for (EventSubscriptionEntity eventSubscription : eventSubscriptions) {
@@ -61,13 +61,14 @@ public class ScopeUtil {
 
         // signal compensation events in reverse order of their 'created' timestamp
         Collections.sort(eventSubscriptions, new Comparator<EventSubscriptionEntity>() {
+            @Override
             public int compare(EventSubscriptionEntity o1, EventSubscriptionEntity o2) {
                 return o2.getCreated().compareTo(o1.getCreated());
             }
         });
 
         for (CompensateEventSubscriptionEntity compensateEventSubscriptionEntity : eventSubscriptions) {
-            Context.getCommandContext().getEventSubscriptionEntityManager().eventReceived(compensateEventSubscriptionEntity, null, async);
+            CommandContextUtil.getEventSubscriptionEntityManager().eventReceived(compensateEventSubscriptionEntity, null, async);
         }
     }
 
@@ -75,10 +76,10 @@ public class ScopeUtil {
      * Creates a new event scope execution and moves existing event subscriptions to this new execution
      */
     public static void createCopyOfSubProcessExecutionForCompensation(ExecutionEntity subProcessExecution) {
-        EventSubscriptionEntityManager eventSubscriptionEntityManager = Context.getCommandContext().getEventSubscriptionEntityManager();
+        EventSubscriptionEntityManager eventSubscriptionEntityManager = CommandContextUtil.getEventSubscriptionEntityManager();
         List<EventSubscriptionEntity> eventSubscriptions = eventSubscriptionEntityManager.findEventSubscriptionsByExecutionAndType(subProcessExecution.getId(), "compensate");
 
-        List<CompensateEventSubscriptionEntity> compensateEventSubscriptions = new ArrayList<CompensateEventSubscriptionEntity>();
+        List<CompensateEventSubscriptionEntity> compensateEventSubscriptions = new ArrayList<>();
         for (EventSubscriptionEntity event : eventSubscriptions) {
             if (event instanceof CompensateEventSubscriptionEntity) {
                 compensateEventSubscriptions.add((CompensateEventSubscriptionEntity) event);
@@ -89,7 +90,7 @@ public class ScopeUtil {
 
             ExecutionEntity processInstanceExecutionEntity = subProcessExecution.getProcessInstance();
 
-            ExecutionEntity eventScopeExecution = Context.getCommandContext().getExecutionEntityManager().createChildExecution(processInstanceExecutionEntity);
+            ExecutionEntity eventScopeExecution = CommandContextUtil.getExecutionEntityManager().createChildExecution(processInstanceExecutionEntity);
             eventScopeExecution.setActive(false);
             eventScopeExecution.setEventScope(true);
             eventScopeExecution.setCurrentFlowElement(subProcessExecution.getCurrentFlowElement());

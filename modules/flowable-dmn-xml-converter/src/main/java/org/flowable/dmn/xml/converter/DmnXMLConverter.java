@@ -66,8 +66,8 @@ public class DmnXMLConverter implements DmnXMLConstants {
     protected static final String DMN_XSD = "org/flowable/impl/dmn/parser/dmn.xsd";
     protected static final String DEFAULT_ENCODING = "UTF-8";
 
-    protected static Map<String, BaseDmnXMLConverter> convertersToDmnMap = new HashMap<String, BaseDmnXMLConverter>();
-    protected static Map<Class<? extends DmnElement>, BaseDmnXMLConverter> convertersToXMLMap = new HashMap<Class<? extends DmnElement>, BaseDmnXMLConverter>();
+    protected static Map<String, BaseDmnXMLConverter> convertersToDmnMap = new HashMap<>();
+    protected static Map<Class<? extends DmnElement>, BaseDmnXMLConverter> convertersToXMLMap = new HashMap<>();
 
     protected ClassLoader classloader;
 

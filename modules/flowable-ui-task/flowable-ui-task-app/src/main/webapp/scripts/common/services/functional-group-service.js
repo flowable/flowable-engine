@@ -28,6 +28,23 @@ flowableModule.service('FunctionalGroupService', ['$http', '$q',
             return deferred.promise;
         };
         
+        var groupInfoHttpAsPromise = function(options, index) {
+            var deferred = $q.defer();
+            $http(options).
+                success(function (response, status, headers, config) {
+                    var groupInfoFormObject = {
+                        groupData: response,
+                        index: index
+                    };
+                    deferred.resolve(groupInfoFormObject);
+                })
+                .error(function (response, status, headers, config) {
+                    deferred.reject(response);
+                });
+                
+            return deferred.promise;
+        };
+        
         /*
          * Get group info by id
          */
@@ -37,6 +54,14 @@ flowableModule.service('FunctionalGroupService', ['$http', '$q',
                 method: 'GET',
                 url: FLOWABLE.CONFIG.contextRoot + '/app/rest/workflow-groups/' + groupId
             });
+        };
+        
+        this.getGroupInfoForForm = function (groupId, index) {
+            
+            return groupInfoHttpAsPromise({
+                method: 'GET',
+                url: FLOWABLE.CONFIG.contextRoot + '/app/rest/workflow-groups/' + groupId
+            }, index);
         };
 
         this.getFilteredGroups = function(filterText, group, tenantId) {

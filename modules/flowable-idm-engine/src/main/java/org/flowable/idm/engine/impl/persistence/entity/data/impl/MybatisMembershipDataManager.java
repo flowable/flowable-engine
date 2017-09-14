@@ -18,13 +18,13 @@ import java.util.Map;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.MembershipEntity;
 import org.flowable.idm.engine.impl.persistence.entity.MembershipEntityImpl;
-import org.flowable.idm.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.idm.engine.impl.persistence.entity.data.AbstractIdmDataManager;
 import org.flowable.idm.engine.impl.persistence.entity.data.MembershipDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisMembershipDataManager extends AbstractDataManager<MembershipEntity> implements MembershipDataManager {
+public class MybatisMembershipDataManager extends AbstractIdmDataManager<MembershipEntity> implements MembershipDataManager {
 
     public MybatisMembershipDataManager(IdmEngineConfiguration idmEngineConfiguration) {
         super(idmEngineConfiguration);
@@ -42,7 +42,7 @@ public class MybatisMembershipDataManager extends AbstractDataManager<Membership
 
     @Override
     public void deleteMembership(String userId, String groupId) {
-        Map<String, Object> parameters = new HashMap<String, Object>();
+        Map<String, Object> parameters = new HashMap<>();
         parameters.put("userId", userId);
         parameters.put("groupId", groupId);
         getDbSqlSession().delete("deleteMembership", parameters);

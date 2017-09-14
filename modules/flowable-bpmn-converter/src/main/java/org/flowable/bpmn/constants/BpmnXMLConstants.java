@@ -166,11 +166,16 @@ public interface BpmnXMLConstants {
     public static final String ELEMENT_MULTIINSTANCE_CARDINALITY = "loopCardinality";
     public static final String ELEMENT_MULTIINSTANCE_DATAINPUT = "loopDataInputRef";
     public static final String ELEMENT_MULTIINSTANCE_DATAITEM = "inputDataItem";
+    public static final String ELEMENT_MULTIINSTANCE_COLLECTION = "collection";
+    public static final String ELEMENT_MULTIINSTANCE_COLLECTION_EXPRESSION = "expression";
+    public static final String ELEMENT_MULTIINSTANCE_COLLECTION_STRING = "string";
     public static final String ELEMENT_MULTIINSTANCE_CONDITION = "completionCondition";
     public static final String ATTRIBUTE_MULTIINSTANCE_SEQUENTIAL = "isSequential";
     public static final String ATTRIBUTE_MULTIINSTANCE_COLLECTION = "collection";
     public static final String ATTRIBUTE_MULTIINSTANCE_VARIABLE = "elementVariable";
     public static final String ATTRIBUTE_MULTIINSTANCE_INDEX_VARIABLE = "elementIndexVariable";
+    public static final String ATTRIBUTE_MULTIINSTANCE_COLLECTION_CLASS = "class";
+    public static final String ATTRIBUTE_MULTIINSTANCE_COLLECTION_DELEGATEEXPRESSION = "delegateExpression";
 
     public static final String ATTRIBUTE_TASK_IMPLEMENTATION = "implementation";
     public static final String ATTRIBUTE_TASK_OPERATION_REF = "operationRef";
@@ -207,6 +212,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_CALL_ACTIVITY_BUSINESS_KEY = "businessKey";
     public static final String ATTRIBUTE_CALL_ACTIVITY_INHERIT_BUSINESS_KEY = "inheritBusinessKey";
     public static final String ATTRIBUTE_CALL_ACTIVITY_INHERITVARIABLES = "inheritVariables";
+    public static final String ATTRIBUTE_CALL_ACTIVITY_USE_LOCALSCOPE_FOR_OUTPARAMETERS = "useLocalScopeForOutParameters";
     public static final String ELEMENT_CALL_ACTIVITY_IN_PARAMETERS = "in";
     public static final String ELEMENT_CALL_ACTIVITY_OUT_PARAMETERS = "out";
     public static final String ATTRIBUTE_IOPARAMETER_SOURCE = "source";

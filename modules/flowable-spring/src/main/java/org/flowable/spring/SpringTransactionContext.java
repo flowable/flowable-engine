@@ -13,10 +13,10 @@
 
 package org.flowable.spring;
 
+import org.flowable.engine.common.impl.cfg.TransactionContext;
+import org.flowable.engine.common.impl.cfg.TransactionListener;
 import org.flowable.engine.common.impl.cfg.TransactionState;
-import org.flowable.engine.impl.cfg.TransactionContext;
-import org.flowable.engine.impl.cfg.TransactionListener;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.springframework.core.Ordered;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronization;
@@ -50,16 +50,19 @@ public class SpringTransactionContext implements TransactionContext {
         }
     }
 
+    @Override
     public void commit() {
         // Do nothing, transaction is managed by spring
     }
 
+    @Override
     public void rollback() {
         // Just in case the rollback isn't triggered by an
         // exception, we mark the current transaction rollBackOnly.
         transactionManager.getTransaction(null).setRollbackOnly();
     }
 
+    @Override
     public void addTransactionListener(final TransactionState transactionState, final TransactionListener transactionListener) {
         if (transactionState == TransactionState.COMMITTING) {
 
@@ -103,24 +106,31 @@ public class SpringTransactionContext implements TransactionContext {
 
     protected abstract class TransactionSynchronizationAdapter implements TransactionSynchronization, Ordered {
 
+        @Override
         public void suspend() {
         }
 
+        @Override
         public void resume() {
         }
 
+        @Override
         public void flush() {
         }
 
+        @Override
         public void beforeCommit(boolean readOnly) {
         }
 
+        @Override
         public void beforeCompletion() {
         }
 
+        @Override
         public void afterCommit() {
         }
 
+        @Override
         public void afterCompletion(int status) {
         }
 

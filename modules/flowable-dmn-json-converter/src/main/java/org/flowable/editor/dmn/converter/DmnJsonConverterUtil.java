@@ -101,7 +101,10 @@ public class DmnJsonConverterUtil {
 
                                     // if build in date function
                                     if (expressionValue.startsWith("fn_date(")) {
-                                        expressionValue = expressionValue.substring(9, expressionValue.lastIndexOf("'"));
+                                        expressionValue = expressionValue.substring(9, expressionValue.lastIndexOf('\''));
+                                        
+                                    } else if (expressionValue.startsWith("date:toDate(")) {
+                                        expressionValue = expressionValue.substring(13, expressionValue.lastIndexOf('\''));
                                     }
 
                                     // determine type is null
@@ -141,7 +144,10 @@ public class DmnJsonConverterUtil {
 
                             // if build in date function
                             if (outputExpressionValue.startsWith("fn_date(")) {
-                                outputExpressionValue = outputExpressionValue.substring(9, outputExpressionValue.lastIndexOf("'"));
+                                outputExpressionValue = outputExpressionValue.substring(9, outputExpressionValue.lastIndexOf('\''));
+                                
+                            } else if (outputExpressionValue.startsWith("date:toDate(")) {
+                                outputExpressionValue = outputExpressionValue.substring(13, outputExpressionValue.lastIndexOf('\''));
                             }
 
                             newRuleNode.put(outputExpressionId, outputExpressionValue);

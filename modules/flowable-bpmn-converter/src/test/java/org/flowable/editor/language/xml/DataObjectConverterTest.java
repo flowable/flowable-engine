@@ -47,6 +47,7 @@ public class DataObjectConverterTest extends AbstractConverterTest {
         deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "dataobjectmodel.bpmn";
     }
@@ -61,7 +62,7 @@ public class DataObjectConverterTest extends AbstractConverterTest {
         List<ValuedDataObject> dataObjects = model.getMainProcess().getDataObjects();
         assertEquals(7, dataObjects.size());
 
-        Map<String, ValuedDataObject> objectMap = new HashMap<String, ValuedDataObject>();
+        Map<String, ValuedDataObject> objectMap = new HashMap<>();
         for (ValuedDataObject valueObj : dataObjects) {
             objectMap.put(valueObj.getId(), valueObj);
         }
@@ -113,7 +114,7 @@ public class DataObjectConverterTest extends AbstractConverterTest {
         dataObjects = subProcess.getDataObjects();
         assertEquals(6, dataObjects.size());
 
-        objectMap = new HashMap<String, ValuedDataObject>();
+        objectMap = new HashMap<>();
         for (ValuedDataObject valueObj : dataObjects) {
             objectMap.put(valueObj.getId(), valueObj);
         }

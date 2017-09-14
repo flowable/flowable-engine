@@ -125,6 +125,7 @@ public class ValuedDataObjectWithExtensionsConverterTest extends AbstractConvert
         deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "valueddataobjectmodel_with_extensions.bpmn";
     }
@@ -139,7 +140,7 @@ public class ValuedDataObjectWithExtensionsConverterTest extends AbstractConvert
         List<ValuedDataObject> dataObjects = model.getMainProcess().getDataObjects();
         assertEquals(1, dataObjects.size());
 
-        Map<String, ValuedDataObject> objectMap = new HashMap<String, ValuedDataObject>();
+        Map<String, ValuedDataObject> objectMap = new HashMap<>();
         for (ValuedDataObject valueObj : dataObjects) {
             objectMap.put(valueObj.getId(), valueObj);
         }
@@ -186,7 +187,7 @@ public class ValuedDataObjectWithExtensionsConverterTest extends AbstractConvert
         dataObjects = subProcess.getDataObjects();
         assertEquals(1, dataObjects.size());
 
-        objectMap = new HashMap<String, ValuedDataObject>();
+        objectMap = new HashMap<>();
         for (ValuedDataObject valueObj : dataObjects) {
             objectMap.put(valueObj.getId(), valueObj);
         }
@@ -248,7 +249,7 @@ public class ValuedDataObjectWithExtensionsConverterTest extends AbstractConvert
             List<ExtensionElement> attributesExtension = dObj.getExtensionElements().get(ELEMENT_DATA_ATTRIBUTES);
 
             if (null != attributesExtension && !attributesExtension.isEmpty()) {
-                attributes = new HashMap<String, String>();
+                attributes = new HashMap<>();
                 List<ExtensionElement> attributeExtensions = attributesExtension.get(0).getChildElements().get(ELEMENT_DATA_ATTRIBUTE);
 
                 for (ExtensionElement attributeExtension : attributeExtensions) {

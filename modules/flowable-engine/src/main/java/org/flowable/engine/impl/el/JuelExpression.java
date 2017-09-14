@@ -19,12 +19,13 @@ import org.flowable.engine.common.impl.javax.el.ELException;
 import org.flowable.engine.common.impl.javax.el.MethodNotFoundException;
 import org.flowable.engine.common.impl.javax.el.PropertyNotFoundException;
 import org.flowable.engine.common.impl.javax.el.ValueExpression;
-import org.flowable.engine.delegate.Expression;
-import org.flowable.engine.delegate.VariableScope;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.delegate.invocation.ExpressionGetInvocation;
 import org.flowable.engine.impl.delegate.invocation.ExpressionSetInvocation;
 import org.flowable.engine.impl.interceptor.DelegateInterceptor;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.variable.service.delegate.Expression;
+import org.flowable.variable.service.delegate.VariableScope;
+import org.flowable.variable.service.impl.el.ExpressionManager;
 
 /**
  * Expression implementation backed by a JUEL {@link ValueExpression}.
@@ -48,6 +49,7 @@ public class JuelExpression implements Expression {
         this.delegateInterceptor = delegateInterceptor;
     }
 
+    @Override
     public Object getValue(VariableScope variableScope) {
         ELContext elContext = expressionManager.getElContext(variableScope);
         try {
@@ -66,11 +68,12 @@ public class JuelExpression implements Expression {
         }
     }
 
+    @Override
     public void setValue(Object value, VariableScope variableScope) {
         ELContext elContext = expressionManager.getElContext(variableScope);
         try {
             ExpressionSetInvocation invocation = new ExpressionSetInvocation(valueExpression, elContext, value);
-            Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(invocation);
+            CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(invocation);
         } catch (Exception e) {
             throw new FlowableException("Error while evaluating expression: " + expressionText, e);
         }
@@ -84,6 +87,7 @@ public class JuelExpression implements Expression {
         return super.toString();
     }
 
+    @Override
     public String getExpressionText() {
         return expressionText;
     }

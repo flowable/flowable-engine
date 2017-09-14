@@ -17,10 +17,11 @@ import java.util.Iterator;
 
 import org.flowable.engine.common.impl.javax.el.ELContext;
 import org.flowable.engine.common.impl.javax.el.ELResolver;
-import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.variable.service.delegate.VariableScope;
 
 /**
  * Implementation of an {@link ELResolver} that resolves expressions with the process variables of a given {@link VariableScope} as context. <br>
@@ -41,6 +42,7 @@ public class VariableScopeElResolver extends ELResolver {
         this.variableScope = variableScope;
     }
 
+    @Override
     public Object getValue(ELContext context, Object base, Object property) {
 
         if (base == null) {
@@ -49,12 +51,20 @@ public class VariableScopeElResolver extends ELResolver {
             if ((EXECUTION_KEY.equals(property) && variableScope instanceof ExecutionEntity) || (TASK_KEY.equals(property) && variableScope instanceof TaskEntity)) {
                 context.setPropertyResolved(true);
                 return variableScope;
+                
             } else if (EXECUTION_KEY.equals(property) && variableScope instanceof TaskEntity) {
                 context.setPropertyResolved(true);
-                return ((TaskEntity) variableScope).getExecution();
+                String executionId = ((TaskEntity) variableScope).getExecutionId();
+                ExecutionEntity executionEntity = null;
+                if (executionId != null) {
+                    executionEntity = CommandContextUtil.getExecutionEntityManager().findById(executionId);
+                }
+                return executionEntity;
+                
             } else if (LOGGED_IN_USER_KEY.equals(property)) {
                 context.setPropertyResolved(true);
                 return Authentication.getAuthenticatedUserId();
+                
             } else {
                 if (variableScope.hasVariable(variable)) {
                     context.setPropertyResolved(true); // if not set, the next elResolver in the CompositeElResolver will be called
@@ -70,6 +80,7 @@ public class VariableScopeElResolver extends ELResolver {
         return null;
     }
 
+    @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
         if (base == null) {
             String variable = (String) property;
@@ -78,6 +89,7 @@ public class VariableScopeElResolver extends ELResolver {
         return true;
     }
 
+    @Override
     public void setValue(ELContext context, Object base, Object property, Object value) {
         if (base == null) {
             String variable = (String) property;
@@ -87,14 +99,17 @@ public class VariableScopeElResolver extends ELResolver {
         }
     }
 
+    @Override
     public Class<?> getCommonPropertyType(ELContext arg0, Object arg1) {
         return Object.class;
     }
 
+    @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext arg0, Object arg1) {
         return null;
     }
 
+    @Override
     public Class<?> getType(ELContext arg0, Object arg1, Object arg2) {
         return Object.class;
     }

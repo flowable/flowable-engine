@@ -14,16 +14,17 @@ package org.flowable.engine.test.jobexecutor;
 
 import java.util.Date;
 
-import org.flowable.engine.impl.asyncexecutor.AcquiredTimerJobEntities;
-import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.engine.impl.cmd.AcquireTimerJobsCmd;
-import org.flowable.engine.impl.cmd.ExecuteAsyncJobCmd;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
-import org.flowable.engine.runtime.Job;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.Job;
+import org.flowable.job.service.impl.asyncexecutor.AcquiredTimerJobEntities;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.job.service.impl.cmd.AcquireTimerJobsCmd;
+import org.flowable.job.service.impl.cmd.ExecuteAsyncJobCmd;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 
 /**
  * @author Tom Baeyens
@@ -35,9 +36,10 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
 
         String jobId = commandExecutor.execute(new Command<String>() {
 
+            @Override
             public String execute(CommandContext commandContext) {
                 JobEntity message = createTweetMessage("i'm coding a test");
-                commandContext.getJobManager().scheduleAsyncJob(message);
+                CommandContextUtil.getJobService(commandContext).scheduleAsyncJob(message);
                 return message.getId();
             }
         });
@@ -66,9 +68,10 @@ public class JobExecutorCmdHappyTest extends JobExecutorTestCase {
 
         String jobId = commandExecutor.execute(new Command<String>() {
 
+            @Override
             public String execute(CommandContext commandContext) {
                 TimerJobEntity timer = createTweetTimer("i'm coding a test", new Date(SOME_TIME + (10 * SECOND)));
-                commandContext.getJobManager().scheduleTimerJob(timer);
+                CommandContextUtil.getTimerJobService(commandContext).scheduleTimerJob(timer);
                 return timer.getId();
             }
         });

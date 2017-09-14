@@ -19,10 +19,12 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.AbstractQuery;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.form.api.FormInstance;
 import org.flowable.form.api.FormInstanceQuery;
-import org.flowable.form.engine.impl.interceptor.CommandContext;
-import org.flowable.form.engine.impl.interceptor.CommandExecutor;
+import org.flowable.form.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -61,81 +63,97 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
         super(commandExecutor);
     }
 
+    @Override
     public FormInstanceQueryImpl id(String id) {
         this.id = id;
         return this;
     }
 
+    @Override
     public FormInstanceQueryImpl ids(Set<String> ids) {
         this.ids = ids;
         return this;
     }
 
+    @Override
     public FormInstanceQueryImpl formDefinitionId(String formDefinitionId) {
         this.formDefinitionId = formDefinitionId;
         return this;
     }
 
+    @Override
     public FormInstanceQueryImpl formDefinitionIdLike(String formDefinitionIdLike) {
         this.formDefinitionIdLike = formDefinitionIdLike;
         return this;
     }
 
+    @Override
     public FormInstanceQueryImpl taskId(String taskId) {
         this.taskId = taskId;
         return this;
     }
 
+    @Override
     public FormInstanceQueryImpl taskIdLike(String taskIdLike) {
         this.taskIdLike = taskIdLike;
         return this;
     }
 
+    @Override
     public FormInstanceQueryImpl processInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
         return this;
     }
 
+    @Override
     public FormInstanceQueryImpl processInstanceIdLike(String processInstanceIdLike) {
         this.processInstanceIdLike = processInstanceIdLike;
         return this;
     }
 
+    @Override
     public FormInstanceQueryImpl processDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
         return this;
     }
 
+    @Override
     public FormInstanceQueryImpl processDefinitionIdLike(String processDefinitionIdLike) {
         this.processDefinitionIdLike = processDefinitionIdLike;
         return this;
     }
 
+    @Override
     public FormInstanceQueryImpl submittedDate(Date submittedDate) {
         this.submittedDate = submittedDate;
         return this;
     }
 
+    @Override
     public FormInstanceQueryImpl submittedDateBefore(Date submittedDateBefore) {
         this.submittedDateBefore = submittedDateBefore;
         return this;
     }
 
+    @Override
     public FormInstanceQueryImpl submittedDateAfter(Date submittedDateAfter) {
         this.submittedDateAfter = submittedDateAfter;
         return this;
     }
 
+    @Override
     public FormInstanceQueryImpl submittedBy(String submittedBy) {
         this.submittedBy = submittedBy;
         return this;
     }
 
+    @Override
     public FormInstanceQueryImpl submittedByLike(String submittedByLike) {
         this.submittedByLike = submittedByLike;
         return this;
     }
 
+    @Override
     public FormInstanceQueryImpl deploymentTenantId(String tenantId) {
         if (tenantId == null) {
             throw new FlowableIllegalArgumentException("deploymentTenantId is null");
@@ -144,6 +162,7 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
         return this;
     }
 
+    @Override
     public FormInstanceQueryImpl deploymentTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
             throw new FlowableIllegalArgumentException("deploymentTenantIdLike is null");
@@ -152,6 +171,7 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
         return this;
     }
 
+    @Override
     public FormInstanceQueryImpl deploymentWithoutTenantId() {
         this.withoutTenantId = true;
         return this;
@@ -159,10 +179,12 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
 
     // sorting ////////////////////////////////////////////////////////
 
+    @Override
     public FormInstanceQuery orderBySubmittedDate() {
         return orderBy(FormInstanceQueryProperty.SUBMITTED_DATE);
     }
 
+    @Override
     public FormInstanceQuery orderByTenantId() {
         return orderBy(FormInstanceQueryProperty.TENANT_ID);
     }
@@ -172,13 +194,13 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
     @Override
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getFormInstanceEntityManager().findFormInstanceCountByQueryCriteria(this);
+        return CommandContextUtil.getFormInstanceEntityManager(commandContext).findFormInstanceCountByQueryCriteria(this);
     }
 
     @Override
     public List<FormInstance> executeList(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getFormInstanceEntityManager().findFormInstancesByQueryCriteria(this);
+        return CommandContextUtil.getFormInstanceEntityManager(commandContext).findFormInstancesByQueryCriteria(this);
     }
 
     // getters ////////////////////////////////////////////////////////

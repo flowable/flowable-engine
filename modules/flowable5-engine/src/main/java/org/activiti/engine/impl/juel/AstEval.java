@@ -32,14 +32,17 @@ public final class AstEval extends AstNode {
         return deferred;
     }
 
+    @Override
     public boolean isLeftValue() {
         return getChild(0).isLeftValue();
     }
 
+    @Override
     public boolean isMethodInvocation() {
         return getChild(0).isMethodInvocation();
     }
 
+    @Override
     public ValueReference getValueReference(Bindings bindings, ELContext context) {
         return child.getValueReference(bindings, context);
     }
@@ -61,34 +64,42 @@ public final class AstEval extends AstNode {
         b.append("}");
     }
 
+    @Override
     public MethodInfo getMethodInfo(Bindings bindings, ELContext context, Class<?> returnType, Class<?>[] paramTypes) {
         return child.getMethodInfo(bindings, context, returnType, paramTypes);
     }
 
+    @Override
     public Object invoke(Bindings bindings, ELContext context, Class<?> returnType, Class<?>[] paramTypes, Object[] paramValues) {
         return child.invoke(bindings, context, returnType, paramTypes, paramValues);
     }
 
+    @Override
     public Class<?> getType(Bindings bindings, ELContext context) {
         return child.getType(bindings, context);
     }
 
+    @Override
     public boolean isLiteralText() {
         return child.isLiteralText();
     }
 
+    @Override
     public boolean isReadOnly(Bindings bindings, ELContext context) {
         return child.isReadOnly(bindings, context);
     }
 
+    @Override
     public void setValue(Bindings bindings, ELContext context, Object value) {
         child.setValue(bindings, context, value);
     }
 
+    @Override
     public int getCardinality() {
         return 1;
     }
 
+    @Override
     public AstNode getChild(int i) {
         return i == 0 ? child : null;
     }

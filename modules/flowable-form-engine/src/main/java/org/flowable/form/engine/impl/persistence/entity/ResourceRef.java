@@ -2,7 +2,7 @@ package org.flowable.form.engine.impl.persistence.entity;
 
 import java.io.Serializable;
 
-import org.flowable.form.engine.impl.context.Context;
+import org.flowable.form.engine.impl.util.CommandContextUtil;
 
 /**
  * <p>
@@ -18,7 +18,7 @@ public class ResourceRef implements Serializable {
 
     private String id;
     private String name;
-    private ResourceEntity entity;
+    private FormResourceEntity entity;
     protected boolean deleted;
 
     public ResourceRef() {
@@ -48,7 +48,7 @@ public class ResourceRef implements Serializable {
     }
 
     private void setBytes(byte[] bytes) {
-        ResourceEntityManager resourceEntityManager = Context.getCommandContext().getResourceEntityManager();
+        FormResourceEntityManager resourceEntityManager = CommandContextUtil.getResourceEntityManager();
         if (id == null) {
             if (bytes != null) {
                 entity = resourceEntityManager.create();
@@ -64,7 +64,7 @@ public class ResourceRef implements Serializable {
         }
     }
 
-    public ResourceEntity getEntity() {
+    public FormResourceEntity getEntity() {
         ensureInitialized();
         return entity;
     }
@@ -74,9 +74,9 @@ public class ResourceRef implements Serializable {
             if (entity != null) {
                 // if the entity has been loaded already,
                 // we might as well use the safer optimistic locking delete.
-                Context.getCommandContext().getResourceEntityManager().delete(entity);
+                CommandContextUtil.getResourceEntityManager().delete(entity);
             } else {
-                Context.getCommandContext().getResourceEntityManager().delete(id);
+                CommandContextUtil.getResourceEntityManager().delete(id);
             }
             entity = null;
             id = null;
@@ -86,7 +86,7 @@ public class ResourceRef implements Serializable {
 
     private void ensureInitialized() {
         if (id != null && entity == null) {
-            entity = Context.getCommandContext().getResourceEntityManager().findById(id);
+            entity = CommandContextUtil.getResourceEntityManager().findById(id);
             name = entity.getName();
         }
     }

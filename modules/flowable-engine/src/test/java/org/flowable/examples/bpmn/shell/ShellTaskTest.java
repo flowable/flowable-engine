@@ -38,6 +38,7 @@ public class ShellTaskTest extends PluggableFlowableTestCase {
             return OsType.UNKOWN;
     }
 
+    @Override
     protected void setUp() throws Exception {
         osType = getSystemOsType();
     }

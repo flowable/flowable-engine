@@ -21,17 +21,16 @@ import javax.persistence.EntityManagerFactory;
 
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.history.HistoricData;
-import org.flowable.engine.history.HistoricVariableInstance;
+import org.flowable.engine.common.impl.history.HistoricData;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.engine.impl.test.AbstractFlowableTestCase;
-import org.flowable.engine.impl.variable.EntityManagerSession;
-import org.flowable.engine.impl.variable.EntityManagerSessionFactory;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.variable.service.impl.types.EntityManagerSession;
+import org.flowable.variable.service.impl.types.EntityManagerSessionFactory;
 
 /**
  * @author Daisuke Yoshimoto
@@ -88,13 +87,13 @@ public class HistoricJPAVariableTest extends AbstractFlowableTestCase {
         // -----------------------------------------------------------------------------
         // Simple test, Start process with JPA entities as variables
         // -----------------------------------------------------------------------------
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("simpleEntityFieldAccess", simpleEntityFieldAccess);
 
         // Start the process with the JPA-entities as variables. They will be stored in the DB.
         this.processInstanceId = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables).getId();
 
-        for (Task task : taskService.createTaskQuery().includeTaskLocalVariables().list()) {
+        for (org.flowable.task.service.Task task : taskService.createTaskQuery().includeTaskLocalVariables().list()) {
             taskService.complete(task.getId());
         }
 
@@ -113,14 +112,14 @@ public class HistoricJPAVariableTest extends AbstractFlowableTestCase {
         // -----------------------------------------------------------------------------
         // Simple test, Start process with JPA entities as variables
         // -----------------------------------------------------------------------------
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("simpleEntityFieldAccess", simpleEntityFieldAccess);
 
         // Start the process with the JPA-entities as variables. They will be stored in the DB.
         this.processInstanceId = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables).getId();
 
         // Finish tasks
-        for (Task task : taskService.createTaskQuery().includeTaskLocalVariables().list()) {
+        for (org.flowable.task.service.Task task : taskService.createTaskQuery().includeTaskLocalVariables().list()) {
             taskService.complete(task.getId());
         }
 
@@ -143,14 +142,14 @@ public class HistoricJPAVariableTest extends AbstractFlowableTestCase {
         // -----------------------------------------------------------------------------
         // Simple test, Start process with JPA entities as variables
         // -----------------------------------------------------------------------------
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("simpleEntityFieldAccess", simpleEntityFieldAccess);
 
         // Start the process with the JPA-entities as variables. They will be stored in the DB.
         this.processInstanceId = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables).getId();
 
         // Finish tasks
-        for (Task task : taskService.createTaskQuery().includeProcessVariables().list()) {
+        for (org.flowable.task.service.Task task : taskService.createTaskQuery().includeProcessVariables().list()) {
             taskService.setVariable(task.getId(), "simpleEntityFieldAccess", simpleEntityFieldAccess);
             taskService.complete(task.getId());
         }

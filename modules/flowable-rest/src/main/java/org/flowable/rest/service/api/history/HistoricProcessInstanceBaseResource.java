@@ -34,7 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  */
 public class HistoricProcessInstanceBaseResource {
 
-    private static Map<String, QueryProperty> allowedSortProperties = new HashMap<String, QueryProperty>();
+    private static Map<String, QueryProperty> allowedSortProperties = new HashMap<>();
 
     static {
         allowedSortProperties.put("processInstanceId", HistoricProcessInstanceQueryProperty.PROCESS_INSTANCE_ID_);
@@ -60,7 +60,7 @@ public class HistoricProcessInstanceBaseResource {
             query.processInstanceId(queryRequest.getProcessInstanceId());
         }
         if (queryRequest.getProcessInstanceIds() != null && !queryRequest.getProcessInstanceIds().isEmpty()) {
-            query.processInstanceIds(new HashSet<String>(queryRequest.getProcessInstanceIds()));
+            query.processInstanceIds(new HashSet<>(queryRequest.getProcessInstanceIds()));
         }
         if (queryRequest.getProcessDefinitionKey() != null) {
             query.processDefinitionKey(queryRequest.getProcessDefinitionKey());

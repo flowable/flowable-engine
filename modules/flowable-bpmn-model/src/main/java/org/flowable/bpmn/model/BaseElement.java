@@ -27,9 +27,9 @@ public abstract class BaseElement implements HasExtensionAttributes {
     protected String id;
     protected int xmlRowNumber;
     protected int xmlColumnNumber;
-    protected Map<String, List<ExtensionElement>> extensionElements = new LinkedHashMap<String, List<ExtensionElement>>();
+    protected Map<String, List<ExtensionElement>> extensionElements = new LinkedHashMap<>();
     /** extension attributes could be part of each element */
-    protected Map<String, List<ExtensionAttribute>> attributes = new LinkedHashMap<String, List<ExtensionAttribute>>();
+    protected Map<String, List<ExtensionAttribute>> attributes = new LinkedHashMap<>();
 
     public String getId() {
         return id;
@@ -63,7 +63,7 @@ public abstract class BaseElement implements HasExtensionAttributes {
         if (extensionElement != null && StringUtils.isNotEmpty(extensionElement.getName())) {
             List<ExtensionElement> elementList = null;
             if (!this.extensionElements.containsKey(extensionElement.getName())) {
-                elementList = new ArrayList<ExtensionElement>();
+                elementList = new ArrayList<>();
                 this.extensionElements.put(extensionElement.getName(), elementList);
             }
             this.extensionElements.get(extensionElement.getName()).add(extensionElement);
@@ -96,7 +96,7 @@ public abstract class BaseElement implements HasExtensionAttributes {
         if (attribute != null && StringUtils.isNotEmpty(attribute.getName())) {
             List<ExtensionAttribute> attributeList = null;
             if (!this.attributes.containsKey(attribute.getName())) {
-                attributeList = new ArrayList<ExtensionAttribute>();
+                attributeList = new ArrayList<>();
                 this.attributes.put(attribute.getName(), attributeList);
             }
             this.attributes.get(attribute.getName()).add(attribute);
@@ -111,12 +111,12 @@ public abstract class BaseElement implements HasExtensionAttributes {
     public void setValues(BaseElement otherElement) {
         setId(otherElement.getId());
 
-        extensionElements = new LinkedHashMap<String, List<ExtensionElement>>();
+        extensionElements = new LinkedHashMap<>();
         if (otherElement.getExtensionElements() != null && !otherElement.getExtensionElements().isEmpty()) {
             for (String key : otherElement.getExtensionElements().keySet()) {
                 List<ExtensionElement> otherElementList = otherElement.getExtensionElements().get(key);
                 if (otherElementList != null && !otherElementList.isEmpty()) {
-                    List<ExtensionElement> elementList = new ArrayList<ExtensionElement>();
+                    List<ExtensionElement> elementList = new ArrayList<>();
                     for (ExtensionElement extensionElement : otherElementList) {
                         elementList.add(extensionElement.clone());
                     }
@@ -125,12 +125,12 @@ public abstract class BaseElement implements HasExtensionAttributes {
             }
         }
 
-        attributes = new LinkedHashMap<String, List<ExtensionAttribute>>();
+        attributes = new LinkedHashMap<>();
         if (otherElement.getAttributes() != null && !otherElement.getAttributes().isEmpty()) {
             for (String key : otherElement.getAttributes().keySet()) {
                 List<ExtensionAttribute> otherAttributeList = otherElement.getAttributes().get(key);
                 if (otherAttributeList != null && !otherAttributeList.isEmpty()) {
-                    List<ExtensionAttribute> attributeList = new ArrayList<ExtensionAttribute>();
+                    List<ExtensionAttribute> attributeList = new ArrayList<>();
                     for (ExtensionAttribute extensionAttribute : otherAttributeList) {
                         attributeList.add(extensionAttribute.clone());
                     }
@@ -140,5 +140,6 @@ public abstract class BaseElement implements HasExtensionAttributes {
         }
     }
 
+    @Override
     public abstract BaseElement clone();
 }

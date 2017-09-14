@@ -60,7 +60,7 @@ public class Extender implements BundleTrackerCustomizer, ServiceTrackerCustomiz
     private final BundleTracker bundleTracker;
     private final ServiceTracker engineServiceTracker;
     private long timeout = 5000;
-    private Map<Long, List<BundleScriptEngineResolver>> resolvers = new ConcurrentHashMap<Long, List<BundleScriptEngineResolver>>();
+    private Map<Long, List<BundleScriptEngineResolver>> resolvers = new ConcurrentHashMap<>();
 
     public Extender(BundleContext context) {
         Extender.context = context;
@@ -80,8 +80,10 @@ public class Extender implements BundleTrackerCustomizer, ServiceTrackerCustomiz
         engineServiceTracker.close();
     }
 
+    @Override
     public Object addingService(ServiceReference reference) {
         new Thread() {
+            @Override
             public void run() {
                 bundleTracker.open();
             }
@@ -89,9 +91,11 @@ public class Extender implements BundleTrackerCustomizer, ServiceTrackerCustomiz
         return context.getService(reference);
     }
 
+    @Override
     public void modifiedService(ServiceReference reference, Object service) {
     }
 
+    @Override
     public void removedService(ServiceReference reference, Object service) {
         context.ungetService(reference);
         if (engineServiceTracker.size() == 0) {
@@ -99,6 +103,7 @@ public class Extender implements BundleTrackerCustomizer, ServiceTrackerCustomiz
         }
     }
 
+    @Override
     public Object addingBundle(Bundle bundle, BundleEvent event) {
         if (event == null) {
             // existing bundles first added to the tracker with no event change
@@ -112,6 +117,7 @@ public class Extender implements BundleTrackerCustomizer, ServiceTrackerCustomiz
         return bundle;
     }
 
+    @Override
     public void modifiedBundle(Bundle bundle, BundleEvent event, Object arg2) {
         if (event == null) {
             // cannot think of why we would be interested in a modified bundle
@@ -124,6 +130,7 @@ public class Extender implements BundleTrackerCustomizer, ServiceTrackerCustomiz
 
     // don't think we would be interested in removedBundle, as that is
     // called when bundle is removed from the tracker
+    @Override
     public void removedBundle(Bundle bundle, BundleEvent event, Object arg2) {
         List<BundleScriptEngineResolver> r = resolvers.remove(bundle.getBundleId());
         if (r != null) {
@@ -135,9 +142,8 @@ public class Extender implements BundleTrackerCustomizer, ServiceTrackerCustomiz
 
     /**
      * this method checks the initial bundle that are installed/active before bundle tracker is opened.
-     * 
-     * @param b
-     *            the bundle to check
+     *
+     * @param b the bundle to check
      */
     private void checkInitialBundle(Bundle b) {
         // If the bundle is active, check it
@@ -156,7 +162,7 @@ public class Extender implements BundleTrackerCustomizer, ServiceTrackerCustomiz
     }
 
     private void checkBundleScriptEngines(Bundle bundle) {
-        List<BundleScriptEngineResolver> r = new ArrayList<BundleScriptEngineResolver>();
+        List<BundleScriptEngineResolver> r = new ArrayList<>();
         registerScriptEngines(bundle, r);
         for (BundleScriptEngineResolver service : r) {
             service.register();
@@ -167,7 +173,7 @@ public class Extender implements BundleTrackerCustomizer, ServiceTrackerCustomiz
     private void checkBundle(Bundle bundle) {
         LOGGER.debug("Scanning bundle {} for flowable process", bundle.getSymbolicName());
         try {
-            List<URL> pathList = new ArrayList<URL>();
+            List<URL> pathList = new ArrayList<>();
             String flowableHeader = bundle.getHeaders().get(BUNDLE_FLOWABLE_HEADER);
             if (flowableHeader == null) {
                 flowableHeader = "OSGI-INF/flowable/";
@@ -238,7 +244,7 @@ public class Extender implements BundleTrackerCustomizer, ServiceTrackerCustomiz
         }
     }
 
-    @SuppressWarnings({ "rawtypes" })
+    @SuppressWarnings({"rawtypes"})
     private void addEntries(Bundle bundle, String path, String filePattern, List<URL> pathList) {
         Enumeration e = bundle.findEntries(path, filePattern, false);
         while (e != null && e.hasMoreElements()) {
@@ -319,10 +325,10 @@ public class Extender implements BundleTrackerCustomizer, ServiceTrackerCustomiz
         return null;
     }
 
-    @SuppressWarnings({ "rawtypes" })
+    @SuppressWarnings({"rawtypes"})
     protected void registerScriptEngines(Bundle bundle, List<BundleScriptEngineResolver> resolvers) {
         URL configURL = null;
-        for (Enumeration e = bundle.findEntries(META_INF_SERVICES_DIR, SCRIPT_ENGINE_SERVICE_FILE, false); e != null && e.hasMoreElements();) {
+        for (Enumeration e = bundle.findEntries(META_INF_SERVICES_DIR, SCRIPT_ENGINE_SERVICE_FILE, false); e != null && e.hasMoreElements(); ) {
             configURL = (URL) e.nextElement();
         }
         if (configURL != null) {
@@ -357,7 +363,8 @@ public class Extender implements BundleTrackerCustomizer, ServiceTrackerCustomiz
             }
         }
 
-        @SuppressWarnings({ "rawtypes" })
+        @SuppressWarnings({"rawtypes"})
+        @Override
         public ScriptEngine resolveScriptEngine(String name) {
             try {
                 BufferedReader in = new BufferedReader(new InputStreamReader(configFile.openStream()));

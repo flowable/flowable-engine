@@ -22,10 +22,11 @@ import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.runtime.ProcessInstanceBuilderImpl;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -44,6 +45,8 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
     protected String businessKey;
     protected String tenantId;
     protected String processInstanceName;
+    protected String callbackId;
+    protected String callbackType;
     protected ProcessInstanceHelper processInstanceHelper;
 
     public StartProcessInstanceCmd(String processDefinitionKey, String processDefinitionId, String businessKey, Map<String, Object> variables) {
@@ -66,10 +69,13 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
                 processInstanceBuilder.getTenantId());
         this.processInstanceName = processInstanceBuilder.getProcessInstanceName();
         this.transientVariables = processInstanceBuilder.getTransientVariables();
+        this.callbackId = processInstanceBuilder.getCallbackId();
+        this.callbackType = processInstanceBuilder.getCallbackType();
     }
 
+    @Override
     public ProcessInstance execute(CommandContext commandContext) {
-        DeploymentManager deploymentCache = commandContext.getProcessEngineConfiguration().getDeploymentManager();
+        DeploymentManager deploymentCache = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDeploymentManager();
 
         // Find the process definition
         ProcessDefinition processDefinition = null;
@@ -98,19 +104,32 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
             throw new FlowableIllegalArgumentException("processDefinitionKey and processDefinitionId are null");
         }
 
-        processInstanceHelper = commandContext.getProcessEngineConfiguration().getProcessInstanceHelper();
-        ProcessInstance processInstance = createAndStartProcessInstance(processDefinition, businessKey, processInstanceName, variables, transientVariables);
+        processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
+        ProcessInstance processInstance = createAndStartProcessInstance(processDefinition, businessKey, processInstanceName, 
+                variables, transientVariables, callbackId, callbackType);
 
         return processInstance;
     }
 
-    protected ProcessInstance createAndStartProcessInstance(ProcessDefinition processDefinition, String businessKey, String processInstanceName,
-            Map<String, Object> variables, Map<String, Object> transientVariables) {
-        return processInstanceHelper.createAndStartProcessInstance(processDefinition, businessKey, processInstanceName, variables, transientVariables);
+    protected ProcessInstance createAndStartProcessInstance(ProcessDefinition processDefinition, 
+                                                            String businessKey, 
+                                                            String processInstanceName,
+                                                            Map<String, Object> variables, 
+                                                            Map<String, Object> transientVariables,
+                                                            String callbackId,
+                                                            String callbackType) {
+        return processInstanceHelper.createProcessInstance(processDefinition, 
+                                                                   businessKey, 
+                                                                   processInstanceName, 
+                                                                   variables, 
+                                                                   transientVariables,
+                                                                   callbackId,
+                                                                   callbackType,
+                                                                   true);
     }
 
     protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {
-        Map<String, Object> variablesMap = new HashMap<String, Object>();
+        Map<String, Object> variablesMap = new HashMap<>();
         // convert data objects to process variables
         if (dataObjects != null) {
             for (ValuedDataObject dataObject : dataObjects) {

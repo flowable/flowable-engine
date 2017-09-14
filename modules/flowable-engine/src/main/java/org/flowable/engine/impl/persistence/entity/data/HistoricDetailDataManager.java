@@ -20,7 +20,6 @@ import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.impl.HistoricDetailQueryImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailAssignmentEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricDetailTransitionInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricFormPropertyEntity;
 
@@ -30,8 +29,6 @@ import org.flowable.engine.impl.persistence.entity.HistoricFormPropertyEntity;
 public interface HistoricDetailDataManager extends DataManager<HistoricDetailEntity> {
 
     HistoricDetailAssignmentEntity createHistoricDetailAssignment();
-
-    HistoricDetailTransitionInstanceEntity createHistoricDetailTransitionInstance();
 
     HistoricDetailVariableInstanceUpdateEntity createHistoricDetailVariableInstanceUpdate();
 

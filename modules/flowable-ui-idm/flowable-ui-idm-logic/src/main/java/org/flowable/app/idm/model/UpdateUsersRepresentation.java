@@ -27,7 +27,7 @@ public class UpdateUsersRepresentation extends AbstractRepresentation {
     protected String lastName;
     protected String email;
     protected String password;
-    protected List<String> users = new ArrayList<String>();
+    protected List<String> users = new ArrayList<>();
 
     public UpdateUsersRepresentation() {
 

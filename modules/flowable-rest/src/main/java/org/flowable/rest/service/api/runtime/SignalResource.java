@@ -18,12 +18,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-
-import io.swagger.annotations.Authorization;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.rest.service.api.RestResponseFactory;
@@ -35,6 +29,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * Resource for notifying the engine a signal event has been received, independent of an execution.
@@ -65,7 +65,7 @@ public class SignalResource {
 
         Map<String, Object> signalVariables = null;
         if (signalRequest.getVariables() != null) {
-            signalVariables = new HashMap<String, Object>();
+            signalVariables = new HashMap<>();
             for (RestVariable variable : signalRequest.getVariables()) {
                 if (variable.getName() == null) {
                     throw new FlowableIllegalArgumentException("Variable name is required.");

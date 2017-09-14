@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -45,35 +44,35 @@ public class BoundaryErrorEventTest extends PluggableFlowableTestCase {
 
         // After starting the process, a task should be assigned to the
         // 'initiator' (normally set by GUI)
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("details", "very interesting");
         variables.put("customerName", "Alfresco");
         String procId = runtimeService.startProcessInstanceByKey("reviewSaledLead", variables).getId();
-        Task task = taskService.createTaskQuery().taskAssignee("kermit").singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().taskAssignee("kermit").singleResult();
         assertEquals("Provide new sales lead", task.getName());
 
         // After completing the task, the review subprocess will be active
         taskService.complete(task.getId());
-        Task ratingTask = taskService.createTaskQuery().taskCandidateGroup("accountancy").singleResult();
+        org.flowable.task.service.Task ratingTask = taskService.createTaskQuery().taskCandidateGroup("accountancy").singleResult();
         assertEquals("Review customer rating", ratingTask.getName());
-        Task profitabilityTask = taskService.createTaskQuery().taskCandidateGroup("management").singleResult();
+        org.flowable.task.service.Task profitabilityTask = taskService.createTaskQuery().taskCandidateGroup("management").singleResult();
         assertEquals("Review profitability", profitabilityTask.getName());
 
         // Complete the management task by stating that not enough info was
         // provided
         // This should throw the error event, which closes the subprocess
-        variables = new HashMap<String, Object>();
+        variables = new HashMap<>();
         variables.put("notEnoughInformation", true);
         taskService.complete(profitabilityTask.getId(), variables);
 
         // The 'provide additional details' task should now be active
-        Task provideDetailsTask = taskService.createTaskQuery().taskAssignee("kermit").singleResult();
+        org.flowable.task.service.Task provideDetailsTask = taskService.createTaskQuery().taskAssignee("kermit").singleResult();
         assertEquals("Provide additional details", provideDetailsTask.getName());
 
         // Providing more details (ie. completing the task), will activate the
         // subprocess again
         taskService.complete(provideDetailsTask.getId());
-        List<Task> reviewTasks = taskService.createTaskQuery().orderByTaskName().asc().list();
+        List<org.flowable.task.service.Task> reviewTasks = taskService.createTaskQuery().orderByTaskName().asc().list();
         assertEquals("Review customer rating", reviewTasks.get(0).getName());
         assertEquals("Review profitability", reviewTasks.get(1).getName());
 

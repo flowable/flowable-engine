@@ -32,6 +32,7 @@ public class DeleteDeploymentCmd implements Command<Void>, Serializable {
         this.cascade = cascade;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (deploymentId == null) {
             throw new ActivitiIllegalArgumentException("deploymentId is null");

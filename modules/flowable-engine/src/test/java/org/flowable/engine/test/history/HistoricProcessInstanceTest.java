@@ -24,15 +24,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.history.HistoricIdentityLink;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.identitylink.service.history.HistoricIdentityLink;
 
 /**
  * @author Tom Baeyens
@@ -70,7 +69,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertNull(historicProcessInstance.getEndTime());
         assertNull(historicProcessInstance.getDurationInMillis());
 
-        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
 
         assertEquals(1, tasks.size());
 
@@ -175,7 +174,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertEquals(0, historyService.createHistoricProcessInstanceQuery().processDefinitionKeyIn(Arrays.asList("undefined1", "undefined2")).count());
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().processInstanceBusinessKey("businessKey123").count());
 
-        List<String> excludeIds = new ArrayList<String>();
+        List<String> excludeIds = new ArrayList<>();
         excludeIds.add("unexistingProcessDefinition");
 
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().processDefinitionKeyNotIn(excludeIds).count());
@@ -275,7 +274,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().or().processDefinitionKey("oneTaskProcess").processDefinitionId("undefined").endOr().count());
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().or().processInstanceBusinessKey("businessKey123").processDefinitionId("undefined").endOr().count());
 
-        List<String> excludeIds = new ArrayList<String>();
+        List<String> excludeIds = new ArrayList<>();
         excludeIds.add("unexistingProcessDefinition");
 
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().or().processDefinitionKeyNotIn(excludeIds).processDefinitionId("undefined").endOr().count());
@@ -336,12 +335,12 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
         // First complete process instance 2
-        for (Task task : taskService.createTaskQuery().processInstanceId(processInstance2.getId()).list()) {
+        for (org.flowable.task.service.Task task : taskService.createTaskQuery().processInstanceId(processInstance2.getId()).list()) {
             taskService.complete(task.getId());
         }
 
         // Then process instance 1
-        for (Task task : taskService.createTaskQuery().processInstanceId(processInstance1.getId()).list()) {
+        for (org.flowable.task.service.Task task : taskService.createTaskQuery().processInstanceId(processInstance1.getId()).list()) {
             taskService.complete(task.getId());
         }
         
@@ -516,7 +515,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
 
         String deploymentId = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/history/oneTaskProcess.bpmn20.xml").tenantId(tenantId).deploy().getId();
 
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("name", "Kermit");
         vars.put("age", 60);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", vars, tenantId);

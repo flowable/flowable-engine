@@ -31,13 +31,14 @@ import org.flowable.bpmn.model.ScriptTask;
  */
 public class ScriptTaskXMLConverter extends BaseBpmnXMLConverter {
 
-    protected Map<String, BaseChildElementParser> childParserMap = new HashMap<String, BaseChildElementParser>();
+    protected Map<String, BaseChildElementParser> childParserMap = new HashMap<>();
 
     public ScriptTaskXMLConverter() {
         ScriptTextParser scriptTextParser = new ScriptTextParser();
         childParserMap.put(scriptTextParser.getElementName(), scriptTextParser);
     }
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return ScriptTask.class;
     }

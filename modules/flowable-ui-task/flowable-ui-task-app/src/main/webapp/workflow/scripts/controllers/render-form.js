@@ -309,15 +309,13 @@ angular.module('flowableApp')
                         }
                         
                     } else if (field.type == 'people' && field.value) {
-                        var userIndex = i;
-                        UserService.getUserInfo(field.value).then(function (userData) {
-                            fields[userIndex].value = userData;
+                        UserService.getUserInfoForForm(field.value, i).then(function (userInfoFormObject) {
+                            fields[userInfoFormObject.index].value = userInfoFormObject.userData;
                         });
                         
                     } else if (field.type == 'functional-group' && field.value) {
-                        var groupIndex = i;
-                        FunctionalGroupService.getGroupInfo(field.value).then(function (groupData) {
-                            fields[groupIndex].value = groupData;
+                        FunctionalGroupService.getGroupInfoForForm(field.value, i).then(function (groupInfoFormObject) {
+                            fields[groupInfoFormObject.index].value = groupInfoFormObject.groupData;
                         });
 
                     } else if (field.type == 'upload' && field.value) {

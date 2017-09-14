@@ -55,7 +55,7 @@ public class TestEventListener {
         eventsReceived.clear();
     }
 
-    private final Set<BusinessProcessEvent> eventsReceivedByKey = new HashSet<BusinessProcessEvent>();
+    private final Set<BusinessProcessEvent> eventsReceivedByKey = new HashSet<>();
 
     // receives all events related to "process1"
     public void onProcessEventByKey(@Observes @BusinessProcess("process1") BusinessProcessEvent businessProcessEvent) {
@@ -68,7 +68,7 @@ public class TestEventListener {
 
     // ---------------------------------------------------------
 
-    private final Set<BusinessProcessEvent> eventsReceived = new HashSet<BusinessProcessEvent>();
+    private final Set<BusinessProcessEvent> eventsReceived = new HashSet<>();
 
     // receives all events
     public void onProcessEvent(@Observes BusinessProcessEvent businessProcessEvent) {

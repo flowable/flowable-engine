@@ -20,8 +20,8 @@ import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.el.ExpressionManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.variable.service.impl.el.ExpressionManager;
 
 /**
  * @author Joram Barrez
@@ -52,7 +52,7 @@ public abstract class AbstractActivityBpmnParseHandler<T extends FlowNode> exten
 
         modelActivity.setBehavior(miActivityBehavior);
 
-        ExpressionManager expressionManager = Context.getProcessEngineConfiguration().getExpressionManager();
+        ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager();
 
         // loop cardinality
         if (StringUtils.isNotEmpty(loopCharacteristics.getLoopCardinality())) {
@@ -61,27 +61,32 @@ public abstract class AbstractActivityBpmnParseHandler<T extends FlowNode> exten
 
         // completion condition
         if (StringUtils.isNotEmpty(loopCharacteristics.getCompletionCondition())) {
-            miActivityBehavior.setCompletionConditionExpression(expressionManager.createExpression(loopCharacteristics.getCompletionCondition()));
+            miActivityBehavior.setCompletionCondition(loopCharacteristics.getCompletionCondition());
         }
 
-        // activiti:collection
+        // flowable:collection
         if (StringUtils.isNotEmpty(loopCharacteristics.getInputDataItem())) {
-            if (loopCharacteristics.getInputDataItem().contains("{")) {
-                miActivityBehavior.setCollectionExpression(expressionManager.createExpression(loopCharacteristics.getInputDataItem()));
-            } else {
-                miActivityBehavior.setCollectionVariable(loopCharacteristics.getInputDataItem());
-            }
+            miActivityBehavior.setCollectionExpression(expressionManager.createExpression(loopCharacteristics.getInputDataItem()));
         }
 
-        // activiti:elementVariable
+        // flowable:collectionString
+        if (StringUtils.isNotEmpty(loopCharacteristics.getCollectionString())) {
+            miActivityBehavior.setCollectionString(loopCharacteristics.getCollectionString());
+        }
+
+        // flowable:elementVariable
         if (StringUtils.isNotEmpty(loopCharacteristics.getElementVariable())) {
             miActivityBehavior.setCollectionElementVariable(loopCharacteristics.getElementVariable());
         }
 
-        // activiti:elementIndexVariable
+        // flowable:elementIndexVariable
         if (StringUtils.isNotEmpty(loopCharacteristics.getElementIndexVariable())) {
             miActivityBehavior.setCollectionElementIndexVariable(loopCharacteristics.getElementIndexVariable());
         }
 
+        // flowable:collectionParser
+        if (loopCharacteristics.getHandler() != null) {
+            miActivityBehavior.setHandler(loopCharacteristics.getHandler().clone());
+        }
     }
 }

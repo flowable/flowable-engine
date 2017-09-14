@@ -26,9 +26,9 @@ public abstract class DmnElement {
     protected String id;
     protected String label;
     protected String description;
-    protected Map<String, List<DmnExtensionElement>> extensionElements = new LinkedHashMap<String, List<DmnExtensionElement>>();
+    protected Map<String, List<DmnExtensionElement>> extensionElements = new LinkedHashMap<>();
     /** extension attributes could be part of each element */
-    protected Map<String, List<DmnExtensionAttribute>> attributes = new LinkedHashMap<String, List<DmnExtensionAttribute>>();
+    protected Map<String, List<DmnExtensionAttribute>> attributes = new LinkedHashMap<>();
 
     public String getId() {
         return id;
@@ -62,7 +62,7 @@ public abstract class DmnElement {
         if (extensionElement != null && extensionElement.getName() != null && !extensionElement.getName().trim().isEmpty()) {
             List<DmnExtensionElement> elementList = null;
             if (!this.extensionElements.containsKey(extensionElement.getName())) {
-                elementList = new ArrayList<DmnExtensionElement>();
+                elementList = new ArrayList<>();
                 this.extensionElements.put(extensionElement.getName(), elementList);
             }
             this.extensionElements.get(extensionElement.getName()).add(extensionElement);
@@ -97,7 +97,7 @@ public abstract class DmnElement {
         if (attribute != null && attribute.getName() != null && !attribute.getName().trim().isEmpty()) {
             List<DmnExtensionAttribute> attributeList = null;
             if (!this.attributes.containsKey(attribute.getName())) {
-                attributeList = new ArrayList<DmnExtensionAttribute>();
+                attributeList = new ArrayList<>();
                 this.attributes.put(attribute.getName(), attributeList);
             }
             this.attributes.get(attribute.getName()).add(attribute);
@@ -107,12 +107,12 @@ public abstract class DmnElement {
     public void setValues(DmnElement otherElement) {
         setId(otherElement.getId());
 
-        extensionElements = new LinkedHashMap<String, List<DmnExtensionElement>>();
+        extensionElements = new LinkedHashMap<>();
         if (otherElement.getExtensionElements() != null && !otherElement.getExtensionElements().isEmpty()) {
             for (String key : otherElement.getExtensionElements().keySet()) {
                 List<DmnExtensionElement> otherElementList = otherElement.getExtensionElements().get(key);
                 if (otherElementList != null && !otherElementList.isEmpty()) {
-                    List<DmnExtensionElement> elementList = new ArrayList<DmnExtensionElement>();
+                    List<DmnExtensionElement> elementList = new ArrayList<>();
                     for (DmnExtensionElement extensionElement : otherElementList) {
                         elementList.add(extensionElement.clone());
                     }
@@ -121,12 +121,12 @@ public abstract class DmnElement {
             }
         }
 
-        attributes = new LinkedHashMap<String, List<DmnExtensionAttribute>>();
+        attributes = new LinkedHashMap<>();
         if (otherElement.getAttributes() != null && !otherElement.getAttributes().isEmpty()) {
             for (String key : otherElement.getAttributes().keySet()) {
                 List<DmnExtensionAttribute> otherAttributeList = otherElement.getAttributes().get(key);
                 if (otherAttributeList != null && !otherAttributeList.isEmpty()) {
-                    List<DmnExtensionAttribute> attributeList = new ArrayList<DmnExtensionAttribute>();
+                    List<DmnExtensionAttribute> attributeList = new ArrayList<>();
                     for (DmnExtensionAttribute extensionAttribute : otherAttributeList) {
                         attributeList.add(extensionAttribute.clone());
                     }

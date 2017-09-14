@@ -20,7 +20,6 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -30,13 +29,13 @@ public class SerializableVariableTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testUpdateSerializableInServiceTask() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("myVar", new TestSerializableVariable(1));
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testUpdateSerializableInServiceTask", vars);
 
         // There is a task here, such the VariableInstanceEntityImpl is inserter first, and updated later
         // (instead of being inserted/updated in the same Tx)
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         TestSerializableVariable testSerializableVariable = (TestSerializableVariable) runtimeService.getVariable(processInstance.getId(), "myVar");
@@ -45,6 +44,7 @@ public class SerializableVariableTest extends PluggableFlowableTestCase {
 
     public static class TestUpdateSerializableVariableDelegate implements JavaDelegate {
 
+        @Override
         public void execute(DelegateExecution execution) {
             TestSerializableVariable var = (TestSerializableVariable) execution.getVariable("myVar");
             var.setNumber(2);

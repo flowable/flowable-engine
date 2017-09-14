@@ -33,6 +33,7 @@ public class ItemDefinition extends BaseElement {
         this.itemKind = itemKind;
     }
 
+    @Override
     public ItemDefinition clone() {
         ItemDefinition clone = new ItemDefinition();
         clone.setValues(this);

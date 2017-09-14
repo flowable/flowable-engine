@@ -6,10 +6,10 @@ create table ACT_GE_PROPERTY (
 );
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.1.1.0', 1);
+values ('schema.version', '6.2.0.0', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.1.1.0)', 1);
+values ('schema.history', 'create(6.2.0.0)', 1);
 
 insert into ACT_GE_PROPERTY
 values ('next.dbid', '1', 1);
@@ -84,6 +84,8 @@ create table ACT_RU_EXECUTION (
     DEADLETTER_JOB_COUNT_ int,
     VAR_COUNT_ int, 
     ID_LINK_COUNT_ int,
+    CALLBACK_ID_ nvarchar(255),
+    CALLBACK_TYPE_ nvarchar(255),
     primary key (ID_)
 );
 

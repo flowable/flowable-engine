@@ -17,14 +17,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import io.swagger.annotations.ApiModelProperty;
-
-import org.flowable.engine.task.DelegationState;
-import org.flowable.engine.task.Task;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.util.DateToStringSerializer;
+import org.flowable.task.service.DelegationState;
+import org.flowable.task.service.Task;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @author Frederik Heremans
@@ -59,7 +59,7 @@ public class TaskResponse {
     protected String processDefinitionId;
     protected String processDefinitionUrl;
 
-    protected List<RestVariable> variables = new ArrayList<RestVariable>();
+    protected List<RestVariable> variables = new ArrayList<>();
 
     public TaskResponse(Task task) {
         setId(task.getId());

@@ -22,13 +22,13 @@ import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.DmnEngines;
 import org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration;
-import org.flowable.dmn.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.dmn.spring.autodeployment.AutoDeploymentStrategy;
 import org.flowable.dmn.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.dmn.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
 import org.flowable.dmn.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -49,7 +49,7 @@ public class SpringDmnEngineConfiguration extends DmnEngineConfiguration impleme
     protected String deploymentMode = "default";
     protected ApplicationContext applicationContext;
     protected Integer transactionSynchronizationAdapterOrder;
-    protected Collection<AutoDeploymentStrategy> deploymentStrategies = new ArrayList<AutoDeploymentStrategy>();
+    protected Collection<AutoDeploymentStrategy> deploymentStrategies = new ArrayList<>();
 
     public SpringDmnEngineConfiguration() {
         this.transactionsExternallyManaged = true;

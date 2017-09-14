@@ -12,6 +12,9 @@
  */
 package org.flowable.bpmn.converter.child;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.bpmn.converter.util.BpmnXMLUtil;
@@ -25,10 +28,12 @@ import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
  */
 public class MultiInstanceParser extends BaseChildElementParser {
 
+    @Override
     public String getElementName() {
         return ELEMENT_MULTIINSTANCE;
     }
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
         if (!(parentElement instanceof Activity))
             return;
@@ -60,6 +65,13 @@ public class MultiInstanceParser extends BaseChildElementParser {
                 } else if (xtr.isStartElement() && ELEMENT_MULTIINSTANCE_CONDITION.equalsIgnoreCase(xtr.getLocalName())) {
                     multiInstanceDef.setCompletionCondition(xtr.getElementText());
 
+                } else if (xtr.isStartElement() && ELEMENT_EXTENSIONS.equalsIgnoreCase(xtr.getLocalName())) {
+                    // parse extension elements
+                    // initialize collection element parser in case it exists
+                    Map<String, BaseChildElementParser> childParserMap = new HashMap<>();
+                    childParserMap.put(ELEMENT_MULTIINSTANCE_COLLECTION, new FlowableCollectionParser());
+                    BpmnXMLUtil.parseChildElements(ELEMENT_EXTENSIONS, multiInstanceDef, xtr, childParserMap, model);
+
                 } else if (xtr.isEndElement() && getElementName().equalsIgnoreCase(xtr.getLocalName())) {
                     readyWithMultiInstance = true;
                 }
@@ -67,6 +79,7 @@ public class MultiInstanceParser extends BaseChildElementParser {
         } catch (Exception e) {
             LOGGER.warn("Error parsing multi instance definition", e);
         }
+
         ((Activity) parentElement).setLoopCharacteristics(multiInstanceDef);
     }
 }

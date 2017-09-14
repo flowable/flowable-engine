@@ -28,7 +28,7 @@ public class TestMultipleFlowableEventListener implements FlowableEventListener 
     private List<Class<?>> eventClasses;
 
     public TestMultipleFlowableEventListener() {
-        eventsReceived = new ArrayList<FlowableEvent>();
+        eventsReceived = new ArrayList<>();
     }
 
     public List<FlowableEvent> getEventsReceived() {

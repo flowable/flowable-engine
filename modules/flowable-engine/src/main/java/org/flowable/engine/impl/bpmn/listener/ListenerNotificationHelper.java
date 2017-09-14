@@ -22,7 +22,10 @@ import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Task;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.cfg.TransactionContext;
+import org.flowable.engine.common.impl.cfg.TransactionListener;
 import org.flowable.engine.common.impl.cfg.TransactionState;
+import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.delegate.BaseExecutionListener;
 import org.flowable.engine.delegate.BaseTaskListener;
 import org.flowable.engine.delegate.CustomPropertiesResolver;
@@ -32,12 +35,11 @@ import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.delegate.TransactionDependentExecutionListener;
 import org.flowable.engine.delegate.TransactionDependentTaskListener;
 import org.flowable.engine.impl.bpmn.parser.factory.ListenerFactory;
-import org.flowable.engine.impl.cfg.TransactionContext;
-import org.flowable.engine.impl.cfg.TransactionListener;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.delegate.invocation.TaskListenerInvocation;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.ExecutionHelper;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Joram Barrez
@@ -47,7 +49,7 @@ public class ListenerNotificationHelper {
     public void executeExecutionListeners(HasExecutionListeners elementWithExecutionListeners, DelegateExecution execution, String eventType) {
         List<FlowableListener> listeners = elementWithExecutionListeners.getExecutionListeners();
         if (listeners != null && listeners.size() > 0) {
-            ListenerFactory listenerFactory = Context.getProcessEngineConfiguration().getListenerFactory();
+            ListenerFactory listenerFactory = CommandContextUtil.getProcessEngineConfiguration().getListenerFactory();
             for (FlowableListener listener : listeners) {
 
                 if (eventType.equals(listener.getEvent())) {
@@ -113,18 +115,18 @@ public class ListenerNotificationHelper {
                 BaseTaskListener taskListener = createTaskListener(listener);
 
                 if (listener.getOnTransaction() != null) {
-                    planTransactionDependentTaskListener(taskEntity.getExecution(), (TransactionDependentTaskListener) taskListener, listener);
+                    planTransactionDependentTaskListener(ExecutionHelper.getExecution(taskEntity.getExecutionId()), (TransactionDependentTaskListener) taskListener, listener);
                 } else {
                     taskEntity.setEventName(eventType);
-                    taskEntity.setCurrentFlowableListener(listener);
+                    taskEntity.setEventHandlerId(listener.getId());
+                    
                     try {
-                        Context.getProcessEngineConfiguration().getDelegateInterceptor()
+                        CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor()
                                 .handleInvocation(new TaskListenerInvocation((TaskListener) taskListener, taskEntity));
                     } catch (Exception e) {
                         throw new FlowableException("Exception while invoking TaskListener: " + e.getMessage(), e);
                     } finally {
                         taskEntity.setEventName(null);
-                        taskEntity.setCurrentFlowableListener(null);
                     }
                 }
             }
@@ -134,7 +136,7 @@ public class ListenerNotificationHelper {
     protected BaseTaskListener createTaskListener(FlowableListener listener) {
         BaseTaskListener taskListener = null;
 
-        ListenerFactory listenerFactory = Context.getProcessEngineConfiguration().getListenerFactory();
+        ListenerFactory listenerFactory = CommandContextUtil.getProcessEngineConfiguration().getListenerFactory();
         if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equalsIgnoreCase(listener.getImplementationType())) {
             taskListener = listenerFactory.createClassDelegateTaskListener(listener);
         } else if (ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equalsIgnoreCase(listener.getImplementationType())) {
@@ -163,7 +165,7 @@ public class ListenerNotificationHelper {
 
     protected CustomPropertiesResolver createCustomPropertiesResolver(FlowableListener listener) {
         CustomPropertiesResolver customPropertiesResolver = null;
-        ListenerFactory listenerFactory = Context.getProcessEngineConfiguration().getListenerFactory();
+        ListenerFactory listenerFactory = CommandContextUtil.getProcessEngineConfiguration().getListenerFactory();
         if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equalsIgnoreCase(listener.getCustomPropertiesResolverImplementationType())) {
             customPropertiesResolver = listenerFactory.createClassDelegateCustomPropertiesResolver(listener);
         } else if (ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equalsIgnoreCase(listener.getCustomPropertiesResolverImplementationType())) {

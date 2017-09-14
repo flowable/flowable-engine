@@ -30,7 +30,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
     @Deployment
     public void testClassDelegateSingleDirectMap() {
         FlagDelegate.reset();
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
 
         runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
@@ -40,7 +40,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
     @Deployment
     public void testExpressionSingleDirectMap() {
         FlagDelegate.reset();
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
 
         runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
@@ -50,7 +50,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
     @Deployment
     public void testDelegateExpressionSingleDirectMap() {
         FlagDelegate.reset();
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
 
         runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
@@ -62,7 +62,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
     public void testClassDelegateSingleDirectMapNotMatchingException() {
         FlagDelegate.reset();
 
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", JAXBException.class.getName());
         assertEquals(0, ServiceTaskTestMock.CALL_COUNT.get());
 
@@ -78,7 +78,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
     public void testExpressionSingleDirectMapNotMatchingException() {
         FlagDelegate.reset();
 
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", IllegalArgumentException.class.getName());
         assertEquals(0, ServiceTaskTestMock.CALL_COUNT.get());
 
@@ -94,7 +94,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
     public void testDelegateExpressionSingleDirectMapNotMatchingException() {
         FlagDelegate.reset();
 
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", IllegalArgumentException.class.getName());
         assertEquals(0, ServiceTaskTestMock.CALL_COUNT.get());
 
@@ -109,7 +109,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
     // exception matches by inheritance
     @Deployment
     public void testClassDelegateSingleInheritedMap() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", BoundaryEventChildException.class.getName());
         FlagDelegate.reset();
 
@@ -120,7 +120,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
     // check the default map
     @Deployment
     public void testClassDelegateDefaultMap() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", Exception.class.getName());
         FlagDelegate.reset();
 
@@ -130,7 +130,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testExpressionDefaultMap() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", Exception.class.getName());
         FlagDelegate.reset();
 
@@ -140,7 +140,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testDelegateExpressionDefaultMap() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", Exception.class.getName());
         FlagDelegate.reset();
 
@@ -151,7 +151,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
     @Deployment
     public void testSeqMultInstanceSingleDirectMap() {
         FlagDelegate.reset();
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
 
         runtimeService.startProcessInstanceByKey("processWithSingleExceptionMap", vars);
@@ -161,7 +161,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
     @Deployment
     public void testSubProcessSingleDirectMap() {
         FlagDelegate.reset();
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
 
         runtimeService.startProcessInstanceByKey("subprocssWithSingleExceptionMap", vars);
@@ -172,7 +172,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
             "org/flowable/engine/test/bpmn/event/error/mapError/BoundaryErrorMapTest.testCallProcessCalee.bpmn20.xml" })
     public void testCallProcessSingleDirectMap() {
         FlagDelegate.reset();
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
 
         runtimeService.startProcessInstanceByKey("callProcssWithSingleExceptionMap", vars);
@@ -183,7 +183,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
             "org/flowable/engine/test/bpmn/event/error/mapError/BoundaryErrorMapTest.testCallProcessExpressionSubProcess.bpmn20.xml" })
     public void testCallProcessExpressionSingleDirectMap() {
         FlagDelegate.reset();
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
 
         runtimeService.startProcessInstanceByKey("callProcssWithSingleExceptionMap", vars);
@@ -194,7 +194,7 @@ public class BoundaryErrorMapTest extends PluggableFlowableTestCase {
             "org/flowable/engine/test/bpmn/event/error/mapError/BoundaryErrorMapTest.testCallProcessDelegateExpressionSubProcess.bpmn20.xml" })
     public void testCallProcessDelegateExpressionSingleDirectMap() {
         FlagDelegate.reset();
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("exceptionClass", BoundaryErrorParentException.class.getName());
 
         runtimeService.startProcessInstanceByKey("callProcssWithSingleExceptionMap", vars);

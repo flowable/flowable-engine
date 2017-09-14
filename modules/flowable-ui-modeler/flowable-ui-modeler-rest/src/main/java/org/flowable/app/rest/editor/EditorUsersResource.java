@@ -34,7 +34,7 @@ public class EditorUsersResource {
     @RequestMapping(value = "/rest/editor-users", method = RequestMethod.GET)
     public ResultListDataRepresentation getUsers(@RequestParam(value = "filter", required = false) String filter) {
         List<? extends User> matchingUsers = remoteIdmService.findUsersByNameFilter(filter);
-        List<UserRepresentation> userRepresentations = new ArrayList<UserRepresentation>(matchingUsers.size());
+        List<UserRepresentation> userRepresentations = new ArrayList<>(matchingUsers.size());
         for (User user : matchingUsers) {
             userRepresentations.add(new UserRepresentation(user));
         }

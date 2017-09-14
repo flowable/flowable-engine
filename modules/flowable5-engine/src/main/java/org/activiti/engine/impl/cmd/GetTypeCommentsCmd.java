@@ -32,6 +32,7 @@ public class GetTypeCommentsCmd implements Command<List<Comment>>, Serializable 
         this.type = type;
     }
 
+    @Override
     public List<Comment> execute(CommandContext commandContext) {
         return commandContext
                 .getCommentEntityManager()

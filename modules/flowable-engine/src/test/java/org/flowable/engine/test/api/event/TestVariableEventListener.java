@@ -17,14 +17,14 @@ import java.util.List;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.delegate.event.FlowableVariableEvent;
+import org.flowable.variable.service.event.FlowableVariableEvent;
 
 public class TestVariableEventListener implements FlowableEventListener {
 
     private List<FlowableEvent> eventsReceived;
 
     public TestVariableEventListener() {
-        eventsReceived = new ArrayList<FlowableEvent>();
+        eventsReceived = new ArrayList<>();
     }
 
     public List<FlowableEvent> getEventsReceived() {

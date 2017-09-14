@@ -19,13 +19,17 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
 import java.util.List;
 
+import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.impl.bpmn.deployer.ParsedDeployment;
 import org.flowable.engine.impl.bpmn.deployer.ParsedDeploymentBuilder;
 import org.flowable.engine.impl.bpmn.deployer.ParsedDeploymentBuilderFactory;
 import org.flowable.engine.impl.bpmn.deployer.ResourceNameUtil;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -54,7 +58,12 @@ public class ParsedDeploymentTest extends PluggableFlowableTestCase {
 
     @Override
     public void setUp() {
-        Context.setCommandContext(processEngineConfiguration.getCommandContextFactory().createCommandContext(null));
+        CommandContext commandContext = processEngineConfiguration.getCommandContextFactory().createCommandContext(null);
+        if (commandContext.getEngineConfigurations() == null) {
+            commandContext.setEngineConfigurations(new HashMap<String, AbstractEngineConfiguration>());
+        }
+        commandContext.getEngineConfigurations().put(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG, processEngineConfiguration);
+        Context.setCommandContext(commandContext);
     }
 
     @Override

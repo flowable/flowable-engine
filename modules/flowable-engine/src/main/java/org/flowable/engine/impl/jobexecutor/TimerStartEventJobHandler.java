@@ -14,15 +14,16 @@ package org.flowable.engine.impl.jobexecutor;
 
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cmd.StartProcessInstanceCmd;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
+import org.flowable.job.service.JobHandler;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,11 +33,13 @@ public class TimerStartEventJobHandler extends TimerEventHandler implements JobH
 
     public static final String TYPE = "timer-start-event";
 
+    @Override
     public String getType() {
         return TYPE;
     }
 
-    public void execute(JobEntity job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
+    @Override
+    public void execute(JobEntity job, String configuration, Object execution, CommandContext commandContext) {
 
         ProcessDefinitionEntity processDefinitionEntity = ProcessDefinitionUtil
                 .getProcessDefinitionFromDatabase(job.getProcessDefinitionId()); // From DB -> need to get latest suspended state
@@ -47,8 +50,8 @@ public class TimerStartEventJobHandler extends TimerEventHandler implements JobH
         try {
             if (!processDefinitionEntity.isSuspended()) {
 
-                if (commandContext.getEventDispatcher().isEnabled()) {
-                    commandContext.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_FIRED, job));
+                if (CommandContextUtil.getEventDispatcher().isEnabled()) {
+                    CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_FIRED, job));
                 }
 
                 // Find initial flow element matching the signal start event
@@ -59,7 +62,7 @@ public class TimerStartEventJobHandler extends TimerEventHandler implements JobH
                     if (flowElement == null) {
                         throw new FlowableException("Could not find matching FlowElement for activityId " + activityId);
                     }
-                    ProcessInstanceHelper processInstanceHelper = commandContext.getProcessEngineConfiguration().getProcessInstanceHelper();
+                    ProcessInstanceHelper processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
                     processInstanceHelper.createAndStartProcessInstanceWithInitialFlowElement(processDefinitionEntity, null, null, flowElement, process, null, null, true);
                 } else {
                     new StartProcessInstanceCmd(processDefinitionEntity.getKey(), null, null, null, job.getTenantId()).execute(commandContext);

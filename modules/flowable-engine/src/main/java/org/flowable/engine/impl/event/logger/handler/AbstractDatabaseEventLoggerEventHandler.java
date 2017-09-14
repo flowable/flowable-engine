@@ -12,21 +12,21 @@
  */
 package org.flowable.engine.impl.event.logger.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.Date;
 import java.util.Map;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Joram Barrez
@@ -52,7 +52,7 @@ public abstract class AbstractDatabaseEventLoggerEventHandler implements EventLo
 
     protected EventLogEntryEntity createEventLogEntry(String type, String processDefinitionId, String processInstanceId, String executionId, String taskId, Map<String, Object> data) {
 
-        EventLogEntryEntity eventLogEntry = Context.getCommandContext().getEventLogEntryEntityManager().create();
+        EventLogEntryEntity eventLogEntry = CommandContextUtil.getEventLogEntryEntityManager().create();
         eventLogEntry.setProcessDefinitionId(processDefinitionId);
         eventLogEntry.setProcessInstanceId(processInstanceId);
         eventLogEntry.setExecutionId(executionId);

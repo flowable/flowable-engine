@@ -19,7 +19,7 @@ import java.util.Date;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.JavaDelegate;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.test.history.SerializableVariable;
 
 /**
@@ -27,6 +27,7 @@ import org.flowable.engine.test.history.SerializableVariable;
  */
 public class VariableSetter implements JavaDelegate {
 
+    @Override
     public void execute(DelegateExecution execution) {
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss SSS");
@@ -38,7 +39,7 @@ public class VariableSetter implements JavaDelegate {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        Context.getProcessEngineConfiguration().getClock().setCurrentTime(updatedDate);
+        CommandContextUtil.getProcessEngineConfiguration().getClock().setCurrentTime(updatedDate);
 
         execution.setVariable("aVariable", "updated value");
         execution.setVariable("bVariable", 123);

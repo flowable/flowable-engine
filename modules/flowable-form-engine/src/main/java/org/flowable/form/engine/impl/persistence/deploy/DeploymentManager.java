@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 import org.flowable.form.api.FormDefinition;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.FormDefinitionQueryImpl;
@@ -23,7 +24,7 @@ import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntityManager;
 import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntity;
 import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntityManager;
-import org.flowable.form.engine.impl.persistence.entity.ResourceEntity;
+import org.flowable.form.engine.impl.persistence.entity.FormResourceEntity;
 
 /**
  * @author Tijs Rademakers
@@ -132,8 +133,8 @@ public class DeploymentManager {
 
         if (cachedForm == null) {
             FormDeploymentEntity deployment = engineConfig.getDeploymentEntityManager().findById(deploymentId);
-            List<ResourceEntity> resources = engineConfig.getResourceEntityManager().findResourcesByDeploymentId(deploymentId);
-            for (ResourceEntity resource : resources) {
+            List<FormResourceEntity> resources = engineConfig.getResourceEntityManager().findResourcesByDeploymentId(deploymentId);
+            for (FormResourceEntity resource : resources) {
                 deployment.addResource(resource);
             }
 

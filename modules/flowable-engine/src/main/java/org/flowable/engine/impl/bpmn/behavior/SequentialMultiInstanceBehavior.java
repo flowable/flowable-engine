@@ -18,10 +18,10 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -38,6 +38,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
     /**
      * Handles the sequential case of spawning the instances. Will only create one instance, since at most one instance can be active.
      */
+    @Override
     protected int createInstances(DelegateExecution multiInstanceRootExecution) {
 
         int nrOfInstances = resolveNrOfInstances(multiInstanceRootExecution);
@@ -48,7 +49,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
         }
 
         // Create child execution that will execute the inner behavior
-        ExecutionEntity execution = Context.getCommandContext().getExecutionEntityManager()
+        ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager()
                 .createChildExecution((ExecutionEntity) multiInstanceRootExecution);
         execution.setCurrentFlowElement(multiInstanceRootExecution.getCurrentFlowElement());
 
@@ -69,6 +70,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
      * Called when the wrapped {@link ActivityBehavior} calls the {@link AbstractBpmnActivityBehavior#leave(DelegateExecution)} method. Handles the completion of one instance, and executes the logic
      * for the sequential behavior.
      */
+    @Override
     public void leave(DelegateExecution execution) {
         DelegateExecution multiInstanceRootExecution = getMultiInstanceRootExecution(execution);
         int loopCounter = getLoopVariable(execution, getCollectionElementIndexVariable()) + 1;
@@ -87,26 +89,30 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
             super.leave(execution);
 
         } else {
-            try {
-                
-                if (execution.getCurrentFlowElement() instanceof SubProcess) {
-                    ExecutionEntityManager executionEntityManager = Context.getCommandContext().getExecutionEntityManager();
-                    ExecutionEntity executionToContinue = executionEntityManager.createChildExecution((ExecutionEntity) multiInstanceRootExecution);
-                    executionToContinue.setCurrentFlowElement(execution.getCurrentFlowElement());
-                    executionToContinue.setScope(true);
-                    executeOriginalBehavior(executionToContinue, loopCounter);
-                } else {
-                    Context.getCommandContext().getHistoryManager().recordActivityEnd((ExecutionEntity) execution, null);
-                    executeOriginalBehavior(execution, loopCounter);
-                }
-
-            } catch (BpmnError error) {
-                // re-throw business fault so that it can be caught by an Error
-                // Intermediate Event or Error Event Sub-Process in the process
-                throw error;
-            } catch (Exception e) {
-                throw new FlowableException("Could not execute inner activity behavior of multi instance behavior", e);
+            continueSequentialMultiInstance(execution, loopCounter, (ExecutionEntity) multiInstanceRootExecution);
+        }
+    }
+    
+    public void continueSequentialMultiInstance(DelegateExecution execution, int loopCounter, ExecutionEntity multiInstanceRootExecution) {
+        try {
+            
+            if (execution.getCurrentFlowElement() instanceof SubProcess) {
+                ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
+                ExecutionEntity executionToContinue = executionEntityManager.createChildExecution(multiInstanceRootExecution);
+                executionToContinue.setCurrentFlowElement(execution.getCurrentFlowElement());
+                executionToContinue.setScope(true);
+                executeOriginalBehavior(executionToContinue, loopCounter);
+            } else {
+                CommandContextUtil.getHistoryManager().recordActivityEnd((ExecutionEntity) execution, null);
+                executeOriginalBehavior(execution, loopCounter);
             }
+
+        } catch (BpmnError error) {
+            // re-throw business fault so that it can be caught by an Error
+            // Intermediate Event or Error Event Sub-Process in the process
+            throw error;
+        } catch (Exception e) {
+            throw new FlowableException("Could not execute inner activity behavior of multi instance behavior", e);
         }
     }
 }

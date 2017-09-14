@@ -43,9 +43,9 @@ public class ParsedDeploymentBuilder {
     }
 
     public ParsedDeployment build() {
-        List<ProcessDefinitionEntity> processDefinitions = new ArrayList<ProcessDefinitionEntity>();
-        Map<ProcessDefinitionEntity, BpmnParse> processDefinitionsToBpmnParseMap = new LinkedHashMap<ProcessDefinitionEntity, BpmnParse>();
-        Map<ProcessDefinitionEntity, ResourceEntity> processDefinitionsToResourceMap = new LinkedHashMap<ProcessDefinitionEntity, ResourceEntity>();
+        List<ProcessDefinitionEntity> processDefinitions = new ArrayList<>();
+        Map<ProcessDefinitionEntity, BpmnParse> processDefinitionsToBpmnParseMap = new LinkedHashMap<>();
+        Map<ProcessDefinitionEntity, ResourceEntity> processDefinitionsToResourceMap = new LinkedHashMap<>();
 
         for (ResourceEntity resource : deployment.getResources().values()) {
             if (isBpmnResource(resource.getName())) {
@@ -91,7 +91,12 @@ public class ParsedDeploymentBuilder {
             bpmnParse.setValidateProcess(false);
         }
 
-        bpmnParse.execute();
+        try {
+            bpmnParse.execute();
+        } catch (Exception e) {
+            LOGGER.error("Could not parse resource {}", resource.getName(), e);
+            throw e;
+        }
         return bpmnParse;
     }
 

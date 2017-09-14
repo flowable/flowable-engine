@@ -15,8 +15,9 @@ package org.flowable.form.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.form.engine.impl.interceptor.Command;
-import org.flowable.form.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.form.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -30,13 +31,14 @@ public class DeleteDeploymentCmd implements Command<Void>, Serializable {
         this.deploymentId = deploymentId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (deploymentId == null) {
             throw new FlowableIllegalArgumentException("deploymentId is null");
         }
 
         // Remove forms from cache:
-        commandContext.getFormEngineConfiguration().getDeploymentManager().removeDeployment(deploymentId);
+        CommandContextUtil.getFormEngineConfiguration().getDeploymentManager().removeDeployment(deploymentId);
 
         return null;
     }

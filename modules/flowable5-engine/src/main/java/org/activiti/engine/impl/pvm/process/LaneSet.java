@@ -19,7 +19,7 @@ import java.util.List;
 
 /**
  * A BPMN 2.0 LaneSet, containing {@link Lane}s, currently only used for rendering the DI info.
- * 
+ *
  * @author Frederik Heremans
  */
 public class LaneSet implements Serializable {
@@ -48,7 +48,7 @@ public class LaneSet implements Serializable {
 
     public List<Lane> getLanes() {
         if (lanes == null) {
-            lanes = new ArrayList<Lane>();
+            lanes = new ArrayList<>();
         }
         return lanes;
     }

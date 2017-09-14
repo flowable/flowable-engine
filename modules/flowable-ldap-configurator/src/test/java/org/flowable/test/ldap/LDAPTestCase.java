@@ -40,6 +40,7 @@ public class LDAPTestCase extends SpringFlowableTestCase {
         super();
     }
 
+    @Override
     public void runBare() throws Throwable {
         Throwable exception = null;
         if (totalTestCount == -1) {

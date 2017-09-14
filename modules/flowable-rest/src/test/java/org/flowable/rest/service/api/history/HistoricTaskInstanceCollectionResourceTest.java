@@ -28,10 +28,10 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.flowable.task.service.Task;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -51,7 +51,7 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
      */
     @Deployment
     public void testQueryTaskInstances() throws Exception {
-        HashMap<String, Object> processVariables = new HashMap<String, Object>();
+        HashMap<String, Object> processVariables = new HashMap<>();
         processVariables.put("stringVar", "Azerty");
         processVariables.put("intVar", 67890);
         processVariables.put("booleanVar", false);
@@ -152,7 +152,7 @@ public class HistoricTaskInstanceCollectionResourceTest extends BaseSpringRestTe
 
         // Check presence of ID's
         if (expectedTaskIds != null) {
-            List<String> toBeFound = new ArrayList<String>(Arrays.asList(expectedTaskIds));
+            List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedTaskIds));
             Iterator<JsonNode> it = dataNode.iterator();
             while (it.hasNext()) {
                 String id = it.next().get("id").textValue();

@@ -21,18 +21,18 @@ import org.flowable.engine.common.api.management.TableMetaData;
 import org.flowable.engine.common.api.management.TablePage;
 import org.flowable.engine.common.api.management.TablePageQuery;
 import org.flowable.engine.common.impl.cmd.CustomSqlExecution;
+import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.event.EventLogEntry;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntity;
-import org.flowable.engine.impl.persistence.entity.SuspendedJobEntity;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
-import org.flowable.engine.runtime.DeadLetterJobQuery;
-import org.flowable.engine.runtime.HistoryJobQuery;
-import org.flowable.engine.runtime.Job;
-import org.flowable.engine.runtime.JobQuery;
-import org.flowable.engine.runtime.SuspendedJobQuery;
-import org.flowable.engine.runtime.TimerJobQuery;
+import org.flowable.job.service.DeadLetterJobQuery;
+import org.flowable.job.service.HistoryJobQuery;
+import org.flowable.job.service.Job;
+import org.flowable.job.service.JobQuery;
+import org.flowable.job.service.SuspendedJobQuery;
+import org.flowable.job.service.TimerJobQuery;
+import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
+import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 
 /**
  * Service for admin and maintenance operations on the process engine.

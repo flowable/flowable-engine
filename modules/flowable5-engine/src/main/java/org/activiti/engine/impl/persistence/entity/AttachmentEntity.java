@@ -45,49 +45,60 @@ public class AttachmentEntity implements Attachment, PersistentObject, HasRevisi
     public AttachmentEntity() {
     }
 
+    @Override
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("name", name);
         persistentState.put("description", description);
         return persistentState;
     }
 
+    @Override
     public int getRevisionNext() {
         return revision + 1;
     }
 
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public void setId(String id) {
         this.id = id;
     }
 
+    @Override
     public int getRevision() {
         return revision;
     }
 
+    @Override
     public void setRevision(int revision) {
         this.revision = revision;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public String getDescription() {
         return description;
     }
 
+    @Override
     public void setDescription(String description) {
         this.description = description;
     }
 
+    @Override
     public String getType() {
         return type;
     }
@@ -96,6 +107,7 @@ public class AttachmentEntity implements Attachment, PersistentObject, HasRevisi
         this.type = type;
     }
 
+    @Override
     public String getTaskId() {
         return taskId;
     }
@@ -104,6 +116,7 @@ public class AttachmentEntity implements Attachment, PersistentObject, HasRevisi
         this.taskId = taskId;
     }
 
+    @Override
     public String getProcessInstanceId() {
         return processInstanceId;
     }
@@ -112,6 +125,7 @@ public class AttachmentEntity implements Attachment, PersistentObject, HasRevisi
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public String getUrl() {
         return url;
     }
@@ -140,14 +154,17 @@ public class AttachmentEntity implements Attachment, PersistentObject, HasRevisi
         this.userId = userId;
     }
 
+    @Override
     public String getUserId() {
         return userId;
     }
 
+    @Override
     public Date getTime() {
         return time;
     }
 
+    @Override
     public void setTime(Date time) {
         this.time = time;
     }

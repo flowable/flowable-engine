@@ -22,6 +22,7 @@ public class FlowableException extends RuntimeException {
     private static final long serialVersionUID = 1L;
   
     protected boolean isLogged;
+    protected boolean reduceLogLevel;
 
     public FlowableException(String message, Throwable cause) {
         super(message, cause);
@@ -38,5 +39,13 @@ public class FlowableException extends RuntimeException {
     public void setLogged(boolean isLogged) {
         this.isLogged = isLogged;
     }
- 
+
+    public boolean isReduceLogLevel() {
+        return reduceLogLevel;
+    }
+
+    public void setReduceLogLevel(boolean reduceLogLevel) {
+        this.reduceLogLevel = reduceLogLevel;
+    }
+    
 }

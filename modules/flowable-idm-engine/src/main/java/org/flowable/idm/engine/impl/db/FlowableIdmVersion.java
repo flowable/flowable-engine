@@ -41,6 +41,7 @@ public class FlowableIdmVersion {
         }
     }
 
+    @Override
     public boolean equals(Object obj) {
         if (!(obj instanceof FlowableIdmVersion)) {
             return false;

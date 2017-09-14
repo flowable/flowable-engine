@@ -27,7 +27,7 @@ public class UserQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, UserQueryProperty> properties = new HashMap<String, UserQueryProperty>();
+    private static final Map<String, UserQueryProperty> properties = new HashMap<>();
 
     public static final UserQueryProperty USER_ID = new UserQueryProperty("RES.ID_");
     public static final UserQueryProperty FIRST_NAME = new UserQueryProperty("RES.FIRST_");
@@ -41,6 +41,7 @@ public class UserQueryProperty implements QueryProperty {
         properties.put(name, this);
     }
 
+    @Override
     public String getName() {
         return name;
     }

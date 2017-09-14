@@ -15,9 +15,10 @@ package org.flowable.standalone.cfg;
 
 import java.util.List;
 
-import org.flowable.engine.ManagementService;
-import org.flowable.engine.impl.AbstractQuery;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.AbstractQuery;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.Attachment;
 
 /**
@@ -33,9 +34,9 @@ public class AttachmentQuery extends AbstractQuery<AttachmentQuery, Attachment> 
     protected String userId;
     protected String taskId;
     protected String processInstanceId;
-
-    public AttachmentQuery(ManagementService managementService) {
-        super(managementService);
+    
+    public AttachmentQuery(CommandExecutor commandExecutor) {
+        super(commandExecutor);
     }
 
     public AttachmentQuery attachmentId(String attachmentId) {
@@ -82,13 +83,13 @@ public class AttachmentQuery extends AbstractQuery<AttachmentQuery, Attachment> 
 
     @Override
     public long executeCount(CommandContext commandContext) {
-        return (Long) commandContext.getDbSqlSession().selectOne("selectAttachmentCountByQueryCriteria", this);
+        return (Long) CommandContextUtil.getDbSqlSession(commandContext).selectOne("selectAttachmentCountByQueryCriteria", this);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public List<Attachment> executeList(CommandContext commandContext) {
-        return commandContext.getDbSqlSession().selectList("selectAttachmentByQueryCriteria", this);
+        return CommandContextUtil.getDbSqlSession(commandContext).selectList("selectAttachmentByQueryCriteria", this);
     }
 
 }

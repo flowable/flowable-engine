@@ -40,7 +40,7 @@ import org.flowable.bpmn.model.alfresco.AlfrescoUserTask;
  */
 public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
 
-    protected Map<String, BaseChildElementParser> childParserMap = new HashMap<String, BaseChildElementParser>();
+    protected Map<String, BaseChildElementParser> childParserMap = new HashMap<>();
 
     /** default attributes taken from bpmn spec and from extension namespace */
     protected static final List<ExtensionAttribute> defaultUserTaskAttributes = Arrays.asList(
@@ -65,6 +65,7 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
         childParserMap.put(customIdentityLinkParser.getElementName(), customIdentityLinkParser);
     }
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return UserTask.class;
     }
@@ -182,7 +183,7 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
             xtw.writeStartElement(ELEMENT_EXTENSIONS);
             didWriteExtensionStartElement = true;
         }
-        Set<String> identityLinkTypes = new HashSet<String>();
+        Set<String> identityLinkTypes = new HashSet<>();
         identityLinkTypes.addAll(userTask.getCustomUserIdentityLinks().keySet());
         identityLinkTypes.addAll(userTask.getCustomGroupIdentityLinks().keySet());
         for (String identityType : identityLinkTypes) {
@@ -196,7 +197,7 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
         xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_CUSTOM_RESOURCE, FLOWABLE_EXTENSIONS_NAMESPACE);
         writeDefaultAttribute(ATTRIBUTE_NAME, identityType, xtw);
 
-        List<String> identityList = new ArrayList<String>();
+        List<String> identityList = new ArrayList<>();
 
         if (users != null) {
             for (String userId : users) {
@@ -227,10 +228,12 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
 
     public class HumanPerformerParser extends BaseChildElementParser {
 
+        @Override
         public String getElementName() {
             return "humanPerformer";
         }
 
+        @Override
         public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
             String resourceElement = XMLStreamReaderUtil.moveDown(xtr);
             if (StringUtils.isNotEmpty(resourceElement) && ELEMENT_RESOURCE_ASSIGNMENT.equals(resourceElement)) {
@@ -244,10 +247,12 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
 
     public class PotentialOwnerParser extends BaseChildElementParser {
 
+        @Override
         public String getElementName() {
             return "potentialOwner";
         }
 
+        @Override
         public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
             String resourceElement = XMLStreamReaderUtil.moveDown(xtr);
             if (StringUtils.isNotEmpty(resourceElement) && ELEMENT_RESOURCE_ASSIGNMENT.equals(resourceElement)) {
@@ -296,10 +301,12 @@ public class UserTaskXMLConverter extends BaseBpmnXMLConverter {
 
     public class CustomIdentityLinkParser extends BaseChildElementParser {
 
+        @Override
         public String getElementName() {
             return ELEMENT_CUSTOM_RESOURCE;
         }
 
+        @Override
         public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
             String identityLinkType = BpmnXMLUtil.getAttributeValue(ATTRIBUTE_NAME, xtr);
 

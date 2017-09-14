@@ -12,11 +12,11 @@
  */
 package org.flowable.dmn.engine.impl.hitpolicy;
 
-import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.flowable.dmn.engine.impl.el.ELExecutionContext;
 
 /**
  * @author Yvo Swillens
@@ -43,7 +43,7 @@ public abstract class AbstractHitPolicy implements ContinueEvaluatingBehavior, C
      * Default behavior for ComposeRuleOutput behavior
      */
     @Override
-    public void composeRuleResult(int ruleNumber, String outputName, Object outputValue, MvelExecutionContext executionContext) {
+    public void composeRuleResult(int ruleNumber, String outputName, Object outputValue, ELExecutionContext executionContext) {
         executionContext.addRuleResult(ruleNumber, outputName, outputValue);
     }
 
@@ -51,8 +51,8 @@ public abstract class AbstractHitPolicy implements ContinueEvaluatingBehavior, C
      * Default behavior for ComposeRuleOutput behavior
      */
     @Override
-    public void composeDecisionResults(MvelExecutionContext executionContext) {
+    public void composeDecisionResults(ELExecutionContext executionContext) {
         List<Map<String, Object>> decisionResults = new ArrayList<>(executionContext.getRuleResults().values());
-        executionContext.setDecisionResults(decisionResults);
+        executionContext.getAuditContainer().setDecisionResult(decisionResults);
     }
 }

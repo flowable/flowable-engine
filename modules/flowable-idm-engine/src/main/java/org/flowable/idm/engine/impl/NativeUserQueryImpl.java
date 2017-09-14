@@ -15,10 +15,12 @@ package org.flowable.idm.engine.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.AbstractNativeQuery;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.NativeUserQuery;
 import org.flowable.idm.api.User;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
-import org.flowable.idm.engine.impl.interceptor.CommandExecutor;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 public class NativeUserQueryImpl extends AbstractNativeQuery<NativeUserQuery, User> implements NativeUserQuery {
 
@@ -34,12 +36,14 @@ public class NativeUserQueryImpl extends AbstractNativeQuery<NativeUserQuery, Us
 
     // results ////////////////////////////////////////////////////////////////
 
+    @Override
     public List<User> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return commandContext.getUserEntityManager().findUsersByNativeQuery(parameterMap);
+        return CommandContextUtil.getUserEntityManager(commandContext).findUsersByNativeQuery(parameterMap);
     }
 
+    @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return commandContext.getUserEntityManager().findUserCountByNativeQuery(parameterMap);
+        return CommandContextUtil.getUserEntityManager(commandContext).findUserCountByNativeQuery(parameterMap);
     }
 
 }

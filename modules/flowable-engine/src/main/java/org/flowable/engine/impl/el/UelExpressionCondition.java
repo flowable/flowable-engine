@@ -15,7 +15,7 @@ package org.flowable.engine.impl.el;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.variable.service.delegate.Expression;
 import org.flowable.engine.impl.Condition;
 
 /**
@@ -32,6 +32,7 @@ public class UelExpressionCondition implements Condition {
         this.expression = expression;
     }
 
+    @Override
     public boolean evaluate(String sequenceFlowId, DelegateExecution execution) {
         Object result = expression.getValue(execution);
 

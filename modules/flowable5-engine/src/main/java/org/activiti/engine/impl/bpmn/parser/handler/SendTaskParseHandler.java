@@ -34,10 +34,12 @@ public class SendTaskParseHandler extends AbstractExternalInvocationBpmnParseHan
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SendTaskParseHandler.class);
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return SendTask.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, SendTask sendTask) {
 
         ActivityImpl activity = createActivityOnCurrentScope(bpmnParse, sendTask, BpmnXMLConstants.ELEMENT_TASK_SEND);

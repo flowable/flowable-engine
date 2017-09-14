@@ -1,4 +1,4 @@
-= Flowable DOCS (v 6.1.1-SNAPSHOT)
+= Flowable DOCS (v 6.2.0-SNAPSHOT)
 :doctype: book
 :docinfo1: header
 :icons: font

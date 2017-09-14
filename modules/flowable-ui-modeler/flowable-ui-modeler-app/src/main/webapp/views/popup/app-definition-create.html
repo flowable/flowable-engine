@@ -3,9 +3,6 @@
 		<div class="modal-content">
 			<div class="modal-header"><h2>{{'APP.POPUP.CREATE-TITLE' | translate}}</h2></div>
 			<div class="modal-body">
-                <div class="error-message" ng-if="errorMessage">
-                    <span>{{errorMessage}}</span>
-                </div>
                 <div ng-if="model.errorMessage && model.errorMessage.length > 0" class="alert error" style="font-size: 14px; margin-top:20px">
                   <div class="popup-error" style="font-size: 14px">
                     <span class="glyphicon glyphicon-remove-circle"></span>

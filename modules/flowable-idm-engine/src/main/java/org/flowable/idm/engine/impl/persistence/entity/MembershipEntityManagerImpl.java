@@ -37,6 +37,7 @@ public class MembershipEntityManagerImpl extends AbstractEntityManager<Membershi
         return membershipDataManager;
     }
 
+    @Override
     public void createMembership(String userId, String groupId) {
         MembershipEntity membershipEntity = create();
         membershipEntity.setUserId(userId);
@@ -48,6 +49,7 @@ public class MembershipEntityManagerImpl extends AbstractEntityManager<Membershi
         }
     }
 
+    @Override
     public void deleteMembership(String userId, String groupId) {
         membershipDataManager.deleteMembership(userId, groupId);
         if (getEventDispatcher().isEnabled()) {

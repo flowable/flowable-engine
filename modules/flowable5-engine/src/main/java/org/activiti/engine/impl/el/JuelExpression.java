@@ -22,8 +22,8 @@ import org.activiti.engine.impl.javax.el.ELException;
 import org.activiti.engine.impl.javax.el.MethodNotFoundException;
 import org.activiti.engine.impl.javax.el.PropertyNotFoundException;
 import org.activiti.engine.impl.javax.el.ValueExpression;
-import org.flowable.engine.delegate.Expression;
-import org.flowable.engine.delegate.VariableScope;
+import org.flowable.variable.service.delegate.Expression;
+import org.flowable.variable.service.delegate.VariableScope;
 
 /**
  * Expression implementation backed by a JUEL {@link ValueExpression}.
@@ -41,6 +41,7 @@ public class JuelExpression implements Expression {
         this.expressionText = expressionText;
     }
 
+    @Override
     public Object getValue(VariableScope variableScope) {
         ELContext elContext = Context.getProcessEngineConfiguration().getExpressionManager().getElContext(variableScope);
         try {
@@ -60,6 +61,7 @@ public class JuelExpression implements Expression {
         }
     }
 
+    @Override
     public void setValue(Object value, VariableScope variableScope) {
         ELContext elContext = Context.getProcessEngineConfiguration().getExpressionManager().getElContext(variableScope);
         try {
@@ -80,6 +82,7 @@ public class JuelExpression implements Expression {
         return super.toString();
     }
 
+    @Override
     public String getExpressionText() {
         return expressionText;
     }

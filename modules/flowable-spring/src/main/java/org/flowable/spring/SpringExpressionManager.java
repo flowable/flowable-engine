@@ -15,17 +15,17 @@ package org.flowable.spring;
 
 import java.util.Map;
 
+import org.flowable.engine.common.impl.el.JsonNodeELResolver;
+import org.flowable.engine.common.impl.el.ReadOnlyMapELResolver;
 import org.flowable.engine.common.impl.javax.el.ArrayELResolver;
 import org.flowable.engine.common.impl.javax.el.BeanELResolver;
 import org.flowable.engine.common.impl.javax.el.CompositeELResolver;
 import org.flowable.engine.common.impl.javax.el.ELResolver;
 import org.flowable.engine.common.impl.javax.el.ListELResolver;
 import org.flowable.engine.common.impl.javax.el.MapELResolver;
-import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.el.DefaultExpressionManager;
-import org.flowable.engine.impl.el.JsonNodeELResolver;
-import org.flowable.engine.impl.el.ReadOnlyMapELResolver;
 import org.flowable.engine.impl.el.VariableScopeElResolver;
+import org.flowable.variable.service.delegate.VariableScope;
 import org.springframework.context.ApplicationContext;
 
 /**

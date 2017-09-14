@@ -29,6 +29,7 @@ public interface ProcessDefinitionInfoEntityManager extends EntityManager<Proces
 
     void deleteInfoJson(ProcessDefinitionInfoEntity processDefinitionInfo);
 
+    @Override
     ProcessDefinitionInfoEntity findById(String id);
 
     ProcessDefinitionInfoEntity findProcessDefinitionInfoByProcessDefinitionId(String processDefinitionId);

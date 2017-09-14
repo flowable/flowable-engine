@@ -46,7 +46,7 @@ public class DefaultManagementAgent implements ManagementAgent {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultManagementAgent.class);
 
     protected MBeanServer server;
-    protected final ConcurrentMap<ObjectName, ObjectName> mbeansRegistered = new ConcurrentHashMap<ObjectName, ObjectName>();
+    protected final ConcurrentMap<ObjectName, ObjectName> mbeansRegistered = new ConcurrentHashMap<>();
     protected JMXConfigurator jmxConfigurator;
     protected Registry registry;
     protected JMXConnectorServer cs;
@@ -58,10 +58,12 @@ public class DefaultManagementAgent implements ManagementAgent {
 
     }
 
+    @Override
     public void register(Object obj, ObjectName name) throws JMException {
         register(obj, name, false);
     }
 
+    @Override
     public void register(Object obj, ObjectName name, boolean forceRegistration) throws JMException {
         try {
             Object mbean = assembler.assemble(obj, name);
@@ -110,11 +112,13 @@ public class DefaultManagementAgent implements ManagementAgent {
         }
     }
 
+    @Override
     public boolean isRegistered(ObjectName name) {
         ObjectName on = mbeansRegistered.get(name);
         return (on != null && server.isRegistered(on)) || server.isRegistered(name);
     }
 
+    @Override
     public void unregister(ObjectName name) throws JMException {
         if (isRegistered(name)) {
             ObjectName on = mbeansRegistered.remove(name);
@@ -135,6 +139,7 @@ public class DefaultManagementAgent implements ManagementAgent {
         this.server = mbeanServer;
     }
 
+    @Override
     public void doStart() {
         createMBeanServer();
     }
@@ -219,6 +224,7 @@ public class DefaultManagementAgent implements ManagementAgent {
         // terminated when the JMX connector has been started)
         Thread thread = new Thread(new Runnable() {
 
+            @Override
             public void run() {
                 try {
                     LOGGER.debug("Staring JMX Connector thread to listen at: {}", url);

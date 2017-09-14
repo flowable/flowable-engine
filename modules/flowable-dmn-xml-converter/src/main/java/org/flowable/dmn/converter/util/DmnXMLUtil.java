@@ -40,7 +40,7 @@ import org.flowable.dmn.xml.constants.DmnXMLConstants;
  */
 public class DmnXMLUtil implements DmnXMLConstants {
 
-    private static Map<String, BaseChildElementParser> genericChildParserMap = new HashMap<String, BaseChildElementParser>();
+    private static Map<String, BaseChildElementParser> genericChildParserMap = new HashMap<>();
 
     static {
         addGenericParser(new InputClauseParser());
@@ -199,7 +199,7 @@ public class DmnXMLUtil implements DmnXMLConstants {
 
     protected static void writeExtensionElement(DmnExtensionElement extensionElement, Map<String, String> namespaceMap, XMLStreamWriter xtw) throws Exception {
         if (StringUtils.isNotEmpty(extensionElement.getName())) {
-            Map<String, String> localNamespaceMap = new HashMap<String, String>();
+            Map<String, String> localNamespaceMap = new HashMap<>();
             if (StringUtils.isNotEmpty(extensionElement.getNamespace())) {
                 if (StringUtils.isNotEmpty(extensionElement.getNamespacePrefix())) {
                     xtw.writeStartElement(extensionElement.getNamespacePrefix(), extensionElement.getName(), extensionElement.getNamespace());

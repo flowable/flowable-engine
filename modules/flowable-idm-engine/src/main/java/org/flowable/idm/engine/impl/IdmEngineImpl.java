@@ -12,12 +12,12 @@
  */
 package org.flowable.idm.engine.impl;
 
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.IdmManagementService;
 import org.flowable.idm.engine.IdmEngine;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.IdmEngines;
-import org.flowable.idm.engine.impl.interceptor.CommandExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +54,7 @@ public class IdmEngineImpl implements IdmEngine {
         IdmEngines.registerIdmEngine(this);
     }
 
+    @Override
     public void close() {
         IdmEngines.unregister(this);
     }
@@ -61,18 +62,22 @@ public class IdmEngineImpl implements IdmEngine {
     // getters and setters
     // //////////////////////////////////////////////////////
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public IdmIdentityService getIdmIdentityService() {
         return identityService;
     }
 
+    @Override
     public IdmManagementService getIdmManagementService() {
         return managementService;
     }
 
+    @Override
     public IdmEngineConfiguration getIdmEngineConfiguration() {
         return engineConfiguration;
     }

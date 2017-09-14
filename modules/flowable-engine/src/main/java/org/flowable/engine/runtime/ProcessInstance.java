@@ -60,6 +60,7 @@ public interface ProcessInstance extends Execution {
     /**
      * returns true if the process instance is suspended
      */
+    @Override
     boolean isSuspended();
 
     /**
@@ -70,16 +71,19 @@ public interface ProcessInstance extends Execution {
     /**
      * The tenant identifier of this process instance
      */
+    @Override
     String getTenantId();
 
     /**
      * Returns the name of this process instance.
      */
+    @Override
     String getName();
 
     /**
      * Returns the description of this process instance.
      */
+    @Override
     String getDescription();
 
     /**
@@ -101,4 +105,14 @@ public interface ProcessInstance extends Execution {
      * Returns the user id of this process instance.
      */
     String getStartUserId();
+    
+    /**
+     * Returns the callback id of this process instance.
+     */
+    String getCallbackId();
+    
+    /**
+     * Returns the callback type of this process instance. 
+     */
+    String getCallbackType();
 }

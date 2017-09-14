@@ -30,6 +30,9 @@ import javax.script.SimpleBindings;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.de.odysseus.el.util.SimpleResolver;
+import org.flowable.engine.common.impl.el.DynamicBeanPropertyELResolver;
+import org.flowable.engine.common.impl.el.ExpressionFactoryResolver;
+import org.flowable.engine.common.impl.el.JsonNodeELResolver;
 import org.flowable.engine.common.impl.javax.el.ArrayELResolver;
 import org.flowable.engine.common.impl.javax.el.BeanELResolver;
 import org.flowable.engine.common.impl.javax.el.CompositeELResolver;
@@ -43,11 +46,8 @@ import org.flowable.engine.common.impl.javax.el.MapELResolver;
 import org.flowable.engine.common.impl.javax.el.ResourceBundleELResolver;
 import org.flowable.engine.common.impl.javax.el.ValueExpression;
 import org.flowable.engine.common.impl.javax.el.VariableMapper;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.impl.bpmn.data.ItemInstance;
-import org.flowable.engine.impl.el.DynamicBeanPropertyELResolver;
-import org.flowable.engine.impl.el.ExpressionFactoryResolver;
-import org.flowable.engine.impl.el.JsonNodeELResolver;
-import org.flowable.engine.impl.util.ReflectUtil;
 
 /**
  * ScriptEngine that used JUEL for script evaluation and compilation (JSR-223).
@@ -71,25 +71,30 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
         this(null);
     }
 
+    @Override
     public CompiledScript compile(String script) throws ScriptException {
         ValueExpression expr = parse(script, context);
         return new JuelCompiledScript(expr);
     }
 
+    @Override
     public CompiledScript compile(Reader reader) throws ScriptException {
         // Create a String based on the reader and compile it
         return compile(readFully(reader));
     }
 
+    @Override
     public Object eval(String script, ScriptContext scriptContext) throws ScriptException {
         ValueExpression expr = parse(script, scriptContext);
         return evaluateExpression(expr, scriptContext);
     }
 
+    @Override
     public Object eval(Reader reader, ScriptContext scriptContext) throws ScriptException {
         return eval(readFully(reader), scriptContext);
     }
 
+    @Override
     public ScriptEngineFactory getFactory() {
         synchronized (this) {
             if (scriptEngineFactory == null) {
@@ -99,6 +104,7 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
         return scriptEngineFactory;
     }
 
+    @Override
     public Bindings createBindings() {
         return new SimpleBindings();
     }
@@ -246,11 +252,13 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
             this.valueExpression = valueExpression;
         }
 
+        @Override
         public ScriptEngine getEngine() {
             // Return outer class instance
             return JuelScriptEngine.this;
         }
 
+        @Override
         public Object eval(ScriptContext ctx) throws ScriptException {
             return evaluateExpression(valueExpression, ctx);
         }

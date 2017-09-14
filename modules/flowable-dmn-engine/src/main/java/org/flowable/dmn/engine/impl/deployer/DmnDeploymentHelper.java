@@ -19,10 +19,10 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.dmn.engine.impl.context.Context;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
+import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 
@@ -39,7 +39,7 @@ public class DmnDeploymentHelper {
      *             if any two decision tables have the same key
      */
     public void verifyDecisionTablesDoNotShareKeys(Collection<DecisionTableEntity> decisionTables) {
-        Set<String> keySet = new LinkedHashSet<String>();
+        Set<String> keySet = new LinkedHashSet<>();
         for (DecisionTableEntity decisionTable : decisionTables) {
             if (keySet.contains(decisionTable.getKey())) {
                 throw new FlowableException(
@@ -84,7 +84,7 @@ public class DmnDeploymentHelper {
     public DecisionTableEntity getMostRecentVersionOfDecisionTable(DecisionTableEntity decisionTable) {
         String key = decisionTable.getKey();
         String tenantId = decisionTable.getTenantId();
-        DecisionTableEntityManager decisionTableEntityManager = Context.getCommandContext().getDmnEngineConfiguration().getDecisionTableEntityManager();
+        DecisionTableEntityManager decisionTableEntityManager = CommandContextUtil.getDmnEngineConfiguration().getDecisionTableEntityManager();
 
         DecisionTableEntity existingDefinition = null;
 
@@ -107,7 +107,7 @@ public class DmnDeploymentHelper {
             throw new FlowableIllegalArgumentException("Provided process definition must have a deployment id.");
         }
 
-        DecisionTableEntityManager decisionTableEntityManager = Context.getCommandContext().getDmnEngineConfiguration().getDecisionTableEntityManager();
+        DecisionTableEntityManager decisionTableEntityManager = CommandContextUtil.getDmnEngineConfiguration().getDecisionTableEntityManager();
         DecisionTableEntity persistedDecisionTable = null;
         if (decisionTable.getTenantId() == null || DmnEngineConfiguration.NO_TENANT_ID.equals(decisionTable.getTenantId())) {
             persistedDecisionTable = decisionTableEntityManager.findDecisionTableByDeploymentAndKey(deploymentId, decisionTable.getKey());

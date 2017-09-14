@@ -50,16 +50,19 @@ public class SpringTransactionContext implements TransactionContext {
         }
     }
 
+    @Override
     public void commit() {
         // Do nothing, transaction is managed by spring
     }
 
+    @Override
     public void rollback() {
         // Just in case the rollback isn't triggered by an
         // exception, we mark the current transaction rollBackOnly.
         transactionManager.getTransaction(null).setRollbackOnly();
     }
 
+    @Override
     public void addTransactionListener(final TransactionState transactionState, final TransactionListener transactionListener) {
         if (transactionState == TransactionState.COMMITTING) {
 
@@ -103,24 +106,31 @@ public class SpringTransactionContext implements TransactionContext {
 
     protected abstract class TransactionSynchronizationAdapter implements TransactionSynchronization, Ordered {
 
+        @Override
         public void suspend() {
         }
 
+        @Override
         public void resume() {
         }
 
+        @Override
         public void flush() {
         }
 
+        @Override
         public void beforeCommit(boolean readOnly) {
         }
 
+        @Override
         public void beforeCompletion() {
         }
 
+        @Override
         public void afterCommit() {
         }
 
+        @Override
         public void afterCompletion(int status) {
         }
 

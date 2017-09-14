@@ -23,9 +23,9 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 
 /**
@@ -43,6 +43,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
      * Subclasses that call leave() will first pass through this method, before the regular {@link FlowNodeActivityBehavior#leave(DelegateExecution)} is called. This way, we can check if the activity
      * has loop characteristics, and delegate to the behavior if this is the case.
      */
+    @Override
     public void leave(DelegateExecution execution) {
         FlowElement currentFlowElement = execution.getCurrentFlowElement();
         Collection<BoundaryEvent> boundaryEvents = findBoundaryEventsForFlowNode(execution.getProcessDefinitionId(), currentFlowElement);
@@ -69,7 +70,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
                 continue;
             }
 
-            ExecutionEntity childExecutionEntity = Context.getCommandContext().getExecutionEntityManager().createChildExecution((ExecutionEntity) execution);
+            ExecutionEntity childExecutionEntity = CommandContextUtil.getExecutionEntityManager().createChildExecution((ExecutionEntity) execution);
             childExecutionEntity.setParentId(execution.getId());
             childExecutionEntity.setCurrentFlowElement(boundaryEvent);
             childExecutionEntity.setScope(false);
@@ -84,7 +85,7 @@ public class AbstractBpmnActivityBehavior extends FlowNodeActivityBehavior {
         Process process = getProcessDefinition(processDefinitionId);
 
         // This could be cached or could be done at parsing time
-        List<BoundaryEvent> results = new ArrayList<BoundaryEvent>(1);
+        List<BoundaryEvent> results = new ArrayList<>(1);
         Collection<BoundaryEvent> boundaryEvents = process.findFlowElementsOfType(BoundaryEvent.class, true);
         for (BoundaryEvent boundaryEvent : boundaryEvents) {
             if (boundaryEvent.getAttachedToRefId() != null && boundaryEvent.getAttachedToRefId().equals(flowElement.getId())) {

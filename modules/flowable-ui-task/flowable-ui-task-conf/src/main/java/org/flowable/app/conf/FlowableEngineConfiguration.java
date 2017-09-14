@@ -13,12 +13,15 @@
 package org.flowable.app.conf;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.app.events.TimerFiredEventHandler;
+import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentService;
 import org.flowable.content.spring.SpringContentEngineConfiguration;
 import org.flowable.content.spring.configurator.SpringContentEngineConfigurator;
+import org.flowable.dmn.api.DmnEngineConfigurationApi;
+import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
 import org.flowable.dmn.spring.configurator.SpringDmnEngineConfigurator;
 import org.flowable.engine.FlowableEngineAgendaFactory;
 import org.flowable.engine.FormService;
@@ -32,15 +35,17 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.agenda.DebugFlowableEngineAgendaFactory;
-import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.event.BreakpointJobHandler;
 import org.flowable.engine.impl.event.logger.handler.EventLoggerEventHandler;
-import org.flowable.engine.impl.jobexecutor.JobHandler;
+import org.flowable.engine.impl.util.EngineServiceUtil;
 import org.flowable.engine.runtime.ProcessDebugger;
+import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.spring.configurator.SpringFormEngineConfigurator;
+import org.flowable.job.service.JobHandler;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.spring.ProcessEngineFactoryBean;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 import org.slf4j.Logger;
@@ -98,6 +103,24 @@ public class FlowableEngineConfiguration {
         }
     }
 
+    @Bean(name = "dmnEngineConfiguration")
+    public DmnEngineConfigurationApi dmnEngineConfiguration() {
+        ProcessEngineConfiguration processEngineConfiguration = processEngine().getProcessEngineConfiguration();
+        return EngineServiceUtil.getDmnEngineConfiguration(processEngineConfiguration);
+    }
+
+    @Bean(name = "formEngineConfiguration")
+    public FormEngineConfigurationApi formEngineConfiguration() {
+        ProcessEngineConfiguration processEngineConfiguration = processEngine().getProcessEngineConfiguration();
+        return EngineServiceUtil.getFormEngineConfiguration(processEngineConfiguration);
+    }
+
+    @Bean(name = "contentEngineConfiguration")
+    public ContentEngineConfigurationApi contentEngineConfiguration() {
+        ProcessEngineConfiguration processEngineConfiguration = processEngine().getProcessEngineConfiguration();
+        return EngineServiceUtil.getContentEngineConfiguration(processEngineConfiguration);
+    }
+
     @Bean(name = "processEngineConfiguration")
     public ProcessEngineConfigurationImpl processEngineConfiguration() {
         SpringProcessEngineConfiguration processEngineConfiguration = new SpringProcessEngineConfiguration();
@@ -128,6 +151,16 @@ public class FlowableEngineConfiguration {
                 processEngineConfiguration.setMailServerUsername(environment.getProperty("email.username"));
                 processEngineConfiguration.setMailServerPassword(environment.getProperty("email.password"));
             }
+
+            Boolean useSSL = environment.getProperty("email.useSSL", Boolean.class);
+            if (Boolean.TRUE.equals(useSSL)) {
+                processEngineConfiguration.setMailServerUseSSL(true);
+            }
+
+            Boolean useTLS = environment.getProperty("email.useTLS", Boolean.class);
+            if (Boolean.TRUE.equals(useTLS)) {
+                processEngineConfiguration.setMailServerUseTLS(useTLS);
+            }
         }
 
         // Limit process definition cache
@@ -138,7 +171,12 @@ public class FlowableEngineConfiguration {
 
         processEngineConfiguration.setDisableIdmEngine(true);
         processEngineConfiguration.addConfigurator(new SpringFormEngineConfigurator());
-        processEngineConfiguration.addConfigurator(new SpringDmnEngineConfigurator());
+
+        SpringDmnEngineConfiguration dmnEngineConfiguration = new SpringDmnEngineConfiguration();
+        dmnEngineConfiguration.setHistoryEnabled(true);
+        SpringDmnEngineConfigurator dmnEngineConfigurator = new SpringDmnEngineConfigurator();
+        dmnEngineConfigurator.setDmnEngineConfiguration(dmnEngineConfiguration);
+        processEngineConfiguration.addConfigurator(dmnEngineConfigurator);
 
         SpringContentEngineConfiguration contentEngineConfiguration = new SpringContentEngineConfiguration();
         String contentRootFolder = environment.getProperty(PROP_FS_ROOT);
@@ -212,26 +250,31 @@ public class FlowableEngineConfiguration {
 
     @Bean
     public FormRepositoryService formEngineRepositoryService() {
-        return processEngine().getFormEngineRepositoryService();
+        return formEngineConfiguration().getFormRepositoryService();
     }
 
     @Bean
     public org.flowable.form.api.FormService formEngineFormService() {
-        return processEngine().getFormEngineFormService();
+        return formEngineConfiguration().getFormService();
     }
 
     @Bean
     public DmnRepositoryService dmnRepositoryService() {
-        return processEngine().getDmnRepositoryService();
+        return dmnEngineConfiguration().getDmnRepositoryService();
     }
 
     @Bean
     public DmnRuleService dmnRuleService() {
-        return processEngine().getDmnRuleService();
+        return dmnEngineConfiguration().getDmnRuleService();
+    }
+
+    @Bean
+    public DmnHistoryService dmnHistoryService() {
+        return dmnEngineConfiguration().getDmnHistoryService();
     }
 
     @Bean
     public ContentService contentService() {
-        return processEngine().getContentService();
+        return contentEngineConfiguration().getContentService();
     }
 }

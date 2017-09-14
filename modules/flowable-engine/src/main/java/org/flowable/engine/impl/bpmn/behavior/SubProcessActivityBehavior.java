@@ -22,11 +22,12 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 
 /**
@@ -44,6 +45,7 @@ public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior {
         this.isOnlyNoneStartEventAllowed = true;
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
         SubProcess subProcess = getSubProcessFromExecution(execution);
 
@@ -63,13 +65,13 @@ public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior {
         }
         
         CommandContext commandContext = Context.getCommandContext();
-        ProcessInstanceHelper processInstanceHelper = commandContext.getProcessEngineConfiguration().getProcessInstanceHelper();
+        ProcessInstanceHelper processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
         processInstanceHelper.processAvailableEventSubProcesses(executionEntity, subProcess, commandContext);
 
-        ExecutionEntity startSubProcessExecution = commandContext.getExecutionEntityManager()
+        ExecutionEntity startSubProcessExecution = CommandContextUtil.getExecutionEntityManager(commandContext)
                 .createChildExecution(executionEntity);
         startSubProcessExecution.setCurrentFlowElement(startElement);
-        Context.getAgenda().planContinueProcessOperation(startSubProcessExecution);
+        CommandContextUtil.getAgenda().planContinueProcessOperation(startSubProcessExecution);
     }
   
     protected FlowElement getStartElement(SubProcess subProcess) {
@@ -103,7 +105,7 @@ public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior {
     }
 
     protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {
-        Map<String, Object> variablesMap = new HashMap<String, Object>();
+        Map<String, Object> variablesMap = new HashMap<>();
         // convert data objects to process variables
         if (dataObjects != null) {
             for (ValuedDataObject dataObject : dataObjects) {

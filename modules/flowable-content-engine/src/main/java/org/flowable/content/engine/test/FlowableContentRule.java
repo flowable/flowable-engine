@@ -90,7 +90,7 @@ public class FlowableContentRule implements TestRule {
         return new Statement() {
             @Override
             public void evaluate() throws Throwable {
-                List<Throwable> errors = new ArrayList<Throwable>();
+                List<Throwable> errors = new ArrayList<>();
 
                 startingQuietly(description, errors);
                 try {

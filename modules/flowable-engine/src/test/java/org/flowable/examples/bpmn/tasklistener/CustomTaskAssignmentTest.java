@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -83,10 +82,10 @@ public class CustomTaskAssignmentTest extends PluggableFlowableTestCase {
     @Deployment
     public void testOverwriteExistingAssignmentsFromVariable() {
         // prepare variables
-        Map<String, String> assigneeMappingTable = new HashMap<String, String>();
+        Map<String, String> assigneeMappingTable = new HashMap<>();
         assigneeMappingTable.put("fozzie", "gonzo");
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("assigneeMappingTable", assigneeMappingTable);
 
         // start process instance
@@ -102,7 +101,7 @@ public class CustomTaskAssignmentTest extends PluggableFlowableTestCase {
     public void testReleaseTask() throws Exception {
         runtimeService.startProcessInstanceByKey("releaseTaskProcess");
 
-        Task task = taskService.createTaskQuery().taskAssignee("fozzie").singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().taskAssignee("fozzie").singleResult();
         assertNotNull(task);
         String taskId = task.getId();
 

@@ -20,17 +20,16 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 
 import org.flowable.dmn.api.DmnDecisionTable;
-import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.test.AbstractFlowableDmnTest;
-import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
+import org.flowable.dmn.engine.test.DmnDeployment;
 import org.junit.Test;
 
 public class DeploymentTest extends AbstractFlowableDmnTest {
 
     @Test
-    @DmnDeploymentAnnotation(resources = "org/flowable/dmn/engine/test/deployment/multiple_conclusions.dmn")
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/multiple_conclusions.dmn")
     public void deploySingleDecision() {
         DmnDecisionTable decision = repositoryService.createDecisionTableQuery()
                 .latestVersion()
@@ -41,7 +40,7 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation(resources = "org/flowable/dmn/engine/test/deployment/multiple_conclusions.dmn")
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/multiple_conclusions.dmn")
     public void deploySingleDecisionAndValidateCache() {
         DmnDecisionTable decision = repositoryService.createDecisionTableQuery()
                 .latestVersion()
@@ -60,7 +59,7 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation(resources = "org/flowable/dmn/engine/test/deployment/multiple_conclusions.dmn")
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/multiple_conclusions.dmn")
     public void deploySingleDecisionAndValidateVersioning() {
         DmnDecisionTable decision = repositoryService.createDecisionTableQuery()
                 .latestVersion()
@@ -141,7 +140,7 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation(resources = "org/flowable/dmn/engine/test/deployment/multiple_decisions.dmn")
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/multiple_decisions.dmn")
     public void deployMultipleDecisions() throws Exception {
 
         DmnDecisionTable decision = repositoryService.createDecisionTableQuery()
@@ -184,7 +183,7 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
                 .category("TEST_DEPLOYMENT_CATEGORY")
                 .deploy();
 
-        DmnDeployment deployment = repositoryService.createDeploymentQuery().deploymentCategory("TEST_DEPLOYMENT_CATEGORY").singleResult();
+        org.flowable.dmn.api.DmnDeployment deployment = repositoryService.createDeploymentQuery().deploymentCategory("TEST_DEPLOYMENT_CATEGORY").singleResult();
         assertNotNull(deployment);
 
         DmnDecisionTable decisionTable = repositoryService.createDecisionTableQuery().decisionTableKey("decision").singleResult();
@@ -199,9 +198,9 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void testNativeQuery() {
-        DmnDeployment deployment = repositoryService.createDeploymentQuery().singleResult();
+        org.flowable.dmn.api.DmnDeployment deployment = repositoryService.createDeploymentQuery().singleResult();
         assertNotNull(deployment);
 
         long count = repositoryService.createNativeDeploymentQuery()
@@ -214,10 +213,16 @@ public class DeploymentTest extends AbstractFlowableDmnTest {
 
         assertEquals(2, count);
     }
+    
+    @Test
+    @DmnDeployment
+    public void testDeployWithXmlSuffix() {
+        assertEquals(1, repositoryService.createDeploymentQuery().count());
+    }
 
     protected void deleteDeployments() {
-        List<DmnDeployment> deployments = repositoryService.createDeploymentQuery().list();
-        for (DmnDeployment deployment : deployments) {
+        List<org.flowable.dmn.api.DmnDeployment> deployments = repositoryService.createDeploymentQuery().list();
+        for (org.flowable.dmn.api.DmnDeployment deployment : deployments) {
             repositoryService.deleteDeployment(deployment.getId());
         }
     }

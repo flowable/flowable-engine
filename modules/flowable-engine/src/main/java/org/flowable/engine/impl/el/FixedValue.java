@@ -14,8 +14,8 @@
 package org.flowable.engine.impl.el;
 
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.delegate.Expression;
-import org.flowable.engine.delegate.VariableScope;
+import org.flowable.variable.service.delegate.Expression;
+import org.flowable.variable.service.delegate.VariableScope;
 
 /**
  * Expression that always returns the same value when <code>getValue</code> is called. Setting of the value is not supported.
@@ -31,14 +31,17 @@ public class FixedValue implements Expression {
         this.value = value;
     }
 
+    @Override
     public Object getValue(VariableScope variableScope) {
         return value;
     }
 
+    @Override
     public void setValue(Object value, VariableScope variableScope) {
         throw new FlowableException("Cannot change fixed value");
     }
 
+    @Override
     public String getExpressionText() {
         return value.toString();
     }

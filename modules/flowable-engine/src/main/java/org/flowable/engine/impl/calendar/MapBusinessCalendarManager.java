@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.calendar.BusinessCalendar;
+import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
 
 /**
  * @author Tom Baeyens
@@ -25,7 +27,7 @@ public class MapBusinessCalendarManager implements BusinessCalendarManager {
     private final Map<String, BusinessCalendar> businessCalendars;
 
     public MapBusinessCalendarManager() {
-        this.businessCalendars = new HashMap<String, BusinessCalendar>();
+        this.businessCalendars = new HashMap<>();
     }
 
     public MapBusinessCalendarManager(Map<String, BusinessCalendar> businessCalendars) {
@@ -33,9 +35,10 @@ public class MapBusinessCalendarManager implements BusinessCalendarManager {
             throw new IllegalArgumentException("businessCalendars can not be null");
         }
 
-        this.businessCalendars = new HashMap<String, BusinessCalendar>(businessCalendars);
+        this.businessCalendars = new HashMap<>(businessCalendars);
     }
 
+    @Override
     public BusinessCalendar getBusinessCalendar(String businessCalendarRef) {
         BusinessCalendar businessCalendar = businessCalendars.get(businessCalendarRef);
         if (businessCalendar == null) {

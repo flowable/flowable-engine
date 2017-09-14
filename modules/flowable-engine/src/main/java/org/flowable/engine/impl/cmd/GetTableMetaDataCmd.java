@@ -16,8 +16,9 @@ import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.management.TableMetaData;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -31,11 +32,12 @@ public class GetTableMetaDataCmd implements Command<TableMetaData>, Serializable
         this.tableName = tableName;
     }
 
+    @Override
     public TableMetaData execute(CommandContext commandContext) {
         if (tableName == null) {
             throw new FlowableIllegalArgumentException("tableName is null");
         }
-        return commandContext.getTableDataManager().getTableMetaData(tableName);
+        return CommandContextUtil.getTableDataManager(commandContext).getTableMetaData(tableName);
     }
 
 }

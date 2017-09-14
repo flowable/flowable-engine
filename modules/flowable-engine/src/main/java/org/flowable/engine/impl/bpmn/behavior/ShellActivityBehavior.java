@@ -26,7 +26,7 @@ import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.variable.service.delegate.Expression;
 
 public class ShellActivityBehavior extends AbstractBpmnActivityBehavior {
 
@@ -80,11 +80,12 @@ public class ShellActivityBehavior extends AbstractBpmnActivityBehavior {
 
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
 
         readFields(execution);
 
-        List<String> argList = new ArrayList<String>();
+        List<String> argList = new ArrayList<>();
         argList.add(commandStr);
 
         if (arg1Str != null)

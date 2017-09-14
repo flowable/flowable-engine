@@ -213,7 +213,7 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
 
         if (baseElement instanceof Activity) {
             final Activity activity = (Activity) baseElement;
-            MultiInstanceExport.writeMultiInstance(activity, xtw);
+            MultiInstanceExport.writeMultiInstance(activity, model, xtw);
 
         }
 
@@ -244,7 +244,7 @@ public abstract class BaseBpmnXMLConverter implements BpmnXMLConstants {
 
     protected void parseChildElements(String elementName, BaseElement parentElement, Map<String, BaseChildElementParser> additionalParsers, BpmnModel model, XMLStreamReader xtr) throws Exception {
 
-        Map<String, BaseChildElementParser> childParsers = new HashMap<String, BaseChildElementParser>();
+        Map<String, BaseChildElementParser> childParsers = new HashMap<>();
         if (additionalParsers != null) {
             childParsers.putAll(additionalParsers);
         }

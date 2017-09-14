@@ -12,9 +12,10 @@
  */
 package org.flowable.engine.impl;
 
-import org.flowable.engine.impl.db.DbSqlSession;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.db.ProcessDbSchemaManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -22,11 +23,9 @@ import org.flowable.engine.impl.interceptor.CommandContext;
  */
 public class SchemaOperationsProcessEngineBuild implements Command<Object> {
 
+    @Override
     public Object execute(CommandContext commandContext) {
-        DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
-        if (dbSqlSession != null) {
-            dbSqlSession.performSchemaOperationsProcessEngineBuild();
-        }
+        ((ProcessDbSchemaManager) CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager()).performSchemaOperationsProcessEngineBuild();
         return null;
     }
 }

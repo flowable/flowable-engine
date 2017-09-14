@@ -30,7 +30,7 @@ public class ProcessInstanceEndedEventHandler extends AbstractDatabaseEventLogge
     public EventLogEntryEntity generateEventLogEntry(CommandContext commandContext) {
         ExecutionEntity processInstanceEntity = getEntityFromEvent();
 
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
         putInMapIfNotNull(data, Fields.ID, processInstanceEntity.getId());
         putInMapIfNotNull(data, Fields.BUSINESS_KEY, processInstanceEntity.getBusinessKey());
         putInMapIfNotNull(data, Fields.PROCESS_DEFINITION_ID, processInstanceEntity.getProcessDefinitionId());

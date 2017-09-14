@@ -18,9 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.service.Job;
 
 /**
  * Test timer expression according to act-865
@@ -32,7 +32,7 @@ public class TimeExpressionTest extends PluggableFlowableTestCase {
 
     private Date testExpression(String timeExpression) {
         // Set the clock fixed
-        HashMap<String, Object> variables1 = new HashMap<String, Object>();
+        HashMap<String, Object> variables1 = new HashMap<>();
         variables1.put("dueDate", timeExpression);
 
         // After process start, there should be timer created

@@ -12,9 +12,6 @@
  */
 package org.flowable.form.engine.impl.cmd;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -27,14 +24,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.editor.form.converter.FormJsonConverter;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.form.api.FormInstance;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.FormExpression;
-import org.flowable.form.engine.impl.interceptor.Command;
-import org.flowable.form.engine.impl.interceptor.CommandContext;
 import org.flowable.form.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.form.engine.impl.persistence.deploy.FormDefinitionCacheEntry;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
+import org.flowable.form.engine.impl.util.CommandContextUtil;
 import org.flowable.form.model.ExpressionFormField;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.FormFieldTypes;
@@ -42,6 +40,9 @@ import org.flowable.form.model.FormModel;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers
@@ -83,6 +84,7 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
         this.tenantId = tenantId;
     }
 
+    @Override
     public FormModel execute(CommandContext commandContext) {
         FormDefinitionCacheEntry formCacheEntry = resolveFormDefinition(commandContext);
         FormInstance formInstance = resolveFormInstance(formCacheEntry, commandContext);
@@ -98,17 +100,17 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
         if (variables != null) {
             this.variables = variables;
         } else {
-            this.variables = new HashMap<String, Object>();
+            this.variables = new HashMap<>();
         }
     }
 
     protected void fillFormFieldValues(FormInstance formInstance, FormModel formDefinition, CommandContext commandContext) {
 
-        FormEngineConfiguration formEngineConfiguration = commandContext.getFormEngineConfiguration();
+        FormEngineConfiguration formEngineConfiguration = CommandContextUtil.getFormEngineConfiguration();
         List<FormField> allFields = formDefinition.listAllFields();
         if (allFields != null) {
 
-            Map<String, JsonNode> formInstanceFieldMap = new HashMap<String, JsonNode>();
+            Map<String, JsonNode> formInstanceFieldMap = new HashMap<>();
             if (formInstance != null) {
                 fillFormInstanceValues(formInstance, formInstanceFieldMap, formEngineConfiguration.getObjectMapper());
                 fillVariablesWithFormInstanceValues(formInstanceFieldMap, allFields);
@@ -146,7 +148,7 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
     }
 
     protected FormDefinitionCacheEntry resolveFormDefinition(CommandContext commandContext) {
-        DeploymentManager deploymentManager = commandContext.getFormEngineConfiguration().getDeploymentManager();
+        DeploymentManager deploymentManager = CommandContextUtil.getFormEngineConfiguration().getDeploymentManager();
 
         // Find the form definition
         FormDefinitionEntity formDefinitionEntity = null;
@@ -258,7 +260,7 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
             return null;
         }
         
-        List<FormInstance> formInstances = commandContext.getFormEngineConfiguration().getFormService()
+        List<FormInstance> formInstances = CommandContextUtil.getFormEngineConfiguration().getFormService()
                 .createFormInstanceQuery().formDefinitionId(formCacheEntry.getFormDefinitionEntity().getId())
                 .taskId(taskId)
                 .orderBySubmittedDate()
@@ -274,7 +276,7 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
 
     protected FormModel resolveFormModel(FormDefinitionCacheEntry formCacheEntry, CommandContext commandContext) {
         FormDefinitionEntity formEntity = formCacheEntry.getFormDefinitionEntity();
-        FormJsonConverter formJsonConverter = commandContext.getFormEngineConfiguration().getFormJsonConverter();
+        FormJsonConverter formJsonConverter = CommandContextUtil.getFormEngineConfiguration().getFormJsonConverter();
         FormModel formDefinition = formJsonConverter.convertToFormModel(formCacheEntry.getFormDefinitionJson(), formEntity.getId(), formEntity.getVersion());
         formDefinition.setId(formEntity.getId());
         formDefinition.setName(formEntity.getName());

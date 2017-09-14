@@ -12,14 +12,15 @@
  */
 package org.flowable.cdi.test.impl.context;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import org.flowable.cdi.BusinessProcess;
 import org.flowable.cdi.test.CdiFlowableTestCase;
 import org.flowable.cdi.test.impl.beans.CreditCard;
 import org.flowable.cdi.test.impl.beans.ProcessScopedMessageBean;
 import org.flowable.engine.test.Deployment;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 /**
  * 

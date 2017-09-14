@@ -17,7 +17,7 @@ import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 
 import org.flowable.engine.common.impl.util.IoUtil;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 /**
  * @author Joram Barrez
@@ -31,6 +31,7 @@ public class AsyncHistoryJobZippedHandler extends AsyncHistoryJobHandler {
         return JOB_TYPE;
     }
     
+    @Override
     protected byte[] getJobBytes(HistoryJobEntity job) {
         byte[] bytes = job.getAdvancedJobHandlerConfigurationByteArrayRef().getBytes();
         bytes = decompress(bytes);

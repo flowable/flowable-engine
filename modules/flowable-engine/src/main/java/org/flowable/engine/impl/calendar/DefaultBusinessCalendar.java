@@ -19,14 +19,15 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.common.impl.calendar.BusinessCalendar;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
  */
 public class DefaultBusinessCalendar implements BusinessCalendar {
 
-    private static Map<String, Integer> units = new HashMap<String, Integer>();
+    private static Map<String, Integer> units = new HashMap<>();
     static {
         units.put("millis", Calendar.MILLISECOND);
         units.put("seconds", Calendar.SECOND);
@@ -50,8 +51,9 @@ public class DefaultBusinessCalendar implements BusinessCalendar {
         return resolveDuedate(duedateDescription);
     }
 
+    @Override
     public Date resolveDuedate(String duedate) {
-        Date resolvedDuedate = Context.getProcessEngineConfiguration().getClock().getCurrentTime();
+        Date resolvedDuedate = CommandContextUtil.getProcessEngineConfiguration().getClock().getCurrentTime();
 
         String[] tokens = duedate.split(" and ");
         for (String token : tokens) {

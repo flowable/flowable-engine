@@ -17,15 +17,14 @@ import java.util.List;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
 import org.flowable.engine.history.HistoricActivityInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
@@ -57,7 +56,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         assertNotNull(rootProcessInstance);
         assertNotNull(childExecution);
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
         assertEquals(childExecution.getId(), task.getExecutionId());
 
         taskService.complete(task.getId());
@@ -68,7 +67,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
                     .list();
             assertEquals(3, historicActivities.size());
 
-            List<String> activityIds = new ArrayList<String>();
+            List<String> activityIds = new ArrayList<>();
             activityIds.add("theStart");
             activityIds.add("theTask");
             activityIds.add("theEnd");
@@ -109,7 +108,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         assertNotNull(rootProcessInstance);
         assertNotNull(childExecution);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals(childExecution.getId(), task.getExecutionId());
 
         taskService.complete(task.getId());
@@ -149,7 +148,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
                     .list();
             assertEquals(8, historicActivities.size());
 
-            List<String> activityIds = new ArrayList<String>();
+            List<String> activityIds = new ArrayList<>();
             activityIds.add("theStart");
             activityIds.add("theTask1");
             activityIds.add("subProcess");
@@ -215,7 +214,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         assertNotNull(rootProcessInstance);
         assertNotNull(childExecution);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals(childExecution.getId(), task.getExecutionId());
 
         taskService.complete(task.getId());
@@ -255,7 +254,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
                     .list();
             assertEquals(8, historicActivities.size());
 
-            List<String> activityIds = new ArrayList<String>();
+            List<String> activityIds = new ArrayList<>();
             activityIds.add("theStart");
             activityIds.add("theTask1");
             activityIds.add("subProcess");
@@ -301,7 +300,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessEvents");
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         Execution subProcessExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("subProcess").singleResult();
@@ -334,7 +333,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         private List<FlowableEvent> eventsReceived;
 
         public SubProcessEventListener() {
-            eventsReceived = new ArrayList<FlowableEvent>();
+            eventsReceived = new ArrayList<>();
         }
 
         public List<FlowableEvent> getEventsReceived() {

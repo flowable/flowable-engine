@@ -19,14 +19,14 @@ import org.flowable.engine.impl.ModelQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ModelEntity;
 import org.flowable.engine.impl.persistence.entity.ModelEntityImpl;
-import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ModelDataManager;
 import org.flowable.engine.repository.Model;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisModelDataManager extends AbstractDataManager<ModelEntity> implements ModelDataManager {
+public class MybatisModelDataManager extends AbstractProcessDataManager<ModelEntity> implements ModelDataManager {
 
     public MybatisModelDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);

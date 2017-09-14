@@ -264,6 +264,7 @@ angular.module('flowableModeler')
         $scope.model.process.key = $scope.originalModel.process.key;
         $scope.model.process.description = $scope.originalModel.process.description;
         $scope.model.process.id = $scope.originalModel.process.id;
+        $scope.model.process.modelType = $scope.originalModel.process.modelType;
     }
 
     $scope.ok = function () {
@@ -284,9 +285,9 @@ angular.module('flowableModeler')
                 $rootScope.editorHistory = [];
                 $location.path("/editor/" + data.id);
             }).
-            error(function() {
+            error(function(data, status, headers, config) {
                 $scope.model.loading = false;
-                $modal.$hide();
+                $scope.model.errorMessage = data.message;
             });
     };
 

@@ -19,14 +19,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.FormDeploymentQueryImpl;
-import org.flowable.form.engine.impl.interceptor.Command;
-import org.flowable.form.engine.impl.interceptor.CommandContext;
 import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntity;
-import org.flowable.form.engine.impl.persistence.entity.ResourceEntity;
+import org.flowable.form.engine.impl.persistence.entity.FormResourceEntity;
 import org.flowable.form.engine.impl.repository.FormDeploymentBuilderImpl;
+import org.flowable.form.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -41,22 +42,23 @@ public class DeployCmd<T> implements Command<FormDeployment>, Serializable {
         this.deploymentBuilder = deploymentBuilder;
     }
 
+    @Override
     public FormDeployment execute(CommandContext commandContext) {
 
         FormDeploymentEntity deployment = deploymentBuilder.getDeployment();
 
-        deployment.setDeploymentTime(commandContext.getFormEngineConfiguration().getClock().getCurrentTime());
+        deployment.setDeploymentTime(CommandContextUtil.getFormEngineConfiguration().getClock().getCurrentTime());
 
         if (deploymentBuilder.isDuplicateFilterEnabled()) {
 
-            List<FormDeployment> existingDeployments = new ArrayList<FormDeployment>();
+            List<FormDeployment> existingDeployments = new ArrayList<>();
             if (deployment.getTenantId() == null || FormEngineConfiguration.NO_TENANT_ID.equals(deployment.getTenantId())) {
-                List<FormDeployment> deploymentEntities = new FormDeploymentQueryImpl(commandContext.getFormEngineConfiguration().getCommandExecutor()).deploymentName(deployment.getName()).listPage(0, 1);
+                List<FormDeployment> deploymentEntities = new FormDeploymentQueryImpl(CommandContextUtil.getFormEngineConfiguration().getCommandExecutor()).deploymentName(deployment.getName()).listPage(0, 1);
                 if (!deploymentEntities.isEmpty()) {
                     existingDeployments.add(deploymentEntities.get(0));
                 }
             } else {
-                List<FormDeployment> deploymentList = commandContext.getFormEngineConfiguration().getFormRepositoryService().createDeploymentQuery().deploymentName(deployment.getName())
+                List<FormDeployment> deploymentList = CommandContextUtil.getFormEngineConfiguration().getFormRepositoryService().createDeploymentQuery().deploymentName(deployment.getName())
                         .deploymentTenantId(deployment.getTenantId()).orderByDeploymentId().desc().list();
 
                 if (!deploymentList.isEmpty()) {
@@ -68,9 +70,9 @@ public class DeployCmd<T> implements Command<FormDeployment>, Serializable {
             if (!existingDeployments.isEmpty()) {
                 existingDeployment = (FormDeploymentEntity) existingDeployments.get(0);
 
-                Map<String, ResourceEntity> resourceMap = new HashMap<String, ResourceEntity>();
-                List<ResourceEntity> resourceList = commandContext.getResourceEntityManager().findResourcesByDeploymentId(existingDeployment.getId());
-                for (ResourceEntity resourceEntity : resourceList) {
+                Map<String, FormResourceEntity> resourceMap = new HashMap<>();
+                List<FormResourceEntity> resourceList = CommandContextUtil.getResourceEntityManager().findResourcesByDeploymentId(existingDeployment.getId());
+                for (FormResourceEntity resourceEntity : resourceList) {
                     resourceMap.put(resourceEntity.getName(), resourceEntity);
                 }
                 existingDeployment.setResources(resourceMap);
@@ -84,10 +86,10 @@ public class DeployCmd<T> implements Command<FormDeployment>, Serializable {
         deployment.setNew(true);
 
         // Save the data
-        commandContext.getDeploymentEntityManager().insert(deployment);
+        CommandContextUtil.getDeploymentEntityManager(commandContext).insert(deployment);
 
         // Actually deploy
-        commandContext.getFormEngineConfiguration().getDeploymentManager().deploy(deployment);
+        CommandContextUtil.getFormEngineConfiguration().getDeploymentManager().deploy(deployment);
 
         return deployment;
     }
@@ -98,17 +100,17 @@ public class DeployCmd<T> implements Command<FormDeployment>, Serializable {
             return true;
         }
 
-        Map<String, ResourceEntity> resources = deployment.getResources();
-        Map<String, ResourceEntity> savedResources = saved.getResources();
+        Map<String, FormResourceEntity> resources = deployment.getResources();
+        Map<String, FormResourceEntity> savedResources = saved.getResources();
 
         for (String resourceName : resources.keySet()) {
-            ResourceEntity savedResource = savedResources.get(resourceName);
+            FormResourceEntity savedResource = savedResources.get(resourceName);
 
             if (savedResource == null) {
                 return true;
             }
 
-            ResourceEntity resource = resources.get(resourceName);
+            FormResourceEntity resource = resources.get(resourceName);
 
             byte[] bytes = resource.getBytes();
             byte[] savedBytes = savedResource.getBytes();

@@ -20,13 +20,13 @@ import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntity;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntityImpl;
-import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.EventLogEntryDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisEventLogEntryDataManager extends AbstractDataManager<EventLogEntryEntity> implements EventLogEntryDataManager {
+public class MybatisEventLogEntryDataManager extends AbstractProcessDataManager<EventLogEntryEntity> implements EventLogEntryDataManager {
 
     public MybatisEventLogEntryDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);
@@ -51,7 +51,7 @@ public class MybatisEventLogEntryDataManager extends AbstractDataManager<EventLo
     @Override
     @SuppressWarnings("unchecked")
     public List<EventLogEntry> findEventLogEntries(long startLogNr, long pageSize) {
-        Map<String, Object> params = new HashMap<String, Object>(2);
+        Map<String, Object> params = new HashMap<>(2);
         params.put("startLogNr", startLogNr);
         if (pageSize > 0) {
             params.put("endLogNr", startLogNr + pageSize + 1);
@@ -62,7 +62,7 @@ public class MybatisEventLogEntryDataManager extends AbstractDataManager<EventLo
     @Override
     @SuppressWarnings("unchecked")
     public List<EventLogEntry> findEventLogEntriesByProcessInstanceId(String processInstanceId) {
-        Map<String, Object> params = new HashMap<String, Object>(2);
+        Map<String, Object> params = new HashMap<>(2);
         params.put("processInstanceId", processInstanceId);
         return getDbSqlSession().selectList("selectEventLogEntriesByProcessInstanceId", params);
     }

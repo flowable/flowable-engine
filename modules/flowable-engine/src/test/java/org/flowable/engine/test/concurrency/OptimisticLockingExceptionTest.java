@@ -19,9 +19,9 @@ import java.util.concurrent.CyclicBarrier;
 
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandContextCloseListener;
 import org.flowable.engine.impl.cmd.TriggerCmd;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandContextCloseListener;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -101,6 +101,7 @@ public class OptimisticLockingExceptionTest extends PluggableFlowableTestCase {
             this.executionId = executionid;
         }
 
+        @Override
         public void run() {
             try {
                 processEngine.getManagementService().executeCommand(new TestTriggerCommand(executionId, null));

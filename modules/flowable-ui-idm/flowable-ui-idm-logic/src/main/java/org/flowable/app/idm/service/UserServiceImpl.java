@@ -84,7 +84,7 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
             User user = identityService.createUserQuery().userId(userId).singleResult();
             if (user != null) {
                 user.setPassword(newPassword);
-                identityService.saveUser(user);
+                identityService.updateUserPassword(user);
             }
         }
     }
@@ -115,12 +115,15 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
             throw new ConflictingRequestException("User already registered", "ACCOUNT.SIGNUP.ERROR.ALREADY-REGISTERED");
         }
 
-        User user = identityService.newUser(id != null ? id : email);
+        User user = identityService.newUser(id);
         user.setFirstName(firstName);
         user.setLastName(lastName);
         user.setEmail(email);
-        user.setPassword(password);
         identityService.saveUser(user);
+
+        User savedUser = identityService.createUserQuery().userEmail(email).singleResult();
+        savedUser.setPassword(password);
+        identityService.updateUserPassword(savedUser);
 
         return user;
     }
@@ -133,14 +136,14 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
         }
 
         List<Privilege> userPrivileges = identityService.createPrivilegeQuery().userId(userId).list();
-        Set<String> privilegeNames = new HashSet<String>();
+        Set<String> privilegeNames = new HashSet<>();
         for (Privilege userPrivilege : userPrivileges) {
             privilegeNames.add(userPrivilege.getName());
         }
 
         List<Group> groups = identityService.createGroupQuery().groupMember(userId).list();
         if (groups.size() > 0) {
-            List<String> groupIds = new ArrayList<String>();
+            List<String> groupIds = new ArrayList<>();
             for (Group group : groups) {
                 groupIds.add(group.getId());
             }
@@ -151,7 +154,7 @@ public class UserServiceImpl extends AbstractIdmService implements UserService {
             }
         }
 
-        return new UserInformation(user, groups, new ArrayList<String>(privilegeNames));
+        return new UserInformation(user, groups, new ArrayList<>(privilegeNames));
     }
 
 }

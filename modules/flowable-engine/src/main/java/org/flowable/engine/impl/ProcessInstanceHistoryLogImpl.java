@@ -19,7 +19,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.history.HistoricData;
+import org.flowable.engine.common.impl.history.HistoricData;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;
 
@@ -30,7 +30,7 @@ public class ProcessInstanceHistoryLogImpl implements ProcessInstanceHistoryLog 
 
     protected HistoricProcessInstance historicProcessInstance;
 
-    protected List<HistoricData> historicData = new ArrayList<HistoricData>();
+    protected List<HistoricData> historicData = new ArrayList<>();
 
     public ProcessInstanceHistoryLogImpl(HistoricProcessInstance historicProcessInstance) {
         this.historicProcessInstance = historicProcessInstance;

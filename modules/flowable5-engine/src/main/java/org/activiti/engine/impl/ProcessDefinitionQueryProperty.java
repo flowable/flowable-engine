@@ -21,14 +21,14 @@ import org.activiti.engine.repository.ProcessDefinitionQuery;
 
 /**
  * Contains the possible properties that can be used in a {@link ProcessDefinitionQuery}.
- * 
+ *
  * @author Joram Barrez
  */
 public class ProcessDefinitionQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, ProcessDefinitionQueryProperty> properties = new HashMap<String, ProcessDefinitionQueryProperty>();
+    private static final Map<String, ProcessDefinitionQueryProperty> properties = new HashMap<>();
 
     public static final ProcessDefinitionQueryProperty PROCESS_DEFINITION_KEY = new ProcessDefinitionQueryProperty("RES.KEY_");
     public static final ProcessDefinitionQueryProperty PROCESS_DEFINITION_CATEGORY = new ProcessDefinitionQueryProperty("RES.CATEGORY_");
@@ -45,6 +45,7 @@ public class ProcessDefinitionQueryProperty implements QueryProperty {
         properties.put(name, this);
     }
 
+    @Override
     public String getName() {
         return name;
     }

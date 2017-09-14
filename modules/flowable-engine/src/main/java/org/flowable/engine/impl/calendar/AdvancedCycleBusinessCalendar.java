@@ -67,7 +67,7 @@ public class AdvancedCycleBusinessCalendar extends CycleBusinessCalendar {
     private static final Map<Integer, AdvancedSchedulerResolver> resolvers;
 
     static {
-        resolvers = new ConcurrentHashMap<Integer, AdvancedSchedulerResolver>();
+        resolvers = new ConcurrentHashMap<>();
         resolvers.put(1, new AdvancedSchedulerResolverWithoutTimeZone());
         resolvers.put(2, new AdvancedSchedulerResolverWithTimeZone());
     }

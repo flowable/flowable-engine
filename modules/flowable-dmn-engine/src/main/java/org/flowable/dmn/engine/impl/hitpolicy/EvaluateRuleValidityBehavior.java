@@ -12,12 +12,12 @@
  */
 package org.flowable.dmn.engine.impl.hitpolicy;
 
-import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
+import org.flowable.dmn.engine.impl.el.ELExecutionContext;
 
 /**
  * @author Yvo Swillens
  */
 public interface EvaluateRuleValidityBehavior {
 
-    void evaluateRuleValidity(int ruleNumber, MvelExecutionContext executionContext);
+    void evaluateRuleValidity(int ruleNumber, ELExecutionContext executionContext);
 }

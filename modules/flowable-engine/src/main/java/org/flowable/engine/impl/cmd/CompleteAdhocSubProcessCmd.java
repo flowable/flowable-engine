@@ -19,11 +19,11 @@ import java.util.List;
 import org.flowable.bpmn.model.AdhocSubProcess;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -38,8 +38,9 @@ public class CompleteAdhocSubProcessCmd implements Command<Void>, Serializable {
         this.executionId = executionId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
-        ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         ExecutionEntity execution = executionEntityManager.findById(executionId);
         if (execution == null) {
             throw new FlowableObjectNotFoundException("No execution found for id '" + executionId + "'", ExecutionEntity.class);
@@ -57,9 +58,9 @@ public class CompleteAdhocSubProcessCmd implements Command<Void>, Serializable {
         ExecutionEntity outgoingFlowExecution = executionEntityManager.createChildExecution(execution.getParent());
         outgoingFlowExecution.setCurrentFlowElement(execution.getCurrentFlowElement());
 
-        executionEntityManager.deleteExecutionAndRelatedData(execution, null, false);
+        executionEntityManager.deleteExecutionAndRelatedData(execution, null);
 
-        Context.getAgenda().planTakeOutgoingSequenceFlowsOperation(outgoingFlowExecution, true);
+        CommandContextUtil.getAgenda().planTakeOutgoingSequenceFlowsOperation(outgoingFlowExecution, true);
 
         return null;
     }

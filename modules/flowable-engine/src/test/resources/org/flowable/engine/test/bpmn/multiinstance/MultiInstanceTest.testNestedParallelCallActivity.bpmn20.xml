@@ -26,10 +26,10 @@
           <sequenceFlow id="flow4" sourceRef="subStart3" targetRef="miCallActivity" />
         
           <callActivity id="miCallActivity" calledElement="externalSubProcess">
-			      <multiInstanceLoopCharacteristics isSequential="false">
-			        <loopCardinality>${7}</loopCardinality>
-			      </multiInstanceLoopCharacteristics>
-			    </callActivity>
+	         <multiInstanceLoopCharacteristics isSequential="false">
+	           <loopCardinality>${7}</loopCardinality>
+	         </multiInstanceLoopCharacteristics>
+	      </callActivity>
           
           <sequenceFlow id="flow5" sourceRef="miCallActivity" targetRef="subProcessEnd3" />
           <endEvent id="subProcessEnd3" />

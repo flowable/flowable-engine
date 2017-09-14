@@ -23,13 +23,14 @@ import org.flowable.engine.test.Deployment;
  */
 public class WebServiceSimplisticTest extends AbstractWebServiceTaskTest {
 
+    @Override
     protected boolean isValidating() {
         return false;
     }
 
     @Deployment
     public void testWebServiceInvocationWithSimplisticDataFlow() throws Exception {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("PrefixVariable", "The counter has the value ");
         variables.put("SuffixVariable", ". Good news");
 
@@ -42,7 +43,7 @@ public class WebServiceSimplisticTest extends AbstractWebServiceTaskTest {
 
     @Deployment
     public void testWebResponseNoName() throws Exception {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("PrefixVariable", "The counter has the value ");
         variables.put("SuffixVariable", ". Good news (NO NAME)");
 
@@ -55,7 +56,7 @@ public class WebServiceSimplisticTest extends AbstractWebServiceTaskTest {
 
     @Deployment
     public void testWebResponseKeywordName() throws Exception {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("PrefixVariable", "The counter has the value ");
         variables.put("SuffixVariable", ". Good news Keyword");
 

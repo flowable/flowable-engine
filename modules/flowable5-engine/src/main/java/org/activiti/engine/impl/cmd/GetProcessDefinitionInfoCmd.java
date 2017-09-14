@@ -35,6 +35,7 @@ public class GetProcessDefinitionInfoCmd implements Command<ObjectNode>, Seriali
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public ObjectNode execute(CommandContext commandContext) {
         if (processDefinitionId == null) {
             throw new ActivitiIllegalArgumentException("process definition id is null");

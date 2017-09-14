@@ -29,6 +29,7 @@ public class DelegateTaskCmd extends NeedsActiveTaskCmd<Object> {
         this.userId = userId;
     }
 
+    @Override
     protected Object execute(CommandContext commandContext, TaskEntity task) {
         task.delegate(userId);
         return null;

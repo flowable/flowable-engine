@@ -55,6 +55,7 @@ public class SubProcessJsonConverter extends BaseBpmnJsonConverter implements Fo
         convertersToJsonMap.put(Transaction.class, SubProcessJsonConverter.class);
     }
 
+    @Override
     protected String getStencilId(BaseElement baseElement) {
         //see http://forum.flowable.org/t/collapsed-subprocess-navigation-in-the-web-based-bpmn-modeler/138/19
         GraphicInfo graphicInfo = model.getGraphicInfo(baseElement.getId());
@@ -66,6 +67,7 @@ public class SubProcessJsonConverter extends BaseBpmnJsonConverter implements Fo
         }
     }
 
+    @Override
     protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
         SubProcess subProcess = (SubProcess) baseElement;
 
@@ -92,6 +94,7 @@ public class SubProcessJsonConverter extends BaseBpmnJsonConverter implements Fo
         BpmnJsonConverterUtil.convertDataPropertiesToJson(subProcess.getDataObjects(), propertiesNode);
     }
 
+    @Override
     protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
         SubProcess subProcess = null;
         if (getPropertyValueAsBoolean("istransaction", elementNode)) {

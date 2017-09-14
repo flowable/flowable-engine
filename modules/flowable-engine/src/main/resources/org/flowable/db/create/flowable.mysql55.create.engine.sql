@@ -6,10 +6,10 @@ create table ACT_GE_PROPERTY (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.1.1.0', 1);
+values ('schema.version', '6.2.0.0', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.1.1.0)', 1);
+values ('schema.history', 'create(6.2.0.0)', 1);
 
 insert into ACT_GE_PROPERTY
 values ('next.dbid', '1', 1);
@@ -83,6 +83,8 @@ create table ACT_RU_EXECUTION (
     DEADLETTER_JOB_COUNT_ integer,
     VAR_COUNT_ integer, 
     ID_LINK_COUNT_ integer,
+    CALLBACK_ID_ varchar(255),
+    CALLBACK_TYPE_ varchar(255),
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 

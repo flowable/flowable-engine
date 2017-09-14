@@ -12,9 +12,9 @@
  */
 package org.flowable.standalone.event;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.delegate.event.impl.FlowableEventImpl;
+import org.flowable.engine.delegate.event.impl.FlowableProcessEventImpl;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.test.api.event.TestFlowableEventListener;
 
@@ -38,7 +38,7 @@ public class EventListenersConfigurationTest extends ResourceFlowableTestCase {
         listener.clearEventsReceived();
 
         // Dispatch a custom event
-        FlowableEvent event = new FlowableEventImpl(FlowableEngineEventType.CUSTOM);
+        FlowableEvent event = new FlowableProcessEventImpl(FlowableEngineEventType.CUSTOM);
         processEngineConfiguration.getEventDispatcher().dispatchEvent(event);
 
         assertEquals(1, listener.getEventsReceived().size());

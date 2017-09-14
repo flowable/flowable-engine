@@ -14,8 +14,6 @@ package org.flowable.form.engine;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -29,9 +27,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.flowable.engine.common.EngineInfo;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.form.engine.impl.util.ReflectUtil;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,20 +41,20 @@ public abstract class FormEngines {
     public static final String NAME_DEFAULT = "default";
 
     protected static boolean isInitialized;
-    protected static Map<String, FormEngine> formEngines = new HashMap<String, FormEngine>();
-    protected static Map<String, EngineInfo> formEngineInfosByName = new HashMap<String, EngineInfo>();
-    protected static Map<String, EngineInfo> formEngineInfosByResourceUrl = new HashMap<String, EngineInfo>();
-    protected static List<EngineInfo> formEngineInfos = new ArrayList<EngineInfo>();
+    protected static Map<String, FormEngine> formEngines = new HashMap<>();
+    protected static Map<String, EngineInfo> formEngineInfosByName = new HashMap<>();
+    protected static Map<String, EngineInfo> formEngineInfosByResourceUrl = new HashMap<>();
+    protected static List<EngineInfo> formEngineInfos = new ArrayList<>();
 
     /**
-     * Initializes all form engines that can be found on the classpath for resources <code>flowable.form.cfg.xml</code> and for resources <code>flowable-dmn-context.xml</code> (Spring style
+     * Initializes all form engines that can be found on the classpath for resources <code>flowable.form.cfg.xml</code> and for resources <code>flowable-form-context.xml</code> (Spring style
      * configuration).
      */
     public static synchronized void init() {
         if (!isInitialized()) {
             if (formEngines == null) {
-                // Create new map to store dmn engines if current map is null
-                formEngines = new HashMap<String, FormEngine>();
+                // Create new map to store form engines if current map is null
+                formEngines = new HashMap<>();
             }
             ClassLoader classLoader = FormEngines.class.getClassLoader();
             Enumeration<URL> resources = null;
@@ -67,7 +66,7 @@ public abstract class FormEngines {
 
             // Remove duplicated configuration URL's using set. Some
             // classloaders may return identical URL's twice, causing duplicate startups
-            Set<URL> configUrls = new HashSet<URL>();
+            Set<URL> configUrls = new HashSet<>();
             while (resources.hasMoreElements()) {
                 configUrls.add(resources.nextElement());
             }
@@ -112,14 +111,14 @@ public abstract class FormEngines {
     }
 
     /**
-     * Registers the given dmn engine. No {@link EngineInfo} will be available for this dmn engine. An engine that is registered will be closed when the {@link FormEngines#destroy()} is called.
+     * Registers the given form engine. No {@link EngineInfo} will be available for this form engine. An engine that is registered will be closed when the {@link FormEngines#destroy()} is called.
      */
     public static void registerFormEngine(FormEngine formEngine) {
         formEngines.put(formEngine.getName(), formEngine);
     }
 
     /**
-     * Unregisters the given dmn engine.
+     * Unregisters the given form engine.
      */
     public static void unregister(FormEngine formEngine) {
         formEngines.remove(formEngine.getName());
@@ -127,9 +126,9 @@ public abstract class FormEngines {
 
     private static EngineInfo initFormEngineFromResource(URL resourceUrl) {
         EngineInfo formEngineInfo = formEngineInfosByResourceUrl.get(resourceUrl.toString());
-        // if there is an existing dmn engine info
+        // if there is an existing form engine info
         if (formEngineInfo != null) {
-            // remove that dmn engine from the member fields
+            // remove that form engine from the member fields
             formEngineInfos.remove(formEngineInfo);
             if (formEngineInfo.getException() == null) {
                 String formEngineName = formEngineInfo.getName();
@@ -141,7 +140,7 @@ public abstract class FormEngines {
 
         String resourceUrlString = resourceUrl.toString();
         try {
-            LOGGER.info("initializing dmn engine for resource {}", resourceUrl);
+            LOGGER.info("initializing form engine for resource {}", resourceUrl);
             FormEngine formEngine = buildFormEngine(resourceUrl);
             String formEngineName = formEngine.getName();
             LOGGER.info("initialised form engine {}", formEngineName);
@@ -150,18 +149,11 @@ public abstract class FormEngines {
             formEngineInfosByName.put(formEngineName, formEngineInfo);
         } catch (Throwable e) {
             LOGGER.error("Exception while initializing form engine: {}", e.getMessage(), e);
-            formEngineInfo = new EngineInfo(null, resourceUrlString, getExceptionString(e));
+            formEngineInfo = new EngineInfo(null, resourceUrlString, ExceptionUtils.getStackTrace(e));
         }
         formEngineInfosByResourceUrl.put(resourceUrlString, formEngineInfo);
         formEngineInfos.add(formEngineInfo);
         return formEngineInfo;
-    }
-
-    private static String getExceptionString(Throwable e) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        return sw.toString();
     }
 
     protected static FormEngine buildFormEngine(URL resource) {
@@ -232,8 +224,8 @@ public abstract class FormEngines {
      */
     public static synchronized void destroy() {
         if (isInitialized()) {
-            Map<String, FormEngine> engines = new HashMap<String, FormEngine>(formEngines);
-            formEngines = new HashMap<String, FormEngine>();
+            Map<String, FormEngine> engines = new HashMap<>(formEngines);
+            formEngines = new HashMap<>();
 
             for (String formEngineName : engines.keySet()) {
                 FormEngine formEngine = engines.get(formEngineName);

@@ -12,10 +12,14 @@
  */
 package org.flowable.form.model;
 
+import java.io.Serializable;
+
 /**
  * @author jbarrez
  */
-public class FormOutcome {
+public class FormOutcome implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
     protected String id;
     protected String name;

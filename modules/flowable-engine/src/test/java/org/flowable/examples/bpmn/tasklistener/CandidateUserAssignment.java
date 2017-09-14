@@ -12,14 +12,15 @@
  */
 package org.flowable.examples.bpmn.tasklistener;
 
-import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * @author Joram Barrez
  */
 public class CandidateUserAssignment implements TaskListener {
 
+    @Override
     public void notify(DelegateTask delegateTask) {
         delegateTask.addCandidateUser("kermit");
         delegateTask.addCandidateUser("fozzie");

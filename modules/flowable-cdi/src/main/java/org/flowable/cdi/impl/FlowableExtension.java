@@ -29,8 +29,8 @@ import javax.enterprise.inject.spi.Extension;
 
 import org.flowable.cdi.annotation.BusinessProcessScoped;
 import org.flowable.cdi.impl.context.BusinessProcessContext;
-import org.flowable.cdi.impl.util.FlowableServices;
 import org.flowable.cdi.impl.util.BeanManagerLookup;
+import org.flowable.cdi.impl.util.FlowableServices;
 import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;
 import org.flowable.cdi.spi.ProcessEngineLookup;
 import org.flowable.engine.ProcessEngine;
@@ -40,9 +40,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * CDI-Extension registering a custom context for {@link BusinessProcessScoped} beans.
- * 
+ * <p>
  * Also starts / stops the {@link ProcessEngine} and deploys all processes listed in the 'processes.xml'-file.
- * 
+ *
  * @author Daniel Meyer
  */
 public class FlowableExtension implements Extension {
@@ -75,13 +75,14 @@ public class FlowableExtension implements Extension {
     protected ProcessEngine lookupProcessEngine(BeanManager beanManager) {
         ServiceLoader<ProcessEngineLookup> processEngineServiceLoader = ServiceLoader.load(ProcessEngineLookup.class);
         Iterator<ProcessEngineLookup> serviceIterator = processEngineServiceLoader.iterator();
-        List<ProcessEngineLookup> discoveredLookups = new ArrayList<ProcessEngineLookup>();
+        List<ProcessEngineLookup> discoveredLookups = new ArrayList<>();
         while (serviceIterator.hasNext()) {
             ProcessEngineLookup serviceInstance = serviceIterator.next();
             discoveredLookups.add(serviceInstance);
         }
 
         Collections.sort(discoveredLookups, new Comparator<ProcessEngineLookup>() {
+            @Override
             public int compare(ProcessEngineLookup o1, ProcessEngineLookup o2) {
                 return (-1) * ((Integer) o1.getPrecedence()).compareTo(o2.getPrecedence());
             }

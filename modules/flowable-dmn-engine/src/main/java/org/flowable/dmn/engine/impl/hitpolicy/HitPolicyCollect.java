@@ -12,18 +12,17 @@
  */
 package org.flowable.dmn.engine.impl.hitpolicy;
 
-import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
-import org.flowable.dmn.model.BuiltinAggregator;
-import org.flowable.dmn.model.HitPolicy;
-
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.flowable.dmn.engine.impl.el.ELExecutionContext;
+import org.flowable.dmn.model.BuiltinAggregator;
+import org.flowable.dmn.model.HitPolicy;
 
 /**
  * @author Yvo Swillens
@@ -35,43 +34,48 @@ public class HitPolicyCollect extends AbstractHitPolicy implements ComposeDecisi
         return HitPolicy.COLLECT.getValue();
     }
 
-    public void composeDecisionResults(MvelExecutionContext executionContext) {
+    @Override
+    public void composeDecisionResults(ELExecutionContext executionContext) {
         List<Map<String, Object>> decisionResults = new ArrayList<>();
         if (executionContext.getRuleResults() != null && !executionContext.getRuleResults().isEmpty()) {
             if (executionContext.getAggregator() == null) {
                 decisionResults = new ArrayList<>(executionContext.getRuleResults().values());
+                
             } else if (executionContext.getAggregator() == BuiltinAggregator.SUM) {
                 Map.Entry<String, List<Double>> distinctOutputValuesEntry = createDistinctOutputDoubleValues(executionContext);
                 if (distinctOutputValuesEntry != null) {
                     Double sumResult = aggregateSum(distinctOutputValuesEntry.getValue());
-                    decisionResults = createDecisionResults(distinctOutputValuesEntry.getKey(), sumResult);
+                    decisionResults.add(createDecisionResults(distinctOutputValuesEntry.getKey(), sumResult));
                 }
+                
             } else if (executionContext.getAggregator() == BuiltinAggregator.MIN) {
                 Map.Entry<String, List<Double>> distinctOutputValuesEntry = createDistinctOutputDoubleValues(executionContext);
                 if (distinctOutputValuesEntry != null) {
                     Double minResult = aggregateMin(distinctOutputValuesEntry.getValue());
-                    decisionResults = createDecisionResults(distinctOutputValuesEntry.getKey(), minResult);
+                    decisionResults.add(createDecisionResults(distinctOutputValuesEntry.getKey(), minResult));
                 }
+                
             } else if (executionContext.getAggregator() == BuiltinAggregator.MAX) {
                 Map.Entry<String, List<Double>> distinctOutputValuesEntry = createDistinctOutputDoubleValues(executionContext);
                 if (distinctOutputValuesEntry != null) {
                     Double maxResult = aggregateMax(distinctOutputValuesEntry.getValue());
-                    decisionResults = createDecisionResults(distinctOutputValuesEntry.getKey(), maxResult);
+                    decisionResults.add(createDecisionResults(distinctOutputValuesEntry.getKey(), maxResult));
                 }
+                
             } else if (executionContext.getAggregator() == BuiltinAggregator.COUNT) {
                 Map.Entry<String, List<Double>> distinctOutputValuesEntry = createDistinctOutputDoubleValues(executionContext);
                 if (distinctOutputValuesEntry != null) {
                     Double countResult = aggregateCount(distinctOutputValuesEntry.getValue());
-                    decisionResults = createDecisionResults(distinctOutputValuesEntry.getKey(), countResult);
+                    decisionResults.add(createDecisionResults(distinctOutputValuesEntry.getKey(), countResult));
                 }
             }
         }
-        executionContext.setDecisionResults(decisionResults);
+        executionContext.getAuditContainer().setDecisionResult(decisionResults);
     }
 
-    protected Map.Entry<String, List<Double>> createDistinctOutputDoubleValues(MvelExecutionContext executionContext) {
+    protected Map.Entry<String, List<Double>> createDistinctOutputDoubleValues(ELExecutionContext executionContext) {
         List<Map<String, Object>> ruleResults = new ArrayList<>(executionContext.getRuleResults().values());
-        Set<Map<String, Object>> distinctRuleResults = new HashSet(ruleResults);
+        Set<Map<String, Object>> distinctRuleResults = new HashSet<>(ruleResults);
         Map<String, List<Double>> distinctOutputDoubleValues = new HashMap<>();
 
         for (Map<String, Object> ruleResult : distinctRuleResults) {
@@ -79,8 +83,8 @@ public class HitPolicyCollect extends AbstractHitPolicy implements ComposeDecisi
                if (distinctOutputDoubleValues.containsKey(entry.getKey()) && distinctOutputDoubleValues.get(entry.getKey()) instanceof List) {
                    distinctOutputDoubleValues.get(entry.getKey()).add((Double) entry.getValue());
                } else {
-                   List valuesList = new ArrayList();
-                   valuesList.add(entry.getValue());
+                   List<Double> valuesList = new ArrayList<>();
+                   valuesList.add((Double) entry.getValue());
                    distinctOutputDoubleValues.put(entry.getKey(), valuesList);
                }
            }
@@ -115,11 +119,9 @@ public class HitPolicyCollect extends AbstractHitPolicy implements ComposeDecisi
         return (double) values.size();
     }
 
-    protected List<Map<String, Object>> createDecisionResults(String outputName, Double outputValue) {
+    protected Map<String, Object> createDecisionResults(String outputName, Double outputValue) {
         Map<String, Object> ruleResult = new HashMap<>();
         ruleResult.put(outputName, outputValue);
-        List<Map<String, Object>> decisionResult = Arrays.asList(ruleResult);
-        return decisionResult;
-
+        return ruleResult;
     }
 }

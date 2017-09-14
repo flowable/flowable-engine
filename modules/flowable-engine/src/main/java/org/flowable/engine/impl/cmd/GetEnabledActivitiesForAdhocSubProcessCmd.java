@@ -22,9 +22,10 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -38,8 +39,9 @@ public class GetEnabledActivitiesForAdhocSubProcessCmd implements Command<List<F
         this.executionId = executionId;
     }
 
+    @Override
     public List<FlowNode> execute(CommandContext commandContext) {
-        ExecutionEntity execution = commandContext.getExecutionEntityManager().findById(executionId);
+        ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager(commandContext).findById(executionId);
         if (execution == null) {
             throw new FlowableObjectNotFoundException("No execution found for id '" + executionId + "'", ExecutionEntity.class);
         }
@@ -48,7 +50,7 @@ public class GetEnabledActivitiesForAdhocSubProcessCmd implements Command<List<F
             throw new FlowableException("The current flow element of the requested execution is not an ad-hoc sub process");
         }
 
-        List<FlowNode> enabledFlowNodes = new ArrayList<FlowNode>();
+        List<FlowNode> enabledFlowNodes = new ArrayList<>();
 
         AdhocSubProcess adhocSubProcess = (AdhocSubProcess) execution.getCurrentFlowElement();
 

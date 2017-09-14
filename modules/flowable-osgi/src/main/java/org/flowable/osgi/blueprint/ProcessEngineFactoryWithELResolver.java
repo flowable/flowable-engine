@@ -10,7 +10,6 @@ import org.flowable.engine.common.impl.javax.el.CompositeELResolver;
 import org.flowable.engine.common.impl.javax.el.ELResolver;
 import org.flowable.engine.common.impl.javax.el.ListELResolver;
 import org.flowable.engine.common.impl.javax.el.MapELResolver;
-import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
 import org.flowable.engine.impl.el.AbstractExpressionManager;
@@ -20,6 +19,7 @@ import org.flowable.engine.impl.scripting.ResolverFactory;
 import org.flowable.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.osgi.OsgiScriptingEngines;
+import org.flowable.variable.service.delegate.VariableScope;
 
 public class ProcessEngineFactoryWithELResolver extends ProcessEngineFactory {
 
@@ -33,7 +33,7 @@ public class ProcessEngineFactoryWithELResolver extends ProcessEngineFactory {
 
         List<ResolverFactory> resolverFactories = configImpl.getResolverFactories();
         if (resolverFactories == null) {
-            resolverFactories = new ArrayList<ResolverFactory>();
+            resolverFactories = new ArrayList<>();
             resolverFactories.add(new VariableScopeResolverFactory());
             resolverFactories.add(new BeansResolverFactory());
         }
@@ -43,7 +43,7 @@ public class ProcessEngineFactoryWithELResolver extends ProcessEngineFactory {
     }
 
     public class BlueprintExpressionManager extends AbstractExpressionManager {
-        
+
         public BlueprintExpressionManager() {
             this.delegateInterceptor = new DefaultDelegateInterceptor();
             this.expressionFactory = new ExpressionFactoryImpl();

@@ -12,8 +12,6 @@
  */
 package org.flowable.spring.boot;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.List;
 
 import org.flowable.rest.service.api.PutAwareCommonsMultipartResolver;
@@ -34,6 +32,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Configuration
 @ComponentScan({ "org.flowable.rest.exception", "org.flowable.rest.service.api" })
@@ -69,6 +69,7 @@ public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
     }
 
     @Bean
+    @Override
     public RequestMappingHandlerMapping requestMappingHandlerMapping() {
         LOGGER.debug("Creating requestMappingHandlerMapping");
         RequestMappingHandlerMapping requestMappingHandlerMapping = new RequestMappingHandlerMapping();

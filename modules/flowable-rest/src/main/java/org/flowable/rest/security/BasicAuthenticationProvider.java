@@ -28,7 +28,7 @@ public class BasicAuthenticationProvider implements AuthenticationProvider {
         boolean authenticated = identityService.checkPassword(name, password);
         if (authenticated) {
             List<Group> groups = identityService.createGroupQuery().groupMember(name).list();
-            Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
+            Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
             for (Group group : groups) {
                 grantedAuthorities.add(new SimpleGrantedAuthority(group.getId()));
             }

@@ -20,9 +20,9 @@ import java.util.List;
  */
 public class DecisionTable extends Expression {
 
-    protected List<InputClause> inputs = new ArrayList<InputClause>();
-    protected List<OutputClause> outputs = new ArrayList<OutputClause>();
-    protected List<DecisionRule> rules = new ArrayList<DecisionRule>();
+    protected List<InputClause> inputs = new ArrayList<>();
+    protected List<OutputClause> outputs = new ArrayList<>();
+    protected List<DecisionRule> rules = new ArrayList<>();
     protected HitPolicy hitPolicy;
     protected BuiltinAggregator aggregation;
     protected DecisionTableOrientation preferredOrientation;

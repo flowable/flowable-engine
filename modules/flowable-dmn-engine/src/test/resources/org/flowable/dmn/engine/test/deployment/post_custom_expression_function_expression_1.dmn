@@ -10,7 +10,7 @@
           <output id="output1" label="Output 1" name="output1" typeRef="string" />
           <rule>
             <inputEntry id="inputEntry1">
-              <text><![CDATA[< fn_testFunctionName('2015-01-01')]]></text>
+              <text><![CDATA[< custom:testFunctionName('2015-01-01')]]></text>
             </inputEntry>
             <outputEntry id="outputEntry1">
               <text>'test'</text>

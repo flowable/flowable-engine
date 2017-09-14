@@ -38,7 +38,7 @@ public abstract class FormTestHelper {
 
     public static final String EMPTY_LINE = "\n";
 
-    static Map<String, FormEngine> formEngines = new HashMap<String, FormEngine>();
+    static Map<String, FormEngine> formEngines = new HashMap<>();
 
     // Test annotation support /////////////////////////////////////////////
 
@@ -108,8 +108,8 @@ public abstract class FormTestHelper {
         FormEngine formEngine = formEngines.get(configurationResource);
         if (formEngine == null) {
             LOGGER.debug("==== BUILDING FORM ENGINE ========================================================================");
-            formEngine = FormEngineConfiguration.createFormEngineConfigurationFromResource(configurationResource)
-                    .setDatabaseSchemaUpdate(FormEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE)
+            formEngine = ((FormEngineConfiguration) FormEngineConfiguration.createFormEngineConfigurationFromResource(configurationResource)
+                    .setDatabaseSchemaUpdate(FormEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE))
                     .buildFormEngine();
             LOGGER.debug("==== FORM ENGINE CREATED =========================================================================");
             formEngines.put(configurationResource, formEngine);

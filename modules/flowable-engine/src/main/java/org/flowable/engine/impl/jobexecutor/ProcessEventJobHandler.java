@@ -13,11 +13,12 @@
 
 package org.flowable.engine.impl.jobexecutor;
 
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
-import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.JobHandler;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
 /**
  * @author Daniel Meyer
@@ -27,13 +28,15 @@ public class ProcessEventJobHandler implements JobHandler {
 
     public static final String TYPE = "event";
 
+    @Override
     public String getType() {
         return TYPE;
     }
 
-    public void execute(JobEntity job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
+    @Override
+    public void execute(JobEntity job, String configuration, Object execution, CommandContext commandContext) {
 
-        EventSubscriptionEntityManager eventSubscriptionEntityManager = commandContext.getEventSubscriptionEntityManager();
+        EventSubscriptionEntityManager eventSubscriptionEntityManager = CommandContextUtil.getEventSubscriptionEntityManager(commandContext);
 
         // lookup subscription:
         EventSubscriptionEntity eventSubscriptionEntity = eventSubscriptionEntityManager.findById(configuration);

@@ -23,10 +23,12 @@ import org.flowable.bpmn.model.SequenceFlow;
  */
 public class ConditionExpressionParser extends BaseChildElementParser {
 
+    @Override
     public String getElementName() {
         return ELEMENT_FLOW_CONDITION;
     }
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
         if (!(parentElement instanceof SequenceFlow))
             return;

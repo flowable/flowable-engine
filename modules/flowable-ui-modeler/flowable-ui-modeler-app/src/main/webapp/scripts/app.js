@@ -64,6 +64,14 @@ flowableModeler
             templateUrl: appResourceRoot + 'views/process.html',
             controller: 'ProcessCtrl'
         })
+        .when('/casemodels', {
+            templateUrl: appResourceRoot + 'views/casemodels.html',
+            controller: 'CaseModelsCtrl'
+        })
+        .when('/casemodels/:modelId', {
+            templateUrl: appResourceRoot + 'views/casemodel.html',
+            controller: 'CaseModelCtrl'
+        })
         .when('/forms', {
             templateUrl: appResourceRoot + 'views/forms.html',
             controller: 'FormsCtrl'
@@ -108,6 +116,10 @@ flowableModeler
             templateUrl: appResourceRoot + 'views/form-builder.html',
             controller: 'FormBuilderController'
         })
+        .when('/case-editor/:modelId', {
+            templateUrl: appResourceRoot + 'editor-app/editor.html',
+            controller: 'EditorController'
+        })
         .when('/decision-table-editor/:modelId', {
             templateUrl: appResourceRoot + 'views/decision-table-editor.html',
             controller: 'DecisionTableEditorController'
@@ -140,7 +152,7 @@ flowableModeler
         // .registerAvailableLanguageKeys(['en'], {
         //     'en-*': 'en'
         // })
-        .useSanitizeValueStrategy('sanitizeParameters')
+        .useSanitizeValueStrategy('escapeParameters')
         .uniformLanguageTag('bcp47')
         .determinePreferredLanguage();
 
@@ -190,6 +202,11 @@ flowableModeler
                     'id': 'processes',
                     'title': 'GENERAL.NAVIGATION.PROCESSES',
                     'path': '/processes'
+                },
+                {
+                    'id': 'casemodels',
+                    'title': 'GENERAL.NAVIGATION.CASEMODELS',
+                    'path': '/casemodels'
                 },
                 {
                     'id': 'forms',

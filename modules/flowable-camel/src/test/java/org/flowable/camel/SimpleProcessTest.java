@@ -38,6 +38,7 @@ public class SimpleProcessTest extends SpringFlowableTestCase {
 
     protected MockEndpoint service2;
 
+    @Override
     public void setUp() throws Exception {
         service1 = (MockEndpoint) camelContext.getEndpoint("mock:service1");
         service1.reset();
@@ -55,6 +56,7 @@ public class SimpleProcessTest extends SpringFlowableTestCase {
         });
     }
 
+    @Override
     public void tearDown() throws Exception {
         List<Route> routes = camelContext.getRoutes();
         for (Route r : routes) {

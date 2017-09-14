@@ -22,14 +22,15 @@ import org.flowable.bpmn.model.CancelEventDefinition;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.impl.bpmn.helper.ScopeUtil;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
@@ -43,7 +44,7 @@ public class CancelEndEventActivityBehavior extends FlowNodeActivityBehavior {
 
         ExecutionEntity executionEntity = (ExecutionEntity) execution;
         CommandContext commandContext = Context.getCommandContext();
-        ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
 
         // find cancel boundary event:
         ExecutionEntity parentScopeExecution = null;
@@ -104,7 +105,7 @@ public class CancelEndEventActivityBehavior extends FlowNodeActivityBehavior {
 
         if (subProcess.getLoopCharacteristics() != null) {
             List<? extends ExecutionEntity> multiInstanceExecutions = parentScopeExecution.getExecutions();
-            List<ExecutionEntity> executionsToDelete = new ArrayList<ExecutionEntity>();
+            List<ExecutionEntity> executionsToDelete = new ArrayList<>();
             for (ExecutionEntity multiInstanceExecution : multiInstanceExecutions) {
                 if (!multiInstanceExecution.getId().equals(parentScopeExecution.getId())) {
                     ScopeUtil.createCopyOfSubProcessExecutionForCompensation(multiInstanceExecution);
@@ -122,7 +123,7 @@ public class CancelEndEventActivityBehavior extends FlowNodeActivityBehavior {
         }
 
         // The current activity is finished (and will not be ended in the deleteChildExecutions)
-        commandContext.getHistoryManager().recordActivityEnd(executionEntity, null);
+        CommandContextUtil.getHistoryManager(commandContext).recordActivityEnd(executionEntity, null);
 
         // set new parent for boundary event execution
         executionEntity.setParent(newParentScopeExecution);
@@ -131,13 +132,13 @@ public class CancelEndEventActivityBehavior extends FlowNodeActivityBehavior {
         // end all executions in the scope of the transaction
         deleteChildExecutions(parentScopeExecution, executionEntity, commandContext, DeleteReason.TRANSACTION_CANCELED);
 
-        commandContext.getAgenda().planTriggerExecutionOperation(executionEntity);
+        CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(executionEntity);
     }
 
     protected void deleteChildExecutions(ExecutionEntity parentExecution, ExecutionEntity notToDeleteExecution,
             CommandContext commandContext, String deleteReason) {
         // Delete all child executions
-        ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         Collection<ExecutionEntity> childExecutions = executionEntityManager.findChildExecutionsByParentExecutionId(parentExecution.getId());
         if (CollectionUtil.isNotEmpty(childExecutions)) {
             for (ExecutionEntity childExecution : childExecutions) {
@@ -147,7 +148,7 @@ public class CancelEndEventActivityBehavior extends FlowNodeActivityBehavior {
             }
         }
 
-        executionEntityManager.deleteExecutionAndRelatedData(parentExecution, deleteReason, false);
+        executionEntityManager.deleteExecutionAndRelatedData(parentExecution, deleteReason);
     }
 
 }

@@ -17,10 +17,15 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
 
+import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.MessageEventDefinition;
+import org.flowable.bpmn.model.SignalEventDefinition;
+import org.flowable.bpmn.model.TimerEventDefinition;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableErrorEvent;
 import org.flowable.engine.delegate.event.FlowableMessageEvent;
 import org.flowable.engine.delegate.event.FlowableSignalEvent;
@@ -28,15 +33,11 @@ import org.flowable.engine.delegate.event.impl.FlowableActivityEventImpl;
 import org.flowable.engine.delegate.event.impl.FlowableSignalEventImpl;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.event.logger.EventLogger;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
-import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.service.Job;
 
 /**
  * Test case for all {@link FlowableEvent}s related to activities.
@@ -126,7 +127,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
 
         // Complete usertask
         listener.clearEventsReceived();
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
         taskService.complete(task.getId());
 
@@ -171,7 +172,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         listener.clearEventsReceived();
 
         // Check gateway and intermediate throw event
-        Task subTask = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).singleResult();
+        org.flowable.task.service.Task subTask = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).singleResult();
         assertNotNull(subTask);
 
         taskService.complete(subTask.getId());
@@ -285,7 +286,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("signalProcess");
         assertNotNull(processInstance);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         Execution executionWithSignalEvent = runtimeService.createExecutionQuery().activityId("shipOrder").singleResult();
@@ -407,7 +408,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         Execution executionWithMessage = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
         assertNotNull(executionWithMessage);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("Wait", task.getName());
 
         taskService.complete(task.getId());
@@ -449,7 +450,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensationProcess");
         assertNotNull(processInstance);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         // Complete task, next a compensation event will be thrown
@@ -561,7 +562,9 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         FlowableEvent activitiEvent = listener.getEventsReceived().get(0);
         assertEquals("ACTIVITY_CANCELLED event expected", FlowableEngineEventType.ACTIVITY_CANCELLED, activitiEvent.getType());
         FlowableActivityCancelledEvent cancelledEvent = (FlowableActivityCancelledEvent) activitiEvent;
-        assertTrue("TIMER is the cause of the cancellation", cancelledEvent.getCause() instanceof JobEntity);
+        assertTrue("Boundary timer is the cause of the cancellation", cancelledEvent.getCause() instanceof BoundaryEvent);
+        BoundaryEvent boundaryEvent = (BoundaryEvent) cancelledEvent.getCause();
+        assertTrue("Boundary timer is the cause of the cancellation", boundaryEvent.getEventDefinitions().get(0) instanceof TimerEventDefinition);
     }
 
     @Deployment(resources = "org/flowable/engine/test/bpmn/event/timer/BoundaryTimerEventTest.testTimerOnNestingOfSubprocesses.bpmn20.xml")
@@ -579,10 +582,11 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
 
         // Check timeout-events have been dispatched
         assertEquals(4, listener.getEventsReceived().size());
-        List<String> eventIdList = new ArrayList<String>();
+        List<String> eventIdList = new ArrayList<>();
         for (FlowableEvent event : listener.getEventsReceived()) {
             assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-            assertTrue("TIMER is the cause of the cancellation", ((FlowableActivityCancelledEvent) event).getCause() instanceof JobEntity);
+            assertTrue("Boundary timer is the cause of the cancellation", ((FlowableActivityCancelledEvent) event).getCause() instanceof BoundaryEvent);
+            assertTrue("Boundary timer is the cause of the cancellation", ( (BoundaryEvent) ((FlowableActivityCancelledEvent) event).getCause()).getEventDefinitions().get(0) instanceof TimerEventDefinition);
             eventIdList.add(((FlowableActivityEventImpl) event).getActivityId());
         }
         assertTrue(eventIdList.indexOf("innerTask1") >= 0);
@@ -606,10 +610,12 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
 
         // Check timeout-events have been dispatched
         assertEquals(4, listener.getEventsReceived().size());
-        List<String> eventIdList = new ArrayList<String>();
+        List<String> eventIdList = new ArrayList<>();
         for (FlowableEvent event : listener.getEventsReceived()) {
             assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, event.getType());
-            assertTrue("TIMER is the cause of the cancellation", ((FlowableActivityCancelledEvent) event).getCause() instanceof JobEntity);
+            assertTrue("Boundary timer is the cause of the cancellation", ((FlowableCancelledEvent)event).getCause() instanceof BoundaryEvent);
+            BoundaryEvent boundaryEvent = (BoundaryEvent) ((FlowableCancelledEvent)event).getCause();
+            assertTrue("Boundary timer is the cause of the cancellation", boundaryEvent.getEventDefinitions().get(0) instanceof TimerEventDefinition);
             eventIdList.add(((FlowableActivityEventImpl) event).getActivityId());
         }
         assertTrue(eventIdList.contains("innerTask1"));
@@ -659,13 +665,12 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         FlowableActivityCancelledEvent signalEvent = (FlowableActivityCancelledEvent) listener.getEventsReceived().get(2);
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, signalEvent.getType());
         assertEquals("cloudformtask1", signalEvent.getActivityId());
-        assertEquals(executionWithMessage.getId(), signalEvent.getExecutionId());
         assertEquals(executionWithMessage.getProcessInstanceId(), signalEvent.getProcessInstanceId());
         assertEquals(processInstance.getProcessDefinitionId(), signalEvent.getProcessDefinitionId());
         assertNotNull(signalEvent.getCause());
-        assertTrue(signalEvent.getCause() instanceof MessageEventSubscriptionEntity);
-        MessageEventSubscriptionEntity cause = (MessageEventSubscriptionEntity) signalEvent.getCause();
-        assertEquals("message_1", cause.getEventName());
+        assertTrue(signalEvent.getCause() instanceof BoundaryEvent);
+        BoundaryEvent cause = (BoundaryEvent) signalEvent.getCause();
+        assertEquals("message_1", ((MessageEventDefinition) cause.getEventDefinitions().get(0)).getMessageRef());
 
         assertDatabaseEventPresent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING);
         assertDatabaseEventPresent(FlowableEngineEventType.ACTIVITY_MESSAGE_RECEIVED);
@@ -682,7 +687,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         Execution executionWithMessage = runtimeService.createExecutionQuery().messageEventSubscriptionName("message_1").singleResult();
         assertNotNull(executionWithMessage);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("User Task", task.getName());
         taskService.complete(task.getId());
 
@@ -750,33 +755,34 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         assertNull(messageEvent.getMessageData());
 
         // Next, an signal-event is expected, as a result of the message
-        assertTrue(listener.getEventsReceived().get(2) instanceof FlowableActivityCancelledEvent);
-        FlowableActivityCancelledEvent signalEvent = (FlowableActivityCancelledEvent) listener.getEventsReceived().get(2);
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, signalEvent.getType());
-        assertEquals("subProcess", signalEvent.getActivityId());
-        assertEquals(executionWithMessage.getProcessInstanceId(), signalEvent.getProcessInstanceId());
-        assertEquals(processInstance.getProcessDefinitionId(), signalEvent.getProcessDefinitionId());
-        assertNotNull(signalEvent.getCause());
-        assertTrue(signalEvent.getCause() instanceof MessageEventSubscriptionEntity);
-        MessageEventSubscriptionEntity cause = (MessageEventSubscriptionEntity) signalEvent.getCause();
-        assertEquals("message_1", cause.getEventName());
 
+        assertTrue(listener.getEventsReceived().get(2) instanceof FlowableActivityCancelledEvent);
+        FlowableActivityCancelledEvent cancelEvent = (FlowableActivityCancelledEvent) listener.getEventsReceived().get(2);
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, cancelEvent.getType());
+        assertEquals("cloudformtask1", cancelEvent.getActivityId());
+        assertEquals(executionWithMessage.getProcessInstanceId(), cancelEvent.getProcessInstanceId());
+        assertEquals(processInstance.getProcessDefinitionId(), cancelEvent.getProcessDefinitionId());
+        assertNotNull(cancelEvent.getCause());
+        assertTrue(cancelEvent.getCause() instanceof BoundaryEvent);
+        BoundaryEvent cause = (BoundaryEvent) cancelEvent.getCause();
+        assertEquals("message_1", ((MessageEventDefinition) cause.getEventDefinitions().get(0)).getMessageRef());
+        
         assertTrue(listener.getEventsReceived().get(3) instanceof FlowableActivityCancelledEvent);
-        signalEvent = (FlowableActivityCancelledEvent) listener.getEventsReceived().get(3);
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, signalEvent.getType());
-        assertEquals("cloudformtask1", signalEvent.getActivityId());
-        assertEquals(executionWithMessage.getProcessInstanceId(), signalEvent.getProcessInstanceId());
-        assertEquals(processInstance.getProcessDefinitionId(), signalEvent.getProcessDefinitionId());
-        assertNotNull(signalEvent.getCause());
-        assertTrue(signalEvent.getCause() instanceof MessageEventSubscriptionEntity);
-        cause = (MessageEventSubscriptionEntity) signalEvent.getCause();
-        assertEquals("message_1", cause.getEventName());
+        cancelEvent = (FlowableActivityCancelledEvent) listener.getEventsReceived().get(3);
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, cancelEvent.getType());
+        assertEquals("subProcess", cancelEvent.getActivityId());
+        assertEquals(executionWithMessage.getProcessInstanceId(), cancelEvent.getProcessInstanceId());
+        assertEquals(processInstance.getProcessDefinitionId(), cancelEvent.getProcessDefinitionId());
+        assertNotNull(cancelEvent.getCause());
+        assertTrue(cancelEvent.getCause() instanceof BoundaryEvent);
+        cause = (BoundaryEvent) cancelEvent.getCause();
+        assertEquals("message_1", ((MessageEventDefinition) cause.getEventDefinitions().get(0)).getMessageRef());
 
         assertDatabaseEventPresent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING);
         assertDatabaseEventPresent(FlowableEngineEventType.ACTIVITY_MESSAGE_RECEIVED);
     }
 
-    /**
+    /** 
      * Test events related to message events, called from the API.
      */
     @Deployment(resources = "org/flowable/engine/test/api/event/ActivityEventsTest.testActivityMessageBoundaryEventsOnSubProcess.bpmn20.xml")
@@ -787,7 +793,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         Execution executionWithMessage = runtimeService.createExecutionQuery().activityId("boundaryMessageEventCatching").singleResult();
         assertNotNull(executionWithMessage);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         assertEquals(2, listener.getEventsReceived().size());
@@ -845,25 +851,31 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         assertTrue(listener.getEventsReceived().get(2) instanceof FlowableActivityCancelledEvent);
         FlowableActivityCancelledEvent cancelEvent = (FlowableActivityCancelledEvent) listener.getEventsReceived().get(2);
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, cancelEvent.getType());
-        assertEquals("subProcess", cancelEvent.getActivityId());
-        assertEquals(executionWithSignal.getProcessInstanceId(), cancelEvent.getProcessInstanceId());
-        assertEquals(processInstance.getProcessDefinitionId(), cancelEvent.getProcessDefinitionId());
-        assertNotNull(cancelEvent.getCause());
-        assertTrue(cancelEvent.getCause() instanceof SignalEventSubscriptionEntity);
-        SignalEventSubscriptionEntity cause = (SignalEventSubscriptionEntity) cancelEvent.getCause();
-        assertEquals("signalName", cause.getEventName());
-
-        assertTrue(listener.getEventsReceived().get(3) instanceof FlowableActivityCancelledEvent);
-        cancelEvent = (FlowableActivityCancelledEvent) listener.getEventsReceived().get(3);
-        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, cancelEvent.getType());
         assertEquals("userTaskInsideProcess", cancelEvent.getActivityId());
         assertEquals(executionWithSignal.getId(), cancelEvent.getExecutionId());
         assertEquals(executionWithSignal.getProcessInstanceId(), cancelEvent.getProcessInstanceId());
         assertEquals(processInstance.getProcessDefinitionId(), cancelEvent.getProcessDefinitionId());
         assertNotNull(cancelEvent.getCause());
-        assertTrue(cancelEvent.getCause() instanceof SignalEventSubscriptionEntity);
-        cause = (SignalEventSubscriptionEntity) cancelEvent.getCause();
-        assertEquals("signalName", cause.getEventName());
+        assertTrue(cancelEvent.getCause() instanceof BoundaryEvent);
+        BoundaryEvent cause = (BoundaryEvent) cancelEvent.getCause();
+        assertTrue(cause.getEventDefinitions().get(0) instanceof SignalEventDefinition);
+        SignalEventDefinition signalEventDefinition = ((SignalEventDefinition) cause.getEventDefinitions().get(0));
+        assertEquals("signal", signalEventDefinition.getSignalRef());
+        assertEquals("signalName", repositoryService.getBpmnModel(cancelEvent.getProcessDefinitionId()).getSignal(signalEventDefinition.getSignalRef()).getName());
+        
+        assertTrue(listener.getEventsReceived().get(3) instanceof FlowableActivityCancelledEvent);
+        cancelEvent = (FlowableActivityCancelledEvent) listener.getEventsReceived().get(3);
+        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, cancelEvent.getType());
+        assertEquals("subProcess", cancelEvent.getActivityId());
+        assertEquals(executionWithSignal.getProcessInstanceId(), cancelEvent.getProcessInstanceId());
+        assertEquals(processInstance.getProcessDefinitionId(), cancelEvent.getProcessDefinitionId());
+        assertNotNull(cancelEvent.getCause());
+        assertTrue(cancelEvent.getCause() instanceof BoundaryEvent);
+        cause = (BoundaryEvent) cancelEvent.getCause();
+        assertTrue(cause.getEventDefinitions().get(0) instanceof SignalEventDefinition);
+        signalEventDefinition = ((SignalEventDefinition) cause.getEventDefinitions().get(0));
+        assertEquals("signal", signalEventDefinition.getSignalRef());
+        assertEquals("signalName", repositoryService.getBpmnModel(cancelEvent.getProcessDefinitionId()).getSignal(signalEventDefinition.getSignalRef()).getName());
     }
 
     @Deployment
@@ -900,9 +912,12 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         assertEquals(executionWithSignal.getProcessInstanceId(), cancelEvent.getProcessInstanceId());
         assertEquals(processInstance.getProcessDefinitionId(), cancelEvent.getProcessDefinitionId());
         assertNotNull(cancelEvent.getCause());
-        assertTrue(cancelEvent.getCause() instanceof SignalEventSubscriptionEntity);
-        SignalEventSubscriptionEntity cause = (SignalEventSubscriptionEntity) cancelEvent.getCause();
-        assertEquals("signalName", cause.getEventName());
+        assertTrue(cancelEvent.getCause() instanceof BoundaryEvent);
+        BoundaryEvent cause = (BoundaryEvent) cancelEvent.getCause();
+        assertTrue(cause.getEventDefinitions().get(0) instanceof SignalEventDefinition);
+        SignalEventDefinition signalEventDefinition = ((SignalEventDefinition) cause.getEventDefinitions().get(0));
+        assertEquals("signal", signalEventDefinition.getSignalRef());
+        assertEquals("signalName", repositoryService.getBpmnModel(cancelEvent.getProcessDefinitionId()).getSignal(signalEventDefinition.getSignalRef()).getName());
     }
 
     protected void assertDatabaseEventPresent(FlowableEngineEventType eventType) {

@@ -100,7 +100,7 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
             models = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE, ModelSort.NAME_ASC);
         }
 
-        List<DecisionTableRepresentation> reps = new ArrayList<DecisionTableRepresentation>();
+        List<DecisionTableRepresentation> reps = new ArrayList<>();
 
         for (Model model : models) {
             reps.add(new DecisionTableRepresentation(model));
@@ -272,6 +272,8 @@ public class FlowableDecisionTableService extends BaseFlowableModelService {
         model.setName(saveRepresentation.getDecisionTableRepresentation().getName());
         model.setKey(decisionKey);
         model.setDescription(saveRepresentation.getDecisionTableRepresentation().getDescription());
+
+        saveRepresentation.getDecisionTableRepresentation().getDecisionTableDefinition().setKey(decisionKey);
 
         String editorJson = null;
         try {

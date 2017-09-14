@@ -31,21 +31,21 @@ public class ApiGroupsResource {
 
     @Autowired
     protected GroupService groupService;
-    
-    @RequestMapping(value = "/idm/groups/{groupId}", method = RequestMethod.GET, produces = { "application/json" })
+
+    @RequestMapping(value = "/idm/groups/{groupId}", method = RequestMethod.GET, produces = {"application/json"})
     public GroupRepresentation getGroupInformation(@PathVariable String groupId) {
         Group group = groupService.getGroup(groupId);
         if (group != null) {
             return new GroupRepresentation(group);
-            
+
         } else {
             throw new NotFoundException();
         }
     }
 
-    @RequestMapping(value = "/idm/groups", method = RequestMethod.GET, produces = { "application/json" })
+    @RequestMapping(value = "/idm/groups", method = RequestMethod.GET, produces = {"application/json"})
     public List<GroupRepresentation> findGroupsByFilter(@RequestParam("filter") String filter) {
-        List<GroupRepresentation> result = new ArrayList<GroupRepresentation>();
+        List<GroupRepresentation> result = new ArrayList<>();
         List<Group> groups = groupService.getGroups(filter);
         for (Group group : groups) {
             result.add(new GroupRepresentation(group));

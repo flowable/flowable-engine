@@ -36,7 +36,9 @@
         SUPER_PROCESS_INSTANCE_ID_,
         DELETE_REASON_,
         TENANT_ID_,
-        NAME_
+        NAME_,
+        CALLBACK_ID_,
+        CALLBACK_TYPE_
       ) values (
         #{id ,jdbcType=VARCHAR},
         1,
@@ -52,7 +54,9 @@
         #{superProcessInstanceId, jdbcType=VARCHAR},
         #{deleteReason, jdbcType=VARCHAR},
         #{tenantId, jdbcType=VARCHAR},
-        #{name, jdbcType=VARCHAR}
+        #{name, jdbcType=VARCHAR},
+        #{callbackId, jdbcType=VARCHAR},
+        #{callbackType, jdbcType=VARCHAR}
       )
   </insert>
   
@@ -72,10 +76,13 @@
         SUPER_PROCESS_INSTANCE_ID_,
         DELETE_REASON_,
         TENANT_ID_,
-        NAME_
+        NAME_,
+        CALLBACK_ID_,
+        CALLBACK_TYPE_
       ) values 
         <foreach collection="list" item="historicProcessInstance" index="index" separator=",">
-          (#{historicProcessInstance.id ,jdbcType=VARCHAR},
+          (
+           #{historicProcessInstance.id ,jdbcType=VARCHAR},
            1,
            #{historicProcessInstance.processInstanceId, jdbcType=VARCHAR},
            #{historicProcessInstance.businessKey, jdbcType=VARCHAR},
@@ -89,7 +96,10 @@
            #{historicProcessInstance.superProcessInstanceId, jdbcType=VARCHAR},
            #{historicProcessInstance.deleteReason, jdbcType=VARCHAR},
            #{historicProcessInstance.tenantId, jdbcType=VARCHAR},
-           #{historicProcessInstance.name, jdbcType=VARCHAR})
+           #{historicProcessInstance.name, jdbcType=VARCHAR},
+           #{historicProcessInstance.callbackId, jdbcType=VARCHAR},
+           #{historicProcessInstance.callbackType, jdbcType=VARCHAR}
+          )
          </foreach>
   </insert>
   
@@ -111,9 +121,12 @@
             SUPER_PROCESS_INSTANCE_ID_,
             DELETE_REASON_,
             TENANT_ID_,
-            NAME_
+            NAME_,
+            CALLBACK_ID_,
+            CALLBACK_TYPE_
           ) VALUES 
-              (#{historicProcessInstance.id ,jdbcType=VARCHAR},
+              (
+               #{historicProcessInstance.id ,jdbcType=VARCHAR},
                1,
                #{historicProcessInstance.processInstanceId, jdbcType=VARCHAR},
                #{historicProcessInstance.businessKey, jdbcType=VARCHAR},
@@ -127,7 +140,10 @@
                #{historicProcessInstance.superProcessInstanceId, jdbcType=VARCHAR},
                #{historicProcessInstance.deleteReason, jdbcType=VARCHAR},
                #{historicProcessInstance.tenantId, jdbcType=VARCHAR},
-               #{historicProcessInstance.name, jdbcType=VARCHAR})
+               #{historicProcessInstance.name, jdbcType=VARCHAR},
+               #{historicProcessInstance.callbackId, jdbcType=VARCHAR},
+               #{historicProcessInstance.callbackType, jdbcType=VARCHAR}
+              )
        </foreach>
     SELECT * FROM dual
   </insert>
@@ -162,6 +178,12 @@
 	    <if test="originalPersistentState.name != name">
 	      NAME_ = #{name, jdbcType=VARCHAR}
 	    </if>
+        <if test="originalPersistentState.callbackId != callbackId">
+          CALLBACK_ID_ = #{callbackId, jdbcType=VARCHAR}
+        </if> 
+        <if test="originalPersistentState.callbackType != callbackType">
+          CALLBACK_ID_ = #{callbackType, jdbcType=VARCHAR}
+        </if>    
       </set>
     where ID_ = #{id}
     and REV_ = #{revision, jdbcType=INTEGER}
@@ -224,15 +246,15 @@
     <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
-    <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntityImpl">
+    <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl">
       <id property="id" column="VAR_ID_"/>
       <result property="name" column="VAR_NAME_" javaType="String" jdbcType="VARCHAR" />
-      <result property="variableType" column="VAR_TYPE_" javaType="org.flowable.engine.impl.variable.VariableType" jdbcType="VARCHAR" />
+      <result property="variableType" column="VAR_TYPE_" javaType="org.flowable.variable.service.impl.types.VariableType" jdbcType="VARCHAR" />
       <result property="revision" column="VAR_REV_" jdbcType="INTEGER" />
       <result property="processInstanceId" column="VAR_PROC_INST_ID_" jdbcType="VARCHAR" />
       <result property="executionId" column="VAR_EXECUTION_ID_" jdbcType="VARCHAR" />
       <result property="taskId" column="VAR_TASK_ID_" jdbcType="VARCHAR" />
-      <result property="byteArrayRef" column="VAR_BYTEARRAY_ID_" typeHandler="ByteArrayRefTypeHandler"/>
+      <result property="byteArrayRef" column="VAR_BYTEARRAY_ID_" typeHandler="VariableByteArrayRefTypeHandler"/>
       <result property="doubleValue" column="VAR_DOUBLE_" jdbcType="DOUBLE" />
       <result property="textValue" column="VAR_TEXT_" jdbcType="VARCHAR" />
       <result property="textValue2" column="VAR_TEXT2_" jdbcType="VARCHAR" />

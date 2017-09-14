@@ -40,6 +40,7 @@ public class GetExecutionVariablesCmd implements Command<Map<String, Object>>, S
         this.isLocal = isLocal;
     }
 
+    @Override
     public Map<String, Object> execute(CommandContext commandContext) {
 
         // Verify existence of execution

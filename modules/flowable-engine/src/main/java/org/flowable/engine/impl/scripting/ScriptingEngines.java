@@ -24,7 +24,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.delegate.VariableScope;
+import org.flowable.variable.service.delegate.VariableScope;
 
 /**
  * @author Tom Baeyens
@@ -49,7 +49,7 @@ public class ScriptingEngines {
 
     public ScriptingEngines(ScriptEngineManager scriptEngineManager) {
         this.scriptEngineManager = scriptEngineManager;
-        cachedEngines = new HashMap<String, ScriptEngine>();
+        cachedEngines = new HashMap<>();
     }
 
     public ScriptingEngines addScriptEngineFactory(ScriptEngineFactory scriptEngineFactory) {

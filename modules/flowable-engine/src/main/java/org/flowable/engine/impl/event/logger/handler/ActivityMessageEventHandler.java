@@ -15,8 +15,8 @@ package org.flowable.engine.impl.event.logger.handler;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.FlowableMessageEvent;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntity;
 
 /**
@@ -28,7 +28,7 @@ public class ActivityMessageEventHandler extends AbstractDatabaseEventLoggerEven
     public EventLogEntryEntity generateEventLogEntry(CommandContext commandContext) {
         FlowableMessageEvent messageEvent = (FlowableMessageEvent) event;
 
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
         putInMapIfNotNull(data, Fields.ACTIVITY_ID, messageEvent.getActivityId());
         putInMapIfNotNull(data, Fields.ACTIVITY_NAME, messageEvent.getActivityName());
         putInMapIfNotNull(data, Fields.PROCESS_DEFINITION_ID, messageEvent.getProcessDefinitionId());

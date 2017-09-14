@@ -31,22 +31,24 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.engine.common.impl.callback.CallbackData;
+import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
-import org.flowable.engine.impl.asyncexecutor.JobManager;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
+import org.flowable.engine.impl.runtime.callback.ProcessInstanceState;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 
 /**
  * @author Tijs Rademakers
@@ -55,20 +57,43 @@ import org.flowable.engine.runtime.ProcessInstance;
 public class ProcessInstanceHelper {
 
     public ProcessInstance createProcessInstance(ProcessDefinition processDefinition,
-            String businessKey, String processInstanceName, Map<String, Object> variables, Map<String, Object> transientVariables) {
-
-        return createAndStartProcessInstance(processDefinition, businessKey, processInstanceName, variables, transientVariables, false);
+                                                 String businessKey, 
+                                                 String processInstanceName, 
+                                                 Map<String, Object> variables, 
+                                                 Map<String, Object> transientVariables) {
+        return createProcessInstance(processDefinition, 
+                                             businessKey, 
+                                             processInstanceName, 
+                                             variables, 
+                                             transientVariables, 
+                                             null,
+                                             null,
+                                             false);
     }
 
     public ProcessInstance createAndStartProcessInstance(ProcessDefinition processDefinition,
-            String businessKey, String processInstanceName, Map<String, Object> variables, Map<String, Object> transientVariables) {
-
-        return createAndStartProcessInstance(processDefinition, businessKey, processInstanceName, variables, transientVariables, true);
+                                                         String businessKey, 
+                                                         String processInstanceName, 
+                                                         Map<String, Object> variables, 
+                                                         Map<String, Object> transientVariables) {
+        return createProcessInstance(processDefinition, 
+                                             businessKey, 
+                                             processInstanceName, 
+                                             variables, 
+                                             transientVariables, 
+                                             null,
+                                             null,
+                                             true);
     }
 
-    protected ProcessInstance createAndStartProcessInstance(ProcessDefinition processDefinition,
-            String businessKey, String processInstanceName,
-            Map<String, Object> variables, Map<String, Object> transientVariables, boolean startProcessInstance) {
+    public ProcessInstance createProcessInstance(ProcessDefinition processDefinition,
+                                                            String businessKey, 
+                                                            String processInstanceName,
+                                                            Map<String, Object> variables, 
+                                                            Map<String, Object> transientVariables, 
+                                                            String callbackId,
+                                                            String callbackType,
+                                                            boolean startProcessInstance) {
 
         CommandContext commandContext = Context.getCommandContext();
         if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
@@ -93,16 +118,29 @@ public class ProcessInstanceHelper {
             throw new FlowableException("No start element found for process definition " + processDefinition.getId());
         }
 
-        return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, businessKey,
-                processInstanceName, initialFlowElement, process, variables, transientVariables, startProcessInstance);
+        return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, 
+                                                                   businessKey,
+                                                                   processInstanceName, 
+                                                                   initialFlowElement, 
+                                                                   process, 
+                                                                   variables, 
+                                                                   transientVariables,
+                                                                   callbackId,
+                                                                   callbackType,
+                                                                   startProcessInstance);
     }
 
-    public ProcessInstance createAndStartProcessInstanceByMessage(ProcessDefinition processDefinition, String messageName, String businessKey,
-            Map<String, Object> variables, Map<String, Object> transientVariables) {
+    public ProcessInstance createAndStartProcessInstanceByMessage(ProcessDefinition processDefinition, 
+                                                                  String messageName, 
+                                                                  String businessKey,
+                                                                  Map<String, Object> variables, 
+                                                                  Map<String, Object> transientVariables,
+                                                                  String callbackId,
+                                                                  String callbackType) {
 
         CommandContext commandContext = Context.getCommandContext();
         if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
-            return commandContext.getProcessEngineConfiguration().getFlowable5CompatibilityHandler().startProcessInstanceByMessage(
+            return CommandContextUtil.getProcessEngineConfiguration(commandContext).getFlowable5CompatibilityHandler().startProcessInstanceByMessage(
                     messageName, variables, transientVariables, businessKey, processDefinition.getTenantId());
         }
 
@@ -135,12 +173,48 @@ public class ProcessInstanceHelper {
             throw new FlowableException("No message start event found for process definition " + processDefinition.getId() + " and message name " + messageName);
         }
 
-        return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, businessKey, null, initialFlowElement, process, variables, transientVariables, true);
+        return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, 
+                                                                   businessKey, 
+                                                                   null, 
+                                                                   initialFlowElement, 
+                                                                   process, 
+                                                                   variables, 
+                                                                   transientVariables,
+                                                                   callbackId,
+                                                                   callbackType,
+                                                                   true);
+    }
+    
+    public ProcessInstance createAndStartProcessInstanceWithInitialFlowElement(ProcessDefinition processDefinition,
+            String businessKey, 
+            String processInstanceName, 
+            FlowElement initialFlowElement,
+            Process process, 
+            Map<String, Object> variables, 
+            Map<String, Object> transientVariables, 
+            boolean startProcessInstance) {
+        return createAndStartProcessInstanceWithInitialFlowElement(processDefinition,
+                                                                   businessKey,
+                                                                   processInstanceName,
+                                                                   initialFlowElement,
+                                                                   process,
+                                                                   variables,
+                                                                   transientVariables,
+                                                                   null,
+                                                                   null,
+                                                                   startProcessInstance);
     }
 
     public ProcessInstance createAndStartProcessInstanceWithInitialFlowElement(ProcessDefinition processDefinition,
-            String businessKey, String processInstanceName, FlowElement initialFlowElement,
-            Process process, Map<String, Object> variables, Map<String, Object> transientVariables, boolean startProcessInstance) {
+                                                                               String businessKey, 
+                                                                               String processInstanceName, 
+                                                                               FlowElement initialFlowElement,
+                                                                               Process process, 
+                                                                               Map<String, Object> variables, 
+                                                                               Map<String, Object> transientVariables,
+                                                                               String callbackId,
+                                                                               String callbackType,
+                                                                               boolean startProcessInstance) {
 
         CommandContext commandContext = Context.getCommandContext();
 
@@ -150,17 +224,17 @@ public class ProcessInstanceHelper {
             initiatorVariableName = ((StartEvent) initialFlowElement).getInitiator();
         }
 
-        ExecutionEntity processInstance = commandContext.getExecutionEntityManager()
+        ExecutionEntity processInstance = CommandContextUtil.getExecutionEntityManager(commandContext)
                 .createProcessInstanceExecution(processDefinition, businessKey, processDefinition.getTenantId(), 
                                 initiatorVariableName, initialFlowElement.getId());
 
         processInstance.setName(processInstanceName);
 
-        commandContext.getHistoryManager().recordProcessInstanceStart(processInstance);
+        CommandContextUtil.getHistoryManager(commandContext).recordProcessInstanceStart(processInstance);
 
-        boolean eventDispatcherEnabled = Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled();
+        boolean eventDispatcherEnabled = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled();
         if (eventDispatcherEnabled) {
-            Context.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
                     FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, processInstance));
         }
 
@@ -177,19 +251,31 @@ public class ProcessInstanceHelper {
                 processInstance.setTransientVariable(varName, transientVariables.get(varName));
             }
         }
+        
+        // Callbacks
+        if (callbackId != null) {
+            processInstance.setCallbackId(callbackId);
+        }
+        if (callbackType != null) {
+            processInstance.setCallbackType(callbackType);
+        }
 
         // Fire events
         if (eventDispatcherEnabled) {
-            Context.getProcessEngineConfiguration().getEventDispatcher()
+            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher()
                     .dispatchEvent(FlowableEventBuilder.createEntityWithVariablesEvent(FlowableEngineEventType.ENTITY_INITIALIZED, processInstance, variables, false));
         }
 
         // Create the first execution that will visit all the process definition elements
-        ExecutionEntity execution = commandContext.getExecutionEntityManager().createChildExecution(processInstance);
+        ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(processInstance);
         execution.setCurrentFlowElement(initialFlowElement);
 
         if (startProcessInstance) {
             startProcessInstance(processInstance, commandContext, variables);
+        }
+        
+        if (callbackId != null) {
+            callCaseInstanceStateChangeCallbacks(commandContext, processInstance, null, ProcessInstanceState.RUNNING);
         }
 
         return processInstance;
@@ -202,10 +288,10 @@ public class ProcessInstanceHelper {
         processAvailableEventSubProcesses(processInstance, process, commandContext);
 
         ExecutionEntity execution = processInstance.getExecutions().get(0); // There will always be one child execution created
-        commandContext.getAgenda().planContinueProcessOperation(execution);
+        CommandContextUtil.getAgenda(commandContext).planContinueProcessOperation(execution);
 
-        if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            FlowableEventDispatcher eventDispatcher = Context.getProcessEngineConfiguration().getEventDispatcher();
+        if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(execution, variables, false));
         }
     }
@@ -239,12 +325,12 @@ public class ProcessInstanceHelper {
                         messageEventDefinition.setMessageRef(bpmnModel.getMessage(messageEventDefinition.getMessageRef()).getName());
                     }
 
-                    ExecutionEntity messageExecution = commandContext.getExecutionEntityManager().createChildExecution(parentExecution);
+                    ExecutionEntity messageExecution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(parentExecution);
                     messageExecution.setCurrentFlowElement(startEvent);
                     messageExecution.setEventScope(true);
                     messageExecution.setActive(false);
 
-                    messageEventSubscriptions.add(commandContext.getEventSubscriptionEntityManager().insertMessageEvent(
+                    messageEventSubscriptions.add(CommandContextUtil.getEventSubscriptionEntityManager(commandContext).insertMessageEvent(
                             messageEventDefinition.getMessageRef(), messageExecution));
 
                 } else if (eventDefinition instanceof SignalEventDefinition) {
@@ -256,44 +342,42 @@ public class ProcessInstanceHelper {
                         signalEventDefinition.setSignalRef(signal.getName());
                     }
 
-                    ExecutionEntity signalExecution = commandContext.getExecutionEntityManager().createChildExecution(parentExecution);
+                    ExecutionEntity signalExecution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(parentExecution);
                     signalExecution.setCurrentFlowElement(startEvent);
                     signalExecution.setEventScope(true);
                     signalExecution.setActive(false);
 
-                    signalEventSubscriptions.add(commandContext.getEventSubscriptionEntityManager().insertSignalEvent(
+                    signalEventSubscriptions.add(CommandContextUtil.getEventSubscriptionEntityManager(commandContext).insertSignalEvent(
                             signalEventDefinition.getSignalRef(), signal, signalExecution));
 
                 } else if (eventDefinition instanceof TimerEventDefinition) {
                     TimerEventDefinition timerEventDefinition = (TimerEventDefinition) eventDefinition;
 
-                    ExecutionEntity timerExecution = commandContext.getExecutionEntityManager().createChildExecution(parentExecution);
+                    ExecutionEntity timerExecution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(parentExecution);
                     timerExecution.setCurrentFlowElement(startEvent);
                     timerExecution.setEventScope(true);
                     timerExecution.setActive(false);
 
-                    JobManager jobManager = commandContext.getJobManager();
-
-                    TimerJobEntity timerJob = jobManager.createTimerJob(timerEventDefinition, false, timerExecution, TriggerTimerEventJobHandler.TYPE,
-                            TimerEventHandler.createConfiguration(startEvent.getId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
-
+                    TimerJobEntity timerJob = TimerUtil.createTimerEntityForTimerEventDefinition(timerEventDefinition, false, timerExecution, TriggerTimerEventJobHandler.TYPE, 
+                                    TimerEventHandler.createConfiguration(startEvent.getId(), timerEventDefinition.getEndDate(), timerEventDefinition.getCalendarName()));
+                    
                     if (timerJob != null) {
-                        jobManager.scheduleTimerJob(timerJob);
+                        CommandContextUtil.getTimerJobService().scheduleTimerJob(timerJob);
                     }
                 }
             }
         }
 
-        if (Context.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+        if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             for (MessageEventSubscriptionEntity messageEventSubscription : messageEventSubscriptions) {
-                commandContext.getProcessEngineConfiguration().getEventDispatcher()
+                CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
                         .dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING, messageEventSubscription.getActivityId(),
                                 messageEventSubscription.getEventName(), null, messageEventSubscription.getExecution().getId(),
                                 messageEventSubscription.getProcessInstanceId(), messageEventSubscription.getProcessDefinitionId()));
             }
 
             for (SignalEventSubscriptionEntity signalEventSubscription : signalEventSubscriptions) {
-                commandContext.getProcessEngineConfiguration().getEventDispatcher()
+                CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
                         .dispatchEvent(FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING, signalEventSubscription.getActivityId(),
                                 signalEventSubscription.getEventName(), null, signalEventSubscription.getExecution().getId(),
                                 signalEventSubscription.getProcessInstanceId(), signalEventSubscription.getProcessDefinitionId()));
@@ -302,7 +386,7 @@ public class ProcessInstanceHelper {
     }
 
     protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {
-        Map<String, Object> variablesMap = new HashMap<String, Object>();
+        Map<String, Object> variablesMap = new HashMap<>();
         // convert data objects to process variables
         if (dataObjects != null) {
             for (ValuedDataObject dataObject : dataObjects) {
@@ -311,4 +395,21 @@ public class ProcessInstanceHelper {
         }
         return variablesMap;
     }
+    
+    public void callCaseInstanceStateChangeCallbacks(CommandContext commandContext, ProcessInstance processInstance, String oldState, String newState) {
+        if (processInstance.getCallbackId() != null && processInstance.getCallbackType() != null) {
+            Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceCallbacks = CommandContextUtil
+                    .getProcessEngineConfiguration(commandContext).getProcessInstanceStateChangedCallbacks();
+            if (caseInstanceCallbacks != null && caseInstanceCallbacks.containsKey(processInstance.getCallbackType())) {
+                for (RuntimeInstanceStateChangeCallback caseInstanceCallback : caseInstanceCallbacks.get(processInstance.getCallbackType())) {
+                    caseInstanceCallback.stateChanged(new CallbackData(processInstance.getCallbackId(), 
+                                                                       processInstance.getCallbackType(), 
+                                                                       processInstance.getId(), 
+                                                                       oldState, 
+                                                                       newState));
+                }
+            }
+        }
+    }
+    
 }

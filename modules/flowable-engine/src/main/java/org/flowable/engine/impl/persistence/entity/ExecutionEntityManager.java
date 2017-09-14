@@ -16,6 +16,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.bpmn.model.FlowElement;
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 import org.flowable.engine.impl.ExecutionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
@@ -70,7 +71,9 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
     long findExecutionCountByNativeQuery(Map<String, Object> parameterMap);
 
     /**
-     * Returns all child executions of a given {@link ExecutionEntity}. In the list, child executions will be behind parent executions.
+     * Returns all child executions of a given {@link ExecutionEntity}. 
+     * In the list, child executions will be behind parent executions.
+     * Children include subprocessinstances and its children.
      */
     List<ExecutionEntity> collectChildren(ExecutionEntity executionEntity);
 
@@ -89,11 +92,15 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
     void deleteProcessInstanceExecutionEntity(String processInstanceId, String currentFlowElementId,
             String deleteReason, boolean cascade, boolean cancel, boolean fireEvents);
 
+    void deleteChildExecutions(ExecutionEntity executionEntity, Collection<String> executionIdsNotToDelete,String deleteReason, boolean cancel, FlowElement cancelActivity);
+    
     void deleteChildExecutions(ExecutionEntity executionEntity, String deleteReason, boolean cancel);
 
-    void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason, boolean cancel);
+    void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason, boolean cancel, FlowElement cancelActivity);
     
-    void deleteRelatedDataForExecution(ExecutionEntity executionEntity, String deleteReason, boolean cancel);
+    void deleteExecutionAndRelatedData(ExecutionEntity executionEntity, String deleteReason);
+    
+    void deleteRelatedDataForExecution(ExecutionEntity executionEntity, String deleteReason);
 
     void updateProcessInstanceLockTime(String processInstanceId);
 

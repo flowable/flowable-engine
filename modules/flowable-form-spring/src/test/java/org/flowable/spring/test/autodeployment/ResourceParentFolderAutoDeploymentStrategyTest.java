@@ -54,6 +54,7 @@ public class ResourceParentFolderAutoDeploymentStrategyTest extends AbstractAuto
     private final String parentFilename2 = "parentFilename2";
 
     @Before
+    @Override
     public void before() throws Exception {
         super.before();
         classUnderTest = new ResourceParentFolderAutoDeploymentStrategy();

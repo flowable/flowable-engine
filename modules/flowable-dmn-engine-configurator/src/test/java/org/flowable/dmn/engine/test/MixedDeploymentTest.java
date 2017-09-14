@@ -12,15 +12,17 @@
  */
 package org.flowable.dmn.engine.test;
 
-import org.flowable.dmn.api.DmnDecisionTable;
-import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.test.Deployment;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.api.DmnRepositoryService;
+import org.flowable.dmn.engine.DmnEngines;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.test.Deployment;
+import org.junit.Test;
 
 /**
  * @author Yvo Swillens
@@ -39,6 +41,7 @@ public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTe
         assertNotNull(processDefinition);
         assertEquals("oneDecisionTaskProcess", processDefinition.getKey());
 
+        DmnRepositoryService dmnRepositoryService = DmnEngines.getDefaultDmnEngine().getDmnRepositoryService();
         DmnDecisionTable decisionTable = dmnRepositoryService.createDecisionTableQuery()
                 .latestVersion()
                 .decisionTableKey("decision1")

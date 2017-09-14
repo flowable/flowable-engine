@@ -28,6 +28,23 @@ flowableModule.service('UserService', ['$http', '$q',
             return deferred.promise;
         };
         
+        var userInfoHttpAsPromise = function(options, index) {
+            var deferred = $q.defer();
+            $http(options).
+                success(function (response, status, headers, config) {
+                    var userInfoFormObject = {
+                        userData: response,
+                        index: index
+                    };
+                    deferred.resolve(userInfoFormObject);
+                })
+                .error(function (response, status, headers, config) {
+                    deferred.reject(response);
+                });
+                
+            return deferred.promise;
+        };
+        
         /*
          * Get user info by id
          */
@@ -37,6 +54,17 @@ flowableModule.service('UserService', ['$http', '$q',
                 method: 'GET',
                 url: FLOWABLE.CONFIG.contextRoot + '/app/rest/users/' + userId
             });
+        };
+        
+        /*
+         * Get user info by id
+         */
+        this.getUserInfoForForm = function (userId, index) {
+        
+            return userInfoHttpAsPromise({
+                method: 'GET',
+                url: FLOWABLE.CONFIG.contextRoot + '/app/rest/users/' + userId
+            }, index);
         };
 
         /*

@@ -69,7 +69,7 @@
 					<h2 translate="GENERAL.TITLE.ACTIONS"></h2>
 				</div>
 				<ul class="list-group">
-                    <li ng-if="!processCompleted && definition.graphicalNotationDefined">
+                    <li ng-if="definition.graphicalNotationDefined">
                         <button type="button" class="btn btn-sm btn-default" ng-click="showProcessDiagram()">
                             <i class="glyphicon glyphicon-zoom-in"></i>{{'PROCESS-INSTANCE.ACTION.SHOW-DIAGRAM' | translate}}
                         </button>

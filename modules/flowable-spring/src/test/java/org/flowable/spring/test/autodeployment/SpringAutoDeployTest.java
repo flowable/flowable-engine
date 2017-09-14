@@ -13,6 +13,11 @@
 
 package org.flowable.spring.test.autodeployment;
 
+import java.net.URISyntaxException;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.common.impl.util.IoUtil;
 import org.flowable.engine.impl.test.AbstractTestCase;
@@ -23,11 +28,6 @@ import org.flowable.engine.repository.ProcessDefinitionQuery;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
-
-import java.net.URISyntaxException;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * @author Tom Baeyens
@@ -50,6 +50,7 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         this.repositoryService = applicationContext.getBean(RepositoryService.class);
     }
 
+    @Override
     protected void tearDown() throws Exception {
         removeAllDeployments();
         this.applicationContext = null;
@@ -61,12 +62,12 @@ public class SpringAutoDeployTest extends AbstractTestCase {
         createAppContext("org/flowable/spring/test/autodeployment/SpringAutoDeployTest-context.xml");
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
 
-        Set<String> processDefinitionKeys = new HashSet<String>();
+        Set<String> processDefinitionKeys = new HashSet<>();
         for (ProcessDefinition processDefinition : processDefinitions) {
             processDefinitionKeys.add(processDefinition.getKey());
         }
 
-        Set<String> expectedProcessDefinitionKeys = new HashSet<String>();
+        Set<String> expectedProcessDefinitionKeys = new HashSet<>();
         expectedProcessDefinitionKeys.add("a");
         expectedProcessDefinitionKeys.add("b");
         expectedProcessDefinitionKeys.add("c");

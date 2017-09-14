@@ -39,6 +39,7 @@ public class CallActivityConverterTest extends AbstractConverterTest {
         validateModel(bpmnModel);
     }
 
+    @Override
     protected String getResource() {
         return "test.callactivitymodel.json";
     }
@@ -52,6 +53,9 @@ public class CallActivityConverterTest extends AbstractConverterTest {
         assertEquals("Call activity", callActivity.getName());
 
         assertEquals("processId", callActivity.getCalledElement());
+        assertTrue(callActivity.isInheritVariables());
+        assertTrue(callActivity.isInheritBusinessKey());
+        assertTrue(callActivity.isUseLocalScopeForOutParameters());
 
         List<IOParameter> parameters = callActivity.getInParameters();
         assertEquals(2, parameters.size());

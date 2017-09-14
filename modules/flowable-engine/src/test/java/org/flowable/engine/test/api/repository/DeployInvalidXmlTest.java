@@ -63,7 +63,7 @@ public class DeployInvalidXmlTest extends PluggableFlowableTestCase {
             + "<!ENTITY lol5 '&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;&lol4;'>" + "<!ENTITY lol6 '&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;&lol5;'>"
             + "<!ENTITY lol7 '&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;&lol6;'>" + "<!ENTITY lol8 '&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;&lol7;'>"
             + "<!ENTITY lol9 '&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;&lol8;'>" + "]>" + "<lolz>&lol9;</lolz>" + "<definitions " + "xmlns='http://www.omg.org/spec/BPMN/20100524/MODEL'"
-            + "xmlns:activiti='http://activiti.org/bpmn'" + "targetNamespace='Examples'>" + "<process id='oneTaskProcess' name='The One Task Process'>"
+            + "xmlns:activiti='http://activiti.org/bpmn'" + "targetNamespace='Examples'>" + "<process id='oneTaskProcess' name='The One org.flowable.task.service.Task Process'>"
             + "  <documentation>This is a process for testing purposes</documentation>" + " <startEvent id='theStart' />" + " <sequenceFlow id='flow1' sourceRef='theStart' targetRef='theTask' />"
             + " <userTask id='theTask' name='my task' />" + " <sequenceFlow id='flow2' sourceRef='theTask' targetRef='theEnd' />" + " <endEvent id='theEnd' />" + "</process>" + "</definitions>";
 
@@ -93,6 +93,7 @@ public class DeployInvalidXmlTest extends PluggableFlowableTestCase {
             this.repositoryService = repositoryService;
         }
 
+        @Override
         public void run() {
             try {
                 String deploymentId = repositoryService.createDeployment().addString("test.bpmn20.xml", UNSAFE_XML).deploy().getId();

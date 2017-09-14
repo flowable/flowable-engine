@@ -16,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.variable.service.delegate.Expression;
 
 /**
  * A simple data input association between a source and a target with assignments
@@ -27,7 +27,7 @@ public class SimpleDataInputAssociation extends AbstractDataAssociation {
 
     private static final long serialVersionUID = 1L;
 
-    protected List<Assignment> assignments = new ArrayList<Assignment>();
+    protected List<Assignment> assignments = new ArrayList<>();
 
     public SimpleDataInputAssociation(Expression sourceExpression, String target) {
         super(sourceExpression, target);
@@ -41,6 +41,7 @@ public class SimpleDataInputAssociation extends AbstractDataAssociation {
         this.assignments.add(assignment);
     }
 
+    @Override
     public void evaluate(DelegateExecution execution) {
         for (Assignment assignment : this.assignments) {
             assignment.evaluate(execution);

@@ -28,11 +28,12 @@ import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.variable.service.delegate.Expression;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.scripting.ScriptingEngines;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.mule.DefaultMuleMessage;
 import org.mule.api.MuleContext;
@@ -57,6 +58,7 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
     private Expression username;
     private Expression password;
 
+    @Override
     public void execute(DelegateExecution execution) {
         String endpointUrlValue = this.getStringFromField(this.endpointUrl, execution);
         String languageValue = this.getStringFromField(this.language, execution);
@@ -74,7 +76,7 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
             isFlowable5Execution = true;
 
         } else {
-            ScriptingEngines scriptingEngines = Context.getProcessEngineConfiguration().getScriptingEngines();
+            ScriptingEngines scriptingEngines = CommandContextUtil.getProcessEngineConfiguration().getScriptingEngines();
             payload = scriptingEngines.evaluate(payloadExpressionValue, languageValue, execution);
         }
 
@@ -157,7 +159,7 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
 
     protected MuleContext getMuleContext() {
         if (this.muleContext == null) {
-            Map<Object, Object> beans = Context.getProcessEngineConfiguration().getBeans();
+            Map<Object, Object> beans = CommandContextUtil.getProcessEngineConfiguration().getBeans();
             this.muleContext = (MuleContext) beans.get("muleContext");
         }
         return this.muleContext;

@@ -42,6 +42,7 @@ public class CustomNamespaceAttributeConverterTest extends AbstractConverterTest
         deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "customnamespaceattributemodel.bpmn";
     }

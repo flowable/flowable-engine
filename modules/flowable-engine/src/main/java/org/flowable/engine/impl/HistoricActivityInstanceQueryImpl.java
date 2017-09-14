@@ -16,10 +16,12 @@ package org.flowable.engine.impl;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.AbstractQuery;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -57,72 +59,84 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     @Override
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getHistoricActivityInstanceEntityManager().findHistoricActivityInstanceCountByQueryCriteria(this);
+        return CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext).findHistoricActivityInstanceCountByQueryCriteria(this);
     }
 
     @Override
     public List<HistoricActivityInstance> executeList(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getHistoricActivityInstanceEntityManager().findHistoricActivityInstancesByQueryCriteria(this);
+        return CommandContextUtil.getHistoricActivityInstanceEntityManager(commandContext).findHistoricActivityInstancesByQueryCriteria(this);
     }
 
+    @Override
     public HistoricActivityInstanceQueryImpl processInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQueryImpl executionId(String executionId) {
         this.executionId = executionId;
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQueryImpl processDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQueryImpl activityId(String activityId) {
         this.activityId = activityId;
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQueryImpl activityName(String activityName) {
         this.activityName = activityName;
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQueryImpl activityType(String activityType) {
         this.activityType = activityType;
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQueryImpl taskAssignee(String assignee) {
         this.assignee = assignee;
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQueryImpl finished() {
         this.finished = true;
         this.unfinished = false;
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQueryImpl unfinished() {
         this.unfinished = true;
         this.finished = false;
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQuery deleteReason(String deleteReason) {
         this.deleteReason = deleteReason;
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQuery deleteReasonLike(String deleteReasonLike) {
         this.deleteReasonLike = deleteReasonLike;
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQueryImpl activityTenantId(String tenantId) {
         if (tenantId == null) {
             throw new FlowableIllegalArgumentException("activity tenant id is null");
@@ -135,6 +149,7 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
         return tenantId;
     }
 
+    @Override
     public HistoricActivityInstanceQueryImpl activityTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
             throw new FlowableIllegalArgumentException("activity tenant id is null");
@@ -147,6 +162,7 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
         return tenantIdLike;
     }
 
+    @Override
     public HistoricActivityInstanceQueryImpl activityWithoutTenantId() {
         this.withoutTenantId = true;
         return this;
@@ -159,61 +175,73 @@ public class HistoricActivityInstanceQueryImpl extends AbstractQuery<HistoricAct
     // ordering
     // /////////////////////////////////////////////////////////////////
 
+    @Override
     public HistoricActivityInstanceQueryImpl orderByHistoricActivityInstanceDuration() {
         orderBy(HistoricActivityInstanceQueryProperty.DURATION);
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQueryImpl orderByHistoricActivityInstanceEndTime() {
         orderBy(HistoricActivityInstanceQueryProperty.END);
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQueryImpl orderByExecutionId() {
         orderBy(HistoricActivityInstanceQueryProperty.EXECUTION_ID);
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQueryImpl orderByHistoricActivityInstanceId() {
         orderBy(HistoricActivityInstanceQueryProperty.HISTORIC_ACTIVITY_INSTANCE_ID);
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQueryImpl orderByProcessDefinitionId() {
         orderBy(HistoricActivityInstanceQueryProperty.PROCESS_DEFINITION_ID);
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQueryImpl orderByProcessInstanceId() {
         orderBy(HistoricActivityInstanceQueryProperty.PROCESS_INSTANCE_ID);
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQueryImpl orderByHistoricActivityInstanceStartTime() {
         orderBy(HistoricActivityInstanceQueryProperty.START);
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQuery orderByActivityId() {
         orderBy(HistoricActivityInstanceQueryProperty.ACTIVITY_ID);
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQueryImpl orderByActivityName() {
         orderBy(HistoricActivityInstanceQueryProperty.ACTIVITY_NAME);
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQueryImpl orderByActivityType() {
         orderBy(HistoricActivityInstanceQueryProperty.ACTIVITY_TYPE);
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQueryImpl orderByTenantId() {
         orderBy(HistoricActivityInstanceQueryProperty.TENANT_ID);
         return this;
     }
 
+    @Override
     public HistoricActivityInstanceQueryImpl activityInstanceId(String activityInstanceId) {
         this.activityInstanceId = activityInstanceId;
         return this;

@@ -15,9 +15,10 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Map;
 
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
-import org.flowable.engine.task.DelegationState;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.TaskHelper;
+import org.flowable.task.service.DelegationState;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Tom Baeyens
@@ -40,6 +41,7 @@ public class ResolveTaskCmd extends NeedsActiveTaskCmd<Void> {
         this.transientVariables = transientVariables;
     }
 
+    @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
         if (variables != null) {
             task.setVariables(variables);
@@ -49,7 +51,7 @@ public class ResolveTaskCmd extends NeedsActiveTaskCmd<Void> {
         }
 
         task.setDelegationState(DelegationState.RESOLVED);
-        commandContext.getTaskEntityManager().changeTaskAssignee(task, task.getOwner());
+        TaskHelper.changeTaskAssignee(task, task.getOwner());
 
         return null;
     }

@@ -36,6 +36,7 @@ public abstract class HistoricDetailEntity implements HistoricDetail, Persistent
     protected Date time;
     protected String detailType;
 
+    @Override
     public Object getPersistentState() {
         // details are not updatable so we always provide the same object as the state
         return HistoricDetailEntity.class;
@@ -51,14 +52,17 @@ public abstract class HistoricDetailEntity implements HistoricDetail, Persistent
 
     // getters and setters //////////////////////////////////////////////////////
 
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public void setId(String id) {
         this.id = id;
     }
 
+    @Override
     public String getProcessInstanceId() {
         return processInstanceId;
     }
@@ -67,6 +71,7 @@ public abstract class HistoricDetailEntity implements HistoricDetail, Persistent
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public String getActivityInstanceId() {
         return activityInstanceId;
     }
@@ -75,6 +80,7 @@ public abstract class HistoricDetailEntity implements HistoricDetail, Persistent
         this.activityInstanceId = activityInstanceId;
     }
 
+    @Override
     public String getTaskId() {
         return taskId;
     }
@@ -83,6 +89,7 @@ public abstract class HistoricDetailEntity implements HistoricDetail, Persistent
         this.taskId = taskId;
     }
 
+    @Override
     public String getExecutionId() {
         return executionId;
     }
@@ -91,6 +98,7 @@ public abstract class HistoricDetailEntity implements HistoricDetail, Persistent
         this.executionId = executionId;
     }
 
+    @Override
     public Date getTime() {
         return time;
     }

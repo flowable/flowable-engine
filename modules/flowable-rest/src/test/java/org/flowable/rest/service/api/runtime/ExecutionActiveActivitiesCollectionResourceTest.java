@@ -45,7 +45,7 @@ public class ExecutionActiveActivitiesCollectionResourceTest extends BaseSpringR
         assertTrue(responseNode.isArray());
         assertEquals(2, responseNode.size());
 
-        Set<String> states = new HashSet<String>();
+        Set<String> states = new HashSet<>();
         states.add(responseNode.get(0).textValue());
         states.add(responseNode.get(1).textValue());
 

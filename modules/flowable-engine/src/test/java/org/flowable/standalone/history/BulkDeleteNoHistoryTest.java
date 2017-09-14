@@ -17,7 +17,6 @@ import java.util.Map;
 
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 public class BulkDeleteNoHistoryTest extends ResourceFlowableTestCase {
@@ -31,7 +30,7 @@ public class BulkDeleteNoHistoryTest extends ResourceFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testLargeAmountOfVariableBulkDelete() throws Exception {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
 
         // Do a bulk-update with a number higher than any DB's magic numbers
         for (int i = 0; i < 4001; i++) {
@@ -39,7 +38,7 @@ public class BulkDeleteNoHistoryTest extends ResourceFlowableTestCase {
         }
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         // Completing the task will cause a bulk delete of 4001 entities

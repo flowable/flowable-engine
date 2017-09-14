@@ -12,19 +12,20 @@
  */
 package org.flowable.engine.impl.history.async.json.transformer;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.Date;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.task.service.HistoricTaskService;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class TaskEndedHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
     
@@ -43,8 +44,8 @@ public class TaskEndedHistoryJsonTransformer extends AbstractHistoryJsonTransfor
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
         String taskId = getStringFromJson(historicalData, HistoryJsonConstants.ID);
-        HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager = commandContext.getHistoricTaskInstanceEntityManager();
-        HistoricTaskInstanceEntity historicTaskInstance = historicTaskInstanceEntityManager.findById(taskId);
+        HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
+        HistoricTaskInstanceEntity historicTaskInstance = historicTaskService.getHistoricTask(taskId);
         
         if (historicTaskInstance != null) {
             Date lastUpdateTime = getDateFromJson(historicalData, HistoryJsonConstants.TIMESTAMP);
@@ -79,7 +80,7 @@ public class TaskEndedHistoryJsonTransformer extends AbstractHistoryJsonTransfor
         } else {
             String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);
             
-            historicTaskInstance = historicTaskInstanceEntityManager.create();
+            historicTaskInstance = historicTaskService.createHistoricTask();
             historicTaskInstance.setId(taskId);
             historicTaskInstance.setProcessDefinitionId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_DEFINITION_ID));
             historicTaskInstance.setProcessInstanceId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID));
@@ -108,7 +109,7 @@ public class TaskEndedHistoryJsonTransformer extends AbstractHistoryJsonTransfor
                 historicTaskInstance.setDurationInMillis(endTime.getTime() - startTime.getTime());
             }
             
-            historicTaskInstanceEntityManager.insert(historicTaskInstance);
+            historicTaskService.insertHistoricTask(historicTaskInstance, true);
 
             if (StringUtils.isNotEmpty(executionId)) {
                 String activityId = getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID);

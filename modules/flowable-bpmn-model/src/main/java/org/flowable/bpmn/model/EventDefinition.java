@@ -17,5 +17,6 @@ package org.flowable.bpmn.model;
  */
 public abstract class EventDefinition extends BaseElement {
 
+    @Override
     public abstract EventDefinition clone();
 }

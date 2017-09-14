@@ -15,9 +15,10 @@ package org.flowable.idm.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.idm.engine.impl.interceptor.Command;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.idm.engine.impl.persistence.entity.IdentityInfoEntity;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -33,8 +34,9 @@ public class GetUserInfoCmd implements Command<String>, Serializable {
         this.key = key;
     }
 
+    @Override
     public String execute(CommandContext commandContext) {
-        IdentityInfoEntity identityInfo = commandContext.getIdentityInfoEntityManager().findUserInfoByUserIdAndKey(userId, key);
+        IdentityInfoEntity identityInfo = CommandContextUtil.getIdentityInfoEntityManager(commandContext).findUserInfoByUserIdAndKey(userId, key);
 
         return (identityInfo != null ? identityInfo.getValue() : null);
     }

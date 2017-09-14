@@ -25,6 +25,7 @@ import org.flowable.dmn.model.ItemDefinition;
  */
 public class ItemDefinitionXMLConverter extends BaseDmnXMLConverter {
 
+    @Override
     public Class<? extends DmnElement> getDmnElementType() {
         return ItemDefinition.class;
     }

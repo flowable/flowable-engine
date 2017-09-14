@@ -334,19 +334,19 @@ public class DmnJsonConverter {
                     // add quotes for string
                     if ("string".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
                         && !"-".equals(expressionValue)) {
-                        if (stringBuilder.length() > 0) {
-                            stringBuilder.append("\"");
-                        } else {
-                            stringBuilder.append("\"");
-                        }
+                        
+                        stringBuilder.append("\"");
                         stringBuilder.append(expressionValue);
                         stringBuilder.append("\"");
+                        
                     } else if ("date".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
                         && !"-".equals(expressionValue) && StringUtils.isNotEmpty(expressionValue)){
+                        
                         // wrap in built in toDate function
-                        stringBuilder.append("fn_date('");
+                        stringBuilder.append("date:toDate('");
                         stringBuilder.append(expressionValue);
                         stringBuilder.append("')");
+                        
                     } else {
                         stringBuilder.append(expressionValue);
                     }
@@ -379,7 +379,7 @@ public class DmnJsonConverter {
                                 outputEntry.setText("\"" + expressionValue + "\"");
                             } else if ("date".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())
                                 && StringUtils.isNotEmpty(expressionValue)) { // wrap in built in toDate function
-                                outputEntry.setText("fn_date('" + expressionValue + "')");
+                                outputEntry.setText("date:toDate('" + expressionValue + "')");
                             } else {
                                 outputEntry.setText(expressionValue);
                             }

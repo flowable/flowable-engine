@@ -53,11 +53,11 @@ import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.variable.service.delegate.Expression;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.el.FixedValue;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.http.HttpActivityBehavior;
 import org.flowable.http.HttpRequest;
 import org.flowable.http.HttpResponse;
@@ -84,7 +84,7 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
     protected final CloseableHttpClient client;
 
     public HttpActivityBehaviorImpl() {  
-        HttpClientConfig config = Context.getProcessEngineConfiguration().getHttpClientConfig();
+        HttpClientConfig config = CommandContextUtil.getProcessEngineConfiguration().getHttpClientConfig();
         HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
 
         // https settings
@@ -94,6 +94,7 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
                 builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
                 httpClientBuilder.setSSLSocketFactory(
                         new SSLConnectionSocketFactory(builder.build(), new HostnameVerifier() {
+                            @Override
                             public boolean verify(String s, SSLSession sslSession) {
                                 return true;
                             }
@@ -137,7 +138,7 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
         HttpRequestBase request = null;
         CloseableHttpResponse response = null;
         
-        ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         
         try {
             if (httpServiceTask.getHttpRequestHandler() != null) {
@@ -181,7 +182,7 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
                 setHeaders(request, requestInfo.getHeaders());
             }
 
-            setConfig(request, requestInfo, Context.getProcessEngineConfiguration().getHttpClientConfig());
+            setConfig(request, requestInfo, CommandContextUtil.getProcessEngineConfiguration().getHttpClientConfig());
 
             if (requestInfo.getTimeout() > 0) {
                 timer.schedule(new TimeoutTask(request), requestInfo.getTimeout());

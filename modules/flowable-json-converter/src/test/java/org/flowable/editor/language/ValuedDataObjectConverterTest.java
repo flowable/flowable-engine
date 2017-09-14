@@ -49,6 +49,7 @@ public class ValuedDataObjectConverterTest extends AbstractConverterTest {
         validateModel(bpmnModel);
     }
 
+    @Override
     protected String getResource() {
         return "test.valueddataobjectmodel.json";
     }

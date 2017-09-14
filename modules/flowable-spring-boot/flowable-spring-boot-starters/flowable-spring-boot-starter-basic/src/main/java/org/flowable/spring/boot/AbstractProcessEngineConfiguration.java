@@ -74,7 +74,7 @@ public abstract class AbstractProcessEngineConfiguration {
     public List<Resource> discoverProcessDefinitionResources(ResourcePatternResolver applicationContext, String prefix, List<String> suffixes, boolean checkPDs) throws IOException {
         if (checkPDs) {
 
-            List<Resource> result = new ArrayList<Resource>();
+            List<Resource> result = new ArrayList<>();
             for (String suffix : suffixes) {
                 String path = prefix + suffix;
                 Resource[] resources = applicationContext.getResources(path);
@@ -89,7 +89,7 @@ public abstract class AbstractProcessEngineConfiguration {
 
             return result;
         }
-        return new ArrayList<Resource>();
+        return new ArrayList<>();
     }
 
     public RuntimeService runtimeServiceBean(ProcessEngine processEngine) {

@@ -32,6 +32,7 @@ import org.springframework.security.web.firewall.HttpFirewall;
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
+    @Override
     public AuthenticationManager authenticationManager() throws Exception {
         return super.authenticationManager();
     }

@@ -21,9 +21,9 @@ import java.sql.SQLException;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.variable.VariableType;
-import org.flowable.engine.impl.variable.VariableTypes;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.variable.service.impl.types.VariableTypes;
 
 /**
  * @author Dave Syer
@@ -32,6 +32,7 @@ public class IbatisVariableTypeHandler implements TypeHandler<VariableType> {
 
     protected VariableTypes variableTypes;
 
+    @Override
     public VariableType getResult(ResultSet rs, String columnName) throws SQLException {
         String typeName = rs.getString(columnName);
         VariableType type = getVariableTypes().getVariableType(typeName);
@@ -41,6 +42,7 @@ public class IbatisVariableTypeHandler implements TypeHandler<VariableType> {
         return type;
     }
 
+    @Override
     public VariableType getResult(CallableStatement cs, int columnIndex) throws SQLException {
         String typeName = cs.getString(columnIndex);
         VariableType type = getVariableTypes().getVariableType(typeName);
@@ -50,6 +52,7 @@ public class IbatisVariableTypeHandler implements TypeHandler<VariableType> {
         return type;
     }
 
+    @Override
     public void setParameter(PreparedStatement ps, int i, VariableType parameter, JdbcType jdbcType) throws SQLException {
         String typeName = parameter.getTypeName();
         ps.setString(i, typeName);
@@ -57,11 +60,12 @@ public class IbatisVariableTypeHandler implements TypeHandler<VariableType> {
 
     protected VariableTypes getVariableTypes() {
         if (variableTypes == null) {
-            variableTypes = Context.getProcessEngineConfiguration().getVariableTypes();
+            variableTypes = CommandContextUtil.getProcessEngineConfiguration().getVariableTypes();
         }
         return variableTypes;
     }
 
+    @Override
     public VariableType getResult(ResultSet resultSet, int columnIndex) throws SQLException {
         String typeName = resultSet.getString(columnIndex);
         VariableType type = getVariableTypes().getVariableType(typeName);

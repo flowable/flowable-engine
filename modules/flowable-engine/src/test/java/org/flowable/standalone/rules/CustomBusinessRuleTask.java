@@ -18,14 +18,14 @@ import java.util.List;
 import org.flowable.engine.delegate.BusinessRuleTaskDelegate;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.DelegateHelper;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.variable.service.delegate.Expression;
 
 public class CustomBusinessRuleTask implements BusinessRuleTaskDelegate {
 
     private static final long serialVersionUID = 1L;
 
-    public static List<Expression> ruleInputVariables = new ArrayList<Expression>();
-    public static List<Expression> ruleIds = new ArrayList<Expression>();
+    public static List<Expression> ruleInputVariables = new ArrayList<>();
+    public static List<Expression> ruleIds = new ArrayList<>();
     public static Boolean exclude;
     public static String resultVariableName;
 

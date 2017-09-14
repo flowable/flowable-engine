@@ -17,7 +17,6 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import io.swagger.annotations.Authorization;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.runtime.EventSubscriptionQuery;
 import org.flowable.rest.api.DataResponse;
@@ -36,6 +35,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Tijs Rademakers

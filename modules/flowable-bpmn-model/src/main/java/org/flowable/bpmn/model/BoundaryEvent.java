@@ -48,6 +48,7 @@ public class BoundaryEvent extends Event {
         this.cancelActivity = cancelActivity;
     }
 
+    @Override
     public BoundaryEvent clone() {
         BoundaryEvent clone = new BoundaryEvent();
         clone.setValues(this);

@@ -12,19 +12,19 @@
  */
 package org.flowable.engine.impl.event.logger;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandContextCloseListener;
 import org.flowable.engine.common.runtime.Clock;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.event.logger.handler.ActivityCompensatedEventHandler;
 import org.flowable.engine.impl.event.logger.handler.ActivityCompletedEventHandler;
 import org.flowable.engine.impl.event.logger.handler.ActivityErrorReceivedEventHandler;
@@ -41,11 +41,11 @@ import org.flowable.engine.impl.event.logger.handler.TaskCreatedEventHandler;
 import org.flowable.engine.impl.event.logger.handler.VariableCreatedEventHandler;
 import org.flowable.engine.impl.event.logger.handler.VariableDeletedEventHandler;
 import org.flowable.engine.impl.event.logger.handler.VariableUpdatedEventHandler;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandContextCloseListener;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Joram Barrez
@@ -60,7 +60,7 @@ public class EventLogger implements FlowableEventListener {
     protected ObjectMapper objectMapper;
 
     // Mapping of type -> handler
-    protected Map<FlowableEngineEventType, Class<? extends EventLoggerEventHandler>> eventHandlers = new HashMap<FlowableEngineEventType, Class<? extends EventLoggerEventHandler>>();
+    protected Map<FlowableEngineEventType, Class<? extends EventLoggerEventHandler>> eventHandlers = new HashMap<>();
 
     // Listeners for new events
     protected List<EventLoggerListener> listeners;
@@ -136,6 +136,7 @@ public class EventLogger implements FlowableEventListener {
                                 }
                             }
 
+                            @Override
                             public void afterSessionsFlush(CommandContext commandContext) {
                             }
 
@@ -207,7 +208,7 @@ public class EventLogger implements FlowableEventListener {
 
     public void addEventLoggerListener(EventLoggerListener listener) {
         if (listeners == null) {
-            listeners = new ArrayList<EventLoggerListener>(1);
+            listeners = new ArrayList<>(1);
         }
         listeners.add(listener);
     }

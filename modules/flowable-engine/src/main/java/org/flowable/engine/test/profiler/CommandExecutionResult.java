@@ -24,10 +24,10 @@ public class CommandExecutionResult {
     protected long totalTimeInMs;
     protected long databaseTimeInMs;
 
-    protected Map<String, Long> dbSelects = new HashMap<String, Long>();
-    protected Map<String, Long> dbInserts = new HashMap<String, Long>();
-    protected Map<String, Long> dbUpdates = new HashMap<String, Long>();
-    protected Map<String, Long> dbDeletes = new HashMap<String, Long>();
+    protected Map<String, Long> dbSelects = new HashMap<>();
+    protected Map<String, Long> dbInserts = new HashMap<>();
+    protected Map<String, Long> dbUpdates = new HashMap<>();
+    protected Map<String, Long> dbDeletes = new HashMap<>();
 
     public String getCommandFqn() {
         return commandFqn;

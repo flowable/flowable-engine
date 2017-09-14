@@ -48,8 +48,7 @@ public interface Query<T extends Query<?, ?>, U extends Object> {
     /**
      * Executes the query and returns the resulting entity or null if no entity matches the query criteria.
      *
-     * @throws FlowableException
-     *             when the query results in more than one entities.
+     * @throws org.flowable.engine.common.api.FlowableException when the query results in more than one entities.
      */
     U singleResult();
 

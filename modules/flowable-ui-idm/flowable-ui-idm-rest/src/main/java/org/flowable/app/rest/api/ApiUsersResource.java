@@ -35,7 +35,7 @@ public class ApiUsersResource {
     @Autowired
     protected UserService userService;
 
-    @RequestMapping(value = "/idm/users/{userId}", method = RequestMethod.GET, produces = { "application/json" })
+    @RequestMapping(value = "/idm/users/{userId}", method = RequestMethod.GET, produces = {"application/json"})
     public UserRepresentation getUserInformation(@PathVariable String userId) {
         UserInformation userInformation = userService.getUserInformation(userId);
         if (userInformation != null) {
@@ -56,10 +56,10 @@ public class ApiUsersResource {
         }
     }
 
-    @RequestMapping(value = "/idm/users", method = RequestMethod.GET, produces = { "application/json" })
+    @RequestMapping(value = "/idm/users", method = RequestMethod.GET, produces = {"application/json"})
     public List<UserRepresentation> findUsersByFilter(@RequestParam("filter") String filter) {
         List<User> users = userService.getUsers(filter, null, null);
-        List<UserRepresentation> result = new ArrayList<UserRepresentation>();
+        List<UserRepresentation> result = new ArrayList<>();
         for (User user : users) {
             result.add(new UserRepresentation(user));
         }

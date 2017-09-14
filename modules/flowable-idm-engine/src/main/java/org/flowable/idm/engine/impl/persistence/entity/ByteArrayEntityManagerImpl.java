@@ -23,7 +23,7 @@ import org.flowable.idm.engine.impl.persistence.entity.data.ByteArrayDataManager
  * @author Joram Barrez
  * @author Marcus Klimstra (CGI)
  */
-public class ByteArrayEntityManagerImpl extends AbstractEntityManager<ByteArrayEntity> implements ByteArrayEntityManager {
+public class ByteArrayEntityManagerImpl extends AbstractEntityManager<IdmByteArrayEntity> implements ByteArrayEntityManager {
 
     protected ByteArrayDataManager byteArrayDataManager;
 
@@ -33,12 +33,12 @@ public class ByteArrayEntityManagerImpl extends AbstractEntityManager<ByteArrayE
     }
 
     @Override
-    protected DataManager<ByteArrayEntity> getDataManager() {
+    protected DataManager<IdmByteArrayEntity> getDataManager() {
         return byteArrayDataManager;
     }
 
     @Override
-    public List<ByteArrayEntity> findAll() {
+    public List<IdmByteArrayEntity> findAll() {
         return byteArrayDataManager.findAll();
     }
 

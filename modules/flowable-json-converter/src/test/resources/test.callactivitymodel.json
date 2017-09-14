@@ -35,6 +35,9 @@
         "dockers" : [  ],
         "outgoing" : [ { "resourceId" : "sid-3E39A302-9778-49BA-AEBE-5609C72C7C65" } ],
         "properties" : { "callactivitycalledelement" : "processId",
+            "callactivityinheritvariables" : true,
+            "callactivityinheritbusinesskey" : true,
+            "callactivityuselocalscopeforoutparameters" : "true",
             "callactivityinparameters" : { "inParameters" : [ { "source" : "test",
                       "sourceExpression" : "",
                       "target" : "test"

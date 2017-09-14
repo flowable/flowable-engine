@@ -15,13 +15,13 @@ package org.flowable.idm.engine.impl.persistence.entity.data;
 import java.util.List;
 
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
-import org.flowable.idm.engine.impl.persistence.entity.PropertyEntity;
+import org.flowable.idm.engine.impl.persistence.entity.IdmPropertyEntity;
 
 /**
  * @author Joram Barrez
  */
-public interface PropertyDataManager extends DataManager<PropertyEntity> {
+public interface PropertyDataManager extends DataManager<IdmPropertyEntity> {
 
-    List<PropertyEntity> findAll();
+    List<IdmPropertyEntity> findAll();
 
 }

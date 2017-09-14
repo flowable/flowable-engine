@@ -49,7 +49,7 @@ public class AbstractFlowable6Test {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractFlowable6Test.class);
 
-    public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000";
+    public static final String H2_TEST_JDBC_URL = "jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000";
 
     @Rule
     public FlowableRule activitiRule = new FlowableRule();

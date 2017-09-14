@@ -63,7 +63,7 @@ import org.flowable.bpmn.model.GraphicInfo;
 
 public class BpmnXMLUtil implements BpmnXMLConstants {
 
-    private static Map<String, BaseChildElementParser> genericChildParserMap = new HashMap<String, BaseChildElementParser>();
+    private static Map<String, BaseChildElementParser> genericChildParserMap = new HashMap<>();
 
     static {
         addGenericParser(new CancelEventDefinitionParser());
@@ -118,7 +118,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
     public static void parseChildElements(String elementName, BaseElement parentElement, XMLStreamReader xtr,
             Map<String, BaseChildElementParser> childParsers, BpmnModel model) throws Exception {
 
-        Map<String, BaseChildElementParser> localParserMap = new HashMap<String, BaseChildElementParser>(genericChildParserMap);
+        Map<String, BaseChildElementParser> localParserMap = new HashMap<>(genericChildParserMap);
         if (childParsers != null) {
             localParserMap.putAll(childParsers);
         }
@@ -147,7 +147,9 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
             } else if (xtr.isEndElement()) {
                 if (ELEMENT_EXTENSIONS.equals(xtr.getLocalName())) {
                     inExtensionElements = false;
-                } else if (elementName.equalsIgnoreCase(xtr.getLocalName())) {
+                }
+                
+                if (elementName.equalsIgnoreCase(xtr.getLocalName())) {
                     readyWithChildElements = true;
                 }
             }
@@ -227,7 +229,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
             }
 
             if (namespaceMap == null) {
-                namespaceMap = new HashMap<String, String>();
+                namespaceMap = new HashMap<>();
             }
 
             for (List<ExtensionElement> extensionElements : baseElement.getExtensionElements().values()) {
@@ -241,7 +243,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
 
     protected static void writeExtensionElement(ExtensionElement extensionElement, Map<String, String> namespaceMap, XMLStreamWriter xtw) throws Exception {
         if (StringUtils.isNotEmpty(extensionElement.getName())) {
-            Map<String, String> localNamespaceMap = new HashMap<String, String>();
+            Map<String, String> localNamespaceMap = new HashMap<>();
             if (StringUtils.isNotEmpty(extensionElement.getNamespace())) {
                 if (StringUtils.isNotEmpty(extensionElement.getNamespacePrefix())) {
                     xtw.writeStartElement(extensionElement.getNamespacePrefix(), extensionElement.getName(), extensionElement.getNamespace());
@@ -301,7 +303,7 @@ public class BpmnXMLUtil implements BpmnXMLConstants {
     }
 
     public static List<String> parseDelimitedList(String s) {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         if (StringUtils.isNotEmpty(s)) {
 
             StringCharacterIterator iterator = new StringCharacterIterator(s);

@@ -15,14 +15,14 @@ package org.flowable.idm.engine.impl.persistence.entity.data;
 import java.util.List;
 
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
-import org.flowable.idm.engine.impl.persistence.entity.ByteArrayEntity;
+import org.flowable.idm.engine.impl.persistence.entity.IdmByteArrayEntity;
 
 /**
  * @author Joram Barrez
  */
-public interface ByteArrayDataManager extends DataManager<ByteArrayEntity> {
+public interface ByteArrayDataManager extends DataManager<IdmByteArrayEntity> {
 
-    List<ByteArrayEntity> findAll();
+    List<IdmByteArrayEntity> findAll();
 
     void deleteByteArrayNoRevisionCheck(String byteArrayEntityId);
 

@@ -24,7 +24,7 @@ public abstract class FlowElement extends BaseElement implements HasExecutionLis
 
     protected String name;
     protected String documentation;
-    protected List<FlowableListener> executionListeners = new ArrayList<FlowableListener>();
+    protected List<FlowableListener> executionListeners = new ArrayList<>();
     protected FlowElementsContainer parentContainer;
 
     public String getName() {
@@ -43,10 +43,12 @@ public abstract class FlowElement extends BaseElement implements HasExecutionLis
         this.documentation = documentation;
     }
 
+    @Override
     public List<FlowableListener> getExecutionListeners() {
         return executionListeners;
     }
 
+    @Override
     public void setExecutionListeners(List<FlowableListener> executionListeners) {
         this.executionListeners = executionListeners;
     }
@@ -70,6 +72,7 @@ public abstract class FlowElement extends BaseElement implements HasExecutionLis
         this.parentContainer = parentContainer;
     }
 
+    @Override
     public abstract FlowElement clone();
 
     public void setValues(FlowElement otherElement) {
@@ -77,7 +80,7 @@ public abstract class FlowElement extends BaseElement implements HasExecutionLis
         setName(otherElement.getName());
         setDocumentation(otherElement.getDocumentation());
 
-        executionListeners = new ArrayList<FlowableListener>();
+        executionListeners = new ArrayList<>();
         if (otherElement.getExecutionListeners() != null && !otherElement.getExecutionListeners().isEmpty()) {
             for (FlowableListener listener : otherElement.getExecutionListeners()) {
                 executionListeners.add(listener.clone());

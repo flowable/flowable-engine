@@ -13,7 +13,7 @@
 package org.flowable.compatibility.test.delegate;
 
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.variable.service.delegate.Expression;
 import org.flowable.engine.delegate.JavaDelegate;
 
 /**

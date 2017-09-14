@@ -12,49 +12,55 @@
  */
 package org.flowable.dmn.engine.impl.cmd;
 
-import org.flowable.dmn.api.DmnDecisionTable;
-import org.flowable.dmn.api.RuleEngineExecutionResult;
-import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.dmn.engine.impl.interceptor.Command;
-import org.flowable.dmn.engine.impl.interceptor.CommandContext;
-import org.flowable.dmn.model.Decision;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.dmn.api.DecisionExecutionAuditContainer;
+import org.flowable.dmn.api.DmnDecisionTable;
+import org.flowable.dmn.engine.DmnEngineConfiguration;
+import org.flowable.dmn.engine.impl.ExecuteDecisionBuilderImpl;
+import org.flowable.dmn.engine.impl.util.CommandContextUtil;
+import org.flowable.dmn.model.Decision;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 /**
  * @author Tijs Rademakers
  * @author Yvo Swillens
  */
 public class ExecuteDecisionCmd extends AbstractExecuteDecisionCmd implements Command<List<Map<String, Object>>> {
+    
+    private static final long serialVersionUID = 1L;
 
+    public ExecuteDecisionCmd(ExecuteDecisionBuilderImpl decisionBuilder) {
+        super(decisionBuilder);
+    }
+    
     public ExecuteDecisionCmd(String decisionKey, Map<String, Object> variables) {
-        this.decisionKey = decisionKey;
-        this.variables = variables;
+        super(decisionKey, variables);
     }
 
     public ExecuteDecisionCmd(String decisionKey, String parentDeploymentId, Map<String, Object> variables) {
         this(decisionKey, variables);
-        this.parentDeploymentId = parentDeploymentId;
+        executeDecisionInfo.setParentDeploymentId(parentDeploymentId);
     }
 
     public ExecuteDecisionCmd(String decisionKey, String parentDeploymentId, Map<String, Object> variables, String tenantId) {
         this(decisionKey, parentDeploymentId, variables);
-        this.tenantId = tenantId;
+        executeDecisionInfo.setTenantId(tenantId);
     }
 
+    @Override
     public List<Map<String, Object>> execute(CommandContext commandContext) {
-        if (decisionKey == null) {
+        if (getDecisionKey() == null) {
             throw new FlowableIllegalArgumentException("decisionKey is null");
         }
 
-        DmnEngineConfiguration dmnEngineConfiguration = commandContext.getDmnEngineConfiguration();
+        DmnEngineConfiguration dmnEngineConfiguration = CommandContextUtil.getDmnEngineConfiguration();
         DmnDecisionTable decisionTable = resolveDecisionTable(dmnEngineConfiguration.getDeploymentManager());
         Decision decision = resolveDecision(dmnEngineConfiguration.getDeploymentManager(), decisionTable);
 
-        RuleEngineExecutionResult executionResult = dmnEngineConfiguration.getRuleEngineExecutor().execute(decision, variables,
-                dmnEngineConfiguration.getCustomExpressionFunctions(), dmnEngineConfiguration.getCustomPropertyHandlers());
+        DecisionExecutionAuditContainer executionResult = dmnEngineConfiguration.getRuleEngineExecutor().execute(decision, executeDecisionInfo);
 
         if (executionResult != null) {
             return executionResult.getDecisionResult();

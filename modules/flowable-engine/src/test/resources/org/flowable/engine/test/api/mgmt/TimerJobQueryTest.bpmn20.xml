@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn" targetNamespace="org.flowable.engine.test.api.mgmt">
+
+    <process id="timerJobQueryTest">
+
+        <startEvent id="theStart" />
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="gw1" />
+
+        <parallelGateway id="gw1" />
+        <sequenceFlow id="flow2" sourceRef="gw1" targetRef="task1" />
+        <sequenceFlow id="flow3" sourceRef="gw1" targetRef="task2" />
+        <sequenceFlow id="flow4" sourceRef="gw1" targetRef="task3" />
+
+        <userTask id="task1" name="Task 1" />
+
+        <boundaryEvent id="timerA" cancelActivity="false" attachedToRef="task1">
+            <timerEventDefinition>
+                <timeDuration>PT1H</timeDuration>
+            </timerEventDefinition>
+        </boundaryEvent>
+
+        <boundaryEvent id="timerB" cancelActivity="false" attachedToRef="task1">
+            <timerEventDefinition>
+                <timeDuration>PT3H</timeDuration>
+            </timerEventDefinition>
+        </boundaryEvent>
+
+        <userTask id="task2" name="Task 2" />
+
+        <boundaryEvent id="timerC" cancelActivity="false" attachedToRef="task1">
+            <timerEventDefinition>
+                <timeDuration>PT1H</timeDuration>
+            </timerEventDefinition>
+        </boundaryEvent>
+        
+        <serviceTask id="task3" flowable:async="true" flowable:expression="${invalidVar + 1 == 100}"/>
+
+        <sequenceFlow id="flow5" sourceRef="timerA" targetRef="escalatedEnd" />
+        <sequenceFlow id="flow6" sourceRef="timerB" targetRef="escalatedEnd" />
+        <sequenceFlow id="flow7" sourceRef="timerC" targetRef="escalatedEnd" />
+        <endEvent id="escalatedEnd" />
+        
+        <sequenceFlow id="flow8" sourceRef="task1" targetRef="normalEnd" />
+        <sequenceFlow id="flow9" sourceRef="task2" targetRef="normalEnd" />
+        <sequenceFlow id="flow10" sourceRef="task3" targetRef="normalEnd" />
+        <endEvent id="normalEnd" />
+        
+    </process>
+
+</definitions>

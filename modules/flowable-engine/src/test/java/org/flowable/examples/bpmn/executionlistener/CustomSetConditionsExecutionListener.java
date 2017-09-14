@@ -22,7 +22,7 @@ public class CustomSetConditionsExecutionListener implements ExecutionListener {
 
     private static final long serialVersionUID = 1L;
 
-    protected List<String> conditions = new ArrayList<String>();
+    protected List<String> conditions = new ArrayList<>();
     protected String flowId;
 
     @Override

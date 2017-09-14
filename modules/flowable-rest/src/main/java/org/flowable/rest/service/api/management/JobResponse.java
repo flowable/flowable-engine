@@ -36,6 +36,7 @@ public class JobResponse {
     protected String exceptionMessage;
     @JsonSerialize(using = DateToStringSerializer.class, as = Date.class)
     protected Date dueDate;
+    protected Date createTime;
     protected String tenantId;
 
     public String getId() {
@@ -124,6 +125,14 @@ public class JobResponse {
 
     public void setDueDate(Date dueDate) {
         this.dueDate = dueDate;
+    }
+
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
     }
 
     public void setTenantId(String tenantId) {

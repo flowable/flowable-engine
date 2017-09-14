@@ -64,6 +64,7 @@ public class FlowableProducer extends DefaultProducer {
         this.timeResolution = timeResolution;
     }
 
+    @Override
     public void process(Exchange exchange) throws Exception {
         if (shouldStartProcess()) {
             ProcessInstance pi = startProcess(exchange);

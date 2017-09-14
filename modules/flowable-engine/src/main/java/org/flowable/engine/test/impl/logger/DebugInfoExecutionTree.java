@@ -39,7 +39,7 @@ public class DebugInfoExecutionTree {
         protected String activityId;
         protected String activityName;
         protected DebugInfoExecutionTreeNode parentNode;
-        protected List<DebugInfoExecutionTreeNode> childNodes = new ArrayList<DebugInfoExecutionTreeNode>();
+        protected List<DebugInfoExecutionTreeNode> childNodes = new ArrayList<>();
 
         /* See http://stackoverflow.com/questions/4965335/how-to-print-binary-tree-diagram */
         public void print(Logger logger) {

@@ -46,6 +46,7 @@ public class EncodingConverterTest extends AbstractConverterTest {
         assertEquals("Fazer relatório", userTask.getName());
     }
 
+    @Override
     protected String getResource() {
         return "encoding.bpmn";
     }
