@@ -10,11 +10,11 @@ import org.apache.http.entity.StringEntity;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.event.logger.EventLogger;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.rest.service.api.management.EventLogResource;
+import org.flowable.task.service.Task;
 import org.hamcrest.CoreMatchers;
 
 import java.io.IOException;

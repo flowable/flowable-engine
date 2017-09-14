@@ -56,9 +56,9 @@ public interface ModelService {
 
     CmmnModel getCmmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap);
 
-    String createModelJson(ModelRepresentation model);
+    String createModelJson(ModelRepresentation model, String skeletonId);
 
-    Model createModel(ModelRepresentation model, String skeleton, User createdBy);
+    Model createModel(ModelRepresentation model, String editorJson, User createdBy);
 
     Model createModel(Model newModel, User createdBy);
 

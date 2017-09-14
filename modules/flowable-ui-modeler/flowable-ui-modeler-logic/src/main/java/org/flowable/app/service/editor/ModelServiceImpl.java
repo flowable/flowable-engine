@@ -202,41 +202,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     @Override
-    public Model createModel(Model newModel, User createdBy) {
-        newModel.setVersion(1);
-        newModel.setCreated(Calendar.getInstance().getTime());
-        newModel.setCreatedBy(createdBy.getId());
-        newModel.setLastUpdated(Calendar.getInstance().getTime());
-        newModel.setLastUpdatedBy(createdBy.getId());
-
-        persistModel(newModel);
-        return newModel;
-    }
-
-    @Override
-    public Model createModel(ModelRepresentation model, String skeleton, User createdBy) {
-        Model newModel = new Model();
-        newModel.setVersion(1);
-        newModel.setName(model.getName());
-        newModel.setKey(model.getKey());
-        newModel.setModelType(model.getModelType());
-        newModel.setCreated(Calendar.getInstance().getTime());
-        if (createdBy != null) {
-            newModel.setCreatedBy(createdBy.getId());
-            newModel.setLastUpdatedBy(createdBy.getId());
-        } else {
-            newModel.setCreatedBy("admin");
-            newModel.setLastUpdatedBy("admin");
-        }
-        newModel.setDescription(model.getDescription());
-        newModel.setModelEditorJson(getInitialEditorModel(model, skeleton));
-        newModel.setLastUpdated(Calendar.getInstance().getTime());
-
-        persistModel(newModel);
-        return newModel;
-    }
-
-    protected String getInitialEditorModel(ModelRepresentation modelRepresentation, String skeleton) {
+    public String createModelJson(ModelRepresentation modelRepresentation, String skeletonId) {
         String json;
         if (modelRepresentation.getModelType() != null && modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_FORM)) {
             try {
@@ -267,7 +233,7 @@ public class ModelServiceImpl implements ModelService {
                 throw new InternalServerErrorException("Error creating app definition");
             }
 
-        } else if (Integer.valueOf(AbstractModel.MODEL_TYPE_CMMN).equals(model.getModelType())) {
+        } else if (Integer.valueOf(AbstractModel.MODEL_TYPE_CMMN).equals(modelRepresentation.getModelType())) {
             ObjectNode editorNode = objectMapper.createObjectNode();
             editorNode.put("id", "canvas");
             editorNode.put("resourceId", "canvas");
@@ -275,10 +241,10 @@ public class ModelServiceImpl implements ModelService {
             stencilSetNode.put("namespace", "http://b3mn.org/stencilset/cmmn1.1#");
             editorNode.set("stencilset", stencilSetNode);
             ObjectNode propertiesNode = objectMapper.createObjectNode();
-            propertiesNode.put("case_id", model.getKey());
-            propertiesNode.put("name", model.getName());
-            if (StringUtils.isNotEmpty(model.getDescription())) {
-                propertiesNode.put("documentation", model.getDescription());
+            propertiesNode.put("case_id", modelRepresentation.getKey());
+            propertiesNode.put("name", modelRepresentation.getName());
+            if (StringUtils.isNotEmpty(modelRepresentation.getDescription())) {
+                propertiesNode.put("documentation", modelRepresentation.getDescription());
             }
             editorNode.set("properties", propertiesNode);
 
@@ -306,20 +272,20 @@ public class ModelServiceImpl implements ModelService {
             json = editorNode.toString();
 
         } else {
-            json = getInitialProcessModelContent(modelRepresentation, skeleton);
+            json = getInitialProcessModelContent(modelRepresentation, skeletonId);
         }
         return json;
     }
 
 
-    protected String getInitialProcessModelContent(ModelRepresentation modelRepresentation, String skeleton) {
+    protected String getInitialProcessModelContent(ModelRepresentation modelRepresentation, String skeletonId) {
         ObjectNode editorNode = createTestProcessModel(modelRepresentation);
         ArrayNode childShapeArray = objectMapper.createArrayNode();
         editorNode.set("childShapes", childShapeArray);
         childShapeArray.add(
                 createStartEvent(0,"startEvent1")
         );
-        JsonNode eventLogEntriesForProcessInstanceId = getEventLogEntriesForProcessInstanceId(skeleton);
+        JsonNode eventLogEntriesForProcessInstanceId = getEventLogEntriesForProcessInstanceId(skeletonId);
 
         childShapeArray.addAll(
                 eventLogEntriesForProcessInstanceId.size() == 0 ?
@@ -665,6 +631,36 @@ public class ModelServiceImpl implements ModelService {
         }
         childNode.set("properties", propertiesNode);
         return childNode;
+    }
+
+    @Override
+    public Model createModel(Model newModel, User createdBy) {
+        newModel.setVersion(1);
+        newModel.setCreated(Calendar.getInstance().getTime());
+        newModel.setCreatedBy(createdBy.getId());
+        newModel.setLastUpdated(Calendar.getInstance().getTime());
+        newModel.setLastUpdatedBy(createdBy.getId());
+
+        persistModel(newModel);
+        return newModel;
+    }
+
+    @Override
+    public Model createModel(ModelRepresentation model, String editorJson, User createdBy) {
+        Model newModel = new Model();
+        newModel.setVersion(1);
+        newModel.setName(model.getName());
+        newModel.setKey(model.getKey());
+        newModel.setModelType(model.getModelType());
+        newModel.setCreated(Calendar.getInstance().getTime());
+        newModel.setCreatedBy(createdBy.getId());
+        newModel.setDescription(model.getDescription());
+        newModel.setModelEditorJson(editorJson);
+        newModel.setLastUpdated(Calendar.getInstance().getTime());
+        newModel.setLastUpdatedBy(createdBy.getId());
+
+        persistModel(newModel);
+        return newModel;
     }
 
     public ModelRepresentation importNewVersion(String modelId, String fileName, InputStream modelStream) {

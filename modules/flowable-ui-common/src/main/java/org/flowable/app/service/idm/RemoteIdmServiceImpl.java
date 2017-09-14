@@ -20,7 +20,6 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import com.google.common.base.Function;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpHeaders;
 import org.apache.http.HttpResponse;
@@ -35,7 +34,6 @@ import org.apache.http.ssl.SSLContextBuilder;
 import org.flowable.app.model.common.RemoteGroup;
 import org.flowable.app.model.common.RemoteToken;
 import org.flowable.app.model.common.RemoteUser;
-import org.flowable.app.rest.HttpRequestHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -167,12 +165,13 @@ public class RemoteIdmServiceImpl implements RemoteIdmService {
         } finally {
             if (client != null) {
                 try {
-                    return objectMapper.readTree(httpResponse.getEntity().getContent());
+                    client.close();
                 } catch (IOException e) {
-                    throw new RuntimeException("Unable to resolve entity content.", e);
+                    LOGGER.warn("Exception while closing http client", e);
                 }
             }
-        });
+        }
+        return null;
     }
 
     protected List<RemoteUser> parseUsersInfo(JsonNode json) {

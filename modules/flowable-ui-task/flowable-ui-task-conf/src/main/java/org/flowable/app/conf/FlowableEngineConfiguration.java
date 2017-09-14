@@ -13,6 +13,7 @@
 package org.flowable.app.conf;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.app.events.TimerFiredEventHandler;
 import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentService;
 import org.flowable.content.spring.SpringContentEngineConfiguration;
@@ -32,8 +33,8 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.runtime.Clock;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.agenda.DebugFlowableEngineAgendaFactory;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.event.BreakpointJobHandler;

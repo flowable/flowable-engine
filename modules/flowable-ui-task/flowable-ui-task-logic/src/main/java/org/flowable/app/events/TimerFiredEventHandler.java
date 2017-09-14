@@ -1,11 +1,11 @@
 package org.flowable.app.events;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.event.logger.handler.AbstractDatabaseEventLoggerEventHandler;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
 import java.util.HashMap;
 

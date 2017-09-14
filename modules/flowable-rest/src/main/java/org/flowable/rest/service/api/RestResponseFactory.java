@@ -69,6 +69,7 @@ import org.flowable.rest.service.api.identity.GroupResponse;
 import org.flowable.rest.service.api.identity.MembershipResponse;
 import org.flowable.rest.service.api.identity.UserInfoResponse;
 import org.flowable.rest.service.api.identity.UserResponse;
+import org.flowable.rest.service.api.management.EventLogEntryResponse;
 import org.flowable.rest.service.api.management.JobResponse;
 import org.flowable.rest.service.api.management.TableResponse;
 import org.flowable.rest.service.api.repository.DecisionTableResponse;

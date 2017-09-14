@@ -16,10 +16,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flowable.app.model.debugger.BreakpointRepresentation;
 import org.flowable.app.service.runtime.DebuggerService;
 import org.flowable.engine.ManagementService;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.event.logger.handler.AbstractDatabaseEventLoggerEventHandler;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -95,10 +96,10 @@ public class DebuggerResource {
                         eventLogInsertRequest.getTaskId(),
                         eventLogInsertRequest.getData()
                 );
-                externalEventHandler.setTimeStamp(commandContext.getProcessEngineConfiguration().getClock().getCurrentTime());
+                externalEventHandler.setTimeStamp(commandContext.getCurrentEngineConfiguration().getClock().getCurrentTime());
                 externalEventHandler.setObjectMapper(objectMapper);
                 EventLogEntryEntity eventLogEntryEntity = externalEventHandler.generateEventLogEntry(commandContext);
-                commandContext.getEventLogEntryEntityManager().insert(eventLogEntryEntity);
+                CommandContextUtil.getEventLogEntryEntityManager(commandContext).insert(eventLogEntryEntity);
                 return null;
             }
         });
