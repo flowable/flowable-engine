@@ -16,7 +16,6 @@ package org.flowable.engine.delegate.event;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -48,43 +47,43 @@ public abstract class AbstractFlowableEngineEventListener implements FlowableEve
             if(types == null || types.contains(engineEventType)) {
                 switch (engineEventType) {
                     case ENTITY_CREATED:
-                        entityCreated((FlowableEntityEvent) flowableEngineEvent);
+                        entityCreated((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                     case ENTITY_INITIALIZED:
-                        entityInitialized((FlowableEntityEvent) flowableEngineEvent);
+                        entityInitialized((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                     case ENTITY_UPDATED:
-                        entityUpdated((FlowableEntityEvent) flowableEngineEvent);
+                        entityUpdated((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                     case ENTITY_DELETED:
-                        entityDeleted((FlowableEntityEvent) flowableEngineEvent);
+                        entityDeleted((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                     case ENTITY_SUSPENDED:
-                        entitySuspended((FlowableEntityEvent) flowableEngineEvent);
+                        entitySuspended((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                     case ENTITY_ACTIVATED:
-                        entityActivated((FlowableEntityEvent) flowableEngineEvent);
+                        entityActivated((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                     case TIMER_SCHEDULED:
-                        timerScheduled((FlowableEntityEvent) flowableEngineEvent);
+                        timerScheduled((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                     case TIMER_FIRED:
-                        timerFired((FlowableEntityEvent) flowableEngineEvent);
+                        timerFired((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                     case JOB_CANCELED:
-                        jobCancelled((FlowableEntityEvent) flowableEngineEvent);
+                        jobCancelled((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                     case JOB_EXECUTION_SUCCESS:
-                        jobExecutionSuccess((FlowableEntityEvent) flowableEngineEvent);
+                        jobExecutionSuccess((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                     case JOB_EXECUTION_FAILURE:
-                        jobExecutionFailure((FlowableEntityEvent) flowableEngineEvent);
+                        jobExecutionFailure((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                     case JOB_RETRIES_DECREMENTED:
-                        jobRetriesDecremented((FlowableEntityEvent) flowableEngineEvent);
+                        jobRetriesDecremented((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                     case JOB_RESCHEDULED:
-                        jobRescheduled((FlowableEntityEvent) flowableEngineEvent);
+                        jobRescheduled((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                     case CUSTOM:
                         custom(flowableEngineEvent);
@@ -126,10 +125,10 @@ public abstract class AbstractFlowableEngineEventListener implements FlowableEve
                         activityErrorReceived((FlowableErrorEvent) flowableEngineEvent);
                         break;
                     case HISTORIC_ACTIVITY_INSTANCE_CREATED:
-                        historicActivityInstanceCreated((FlowableEntityEvent) flowableEngineEvent);
+                        historicActivityInstanceCreated((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                     case HISTORIC_ACTIVITY_INSTANCE_ENDED:
-                        historicActivityInstanceEnded((FlowableEntityEvent) flowableEngineEvent);
+                        historicActivityInstanceEnded((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                     case SEQUENCEFLOW_TAKEN:
                         sequenceFlowTaken((FlowableSequenceFlowTakenEvent) flowableEngineEvent);
@@ -147,13 +146,13 @@ public abstract class AbstractFlowableEngineEventListener implements FlowableEve
                         taskCreated((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                     case TASK_ASSIGNED:
-                        taskAssigned((FlowableEntityEvent) flowableEngineEvent);
+                        taskAssigned((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                     case TASK_COMPLETED:
-                        taskCompleted((FlowableEntityEvent) flowableEngineEvent);
+                        taskCompleted((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                     case PROCESS_CREATED:
-                        processCreated((FlowableEntityEvent) flowableEngineEvent);
+                        processCreated((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                     case PROCESS_STARTED:
                         processStarted((FlowableProcessStartedEvent) flowableEngineEvent);
@@ -165,16 +164,16 @@ public abstract class AbstractFlowableEngineEventListener implements FlowableEve
                         processCompletedWithTerminateEnd((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                     case PROCESS_COMPLETED_WITH_ERROR_END_EVENT:
-                        processCompletedWithErrorEnd((FlowableEntityEvent) flowableEngineEvent);
+                        processCompletedWithErrorEnd((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                     case PROCESS_CANCELLED:
                         processCancelled((FlowableCancelledEvent) flowableEngineEvent);
                         break;
                     case HISTORIC_PROCESS_INSTANCE_CREATED:
-                        historicProcessInstanceCreated((FlowableEntityEvent) flowableEngineEvent);
+                        historicProcessInstanceCreated((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                     case HISTORIC_PROCESS_INSTANCE_ENDED:
-                        historicProcessInstanceEnded((FlowableEntityEvent) flowableEngineEvent);
+                        historicProcessInstanceEnded((FlowableEngineEntityEvent) flowableEngineEvent);
                         break;
                 }
             }
@@ -186,31 +185,31 @@ public abstract class AbstractFlowableEngineEventListener implements FlowableEve
         return true;
     }
 
-    protected void entityCreated(FlowableEntityEvent event) {}
+    protected void entityCreated(FlowableEngineEntityEvent event) {}
 
-    protected void entityInitialized(FlowableEntityEvent event) {}
+    protected void entityInitialized(FlowableEngineEntityEvent event) {}
 
-    protected void entityUpdated(FlowableEntityEvent event) {}
+    protected void entityUpdated(FlowableEngineEntityEvent event) {}
 
-    protected void entityDeleted(FlowableEntityEvent event) {}
+    protected void entityDeleted(FlowableEngineEntityEvent event) {}
 
-    protected void entitySuspended(FlowableEntityEvent event) {}
+    protected void entitySuspended(FlowableEngineEntityEvent event) {}
 
-    protected void entityActivated(FlowableEntityEvent event) {}
+    protected void entityActivated(FlowableEngineEntityEvent event) {}
 
-    protected void timerScheduled(FlowableEntityEvent event) {}
+    protected void timerScheduled(FlowableEngineEntityEvent event) {}
 
-    protected void timerFired(FlowableEntityEvent event) {}
+    protected void timerFired(FlowableEngineEntityEvent event) {}
 
-    protected void jobCancelled(FlowableEntityEvent event) {}
+    protected void jobCancelled(FlowableEngineEntityEvent event) {}
 
-    protected void jobExecutionSuccess(FlowableEntityEvent event) {}
+    protected void jobExecutionSuccess(FlowableEngineEntityEvent event) {}
 
-    protected void jobExecutionFailure(FlowableEntityEvent event) {}
+    protected void jobExecutionFailure(FlowableEngineEntityEvent event) {}
 
-    protected void jobRetriesDecremented(FlowableEntityEvent event) {}
+    protected void jobRetriesDecremented(FlowableEngineEntityEvent event) {}
 
-    protected void jobRescheduled(FlowableEntityEvent event) {}
+    protected void jobRescheduled(FlowableEngineEntityEvent event) {}
 
     protected void custom(FlowableEngineEvent event) {}
 
@@ -238,9 +237,9 @@ public abstract class AbstractFlowableEngineEventListener implements FlowableEve
 
     protected void activityErrorReceived(FlowableErrorEvent event) {}
 
-    protected void historicActivityInstanceCreated(FlowableEntityEvent event) {}
+    protected void historicActivityInstanceCreated(FlowableEngineEntityEvent event) {}
 
-    protected void historicActivityInstanceEnded(FlowableEntityEvent event) {}
+    protected void historicActivityInstanceEnded(FlowableEngineEntityEvent event) {}
 
     protected void sequenceFlowTaken(FlowableSequenceFlowTakenEvent event) {}
 
@@ -252,11 +251,11 @@ public abstract class AbstractFlowableEngineEventListener implements FlowableEve
 
     protected void taskCreated(FlowableEngineEntityEvent event) {}
 
-    protected void taskAssigned(FlowableEntityEvent event) {}
+    protected void taskAssigned(FlowableEngineEntityEvent event) {}
 
-    protected void taskCompleted(FlowableEntityEvent event) {}
+    protected void taskCompleted(FlowableEngineEntityEvent event) {}
 
-    protected void processCreated(FlowableEntityEvent event) {}
+    protected void processCreated(FlowableEngineEntityEvent event) {}
 
     protected void processStarted(FlowableProcessStartedEvent event) {}
 
@@ -264,13 +263,13 @@ public abstract class AbstractFlowableEngineEventListener implements FlowableEve
 
     protected void processCompletedWithTerminateEnd(FlowableEngineEntityEvent event) {}
 
-    protected void processCompletedWithErrorEnd(FlowableEntityEvent event) {}
+    protected void processCompletedWithErrorEnd(FlowableEngineEntityEvent event) {}
 
     protected void processCancelled(FlowableCancelledEvent event) {}
 
-    protected void historicProcessInstanceCreated(FlowableEntityEvent event) {}
+    protected void historicProcessInstanceCreated(FlowableEngineEntityEvent event) {}
 
-    protected void historicProcessInstanceEnded(FlowableEntityEvent event) {}
+    protected void historicProcessInstanceEnded(FlowableEngineEntityEvent event) {}
 
     protected DelegateExecution getExecution(FlowableEngineEvent event) {
         String executionId = event.getExecutionId();

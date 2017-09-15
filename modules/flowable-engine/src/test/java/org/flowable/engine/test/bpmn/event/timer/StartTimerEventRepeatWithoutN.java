@@ -14,9 +14,8 @@
 package org.flowable.engine.test.bpmn.event.timer;
 
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
@@ -40,7 +39,7 @@ public class StartTimerEventRepeatWithoutN extends PluggableFlowableTestCase {
         }
 
         @Override
-        protected void timerFired(FlowableEntityEvent event) {
+        protected void timerFired(FlowableEngineEntityEvent event) {
             counter++;
         }
 

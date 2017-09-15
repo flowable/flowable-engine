@@ -862,7 +862,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         }
 
         @Override
-        protected void taskCompleted(FlowableEntityEvent event) {
+        protected void taskCompleted(FlowableEngineEntityEvent event) {
             eventsReceived.add(event);
         }
 

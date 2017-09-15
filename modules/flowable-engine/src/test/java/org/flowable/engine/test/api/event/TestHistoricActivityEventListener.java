@@ -17,10 +17,9 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 
 /**
@@ -49,22 +48,22 @@ public class TestHistoricActivityEventListener extends AbstractFlowableEngineEve
     }
 
     @Override
-    protected void historicActivityInstanceCreated(FlowableEntityEvent event) {
+    protected void historicActivityInstanceCreated(FlowableEngineEntityEvent event) {
         eventsReceived.add(event);
     }
 
     @Override
-    protected void historicActivityInstanceEnded(FlowableEntityEvent event) {
+    protected void historicActivityInstanceEnded(FlowableEngineEntityEvent event) {
         eventsReceived.add(event);
     }
 
     @Override
-    protected void historicProcessInstanceCreated(FlowableEntityEvent event) {
+    protected void historicProcessInstanceCreated(FlowableEngineEntityEvent event) {
         eventsReceived.add(event);
     }
 
     @Override
-    protected void historicProcessInstanceEnded(FlowableEntityEvent event) {
+    protected void historicProcessInstanceEnded(FlowableEngineEntityEvent event) {
         eventsReceived.add(event);
     }
 
