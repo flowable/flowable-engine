@@ -27,8 +27,8 @@ public abstract class AbstractAgenda implements Agenda {
     private static final Logger LOGGER = LoggerFactory.getLogger(AbstractAgenda.class);
 
     protected CommandContext commandContext;
-    protected LinkedList<Runnable> operations = new LinkedList<Runnable>();
-    
+    protected LinkedList<Runnable> operations = new LinkedList<>();
+
     public AbstractAgenda(CommandContext commandContext) {
         this.commandContext = commandContext;
     }
@@ -70,7 +70,7 @@ public abstract class AbstractAgenda implements Agenda {
     public LinkedList<Runnable> getOperations() {
         return operations;
     }
-    
+
     public CommandContext getCommandContext() {
         return commandContext;
     }
@@ -78,15 +78,15 @@ public abstract class AbstractAgenda implements Agenda {
     public void setCommandContext(CommandContext commandContext) {
         this.commandContext = commandContext;
     }
-    
+
     @Override
     public void flush() {
-        
+
     }
 
     @Override
     public void close() {
-        
+
     }
-    
+
 }

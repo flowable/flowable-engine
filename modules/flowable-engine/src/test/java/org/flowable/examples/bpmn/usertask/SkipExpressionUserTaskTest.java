@@ -13,14 +13,17 @@
 package org.flowable.examples.bpmn.usertask;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -121,19 +124,22 @@ public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
         }
     }
     
-    public class SkipFlowableEventListener implements FlowableEventListener {
-        
+    public class SkipFlowableEventListener extends AbstractFlowableEngineEventListener {
+
+        public SkipFlowableEventListener() {
+            super(new HashSet<>(Arrays.asList(FlowableEngineEventType.TASK_CREATED, FlowableEngineEventType.TASK_COMPLETED)));
+        }
         protected List<FlowableEvent> createdEvents = new ArrayList<>();
         protected List<FlowableEvent> completedEvents = new ArrayList<>();
 
         @Override
-        public void onEvent(FlowableEvent event) {
-            if (FlowableEngineEventType.TASK_CREATED == event.getType()) {
-                createdEvents.add(event);
-                
-            } else if (FlowableEngineEventType.TASK_COMPLETED == event.getType()) {
-                completedEvents.add(event);
-            }
+        protected void taskCreated(FlowableEngineEntityEvent event) {
+            createdEvents.add(event);
+        }
+
+        @Override
+        protected void taskCompleted(FlowableEngineEntityEvent event) {
+            completedEvents.add(event);
         }
 
         @Override

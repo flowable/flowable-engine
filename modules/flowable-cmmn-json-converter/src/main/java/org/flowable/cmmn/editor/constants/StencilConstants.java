@@ -22,6 +22,7 @@ public interface StencilConstants {
     final String STENCIL_STAGE = "Stage";
     final String STENCIL_TASK_HUMAN = "HumanTask";
     final String STENCIL_TASK_DECISION = "DecisionTask";
+    final String STENCIL_MILESTONE = "Milestone";
 
     final String STENCIL_ENTRY_CRITERION = "EntryCriterion";
     final String STENCIL_EXIT_CRITERION = "ExitCriterion";

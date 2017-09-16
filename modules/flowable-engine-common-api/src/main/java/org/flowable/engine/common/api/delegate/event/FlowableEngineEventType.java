@@ -180,11 +180,6 @@ public enum FlowableEngineEventType implements FlowableEventType {
      * Indicates the engine has taken (ie. followed) a sequenceflow from a source activity to a target activity.
      */
     SEQUENCEFLOW_TAKEN,
-
-    /**
-     * When a BPMN Error was thrown, but was not caught within in the process.
-     */
-    UNCAUGHT_BPMN_ERROR,
     
     /**
      * A new variable has been created.
@@ -268,23 +263,7 @@ public enum FlowableEngineEventType implements FlowableEventType {
      * 
      * Note that history (minimum level ACTIVITY) must be enabled to receive this event.
      */
-    HISTORIC_PROCESS_INSTANCE_ENDED,
-
-    /**
-     * A new membership has been created.
-     */
-    MEMBERSHIP_CREATED,
-
-    /**
-     * A single membership has been deleted.
-     */
-    MEMBERSHIP_DELETED,
-
-    /**
-     * All memberships in the related group have been deleted. No individual {@link #MEMBERSHIP_DELETED} events will be dispatched due to possible performance reasons. The event is dispatched before
-     * the memberships are deleted, so they can still be accessed in the dispatch method of the listener.
-     */
-    MEMBERSHIPS_DELETED;
+    HISTORIC_PROCESS_INSTANCE_ENDED;
 
     public static final FlowableEngineEventType[] EMPTY_ARRAY = new FlowableEngineEventType[] {};
 

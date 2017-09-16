@@ -13,7 +13,7 @@
 package org.flowable.cmmn.engine.configurator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,22 +41,22 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
 
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
     protected CmmnEngine cmmnEngine;
-    
+
     @Override
     public int getPriority() {
         return EngineConfigurationConstants.PRIORITY_ENGINE_CMMN;
     }
-    
+
     @Override
     protected List<Deployer> getCustomDeployers() {
-        return Arrays.<Deployer>asList(new CmmnDeployer(this));
+        return Collections.<Deployer>singletonList(new CmmnDeployer(this));
     }
-    
+
     @Override
     protected String getMybatisCfgPath() {
         return CmmnEngineConfiguration.DEFAULT_MYBATIS_MAPPING_FILE;
     }
-    
+
     @Override
     public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
         if (cmmnEngineConfiguration == null) {
@@ -66,10 +66,10 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
         initialiseCommonProperties(processEngineConfiguration, cmmnEngineConfiguration);
         initProcessInstanceService(processEngineConfiguration);
         initProcessInstanceStateChangedCallbacks(processEngineConfiguration);
-        
+
         this.cmmnEngine = initCmmnEngine();
     }
-    
+
     protected void initProcessInstanceService(ProcessEngineConfigurationImpl processEngineConfiguration) {
         cmmnEngineConfiguration.setProcessInstanceService(new DefaultProcessInstanceService(processEngineConfiguration.getRuntimeService()));
     }
@@ -89,7 +89,7 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
     protected List<Class<? extends Entity>> getEntityInsertionOrder() {
         return EntityDependencyOrder.INSERT_ORDER;
     }
-    
+
     @Override
     protected List<Class<? extends Entity>> getEntityDeletionOrder() {
         return EntityDependencyOrder.DELETE_ORDER;
@@ -119,5 +119,5 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
     public void setCmmnEngine(CmmnEngine cmmnEngine) {
         this.cmmnEngine = cmmnEngine;
     }
-    
+
 }

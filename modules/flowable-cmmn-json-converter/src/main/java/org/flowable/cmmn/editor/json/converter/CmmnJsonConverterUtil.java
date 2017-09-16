@@ -86,6 +86,10 @@ public class CmmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
 
         return elementId;
     }
+    
+    public static String getShapeId(JsonNode objectNode) {
+        return objectNode.get(EDITOR_SHAPE_ID).asText();
+    }
 
     public static String lookForSourceRef(String flowId, JsonNode childShapesNode) {
         String sourceRef = null;

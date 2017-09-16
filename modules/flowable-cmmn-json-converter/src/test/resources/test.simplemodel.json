@@ -65,7 +65,7 @@
                     ],
                     "outgoing":[
                         {
-                            "resourceId":"sid-A6F9FB03-6038-4EEB-83D3-9764356B5996"
+                            "resourceId":"criterion1"
                         }
                     ],
                     "bounds":{
@@ -83,7 +83,7 @@
                     ]
                 },
                 {
-                    "resourceId":"sid-F9EE7169-7239-4E52-A71D-0B985C035BED",
+                    "resourceId":"task2",
                     "properties":{
                         "overrideid":"",
                         "name":"Task A",
@@ -129,7 +129,7 @@
                     ]
                 },
                 {
-                    "resourceId":"sid-A6F9FB03-6038-4EEB-83D3-9764356B5996",
+                    "resourceId":"criterion1",
                     "properties":{
                         "overrideid":"",
                         "name":"",
@@ -197,7 +197,7 @@
             ],
             "outgoing":[
                 {
-                    "resourceId":"sid-F9EE7169-7239-4E52-A71D-0B985C035BED"
+                    "resourceId":"task2"
                 }
             ],
             "bounds":{
@@ -221,7 +221,7 @@
                 }
             ],
             "target":{
-                "resourceId":"sid-F9EE7169-7239-4E52-A71D-0B985C035BED"
+                "resourceId":"task2"
             }
         }
     ],

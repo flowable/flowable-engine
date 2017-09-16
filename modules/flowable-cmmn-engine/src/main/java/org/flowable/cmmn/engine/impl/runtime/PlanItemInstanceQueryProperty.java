@@ -25,11 +25,11 @@ public class PlanItemInstanceQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, PlanItemInstanceQueryProperty> properties = new HashMap<String, PlanItemInstanceQueryProperty>();
+    private static final Map<String, PlanItemInstanceQueryProperty> properties = new HashMap<>();
 
     public static final PlanItemInstanceQueryProperty START_TIME = new PlanItemInstanceQueryProperty("RES.START_TIME_");
     public static final PlanItemInstanceQueryProperty NAME = new PlanItemInstanceQueryProperty("RES.NAME_");
-    
+
     private String name;
 
     public PlanItemInstanceQueryProperty(String name) {

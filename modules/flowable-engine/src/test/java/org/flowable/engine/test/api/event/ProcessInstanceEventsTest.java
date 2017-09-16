@@ -22,7 +22,11 @@ import java.util.List;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.flowable.bpmn.model.FlowNode;
-import org.flowable.engine.common.api.delegate.event.*;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
@@ -220,7 +224,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
     /**
      * Test create, update and delete events of process instances.
      */
-    @Deployment(resources = { "org/flowable/engine/test/api/runtime/nestedSubProcess.bpmn20.xml", "org/flowable/engine/test/api/runtime/subProcess.bpmn20.xml" })
+    @Deployment(resources = {"org/flowable/engine/test/api/runtime/nestedSubProcess.bpmn20.xml", "org/flowable/engine/test/api/runtime/subProcess.bpmn20.xml"})
     public void testSubProcessInstanceEvents() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedSimpleSubProcess");
         assertNotNull(processInstance);
@@ -319,7 +323,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
     /**
      * Test process with signals start.
      */
-    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/signal/SignalEventTest.testSignalWithGlobalScope.bpmn20.xml" })
+    @Deployment(resources = {"org/flowable/engine/test/bpmn/event/signal/SignalEventTest.testSignalWithGlobalScope.bpmn20.xml"})
     public void testSignalProcessInstanceStart() throws Exception {
         this.runtimeService.startProcessInstanceByKey("processWithSignalCatch");
         listener.clearEventsReceived();
@@ -331,7 +335,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
     /**
      * Test Start->End process on PROCESS_COMPLETED event
      */
-    @Deployment(resources = { "org/flowable/engine/test/api/event/ProcessInstanceEventsTest.noneTaskProcess.bpmn20.xml" })
+    @Deployment(resources = {"org/flowable/engine/test/api/event/ProcessInstanceEventsTest.noneTaskProcess.bpmn20.xml"})
     public void testProcessCompleted_StartEnd() throws Exception {
         this.runtimeService.startProcessInstanceByKey("noneTaskProcess");
 
@@ -341,7 +345,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
     /**
      * Test Start->User org.flowable.task.service.Task process on PROCESS_COMPLETED event
      */
-    @Deployment(resources = { "org/flowable/engine/test/api/event/ProcessInstanceEventsTest.noEndProcess.bpmn20.xml" })
+    @Deployment(resources = {"org/flowable/engine/test/api/event/ProcessInstanceEventsTest.noEndProcess.bpmn20.xml"})
     public void testProcessCompleted_NoEnd() throws Exception {
         ProcessInstance noEndProcess = this.runtimeService.startProcessInstanceByKey("noEndProcess");
         org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(noEndProcess.getId()).singleResult();
@@ -352,10 +356,10 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
     /**
      * Test +-->Task1 Start-<> +-->Task1
-     *
+     * <p>
      * process on PROCESS_COMPLETED event
      */
-    @Deployment(resources = { "org/flowable/engine/test/api/event/ProcessInstanceEventsTest.parallelGatewayNoEndProcess.bpmn20.xml" })
+    @Deployment(resources = {"org/flowable/engine/test/api/event/ProcessInstanceEventsTest.parallelGatewayNoEndProcess.bpmn20.xml"})
     public void testProcessCompleted_ParallelGatewayNoEnd() throws Exception {
         this.runtimeService.startProcessInstanceByKey("noEndProcess");
 
@@ -367,7 +371,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
      * <p/>
      * process on PROCESS_COMPLETED event
      */
-    @Deployment(resources = { "org/flowable/engine/test/api/event/ProcessInstanceEventsTest.parallelGatewayTwoEndsProcess.bpmn20.xml" })
+    @Deployment(resources = {"org/flowable/engine/test/api/event/ProcessInstanceEventsTest.parallelGatewayTwoEndsProcess.bpmn20.xml"})
     public void testProcessCompleted_ParallelGatewayTwoEnds() throws Exception {
         this.runtimeService.startProcessInstanceByKey("noEndProcess");
 
@@ -385,7 +389,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         assertEquals("FlowableEventType.PROCESS_COMPLETED_WITH_TERMINATE_END_EVENT was expected 6 times.", 6, events.size());
     }
 
-    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    @Deployment(resources = {"org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
     public void testProcessInstanceCancelledEvents_cancel() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertNotNull(processInstance);
@@ -411,7 +415,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         listener.clearEventsReceived();
     }
 
-    @Deployment(resources = { "org/flowable/engine/test/api/runtime/nestedSubProcess.bpmn20.xml", "org/flowable/engine/test/api/runtime/subProcess.bpmn20.xml" })
+    @Deployment(resources = {"org/flowable/engine/test/api/runtime/nestedSubProcess.bpmn20.xml", "org/flowable/engine/test/api/runtime/subProcess.bpmn20.xml"})
     public void testProcessInstanceCancelledEvents_cancelProcessHierarchy() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedSimpleSubProcess");
         ProcessInstance subProcess = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
@@ -438,12 +442,12 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
         List<FlowableEvent> taskCancelledEvents = listener.filterEvents(FlowableEngineEventType.ACTIVITY_CANCELLED);
         assertEquals("ActivitiEventType.ACTIVITY_CANCELLED was expected 2 times.", 2, taskCancelledEvents.size());
-        
+
         FlowableActivityCancelledEvent activityCancelledEvent = (FlowableActivityCancelledEvent) taskCancelledEvents.get(0);
         assertTrue("The cause has to be the same as deleteProcessInstance method call", FlowableActivityCancelledEvent.class.isAssignableFrom(activityCancelledEvent.getClass()));
         assertEquals("The process instance has to point to the subprocess", subProcess.getId(), activityCancelledEvent.getProcessInstanceId());
         assertEquals("The cause has to be the same as in deleteProcessInstance method call", "delete_test", activityCancelledEvent.getCause());
-        
+
         activityCancelledEvent = (FlowableActivityCancelledEvent) taskCancelledEvents.get(1);
         assertTrue("The cause has to be the same as deleteProcessInstance method call", FlowableActivityCancelledEvent.class.isAssignableFrom(activityCancelledEvent.getClass()));
         assertEquals("The process instance has to point to the main process", processInstance.getId(), activityCancelledEvent.getProcessInstanceId());
@@ -453,7 +457,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         listener.clearEventsReceived();
     }
 
-    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    @Deployment(resources = {"org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
     public void testProcessInstanceCancelledEvents_complete() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertNotNull(processInstance);
@@ -468,7 +472,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
     }
 
-    @Deployment(resources = { "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    @Deployment(resources = {"org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
     public void testProcessInstanceTerminatedEvents_complete() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertNotNull(processInstance);
@@ -511,8 +515,8 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
     }
 
-    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInCallActivity.bpmn",
-            "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessTerminate.bpmn" })
+    @Deployment(resources = {"org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInCallActivity.bpmn",
+            "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.subProcessTerminate.bpmn"})
     public void testProcessInstanceTerminatedEvents_callActivity() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventExample");
 
@@ -529,7 +533,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
     }
 
-    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInSubProcessWithBoundaryTerminateAll.bpmn20.xml"})
+    @Deployment(resources = {"org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInSubProcessWithBoundaryTerminateAll.bpmn20.xml"})
     public void testTerminateAllInSubProcess() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateEndEventWithBoundary");
 
@@ -545,8 +549,8 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
     }
 
-    @Deployment(resources = { "org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInParentProcess.bpmn",
-                    "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml" })
+    @Deployment(resources = {"org/flowable/engine/test/bpmn/event/end/TerminateEndEventTest.testTerminateInParentProcess.bpmn",
+            "org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
     public void testProcessInstanceTerminatedEvents_terminateInParentProcess() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("terminateParentProcess");
 
@@ -617,7 +621,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = {
             "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelCallActivity.bpmn20.xml",
-            "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml" })
+            "org/flowable/engine/test/bpmn/multiinstance/MultiInstanceTest.externalSubProcess.bpmn20.xml"})
     public void testDeleteMultiInstanceCallActivityProcessInstance() {
         assertEquals(0, taskService.createTaskQuery().count());
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("miParallelCallActivity");
@@ -632,7 +636,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
         assertEquals(0, taskService.createTaskQuery().count());
     }
-    
+
     @Deployment(resources = "org/flowable/engine/test/api/runtime/subProcessWithTerminateEnd.bpmn20.xml")
     public void testProcessInstanceTerminatedEventInSubProcess() throws Exception {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("subProcessWithTerminateEndTest");
@@ -661,13 +665,13 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
             if ("userTask".equals(activityEvent.getActivityType())) {
                 taskFound = true;
                 assertEquals("task", activityEvent.getActivityId());
-            
+
             } else if ("subProcess".equals(activityEvent.getActivityType())) {
                 subProcessFound = true;
                 assertEquals("embeddedSubprocess", activityEvent.getActivityId());
             }
         }
-        
+
         assertTrue(taskFound);
         assertTrue(subProcessFound);
     }
@@ -710,21 +714,17 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         List<FlowableEvent> activityTerminatedEvents = listener
                 .filterEvents(FlowableEngineEventType.ACTIVITY_CANCELLED);
         assertEquals(4, activityTerminatedEvents.size());
-        for (FlowableEvent flowableEvent: activityTerminatedEvents)
-        {
+        for (FlowableEvent flowableEvent : activityTerminatedEvents) {
             FlowableActivityCancelledEvent activityCancelledEvent = (FlowableActivityCancelledEvent) flowableEvent;
             if ("intermediateCatchEvent".equals(activityCancelledEvent.getActivityType())) {
                 assertEquals("timer", activityCancelledEvent.getActivityId());
                 timerCatchEventFound = true;
-            }
-            else if ("boundaryEvent".equals(activityCancelledEvent.getActivityType())) {
+            } else if ("boundaryEvent".equals(activityCancelledEvent.getActivityType())) {
                 boundaryEventFound = true;
-            }
-            else if ("userTask".equals(activityCancelledEvent.getActivityType())) {
+            } else if ("userTask".equals(activityCancelledEvent.getActivityType())) {
                 assertEquals("Task in subprocess1", activityCancelledEvent.getActivityName());
                 userTaskFound = true;
-            }
-            else if ("subProcess".equals(activityCancelledEvent.getActivityType())) {
+            } else if ("subProcess".equals(activityCancelledEvent.getActivityType())) {
                 assertEquals("subprocess1", activityCancelledEvent.getActivityId());
                 subprocessFound = true;
             }

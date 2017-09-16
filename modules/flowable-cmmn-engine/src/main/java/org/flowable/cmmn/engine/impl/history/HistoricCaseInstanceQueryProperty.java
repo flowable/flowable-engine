@@ -25,7 +25,7 @@ public class HistoricCaseInstanceQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, HistoricCaseInstanceQueryProperty> properties = new HashMap<String, HistoricCaseInstanceQueryProperty>();
+    private static final Map<String, HistoricCaseInstanceQueryProperty> properties = new HashMap<>();
 
     public static final HistoricCaseInstanceQueryProperty CASE_INSTANCE_ID = new HistoricCaseInstanceQueryProperty("RES.ID_");
     public static final HistoricCaseInstanceQueryProperty CASE_DEFINITION_KEY = new HistoricCaseInstanceQueryProperty("CaseDefinitionKey");

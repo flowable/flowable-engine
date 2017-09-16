@@ -14,8 +14,6 @@ package org.flowable.idm.engine;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -72,7 +70,7 @@ public abstract class IdmEngines {
             while (resources.hasMoreElements()) {
                 configUrls.add(resources.nextElement());
             }
-            for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext();) {
+            for (Iterator<URL> iterator = configUrls.iterator(); iterator.hasNext(); ) {
                 URL resource = iterator.next();
                 LOGGER.info("Initializing idm engine using configuration '{}'", resource.toString());
                 initIdmEngineFromResource(resource);
@@ -99,8 +97,8 @@ public abstract class IdmEngines {
     protected static void initIdmEngineFromSpringResource(URL resource) {
         try {
             Class<?> springConfigurationHelperClass = ReflectUtil.loadClass("org.flowable.idm.spring.SpringIdmConfigurationHelper");
-            Method method = springConfigurationHelperClass.getDeclaredMethod("buildIdmEngine", new Class<?>[] { URL.class });
-            IdmEngine idmEngine = (IdmEngine) method.invoke(null, new Object[] { resource });
+            Method method = springConfigurationHelperClass.getDeclaredMethod("buildIdmEngine", new Class<?>[]{URL.class});
+            IdmEngine idmEngine = (IdmEngine) method.invoke(null, new Object[]{resource});
 
             String idmEngineName = idmEngine.getName();
             EngineInfo idmEngineInfo = new EngineInfo(idmEngineName, resource.toString(), null);
@@ -172,7 +170,9 @@ public abstract class IdmEngines {
         }
     }
 
-    /** Get initialization results. */
+    /**
+     * Get initialization results.
+     */
     public static List<EngineInfo> getIdmEngineInfos() {
         return idmEngineInfos;
     }
@@ -191,9 +191,8 @@ public abstract class IdmEngines {
 
     /**
      * obtain a idm engine by name.
-     * 
-     * @param idmEngineName
-     *            is the name of the idm engine or null for the default idm engine.
+     *
+     * @param idmEngineName is the name of the idm engine or null for the default idm engine.
      */
     public static IdmEngine getIdmEngine(String idmEngineName) {
         if (!isInitialized()) {

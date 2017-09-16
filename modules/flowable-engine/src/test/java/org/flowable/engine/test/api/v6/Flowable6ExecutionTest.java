@@ -16,8 +16,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
 import org.flowable.engine.history.HistoricActivityInstance;
@@ -328,7 +328,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
     }
 
-    public class SubProcessEventListener implements FlowableEventListener {
+    public class SubProcessEventListener extends AbstractFlowableEngineEventListener {
 
         private List<FlowableEvent> eventsReceived;
 
@@ -345,23 +345,24 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         }
 
         @Override
-        public void onEvent(FlowableEvent activitiEvent) {
-            if (activitiEvent instanceof FlowableActivityEvent) {
-                FlowableActivityEvent event = (FlowableActivityEvent) activitiEvent;
-                if ("subProcess".equals(event.getActivityType())) {
-                    eventsReceived.add(event);
-                }
-            } else if (activitiEvent instanceof FlowableActivityCancelledEvent) {
-                FlowableActivityCancelledEvent event = (FlowableActivityCancelledEvent) activitiEvent;
-                if ("subProcess".equals(event.getActivityType())) {
-                    eventsReceived.add(event);
-                }
+        protected void activityStarted(FlowableActivityEvent event) {
+            if ("subProcess".equals(event.getActivityType())) {
+                eventsReceived.add(event);
             }
         }
 
         @Override
-        public boolean isFailOnException() {
-            return true;
+        protected void activityCancelled(FlowableActivityCancelledEvent event) {
+            if ("subProcess".equals(event.getActivityType())) {
+                eventsReceived.add(event);
+            }
+        }
+
+        @Override
+        protected void activityCompleted(FlowableActivityEvent event) {
+            if ("subProcess".equals(event.getActivityType())) {
+                eventsReceived.add(event);
+            }
         }
     }
 }

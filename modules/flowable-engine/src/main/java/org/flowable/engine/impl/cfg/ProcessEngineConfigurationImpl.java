@@ -13,10 +13,11 @@
 
 package org.flowable.engine.impl.cfg;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -322,8 +323,6 @@ import org.flowable.variable.service.impl.types.VariableTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -367,7 +366,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected ProcessDefinitionInfoDataManager processDefinitionInfoDataManager;
     protected PropertyDataManager propertyDataManager;
     protected ResourceDataManager resourceDataManager;
-    
+
     // ENTITY MANAGERS ///////////////////////////////////////////////////////////
 
     protected AttachmentEntityManager attachmentEntityManager;
@@ -386,7 +385,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected PropertyEntityManager propertyEntityManager;
     protected ResourceEntityManager resourceEntityManager;
     protected TableDataManager tableDataManager;
-    
+
     // Candidate Manager
 
     protected CandidateManager candidateManager;
@@ -649,13 +648,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected List<VariableType> customPreVariableTypes;
     protected List<VariableType> customPostVariableTypes;
     protected VariableTypes variableTypes;
-    
+
     protected InternalHistoryVariableManager internalHistoryVariableManager;
     protected InternalTaskVariableScopeResolver internalTaskVariableScopeResolver;
     protected InternalHistoryTaskManager internalHistoryTaskManager;
     protected InternalTaskLocalizationManager internalTaskLocalizationManager;
     protected InternalJobManager internalJobManager;
-    
+
     protected Map<String, List<RuntimeInstanceStateChangeCallback>> processInstanceStateChangedCallbacks;
 
     /**
@@ -883,7 +882,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             }
         }
     }
-    
+
     @Override
     public String getEngineCfgKey() {
         return EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG;
@@ -891,7 +890,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     @Override
     public List<CommandInterceptor> getAdditionalDefaultCommandInterceptors() {
-        return Arrays.<CommandInterceptor>asList(new BpmnOverrideContextInterceptor());
+        return Collections.<CommandInterceptor>singletonList(new BpmnOverrideContextInterceptor());
     }
     // services
     // /////////////////////////////////////////////////////////////////
@@ -1225,7 +1224,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
 
         this.variableServiceConfiguration.setVariableTypes(this.variableTypes);
-        
+
         if (this.internalHistoryVariableManager != null) {
             this.variableServiceConfiguration.setInternalHistoryVariableManager(this.internalHistoryVariableManager);
         } else {
@@ -1239,54 +1238,54 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         addServiceConfiguration(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG, this.variableServiceConfiguration);
     }
-    
+
     public void initIdentityLinkServiceConfiguration() {
         this.identityLinkServiceConfiguration = new IdentityLinkServiceConfiguration();
         this.identityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.identityLinkServiceConfiguration.setClock(this.clock);
         this.identityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
         this.identityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
-        
+
         this.identityLinkServiceConfiguration.init();
-        
+
         addServiceConfiguration(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG, this.identityLinkServiceConfiguration);
     }
-    
+
     public void initTaskServiceConfiguration() {
         this.taskServiceConfiguration = new TaskServiceConfiguration();
         this.taskServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.taskServiceConfiguration.setClock(this.clock);
         this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
         this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
-        
+
         if (this.internalHistoryTaskManager != null) {
             this.taskServiceConfiguration.setInternalHistoryTaskManager(this.internalHistoryTaskManager);
         } else {
             this.taskServiceConfiguration.setInternalHistoryTaskManager(new DefaultHistoryTaskManager(this));
         }
-        
+
         if (this.internalTaskVariableScopeResolver != null) {
             this.taskServiceConfiguration.setInternalTaskVariableScopeResolver(this.internalTaskVariableScopeResolver);
         } else {
             this.taskServiceConfiguration.setInternalTaskVariableScopeResolver(new DefaultTaskVariableScopeResolver(this));
         }
-        
+
         if (this.internalTaskLocalizationManager != null) {
             this.taskServiceConfiguration.setInternalTaskLocalizationManager(this.internalTaskLocalizationManager);
         } else {
             this.taskServiceConfiguration.setInternalTaskLocalizationManager(new DefaultTaskLocalizationManager(this));
         }
-        
+
         this.taskServiceConfiguration.setEnableTaskRelationshipCounts(this.performanceSettings.isEnableTaskRelationshipCounts());
         this.taskServiceConfiguration.setEnableLocalization(this.performanceSettings.isEnableLocalization());
         this.taskServiceConfiguration.setTaskQueryLimit(this.taskQueryLimit);
         this.taskServiceConfiguration.setHistoricTaskQueryLimit(this.historicTaskQueryLimit);
-        
+
         this.taskServiceConfiguration.init();
-        
+
         addServiceConfiguration(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG, this.taskServiceConfiguration);
     }
-    
+
     public void initJobServiceConfiguration() {
         this.jobServiceConfiguration = new JobServiceConfiguration();
         this.jobServiceConfiguration.setHistoryLevel(this.historyLevel);
@@ -1296,26 +1295,26 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.jobServiceConfiguration.setCommandExecutor(this.commandExecutor);
         this.jobServiceConfiguration.setExpressionManager(this.expressionManager);
         this.jobServiceConfiguration.setBusinessCalendarManager(this.businessCalendarManager);
-        
+
         this.jobServiceConfiguration.setJobHandlers(this.jobHandlers);
         this.jobServiceConfiguration.setHistoryJobHandlers(this.historyJobHandlers);
         this.jobServiceConfiguration.setFailedJobCommandFactory(this.failedJobCommandFactory);
         this.jobServiceConfiguration.setAsyncRunnableExecutionExceptionHandler(this.asyncRunnableExecutionExceptionHandler);
         this.jobServiceConfiguration.setAsyncExecutorNumberOfRetries(this.asyncExecutorNumberOfRetries);
         this.jobServiceConfiguration.setAsyncExecutorResetExpiredJobsMaxTimeout(this.asyncExecutorResetExpiredJobsMaxTimeout);
-        
+
         if (this.jobManager != null) {
             this.jobServiceConfiguration.setJobManager(this.jobManager);
         }
-        
+
         if (this.internalJobManager != null) {
             this.jobServiceConfiguration.setInternalJobManager(this.internalJobManager);
         } else {
             this.jobServiceConfiguration.setInternalJobManager(new DefaultJobScopeManager(this));
         }
-        
+
         this.jobServiceConfiguration.init();
-        
+
         addServiceConfiguration(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG, this.jobServiceConfiguration);
     }
 
@@ -1325,7 +1324,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             configurator.configure(this);
         }
     }
-    
+
     public void afterInitTaskServiceConfiguration() {
         if (engineConfigurations.containsKey(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)) {
             IdmEngineConfiguration idmEngineConfiguration = (IdmEngineConfiguration) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
@@ -1689,7 +1688,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
             asyncExecutor = defaultAsyncExecutor;
         }
-        
+
         asyncExecutor.setJobServiceConfiguration(jobServiceConfiguration);
         asyncExecutor.setAutoActivate(asyncExecutorActivate);
         jobServiceConfiguration.setAsyncExecutor(asyncExecutor);
@@ -1738,7 +1737,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         asyncHistoryExecutor.setJobServiceConfiguration(jobServiceConfiguration);
         asyncHistoryExecutor.setAutoActivate(asyncHistoryExecutorActivate);
     }
-    
+
     // history
     // //////////////////////////////////////////////////////////////////
 
@@ -2411,7 +2410,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.variableTypes = variableTypes;
         return this;
     }
-    
+
     public InternalHistoryVariableManager getInternalHistoryVariableManager() {
         return internalHistoryVariableManager;
     }
@@ -3387,7 +3386,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.objectMapper = objectMapper;
         return this;
     }
-    
+
     public Map<String, List<RuntimeInstanceStateChangeCallback>> getProcessInstanceStateChangedCallbacks() {
         return processInstanceStateChangedCallbacks;
     }
