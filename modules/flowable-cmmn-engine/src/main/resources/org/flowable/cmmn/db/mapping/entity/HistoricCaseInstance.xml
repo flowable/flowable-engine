@@ -69,19 +69,43 @@
     </insert>
 
     <update id="updateHistoricCaseInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl">
-        update ${prefix}ACT_CMMN_HI_CASE_INST set
+        update ${prefix}ACT_CMMN_HI_CASE_INST
+        <set>
             REV_ = #{revisionNext, jdbcType=INTEGER},
-            NAME_ = #{name, jdbcType=VARCHAR},
-            PARENT_ID_ = #{parentId, jdbcType=VARCHAR},
-            CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
-            BUSINESS_KEY_ = #{businessKey, jdbcType=VARCHAR},
-            STATE_ = #{state, jdbcType=VARCHAR},
-            START_TIME_ = #{startTime, jdbcType=TIMESTAMP},
-            END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
-            START_USER_ID_ = #{startUserId, jdbcType=VARCHAR},
-            CALLBACK_ID_ = #{callbackId, jdbcType=VARCHAR},
-            CALLBACK_TYPE_ = #{callbackId, jdbcType=VARCHAR},
-            TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+            <if test="originalPersistentState.name != name">
+                NAME_ = #{name, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.parentId != parentId">
+                PARENT_ID_ = #{parentId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.caseDefinitionId != caseDefinitionId">
+                CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.businessKey != businessKey">
+                BUSINESS_KEY_ = #{businessKey, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.state != state">
+                STATE_ = #{state, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.startTime != startTime">
+                START_TIME_ = #{startTime, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.endTime != endTime">
+                END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.startUserId != startUserId">
+                START_USER_ID_ = #{startUserId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.callbackId != callbackId">
+                CALLBACK_ID_ = #{callbackId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.callbackType != callbackType">
+                CALLBACK_TYPE_ = #{callbackType, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.tenantId != tenantId">
+                TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+            </if>
+        </set>    
         where ID_ = #{id, jdbcType=VARCHAR}
     </update>
 

@@ -52,13 +52,25 @@
     </insert>
 
     <update id="updateSentryOnPartInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntityImpl">
-        update ${prefix}ACT_CMMN_RU_SENTRY_ON_PART_INST set
+        update ${prefix}ACT_CMMN_RU_SENTRY_ON_PART_INST
+        <set>
             REV_ = #{revisionNext, jdbcType=INTEGER},
-            CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
-            CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR},
-            PLAN_ITEM_INST_ID_ = #{planItemInstanceId, jdbcType=VARCHAR},
-            ON_PART_ID_ = #{onPartId, jdbcType=VARCHAR},
-            TIME_STAMP_ = #{timeStamp, jdbcType=TIMESTAMP}
+            <if test="originalPersistentState.caseDefinitionId != caseDefinitionId">
+                CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.caseInstanceId != caseInstanceId">
+                CASE_INST_ID_ = #{caseInstanceId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.planItemInstanceId != planItemInstanceId">                
+                PLAN_ITEM_INST_ID_ = #{planItemInstanceId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.onPartId != onPartId">    
+                ON_PART_ID_ = #{onPartId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.timeStamp != timeStamp">
+                TIME_STAMP_ = #{timeStamp, jdbcType=TIMESTAMP}
+            </if>
+        </set>
         where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
     </update>
 
