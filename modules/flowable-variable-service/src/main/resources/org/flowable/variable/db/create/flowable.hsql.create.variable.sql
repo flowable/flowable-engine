@@ -18,4 +18,9 @@ create table ACT_RU_VARIABLE (
 
 create index ACT_IDX_RU_VAR_SCOPE_ID_TYPE on ACT_RU_VARIABLE(SCOPE_ID_, SCOPE_TYPE_);
 
+alter table ACT_RU_VARIABLE
+    add constraint ACT_FK_VAR_BYTEARRAY
+    foreign key (BYTEARRAY_ID_)
+    references ACT_GE_BYTEARRAY;
+
 insert into ACT_GE_PROPERTY values ('variable.schema.version', '6.2.0.0', 1);

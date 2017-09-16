@@ -8,7 +8,6 @@ drop index ACT_IDX_TASK_PROCINST;
 drop index ACT_IDX_TASK_PROCDEF;
 drop index ACT_IDX_VAR_EXE;
 drop index ACT_IDX_VAR_PROCINST;
-drop index ACT_IDX_VAR_BYTEARRAY;
 drop index ACT_IDX_JOB_EXECUTION_ID;
 drop index ACT_IDX_JOB_PROC_INST_ID;
 drop index ACT_IDX_JOB_PROC_DEF_ID;
@@ -72,9 +71,6 @@ alter table ACT_RU_VARIABLE
 alter table ACT_RU_VARIABLE
 	drop CONSTRAINT ACT_FK_VAR_PROCINST;
 
-alter table ACT_RU_VARIABLE
-    drop CONSTRAINT ACT_FK_VAR_BYTEARRAY;
-    
 alter table ACT_RU_JOB 
     drop CONSTRAINT ACT_FK_JOB_EXECUTION;
     
@@ -152,7 +148,6 @@ drop index ACT_IDX_EVENT_SUBSCR;
 drop index ACT_IDX_ATHRZ_PROCEDEF;
 drop index ACT_IDX_PROCDEF_INFO_PROC;
 
-drop table ACT_GE_BYTEARRAY;
 drop table ACT_RE_DEPLOYMENT;
 drop table ACT_RE_MODEL;
 drop table ACT_RE_PROCDEF;

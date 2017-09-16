@@ -1,13 +1,3 @@
-create table ACT_GE_BYTEARRAY (
-    ID_ varchar(64),
-    REV_ integer,
-    NAME_ varchar(255),
-    DEPLOYMENT_ID_ varchar(64),
-    BYTES_ longvarbinary,
-    GENERATED_ bit,
-    primary key (ID_)
-);
-
 create table ACT_RE_DEPLOYMENT (
     ID_ varchar(64),
     NAME_ varchar(255),
@@ -347,11 +337,6 @@ alter table ACT_RU_VARIABLE
     foreign key (PROC_INST_ID_)
     references ACT_RU_EXECUTION;
 
-alter table ACT_RU_VARIABLE
-    add constraint ACT_FK_VAR_BYTEARRAY
-    foreign key (BYTEARRAY_ID_)
-    references ACT_GE_BYTEARRAY;
-    
 alter table ACT_RU_JOB
     add constraint ACT_FK_JOB_EXECUTION
     foreign key (EXECUTION_ID_)

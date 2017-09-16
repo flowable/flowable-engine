@@ -1,13 +1,3 @@
-create table ACT_GE_BYTEARRAY (
-    ID_ varchar(64),
-    REV_ integer,
-    NAME_ varchar(255),
-    DEPLOYMENT_ID_ varchar(64),
-    BYTES_ LONGBLOB,
-    GENERATED_ TINYINT,
-    primary key (ID_)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
-
 create table ACT_RE_DEPLOYMENT (
     ID_ varchar(64),
     NAME_ varchar(255),
@@ -348,11 +338,6 @@ alter table ACT_RU_VARIABLE
     foreign key (PROC_INST_ID_)
     references ACT_RU_EXECUTION(ID_);
 
-alter table ACT_RU_VARIABLE 
-    add constraint ACT_FK_VAR_BYTEARRAY 
-    foreign key (BYTEARRAY_ID_) 
-    references ACT_GE_BYTEARRAY (ID_);
-    
 alter table ACT_RU_JOB 
     add constraint ACT_FK_JOB_EXECUTION 
     foreign key (EXECUTION_ID_) 

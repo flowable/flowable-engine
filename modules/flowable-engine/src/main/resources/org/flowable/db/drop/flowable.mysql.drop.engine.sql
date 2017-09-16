@@ -41,9 +41,6 @@ alter table ACT_RU_VARIABLE
 alter table ACT_RU_VARIABLE
 	drop FOREIGN KEY ACT_FK_VAR_PROCINST;    
 
-alter table ACT_RU_VARIABLE
-    drop FOREIGN KEY ACT_FK_VAR_BYTEARRAY;
-
 alter table ACT_RU_JOB
     drop FOREIGN KEY ACT_FK_JOB_EXECUTION;
     
@@ -113,7 +110,6 @@ alter table ACT_PROCDEF_INFO
 drop index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK;
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR;
     
-drop table if exists ACT_GE_BYTEARRAY;
 drop table if exists ACT_RE_DEPLOYMENT;
 drop table if exists ACT_RE_MODEL;
 drop table if exists ACT_RU_IDENTITYLINK;

@@ -1,4 +1,3 @@
-drop table if exists ACT_GE_BYTEARRAY cascade constraints;
 drop table if exists ACT_RE_DEPLOYMENT cascade constraints;
 drop table if exists ACT_RE_MODEL cascade constraints;
 drop table if exists ACT_RU_EXECUTION cascade constraints;

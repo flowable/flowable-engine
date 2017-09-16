@@ -14,12 +14,9 @@ package org.flowable.cmmn.test.runtime;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.flowable.cmmn.engine.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.engine.repository.CaseDefinition;
@@ -36,7 +33,7 @@ import org.junit.Test;
  * @author Joram Barrez
  */
 public class RuntimeServiceTest extends FlowableCmmnTestCase {
-    
+
     @Test
     @CmmnDeployment
     public void testStartSimplePassthroughCase() {
@@ -136,53 +133,5 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
         assertCaseInstanceEnded(caseInstance, 0);
     }
-    
-    @Test
-    @CmmnDeployment
-    public void testGetVariables() {
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("stringVar", "Hello World");
-        variables.put("intVar", 42);
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase", variables);
-        
-        Map<String, Object> variablesFromGet = cmmnRuntimeService.getVariables(caseInstance.getId());
-        assertTrue(variablesFromGet.containsKey("stringVar"));
-        assertEquals("Hello World", (String) variablesFromGet.get("stringVar"));
-        assertTrue(variablesFromGet.containsKey("intVar"));
-        assertEquals(42, ((Integer) variablesFromGet.get("intVar")).intValue());
-        
-        assertEquals("Hello World", (String) cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar"));
-        assertEquals(42, ((Integer) cmmnRuntimeService.getVariable(caseInstance.getId(), "intVar")).intValue());
-        assertNull(cmmnRuntimeService.getVariable(caseInstance.getId(), "doesNotExist"));
-    }
-    
-    @Test
-    @CmmnDeployment
-    public void testSetVariables() {
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("stringVar", "Hello World");
-        variables.put("intVar", 42);
-        cmmnRuntimeService.setVariables(caseInstance.getId(), variables);
-        
-        assertEquals("Hello World", (String) cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar"));
-        assertEquals(42, ((Integer) cmmnRuntimeService.getVariable(caseInstance.getId(), "intVar")).intValue());
-        assertNull(cmmnRuntimeService.getVariable(caseInstance.getId(), "doesNotExist"));
-    }
-    
-    @Test
-    @CmmnDeployment
-    public void testRemoveVariables() {
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("stringVar", "Hello World");
-        variables.put("intVar", 42);
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase", variables);
-        assertEquals(2, cmmnRuntimeService.getVariables(caseInstance.getId()).size());
-        
-        cmmnRuntimeService.removeVariable(caseInstance.getId(), "stringVar");
-        assertEquals(1, cmmnRuntimeService.getVariables(caseInstance.getId()).size());
-        assertNull(cmmnRuntimeService.getVariable(caseInstance.getId(), "StringVar"));
-        assertNotNull(cmmnRuntimeService.getVariable(caseInstance.getId(), "intVar"));
-    }
-    
+
 }
