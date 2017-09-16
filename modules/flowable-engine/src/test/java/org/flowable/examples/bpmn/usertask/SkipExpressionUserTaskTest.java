@@ -21,9 +21,7 @@ import java.util.Map;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.history.HistoricActivityInstance;
@@ -140,7 +138,7 @@ public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
         }
 
         @Override
-        protected void taskCompleted(FlowableEntityEvent event) {
+        protected void taskCompleted(FlowableEngineEntityEvent event) {
             completedEvents.add(event);
         }
 

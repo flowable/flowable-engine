@@ -13,7 +13,7 @@
 package org.flowable.standalone.event;
 
 import org.flowable.bpmn.model.Process;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
@@ -23,7 +23,7 @@ public class GetProcessOnDefinitionInitializedListener extends AbstractFlowableE
     public static String processId;
 
     @Override
-    protected void entityInitialized(FlowableEntityEvent event) {
+    protected void entityInitialized(FlowableEngineEntityEvent event) {
         if (event.getEntity() instanceof ProcessDefinitionEntity) {
             Process process = ProcessDefinitionUtil.getProcess(((ProcessDefinitionEntity) event.getEntity()).getId());
             processId = process.getId();

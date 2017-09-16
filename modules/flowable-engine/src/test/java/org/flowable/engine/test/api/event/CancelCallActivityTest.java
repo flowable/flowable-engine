@@ -229,7 +229,7 @@ public class CancelCallActivityTest extends PluggableFlowableTestCase {
         }
 
         @Override
-        protected void entityCreated(FlowableEntityEvent event) {
+        protected void entityCreated(FlowableEngineEntityEvent event) {
             if (event.getEntity() instanceof ExecutionEntity) {
                 eventsReceived.add(event);
             }
@@ -256,7 +256,7 @@ public class CancelCallActivityTest extends PluggableFlowableTestCase {
         }
 
         @Override
-        protected void taskCompleted(FlowableEntityEvent event) {
+        protected void taskCompleted(FlowableEngineEntityEvent event) {
             eventsReceived.add(event);
         }
 
