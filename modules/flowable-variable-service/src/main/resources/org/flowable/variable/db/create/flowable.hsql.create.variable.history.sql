@@ -18,26 +18,5 @@ create table ACT_HI_VARINST (
   primary key (ID_)
 );
 
-create table ACT_HI_DETAIL (
-  ID_ varchar(64) not null,
-  TYPE_ varchar(255) not null,
-  TIME_ timestamp not null,
-  NAME_ varchar(255),
-  PROC_INST_ID_ varchar(64),
-  EXECUTION_ID_ varchar(64),
-  TASK_ID_ varchar(64),
-  ACT_INST_ID_ varchar(64),
-  VAR_TYPE_ varchar(255),
-  REV_ integer,
-  BYTEARRAY_ID_ varchar(64),
-  DOUBLE_ double,
-  LONG_ bigint,
-  TEXT_ varchar(4000),
-  TEXT2_ varchar(4000),
-  primary key (ID_)
-);
-
-create index ACT_IDX_HI_DETAIL_TIME on ACT_HI_DETAIL(TIME_);
-create index ACT_IDX_HI_DETAIL_NAME on ACT_HI_DETAIL(NAME_);
 create index ACT_IDX_HI_PROCVAR_NAME_TYPE on ACT_HI_VARINST(NAME_, VAR_TYPE_);
 create index ACT_IDX_HI_VAR_SCOPE_ID_TYPE on ACT_HI_VARINST(SCOPE_ID_, SCOPE_TYPE_);

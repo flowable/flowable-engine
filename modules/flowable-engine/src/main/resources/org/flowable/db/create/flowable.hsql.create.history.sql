@@ -66,6 +66,25 @@ create table ACT_HI_TASKINST (
   primary key (ID_)
 );
 
+create table ACT_HI_DETAIL (
+  ID_ varchar(64) not null,
+  TYPE_ varchar(255) not null,
+  TIME_ timestamp not null,
+  NAME_ varchar(255),
+  PROC_INST_ID_ varchar(64),
+  EXECUTION_ID_ varchar(64),
+  TASK_ID_ varchar(64),
+  ACT_INST_ID_ varchar(64),
+  VAR_TYPE_ varchar(255),
+  REV_ integer,
+  BYTEARRAY_ID_ varchar(64),
+  DOUBLE_ double,
+  LONG_ bigint,
+  TEXT_ varchar(4000),
+  TEXT2_ varchar(4000),
+  primary key (ID_)
+);
+
 create table ACT_HI_COMMENT (
   ID_ varchar(64) not null,
   TYPE_ varchar(255),
@@ -110,6 +129,8 @@ create index ACT_IDX_HI_ACT_INST_START on ACT_HI_ACTINST(START_TIME_);
 create index ACT_IDX_HI_ACT_INST_END on ACT_HI_ACTINST(END_TIME_);
 create index ACT_IDX_HI_DETAIL_PROC_INST on ACT_HI_DETAIL(PROC_INST_ID_);
 create index ACT_IDX_HI_DETAIL_ACT_INST on ACT_HI_DETAIL(ACT_INST_ID_);
+create index ACT_IDX_HI_DETAIL_TIME on ACT_HI_DETAIL(TIME_);
+create index ACT_IDX_HI_DETAIL_NAME on ACT_HI_DETAIL(NAME_);
 create index ACT_IDX_HI_DETAIL_TASK_ID on ACT_HI_DETAIL(TASK_ID_);
 create index ACT_IDX_HI_PROCVAR_PROC_INST on ACT_HI_VARINST(PROC_INST_ID_);
 create index ACT_IDX_HI_PROCVAR_TASK_ID on ACT_HI_VARINST(TASK_ID_);
