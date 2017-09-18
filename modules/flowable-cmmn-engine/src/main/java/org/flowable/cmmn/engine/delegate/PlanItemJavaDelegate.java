@@ -12,8 +12,6 @@
  */
 package org.flowable.cmmn.engine.delegate;
 
-import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
-
 /**
  * Convenience class to be used when needing to execute custom logic for a plan item by delegating to a Java class.
  * After the logic has been executed, the engine will continue executing the case model by automatically completing associated plan item.

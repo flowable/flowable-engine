@@ -488,3 +488,6 @@ alter table ACT_PROCDEF_INFO
 
 insert into ACT_GE_PROPERTY
 values ('schema.version', '6.2.0.0', 1);
+
+insert into ACT_GE_PROPERTY
+values ('schema.history', 'create(6.2.0.0)', 1); 

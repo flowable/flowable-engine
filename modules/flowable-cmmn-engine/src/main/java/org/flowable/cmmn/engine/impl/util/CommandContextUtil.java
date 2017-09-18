@@ -28,6 +28,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.db.DbSqlSession;
+import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
@@ -45,6 +46,14 @@ public class CommandContextUtil {
     
     public static CmmnEngineConfiguration getCmmnEngineConfiguration(CommandContext commandContext) {
         return (CmmnEngineConfiguration) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+    }
+    
+    public static ExpressionManager getExpressionManager() {
+        return getExpressionManager(getCommandContext());
+    }
+    
+    public static ExpressionManager getExpressionManager(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getExpressionManager();
     }
     
     public static CmmnHistoryManager getCmmnHistoryManager() {

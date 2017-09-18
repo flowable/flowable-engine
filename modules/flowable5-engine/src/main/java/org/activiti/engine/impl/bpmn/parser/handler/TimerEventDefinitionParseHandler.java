@@ -35,7 +35,7 @@ import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.engine.impl.jobexecutor.TimerDeclarationType;
-import org.flowable.variable.service.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

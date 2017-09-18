@@ -10,17 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.dmn.engine.impl.el;
+package org.flowable.engine.common.impl.el;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
-import org.flowable.engine.common.impl.el.ExpressionFactoryResolver;
-import org.flowable.engine.common.impl.el.FlowableElContext;
-import org.flowable.engine.common.impl.el.JsonNodeELResolver;
-import org.flowable.engine.common.impl.el.ParsingElContext;
-import org.flowable.engine.common.impl.el.ReadOnlyMapELResolver;
+import org.flowable.engine.common.api.variable.VariableContainer;
 import org.flowable.engine.common.impl.javax.el.ArrayELResolver;
 import org.flowable.engine.common.impl.javax.el.BeanELResolver;
 import org.flowable.engine.common.impl.javax.el.CompositeELResolver;
@@ -32,26 +30,19 @@ import org.flowable.engine.common.impl.javax.el.MapELResolver;
 import org.flowable.engine.common.impl.javax.el.ValueExpression;
 
 /**
- * <p>
- * Central manager for all expressions.
- * </p>
- * <p>
- * Process parsers will use this to build expression objects that are stored in the process definitions.
- * </p>
- * <p>
- * Then also this class is used as an entry point for runtime evaluation of the expressions.
- * </p>
+ * {@link ExpressionManager} implementation, similar to the one found for the process engine,
+ * but adapted to work in a CMMN context.
  *
  * @author Tom Baeyens
  * @author Dave Syer
  * @author Frederik Heremans
+ * @author Joram Barrez
  */
 public class DefaultExpressionManager implements ExpressionManager {
 
     protected ExpressionFactory expressionFactory;
     protected List<FlowableFunctionDelegate> functionDelegates;
 
-    // Default implementation (does nothing)
     protected ELContext parsingElContext;
     protected Map<Object, Object> beans;
 
@@ -63,7 +54,7 @@ public class DefaultExpressionManager implements ExpressionManager {
         this.expressionFactory = ExpressionFactoryResolver.resolveExpressionFactory();
         this.beans = beans;
     }
-    
+
     @Override
     public Expression createExpression(String expression) {
         if (parsingElContext == null) {
@@ -71,6 +62,10 @@ public class DefaultExpressionManager implements ExpressionManager {
         }
 
         ValueExpression valueExpression = expressionFactory.createValueExpression(parsingElContext, expression.trim(), Object.class);
+        return createJuelExpression(expression, valueExpression);
+    }
+
+    protected Expression createJuelExpression(String expression, ValueExpression valueExpression) {
         return new JuelExpression(this, valueExpression, expression);
     }
 
@@ -79,31 +74,45 @@ public class DefaultExpressionManager implements ExpressionManager {
     }
     
     @Override
-    public ELContext getElContext(Map<String, Object> variables) {
-        return createElContext(variables);
-    }
-
-    protected FlowableElContext createElContext(Map<String, Object> variables) {
-        ELResolver elResolver = createElResolver(variables);
+    public ELContext getElContext(VariableContainer variableContainer) {
+        ELResolver elResolver = createElResolver(variableContainer);
         return new FlowableElContext(elResolver, functionDelegates);
     }
-
-    protected ELResolver createElResolver(Map<String, Object> variables) {
-        CompositeELResolver elResolver = new CompositeELResolver();
-        elResolver.add(new VariableScopeElResolver(variables));
-
+    
+    protected ELResolver createElResolver(VariableContainer variableContainer) {
+        List<ELResolver> elResolvers = new ArrayList<>();
+        elResolvers.add(createVariableElResolver(variableContainer));
         if (beans != null) {
-            // ACT-1102: Also expose all beans in configuration when using
-            // standalone flowable, not in spring-context
-            elResolver.add(new ReadOnlyMapELResolver(beans));
+            elResolvers.add(new ReadOnlyMapELResolver(beans));
         }
+        elResolvers.add(new ArrayELResolver());
+        elResolvers.add(new ListELResolver());
+        elResolvers.add(new MapELResolver());
+        elResolvers.add(new JsonNodeELResolver());
+        ELResolver beanElResolver = createBeanElResolver();
+        if (beanElResolver != null) {
+            elResolvers.add(beanElResolver);
+        }
+        
+        configureResolvers(elResolvers);
+        
+        CompositeELResolver compositeELResolver = new CompositeELResolver();
+        for (ELResolver elResolver : elResolvers) {
+            compositeELResolver.add(elResolver);
+        }
+        return compositeELResolver;
+    }
+    
+    protected void configureResolvers(List<ELResolver> elResolvers) {
+        // to be extended if needed
+    }
 
-        elResolver.add(new ArrayELResolver());
-        elResolver.add(new ListELResolver());
-        elResolver.add(new MapELResolver());
-        elResolver.add(new JsonNodeELResolver());
-        elResolver.add(new BeanELResolver());
-        return elResolver;
+    protected ELResolver createVariableElResolver(VariableContainer variableContainer) {
+        return new VariableContainerELResolver(variableContainer);
+    }
+    
+    protected ELResolver createBeanElResolver() {
+        return new BeanELResolver();
     }
 
     @Override

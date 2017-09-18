@@ -39,6 +39,7 @@ import org.flowable.cmmn.engine.impl.delegate.DefaultCmmnClassDelegateFactory;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.deployer.Deployer;
+import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.interceptor.CmmnCommandInvoker;
@@ -90,9 +91,11 @@ import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelperImpl;
 import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
 import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
 import org.flowable.engine.common.impl.db.DbSchemaManager;
+import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
@@ -186,6 +189,10 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     protected DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache;
     
     protected HistoryLevel historyLevel = HistoryLevel.AUDIT;
+    
+    protected ExpressionManager expressionManager;
+    protected List<FlowableFunctionDelegate> flowableFunctionDelegates;
+    protected List<FlowableFunctionDelegate> customFlowableFunctionDelegates;
 
     // Variable support
     protected DbSchemaManager variableDbSchemaManager;
@@ -234,6 +241,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         initTransactionContextFactory();
         initCommandExecutors();
         initIdGenerator();
+        initExpressionManager();
         initCmmnEngineAgendaFactory();
 
         if (usingRelationalDatabase) {
@@ -280,6 +288,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     @Override
     public void initMybatisTypeHandlers(Configuration configuration) {
         configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler(variableTypes));
+    }
+    
+    public void initExpressionManager() {
+        if (expressionManager == null) {
+            expressionManager = new CmmnExpressionManager(beans);
+        }
+
+        expressionManager.setFunctionDelegates(flowableFunctionDelegates);
     }
 
     public void initCmmnEngineAgendaFactory() {
@@ -403,6 +419,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         if (activityBehaviorFactory == null) {
             DefaultCmmnActivityBehaviorFactory defaultCmmnActivityBehaviorFactory = new DefaultCmmnActivityBehaviorFactory();
             defaultCmmnActivityBehaviorFactory.setClassDelegateFactory(classDelegateFactory);
+            defaultCmmnActivityBehaviorFactory.setExpressionManager(expressionManager);
             activityBehaviorFactory = defaultCmmnActivityBehaviorFactory;
         }
     }
@@ -942,6 +959,33 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
 
     public CmmnEngineConfiguration setHistoryLevel(HistoryLevel historyLevel) {
         this.historyLevel = historyLevel;
+        return this;
+    }
+    
+    public ExpressionManager getExpressionManager() {
+        return expressionManager;
+    }
+
+    public CmmnEngineConfiguration setExpressionManager(ExpressionManager expressionManager) {
+        this.expressionManager = expressionManager;
+        return this;
+    }
+
+    public List<FlowableFunctionDelegate> getFlowableFunctionDelegates() {
+        return flowableFunctionDelegates;
+    }
+
+    public CmmnEngineConfiguration setFlowableFunctionDelegates(List<FlowableFunctionDelegate> flowableFunctionDelegates) {
+        this.flowableFunctionDelegates = flowableFunctionDelegates;
+        return this;
+    }
+
+    public List<FlowableFunctionDelegate> getCustomFlowableFunctionDelegates() {
+        return customFlowableFunctionDelegates;
+    }
+
+    public CmmnEngineConfiguration setCustomFlowableFunctionDelegates(List<FlowableFunctionDelegate> customFlowableFunctionDelegates) {
+        this.customFlowableFunctionDelegates = customFlowableFunctionDelegates;
         return this;
     }
 

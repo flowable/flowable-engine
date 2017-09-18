@@ -71,11 +71,15 @@ public class FlowableCmmnTestCase {
         this.cmmnHistoryService = cmmnEngine.getCmmnHistoryService();
     }
     
-    protected void assertCaseInstanceEnded(CaseInstance caseInstance, int nrOfExpectedMilestones) {
+    protected void assertCaseInstanceEnded(CaseInstance caseInstance) {
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count());
         assertEquals(0, cmmnRuntimeService.createPlanItemQuery().caseInstanceId(caseInstance.getId()).count());
-        assertEquals(0, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).finished().count());
+    }
+    
+    protected void assertCaseInstanceEnded(CaseInstance caseInstance, int nrOfExpectedMilestones) {
+        assertCaseInstanceEnded(caseInstance);
+        assertEquals(0, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
         assertEquals(nrOfExpectedMilestones, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
     }
     

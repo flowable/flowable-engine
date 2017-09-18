@@ -13,15 +13,16 @@
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import org.flowable.cmmn.engine.PlanItemInstanceCallbackType;
+import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.Process;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 import liquibase.util.StringUtils;
@@ -32,10 +33,12 @@ import liquibase.util.StringUtils;
 public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements PlanItemActivityBehavior {
     
     protected Process process;
+    protected Expression processRefExpression;
     
-    public ProcessTaskActivityBehavior(Process process, boolean isBlocking) {
+    public ProcessTaskActivityBehavior(Process process, Expression processRefExpression, boolean isBlocking) {
         super(isBlocking);
         this.process = process;
+        this.processRefExpression = processRefExpression;
     }
 
     @Override
@@ -45,26 +48,28 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
             throw new FlowableException("Could not start process instance: no " + ProcessInstanceService.class + " implementation found");
         }
 
+        String externalRef = null;
         if (process != null) {
-            String externalRef = process.getExternalRef();
+            externalRef = process.getExternalRef();
             if (StringUtils.isEmpty(externalRef)) {
                 throw new FlowableException("Could not start process instance: no externalRef defined");
             }
             
-            String processInstanceId = null;
-            if (isBlocking) {
-                processInstanceId = processInstanceService.startProcessInstanceByKey(externalRef, planItemInstance.getId());
-            } else {
-                processInstanceId = processInstanceService.startProcessInstanceByKey(externalRef);
-            }
             
-            planItemInstance.setReferenceType(PlanItemInstanceCallbackType.CHILD_PROCESS);
-            planItemInstance.setReferenceId(processInstanceId);
-            
-        } else {
-            // TODO (expression support etc)
+        } else if (processRefExpression != null) {
+            externalRef = processRefExpression.getValue(planItemInstance).toString();
             
         }
+        
+        String processInstanceId = null;
+        if (isBlocking) {
+            processInstanceId = processInstanceService.startProcessInstanceByKey(externalRef, planItemInstance.getId());
+        } else {
+            processInstanceId = processInstanceService.startProcessInstanceByKey(externalRef);
+        }
+        
+        planItemInstance.setReferenceType(PlanItemInstanceCallbackType.CHILD_PROCESS);
+        planItemInstance.setReferenceId(processInstanceId);
         
         if (!isBlocking) {
             CommandContextUtil.getAgenda().planCompletePlanItem((PlanItemInstanceEntity) planItemInstance);

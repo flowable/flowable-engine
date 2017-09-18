@@ -10,37 +10,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.flowable.form.engine.impl.el;
+package org.flowable.engine.common.impl.el;
 
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
-import java.util.Map;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.variable.VariableContainer;
 import org.flowable.engine.common.impl.javax.el.ELContext;
 import org.flowable.engine.common.impl.javax.el.ELResolver;
 
 /**
- * An {@link ELResolver} that exposed object values in the map, under the name of the entry's key. The values in the map are only returned when requested property has no 'base', meaning it's a
- * root-object.
- * 
- * @author Frederik Heremans
+ * @author Joram Barrez
  */
-public class ReadOnlyMapELResolver extends ELResolver {
+public class VariableContainerELResolver extends ELResolver {
 
-    protected Map<Object, Object> wrappedMap;
+    protected VariableContainer variableContainer;
 
-    public ReadOnlyMapELResolver(Map<Object, Object> map) {
-        this.wrappedMap = map;
+    public VariableContainerELResolver(VariableContainer variableContainer) {
+        this.variableContainer = variableContainer;
     }
-
+    
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
         if (base == null) {
-            if (wrappedMap.containsKey(property)) {
-                context.setPropertyResolved(true);
-                return wrappedMap.get(property);
+            String variable = (String) property; // according to javadoc, can only be a String
+            if (variableContainer.hasVariable(variable)) {
+                context.setPropertyResolved(true); // if not set, the next elResolver in the CompositeElResolver will be called
+                return variableContainer.getVariable(variable);
             }
         }
         return null;
@@ -48,30 +44,36 @@ public class ReadOnlyMapELResolver extends ELResolver {
 
     @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
+        if (base == null) {
+            String variable = (String) property;
+            return !variableContainer.hasVariable(variable);
+        }
         return true;
     }
 
     @Override
     public void setValue(ELContext context, Object base, Object property, Object value) {
         if (base == null) {
-            if (wrappedMap.containsKey(property)) {
-                throw new FlowableException("Cannot set value of '" + property + "', it's readonly!");
+            String variable = (String) property;
+            if (variableContainer.hasVariable(variable)) {
+                variableContainer.setVariable(variable, value);
             }
         }
     }
 
     @Override
-    public Class<?> getCommonPropertyType(ELContext context, Object arg) {
+    public Class<?> getCommonPropertyType(ELContext arg0, Object arg1) {
         return Object.class;
     }
 
     @Override
-    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext context, Object arg) {
+    public Iterator<FeatureDescriptor> getFeatureDescriptors(ELContext arg0, Object arg1) {
         return null;
     }
 
     @Override
-    public Class<?> getType(ELContext context, Object arg1, Object arg2) {
+    public Class<?> getType(ELContext arg0, Object arg1, Object arg2) {
         return Object.class;
     }
+
 }

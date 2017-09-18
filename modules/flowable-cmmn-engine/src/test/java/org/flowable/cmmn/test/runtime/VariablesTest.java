@@ -21,6 +21,9 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.engine.delegate.PlanItemJavaDelegate;
+import org.flowable.cmmn.engine.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
@@ -90,7 +93,22 @@ public class VariablesTest extends FlowableCmmnTestCase {
         assertEquals("Hello World", myVariable.value);
     }
     
-    private static class MyVariable implements Serializable {
+    @Test
+    @CmmnDeployment
+    public void testResolveMilestoneNameAsExpression() {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("myVariable", "Hello from test");
+        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase", variables);
+        assertCaseInstanceEnded(caseInstance);
+
+        HistoricMilestoneInstance historicMilestoneInstance = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
+                .milestoneInstanceCaseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals("Milestone Hello from test and delegate", historicMilestoneInstance.getName());
+    }
+
+    // Test helper classes
+
+    public static class MyVariable implements Serializable {
         
         private static final long serialVersionUID = 1L;
         
@@ -100,6 +118,16 @@ public class VariablesTest extends FlowableCmmnTestCase {
             this.value = value;
         }
         
+    }
+
+    public static class SetVariableDelegate implements PlanItemJavaDelegate {
+
+        @Override
+        public void execute(DelegatePlanItemInstance planItemInstance) {
+            String variableValue = (String) planItemInstance.getVariable("myVariable");
+            planItemInstance.setVariable("myVariable", variableValue + " and delegate");
+        }
+
     }
 
 }

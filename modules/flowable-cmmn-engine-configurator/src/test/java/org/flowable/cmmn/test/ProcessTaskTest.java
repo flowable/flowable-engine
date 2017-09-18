@@ -16,7 +16,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.fail;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.cmmn.engine.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
@@ -63,13 +65,12 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
     @Test
     @CmmnDeployment
     public void testOneTaskProcessBlocking() {
-        
         CaseInstance caseInstance = startCaseInstanceWithOneTaskProcess();
         
         Task task = processEngine.getTaskService().createTaskQuery().singleResult();
         
         // Blocking process task, plan item should be in state ACTIVE
-        List<PlanItemInstance>  planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .list();
@@ -83,6 +84,27 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
         planItemInstances = cmmnRuntimeService.createPlanItemQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .list();
+        assertEquals(1, planItemInstances.size());
+        assertEquals("Task Two", planItemInstances.get(0).getName());
+        assertEquals(1, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testProcessRefExpression() {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("processDefinitionKey", "oneTask");
+        cmmnRuntimeService.startCaseInstanceById(cmmnRepositoryService.createCaseDefinitionQuery().singleResult().getId(), variables);
+        
+        Task task = processEngine.getTaskService().createTaskQuery().singleResult();
+        assertNotNull(task);
+        
+        // Completing task will trigger completion of process task plan item
+        processEngine.getTaskService().complete(task.getId());
+        
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+                .planItemInstanceStateActive()
                 .list();
         assertEquals(1, planItemInstances.size());
         assertEquals("Task Two", planItemInstances.get(0).getName());

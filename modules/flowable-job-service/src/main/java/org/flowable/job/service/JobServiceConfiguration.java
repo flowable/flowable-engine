@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.flowable.engine.common.AbstractServiceConfiguration;
 import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
+import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.job.service.impl.HistoryJobServiceImpl;
@@ -50,7 +51,6 @@ import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisJobByte
 import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisSuspendedJobDataManager;
 import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisTimerJobDataManager;
-import org.flowable.variable.service.impl.el.ExpressionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

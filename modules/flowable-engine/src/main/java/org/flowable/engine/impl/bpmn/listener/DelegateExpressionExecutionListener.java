@@ -23,7 +23,7 @@ import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.delegate.invocation.ExecutionListenerInvocation;
 import org.flowable.engine.impl.delegate.invocation.JavaDelegateInvocation;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.variable.service.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * @author Joram Barrez

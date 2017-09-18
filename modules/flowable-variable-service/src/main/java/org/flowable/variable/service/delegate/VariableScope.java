@@ -17,22 +17,21 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 
+import org.flowable.engine.common.api.variable.VariableContainer;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
 
 /**
  * Interface for class that acts as a scope for variables: i.e. the implementation can be used to set and get variables.
  * 
- * Typically, executions (and thus process instances) and tasks are the primary use case to get and set variables. The {@link DelegateExecution} for example is often used in {@link JavaDelegate}
- * implementation to get and set variables.
- * 
- * Variables are typically stored on the 'highest parent'. For executions, this means that when called on an execution the variable will be stored on the process instance execution. Variables can be
- * stored on the actual scope itself though, by calling the xxLocal methods.
+ * Variables are typically stored on the 'highest parent'. For executions, this means that when called on an execution 
+ * the variable will be stored on the process instance execution. Variables can be stored on the actual scope itself though, 
+ * by calling the xxLocal methods.
  * 
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public interface VariableScope {
+public interface VariableScope extends VariableContainer {
 
     /**
      * Returns all variables. This will include all variables of parent scopes too.
@@ -101,6 +100,7 @@ public interface VariableScope {
     /**
      * Returns the variable value for one specific variable. Will look in parent scopes when the variable does not exist on this particular scope.
      */
+    @Override
     Object getVariable(String variableName);
 
     /**
@@ -183,6 +183,7 @@ public interface VariableScope {
      * @param value
      *            the value of the variable to be set
      */
+    @Override
     void setVariable(String variableName, Object value);
 
     /**
@@ -235,6 +236,7 @@ public interface VariableScope {
     /**
      * Returns whether this scope or any parent scope has a specific variable.
      */
+    @Override
     boolean hasVariable(String variableName);
 
     /**

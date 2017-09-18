@@ -22,7 +22,7 @@ import org.flowable.engine.impl.bpmn.data.SimpleDataInputAssociation;
 import org.flowable.engine.impl.bpmn.data.TransformationDataOutputAssociation;
 import org.flowable.engine.impl.bpmn.webservice.MessageImplicitDataInputAssociation;
 import org.flowable.engine.impl.bpmn.webservice.MessageImplicitDataOutputAssociation;
-import org.flowable.variable.service.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * @author Joram Barrez

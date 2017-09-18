@@ -21,6 +21,7 @@ import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.DelegateHelper;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -28,7 +29,6 @@ import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.variable.service.impl.el.ExpressionManager;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

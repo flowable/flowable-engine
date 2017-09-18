@@ -10,20 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.flowable.form.engine.impl.el;
-
-import org.flowable.engine.common.impl.javax.el.ExpressionFactory;
+package org.flowable.engine.common.api.variable;
 
 /**
- * Class used to get hold of a {@link ExpressionFactory}.
- * 
- * @author Tijs Rademakers
+ * @author Joram Barrez
  */
-public abstract class ExpressionFactoryResolver {
+public interface VariableContainer {
+    
+    boolean hasVariable(String variableName);
+    
+    Object getVariable(String variableName);
+    
+    void setVariable(String variableName, Object variableValue);
 
-    public static ExpressionFactory resolveExpressionFactory() {
-        // Return instance of custom JUEL implementation
-        return new org.flowable.engine.common.impl.de.odysseus.el.ExpressionFactoryImpl();
-    }
 }

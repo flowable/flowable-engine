@@ -15,7 +15,7 @@ package org.activiti.engine.impl.bpmn.listener;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.variable.service.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * An {@link ExecutionListener} that evaluates a {@link Expression} when notified.

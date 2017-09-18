@@ -23,7 +23,7 @@ import org.activiti.engine.impl.delegate.JavaDelegateInvocation;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.JavaDelegate;
-import org.flowable.variable.service.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * @author Joram Barrez

@@ -101,6 +101,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new CmmnDiWaypointXmlConverter());
 
         addTextConverter(new StandardEventXmlConverter());
+        addTextConverter(new ProcessRefExpressionXmlConverter());
     }
 
     public static void addElementConverter(BaseCmmnXmlConverter converter) {

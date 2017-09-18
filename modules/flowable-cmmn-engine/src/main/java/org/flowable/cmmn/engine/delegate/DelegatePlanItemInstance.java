@@ -10,17 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.runtime;
+package org.flowable.cmmn.engine.delegate;
 
 import java.util.Date;
 
+import org.flowable.cmmn.engine.runtime.PlanItemInstance;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.variable.service.delegate.VariableScope;
 
 /**
  * @author Joram Barrez
  */
-public interface DelegatePlanItemInstance extends PlanItemInstance {
-    
+public interface DelegatePlanItemInstance extends PlanItemInstance, VariableScope {
+
     void setName(String name);
     void setState(String state);
     void setCaseDefinitionId(String caseDefinitionId);
@@ -33,7 +35,7 @@ public interface DelegatePlanItemInstance extends PlanItemInstance {
     void setReferenceId(String referenceId);
     void setReferenceType(String referenceType);
     void setTenantId(String tenantId);
-    
+
     PlanItem getPlanItem();
-    
+
 }

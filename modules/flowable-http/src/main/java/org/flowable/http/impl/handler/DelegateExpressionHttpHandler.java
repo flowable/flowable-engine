@@ -17,7 +17,7 @@ import java.util.List;
 import org.apache.http.client.HttpClient;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.variable.service.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.impl.bpmn.helper.DelegateExpressionUtil;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.util.CommandContextUtil;

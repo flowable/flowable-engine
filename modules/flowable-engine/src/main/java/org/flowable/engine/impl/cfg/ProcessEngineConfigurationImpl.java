@@ -13,8 +13,6 @@
 
 package org.flowable.engine.impl.cfg;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
@@ -63,6 +61,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
+import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.event.FlowableEventDispatcherImpl;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.interceptor.Command;
@@ -160,8 +159,8 @@ import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.impl.db.EntityDependencyOrder;
 import org.flowable.engine.impl.db.ProcessDbSchemaManager;
 import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
-import org.flowable.engine.impl.el.DefaultExpressionManager;
 import org.flowable.engine.impl.el.FlowableDateFunctionDelegate;
+import org.flowable.engine.impl.el.ProcessExpressionManager;
 import org.flowable.engine.impl.event.CompensationEventHandler;
 import org.flowable.engine.impl.event.EventHandler;
 import org.flowable.engine.impl.event.MessageEventHandler;
@@ -295,7 +294,6 @@ import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.db.IbatisVariableTypeHandler;
 import org.flowable.variable.service.impl.db.VariableDbSchemaManager;
-import org.flowable.variable.service.impl.el.ExpressionManager;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.CustomObjectType;
@@ -322,6 +320,8 @@ import org.flowable.variable.service.impl.types.VariableType;
 import org.flowable.variable.service.impl.types.VariableTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tom Baeyens
@@ -1863,9 +1863,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void initExpressionManager() {
         if (expressionManager == null) {
-            expressionManager = new DefaultExpressionManager(delegateInterceptor, beans, true);
+            expressionManager = new ProcessExpressionManager(delegateInterceptor, beans);
         }
-
         expressionManager.setFunctionDelegates(flowableFunctionDelegates);
     }
 

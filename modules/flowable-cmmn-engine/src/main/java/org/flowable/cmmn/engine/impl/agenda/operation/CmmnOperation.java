@@ -24,6 +24,8 @@ import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
+import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
@@ -75,14 +77,19 @@ public abstract class CmmnOperation implements Runnable {
                                                                         String caseInstanceId, 
                                                                         String stagePlanItemInstanceId, 
                                                                         String tenantId) {
+        ExpressionManager expressionManager = CommandContextUtil.getExpressionManager(commandContext);
         PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
-        List<PlanItemInstanceEntity> planItemInstances = new ArrayList<>();
+        CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceId);
         
+        List<PlanItemInstanceEntity> planItemInstances = new ArrayList<>();
         for (PlanItem planItem : planItems) {
             PlanItemInstanceEntity planItemInstanceEntity = planItemInstanceEntityManager.create();
             planItemInstanceEntity.setCaseDefinitionId(caseDefinitionId);
             planItemInstanceEntity.setCaseInstanceId(caseInstanceId);
-            planItemInstanceEntity.setName(planItem.getName());
+            if (planItem.getName() != null) {
+                Expression nameExpression = expressionManager.createExpression(planItem.getName());
+                planItemInstanceEntity.setName(nameExpression.getValue(caseInstanceEntity).toString());
+            }
             planItemInstanceEntity.setState(PlanItemInstanceState.AVAILABLE);
             planItemInstanceEntity.setStartTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
             planItemInstanceEntity.setElementId(planItem.getId());

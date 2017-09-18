@@ -35,7 +35,7 @@ import org.apache.commons.mail.MultiPartEmail;
 import org.apache.commons.mail.SimpleEmail;
 import org.flowable.engine.cfg.MailServerInfo;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.variable.service.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

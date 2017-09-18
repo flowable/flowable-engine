@@ -19,4 +19,6 @@ public interface VariableScopeType {
 
     String CASE_INSTANCE = "case-instance";
     
+    String PLAN_ITEM_INSTANCE = "planitem-instance";
+    
 }

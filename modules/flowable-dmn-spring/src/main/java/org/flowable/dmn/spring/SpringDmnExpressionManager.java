@@ -15,8 +15,8 @@ package org.flowable.dmn.spring;
 
 import java.util.Map;
 
-import org.flowable.dmn.engine.impl.el.DefaultExpressionManager;
-import org.flowable.dmn.engine.impl.el.VariableScopeElResolver;
+import org.flowable.engine.common.api.variable.VariableContainer;
+import org.flowable.engine.common.impl.el.DefaultExpressionManager;
 import org.flowable.engine.common.impl.el.JsonNodeELResolver;
 import org.flowable.engine.common.impl.el.ReadOnlyMapELResolver;
 import org.flowable.engine.common.impl.javax.el.ArrayELResolver;
@@ -46,11 +46,11 @@ public class SpringDmnExpressionManager extends DefaultExpressionManager {
         super(beans);
         this.applicationContext = applicationContext;
     }
-
+    
     @Override
-    protected ELResolver createElResolver(Map<String, Object> variables) {
+    protected ELResolver createElResolver(VariableContainer variableContainer) {
         CompositeELResolver compositeElResolver = new CompositeELResolver();
-        compositeElResolver.add(new VariableScopeElResolver(variables));
+        compositeElResolver.add(createVariableElResolver(variableContainer));
 
         if (beans != null) {
             // Only expose limited set of beans in expressions
@@ -67,5 +67,5 @@ public class SpringDmnExpressionManager extends DefaultExpressionManager {
         compositeElResolver.add(new BeanELResolver());
         return compositeElResolver;
     }
-
+    
 }

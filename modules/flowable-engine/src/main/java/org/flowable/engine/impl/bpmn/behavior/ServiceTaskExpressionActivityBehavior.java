@@ -20,7 +20,7 @@ import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.variable.service.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.context.BpmnOverrideContext;

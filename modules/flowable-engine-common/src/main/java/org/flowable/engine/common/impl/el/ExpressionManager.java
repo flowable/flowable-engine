@@ -10,24 +10,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.dmn.engine.impl.el;
+package org.flowable.engine.common.impl.el;
 
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
+import org.flowable.engine.common.api.variable.VariableContainer;
 import org.flowable.engine.common.impl.javax.el.ELContext;
 
 /**
  * Used as an entry point for runtime evaluation of the expressions.
  *
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public interface ExpressionManager {
-    
-    Expression createExpression(String expression);
 
-    ELContext getElContext(Map<String, Object> variables);
+    Expression createExpression(String expression);
+    
+    ELContext getElContext(VariableContainer variableContainer);
     
     Map<Object, Object> getBeans();
     

@@ -17,6 +17,8 @@ import org.flowable.dmn.model.InputClause;
 import org.flowable.dmn.model.LiteralExpression;
 import org.flowable.dmn.model.OutputClause;
 import org.flowable.dmn.model.UnaryTests;
+import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -69,7 +69,8 @@ public interface CmmnXmlConstants {
     
     String ATTRIBUTE_CASE_REF = "caseRef";
     String ATTRIBUTE_PROCESS_REF = "processRef";
-    String ATTRIBUTE_PROCESS_REF_EXPRESSION = "processRefExpression";
+    
+    String ELEMENT_PROCESS_REF_EXPRESSION = "processRefExpression";
     
     String ATTRIBUTE_CLASS = "class";
     

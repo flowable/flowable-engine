@@ -12,8 +12,6 @@
  */
 package org.flowable.dmn.engine.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +24,6 @@ import org.flowable.dmn.engine.impl.el.ELExecutionContext;
 import org.flowable.dmn.engine.impl.el.ELExecutionContextBuilder;
 import org.flowable.dmn.engine.impl.el.ELExpressionExecutor;
 import org.flowable.dmn.engine.impl.el.ExecutionVariableFactory;
-import org.flowable.dmn.engine.impl.el.ExpressionManager;
 import org.flowable.dmn.engine.impl.hitpolicy.AbstractHitPolicy;
 import org.flowable.dmn.engine.impl.hitpolicy.ComposeDecisionResultBehavior;
 import org.flowable.dmn.engine.impl.hitpolicy.ComposeRuleResultBehavior;
@@ -43,8 +40,11 @@ import org.flowable.dmn.model.LiteralExpression;
 import org.flowable.dmn.model.RuleInputClauseContainer;
 import org.flowable.dmn.model.RuleOutputClauseContainer;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Yvo Swillens

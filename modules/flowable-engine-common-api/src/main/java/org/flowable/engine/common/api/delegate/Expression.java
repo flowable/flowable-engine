@@ -11,18 +11,21 @@
  * limitations under the License.
  */
 
-package org.flowable.variable.service.delegate;
+package org.flowable.engine.common.api.delegate;
 
 import java.io.Serializable;
 
+import org.flowable.engine.common.api.variable.VariableContainer;
+
 /**
  * @author Frederik Heremans
+ * @author Joram Barrez
  */
 public interface Expression extends Serializable {
 
-    Object getValue(VariableScope variableScope);
+    Object getValue(VariableContainer variableContainer);
 
-    void setValue(Object value, VariableScope variableScope);
+    void setValue(Object value, VariableContainer variableContainer);
 
     String getExpressionText();
 

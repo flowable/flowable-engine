@@ -13,15 +13,16 @@
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import org.flowable.cmmn.engine.PlanItemInstanceCallbackType;
+import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
@@ -29,11 +30,11 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
  */
 public class CaseTaskActivityBehavior extends TaskActivityBehavior implements PlanItemActivityBehavior {
     
-    protected String caseRef;
+    protected Expression caseRefExpression;
     
-    public CaseTaskActivityBehavior(String caseRef, boolean isBlocking) {
+    public CaseTaskActivityBehavior(Expression caseRefExpression, boolean isBlocking) {
         super(isBlocking);
-        this.caseRef = caseRef;
+        this.caseRefExpression = caseRefExpression;
     }
 
     @Override
@@ -41,7 +42,7 @@ public class CaseTaskActivityBehavior extends TaskActivityBehavior implements Pl
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         
         CaseInstanceHelper caseInstanceHelper = CommandContextUtil.getCaseInstanceHelper(commandContext);
-        CaseInstanceEntity caseInstanceEntity = caseInstanceHelper.startCaseInstanceByKey(commandContext, caseRef);
+        CaseInstanceEntity caseInstanceEntity = caseInstanceHelper.startCaseInstanceByKey(commandContext, caseRefExpression.getValue(planItemInstance).toString());
         caseInstanceEntity.setParentId(planItemInstance.getCaseInstanceId());
         
         // Bidirectional storing of reference to avoid queries later on

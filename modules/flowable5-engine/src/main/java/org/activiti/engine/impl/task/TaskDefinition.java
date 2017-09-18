@@ -22,7 +22,7 @@ import java.util.Set;
 
 import org.activiti.engine.impl.form.TaskFormHandler;
 import org.flowable.engine.delegate.TaskListener;
-import org.flowable.variable.service.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * Container for task definition information gathered at parsing time.

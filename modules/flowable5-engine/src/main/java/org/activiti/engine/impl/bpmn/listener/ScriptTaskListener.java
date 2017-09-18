@@ -17,7 +17,7 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.task.service.delegate.DelegateTask;
-import org.flowable.variable.service.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * @author Rich Kroll
