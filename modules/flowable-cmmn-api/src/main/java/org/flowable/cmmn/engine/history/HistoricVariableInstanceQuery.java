@@ -10,32 +10,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.flowable.variable.service.history;
+package org.flowable.cmmn.engine.history;
 
 import java.util.Set;
 
 import org.flowable.engine.common.api.query.Query;
+import org.flowable.variable.service.history.HistoricVariableInstance;
 
 /**
- * Programmatic querying for {@link HistoricVariableInstance}s.
- * 
  * @author Joram Barrez
- * @author Tijs Rademakers
  */
 public interface HistoricVariableInstanceQuery extends Query<HistoricVariableInstanceQuery, HistoricVariableInstance> {
-
+    
     /** Only select a historic variable with the given id. */
     HistoricVariableInstanceQuery id(String id);
 
-    /** Only select historic process variables with the given process instance. */
-    HistoricVariableInstanceQuery processInstanceId(String processInstanceId);
-
-    /** Only select historic process variables with the given id. **/
-    HistoricVariableInstanceQuery executionId(String executionId);
-
-    /** Only select historic process variables whose id is in the given set of ids. */
-    HistoricVariableInstanceQuery executionIds(Set<String> executionIds);
+    /** Only select historic process variables with the given case instance. */
+    HistoricVariableInstanceQuery caseInstanceId(String caseInstanceId);
 
     /** Only select historic process variables with the given task. */
     HistoricVariableInstanceQuery taskId(String taskId);
@@ -72,8 +63,6 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
      * only select historic process variables like the given name and value (case insensitive)
      */
     HistoricVariableInstanceQuery variableValueLikeIgnoreCase(String variableName, String variableValue);
-
-    HistoricVariableInstanceQuery orderByProcessInstanceId();
 
     HistoricVariableInstanceQuery orderByVariableName();
 

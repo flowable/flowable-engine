@@ -12,17 +12,19 @@
  */
 package org.flowable.variable.service.impl.persistence.entity;
 
-import org.flowable.engine.common.impl.db.HasRevision;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.variable.service.impl.types.ValueFields;
 
 /**
- * @author Tijs Rademakers
+ * Generic variable class that can be reused for V6 and V5 engine.
  * 
- *         Generic variable class that can be reused for V6 and V5 engine
+ * @author Tijs Rademakers
  */
-public interface VariableInstance extends ValueFields, Entity, HasRevision {
+public interface VariableInstance extends ValueFields {
 
+    String getId();
+    
+    void setId(String id);
+    
     void setName(String name);
     
     void setExecutionId(String executionId);

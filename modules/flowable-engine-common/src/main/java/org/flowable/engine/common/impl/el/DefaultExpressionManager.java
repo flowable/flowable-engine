@@ -30,8 +30,8 @@ import org.flowable.engine.common.impl.javax.el.MapELResolver;
 import org.flowable.engine.common.impl.javax.el.ValueExpression;
 
 /**
- * {@link ExpressionManager} implementation, similar to the one found for the process engine,
- * but adapted to work in a CMMN context.
+ * Default {@link ExpressionManager} implementation that contains the logic for creating 
+ * and resolving {@link Expression} instances. 
  *
  * @author Tom Baeyens
  * @author Dave Syer

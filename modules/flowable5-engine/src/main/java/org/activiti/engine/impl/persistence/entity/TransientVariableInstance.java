@@ -111,56 +111,6 @@ public class TransientVariableInstance implements VariableInstance {
     }
 
     @Override
-    public boolean isInserted() {
-        return false;
-    }
-
-    @Override
-    public void setInserted(boolean inserted) {
-
-    }
-
-    @Override
-    public boolean isUpdated() {
-        return false;
-    }
-
-    @Override
-    public void setUpdated(boolean updated) {
-
-    }
-
-    @Override
-    public boolean isDeleted() {
-        return false;
-    }
-
-    @Override
-    public void setDeleted(boolean deleted) {
-
-    }
-
-    @Override
-    public Object getPersistentState() {
-        return null;
-    }
-
-    @Override
-    public void setRevision(int revision) {
-
-    }
-
-    @Override
-    public int getRevision() {
-        return 0;
-    }
-
-    @Override
-    public int getRevisionNext() {
-        return 0;
-    }
-
-    @Override
     public void setName(String name) {
 
     }
@@ -225,16 +175,6 @@ public class TransientVariableInstance implements VariableInstance {
         return null;
     }
 
-    @Override
-    public Object getOriginalPersistentState() {
-        return null;
-    }
-
-    @Override
-    public void setOriginalPersistentState(Object persistentState) {
-        
-    }
-    
     // non-supported (v6)
 
     @Override

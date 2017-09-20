@@ -205,5 +205,9 @@
             </if>
         </where>
     </sql>
+    
+    <select id="selectCaseInstancesByCaseDefinitionId" resultMap="caseInstanceResultMap">
+        select * from ${prefix}ACT_CMMN_RU_CASE_INST where CASE_DEF_ID_ = #{parameter}
+    </select>
 
 </mapper>

@@ -28,6 +28,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEnti
 import org.flowable.cmmn.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Joram Barrez
@@ -46,6 +48,8 @@ public class TableDataManagerImpl implements TableDataManager {
         entityToTableNameMap.put(MilestoneInstanceEntity.class, "ACT_CMMN_RU_MIL_INST");
         entityToTableNameMap.put(HistoricCaseInstanceEntity.class, "ACT_CMMN_HI_CASE_INST");
         entityToTableNameMap.put(HistoricMilestoneInstanceEntity.class, "ACT_CMMN_HI_MIL_INST");
+        entityToTableNameMap.put(VariableInstanceEntity.class, "ACT_RU_VARIABLE");
+        entityToTableNameMap.put(HistoricVariableInstanceEntity.class, "ACT_HI_VARINST");
     }
 
     public TableDataManagerImpl() {

@@ -14,7 +14,7 @@ package org.flowable.engine.impl;
 
 import java.util.List;
 
-import org.flowable.engine.common.impl.history.HistoricData;
+import org.flowable.engine.common.api.history.HistoricData;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;

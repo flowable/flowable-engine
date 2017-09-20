@@ -15,8 +15,6 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 import java.util.List;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
@@ -42,25 +40,13 @@ public abstract class AbstractDeleteCaseInstanceOperation extends AbstractChange
     }
     
     protected void deleteCaseInstance() {
-        deleteCaseInstanceRuntimeData();
+        deleteRuntimeData();
         CommandContextUtil.getCaseInstanceHelper(commandContext).callCaseInstanceStateChangeCallbacks(commandContext, 
                 caseInstanceEntity, caseInstanceEntity.getState(), getNewState());
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordCaseInstanceEnd(caseInstanceEntityId);
     }
-    
-    protected void deleteCaseInstanceRuntimeData() {
-        
-        // Runtime milestones related to case instance
-        MilestoneInstanceEntityManager milestoneInstanceEntityManager = CommandContextUtil.getMilestoneInstanceEntityManager(commandContext);
-        List<MilestoneInstanceEntity> milestoneInstanceEntities = milestoneInstanceEntityManager
-                .findMilestoneInstancesByCaseInstanceId(caseInstanceEntityId);
-        if (milestoneInstanceEntities != null) {
-            for (MilestoneInstanceEntity milestoneInstanceEntity : milestoneInstanceEntities) {
-                milestoneInstanceEntityManager.delete(milestoneInstanceEntity);
-            }
-        }
-        
-        // Child plan item instances
+
+    protected void deleteRuntimeData() {
         List<PlanItemInstanceEntity> childPlanItemInstances = caseInstanceEntity.getChildPlanItemInstances();
         if (childPlanItemInstances != null) {
             for (PlanItemInstanceEntity childPlanItemInstance : childPlanItemInstances) {
@@ -70,9 +56,7 @@ public abstract class AbstractDeleteCaseInstanceOperation extends AbstractChange
                 }
             }
         }
-        
-        // Actual case instance and associated plan item for plan model
-        CommandContextUtil.getCaseInstanceEntityManager(commandContext).delete(caseInstanceEntityId);
+        CommandContextUtil.getCaseInstanceEntityManager(commandContext).deleteCaseInstanceAndRelatedDate(caseInstanceEntity.getId());
     }
     
 }

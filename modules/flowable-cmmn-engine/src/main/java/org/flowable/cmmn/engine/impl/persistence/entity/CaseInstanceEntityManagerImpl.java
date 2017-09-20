@@ -18,9 +18,14 @@ import java.util.List;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.variable.VariableScopeType;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.cmmn.engine.runtime.CaseInstanceQuery;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
 
 /**
  * @author Joram Barrez
@@ -43,6 +48,11 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
     public CaseInstanceQuery createCaseInstanceQuery() {
         return new CaseInstanceQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
     }
+    
+    @Override
+    public List<CaseInstanceEntity> findCaseInstancesByCaseDefinitionId(String caseDefinitionId) {
+        return caseInstanceDataManager.findCaseInstancesByCaseDefinitionId(caseDefinitionId);
+    }
 
     @Override
     public List<CaseInstance> findByCriteria(CaseInstanceQuery query) {
@@ -57,6 +67,34 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
     @Override
     public void deleteByCaseDefinitionId(String caseDefinitionId) {
         caseInstanceDataManager.deleteByCaseDefinitionId(caseDefinitionId);
+    }
+    
+    @Override
+    public void deleteCaseInstanceAndRelatedDate(String caseInstanceId) {
+        CaseInstanceEntity caseInstanceEntity = caseInstanceDataManager.findById(caseInstanceId);
+
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+
+        // Variables
+        CommandContextUtil.getVariableServiceConfiguration(commandContext).getVariableInstanceEntityManager();
+        VariableInstanceEntityManager variableInstanceEntityManager = getVariableInstanceEntityManager();
+        List<VariableInstanceEntity> variableInstanceEntities = variableInstanceEntityManager
+                .findVariableInstanceByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CASE_INSTANCE);
+        for (VariableInstanceEntity variableInstanceEntity : variableInstanceEntities) {
+            variableInstanceEntityManager.delete(variableInstanceEntity);
+        }
+
+        // Runtime milestones
+        MilestoneInstanceEntityManager milestoneInstanceEntityManager = CommandContextUtil.getMilestoneInstanceEntityManager(commandContext);
+        List<MilestoneInstanceEntity> milestoneInstanceEntities = milestoneInstanceEntityManager
+                .findMilestoneInstancesByCaseInstanceId(caseInstanceId);
+        if (milestoneInstanceEntities != null) {
+            for (MilestoneInstanceEntity milestoneInstanceEntity : milestoneInstanceEntities) {
+                milestoneInstanceEntityManager.delete(milestoneInstanceEntity);
+            }
+        }
+
+        delete(caseInstanceEntity);
     }
 
 }

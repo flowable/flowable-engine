@@ -41,6 +41,7 @@ import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.deployer.Deployer;
 import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
+import org.flowable.cmmn.engine.impl.history.CmmnHistoryVariableManager;
 import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.interceptor.CmmnCommandInvoker;
 import org.flowable.cmmn.engine.impl.parser.CmmnActivityBehaviorFactory;
@@ -107,6 +108,7 @@ import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache
 import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.variable.service.VariableServiceConfiguration;
+import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.db.IbatisVariableTypeHandler;
 import org.flowable.variable.service.impl.db.VariableDbSchemaManager;
 import org.flowable.variable.service.impl.types.BooleanType;
@@ -200,6 +202,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     protected List<VariableType> customPreVariableTypes;
     protected List<VariableType> customPostVariableTypes;
     protected VariableServiceConfiguration variableServiceConfiguration;
+    protected InternalHistoryVariableManager internalHistoryVariableManager;
     protected boolean serializableVariableTypeTrackDeserializedObjects = true;
     protected ObjectMapper objectMapper = new ObjectMapper();
 
@@ -294,7 +297,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         if (expressionManager == null) {
             expressionManager = new CmmnExpressionManager(beans);
         }
-
+        if (flowableFunctionDelegates == null) {
+            flowableFunctionDelegates = new ArrayList<>();
+        }
+        if (customFlowableFunctionDelegates != null) {
+            flowableFunctionDelegates.addAll(customFlowableFunctionDelegates);
+        }
         expressionManager.setFunctionDelegates(flowableFunctionDelegates);
     }
 
@@ -574,12 +582,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
 
         this.variableServiceConfiguration.setVariableTypes(this.variableTypes);
         
-        // TODO
-//        if (this.internalHistoryVariableManager != null) {
-//            this.variableServiceConfiguration.setInternalHistoryVariableManager(this.internalHistoryVariableManager);
-//        } else {
-//            this.variableServiceConfiguration.setInternalHistoryVariableManager(new DefaultHistoryVariableManager(this));
-//        }
+        if (this.internalHistoryVariableManager != null) {
+            this.variableServiceConfiguration.setInternalHistoryVariableManager(this.internalHistoryVariableManager);
+        } else {
+            this.variableServiceConfiguration.setInternalHistoryVariableManager(new CmmnHistoryVariableManager(cmmnHistoryManager));
+        }
 
         this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
         this.variableServiceConfiguration.setSerializableVariableTypeTrackDeserializedObjects(this.isSerializableVariableTypeTrackDeserializedObjects());
@@ -1031,6 +1038,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
 
     public CmmnEngineConfiguration setVariableServiceConfiguration(VariableServiceConfiguration variableServiceConfiguration) {
         this.variableServiceConfiguration = variableServiceConfiguration;
+        return this;
+    }
+    
+    public InternalHistoryVariableManager getInternalHistoryVariableManager() {
+        return internalHistoryVariableManager;
+    }
+
+    public CmmnEngineConfiguration setInternalHistoryVariableManager(InternalHistoryVariableManager internalHistoryVariableManager) {
+        this.internalHistoryVariableManager = internalHistoryVariableManager;
         return this;
     }
 

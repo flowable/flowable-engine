@@ -32,6 +32,7 @@ import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
+import org.flowable.variable.service.HistoricVariableService;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
 
@@ -155,6 +156,19 @@ public class CommandContextUtil {
             variableService = variableServiceConfiguration.getVariableService();
         }
         return variableService;
+    }
+    
+    public static HistoricVariableService getHistoricVariableService() {
+        return getHistoricVariableService(getCommandContext());
+    }
+    
+    public static HistoricVariableService getHistoricVariableService(CommandContext commandContext) {
+        HistoricVariableService historicVariableService = null;
+        VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration(commandContext);
+        if (variableServiceConfiguration != null) {
+            historicVariableService = variableServiceConfiguration.getHistoricVariableService();
+        }
+        return historicVariableService;
     }
     
     public static VariableServiceConfiguration getVariableServiceConfiguration() {

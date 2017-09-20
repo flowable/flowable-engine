@@ -25,10 +25,14 @@ public interface CaseInstanceEntityManager extends EntityManager<CaseInstanceEnt
     
     CaseInstanceQuery createCaseInstanceQuery();
     
+    List<CaseInstanceEntity> findCaseInstancesByCaseDefinitionId(String caseDefinitionId);
+    
     List<CaseInstance> findByCriteria(CaseInstanceQuery query);
     
     long countByCriteria(CaseInstanceQuery query);
     
     void deleteByCaseDefinitionId(String caseDefinitionId);
+    
+    void deleteCaseInstanceAndRelatedDate(String caseInstanceId);
     
 }

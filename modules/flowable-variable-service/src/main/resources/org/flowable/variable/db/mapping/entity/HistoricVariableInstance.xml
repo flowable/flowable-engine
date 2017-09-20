@@ -308,6 +308,10 @@
     <select id="selectHistoricVariableInstanceByTaskId" resultMap="historicProcessVariableResultMap">
         select * from ${prefix}ACT_HI_VARINST where TASK_ID_ = #{parameter}
     </select>
+    
+    <select id="selectHistoricVariableInstanceByScopeIdAndScopeType" resultMap="historicProcessVariableResultMap">
+        select * from ${prefix}ACT_HI_VARINST where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType}
+    </select>
 
     <select id="selectHistoricVariableInstanceByNativeQuery" parameterType="java.util.Map" resultMap="historicProcessVariableResultMap">
         <include refid="org.flowable.variable.db.common.selectByNativeQuery" />

@@ -50,7 +50,7 @@ public interface VariableService {
     
     VariableInstanceEntity findVariableInstanceByScopeIdAndScopeTypeAndName(String scopeId, String scopeType, String variableName);
     
-    List<VariableInstanceEntity> findVariableInstanceByScopeIdAndScopeTypeAndNames(String scopeId, String scopeType, Collection<String> variableNames);
+    List<VariableInstanceEntity> findVariableInstancesByScopeIdAndScopeTypeAndNames(String scopeId, String scopeType, Collection<String> variableNames);
     
     VariableInstanceEntity createVariableInstance(String name, VariableType type, Object value);
     

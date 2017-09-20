@@ -24,7 +24,6 @@ import org.flowable.variable.service.impl.el.VariableScopeExpressionManager;
 public class CmmnExpressionManager extends VariableScopeExpressionManager {
 
     public CmmnExpressionManager() {
-        super();
     }
 
     public CmmnExpressionManager(Map<Object, Object> beans) {

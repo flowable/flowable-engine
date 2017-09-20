@@ -201,12 +201,12 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
 
     @Override
     protected List<VariableInstanceEntity> getSpecificVariables(Collection<String> variableNames) {
-        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeTypeAndNames(id, VariableScopeType.PLAN_ITEM_INSTANCE, variableNames);
+        return CommandContextUtil.getVariableService().findVariableInstancesByScopeIdAndScopeTypeAndNames(id, VariableScopeType.PLAN_ITEM_INSTANCE, variableNames);
     }
 
     @Override
-    protected String variableScopeType() {
-        return "planItemInstance";
+    protected boolean isPropagateToHistoricVariable() {
+        return true;
     }
 
 }

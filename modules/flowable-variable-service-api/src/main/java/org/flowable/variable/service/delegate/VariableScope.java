@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.flowable.engine.common.api.variable.VariableContainer;
-import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
 
 /**

@@ -18,7 +18,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 /**
  * @author Joram Barrez
  */
-public class VariableByExecutionIdMatcher extends CachedEntityMatcherAdapter<VariableInstanceEntity> {
+public class VariableInstanceByExecutionIdMatcher extends CachedEntityMatcherAdapter<VariableInstanceEntity> {
 
     @Override
     public boolean isRetained(VariableInstanceEntity variableInstanceEntity, Object parameter) {

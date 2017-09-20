@@ -175,12 +175,12 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
 
     @Override
     protected List<VariableInstanceEntity> getSpecificVariables(Collection<String> variableNames) {
-        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeTypeAndNames(id, VariableScopeType.CASE_INSTANCE, variableNames);
+        return CommandContextUtil.getVariableService().findVariableInstancesByScopeIdAndScopeTypeAndNames(id, VariableScopeType.CASE_INSTANCE, variableNames);
     }
 
     @Override
-    protected String variableScopeType() {
-        return "caseInstance";
+    protected boolean isPropagateToHistoricVariable() {
+        return true;
     }
     
 }

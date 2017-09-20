@@ -24,9 +24,11 @@ import java.util.Map;
 import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.delegate.PlanItemJavaDelegate;
 import org.flowable.cmmn.engine.history.HistoricMilestoneInstance;
+import org.flowable.cmmn.engine.impl.variable.VariableScopeType;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.variable.service.history.HistoricVariableInstance;
 import org.junit.Test;
 
 /**
@@ -104,6 +106,51 @@ public class VariablesTest extends FlowableCmmnTestCase {
         HistoricMilestoneInstance historicMilestoneInstance = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
                 .milestoneInstanceCaseInstanceId(caseInstance.getId()).singleResult();
         assertEquals("Milestone Hello from test and delegate", historicMilestoneInstance.getName());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testHistoricVariables() {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("stringVar", "test");
+        variables.put("intVar", 123);
+        variables.put("doubleVar", 123.123);
+        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase", variables);
+        
+        // verify variables
+        assertEquals("test", cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar"));
+        HistoricVariableInstance historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("stringVar").singleResult();
+        assertEquals(caseInstance.getId(), historicVariableInstance.getScopeId());
+        assertEquals(VariableScopeType.CASE_INSTANCE, historicVariableInstance.getScopeType());
+        assertEquals("test", historicVariableInstance.getValue());
+        
+        assertEquals(123, cmmnRuntimeService.getVariable(caseInstance.getId(), "intVar"));
+        historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("intVar").singleResult();
+        assertEquals(caseInstance.getId(), historicVariableInstance.getScopeId());
+        assertEquals(VariableScopeType.CASE_INSTANCE, historicVariableInstance.getScopeType());
+        assertEquals(123, historicVariableInstance.getValue());
+        
+        assertEquals(123.123, cmmnRuntimeService.getVariable(caseInstance.getId(), "doubleVar"));
+        historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("doubleVar").singleResult();
+        assertEquals(caseInstance.getId(), historicVariableInstance.getScopeId());
+        assertEquals(VariableScopeType.CASE_INSTANCE, historicVariableInstance.getScopeType());
+        assertEquals(123.123, historicVariableInstance.getValue());
+        
+        // Update variables
+        Map<String, Object> newVariables = new HashMap<>();
+        newVariables.put("stringVar", "newValue");
+        newVariables.put("otherStringVar", "test number 2");        
+        cmmnRuntimeService.setVariables(caseInstance.getId(), newVariables);
+        
+        assertEquals("newValue", cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar"));
+        assertEquals("newValue", cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("stringVar").singleResult().getValue());
+        assertEquals("test number 2", cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("otherStringVar").singleResult().getValue());
+        
+        // Delete variables
+        cmmnRuntimeService.removeVariable(caseInstance.getId(), "stringVar");
+        assertNull(cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar"));
+        assertNull(cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("stringVar").singleResult());
+        assertNotNull(cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("otherStringVar").singleResult());
     }
 
     // Test helper classes

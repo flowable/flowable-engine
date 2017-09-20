@@ -15,7 +15,7 @@ package org.flowable.task.service.history;
 
 import java.util.Date;
 
-import org.flowable.engine.common.impl.history.HistoricData;
+import org.flowable.engine.common.api.history.HistoricData;
 import org.flowable.task.service.TaskInfo;
 
 /**

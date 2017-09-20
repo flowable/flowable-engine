@@ -15,13 +15,14 @@ package org.flowable.variable.service.history;
 
 import java.util.Date;
 
-import org.flowable.engine.common.impl.history.HistoricData;
+import org.flowable.engine.common.api.history.HistoricData;
 
 /**
- * A single process variable containing the last value when its process instance has finished. It is only available when HISTORY_LEVEL is set >= VARIABLE
+ * A single process variable containing the last value when its process instance has finished.
  * 
  * @author Christian Lipphardt (camunda)
  * @author ruecker
+ * @author Joram Barrez
  */
 public interface HistoricVariableInstance extends HistoricData {
 
@@ -51,4 +52,8 @@ public interface HistoricVariableInstance extends HistoricData {
      * Returns the time when the value of the variable was last updated. Note that a {@link HistoricVariableInstance} only contains the latest value of the variable.
      */
     Date getLastUpdatedTime();
+    
+    String getScopeId();
+    
+    String getScopeType();
 }

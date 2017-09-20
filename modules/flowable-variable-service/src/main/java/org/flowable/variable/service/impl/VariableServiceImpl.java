@@ -92,8 +92,8 @@ public class VariableServiceImpl extends ServiceImpl implements VariableService 
     }
     
     @Override
-    public List<VariableInstanceEntity> findVariableInstanceByScopeIdAndScopeTypeAndNames(String scopeId, String scopeType, Collection<String> variableNames) {
-        return getVariableInstanceEntityManager().findVariableInstanceByScopeIdAndScopeTypeAndNames(scopeId, scopeType, variableNames); 
+    public List<VariableInstanceEntity> findVariableInstancesByScopeIdAndScopeTypeAndNames(String scopeId, String scopeType, Collection<String> variableNames) {
+        return getVariableInstanceEntityManager().findVariableInstancesByScopeIdAndScopeTypeAndNames(scopeId, scopeType, variableNames); 
     }
     
     @Override

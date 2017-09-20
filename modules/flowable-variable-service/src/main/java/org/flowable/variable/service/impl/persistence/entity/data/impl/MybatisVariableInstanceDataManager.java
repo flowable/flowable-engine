@@ -20,17 +20,27 @@ import java.util.Set;
 
 import org.flowable.engine.common.impl.db.AbstractDataManager;
 import org.flowable.engine.common.impl.db.CachedEntityMatcher;
+import org.flowable.engine.common.impl.db.SingleCachedEntityMatcher;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
 import org.flowable.variable.service.impl.persistence.entity.data.VariableInstanceDataManager;
-import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableByExecutionIdMatcher;
+import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceByExecutionIdMatcher;
+import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceByScopeIdAndScopeTypeAndVariableNameMatcher;
+import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceByScopeIdAndScopeTypeAndVariableNamesMatcher;
+import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceByScopeIdAndScopeTypeMatcher;
 
 /**
  * @author Joram Barrez
  */
 public class MybatisVariableInstanceDataManager extends AbstractDataManager<VariableInstanceEntity> implements VariableInstanceDataManager {
 
-    protected CachedEntityMatcher<VariableInstanceEntity> variableByExecutionIdMatcher = new VariableByExecutionIdMatcher();
+    protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceByExecutionIdMatcher = new VariableInstanceByExecutionIdMatcher();
+    
+    protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceByScopeIdAndScopeTypeMatcher = new VariableInstanceByScopeIdAndScopeTypeMatcher();
+    
+    protected SingleCachedEntityMatcher<VariableInstanceEntity> variableInstanceByScopeIdAndScopeTypeAndVariableNameMatcher = new VariableInstanceByScopeIdAndScopeTypeAndVariableNameMatcher();
+    
+    protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceByScopeIdAndScopeTypeAndVariableNamesMatcher = new VariableInstanceByScopeIdAndScopeTypeAndVariableNamesMatcher();
 
     @Override
     public Class<? extends VariableInstanceEntity> getManagedEntityClass() {
@@ -58,7 +68,7 @@ public class MybatisVariableInstanceDataManager extends AbstractDataManager<Vari
 
     @Override
     public List<VariableInstanceEntity> findVariableInstancesByExecutionId(final String executionId) {
-        return getList("selectVariablesByExecutionId", executionId, variableByExecutionIdMatcher, true);
+        return getList("selectVariablesByExecutionId", executionId, variableInstanceByExecutionIdMatcher, true);
     }
 
     @Override
@@ -107,7 +117,7 @@ public class MybatisVariableInstanceDataManager extends AbstractDataManager<Vari
         Map<String, Object> params = new HashMap<>(2);
         params.put("scopeId", scopeId);
         params.put("scopeType", scopeType);
-        return getDbSqlSession().selectList("selectVariableInstancesByScopeIdAndScopeType", params);
+        return getList("selectVariableInstancesByScopeIdAndScopeType", params, variableInstanceByScopeIdAndScopeTypeMatcher, true); 
     }
     
     @Override
@@ -116,17 +126,16 @@ public class MybatisVariableInstanceDataManager extends AbstractDataManager<Vari
         params.put("scopeId", scopeId);
         params.put("scopeType", scopeType);
         params.put("variableName", variableName);
-        return (VariableInstanceEntity) getDbSqlSession().selectOne("selectVariableInstanceByScopeIdAndScopeTypeAndName", params);
+        return getEntity("selectVariableInstanceByScopeIdAndScopeTypeAndName", params, variableInstanceByScopeIdAndScopeTypeAndVariableNameMatcher, true);
     }
     
     @Override
-    @SuppressWarnings("unchecked")
-    public List<VariableInstanceEntity> findVariableInstanceByScopeIdAndScopeTypeAndNames(String scopeId, String scopeType, Collection<String> variableNames) {
+    public List<VariableInstanceEntity> findVariableInstancesByScopeIdAndScopeTypeAndNames(String scopeId, String scopeType, Collection<String> variableNames) {
         Map<String, Object> params = new HashMap<>(3);
         params.put("scopeId", scopeId);
         params.put("scopeType", scopeType);
         params.put("variableNames", variableNames);
-        return getDbSqlSession().selectList("selectVariableInstanceByScopeIdAndScopeTypeAndNames", params);
+        return getList("selectVariableInstanceByScopeIdAndScopeTypeAndNames", params, variableInstanceByScopeIdAndScopeTypeAndVariableNamesMatcher, true);
     }
 
 }

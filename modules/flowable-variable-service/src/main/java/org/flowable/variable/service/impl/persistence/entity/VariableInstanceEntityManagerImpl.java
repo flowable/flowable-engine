@@ -103,8 +103,8 @@ public class VariableInstanceEntityManagerImpl extends AbstractEntityManager<Var
     }
     
     @Override
-    public List<VariableInstanceEntity> findVariableInstanceByScopeIdAndScopeTypeAndNames(String scopeId, String scopeType, Collection<String> variableNames) {
-        return variableInstanceDataManager.findVariableInstanceByScopeIdAndScopeTypeAndNames(scopeId, scopeType, variableNames);
+    public List<VariableInstanceEntity> findVariableInstancesByScopeIdAndScopeTypeAndNames(String scopeId, String scopeType, Collection<String> variableNames) {
+        return variableInstanceDataManager.findVariableInstancesByScopeIdAndScopeTypeAndNames(scopeId, scopeType, variableNames);
     }
 
     @Override
