@@ -83,7 +83,7 @@ public class CaseDefinitionEntityManagerImpl extends AbstractCmmnEntityManager<C
         List<CaseInstanceEntity> caseInstances = caseInstanceEntityManager.findCaseInstancesByCaseDefinitionId(caseDefinitionId);
         
         for (CaseInstance caseInstance : caseInstances) {
-            caseInstanceEntityManager.deleteCaseInstanceAndRelatedDate(caseInstance.getId());
+            caseInstanceEntityManager.deleteCaseInstanceAndRelatedData(caseInstance.getId());
         }
         
         if (cascadeHistory) {

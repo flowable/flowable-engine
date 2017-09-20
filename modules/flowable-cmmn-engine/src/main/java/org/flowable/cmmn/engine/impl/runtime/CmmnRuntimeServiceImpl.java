@@ -24,6 +24,7 @@ import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TerminateCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TriggerPlanItemInstanceCmd;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
+import org.flowable.cmmn.engine.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.engine.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.engine.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceQuery;
@@ -32,70 +33,58 @@ import org.flowable.cmmn.engine.runtime.PlanItemInstanceQuery;
  * @author Joram Barrez
  */
 public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeService {
-    
+
     @Override
-    public CaseInstance startCaseInstanceById(String caseDefinitionId) {
-        return commandExecutor.execute(new StartCaseInstanceCmd(caseDefinitionId, null, null));
+    public CaseInstanceBuilder createCaseInstanceBuilder() {
+        return new CaseInstanceBuilderImpl(this);
     }
-    
-    @Override
-    public CaseInstance startCaseInstanceById(String caseDefinitionId, Map<String, Object> variables) {
-        return commandExecutor.execute(new StartCaseInstanceCmd(caseDefinitionId, null, variables));
+
+    public CaseInstance startCaseInstance(CaseInstanceBuilder caseInstanceBuilder) {
+        return commandExecutor.execute(new StartCaseInstanceCmd(caseInstanceBuilder));
     }
-    
-    @Override
-    public CaseInstance startCaseInstanceByKey(String caseDefinitionKey) {
-        return commandExecutor.execute(new StartCaseInstanceCmd(null, caseDefinitionKey, null));
-    }
-    
-    @Override
-    public CaseInstance startCaseInstanceByKey(String caseDefinitionKey, Map<String, Object> variables) {
-        return commandExecutor.execute(new StartCaseInstanceCmd(null, caseDefinitionKey, variables));
-    }
-    
-    @Override
-    public void triggerPlanItemInstance(String planItemInstanceId) {
+
+    @Override public void triggerPlanItemInstance(String planItemInstanceId) {
         commandExecutor.execute(new TriggerPlanItemInstanceCmd(planItemInstanceId));
     }
-    
+
     @Override
     public void terminateCaseInstance(String caseInstanceId) {
         commandExecutor.execute(new TerminateCaseInstanceCmd(caseInstanceId));
     }
-    
+
     @Override
     public Map<String, Object> getVariables(String caseInstanceId) {
         return commandExecutor.execute(new GetVariablesCmd(caseInstanceId));
     }
-    
+
     @Override
     public Object getVariable(String caseInstanceId, String variableName) {
         return commandExecutor.execute(new GetVariableCmd(caseInstanceId, variableName));
     }
-    
+
     @Override
     public void setVariables(String caseInstanceId, Map<String, Object> variables) {
         commandExecutor.execute(new SetVariablesCmd(caseInstanceId, variables));
     }
-    
+
     @Override
     public void removeVariable(String caseInstanceId, String variableName) {
         commandExecutor.execute(new RemoveVariableCmd(caseInstanceId, variableName));
     }
-    
+
     @Override
     public CaseInstanceQuery createCaseInstanceQuery() {
         return cmmnEngineConfiguration.getCaseInstanceEntityManager().createCaseInstanceQuery();
     }
-    
+
     @Override
     public PlanItemInstanceQuery createPlanItemQuery() {
         return cmmnEngineConfiguration.getPlanItemInstanceEntityManager().createPlanItemInstanceQuery();
     }
-    
+
     @Override
     public MilestoneInstanceQuery createMilestoneInstanceQuery() {
         return cmmnEngineConfiguration.getMilestoneInstanceEntityManager().createMilestoneInstanceQuery();
     }
-    
+
 }

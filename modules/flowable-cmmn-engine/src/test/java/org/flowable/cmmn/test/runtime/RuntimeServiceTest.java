@@ -43,7 +43,7 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         assertNotNull(caseDefinition.getDeploymentId());
         assertTrue(caseDefinition.getVersion() > 0);
         
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceById(caseDefinition.getId());
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionId(caseDefinition.getId()).start();
         assertNotNull(caseInstance);
         assertEquals(caseDefinition.getId(), caseInstance.getCaseDefinitionId());
         assertNotNull(caseInstance.getStartTime());
@@ -66,7 +66,7 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testStartSimplePassthroughCaseWithBlockingTask() {
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceById(caseDefinition.getId());
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionId(caseDefinition.getId()).start();
         assertEquals(CaseInstanceState.ACTIVE, caseInstance.getState());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
@@ -112,12 +112,12 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
     public void testTerminateCaseInstance() {
         
         // Task A active
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
         assertCaseInstanceEnded(caseInstance, 0);
         
         // Task B active
-        caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         cmmnRuntimeService.triggerPlanItemInstance(cmmnRuntimeService.createPlanItemQuery()
                 .caseInstanceId(caseInstance.getId()).planItemInstanceState(PlanItemInstanceState.ACTIVE).singleResult().getId());
         cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
@@ -127,7 +127,7 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testTerminateCaseInstanceWithNestedStages() {
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         assertEquals(8, cmmnRuntimeService.createPlanItemQuery()
                 .caseInstanceId(caseInstance.getId()).count());
         cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());

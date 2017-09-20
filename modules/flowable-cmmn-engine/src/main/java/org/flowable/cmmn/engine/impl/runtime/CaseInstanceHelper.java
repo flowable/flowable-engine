@@ -12,10 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.runtime;
 
-import java.util.Map;
-
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
+import org.flowable.cmmn.engine.runtime.CaseInstanceBuilder;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
@@ -23,11 +22,7 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
  */
 public interface CaseInstanceHelper {
     
-    CaseInstanceEntity startCaseInstanceById(CommandContext commandContext, String caseDefinitionId);
-    CaseInstanceEntity startCaseInstanceById(CommandContext commandContext, String caseDefinitionId, Map<String, Object> variables);
-    
-    CaseInstanceEntity startCaseInstanceByKey(CommandContext commandContext, String caseDefinitionKey);
-    CaseInstanceEntity startCaseInstanceByKey(CommandContext commandContext, String caseDefinitionKey, Map<String, Object> variables);
+    CaseInstanceEntity startCaseInstance(CaseInstanceBuilder caseInstanceBuilder);
     
     void callCaseInstanceStateChangeCallbacks(CommandContext commandContext, CaseInstance caseInstance, String oldState, String newState);
     

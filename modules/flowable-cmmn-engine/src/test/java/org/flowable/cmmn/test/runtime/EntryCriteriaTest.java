@@ -36,7 +36,7 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testStartPassthroughCaseWithThreeEntryCriteriaOnParts() {
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceById(caseDefinition.getId());
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionId(caseDefinition.getId()).start();
      
         List<HistoricMilestoneInstance> mileStones = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
                 .milestoneInstanceCaseInstanceId(caseInstance.getId())
@@ -58,7 +58,7 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testThreeEntryCriteriaOnPartsForWaitStates() {
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceById(caseDefinition.getId());
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionId(caseDefinition.getId()).start();
         assertEquals(0, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
         assertEquals(0, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
         
@@ -87,7 +87,7 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testTerminateCaseInstanceAfterOneOutOfMultipleOnPartsSatisfied() {
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         
         List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemQuery()
                 .caseInstanceId(caseInstance.getId())

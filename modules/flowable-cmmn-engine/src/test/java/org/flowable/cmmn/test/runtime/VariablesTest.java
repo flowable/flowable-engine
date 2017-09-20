@@ -42,7 +42,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
         Map<String, Object> variables = new HashMap<>();
         variables.put("stringVar", "Hello World");
         variables.put("intVar", 42);
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase", variables);
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").variables(variables).start();
 
         Map<String, Object> variablesFromGet = cmmnRuntimeService.getVariables(caseInstance.getId());
         assertTrue(variablesFromGet.containsKey("stringVar"));
@@ -58,7 +58,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testSetVariables() {
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         Map<String, Object> variables = new HashMap<>();
         variables.put("stringVar", "Hello World");
         variables.put("intVar", 42);
@@ -75,7 +75,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
         Map<String, Object> variables = new HashMap<>();
         variables.put("stringVar", "Hello World");
         variables.put("intVar", 42);
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase", variables);
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").variables(variables).start();
         assertEquals(2, cmmnRuntimeService.getVariables(caseInstance.getId()).size());
 
         cmmnRuntimeService.removeVariable(caseInstance.getId(), "stringVar");
@@ -89,7 +89,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
     public void testSerializableVariable() {
         Map<String, Object> variables = new HashMap<>();
         variables.put("myVariable", new MyVariable("Hello World"));
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase", variables);
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").variables(variables).start();
         
         MyVariable myVariable = (MyVariable) cmmnRuntimeService.getVariable(caseInstance.getId(), "myVariable");
         assertEquals("Hello World", myVariable.value);
@@ -100,7 +100,8 @@ public class VariablesTest extends FlowableCmmnTestCase {
     public void testResolveMilestoneNameAsExpression() {
         Map<String, Object> variables = new HashMap<>();
         variables.put("myVariable", "Hello from test");
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase", variables);
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase").variables(variables).start();
         assertCaseInstanceEnded(caseInstance);
 
         HistoricMilestoneInstance historicMilestoneInstance = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
@@ -115,7 +116,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
         variables.put("stringVar", "test");
         variables.put("intVar", 123);
         variables.put("doubleVar", 123.123);
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase", variables);
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").variables(variables).start();
         
         // verify variables
         assertEquals("test", cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar"));

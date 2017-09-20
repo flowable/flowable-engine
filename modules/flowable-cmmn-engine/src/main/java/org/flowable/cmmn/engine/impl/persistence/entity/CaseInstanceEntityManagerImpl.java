@@ -70,7 +70,7 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
     }
     
     @Override
-    public void deleteCaseInstanceAndRelatedDate(String caseInstanceId) {
+    public void deleteCaseInstanceAndRelatedData(String caseInstanceId) {
         CaseInstanceEntity caseInstanceEntity = caseInstanceDataManager.findById(caseInstanceId);
 
         CommandContext commandContext = CommandContextUtil.getCommandContext();

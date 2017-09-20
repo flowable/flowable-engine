@@ -95,7 +95,10 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
     public void testProcessRefExpression() {
         Map<String, Object> variables = new HashMap<>();
         variables.put("processDefinitionKey", "oneTask");
-        cmmnRuntimeService.startCaseInstanceById(cmmnRepositoryService.createCaseDefinitionQuery().singleResult().getId(), variables);
+        cmmnRuntimeService.createCaseInstanceBuilder()
+            .caseDefinitionId(cmmnRepositoryService.createCaseDefinitionQuery().singleResult().getId())
+            .variables(variables)
+            .start();
         
         Task task = processEngine.getTaskService().createTaskQuery().singleResult();
         assertNotNull(task);
@@ -112,7 +115,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
     }
     
     protected CaseInstance startCaseInstanceWithOneTaskProcess() {
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceById(cmmnRepositoryService.createCaseDefinitionQuery().singleResult().getId());
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionId(cmmnRepositoryService.createCaseDefinitionQuery().singleResult().getId()).start();
         
         assertEquals(0, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
         assertEquals(0L, processEngineRuntimeService.createProcessInstanceQuery().count());
@@ -130,7 +133,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
     @Test
     @CmmnDeployment
     public void testTransactionRollback() {
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceById(cmmnRepositoryService.createCaseDefinitionQuery().singleResult().getId());
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionId(cmmnRepositoryService.createCaseDefinitionQuery().singleResult().getId()).start();
         
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemQuery()
                 .caseInstanceId(caseInstance.getId())
@@ -164,7 +167,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
     @Test
     @CmmnDeployment
     public void testTriggerUnfinishedProcessPlanItem() {
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
@@ -186,7 +189,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
     @Test
     @CmmnDeployment
     public void testStartProcessInstanceNonBlockingAndCaseInstanceFinished() {
-        cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         
         assertEquals(1, processEngine.getTaskService().createTaskQuery().count());
         assertEquals(1, processEngineRuntimeService.createProcessInstanceQuery().count());
@@ -200,7 +203,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
     @Test
     @CmmnDeployment
     public void testStartMultipleProcessInstancesBlocking() {
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemQuery()
                 .caseInstanceId(caseInstance.getId())
@@ -226,7 +229,7 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
     @Test
     @CmmnDeployment
     public void testTerminateCaseInstanceWithBlockingProcessTask() {
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         assertEquals(8, cmmnRuntimeService.createPlanItemQuery().caseInstanceId(caseInstance.getId()).count());
         assertEquals(3, cmmnRuntimeService.createPlanItemQuery().caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE).count());
