@@ -626,4 +626,18 @@
             </documentation>
         </annotation>
     </attribute>
+
+  <element name="customResource">
+    <annotation>
+      <documentation>
+        A custom user task resource
+      </documentation>
+     </annotation>
+    <complexType>
+      <sequence>
+        <element name="resourceAssignmentExpression" type="sem:tResourceAssignmentExpression" minOccurs="1" maxOccurs="1"/>
+      </sequence>
+      <attribute name="name" type="string" use="required" />
+    </complexType>
+  </element>
 </schema>
