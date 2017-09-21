@@ -97,7 +97,8 @@ public class ModelsResource {
         modelRepresentation.setKey(modelRepresentation.getKey().replaceAll(" ", ""));
         checkForDuplicateKey(modelRepresentation);
 
-        Model newModel = modelService.createModel(modelRepresentation, skeleton, SecurityUtils.getCurrentUserObject());
+        Model newModel = modelService.createModel(modelRepresentation,
+                modelService.createModelJson(modelRepresentation, skeleton), SecurityUtils.getCurrentUserObject());
         return new ModelRepresentation(newModel);
     }
 
@@ -121,11 +122,11 @@ public class ModelsResource {
         if (model == null) {
             throw new InternalServerErrorException("Error duplicating model : Unknown original model");
         }
-        
+
         modelRepresentation.setKey(modelRepresentation.getKey().replaceAll(" ", ""));
         checkForDuplicateKey(modelRepresentation);
-        
-        if (modelRepresentation.getModelType() == null || modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_BPMN)) {            
+
+        if (modelRepresentation.getModelType() == null || modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_BPMN)) {
             // BPMN model
             ObjectNode editorNode = null;
             try {
