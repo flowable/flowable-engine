@@ -31,12 +31,15 @@ public class MultiInstanceExport implements BpmnXMLConstants {
     public static void writeMultiInstance(Activity activity, BpmnModel model, XMLStreamWriter xtw) throws Exception {
         if (activity.getLoopCharacteristics() != null) {
             MultiInstanceLoopCharacteristics multiInstanceObject = activity.getLoopCharacteristics();
+            CollectionHandler handler = multiInstanceObject.getHandler();
+
             if (StringUtils.isNotEmpty(multiInstanceObject.getLoopCardinality()) || StringUtils.isNotEmpty(multiInstanceObject.getInputDataItem())
                     || StringUtils.isNotEmpty(multiInstanceObject.getCompletionCondition()) || StringUtils.isNotEmpty(multiInstanceObject.getCollectionString())) {
 
                 xtw.writeStartElement(ELEMENT_MULTIINSTANCE);
                 BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_MULTIINSTANCE_SEQUENTIAL, String.valueOf(multiInstanceObject.isSequential()).toLowerCase(), xtw);
-                if (StringUtils.isNotEmpty(multiInstanceObject.getInputDataItem())) {
+                // if a custom handler is not specified, then use the attribute
+                if (handler == null && StringUtils.isNotEmpty(multiInstanceObject.getInputDataItem())) {
                     BpmnXMLUtil.writeQualifiedAttribute(ATTRIBUTE_MULTIINSTANCE_COLLECTION, multiInstanceObject.getInputDataItem(), xtw);
                 }
                 if (StringUtils.isNotEmpty(multiInstanceObject.getElementVariable())) {
@@ -54,28 +57,29 @@ public class MultiInstanceExport implements BpmnXMLConstants {
                 }
 
                 // check for collection element handler
-                CollectionHandler handler = multiInstanceObject.getHandler();
                 if (handler != null) {
                 	// start extensions
                     xtw.writeStartElement(ELEMENT_EXTENSIONS);
                     
-                    if (StringUtils.isNotEmpty(multiInstanceObject.getCollectionString())) {
-                        // start collection element
-                        xtw.writeStartElement(ELEMENT_MULTIINSTANCE_COLLECTION);
-                        
-                    	if (StringUtils.isNotEmpty(handler.getImplementationType()) && ATTRIBUTE_MULTIINSTANCE_COLLECTION_CLASS.equals(handler.getImplementationType())) {
-                            BpmnXMLUtil.writeQualifiedAttribute(ATTRIBUTE_MULTIINSTANCE_COLLECTION_CLASS, handler.getImplementation(), xtw);
-                        } else if (StringUtils.isNotEmpty(handler.getImplementationType()) && ATTRIBUTE_MULTIINSTANCE_COLLECTION_DELEGATEEXPRESSION.equals(handler.getImplementationType())) {
-                            BpmnXMLUtil.writeQualifiedAttribute(ATTRIBUTE_MULTIINSTANCE_COLLECTION_DELEGATEEXPRESSION, handler.getImplementation(), xtw);
-                        }
+                    // start collection element
+                    xtw.writeStartElement(FLOWABLE_EXTENSIONS_NAMESPACE, ELEMENT_MULTIINSTANCE_COLLECTION);
 
+                    // collection handler attribute
+                    BpmnXMLUtil.writeQualifiedAttribute(handler.getImplementationType(), handler.getImplementation(), xtw);
+
+                    if (StringUtils.isNotEmpty(multiInstanceObject.getInputDataItem())) {
+                    	// use an expression element if there is a handler specified
+                        xtw.writeStartElement(FLOWABLE_EXTENSIONS_NAMESPACE, ELEMENT_MULTIINSTANCE_COLLECTION_EXPRESSION);
+                        xtw.writeCharacters(multiInstanceObject.getInputDataItem());
+                        xtw.writeEndElement();
+                    } else if (StringUtils.isNotEmpty(multiInstanceObject.getCollectionString())) {
                         xtw.writeStartElement(FLOWABLE_EXTENSIONS_NAMESPACE, ELEMENT_MULTIINSTANCE_COLLECTION_STRING);
                         xtw.writeCData(multiInstanceObject.getCollectionString().trim());
                         xtw.writeEndElement();
-                        
-                        // end collection element
-                        xtw.writeEndElement();
                     }
+
+                    // end collection element
+                    xtw.writeEndElement();
                 }
                 
             	
