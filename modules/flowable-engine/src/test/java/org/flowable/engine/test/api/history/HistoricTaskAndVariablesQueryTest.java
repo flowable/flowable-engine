@@ -12,13 +12,6 @@
  */
 package org.flowable.engine.test.api.history;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -27,6 +20,9 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.service.IdentityLinkInfo;
 import org.flowable.task.service.history.HistoricTaskInstance;
 import org.flowable.task.service.history.HistoricTaskInstanceQuery;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author Tijs Rademakers
@@ -415,6 +411,88 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
             tasks = historyService.createHistoricTaskInstanceQuery().taskCandidateGroupIn(groups).list();
             assertEquals(1, tasks.size());
         }
+    }
+
+    @Deployment(resources = { "org/flowable/engine/test/api/history/HistoricTaskAndVariablesQueryTest.testCandidate.bpmn20.xml" })
+    public void testCandidateAssignedToOthers() {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+
+            String taskId = taskService
+                    .createTaskQuery()
+                    .processInstanceId(processInstance.getProcessInstanceId())
+                    .list()
+                    .get(0)
+                    .getId();
+            taskService.setAssignee(taskId, "kermit");
+
+            List<HistoricTaskInstance> tasks = historyService
+                    .createHistoricTaskInstanceQuery()
+                    .taskCandidateUser("kermit")
+                    .list();
+            assertEquals(2, tasks.size());
+
+            tasks = historyService
+                    .createHistoricTaskInstanceQuery()
+                    .taskCandidateUser("kermit")
+                    .candidateAssignedToOthers()
+                    .list();
+            assertEquals(3, tasks.size());
+
+
+            tasks = historyService
+                    .createHistoricTaskInstanceQuery()
+                    .taskCandidateGroup("management")
+                    .list();
+            assertEquals(0, tasks.size());
+
+            tasks = historyService
+                    .createHistoricTaskInstanceQuery()
+                    .taskCandidateGroup("management")
+                    .candidateAssignedToOthers()
+                    .list();
+            assertEquals(1, tasks.size());
+        }
+    }
+
+    @Deployment(resources = {"org/flowable/engine/test/api/history/HistoricTaskAndVariablesQueryTest.testCandidate.bpmn20.xml"})
+    public void testCandidateAssignedToOthersOr() {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+
+            String taskId = taskService
+                    .createTaskQuery()
+                    .processInstanceId(processInstance.getProcessInstanceId())
+                    .list()
+                    .get(0)
+                    .getId();
+            taskService.setAssignee(taskId, "kermit");
+
+
+            List<HistoricTaskInstance>  tasks = historyService.createHistoricTaskInstanceQuery()
+                    .or()
+                    .taskCandidateUser("kermit")
+                    .taskAssignee("gonzo")
+                    .candidateAssignedToOthers()
+                    .endOr()
+                    .list();
+
+
+            assertEquals(4, tasks.size());
+
+            tasks = historyService.createHistoricTaskInstanceQuery()
+                    .or()
+                    .taskCandidateUser("kermit")
+                    .taskAssignee("gonzo")
+                    .endOr()
+                    .list();
+            assertEquals(3, tasks.size());
+
+
+        }
+
     }
 
     public void testQueryWithPagingAndVariables() {
