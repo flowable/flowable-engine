@@ -57,6 +57,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String assignee;
     protected String assigneeLike;
     protected String assigneeLikeIgnoreCase;
+    protected boolean candidateAssignedToOthers;
     protected List<String> assigneeIds;
     protected String involvedUser;
     protected String owner;
@@ -497,6 +498,16 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.involvedUser = involvedUser;
         } else {
             this.involvedUser = involvedUser;
+        }
+        return this;
+    }
+
+    @Override
+    public TaskQuery candidateAssignedToOthers() {
+        if (orActive) {
+            currentOrQueryObject.candidateAssignedToOthers = true;
+        } else {
+            this.candidateAssignedToOthers = true;
         }
         return this;
     }
@@ -1443,6 +1454,14 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public String getDelegationStateString() {
         return (delegationState != null ? delegationState.toString() : null);
+    }
+
+    public boolean isCandidateAssignedToOthers() {
+        return candidateAssignedToOthers;
+    }
+
+    public void setCandidateAssignedToOthers(boolean candidateAssignedToOthers) {
+        this.candidateAssignedToOthers = candidateAssignedToOthers;
     }
 
     public String getCandidateUser() {
