@@ -15,17 +15,18 @@ package org.flowable.engine.impl.rules;
 
 import java.util.Map;
 
-import org.drools.KnowledgeBase;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.ResourceType;
-import org.drools.io.Resource;
-import org.drools.io.ResourceFactory;
+import org.drools.core.marshalling.impl.ProtobufMessages.KnowledgeBase;
 import org.flowable.engine.impl.persistence.deploy.Deployer;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.kie.api.KieBase;
+import org.kie.api.io.Resource;
+import org.kie.api.io.ResourceType;
+import org.kie.internal.builder.KnowledgeBuilder;
+import org.kie.internal.builder.KnowledgeBuilderFactory;
+import org.kie.internal.io.ResourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,8 +60,8 @@ public class RulesDeployer implements Deployer {
         }
 
         if (knowledgeBuilder != null) {
-            KnowledgeBase knowledgeBase = knowledgeBuilder.newKnowledgeBase();
-            deploymentManager.getKnowledgeBaseCache().add(deployment.getId(), knowledgeBase);
+            KieBase kieBase = knowledgeBuilder.newKieBase();
+            deploymentManager.getKnowledgeBaseCache().add(deployment.getId(), kieBase);
         }
     }
 }

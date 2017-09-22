@@ -90,17 +90,17 @@
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-api</artifactId>
-				<version>1.7.6</version>
+				<version>1.7.25</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>jcl-over-slf4j</artifactId>
-				<version>1.7.6</version>
+				<version>1.7.25</version>
 			</dependency>
 			<dependency>
 				<groupId>org.slf4j</groupId>
 				<artifactId>slf4j-log4j12</artifactId>
-				<version>1.7.6</version>
+				<version>1.7.25</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-logging</groupId>
@@ -576,12 +576,12 @@
 			<dependency>
 				<groupId>org.drools</groupId>
 				<artifactId>drools-core</artifactId>
-				<version>5.5.0.Final</version>
+				<version>7.3.0.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>org.drools</groupId>
 				<artifactId>drools-compiler</artifactId>
-				<version>5.5.0.Final</version>
+				<version>7.3.0.Final</version>
 			</dependency>
 			<dependency>
 				<groupId>org.json</groupId>
