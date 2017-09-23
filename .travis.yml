@@ -6,7 +6,6 @@ sudo: required
 jdk:
   - oraclejdk9
   - oraclejdk8
-  - openjdk7
 
 cache:
   directories:

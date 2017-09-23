@@ -16,7 +16,6 @@
   <properties>
     	<!-- Maven build properties -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<java.version>1.7</java.version>
   </properties>
 
 	<prerequisites>

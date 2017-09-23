@@ -14,7 +14,7 @@ package org.flowable.standalone.escapeclause;
 
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 
-public class AbstractEscapeClauseTestCase extends ResourceFlowableTestCase {
+public abstract class AbstractEscapeClauseTestCase extends ResourceFlowableTestCase {
 
     public AbstractEscapeClauseTestCase() {
         this(null);
