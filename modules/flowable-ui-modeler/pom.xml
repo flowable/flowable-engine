@@ -14,7 +14,7 @@
   </parent>
   
   <properties>
-		<tomcat.version>7.0.53</tomcat.version>
+		<!-- Web container version -->		<tomcat.version>7.0.53</tomcat.version>
   </properties>
 
 	<prerequisites>
