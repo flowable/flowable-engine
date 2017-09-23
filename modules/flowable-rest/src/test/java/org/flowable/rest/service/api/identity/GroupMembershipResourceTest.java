@@ -22,16 +22,20 @@ import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Frederik Heremans
  */
 public class GroupMembershipResourceTest extends BaseSpringRestTestCase {
 
-    public void testCreatemembership() throws Exception {
+    @Test
+    public void testCreateMembership() throws Exception {
         try {
             Group testGroup = identityService.newGroup("testgroup");
             testGroup.setName("Test group");
@@ -78,6 +82,7 @@ public class GroupMembershipResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testCreateMembershipAlreadyExisting() throws Exception {
         try {
             Group testGroup = identityService.newGroup("testgroup");
@@ -114,6 +119,7 @@ public class GroupMembershipResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testDeleteMembership() throws Exception {
         try {
             Group testGroup = identityService.newGroup("testgroup");
@@ -152,6 +158,7 @@ public class GroupMembershipResourceTest extends BaseSpringRestTestCase {
     /**
      * Test delete membership that is no member in the group.
      */
+    @Test
     public void testDeleteMembershipNoMember() throws Exception {
         try {
             Group testGroup = identityService.newGroup("testgroup");
@@ -185,6 +192,7 @@ public class GroupMembershipResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting member from an unexisting group.
      */
+    @Test
     public void testDeleteMemberfromUnexistingGroup() throws Exception {
         HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP_MEMBERSHIP, "unexisting", "kermit"));
         closeResponse(executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND));
@@ -193,6 +201,7 @@ public class GroupMembershipResourceTest extends BaseSpringRestTestCase {
     /**
      * Test adding member to an unexisting group.
      */
+    @Test
     public void testAddMemberToUnexistingGroup() throws Exception {
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP_MEMBERSHIP_COLLECTION, "unexisting"));
         httpPost.setEntity(new StringEntity(objectMapper.createObjectNode().toString()));
@@ -202,6 +211,7 @@ public class GroupMembershipResourceTest extends BaseSpringRestTestCase {
     /**
      * Test adding member to a group, without specifying userId
      */
+    @Test
     public void testAddMemberNoUserId() throws Exception {
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP_MEMBERSHIP_COLLECTION, "admin"));
         httpPost.setEntity(new StringEntity(objectMapper.createObjectNode().toString()));

@@ -6,9 +6,12 @@ import org.apache.http.client.methods.HttpGet;
 import org.flowable.engine.common.api.management.TableMetaData;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to the Table columns.
@@ -20,6 +23,7 @@ public class TableColumnsResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single table's columns. GET management/tables/{tableName}/columns
      */
+    @Test
     public void testGetTableColumns() throws Exception {
         String tableName = managementService.getTableCount().keySet().iterator().next();
 
@@ -47,6 +51,7 @@ public class TableColumnsResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testGetColumnsForUnexistingTable() throws Exception {
         closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TABLE_COLUMNS, "unexisting")), HttpStatus.SC_NOT_FOUND));
     }

@@ -23,10 +23,13 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to the process instance query resource.
@@ -38,6 +41,7 @@ public class ProcessInstanceQueryResourceTest extends BaseSpringRestTestCase {
     /**
      * Test querying process instance based on variables. POST query/process-instances
      */
+    @Test
     @Deployment
     public void testQueryProcessInstancesWithVariables() throws Exception {
         HashMap<String, Object> processVariables = new HashMap<>();
@@ -127,6 +131,7 @@ public class ProcessInstanceQueryResourceTest extends BaseSpringRestTestCase {
     /**
      * Test querying process instance based on variables. POST query/process-instances
      */
+    @Test
     @Deployment
     public void testQueryProcessInstancesPagingAndSorting() throws Exception {
         ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("aOneTaskProcess");

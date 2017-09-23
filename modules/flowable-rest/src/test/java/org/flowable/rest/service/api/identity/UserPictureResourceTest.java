@@ -27,7 +27,10 @@ import org.flowable.idm.api.User;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.HttpMultipartHelper;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 import org.springframework.http.MediaType;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Frederik Heremans
@@ -37,6 +40,7 @@ public class UserPictureResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting the picture for a user.
      */
+    @Test
     public void testGetUserPicture() throws Exception {
         User savedUser = null;
         try {
@@ -71,6 +75,7 @@ public class UserPictureResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting the picture for an unexisting user.
      */
+    @Test
     public void testGetPictureForUnexistingUser() throws Exception {
         closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_USER_PICTURE, "unexisting")), HttpStatus.SC_NOT_FOUND));
     }
@@ -78,6 +83,7 @@ public class UserPictureResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting the picture for a user who doesn't have a pîcture set
      */
+    @Test
     public void testGetPictureForUserWithoutPicture() throws Exception {
         User savedUser = null;
         try {
@@ -103,6 +109,7 @@ public class UserPictureResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testUpdatePicture() throws Exception {
         User savedUser = null;
         try {
@@ -131,6 +138,7 @@ public class UserPictureResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testUpdatePictureWithCustomMimeType() throws Exception {
         User savedUser = null;
         try {

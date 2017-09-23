@@ -24,9 +24,12 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.idm.api.Group;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Frederik Heremans
@@ -36,6 +39,7 @@ public class GroupCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting all groups.
      */
+    @Test
     @Deployment
     public void testGetGroups() throws Exception {
         List<Group> savedGroups = new ArrayList<>();
@@ -86,6 +90,7 @@ public class GroupCollectionResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testCreateGroup() throws Exception {
         try {
             ObjectNode requestNode = objectMapper.createObjectNode();
@@ -114,6 +119,7 @@ public class GroupCollectionResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testCreateGroupExceptions() throws Exception {
         // Create without ID
         ObjectNode requestNode = objectMapper.createObjectNode();

@@ -20,12 +20,12 @@ import org.activiti.engine.impl.persistence.deploy.Deployer;
 import org.activiti.engine.impl.persistence.deploy.DeploymentManager;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti.engine.impl.persistence.entity.ResourceEntity;
-import org.drools.KnowledgeBase;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.ResourceType;
-import org.drools.io.Resource;
-import org.drools.io.ResourceFactory;
+import org.kie.api.KieBase;
+import org.kie.api.io.Resource;
+import org.kie.api.io.ResourceType;
+import org.kie.internal.builder.KnowledgeBuilder;
+import org.kie.internal.builder.KnowledgeBuilderFactory;
+import org.kie.internal.io.ResourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +61,7 @@ public class RulesDeployer implements Deployer {
         }
 
         if (knowledgeBuilder != null) {
-            KnowledgeBase knowledgeBase = knowledgeBuilder.newKnowledgeBase();
+            KieBase knowledgeBase = knowledgeBuilder.newKieBase();
             deploymentManager.getKnowledgeBaseCache().add(deployment.getId(), knowledgeBase);
         }
     }

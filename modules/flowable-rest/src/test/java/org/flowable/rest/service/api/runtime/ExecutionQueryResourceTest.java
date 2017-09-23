@@ -19,9 +19,12 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to the process instance query resource.
@@ -33,6 +36,7 @@ public class ExecutionQueryResourceTest extends BaseSpringRestTestCase {
     /**
      * Test querying executions based on variables. POST query/executions
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-subprocess.bpmn20.xml" })
     public void testQueryExecutionWithVariables() throws Exception {
         HashMap<String, Object> processVariables = new HashMap<>();

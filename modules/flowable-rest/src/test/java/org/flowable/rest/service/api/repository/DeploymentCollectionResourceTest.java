@@ -9,8 +9,11 @@ import org.apache.http.client.methods.HttpGet;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to the Deployment collection.
@@ -22,6 +25,7 @@ public class DeploymentCollectionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting deployments. GET repository/deployments
      */
+    @Test
     public void testGetDeployments() throws Exception {
 
         try {

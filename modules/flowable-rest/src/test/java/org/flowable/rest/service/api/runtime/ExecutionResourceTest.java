@@ -24,10 +24,13 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to a single execution resource.
@@ -39,6 +42,7 @@ public class ExecutionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single execution.
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-subprocess.bpmn20.xml" })
     public void testGetExecution() throws Exception {
         Execution processInstanceExecution = runtimeService.startProcessInstanceByKey("processOne");
@@ -86,6 +90,7 @@ public class ExecutionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an unexisting execution.
      */
+    @Test
     public void testGetUnexistingExecution() throws Exception {
         CloseableHttpResponse response = executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_EXECUTION, "unexisting")), HttpStatus.SC_NOT_FOUND);
         closeResponse(response);
@@ -94,6 +99,7 @@ public class ExecutionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test signalling a single execution, without signal name.
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-signal.bpmn20.xml" })
     public void testSignalExecution() throws Exception {
         runtimeService.startProcessInstanceByKey("processOne");
@@ -126,6 +132,7 @@ public class ExecutionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test signalling a single execution, without signal name.
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-signal-event.bpmn20.xml" })
     public void testSignalEventExecution() throws Exception {
         Execution signalExecution = runtimeService.startProcessInstanceByKey("processOne");
@@ -160,6 +167,7 @@ public class ExecutionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test signalling a single execution, with signal event.
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-signal-event.bpmn20.xml" })
     public void testSignalEventExecutionWithvariables() throws Exception {
         Execution signalExecution = runtimeService.startProcessInstanceByKey("processOne");
@@ -199,6 +207,7 @@ public class ExecutionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test signalling a single execution, without signal event and variables.
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-message-event.bpmn20.xml" })
     public void testMessageEventExecution() throws Exception {
         Execution execution = runtimeService.startProcessInstanceByKey("processOne");
@@ -231,6 +240,7 @@ public class ExecutionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test messaging a single execution with variables.
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-message-event.bpmn20.xml" })
     public void testMessageEventExecutionWithvariables() throws Exception {
         Execution signalExecution = runtimeService.startProcessInstanceByKey("processOne");
@@ -270,6 +280,7 @@ public class ExecutionResourceTest extends BaseSpringRestTestCase {
     /**
      * Test executing an illegal action on an execution.
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-subprocess.bpmn20.xml" })
     public void testIllegalExecutionAction() throws Exception {
         Execution execution = runtimeService.startProcessInstanceByKey("processOne");

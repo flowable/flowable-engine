@@ -29,10 +29,13 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to a single Process instance resource.
@@ -44,6 +47,7 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
 
     // check if process instance query with business key with and without includeProcess Variables
     // related to https://activiti.atlassian.net/browse/ACT-1992
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
     public void testGetProcessInstancesByBusinessKeyAndIncludeVariables() throws Exception {
         HashMap<String, Object> variables = new HashMap<>();
@@ -96,6 +100,7 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
     /**
      * Test getting a list of process instance, using all possible filters.
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
     public void testGetProcessInstances() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne", "myBusinessKey");
@@ -181,6 +186,7 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
     /**
      * Test getting a list of process instance, using all tenant filters.
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
     public void testGetProcessInstancesTenant() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne", "myBusinessKey");
@@ -215,6 +221,7 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
     /**
      * Test starting a process instance using procDefinitionId, key procDefinitionKey business-key.
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
     public void testStartProcess() throws Exception {
         ObjectNode requestNode = objectMapper.createObjectNode();
@@ -299,6 +306,7 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
     /**
      * Test starting a process instance passing in variables to set.
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
     public void testStartProcessWithVariables() throws Exception {
         ArrayNode variablesNode = objectMapper.createArrayNode();
@@ -377,6 +385,7 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
     /**
      * Test starting a process instance passing in variables to set.
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
     public void testStartProcessWithVariablesAndReturnVariables() throws Exception {
         ArrayNode variablesNode = objectMapper.createArrayNode();
@@ -432,6 +441,7 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
         assertEquals(1234, processVariables.get("integerVariable"));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/oneTaskProcess.bpmn20.xml" })
     public void testStartProcessUsingKeyAndTenantId() throws Exception {
         org.flowable.engine.repository.Deployment tenantDeployment = null;
@@ -475,6 +485,7 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
     /**
      * Test starting a process instance, covering all edge-cases.
      */
+    @Test
     public void testStartProcessExceptions() throws Exception {
 
         ObjectNode requestNode = objectMapper.createObjectNode();
@@ -525,6 +536,7 @@ public class ProcessInstanceCollectionResourceTest extends BaseSpringRestTestCas
     /**
      * Explicitly testing the statelessness of the Rest API.
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceResourceTest.process-one.bpmn20.xml" })
     public void testStartProcessWithSameHttpClient() throws Exception {
         ObjectNode requestNode = objectMapper.createObjectNode();

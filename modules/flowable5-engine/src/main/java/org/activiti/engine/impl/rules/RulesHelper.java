@@ -18,21 +18,21 @@ import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti.engine.repository.Deployment;
-import org.drools.KnowledgeBase;
 import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
+import org.kie.api.KieBase;
 
 /**
  * @author Tom Baeyens
  */
 public class RulesHelper {
 
-    public static KnowledgeBase findKnowledgeBaseByDeploymentId(String deploymentId) {
+    public static KieBase findKnowledgeBaseByDeploymentId(String deploymentId) {
         DeploymentCache<Object> knowledgeBaseCache = Context
                 .getProcessEngineConfiguration()
                 .getDeploymentManager()
                 .getKnowledgeBaseCache();
 
-        KnowledgeBase knowledgeBase = (KnowledgeBase) knowledgeBaseCache.get(deploymentId);
+        KieBase knowledgeBase = (KieBase) knowledgeBaseCache.get(deploymentId);
         if (knowledgeBase == null) {
             DeploymentEntity deployment = Context
                     .getCommandContext()
@@ -45,7 +45,7 @@ public class RulesHelper {
                     .getProcessEngineConfiguration()
                     .getDeploymentManager()
                     .deploy(deployment);
-            knowledgeBase = (KnowledgeBase) knowledgeBaseCache.get(deploymentId);
+            knowledgeBase = (KieBase) knowledgeBaseCache.get(deploymentId);
             if (knowledgeBase == null) {
                 throw new ActivitiException("deployment " + deploymentId + " doesn't contain any rules");
             }

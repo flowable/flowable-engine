@@ -24,6 +24,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.validation.Validator;
 import org.springframework.web.multipart.MultipartResolver;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
@@ -41,9 +42,6 @@ public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
 
     @Autowired
     private ObjectMapper objectMapper;
-
-    @Autowired
-    private Environment environment;
 
     @Bean
     public SessionLocaleResolver localeResolver() {
@@ -91,5 +89,5 @@ public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
     protected void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
         configurer.favorPathExtension(false);
     }
-
+    
 }

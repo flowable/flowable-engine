@@ -25,15 +25,19 @@ import org.flowable.engine.repository.Model;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Frederik Heremans
  */
 public class ModelResourceTest extends BaseSpringRestTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testGetModel() throws Exception {
 
@@ -89,11 +93,13 @@ public class ModelResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testGetUnexistingModel() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL, "unexisting"));
         closeResponse(executeRequest(httpGet, HttpStatus.SC_NOT_FOUND));
     }
 
+    @Test
     public void testDeleteModel() throws Exception {
         Model model = null;
         try {
@@ -127,11 +133,13 @@ public class ModelResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testDeleteUnexistingModel() throws Exception {
         HttpDelete httpDelete = new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL, "unexisting"));
         closeResponse(executeRequest(httpDelete, HttpStatus.SC_NOT_FOUND));
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testUpdateModel() throws Exception {
 
@@ -195,6 +203,7 @@ public class ModelResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testUpdateModelOverrideWithNull() throws Exception {
         Model model = null;
@@ -263,6 +272,7 @@ public class ModelResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testUpdateModelNoFields() throws Exception {
 
@@ -313,6 +323,7 @@ public class ModelResourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testUpdateUnexistingModel() throws Exception {
         HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL, "unexisting"));
         httpPut.setEntity(new StringEntity(objectMapper.createObjectNode().toString()));

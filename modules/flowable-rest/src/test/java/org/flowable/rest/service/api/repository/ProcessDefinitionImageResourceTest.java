@@ -20,12 +20,16 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Bassam Al-Sarori
  */
 public class ProcessDefinitionImageResourceTest extends BaseSpringRestTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml", "org/flowable/rest/service/api/repository/oneTaskProcess.png" })
     public void testGetProcessDefinitionImage() throws Exception {
         ProcessDefinition oneTaskProcess = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").singleResult();
@@ -36,6 +40,7 @@ public class ProcessDefinitionImageResourceTest extends BaseSpringRestTestCase {
         closeResponse(response);
     }
 
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testGetProcessDefinitionImageWithoutImage() throws Exception {
         ProcessDefinition oneTaskProcess = repositoryService.createProcessDefinitionQuery().processDefinitionKey("oneTaskProcess").singleResult();
@@ -51,6 +56,7 @@ public class ProcessDefinitionImageResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an unexisting process definition.
      */
+    @Test
     public void testGetUnexistingProcessDefinition() {
         closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_DEFINITION_IMAGE, "unexistingpi")), HttpStatus.SC_NOT_FOUND));
     }

@@ -33,9 +33,12 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.HttpMultipartHelper;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * Test for all REST-operations related to a single execution variable.
@@ -47,6 +50,7 @@ public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an execution variable. GET
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-subprocess.bpmn20.xml" })
     public void testGetExecutionVariable() throws Exception {
 
@@ -97,6 +101,7 @@ public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting execution variable data.
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-subprocess.bpmn20.xml" })
     public void testGetExecutionVariableData() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne");
@@ -125,6 +130,7 @@ public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an execution variable data.
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-subprocess.bpmn20.xml" })
     public void testGetExecutionVariableDataSerializable() throws Exception {
 
@@ -152,6 +158,7 @@ public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an execution variable, for illegal vars.
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-subprocess.bpmn20.xml" })
     public void testGetExecutionDataForIllegalVariables() throws Exception {
 
@@ -172,6 +179,7 @@ public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting a single execution variable, including "not found" check.
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-subprocess.bpmn20.xml" })
     public void testDeleteExecutionVariable() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne", Collections.singletonMap("myVariable", (Object) "processValue"));
@@ -206,6 +214,7 @@ public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test updating a single execution variable, including "not found" check.
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-subprocess.bpmn20.xml" })
     public void testUpdateExecutionVariable() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processOne", Collections.singletonMap("overlappingVariable", (Object) "processValue"));
@@ -269,6 +278,7 @@ public class ExecutionVariableResourceTest extends BaseSpringRestTestCase {
     /**
      * Test updating a single execution variable using a binary stream.
      */
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ExecutionResourceTest.process-with-subprocess.bpmn20.xml" })
     public void testUpdateBinaryExecutionVariable() throws Exception {
 

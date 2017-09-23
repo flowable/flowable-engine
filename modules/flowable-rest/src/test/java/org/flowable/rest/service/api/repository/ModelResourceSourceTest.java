@@ -25,12 +25,16 @@ import org.flowable.engine.repository.Model;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.HttpMultipartHelper;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Frederik Heremans
  */
 public class ModelResourceSourceTest extends BaseSpringRestTestCase {
 
+    @Test
     public void testGetModelEditorSource() throws Exception {
 
         Model model = null;
@@ -59,6 +63,7 @@ public class ModelResourceSourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testGetModelEditorSourceNoSource() throws Exception {
         Model model = null;
         try {
@@ -79,6 +84,7 @@ public class ModelResourceSourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testGetModelEditorSourceExtra() throws Exception {
 
         Model model = null;
@@ -107,6 +113,7 @@ public class ModelResourceSourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testGetModelEditorSourceExtraNoSource() throws Exception {
         Model model = null;
         try {
@@ -127,16 +134,19 @@ public class ModelResourceSourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testGetModelSourceUnexistingModel() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL_SOURCE, "unexisting"));
         closeResponse(executeRequest(httpGet, HttpStatus.SC_NOT_FOUND));
     }
 
+    @Test
     public void testGetModelSourceExtraUnexistingModel() throws Exception {
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL_SOURCE_EXTRA, "unexisting"));
         closeResponse(executeRequest(httpGet, HttpStatus.SC_NOT_FOUND));
     }
 
+    @Test
     public void testSetModelEditorSource() throws Exception {
 
         Model model = null;
@@ -161,6 +171,7 @@ public class ModelResourceSourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testSetModelEditorSourceExtra() throws Exception {
 
         Model model = null;
@@ -185,12 +196,14 @@ public class ModelResourceSourceTest extends BaseSpringRestTestCase {
         }
     }
 
+    @Test
     public void testSetModelSourceUnexistingModel() throws Exception {
         HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL_SOURCE, "unexisting"));
         httpPut.setEntity(new StringEntity(""));
         closeResponse(executeBinaryRequest(httpPut, HttpStatus.SC_NOT_FOUND));
     }
 
+    @Test
     public void testSetModelSourceExtraUnexistingModel() throws Exception {
         HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL_SOURCE_EXTRA, "unexisting"));
         httpPut.setEntity(new StringEntity(""));

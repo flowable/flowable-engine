@@ -23,15 +23,19 @@ import org.flowable.engine.repository.Model;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Frederik Heremans
  */
 public class ModelCollectionResourceTest extends BaseSpringRestTestCase {
 
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testGetModels() throws Exception {
         // Create 2 models
@@ -154,7 +158,8 @@ public class ModelCollectionResourceTest extends BaseSpringRestTestCase {
             }
         }
     }
-
+    
+    @Test
     @Deployment(resources = { "org/flowable/rest/service/api/repository/oneTaskProcess.bpmn20.xml" })
     public void testCreateModel() throws Exception {
         Model model = null;
