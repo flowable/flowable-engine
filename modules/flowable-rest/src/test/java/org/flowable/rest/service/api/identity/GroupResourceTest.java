@@ -22,9 +22,12 @@ import org.apache.http.entity.StringEntity;
 import org.flowable.idm.api.Group;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.junit.Test;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.junit.Assert.*;
 
 /**
  * @author Frederik Heremans
@@ -34,6 +37,7 @@ public class GroupResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting a single group.
      */
+    @Test
     public void testGetGroup() throws Exception {
         try {
             Group testGroup = identityService.newGroup("testgroup");
@@ -69,6 +73,7 @@ public class GroupResourceTest extends BaseSpringRestTestCase {
     /**
      * Test getting an unexisting group.
      */
+    @Test
     public void testGetUnexistingGroup() throws Exception {
         closeResponse(executeRequest(new HttpGet(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP, "unexisting")), HttpStatus.SC_NOT_FOUND));
     }
@@ -76,6 +81,7 @@ public class GroupResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting a single group.
      */
+    @Test
     public void testDeleteGroup() throws Exception {
         try {
             Group testGroup = identityService.newGroup("testgroup");
@@ -100,6 +106,7 @@ public class GroupResourceTest extends BaseSpringRestTestCase {
     /**
      * Test deleting an unexisting group.
      */
+    @Test
     public void testDeleteUnexistingGroup() throws Exception {
         closeResponse(executeRequest(new HttpDelete(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP, "unexisting")), HttpStatus.SC_NOT_FOUND));
     }
@@ -107,6 +114,7 @@ public class GroupResourceTest extends BaseSpringRestTestCase {
     /**
      * Test updating a single group.
      */
+    @Test
     public void testUpdateGroup() throws Exception {
         try {
             Group testGroup = identityService.newGroup("testgroup");
@@ -148,6 +156,7 @@ public class GroupResourceTest extends BaseSpringRestTestCase {
     /**
      * Test updating a single group passing in no fields in the json, user should remain unchanged.
      */
+    @Test
     public void testUpdateGroupNoFields() throws Exception {
         try {
             Group testGroup = identityService.newGroup("testgroup");
@@ -187,6 +196,7 @@ public class GroupResourceTest extends BaseSpringRestTestCase {
     /**
      * Test updating a single user passing in null-values.
      */
+    @Test
     public void testUpdateGroupNullFields() throws Exception {
         try {
             Group testGroup = identityService.newGroup("testgroup");
@@ -227,6 +237,7 @@ public class GroupResourceTest extends BaseSpringRestTestCase {
     /**
      * Test updating an unexisting group.
      */
+    @Test
     public void testUpdateUnexistingGroup() throws Exception {
         HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_GROUP, "unexisting"));
         httpPut.setEntity(new StringEntity(objectMapper.createObjectNode().toString()));

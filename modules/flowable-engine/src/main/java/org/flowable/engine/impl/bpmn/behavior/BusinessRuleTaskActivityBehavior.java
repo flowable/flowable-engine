@@ -25,7 +25,6 @@ import org.flowable.engine.impl.rules.RulesAgendaFilter;
 import org.flowable.engine.impl.rules.RulesHelper;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.variable.service.delegate.Expression;
 import org.kie.api.KieBase;
 import org.kie.api.runtime.KieSession;
 
