@@ -12,9 +12,6 @@
  */
 package org.flowable.engine.impl.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentService;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
@@ -23,6 +20,7 @@ import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventDispatcher;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -67,6 +65,9 @@ import org.flowable.form.api.FormService;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntityManager;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class CommandContextUtil {
     
@@ -502,7 +503,11 @@ public class CommandContextUtil {
     public static FlowableEventDispatcher getEventDispatcher(CommandContext commandContext) {
         return getProcessEngineConfiguration(commandContext).getEventDispatcher();
     }
-    
+
+    public static TransactionDependentFlowableEventDispatcher getTransactionEventDispatcher(CommandContext commandContext) {
+        return getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher();
+    }
+
     public static FailedJobCommandFactory getFailedJobCommandFactory() {
         return getFailedJobCommandFactory(getCommandContext());
     }

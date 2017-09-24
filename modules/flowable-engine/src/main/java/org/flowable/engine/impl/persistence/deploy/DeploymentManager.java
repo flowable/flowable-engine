@@ -13,15 +13,14 @@
 
 package org.flowable.engine.impl.persistence.deploy;
 
-import java.util.List;
-import java.util.Map;
-
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.app.AppModel;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventDispatcher;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
@@ -33,6 +32,9 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManage
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.ProcessDefinition;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Tom Baeyens
@@ -190,22 +192,21 @@ public class DeploymentManager {
         // Remove any process definition from the cache
         List<ProcessDefinition> processDefinitions = new ProcessDefinitionQueryImpl().deploymentId(deploymentId).list();
         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
+        TransactionDependentFlowableEventDispatcher transactionEventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher();
 
         for (ProcessDefinition processDefinition : processDefinitions) {
 
             // Since all process definitions are deleted by a single query, we should dispatch the events in this loop
-            if (eventDispatcher.isEnabled()) {
-                eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, processDefinition));
-            }
+            dispatchEvent(eventDispatcher, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, processDefinition));
+            dispatchTransactionEvent(transactionEventDispatcher, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, processDefinition));
         }
 
         // Delete data
         deploymentEntityManager.deleteDeployment(deploymentId, cascade);
 
         // Since we use a delete by query, delete-events are not automatically dispatched
-        if (eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, deployment));
-        }
+        dispatchEvent(eventDispatcher, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, deployment));
+        dispatchTransactionEvent(transactionEventDispatcher, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, deployment));
 
         for (ProcessDefinition processDefinition : processDefinitions) {
             processDefinitionCache.remove(processDefinition.getId());
@@ -214,6 +215,18 @@ public class DeploymentManager {
 
         appResourceCache.remove(deploymentId);
         knowledgeBaseCache.remove(deploymentId);
+    }
+
+    private void dispatchEvent(FlowableEventDispatcher eventDispatcher, FlowableEntityEvent entityEvent) {
+        if (eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(entityEvent);
+        }
+    }
+
+    private void dispatchTransactionEvent(TransactionDependentFlowableEventDispatcher eventDispatcher, FlowableEntityEvent entityEvent) {
+        if (eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(entityEvent);
+        }
     }
 
     // getters and setters

@@ -12,13 +12,6 @@
  */
 package org.flowable.engine.impl.asyncexecutor;
 
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
@@ -66,6 +59,13 @@ import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.JobInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.List;
+import java.util.Map;
 
 public class DefaultJobManager implements JobManager {
 
@@ -156,10 +156,8 @@ public class DefaultJobManager implements JobManager {
             processEngineConfiguration.getTimerJobEntityManager().delete(timerJob);
             scheduleTimer(rescheduledTimerJob);
 
-            if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-                CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                        FlowableEventBuilder.createJobRescheduledEvent(FlowableEngineEventType.JOB_RESCHEDULED, rescheduledTimerJob, timerJob.getId()));
-            }
+            dispatchEvent(rescheduledTimerJob, timerJob);
+            dispatchTransactionEvent(rescheduledTimerJob, timerJob);
 
             // job rescheduled event should occur before new timer scheduled event
             sendTimerScheduledEvent(rescheduledTimerJob);
@@ -689,4 +687,20 @@ public class DefaultJobManager implements JobManager {
     protected ExecutionEntityManager getExecutionEntityManager() {
         return processEngineConfiguration.getExecutionEntityManager();
     }
+
+    private void dispatchEvent(TimerJobEntity rescheduledTimerJob, TimerJobEntity timerJob) {
+        if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createJobRescheduledEvent(FlowableEngineEventType.JOB_RESCHEDULED, rescheduledTimerJob, timerJob.getId()));
+        }
+    }
+
+    private void dispatchTransactionEvent(TimerJobEntity rescheduledTimerJob, TimerJobEntity timerJob) {
+        if (CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().isEnabled()) {
+            CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createJobRescheduledEvent(FlowableEngineEventType.JOB_RESCHEDULED, rescheduledTimerJob, timerJob.getId()));
+        }
+    }
+
+
 }

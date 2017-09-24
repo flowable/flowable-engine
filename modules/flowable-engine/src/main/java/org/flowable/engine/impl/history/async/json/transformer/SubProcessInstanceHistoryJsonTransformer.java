@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.history.async.json.transformer;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
@@ -22,8 +24,6 @@ import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class SubProcessInstanceHistoryJsonTransformer extends AbstractHistoryJsonTransformer {
 
@@ -74,6 +74,8 @@ public class SubProcessInstanceHistoryJsonTransformer extends AbstractHistoryJso
     
             // Fire event
             dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(
+                    FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, subProcessInstance));
+            dispatchTransactionEvent(commandContext, FlowableEventBuilder.createEntityEvent(
                     FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, subProcessInstance));
         }
         

@@ -12,8 +12,6 @@
  */
 package org.flowable.engine.impl.bpmn.behavior;
 
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.MessageEventDefinition;
@@ -28,6 +26,8 @@ import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManage
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+
+import java.util.List;
 
 /**
  * @author Tijs Rademakers
@@ -59,8 +59,21 @@ public class BoundaryMessageEventActivityBehavior extends BoundaryEventActivityB
 
         CommandContextUtil.getEventSubscriptionEntityManager(commandContext).insertMessageEvent(messageName, executionEntity);
 
+        dispatchEvent(commandContext, executionEntity, messageName);
+        dispatchTransactionEvent(commandContext, executionEntity, messageName);
+    }
+
+    private void dispatchEvent(CommandContext commandContext, ExecutionEntity executionEntity, String messageName) {
         if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
             CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
+                    .dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING, executionEntity.getActivityId(), messageName,
+                            null, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()));
+        }
+    }
+
+    private void dispatchTransactionEvent(CommandContext commandContext, ExecutionEntity executionEntity, String messageName) {
+        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher().isEnabled()) {
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher()
                     .dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING, executionEntity.getActivityId(), messageName,
                             null, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()));
         }

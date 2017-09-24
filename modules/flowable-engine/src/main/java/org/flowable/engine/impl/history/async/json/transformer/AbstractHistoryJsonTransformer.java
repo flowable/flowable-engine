@@ -12,19 +12,20 @@
  */
 package org.flowable.engine.impl.history.async.json.transformer;
 
-import java.util.Date;
-import java.util.List;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventDispatcher;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.AsyncHistoryDateUtil;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Date;
+import java.util.List;
 
 public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTransformer {
 
@@ -81,6 +82,13 @@ public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTrans
         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher();
         if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(event);
+        }
+    }
+
+    protected void dispatchTransactionEvent(CommandContext commandContext, FlowableEvent event) {
+        TransactionDependentFlowableEventDispatcher transactionEventDispatcher = CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher();
+        if (transactionEventDispatcher != null && transactionEventDispatcher.isEnabled()) {
+            transactionEventDispatcher.dispatchEvent(event);
         }
     }
 

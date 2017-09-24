@@ -12,11 +12,7 @@
  */
 package org.flowable.engine.impl.bpmn.behavior;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.UserTask;
@@ -43,7 +39,11 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author Joram Barrez
@@ -212,14 +212,26 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_CREATE);
 
             // All properties set, now firing 'create' events
-            if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-                CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
-            }
-            
+            dispatchEvent(task);
+            dispatchTransactionEvent(task);
+
         } else {
             taskEntityManager.deleteTask(task, null, false, false);
             leave(execution);
+        }
+    }
+
+    private void dispatchEvent(TaskEntity task) {
+        if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
+        }
+    }
+
+    private void dispatchTransactionEvent(TaskEntity task) {
+        if (CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().isEnabled()) {
+            CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
         }
     }
 

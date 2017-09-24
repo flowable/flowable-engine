@@ -12,8 +12,6 @@
  */
 package org.flowable.engine.impl.cmd;
 
-import java.io.Serializable;
-
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
@@ -26,6 +24,8 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
 
 /**
  * @author Tijs Rademakers
@@ -46,6 +46,7 @@ public class DeleteTimerJobCmd implements Command<Object>, Serializable {
         TimerJobEntity jobToDelete = getJobToDelete(commandContext);
 
         sendCancelEvent(jobToDelete);
+        sendCancelTransactionEvent(jobToDelete);
 
         CommandContextUtil.getTimerJobEntityManager(commandContext).delete(jobToDelete);
         return null;
@@ -54,6 +55,12 @@ public class DeleteTimerJobCmd implements Command<Object>, Serializable {
     protected void sendCancelEvent(TimerJobEntity jobToDelete) {
         if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
+        }
+    }
+
+    protected void sendCancelTransactionEvent(TimerJobEntity jobToDelete) {
+        if (CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().isEnabled()) {
+            CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
         }
     }
 

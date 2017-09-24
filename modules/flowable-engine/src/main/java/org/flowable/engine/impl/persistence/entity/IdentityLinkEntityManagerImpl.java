@@ -13,10 +13,6 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
@@ -25,6 +21,10 @@ import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.CountingTaskEntity;
 import org.flowable.engine.impl.persistence.entity.data.IdentityLinkDataManager;
 import org.flowable.engine.task.IdentityLinkType;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * @author Tom Baeyens
@@ -83,9 +83,8 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
             }
         }
 
-        if (getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, identityLink));
-        }
+        dispatchEvent(identityLink);
+        dispatchTransactionEvent(identityLink);
     }
 
     @Override
@@ -273,5 +272,18 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
     public void setIdentityLinkDataManager(IdentityLinkDataManager identityLinkDataManager) {
         this.identityLinkDataManager = identityLinkDataManager;
     }
+
+    private void dispatchEvent(IdentityLinkEntity identityLink) {
+        if (getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, identityLink));
+        }
+    }
+
+    private void dispatchTransactionEvent(IdentityLinkEntity identityLink) {
+        if (getTransactionEventDispatcher().isEnabled()) {
+            getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, identityLink));
+        }
+    }
+
 
 }

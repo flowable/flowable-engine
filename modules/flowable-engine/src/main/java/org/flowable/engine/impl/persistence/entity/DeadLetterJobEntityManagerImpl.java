@@ -13,8 +13,6 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
-import java.util.List;
-
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.DeadLetterJobQueryImpl;
@@ -24,6 +22,8 @@ import org.flowable.engine.impl.persistence.entity.data.DeadLetterJobDataManager
 import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * @author Tijs Rademakers
@@ -104,6 +104,9 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
         // Send event
         if (getEventDispatcher().isEnabled()) {
             getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        }
+        if (getTransactionEventDispatcher().isEnabled()) {
+            getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
         }
     }
 

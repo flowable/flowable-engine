@@ -12,8 +12,6 @@
  */
 package org.flowable.engine.impl.bpmn.behavior;
 
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.SignalEventDefinition;
@@ -29,6 +27,8 @@ import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManage
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+
+import java.util.List;
 
 public class IntermediateCatchSignalEventActivityBehavior extends IntermediateCatchEventActivityBehavior {
 
@@ -57,8 +57,21 @@ public class IntermediateCatchSignalEventActivityBehavior extends IntermediateCa
 
         CommandContextUtil.getEventSubscriptionEntityManager(commandContext).insertSignalEvent(signalName, signal, executionEntity);
 
+        dispatchEvent(commandContext, executionEntity, signalName);
+        dispatchTransactionEvent(commandContext, executionEntity, signalName);
+    }
+
+    private void dispatchEvent(CommandContext commandContext, ExecutionEntity executionEntity, String signalName) {
         if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
             CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
+                    .dispatchEvent(FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING, executionEntity.getActivityId(), signalName,
+                            null, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()));
+        }
+    }
+
+    private void dispatchTransactionEvent(CommandContext commandContext, ExecutionEntity executionEntity, String signalName) {
+        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher().isEnabled()) {
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher()
                     .dispatchEvent(FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING, executionEntity.getActivityId(), signalName,
                             null, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()));
         }

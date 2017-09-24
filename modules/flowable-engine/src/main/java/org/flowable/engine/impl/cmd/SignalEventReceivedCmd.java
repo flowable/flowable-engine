@@ -13,10 +13,6 @@
 
 package org.flowable.engine.impl.cmd;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.interceptor.Command;
@@ -30,6 +26,10 @@ import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.Execution;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -106,10 +106,8 @@ public class SignalEventReceivedCmd implements Command<Void> {
                     compatibilityHandler.signalEventReceived(signalEventSubscriptionEntity, payload, async);
 
                 } else {
-                    CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                            FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, signalEventSubscriptionEntity.getActivityId(), eventName,
-                                    payload, signalEventSubscriptionEntity.getExecutionId(), signalEventSubscriptionEntity.getProcessInstanceId(),
-                                    signalEventSubscriptionEntity.getProcessDefinitionId()));
+                    dispatchEvent(signalEventSubscriptionEntity);
+                    dispatchTransactionEvent(signalEventSubscriptionEntity);
 
                     eventSubscriptionEntityManager.eventReceived(signalEventSubscriptionEntity, payload, async);
                 }
@@ -117,6 +115,20 @@ public class SignalEventReceivedCmd implements Command<Void> {
         }
 
         return null;
+    }
+
+    private void dispatchEvent(SignalEventSubscriptionEntity signalEventSubscriptionEntity) {
+        CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, signalEventSubscriptionEntity.getActivityId(), eventName,
+                        payload, signalEventSubscriptionEntity.getExecutionId(), signalEventSubscriptionEntity.getProcessInstanceId(),
+                        signalEventSubscriptionEntity.getProcessDefinitionId()));
+    }
+
+    private void dispatchTransactionEvent(SignalEventSubscriptionEntity signalEventSubscriptionEntity) {
+        CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().dispatchEvent(
+                FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, signalEventSubscriptionEntity.getActivityId(), eventName,
+                        payload, signalEventSubscriptionEntity.getExecutionId(), signalEventSubscriptionEntity.getProcessInstanceId(),
+                        signalEventSubscriptionEntity.getProcessDefinitionId()));
     }
 
 }

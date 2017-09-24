@@ -13,9 +13,6 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
-import java.util.List;
-import java.util.Map;
-
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
@@ -30,6 +27,9 @@ import org.flowable.engine.impl.persistence.entity.data.TaskDataManager;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.task.IdentityLinkType;
 import org.flowable.engine.task.Task;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Tom Baeyens
@@ -101,6 +101,12 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
                         FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, taskEntity));
             }
         }
+        if (getTransactionEventDispatcher().isEnabled()) {
+            if (taskEntity.getAssignee() != null) {
+                getTransactionEventDispatcher().dispatchEvent(
+                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, taskEntity));
+            }
+        }
 
         getHistoryManager().recordTaskCreated(taskEntity, execution);
     }
@@ -143,6 +149,9 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
         if (getEventDispatcher().isEnabled()) {
             getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, taskEntity));
         }
+        if (getTransactionEventDispatcher().isEnabled()) {
+            getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, taskEntity));
+        }
 
     }
 
@@ -170,6 +179,12 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
             if (getEventDispatcher().isEnabled() && !task.isCanceled()) {
                 task.setCanceled(true);
                 getEventDispatcher().dispatchEvent(
+                        FlowableEventBuilder.createActivityCancelledEvent(task.getExecution().getActivityId(), task.getName(),
+                                task.getExecutionId(), task.getProcessInstanceId(),
+                                task.getProcessDefinitionId(), "userTask", deleteReason));
+            }
+            if (getTransactionEventDispatcher().isEnabled() && !task.isCanceled()) {
+                getTransactionEventDispatcher().dispatchEvent(
                         FlowableEventBuilder.createActivityCancelledEvent(task.getExecution().getActivityId(), task.getName(),
                                 task.getExecutionId(), task.getProcessInstanceId(),
                                 task.getProcessDefinitionId(), "userTask", deleteReason));
@@ -217,9 +232,12 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
             }
 
             delete(task, false);
-            
+
             if (getEventDispatcher().isEnabled() && fireEvents) {
                 getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, task));
+            }
+            if (getTransactionEventDispatcher().isEnabled() && fireEvents) {
+                getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, task));
             }
 
         }

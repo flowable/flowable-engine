@@ -13,9 +13,6 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
-import java.util.List;
-import java.util.Map;
-
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.Message;
@@ -41,6 +38,9 @@ import org.flowable.engine.impl.util.TimerUtil;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Tom Baeyens
@@ -140,6 +140,9 @@ public class DeploymentEntityManagerImpl extends AbstractEntityManager<Deploymen
             for (TimerJobEntity timerStartJob : timerStartJobs) {
                 if (getEventDispatcher().isEnabled()) {
                     getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timerStartJob, null, null, processDefinition.getId()));
+                }
+                if (getTransactionEventDispatcher().isEnabled()) {
+                    getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timerStartJob, null, null, processDefinition.getId()));
                 }
 
                 getTimerJobEntityManager().delete(timerStartJob);

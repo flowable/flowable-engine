@@ -13,12 +13,8 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
+import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventDispatcher;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableVariableEvent;
@@ -28,6 +24,11 @@ import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.CountingTaskEntity;
 import org.flowable.engine.impl.persistence.entity.data.VariableInstanceDataManager;
 import org.flowable.engine.impl.variable.VariableType;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Tom Baeyens
@@ -141,6 +142,13 @@ public class VariableInstanceEntityManagerImpl extends AbstractEntityManager<Var
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, entity));
 
             eventDispatcher.dispatchEvent(createVariableDeleteEvent(entity));
+        }
+
+        TransactionDependentFlowableEventDispatcher transactionEventDispatcher = getTransactionEventDispatcher();
+        if (fireDeleteEvent && transactionEventDispatcher.isEnabled()) {
+            transactionEventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, entity));
+
+            transactionEventDispatcher.dispatchEvent(createVariableDeleteEvent(entity));
         }
 
     }

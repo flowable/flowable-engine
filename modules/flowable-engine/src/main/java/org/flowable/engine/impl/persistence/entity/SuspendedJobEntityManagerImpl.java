@@ -13,8 +13,6 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
-import java.util.List;
-
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.SuspendedJobQueryImpl;
@@ -24,6 +22,8 @@ import org.flowable.engine.impl.persistence.entity.data.SuspendedJobDataManager;
 import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 /**
  * @author Tijs Rademakers
@@ -105,9 +105,8 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
         }
 
         // Send event
-        if (getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
-        }
+        dispatchEvent();
+        dispatchTransactionEvent();
     }
 
     /**
@@ -145,4 +144,18 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
     public void setJobDataManager(SuspendedJobDataManager jobDataManager) {
         this.jobDataManager = jobDataManager;
     }
+
+    private void dispatchEvent() {
+        if (getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        }
+    }
+
+    private void dispatchTransactionEvent() {
+        if (getTransactionEventDispatcher().isEnabled()) {
+            getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        }
+    }
+
+
 }

@@ -13,11 +13,6 @@
 
 package org.flowable.engine.impl.bpmn.behavior;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
@@ -40,6 +35,11 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
+
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Implementation of the BPMN 2.0 call activity (limited currently to calling a subprocess and not (yet) a global task).
@@ -93,7 +93,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         }
 
         CommandContext commandContext = CommandContextUtil.getCommandContext();
-        
+
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
@@ -117,10 +117,10 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         CommandContextUtil.getHistoryManager(commandContext).recordSubProcessInstanceStart(executionEntity, subProcessInstance);
 
         boolean eventDispatcherEnabled = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled();
-        if (eventDispatcherEnabled) {
-            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, subProcessInstance));
-        }
+        dispatchEvent(subProcessInstance, eventDispatcherEnabled);
+
+        boolean transactionEventDispatcherEnabled = CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().isEnabled();
+        dispatchTransactionEvent(subProcessInstance, transactionEventDispatcherEnabled);
 
         // process template-defined data objects
         subProcessInstance.setVariables(processDataObjects(subProcess.getDataObjects()));
@@ -160,6 +160,24 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         if (eventDispatcherEnabled) {
             CommandContextUtil.getEventDispatcher(commandContext)
                     .dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(subProcessInitialExecution, variables, false));
+        }
+        if (transactionEventDispatcherEnabled) {
+            CommandContextUtil.getTransactionEventDispatcher(commandContext)
+                    .dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(subProcessInitialExecution, variables, false));
+        }
+    }
+
+    private void dispatchEvent(ExecutionEntity subProcessInstance, boolean eventDispatcherEnabled) {
+        if (eventDispatcherEnabled) {
+            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, subProcessInstance));
+        }
+    }
+
+    private void dispatchTransactionEvent(ExecutionEntity subProcessInstance, boolean transactionEventDispatcherEnabled) {
+        if (transactionEventDispatcherEnabled) {
+            CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, subProcessInstance));
         }
     }
 

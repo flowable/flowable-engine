@@ -13,8 +13,6 @@
 
 package org.flowable.engine.impl.cmd;
 
-import java.io.Serializable;
-
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
@@ -24,6 +22,8 @@ import org.flowable.engine.impl.persistence.entity.AttachmentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
+
+import java.io.Serializable;
 
 /**
  * @author Tom Baeyens
@@ -65,11 +65,23 @@ public class DeleteAttachmentCmd implements Command<Object>, Serializable {
             CommandContextUtil.getHistoryManager(commandContext).createAttachmentComment(attachment.getTaskId(), attachment.getProcessInstanceId(), attachment.getName(), false);
         }
 
+        dispatchEvent(commandContext, attachment, processInstanceId, processDefinitionId);
+        dispatchTransactionEvent(commandContext, attachment, processInstanceId, processDefinitionId);
+        return null;
+    }
+
+    private void dispatchEvent(CommandContext commandContext, AttachmentEntity attachment, String processInstanceId, String processDefinitionId) {
         if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
             CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
                     .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, attachment, processInstanceId, processInstanceId, processDefinitionId));
         }
-        return null;
+    }
+
+    private void dispatchTransactionEvent(CommandContext commandContext, AttachmentEntity attachment, String processInstanceId, String processDefinitionId) {
+        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher().isEnabled()) {
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher()
+                    .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, attachment, processInstanceId, processInstanceId, processDefinitionId));
+        }
     }
 
 }

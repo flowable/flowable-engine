@@ -12,10 +12,8 @@
  */
 package org.flowable.engine.impl.bpmn.deployer;
 
-import java.util.Collection;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.constants.BpmnXMLConstants;
@@ -29,6 +27,7 @@ import org.flowable.bpmn.model.UserTask;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.DynamicBpmnService;
+import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -45,8 +44,10 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -187,9 +188,8 @@ public class BpmnDeployer implements Deployer {
 
             cachingAndArtifactsManager.updateProcessDefinitionCache(parsedDeployment);
 
-            if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
-                CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processDefinition));
-            }
+            dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processDefinition));
+            dispatchTransactionEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processDefinition));
         }
     }
 
@@ -219,10 +219,22 @@ public class BpmnDeployer implements Deployer {
     protected void dispatchProcessDefinitionEntityInitializedEvent(ParsedDeployment parsedDeployment) {
         CommandContext commandContext = Context.getCommandContext();
         for (ProcessDefinitionEntity processDefinitionEntity : parsedDeployment.getAllProcessDefinitions()) {
-            if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
-                CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().dispatchEvent(
-                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, processDefinitionEntity));
-            }
+            dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, processDefinitionEntity));
+            dispatchTransactionEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, processDefinitionEntity));
+        }
+    }
+
+    private void dispatchEvent(CommandContext commandContext, FlowableEntityEvent entityEvent) {
+        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().dispatchEvent(
+                    entityEvent);
+        }
+    }
+
+    private void dispatchTransactionEvent(CommandContext commandContext, FlowableEntityEvent entityEvent) {
+        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher().isEnabled()) {
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher().dispatchEvent(
+                    entityEvent);
         }
     }
 

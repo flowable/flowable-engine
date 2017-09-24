@@ -12,23 +12,18 @@
  */
 package org.flowable.engine.impl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.form.FormData;
 import org.flowable.engine.impl.cmd.ActivateProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.AddEventListenerCommand;
 import org.flowable.engine.impl.cmd.AddIdentityLinkForProcessInstanceCmd;
+import org.flowable.engine.impl.cmd.AddTransactionEventListenerCommand;
 import org.flowable.engine.impl.cmd.ChangeActivityStateCmd;
 import org.flowable.engine.impl.cmd.CompleteAdhocSubProcessCmd;
 import org.flowable.engine.impl.cmd.DeleteIdentityLinkForProcessInstanceCmd;
@@ -53,6 +48,7 @@ import org.flowable.engine.impl.cmd.HasExecutionVariableCmd;
 import org.flowable.engine.impl.cmd.MessageEventReceivedCmd;
 import org.flowable.engine.impl.cmd.RemoveEventListenerCommand;
 import org.flowable.engine.impl.cmd.RemoveExecutionVariablesCmd;
+import org.flowable.engine.impl.cmd.RemoveTransactionEventListenerCommand;
 import org.flowable.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.flowable.engine.impl.cmd.SetProcessInstanceBusinessKeyCmd;
 import org.flowable.engine.impl.cmd.SetProcessInstanceNameCmd;
@@ -79,6 +75,13 @@ import org.flowable.engine.task.Event;
 import org.flowable.engine.task.IdentityLink;
 import org.flowable.engine.task.IdentityLinkType;
 import org.flowable.form.model.FormModel;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Tom Baeyens
@@ -509,8 +512,23 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     }
 
     @Override
+    public void addTransactionEventListener(TransactionDependentFlowableEventListener listenerToAdd) {
+        commandExecutor.execute(new AddTransactionEventListenerCommand(listenerToAdd));
+    }
+
+    @Override
+    public void addTransactionEventListener(TransactionDependentFlowableEventListener listenerToAdd, FlowableEngineEventType... types) {
+        commandExecutor.execute(new AddTransactionEventListenerCommand(listenerToAdd, types));
+    }
+
+    @Override
     public void removeEventListener(FlowableEventListener listenerToRemove) {
         commandExecutor.execute(new RemoveEventListenerCommand(listenerToRemove));
+    }
+
+    @Override
+    public void removeTransactionEventListener(TransactionDependentFlowableEventListener listenerToRemove) {
+        commandExecutor.execute(new RemoveTransactionEventListenerCommand(listenerToRemove));
     }
 
     @Override

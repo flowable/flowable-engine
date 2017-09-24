@@ -13,8 +13,6 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
-import java.util.List;
-
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
@@ -23,6 +21,8 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.data.AttachmentDataManager;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Task;
+
+import java.util.List;
 
 /**
  * @author Tom Baeyens
@@ -59,6 +59,7 @@ public class AttachmentEntityManagerImpl extends AbstractEntityManager<Attachmen
         checkHistoryEnabled();
         List<AttachmentEntity> attachments = findAttachmentsByTaskId(taskId);
         boolean dispatchEvents = getEventDispatcher().isEnabled();
+        boolean dispatchTransactionEvents = getTransactionEventDispatcher().isEnabled();
 
         String processInstanceId = null;
         String processDefinitionId = null;
@@ -85,6 +86,10 @@ public class AttachmentEntityManagerImpl extends AbstractEntityManager<Attachmen
 
             if (dispatchEvents) {
                 getEventDispatcher().dispatchEvent(
+                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, attachment, executionId, processInstanceId, processDefinitionId));
+            }
+            if (dispatchTransactionEvents) {
+                getTransactionEventDispatcher().dispatchEvent(
                         FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, attachment, executionId, processInstanceId, processDefinitionId));
             }
         }

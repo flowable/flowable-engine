@@ -12,17 +12,6 @@
  */
 package org.flowable.engine.cfg;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-
 import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.db.CustomMyBatisTypeHandlerConfig;
@@ -35,6 +24,17 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 
 /**
  * Convenience class for external engines (IDM/DMN/Form/...) to work together with the process engine
@@ -137,6 +137,7 @@ public abstract class AbstractEngineConfigurator implements ProcessEngineConfigu
         initSessionFactories(processEngineConfiguration, targetEngineConfiguration);
         initDbProperties(processEngineConfiguration, targetEngineConfiguration);
         initEventDispatcher(processEngineConfiguration, targetEngineConfiguration);
+        initTransactionDependentEventDispatcher(processEngineConfiguration, targetEngineConfiguration);
         initClock(processEngineConfiguration, targetEngineConfiguration);
     }
 
@@ -198,7 +199,13 @@ public abstract class AbstractEngineConfigurator implements ProcessEngineConfigu
             targetEngineConfiguration.setEventDispatcher(processEngineConfiguration.getEventDispatcher());
         }
     }
-    
+
+    protected void initTransactionDependentEventDispatcher(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
+        if (processEngineConfiguration.getTransactionDependentEventDispatcher() != null) {
+            targetEngineConfiguration.setTransactionDependentEventDispatcher(processEngineConfiguration.getTransactionDependentEventDispatcher());
+        }
+    }
+
     protected void initClock(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
         targetEngineConfiguration.setClock(processEngineConfiguration.getClock());
     }

@@ -13,8 +13,6 @@
 
 package org.flowable.engine.impl.bpmn.behavior;
 
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.SignalEventDefinition;
@@ -31,6 +29,8 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
+
+import java.util.List;
 
 /**
  * @author Tijs Rademakers
@@ -82,10 +82,8 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
         }
 
         for (SignalEventSubscriptionEntity signalEventSubscriptionEntity : subscriptionEntities) {
-            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, signalEventSubscriptionEntity.getActivityId(), eventSubscriptionName,
-                            null, signalEventSubscriptionEntity.getExecutionId(), signalEventSubscriptionEntity.getProcessInstanceId(),
-                            signalEventSubscriptionEntity.getProcessDefinitionId()));
+            dispatchEvent(eventSubscriptionName, signalEventSubscriptionEntity);
+            dispatchTransactionEvent(eventSubscriptionName, signalEventSubscriptionEntity);
 
             if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, signalEventSubscriptionEntity.getProcessDefinitionId())) {
                 Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
@@ -97,6 +95,20 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
         }
 
         CommandContextUtil.getAgenda(commandContext).planTakeOutgoingSequenceFlowsOperation((ExecutionEntity) execution, true);
+    }
+
+    private void dispatchEvent(String eventSubscriptionName, SignalEventSubscriptionEntity signalEventSubscriptionEntity) {
+        CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, signalEventSubscriptionEntity.getActivityId(), eventSubscriptionName,
+                        null, signalEventSubscriptionEntity.getExecutionId(), signalEventSubscriptionEntity.getProcessInstanceId(),
+                        signalEventSubscriptionEntity.getProcessDefinitionId()));
+    }
+
+    private void dispatchTransactionEvent(String eventSubscriptionName, SignalEventSubscriptionEntity signalEventSubscriptionEntity) {
+        CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().dispatchEvent(
+                FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, signalEventSubscriptionEntity.getActivityId(), eventSubscriptionName,
+                        null, signalEventSubscriptionEntity.getExecutionId(), signalEventSubscriptionEntity.getProcessInstanceId(),
+                        signalEventSubscriptionEntity.getProcessDefinitionId()));
     }
 
 }

@@ -13,8 +13,6 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
-import java.util.List;
-
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
@@ -23,6 +21,8 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.data.JobDataManager;
 import org.flowable.engine.runtime.Job;
+
+import java.util.List;
 
 /**
  * @author Tom Baeyens
@@ -99,9 +99,8 @@ public class JobEntityManagerImpl extends JobInfoEntityManagerImpl<JobEntity> im
         removeExecutionLink(jobEntity);
 
         // Send event
-        if (getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
-        }
+        dispatchEvent();
+        dispatchTransactionEvent();
     }
 
     @Override
@@ -144,5 +143,18 @@ public class JobEntityManagerImpl extends JobInfoEntityManagerImpl<JobEntity> im
     public void setJobDataManager(JobDataManager jobDataManager) {
         this.jobDataManager = jobDataManager;
     }
+
+    private void dispatchEvent() {
+        if (getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        }
+    }
+
+    private void dispatchTransactionEvent() {
+        if (getTransactionEventDispatcher().isEnabled()) {
+            getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        }
+    }
+
 
 }

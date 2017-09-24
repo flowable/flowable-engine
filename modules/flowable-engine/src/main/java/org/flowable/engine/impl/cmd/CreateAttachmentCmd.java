@@ -13,8 +13,6 @@
 
 package org.flowable.engine.impl.cmd;
 
-import java.io.InputStream;
-
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.interceptor.Command;
@@ -33,6 +31,8 @@ import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Task;
+
+import java.io.InputStream;
 
 /**
  * @author Tom Baeyens
@@ -100,6 +100,13 @@ public class CreateAttachmentCmd implements Command<Attachment> {
 
         CommandContextUtil.getHistoryManager(commandContext).createAttachmentComment(taskId, processInstanceId, attachmentName, true);
 
+        dispatchEvent(commandContext, attachment);
+        dispatchTransactionEvent(commandContext, attachment);
+
+        return attachment;
+    }
+
+    private void dispatchEvent(CommandContext commandContext, AttachmentEntity attachment) {
         if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
             // Forced to fetch the process-instance to associate the right
             // process definition
@@ -116,8 +123,25 @@ public class CreateAttachmentCmd implements Command<Attachment> {
             CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
                     .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, attachment, processInstanceId, processInstanceId, processDefinitionId));
         }
+    }
 
-        return attachment;
+    private void dispatchTransactionEvent(CommandContext commandContext, AttachmentEntity attachment) {
+        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher().isEnabled()) {
+            // Forced to fetch the process-instance to associate the right
+            // process definition
+            String processDefinitionId = null;
+            if (attachment.getProcessInstanceId() != null) {
+                ExecutionEntity process = CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstanceId);
+                if (process != null) {
+                    processDefinitionId = process.getProcessDefinitionId();
+                }
+            }
+
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher()
+                    .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, attachment, processInstanceId, processInstanceId, processDefinitionId));
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher()
+                    .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, attachment, processInstanceId, processInstanceId, processDefinitionId));
+        }
     }
 
     protected TaskEntity verifyTaskParameters(CommandContext commandContext) {

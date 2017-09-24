@@ -13,10 +13,6 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.delegate.VariableScope;
@@ -33,6 +29,10 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author Tijs Rademakers
@@ -170,9 +170,8 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
         }
 
         // Send event
-        if (getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
-        }
+        dispatchEvent();
+        dispatchTransactionEvent();
     }
 
     /**
@@ -267,4 +266,18 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
     public void setJobDataManager(TimerJobDataManager jobDataManager) {
         this.jobDataManager = jobDataManager;
     }
+
+    private void dispatchEvent() {
+        if (getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        }
+    }
+
+    private void dispatchTransactionEvent() {
+        if (getTransactionEventDispatcher().isEnabled()) {
+            getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        }
+    }
+
+
 }

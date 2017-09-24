@@ -13,8 +13,6 @@
 
 package org.flowable.engine.impl.event;
 
-import java.util.List;
-
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SubProcess;
@@ -28,6 +26,8 @@ import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+
+import java.util.List;
 
 /**
  * @author Tijs Rademakers
@@ -66,11 +66,8 @@ public class CompensationEventHandler implements EventHandler {
 
             try {
 
-                if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
-                    CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().dispatchEvent(
-                            FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPENSATE, flowElement.getId(), flowElement.getName(),
-                                    compensatingExecution.getId(), compensatingExecution.getProcessInstanceId(), compensatingExecution.getProcessDefinitionId(), flowElement));
-                }
+                dispatchEvent(commandContext, compensatingExecution, flowElement);
+                dispatchTransactionEvent(commandContext, compensatingExecution, flowElement);
                 compensatingExecution.setCurrentFlowElement(flowElement);
                 CommandContextUtil.getAgenda().planContinueProcessInCompensation(compensatingExecution);
 
@@ -78,6 +75,22 @@ public class CompensationEventHandler implements EventHandler {
                 throw new FlowableException("Error while handling compensation event " + eventSubscription, e);
             }
 
+        }
+    }
+
+    private void dispatchEvent(CommandContext commandContext, ExecutionEntity compensatingExecution, FlowElement flowElement) {
+        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPENSATE, flowElement.getId(), flowElement.getName(),
+                            compensatingExecution.getId(), compensatingExecution.getProcessInstanceId(), compensatingExecution.getProcessDefinitionId(), flowElement));
+        }
+    }
+
+    private void dispatchTransactionEvent(CommandContext commandContext, ExecutionEntity compensatingExecution, FlowElement flowElement) {
+        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher().isEnabled()) {
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPENSATE, flowElement.getId(), flowElement.getName(),
+                            compensatingExecution.getId(), compensatingExecution.getProcessInstanceId(), compensatingExecution.getProcessDefinitionId(), flowElement));
         }
     }
 

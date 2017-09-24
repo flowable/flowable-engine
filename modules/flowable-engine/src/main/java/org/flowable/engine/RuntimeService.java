@@ -12,11 +12,6 @@
  */
 package org.flowable.engine;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -24,6 +19,7 @@ import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
 import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.persistence.entity.VariableInstance;
@@ -41,6 +37,11 @@ import org.flowable.engine.task.Event;
 import org.flowable.engine.task.IdentityLink;
 import org.flowable.engine.task.IdentityLinkType;
 import org.flowable.form.model.FormModel;
+
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * 
@@ -1197,6 +1198,22 @@ public interface RuntimeService {
     void addEventListener(FlowableEventListener listenerToAdd, FlowableEngineEventType... types);
 
     /**
+     * Adds an event-listener which will be notified of ALL events by the transaction dispatcher.
+     *
+     * @param listenerToAdd the listener to add
+     */
+    void addTransactionEventListener(TransactionDependentFlowableEventListener listenerToAdd);
+
+    /**
+     * Adds an event-listener which will only be notified when an event occurs, which type is in the
+     * given types.
+     *
+     * @param listenerToAdd the listener to add
+     * @param types         types of events the listener should be notified for
+     */
+    void addTransactionEventListener(TransactionDependentFlowableEventListener listenerToAdd, FlowableEngineEventType... types);
+
+    /**
      * Removes the given listener from this dispatcher. The listener will no longer be notified, regardless of the type(s) it was registered for in the first place.
      * 
      * @param listenerToRemove
@@ -1205,11 +1222,19 @@ public interface RuntimeService {
     void removeEventListener(FlowableEventListener listenerToRemove);
 
     /**
+     * Removes the given listener from this dispatcher. The listener will no longer be notified, regardless of the type(s) it was registered for in the first place.
+     *
+     * @param listenerToRemove
+     *            listener to remove
+     */
+    void removeTransactionEventListener(TransactionDependentFlowableEventListener listenerToRemove);
+
+    /**
      * Dispatches the given event to any listeners that are registered.
-     * 
+     *
      * @param event
      *            event to dispatch.
-     * 
+     *
      * @throws FlowableException
      *             if an exception occurs when dispatching the event or when the {@link FlowableEventDispatcher} is disabled.
      * @throws FlowableIllegalArgumentException
