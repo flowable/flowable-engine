@@ -20,6 +20,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
@@ -77,6 +79,7 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpActivityBehaviorImpl.class);
+    private static final Pattern HEADER_PATTERN = Pattern.compile("(.+):(.+)");
     
     protected HttpServiceTask httpServiceTask;
 
@@ -257,13 +260,13 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
         try (BufferedReader reader = new BufferedReader(new StringReader(headers))) {
             String line = reader.readLine();
             while (line != null) {
-                String[] header = line.split(":");
-                if (header.length == 2) {
-                    base.addHeader(header[0], header[1]);
-                    line = reader.readLine();
-                } else {
+                Matcher matcher = HEADER_PATTERN.matcher(line);
+                if (!matcher.matches()) {
                     throw new FlowableException(HTTP_TASK_REQUEST_HEADERS_INVALID);
                 }
+
+                base.addHeader(matcher.group(1), matcher.group(2));
+                line = reader.readLine();
             }
         }
     }
