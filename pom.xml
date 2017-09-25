@@ -329,17 +329,27 @@
                 <artifactId>flowable-cmmn-converter</artifactId>
                 <version>${project.version}</version>
             </dependency>
-             <dependency>
+            <dependency>
                 <groupId>org.flowable</groupId>
                 <artifactId>flowable-cmmn-engine</artifactId>
                 <version>${project.version}</version>
             </dependency>
-             <dependency>
+            <dependency>
                 <groupId>org.flowable</groupId>
-                <artifactId>flowable-engine-configurator</artifactId>
+                <artifactId>flowable-cmmn-spring</artifactId>
                 <version>${project.version}</version>
             </dependency>
-             <dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-cmmn-engine-configurator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.flowable</groupId>
+                <artifactId>flowable-cmmn-spring-configurator</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.flowable</groupId>
                 <artifactId>flowable-cmmn-model</artifactId>
                 <version>${project.version}</version>
