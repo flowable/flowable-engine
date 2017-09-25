@@ -27,16 +27,22 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.Criterion;
+import org.flowable.cmmn.model.HasEntryCriteria;
+import org.flowable.cmmn.model.HasExitCriteria;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ProcessTask;
+import org.flowable.cmmn.model.SentryIfPart;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.util.io.InputStreamSource;
 import org.flowable.engine.common.impl.util.io.StreamSource;
 import org.slf4j.Logger;
@@ -50,6 +56,7 @@ public class CmmnParserImpl implements CmmnParser {
     private final Logger logger = LoggerFactory.getLogger(CmmnParserImpl.class);
     
     protected CmmnActivityBehaviorFactory activityBehaviorFactory;
+    protected ExpressionManager expressionManager;
     
     public CmmnParseResult parse(CmmnResourceEntity resourceEntity) {
         CmmnParseResult parseResult = new CmmnParseResult();
@@ -100,6 +107,7 @@ public class CmmnParserImpl implements CmmnParser {
             caseDefinitionEntities.add(caseDefinitionEntity);
             
             processPlanFragment(caze.getPlanModel());
+            processSentries(caze);
         }
         return caseDefinitionEntities;
     }
@@ -145,6 +153,28 @@ public class CmmnParserImpl implements CmmnParser {
         }
 
     }
+    
+    protected void processSentries(Case caze) {
+        List<Criterion> criteria = new ArrayList<>();
+        for (CaseElement caseElement : caze.getAllCaseElements().values()) {
+            if (caseElement instanceof HasEntryCriteria) {
+                ((HasEntryCriteria) caseElement).getEntryCriteria();
+            } else if (caseElement instanceof HasExitCriteria) {
+                ((HasExitCriteria) caseElement).getExitCriteria();
+            }
+        }
+        
+        for (Criterion criterion : criteria) {
+            if (criterion.getSentry() != null && criterion.getSentry().getSentryIfPart() != null) {
+                SentryIfPart sentryIfPart = criterion.getSentry().getSentryIfPart();
+                if (StringUtils.isNotEmpty(sentryIfPart.getCondition())) {
+                    sentryIfPart.setConditionExpression(expressionManager.createExpression(sentryIfPart.getCondition()));
+                } else {
+                    throw new FlowableException("Empty condition for if part found");
+                }
+            }
+        }
+    }
 
     public CmmnActivityBehaviorFactory getActivityBehaviorFactory() {
         return activityBehaviorFactory;
@@ -154,4 +184,12 @@ public class CmmnParserImpl implements CmmnParser {
         this.activityBehaviorFactory = activityBehaviorFactory;
     }
 
+    public ExpressionManager getExpressionManager() {
+        return expressionManager;
+    }
+
+    public void setExpressionManager(ExpressionManager expressionManager) {
+        this.expressionManager = expressionManager;
+    }
+    
 }

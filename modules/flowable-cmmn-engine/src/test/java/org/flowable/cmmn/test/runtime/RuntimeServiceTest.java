@@ -134,4 +134,18 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         assertCaseInstanceEnded(caseInstance, 0);
     }
 
+    @Test
+    @CmmnDeployment
+    public void testCaseInstanceProperties() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .name("test name")
+                .businessKey("test business key")
+                .start();
+        
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals("test name", caseInstance.getName());
+        assertEquals("test business key", caseInstance.getBusinessKey());
+    }
+
 }

@@ -21,20 +21,22 @@ import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 /**
  * @author Joram Barrez
  */
-public class SentryOnPartInstanceEntityImpl extends AbstractEntity implements SentryOnPartInstanceEntity {
-    
+public class SentryPartInstanceEntityImpl extends AbstractEntity implements SentryPartInstanceEntity {
+
     protected String caseDefinitionId;
     protected String caseInstanceId;
     protected String planItemInstanceId;
     protected String onPartId;
+    protected String ifPartId;
     protected Date timeStamp;
-    
+
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("caseDefinitionId", caseDefinitionId);
         persistentState.put("caseInstanceId", caseInstanceId);
         persistentState.put("planItemInstanceId", planItemInstanceId);
         persistentState.put("onPartId", onPartId);
+        persistentState.put("ifPart", ifPartId);
         persistentState.put("timeStamp", timeStamp);
         return persistentState;
     }
@@ -71,6 +73,14 @@ public class SentryOnPartInstanceEntityImpl extends AbstractEntity implements Se
         this.onPartId = onPartId;
     }
 
+    public String getIfPartId() {
+        return ifPartId;
+    }
+
+    public void setIfPartId(String ifPartId) {
+        this.ifPartId = ifPartId;
+    }
+
     public Date getTimeStamp() {
         return timeStamp;
     }
@@ -78,5 +88,5 @@ public class SentryOnPartInstanceEntityImpl extends AbstractEntity implements Se
     public void setTimeStamp(Date timeStamp) {
         this.timeStamp = timeStamp;
     }
-    
+
 }

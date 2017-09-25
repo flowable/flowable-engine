@@ -22,7 +22,7 @@ import org.flowable.variable.service.delegate.VariableScope;
 /**
  * @author Joram Barrez
  */
-public interface CaseInstanceEntity extends Entity, CaseInstance, EntityWithSentryOnPartInstances, VariableScope {
+public interface CaseInstanceEntity extends Entity, CaseInstance, EntityWithSentryPartInstances, VariableScope {
 
     void setBusinessKey(String businessKey);
     void setName(String name);

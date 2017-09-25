@@ -41,7 +41,7 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
     
     // non persisted
     protected List<PlanItemInstanceEntity> childPlanItemInstances;
-    protected List<SentryOnPartInstanceEntity> satisfiedSentryOnPartInstances;
+    protected List<SentryPartInstanceEntity> satisfiedSentryPartInstances;
     
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
@@ -133,17 +133,17 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
     }
     
     @Override
-    public List<SentryOnPartInstanceEntity> getSatisfiedSentryOnPartInstances() {
-        if (satisfiedSentryOnPartInstances == null) {
-            satisfiedSentryOnPartInstances = CommandContextUtil.getSentryOnPartInstanceEntityManager()
-                    .findSentryOnPartInstancesByCaseInstanceIdAndNullPlanItemInstanceId(id);
+    public List<SentryPartInstanceEntity> getSatisfiedSentryPartInstances() {
+        if (satisfiedSentryPartInstances == null) {
+            satisfiedSentryPartInstances = CommandContextUtil.getSentryPartInstanceEntityManager()
+                    .findSentryPartInstancesByCaseInstanceIdAndNullPlanItemInstanceId(id);
         }
-        return satisfiedSentryOnPartInstances;
+        return satisfiedSentryPartInstances;
     }
     
     @Override
-    public void setSatisfiedSentryOnPartInstances(List<SentryOnPartInstanceEntity> sentryOnPartInstanceEntities) {
-        this.satisfiedSentryOnPartInstances = sentryOnPartInstanceEntities;
+    public void setSatisfiedSentryPartInstances(List<SentryPartInstanceEntity> sentryPartInstanceEntities) {
+        this.satisfiedSentryPartInstances = sentryPartInstanceEntities;
     }
     
     

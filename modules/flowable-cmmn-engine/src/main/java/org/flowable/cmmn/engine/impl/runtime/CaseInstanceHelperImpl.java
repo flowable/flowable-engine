@@ -19,7 +19,7 @@ import java.util.Map;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
-import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.repository.CaseDefinition;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
@@ -111,7 +111,7 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         caseInstanceEntity.setTenantId(caseDefinition.getTenantId());
         caseInstanceEntityManager.insert(caseInstanceEntity);
         
-        caseInstanceEntity.setSatisfiedSentryOnPartInstances(new ArrayList<SentryOnPartInstanceEntity>(1));
+        caseInstanceEntity.setSatisfiedSentryPartInstances(new ArrayList<SentryPartInstanceEntity>(1));
         
         return caseInstanceEntity;
     }

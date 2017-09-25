@@ -86,6 +86,32 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
     
     @Test
     @CmmnDeployment
+    public void testMultipleEntryCriteria() {
+        // 3 sentries, each completion should trigger the milestone
+        for (int i=0; i<3; i++) {
+            CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+            List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+                    .caseInstanceId(caseInstance.getId())
+                    .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                    .orderByName().asc()
+                    .list();
+            assertEquals(3, planItemInstances.size());
+            
+            cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(i).getId());
+            assertEquals(1, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+            
+            // Triggering the other two should not have additional effects
+            for (PlanItemInstance planItemInstance :cmmnRuntimeService.createPlanItemQuery().caseInstanceId(caseInstance.getId()).planItemInstanceState(PlanItemInstanceState.ACTIVE).list()) {
+                cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+            }
+            
+            assertEquals(1, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+            assertCaseInstanceEnded(caseInstance);
+        }
+    }
+    
+    @Test
+    @CmmnDeployment
     public void testTerminateCaseInstanceAfterOneOutOfMultipleOnPartsSatisfied() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         
@@ -105,4 +131,5 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }
+
 }

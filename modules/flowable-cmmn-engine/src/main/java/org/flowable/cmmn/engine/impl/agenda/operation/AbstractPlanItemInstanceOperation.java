@@ -13,8 +13,8 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
@@ -38,11 +38,11 @@ public abstract class AbstractPlanItemInstanceOperation extends CmmnOperation {
         this.planItemInstanceEntity = planItemInstanceEntity;
     }
     
-    protected void deleteSentryOnPartInstances() {
-        SentryOnPartInstanceEntityManager sentryOnPartInstanceEntityManager = CommandContextUtil.getSentryOnPartInstanceEntityManager(commandContext);
-        if (planItemInstanceEntity.getSatisfiedSentryOnPartInstances() != null) {
-            for (SentryOnPartInstanceEntity sentryOnPartInstanceEntity : planItemInstanceEntity.getSatisfiedSentryOnPartInstances()) {
-                sentryOnPartInstanceEntityManager.delete(sentryOnPartInstanceEntity);
+    protected void deleteSentryPartInstances() {
+        SentryPartInstanceEntityManager sentryPartInstanceEntityManager = CommandContextUtil.getSentryPartInstanceEntityManager(commandContext);
+        if (planItemInstanceEntity.getSatisfiedSentryPartInstances() != null) {
+            for (SentryPartInstanceEntity sentryPartInstanceEntity : planItemInstanceEntity.getSatisfiedSentryPartInstances()) {
+                sentryPartInstanceEntityManager.delete(sentryPartInstanceEntity);
             }
         }
     }

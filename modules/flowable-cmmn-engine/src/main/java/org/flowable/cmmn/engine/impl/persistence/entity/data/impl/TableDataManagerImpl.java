@@ -24,7 +24,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEnti
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
@@ -44,7 +44,7 @@ public class TableDataManagerImpl implements TableDataManager {
         entityToTableNameMap.put(CaseDefinitionEntity.class, "ACT_CMMN_RE_CASEDEF");
         entityToTableNameMap.put(CaseInstanceEntity.class, "ACT_CMMN_RU_CASE_INST");
         entityToTableNameMap.put(PlanItemInstanceEntity.class, "ACT_CMMN_RU_PLAN_ITEM_INST");
-        entityToTableNameMap.put(SentryOnPartInstanceEntity.class, "ACT_CMMN_RU_SENTRY_ON_PART_INST");
+        entityToTableNameMap.put(SentryPartInstanceEntity.class, "ACT_CMMN_RU_SENTRY_PART_INST");
         entityToTableNameMap.put(MilestoneInstanceEntity.class, "ACT_CMMN_RU_MIL_INST");
         entityToTableNameMap.put(HistoricCaseInstanceEntity.class, "ACT_CMMN_HI_CASE_INST");
         entityToTableNameMap.put(HistoricMilestoneInstanceEntity.class, "ACT_CMMN_HI_MIL_INST");

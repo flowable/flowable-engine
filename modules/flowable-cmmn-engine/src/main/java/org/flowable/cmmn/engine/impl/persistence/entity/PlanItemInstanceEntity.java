@@ -20,7 +20,7 @@ import org.flowable.engine.common.impl.persistence.entity.Entity;
 /**
  * @author Joram Barrez
  */
-public interface PlanItemInstanceEntity extends Entity, DelegatePlanItemInstance, EntityWithSentryOnPartInstances {
+public interface PlanItemInstanceEntity extends Entity, DelegatePlanItemInstance, EntityWithSentryPartInstances {
     
     void setChildren(List<PlanItemInstanceEntity> children);
     List<PlanItemInstanceEntity> getChildren();

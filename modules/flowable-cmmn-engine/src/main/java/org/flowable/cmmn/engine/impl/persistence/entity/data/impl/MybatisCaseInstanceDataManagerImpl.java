@@ -20,7 +20,7 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.matcher.CaseInstanceByCaseDefinitionIdMatcher;
@@ -48,7 +48,7 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
     public CaseInstanceEntity create() {
         CaseInstanceEntityImpl caseInstanceEntityImpl = new CaseInstanceEntityImpl();
         caseInstanceEntityImpl.setChildPlanItemInstances(new ArrayList<PlanItemInstanceEntity>(1));
-        caseInstanceEntityImpl.setSatisfiedSentryOnPartInstances(new ArrayList<SentryOnPartInstanceEntity>(1));
+        caseInstanceEntityImpl.setSatisfiedSentryPartInstances(new ArrayList<SentryPartInstanceEntity>(1));
         caseInstanceEntityImpl.internalSetVariableInstances(new HashMap<String, VariableInstanceEntity>(1));
         return caseInstanceEntityImpl;
     }

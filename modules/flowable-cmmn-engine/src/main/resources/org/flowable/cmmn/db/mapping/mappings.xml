@@ -21,7 +21,7 @@
     <mapper resource="org/flowable/cmmn/db/mapping/entity/CaseDefinition.xml" />
     <mapper resource="org/flowable/cmmn/db/mapping/entity/CaseInstance.xml" />
     <mapper resource="org/flowable/cmmn/db/mapping/entity/PlanItemInstance.xml" />
-    <mapper resource="org/flowable/cmmn/db/mapping/entity/SentryOnPartInstance.xml"/>
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/SentryPartInstance.xml"/>
     <mapper resource="org/flowable/cmmn/db/mapping/entity/MilestoneInstance.xml" />
     <mapper resource="org/flowable/cmmn/db/mapping/entity/HistoricCaseInstance.xml"/>
     <mapper resource="org/flowable/cmmn/db/mapping/entity/HistoricMilestoneInstance.xml" />

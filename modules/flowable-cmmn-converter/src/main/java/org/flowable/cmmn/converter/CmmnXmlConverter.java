@@ -92,6 +92,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new EntryCriterionXmlConverter());
         addElementConverter(new ExitCriterionXmlConverter());
         addElementConverter(new PlanItemOnPartXmlConverter());
+        addElementConverter(new SentryIfPartXmlConverter());
         addElementConverter(new CaseTaskXmlConverter());
         addElementConverter(new ProcessXmlConverter());
         addElementConverter(new ProcessTaskXmlConverter());
@@ -102,6 +103,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
         addTextConverter(new StandardEventXmlConverter());
         addTextConverter(new ProcessRefExpressionXmlConverter());
+        addTextConverter(new ConditionXmlConverter());
     }
 
     public static void addElementConverter(BaseCmmnXmlConverter converter) {
@@ -311,6 +313,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         ensureIds(conversionHelper.getExitCriteria(), "exitCriterion_");
         ensureIds(conversionHelper.getSentries(), "sentry_");
         ensureIds(conversionHelper.getSentryOnParts(), "onPart_");
+        ensureIds(conversionHelper.getSentryIfParts(), "ifPart_");
         ensureIds(conversionHelper.getPlanItems(), "planItem_");
         ensureIds(conversionHelper.getPlanItemDefinitions(), "planItemDefinition_");
 

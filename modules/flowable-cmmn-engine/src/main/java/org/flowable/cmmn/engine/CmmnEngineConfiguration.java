@@ -64,8 +64,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityM
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManagerImpl;
-import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntityManager;
-import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntityManagerImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseDefinitionDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnDeploymentDataManager;
@@ -74,7 +74,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricCaseInstanc
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricMilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.MilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDataManager;
-import org.flowable.cmmn.engine.impl.persistence.entity.data.SentryOnPartInstanceDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.SentryPartInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCaseDefinitionDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCaseInstanceDataManagerImpl;
@@ -84,7 +84,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisHistori
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisMilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisPlanItemInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
-import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisSentryOnPartInstanceDataManagerImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisSentryPartInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.TableDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
 import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
@@ -156,7 +156,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     protected CaseDefinitionDataManager caseDefinitionDataManager;
     protected CaseInstanceDataManager caseInstanceDataManager;
     protected PlanItemInstanceDataManager planItemInstanceDataManager;
-    protected SentryOnPartInstanceDataManager sentryOnPartInstanceDataManager;
+    protected SentryPartInstanceDataManager sentryPartInstanceDataManager;
     protected MilestoneInstanceDataManager milestoneInstanceDataManager;
     protected HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager;
     protected HistoricMilestoneInstanceDataManager historicMilestoneInstanceDataManager;
@@ -166,7 +166,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     protected CaseDefinitionEntityManager caseDefinitionEntityManager;
     protected CaseInstanceEntityManager caseInstanceEntityManager;
     protected PlanItemInstanceEntityManager planItemInstanceEntityManager;
-    protected SentryOnPartInstanceEntityManager sentryOnPartInstanceEntityManager;
+    protected SentryPartInstanceEntityManager sentryPartInstanceEntityManager;
     protected MilestoneInstanceEntityManager milestoneInstanceEntityManager;
     protected HistoricCaseInstanceDataManager historicCaseInstanceDataManager;
     protected HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager;
@@ -373,8 +373,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         if (planItemInstanceDataManager == null) {
             planItemInstanceDataManager = new MybatisPlanItemInstanceDataManagerImpl(this);
         }
-        if (sentryOnPartInstanceDataManager == null) {
-            sentryOnPartInstanceDataManager = new MybatisSentryOnPartInstanceDataManagerImpl(this);
+        if (sentryPartInstanceDataManager == null) {
+            sentryPartInstanceDataManager = new MybatisSentryPartInstanceDataManagerImpl(this);
         }
         if (milestoneInstanceDataManager == null) {
             milestoneInstanceDataManager = new MybatisMilestoneInstanceDataManager(this);
@@ -403,8 +403,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         if (planItemInstanceEntityManager == null) {
             planItemInstanceEntityManager = new PlanItemInstanceEntityManagerImpl(this, planItemInstanceDataManager);
         }
-        if (sentryOnPartInstanceEntityManager == null) {
-            sentryOnPartInstanceEntityManager = new SentryOnPartInstanceEntityManagerImpl(this, sentryOnPartInstanceDataManager);
+        if (sentryPartInstanceEntityManager == null) {
+            sentryPartInstanceEntityManager = new SentryPartInstanceEntityManagerImpl(this, sentryPartInstanceDataManager);
         }
         if (milestoneInstanceEntityManager == null) {
             milestoneInstanceEntityManager = new MilestoneInstanceEntityManagerImpl(this, milestoneInstanceDataManager);
@@ -486,6 +486,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         if (cmmnParser == null) {
             CmmnParserImpl cmmnParserImpl = new CmmnParserImpl();
             cmmnParserImpl.setActivityBehaviorFactory(activityBehaviorFactory);
+            cmmnParserImpl.setExpressionManager(expressionManager);
             cmmnParser = cmmnParserImpl;
         }
     }
@@ -709,12 +710,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
-    public SentryOnPartInstanceDataManager getSentryOnPartInstanceDataManager() {
-        return sentryOnPartInstanceDataManager;
+    public SentryPartInstanceDataManager getSentryPartInstanceDataManager() {
+        return sentryPartInstanceDataManager;
     }
 
-    public CmmnEngineConfiguration setSentryOnPartInstanceDataManager(SentryOnPartInstanceDataManager sentryOnPartInstanceDataManager) {
-        this.sentryOnPartInstanceDataManager = sentryOnPartInstanceDataManager;
+    public CmmnEngineConfiguration setSentryPartInstanceDataManager(SentryPartInstanceDataManager sentryPartInstanceDataManager) {
+        this.sentryPartInstanceDataManager = sentryPartInstanceDataManager;
         return this;
     }
 
@@ -790,12 +791,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
-    public SentryOnPartInstanceEntityManager getSentryOnPartInstanceEntityManager() {
-        return sentryOnPartInstanceEntityManager;
+    public SentryPartInstanceEntityManager getSentryPartInstanceEntityManager() {
+        return sentryPartInstanceEntityManager;
     }
 
-    public CmmnEngineConfiguration setSentryOnPartInstanceEntityManager(SentryOnPartInstanceEntityManager sentryOnPartInstanceEntityManager) {
-        this.sentryOnPartInstanceEntityManager = sentryOnPartInstanceEntityManager;
+    public CmmnEngineConfiguration setSentryPartInstanceEntityManager(SentryPartInstanceEntityManager sentryPartInstanceEntityManager) {
+        this.sentryPartInstanceEntityManager = sentryPartInstanceEntityManager;
         return this;
     }
 

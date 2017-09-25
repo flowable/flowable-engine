@@ -19,7 +19,7 @@ import org.flowable.engine.common.impl.persistence.entity.Entity;
 /**
  * @author Joram Barrez
  */
-public interface SentryOnPartInstanceEntity extends Entity {
+public interface SentryPartInstanceEntity extends Entity {
     
     String getCaseDefinitionId();
     void setCaseDefinitionId(String caseDefinitionId);
@@ -32,6 +32,9 @@ public interface SentryOnPartInstanceEntity extends Entity {
     
     String getOnPartId();
     void setOnPartId(String onPartId);
+    
+    String getIfPartId();
+    void setIfPartId(String ifPartId);
 
     Date getTimeStamp();
     void setTimeStamp(Date timeStamp);

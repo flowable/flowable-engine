@@ -112,10 +112,6 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
         return cmmnRuntimeService.startCaseInstance(this);
     }
 
-    public CmmnRuntimeServiceImpl getCmmnRuntimeService() {
-        return cmmnRuntimeService;
-    }
-
     @Override
     public String getCaseDefinitionId() {
         return caseDefinitionId;

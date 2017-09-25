@@ -32,6 +32,7 @@ import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Sentry;
+import org.flowable.cmmn.model.SentryIfPart;
 import org.flowable.cmmn.model.SentryOnPart;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.engine.common.api.FlowableException;
@@ -59,6 +60,7 @@ public class ConversionHelper {
     protected List<Criterion> exitCriteria = new ArrayList<>();
     protected List<Sentry> sentries = new ArrayList<>();
     protected List<SentryOnPart> sentryOnParts = new ArrayList<>();
+    protected List<SentryIfPart> sentryIfParts = new ArrayList<>();
     protected List<PlanItem> planItems = new ArrayList<>();
     protected List<PlanItemDefinition> planItemDefinitions = new ArrayList<>();
     
@@ -151,6 +153,15 @@ public class ConversionHelper {
         addSentryOnPart(sentryOnPart);
         getCurrentSentry().addSentryOnPart(sentryOnPart);
         setCurrentSentryOnPart(sentryOnPart);
+    }
+    
+    public void addSentryIfPart(SentryIfPart sentryIfPart) {
+        sentryIfParts.add(sentryIfPart);
+    }
+    
+    public void addSentryIfPartToCurrentSentry(SentryIfPart sentryIfPart) {
+        addSentryIfPart(sentryIfPart);
+        getCurrentSentry().setSentryIfPart(sentryIfPart);
     }
     
     public void addPlanItem(PlanItem planItem) {
@@ -297,6 +308,10 @@ public class ConversionHelper {
 
     public List<SentryOnPart> getSentryOnParts() {
         return sentryOnParts;
+    }
+    
+    public List<SentryIfPart> getSentryIfParts() {
+        return sentryIfParts;
     }
 
     public List<PlanItem> getPlanItems() {

@@ -53,6 +53,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_STANDARD_EVENT = "standardEvent";
     String ELEMENT_ENTRY_CRITERION = "entryCriterion";
     String ELEMENT_EXIT_CRITERION = "exitCriterion";
+    String ELEMENT_IF_PART = "ifPart";
     String ELEMENT_EXTENSIONS = "extensions";
     
     String ELEMENT_PROCESS = "process";
@@ -71,6 +72,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_PROCESS_REF = "processRef";
     
     String ELEMENT_PROCESS_REF_EXPRESSION = "processRefExpression";
+    String ELEMENT_CONDITION = "condition";
     
     String ATTRIBUTE_CLASS = "class";
     

@@ -48,7 +48,7 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
     protected PlanItem planItem;
     protected List<PlanItemInstanceEntity> children;
     protected PlanItemInstanceEntity stagePlanItemInstance;
-    protected List<SentryOnPartInstanceEntity> satisfiedSentryOnPartInstances;
+    protected List<SentryPartInstanceEntity> satisfiedSentryPartInstances;
     
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
@@ -162,15 +162,15 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
     }
     
     @Override
-    public List<SentryOnPartInstanceEntity> getSatisfiedSentryOnPartInstances() {
-        if (satisfiedSentryOnPartInstances == null) {
-            satisfiedSentryOnPartInstances = CommandContextUtil.getSentryOnPartInstanceEntityManager().findSentryOnPartInstancesByPlanItemInstanceId(id);
+    public List<SentryPartInstanceEntity> getSatisfiedSentryPartInstances() {
+        if (satisfiedSentryPartInstances == null) {
+            satisfiedSentryPartInstances = CommandContextUtil.getSentryPartInstanceEntityManager().findSentryPartInstancesByPlanItemInstanceId(id);
         }
-        return satisfiedSentryOnPartInstances;
+        return satisfiedSentryPartInstances;
     }
     
-    public void setSatisfiedSentryOnPartInstances(List<SentryOnPartInstanceEntity> satisfiedSentryOnPartInstances) {
-        this.satisfiedSentryOnPartInstances = satisfiedSentryOnPartInstances;
+    public void setSatisfiedSentryPartInstances(List<SentryPartInstanceEntity> satisfiedSentryPartInstances) {
+        this.satisfiedSentryPartInstances = satisfiedSentryPartInstances;
     }
 
     // VariableScopeImpl methods

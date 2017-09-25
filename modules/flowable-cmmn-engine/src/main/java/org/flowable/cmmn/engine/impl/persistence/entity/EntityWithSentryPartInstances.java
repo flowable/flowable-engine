@@ -10,20 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.impl.persistence.entity.data;
+package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntity;
-import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.variable.service.delegate.VariableScope;
 
 /**
  * @author Joram Barrez
  */
-public interface SentryOnPartInstanceDataManager extends DataManager<SentryOnPartInstanceEntity> {
+public interface EntityWithSentryPartInstances extends Entity, VariableScope {
     
-    List<SentryOnPartInstanceEntity> findSentryOnPartInstancesByCaseInstanceIdAndNullPlanItemInstanceId(String caseInstanceId);
-    
-    List<SentryOnPartInstanceEntity> findSentryOnPartInstancesByPlanItemInstanceId(String planItemId);
-    
+    List<SentryPartInstanceEntity> getSatisfiedSentryPartInstances();
+    void setSatisfiedSentryPartInstances(List<SentryPartInstanceEntity> sentryPartInstanceEntities);
+
 }

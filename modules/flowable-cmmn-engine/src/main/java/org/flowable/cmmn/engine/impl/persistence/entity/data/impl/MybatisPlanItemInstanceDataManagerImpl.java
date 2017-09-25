@@ -18,7 +18,7 @@ import java.util.List;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl;
-import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
@@ -44,7 +44,7 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
         
         // Avoid queries being done for new instance
         planItemInstanceEntityImpl.setChildren(new ArrayList<PlanItemInstanceEntity>(1));
-        planItemInstanceEntityImpl.setSatisfiedSentryOnPartInstances(new ArrayList<SentryOnPartInstanceEntity>(1));
+        planItemInstanceEntityImpl.setSatisfiedSentryPartInstances(new ArrayList<SentryPartInstanceEntity>(1));
         
         return planItemInstanceEntityImpl;
     }

@@ -23,7 +23,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEnti
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
-import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.engine.common.impl.context.Context;
@@ -105,12 +105,12 @@ public class CommandContextUtil {
         return getCmmnEngineConfiguration(commandContext).getPlanItemInstanceEntityManager();
     }
     
-    public static SentryOnPartInstanceEntityManager getSentryOnPartInstanceEntityManager() {
-        return getSentryOnPartInstanceEntityManager(getCommandContext());
+    public static SentryPartInstanceEntityManager getSentryPartInstanceEntityManager() {
+        return getSentryPartInstanceEntityManager(getCommandContext());
     }
     
-    public static SentryOnPartInstanceEntityManager getSentryOnPartInstanceEntityManager(CommandContext commandContext) {
-        return getCmmnEngineConfiguration(commandContext).getSentryOnPartInstanceEntityManager();
+    public static SentryPartInstanceEntityManager getSentryPartInstanceEntityManager(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getSentryPartInstanceEntityManager();
     }
     
     public static MilestoneInstanceEntityManager getMilestoneInstanceEntityManager() {

@@ -153,6 +153,23 @@ public class VariablesTest extends FlowableCmmnTestCase {
         assertNull(cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("stringVar").singleResult());
         assertNotNull(cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("otherStringVar").singleResult());
     }
+    
+    @Test
+    @CmmnDeployment
+    public void testTransientVariables() {
+        Map<String, Object> variables = new HashMap<>();
+        variables.put("transientStartVar", "Hello from test");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase").transientVariables(variables).start();
+        
+        HistoricMilestoneInstance historicMilestoneInstance = cmmnHistoryService.createHistoricMilestoneInstanceQuery()
+                .milestoneInstanceCaseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals("Milestone Hello from test and delegate", historicMilestoneInstance.getName());
+        
+        // Variables should not be persisted
+        assertEquals(0, cmmnRuntimeService.getVariables(caseInstance.getId()).size());
+        assertEquals(0, cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+    }
 
     // Test helper classes
 
@@ -176,6 +193,16 @@ public class VariablesTest extends FlowableCmmnTestCase {
             planItemInstance.setVariable("myVariable", variableValue + " and delegate");
         }
 
+    }
+    
+    public static class SetTransientVariableDelegate implements PlanItemJavaDelegate {
+        
+        @Override
+        public void execute(DelegatePlanItemInstance planItemInstance) {
+            String variableValue = (String) planItemInstance.getVariable("transientStartVar");
+            planItemInstance.setTransientVariable("transientVar", variableValue + " and delegate");
+        }
+        
     }
 
 }
