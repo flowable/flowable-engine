@@ -20,8 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
@@ -55,7 +53,6 @@ import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.variable.service.delegate.Expression;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.el.FixedValue;
@@ -67,6 +64,7 @@ import org.flowable.http.delegate.HttpRequestHandler;
 import org.flowable.http.delegate.HttpResponseHandler;
 import org.flowable.http.impl.handler.ClassDelegateHttpHandler;
 import org.flowable.http.impl.handler.DelegateExpressionHttpHandler;
+import org.flowable.variable.service.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -259,8 +257,14 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
         try (BufferedReader reader = new BufferedReader(new StringReader(headers))) {
             String line = reader.readLine();
             while (line != null) {
-                if (line.indexOf(":") > 0) {
-                    base.addHeader(line.substring(0, line.indexOf(":")), line.substring(line.indexOf(":") + 1));
+                int colonIndex = line.indexOf(":");
+                if (colonIndex > 0) {
+                    String headerName = line.substring(0, colonIndex);
+                    if (line.length() > colonIndex + 2) {
+                        base.addHeader(headerName, line.substring(colonIndex + 1));
+                    } else {
+                        base.addHeader(headerName, null);
+                    }
                     line = reader.readLine();
                     
                 } else {

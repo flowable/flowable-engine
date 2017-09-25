@@ -290,7 +290,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         Map<String, Object> variables = new HashMap<>();
         variables.put("method", "POST");
         variables.put("url", "https://localhost:9799/api?code=500");
-        variables.put("headers", "Content-Type: text/plain\nX-Request-ID: 623b94fc-14b8-4ee6-aed7-b16b9321e29f\nhost:localhost:7000");
+        variables.put("headers", "Content-Type: text/plain\nX-Request-ID: 623b94fc-14b8-4ee6-aed7-b16b9321e29f\nhost:localhost:7000\nTest:");
         variables.put("body", body);
         variables.put("timeout", 2000);
         variables.put("ignore", true);
@@ -306,6 +306,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         assertEquals("text/plain", headerMap.get("Content-Type"));
         assertEquals("623b94fc-14b8-4ee6-aed7-b16b9321e29f", headerMap.get("X-Request-ID"));
         assertEquals("localhost:7000", headerMap.get("Host"));
+        assertEquals("", headerMap.get("Test"));
 
         // Request assertions
         Map<String, Object> request = new HashMap<>();
