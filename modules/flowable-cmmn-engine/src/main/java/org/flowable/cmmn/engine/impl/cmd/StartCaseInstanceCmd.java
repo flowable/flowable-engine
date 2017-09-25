@@ -16,6 +16,7 @@ import java.io.Serializable;
 
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
+import org.flowable.cmmn.engine.runtime.CaseInstanceBuilder;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -25,32 +26,18 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
  */
 public class StartCaseInstanceCmd implements Command<CaseInstance>, Serializable {
 
-    protected String caseDefinitionId;
-    protected String caseDefinitionKey;
+    protected CaseInstanceBuilder caseInstanceBuilder;
     
-    // TODO: add params to cmmnruntimeservice
-    protected String businessKey;
-    protected String initiator;
-    protected String tenantId;
-
-    public StartCaseInstanceCmd(String caseDefinitionId, String caseDefinitionKey) {
-        this.caseDefinitionId = caseDefinitionId;
-        this.caseDefinitionKey = caseDefinitionKey;
+    public StartCaseInstanceCmd(CaseInstanceBuilder caseInstanceBuilder) {
+        this.caseInstanceBuilder = caseInstanceBuilder;
     }
 
     @Override
     public CaseInstance execute(CommandContext commandContext) {
-        if (caseDefinitionId != null) {
-            return CommandContextUtil.getCmmnEngineConfiguration(commandContext)
-                    .getCaseInstanceHelper().startCaseInstanceById(commandContext, caseDefinitionId);
-            
-        } else if (caseDefinitionKey != null) {
-            return CommandContextUtil.getCmmnEngineConfiguration(commandContext)
-                    .getCaseInstanceHelper().startCaseInstanceByKey(commandContext, caseDefinitionKey);
-            
+        if (caseInstanceBuilder != null) {
+            return CommandContextUtil.getCmmnEngineConfiguration(commandContext).getCaseInstanceHelper().startCaseInstance(caseInstanceBuilder);
         } else {
-            throw new FlowableIllegalArgumentException("Cannot start case instance: no casedefinition id nor key provided");
-            
+            throw new FlowableIllegalArgumentException("Cannot start case instance: no case instance builder provided");
         }
     }
    

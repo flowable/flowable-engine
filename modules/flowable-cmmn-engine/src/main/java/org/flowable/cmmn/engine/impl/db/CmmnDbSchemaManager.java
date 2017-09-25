@@ -19,8 +19,6 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.db.DbSchemaManager;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import liquibase.Liquibase;
 import liquibase.database.Database;
@@ -32,8 +30,6 @@ import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
 public class CmmnDbSchemaManager implements DbSchemaManager {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(CmmnDbSchemaManager.class);
 
     public static final String LIQUIBASE_CHANGELOG = "org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog.xml";
     
@@ -47,24 +43,23 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
     
     public void initSchema(CmmnEngineConfiguration cmmnEngineConfiguration, String databaseSchemaUpdate) {
         try {
-            Liquibase liquibase = createLiquibaseInstance(cmmnEngineConfiguration);
             if (CmmnEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)) {
-                LOGGER.debug("Creating CMMN schema");
-                liquibase.update("cmmn");
-            }
-            if (CmmnEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
-                LOGGER.debug("Dropping and creating schema CMMN");
-                liquibase.dropAll();
-                liquibase.update("cmmn");
+                dbSchemaCreate();
+                
+            } else if (CmmnEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
+                dbSchemaDrop();
+                dbSchemaCreate();
+                
             } else if (CmmnEngineConfiguration.DB_SCHEMA_UPDATE_TRUE.equals(databaseSchemaUpdate)) {
-                LOGGER.debug("Updating schema CMMN");
-                liquibase.update("cmmn");
+                dbSchemaUpdate();
+                
             } else if (CmmnEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
-                LOGGER.debug("Validating schema CMMN");
+                Liquibase liquibase = createLiquibaseInstance(cmmnEngineConfiguration);
                 liquibase.validate();
+                
             }
         } catch (Exception e) {
-            throw new FlowableException("Error initialising cmmn data model");
+            throw new FlowableException("Error initialising cmmn data model", e);
         }
     }
 
@@ -97,6 +92,10 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
     @Override
     public void dbSchemaCreate() {
         try {
+            
+            getCommonDbSchemaManager().dbSchemaCreate();
+            getVariableDbSchemaManager().dbSchemaCreate();
+            
             Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getCmmnEngineConfiguration());
             liquibase.update("cmmn");
         } catch (Exception e) {
@@ -109,6 +108,9 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
         try {
             Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getCmmnEngineConfiguration());
             liquibase.dropAll();
+            
+            getVariableDbSchemaManager().dbSchemaDrop();
+            getCommonDbSchemaManager().dbSchemaDrop();
         } catch (Exception e) {
             throw new FlowableException("Error dropping CMMN engine tables", e);
         }
@@ -116,8 +118,26 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
 
     @Override
     public String dbSchemaUpdate() {
-        dbSchemaCreate();
+        try {
+            
+            getCommonDbSchemaManager().dbSchemaUpdate();
+            getVariableDbSchemaManager().dbSchemaUpdate();
+            
+            Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getCmmnEngineConfiguration());
+            liquibase.update("cmmn");
+        } catch (Exception e) {
+            throw new FlowableException("Error updating CMMN engine tables", e);
+        }
         return null;
     }
+    
+    protected DbSchemaManager getCommonDbSchemaManager() {
+        return CommandContextUtil.getCmmnEngineConfiguration().getCommonDbSchemaManager();
+    }
+    
+    protected DbSchemaManager getVariableDbSchemaManager() {
+        return CommandContextUtil.getCmmnEngineConfiguration().getVariableDbSchemaManager();
+    }
+    
     
 }

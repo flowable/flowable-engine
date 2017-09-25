@@ -15,6 +15,8 @@ package org.flowable.cmmn.engine.impl;
 import org.flowable.cmmn.engine.CmmnHistoryService;
 import org.flowable.cmmn.engine.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.engine.history.HistoricMilestoneInstanceQuery;
+import org.flowable.cmmn.engine.history.HistoricVariableInstanceQuery;
+import org.flowable.cmmn.engine.impl.history.CmmnHistoricVariableInstanceQueryImpl;
 
 /**
  * @author Joram Barrez
@@ -29,6 +31,11 @@ public class CmmnHistoryServiceImpl extends ServiceImpl implements CmmnHistorySe
     @Override
     public HistoricMilestoneInstanceQuery createHistoricMilestoneInstanceQuery() {
         return cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager().createHistoricMilestoneInstanceQuery();
+    }
+    
+    @Override
+    public HistoricVariableInstanceQuery createHistoricVariableInstanceQuery() {
+        return new CmmnHistoricVariableInstanceQueryImpl(commandExecutor);
     }
     
 }

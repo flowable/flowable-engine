@@ -55,8 +55,8 @@ public class HistoricVariableServiceImpl extends ServiceImpl implements Historic
     }
     
     @Override
-    public HistoricVariableInstanceEntity copyAndInsert(VariableInstanceEntity variable) {
-        return getHistoricVariableInstanceEntityManager().copyAndInsert(variable);
+    public HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variable) {
+        return getHistoricVariableInstanceEntityManager().createAndInsert(variable);
     }
     
     @Override

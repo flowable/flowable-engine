@@ -320,5 +320,27 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
         sb.append("]");
         return sb.toString();
     }
+    
+    // non-supported (v6)
+
+    @Override
+    public String getScopeId() {
+        return null;
+    }
+
+    @Override
+    public String getScopeType() {
+        return null;
+    }
+
+    @Override
+    public void setScopeId(String scopeId) {
+        
+    }
+
+    @Override
+    public void setScopeType(String scopeType) {
+        
+    }
 
 }

@@ -12,11 +12,11 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.delegate.PlanItemJavaDelegate;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
 
 /**
  * @author Joram Barrez

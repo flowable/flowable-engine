@@ -24,13 +24,15 @@ import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
  */
 public interface HistoricVariableInstanceEntityManager extends EntityManager<HistoricVariableInstanceEntity> {
 
-    HistoricVariableInstanceEntity copyAndInsert(VariableInstanceEntity variableInstance);
+    HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variableInstance);
 
     void copyVariableValue(HistoricVariableInstanceEntity historicVariableInstance, VariableInstanceEntity variableInstance);
 
     List<HistoricVariableInstance> findHistoricVariableInstancesByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery);
 
     HistoricVariableInstanceEntity findHistoricVariableInstanceByVariableInstanceId(String variableInstanceId);
+    
+    List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeType(String scopeId, String scopeType);
 
     long findHistoricVariableInstanceCountByQueryCriteria(HistoricVariableInstanceQueryImpl historicProcessVariableQuery);
 

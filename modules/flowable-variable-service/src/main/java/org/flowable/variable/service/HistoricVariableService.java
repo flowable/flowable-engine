@@ -34,7 +34,7 @@ public interface HistoricVariableService {
     
     void insertHistoricVariableInstance(HistoricVariableInstanceEntity variable);
     
-    HistoricVariableInstanceEntity copyAndInsert(VariableInstanceEntity variable);
+    HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variable);
     
     void copyVariableValue(HistoricVariableInstanceEntity historicVariable, VariableInstanceEntity variable);
     

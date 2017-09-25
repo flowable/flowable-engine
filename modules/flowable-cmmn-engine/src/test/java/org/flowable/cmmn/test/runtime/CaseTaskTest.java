@@ -47,7 +47,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testBasicBlocking() {
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         assertNotNull(caseInstance);
         assertEquals(1, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
@@ -93,7 +93,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testBasicNonBlocking() {
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         assertNotNull(caseInstance);
         assertEquals(1, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
@@ -137,7 +137,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testRuntimeServiceTriggerCasePlanItemInstance() {
-        cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         assertEquals(2, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         assertEquals(2, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
@@ -170,7 +170,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testRuntimeServiceTriggerNonBlockingCasePlanItem() {
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         assertEquals(2, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         assertEquals(2, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
@@ -202,7 +202,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testTerminateCaseInstanceWithNonBlockingCaseTask() {
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         assertEquals(2, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
         
@@ -229,7 +229,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testTerminateCaseInstanceWithNestedCaseTasks() {
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         assertEquals(4, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
         

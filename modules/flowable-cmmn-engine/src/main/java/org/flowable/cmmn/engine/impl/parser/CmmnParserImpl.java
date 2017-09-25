@@ -37,6 +37,7 @@ import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.util.io.InputStreamSource;
 import org.flowable.engine.common.impl.util.io.StreamSource;
 import org.slf4j.Logger;
@@ -50,6 +51,7 @@ public class CmmnParserImpl implements CmmnParser {
     private final Logger logger = LoggerFactory.getLogger(CmmnParserImpl.class);
     
     protected CmmnActivityBehaviorFactory activityBehaviorFactory;
+    protected ExpressionManager expressionManager;
     
     public CmmnParseResult parse(CmmnResourceEntity resourceEntity) {
         CmmnParseResult parseResult = new CmmnParseResult();
@@ -145,7 +147,7 @@ public class CmmnParserImpl implements CmmnParser {
         }
 
     }
-
+    
     public CmmnActivityBehaviorFactory getActivityBehaviorFactory() {
         return activityBehaviorFactory;
     }
@@ -154,4 +156,12 @@ public class CmmnParserImpl implements CmmnParser {
         this.activityBehaviorFactory = activityBehaviorFactory;
     }
 
+    public ExpressionManager getExpressionManager() {
+        return expressionManager;
+    }
+
+    public void setExpressionManager(ExpressionManager expressionManager) {
+        this.expressionManager = expressionManager;
+    }
+    
 }

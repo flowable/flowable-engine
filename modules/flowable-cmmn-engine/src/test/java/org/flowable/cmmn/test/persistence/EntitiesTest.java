@@ -99,13 +99,16 @@ public class EntitiesTest {
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);
                 String resource = node.getAttributes().getNamedItem("resource").getTextContent();
-                resource = resource.replaceAll("org/flowable/cmmn/db/mapping/entity/", "");
-                resource = resource.replaceAll(".xml", "");
-                resources.add(resource);
+                if (resource.startsWith("org/flowable/cmmn")) {
+                    resource = resource.replaceAll("org/flowable/cmmn/db/mapping/entity/", "");
+                    resource = resource.replaceAll(".xml", "");
+                    resources.add(resource);
+                }
             }
             
             resources.remove("TableData"); // not an entity
             
+            assertTrue(resources.size() > 0);
             return resources;
         } catch (Exception e) {
             throw new RuntimeException(e);

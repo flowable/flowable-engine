@@ -13,6 +13,8 @@
 
 package org.flowable.engine.impl.db.upgrade;
 
+import org.flowable.engine.common.impl.db.DbUpgradeStep;
+
 /**
  * @author Tom Baeyens
  */

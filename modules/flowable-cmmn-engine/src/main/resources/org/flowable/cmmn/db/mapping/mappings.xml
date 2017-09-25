@@ -6,6 +6,14 @@
   <settings>
     <setting name="lazyLoadingEnabled" value="false" />
   </settings>
+   <typeAliases>
+    <typeAlias type="org.flowable.variable.service.impl.persistence.VariableByteArrayRefTypeHandler" alias="VariableByteArrayRefTypeHandler"/>
+  </typeAliases>
+  <typeHandlers>
+    <typeHandler handler="VariableByteArrayRefTypeHandler" 
+                 javaType="org.flowable.variable.service.impl.persistence.entity.VariableByteArrayRef"
+                 jdbcType="VARCHAR"/>
+  </typeHandlers>
   <mappers>
     <mapper resource="org/flowable/cmmn/db/mapping/entity/TableData.xml" />
     <mapper resource="org/flowable/cmmn/db/mapping/entity/CmmnDeployment.xml" />
@@ -13,9 +21,15 @@
     <mapper resource="org/flowable/cmmn/db/mapping/entity/CaseDefinition.xml" />
     <mapper resource="org/flowable/cmmn/db/mapping/entity/CaseInstance.xml" />
     <mapper resource="org/flowable/cmmn/db/mapping/entity/PlanItemInstance.xml" />
-    <mapper resource="org/flowable/cmmn/db/mapping/entity/SentryOnPartInstance.xml"/>
+    <mapper resource="org/flowable/cmmn/db/mapping/entity/SentryPartInstance.xml"/>
     <mapper resource="org/flowable/cmmn/db/mapping/entity/MilestoneInstance.xml" />
     <mapper resource="org/flowable/cmmn/db/mapping/entity/HistoricCaseInstance.xml"/>
     <mapper resource="org/flowable/cmmn/db/mapping/entity/HistoricMilestoneInstance.xml" />
+    
+    <!-- Variable support -->
+    <mapper resource="org/flowable/variable/db/mapping/common.xml" />
+    <mapper resource="org/flowable/variable/db/mapping/entity/ByteArray.xml" />
+    <mapper resource="org/flowable/variable/db/mapping/entity/VariableInstance.xml" />
+    <mapper resource="org/flowable/variable/db/mapping/entity/HistoricVariableInstance.xml" />
   </mappers>
 </configuration>

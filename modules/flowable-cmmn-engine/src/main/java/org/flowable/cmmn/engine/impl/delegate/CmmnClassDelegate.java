@@ -12,10 +12,10 @@
  */
 package org.flowable.cmmn.engine.impl.delegate;
 
+import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.delegate.PlanItemJavaDelegate;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemJavaDelegateActivityBehavior;
-import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.util.ReflectUtil;
 

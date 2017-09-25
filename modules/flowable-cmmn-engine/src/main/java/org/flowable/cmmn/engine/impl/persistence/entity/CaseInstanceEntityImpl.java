@@ -12,18 +12,21 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
+import org.flowable.cmmn.engine.impl.variable.VariableScopeType;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
 /**
  * @author Joram Barrez
  */
-public class CaseInstanceEntityImpl extends AbstractEntity implements CaseInstanceEntity {
+public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseInstanceEntity {
     
     protected String businessKey;
     protected String name;
@@ -38,7 +41,7 @@ public class CaseInstanceEntityImpl extends AbstractEntity implements CaseInstan
     
     // non persisted
     protected List<PlanItemInstanceEntity> childPlanItemInstances;
-    protected List<SentryOnPartInstanceEntity> satisfiedSentryOnPartInstances;
+    protected List<SentryPartInstanceEntity> satisfiedSentryPartInstances;
     
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
@@ -130,17 +133,54 @@ public class CaseInstanceEntityImpl extends AbstractEntity implements CaseInstan
     }
     
     @Override
-    public List<SentryOnPartInstanceEntity> getSatisfiedSentryOnPartInstances() {
-        if (satisfiedSentryOnPartInstances == null) {
-            satisfiedSentryOnPartInstances = CommandContextUtil.getSentryOnPartInstanceEntityManager()
-                    .findSentryOnPartInstancesByCaseInstanceIdAndNullPlanItemInstanceId(id);
+    public List<SentryPartInstanceEntity> getSatisfiedSentryPartInstances() {
+        if (satisfiedSentryPartInstances == null) {
+            satisfiedSentryPartInstances = CommandContextUtil.getSentryPartInstanceEntityManager()
+                    .findSentryPartInstancesByCaseInstanceIdAndNullPlanItemInstanceId(id);
         }
-        return satisfiedSentryOnPartInstances;
+        return satisfiedSentryPartInstances;
     }
     
     @Override
-    public void setSatisfiedSentryOnPartInstances(List<SentryOnPartInstanceEntity> sentryOnPartInstanceEntities) {
-        this.satisfiedSentryOnPartInstances = sentryOnPartInstanceEntities;
+    public void setSatisfiedSentryPartInstances(List<SentryPartInstanceEntity> sentryPartInstanceEntities) {
+        this.satisfiedSentryPartInstances = sentryPartInstanceEntities;
+    }
+    
+    
+    // VariableScopeImpl methods
+
+    @Override
+    protected Collection<VariableInstanceEntity> loadVariableInstances() {
+        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeType(id, VariableScopeType.CASE_INSTANCE);
+    }
+
+    @Override
+    protected VariableScopeImpl getParentVariableScope() {
+        if (parentId != null) {
+            return (VariableScopeImpl) CommandContextUtil.getCaseInstanceEntityManager().findById(parentId);
+        }
+        return null;
+    }
+
+    @Override
+    protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
+        variableInstance.setScopeId(id);
+        variableInstance.setScopeType(VariableScopeType.CASE_INSTANCE);
+    }
+
+    @Override
+    protected VariableInstanceEntity getSpecificVariable(String variableName) {
+        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeTypeAndName(id, VariableScopeType.CASE_INSTANCE, variableName);
+    }
+
+    @Override
+    protected List<VariableInstanceEntity> getSpecificVariables(Collection<String> variableNames) {
+        return CommandContextUtil.getVariableService().findVariableInstancesByScopeIdAndScopeTypeAndNames(id, VariableScopeType.CASE_INSTANCE, variableNames);
+    }
+
+    @Override
+    protected boolean isPropagateToHistoricVariable() {
+        return true;
     }
     
 }

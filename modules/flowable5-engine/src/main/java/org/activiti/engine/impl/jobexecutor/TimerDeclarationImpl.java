@@ -24,7 +24,7 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.engine.common.impl.calendar.BusinessCalendar;
 import org.flowable.engine.impl.jobexecutor.TimerDeclarationType;
-import org.flowable.variable.service.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.variable.service.delegate.VariableScope;
 import org.joda.time.DateTime;
 

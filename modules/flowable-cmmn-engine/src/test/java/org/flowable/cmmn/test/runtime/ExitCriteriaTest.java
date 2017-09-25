@@ -32,7 +32,7 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testSimpleExitCriteriaBlocking() {
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         List<PlanItemInstance> planItems = cmmnRuntimeService.createPlanItemQuery()
                 .caseInstanceId(caseInstance.getId())
                 .orderByName().asc()
@@ -51,7 +51,7 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testSimpleExitCriteriaNonBlocking() {
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
@@ -61,7 +61,7 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testSimpleExitCriteriaWithMultipleOnParts() {
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         List<PlanItemInstance> planItems = cmmnRuntimeService.createPlanItemQuery()
                 .caseInstanceId(caseInstance.getId())
                 .orderByName().asc()
@@ -81,7 +81,7 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testSimpleExitCriteriaWithMultipleOnParts2() {
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         List<PlanItemInstance> planItems = cmmnRuntimeService.createPlanItemQuery()
                 .caseInstanceId(caseInstance.getId())
                 .orderByName().asc()
@@ -100,7 +100,7 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testExitPlanModelOnMilestoneReached() {
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         List<PlanItemInstance> planItems = cmmnRuntimeService.createPlanItemQuery()
                 .planItemInstanceState(PlanItemInstanceState.AVAILABLE)
                 .orderByName().asc()
@@ -134,7 +134,7 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testExitThreeNestedStagesThroughPlanModel() {
-        cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         assertEquals(8, cmmnRuntimeService.createPlanItemQuery().count());
         
         PlanItemInstance taskA = cmmnRuntimeService.createPlanItemQuery().planItemInstanceName("Task A").singleResult();
@@ -153,7 +153,7 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
         String oneTaskCaseDeploymentId = cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/runtime/oneTaskCase.cmmn").deploy().getId();
         
-        cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         assertEquals(4, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         

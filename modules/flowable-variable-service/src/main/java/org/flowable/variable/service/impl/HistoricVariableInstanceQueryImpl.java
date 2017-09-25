@@ -47,6 +47,8 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     protected String variableNameLike;
     protected boolean excludeTaskRelated;
     protected boolean excludeVariableInitialization;
+    protected String scopeId;
+    protected String scopeType;
     protected QueryVariableValue queryVariableValue;
 
     public HistoricVariableInstanceQueryImpl() {
@@ -215,6 +217,18 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
         this.variableNameLike = variableNameLike;
         return this;
     }
+    
+    @Override
+    public HistoricVariableInstanceQuery scopeId(String scopeId) {
+        this.scopeId = scopeId;
+        return this;
+    }
+    
+    @Override
+    public HistoricVariableInstanceQuery scopeType(String scopeType) {
+        this.scopeType = scopeType;
+        return this;
+    }
 
     protected void ensureVariablesInitialized() {
         if (this.queryVariableValue != null) {
@@ -295,6 +309,14 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
 
     public String getVariableNameLike() {
         return variableNameLike;
+    }
+    
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public String getScopeType() {
+        return scopeType;
     }
 
     public QueryVariableValue getQueryVariableValue() {

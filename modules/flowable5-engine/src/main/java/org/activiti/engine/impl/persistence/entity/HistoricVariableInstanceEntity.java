@@ -320,5 +320,17 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
         sb.append("]");
         return sb.toString();
     }
+    
+    // non-supported (v6)
+
+    @Override
+    public String getScopeId() {
+        return null;
+    }
+
+    @Override
+    public String getScopeType() {
+        return null;
+    }
 
 }

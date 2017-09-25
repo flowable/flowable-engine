@@ -22,6 +22,7 @@ public class Sentry extends CaseElement {
     
     protected String name;
     protected List<SentryOnPart> onParts = new ArrayList<>();
+    protected SentryIfPart sentryIfPart;
     
     public String getName() {
         return name;
@@ -38,5 +39,10 @@ public class Sentry extends CaseElement {
     public void addSentryOnPart(SentryOnPart sentryOnPart) {
         onParts.add(sentryOnPart);
     }
-    
+    public SentryIfPart getSentryIfPart() {
+        return sentryIfPart;
+    }
+    public void setSentryIfPart(SentryIfPart sentryIfPart) {
+        this.sentryIfPart = sentryIfPart;
+    }
 }

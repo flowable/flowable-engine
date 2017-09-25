@@ -12,12 +12,13 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
@@ -25,11 +26,10 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
  */
 public class MilestoneActivityBehavior implements CmmnActivityBehavior {
     
-    // TODO: should be expression
-    protected String milestoneName;
+    protected Expression milestoneNameExpression;
     
-    public MilestoneActivityBehavior(String milestoneName) {
-        this.milestoneName = milestoneName;
+    public MilestoneActivityBehavior(Expression milestoneNameExpression) {
+        this.milestoneNameExpression = milestoneNameExpression;
     }
 
     @Override
@@ -43,7 +43,7 @@ public class MilestoneActivityBehavior implements CmmnActivityBehavior {
     protected MilestoneInstanceEntity createMilestoneInstance(DelegatePlanItemInstance delegatePlanItemInstance, CommandContext commandContext) {
         MilestoneInstanceEntityManager milestoneInstanceEntityManager = CommandContextUtil.getMilestoneInstanceEntityManager(commandContext);
         MilestoneInstanceEntity milestoneInstanceEntity = milestoneInstanceEntityManager.create();
-        milestoneInstanceEntity.setName(milestoneName);
+        milestoneInstanceEntity.setName(milestoneNameExpression.getValue(delegatePlanItemInstance).toString());
         milestoneInstanceEntity.setTimeStamp(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
         milestoneInstanceEntity.setCaseInstanceId(delegatePlanItemInstance.getCaseInstanceId());
         milestoneInstanceEntity.setCaseDefinitionId(delegatePlanItemInstance.getCaseDefinitionId());

@@ -29,7 +29,7 @@ public abstract class AbstractDeletePlanItemOperation extends AbstractChangePlan
     public void run() {
         super.run();
         
-        deleteSentryOnPartInstances();
+        deleteSentryPartInstances();
         CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).delete(planItemInstanceEntity);
     }
     

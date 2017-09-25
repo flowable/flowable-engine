@@ -12,10 +12,10 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.impl.behavior.CmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.engine.common.api.FlowableException;
 

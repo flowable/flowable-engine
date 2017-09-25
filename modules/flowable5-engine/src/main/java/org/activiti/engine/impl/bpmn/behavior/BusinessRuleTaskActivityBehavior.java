@@ -26,7 +26,7 @@ import org.drools.KnowledgeBase;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.flowable.engine.delegate.BusinessRuleTaskDelegate;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.variable.service.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * activity implementation of the BPMN 2.0 business rule task.

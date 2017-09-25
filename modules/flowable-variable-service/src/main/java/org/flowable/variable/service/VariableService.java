@@ -24,6 +24,7 @@ import org.flowable.variable.service.impl.types.VariableType;
  * Service which provides access to variables.
  * 
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public interface VariableService {
     
@@ -44,6 +45,12 @@ public interface VariableService {
     VariableInstanceEntity findVariableInstanceByExecutionAndName(String executionId, String taskName);
     
     List<VariableInstanceEntity> findVariableInstancesByExecutionAndNames(String executionId, Collection<String> taskNames);
+    
+    List<VariableInstanceEntity> findVariableInstanceByScopeIdAndScopeType(String scopeId, String scopeType);
+    
+    VariableInstanceEntity findVariableInstanceByScopeIdAndScopeTypeAndName(String scopeId, String scopeType, String variableName);
+    
+    List<VariableInstanceEntity> findVariableInstancesByScopeIdAndScopeTypeAndNames(String scopeId, String scopeType, Collection<String> variableNames);
     
     VariableInstanceEntity createVariableInstance(String name, VariableType type, Object value);
     

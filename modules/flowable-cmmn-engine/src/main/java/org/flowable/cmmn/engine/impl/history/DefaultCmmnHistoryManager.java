@@ -18,7 +18,12 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEnti
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.MilestoneInstance;
+import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Joram Barrez
@@ -33,37 +38,76 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     
     @Override
     public void recordCaseInstanceStart(CaseInstanceEntity caseInstanceEntity) {
-        HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
-        HistoricCaseInstanceEntity historicCaseInstanceEntity = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().create();
-        historicCaseInstanceEntity.setId(caseInstanceEntity.getId());
-        historicCaseInstanceEntity.setName(caseInstanceEntity.getName());
-        historicCaseInstanceEntity.setBusinessKey(caseInstanceEntity.getBusinessKey());
-        historicCaseInstanceEntity.setParentId(caseInstanceEntity.getParentId());
-        historicCaseInstanceEntity.setCaseDefinitionId(caseInstanceEntity.getCaseDefinitionId());
-        historicCaseInstanceEntity.setState(caseInstanceEntity.getState());
-        historicCaseInstanceEntity.setStartUserId(caseInstanceEntity.getStartUserId());
-        historicCaseInstanceEntity.setStartTime(caseInstanceEntity.getStartTime());
-        historicCaseInstanceEntity.setTenantId(caseInstanceEntity.getTenantId());
-        historicCaseInstanceEntityManager.insert(historicCaseInstanceEntity);
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
+            HistoricCaseInstanceEntity historicCaseInstanceEntity = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager().create();
+            historicCaseInstanceEntity.setId(caseInstanceEntity.getId());
+            historicCaseInstanceEntity.setName(caseInstanceEntity.getName());
+            historicCaseInstanceEntity.setBusinessKey(caseInstanceEntity.getBusinessKey());
+            historicCaseInstanceEntity.setParentId(caseInstanceEntity.getParentId());
+            historicCaseInstanceEntity.setCaseDefinitionId(caseInstanceEntity.getCaseDefinitionId());
+            historicCaseInstanceEntity.setState(caseInstanceEntity.getState());
+            historicCaseInstanceEntity.setStartUserId(caseInstanceEntity.getStartUserId());
+            historicCaseInstanceEntity.setStartTime(caseInstanceEntity.getStartTime());
+            historicCaseInstanceEntity.setTenantId(caseInstanceEntity.getTenantId());
+            historicCaseInstanceEntityManager.insert(historicCaseInstanceEntity);
+        }
     }
     
     @Override
     public void recordCaseInstanceEnd(String caseInstanceId) {
-        HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
-        HistoricCaseInstanceEntity historicCaseInstanceEntity = historicCaseInstanceEntityManager.findById(caseInstanceId);
-        historicCaseInstanceEntity.setEndTime(cmmnEngineConfiguration.getClock().getCurrentTime());
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
+            HistoricCaseInstanceEntity historicCaseInstanceEntity = historicCaseInstanceEntityManager.findById(caseInstanceId);
+            historicCaseInstanceEntity.setEndTime(cmmnEngineConfiguration.getClock().getCurrentTime());
+        }
     }
     
     @Override
     public void recordMilestoneReached(MilestoneInstance milestoneInstance) {
-        HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager = cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager();
-        HistoricMilestoneInstanceEntity historicMilestoneInstanceEntity = historicMilestoneInstanceEntityManager.create();
-        historicMilestoneInstanceEntity.setName(milestoneInstance.getName());
-        historicMilestoneInstanceEntity.setCaseInstanceId(milestoneInstance.getCaseInstanceId());
-        historicMilestoneInstanceEntity.setCaseDefinitionId(milestoneInstance.getCaseDefinitionId());
-        historicMilestoneInstanceEntity.setElementId(milestoneInstance.getElementId());
-        historicMilestoneInstanceEntity.setTimeStamp(cmmnEngineConfiguration.getClock().getCurrentTime());
-        historicMilestoneInstanceEntityManager.insert(historicMilestoneInstanceEntity);
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager = cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager();
+            HistoricMilestoneInstanceEntity historicMilestoneInstanceEntity = historicMilestoneInstanceEntityManager.create();
+            historicMilestoneInstanceEntity.setName(milestoneInstance.getName());
+            historicMilestoneInstanceEntity.setCaseInstanceId(milestoneInstance.getCaseInstanceId());
+            historicMilestoneInstanceEntity.setCaseDefinitionId(milestoneInstance.getCaseDefinitionId());
+            historicMilestoneInstanceEntity.setElementId(milestoneInstance.getElementId());
+            historicMilestoneInstanceEntity.setTimeStamp(cmmnEngineConfiguration.getClock().getCurrentTime());
+            historicMilestoneInstanceEntityManager.insert(historicMilestoneInstanceEntity);
+        }
+    }
+
+    @Override
+    public void recordVariableCreate(VariableInstanceEntity variable) {
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+            CommandContextUtil.getHistoricVariableService().createAndInsert(variable);
+        }
+    }
+
+    @Override
+    public void recordVariableUpdate(VariableInstanceEntity variable) {
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+            CommandContext commandContext = CommandContextUtil.getCommandContext();
+            HistoricVariableInstanceEntity historicProcessVariable = CommandContextUtil
+                    .getHistoricVariableService(commandContext).getHistoricVariableInstance(variable.getId());
+            if (historicProcessVariable != null) {
+                CommandContextUtil.getHistoricVariableService(commandContext).copyVariableValue(historicProcessVariable, variable);
+            } else {
+                CommandContextUtil.getHistoricVariableService(commandContext).createAndInsert(variable);
+            }
+        }
+    }
+
+    @Override
+    public void recordVariableRemoved(VariableInstanceEntity variable) {
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+            CommandContext commandContext = CommandContextUtil.getCommandContext();
+            HistoricVariableInstanceEntity historicProcessVariable = CommandContextUtil
+                    .getHistoricVariableService(commandContext).getHistoricVariableInstance(variable.getId());
+            if (historicProcessVariable != null) {
+                CommandContextUtil.getHistoricVariableService(commandContext).deleteHistoricVariableInstance(historicProcessVariable);
+            }
+        }
     }
 
 }

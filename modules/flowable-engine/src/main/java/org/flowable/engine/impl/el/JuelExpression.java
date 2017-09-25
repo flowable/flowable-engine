@@ -13,19 +13,13 @@
 
 package org.flowable.engine.impl.el;
 
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.javax.el.ELContext;
-import org.flowable.engine.common.impl.javax.el.ELException;
-import org.flowable.engine.common.impl.javax.el.MethodNotFoundException;
-import org.flowable.engine.common.impl.javax.el.PropertyNotFoundException;
 import org.flowable.engine.common.impl.javax.el.ValueExpression;
 import org.flowable.engine.impl.delegate.invocation.ExpressionGetInvocation;
 import org.flowable.engine.impl.delegate.invocation.ExpressionSetInvocation;
 import org.flowable.engine.impl.interceptor.DelegateInterceptor;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.variable.service.delegate.Expression;
-import org.flowable.variable.service.delegate.VariableScope;
-import org.flowable.variable.service.impl.el.ExpressionManager;
 
 /**
  * Expression implementation backed by a JUEL {@link ValueExpression}.
@@ -33,62 +27,28 @@ import org.flowable.variable.service.impl.el.ExpressionManager;
  * @author Frederik Heremans
  * @author Joram Barrez
  */
-public class JuelExpression implements Expression {
+public class JuelExpression extends org.flowable.engine.common.impl.el.JuelExpression {
 
     private static final long serialVersionUID = 1L;
     
-    protected String expressionText;
-    protected ValueExpression valueExpression;
-    protected ExpressionManager expressionManager;
     protected DelegateInterceptor delegateInterceptor;
 
     public JuelExpression(ExpressionManager expressionManager, DelegateInterceptor delegateInterceptor, ValueExpression valueExpression, String expressionText) {
-        this.valueExpression = valueExpression;
-        this.expressionText = expressionText;
-        this.expressionManager = expressionManager;
+        super(expressionManager, valueExpression, expressionText);
         this.delegateInterceptor = delegateInterceptor;
     }
-
+    
     @Override
-    public Object getValue(VariableScope variableScope) {
-        ELContext elContext = expressionManager.getElContext(variableScope);
-        try {
-            ExpressionGetInvocation invocation = new ExpressionGetInvocation(valueExpression, elContext);
-            delegateInterceptor.handleInvocation(invocation);
-            return invocation.getInvocationResult();
-            
-        } catch (PropertyNotFoundException pnfe) {
-            throw new FlowableException("Unknown property used in expression: " + expressionText, pnfe);
-        } catch (MethodNotFoundException mnfe) {
-            throw new FlowableException("Unknown method used in expression: " + expressionText, mnfe);
-        } catch (ELException ele) {
-            throw new FlowableException("Error while evaluating expression: " + expressionText, ele);
-        } catch (Exception e) {
-            throw new FlowableException("Error while evaluating expression: " + expressionText, e);
-        }
+    protected Object resolveGetValueExpression(ELContext elContext) {
+        ExpressionGetInvocation invocation = new ExpressionGetInvocation(valueExpression, elContext);
+        delegateInterceptor.handleInvocation(invocation);
+        return invocation.getInvocationResult();
+    }
+    
+    @Override
+    protected void resolveSetValueExpression(Object value, ELContext elContext) {
+        ExpressionSetInvocation invocation = new ExpressionSetInvocation(valueExpression, elContext, value);
+        CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(invocation);
     }
 
-    @Override
-    public void setValue(Object value, VariableScope variableScope) {
-        ELContext elContext = expressionManager.getElContext(variableScope);
-        try {
-            ExpressionSetInvocation invocation = new ExpressionSetInvocation(valueExpression, elContext, value);
-            CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(invocation);
-        } catch (Exception e) {
-            throw new FlowableException("Error while evaluating expression: " + expressionText, e);
-        }
-    }
-
-    @Override
-    public String toString() {
-        if (valueExpression != null) {
-            return valueExpression.getExpressionString();
-        }
-        return super.toString();
-    }
-
-    @Override
-    public String getExpressionText() {
-        return expressionText;
-    }
 }
