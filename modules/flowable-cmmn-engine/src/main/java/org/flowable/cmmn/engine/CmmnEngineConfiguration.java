@@ -20,6 +20,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
 import org.flowable.cmmn.engine.impl.CmmnEngineImpl;
 import org.flowable.cmmn.engine.impl.CmmnHistoryServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
@@ -829,6 +831,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
 
     public CmmnEngineConfiguration setCaseInstanceStateChangeCallbacks(Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks) {
         this.caseInstanceStateChangeCallbacks = caseInstanceStateChangeCallbacks;
+        return this;
+    }
+    
+    @Override
+    public CmmnEngineConfiguration setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
         return this;
     }
 
