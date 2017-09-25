@@ -79,7 +79,6 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpActivityBehaviorImpl.class);
-    private static final Pattern HEADER_PATTERN = Pattern.compile("(.+):(.+)");
     
     protected HttpServiceTask httpServiceTask;
 
@@ -260,13 +259,13 @@ public class HttpActivityBehaviorImpl extends HttpActivityBehavior {
         try (BufferedReader reader = new BufferedReader(new StringReader(headers))) {
             String line = reader.readLine();
             while (line != null) {
-                Matcher matcher = HEADER_PATTERN.matcher(line);
-                if (!matcher.matches()) {
+                if (line.indexOf(":") > 0) {
+                    base.addHeader(line.substring(0, line.indexOf(":")), line.substring(line.indexOf(":") + 1));
+                    line = reader.readLine();
+                    
+                } else {
                     throw new FlowableException(HTTP_TASK_REQUEST_HEADERS_INVALID);
                 }
-
-                base.addHeader(matcher.group(1), matcher.group(2));
-                line = reader.readLine();
             }
         }
     }

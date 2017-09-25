@@ -15,7 +15,9 @@ package org.flowable.http;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -107,9 +109,11 @@ public class HttpServiceTaskTestServer {
         });
     }
 
-    private static class HttpServiceTaskTestServlet extends HttpServlet {
+    public static class HttpServiceTaskTestServlet extends HttpServlet {
 
         private static final long serialVersionUID = 1L;
+        
+        public static Map<String, String> headerMap = new HashMap<>();
                         
         private String name = "test servlet";
         private ObjectMapper mapper = new ObjectMapper();
@@ -143,7 +147,13 @@ public class HttpServiceTaskTestServer {
 
         @Override
         protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
+            headerMap.clear();
+            Enumeration<String> headerNames = req.getHeaderNames();
+            while (headerNames.hasMoreElements()) {
+                String header = headerNames.nextElement();
+                headerMap.put(header, req.getHeader(header));
+            }
+            
             HttpTestData data = parseTestData(req, resp);
             int code = data.getCode();
             if (code >= 200 && code < 300) {

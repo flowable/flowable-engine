@@ -23,6 +23,7 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.http.HttpServiceTaskTestServer.HttpServiceTaskTestServlet;
 import org.flowable.variable.service.history.HistoricVariableInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -300,6 +301,11 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
 
         ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpPut5XX", variables);
         assertFalse(process.isEnded());
+        
+        Map<String, String> headerMap = HttpServiceTaskTestServlet.headerMap;
+        assertEquals("text/plain", headerMap.get("Content-Type"));
+        assertEquals("623b94fc-14b8-4ee6-aed7-b16b9321e29f", headerMap.get("X-Request-ID"));
+        assertEquals("localhost:7000", headerMap.get("Host"));
 
         // Request assertions
         Map<String, Object> request = new HashMap<>();
