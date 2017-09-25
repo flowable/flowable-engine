@@ -806,7 +806,7 @@
             <if test="candidateGroups == null">
               and (RES.ASSIGNEE_ = #{userIdForCandidateAndAssignee}
                 or (
-                <if test="candidateAssignedToOthers">
+                <if test="!candidateAssignedToOthers">
                   RES.ASSIGNEE_ is null
                 </if>
                 and (I.USER_ID_ = #{userIdForCandidateAndAssignee}
