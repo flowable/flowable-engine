@@ -15,9 +15,8 @@ package org.flowable.rest.service.api.repository;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -36,7 +35,7 @@ import io.swagger.annotations.Authorization;
 public class DeploymentResourceDataResource extends BaseDeploymentResourceDataResource {
 
     @ResponseBody
-    @RequestMapping(value = "/repository/deployments/{deploymentId}/resourcedata/{resourceName}", method = RequestMethod.GET)
+    @GetMapping("/repository/deployments/{deploymentId}/resourcedata/{resourceName}")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates both deployment and resource have been found and the resource data has been returned."),
             @ApiResponse(code = 404, message = "Indicates the requested deployment was not found or there is no resource with the given id present in the deployment. The status-description contains additional information.") })
