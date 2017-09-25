@@ -25,9 +25,9 @@ public class VariableDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManag
 
     private static final String VARIABLE_VERSION_PROPERTY = "variable.schema.version";
 
-    private static final String SCHEMA_FILE_COMPONENT = "variable";
+    private static final String SCHEMA_COMPONENT = "variable";
 
-    private static final String SCHEMA_FILE_COMPONENT_HISTORY = "variable.history";
+    private static final String SCHEMA_COMPONENT_HISTORY = "variable.history";
 
     @Override
     public void dbSchemaCreate() {
@@ -37,18 +37,18 @@ public class VariableDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManag
                 throw new FlowableWrongDbException(FlowableVersions.CURRENT_VERSION, dbVersion);
             }
         } else {
-            executeMandatorySchemaResource("create", SCHEMA_FILE_COMPONENT);
+            executeMandatorySchemaResource("create", SCHEMA_COMPONENT);
             if (getDbSqlSession().getDbSqlSessionFactory().isDbHistoryUsed()) {
-                executeMandatorySchemaResource("create", SCHEMA_FILE_COMPONENT_HISTORY);
+                executeMandatorySchemaResource("create", SCHEMA_COMPONENT_HISTORY);
             }
         }
     }
 
     @Override
     public void dbSchemaDrop() {
-        executeMandatorySchemaResource("drop", SCHEMA_FILE_COMPONENT);
+        executeMandatorySchemaResource("drop", SCHEMA_COMPONENT);
         if (getDbSqlSession().getDbSqlSessionFactory().isDbHistoryUsed()) {
-            executeMandatorySchemaResource("drop", SCHEMA_FILE_COMPONENT_HISTORY);
+            executeMandatorySchemaResource("drop", SCHEMA_COMPONENT_HISTORY);
         }
     }
 
@@ -60,9 +60,9 @@ public class VariableDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManag
             int matchingVersionIndex = FlowableVersions.getFlowableVersionForDbVersion(dbVersion);
             boolean isUpgradeNeeded = (matchingVersionIndex != (FlowableVersions.FLOWABLE_VERSIONS.size() - 1));
             if (isUpgradeNeeded) {
-                dbSchemaUpgrade(SCHEMA_FILE_COMPONENT, matchingVersionIndex);
+                dbSchemaUpgrade(SCHEMA_COMPONENT, matchingVersionIndex);
                 if (getDbSqlSession().getDbSqlSessionFactory().isDbHistoryUsed()) {
-                    dbSchemaUpgrade(SCHEMA_FILE_COMPONENT_HISTORY, matchingVersionIndex);
+                    dbSchemaUpgrade(SCHEMA_COMPONENT_HISTORY, matchingVersionIndex);
                 }
                 setProperty(VARIABLE_VERSION_PROPERTY, FlowableVersions.CURRENT_VERSION);
             }

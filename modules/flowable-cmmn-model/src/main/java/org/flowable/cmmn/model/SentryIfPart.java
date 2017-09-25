@@ -19,8 +19,6 @@ public class SentryIfPart extends CmmnElement {
 
     protected String condition;
     
-    protected Object conditionExpression; // Cannot be typed (due to not having the dependency), but needs to be set here to avoid having to recreate at runtime
-    
     public String getCondition() {
         return condition;
     }
@@ -29,12 +27,4 @@ public class SentryIfPart extends CmmnElement {
         this.condition = condition;
     }
 
-    public Object getConditionExpression() {
-        return conditionExpression;
-    }
-
-    public void setConditionExpression(Object conditionExpression) {
-        this.conditionExpression = conditionExpression;
-    }
-    
 }

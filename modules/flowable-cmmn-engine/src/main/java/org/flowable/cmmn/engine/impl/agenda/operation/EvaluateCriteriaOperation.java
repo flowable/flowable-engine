@@ -180,13 +180,14 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 
             } else {
 
-                Set<String> satisfiedSentryIfPartIds = new HashSet<>();
+                boolean sentryIfPartSatisfied = false;
                 Set<String> satisfiedSentryOnPartIds = new HashSet<>(1); // can maxmimum be one for a given sentry
                 for (SentryPartInstanceEntity sentryPartInstanceEntity : entityWithSentryPartInstances.getSatisfiedSentryPartInstances()) {
                     if (sentryPartInstanceEntity.getOnPartId() != null) {
                         satisfiedSentryOnPartIds.add(sentryPartInstanceEntity.getOnPartId());
-                    } else if (sentryPartInstanceEntity.getIfPartId() != null) {
-                        satisfiedSentryIfPartIds.add(sentryPartInstanceEntity.getIfPartId());
+                    } else if (sentryPartInstanceEntity.getIfPartId() != null 
+                            && sentryPartInstanceEntity.getIfPartId().equals(sentry.getSentryIfPart().getId())) {
+                        sentryIfPartSatisfied = true;
                     }
                 }
 
@@ -204,16 +205,16 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 }
                 
                 // If parts
-                if (sentry.getSentryIfPart() != null && !satisfiedSentryIfPartIds.contains(sentry.getSentryIfPart().getId())) {
+                if (sentry.getSentryIfPart() != null && !sentryIfPartSatisfied) {
                     if (evaluateSentryIfPart(sentry, entityWithSentryPartInstances)) {
                         createSentryPartInstanceEntity(entityWithSentryPartInstances, null, sentry.getSentryIfPart());
-                        satisfiedSentryIfPartIds.add(sentry.getSentryIfPart().getId());
+                        sentryIfPartSatisfied = true;
                         criteriaSatisfied = true;
                     }
                 }
 
                 if (sentry.getOnParts().size() == entityWithSentryPartInstances.getSatisfiedSentryPartInstances().size()
-                        && (sentry.getSentryIfPart() == null || satisfiedSentryIfPartIds.size() == 1)) {
+                        && (sentry.getSentryIfPart() == null || sentryIfPartSatisfied)) {
                     return CriteriaEvaluationResult.SENTRY_SATISFIED;
                 } else if (criteriaSatisfied) {
                     partTriggered = true;
@@ -258,7 +259,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
     }
     
     protected boolean evaluateSentryIfPart(Sentry sentry, EntityWithSentryPartInstances entityWithSentryPartInstances) {
-        Expression conditionExpression = (Expression) sentry.getSentryIfPart().getConditionExpression();
+        Expression conditionExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(sentry.getSentryIfPart().getCondition());
         Object result = conditionExpression.getValue(entityWithSentryPartInstances);
         if (result instanceof Boolean) {
             return (Boolean) result;

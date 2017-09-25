@@ -25,7 +25,7 @@ import org.flowable.engine.common.impl.javax.el.ELContext;
 public class CmmnVariableScopeELResolver extends VariableContainerELResolver {
 
     public static final String PLAN_ITEM_INSTANCE_KEY = "planItemInstance";
-    public static final String CASE_INSTANCE_KEY = "caseInstanceKey";
+    public static final String CASE_INSTANCE_KEY = "caseInstance";
 
     public CmmnVariableScopeELResolver(VariableContainer variableContainer) {
         super(variableContainer);
