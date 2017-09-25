@@ -19,6 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
@@ -26,6 +27,7 @@ import org.flowable.cmmn.engine.delegate.PlanItemJavaDelegate;
 import org.flowable.cmmn.engine.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.engine.impl.variable.VariableScopeType;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
+import org.flowable.cmmn.engine.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.variable.service.history.HistoricVariableInstance;
@@ -169,6 +171,40 @@ public class VariablesTest extends FlowableCmmnTestCase {
         // Variables should not be persisted
         assertEquals(0, cmmnRuntimeService.getVariables(caseInstance.getId()).size());
         assertEquals(0, cmmnHistoryService.createHistoricVariableInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testBlockingExpressionBasedOnVariable() {
+        // Blocking
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testBlockingExpression")
+                .variable("nameVar", "First Task")
+                .variable("blockB", true)
+                .start();
+        
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceStateActive()
+                .orderByName().asc()
+                .list();
+        assertEquals(2, planItemInstances.size());
+        assertEquals("B", planItemInstances.get(0).getName());
+        assertEquals("First Task", planItemInstances.get(1).getName());
+        
+        // Non-blocking
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testBlockingExpression")
+                .variable("nameVar", "Second Task")
+                .variable("blockB", false)
+                .start();
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceStateActive()
+                .list();
+        assertEquals(1, planItemInstances.size());
+        assertEquals("Second Task", planItemInstances.get(0).getName());
     }
 
     // Test helper classes

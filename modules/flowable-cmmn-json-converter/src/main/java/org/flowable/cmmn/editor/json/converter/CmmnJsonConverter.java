@@ -71,6 +71,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, StencilConstants,
         AssociationJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
 
         // task types
+        TaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         HumanTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         DecisionTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         
@@ -141,7 +142,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, StencilConstants,
 
         ObjectNode propertiesNode = objectMapper.createObjectNode();
         if (StringUtils.isNotEmpty(caseModel.getId())) {
-            propertiesNode.put(PROPERTY_PROCESS_ID, caseModel.getId());
+            propertiesNode.put(PROPERTY_CASE_ID, caseModel.getId());
         }
         if (StringUtils.isNotEmpty(caseModel.getName())) {
             propertiesNode.put(PROPERTY_NAME, caseModel.getName());
@@ -151,7 +152,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, StencilConstants,
         }
         
         if (StringUtils.isNoneEmpty(model.getTargetNamespace())) {
-            propertiesNode.put(PROPERTY_PROCESS_NAMESPACE, model.getTargetNamespace());
+            propertiesNode.put(PROPERTY_CASE_NAMESPACE, model.getTargetNamespace());
         }
 
         modelNode.set(EDITOR_SHAPE_PROPERTIES, propertiesNode);
@@ -232,9 +233,9 @@ public class CmmnJsonConverter implements EditorJsonConstants, StencilConstants,
 
         Case caseModel = new Case();
         cmmnModel.getCases().add(caseModel);
-        caseModel.setId(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_PROCESS_ID, modelNode));
+        caseModel.setId(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_CASE_ID, modelNode));
         caseModel.setName(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_NAME, modelNode));
-        String namespace = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_PROCESS_NAMESPACE, modelNode);
+        String namespace = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_CASE_NAMESPACE, modelNode);
         if (StringUtils.isNotEmpty(namespace)) {
             cmmnModel.setTargetNamespace(namespace);
         }

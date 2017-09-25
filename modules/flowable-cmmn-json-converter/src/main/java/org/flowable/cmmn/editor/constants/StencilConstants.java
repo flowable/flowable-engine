@@ -18,69 +18,66 @@ package org.flowable.cmmn.editor.constants;
 public interface StencilConstants {
 
     // stencil items
-    final String STENCIL_PLANMODEL = "PlanModel";
-    final String STENCIL_STAGE = "Stage";
-    final String STENCIL_TASK_HUMAN = "HumanTask";
-    final String STENCIL_TASK_DECISION = "DecisionTask";
-    final String STENCIL_MILESTONE = "Milestone";
+    String STENCIL_PLANMODEL = "PlanModel";
+    String STENCIL_STAGE = "Stage";
+    String STENCIL_TASK = "Task";
+    String STENCIL_TASK_HUMAN = "HumanTask";
+    String STENCIL_TASK_DECISION = "DecisionTask";
+    String STENCIL_MILESTONE = "Milestone";
 
-    final String STENCIL_ENTRY_CRITERION = "EntryCriterion";
-    final String STENCIL_EXIT_CRITERION = "ExitCriterion";
+    String STENCIL_ENTRY_CRITERION = "EntryCriterion";
+    String STENCIL_EXIT_CRITERION = "ExitCriterion";
     
-    final String STENCIL_ASSOCIATION = "Association";
+    String STENCIL_ASSOCIATION = "Association";
     
-    final String PROPERTY_VALUE_YES = "Yes";
-    final String PROPERTY_VALUE_NO = "No";
+    String PROPERTY_VALUE_YES = "Yes";
+    String PROPERTY_VALUE_NO = "No";
     
     // stencil properties
-    final String PROPERTY_OVERRIDE_ID = "overrideid";
-    final String PROPERTY_NAME = "name";
-    final String PROPERTY_DOCUMENTATION = "documentation";
+    String PROPERTY_OVERRIDE_ID = "overrideid";
+    String PROPERTY_NAME = "name";
+    String PROPERTY_DOCUMENTATION = "documentation";
 
-    final String PROPERTY_PROCESS_ID = "process_id";
-    final String PROPERTY_PROCESS_VERSION = "process_version";
-    final String PROPERTY_PROCESS_AUTHOR = "process_author";
-    final String PROPERTY_PROCESS_NAMESPACE = "process_namespace";
-    final String PROPERTY_PROCESS_EXECUTABLE = "process_executable";
+    String PROPERTY_CASE_ID = "case_id";
+    String PROPERTY_CASE_VERSION = "case_version";
+    String PROPERTY_CASE_AUTHOR = "case_author";
+    String PROPERTY_CASE_NAMESPACE = "case_namespace";
     
-    final String PROPERTY_TIMER_DURATON = "timerdurationdefinition";
-    final String PROPERTY_TIMER_DATE = "timerdatedefinition";
-    final String PROPERTY_TIMER_CYCLE = "timercycledefinition";
-    final String PROPERTY_TIMER_CYCLE_END_DATE = "timerenddatedefinition";
+    String PROPERTY_TIMER_DURATON = "timerdurationdefinition";
+    String PROPERTY_TIMER_DATE = "timerdatedefinition";
+    String PROPERTY_TIMER_CYCLE = "timercycledefinition";
+    String PROPERTY_TIMER_CYCLE_END_DATE = "timerenddatedefinition";
 
-    final String PROPERTY_FORMKEY = "formkeydefinition";
-    final String PROPERTY_FORM_REFERENCE = "formreference";
+    String PROPERTY_FORMKEY = "formkeydefinition";
+    String PROPERTY_FORM_REFERENCE = "formreference";
 
-    final String PROPERTY_USERTASK_ASSIGNMENT = "usertaskassignment";
-    final String PROPERTY_USERTASK_PRIORITY = "prioritydefinition";
-    final String PROPERTY_USERTASK_DUEDATE = "duedatedefinition";
-    final String PROPERTY_USERTASK_ASSIGNEE = "assignee";
-    final String PROPERTY_USERTASK_OWNER = "owner";
-    final String PROPERTY_USERTASK_CANDIDATE_USERS = "candidateUsers";
-    final String PROPERTY_USERTASK_CANDIDATE_GROUPS = "candidateGroups";
-    final String PROPERTY_USERTASK_CATEGORY = "categorydefinition";
+    String PROPERTY_IS_BLOCKING = "isblocking";
+    String PROPERTY_IS_BLOCKING_EXPRESSION = "isblockingexpression";
+    
+    String PROPERTY_USERTASK_ASSIGNMENT = "usertaskassignment";
+    String PROPERTY_USERTASK_PRIORITY = "prioritydefinition";
+    String PROPERTY_USERTASK_DUEDATE = "duedatedefinition";
+    String PROPERTY_USERTASK_ASSIGNEE = "assignee";
+    String PROPERTY_USERTASK_OWNER = "owner";
+    String PROPERTY_USERTASK_CANDIDATE_USERS = "candidateUsers";
+    String PROPERTY_USERTASK_CANDIDATE_GROUPS = "candidateGroups";
+    String PROPERTY_USERTASK_CATEGORY = "categorydefinition";
 
-    final String PROPERTY_SERVICETASK_CLASS = "servicetaskclass";
-    final String PROPERTY_SERVICETASK_EXPRESSION = "servicetaskexpression";
-    final String PROPERTY_SERVICETASK_DELEGATE_EXPRESSION = "servicetaskdelegateexpression";
-    final String PROPERTY_SERVICETASK_RESULT_VARIABLE = "servicetaskresultvariable";
-    final String PROPERTY_SERVICETASK_FIELDS = "servicetaskfields";
-    final String PROPERTY_SERVICETASK_FIELD_NAME = "name";
-    final String PROPERTY_SERVICETASK_FIELD_STRING_VALUE = "stringValue";
-    final String PROPERTY_SERVICETASK_FIELD_STRING = "string";
-    final String PROPERTY_SERVICETASK_FIELD_EXPRESSION = "expression";
+    String PROPERTY_SERVICETASK_CLASS = "servicetaskclass";
+    String PROPERTY_SERVICETASK_EXPRESSION = "servicetaskexpression";
+    String PROPERTY_SERVICETASK_DELEGATE_EXPRESSION = "servicetaskdelegateexpression";
+    String PROPERTY_SERVICETASK_RESULT_VARIABLE = "servicetaskresultvariable";
+    String PROPERTY_SERVICETASK_FIELDS = "servicetaskfields";
+    String PROPERTY_SERVICETASK_FIELD_NAME = "name";
+    String PROPERTY_SERVICETASK_FIELD_STRING_VALUE = "stringValue";
+    String PROPERTY_SERVICETASK_FIELD_STRING = "string";
+    String PROPERTY_SERVICETASK_FIELD_EXPRESSION = "expression";
 
-    final String PROPERTY_SCRIPT_FORMAT = "scriptformat";
-    final String PROPERTY_SCRIPT_TEXT = "scripttext";
+    String PROPERTY_SCRIPT_FORMAT = "scriptformat";
+    String PROPERTY_SCRIPT_TEXT = "scripttext";
 
-    final String PROPERTY_RULETASK_CLASS = "ruletask_class";
-    final String PROPERTY_RULETASK_VARIABLES_INPUT = "ruletask_variables_input";
-    final String PROPERTY_RULETASK_RESULT = "ruletask_result";
-    final String PROPERTY_RULETASK_RULES = "ruletask_rules";
-    final String PROPERTY_RULETASK_EXCLUDE = "ruletask_exclude";
-
-    final String PROPERTY_DECISIONTABLE_REFERENCE = "decisiontaskdecisiontablereference";
-    final String PROPERTY_DECISIONTABLE_REFERENCE_ID = "decisiontablereferenceid";
-    final String PROPERTY_DECISIONTABLE_REFERENCE_NAME = "decisiontablereferencename";
-    final String PROPERTY_DECISIONTABLE_REFERENCE_KEY = "decisionTableReferenceKey";
+    String PROPERTY_DECISIONTABLE_REFERENCE = "decisiontaskdecisiontablereference";
+    String PROPERTY_DECISIONTABLE_REFERENCE_ID = "decisiontablereferenceid";
+    String PROPERTY_DECISIONTABLE_REFERENCE_NAME = "decisiontablereferencename";
+    String PROPERTY_DECISIONTABLE_REFERENCE_KEY = "decisionTableReferenceKey";
 }

@@ -22,9 +22,7 @@ public class CaseTaskExport extends AbstractPlanItemDefinitionExport {
         // start case task element
         xtw.writeStartElement(ELEMENT_CASE_TASK);
         writeCommonPlanItemDefinitionAttributes(caseTask, xtw);
-        if (!caseTask.isBlocking()) {
-            xtw.writeAttribute(ATTRIBUTE_IS_BLOCKING, "false");
-        }
+        writeBlockingAttribute(xtw, caseTask);
         
         // end case task element
         xtw.writeEndElement();

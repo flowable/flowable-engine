@@ -67,6 +67,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_SOURCE_REF = "sourceRef";
     String ATTRIBUTE_SENTRY_REF = "sentryRef";
     String ATTRIBUTE_IS_BLOCKING = "isBlocking";
+    String ATTRIBUTE_IS_BLOCKING_EXPRESSION = "isBlockingExpression";
     
     String ATTRIBUTE_CASE_REF = "caseRef";
     String ATTRIBUTE_PROCESS_REF = "processRef";

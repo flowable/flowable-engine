@@ -11,18 +11,16 @@
         }
     },
     "properties":{
-        "process_id":"testModel",
+        "case_id":"testModel",
         "name":"Test model",
         "documentation":"",
-        "process_author":"",
-        "process_version":"",
-        "process_namespace":"http://www.flowable.org/processdef",
+        "case_author":"",
+        "case_version":"",
+        "case_namespace":"http://www.flowable.org/casedef",
         "executionlisteners":"",
         "eventlisteners":"",
         "signaldefinitions":"",
-        "messagedefinitions":"",
-        "process_potentialstarteruser":"",
-        "process_potentialstartergroup":""
+        "messagedefinitions":""
     },
     "childShapes":[
         {

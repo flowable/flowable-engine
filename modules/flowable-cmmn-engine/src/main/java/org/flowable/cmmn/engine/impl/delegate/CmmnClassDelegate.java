@@ -42,14 +42,14 @@ public class CmmnClassDelegate implements CmmnActivityBehavior {
     protected CmmnActivityBehavior getCmmnActivityBehavior(String className) {
         Object instance = instantiate(className);
         
-        if (instance instanceof CmmnActivityBehavior) {
-            return (CmmnActivityBehavior) instance;
-            
-        } else if (instance instanceof PlanItemJavaDelegate) {
+       if (instance instanceof PlanItemJavaDelegate) {
             return new PlanItemJavaDelegateActivityBehavior((PlanItemJavaDelegate) instance);
             
         } else if (instance instanceof PlanItemJavaDelegateActivityBehavior) {
             return (PlanItemJavaDelegateActivityBehavior) instance;
+            
+        } else if (instance instanceof CmmnActivityBehavior) {
+            return (CmmnActivityBehavior) instance;
             
         } else {
             throw new FlowableIllegalArgumentException(className + " does not implement the " 

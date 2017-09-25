@@ -14,50 +14,49 @@ package org.flowable.cmmn.editor.json.converter;
 
 import java.util.Map;
 
+import org.flowable.cmmn.editor.constants.StencilConstants;
 import org.flowable.cmmn.model.BaseElement;
-import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.model.Milestone;
-import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.Task;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
- * @author Tijs Rademakers
+ * @author Joram Barrez
  */
-public class MilestoneJsonConverter extends BaseCmmnJsonConverter {
-
-    public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToBpmnMap,
+public class TaskJsonConverter extends BaseCmmnJsonConverter {
+    
+    public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap,
             Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
-        fillJsonTypes(convertersToBpmnMap);
+        fillJsonTypes(convertersToCmmnMap);
         fillCmmnTypes(convertersToJsonMap);
     }
 
     public static void fillJsonTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToBpmnMap) {
-        convertersToBpmnMap.put(STENCIL_MILESTONE, MilestoneJsonConverter.class);
+        convertersToBpmnMap.put(STENCIL_TASK, TaskJsonConverter.class);
     }
 
     public static void fillCmmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
-        convertersToJsonMap.put(Milestone.class, MilestoneJsonConverter.class);
+        convertersToJsonMap.put(Task.class, TaskJsonConverter.class);
     }
-
+    
+    @Override
     protected String getStencilId(BaseElement baseElement) {
-        return STENCIL_MILESTONE;
+        return StencilConstants.STENCIL_TASK;
     }
 
     @Override
-    protected CaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, 
-                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel) {
-        Milestone milestone = new Milestone();
-        return milestone;
+    protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor,
+            BaseElement baseElement, CmmnModel cmmnModel) {
+        // todo
     }
 
     @Override
-    protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel) {
-        PlanItem planItem = (PlanItem) baseElement;
-        Milestone milestone = (Milestone) planItem.getPlanItemDefinition();
-       
-        // nothing to do yet
+    protected BaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor,
+            BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel) {
+        Task task = new Task();
+        return task;
     }
+
 }

@@ -30,6 +30,7 @@ import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
+import org.flowable.cmmn.model.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,6 +108,12 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Sten
             PlanItemDefinition planItemDefinition = (PlanItemDefinition) baseElement;
             planItemDefinition.setName(getPropertyValueAsString(PROPERTY_NAME, elementNode));
             planItemDefinition.setDocumentation(getPropertyValueAsString(PROPERTY_DOCUMENTATION, elementNode));
+            
+            if (planItemDefinition instanceof Task) {
+                Task task = (Task) planItemDefinition;
+                task.setBlocking(getPropertyValueAsBoolean(PROPERTY_IS_BLOCKING, elementNode));
+                task.setBlockingExpression(getPropertyValueAsString(PROPERTY_IS_BLOCKING_EXPRESSION, elementNode));
+            }
         
             Stage stage = (Stage) parentElement;
             stage.addPlanItemDefinition(planItemDefinition);

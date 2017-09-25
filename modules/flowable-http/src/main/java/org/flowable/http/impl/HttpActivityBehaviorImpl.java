@@ -52,8 +52,8 @@ import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.el.FixedValue;
@@ -65,7 +65,6 @@ import org.flowable.http.delegate.HttpRequestHandler;
 import org.flowable.http.delegate.HttpResponseHandler;
 import org.flowable.http.impl.handler.ClassDelegateHttpHandler;
 import org.flowable.http.impl.handler.DelegateExpressionHttpHandler;
-import org.flowable.variable.service.delegate.Expression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
