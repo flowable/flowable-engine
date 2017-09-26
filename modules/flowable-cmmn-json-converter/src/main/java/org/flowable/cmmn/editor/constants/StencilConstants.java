@@ -80,4 +80,7 @@ public interface StencilConstants {
     String PROPERTY_DECISIONTABLE_REFERENCE_ID = "decisiontablereferenceid";
     String PROPERTY_DECISIONTABLE_REFERENCE_NAME = "decisiontablereferencename";
     String PROPERTY_DECISIONTABLE_REFERENCE_KEY = "decisionTableReferenceKey";
+    
+    String PROPERTY_IF_PART_CONDITION = "ifpartcondition";
+    
 }
