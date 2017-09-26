@@ -32,7 +32,7 @@ public class PlanItemJavaDelegateActivityBehavior extends CoreCmmnActivityBehavi
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         planItemJavaDelegate.execute(planItemInstanceEntity);
-        CommandContextUtil.getAgenda(commandContext).planCompletePlanItem(planItemInstanceEntity);
+        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance(planItemInstanceEntity);
     }
 
 }

@@ -39,7 +39,7 @@ public class TaskActivityBehavior extends CoreCmmnTriggerableActivityBehavior {
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         if (!determineIsBlocking(planItemInstanceEntity)) {
-            CommandContextUtil.getAgenda(commandContext).planCompletePlanItem((PlanItemInstanceEntity) planItemInstanceEntity);
+            CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance((PlanItemInstanceEntity) planItemInstanceEntity);
         }
     }
 
@@ -57,7 +57,7 @@ public class TaskActivityBehavior extends CoreCmmnTriggerableActivityBehavior {
         if (!PlanItemInstanceState.ACTIVE.equals(planItemInstance.getState())) {
             throw new FlowableException("Can only trigger a plan item that is in the ACTIVE state");
         }
-        CommandContextUtil.getAgenda(commandContext).planCompletePlanItem((PlanItemInstanceEntity) planItemInstance);
+        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance((PlanItemInstanceEntity) planItemInstance);
     }
 
 }

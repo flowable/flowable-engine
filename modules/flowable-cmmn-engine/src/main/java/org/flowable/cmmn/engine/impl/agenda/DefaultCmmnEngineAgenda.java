@@ -12,18 +12,18 @@
  */
 package org.flowable.cmmn.engine.impl.agenda;
 
-import org.flowable.cmmn.engine.impl.agenda.operation.ActivatePlanItemOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.ActivatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.CmmnOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.CompleteCaseInstanceOperation;
-import org.flowable.cmmn.engine.impl.agenda.operation.CompletePlanItemOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.CompletePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.EvaluateCriteriaOperation;
-import org.flowable.cmmn.engine.impl.agenda.operation.ExitPlanItemOperation;
-import org.flowable.cmmn.engine.impl.agenda.operation.InitPlanModelOperation;
-import org.flowable.cmmn.engine.impl.agenda.operation.InitStageOperation;
-import org.flowable.cmmn.engine.impl.agenda.operation.OccurPlanItemOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.ExitPlanItemInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.InitPlanModelInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.InitStageInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.OccurPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.TerminateCaseInstanceOperation;
-import org.flowable.cmmn.engine.impl.agenda.operation.TerminatePlanItemOperation;
-import org.flowable.cmmn.engine.impl.agenda.operation.TriggerPlanItemOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.TerminatePlanItemInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.TriggerPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -52,12 +52,12 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
 
     @Override
     public void planInitPlanModelOperation(CaseInstanceEntity caseInstanceEntity) {
-        addOperation(new InitPlanModelOperation(commandContext, caseInstanceEntity));
+        addOperation(new InitPlanModelInstanceOperation(commandContext, caseInstanceEntity));
     }
 
     @Override
     public void planInitStageOperation(PlanItemInstanceEntity planItemInstanceEntity) {
-        addOperation(new InitStageOperation(commandContext, planItemInstanceEntity));
+        addOperation(new InitStageInstanceOperation(commandContext, planItemInstanceEntity));
     }
 
     @Override
@@ -71,48 +71,43 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     }
 
     @Override
-    public void planActivatePlanItem(PlanItemInstanceEntity planItemInstanceEntity) {
-        addOperation(new ActivatePlanItemOperation(commandContext, planItemInstanceEntity));
+    public void planActivatePlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new ActivatePlanItemInstanceOperation(commandContext, planItemInstanceEntity));
     }
 
     @Override
-    public void planCompletePlanItem(PlanItemInstanceEntity planItemInstanceEntity) {
-        addOperation(new CompletePlanItemOperation(commandContext, planItemInstanceEntity));
+    public void planCompletePlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new CompletePlanItemInstanceOperation(commandContext, planItemInstanceEntity));
     }
 
     @Override
-    public void planOccurPlanItem(PlanItemInstanceEntity planItemInstanceEntity) {
-        addOperation(new OccurPlanItemOperation(commandContext, planItemInstanceEntity));
+    public void planOccurPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new OccurPlanItemInstanceOperation(commandContext, planItemInstanceEntity));
     }
 
     @Override
-    public void planExitPlanItem(PlanItemInstanceEntity planItemInstanceEntity) {
-        addOperation(new ExitPlanItemOperation(commandContext, planItemInstanceEntity));
+    public void planExitPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new ExitPlanItemInstanceOperation(commandContext, planItemInstanceEntity));
     }
 
     @Override
-    public void planTerminatePlanItem(PlanItemInstanceEntity planItemInstanceEntity) {
-        addOperation(new TerminatePlanItemOperation(commandContext, planItemInstanceEntity));
+    public void planTerminatePlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new TerminatePlanItemInstanceOperation(commandContext, planItemInstanceEntity));
     }
 
     @Override
-    public void planTriggerPlanItem(PlanItemInstanceEntity planItemInstanceEntity) {
-        addOperation(new TriggerPlanItemOperation(commandContext, planItemInstanceEntity));
+    public void planTriggerPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new TriggerPlanItemInstanceOperation(commandContext, planItemInstanceEntity));
     }
 
     @Override
-    public void planCompleteCase(CaseInstanceEntity caseInstanceEntity) {
+    public void planCompleteCaseInstance(CaseInstanceEntity caseInstanceEntity) {
         addOperation(new CompleteCaseInstanceOperation(commandContext, caseInstanceEntity));
     }
 
     @Override
-    public void planTerminateCase(String caseInstanceEntityId, boolean manualTermination) {
+    public void planTerminateCaseInstance(String caseInstanceEntityId, boolean manualTermination) {
         addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntityId, manualTermination));
-    }
-
-    @Override
-    public void planTerminateCase(CaseInstanceEntity caseInstanceEntity, boolean manualTermination) {
-        addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntity, manualTermination));
     }
 
 }

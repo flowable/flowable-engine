@@ -13,24 +13,27 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
  */
-public abstract class AbstractDeletePlanItemOperation extends AbstractChangePlanItemInstanceStateOperation {
-
-    public AbstractDeletePlanItemOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+public class CompletePlanItemInstanceOperation extends AbstractDeletePlanItemInstanceOperation {
+    
+    public CompletePlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
     }
 
     @Override
-    public void run() {
-        super.run();
-        
-        deleteSentryPartInstances();
-        CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).delete(planItemInstanceEntity);
+    protected String getNewState() {
+        return PlanItemInstanceState.COMPLETED;
+    }
+    
+    @Override
+    protected String getLifeCycleTransition() {
+        return PlanItemTransition.COMPLETE;
     }
     
 }

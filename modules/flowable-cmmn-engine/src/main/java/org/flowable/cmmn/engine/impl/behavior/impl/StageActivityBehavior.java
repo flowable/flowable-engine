@@ -51,11 +51,11 @@ public class StageActivityBehavior extends CoreCmmnTriggerableActivityBehavior i
         if (childPlanItemInstances != null) {
             for (PlanItemInstanceEntity childPlanItemInstance : childPlanItemInstances) {
                 if (StateTransition.isPossible(planItemInstance, PlanItemTransition.COMPLETE)) {
-                    CommandContextUtil.getAgenda().planCompletePlanItem(childPlanItemInstance);
+                    CommandContextUtil.getAgenda().planCompletePlanItemInstance(childPlanItemInstance);
                 }
             }
         }
-        CommandContextUtil.getAgenda(commandContext).planCompletePlanItem((PlanItemInstanceEntity) planItemInstance);
+        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance((PlanItemInstanceEntity) planItemInstance);
     }
     
     @Override
@@ -73,9 +73,9 @@ public class StageActivityBehavior extends CoreCmmnTriggerableActivityBehavior i
             for (PlanItemInstanceEntity childPlanItemInstance : childPlanItemInstances) {
                 if (StateTransition.isPossible(planItemInstance, transition)) {
                     if (PlanItemTransition.TERMINATE.equals(transition)) {
-                        CommandContextUtil.getAgenda().planTerminatePlanItem(childPlanItemInstance);
+                        CommandContextUtil.getAgenda().planTerminatePlanItemInstance(childPlanItemInstance);
                     } else if (PlanItemTransition.EXIT.equals(transition)) {
-                        CommandContextUtil.getAgenda().planExitPlanItem(childPlanItemInstance);
+                        CommandContextUtil.getAgenda().planExitPlanItemInstance(childPlanItemInstance);
                     }
                 }
             }

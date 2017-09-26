@@ -12,37 +12,40 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
-import org.flowable.cmmn.engine.impl.behavior.CmmnTriggerableActivityBehavior;
-import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.PlanItem;
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
  */
-public class TriggerPlanItemOperation extends AbstractPlanItemInstanceOperation {
+public class ActivatePlanItemInstanceOperation extends AbstractPlanItemInstanceOperation {
     
-    public TriggerPlanItemOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+    public ActivatePlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
     }
     
     @Override
     public void run() {
-        if (PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState())) {
-            Object behaviorObject = planItemInstanceEntity.getPlanItem().getBehavior();
-            if (!(behaviorObject instanceof CmmnTriggerableActivityBehavior)) {
-                throw new FlowableException("Cannot trigger a plan item which activity behavior does not implement the " 
-                        + CmmnTriggerableActivityBehavior.class + " interface");
-            }
-            CmmnTriggerableActivityBehavior behavior = (CmmnTriggerableActivityBehavior) planItemInstanceEntity.getPlanItem().getBehavior();
-            if (behavior instanceof CoreCmmnTriggerableActivityBehavior) {
-                ((CoreCmmnTriggerableActivityBehavior) behavior).trigger(commandContext, planItemInstanceEntity);
-            } else {
-                behavior.trigger(planItemInstanceEntity);
-            }
+        if (!PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState())) {
+            
+            // Sentries are not needed to be kept around, as the plan item is being activated
+            deleteSentryPartInstances();
+            
+            planItemInstanceEntity.setState(PlanItemInstanceState.ACTIVE);
+            executeActivityBehavior();
+        }
+    }
+    
+    protected void executeActivityBehavior() {
+        CmmnActivityBehavior activityBehavior = (CmmnActivityBehavior) planItemInstanceEntity.getPlanItem().getBehavior();
+        if (activityBehavior instanceof CoreCmmnActivityBehavior) {
+            ((CoreCmmnActivityBehavior) activityBehavior).execute(commandContext, planItemInstanceEntity);
+        } else {
+            activityBehavior.execute(planItemInstanceEntity);
         }
     }
     
@@ -50,7 +53,7 @@ public class TriggerPlanItemOperation extends AbstractPlanItemInstanceOperation 
     public String toString() {
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("[Trigger PlanItem] ");
+        stringBuilder.append("[Activate PlanItem] ");
         if (planItem.getName() != null) {
             stringBuilder.append(planItem.getName());
             stringBuilder.append(" (");
