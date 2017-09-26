@@ -45,10 +45,6 @@ public class AbstractPlanItemDefinitionExport implements CmmnXmlConstants {
         } else {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_IS_BLOCKING_EXPRESSION, task.getBlockingExpression());
         }
-        
-        if (!task.isBlocking() && StringUtils.isEmpty(task.getBlockingExpression())) {
-            
-        }
     }
 
 }

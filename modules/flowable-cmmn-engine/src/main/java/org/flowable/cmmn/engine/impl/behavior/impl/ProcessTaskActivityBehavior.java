@@ -43,7 +43,7 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
     }
 
     @Override
-    public void execute(DelegatePlanItemInstance planItemInstance) {
+    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         ProcessInstanceService processInstanceService = CommandContextUtil.getCmmnEngineConfiguration().getProcessInstanceService();
         if (processInstanceService == null) {
             throw new FlowableException("Could not start process instance: no " + ProcessInstanceService.class + " implementation found");
@@ -58,28 +58,28 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
             
             
         } else if (processRefExpression != null) {
-            externalRef = processRefExpression.getValue(planItemInstance).toString();
+            externalRef = processRefExpression.getValue(planItemInstanceEntity).toString();
             
         }
         
         String processInstanceId = null;
-        boolean blocking = determineIsBlocking(planItemInstance);
+        boolean blocking = determineIsBlocking(planItemInstanceEntity);
         if (blocking) {
-            processInstanceId = processInstanceService.startProcessInstanceByKey(externalRef, planItemInstance.getId());
+            processInstanceId = processInstanceService.startProcessInstanceByKey(externalRef, planItemInstanceEntity.getId());
         } else {
             processInstanceId = processInstanceService.startProcessInstanceByKey(externalRef);
         }
         
-        planItemInstance.setReferenceType(PlanItemInstanceCallbackType.CHILD_PROCESS);
-        planItemInstance.setReferenceId(processInstanceId);
+        planItemInstanceEntity.setReferenceType(PlanItemInstanceCallbackType.CHILD_PROCESS);
+        planItemInstanceEntity.setReferenceId(processInstanceId);
         
         if (!blocking) {
-            CommandContextUtil.getAgenda().planCompletePlanItem((PlanItemInstanceEntity) planItemInstance);
+            CommandContextUtil.getAgenda(commandContext).planCompletePlanItem(planItemInstanceEntity);
         }
     }
     
     @Override
-    public void trigger(DelegatePlanItemInstance planItemInstance) {
+    public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstance) {
         if (!PlanItemInstanceState.ACTIVE.equals(planItemInstance.getState())) {
             throw new FlowableException("Can only trigger a plan item that is in the ACTIVE state");
         }
@@ -92,8 +92,7 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
         }
         
         // Triggering the plan item (as opposed to a regular complete) terminates the process instance
-        CommandContext commandContext = CommandContextUtil.getCommandContext();
-        CommandContextUtil.getAgenda(commandContext).planCompletePlanItem((PlanItemInstanceEntity) planItemInstance);
+        CommandContextUtil.getAgenda(commandContext).planCompletePlanItem(planItemInstance);
         deleteProcessInstance(planItemInstance, commandContext);
     }
 

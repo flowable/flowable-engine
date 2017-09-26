@@ -14,7 +14,7 @@ package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
-import org.flowable.cmmn.engine.impl.behavior.CmmnTriggerableActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
@@ -26,7 +26,7 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 /**
  * @author Joram Barrez
  */
-public class TaskActivityBehavior implements CmmnTriggerableActivityBehavior {
+public class TaskActivityBehavior extends CoreCmmnTriggerableActivityBehavior {
     
     protected boolean isBlocking;
     protected String isBlockingExpression;
@@ -35,31 +35,29 @@ public class TaskActivityBehavior implements CmmnTriggerableActivityBehavior {
         this.isBlocking = task.isBlocking();
         this.isBlockingExpression = task.getBlockingExpression();
     }
-
-
+    
     @Override
-    public void execute(DelegatePlanItemInstance planItemInstance) {
-        if (!determineIsBlocking(planItemInstance)) {
-            CommandContextUtil.getAgenda().planCompletePlanItem((PlanItemInstanceEntity) planItemInstance);
+    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+        if (!determineIsBlocking(planItemInstanceEntity)) {
+            CommandContextUtil.getAgenda(commandContext).planCompletePlanItem((PlanItemInstanceEntity) planItemInstanceEntity);
         }
     }
 
     protected boolean determineIsBlocking(DelegatePlanItemInstance planItemInstance) {
-        CommandContext commandContext = CommandContextUtil.getCommandContext();
         boolean blocking = isBlocking;
         if (StringUtils.isNotEmpty(isBlockingExpression)) {
-            Expression expression = CommandContextUtil.getExpressionManager(commandContext).createExpression(isBlockingExpression);
+            Expression expression = CommandContextUtil.getExpressionManager().createExpression(isBlockingExpression);
             blocking = (Boolean) expression.getValue(planItemInstance);
         }
         return blocking;
     }
-
+    
     @Override
-    public void trigger(DelegatePlanItemInstance planItemInstance) {
+    public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstance) {
         if (!PlanItemInstanceState.ACTIVE.equals(planItemInstance.getState())) {
             throw new FlowableException("Can only trigger a plan item that is in the ACTIVE state");
         }
-        CommandContextUtil.getAgenda().planCompletePlanItem((PlanItemInstanceEntity) planItemInstance);
+        CommandContextUtil.getAgenda(commandContext).planCompletePlanItem((PlanItemInstanceEntity) planItemInstance);
     }
 
 }

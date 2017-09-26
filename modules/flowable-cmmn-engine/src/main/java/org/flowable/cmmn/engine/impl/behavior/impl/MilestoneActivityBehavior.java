@@ -12,8 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
-import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
-import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -24,30 +23,29 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 /**
  * @author Joram Barrez
  */
-public class MilestoneActivityBehavior implements CmmnActivityBehavior {
+public class MilestoneActivityBehavior extends CoreCmmnActivityBehavior {
     
     protected Expression milestoneNameExpression;
     
     public MilestoneActivityBehavior(Expression milestoneNameExpression) {
         this.milestoneNameExpression = milestoneNameExpression;
     }
-
+    
     @Override
-    public void execute(DelegatePlanItemInstance delegatePlanItemInstance) {
-        CommandContext commandContext = CommandContextUtil.getCommandContext();
-        MilestoneInstanceEntity milestoneInstanceEntity = createMilestoneInstance(delegatePlanItemInstance, commandContext);
+    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+        MilestoneInstanceEntity milestoneInstanceEntity = createMilestoneInstance(planItemInstanceEntity, commandContext);
         CommandContextUtil.getCmmnHistoryManager(commandContext).recordMilestoneReached(milestoneInstanceEntity);
-        CommandContextUtil.getAgenda(commandContext).planOccurPlanItem((PlanItemInstanceEntity) delegatePlanItemInstance);
+        CommandContextUtil.getAgenda(commandContext).planOccurPlanItem(planItemInstanceEntity);
     }
 
-    protected MilestoneInstanceEntity createMilestoneInstance(DelegatePlanItemInstance delegatePlanItemInstance, CommandContext commandContext) {
+    protected MilestoneInstanceEntity createMilestoneInstance(PlanItemInstanceEntity planItemInstanceEntity, CommandContext commandContext) {
         MilestoneInstanceEntityManager milestoneInstanceEntityManager = CommandContextUtil.getMilestoneInstanceEntityManager(commandContext);
         MilestoneInstanceEntity milestoneInstanceEntity = milestoneInstanceEntityManager.create();
-        milestoneInstanceEntity.setName(milestoneNameExpression.getValue(delegatePlanItemInstance).toString());
+        milestoneInstanceEntity.setName(milestoneNameExpression.getValue(planItemInstanceEntity).toString());
         milestoneInstanceEntity.setTimeStamp(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
-        milestoneInstanceEntity.setCaseInstanceId(delegatePlanItemInstance.getCaseInstanceId());
-        milestoneInstanceEntity.setCaseDefinitionId(delegatePlanItemInstance.getCaseDefinitionId());
-        milestoneInstanceEntity.setElementId(delegatePlanItemInstance.getElementId());
+        milestoneInstanceEntity.setCaseInstanceId(planItemInstanceEntity.getCaseInstanceId());
+        milestoneInstanceEntity.setCaseDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
+        milestoneInstanceEntity.setElementId(planItemInstanceEntity.getElementId());
         milestoneInstanceEntityManager.insert(milestoneInstanceEntity);
         return milestoneInstanceEntity;
     }

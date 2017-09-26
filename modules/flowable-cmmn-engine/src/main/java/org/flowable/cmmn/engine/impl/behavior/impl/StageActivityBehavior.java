@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.behavior.impl;
 import java.util.List;
 
 import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.StateTransition;
@@ -27,30 +28,26 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 /**
  * @author Joram Barrez
  */
-public class StageActivityBehavior implements PlanItemActivityBehavior {
+public class StageActivityBehavior extends CoreCmmnTriggerableActivityBehavior implements PlanItemActivityBehavior {
     
     protected Stage stage;
     
     public StageActivityBehavior(Stage stage) {
         this.stage = stage;
     }
-
+    
     @Override
-    public void execute(DelegatePlanItemInstance delegatePlanItemInstance) {
-        CommandContext commandContext = CommandContextUtil.getCommandContext();
-        PlanItemInstanceEntity stagePlanItemInstanceEntity = (PlanItemInstanceEntity) delegatePlanItemInstance;
-        if (delegatePlanItemInstance.getPlanItem().getName() != null) {
-            Expression nameExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(delegatePlanItemInstance.getPlanItem().getName());
-            stagePlanItemInstanceEntity.setName(nameExpression.getValue(delegatePlanItemInstance).toString());
+    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+        if (planItemInstanceEntity.getPlanItem().getName() != null) {
+            Expression nameExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(planItemInstanceEntity.getPlanItem().getName());
+            planItemInstanceEntity.setName(nameExpression.getValue(planItemInstanceEntity).toString());
         }
-        CommandContextUtil.getAgenda(commandContext).planInitStageOperation(stagePlanItemInstanceEntity);
+        CommandContextUtil.getAgenda(commandContext).planInitStageOperation(planItemInstanceEntity);
     }
     
     @Override
-    public void trigger(DelegatePlanItemInstance planItemInstance) {
-        CommandContext commandContext = CommandContextUtil.getCommandContext();
-        PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) planItemInstance;
-        List<PlanItemInstanceEntity> childPlanItemInstances = planItemInstanceEntity.getChildren();
+    public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstance) {
+        List<PlanItemInstanceEntity> childPlanItemInstances = planItemInstance.getChildren();
         if (childPlanItemInstances != null) {
             for (PlanItemInstanceEntity childPlanItemInstance : childPlanItemInstances) {
                 if (StateTransition.isPossible(planItemInstance, PlanItemTransition.COMPLETE)) {
