@@ -213,7 +213,7 @@ image::images/flowable_modeler_formoverview_screen.png[align="center"]
 
 You can preview every form definition by opening the details view of a form definition. In the details view, the form name, key and description can be edited and the history of form models is available. You can also duplicate the form definition to create a new form definition with the same form fields. 
 
-Now let's open the vacation request process model in the BPMN editor again and add a Script task to the process model, that will calculate the number of days between the vacation start and end dates. Click on the _Script form_ property and fill in a value of _groovy_ to instruct the Flowable engine to use the Groovy scripting engine. Now click on the _Script_ property and fill in the script that calculates the number of days.
+Now let's open the vacation request process model in the BPMN editor again and add a Script task to the process model, that will calculate the number of days between the vacation start and end dates. Click on the _Script format_ property and fill in a value of _groovy_ to instruct the Flowable engine to use the Groovy scripting engine. Now click on the _Script_ property and fill in the script that calculates the number of days.
 
 image::images/flowable_modeler_script_popup.png[align="center", width="600"]
 
