@@ -62,9 +62,12 @@ public class DeploymentResourceResource {
             @ApiResponse(code = 200, message = "Indicates both deployment and resource have been found and the resource has been returned."),
             @ApiResponse(code = 404, message = "Indicates the requested deployment was not found or there is no resource with the given id present in the deployment. The status-description contains additional information.")
     })
-    // FIXME Why ** ?
     @GetMapping(value = "/repository/deployments/{deploymentId}/resources/**", produces = "application/json")
     public DeploymentResourceResponse getDeploymentResource(@ApiParam(name = "deploymentId") @PathVariable("deploymentId") String deploymentId, HttpServletRequest request) {
+        // The ** is needed because the name of the resource can actually contain forward slashes.
+        // For example org/flowable/model.bpmn2. The number of forward slashes is unknown.
+        // Using ** means that everything should get matched.
+        // See also https://stackoverflow.com/questions/31421061/how-to-handle-requests-that-includes-forward-slashes/42403361#42403361
 
         // Check if deployment exists
         Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
