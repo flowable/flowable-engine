@@ -78,7 +78,7 @@ public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeSe
     }
 
     @Override
-    public PlanItemInstanceQuery createPlanItemQuery() {
+    public PlanItemInstanceQuery createPlanItemInstanceQuery() {
         return cmmnEngineConfiguration.getPlanItemInstanceEntityManager().createPlanItemInstanceQuery();
     }
 

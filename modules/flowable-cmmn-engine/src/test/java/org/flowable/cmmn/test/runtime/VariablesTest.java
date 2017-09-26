@@ -183,7 +183,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
                 .variable("blockB", true)
                 .start();
         
-        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceStateActive()
                 .orderByName().asc()
@@ -199,7 +199,7 @@ public class VariablesTest extends FlowableCmmnTestCase {
                 .variable("blockB", false)
                 .start();
         
-        planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceStateActive()
                 .list();

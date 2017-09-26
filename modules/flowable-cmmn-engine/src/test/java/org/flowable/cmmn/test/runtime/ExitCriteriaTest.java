@@ -33,7 +33,7 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testSimpleExitCriteriaBlocking() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        List<PlanItemInstance> planItems = cmmnRuntimeService.createPlanItemQuery()
+        List<PlanItemInstance> planItems = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .orderByName().asc()
                 .list();
@@ -43,7 +43,7 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
         
         // Completing A should trigger exit criteria of B. Case completes.
         cmmnRuntimeService.triggerPlanItemInstance(planItems.get(0).getId());
-        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }
@@ -52,7 +52,7 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testSimpleExitCriteriaNonBlocking() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).finished().count());
@@ -62,7 +62,7 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testSimpleExitCriteriaWithMultipleOnParts() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        List<PlanItemInstance> planItems = cmmnRuntimeService.createPlanItemQuery()
+        List<PlanItemInstance> planItems = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .orderByName().asc()
                 .list();
@@ -73,7 +73,7 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
             cmmnRuntimeService.triggerPlanItemInstance(planItems.get(i).getId());
         }
         
-        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }
@@ -82,7 +82,7 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testSimpleExitCriteriaWithMultipleOnParts2() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        List<PlanItemInstance> planItems = cmmnRuntimeService.createPlanItemQuery()
+        List<PlanItemInstance> planItems = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .orderByName().asc()
                 .list();
@@ -92,7 +92,7 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(planItems.get(0).getId());
         cmmnRuntimeService.triggerPlanItemInstance(planItems.get(1).getId());
         
-        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }
@@ -101,7 +101,7 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testExitPlanModelOnMilestoneReached() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        List<PlanItemInstance> planItems = cmmnRuntimeService.createPlanItemQuery()
+        List<PlanItemInstance> planItems = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .planItemInstanceState(PlanItemInstanceState.AVAILABLE)
                 .orderByName().asc()
                 .list();
@@ -109,7 +109,7 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
         assertEquals("D", planItems.get(0).getName());
         assertEquals("The Milestone", planItems.get(1).getName());
         
-         planItems = cmmnRuntimeService.createPlanItemQuery()
+         planItems = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .orderByName().asc()
@@ -126,7 +126,7 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(planItems.get(0).getId());
         cmmnRuntimeService.triggerPlanItemInstance(planItems.get(1).getId());
         
-        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }
@@ -135,13 +135,13 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testExitThreeNestedStagesThroughPlanModel() {
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        assertEquals(8, cmmnRuntimeService.createPlanItemQuery().count());
+        assertEquals(8, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         
-        PlanItemInstance taskA = cmmnRuntimeService.createPlanItemQuery().planItemInstanceName("Task A").singleResult();
+        PlanItemInstance taskA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Task A").singleResult();
         assertNotNull(taskA);
         cmmnRuntimeService.triggerPlanItemInstance(taskA.getId());
         
-        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }
@@ -158,15 +158,15 @@ public class ExitCriteriaTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         
         // Trigger the plan item should satisfy the sentry of the plan model exit criteria
-        PlanItemInstance taskA = cmmnRuntimeService.createPlanItemQuery().planItemInstanceName("Task A").singleResult();
+        PlanItemInstance taskA = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("Task A").singleResult();
         assertNotNull(taskA);
         cmmnRuntimeService.triggerPlanItemInstance(taskA.getId());
         
-        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(4, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         
-        cmmnRepositoryService.deleteDeploymentAndRelatedData(oneTaskCaseDeploymentId);
+        cmmnRepositoryService.deleteDeployment(oneTaskCaseDeploymentId, true);
     }
     
 }

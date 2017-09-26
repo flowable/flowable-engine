@@ -30,7 +30,7 @@ public interface CmmnRepositoryService {
 
     CmmnModel getCmmnModel(String caseDefinitionId);
     
-    void deleteDeploymentAndRelatedData(String deploymentId);
+    void deleteDeployment(String deploymentId, boolean cascade);
     
     CmmnDeploymentQuery createDeploymentQuery();
     

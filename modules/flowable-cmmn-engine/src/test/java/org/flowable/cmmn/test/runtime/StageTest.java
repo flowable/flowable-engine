@@ -32,7 +32,7 @@ public class StageTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testOneNestedStage() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .orderByName().asc()
@@ -47,7 +47,7 @@ public class StageTest extends FlowableCmmnTestCase {
        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(3).getId());
        
-       planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+       planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                .caseInstanceId(caseInstance.getId())
                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                .orderByName().asc()
@@ -60,7 +60,7 @@ public class StageTest extends FlowableCmmnTestCase {
        
        // Finish case instance
        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
-       assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
+       assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }
@@ -69,7 +69,7 @@ public class StageTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testOneNestedStageNonBlocking() {
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }
@@ -78,7 +78,7 @@ public class StageTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testTwoNestedStages() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .orderByName().asc()
                 .list();
@@ -90,7 +90,7 @@ public class StageTest extends FlowableCmmnTestCase {
        
        // Complete inner nested stage
        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
-       planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+       planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                .caseInstanceId(caseInstance.getId())
                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                .orderByName().asc()
@@ -106,7 +106,7 @@ public class StageTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testTwoNestedStagesNonBlocking() {
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }
@@ -115,7 +115,7 @@ public class StageTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testThreeNestedStages() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .orderByName().asc()
                 .list();
@@ -128,7 +128,7 @@ public class StageTest extends FlowableCmmnTestCase {
 
         // Complete inner nested stage (3th stage)
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(3).getId());
-        planItemInstances = cmmnRuntimeService.createPlanItemQuery().caseInstanceId(caseInstance.getId())
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .orderByName().asc()
                 .list();
@@ -141,7 +141,7 @@ public class StageTest extends FlowableCmmnTestCase {
 
         // Commplete inner nested stage (2nd stage)
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
-        planItemInstances = cmmnRuntimeService.createPlanItemQuery().caseInstanceId(caseInstance.getId())
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .orderByName().asc()
                 .list();
@@ -154,7 +154,7 @@ public class StageTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(3).getId());
         
-        planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .orderByName().asc()
@@ -166,7 +166,7 @@ public class StageTest extends FlowableCmmnTestCase {
         }
         
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
-        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }
@@ -175,7 +175,7 @@ public class StageTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testThreeNestedStagesNonBlocking() {
         cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }
@@ -184,7 +184,7 @@ public class StageTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testThreeNestedStagesWithCriteria() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .orderByName().asc()
@@ -199,7 +199,7 @@ public class StageTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(1).getId());
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(2).getId());
         
-        planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .orderByName().asc()
@@ -213,7 +213,7 @@ public class StageTest extends FlowableCmmnTestCase {
         // Triggering Task C should exit stage 2, which should also exit the inner nested stage
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(3).getId());
         
-        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }
@@ -222,10 +222,10 @@ public class StageTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testTerminateCaseInstanceNestedStages() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-        assertEquals(8, cmmnRuntimeService.createPlanItemQuery().count());
+        assertEquals(8, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         
         cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
-        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().count());
+        assertEquals(0, cmmnRuntimeService.createPlanItemInstanceQuery().count());
         assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
     }

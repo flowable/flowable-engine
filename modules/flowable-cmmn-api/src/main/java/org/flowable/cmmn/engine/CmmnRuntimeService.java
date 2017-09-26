@@ -40,7 +40,7 @@ public interface CmmnRuntimeService {
     
     CaseInstanceQuery createCaseInstanceQuery();
     
-    PlanItemInstanceQuery createPlanItemQuery();
+    PlanItemInstanceQuery createPlanItemInstanceQuery();
     
     MilestoneInstanceQuery createMilestoneInstanceQuery();
     
