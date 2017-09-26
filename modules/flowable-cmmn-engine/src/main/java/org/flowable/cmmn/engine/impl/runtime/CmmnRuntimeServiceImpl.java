@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnRuntimeService;
 import org.flowable.cmmn.engine.impl.ServiceImpl;
+import org.flowable.cmmn.engine.impl.cmd.EvaluateCriteriaCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.RemoveVariableCmd;
@@ -50,6 +51,11 @@ public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeSe
     @Override
     public void terminateCaseInstance(String caseInstanceId) {
         commandExecutor.execute(new TerminateCaseInstanceCmd(caseInstanceId));
+    }
+    
+    @Override
+    public void evaluateCriteria(String caseInstanceId) {
+        commandExecutor.execute(new EvaluateCriteriaCmd(caseInstanceId));
     }
 
     @Override

@@ -120,7 +120,7 @@ public class PlanItemInstanceQueryImpl extends AbstractQuery<PlanItemInstanceQue
     }
     
     @Override
-    public PlanItemInstanceQuery planItemInstanceStatCompleted() {
+    public PlanItemInstanceQuery planItemInstanceStateCompleted() {
         return planItemInstanceState(PlanItemInstanceState.COMPLETED);
     }
     

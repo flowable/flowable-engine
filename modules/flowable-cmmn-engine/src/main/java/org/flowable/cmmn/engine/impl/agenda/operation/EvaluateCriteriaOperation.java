@@ -213,8 +213,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                     }
                 }
 
-                if (sentry.getOnParts().size() == entityWithSentryPartInstances.getSatisfiedSentryPartInstances().size()
-                        && (sentry.getSentryIfPart() == null || sentryIfPartSatisfied)) {
+                if (entityWithSentryPartInstances.getSatisfiedSentryPartInstances().size() == (sentry.getOnParts().size() + (sentry.getSentryIfPart() != null ? 1 : 0))) {
                     return CriteriaEvaluationResult.SENTRY_SATISFIED;
                 } else if (criteriaSatisfied) {
                     partTriggered = true;

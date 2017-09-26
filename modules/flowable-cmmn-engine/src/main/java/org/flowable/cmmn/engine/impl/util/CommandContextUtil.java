@@ -12,6 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.util;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
@@ -40,6 +43,8 @@ import org.flowable.variable.service.VariableServiceConfiguration;
  * @author Joram Barrez
  */
 public class CommandContextUtil {
+    
+    public static final String ATTRIBUTE_INVOLVED_CASE_INSTANCE_IDS = "ctx.attribute.involvedCaseInstanceIds";
     
     public static CmmnEngineConfiguration getCmmnEngineConfiguration() {
         return getCmmnEngineConfiguration(getCommandContext());
@@ -201,6 +206,30 @@ public class CommandContextUtil {
     
     public static EntityCache getEntityCache(CommandContext commandContext) {
         return commandContext.getSession(EntityCache.class);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static void addInvolvedCaseInstanceId(CommandContext commandContext, String caseInstanceId) {
+        if (caseInstanceId != null) {
+            Set<String> involvedCaseInstanceIds = null;
+            Object obj = commandContext.getAttribute(ATTRIBUTE_INVOLVED_CASE_INSTANCE_IDS);
+            if (obj != null) {
+                involvedCaseInstanceIds = (Set<String>) obj;
+            } else {
+                involvedCaseInstanceIds = new HashSet<>(1); // typically will be only 1 entry
+                commandContext.addAttribute(ATTRIBUTE_INVOLVED_CASE_INSTANCE_IDS, involvedCaseInstanceIds);
+            }
+            involvedCaseInstanceIds.add(caseInstanceId);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static Set<String> getInvolvedCaseInstanceIds(CommandContext commandContext) {
+         Object obj = commandContext.getAttribute(ATTRIBUTE_INVOLVED_CASE_INSTANCE_IDS);
+         if (obj != null) {
+             return (Set<String>) obj;
+         }
+         return null;
     }
     
     public static CaseInstanceHelper getCaseInstanceHelper() {

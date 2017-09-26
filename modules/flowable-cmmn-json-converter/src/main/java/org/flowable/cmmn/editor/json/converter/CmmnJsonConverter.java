@@ -367,26 +367,12 @@ public class CmmnJsonConverter implements EditorJsonConstants, StencilConstants,
                         continue;
                     }
                     
-                    if (!associationMap.containsKey(criterion.getId())) {
-                        continue;
-                    }
+                    parentStage.addSentry(criterion.getSentry());
                     
-                    List<Association> associations = associationMap.get(criterion.getId()); 
-                    for (Association association : associations) {
-                        PlanItem criterionPlanItem = null;
-                        if (association.getSourceRef().equals(criterion.getId())) {
-                            criterionPlanItem = (PlanItem) association.getTargetElement();
-                        } else {
-                            criterionPlanItem = (PlanItem) association.getSourceElement();
-                        }
-                        
-                        SentryOnPart sentryOnPart = new SentryOnPart();
-                        sentryOnPart.setId("sentryOnPart" + cmmnModelIdHelper.nextSentryOnPartId());
-                        sentryOnPart.setSourceRef(criterionPlanItem.getId());
-                        sentryOnPart.setSource(criterionPlanItem);
-                        sentryOnPart.setStandardEvent("complete"); // todo: needs to come from model
-                        criterion.getSentry().addSentryOnPart(sentryOnPart);
-                        
+                    boolean associationsFound = associationMap.containsKey(criterion.getId()); 
+                    if (!associationsFound && criterion.getSentry() == null) {
+                        continue;
+                    } else {
                         if (criterion.isEntryCriterion()) {
                             planItem.addEntryCriterion(criterion);
                         } else if (criterion.isExitCriterion()) {
@@ -394,7 +380,25 @@ public class CmmnJsonConverter implements EditorJsonConstants, StencilConstants,
                         }
                     }
                     
-                    parentStage.addSentry(criterion.getSentry());
+                    if (associationsFound) {
+                        List<Association> associations = associationMap.get(criterion.getId()); 
+                        for (Association association : associations) {
+                            PlanItem criterionPlanItem = null;
+                            if (association.getSourceRef().equals(criterion.getId())) {
+                                criterionPlanItem = (PlanItem) association.getTargetElement();
+                            } else {
+                                criterionPlanItem = (PlanItem) association.getSourceElement();
+                            }
+                            
+                            SentryOnPart sentryOnPart = new SentryOnPart();
+                            sentryOnPart.setId("sentryOnPart" + cmmnModelIdHelper.nextSentryOnPartId());
+                            sentryOnPart.setSourceRef(criterionPlanItem.getId());
+                            sentryOnPart.setSource(criterionPlanItem);
+                            sentryOnPart.setStandardEvent("complete"); // todo: needs to come from model
+                            criterion.getSentry().addSentryOnPart(sentryOnPart);
+                        }
+                    }
+                    
                 }
             }
         }

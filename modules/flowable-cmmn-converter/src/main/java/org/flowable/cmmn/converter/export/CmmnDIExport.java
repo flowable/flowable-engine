@@ -102,7 +102,7 @@ public class CmmnDIExport implements CmmnXmlConstants {
         xtw.writeEndElement();
         
         // The xsd requires a CMMNLabel to be there, even though the spec text says it's optional
-        xtw.writeStartElement(OMGDI_PREFIX, ELEMENT_DI_LABEL, OMGDI_NAMESPACE);
+        xtw.writeStartElement(CMMNDI_PREFIX, ELEMENT_DI_LABEL, CMMNDI_NAMESPACE);
         xtw.writeEndElement();
 
         xtw.writeEndElement();
@@ -126,6 +126,10 @@ public class CmmnDIExport implements CmmnXmlConstants {
             xtw.writeAttribute(ATTRIBUTE_DI_Y, String.valueOf(graphicInfo.getY()));
             xtw.writeEndElement();
         }
+        
+        // The xsd requires a CMMNLabel to be there, even though the spec text says it's optional
+        xtw.writeStartElement(CMMNDI_PREFIX, ELEMENT_DI_LABEL, CMMNDI_NAMESPACE);
+        xtw.writeEndElement();
 
         xtw.writeEndElement();
     }

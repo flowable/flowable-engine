@@ -12,6 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.interceptor;
 
+import java.util.Set;
+
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.impl.context.Context;
@@ -45,8 +47,16 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
                 }
             });
             executeOperations(commandContext);
+            
+            Set<String> involvedCaseInstanceIds = CommandContextUtil.getInvolvedCaseInstanceIds(commandContext);
+            if (involvedCaseInstanceIds != null) {
+                for (String caseInstanceId : involvedCaseInstanceIds) {
+                    CommandContextUtil.getAgenda(commandContext).planEvaluateCriteria(caseInstanceId);
+                }
+                executeOperations(commandContext);
+            }
         }
-      
+        
         return (T) commandContext.getResult();
     }
 
