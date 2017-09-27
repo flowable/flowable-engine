@@ -487,7 +487,7 @@
     "hide" : true,
     "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage" ],
     "hiddenPropertyPackages" : [ ],
-    "roles" : [ ]
+    "roles" : [ "StageModelActivity" ]
   }, {
     "type" : "node",
     "id" : "Stage",
@@ -499,7 +499,7 @@
     "hide" : true,
     "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage" ],
     "hiddenPropertyPackages" : [ ],
-    "roles" : [ "all" ]
+    "roles" : [ "StageActivity", "all" ]
   }, {
     "type" : "node",
     "id" : "Task",
@@ -554,7 +554,7 @@
     "groups" : [ "Sentries" ],
     "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "ifpartconditionpackage" ],
     "hiddenPropertyPackages" : [ ],
-    "roles" : [ "association_start", "SentriesMorph", "SentryOnItemBoundary" ]
+    "roles" : [ "association_start", "SentriesMorph", "EntryCriterionOnItemBoundary" ]
   }, {
     "type" : "node",
     "id" : "ExitCriterion",
@@ -565,7 +565,7 @@
     "groups" : [ "Sentries" ],
     "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "ifpartconditionpackage" ],
     "hiddenPropertyPackages" : [ ],
-    "roles" : [ "association_start", "SentriesMorph", "SentryOnItemBoundary" ]
+    "roles" : [ "association_start", "SentriesMorph", "ExitCriterionOnItemBoundary" ]
   }, {
     "type" : "edge",
     "id" : "Association",
@@ -602,12 +602,27 @@
         "to" : [ "association_end" ]
       } ]
     }, {
-      "role" : "SentryOnItemBoundary",
+      "role" : "EntryCriterionOnItemBoundary",
       "connects" : [ {
         "from" : "Activity",
-        "to" : [ "SentryOnItemBoundary" ]
-      } ]
-    }],
+        "to" : [ "EntryCriterionOnItemBoundary"]
+      }, {
+        "from" : "StageActivity",
+        "to" : [ "EntryCriterionOnItemBoundary"]
+      }]},  {
+        "role" : "ExitCriterionOnItemBoundary",
+        "connects" : [ {
+          "from" : "Activity",
+          "to" : [ "ExitCriterionOnItemBoundary" ]
+        }, {
+          "from" : "StageActivity",
+          "to" : [ "ExitCriterionOnItemBoundary"]
+        }, {
+          "from" : "StageModelActivity",
+          "to" : [ "ExitCriterionOnItemBoundary"]
+        }
+      ]}
+    ],
     "containmentRules" : [ {
       "role" : "CaseDiagram",
       "contains" : [ "CasePlanModel" ]
