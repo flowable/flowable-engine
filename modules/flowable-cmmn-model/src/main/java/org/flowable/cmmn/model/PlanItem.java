@@ -67,50 +67,62 @@ public class PlanItem extends CaseElement implements HasEntryCriteria, HasExitCr
         this.criteriaRefs = criteriaRefs;
     }
     
+    @Override
     public void addEntryCriterion(Criterion entryCriterion) {
         this.entryCriteria.add(entryCriterion);
     }
 
+    @Override
     public List<Criterion> getEntryCriteria() {
         return entryCriteria;
     }
 
+    @Override
     public void setEntryCriteria(List<Criterion> entryCriteria) {
         this.entryCriteria = entryCriteria;
     }
     
+    @Override
     public void addExitCriterion(Criterion exitCriterion) {
         this.exitCriteria.add(exitCriterion);
     }
     
+    @Override
     public List<Criterion> getExitCriteria() {
         return exitCriteria;
     }
 
+    @Override
     public void setExitCriteria(List<Criterion> exitCriteria) {
         this.exitCriteria = exitCriteria;
     }
     
+    @Override
     public void addIncomingAssociation(Association association) {
         this.incomingAssociations.add(association);
     }
     
+    @Override
     public List<Association> getIncomingAssociations() {
         return incomingAssociations;
     }
     
+    @Override
     public void setIncomingAssociations(List<Association> incomingAssociations) {
         this.incomingAssociations = incomingAssociations;
     }
     
+    @Override
     public void addOutgoingAssociation(Association association) {
         this.outgoingAssociations.add(association);
     }
     
+    @Override
     public List<Association> getOutgoingAssociations() {
         return outgoingAssociations;
     }
     
+    @Override
     public void setOutgoingAssociations(List<Association> outgoingAssociations) {
         this.outgoingAssociations = outgoingAssociations;
     }

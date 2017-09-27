@@ -16,6 +16,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
+import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Sentry;
@@ -54,6 +55,24 @@ public class StageExport implements CmmnXmlConstants {
         
         for (PlanItemDefinition planItemDefinition : stage.getPlanItemDefinitions()) {
             PlanItemDefinitionExport.writePlanItemDefinition(planItemDefinition, xtw);
+        }
+        
+        if (stage.isPlanModel() && stage.getExitCriteria() != null && !stage.getExitCriteria().isEmpty()) {
+            for (Criterion exitCriterion : stage.getExitCriteria()) {
+                xtw.writeStartElement(ELEMENT_EXIT_CRITERION);
+                xtw.writeAttribute(ATTRIBUTE_ID, exitCriterion.getId());
+
+                if (StringUtils.isNotEmpty(exitCriterion.getName())) {
+                    xtw.writeAttribute(ATTRIBUTE_NAME, exitCriterion.getName());
+                }
+
+                if (StringUtils.isNotEmpty(exitCriterion.getSentryRef())) {
+                    xtw.writeAttribute(ATTRIBUTE_SENTRY_REF, exitCriterion.getSentryRef());
+                }
+                
+                // end entry criterion element
+                xtw.writeEndElement();
+            }
         }
         
         // end plan model or stage element

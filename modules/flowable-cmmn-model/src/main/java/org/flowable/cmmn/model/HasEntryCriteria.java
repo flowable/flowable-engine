@@ -19,6 +19,8 @@ import java.util.List;
  */
 public interface HasEntryCriteria {
     
+    void addEntryCriterion(Criterion entryCriterion);
+    
     List<Criterion> getEntryCriteria();
     
     void setEntryCriteria(List<Criterion> entryCriteria);

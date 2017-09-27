@@ -625,7 +625,7 @@
     ],
     "containmentRules" : [ {
       "role" : "CaseDiagram",
-      "contains" : [ "CasePlanModel" ]
+      "contains" : [ "CasePlanModel", "ExitCriterion" ]
     }, {
       "role" : "CasePlanModel",
       "contains" : [ "all" ]

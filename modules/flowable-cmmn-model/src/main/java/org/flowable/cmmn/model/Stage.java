@@ -84,11 +84,18 @@ public class Stage extends PlanFragment implements HasExitCriteria {
     public void setPlanModel(boolean isPlanModel) {
         this.isPlanModel = isPlanModel;
     }
+    
+    @Override
+    public void addExitCriterion(Criterion exitCriterion) {
+        exitCriteria.add(exitCriterion);
+    }
 
+    @Override
     public List<Criterion> getExitCriteria() {
         return exitCriteria;
     }
 
+    @Override
     public void setExitCriteria(List<Criterion> exitCriteria) {
         this.exitCriteria = exitCriteria;
     }

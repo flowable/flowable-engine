@@ -80,6 +80,11 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
                     BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
         
         Criterion criterion = new Criterion();
+        String id = CmmnJsonConverterUtil.getElementId(elementNode);
+        if (StringUtils.isBlank(id)) {
+            id = "criterion_" + cmmnModelIdHelper.nextCriterionId();
+        }
+        criterion.setId(id);
         criterion.setTechnicalId(CmmnJsonConverterUtil.getShapeId(elementNode));
         String stencilId = CmmnJsonConverterUtil.getStencilId(elementNode);
         if (STENCIL_ENTRY_CRITERION.equals(stencilId)) {
