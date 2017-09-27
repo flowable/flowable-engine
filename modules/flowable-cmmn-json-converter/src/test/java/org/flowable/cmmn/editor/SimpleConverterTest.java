@@ -64,7 +64,7 @@ public class SimpleConverterTest extends AbstractConverterTest {
         assertEquals(718.0, graphicInfo.getWidth(), 0.1);
         assertEquals(714.0, graphicInfo.getHeight(), 0.1);
 
-        PlanItem planItem = planModelStage.findPlanItem("planItem1");
+        PlanItem planItem = planModelStage.findPlanItemInPlanFragmentOrUpwards("planItem1");
         assertNotNull(planItem);
         assertEquals("planItem1", planItem.getId());
         assertEquals("Task B", planItem.getName());

@@ -343,7 +343,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
     protected void processPlanFragment(CmmnModel cmmnModel, PlanFragment planFragment) {
         processPlanItems(cmmnModel, planFragment);
-        processSentries(planFragment);
+        processSentries(cmmnModel.getPrimaryCase().getPlanModel(), planFragment);
 
         if (planFragment instanceof Stage) {
             Stage stage = (Stage) planFragment;
@@ -433,10 +433,10 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         }
     }
 
-    protected void processSentries(PlanFragment planFragment) {
+    protected void processSentries(Stage planModelStage, PlanFragment planFragment) {
         for (Sentry sentry : planFragment.getSentries()) {
             for (SentryOnPart onPart : sentry.getOnParts()) {
-                PlanItem planItem = sentry.getParent().findPlanItem(onPart.getSourceRef());
+                PlanItem planItem = planModelStage.findPlanItemInPlanFragmentOrDownwards(onPart.getSourceRef());
                 if (planItem != null) {
                     onPart.setSource(planItem);
                 } else {

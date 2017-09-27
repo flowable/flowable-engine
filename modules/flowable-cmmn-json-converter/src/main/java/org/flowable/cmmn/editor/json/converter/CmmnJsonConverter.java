@@ -370,13 +370,13 @@ public class CmmnJsonConverter implements EditorJsonConstants, StencilConstants,
         
         for (PlanItem planItem : planItems) {
             PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
+            
+            if (planItemDefinition instanceof Stage) {
+                Stage stage = (Stage) planItemDefinition;
+                postProcessElements(stage, stage.getPlanItems(), edgeMap, associationMap, cmmnModel, cmmnModelIdHelper);
+            }
+            
              if (CollectionUtils.isNotEmpty(planItem.getCriteriaRefs())) {
-                 
-                 if (planItemDefinition instanceof Stage) {
-                     Stage stage = (Stage) planItemDefinition;
-                     postProcessElements(stage, stage.getPlanItems(), edgeMap, associationMap, cmmnModel, cmmnModelIdHelper);
-                 }
-                 
                  createSentryParts(planItem.getCriteriaRefs(), parentStage, associationMap, cmmnModel, cmmnModelIdHelper, planItem, planItem);
             }
         }

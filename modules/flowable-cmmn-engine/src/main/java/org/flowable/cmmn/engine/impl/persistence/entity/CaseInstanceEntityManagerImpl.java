@@ -83,6 +83,12 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         for (VariableInstanceEntity variableInstanceEntity : variableInstanceEntities) {
             variableInstanceEntityManager.delete(variableInstanceEntity);
         }
+        
+        // Sentry part instances
+        List<SentryPartInstanceEntity> sentryPartInstances = caseInstanceEntity.getSatisfiedSentryPartInstances();
+        for (SentryPartInstanceEntity sentryPartInstanceEntity : sentryPartInstances) {
+            CommandContextUtil.getSentryPartInstanceEntityManager(commandContext).delete(sentryPartInstanceEntity);
+        }
 
         // Runtime milestones
         MilestoneInstanceEntityManager milestoneInstanceEntityManager = CommandContextUtil.getMilestoneInstanceEntityManager(commandContext);

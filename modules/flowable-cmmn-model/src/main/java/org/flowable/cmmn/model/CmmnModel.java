@@ -107,7 +107,7 @@ public class CmmnModel {
     public PlanItem findPlanItem(String id) {
         PlanItem foundPlanItem = null;
         for (Case caseModel : cases) {
-            foundPlanItem = caseModel.getPlanModel().findPlanItem(id);
+            foundPlanItem = caseModel.getPlanModel().findPlanItemInPlanFragmentOrUpwards(id);
             if (foundPlanItem != null) {
                 break;
             }
@@ -116,7 +116,7 @@ public class CmmnModel {
         if (foundPlanItem == null) {
             for (Case caseModel : cases) {
                 for (Stage stage : caseModel.getPlanModel().findPlanItemDefinitionsOfType(Stage.class, true)) {
-                    foundPlanItem = stage.findPlanItem(id);
+                    foundPlanItem = stage.findPlanItemInPlanFragmentOrUpwards(id);
                     if (foundPlanItem != null) {
                         break;
                     }

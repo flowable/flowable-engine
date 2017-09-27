@@ -25,15 +25,30 @@ public class PlanFragment extends PlanItemDefinition {
     protected Case caze;
     protected Map<String, PlanItem> planItemMap = new LinkedHashMap<>();
     protected List<Sentry> sentries = new ArrayList<>();
-
-    public PlanItem findPlanItem(String planItemId) {
+    
+    public PlanItem findPlanItemInPlanFragmentOrDownwards(String planItemId) {
+        for (PlanItem planItem : planItemMap.values()) {
+            if (planItem.getId().equals(planItemId)) {
+                return planItem;
+            }
+            if (planItem.getPlanItemDefinition() instanceof PlanFragment) {
+                PlanItem p = ((PlanFragment) planItem.getPlanItemDefinition()).findPlanItemInPlanFragmentOrDownwards(planItemId);
+                if (p != null) {
+                    return p;
+                }
+            }
+        }
+        return null;
+    }
+    
+    public PlanItem findPlanItemInPlanFragmentOrUpwards(String planItemId) {
         if (planItemMap.containsKey(planItemId)) {
             return planItemMap.get(planItemId);
         }
-
+        
         PlanFragment parentPlanFragment = getParent();
         if (parentPlanFragment != null) {
-            return parentPlanFragment.findPlanItem(planItemId);
+            return parentPlanFragment.findPlanItemInPlanFragmentOrUpwards(planItemId);
         }
 
         return null;
@@ -45,7 +60,7 @@ public class PlanFragment extends PlanItemDefinition {
                 return sentry;
             }
         }
-
+        
         PlanFragment parentPlanFragment = getParent();
         if (parentPlanFragment != null) {
             return parentPlanFragment.findSentry(sentryId);

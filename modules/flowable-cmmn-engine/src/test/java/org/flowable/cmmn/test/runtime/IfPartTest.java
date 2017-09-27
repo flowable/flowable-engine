@@ -149,6 +149,119 @@ public class IfPartTest extends FlowableCmmnTestCase {
         assertNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().planItemInstanceName("B").singleResult());
     }
     
+    @Test
+    @CmmnDeployment
+    public void testExitPlanModelWithIfPart() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testExitPlanModelWithIfPart").start();
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().orderByName().asc().list();
+        assertEquals(2, planItemInstances.size());
+        assertEquals("A", planItemInstances.get(0).getName());
+        assertEquals("B", planItemInstances.get(1).getName());
+        
+        // Completing B terminates the case through one of the exit criteria
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(1).getId());
+        assertCaseInstanceEnded(caseInstance);
+        
+        // Now B isn't completed, but A is. When the variable is set, the case is terminated
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testExitPlanModelWithIfPart").start();
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().orderByName().asc().list();
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
+        assertEquals(1, cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().count());
+        
+        cmmnRuntimeService.setVariables(caseInstance.getId(), CollectionUtil.singletonMap("exitPlanModelVariable", true));
+        assertCaseInstanceEnded(caseInstance);
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testNestedStagesWithIfPart() {
+        // Start case, activate inner nested stage
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testNestedStagesWithIfPart").start();
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().orderByName().asc().list();
+        assertEquals(4, planItemInstances.size());
+        assertEquals("A", planItemInstances.get(0).getName());
+        assertEquals("C", planItemInstances.get(1).getName());
+        assertEquals("Stage1", planItemInstances.get(2).getName());
+        assertEquals("Stage2", planItemInstances.get(3).getName());
+        assertNotNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateAvailable().planItemInstanceName("Stage3").singleResult());
+        
+        cmmnRuntimeService.setVariables(caseInstance.getId(), CollectionUtil.singletonMap("nestedStageEntryVariable", true));
+        assertEquals(6, cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().orderByName().asc().count());
+        PlanItemInstance planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().planItemInstanceName("B").singleResult();
+        assertNotNull(planItemInstanceB);
+        
+        // Triggering B should delete all stages
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstanceB.getId());
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().orderByName().asc().list();
+        assertEquals(1, planItemInstances.size());
+        assertEquals("A", planItemInstances.get(0).getName());
+
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
+        assertCaseInstanceEnded(caseInstance);
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testNestedStagesWithIfPart2() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testNestedStagesWithIfPart").start();
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().orderByName().asc().list();
+        assertEquals(4, planItemInstances.size());
+
+        // Setting the destroyStages variables, deletes all stages
+        cmmnRuntimeService.setVariables(caseInstance.getId(), CollectionUtil.singletonMap("destroyStages", true));
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().orderByName().asc().list();
+        assertEquals(1, planItemInstances.size());
+        assertEquals("A", planItemInstances.get(0).getName());
+
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
+        assertCaseInstanceEnded(caseInstance);
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testNestedStagesWithIfPart3() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testNestedStagesWithIfPart").start();
+        assertEquals(4, cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().count());
+        
+        /// Setting the destroyAll variable should terminate all
+        cmmnRuntimeService.setVariables(caseInstance.getId(), CollectionUtil.singletonMap("destroyAll", true));
+        assertCaseInstanceEnded(caseInstance);
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testStageWithExitIfPart() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testStageWithExitIfPart")
+                .variable("enableStage", true)
+                .start();
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().orderByName().asc().list();
+        assertEquals(4, planItemInstances.size());
+        assertEquals("A", planItemInstances.get(0).getName());
+        assertEquals("B", planItemInstances.get(1).getName());
+        assertEquals("C", planItemInstances.get(2).getName());
+        
+        // Triggering A should terminate the stage and thus also the case
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
+        assertCaseInstanceEnded(caseInstance);
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testStageWithExitIfPart2() {
+        // Not setting the enableStage variable now
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testStageWithExitIfPart")
+                .start();
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().orderByName().asc().list();
+        assertEquals(1, planItemInstances.size());
+        assertEquals("A", planItemInstances.get(0).getName());
+        
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
+        assertCaseInstanceEnded(caseInstance);
+    }
+    
     public static class TestBean implements Serializable {
         
         public static boolean RETURN_VALUE;
