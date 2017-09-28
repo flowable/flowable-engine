@@ -19,12 +19,21 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.util.CollectionUtil;
+import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.service.Task;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * @author Joram Barrez
@@ -550,6 +559,57 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
             tasks = taskService.createTaskQuery().list();
         }
         assertEquals(0L, runtimeService.createProcessInstanceQuery().count());
+
+    }
+
+    @Deployment
+    public void testInsideEventSubProcessBug() {
+
+        ProcessDefinition processDefinition = repositoryService
+                .createProcessDefinitionQuery()
+                .processDefinitionKey("b92d819d-481f-4001-834e-cbdfa6ee0fad")
+                .singleResult();
+
+        //make sure both conditions are true for the sequence flows of the inclusive gateway
+        final ProcessInstance instance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionId(processDefinition.getId())
+                .variable("test", true)
+                .variable("test2", true)
+                .start();
+
+        List<Task> tasks = taskService
+                .createTaskQuery()
+                .processDefinitionId(instance.getProcessDefinitionId())
+                .list();
+
+        assertEquals(1, tasks.size());
+
+        String executionId = processEngine.getManagementService().executeCommand(new Command<String>() {
+            @Override
+            public String execute(CommandContext commandContext) {
+                EventSubscriptionQueryImpl q = new EventSubscriptionQueryImpl(commandContext);
+                q.processInstanceId(instance.getProcessInstanceId());
+
+                List<EventSubscription> subs = CommandContextUtil
+                        .getEventSubscriptionEntityManager()
+                        .findEventSubscriptionsByQueryCriteria(q);
+
+                assertEquals(1, subs.size());
+                EventSubscription sub = subs.get(0);
+                assertEquals(sub.getEventName(), "test");
+
+                return sub.getExecutionId();
+            }
+        });
+
+        //send the message, after this we are inside the event subprocess
+        runtimeService.messageEventReceived("test", executionId);
+        tasks = taskService.createTaskQuery()
+                .processDefinitionId(instance.getProcessDefinitionId())
+                .list();
+
+        //since it is non interupting, we now expect 3 tasks to be present
+        assertEquals(3, tasks.size());
 
     }
 
