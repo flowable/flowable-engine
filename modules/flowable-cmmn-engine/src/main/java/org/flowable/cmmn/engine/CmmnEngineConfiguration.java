@@ -33,6 +33,7 @@ import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaFactory;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaSessionFactory;
 import org.flowable.cmmn.engine.impl.agenda.DefaultCmmnEngineAgendaFactory;
 import org.flowable.cmmn.engine.impl.callback.ChildCaseInstanceStateChangeCallback;
+import org.flowable.cmmn.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
 import org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.db.CmmnDbSchemaManager;
 import org.flowable.cmmn.engine.impl.db.EntityDependencyOrder;
@@ -197,6 +198,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     protected ExpressionManager expressionManager;
     protected List<FlowableFunctionDelegate> flowableFunctionDelegates;
     protected List<FlowableFunctionDelegate> customFlowableFunctionDelegates;
+    
+    /**
+     * Using field injection together with a delegate expression for a service task / execution listener / task listener is not thread-sade , see user guide section 'Field Injection' for more
+     * information.
+     * <p>
+     * Set this flag to false to throw an exception at runtime when a field is injected and a delegateExpression is used.
+     */
+    protected DelegateExpressionFieldInjectionMode delegateExpressionFieldInjectionMode = DelegateExpressionFieldInjectionMode.MIXED;
 
     // Variable support
     protected DbSchemaManager variableDbSchemaManager;
@@ -985,6 +994,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
 
     public CmmnEngineConfiguration setExpressionManager(ExpressionManager expressionManager) {
         this.expressionManager = expressionManager;
+        return this;
+    }
+
+    public DelegateExpressionFieldInjectionMode getDelegateExpressionFieldInjectionMode() {
+        return delegateExpressionFieldInjectionMode;
+    }
+
+    public CmmnEngineConfiguration setDelegateExpressionFieldInjectionMode(DelegateExpressionFieldInjectionMode delegateExpressionFieldInjectionMode) {
+        this.delegateExpressionFieldInjectionMode = delegateExpressionFieldInjectionMode;
         return this;
     }
 

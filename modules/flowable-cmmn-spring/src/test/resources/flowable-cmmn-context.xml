@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
+        <property name="driverClass" value="org.h2.Driver"/>
+        <property name="url" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000"/>
+        <property name="username" value="sa"/>
+        <property name="password" value=""/>
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="cmmnEngineConfiguration" class="org.flowable.cmmn.spring.SpringCmmnEngineConfiguration">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="databaseSchemaUpdate" value="true"/>
+    </bean>
+
+    <bean id="cmmnEngine" class="org.flowable.cmmn.spring.CmmnEngineFactoryBean">
+        <property name="cmmnEngineConfiguration" ref="cmmnEngineConfiguration"/>
+    </bean>
+
+    <bean id="cmmnRepositoryService" factory-bean="cmmnEngine" factory-method="getCmmnRepositoryService"/>
+    <bean id="cmmnRuntimeService" factory-bean="cmmnEngine" factory-method="getCmmnRuntimeService"/>
+
+</beans>

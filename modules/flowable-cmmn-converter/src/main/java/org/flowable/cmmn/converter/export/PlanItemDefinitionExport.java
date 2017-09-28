@@ -20,6 +20,7 @@ import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ProcessTask;
+import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
 
@@ -37,6 +38,9 @@ public class PlanItemDefinitionExport implements CmmnXmlConstants {
         
         } else if (planItemDefinition instanceof CaseTask) {
             CaseTaskExport.writeCaseTask((CaseTask) planItemDefinition, xtw);
+            
+        } else if (planItemDefinition instanceof ServiceTask) {
+            ServiceTaskExport.writeTask((ServiceTask) planItemDefinition, xtw);
         
         } else if (planItemDefinition instanceof Task) {
             TaskExport.writeTask((Task) planItemDefinition, xtw);

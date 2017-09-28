@@ -16,7 +16,7 @@
 
 	<properties>
 		<flowable.artifact>
-			org.flowable.form.spring.configurator
+			org.flowable.dmn.spring.configurator
 		</flowable.artifact>
 	</properties>
 	

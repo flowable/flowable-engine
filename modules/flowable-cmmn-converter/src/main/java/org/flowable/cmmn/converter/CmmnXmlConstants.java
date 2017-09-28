@@ -74,7 +74,19 @@ public interface CmmnXmlConstants {
     String ELEMENT_PROCESS_REF_EXPRESSION = "processRefExpression";
     String ELEMENT_CONDITION = "condition";
     
+    String ATTRIBUTE_TYPE = "type";
+    
     String ATTRIBUTE_CLASS = "class";
+    String ATTRIBUTE_EXPRESSION = "expression";
+    String ATTRIBUTE_DELEGATE_EXPRESSION = "delegateExpression";
+    
+    String ATTRIBUTE_RESULT_VARIABLE_NAME = "resultVariableName";
+    
+    String ELEMENT_FIELD = "field";
+    String ATTRIBUTE_FIELD_STRING = "stringValue";
+    String ATTRIBUTE_FIELD_EXPRESSION = "expression";
+    String ELEMENT_FIELD_STRING = "string";
+    String ELEMENT_FIELD_EXPRESSION = "expression";
     
     String ELEMENT_DI_CMMN = "CMMNDI";
     String ELEMENT_DI_DIAGRAM = "CMMNDiagram";

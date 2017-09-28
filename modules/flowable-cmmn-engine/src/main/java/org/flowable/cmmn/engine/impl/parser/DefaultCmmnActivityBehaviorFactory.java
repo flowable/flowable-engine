@@ -15,6 +15,8 @@ package org.flowable.cmmn.engine.impl.parser;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.behavior.impl.CaseTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.MilestoneActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemDelegateExpressionActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemExpressionActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.ProcessTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.StageActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.TaskActivityBehavior;
@@ -24,6 +26,7 @@ import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.ProcessTask;
+import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
 import org.flowable.engine.common.api.delegate.Expression;
@@ -73,8 +76,18 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     }
     
     @Override
-    public CmmnClassDelegate createCmmnClassDelegate(PlanItem planItem, Task task) {
-        return classDelegateFactory.create(task.getClassName());
+    public CmmnClassDelegate createCmmnClassDelegate(PlanItem planItem, ServiceTask task) {
+        return classDelegateFactory.create(task.getImplementation());
+    }
+
+    @Override
+    public PlanItemExpressionActivityBehavior createPlanItemExpressionActivityBehavior(PlanItem planItem, ServiceTask task) {
+        return new PlanItemExpressionActivityBehavior(task.getImplementation(), task.getResultVariableName());
+    }
+
+    @Override
+    public PlanItemDelegateExpressionActivityBehavior createPlanItemDelegateExpressionActivityBehavior(PlanItem planItem, ServiceTask task) {
+        return new PlanItemDelegateExpressionActivityBehavior(task.getImplementation(), task.getFieldExtensions());
     }
 
     public CmmnClassDelegateFactory getClassDelegateFactory() {
