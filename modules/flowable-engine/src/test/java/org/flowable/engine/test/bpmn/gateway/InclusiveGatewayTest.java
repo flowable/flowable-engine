@@ -33,8 +33,6 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.service.Task;
 
-import static org.junit.Assert.assertEquals;
-
 /**
  * @author Joram Barrez
  * @author Tom Van Buskirk
@@ -562,8 +560,9 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
 
     }
 
+    // See https://github.com/flowable/flowable-engine/issues/582
     @Deployment
-    public void testInsideEventSubProcessBug() {
+    public void testInclusiveGatewayInEventSubProcess() {
 
         ProcessDefinition processDefinition = repositoryService
                 .createProcessDefinitionQuery()
