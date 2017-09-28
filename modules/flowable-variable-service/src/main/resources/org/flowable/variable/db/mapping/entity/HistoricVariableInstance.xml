@@ -21,7 +21,7 @@
     <!-- HISTORIC PROCESS VARIABLE INSERT -->
 
     <insert id="insertHistoricVariableInstance" parameterType="org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl">
-        insert into ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, SCOPE_ID_, SCOPE_TYPE_,
+        insert into ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_,
             BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, CREATE_TIME_, LAST_UPDATED_TIME_)
         values (
             #{id, jdbcType=VARCHAR},
@@ -32,6 +32,7 @@
             #{revision, jdbcType=VARCHAR},
             #{variableType, jdbcType=VARCHAR},
             #{scopeId, jdbcType=VARCHAR},
+            #{subScopeId, jdbcType=VARCHAR},
             #{scopeType, jdbcType=VARCHAR},
             #{byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
             #{doubleValue, jdbcType=DOUBLE},
@@ -44,7 +45,7 @@
     </insert>
 
     <insert id="bulkInsertHistoricVariableInstance" parameterType="java.util.List">
-        insert into ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, SCOPE_ID_, SCOPE_TYPE_, 
+        insert into ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, 
             BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, CREATE_TIME_, LAST_UPDATED_TIME_)
         values
         <foreach collection="list" item="historicVariable" index="index" separator=",">
@@ -57,6 +58,7 @@
                 #{historicVariable.revision, jdbcType=VARCHAR},
                 #{historicVariable.variableType, jdbcType=VARCHAR},
                 #{historicVariable.scopeId, jdbcType=VARCHAR},
+                #{historicVariable.subScopeId, jdbcType=VARCHAR},
                 #{historicVariable.scopeType, jdbcType=VARCHAR},
                 #{historicVariable.byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
                 #{historicVariable.doubleValue, jdbcType=DOUBLE},
@@ -72,7 +74,7 @@
     <insert id="bulkInsertHistoricVariableInstance" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
         <foreach collection="list" item="historicVariable" index="index">
-            INTO ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, SCOPE_ID_, SCOPE_TYPE_, 
+            INTO ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, 
                 BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, CREATE_TIME_, LAST_UPDATED_TIME_) VALUES
             (
                 #{historicVariable.id, jdbcType=VARCHAR},
@@ -83,6 +85,7 @@
                 #{historicVariable.revision, jdbcType=VARCHAR},
                 #{historicVariable.variableType, jdbcType=VARCHAR},
                 #{historicVariable.scopeId, jdbcType=VARCHAR},
+                #{historicVariable.subScopeId, jdbcType=VARCHAR},
                 #{historicVariable.scopeType, jdbcType=VARCHAR},
                 #{historicVariable.byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
                 #{historicVariable.doubleValue, jdbcType=DOUBLE},
@@ -107,6 +110,9 @@
             </if>
             <if test="originalPersistentState.scopeId != scopeId">
                 SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.subScopeId != scopeId">
+                SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.scopeType != scopeType">
                 SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
@@ -160,6 +166,7 @@
         <result property="revision" column="REV_" jdbcType="INTEGER" />
         <result property="variableType" column="VAR_TYPE_" javaType="org.flowable.variable.service.impl.types.VariableType" jdbcType="VARCHAR" />
         <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR" />
+        <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR" />
         <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR" />
         <result property="byteArrayRef" column="BYTEARRAY_ID_" typeHandler="VariableByteArrayRefTypeHandler" />
         <result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
@@ -311,6 +318,10 @@
     
     <select id="selectHistoricVariableInstanceByScopeIdAndScopeType" resultMap="historicProcessVariableResultMap">
         select * from ${prefix}ACT_HI_VARINST where SCOPE_ID_ = #{parameter.scopeId} and SCOPE_TYPE_ = #{parameter.scopeType}
+    </select>
+    
+    <select id="selectHistoricVariableInstanceBySubScopeIdAndScopeType" resultMap="historicProcessVariableResultMap">
+        select * from ${prefix}ACT_HI_VARINST where SUB_SCOPE_ID_ = #{parameter.subScopeId} and SCOPE_TYPE_ = #{parameter.scopeType}
     </select>
 
     <select id="selectHistoricVariableInstanceByNativeQuery" parameterType="java.util.Map" resultMap="historicProcessVariableResultMap">

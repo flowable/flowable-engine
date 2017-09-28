@@ -177,7 +177,7 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
 
     @Override
     protected Collection<VariableInstanceEntity> loadVariableInstances() {
-        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeType(id, VariableScopeType.PLAN_ITEM_INSTANCE);
+        return CommandContextUtil.getVariableService().findVariableInstanceBySubScopeIdAndScopeType(id, VariableScopeType.CMMN);
     }
 
     @Override
@@ -190,18 +190,19 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
 
     @Override
     protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
-        variableInstance.setScopeId(id);
-        variableInstance.setScopeType(VariableScopeType.PLAN_ITEM_INSTANCE);
+        variableInstance.setScopeId(caseInstanceId);
+        variableInstance.setSubScopeId(id);
+        variableInstance.setScopeType(VariableScopeType.CMMN);
     }
 
     @Override
     protected VariableInstanceEntity getSpecificVariable(String variableName) {
-        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeTypeAndName(id, VariableScopeType.PLAN_ITEM_INSTANCE, variableName);
+        return CommandContextUtil.getVariableService().findVariableInstanceBySubScopeIdAndScopeTypeAndName(id, VariableScopeType.CMMN, variableName);
     }
 
     @Override
     protected List<VariableInstanceEntity> getSpecificVariables(Collection<String> variableNames) {
-        return CommandContextUtil.getVariableService().findVariableInstancesByScopeIdAndScopeTypeAndNames(id, VariableScopeType.PLAN_ITEM_INSTANCE, variableNames);
+        return CommandContextUtil.getVariableService().findVariableInstancesBySubScopeIdAndScopeTypeAndNames(id, VariableScopeType.CMMN, variableNames);
     }
 
     @Override

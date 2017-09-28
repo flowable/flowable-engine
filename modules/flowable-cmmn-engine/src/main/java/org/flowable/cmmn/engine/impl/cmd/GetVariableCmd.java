@@ -39,7 +39,7 @@ public class GetVariableCmd implements Command<Object> {
         }
         
         VariableInstanceEntity variableInstanceEntity = CommandContextUtil.getVariableService(commandContext)
-                .findVariableInstanceByScopeIdAndScopeTypeAndName(caseInstanceId, VariableScopeType.CASE_INSTANCE, variableName);
+                .findVariableInstanceByScopeIdAndScopeTypeAndName(caseInstanceId, VariableScopeType.CMMN, variableName);
         if (variableInstanceEntity != null) {
             return variableInstanceEntity.getValue();
         } 

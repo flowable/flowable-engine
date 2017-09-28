@@ -40,7 +40,7 @@ public class GetVariablesCmd implements Command<Map<String, Object>> {
             throw new FlowableIllegalArgumentException("caseInstanceId is null");
         }
         List<VariableInstanceEntity> variableInstanceEntities = CommandContextUtil.getVariableService(commandContext)
-                .findVariableInstanceByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CASE_INSTANCE);
+                .findVariableInstanceByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
         Map<String, Object> variables = new HashMap<>(variableInstanceEntities.size());
         for (VariableInstanceEntity variableInstanceEntity : variableInstanceEntities) {
             variables.put(variableInstanceEntity.getName(), variableInstanceEntity.getValue());

@@ -124,19 +124,19 @@ public class VariablesTest extends FlowableCmmnTestCase {
         assertEquals("test", cmmnRuntimeService.getVariable(caseInstance.getId(), "stringVar"));
         HistoricVariableInstance historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("stringVar").singleResult();
         assertEquals(caseInstance.getId(), historicVariableInstance.getScopeId());
-        assertEquals(VariableScopeType.CASE_INSTANCE, historicVariableInstance.getScopeType());
+        assertEquals(VariableScopeType.CMMN, historicVariableInstance.getScopeType());
         assertEquals("test", historicVariableInstance.getValue());
         
         assertEquals(123, cmmnRuntimeService.getVariable(caseInstance.getId(), "intVar"));
         historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("intVar").singleResult();
         assertEquals(caseInstance.getId(), historicVariableInstance.getScopeId());
-        assertEquals(VariableScopeType.CASE_INSTANCE, historicVariableInstance.getScopeType());
+        assertEquals(VariableScopeType.CMMN, historicVariableInstance.getScopeType());
         assertEquals(123, historicVariableInstance.getValue());
         
         assertEquals(123.123, cmmnRuntimeService.getVariable(caseInstance.getId(), "doubleVar"));
         historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("doubleVar").singleResult();
         assertEquals(caseInstance.getId(), historicVariableInstance.getScopeId());
-        assertEquals(VariableScopeType.CASE_INSTANCE, historicVariableInstance.getScopeType());
+        assertEquals(VariableScopeType.CMMN, historicVariableInstance.getScopeType());
         assertEquals(123.123, historicVariableInstance.getValue());
         
         // Update variables

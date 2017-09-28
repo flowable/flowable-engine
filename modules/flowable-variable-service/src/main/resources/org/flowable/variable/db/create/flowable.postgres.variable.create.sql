@@ -7,6 +7,7 @@ create table ACT_RU_VARIABLE (
     PROC_INST_ID_ varchar(64),
     TASK_ID_ varchar(64),
     SCOPE_ID_ varchar(255),
+    SUB_SCOPE_ID_ varchar(255),
     SCOPE_TYPE_ varchar(255),
     BYTEARRAY_ID_ varchar(64),
     DOUBLE_ double precision,
@@ -17,6 +18,7 @@ create table ACT_RU_VARIABLE (
 );
 
 create index ACT_IDX_RU_VAR_SCOPE_ID_TYPE on ACT_RU_VARIABLE(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_RU_VAR_SUB_SCOPE_ID_TYPE on ACT_RU_VARIABLE(SUB_SCOPE_ID_, SCOPE_TYPE_);
 
 create index ACT_IDX_VAR_BYTEARRAY on ACT_RU_VARIABLE(BYTEARRAY_ID_);
 alter table ACT_RU_VARIABLE 

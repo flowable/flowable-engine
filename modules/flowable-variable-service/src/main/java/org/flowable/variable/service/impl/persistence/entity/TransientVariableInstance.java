@@ -188,6 +188,16 @@ public class TransientVariableInstance implements VariableInstance {
     public void setScopeId(String scopeId) {
         
     }
+    
+    @Override
+    public String getSubScopeId() {
+        return null;
+    }
+    
+    @Override
+    public void setSubScopeId(String subScopeId) {
+        
+    }
 
     @Override
     public void setScopeType(String scopeType) {

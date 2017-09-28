@@ -7,6 +7,7 @@ create table ACT_HI_VARINST (
     NAME_ nvarchar(255) not null,
     VAR_TYPE_ nvarchar(100),
     SCOPE_ID_ nvarchar(255),
+    SUB_SCOPE_ID_ nvarchar(255),
     SCOPE_TYPE_ nvarchar(255),
     BYTEARRAY_ID_ nvarchar(64),
     DOUBLE_ double precision,
@@ -20,3 +21,4 @@ create table ACT_HI_VARINST (
 
 create index ACT_IDX_HI_PROCVAR_NAME_TYPE on ACT_HI_VARINST(NAME_, VAR_TYPE_);
 create index ACT_IDX_HI_VAR_SCOPE_ID_TYPE on ACT_HI_VARINST(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_HI_VAR_SUB_SCOPE_ID_TYPE on ACT_HI_VARINST(SUB_SCOPE_ID_, SCOPE_TYPE_);

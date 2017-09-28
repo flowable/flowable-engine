@@ -41,6 +41,11 @@ public interface ValueFields {
     String getScopeId();
     
     /**
+     * @return the sub scope id of the variable
+     */
+    String getSubScopeId();
+    
+    /**
      * @return the scope type of the variable
      */
     String getScopeType();

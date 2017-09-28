@@ -28,19 +28,31 @@ import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematc
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceByScopeIdAndScopeTypeAndVariableNameMatcher;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceByScopeIdAndScopeTypeAndVariableNamesMatcher;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceByScopeIdAndScopeTypeMatcher;
+import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceBySubScopeIdAndScopeTypeAndVariableNameMatcher;
+import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceBySubScopeIdAndScopeTypeAndVariableNamesMatcher;
+import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceBySubScopeIdAndScopeTypeMatcher;
 
 /**
  * @author Joram Barrez
  */
 public class MybatisVariableInstanceDataManager extends AbstractDataManager<VariableInstanceEntity> implements VariableInstanceDataManager {
 
-    protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceByExecutionIdMatcher = new VariableInstanceByExecutionIdMatcher();
+    protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceByExecutionIdMatcher 
+        = new VariableInstanceByExecutionIdMatcher();
     
-    protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceByScopeIdAndScopeTypeMatcher = new VariableInstanceByScopeIdAndScopeTypeMatcher();
+    protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceByScopeIdAndScopeTypeMatcher 
+        = new VariableInstanceByScopeIdAndScopeTypeMatcher();
+    protected SingleCachedEntityMatcher<VariableInstanceEntity> variableInstanceByScopeIdAndScopeTypeAndVariableNameMatcher 
+        = new VariableInstanceByScopeIdAndScopeTypeAndVariableNameMatcher();
+    protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceByScopeIdAndScopeTypeAndVariableNamesMatcher 
+        = new VariableInstanceByScopeIdAndScopeTypeAndVariableNamesMatcher();
     
-    protected SingleCachedEntityMatcher<VariableInstanceEntity> variableInstanceByScopeIdAndScopeTypeAndVariableNameMatcher = new VariableInstanceByScopeIdAndScopeTypeAndVariableNameMatcher();
-    
-    protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceByScopeIdAndScopeTypeAndVariableNamesMatcher = new VariableInstanceByScopeIdAndScopeTypeAndVariableNamesMatcher();
+    protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceBySubScopeIdAndScopeTypeMatcher 
+        = new VariableInstanceBySubScopeIdAndScopeTypeMatcher();
+    protected SingleCachedEntityMatcher<VariableInstanceEntity> variableInstanceBySubScopeIdAndScopeTypeAndVariableNameMatcher 
+        = new VariableInstanceBySubScopeIdAndScopeTypeAndVariableNameMatcher();
+    protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceBySubScopeIdAndScopeTypeAndVariableNamesMatcher 
+        = new VariableInstanceBySubScopeIdAndScopeTypeAndVariableNamesMatcher();
 
     @Override
     public Class<? extends VariableInstanceEntity> getManagedEntityClass() {
@@ -136,6 +148,32 @@ public class MybatisVariableInstanceDataManager extends AbstractDataManager<Vari
         params.put("scopeType", scopeType);
         params.put("variableNames", variableNames);
         return getList("selectVariableInstanceByScopeIdAndScopeTypeAndNames", params, variableInstanceByScopeIdAndScopeTypeAndVariableNamesMatcher, true);
+    }
+
+    @Override
+    public List<VariableInstanceEntity> findVariableInstanceBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
+        Map<String, Object> params = new HashMap<>(2);
+        params.put("subScopeId", subScopeId);
+        params.put("scopeType", scopeType);
+        return getList("selectVariableInstancesBySubScopeIdAndScopeType", params, variableInstanceBySubScopeIdAndScopeTypeMatcher, true); 
+    }
+
+    @Override
+    public VariableInstanceEntity findVariableInstanceBySubScopeIdAndScopeTypeAndName(String subScopeId, String scopeType, String variableName) {
+        Map<String, String> params = new HashMap<>(3);
+        params.put("subScopeId", subScopeId);
+        params.put("scopeType", scopeType);
+        params.put("variableName", variableName);
+        return getEntity("selectVariableInstanceBySubScopeIdAndScopeTypeAndName", params, variableInstanceBySubScopeIdAndScopeTypeAndVariableNameMatcher, true);
+    }
+
+    @Override
+    public List<VariableInstanceEntity> findVariableInstancesBySubScopeIdAndScopeTypeAndNames(String subScopeId, String scopeType, Collection<String> variableNames) {
+        Map<String, Object> params = new HashMap<>(3);
+        params.put("subScopeId", subScopeId);
+        params.put("scopeType", scopeType);
+        params.put("variableNames", variableNames);
+        return getList("selectVariableInstanceBySubScopeIdAndScopeTypeAndNames", params, variableInstanceBySubScopeIdAndScopeTypeAndVariableNamesMatcher, true);
     }
 
 }

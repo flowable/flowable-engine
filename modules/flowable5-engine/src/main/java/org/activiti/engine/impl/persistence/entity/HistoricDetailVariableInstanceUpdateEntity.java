@@ -228,6 +228,11 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricDetailEn
     public String getScopeId() {
         return null;
     }
+    
+    @Override
+    public String getSubScopeId() {
+        return null;
+    }
 
     @Override
     public String getScopeType() {
