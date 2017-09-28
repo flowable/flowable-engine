@@ -32,7 +32,7 @@ public class ActivatePlanItemOperation extends AbstractPlanItemInstanceOperation
         if (!PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState())) {
             
             // Sentries are not needed to be kept around, as the plan item is being activated
-            deleteSentryOnPartInstances();
+            deleteSentryPartInstances();
             
             planItemInstanceEntity.setState(PlanItemInstanceState.ACTIVE);
             executeActivityBehavior();

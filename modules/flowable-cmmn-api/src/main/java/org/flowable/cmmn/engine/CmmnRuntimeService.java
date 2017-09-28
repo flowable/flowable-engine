@@ -12,7 +12,9 @@
  */
 package org.flowable.cmmn.engine;
 
-import org.flowable.cmmn.engine.runtime.CaseInstance;
+import java.util.Map;
+
+import org.flowable.cmmn.engine.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.engine.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.engine.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceQuery;
@@ -21,14 +23,20 @@ import org.flowable.cmmn.engine.runtime.PlanItemInstanceQuery;
  * @author Joram Barrez
  */
 public interface CmmnRuntimeService {
-    
-    CaseInstance startCaseInstanceById(String caseDefinitionId);
-    
-    CaseInstance startCaseInstanceByKey(String caseDefinitionKey);
+
+    CaseInstanceBuilder createCaseInstanceBuilder();
     
     void triggerPlanItemInstance(String planItemInstanceId);
     
     void terminateCaseInstance(String caseInstanceId);
+    
+    Map<String, Object> getVariables(String caseInstanceId);
+    
+    Object getVariable(String caseInstanceId, String variableName);
+    
+    void setVariables(String caseInstanceId, Map<String, Object> variables);
+    
+    void removeVariable(String caseInstanceId, String variableName);
     
     CaseInstanceQuery createCaseInstanceQuery();
     

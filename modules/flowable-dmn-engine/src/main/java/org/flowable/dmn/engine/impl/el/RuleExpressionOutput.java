@@ -15,6 +15,9 @@ package org.flowable.dmn.engine.impl.el;
 
 import java.util.Map;
 
+import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.engine.common.impl.el.VariableContainerWrapper;
+
 /**
  * Resolves an EL expression value at runtime.
  * 
@@ -30,7 +33,7 @@ public class RuleExpressionOutput {
     }
 
     public Object getValue(Map<String, Object> variables) {
-        Object value = expression.getValue(variables);
+        Object value = expression.getValue(new VariableContainerWrapper(variables));
         return value;
     }
 

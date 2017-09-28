@@ -43,7 +43,7 @@ public class HistoricVariableInstanceEntityManagerImpl extends AbstractEntityMan
     }
 
     @Override
-    public HistoricVariableInstanceEntity copyAndInsert(VariableInstanceEntity variableInstance) {
+    public HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variableInstance) {
         HistoricVariableInstanceEntity historicVariableInstance = historicVariableInstanceDataManager.create();
         historicVariableInstance.setId(variableInstance.getId());
         historicVariableInstance.setProcessInstanceId(variableInstance.getProcessInstanceId());
@@ -52,6 +52,8 @@ public class HistoricVariableInstanceEntityManagerImpl extends AbstractEntityMan
         historicVariableInstance.setRevision(variableInstance.getRevision());
         historicVariableInstance.setName(variableInstance.getName());
         historicVariableInstance.setVariableType(variableInstance.getType());
+        historicVariableInstance.setScopeId(variableInstance.getScopeId());
+        historicVariableInstance.setScopeType(variableInstance.getScopeType());
 
         copyVariableValue(historicVariableInstance, variableInstance);
 
@@ -111,6 +113,11 @@ public class HistoricVariableInstanceEntityManagerImpl extends AbstractEntityMan
     @Override
     public HistoricVariableInstanceEntity findHistoricVariableInstanceByVariableInstanceId(String variableInstanceId) {
         return historicVariableInstanceDataManager.findHistoricVariableInstanceByVariableInstanceId(variableInstanceId);
+    }
+    
+    @Override
+    public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeType(String scopeId, String scopeType) {
+        return historicVariableInstanceDataManager.findHistoricalVariableInstancesByScopeIdAndScopeType(scopeId, scopeType);
     }
 
     @Override

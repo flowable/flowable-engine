@@ -30,7 +30,7 @@ import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.calendar.DueDateBusinessCalendar;
-import org.flowable.variable.service.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * @author Joram Barrez

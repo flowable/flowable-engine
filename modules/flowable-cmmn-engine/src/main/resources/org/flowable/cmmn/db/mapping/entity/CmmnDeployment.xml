@@ -21,9 +21,15 @@
   <!-- DEPLOYMENT UPDATE -->
   
   <update id="updateCmmnDeployment" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityImpl">
-    update ${prefix}ACT_CMMN_RE_DEPLOYMENT set
-      CATEGORY_ = #{category, jdbcType=VARCHAR},
-      TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+    update ${prefix}ACT_CMMN_RE_DEPLOYMENT
+    <set>
+      <if test="originalPersistentState.category != category">
+        CATEGORY_ = #{category, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.tenantId != tenantId">
+        TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+      </if>
+    </set>  
     where ID_ = #{id, jdbcType=VARCHAR}
   </update>
   

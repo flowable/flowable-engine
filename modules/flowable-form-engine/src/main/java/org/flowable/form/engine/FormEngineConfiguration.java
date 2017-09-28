@@ -24,6 +24,8 @@ import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
+import org.flowable.engine.common.impl.el.DefaultExpressionManager;
+import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
@@ -50,7 +52,6 @@ import org.flowable.form.engine.impl.deployer.CachingAndArtifactsManager;
 import org.flowable.form.engine.impl.deployer.FormDefinitionDeployer;
 import org.flowable.form.engine.impl.deployer.FormDefinitionDeploymentHelper;
 import org.flowable.form.engine.impl.deployer.ParsedDeploymentBuilderFactory;
-import org.flowable.form.engine.impl.el.ExpressionManager;
 import org.flowable.form.engine.impl.parser.FormDefinitionParseFactory;
 import org.flowable.form.engine.impl.persistence.deploy.Deployer;
 import org.flowable.form.engine.impl.persistence.deploy.DeploymentManager;
@@ -222,7 +223,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public void initExpressionManager() {
         if (expressionManager == null) {
-            expressionManager = new ExpressionManager();
+            expressionManager = new DefaultExpressionManager();
         }
     }
 

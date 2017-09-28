@@ -21,7 +21,7 @@ import javax.persistence.EntityManagerFactory;
 
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.common.impl.history.HistoricData;
+import org.flowable.engine.common.api.history.HistoricData;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;

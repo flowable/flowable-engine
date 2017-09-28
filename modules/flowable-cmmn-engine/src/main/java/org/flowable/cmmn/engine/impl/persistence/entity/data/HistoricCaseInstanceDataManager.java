@@ -24,6 +24,8 @@ import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
  */
 public interface HistoricCaseInstanceDataManager extends DataManager<HistoricCaseInstanceEntity> {
     
+    List<HistoricCaseInstanceEntity> findHistoricCaseInstancesByCaseDefinitionId(String caseDefinitionId);
+    
     List<HistoricCaseInstance> findByCriteria(HistoricCaseInstanceQueryImpl query);
     
     long countByCriteria(HistoricCaseInstanceQueryImpl query);

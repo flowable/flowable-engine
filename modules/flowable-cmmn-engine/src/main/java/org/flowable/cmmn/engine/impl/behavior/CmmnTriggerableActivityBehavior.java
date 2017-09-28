@@ -13,7 +13,7 @@
 package org.flowable.cmmn.engine.impl.behavior;
 
 import org.flowable.cmmn.engine.CmmnRuntimeService;
-import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
+import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.runtime.PlanItemInstance;
 import org.flowable.cmmn.model.PlanItem;
 

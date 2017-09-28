@@ -75,6 +75,13 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
             }
         }
     }
+    
+    /**
+     * Only to be used when creating a new entity, to avoid an extra call to the database.
+     */
+    public void internalSetVariableInstances(Map<String, VariableInstanceEntity> variableInstances) {
+        this.variableInstances = variableInstances;
+    }
 
     @Override
     public Map<String, Object> getVariables() {
@@ -818,7 +825,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         
         initializeVariableInstanceBackPointer(variableInstance);
         
-        if ("task".equals(variableScopeType())) {
+        if (isPropagateToHistoricVariable()) {
             VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
             if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
                 variableServiceConfiguration.getInternalHistoryVariableManager().recordVariableRemoved(variableInstance);
@@ -848,7 +855,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         initializeVariableInstanceBackPointer(variableInstance);
         
         VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
-        if ("task".equals(variableScopeType())) {
+        if (isPropagateToHistoricVariable()) {
             if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
                 variableServiceConfiguration.getInternalHistoryVariableManager().recordVariableUpdate(variableInstance);
             }
@@ -878,7 +885,7 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         }
         
         VariableServiceConfiguration variableServiceConfiguration = CommandContextUtil.getVariableServiceConfiguration();
-        if ("task".equals(variableScopeType())) {
+        if (isPropagateToHistoricVariable()) {
             if (variableServiceConfiguration.getInternalHistoryVariableManager() != null) {
                 variableServiceConfiguration.getInternalHistoryVariableManager().recordVariableCreate(variableInstance);
             }
@@ -1020,7 +1027,10 @@ public abstract class VariableScopeImpl extends AbstractEntity implements Serial
         }
     }
 
-    protected abstract String variableScopeType();
+    /**
+     * Return whether changes to the variables are progagated to the history storage. 
+     */
+    protected abstract boolean isPropagateToHistoricVariable();
 
     // getters and setters
     // //////////////////////////////////////////////////////

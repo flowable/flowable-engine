@@ -17,7 +17,7 @@ import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.task.service.delegate.DelegateTask;
-import org.flowable.variable.service.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * @author Rich Kroll

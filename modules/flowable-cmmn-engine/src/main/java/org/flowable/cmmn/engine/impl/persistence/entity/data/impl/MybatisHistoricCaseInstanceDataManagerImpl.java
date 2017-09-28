@@ -21,11 +21,14 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEnti
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricCaseInstanceDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.matcher.HistoricCaseInstanceByCaseDefinitionIdMatcher;
 
 /**
  * @author Joram Barrez
  */
 public class MybatisHistoricCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<HistoricCaseInstanceEntity> implements HistoricCaseInstanceDataManager {
+    
+    protected HistoricCaseInstanceByCaseDefinitionIdMatcher historicCaseInstanceByCaseDefinitionIdMatcher = new HistoricCaseInstanceByCaseDefinitionIdMatcher();
 
     public MybatisHistoricCaseInstanceDataManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration) {
         super(cmmnEngineConfiguration);
@@ -39,6 +42,11 @@ public class MybatisHistoricCaseInstanceDataManagerImpl extends AbstractCmmnData
     @Override
     public HistoricCaseInstanceEntity create() {
         return new HistoricCaseInstanceEntityImpl();
+    }
+    
+    @Override
+    public List<HistoricCaseInstanceEntity> findHistoricCaseInstancesByCaseDefinitionId(String caseDefinitionId) {
+        return getList("selectHistoricCaseInstancesByCaseDefinitionId", caseDefinitionId, historicCaseInstanceByCaseDefinitionIdMatcher, true);
     }
 
     @Override

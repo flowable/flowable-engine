@@ -26,6 +26,8 @@ import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
+import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.engine.common.impl.el.ExpressionManager;
 
 /**
  * @author Joram Barrez
@@ -33,6 +35,7 @@ import org.flowable.cmmn.model.Task;
 public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorFactory {
     
     protected CmmnClassDelegateFactory classDelegateFactory;
+    protected ExpressionManager expressionManager;
 
     @Override
     public StageActivityBehavior createStageActivityBehavoir(PlanItem planItem, Stage stage) {
@@ -47,7 +50,7 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
         } else if (StringUtils.isNotEmpty(milestone.getName())) {
             name = milestone.getName();
         }
-        return new MilestoneActivityBehavior(name);
+        return new MilestoneActivityBehavior(expressionManager.createExpression(name));
     }
     
     @Override
@@ -57,12 +60,16 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     
     @Override
     public CaseTaskActivityBehavior createCaseTaskActivityBehavior(PlanItem planItem, CaseTask caseTask) {
-        return new CaseTaskActivityBehavior(caseTask.getCaseRef(), caseTask.isBlocking());
+        return new CaseTaskActivityBehavior(expressionManager.createExpression(caseTask.getCaseRef()), caseTask.isBlocking());
     }
     
     @Override
     public ProcessTaskActivityBehavior createProcessTaskActivityBehavior(PlanItem planItem, ProcessTask processTask) {
-        return new ProcessTaskActivityBehavior(processTask.getProcess(), processTask.isBlocking());
+        Expression processRefExpression = null;
+        if (StringUtils.isNotEmpty(processTask.getProcessRefExpression())) {
+            processRefExpression = expressionManager.createExpression(processTask.getProcessRefExpression());
+        }
+        return new ProcessTaskActivityBehavior(processTask.getProcess(), processRefExpression, processTask.isBlocking());
     }
     
     @Override
@@ -76,6 +83,14 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
 
     public void setClassDelegateFactory(CmmnClassDelegateFactory classDelegateFactory) {
         this.classDelegateFactory = classDelegateFactory;
+    }
+
+    public ExpressionManager getExpressionManager() {
+        return expressionManager;
+    }
+
+    public void setExpressionManager(ExpressionManager expressionManager) {
+        this.expressionManager = expressionManager;
     }
     
 }

@@ -43,6 +43,11 @@ public class HistoricCaseInstanceEntityManagerImpl extends AbstractCmmnEntityMan
     public HistoricCaseInstanceQuery createHistoricCaseInstanceQuery() {
         return new HistoricCaseInstanceQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
     }
+    
+    @Override
+    public List<HistoricCaseInstanceEntity> findHistoricCaseInstancesByCaseDefinitionId(String caseDefinitionId) {
+        return historicCaseInstanceDataManager.findHistoricCaseInstancesByCaseDefinitionId(caseDefinitionId);
+    }
 
     @Override
     public List<HistoricCaseInstance> findByCriteria(HistoricCaseInstanceQuery query) {

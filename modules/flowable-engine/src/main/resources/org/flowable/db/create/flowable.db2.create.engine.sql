@@ -1,29 +1,3 @@
-create table ACT_GE_PROPERTY (
-    NAME_ varchar(64) not null,
-    VALUE_ varchar(300),
-    REV_ integer,
-    primary key (NAME_)
-);
-
-insert into ACT_GE_PROPERTY
-values ('schema.version', '6.2.0.0', 1);
-
-insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.2.0.0)', 1);
-
-insert into ACT_GE_PROPERTY
-values ('next.dbid', '1', 1);
-
-create table ACT_GE_BYTEARRAY (
-    ID_ varchar(64) not null,
-    REV_ integer,
-    NAME_ varchar(255),
-    DEPLOYMENT_ID_ varchar(64),
-    BYTES_ BLOB,
-    GENERATED_ smallint check(GENERATED_ in (1,0)),
-    primary key (ID_)
-);
-
 create table ACT_RE_DEPLOYMENT (
     ID_ varchar(64) not null,
     NAME_ varchar(255),
@@ -246,22 +220,6 @@ create table ACT_RU_IDENTITYLINK (
     primary key (ID_)
 );
 
-create table ACT_RU_VARIABLE (
-    ID_ varchar(64) not null,
-    REV_ integer,
-    TYPE_ varchar(255) not null,
-    NAME_ varchar(255) not null,
-    EXECUTION_ID_ varchar(64),
-    PROC_INST_ID_ varchar(64),
-    TASK_ID_ varchar(64),
-    BYTEARRAY_ID_ varchar(64),
-    DOUBLE_ double precision,
-    LONG_ bigint,
-    TEXT_ varchar(4000),
-    TEXT2_ varchar(4000),
-    primary key (ID_)
-);
-
 create table ACT_RU_EVENT_SUBSCR (
     ID_ varchar(64) not null,
     REV_ integer,
@@ -313,7 +271,6 @@ create index ACT_IDX_EXECUTION_PROC on ACT_RU_EXECUTION(PROC_DEF_ID_);
 create index ACT_IDX_EXECUTION_PARENT on ACT_RU_EXECUTION(PARENT_ID_);
 create index ACT_IDX_EXECUTION_SUPER on ACT_RU_EXECUTION(SUPER_EXEC_);
 create index ACT_IDX_EXECUTION_IDANDREV on ACT_RU_EXECUTION(ID_, REV_);
-create index ACT_IDX_VARIABLE_BA on ACT_RU_VARIABLE(BYTEARRAY_ID_);
 create index ACT_IDX_VARIABLE_EXEC on ACT_RU_VARIABLE(EXECUTION_ID_);
 create index ACT_IDX_VARIABLE_PROCINST on ACT_RU_VARIABLE(PROC_INST_ID_);
 create index ACT_IDX_IDENT_LNK_TASK on ACT_RU_IDENTITYLINK(TASK_ID_);
@@ -410,11 +367,6 @@ alter table ACT_RU_VARIABLE
     foreign key (PROC_INST_ID_)
     references ACT_RU_EXECUTION(ID_);
 
-alter table ACT_RU_VARIABLE 
-    add constraint ACT_FK_VAR_BYTEARRAY 
-    foreign key (BYTEARRAY_ID_) 
-    references ACT_GE_BYTEARRAY (ID_);
-    
 alter table ACT_RU_JOB
     add constraint ACT_FK_JOB_EXECUTION 
     foreign key (EXECUTION_ID_) 
@@ -528,3 +480,9 @@ alter table ACT_PROCDEF_INFO
 alter table ACT_PROCDEF_INFO
     add constraint ACT_UNIQ_INFO_PROCDEF
     unique (PROC_DEF_ID_);
+    
+insert into ACT_GE_PROPERTY
+values ('schema.version', '6.2.0.0', 1); 
+
+insert into ACT_GE_PROPERTY
+values ('schema.history', 'create(6.2.0.0)', 1);   

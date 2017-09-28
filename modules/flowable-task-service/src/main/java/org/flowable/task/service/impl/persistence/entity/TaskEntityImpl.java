@@ -314,8 +314,8 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     // Override from VariableScopeImpl
 
     @Override
-    protected String variableScopeType() {
-        return "task";
+    protected boolean isPropagateToHistoricVariable() {
+        return true;
     }
 
     // Overridden to avoid fetching *all* variables (as is the case in the super // call)

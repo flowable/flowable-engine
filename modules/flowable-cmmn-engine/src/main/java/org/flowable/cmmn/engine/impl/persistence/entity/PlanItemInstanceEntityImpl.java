@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -19,14 +20,16 @@ import java.util.Map;
 
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.variable.VariableScopeType;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.PlanItem;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
 /**
  * @author Joram Barrez
  */
-public class PlanItemInstanceEntityImpl extends AbstractEntity implements PlanItemInstanceEntity {
+public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements PlanItemInstanceEntity {
     
     protected String caseDefinitionId;
     protected String caseInstanceId;
@@ -45,7 +48,7 @@ public class PlanItemInstanceEntityImpl extends AbstractEntity implements PlanIt
     protected PlanItem planItem;
     protected List<PlanItemInstanceEntity> children;
     protected PlanItemInstanceEntity stagePlanItemInstance;
-    protected List<SentryOnPartInstanceEntity> satisfiedSentryOnPartInstances;
+    protected List<SentryPartInstanceEntity> satisfiedSentryPartInstances;
     
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
@@ -159,15 +162,51 @@ public class PlanItemInstanceEntityImpl extends AbstractEntity implements PlanIt
     }
     
     @Override
-    public List<SentryOnPartInstanceEntity> getSatisfiedSentryOnPartInstances() {
-        if (satisfiedSentryOnPartInstances == null) {
-            satisfiedSentryOnPartInstances = CommandContextUtil.getSentryOnPartInstanceEntityManager().findSentryOnPartInstancesByPlanItemInstanceId(id);
+    public List<SentryPartInstanceEntity> getSatisfiedSentryPartInstances() {
+        if (satisfiedSentryPartInstances == null) {
+            satisfiedSentryPartInstances = CommandContextUtil.getSentryPartInstanceEntityManager().findSentryPartInstancesByPlanItemInstanceId(id);
         }
-        return satisfiedSentryOnPartInstances;
+        return satisfiedSentryPartInstances;
     }
     
-    public void setSatisfiedSentryOnPartInstances(List<SentryOnPartInstanceEntity> satisfiedSentryOnPartInstances) {
-        this.satisfiedSentryOnPartInstances = satisfiedSentryOnPartInstances;
+    public void setSatisfiedSentryPartInstances(List<SentryPartInstanceEntity> satisfiedSentryPartInstances) {
+        this.satisfiedSentryPartInstances = satisfiedSentryPartInstances;
     }
-    
+
+    // VariableScopeImpl methods
+
+    @Override
+    protected Collection<VariableInstanceEntity> loadVariableInstances() {
+        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeType(id, VariableScopeType.PLAN_ITEM_INSTANCE);
+    }
+
+    @Override
+    protected VariableScopeImpl getParentVariableScope() {
+        if (caseInstanceId != null) {
+            return (VariableScopeImpl) CommandContextUtil.getCaseInstanceEntityManager().findById(caseInstanceId);
+        }
+        return null;
+    }
+
+    @Override
+    protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
+        variableInstance.setScopeId(id);
+        variableInstance.setScopeType(VariableScopeType.PLAN_ITEM_INSTANCE);
+    }
+
+    @Override
+    protected VariableInstanceEntity getSpecificVariable(String variableName) {
+        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeTypeAndName(id, VariableScopeType.PLAN_ITEM_INSTANCE, variableName);
+    }
+
+    @Override
+    protected List<VariableInstanceEntity> getSpecificVariables(Collection<String> variableNames) {
+        return CommandContextUtil.getVariableService().findVariableInstancesByScopeIdAndScopeTypeAndNames(id, VariableScopeType.PLAN_ITEM_INSTANCE, variableNames);
+    }
+
+    @Override
+    protected boolean isPropagateToHistoricVariable() {
+        return true;
+    }
+
 }

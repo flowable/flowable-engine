@@ -14,13 +14,14 @@ package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import java.util.List;
 
+import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.StateTransition;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.Stage;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
@@ -36,9 +37,13 @@ public class StageActivityBehavior implements PlanItemActivityBehavior {
 
     @Override
     public void execute(DelegatePlanItemInstance delegatePlanItemInstance) {
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
         PlanItemInstanceEntity stagePlanItemInstanceEntity = (PlanItemInstanceEntity) delegatePlanItemInstance;
-        stagePlanItemInstanceEntity.setName(delegatePlanItemInstance.getPlanItem().getName());
-        CommandContextUtil.getAgenda().planInitStageOperation(stagePlanItemInstanceEntity);
+        if (delegatePlanItemInstance.getPlanItem().getName() != null) {
+            Expression nameExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(delegatePlanItemInstance.getPlanItem().getName());
+            stagePlanItemInstanceEntity.setName(nameExpression.getValue(delegatePlanItemInstance).toString());
+        }
+        CommandContextUtil.getAgenda(commandContext).planInitStageOperation(stagePlanItemInstanceEntity);
     }
     
     @Override

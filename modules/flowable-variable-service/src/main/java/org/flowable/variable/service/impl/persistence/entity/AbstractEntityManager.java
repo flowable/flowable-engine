@@ -53,11 +53,14 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
     public void insert(EntityImpl entity, boolean fireCreateEvent) {
         getDataManager().insert(entity);
 
-        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
-        if (fireCreateEvent && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(FlowableVariableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, entity));
-            eventDispatcher.dispatchEvent(FlowableVariableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, entity));
+        if (fireCreateEvent) {
+            FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(FlowableVariableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, entity));
+                eventDispatcher.dispatchEvent(FlowableVariableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, entity));
+            }
         }
+        
     }
 
     @Override
@@ -69,8 +72,11 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
     public EntityImpl update(EntityImpl entity, boolean fireUpdateEvent) {
         EntityImpl updatedEntity = getDataManager().update(entity);
 
-        if (fireUpdateEvent && getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableVariableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, entity));
+        if (fireUpdateEvent) {
+            FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(FlowableVariableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, entity));
+            }
         }
 
         return updatedEntity;
@@ -91,8 +97,11 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
     public void delete(EntityImpl entity, boolean fireDeleteEvent) {
         getDataManager().delete(entity);
 
-        if (fireDeleteEvent && getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableVariableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, entity));
+        if (fireDeleteEvent) {
+            FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(FlowableVariableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, entity));
+            }
         }
     }
 

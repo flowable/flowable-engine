@@ -14,7 +14,7 @@
 package org.flowable.engine.test.bpmn.event.compensate.helper;
 
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.variable.service.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.delegate.JavaDelegate;
 
 /**

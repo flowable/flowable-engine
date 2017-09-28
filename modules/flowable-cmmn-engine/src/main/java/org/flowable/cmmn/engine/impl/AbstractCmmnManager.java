@@ -25,6 +25,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityMa
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManager;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
 
 /**
  * @author Joram Barrez
@@ -79,6 +81,14 @@ public abstract class AbstractCmmnManager {
     
     protected HistoricMilestoneInstanceEntityManager getHistoricMilestoneInstanceEntityManager() {
         return cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager();
+    }
+    
+    protected VariableInstanceEntityManager getVariableInstanceEntityManager() {
+        return cmmnEngineConfiguration.getVariableServiceConfiguration().getVariableInstanceEntityManager();
+    }
+    
+    protected HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager() {
+        return cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager();
     }
 
     protected CmmnEngineConfiguration getCmmnEngineConfiguration() {

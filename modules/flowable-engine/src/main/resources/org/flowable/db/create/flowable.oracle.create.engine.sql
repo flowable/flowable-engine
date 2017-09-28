@@ -1,29 +1,3 @@
-create table ACT_GE_PROPERTY (
-    NAME_ NVARCHAR2(64),
-    VALUE_ NVARCHAR2(300),
-    REV_ INTEGER,
-    primary key (NAME_)
-);
-
-insert into ACT_GE_PROPERTY
-values ('schema.version', '6.2.0.0', 1);
-
-insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.2.0.0)', 1);
-
-insert into ACT_GE_PROPERTY
-values ('next.dbid', '1', 1);
-
-create table ACT_GE_BYTEARRAY (
-    ID_ NVARCHAR2(64),
-    REV_ INTEGER,
-    NAME_ NVARCHAR2(255),
-    DEPLOYMENT_ID_ NVARCHAR2(64),
-    BYTES_ BLOB,
-    GENERATED_ NUMBER(1,0) CHECK (GENERATED_ IN (1,0)),
-    primary key (ID_)
-);
-
 create table ACT_RE_DEPLOYMENT (
     ID_ NVARCHAR2(64),
     NAME_ NVARCHAR2(255),
@@ -246,22 +220,6 @@ create table ACT_RU_IDENTITYLINK (
     primary key (ID_)
 );
 
-create table ACT_RU_VARIABLE (
-    ID_ NVARCHAR2(64) not null,
-    REV_ INTEGER,
-    TYPE_ NVARCHAR2(255) not null,
-    NAME_ NVARCHAR2(255) not null,
-    EXECUTION_ID_ NVARCHAR2(64),
-    PROC_INST_ID_ NVARCHAR2(64),
-    TASK_ID_ NVARCHAR2(64),
-    BYTEARRAY_ID_ NVARCHAR2(64),
-    DOUBLE_ NUMBER(*,10),
-    LONG_ NUMBER(19,0),
-    TEXT_ NVARCHAR2(2000),
-    TEXT2_ NVARCHAR2(2000),
-    primary key (ID_)
-);
-
 create table ACT_RU_EVENT_SUBSCR (
     ID_ NVARCHAR2(64) not null,
     REV_ integer,
@@ -393,12 +351,6 @@ alter table ACT_RU_VARIABLE
     foreign key (PROC_INST_ID_)
     references ACT_RU_EXECUTION(ID_);
 
-create index ACT_IDX_VAR_BYTEARRAY on ACT_RU_VARIABLE(BYTEARRAY_ID_);
-alter table ACT_RU_VARIABLE 
-    add constraint ACT_FK_VAR_BYTEARRAY 
-    foreign key (BYTEARRAY_ID_) 
-    references ACT_GE_BYTEARRAY (ID_);
-    
 create index ACT_IDX_JOB_EXECUTION_ID on ACT_RU_JOB(EXECUTION_ID_);
 alter table ACT_RU_JOB 
     add constraint ACT_FK_JOB_EXECUTION 
@@ -534,3 +486,9 @@ alter table ACT_PROCDEF_INFO
 alter table ACT_PROCDEF_INFO
     add constraint ACT_UNIQ_INFO_PROCDEF
     unique (PROC_DEF_ID_);
+    
+insert into ACT_GE_PROPERTY
+values ('schema.version', '6.2.0.0', 1);   
+
+insert into ACT_GE_PROPERTY
+values ('schema.history', 'create(6.2.0.0)', 1);  

@@ -40,7 +40,7 @@ import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.task.service.delegate.DelegateTask;
-import org.flowable.variable.service.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 

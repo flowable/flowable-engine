@@ -25,6 +25,8 @@ public interface HistoricCaseInstanceEntityManager extends EntityManager<Histori
     
     HistoricCaseInstanceQuery createHistoricCaseInstanceQuery();
     
+    List<HistoricCaseInstanceEntity> findHistoricCaseInstancesByCaseDefinitionId(String caseDefinitionId);
+    
     List<HistoricCaseInstance> findByCriteria(HistoricCaseInstanceQuery query);
     
     long countByCriteria(HistoricCaseInstanceQuery query);

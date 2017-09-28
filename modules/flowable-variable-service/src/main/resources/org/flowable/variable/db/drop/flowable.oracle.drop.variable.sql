@@ -1,0 +1,6 @@
+drop index ACT_IDX_VAR_BYTEARRAY;
+
+alter table ACT_RU_VARIABLE
+    drop CONSTRAINT ACT_FK_VAR_BYTEARRAY;
+
+drop table ACT_RU_VARIABLE;
