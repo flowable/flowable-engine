@@ -21,7 +21,7 @@
                 </planItemOnPart>
             </sentry>
 
-            <task id="someTask" name="The Task" flowable:class="org.flowable.cmmn.test.runtime.VariablesTest$SetVariableDelegate"/>
+            <task id="someTask" name="The Task" flowable:type="java" flowable:class="org.flowable.cmmn.test.runtime.VariablesTest$SetVariableDelegate"/>
             <milestone id="mileStoneOne" name="Milestone ${myVariable}" />
 
         </casePlanModel>
