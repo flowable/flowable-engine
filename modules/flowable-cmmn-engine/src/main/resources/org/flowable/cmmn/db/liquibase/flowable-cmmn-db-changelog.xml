@@ -28,7 +28,7 @@
 
         <createTable tableName="ACT_CMMN_RE_DEPLOYMENT_RESOURCE">
             <column name="ID_" type="varchar(255)">
-                <constraints primaryKey="true" nullable="false" />
+                <constraints primaryKey="true" nullable="false" primaryKeyName="PK_CMMN_DEPLOYMENT_RESOURCE" />
             </column>
             <column name="NAME_" type="varchar(255)" />
             <column name="DEPLOYMENT_ID_" type="varchar(255)" />
@@ -118,7 +118,7 @@
 
         <createTable tableName="ACT_CMMN_RU_PLAN_ITEM_INST">
             <column name="ID_" type="varchar(255)">
-                <constraints primaryKey="true" nullable="false" />
+                <constraints primaryKey="true" nullable="false" primaryKeyName="PK_CMMN_PLAN_ITEM_INST" />
             </column>
             <column name="REV_" type="integer">
                 <constraints nullable="false" />
@@ -159,7 +159,7 @@
 
         <createTable tableName="ACT_CMMN_RU_SENTRY_PART_INST">
             <column name="ID_" type="varchar(255)">
-                <constraints primaryKey="true" nullable="false" />
+                <constraints primaryKey="true" nullable="false" primaryKeyName="PK_CMMN_SENTRY_PART_INST"/>
             </column>
             <column name="REV_" type="integer">
                 <constraints nullable="false" />

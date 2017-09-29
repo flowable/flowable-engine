@@ -94,16 +94,6 @@
             <artifactId>hsqldb</artifactId>
             <scope>test</scope>
         </dependency>
-        <dependency>
-            <groupId>com.ibm.db2.jcc</groupId>
-            <artifactId>db2jcc4</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.oracle.jdbc</groupId>
-            <artifactId>ojdbc7</artifactId>
-            <scope>test</scope>
-        </dependency>
     </dependencies>
     
     <profiles>
@@ -240,6 +230,90 @@
                     </plugin>
                 </plugins>
             </build>
+        </profile>
+        <profile>
+            <id>oracle</id>
+            <activation>
+                <property>
+                    <name>database</name>
+                    <value>oracle</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle.jdbc</groupId>
+                    <artifactId>ojdbc7</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <profile>
+            <id>oraclewithschema</id>
+            <activation>
+                <property>
+                    <name>databasewithschema</name>
+                    <value>oracle</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle.jdbc</groupId>
+                    <artifactId>ojdbc7</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        
+        <profile>
+            <id>oraclewithschemaasynchistory</id>
+            <activation>
+                <property>
+                    <name>databasewithschemaasynchistory</name>
+                    <value>oracle</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.oracle.jdbc</groupId>
+                    <artifactId>ojdbc7</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        
+        <profile>
+            <id>db2</id>
+            <activation>
+                <property>
+                    <name>database</name>
+                    <value>db2</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.ibm.db2.jcc</groupId>
+                    <artifactId>db2jcc4</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+        
+        <profile>
+            <id>db2asynchistory</id>
+            <activation>
+                <property>
+                    <name>databaseasynchistory</name>
+                    <value>db2</value>
+                </property>
+            </activation>
+            <dependencies>
+                <dependency>
+                    <groupId>com.ibm.db2.jcc</groupId>
+                    <artifactId>db2jcc4</artifactId>
+                    <scope>test</scope>
+                </dependency>
+            </dependencies>
         </profile>
     </profiles>
     
