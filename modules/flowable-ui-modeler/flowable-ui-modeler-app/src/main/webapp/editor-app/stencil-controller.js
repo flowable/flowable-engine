@@ -1095,12 +1095,24 @@ angular.module('flowableModeler')
                         }
 
                         var parentItem = $scope.getStencilItemById(parentCandidate.getStencil().idWithoutNs());
-                        
-                        if (parentItem.roles.indexOf("Activity") > -1) {
-                            if (item.roles.indexOf("IntermediateEventOnActivityBoundary") > -1 || item.roles.indexOf("SentryOnItemBoundary") > -1) {
+                        if (parentItem.roles.indexOf('Activity') > -1) {
+                            if (item.roles.indexOf('IntermediateEventOnActivityBoundary') > -1 
+                                || item.roles.indexOf('EntryCriterionOnItemBoundary') > -1
+                                || item.roles.indexOf('ExitCriterionOnItemBoundary') > -1) {
                                 _canContain = true;
                             }
                             
+                        } else if(parentItem.roles.indexOf('StageActivity') > -1) {
+                            if (item.roles.indexOf('EntryCriterionOnItemBoundary') > -1
+                                || item.roles.indexOf('ExitCriterionOnItemBoundary') > -1) {
+                                _canContain = true;
+                            }
+                        
+                        } else if(parentItem.roles.indexOf('StageModelActivity') > -1) { 
+                            if (item.roles.indexOf('ExitCriterionOnItemBoundary') > -1) {
+                                _canContain = true;
+                            }
+                        
                         } else if (parentCandidate.getStencil().idWithoutNs() === 'Pool') {
                           	if (item.id === 'Lane') {
                             	_canContain = true;

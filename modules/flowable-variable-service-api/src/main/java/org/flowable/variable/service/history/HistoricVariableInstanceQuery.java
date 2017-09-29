@@ -74,9 +74,14 @@ public interface HistoricVariableInstanceQuery extends Query<HistoricVariableIns
     HistoricVariableInstanceQuery variableValueLikeIgnoreCase(String variableName, String variableValue);
     
     /**
-     * Only select historic variables with the give scope id.
+     * Only select historic variables with the given scope id.
      */
     HistoricVariableInstanceQuery scopeId(String scopeId);
+    
+    /**
+     * Only select historic variables with the given sub scope id.
+     */
+    HistoricVariableInstanceQuery subScopeId(String subScopeId);
     
     /**
      * Only select historic variables with the give scope type.

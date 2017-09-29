@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
 
 /**
@@ -56,6 +57,13 @@ public class CmmnDeploymentEntityImpl extends AbstractEntityNoRevision implement
     }
 
     public Map<String, CmmnResourceEntity> getResources() {
+        if (resources == null && id != null) {
+            List<CmmnResourceEntity> resourcesList = CommandContextUtil.getCmmnResourceEntityManager().findResourcesByDeploymentId(id);
+            resources = new HashMap<>();
+            for (CmmnResourceEntity resource : resourcesList) {
+                resources.put(resource.getName(), resource);
+            }
+        }
         return resources;
     }
 

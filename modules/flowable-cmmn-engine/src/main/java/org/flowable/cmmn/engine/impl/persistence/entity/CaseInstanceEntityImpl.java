@@ -151,7 +151,7 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
 
     @Override
     protected Collection<VariableInstanceEntity> loadVariableInstances() {
-        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeType(id, VariableScopeType.CASE_INSTANCE);
+        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeType(id, VariableScopeType.CMMN);
     }
 
     @Override
@@ -165,17 +165,17 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
     @Override
     protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
         variableInstance.setScopeId(id);
-        variableInstance.setScopeType(VariableScopeType.CASE_INSTANCE);
+        variableInstance.setScopeType(VariableScopeType.CMMN);
     }
 
     @Override
     protected VariableInstanceEntity getSpecificVariable(String variableName) {
-        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeTypeAndName(id, VariableScopeType.CASE_INSTANCE, variableName);
+        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeTypeAndName(id, VariableScopeType.CMMN, variableName);
     }
 
     @Override
     protected List<VariableInstanceEntity> getSpecificVariables(Collection<String> variableNames) {
-        return CommandContextUtil.getVariableService().findVariableInstancesByScopeIdAndScopeTypeAndNames(id, VariableScopeType.CASE_INSTANCE, variableNames);
+        return CommandContextUtil.getVariableService().findVariableInstancesByScopeIdAndScopeTypeAndNames(id, VariableScopeType.CMMN, variableNames);
     }
 
     @Override

@@ -29,7 +29,7 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery planItemInstanceState(String state);
     PlanItemInstanceQuery planItemInstanceStateActive();
     PlanItemInstanceQuery planItemInstanceStateAvailable();
-    PlanItemInstanceQuery planItemInstanceStatCompleted();
+    PlanItemInstanceQuery planItemInstanceStateCompleted();
     PlanItemInstanceQuery planItemInstanceStateTerminated();
     PlanItemInstanceQuery planItemInstanceStartedBefore(Date startedBefore);
     PlanItemInstanceQuery planItemInstanceStarterAfter(Date startedAfer);

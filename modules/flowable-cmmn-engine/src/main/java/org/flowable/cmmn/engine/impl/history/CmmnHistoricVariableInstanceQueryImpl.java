@@ -45,7 +45,14 @@ public class CmmnHistoricVariableInstanceQueryImpl implements HistoricVariableIn
     @Override
     public HistoricVariableInstanceQuery caseInstanceId(String caseInstanceId) {
         wrappedHistoricVariableInstanceQuery.scopeId(caseInstanceId);
-        wrappedHistoricVariableInstanceQuery.scopeType(VariableScopeType.CASE_INSTANCE);
+        wrappedHistoricVariableInstanceQuery.scopeType(VariableScopeType.CMMN);
+        return this;
+    }
+    
+    @Override
+    public HistoricVariableInstanceQuery planItemInstanceId(String planItemInstanceId) {
+        wrappedHistoricVariableInstanceQuery.subScopeId(planItemInstanceId);
+        wrappedHistoricVariableInstanceQuery.scopeType(VariableScopeType.CMMN);
         return this;
     }
 

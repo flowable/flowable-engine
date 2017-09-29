@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
 import org.flowable.cmmn.editor.json.model.ModelInfo;
 import org.flowable.cmmn.model.BaseElement;
@@ -39,17 +40,18 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
     protected Map<String, String> formMap;
     protected Map<String, ModelInfo> formKeyMap;
 
-    public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToBpmnMap, Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
+    public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap, 
+            Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
 
-        fillJsonTypes(convertersToBpmnMap);
-        fillBpmnTypes(convertersToJsonMap);
+        fillJsonTypes(convertersToCmmnMap);
+        fillCmmnTypes(convertersToJsonMap);
     }
 
     public static void fillJsonTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToBpmnMap) {
         convertersToBpmnMap.put(STENCIL_TASK_HUMAN, HumanTaskJsonConverter.class);
     }
 
-    public static void fillBpmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
+    public static void fillCmmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
         convertersToJsonMap.put(HumanTask.class, HumanTaskJsonConverter.class);
     }
 
@@ -234,7 +236,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
 
     @Override
     protected CaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, 
-                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel) {
+                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
         
         HumanTask task = new HumanTask();
 

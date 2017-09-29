@@ -22,9 +22,9 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 /**
  * @author Joram Barrez
  */
-public class ExitPlanItemOperation extends AbstractDeletePlanItemOperation {
+public class ExitPlanItemInstanceOperation extends AbstractDeletePlanItemInstanceOperation {
     
-    public ExitPlanItemOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+    public ExitPlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
     }
     
@@ -49,7 +49,7 @@ public class ExitPlanItemOperation extends AbstractDeletePlanItemOperation {
     protected void completeChildPlanItems() {
         for (PlanItemInstanceEntity child : planItemInstanceEntity.getChildren()) {
             if (StateTransition.isPossible(planItemInstanceEntity, PlanItemTransition.EXIT)) {
-                CommandContextUtil.getAgenda(commandContext).planExitPlanItem(child);
+                CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstance(child);
             }
         }
     }

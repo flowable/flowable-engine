@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.PlanItem;
@@ -21,9 +22,9 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 /**
  * @author Joram Barrez
  */
-public class ActivatePlanItemOperation extends AbstractPlanItemInstanceOperation {
+public class ActivatePlanItemInstanceOperation extends AbstractPlanItemInstanceOperation {
     
-    public ActivatePlanItemOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+    public ActivatePlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
     }
     
@@ -41,7 +42,11 @@ public class ActivatePlanItemOperation extends AbstractPlanItemInstanceOperation
     
     protected void executeActivityBehavior() {
         CmmnActivityBehavior activityBehavior = (CmmnActivityBehavior) planItemInstanceEntity.getPlanItem().getBehavior();
-        activityBehavior.execute(planItemInstanceEntity);
+        if (activityBehavior instanceof CoreCmmnActivityBehavior) {
+            ((CoreCmmnActivityBehavior) activityBehavior).execute(commandContext, planItemInstanceEntity);
+        } else {
+            activityBehavior.execute(planItemInstanceEntity);
+        }
     }
     
     @Override

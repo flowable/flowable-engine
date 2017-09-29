@@ -25,13 +25,9 @@ import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.Stage;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class CmmnDIExport implements CmmnXmlConstants {
     
-    private static final Logger LOGGER = LoggerFactory.getLogger(CmmnDIExport.class);
-
     public static void writeCmmnDI(CmmnModel model, XMLStreamWriter xtw) throws Exception {
         // CMMN DI information
         xtw.writeStartElement(CMMNDI_PREFIX, ELEMENT_DI_CMMN, CMMNDI_NAMESPACE);
@@ -104,8 +100,13 @@ public class CmmnDIExport implements CmmnXmlConstants {
         xtw.writeAttribute(ATTRIBUTE_DI_X, String.valueOf(graphicInfo.getX()));
         xtw.writeAttribute(ATTRIBUTE_DI_Y, String.valueOf(graphicInfo.getY()));
         xtw.writeEndElement();
+        
+        // The xsd requires a CMMNLabel to be there, even though the spec text says it's optional
+        xtw.writeStartElement(CMMNDI_PREFIX, ELEMENT_DI_LABEL, CMMNDI_NAMESPACE);
+        xtw.writeEndElement();
 
         xtw.writeEndElement();
+        
     }
     
     protected static void createCmmnEdge(CmmnModel model, String associationId, String sourceElementId, String targetElementId, XMLStreamWriter xtw) throws Exception {
@@ -125,6 +126,10 @@ public class CmmnDIExport implements CmmnXmlConstants {
             xtw.writeAttribute(ATTRIBUTE_DI_Y, String.valueOf(graphicInfo.getY()));
             xtw.writeEndElement();
         }
+        
+        // The xsd requires a CMMNLabel to be there, even though the spec text says it's optional
+        xtw.writeStartElement(CMMNDI_PREFIX, ELEMENT_DI_LABEL, CMMNDI_NAMESPACE);
+        xtw.writeEndElement();
 
         xtw.writeEndElement();
     }

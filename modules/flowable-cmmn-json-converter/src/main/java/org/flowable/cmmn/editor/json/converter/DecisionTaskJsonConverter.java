@@ -14,6 +14,7 @@ package org.flowable.cmmn.editor.json.converter;
 
 import java.util.Map;
 
+import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnModel;
@@ -51,7 +52,7 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements 
 
     @Override
     protected CaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, 
-                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel) {
+                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
 
         ServiceTask serviceTask = new ServiceTask();
         serviceTask.setType(ServiceTask.DMN_TASK);

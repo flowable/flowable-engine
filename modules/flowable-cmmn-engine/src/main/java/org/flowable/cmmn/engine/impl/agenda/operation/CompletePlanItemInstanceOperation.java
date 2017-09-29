@@ -20,20 +20,20 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 /**
  * @author Joram Barrez
  */
-public class TerminatePlanItemOperation extends AbstractDeletePlanItemOperation {
-
-    public TerminatePlanItemOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+public class CompletePlanItemInstanceOperation extends AbstractDeletePlanItemInstanceOperation {
+    
+    public CompletePlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
     }
 
     @Override
     protected String getNewState() {
-        return PlanItemInstanceState.TERMINATED;
+        return PlanItemInstanceState.COMPLETED;
     }
-
+    
     @Override
     protected String getLifeCycleTransition() {
-        return PlanItemTransition.TERMINATE;
+        return PlanItemTransition.COMPLETE;
     }
     
 }

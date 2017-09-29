@@ -64,7 +64,7 @@ public class CaseDefinitionQueryTest extends FlowableCmmnTestCase {
     public void deleteTestDeployments() {
         List<CmmnDeployment> deployments = cmmnRepositoryService.createDeploymentQuery().list();
         for (CmmnDeployment cmmnDeployment : deployments) {
-            cmmnRepositoryService.deleteDeploymentAndRelatedData(cmmnDeployment.getId());
+            cmmnRepositoryService.deleteDeployment(cmmnDeployment.getId(), true);
         }
     }
 

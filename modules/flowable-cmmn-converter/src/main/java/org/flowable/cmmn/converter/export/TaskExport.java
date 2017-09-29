@@ -22,9 +22,7 @@ public class TaskExport extends AbstractPlanItemDefinitionExport {
         // start task element
         xtw.writeStartElement(ELEMENT_TASK);
         writeCommonPlanItemDefinitionAttributes(task, xtw);
-        if (!task.isBlocking()) {
-            xtw.writeAttribute(ATTRIBUTE_IS_BLOCKING, "false");
-        }
+        writeBlockingAttribute(xtw, task);
         
         // end task element
         xtw.writeEndElement();

@@ -48,6 +48,7 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     protected boolean excludeTaskRelated;
     protected boolean excludeVariableInitialization;
     protected String scopeId;
+    protected String subScopeId;
     protected String scopeType;
     protected QueryVariableValue queryVariableValue;
 
@@ -225,6 +226,12 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     }
     
     @Override
+    public HistoricVariableInstanceQuery subScopeId(String subScopeId) {
+        this.subScopeId = subScopeId;
+        return this;
+    }
+    
+    @Override
     public HistoricVariableInstanceQuery scopeType(String scopeType) {
         this.scopeType = scopeType;
         return this;
@@ -313,6 +320,10 @@ public class HistoricVariableInstanceQueryImpl extends AbstractQuery<HistoricVar
     
     public String getScopeId() {
         return scopeId;
+    }
+    
+    public String getSubScopeId() {
+        return subScopeId;
     }
 
     public String getScopeType() {

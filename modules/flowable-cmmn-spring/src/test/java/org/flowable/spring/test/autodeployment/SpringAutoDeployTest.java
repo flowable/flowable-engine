@@ -25,9 +25,9 @@ import org.flowable.cmmn.engine.repository.CaseDefinition;
 import org.flowable.cmmn.engine.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.engine.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.repository.CmmnDeploymentQuery;
-import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.engine.common.impl.util.IoUtil;
 import org.junit.After;
+import org.junit.Test;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.AbstractXmlApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
@@ -36,7 +36,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public class SpringAutoDeployTest extends FlowableCmmnTestCase {
+public class SpringAutoDeployTest {
 
     protected static final String CTX_PATH = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-context.xml";
     protected static final String CTX_NO_DROP_PATH = "org/flowable/spring/test/autodeployment/SpringAutoDeployTest-no-drop-context.xml";
@@ -54,12 +54,13 @@ public class SpringAutoDeployTest extends FlowableCmmnTestCase {
     }
 
     @After
-    protected void tearDown() throws Exception {
+    public void tearDown() throws Exception {
         removeAllDeployments();
         this.applicationContext = null;
         this.repositoryService = null;
     }
 
+    @Test
     public void testBasicActivitiSpringIntegration() {
         createAppContext("org/flowable/spring/test/autodeployment/SpringAutoDeployTest-context.xml");
         List<CaseDefinition> caseDefinitions = repositoryService.createCaseDefinitionQuery().orderByCaseDefinitionKey().asc().list();
@@ -75,6 +76,7 @@ public class SpringAutoDeployTest extends FlowableCmmnTestCase {
         assertEquals(expectedCaseDefinitionKeys, caseDefinitionKeys);
     }
 
+    @Test
     public void testNoRedeploymentForSpringContainerRestart() throws Exception {
         createAppContext(CTX_PATH);
         CmmnDeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
@@ -89,16 +91,17 @@ public class SpringAutoDeployTest extends FlowableCmmnTestCase {
     }
 
     // Updating the form file should lead to a new deployment when restarting the Spring container
+    @Test
     public void testResourceRedeploymentAfterCaseDefinitionChange() throws Exception {
         createAppContext(CTX_PATH);
         assertEquals(1, repositoryService.createDeploymentQuery().count());
         ((AbstractXmlApplicationContext) applicationContext).destroy();
 
         String filePath = "org/flowable/spring/test/autodeployment/simple-case.cmmn";
-        String originalFormFileContent = IoUtil.readFileAsString(filePath);
-        String updatedFormFileContent = originalFormFileContent.replace("Simple decision", "My simple decision");
-        assertTrue(updatedFormFileContent.length() > originalFormFileContent.length());
-        IoUtil.writeStringToFile(updatedFormFileContent, filePath);
+        String originalCaseFileContent = IoUtil.readFileAsString(filePath);
+        String updatedCaseFileContent = originalCaseFileContent.replace("Case 1", "My simple case");
+        assertTrue(updatedCaseFileContent.length() > originalCaseFileContent.length());
+        IoUtil.writeStringToFile(updatedCaseFileContent, filePath);
 
         // Classic produced/consumer problem here:
         // The file is already written in Java, but not yet completely persisted by the OS
@@ -110,7 +113,7 @@ public class SpringAutoDeployTest extends FlowableCmmnTestCase {
             repositoryService = (CmmnRepositoryService) applicationContext.getBean("cmmnRepositoryService");
         } finally {
             // Reset file content such that future test are not seeing something funny
-            IoUtil.writeStringToFile(originalFormFileContent, filePath);
+            IoUtil.writeStringToFile(originalCaseFileContent, filePath);
         }
 
         // Assertions come AFTER the file write! Otherwise the form file is
@@ -119,24 +122,28 @@ public class SpringAutoDeployTest extends FlowableCmmnTestCase {
         assertEquals(2, repositoryService.createCaseDefinitionQuery().count());
     }
 
+    @Test
     public void testAutoDeployWithCreateDropOnCleanDb() {
         createAppContext(CTX_CREATE_DROP_CLEAN_DB);
         assertEquals(1, repositoryService.createDeploymentQuery().count());
         assertEquals(1, repositoryService.createCaseDefinitionQuery().count());
     }
 
+    @Test
     public void testAutoDeployWithDeploymentModeDefault() {
         createAppContext(CTX_DEPLOYMENT_MODE_DEFAULT);
         assertEquals(1, repositoryService.createDeploymentQuery().count());
         assertEquals(1, repositoryService.createCaseDefinitionQuery().count());
     }
 
+    @Test
     public void testAutoDeployWithDeploymentModeSingleResource() {
         createAppContext(CTX_DEPLOYMENT_MODE_SINGLE_RESOURCE);
         assertEquals(1, repositoryService.createDeploymentQuery().count());
         assertEquals(1, repositoryService.createCaseDefinitionQuery().count());
     }
 
+    @Test
     public void testAutoDeployWithDeploymentModeResourceParentFolder() {
         createAppContext(CTX_DEPLOYMENT_MODE_RESOURCE_PARENT_FOLDER);
         assertEquals(2, repositoryService.createDeploymentQuery().count());
@@ -146,9 +153,9 @@ public class SpringAutoDeployTest extends FlowableCmmnTestCase {
     // --Helper methods
     // ----------------------------------------------------------
 
-    private void removeAllDeployments() {
+    protected void removeAllDeployments() {
         for (CmmnDeployment deployment : repositoryService.createDeploymentQuery().list()) {
-            repositoryService.deleteDeploymentAndRelatedData(deployment.getId());
+            repositoryService.deleteDeployment(deployment.getId(), true);
         }
     }
 

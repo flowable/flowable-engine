@@ -80,7 +80,7 @@ public abstract class CmmnTestHelper {
         LOGGER.debug("annotation @CmmnDeployment deletes deployment for {}.{}", testClass.getSimpleName(), methodName);
         if (deploymentId != null) {
             try {
-                cmmnEngine.getCmmnRepositoryService().deleteDeploymentAndRelatedData(deploymentId);
+                cmmnEngine.getCmmnRepositoryService().deleteDeployment(deploymentId, true);
             
             } catch (FlowableObjectNotFoundException e) {
                 // Deployment was already deleted by the test case. Ignore.

@@ -58,12 +58,12 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     
     @Override
     public TaskActivityBehavior createTaskActivityBehavior(PlanItem planItem, Task task) {
-        return new TaskActivityBehavior(task.isBlocking());
+        return new TaskActivityBehavior(task);
     }
     
     @Override
     public CaseTaskActivityBehavior createCaseTaskActivityBehavior(PlanItem planItem, CaseTask caseTask) {
-        return new CaseTaskActivityBehavior(expressionManager.createExpression(caseTask.getCaseRef()), caseTask.isBlocking());
+        return new CaseTaskActivityBehavior(expressionManager.createExpression(caseTask.getCaseRef()), caseTask);
     }
     
     @Override
@@ -72,12 +72,12 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
         if (StringUtils.isNotEmpty(processTask.getProcessRefExpression())) {
             processRefExpression = expressionManager.createExpression(processTask.getProcessRefExpression());
         }
-        return new ProcessTaskActivityBehavior(processTask.getProcess(), processRefExpression, processTask.isBlocking());
+        return new ProcessTaskActivityBehavior(processTask.getProcess(), processRefExpression, processTask);
     }
     
     @Override
     public CmmnClassDelegate createCmmnClassDelegate(PlanItem planItem, ServiceTask task) {
-        return classDelegateFactory.create(task.getImplementation());
+        return classDelegateFactory.create(task.getImplementation(), task.getFieldExtensions());
     }
 
     @Override

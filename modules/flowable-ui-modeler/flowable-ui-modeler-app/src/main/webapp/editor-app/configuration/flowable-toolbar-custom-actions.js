@@ -13,6 +13,13 @@
 
 // Create custom functions for the FLOWABLE-editor
 FLOWABLE.TOOLBAR.ACTIONS.closeEditor =  function(services) {
+    if (services.editorManager && services.editorManager.getStencilData()) {
+        var stencilNameSpace = services.editorManager.getStencilData().namespace;
+        if (stencilNameSpace !== undefined && stencilNameSpace !== null && stencilNameSpace.indexOf('cmmn1.1') !== -1) {
+            services.$location.path("/casemodels");
+            return;
+        }
+    }
 	services.$location.path("/processes");
 };
 

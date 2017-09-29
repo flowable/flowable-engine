@@ -12,9 +12,9 @@
  */
 package org.flowable.spring.test.el;
 
-public class CustomRuleBean {
+public class CustomBean {
 
-    public boolean test(String value) {
-        return !"test".equals(value);
+    public String hello(String value) {
+        return "hello " + value;
     }
 }

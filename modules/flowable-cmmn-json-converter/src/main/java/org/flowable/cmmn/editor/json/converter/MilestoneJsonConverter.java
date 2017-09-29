@@ -14,6 +14,7 @@ package org.flowable.cmmn.editor.json.converter;
 
 import java.util.Map;
 
+import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnModel;
@@ -30,16 +31,15 @@ public class MilestoneJsonConverter extends BaseCmmnJsonConverter {
 
     public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToBpmnMap,
             Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
-
         fillJsonTypes(convertersToBpmnMap);
-        fillBpmnTypes(convertersToJsonMap);
+        fillCmmnTypes(convertersToJsonMap);
     }
 
     public static void fillJsonTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToBpmnMap) {
         convertersToBpmnMap.put(STENCIL_MILESTONE, MilestoneJsonConverter.class);
     }
 
-    public static void fillBpmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
+    public static void fillCmmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
         convertersToJsonMap.put(Milestone.class, MilestoneJsonConverter.class);
     }
 
@@ -49,8 +49,7 @@ public class MilestoneJsonConverter extends BaseCmmnJsonConverter {
 
     @Override
     protected CaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, 
-                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel) {
-
+                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
         Milestone milestone = new Milestone();
         return milestone;
     }

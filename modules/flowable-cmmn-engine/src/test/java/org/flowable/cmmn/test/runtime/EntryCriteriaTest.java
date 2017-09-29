@@ -62,7 +62,7 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
         assertEquals(0, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
         
-        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .list();
@@ -90,7 +90,7 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
         // 3 sentries, each completion should trigger the milestone
         for (int i=0; i<3; i++) {
             CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
-            List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+            List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                     .caseInstanceId(caseInstance.getId())
                     .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                     .orderByName().asc()
@@ -101,7 +101,7 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
             assertEquals(1, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
             
             // Triggering the other two should not have additional effects
-            for (PlanItemInstance planItemInstance :cmmnRuntimeService.createPlanItemQuery().caseInstanceId(caseInstance.getId()).planItemInstanceState(PlanItemInstanceState.ACTIVE).list()) {
+            for (PlanItemInstance planItemInstance :cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceState(PlanItemInstanceState.ACTIVE).list()) {
                 cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
             }
             
@@ -115,7 +115,7 @@ public class EntryCriteriaTest extends FlowableCmmnTestCase {
     public void testTerminateCaseInstanceAfterOneOutOfMultipleOnPartsSatisfied() {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         
-        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .orderByName().asc()

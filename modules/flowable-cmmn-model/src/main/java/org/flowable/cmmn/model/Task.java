@@ -18,6 +18,7 @@ package org.flowable.cmmn.model;
 public class Task extends PlanItemDefinition {
     
     protected boolean blocking = true;
+    protected String blockingExpression;
 
     public boolean isBlocking() {
         return blocking;
@@ -26,9 +27,18 @@ public class Task extends PlanItemDefinition {
     public void setBlocking(boolean blocking) {
         this.blocking = blocking;
     }
+    
+    public String getBlockingExpression() {
+        return blockingExpression;
+    }
+
+    public void setBlockingExpression(String blockingExpression) {
+        this.blockingExpression = blockingExpression;
+    }
 
     public void setValues(Task otherElement) {
         super.setValues(otherElement);
         setBlocking(otherElement.isBlocking());
+        setBlockingExpression(otherElement.getBlockingExpression());
     }
 }

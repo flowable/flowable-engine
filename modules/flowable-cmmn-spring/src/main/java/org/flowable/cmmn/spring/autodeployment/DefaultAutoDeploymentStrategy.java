@@ -41,7 +41,7 @@ public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrateg
     public void deployResources(final String deploymentNameHint, final Resource[] resources, final CmmnRepositoryService repositoryService) {
 
         // Create a single deployment for all resources using the name hint as the literal name
-        final CmmnDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().name(deploymentNameHint);
+        final CmmnDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentNameHint);
 
         for (final Resource resource : resources) {
             final String resourceName = determineResourceName(resource);

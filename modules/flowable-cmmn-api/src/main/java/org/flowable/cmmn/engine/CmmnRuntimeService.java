@@ -30,6 +30,8 @@ public interface CmmnRuntimeService {
     
     void terminateCaseInstance(String caseInstanceId);
     
+    void evaluateCriteria(String caseInstanceId);
+    
     Map<String, Object> getVariables(String caseInstanceId);
     
     Object getVariable(String caseInstanceId, String variableName);
@@ -40,7 +42,7 @@ public interface CmmnRuntimeService {
     
     CaseInstanceQuery createCaseInstanceQuery();
     
-    PlanItemInstanceQuery createPlanItemQuery();
+    PlanItemInstanceQuery createPlanItemInstanceQuery();
     
     MilestoneInstanceQuery createMilestoneInstanceQuery();
     

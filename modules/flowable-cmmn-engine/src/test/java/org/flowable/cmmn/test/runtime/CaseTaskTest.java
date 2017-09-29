@@ -41,7 +41,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
     
     @After
     public void deleteOneTaskCaseDefinition() {
-        cmmnRepositoryService.deleteDeploymentAndRelatedData(oneTaskCaseDeploymentId);
+        cmmnRepositoryService.deleteDeployment(oneTaskCaseDeploymentId, true);
     }
     
     @Test
@@ -53,7 +53,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
         
-        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemQuery()
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .singleResult();
@@ -63,7 +63,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
         assertEquals(2, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
-        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .orderByName().asc()
                 .list();
@@ -77,7 +77,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         
-        planItemInstance = cmmnRuntimeService.createPlanItemQuery()
+        planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .singleResult();
@@ -99,7 +99,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
         
-        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemQuery()
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .singleResult();
@@ -110,7 +110,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         
         assertEquals(2, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
-        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .orderByName().asc()
                 .list();
@@ -123,7 +123,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         
-        planItemInstance = cmmnRuntimeService.createPlanItemQuery()
+        planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .singleResult();
         assertEquals("The Task", planItemInstance.getName());
@@ -142,7 +142,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         assertEquals(2, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
         
-        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+        List<PlanItemInstance> planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .orderByName().asc()
                 .list();
@@ -158,7 +158,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
         
-        planItemInstances = cmmnRuntimeService.createPlanItemQuery()
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .orderByName().asc()
                 .list();
@@ -175,7 +175,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         assertEquals(2, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
         
-        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemQuery()
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .orderByName().asc()
@@ -188,7 +188,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
         
-        planItemInstance = cmmnRuntimeService.createPlanItemQuery()
+        planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .orderByName().asc()
                 .singleResult();
@@ -206,7 +206,7 @@ public class CaseTaskTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         assertEquals(2, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
         
-        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemQuery()
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .singleResult();

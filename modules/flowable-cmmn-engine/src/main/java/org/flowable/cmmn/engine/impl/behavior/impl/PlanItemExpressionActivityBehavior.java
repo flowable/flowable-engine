@@ -45,7 +45,7 @@ public class PlanItemExpressionActivityBehavior implements CmmnActivityBehavior 
                 planItemInstance.setVariable(resultVariable, value);
             }
 
-            CommandContextUtil.getAgenda().planCompletePlanItem((PlanItemInstanceEntity) planItemInstance);
+            CommandContextUtil.getAgenda().planCompletePlanItemInstance((PlanItemInstanceEntity) planItemInstance);
             
         } catch (Exception exc) {
             throw new FlowableException(exc.getMessage(), exc);

@@ -15,19 +15,19 @@
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
-    <bean id="dmnEngineConfiguration" class="org.flowable.dmn.spring.SpringDmnEngineConfiguration">
+    <bean id="cmmnEngineConfiguration" class="org.flowable.cmmn.spring.SpringCmmnEngineConfiguration">
         <property name="dataSource" ref="dataSource"/>
         <property name="transactionManager" ref="transactionManager"/>
         <property name="databaseSchemaUpdate" value="true"/>
     </bean>
 
-    <bean id="dmnEngine" class="org.flowable.dmn.spring.DmnEngineFactoryBean">
-        <property name="dmnEngineConfiguration" ref="dmnEngineConfiguration"/>
+    <bean id="cmmnEngine" class="org.flowable.cmmn.spring.CmmnEngineFactoryBean">
+        <property name="cmmnEngineConfiguration" ref="cmmnEngineConfiguration"/>
     </bean>
 
-    <bean id="dmnRepositoryService" factory-bean="dmnEngine" factory-method="getDmnRepositoryService"/>
-    <bean id="dmnRuleService" factory-bean="dmnEngine" factory-method="getDmnRuleService"/>
+    <bean id="cmmnRepositoryService" factory-bean="cmmnEngine" factory-method="getCmmnRepositoryService"/>
+    <bean id="cmmnRuntimeService" factory-bean="cmmnEngine" factory-method="getCmmnRuntimeService"/>
     
-    <bean id="customRuleBean" class="org.flowable.spring.test.el.CustomRuleBean" />
+    <bean id="customBean" class="org.flowable.spring.test.el.CustomBean" />
 
 </beans>

@@ -114,6 +114,10 @@ public class CmmnDeploymentManager {
     }
     
     public void removeDeployment(String deploymentId) {
+        removeDeployment(deploymentId, true);
+    }
+    
+    public void removeDeployment(String deploymentId, boolean cascade) {
         CmmnDeploymentEntity deployment = deploymentEntityManager.findById(deploymentId);
         if (deployment == null) {
             throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.", CmmnDeploymentEntity.class);
@@ -123,7 +127,7 @@ public class CmmnDeploymentManager {
             caseDefinitionCache.remove(caseDefinition.getId());
         }
         
-        deploymentEntityManager.deleteDeploymentAndRelatedData(deploymentId, true);
+        deploymentEntityManager.deleteDeploymentAndRelatedData(deploymentId, cascade);
     }
 
     public List<Deployer> getDeployers() {

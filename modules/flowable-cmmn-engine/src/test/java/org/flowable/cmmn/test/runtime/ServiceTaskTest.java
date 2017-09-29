@@ -36,7 +36,7 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
                         .start();
         assertNotNull(caseInstance);
         
-        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemQuery()
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .singleResult();
@@ -52,6 +52,125 @@ public class ServiceTaskTest extends FlowableCmmnTestCase {
         assertEquals("executed", cmmnHistoryService.createHistoricVariableInstanceQuery()
                         .caseInstanceId(caseInstance.getId())
                         .variableName("javaDelegate")
+                        .singleResult().getValue());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testJavaServiceTaskFields() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                        .caseDefinitionKey("myCase")
+                        .variable("test", "test")
+                        .start();
+        assertNotNull(caseInstance);
+        
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .singleResult();
+        assertNotNull(planItemInstance);
+        
+        assertEquals("test", cmmnRuntimeService.getVariable(caseInstance.getId(), "testValue"));
+        assertEquals(true, cmmnRuntimeService.getVariable(caseInstance.getId(), "testExpression"));
+        
+        // Triggering the task should start the child case instance
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        
+        assertEquals("test", cmmnHistoryService.createHistoricVariableInstanceQuery()
+                        .caseInstanceId(caseInstance.getId())
+                        .variableName("testValue")
+                        .singleResult().getValue());
+        assertEquals(true, cmmnHistoryService.createHistoricVariableInstanceQuery()
+                        .caseInstanceId(caseInstance.getId())
+                        .variableName("testExpression")
+                        .singleResult().getValue());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testResultVariableName() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                        .caseDefinitionKey("myCase")
+                        .variable("test", "test")
+                        .start();
+        assertNotNull(caseInstance);
+        
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .singleResult();
+        assertNotNull(planItemInstance);
+        
+        assertEquals("hello test", cmmnRuntimeService.getVariable(caseInstance.getId(), "beanResponse"));
+        
+        // Triggering the task should start the child case instance
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        
+        assertEquals("hello test", cmmnHistoryService.createHistoricVariableInstanceQuery()
+                        .caseInstanceId(caseInstance.getId())
+                        .variableName("beanResponse")
+                        .singleResult().getValue());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testDelegateExpression() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                        .caseDefinitionKey("myCase")
+                        .variable("test", "test2")
+                        .start();
+        assertNotNull(caseInstance);
+        
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .singleResult();
+        assertNotNull(planItemInstance);
+        
+        assertEquals("executed", cmmnRuntimeService.getVariable(caseInstance.getId(), "javaDelegate"));
+        assertEquals("test2", cmmnRuntimeService.getVariable(caseInstance.getId(), "test"));
+        
+        // Triggering the task should start the child case instance
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        
+        assertEquals("executed", cmmnHistoryService.createHistoricVariableInstanceQuery()
+                        .caseInstanceId(caseInstance.getId())
+                        .variableName("javaDelegate")
+                        .singleResult().getValue());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testDelegateExpressionFields() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                        .caseDefinitionKey("myCase")
+                        .variable("test", "test")
+                        .start();
+        assertNotNull(caseInstance);
+        
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .singleResult();
+        assertNotNull(planItemInstance);
+        
+        assertEquals("test", cmmnRuntimeService.getVariable(caseInstance.getId(), "testValue"));
+        assertEquals(true, cmmnRuntimeService.getVariable(caseInstance.getId(), "testExpression"));
+        
+        // Triggering the task should start the child case instance
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().count());
+        
+        assertEquals("test", cmmnHistoryService.createHistoricVariableInstanceQuery()
+                        .caseInstanceId(caseInstance.getId())
+                        .variableName("testValue")
+                        .singleResult().getValue());
+        assertEquals(true, cmmnHistoryService.createHistoricVariableInstanceQuery()
+                        .caseInstanceId(caseInstance.getId())
+                        .variableName("testExpression")
                         .singleResult().getValue());
     }
     

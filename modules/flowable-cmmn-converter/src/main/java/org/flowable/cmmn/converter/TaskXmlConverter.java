@@ -79,6 +79,11 @@ public class TaskXmlConverter extends PlanItemDefinitiomXmlConverter {
         if (StringUtils.isNotEmpty(isBlockingString)) {
             task.setBlocking(Boolean.valueOf(isBlockingString));
         }
+
+        String isBlockingExpressionString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_IS_BLOCKING_EXPRESSION);
+        if (StringUtils.isNotEmpty(isBlockingExpressionString)) {
+            task.setBlockingExpression(isBlockingExpressionString);
+        }
     }
     
 }

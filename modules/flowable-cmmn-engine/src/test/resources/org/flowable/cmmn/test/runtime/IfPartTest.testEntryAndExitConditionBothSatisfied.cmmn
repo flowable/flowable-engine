@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+  <case id="testEntryAndExitConditionBothSatisfied" name="testEntryAndExitConditionBothSatisfied">
+    <casePlanModel id="casePlanModel" name="testExitStageWithCondition">
+      <planItem id="planItem5" definitionRef="sid-03E35ADE-670A-4455-B400-6CC2EAF0FF79"></planItem>
+      <stage id="sid-03E35ADE-670A-4455-B400-6CC2EAF0FF79">
+        <planItem id="planItem4" definitionRef="sid-056D1B81-510E-4CA9-935C-C44D018C796C"></planItem>
+        <stage id="sid-056D1B81-510E-4CA9-935C-C44D018C796C">
+          <planItem id="planItem3" definitionRef="sid-C726C9EB-91F1-4EC8-9402-BEB5B7C0E605"></planItem>
+          <stage id="sid-C726C9EB-91F1-4EC8-9402-BEB5B7C0E605">
+            <planItem id="planItem1" name="A" definitionRef="sid-444C760C-1122-4706-B305-2DD909C61C70">
+              <entryCriterion id="sid-70543C8E-27E0-4CFD-9CCF-BA7E696010CD" sentryRef="sentry1"></entryCriterion>
+            </planItem>
+            <planItem id="planItem2" name="B" definitionRef="sid-F3D46F70-69C7-4F76-AF5F-5FF0806FF2BB">
+              <exitCriterion id="sid-E737BDBD-9B7A-43AA-819A-6F7C2475371C" sentryRef="sentry2"></exitCriterion>
+            </planItem>
+            <sentry id="sentry1">
+              <ifPart>
+                <condition><![CDATA[${caseInstance.getVariable('conditionVariable') != null && conditionVariable}]]></condition>
+              </ifPart>
+            </sentry>
+            <sentry id="sentry2">
+              <ifPart>
+                <condition><![CDATA[${caseInstance.getVariable('conditionVariable') != null && conditionVariable}]]></condition>
+              </ifPart>
+            </sentry>
+            <task id="sid-444C760C-1122-4706-B305-2DD909C61C70" name="A"></task>
+            <task id="sid-F3D46F70-69C7-4F76-AF5F-5FF0806FF2BB" name="B"></task>
+          </stage>
+        </stage>
+      </stage>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_testExitStageWithCondition">
+      <cmmndi:CMMNShape id="CMMNShape_casePlanModel" cmmnElementRef="casePlanModel">
+        <dc:Bounds height="714.0" width="718.0" x="40.0" y="40.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem5" cmmnElementRef="planItem5">
+        <dc:Bounds height="329.0" width="648.0" x="75.0" y="90.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem4" cmmnElementRef="planItem4">
+        <dc:Bounds height="264.0" width="507.0" x="120.0" y="117.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem3" cmmnElementRef="planItem3">
+        <dc:Bounds height="183.0" width="387.0" x="177.0" y="165.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+        <dc:Bounds height="80.0" width="100.0" x="210.0" y="209.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_sid-70543C8E-27E0-4CFD-9CCF-BA7E696010CD" cmmnElementRef="sid-70543C8E-27E0-4CFD-9CCF-BA7E696010CD">
+        <dc:Bounds height="22.0" width="14.0" x="202.02010995562753" y="239.05113175349223"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+        <dc:Bounds height="80.0" width="100.0" x="405.0" y="214.5"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_sid-E737BDBD-9B7A-43AA-819A-6F7C2475371C" cmmnElementRef="sid-E737BDBD-9B7A-43AA-819A-6F7C2475371C">
+        <dc:Bounds height="22.0" width="14.0" x="397.5061162653264" y="237.88956847392515"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>

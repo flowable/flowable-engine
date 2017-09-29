@@ -86,6 +86,7 @@ public class AbstractAutoDeploymentStrategyTest {
         when(resourceMock3.getInputStream()).thenReturn(inputStreamMock);
 
         when(repositoryServiceMock.createDeployment()).thenReturn(deploymentBuilderMock);
+        when(deploymentBuilderMock.enableDuplicateFiltering()).thenReturn(deploymentBuilderMock);
         when(deploymentBuilderMock.name(isA(String.class))).thenReturn(deploymentBuilderMock);
 
         when(deploymentBuilderMock.deploy()).thenReturn(deploymentMock);

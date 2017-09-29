@@ -327,6 +327,11 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
     public String getScopeId() {
         return null;
     }
+    
+    @Override
+    public String getSubScopeId() {
+        return null;
+    }
 
     @Override
     public String getScopeType() {
@@ -335,6 +340,11 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
 
     @Override
     public void setScopeId(String scopeId) {
+        
+    }
+    
+    @Override
+    public void setSubScopeId(String subScopeId) {
         
     }
 

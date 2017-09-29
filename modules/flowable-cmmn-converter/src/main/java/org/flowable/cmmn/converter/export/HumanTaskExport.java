@@ -22,9 +22,7 @@ public class HumanTaskExport extends AbstractPlanItemDefinitionExport {
         // start human task element
         xtw.writeStartElement(ELEMENT_HUMAN_TASK);
         writeCommonPlanItemDefinitionAttributes(humanTask, xtw);
-        if (!humanTask.isBlocking()) {
-            xtw.writeAttribute(ATTRIBUTE_IS_BLOCKING, "false");
-        }
+        writeBlockingAttribute(xtw, humanTask);
         
         // end human task element
         xtw.writeEndElement();

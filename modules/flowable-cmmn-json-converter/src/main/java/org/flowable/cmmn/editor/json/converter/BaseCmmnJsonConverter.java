@@ -19,6 +19,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.EditorJsonConstants;
 import org.flowable.cmmn.editor.constants.StencilConstants;
+import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
 import org.flowable.cmmn.editor.json.converter.util.JsonConverterUtil;
 import org.flowable.cmmn.model.Association;
@@ -30,6 +31,7 @@ import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
+import org.flowable.cmmn.model.Task;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,21 +100,28 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Sten
         planItemNode.set("outgoing", outgoingArrayNode);
     }
 
-    public void convertToCmmnModel(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel) {
+    public void convertToCmmnModel(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, BaseElement parentElement, 
+            Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
 
-        BaseElement baseElement = convertJsonToElement(elementNode, modelNode, processor, parentElement, shapeMap, cmmnModel);
+        BaseElement baseElement = convertJsonToElement(elementNode, modelNode, processor, parentElement, shapeMap, cmmnModel, cmmnModelIdHelper);
         baseElement.setId(CmmnJsonConverterUtil.getElementId(elementNode));
 
         if (baseElement instanceof PlanItemDefinition) {
             PlanItemDefinition planItemDefinition = (PlanItemDefinition) baseElement;
             planItemDefinition.setName(getPropertyValueAsString(PROPERTY_NAME, elementNode));
             planItemDefinition.setDocumentation(getPropertyValueAsString(PROPERTY_DOCUMENTATION, elementNode));
+            
+            if (planItemDefinition instanceof Task) {
+                Task task = (Task) planItemDefinition;
+                task.setBlocking(getPropertyValueAsBoolean(PROPERTY_IS_BLOCKING, elementNode));
+                task.setBlockingExpression(getPropertyValueAsString(PROPERTY_IS_BLOCKING_EXPRESSION, elementNode));
+            }
         
             Stage stage = (Stage) parentElement;
             stage.addPlanItemDefinition(planItemDefinition);
             
             PlanItem planItem = new PlanItem();
-            planItem.setId("planItem" + cmmnModel.nextPlanItemId());
+            planItem.setId("planItem" + cmmnModelIdHelper.nextPlanItemId());
             planItem.setName(planItemDefinition.getName());
             planItem.setPlanItemDefinition(planItemDefinition);
             planItem.setDefinitionRef(planItemDefinition.getId());
@@ -138,7 +147,7 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Sten
     protected abstract void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel);
 
     protected abstract BaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, 
-                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel);
+                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper);
 
     protected abstract String getStencilId(BaseElement baseElement);
     

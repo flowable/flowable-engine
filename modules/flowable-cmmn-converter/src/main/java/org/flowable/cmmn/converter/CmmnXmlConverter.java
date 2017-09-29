@@ -35,6 +35,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.exception.XMLException;
 import org.flowable.cmmn.converter.export.CaseExport;
 import org.flowable.cmmn.converter.export.CmmnDIExport;
@@ -344,7 +345,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
     protected void processPlanFragment(CmmnModel cmmnModel, PlanFragment planFragment) {
         processPlanItems(cmmnModel, planFragment);
-        processSentries(planFragment);
+        processSentries(cmmnModel.getPrimaryCase().getPlanModel(), planFragment);
 
         if (planFragment instanceof Stage) {
             Stage stage = (Stage) planFragment;
@@ -379,7 +380,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 boolean exitCriteriaAllowed = true;
                 if (planItemDefinition instanceof Task) {
                     Task task = (Task) planItemDefinition;
-                    if (!task.isBlocking()) {
+                    if (!task.isBlocking() && StringUtils.isEmpty(task.getBlockingExpression())) {
                         exitCriteriaAllowed = false;
                     }
                 }
@@ -434,10 +435,10 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         }
     }
 
-    protected void processSentries(PlanFragment planFragment) {
+    protected void processSentries(Stage planModelStage, PlanFragment planFragment) {
         for (Sentry sentry : planFragment.getSentries()) {
             for (SentryOnPart onPart : sentry.getOnParts()) {
-                PlanItem planItem = sentry.getParent().findPlanItem(onPart.getSourceRef());
+                PlanItem planItem = planModelStage.findPlanItemInPlanFragmentOrDownwards(onPart.getSourceRef());
                 if (planItem != null) {
                     onPart.setSource(planItem);
                 } else {

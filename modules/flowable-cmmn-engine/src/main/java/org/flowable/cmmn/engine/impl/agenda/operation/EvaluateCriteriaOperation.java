@@ -62,7 +62,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
         CriteriaEvaluationResult planModelExitCriteriaEvaluationResult = evaluateExitCriteria(caseInstanceEntity, getPlanModel(caseInstanceEntity));
         if (CriteriaEvaluationResult.SENTRY_SATISFIED.equals(planModelExitCriteriaEvaluationResult)) {
-            CommandContextUtil.getAgenda(commandContext).planTerminateCase(caseInstanceEntity, false);
+            CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstance(caseInstanceEntity.getId(), false);
 
         } else {
             boolean criteriaChangeOrActiveChildren = evaluatePlanItemsCriteria(caseInstanceEntity.getChildPlanItemInstances());
@@ -70,7 +70,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("No active plan items found for plan model, completing case instance");
                 }
-                CommandContextUtil.getAgenda(commandContext).planCompleteCase(caseInstanceEntity);
+                CommandContextUtil.getAgenda(commandContext).planCompleteCaseInstance(caseInstanceEntity);
             }
 
         }
@@ -96,20 +96,20 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             if (PlanItemInstanceState.AVAILABLE.equals(planItemInstanceEntity.getState())) {
                 evaluationResult = evaluateEntryCriteria(planItemInstanceEntity, planItem);
                 if (evaluationResult.equals(CriteriaEvaluationResult.SENTRY_SATISFIED)) {
-                    CommandContextUtil.getAgenda(commandContext).planActivatePlanItem(planItemInstanceEntity);
+                    CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstance(planItemInstanceEntity);
                 }
 
             } else if (PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState())) {
                 evaluationResult = evaluateExitCriteria(planItemInstanceEntity, planItem);
                 if (evaluationResult.equals(CriteriaEvaluationResult.SENTRY_SATISFIED)) {
-                    CommandContextUtil.getAgenda(commandContext).planExitPlanItem(planItemInstanceEntity);
+                    CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstance(planItemInstanceEntity);
 
                 } else if (planItem.getPlanItemDefinition() instanceof Stage) {
                     boolean criteriaChangeOrActiveChildrenForStage = evaluateStagePlanItemInstance(planItemInstanceEntity);
                     if (criteriaChangeOrActiveChildrenForStage) {
                         activeChildren++;
                     } else {
-                        CommandContextUtil.getAgenda(commandContext).planCompletePlanItem(planItemInstanceEntity);
+                        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance(planItemInstanceEntity);
                     }
 
                 } else {
@@ -213,8 +213,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                     }
                 }
 
-                if (sentry.getOnParts().size() == entityWithSentryPartInstances.getSatisfiedSentryPartInstances().size()
-                        && (sentry.getSentryIfPart() == null || sentryIfPartSatisfied)) {
+                if (entityWithSentryPartInstances.getSatisfiedSentryPartInstances().size() == (sentry.getOnParts().size() + (sentry.getSentryIfPart() != null ? 1 : 0))) {
                     return CriteriaEvaluationResult.SENTRY_SATISFIED;
                 } else if (criteriaSatisfied) {
                     partTriggered = true;

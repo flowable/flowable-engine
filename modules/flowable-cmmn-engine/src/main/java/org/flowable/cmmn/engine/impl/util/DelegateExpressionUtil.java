@@ -38,9 +38,9 @@ public class DelegateExpressionUtil {
 
             DelegateExpressionFieldInjectionMode injectionMode = CommandContextUtil.getCmmnEngineConfiguration().getDelegateExpressionFieldInjectionMode();
             if (injectionMode == DelegateExpressionFieldInjectionMode.COMPATIBILITY) {
-                applyFieldExtension(fieldExtensions, delegate, variableScope, true);
+                applyFieldExtensions(fieldExtensions, delegate, variableScope, true);
             } else if (injectionMode == DelegateExpressionFieldInjectionMode.MIXED) {
-                applyFieldExtension(fieldExtensions, delegate, variableScope, false);
+                applyFieldExtensions(fieldExtensions, delegate, variableScope, false);
             }
 
         }
@@ -48,7 +48,7 @@ public class DelegateExpressionUtil {
         return delegate;
     }
     
-    protected static void applyFieldExtension(List<FieldExtension> fieldExtensions, Object target, VariableScope variableScope, boolean throwExceptionOnMissingField) {
+    protected static void applyFieldExtensions(List<FieldExtension> fieldExtensions, Object target, VariableScope variableScope, boolean throwExceptionOnMissingField) {
         if (fieldExtensions != null) {
             for (FieldExtension fieldExtension : fieldExtensions) {
                 applyFieldExtension(fieldExtension, target, variableScope, throwExceptionOnMissingField);
@@ -62,7 +62,7 @@ public class DelegateExpressionUtil {
             value = fieldExtension.getStringValue();
         } else if (fieldExtension.getExpression() != null) {
             ExpressionManager expressionManager = CommandContextUtil.getCmmnEngineConfiguration().getExpressionManager();
-            value = expressionManager.createExpression(fieldExtension.getExpression()).getValue(variableScope);
+            value = expressionManager.createExpression(fieldExtension.getExpression());
         }
         
         ReflectUtil.invokeSetterOrField(target, fieldExtension.getFieldName(), value, throwExceptionOnMissingField);

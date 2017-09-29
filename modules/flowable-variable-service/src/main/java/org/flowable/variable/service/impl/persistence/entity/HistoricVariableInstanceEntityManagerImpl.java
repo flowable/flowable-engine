@@ -119,6 +119,11 @@ public class HistoricVariableInstanceEntityManagerImpl extends AbstractEntityMan
     public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesByScopeIdAndScopeType(String scopeId, String scopeType) {
         return historicVariableInstanceDataManager.findHistoricalVariableInstancesByScopeIdAndScopeType(scopeId, scopeType);
     }
+    
+    @Override
+    public List<HistoricVariableInstanceEntity> findHistoricalVariableInstancesBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
+        return historicVariableInstanceDataManager.findHistoricalVariableInstancesBySubScopeIdAndScopeType(subScopeId, scopeType);
+    }
 
     @Override
     public void deleteHistoricVariableInstancesByTaskId(String taskId) {

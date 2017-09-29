@@ -66,7 +66,7 @@ public class StageConverterTest extends AbstractConverterTest {
         assertEquals(819.0, graphicInfo.getWidth(), 0.1);
         assertEquals(713.0, graphicInfo.getHeight(), 0.1);
 
-        PlanItem planItem = planModelStage.findPlanItem("planItem1");
+        PlanItem planItem = planModelStage.findPlanItemInPlanFragmentOrUpwards("planItem1");
         assertNotNull(planItem);
         assertEquals("planItem1", planItem.getId());
         assertEquals("Task", planItem.getName());
@@ -86,7 +86,7 @@ public class StageConverterTest extends AbstractConverterTest {
         assertEquals(100.0, graphicInfo.getWidth(), 0.1);
         assertEquals(80.0, graphicInfo.getHeight(), 0.1);
         
-        PlanItem taskPlanItem = planModelStage.findPlanItem("planItem2");
+        PlanItem taskPlanItem = planModelStage.findPlanItemInPlanFragmentOrUpwards("planItem2");
         assertNotNull(planItem);
         assertEquals("planItem2", taskPlanItem.getId());
         assertEquals("Task2", taskPlanItem.getName());
@@ -106,7 +106,7 @@ public class StageConverterTest extends AbstractConverterTest {
         assertEquals(100.0, graphicInfo.getWidth(), 0.1);
         assertEquals(80.0, graphicInfo.getHeight(), 0.1);
         
-        PlanItem milestonePlanItem = planModelStage.findPlanItem("planItem6");
+        PlanItem milestonePlanItem = planModelStage.findPlanItemInPlanFragmentOrUpwards("planItem6");
         assertNotNull(milestonePlanItem);
         assertEquals("planItem6", milestonePlanItem.getId());
         assertEquals("Milestone 1", milestonePlanItem.getName());
@@ -149,7 +149,7 @@ public class StageConverterTest extends AbstractConverterTest {
         assertEquals("complete", onPart.getStandardEvent());
         assertEquals("planItem2", onPart.getSourceRef());
         
-        PlanItem stagePlanItem = planModelStage.findPlanItem("planItem5");
+        PlanItem stagePlanItem = planModelStage.findPlanItemInPlanFragmentOrUpwards("planItem5");
         assertNotNull(stagePlanItem);
         assertEquals("planItem5", stagePlanItem.getId());
         assertEquals("Child stage", stagePlanItem.getName());
@@ -171,7 +171,7 @@ public class StageConverterTest extends AbstractConverterTest {
         assertEquals(241.0, graphicInfo.getHeight(), 0.1);
         
         assertEquals(2, stage.getPlanItems().size());
-        PlanItem subPlanItem1 = stage.findPlanItem("planItem3");
+        PlanItem subPlanItem1 = stage.findPlanItemInPlanFragmentOrUpwards("planItem3");
         assertNotNull(subPlanItem1);
         assertEquals("planItem3", subPlanItem1.getId());
         assertEquals("Sub task 1", subPlanItem1.getName());
@@ -192,7 +192,7 @@ public class StageConverterTest extends AbstractConverterTest {
         assertEquals(100.0, graphicInfo.getWidth(), 0.1);
         assertEquals(80.0, graphicInfo.getHeight(), 0.1);
         
-        PlanItem subPlanItem2 = stage.findPlanItem("planItem4");
+        PlanItem subPlanItem2 = stage.findPlanItemInPlanFragmentOrUpwards("planItem4");
         assertNotNull(subPlanItem2);
         assertEquals("planItem4", subPlanItem2.getId());
         assertEquals("Sub task 2", subPlanItem2.getName());

@@ -55,7 +55,7 @@ public class ResourceParentFolderAutoDeploymentStrategy extends AbstractAutoDepl
 
             final String deploymentName = determineDeploymentName(deploymentNameHint, group.getKey());
 
-            final CmmnDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().name(deploymentName);
+            final CmmnDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentName);
 
             for (final Resource resource : group.getValue()) {
                 final String resourceName = determineResourceName(resource);

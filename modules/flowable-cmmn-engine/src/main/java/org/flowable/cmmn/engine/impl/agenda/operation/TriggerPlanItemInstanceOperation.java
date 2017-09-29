@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.engine.impl.behavior.CmmnTriggerableActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.PlanItem;
@@ -22,9 +23,9 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 /**
  * @author Joram Barrez
  */
-public class TriggerPlanItemOperation extends AbstractPlanItemInstanceOperation {
+public class TriggerPlanItemInstanceOperation extends AbstractPlanItemInstanceOperation {
     
-    public TriggerPlanItemOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+    public TriggerPlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
     }
     
@@ -37,7 +38,11 @@ public class TriggerPlanItemOperation extends AbstractPlanItemInstanceOperation 
                         + CmmnTriggerableActivityBehavior.class + " interface");
             }
             CmmnTriggerableActivityBehavior behavior = (CmmnTriggerableActivityBehavior) planItemInstanceEntity.getPlanItem().getBehavior();
-            behavior.trigger(planItemInstanceEntity);
+            if (behavior instanceof CoreCmmnTriggerableActivityBehavior) {
+                ((CoreCmmnTriggerableActivityBehavior) behavior).trigger(commandContext, planItemInstanceEntity);
+            } else {
+                behavior.trigger(planItemInstanceEntity);
+            }
         }
     }
     

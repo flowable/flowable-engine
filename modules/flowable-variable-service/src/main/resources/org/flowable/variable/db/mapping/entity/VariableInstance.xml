@@ -7,7 +7,7 @@
     <!-- VARIABLE INSTANCE INSERT -->
 
     <insert id="insertVariableInstance" parameterType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
-        insert into ${prefix}ACT_RU_VARIABLE (ID_, REV_, TYPE_, NAME_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, SCOPE_ID_, SCOPE_TYPE_, 
+        insert into ${prefix}ACT_RU_VARIABLE (ID_, REV_, TYPE_, NAME_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, 
             BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
         values (
             #{id, jdbcType=VARCHAR},
@@ -18,6 +18,7 @@
             #{executionId, jdbcType=VARCHAR},
             #{taskId, jdbcType=VARCHAR},
             #{scopeId, jdbcType=VARCHAR},
+            #{subScopeId, jdbcType=VARCHAR},
             #{scopeType, jdbcType=VARCHAR},
             #{byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
             #{doubleValue, jdbcType=DOUBLE},
@@ -28,7 +29,7 @@
     </insert>
 
     <insert id="bulkInsertVariableInstance" parameterType="java.util.List">
-        INSERT INTO ${prefix}ACT_RU_VARIABLE (ID_, REV_, TYPE_, NAME_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, SCOPE_ID_, SCOPE_TYPE_, 
+        INSERT INTO ${prefix}ACT_RU_VARIABLE (ID_, REV_, TYPE_, NAME_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, 
             BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_) VALUES
         <foreach collection="list" item="variable" index="index" separator=",">
             (
@@ -40,6 +41,7 @@
                 #{variable.executionId, jdbcType=VARCHAR},
                 #{variable.taskId, jdbcType=VARCHAR},
                 #{variable.scopeId, jdbcType=VARCHAR},
+                #{variable.subScopeId, jdbcType=VARCHAR},
                 #{variable.scopeType, jdbcType=VARCHAR},
                 #{variable.byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
                 #{variable.doubleValue, jdbcType=DOUBLE},
@@ -53,7 +55,7 @@
     <insert id="bulkInsertVariableInstance" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
         <foreach collection="list" item="variable" index="index">
-            INTO ${prefix}ACT_RU_VARIABLE (ID_, REV_, TYPE_, NAME_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, SCOPE_ID_, SCOPE_TYPE_, 
+            INTO ${prefix}ACT_RU_VARIABLE (ID_, REV_, TYPE_, NAME_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, 
                 BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_) VALUES
             (
                 #{variable.id, jdbcType=VARCHAR},
@@ -64,6 +66,7 @@
                 #{variable.executionId, jdbcType=VARCHAR},
                 #{variable.taskId, jdbcType=VARCHAR},
                 #{variable.scopeId, jdbcType=VARCHAR},
+                #{variable.subScopeId, jdbcType=VARCHAR},
                 #{variable.scopeType, jdbcType=VARCHAR},
                 #{variable.byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
                 #{variable.doubleValue, jdbcType=DOUBLE},
@@ -89,6 +92,9 @@
             </if>
             <if test="originalPersistentState.scopeId != scopeId">
                 SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.subScopeId != scopeId">
+                SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR},
             </if>
             <if test="originalPersistentState.scopeType != scopeType">
                 SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
@@ -139,6 +145,7 @@
         <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
         <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
         <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR" />
+        <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR" />
         <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR" />
         <result property="byteArrayRef" column="BYTEARRAY_ID_" typeHandler="VariableByteArrayRefTypeHandler" />
         <result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
@@ -230,6 +237,31 @@
     <select id="selectVariableInstanceByScopeIdAndScopeTypeAndNames"  parameterType="java.util.Map" resultMap="variableInstanceResultMap">
         select * from ${prefix}ACT_RU_VARIABLE
         where SCOPE_ID_ = #{parameter.scopeId, jdbcType=VARCHAR} 
+        and SCOPE_TYPE_ =  #{parameter.scopeType, jdbcType=VARCHAR}
+        <if test="parameter.variableNames != null and parameter.variableNames.size > 0">
+            and (
+            <foreach collection="parameter.variableNames" index="index" item="name" separator=" or ">
+                NAME_= #{name, jdbcType=VARCHAR}
+            </foreach>
+            )
+        </if>
+    </select>
+    
+     <select id="selectVariableInstancesBySubScopeIdAndScopeType" parameterType="java.util.Map" resultMap="variableInstanceResultMap">
+        select * from ${prefix}ACT_RU_VARIABLE
+        where SCOPE_ID_ = #{parameter.subScopeId, jdbcType=VARCHAR} and SCOPE_TYPE_ =  #{parameter.scopeType, jdbcType=VARCHAR}
+    </select> 
+    
+    <select id="selectVariableInstanceBySubScopeIdAndScopeTypeAndName" parameterType="java.util.Map" resultMap="variableInstanceResultMap">
+        select * from ${prefix}ACT_RU_VARIABLE
+        where SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR} 
+        and SCOPE_TYPE_ =  #{scopeType, jdbcType=VARCHAR}
+        and NAME_ = #{variableName, jdbcType=VARCHAR}
+    </select> 
+    
+    <select id="selectVariableInstanceBySubScopeIdAndScopeTypeAndNames"  parameterType="java.util.Map" resultMap="variableInstanceResultMap">
+        select * from ${prefix}ACT_RU_VARIABLE
+        where SUB_SCOPE_ID_ = #{parameter.subScopeId, jdbcType=VARCHAR} 
         and SCOPE_TYPE_ =  #{parameter.scopeType, jdbcType=VARCHAR}
         <if test="parameter.variableNames != null and parameter.variableNames.size > 0">
             and (

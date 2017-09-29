@@ -115,7 +115,7 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
     }
     
     protected void deleteDeployment(String deploymentId) {
-        cmmnEngine.getCmmnRepositoryService().deleteDeploymentAndRelatedData(deploymentId);
+        cmmnEngine.getCmmnRepositoryService().deleteDeployment(deploymentId, true);
     }
     
     protected void assertDatabaseEmpty(FrameworkMethod method) {

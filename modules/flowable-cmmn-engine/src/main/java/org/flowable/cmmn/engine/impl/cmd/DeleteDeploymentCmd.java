@@ -23,16 +23,18 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 public class DeleteDeploymentCmd implements Command<Void> {
 
     protected String deploymentId;
+    protected boolean cascade;
 
-    public DeleteDeploymentCmd(String deploymentId) {
+    public DeleteDeploymentCmd(String deploymentId, boolean cascade) {
         this.deploymentId = deploymentId;
+        this.cascade = cascade;
     }
 
     public Void execute(CommandContext commandContext) {
         if (deploymentId == null) {
             throw new FlowableIllegalArgumentException("deploymentId is null");
         }
-        CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDeploymentManager().removeDeployment(deploymentId);
+        CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDeploymentManager().removeDeployment(deploymentId, cascade);
         return null;
     }
 }

@@ -327,6 +327,11 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     public String getScopeId() {
         return null;
     }
+    
+    @Override
+    public String getSubScopeId() {
+        return null;
+    }
 
     @Override
     public String getScopeType() {

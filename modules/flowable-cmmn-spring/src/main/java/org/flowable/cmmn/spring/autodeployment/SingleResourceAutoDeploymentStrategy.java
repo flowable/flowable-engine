@@ -45,7 +45,7 @@ public class SingleResourceAutoDeploymentStrategy extends AbstractAutoDeployment
         for (final Resource resource : resources) {
 
             final String resourceName = determineResourceName(resource);
-            final CmmnDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().name(resourceName);
+            final CmmnDeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(resourceName);
 
             try {
                 deploymentBuilder.addInputStream(resourceName, resource.getInputStream());

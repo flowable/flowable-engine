@@ -12,11 +12,13 @@
  */
 package org.flowable.cmmn.converter.export;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.Task;
 
 public class AbstractPlanItemDefinitionExport implements CmmnXmlConstants {
     
@@ -34,4 +36,15 @@ public class AbstractPlanItemDefinitionExport implements CmmnXmlConstants {
             xtw.writeEndElement();
         }
     }
+
+    public static void writeBlockingAttribute(XMLStreamWriter xtw, Task task) throws XMLStreamException {
+        if (StringUtils.isEmpty(task.getBlockingExpression())) {
+            if (!task.isBlocking()) { // if omitted, by default assumed true
+                xtw.writeAttribute(ATTRIBUTE_IS_BLOCKING, "false");
+            }
+        } else {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_IS_BLOCKING_EXPRESSION, task.getBlockingExpression());
+        }
+    }
+
 }

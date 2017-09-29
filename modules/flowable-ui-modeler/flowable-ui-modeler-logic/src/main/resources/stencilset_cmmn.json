@@ -29,7 +29,7 @@
       "type" : "String",
       "title" : "Name",
       "value" : "",
-      "description" : "The descriptive name of the BPMN element.",
+      "description" : "The descriptive name of the CMMN element.",
       "popular" : true,
       "refToView" : "text_name"
     } ]
@@ -40,7 +40,25 @@
       "type" : "Text",
       "title" : "Documentation",
       "value" : "",
-      "description" : "The descriptive name of the BPMN element.",
+      "description" : "The descriptive name of the CMMN element.",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "blockingpackage",
+    "properties" : [ {
+      "id" : "isblocking",
+      "type" : "Boolean",
+      "title" : "Blocking",
+      "value" : "true",
+      "description" : "Boolean property, default true. If false the task will automatically complete the task after executing any associated logic",
+      "popular" : true
+    },
+    {
+      "id" : "isblockingexpression",
+      "type" : "String",
+      "title" : "Blocking expression",
+      "value" : "",
+      "description" : "An expression to control at runtime whether this task is blocking or not. When set, the value of the blocking property is ignored.",
       "popular" : true
     } ]
   }, {
@@ -434,6 +452,16 @@
       "description" : "Set the decision table reference",
       "popular" : true
     } ]
+  }, {
+    "name" : "ifpartconditionpackage",
+    "properties" : [ {
+      "id" : "ifpartcondition",
+      "type" : "String",
+      "title" : "Condition",
+      "value" : "",
+      "description" : "An expression that must be true to satisfy the sentry",
+      "popular" : true
+    } ]
   } ],
   "stencils" : [ {
     "type" : "node",
@@ -459,7 +487,7 @@
     "hide" : true,
     "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage" ],
     "hiddenPropertyPackages" : [ ],
-    "roles" : [ ]
+    "roles" : [ "StageModelActivity" ]
   }, {
     "type" : "node",
     "id" : "Stage",
@@ -471,7 +499,18 @@
     "hide" : true,
     "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage" ],
     "hiddenPropertyPackages" : [ ],
-    "roles" : [ "all" ]
+    "roles" : [ "StageActivity", "all" ]
+  }, {
+    "type" : "node",
+    "id" : "Task",
+    "title" : "Task",
+    "description" : "A manual task",
+    "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"102\" height=\"82\" version=\"1.0\"><defs></defs><oryx:magnets><oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" /><oryx:magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" /><oryx:magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" /><oryx:magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /><oryx:magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /><oryx:magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /><oryx:magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" /><oryx:magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" /><oryx:magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" /><oryx:magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" /><oryx:magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" /><oryx:magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" /><oryx:magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" /></oryx:magnets><g pointer-events=\"fill\" oryx:minimumSize=\"50 40\"><rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"79\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" /><rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"100\" height=\"80\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\" fill=\"#f9f9f9\" /><text font-size=\"12\" id=\"text_name\" x=\"50\" y=\"40\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"#373e48\"></text></g></svg>",
+    "icon" : "activity/task.png",
+    "groups" : [ "Activities" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "blockingpackage"],
+    "hiddenPropertyPackages" : [ ],
+    "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
     "type" : "node",
     "id" : "HumanTask",
@@ -480,7 +519,7 @@
     "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n\n   width=\"102\"\n   height=\"82\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n\t<rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"79\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" />\n\t<rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"100\" height=\"80\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\" fill=\"#f9f9f9\" />\n\t\t<text \n\t\t\tfont-size=\"12\" \n\t\t\tid=\"text_name\" \n\t\t\tx=\"50\" \n\t\t\ty=\"40\" \n\t\t\toryx:align=\"middle center\"\n\t\t\toryx:fittoelem=\"text_frame\"\n\t\t\tstroke=\"#373e48\">\n\t\t</text>\n\t\n\t<g id=\"userTask\" transform=\"translate(3,3)\">\n\t\t<path oryx:anchors=\"top left\"\n       \t\tstyle=\"fill:#d1b575;stroke:none;\"\n       \t\t d=\"m 1,17 16,0 0,-1.7778 -5.333332,-3.5555 0,-1.7778 c 1.244444,0 1.244444,-2.3111 1.244444,-2.3111 l 0,-3.0222 C 12.555557,0.8221 9.0000001,1.0001 9.0000001,1.0001 c 0,0 -3.5555556,-0.178 -3.9111111,3.5555 l 0,3.0222 c 0,0 0,2.3111 1.2444443,2.3111 l 0,1.7778 L 1,15.2222 1,17 17,17\" \n         />\n\t\t\n\t</g></g>\n</svg>",
     "icon" : "activity/humantask.png",
     "groups" : [ "Activities" ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "usertaskassignmentpackage", "formkeydefinitionpackage", "formreferencepackage", "duedatedefinitionpackage", "prioritydefinitionpackage" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "blockingpackage", "usertaskassignmentpackage", "formkeydefinitionpackage", "formreferencepackage", "duedatedefinitionpackage", "prioritydefinitionpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -502,7 +541,7 @@
     "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?> <svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"102\" height=\"82\" version=\"1.0\"> <defs></defs> <oryx:magnets> <oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" /> <oryx:magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" /> <oryx:magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" /> <oryx:magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /> <oryx:magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /> <oryx:magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /> <oryx:magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" /> <oryx:magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" /> <oryx:magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" /> <oryx:magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" /> <oryx:magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" /> <oryx:magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" /> <oryx:magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" /> </oryx:magnets> <g pointer-events=\"fill\" oryx:minimumSize=\"50 40\"> <defs> <radialGradient id=\"background\" cx=\"10%\" cy=\"10%\" r=\"100%\" fx=\"10%\" fy=\"10%\"> <stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/> <stop id=\"fill_el\" offset=\"100%\" stop-color=\"#ffffcc\" stop-opacity=\"1\"/> </radialGradient> </defs> <rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"79\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" /> <rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"100\" height=\"80\" rx=\"10\" ry=\"10\" stroke=\"black\" stroke-width=\"1\" fill=\"url(#background) #ffffcc\" /> <text font-size=\"12\" id=\"text_name\" x=\"50\" y=\"40\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"black\"> </text> <g id=\"caseTask\" transform=\"scale(0.7,0.7) translate(8,8)\"> <path oryx:anchors=\"top left\" style=\"opacity:1;fill:#000000;stroke:#000000\" d=\"M5 4 L9 0 L18 0 L 21 3z\"/> <path oryx:anchors=\"top left\" style=\"opacity:1;fill:#F4F6F7;stroke:#000000\" d=\"M1 23 L1 4 L30 4 L30 23z\"/> </g> <g id=\"manualActivation\" display=\"none\"> <g id=\"b\" oryx:anchors=\"bottom\"> <path oryx:anchors=\"bottom\" fill=\"none\" d=\"M45.5 68 L54 73 L45.5 77 L45.5 69z\" transform=\"translate(-2,0)\"/> </g> </g><g id=\"repetition\" display=\"none\"> <g id=\"b\" oryx:anchors=\"bottom\"> <path oryx:anchors=\"bottom\" fill=\"none\" d=\"M47 68 v10 M50 68 v10 M53 68 v10\" transform=\"translate(10,0)\"/> </g> </g> <g id=\"required\" display=\"none\"> <g id=\"b\" oryx:anchors=\"bottom\" > <path fill=\"none\" oryx:anchors=\"bottom\" d=\"M49 67 L49 74 M49 76 L49 78\" transform=\"translate(-11,0)\"/> </g> </g> </g> </svg>",
     "icon" : "activity/casetask.png",
     "groups" : [ "Activities" ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage"],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "blockingpackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -513,9 +552,9 @@
     "view" : "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\" ?><svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"14\"  height=\"22\" version=\"1.0\"> <oryx:magnets><oryx:magnet oryx:cx=\"8\" oryx:cy=\"10\" oryx:default=\"yes\" /></oryx:magnets><oryx:docker oryx:cx=\"16\" oryx:cy=\"16\" /><g pointer-events=\"fill\"><defs><radialGradient id=\"background\" cx=\"10%\" cy=\"10%\" r=\"100%\" fx=\"10%\" fy=\"10%\"><stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/><stop id=\"fill_el\" offset=\"100%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/></radialGradient></defs><polygon id=\"bg_frame\" points=\"7 0  14 11  7 22 0 11\" fill=\"url(#background) #ffffff\" stroke=\"#000000\"/></g></svg>",
     "icon" : "sentry/entry.png",
     "groups" : [ "Sentries" ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "ifpartconditionpackage" ],
     "hiddenPropertyPackages" : [ ],
-    "roles" : [ "association_start", "SentriesMorph", "SentryOnItemBoundary" ]
+    "roles" : [ "association_start", "SentriesMorph", "EntryCriterionOnItemBoundary" ]
   }, {
     "type" : "node",
     "id" : "ExitCriterion",
@@ -524,9 +563,9 @@
     "view" : "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\" ?><svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"14\"  height=\"22\" version=\"1.0\"> <oryx:magnets><oryx:magnet oryx:cx=\"8\" oryx:cy=\"10\" oryx:default=\"yes\" /></oryx:magnets><oryx:docker oryx:cx=\"16\" oryx:cy=\"16\" /><g pointer-events=\"fill\"><defs><radialGradient id=\"background\" cx=\"10%\" cy=\"10%\" r=\"100%\" fx=\"10%\" fy=\"10%\"><stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/><stop id=\"fill_el\" offset=\"100%\" stop-color=\"#000000\" stop-opacity=\"1\"/></radialGradient></defs><polygon id=\"bg_frame\" points=\"7 0  14 11  7 22 0 11\" fill=\"url(#background) #000000\" /></g></svg>",
     "icon" : "sentry/exit.png",
     "groups" : [ "Sentries" ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "ifpartconditionpackage" ],
     "hiddenPropertyPackages" : [ ],
-    "roles" : [ "association_start", "SentriesMorph", "SentryOnItemBoundary" ]
+    "roles" : [ "association_start", "SentriesMorph", "ExitCriterionOnItemBoundary" ]
   }, {
     "type" : "edge",
     "id" : "Association",
@@ -563,15 +602,30 @@
         "to" : [ "association_end" ]
       } ]
     }, {
-      "role" : "SentryOnItemBoundary",
+      "role" : "EntryCriterionOnItemBoundary",
       "connects" : [ {
         "from" : "Activity",
-        "to" : [ "SentryOnItemBoundary" ]
-      } ]
-    }],
+        "to" : [ "EntryCriterionOnItemBoundary"]
+      }, {
+        "from" : "StageActivity",
+        "to" : [ "EntryCriterionOnItemBoundary"]
+      }]},  {
+        "role" : "ExitCriterionOnItemBoundary",
+        "connects" : [ {
+          "from" : "Activity",
+          "to" : [ "ExitCriterionOnItemBoundary" ]
+        }, {
+          "from" : "StageActivity",
+          "to" : [ "ExitCriterionOnItemBoundary"]
+        }, {
+          "from" : "StageModelActivity",
+          "to" : [ "ExitCriterionOnItemBoundary"]
+        }
+      ]}
+    ],
     "containmentRules" : [ {
       "role" : "CaseDiagram",
-      "contains" : [ "CasePlanModel" ]
+      "contains" : [ "CasePlanModel", "ExitCriterion" ]
     }, {
       "role" : "CasePlanModel",
       "contains" : [ "all" ]

@@ -52,6 +52,8 @@ public class SetVariablesCmd implements Command<Void> {
         }
         caseInstanceEntity.setVariables(variables);
         
+        CommandContextUtil.getAgenda(commandContext).planEvaluateCriteria(caseInstanceId);
+        
         return null;
     }
 

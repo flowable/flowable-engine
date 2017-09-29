@@ -14,42 +14,44 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import java.util.List;
 
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
  */
-public class InitStageOperation extends AbstractPlanItemInstanceOperation {
+public class InitPlanModelInstanceOperation extends AbstractCaseInstanceOperation {
     
-    public InitStageOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        super(commandContext, planItemInstanceEntity);
+    protected CaseInstanceEntity caseInstanceEntity;
+    
+    public InitPlanModelInstanceOperation(CommandContext commandContext, CaseInstanceEntity caseInstanceEntity) {
+        super(commandContext, null, caseInstanceEntity);
+        this.caseInstanceEntity = caseInstanceEntity;
     }
     
     @Override
     public void run() {
-        Stage stage = getStage(planItemInstanceEntity);
+        super.run();
         
-        planItemInstanceEntity.setState(PlanItemInstanceState.ACTIVE);
-        planItemInstanceEntity.setStage(true);
-        
+        Stage stage = CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId()).getPlanModel();
         List<PlanItemInstanceEntity> planItemInstances = createPlanItemInstances(commandContext, 
                 stage.getPlanItems(), 
-                planItemInstanceEntity.getCaseDefinitionId(), 
-                planItemInstanceEntity.getCaseInstanceId(), 
-                planItemInstanceEntity.getId(), 
-                planItemInstanceEntity.getTenantId());
-        planItemInstanceEntity.setChildren(planItemInstances);
+                caseInstanceEntity.getCaseDefinitionId(), 
+                caseInstanceEntity.getId(), 
+                null, 
+                caseInstanceEntity.getTenantId());
+        caseInstanceEntity.setChildPlanItemInstances(planItemInstances);
         
-        CommandContextUtil.getAgenda(commandContext).planEvaluateCriteria(planItemInstanceEntity.getCaseInstanceId());
+        CommandContextUtil.getAgenda(commandContext).planEvaluateCriteria(caseInstanceEntity.getId());
     }
-
+    
     @Override
     public String toString() {
-        return "[Init Stage] Using plan item " + planItemInstanceEntity.getName() + " (" + planItemInstanceEntity.getId() + ")";
+        return "[Init Plan Model] initializing plan model for case instance " + caseInstanceEntity.getId();
     }
 
 }
