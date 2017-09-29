@@ -13,19 +13,19 @@
 
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
-import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
-import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * ActivityBehavior that evaluates an expression when executed. Optionally, it sets the result of the expression as a variable on the execution.
  *
  * @author Tijs Rademakers
  */
-public class PlanItemExpressionActivityBehavior implements CmmnActivityBehavior {
+public class PlanItemExpressionActivityBehavior extends CoreCmmnActivityBehavior {
 
     protected String expression;
     protected String resultVariable;
@@ -34,18 +34,18 @@ public class PlanItemExpressionActivityBehavior implements CmmnActivityBehavior 
         this.expression = expression;
         this.resultVariable = resultVariable;
     }
-
+    
     @Override
-    public void execute(DelegatePlanItemInstance planItemInstance) {
+    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         Object value = null;
         try {
-            Expression expressionObject = CommandContextUtil.getCmmnEngineConfiguration().getExpressionManager().createExpression(expression);
-            value = expressionObject.getValue(planItemInstance);
+            Expression expressionObject = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getExpressionManager().createExpression(expression);
+            value = expressionObject.getValue(planItemInstanceEntity);
             if (resultVariable != null) {
-                planItemInstance.setVariable(resultVariable, value);
+                planItemInstanceEntity.setVariable(resultVariable, value);
             }
 
-            CommandContextUtil.getAgenda().planCompletePlanItemInstance((PlanItemInstanceEntity) planItemInstance);
+            CommandContextUtil.getAgenda().planCompletePlanItemInstance(planItemInstanceEntity);
             
         } catch (Exception exc) {
             throw new FlowableException(exc.getMessage(), exc);

@@ -14,16 +14,18 @@ package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import java.util.List;
 
-import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.delegate.PlanItemJavaDelegate;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.util.DelegateExpressionUtil;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * {@link CmmnActivityBehavior} used when 'delegateExpression' is used for a serviceTask.
@@ -32,7 +34,7 @@ import org.flowable.engine.common.api.delegate.Expression;
  * @author Josh Long
  * @author Tijs Rademakers
  */
-public class PlanItemDelegateExpressionActivityBehavior implements CmmnActivityBehavior {
+public class PlanItemDelegateExpressionActivityBehavior extends CoreCmmnActivityBehavior {
 
     protected String expression;
     protected List<FieldExtension> fieldExtensions;
@@ -41,19 +43,18 @@ public class PlanItemDelegateExpressionActivityBehavior implements CmmnActivityB
         this.expression = expression;
         this.fieldExtensions = fieldExtensions;
     }
-
+    
     @Override
-    public void execute(DelegatePlanItemInstance planItemInstance) {
-
+    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         try {
-            Expression expressionObject = CommandContextUtil.getCmmnEngineConfiguration().getExpressionManager().createExpression(expression);
-            Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expressionObject, planItemInstance, fieldExtensions);
+            Expression expressionObject = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getExpressionManager().createExpression(expression);
+            Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expressionObject, planItemInstanceEntity, fieldExtensions);
             if (delegate instanceof PlanItemActivityBehavior) {
-                ((PlanItemActivityBehavior) delegate).execute(planItemInstance);
+                ((PlanItemActivityBehavior) delegate).execute(planItemInstanceEntity);
 
             } else if (delegate instanceof PlanItemJavaDelegate) {
                 PlanItemJavaDelegateActivityBehavior behavior = new PlanItemJavaDelegateActivityBehavior((PlanItemJavaDelegate) delegate);
-                behavior.execute(planItemInstance);
+                behavior.execute(planItemInstanceEntity);
 
             } else {
                 throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did neither resolve to an implementation of " + 

@@ -15,11 +15,11 @@ package org.flowable.cmmn.spring;
 
 import java.util.Map;
 
+import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
 import org.flowable.engine.common.api.variable.VariableContainer;
 import org.flowable.engine.common.impl.el.DefaultExpressionManager;
 import org.flowable.engine.common.impl.el.JsonNodeELResolver;
 import org.flowable.engine.common.impl.el.ReadOnlyMapELResolver;
-import org.flowable.engine.common.impl.el.VariableContainerELResolver;
 import org.flowable.engine.common.impl.javax.el.ArrayELResolver;
 import org.flowable.engine.common.impl.javax.el.BeanELResolver;
 import org.flowable.engine.common.impl.javax.el.CompositeELResolver;
@@ -33,7 +33,7 @@ import org.springframework.context.ApplicationContext;
  * 
  * @author Tijs Rademakers
  */
-public class SpringCmmnExpressionManager extends DefaultExpressionManager {
+public class SpringCmmnExpressionManager extends CmmnExpressionManager {
 
     protected ApplicationContext applicationContext;
 
@@ -51,7 +51,7 @@ public class SpringCmmnExpressionManager extends DefaultExpressionManager {
     @Override
     protected ELResolver createElResolver(VariableContainer variableContainer) {
         CompositeELResolver compositeElResolver = new CompositeELResolver();
-        compositeElResolver.add(new VariableContainerELResolver(variableContainer));
+        compositeElResolver.add(createVariableElResolver(variableContainer));
 
         if (beans != null) {
             // Only expose limited set of beans in expressions
