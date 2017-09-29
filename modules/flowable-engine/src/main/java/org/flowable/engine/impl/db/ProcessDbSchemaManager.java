@@ -117,14 +117,33 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     @Override
     public void dbSchemaDrop() {
         
-        executeMandatorySchemaResource("drop", "engine");
-        if (CommandContextUtil.getDbSqlSession().getDbSqlSessionFactory().isDbHistoryUsed()) {
-            executeMandatorySchemaResource("drop", "history");
+        try {
+            executeMandatorySchemaResource("drop", "engine");
+            if (CommandContextUtil.getDbSqlSession().getDbSqlSessionFactory().isDbHistoryUsed()) {
+                executeMandatorySchemaResource("drop", "history");
+            }
+            
+        } catch (Exception e) {
+            LOGGER.info("Error dropping engine tables", e);
         }
      
-        getVariableDbSchemaManager().dbSchemaDrop();
-        getTaskDbSchemaManager().dbSchemaDrop();
-        getCommonDbSchemaManager().dbSchemaDrop();
+        try {
+            getVariableDbSchemaManager().dbSchemaDrop();
+        } catch (Exception e) {
+            LOGGER.info("Error dropping variable tables", e);
+        }
+        
+        try {
+            getTaskDbSchemaManager().dbSchemaDrop();
+        } catch (Exception e) {
+            LOGGER.info("Error dropping task tables", e);
+        }
+        
+        try {
+            getCommonDbSchemaManager().dbSchemaDrop();
+        } catch (Exception e) {
+            LOGGER.info("Error dropping common tables", e);
+        }
     }
 
     public void dbSchemaPrune() {

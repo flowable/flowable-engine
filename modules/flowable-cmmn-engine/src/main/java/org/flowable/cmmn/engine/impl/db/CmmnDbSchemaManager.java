@@ -19,6 +19,8 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.db.DbSchemaManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import liquibase.Liquibase;
 import liquibase.database.Database;
@@ -30,6 +32,8 @@ import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
 public class CmmnDbSchemaManager implements DbSchemaManager {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(CmmnDbSchemaManager.class);
 
     public static final String LIQUIBASE_CHANGELOG = "org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog.xml";
     
@@ -109,12 +113,26 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
         try {
             Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getCmmnEngineConfiguration());
             liquibase.dropAll();
-            
+        } catch (Exception e) {
+            LOGGER.info("Error dropping CMMN engine tables", e);
+        }
+          
+        try {
             getVariableDbSchemaManager().dbSchemaDrop();
+        } catch (Exception e) {
+            LOGGER.info("Error dropping variable tables", e);
+        }
+        
+        try {
             getTaskDbSchemaManager().dbSchemaDrop();
+        } catch (Exception e) {
+            LOGGER.info("Error dropping task tables", e);
+        }
+        
+        try {
             getCommonDbSchemaManager().dbSchemaDrop();
         } catch (Exception e) {
-            throw new FlowableException("Error dropping CMMN engine tables", e);
+            LOGGER.info("Error dropping common tables", e);
         }
     }
 
