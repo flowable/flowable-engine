@@ -77,11 +77,11 @@
     </select>
 
     <select id="selectMilestoneInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.MilestoneInstanceQueryImpl" resultMap="mileStoneInstanceResultMap">
-        ${limitBefore}
-        select RES.* ${limitBetween}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+        select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
         <include refid="selectMilestoneInstancesByQueryCriteriaSql" />
         ${orderBy}
-        ${limitAfter}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 
     <select id="selectMilestoneInstanceCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.MilestoneInstanceQueryImpl" resultType="long">

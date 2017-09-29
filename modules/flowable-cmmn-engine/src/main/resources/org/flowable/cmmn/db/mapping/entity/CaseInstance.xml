@@ -131,11 +131,11 @@
     </select>
 
     <select id="selectCaseInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl" resultMap="caseInstanceResultMap">
-        ${limitBefore}
-        select RES.* ${limitBetween}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+        select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
         <include refid="selectCaseInstancesByQueryCriteriaSql" />
         ${orderBy}
-        ${limitAfter}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
 
     <select id="selectCaseInstanceCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl" resultType="long">
