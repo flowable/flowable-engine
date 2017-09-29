@@ -180,7 +180,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     protected ProcessInstanceService processInstanceService;
     protected Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks;
 
-
     protected boolean enableSafeCmmnXml;
     protected CmmnActivityBehaviorFactory activityBehaviorFactory;
     protected CmmnClassDelegateFactory classDelegateFactory;

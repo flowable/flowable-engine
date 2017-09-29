@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.variable.VariableScopeType;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -37,7 +38,7 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
     protected String startUserId;
     protected String callbackId;
     protected String callbackType;
-    protected String tenantId;
+    protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     
     // non persisted
     protected List<PlanItemInstanceEntity> childPlanItemInstances;
