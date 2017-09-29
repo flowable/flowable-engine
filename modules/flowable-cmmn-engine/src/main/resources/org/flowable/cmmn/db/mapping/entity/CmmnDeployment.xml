@@ -7,7 +7,7 @@
   <!-- DEPLOYMENT INSERT -->
   
   <insert id="insertCmmnDeployment" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityImpl">
-    insert into ${prefix}ACT_CMMN_RE_DEPLOYMENT(ID_, NAME_, CATEGORY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_)
+    insert into ${prefix}ACT_CMMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_)
     values(
         #{id, jdbcType=VARCHAR},
         #{name, jdbcType=VARCHAR},
@@ -21,7 +21,7 @@
   <!-- DEPLOYMENT UPDATE -->
   
   <update id="updateCmmnDeployment" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityImpl">
-    update ${prefix}ACT_CMMN_RE_DEPLOYMENT
+    update ${prefix}ACT_CMMN_DEPLOYMENT
     <set>
       <if test="originalPersistentState.category != category">
         CATEGORY_ = #{category, jdbcType=VARCHAR},
@@ -36,7 +36,7 @@
   <!-- DEPLOYMENT DELETE -->
   
   <delete id="deleteCmmnDeployment" parameterType="string">
-    delete from ${prefix}ACT_CMMN_RE_DEPLOYMENT where ID_ = #{id}
+    delete from ${prefix}ACT_CMMN_DEPLOYMENT where ID_ = #{id}
   </delete>
 
   <!-- DEPLOYMENT RESULTMAP -->
@@ -53,11 +53,11 @@
   <!-- DEPLOYMENT SELECT -->
 
   <select id="selectCmmnDeploymentsByName" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="cmmnDeploymentResultMap">
-    select * from ${prefix}ACT_CMMN_RE_DEPLOYMENT D where NAME_=#{parameter} order by D.DEPLOY_TIME_ desc
+    select * from ${prefix}ACT_CMMN_DEPLOYMENT D where NAME_=#{parameter} order by D.DEPLOY_TIME_ desc
   </select>
   
   <select id="selectCmmnDeployment" parameterType="string" resultMap="cmmnDeploymentResultMap">
-    select * from ${prefix}ACT_CMMN_RE_DEPLOYMENT where ID_ = #{id, jdbcType=VARCHAR}
+    select * from ${prefix}ACT_CMMN_DEPLOYMENT where ID_ = #{id, jdbcType=VARCHAR}
   </select>
   
   <select id="selectCmmnDeploymentsByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl" resultMap="cmmnDeploymentResultMap">
@@ -74,7 +74,7 @@
   </select>
   
   <sql id="selectCmmnDeploymentsByQueryCriteriaSql">  
-    from ${prefix}ACT_CMMN_RE_DEPLOYMENT RES
+    from ${prefix}ACT_CMMN_DEPLOYMENT RES
     <where>
       <if test="deploymentId != null">
         RES.ID_ = #{deploymentId}

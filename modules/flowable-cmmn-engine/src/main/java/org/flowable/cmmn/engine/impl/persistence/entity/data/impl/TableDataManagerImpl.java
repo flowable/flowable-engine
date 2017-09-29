@@ -39,9 +39,9 @@ public class TableDataManagerImpl implements TableDataManager {
     public static Map<Class<? extends Entity>, String> entityToTableNameMap = new HashMap<>();
 
     static {
-        entityToTableNameMap.put(CmmnDeploymentEntity.class, "ACT_CMMN_RE_DEPLOYMENT");
-        entityToTableNameMap.put(CmmnResourceEntity.class, "ACT_CMMN_RE_DEPLOYMENT_RESOURCE");
-        entityToTableNameMap.put(CaseDefinitionEntity.class, "ACT_CMMN_RE_CASEDEF");
+        entityToTableNameMap.put(CmmnDeploymentEntity.class, "ACT_CMMN_DEPLOYMENT");
+        entityToTableNameMap.put(CmmnResourceEntity.class, "ACT_CMMN_DEPLOYMENT_RESOURCE");
+        entityToTableNameMap.put(CaseDefinitionEntity.class, "ACT_CMMN_CASEDEF");
         entityToTableNameMap.put(CaseInstanceEntity.class, "ACT_CMMN_RU_CASE_INST");
         entityToTableNameMap.put(PlanItemInstanceEntity.class, "ACT_CMMN_RU_PLAN_ITEM_INST");
         entityToTableNameMap.put(SentryPartInstanceEntity.class, "ACT_CMMN_RU_SENTRY_PART_INST");
