@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,21 +32,26 @@ import org.flowable.engine.impl.util.ProcessInstanceHelper;
 
 /**
  * Implementation of the BPMN 2.0 subprocess (formally known as 'embedded' subprocess): a subprocess defined within another process definition.
- * 
+ *
  * @author Joram Barrez
  */
 public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior {
 
     private static final long serialVersionUID = 1L;
-  
+
     protected boolean isOnlyNoneStartEventAllowed;
-  
+
     public SubProcessActivityBehavior() {
         this.isOnlyNoneStartEventAllowed = true;
     }
 
     @Override
     public void execute(DelegateExecution execution) {
+        ExecutionEntity startSubProcessExecution = createSubProcessExecution(execution);
+        CommandContextUtil.getAgenda().planContinueProcessOperation(startSubProcessExecution);
+    }
+
+    protected ExecutionEntity createSubProcessExecution(DelegateExecution execution) {
         SubProcess subProcess = getSubProcessFromExecution(execution);
 
         FlowElement startElement = getStartElement(subProcess);
@@ -63,7 +68,7 @@ public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior {
         if (dataObjectVars != null) {
             executionEntity.setVariablesLocal(dataObjectVars);
         }
-        
+
         CommandContext commandContext = Context.getCommandContext();
         ProcessInstanceHelper processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
         processInstanceHelper.processAvailableEventSubProcesses(executionEntity, subProcess, commandContext);
@@ -71,9 +76,9 @@ public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior {
         ExecutionEntity startSubProcessExecution = CommandContextUtil.getExecutionEntityManager(commandContext)
                 .createChildExecution(executionEntity);
         startSubProcessExecution.setCurrentFlowElement(startElement);
-        CommandContextUtil.getAgenda().planContinueProcessOperation(startSubProcessExecution);
+        return startSubProcessExecution;
     }
-  
+
     protected FlowElement getStartElement(SubProcess subProcess) {
         if (CollectionUtil.isNotEmpty(subProcess.getFlowElements())) {
             for (FlowElement subElement : subProcess.getFlowElements()) {
@@ -83,7 +88,7 @@ public class SubProcessActivityBehavior extends AbstractBpmnActivityBehavior {
                         if (CollectionUtil.isEmpty(startEvent.getEventDefinitions())) {
                             return startEvent;
                         }
-                        
+
                     } else {
                         return startEvent;
                     }

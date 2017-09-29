@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,10 +12,12 @@
  */
 package org.flowable.editor.language.json.converter;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.flowable.bpmn.model.BaseElement;
+import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.GraphicInfo;
 import org.flowable.bpmn.model.SubProcess;
@@ -47,6 +49,7 @@ public class SubProcessJsonConverter extends BaseBpmnJsonConverter implements Fo
 
     public static void fillJsonTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap) {
         convertersToBpmnMap.put(STENCIL_SUB_PROCESS, SubProcessJsonConverter.class);
+        convertersToBpmnMap.put(STENCIL_SIMULATION_SUB_PROCESS, SubProcessJsonConverter.class);
         convertersToBpmnMap.put(STENCIL_COLLAPSED_SUB_PROCESS, SubProcessJsonConverter.class);
     }
 
@@ -74,17 +77,17 @@ public class SubProcessJsonConverter extends BaseBpmnJsonConverter implements Fo
         propertiesNode.put("activitytype", getStencilId(baseElement));
         GraphicInfo gi = model.getGraphicInfo(baseElement.getId());
         Boolean isExpanded = gi.getExpanded();
-        
+
         ArrayNode subProcessShapesArrayNode = objectMapper.createArrayNode();
         GraphicInfo graphicInfo = model.getGraphicInfo(subProcess.getId());
-        
+
         if (isExpanded != null && isExpanded == false) {
             processor.processFlowElements(subProcess, model, subProcessShapesArrayNode, formKeyMap, decisionTableKeyMap, 0, 0);
         } else {
             processor.processFlowElements(subProcess, model, subProcessShapesArrayNode, formKeyMap,
                     decisionTableKeyMap, graphicInfo.getX(), graphicInfo.getY());
         }
-        
+
         flowElementNode.set("childShapes", subProcessShapesArrayNode);
 
         if (subProcess instanceof Transaction) {
@@ -104,6 +107,21 @@ public class SubProcessJsonConverter extends BaseBpmnJsonConverter implements Fo
             subProcess = new SubProcess();
         }
 
+        if (STENCIL_SIMULATION_SUB_PROCESS.equals(elementNode.get("stencil").get("id").textValue())) {
+            ExtensionElement simulation = new ExtensionElement();
+            simulation.setName("type");
+            simulation.setElementText("simulation");
+            simulation.setNamespace("http://flowable.org/bpmn");
+            subProcess.getExtensionElements().put("type",
+                    Collections.singletonList(simulation));
+            ExtensionElement virtualEngineConfiguration= new ExtensionElement();
+            virtualEngineConfiguration.setName("virtualEngineConfiguration");
+            virtualEngineConfiguration.setElementText(getPropertyValueAsString("virtual_engine_configuration", elementNode));
+            virtualEngineConfiguration.setNamespace("http://flowable.org/bpmn");
+            subProcess.getExtensionElements().put("virtualEngineConfiguration",
+                    Collections.singletonList(virtualEngineConfiguration));
+        }
+
         JsonNode childShapesArray = elementNode.get(EDITOR_CHILD_SHAPES);
         processor.processJsonElements(childShapesArray, modelNode, subProcess, shapeMap, formMap, decisionTableMap, model);
 
@@ -113,7 +131,7 @@ public class SubProcessJsonConverter extends BaseBpmnJsonConverter implements Fo
             subProcess.setDataObjects(dataObjects);
             subProcess.getFlowElements().addAll(dataObjects);
         }
-        
+
         //store correct convertion info...
         if (STENCIL_COLLAPSED_SUB_PROCESS.equals(BpmnJsonConverterUtil.getStencilId(elementNode))) {
             GraphicInfo graphicInfo = model.getGraphicInfo(BpmnJsonConverterUtil.getElementId(elementNode));

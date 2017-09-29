@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -134,7 +134,7 @@ public class SubProcess extends Activity implements FlowElementsContainer {
 
         /*
          * This is required because data objects in Designer have no DI info and are added as properties, not flow elements
-         * 
+         *
          * Determine the differences between the 2 elements' data object
          */
         for (ValuedDataObject thisObject : getDataObjects()) {
@@ -180,5 +180,10 @@ public class SubProcess extends Activity implements FlowElementsContainer {
 
     public void setDataObjects(List<ValuedDataObject> dataObjects) {
         this.dataObjects = dataObjects;
+    }
+
+    public boolean isSimulation() {
+        List<ExtensionElement> type = this.getExtensionElements().get("type");
+        return type != null && !type.isEmpty() && "simulation".equals(type.get(0).getElementText());
     }
 }

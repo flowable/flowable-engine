@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,13 +11,6 @@
  * limitations under the License.
  */
 package org.flowable.engine.test;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
@@ -48,7 +41,6 @@ import org.flowable.bpmn.model.ThrowEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.Transaction;
 import org.flowable.bpmn.model.UserTask;
-import org.flowable.variable.service.delegate.Expression;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.AdhocSubProcessActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryCancelEventActivityBehavior;
@@ -87,6 +79,7 @@ import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ServiceTaskDelegateExpressionActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ServiceTaskExpressionActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ShellActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.SimulationSubProcessActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SubProcessActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.TaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.TerminateEndEventActivityBehavior;
@@ -100,6 +93,14 @@ import org.flowable.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.el.FixedValue;
 import org.flowable.engine.impl.test.NoOpServiceTask;
+import org.flowable.variable.service.delegate.Expression;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Joram Barrez
@@ -293,7 +294,12 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     public SubProcessActivityBehavior createSubprocessActivityBehavior(SubProcess subProcess) {
         return wrappedActivityBehaviorFactory.createSubprocessActivityBehavior(subProcess);
     }
-    
+
+    @Override
+    public SimulationSubProcessActivityBehavior createSimulationSubProcessActivityBehavior(SubProcess subProcess) {
+        return wrappedActivityBehaviorFactory.createSimulationSubProcessActivityBehavior(subProcess);
+    }
+
     @Override
     public EventSubProcessActivityBehavior createEventSubprocessActivityBehavior(EventSubProcess eventSubProcess) {
         return wrappedActivityBehaviorFactory.createEventSubprocessActivityBehavior(eventSubProcess);

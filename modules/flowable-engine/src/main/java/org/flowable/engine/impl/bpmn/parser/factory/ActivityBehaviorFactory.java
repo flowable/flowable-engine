@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -79,6 +79,7 @@ import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ServiceTaskDelegateExpressionActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ServiceTaskExpressionActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ShellActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.SimulationSubProcessActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SubProcessActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.TaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.TerminateEndEventActivityBehavior;
@@ -94,18 +95,18 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
 /**
  * Factory class used by the {@link BpmnParser} and {@link BpmnParse} to instantiate the behaviour classes. For example when parsing an exclusive gateway, this factory will be requested to create a
  * new {@link ActivityBehavior} that will be set on the {@link ActivityImpl} of that step of the process and will implement the spec-compliant behavior of the exclusive gateway.
- * 
+ *
  * You can provide your own implementation of this class. This way, you can give different execution semantics to a standard bpmn xml construct. Eg. you could tweak the exclusive gateway to do
  * something completely different if you would want that. Creating your own {@link ActivityBehaviorFactory} is only advisable if you want to change the default behavior of any BPMN default construct.
  * And even then, think twice, because it won't be spec compliant bpmn anymore.
- * 
+ *
  * Note that you can always express any custom step as a service task with a class delegation.
- * 
+ *
  * The easiest and advisable way to implement your own {@link ActivityBehaviorFactory} is to extend the {@link DefaultActivityBehaviorFactory} class and override the method specific to the
  * {@link ActivityBehavior} you want to change.
- * 
+ *
  * An instance of this interface can be injected in the {@link ProcessEngineConfigurationImpl} and its subclasses.
- * 
+ *
  * @author Joram Barrez
  */
 public interface ActivityBehaviorFactory {
@@ -170,7 +171,9 @@ public interface ActivityBehaviorFactory {
 
     public abstract SubProcessActivityBehavior createSubprocessActivityBehavior(SubProcess subProcess);
 
-    public abstract EventSubProcessActivityBehavior createEventSubprocessActivityBehavior(EventSubProcess eventSubProcess); 
+    public abstract SimulationSubProcessActivityBehavior createSimulationSubProcessActivityBehavior(SubProcess subProcess);
+
+    public abstract EventSubProcessActivityBehavior createEventSubprocessActivityBehavior(EventSubProcess eventSubProcess);
 
     public abstract EventSubProcessErrorStartEventActivityBehavior createEventSubProcessErrorStartEventActivityBehavior(StartEvent startEvent);
 

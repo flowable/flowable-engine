@@ -12,10 +12,6 @@
  */
 package org.flowable.engine.impl.agenda;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.CompensateEventDefinition;
@@ -27,6 +23,7 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.Transaction;
+import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -35,6 +32,7 @@ import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.flowable.engine.impl.bpmn.helper.ScopeUtil;
+import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -44,12 +42,18 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import static org.flowable.engine.impl.bpmn.behavior.SimulationSubProcessActivityBehavior.VIRTUAL_PROCESS_ENGINE_VARIABLE_NAME;
+
 /**
  * This operations ends an execution and follows the typical BPMN rules to continue the process (if possible).
- * 
+ *
  * This operations is typically not scheduled from an {@link ActivityBehavior}, but rather from another operation. This happens when the conditions are so that the process can't continue via the
  * regular ways and an execution cleanup needs to happen, potentially opening up new ways of continuing the process instance.
- * 
+ *
  * @author Joram Barrez
  */
 public class EndExecutionOperation extends AbstractOperation {
@@ -184,9 +188,9 @@ public class EndExecutionOperation extends AbstractOperation {
                             agenda.planTakeOutgoingSequenceFlowsOperation(executionToContinue, true);
                             return;
                         }
-                        
+
                     }
-                    
+
                     agenda.planEndExecutionOperation(subProcessParentExecution);
                 }
 
@@ -242,6 +246,14 @@ public class EndExecutionOperation extends AbstractOperation {
         executionToContinue.setCurrentFlowElement(subProcess);
         executionToContinue.setActive(false);
 
+        if (subProcess.isSimulation()) {
+            String currentEngineName = Context.getCommandContext().getCurrentEngineConfiguration().getEngineName();
+            String virtualEngineName = (String) execution.getVariable(VIRTUAL_PROCESS_ENGINE_VARIABLE_NAME);
+            if (!currentEngineName.equals(virtualEngineName)) {
+                ProcessEngines.getProcessEngine(virtualEngineName).close();
+            }
+            execution.removeTransientVariable(VIRTUAL_PROCESS_ENGINE_VARIABLE_NAME);
+        }
         boolean hasCompensation = false;
         if (subProcess instanceof Transaction) {
             hasCompensation = true;
@@ -253,7 +265,7 @@ public class EndExecutionOperation extends AbstractOperation {
                         for (BoundaryEvent boundaryEvent : subActivity.getBoundaryEvents()) {
                             if (CollectionUtil.isNotEmpty(boundaryEvent.getEventDefinitions()) &&
                                     boundaryEvent.getEventDefinitions().get(0) instanceof CompensateEventDefinition) {
-                                
+
                                 hasCompensation = true;
                                 break;
                             }
@@ -392,7 +404,7 @@ public class EndExecutionOperation extends AbstractOperation {
         for (ExecutionEntity childExecution : executions) {
             if (childExecution.isEventScope()) {
                 executionEntityManager.deleteExecutionAndRelatedData(childExecution, null);
-                
+
             } else {
                 allEventScopeExecutions = false;
             }

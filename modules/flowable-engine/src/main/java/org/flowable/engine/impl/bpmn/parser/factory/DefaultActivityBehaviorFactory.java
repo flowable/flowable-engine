@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,8 +11,6 @@
  * limitations under the License.
  */
 package org.flowable.engine.impl.bpmn.parser.factory;
-
-import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Activity;
@@ -90,6 +88,7 @@ import org.flowable.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ServiceTaskDelegateExpressionActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ServiceTaskExpressionActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.ShellActivityBehavior;
+import org.flowable.engine.impl.bpmn.behavior.SimulationSubProcessActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.SubProcessActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.TaskActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.TerminateEndEventActivityBehavior;
@@ -105,9 +104,11 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.scripting.ScriptingEngines;
 import org.flowable.variable.service.delegate.Expression;
 
+import java.util.List;
+
 /**
  * Default implementation of the {@link ActivityBehaviorFactory}. Used when no custom {@link ActivityBehaviorFactory} is injected on the {@link ProcessEngineConfigurationImpl}.
- * 
+ *
  * @author Joram Barrez
  */
 public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory implements ActivityBehaviorFactory {
@@ -416,7 +417,14 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     public SubProcessActivityBehavior createSubprocessActivityBehavior(SubProcess subProcess) {
         return new SubProcessActivityBehavior();
     }
-    
+
+    @Override
+    public SimulationSubProcessActivityBehavior createSimulationSubProcessActivityBehavior(SubProcess subProcess) {
+        return new SimulationSubProcessActivityBehavior(
+                subProcess.getExtensionElements().get("virtualEngineConfiguration").get(0).getElementText()
+        );
+    }
+
     @Override
     public EventSubProcessActivityBehavior createEventSubprocessActivityBehavior(EventSubProcess eventSubProcess) {
         return new EventSubProcessActivityBehavior();

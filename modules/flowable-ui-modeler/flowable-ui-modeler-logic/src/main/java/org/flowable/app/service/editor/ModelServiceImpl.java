@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.google.common.base.Function;
+import com.google.common.collect.ImmutableList;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -50,6 +51,7 @@ import org.flowable.bpmn.model.UserTask;
 import org.flowable.cmmn.converter.CmmnXmlConverter;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.editor.constants.StencilConstants;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.editor.language.json.converter.util.JsonConverterUtil;
@@ -76,6 +78,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import static org.flowable.app.rest.HttpRequestHelper.executeHttpGet;
 
@@ -89,6 +92,10 @@ public class ModelServiceImpl implements ModelService {
     public static final String NAMESPACE = "http://flowable.org/modeler";
 
     protected static final String PROCESS_NOT_FOUND_MESSAGE_KEY = "PROCESS.ERROR.NOT-FOUND";
+    public static final int UPPER_LEFT_Y = 10;
+    public static final int DELTA_X = 100;
+    public static final int NODE_SIZE_X = 150;
+    private static final int SUBPROCESS_BORDER = 5;
 
     @Autowired
     protected ModelImageService modelImageService;
@@ -282,51 +289,67 @@ public class ModelServiceImpl implements ModelService {
         ObjectNode editorNode = createTestProcessModel(modelRepresentation);
         ArrayNode childShapeArray = objectMapper.createArrayNode();
         editorNode.set("childShapes", childShapeArray);
-        childShapeArray.add(
-                createStartEvent(0,"startEvent1")
-        );
         JsonNode eventLogEntriesForProcessInstanceId = getEventLogEntriesForProcessInstanceId(skeletonId);
 
         childShapeArray.addAll(
                 eventLogEntriesForProcessInstanceId.size() == 0 ?
-                        addUserTask() :
-                        addAssertion(
-                                createNodesFromEventLogEntries(
-                                        eventLogEntriesForProcessInstanceId
+                        addSequenceFlows(addUserTask()) :
+                        addSequenceFlows(
+                                encapsulateInSimulationSubProcess(
+                                        addSequenceFlows(
+                                                addAssertion(
+                                                        createNodesFromEventLogEntries(
+                                                                eventLogEntriesForProcessInstanceId
+                                                        )
+                                                )
+                                        )
                                 )
                         )
         );
-        addSequenceFlows(childShapeArray);
+
         return editorNode.toString();
     }
 
     private List<ObjectNode> addUserTask() {
         List<ObjectNode> nodes = new ArrayList<>();
+        nodes.add(createStartEvent(0, "startEvent1"));
         nodes.add(createUserTask(1, "userTask", "User task"));
         nodes.add(createEndEvent(2, "end"));
         return nodes;
     }
 
+    private List<ObjectNode> encapsulateInSimulationSubProcess(List<ObjectNode> testEvents) {
+        ObjectNode simulationSubProcess = createSimulationSubProcess(1, "_testSubProcess", testEvents);
+        return ImmutableList.<ObjectNode>builder().
+                add(createStartEvent(0, "_startTest")).
+                add(simulationSubProcess).
+                add(
+                        createNode(getRightX(simulationSubProcess)+ DELTA_X , UPPER_LEFT_Y + CIRCLE_SIZE / 2, "EndNoneEvent", "_endTest", CIRCLE_SIZE, CIRCLE_SIZE, Collections.<String, String>emptyMap())
+                ).
+                build();
+    }
+
     protected List<ObjectNode> addAssertion(List<ObjectNode> nodes) {
-        nodes.add(nodes.size(), createScriptTask(nodes.size() + 1, "assertion", "assertThat",
-                "import org.flowable.engine.impl.context.Context;\n" +
+        nodes.add(nodes.size(), createScriptTask(nodes.size(), "assertion", "assertThat",
+                "import static org.flowable.app.service.runtime.TestHelper.* ;\n" +
                         "import static org.hamcrest.core.Is.is;\n" +
                         "import static org.flowable.engine.test.MatcherAssert.assertThat;\n" +
                         "\n" +
-                        "assertThat(Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).count(), is(0L));")
+                        "assertThat(getVirtualProcessEngine(execution).getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).count(), is(0L));")
         );
-        nodes.add(nodes.size(), createEndEvent(nodes.size() + 1, "end"));
+        nodes.add(nodes.size(), createEndEvent(nodes.size(), "end"));
         return nodes;
     }
 
-    protected ArrayNode addSequenceFlows(ArrayNode nodes) {
+    protected List<ObjectNode> addSequenceFlows(List<ObjectNode> nodes) {
         if (nodes.size() > 1) {
+            ImmutableList.Builder<ObjectNode> nodesBuilder = ImmutableList.builder();
             int taskLength = nodes.size();
             for (int i =1; i< taskLength; i++) {
-                ObjectNode sourceNode = (ObjectNode) nodes.get(i - 1);
-                String sequenceFlowId = "sequenceFlow" + i;
-                ObjectNode targetNode = (ObjectNode) nodes.get(i);
-                List<String> targetId = targetNode.findValuesAsText("resourceId");
+                ObjectNode sourceNode = nodes.get(i - 1);
+                String sequenceFlowId = "sequenceFlow" + i + "-" + UUID.randomUUID();
+                ObjectNode targetNode = nodes.get(i);
+                String targetId = targetNode.get("resourceId").textValue();
 
                 ArrayNode sourceOutgoing = objectMapper.createArrayNode();
                 sourceNode.set("outgoing", sourceOutgoing);
@@ -334,7 +357,7 @@ public class ModelServiceImpl implements ModelService {
                 sequenceFlowResourceId.put("resourceId", sequenceFlowId);
                 sourceOutgoing.add(sequenceFlowResourceId);
 
-                ObjectNode sequenceFlow = createNode(130, 178, "SequenceFlow", sequenceFlowId, 120, 0, Collections.EMPTY_MAP);
+                ObjectNode sequenceFlow = createNode(getRightX(sourceNode)-CIRCLE_SIZE, UPPER_LEFT_Y+CIRCLE_SIZE, "SequenceFlow", sequenceFlowId, getLeftX(targetNode) - getRightX(sourceNode) + CIRCLE_SIZE, 0, Collections.EMPTY_MAP);
                 ArrayNode dockers = objectMapper.createArrayNode();
                 sequenceFlow.set("dockers", dockers);
                 ObjectNode positionDockerSource = getDockersPosition(sourceNode);
@@ -345,14 +368,17 @@ public class ModelServiceImpl implements ModelService {
                 ArrayNode sequenceFlowOutgoing = objectMapper.createArrayNode();
                 sequenceFlow.set("outgoing", sequenceFlowOutgoing);
                 ObjectNode targetResourceId = objectMapper.createObjectNode();
-                targetResourceId.put("resourceId", targetId.get(0));
+                targetResourceId.put("resourceId", targetId);
                 sequenceFlowOutgoing.add(targetResourceId);
                 sequenceFlow.set("target", targetResourceId);
 
-                nodes.add(sequenceFlow);
+                nodesBuilder.add(sourceNode);
+                nodesBuilder.add(sequenceFlow);
             }
+            nodesBuilder.add(nodes.get(taskLength-1));
+            return nodesBuilder.build();
         }
-        return nodes;
+        return  nodes;
     }
 
     protected ObjectNode getDockersPosition(ObjectNode sourceNode) {
@@ -418,6 +444,8 @@ public class ModelServiceImpl implements ModelService {
 
     protected List<ObjectNode> createNodesFromEventLogEntries(JsonNode eventLogEntries) {
         List<ObjectNode> nodes = new ArrayList<>();
+        nodes.add(createStartEvent(0, "startEvent1"));
+
         int position = 1;
         for (JsonNode eventLogEntry : eventLogEntries) {
             switch (eventLogEntry.get("type").textValue()) {
@@ -427,9 +455,9 @@ public class ModelServiceImpl implements ModelService {
                     try {
                         StringBuilder variablesScript = getVariablesScript(eventLogEntry);
                         nodes.add(createScriptTask(position++, "startProcess", "Start " + key + " process",
-                                "import org.flowable.engine.impl.context.Context;\n" +
+                                "import static org.flowable.app.service.runtime.TestHelper.*;\n" +
                                         "\n" +
-                                        "processInstanceBuilder = Context.getProcessEngineConfiguration().getRuntimeService().createProcessInstanceBuilder().processDefinitionKey('" +
+                                        "processInstanceBuilder = getVirtualProcessEngine(execution).getRuntimeService().createProcessInstanceBuilder().processDefinitionKey('" +
                                         key + "');\n" +
                                         variablesScript +
                                         "execution.setVariable('processInstanceId', processInstanceBuilder.start().getId());",
@@ -445,9 +473,9 @@ public class ModelServiceImpl implements ModelService {
                         Object messageName = objectMapper.readValue(eventLogEntry.get("data").binaryValue(), Map.class).get("messageName");
                         nodes.add(createScriptTask(position, "sendMessage" + position++, "Send message " + messageName,
 
-                        "import org.flowable.engine.impl.context.Context;\n" +
+                        "import static org.flowable.app.service.runtime.TestHelper.*;\n" +
                                 "\n" +
-                                "runtimeService = Context.getProcessEngineConfiguration().getRuntimeService()\n" +
+                                "runtimeService = getVirtualProcessEngine(execution).getRuntimeService()\n" +
                                 "subscription= runtimeService.createEventSubscriptionQuery().processInstanceId(processInstanceId)" +
                                 ".eventName(\""+ messageName +"\").singleResult();\n" +
                                 "if (subscription == null) {\n" +
@@ -464,12 +492,12 @@ public class ModelServiceImpl implements ModelService {
                         String taskDefinitionKey = (String) objectMapper.readValue(eventLogEntry.get("data").binaryValue(), Map.class).get("taskDefinitionKey");
                     nodes.add(createScriptTask(position, "claimTask" + position++, "Claim task " +
                                     taskDefinitionKey + " to user "+ eventLogEntry.get("userId"),
-                            "import org.flowable.engine.impl.context.Context;\n" +
+                            "import static org.flowable.app.service.runtime.TestHelper.*;\n" +
                                     "\n" +
-                                    "processInstanceIds = testHelper.getSubProcessInstanceIds(processInstanceId)\n" +
-                                    "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery().processInstanceIdIn(processInstanceIds)." +
+                                    "processInstanceIds = getSubProcessInstanceIds(processInstanceId, execution);\n" +
+                                    "taskId = getVirtualProcessEngine(execution).getTaskService().createTaskQuery().processInstanceIdIn(processInstanceIds)." +
                                     "taskDefinitionKey(\""+taskDefinitionKey+"\").singleResult().getId();\n" +
-                                    "Context.getProcessEngineConfiguration().getTaskService().claim(taskId, '"+ eventLogEntry.get("userId").textValue() +"');"
+                                    "getVirtualProcessEngine(execution).getTaskService().claim(taskId, '"+ eventLogEntry.get("userId").textValue() +"');"
                     ));
                     } catch (IOException e) {
                         throw new RuntimeException("eventLog entry [" + eventLogEntry + "] does not have a correct format", e);
@@ -477,10 +505,10 @@ public class ModelServiceImpl implements ModelService {
                     break;
                 case "TIMER_FIRED":
                     nodes.add(createScriptTask(position, "fireAllTimers" + position++, "Fire all timers",
-                            "import org.flowable.engine.impl.context.Context;\n" +
+                            "import static org.flowable.app.service.runtime.TestHelper.*;\n" +
                                     "\n" +
-                                    "processInstanceIds = testHelper.getSubProcessInstanceIds(processInstanceId)\n" +
-                                    "managementService = Context.getProcessEngineConfiguration().getManagementService();\n" +
+                                    "processInstanceIds = getSubProcessInstanceIds(processInstanceId, execution);\n" +
+                                    "managementService = getVirtualProcessEngine(execution).getManagementService();\n" +
                                     "for( String processInstanceId : processInstanceIds) {\n" +
                                     "    timers = managementService.createTimerJobQuery().processInstanceId(processInstanceId)." +
                                     "timers().list();\n" +
@@ -494,12 +522,12 @@ public class ModelServiceImpl implements ModelService {
                     try {
                         String taskDefinitionKey = (String) objectMapper.readValue(eventLogEntry.get("data").binaryValue(), Map.class).get("taskDefinitionKey");
                         nodes.add(createScriptTask(position, "completeTask"+position++, "Complete task "+ taskDefinitionKey,
-                            "import org.flowable.engine.impl.context.Context;\n" +
+                            "import static org.flowable.app.service.runtime.TestHelper.*;\n" +
                                     "\n" +
-                                    "processInstanceIds = testHelper.getSubProcessInstanceIds(processInstanceId)\n" +
-                                    "taskId = Context.getProcessEngineConfiguration().getTaskService().createTaskQuery()." +
+                                    "processInstanceIds = getSubProcessInstanceIds(processInstanceId, execution);\n" +
+                                    "taskId = getVirtualProcessEngine(execution).getTaskService().createTaskQuery()." +
                                     "processInstanceIdIn(processInstanceIds).taskDefinitionKey(\""+taskDefinitionKey+"\").singleResult().getId();\n" +
-                                    "Context.getProcessEngineConfiguration().getTaskService().complete(taskId);"
+                                    "getVirtualProcessEngine(execution).getTaskService().complete(taskId);"
                     ));
                     } catch (IOException e) {
                         throw new RuntimeException("eventLog entry [" + eventLogEntry + "] does not have a correct format", e);
@@ -572,13 +600,30 @@ public class ModelServiceImpl implements ModelService {
         );
     }
 
+    protected ObjectNode createSimulationSubProcess(int position, String id, List<ObjectNode> testEvents) {
+        HashMap<String, String> properties = new HashMap<>();
+        ObjectNode lastNode = testEvents.get(testEvents.size() - 1);
+        int rightX = getRightX(lastNode);
+        int leftX = DELTA_X + position * NODE_SIZE_X;
+        return createNode(leftX, UPPER_LEFT_Y - SUBPROCESS_BORDER, StencilConstants.STENCIL_SIMULATION_SUB_PROCESS, id,
+                rightX-leftX + 3 * DELTA_X , 2 * CIRCLE_SIZE + UPPER_LEFT_Y + 2*SUBPROCESS_BORDER,
+                properties, objectMapper.createArrayNode().addAll(testEvents));
+    }
+
+    private int getRightX(ObjectNode lastNode) {
+        return lastNode.get("bounds").get("lowerRight").get("x").asInt();
+    }
+    private int getLeftX(ObjectNode lastNode) {
+        return lastNode.get("bounds").get("upperLeft").get("x").asInt();
+    }
+
     protected ObjectNode createScriptTask(int position, String id, String name, String script, boolean isAsync) {
         HashMap<String, String> properties = new HashMap<>();
         properties.put("scriptformat", "groovy");
         properties.put("scripttext", script);
         properties.put("name", name);
         properties.put("asynchronousdefinition", Boolean.toString(isAsync));
-        return createNode(100 + position *150, 148, "ScriptTask", id, 3 * CIRCLE_SIZE, 2 * CIRCLE_SIZE,
+        return createNode(DELTA_X + position * NODE_SIZE_X, UPPER_LEFT_Y, "ScriptTask", id, 3 * CIRCLE_SIZE, 2 * CIRCLE_SIZE,
                 properties);
     }
 
@@ -589,7 +634,7 @@ public class ModelServiceImpl implements ModelService {
     protected ObjectNode createUserTask(int position, String id, String name) {
         HashMap<String, String> properties = new HashMap<>();
         properties.put("name", name);
-        return createNode(100 + position * 150, 148, "UserTask", id, 3 * CIRCLE_SIZE, 2 * CIRCLE_SIZE,
+        return createNode(DELTA_X + position * NODE_SIZE_X, UPPER_LEFT_Y, "UserTask", id, 3 * CIRCLE_SIZE, 2 * CIRCLE_SIZE,
                 properties);
     }
 
@@ -602,11 +647,17 @@ public class ModelServiceImpl implements ModelService {
     }
 
     protected ObjectNode createNoneEvent(int position, String id, String stencil) {
-        return createNode(100 + position * 150, 163, stencil, id, CIRCLE_SIZE, CIRCLE_SIZE, Collections.<String, String>emptyMap());
+        return createNode(DELTA_X + position * NODE_SIZE_X, UPPER_LEFT_Y + CIRCLE_SIZE/2, stencil, id, CIRCLE_SIZE, CIRCLE_SIZE, Collections.<String, String>emptyMap());
     }
 
     protected ObjectNode createNode(int upperLeftX, int upperLeftY, String stencil, String id, int sizeX, int sizeY,
                                     Map<String, String> properties) {
+        return createNode( upperLeftX, upperLeftY, stencil, id, sizeX, sizeY,
+        properties, this.objectMapper.createArrayNode());
+    }
+
+    protected ObjectNode createNode(int upperLeftX, int upperLeftY, String stencil, String id, int sizeX, int sizeY,
+                                    Map<String, String> properties, ArrayNode childShapes) {
         ObjectNode childNode = objectMapper.createObjectNode();
         ObjectNode boundsNode = objectMapper.createObjectNode();
         childNode.set("bounds", boundsNode);
@@ -618,7 +669,7 @@ public class ModelServiceImpl implements ModelService {
         boundsNode.set("upperLeft", upperLeftNode);
         upperLeftNode.put("x", upperLeftX);
         upperLeftNode.put("y", upperLeftY);
-        childNode.set("childShapes", objectMapper.createArrayNode());
+        childNode.set("childShapes", childShapes);
         childNode.set("dockers", objectMapper.createArrayNode());
         childNode.set("outgoing", objectMapper.createArrayNode());
         childNode.put("resourceId", id);

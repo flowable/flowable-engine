@@ -870,6 +870,17 @@
       "refToView" : "border"
     } ]
   }, {
+    "name" : "virtual_engine_configuration_package",
+    "properties" : [ {
+      "id" : "virtual_engine_configuration",
+      "type" : "String",
+      "title" : "Virtual engine configuration",
+      "value" : "",
+      "description" : "Path to the resource with virtual engine configuration.",
+      "popular" : true,
+      "refToView" : "border"
+    } ]
+  }, {
     "name" : "formreferencepackage",
     "properties" : [ {
       "id" : "formreference",
@@ -1508,7 +1519,41 @@
     "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "completionconditionpackage", "orderingpackage", "cancelremaininginstancespackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "sequence_start", "sequence_end", "all" ]
-  } ],
+  },
+    {
+      "type": "node",
+      "id": "SimulationSubProcess",
+      "title": "Simulation sub process",
+      "description": "A simulation sub process scope",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n   width=\"200\"\n   height=\"160\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"50\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"80\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"110\" oryx:anchors=\"left\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"70\" oryx:cy=\"159\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"100\" oryx:cy=\"159\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"130\" oryx:cy=\"159\" oryx:anchors=\"bottom\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"199\" oryx:cy=\"50\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"199\" oryx:cy=\"80\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"199\" oryx:cy=\"110\" oryx:anchors=\"right\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"70\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"100\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"130\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"100\" oryx:cy=\"80\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"fill\" oryx:minimumSize=\"120 100\" oryx:maximumSize=\"\" >\n    <rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"0\" y=\"0\" width=\"190\" height=\"160\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" />\n\t<rect id=\"bg_frame\" oryx:anchors=\"bottom top right left\" x=\"0\" y=\"0\" width=\"200\" height=\"160\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\" fill=\"#ffffff\" />\n\t<rect id=\"border\" oryx:anchors=\"top bottom left right\" oryx:resize=\"vertical horizontal\" x=\"2.5\" y=\"2.5\" width=\"195\" height=\"155\" rx=\"8\" ry=\"8\" stroke=\"black\" stroke-width=\"1\" fill=\"none\" />\n\t<text \n\t\tfont-size=\"12\" \n\t\tid=\"text_name\" \n\t\tx=\"8\" \n\t\ty=\"10\" \n\t\toryx:align=\"top left\"\n\t\toryx:fittoelem=\"text_frame\"\n\t\toryx:anchors=\"left top\" \n\t\tstroke=\"#373e48\">\n\t</text>\n\t\n\t<g \tid=\"parallel\"\n\t\ttransform=\"translate(1)\">\n\t\t<path \n\t\t\tid=\"parallelpath\"\n\t\t\toryx:anchors=\"bottom\" \n\t\t\tfill=\"none\" stroke=\"#bbbbbb\" d=\"M96 145 v10 M100 145 v10 M104 145 v10\" \n\t\t\tstroke-width=\"2\"\n\t\t/>\n\t</g>\n\t<g \tid=\"sequential\"\n\t\ttransform=\"translate(1)\">\n\t\t<path \n\t\t\tid=\"sequentialpath\"\n\t\t\toryx:anchors=\"bottom\" \n\t\t\tfill=\"none\" stroke=\"#bbbbbb\" stroke-width=\"2\" d=\"M95,154h10 M95,150h10 M95,146h10\"\n\t\t/>\n\t</g>\n  </g>\n</svg>",
+      "icon": "activity/expanded.subprocess.png",
+      "groups": [
+        "Simulation"
+      ],
+      "propertyPackages": [
+        "overrideidpackage",
+        "namepackage",
+        "documentationpackage",
+        "asynchronousdefinitionpackage",
+        "exclusivedefinitionpackage",
+        "executionlistenerspackage",
+        "multiinstance_typepackage",
+        "multiinstance_cardinalitypackage",
+        "multiinstance_collectionpackage",
+        "multiinstance_variablepackage",
+        "multiinstance_conditionpackage",
+        "istransactionpackage",
+        "virtual_engine_configuration_package"
+      ],
+      "hiddenPropertyPackages": [],
+      "roles": [
+        "Activity",
+        "sequence_start",
+        "sequence_end",
+        "all"
+      ]
+    }
+  ],
   "rules" : {
     "cardinalityRules" : [ {
       "role" : "Startevents_all",
@@ -1575,6 +1620,9 @@
     "containmentRules" : [ {
       "role" : "BPMNDiagram",
       "contains" : [ "all" ]
+    }, {
+      "role" : "SimulationSubProcess",
+      "contains" : [ "sequence_start", "sequence_end", "from_task_event", "to_task_event", "EventSubProcess", "TextAnnotation", "DataStore" ]
     }, {
       "role" : "SubProcess",
       "contains" : [ "sequence_start", "sequence_end", "from_task_event", "to_task_event", "EventSubProcess", "TextAnnotation", "DataStore" ]

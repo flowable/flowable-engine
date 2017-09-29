@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+
+  targetNamespace="Examples">
+
+  <process id="simpleSimulationSubProcess">
+
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="subProcess" />
+
+    <subProcess id="subProcess" >
+      <extensionElements>
+        <flowable:type>simulation</flowable:type>
+        <flowable:virtualEngineConfiguration><![CDATA[${virtualEngineCfg}]]></flowable:virtualEngineConfiguration>
+      </extensionElements>
+      <startEvent id="subProcessStart" />
+      <sequenceFlow id="flow2" sourceRef="subProcessStart" targetRef="scriptTask" />
+      <scriptTask id="scriptTask" name="Script task in subprocess" scriptFormat="groovy">
+        <script>
+          runtimeService = org.flowable.engine.impl.context.Context.getProcessEngineConfiguration().getRuntimeService();
+          runtimeService.setVariable(execution.getProcessInstanceId(), "virtualEngineName", execution.getTransientVariable("_virtualProcessEngine").getName());
+        </script>
+      </scriptTask>
+      <sequenceFlow id="flow3" sourceRef="scriptTask" targetRef="subProcessEnd" />
+      <endEvent id="subProcessEnd" />
+    </subProcess>
+
+    <sequenceFlow id="flow4" sourceRef="subProcess" targetRef="userTask" />
+
+    <userTask id="userTask" name="wait state to check process instance state"/>
+    <sequenceFlow id="flow6" sourceRef="userTask" targetRef="theEnd"/>
+
+    <endEvent id="theEnd" />
+
+  </process>
+
+</definitions>

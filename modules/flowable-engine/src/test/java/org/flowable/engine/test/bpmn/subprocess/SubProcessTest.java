@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.ProcessEngines;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricActivityInstance;
@@ -28,6 +29,10 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.job.service.Job;
 import org.flowable.task.service.TaskQuery;
 import org.flowable.task.service.history.HistoricTaskInstance;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 
 /**
  * @author Joram Barrez
@@ -439,4 +444,35 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         taskService.complete(currentTask.getId());
         assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
     }
+
+    @Deployment
+    public void testSimpleSimulationSubProcess() {
+        // After staring the process, the task in the subprocess should be active
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSimulationSubProcess",
+                CollectionUtil.singletonMap("virtualEngineCfg", "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.virtualProcessEngine.cfg.xml"));
+        org.flowable.task.service.Task userTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        assertEquals("wait state to check process instance state", userTask.getName());
+
+        assertThat(ProcessEngines.getProcessEngine("virtual-flowable"), is(nullValue()));
+        assertThat(
+                (String) runtimeService.getVariable(pi.getId(),"virtualEngineName"),
+                is("virtual-flowable"));
+        taskService.complete(userTask.getId());
+        assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
+    }
+
+    @Deployment(resources={"org/flowable/engine/test/bpmn/subprocess/SubProcessTest.testSimpleSimulationSubProcess.bpmn20.xml"})
+    public void testSimulationSubProcessWithRealProcessEngine() {
+        ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSimulationSubProcess",
+                CollectionUtil.singletonMap("virtualEngineCfg", ""));
+        org.flowable.task.service.Task userTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        assertEquals("wait state to check process instance state", userTask.getName());
+
+        assertThat(
+                (String) runtimeService.getVariable(pi.getId(),"virtualEngineName"),
+                is("default"));
+        taskService.complete(userTask.getId());
+        assertNull(runtimeService.createProcessInstanceQuery().processInstanceId(pi.getId()).singleResult());
+    }
+
 }
