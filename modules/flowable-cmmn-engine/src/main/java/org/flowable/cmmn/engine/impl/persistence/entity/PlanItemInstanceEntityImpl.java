@@ -18,6 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.impl.variable.VariableScopeType;
@@ -42,7 +43,7 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
     protected String startUserId;
     protected String referenceId;
     protected String referenceType;
-    protected String tenantId;
+    protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     
     // Non-persisted
     protected PlanItem planItem;
