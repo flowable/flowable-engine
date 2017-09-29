@@ -58,7 +58,7 @@
             <column name="KEY_" type="varchar(255)">
                 <constraints nullable="false" />
             </column>
-            <column name="VERSION_" type="varchar(255)">
+            <column name="VERSION_" type="integer">
                 <constraints nullable="false" />
             </column>
             <column name="CATEGORY_" type="varchar(255)" />
