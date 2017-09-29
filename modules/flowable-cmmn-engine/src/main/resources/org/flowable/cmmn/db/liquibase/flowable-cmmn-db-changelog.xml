@@ -21,9 +21,7 @@
             <column name="PARENT_DEPLOYMENT_ID_" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
-            <column name="TENANT_ID_" type="varchar(255)">
-                <constraints nullable="true" />
-            </column>
+            <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
         </createTable>
 
         <createTable tableName="ACT_CMMN_DEPLOYMENT_RESOURCE">
@@ -66,9 +64,7 @@
             <column name="RESOURCE_NAME_" type="varchar(4000)" />
             <column name="DESCRIPTION_" type="varchar(4000)" />
             <column name="HAS_GRAPHICAL_NOTATION_" type="boolean" />
-            <column name="TENANT_ID_" type="varchar(255)" defaultValue="">
-                <constraints nullable="false" />
-            </column>
+            <column name="TENANT_ID_" type="varchar(255)" defaultValue="" />
         </createTable>
         
         <addForeignKeyConstraint constraintName="ACT_FK_CASE_DEF_DPLY" 
