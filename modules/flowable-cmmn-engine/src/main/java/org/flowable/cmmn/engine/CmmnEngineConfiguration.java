@@ -110,6 +110,7 @@ import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.task.service.impl.db.TaskDbSchemaManager;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.db.IbatisVariableTypeHandler;
@@ -209,6 +210,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
 
     // Variable support
     protected DbSchemaManager variableDbSchemaManager;
+    protected DbSchemaManager taskDbSchemaManager;
     protected VariableTypes variableTypes;
     protected List<VariableType> customPreVariableTypes;
     protected List<VariableType> customPostVariableTypes;
@@ -291,11 +293,26 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
 
     public void initDbSchemaManager() {
         super.initDbSchemaManager();
+        initCmmnDbSchemaManager();
+        initVariableDbSchemaManager();
+        initTaskDbSchemaManager();
+    }
+
+    protected void initCmmnDbSchemaManager() {
         if (this.dbSchemaManager == null) {
             this.dbSchemaManager = new CmmnDbSchemaManager();
         }
+    }
+
+    protected void initVariableDbSchemaManager() {
         if (this.variableDbSchemaManager == null) {
             this.variableDbSchemaManager = new VariableDbSchemaManager();
+        }
+    }
+
+    protected void initTaskDbSchemaManager() {
+        if (this.taskDbSchemaManager == null) {
+            this.taskDbSchemaManager = new TaskDbSchemaManager();
         }
     }
 
@@ -1033,6 +1050,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
     
+    public DbSchemaManager getTaskDbSchemaManager() {
+        return taskDbSchemaManager;
+    }
+
+    public CmmnEngineConfiguration setTaskDbSchemaManager(DbSchemaManager taskDbSchemaManager) {
+        this.taskDbSchemaManager = taskDbSchemaManager;
+        return this;
+    }
+
     public VariableTypes getVariableTypes() {
         return variableTypes;
     }

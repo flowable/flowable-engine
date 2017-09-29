@@ -61,6 +61,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
+import org.flowable.engine.common.impl.db.DbSchemaManager;
 import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.event.FlowableEventDispatcherImpl;
 import org.flowable.engine.common.impl.history.HistoryLevel;
@@ -288,6 +289,7 @@ import org.flowable.task.service.InternalTaskLocalizationManager;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
+import org.flowable.task.service.impl.db.TaskDbSchemaManager;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
 import org.flowable.variable.service.VariableServiceConfiguration;
@@ -737,7 +739,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // agenda factory
     protected FlowableEngineAgendaFactory agendaFactory;
     
-    protected VariableDbSchemaManager variableDbSchemaManager;
+    protected DbSchemaManager variableDbSchemaManager;
+    protected DbSchemaManager taskDbSchemaManager;
 
     // Backwards compatibility //////////////////////////////////////////////////////////////
 
@@ -924,11 +927,26 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void initDbSchemaManagers() {
         super.initDbSchemaManager();
+        initProcessDbSchemaManager();
+        initVariableDbSchemaManager();
+        initTaskDbSchemaManager();
+    }
+
+    protected void initProcessDbSchemaManager() {
         if (this.dbSchemaManager == null) {
             this.dbSchemaManager = new ProcessDbSchemaManager();
         }
+    }
+
+    protected void initVariableDbSchemaManager() {
         if (this.variableDbSchemaManager == null) {
             this.variableDbSchemaManager = new VariableDbSchemaManager();
+        }
+    }
+
+    protected void initTaskDbSchemaManager() {
+        if (this.taskDbSchemaManager == null) {
+            this.taskDbSchemaManager = new TaskDbSchemaManager();
         }
     }
 
@@ -3395,12 +3413,21 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
     
-    public VariableDbSchemaManager getVariableDbSchemaManager() {
+    public DbSchemaManager getVariableDbSchemaManager() {
         return variableDbSchemaManager;
     }
 
-    public ProcessEngineConfigurationImpl setVariableDbSchemaManager(VariableDbSchemaManager variableDbSchemaManager) {
+    public ProcessEngineConfigurationImpl setVariableDbSchemaManager(DbSchemaManager variableDbSchemaManager) {
         this.variableDbSchemaManager = variableDbSchemaManager;
+        return this;
+    }
+    
+    public DbSchemaManager getTaskDbSchemaManager() {
+        return taskDbSchemaManager;
+    }
+
+    public ProcessEngineConfigurationImpl setTaskDbSchemaManager(DbSchemaManager taskDbSchemaManager) {
+        this.taskDbSchemaManager = taskDbSchemaManager;
         return this;
     }
 

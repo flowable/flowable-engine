@@ -94,6 +94,7 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
         try {
             
             getCommonDbSchemaManager().dbSchemaCreate();
+            getTaskDbSchemaManager().dbSchemaCreate();
             getVariableDbSchemaManager().dbSchemaCreate();
             
             Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getCmmnEngineConfiguration());
@@ -110,6 +111,7 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
             liquibase.dropAll();
             
             getVariableDbSchemaManager().dbSchemaDrop();
+            getTaskDbSchemaManager().dbSchemaDrop();
             getCommonDbSchemaManager().dbSchemaDrop();
         } catch (Exception e) {
             throw new FlowableException("Error dropping CMMN engine tables", e);
@@ -121,6 +123,7 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
         try {
             
             getCommonDbSchemaManager().dbSchemaUpdate();
+            getTaskDbSchemaManager().dbSchemaUpdate();
             getVariableDbSchemaManager().dbSchemaUpdate();
             
             Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getCmmnEngineConfiguration());
@@ -139,5 +142,8 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
         return CommandContextUtil.getCmmnEngineConfiguration().getVariableDbSchemaManager();
     }
     
+    protected DbSchemaManager getTaskDbSchemaManager() {
+        return CommandContextUtil.getCmmnEngineConfiguration().getTaskDbSchemaManager();
+    }
     
 }

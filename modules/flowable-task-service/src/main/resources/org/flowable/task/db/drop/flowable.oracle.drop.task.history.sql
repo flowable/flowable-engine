@@ -1,0 +1,1 @@
+drop table ACT_HI_TASKINST;

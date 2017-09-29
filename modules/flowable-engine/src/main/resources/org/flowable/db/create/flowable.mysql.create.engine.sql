@@ -181,33 +181,6 @@ create table ACT_RE_PROCDEF (
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
-create table ACT_RU_TASK (
-    ID_ varchar(64),
-    REV_ integer,
-    EXECUTION_ID_ varchar(64),
-    PROC_INST_ID_ varchar(64),
-    PROC_DEF_ID_ varchar(64),
-    NAME_ varchar(255),
-    PARENT_TASK_ID_ varchar(64),
-    DESCRIPTION_ varchar(4000),
-    TASK_DEF_KEY_ varchar(255),
-    OWNER_ varchar(255),
-    ASSIGNEE_ varchar(255),
-    DELEGATION_ varchar(64),
-    PRIORITY_ integer,
-    CREATE_TIME_ timestamp(3) NULL,
-    DUE_DATE_ datetime(3),
-    CATEGORY_ varchar(255),
-    SUSPENSION_STATE_ integer,
-    TENANT_ID_ varchar(255) default '',
-    FORM_KEY_ varchar(255),
-    CLAIM_TIME_ datetime(3),
-    IS_COUNT_ENABLED_ TINYINT,
-	VAR_COUNT_ integer,
-	ID_LINK_COUNT_ integer,
-    primary key (ID_)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
-
 create table ACT_RU_IDENTITYLINK (
     ID_ varchar(64),
     REV_ integer,
@@ -261,7 +234,6 @@ create table ACT_PROCDEF_INFO (
 
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDC_EXEC_ROOT on ACT_RU_EXECUTION(ROOT_PROC_INST_ID_);
-create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
 create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);
 create index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK(GROUP_ID_);
 create index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR(CONFIGURATION_);

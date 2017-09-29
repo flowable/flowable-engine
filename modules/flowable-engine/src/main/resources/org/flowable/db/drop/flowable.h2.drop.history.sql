@@ -1,6 +1,5 @@
 drop table if exists ACT_HI_PROCINST cascade constraints;
 drop table if exists ACT_HI_ACTINST cascade constraints;
-drop table if exists ACT_HI_TASKINST cascade constraints;
 drop table if exists ACT_HI_DETAIL cascade constraints;
 drop table if exists ACT_HI_COMMENT cascade constraints;
 drop table if exists ACT_HI_ATTACHMENT cascade constraints;

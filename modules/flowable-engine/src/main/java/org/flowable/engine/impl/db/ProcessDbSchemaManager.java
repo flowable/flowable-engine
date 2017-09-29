@@ -89,6 +89,7 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     public void dbSchemaCreate() {
         
         getCommonDbSchemaManager().dbSchemaCreate();
+        getTaskDbSchemaManager().dbSchemaCreate();
         getVariableDbSchemaManager().dbSchemaCreate();
         
         if (isEngineTablePresent()) {
@@ -122,6 +123,7 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         }
      
         getVariableDbSchemaManager().dbSchemaDrop();
+        getTaskDbSchemaManager().dbSchemaDrop();
         getCommonDbSchemaManager().dbSchemaDrop();
     }
 
@@ -135,6 +137,7 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     public String dbSchemaUpdate() {
         
         getCommonDbSchemaManager().dbSchemaUpdate();
+        getTaskDbSchemaManager().dbSchemaUpdate();
         getVariableDbSchemaManager().dbSchemaUpdate();
 
         String feedback = null;
@@ -291,6 +294,10 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     
     protected DbSchemaManager getVariableDbSchemaManager() {
         return CommandContextUtil.getProcessEngineConfiguration().getVariableDbSchemaManager();
+    }
+    
+    protected DbSchemaManager getTaskDbSchemaManager() {
+        return CommandContextUtil.getProcessEngineConfiguration().getTaskDbSchemaManager();
     }
     
     @Override
