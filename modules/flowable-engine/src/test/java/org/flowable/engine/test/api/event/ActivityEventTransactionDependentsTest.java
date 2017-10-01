@@ -190,6 +190,7 @@ public class ActivityEventTransactionDependentsTest extends PluggableFlowableTes
         @Override
         public void onEvent(FlowableEvent event) {
             eventsReceived.add(event);
+            LOGGER.debug("{} event added ... {}", event.getType(), eventsReceived.size());
         }
 
         public List<FlowableEvent> getEventsReceived() {
