@@ -12,10 +12,6 @@
  */
 package org.flowable.engine.impl.agenda;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.CompensateEventDefinition;
@@ -43,6 +39,10 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * This operations ends an execution and follows the typical BPMN rules to continue the process (if possible).
@@ -175,6 +175,10 @@ public class EndExecutionOperation extends AbstractOperation {
                         FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, subProcess.getId(), subProcess.getName(),
                                 parentExecution.getId(), parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId(), subProcess));
 
+                CommandContextUtil.getTransactionEventDispatcher(commandContext).dispatchEvent(
+                        FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, subProcess.getId(), subProcess.getName(),
+                                parentExecution.getId(), parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId(), subProcess));
+
                 ExecutionEntity subProcessParentExecution = parentExecution.getParent();
                 if (getNumberOfActiveChildExecutionsForExecution(executionEntityManager, subProcessParentExecution.getId()) == 0) {
                     if (subProcessParentExecution.getCurrentFlowElement() instanceof SubProcess) {
@@ -274,6 +278,9 @@ public class EndExecutionOperation extends AbstractOperation {
         executionEntityManager.deleteExecutionAndRelatedData(parentExecution, null);
 
         CommandContextUtil.getEventDispatcher(commandContext).dispatchEvent(
+                FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, subProcess.getId(), subProcess.getName(),
+                        parentExecution.getId(), parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId(), subProcess));
+        CommandContextUtil.getTransactionEventDispatcher(commandContext).dispatchEvent(
                 FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, subProcess.getId(), subProcess.getName(),
                         parentExecution.getId(), parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId(), subProcess));
         return executionToContinue;

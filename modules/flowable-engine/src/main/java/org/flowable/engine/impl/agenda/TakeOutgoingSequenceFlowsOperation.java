@@ -12,10 +12,6 @@
  */
 package org.flowable.engine.impl.agenda;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.AdhocSubProcess;
 import org.flowable.bpmn.model.BoundaryEvent;
@@ -43,6 +39,10 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.condition.ConditionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Operation that leaves the {@link FlowElement} where the {@link ExecutionEntity} is currently at and leaves it following the sequence flow.
@@ -119,6 +119,9 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
 
             if (!(execution.getCurrentFlowElement() instanceof SubProcess)) {
                 CommandContextUtil.getEventDispatcher(commandContext).dispatchEvent(
+                        FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, flowNode.getId(), flowNode.getName(),
+                                execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
+                CommandContextUtil.getTransactionEventDispatcher(commandContext).dispatchEvent(
                         FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, flowNode.getId(), flowNode.getName(),
                                 execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
             }
