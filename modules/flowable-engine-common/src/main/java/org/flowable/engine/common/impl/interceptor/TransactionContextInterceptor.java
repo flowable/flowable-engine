@@ -15,6 +15,7 @@ package org.flowable.engine.common.impl.interceptor;
 
 import org.flowable.engine.common.impl.cfg.TransactionContext;
 import org.flowable.engine.common.impl.cfg.TransactionContextFactory;
+import org.flowable.engine.common.impl.cfg.TransactionPropagation;
 import org.flowable.engine.common.impl.context.Context;
 
 /**
@@ -36,12 +37,13 @@ public class TransactionContextInterceptor extends AbstractCommandInterceptor {
 
         CommandContext commandContext = Context.getCommandContext();
         // Storing it in a variable, to reference later (it can change during command execution)
-        boolean isReused = commandContext.isReused();
+        boolean openTransaction = !config.getTransactionPropagation().equals(TransactionPropagation.NOT_SUPPORTED)
+                && transactionContextFactory != null && !commandContext.isReused();
         boolean isContextSet = false;
 
         try {
 
-            if (transactionContextFactory != null && !isReused) {
+            if (openTransaction) {
                 TransactionContext transactionContext = (TransactionContext) transactionContextFactory.openTransactionContext(commandContext);
                 Context.setTransactionContext(transactionContext);
                 isContextSet = true;
@@ -51,7 +53,7 @@ public class TransactionContextInterceptor extends AbstractCommandInterceptor {
             return next.execute(config, command);
 
         } finally {
-            if (transactionContextFactory != null && isContextSet && !isReused) {
+            if (openTransaction && isContextSet) {
                 Context.removeTransactionContext();
             }
         }

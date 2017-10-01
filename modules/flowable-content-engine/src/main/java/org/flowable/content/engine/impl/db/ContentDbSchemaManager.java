@@ -12,11 +12,13 @@
  */
 package org.flowable.content.engine.impl.db;
 
+import java.sql.Connection;
+
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.db.DbSchemaManager;
-import org.flowable.engine.common.impl.db.DbSqlSession;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 import liquibase.Liquibase;
 import liquibase.database.Database;
@@ -55,8 +57,17 @@ public class ContentDbSchemaManager implements DbSchemaManager {
 
     protected static Liquibase createLiquibaseInstance() {
         try {
-            DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
-            DatabaseConnection connection = new JdbcConnection(dbSqlSession.getSqlSession().getConnection());
+            
+            Connection jdbcConnection = null;
+            CommandContext commandContext = CommandContextUtil.getCommandContext();
+            if (commandContext == null) {
+                jdbcConnection = CommandContextUtil.getContentEngineConfiguration(commandContext).getDataSource().getConnection();
+            } else {
+                jdbcConnection = CommandContextUtil.getDbSqlSession(commandContext).getSqlSession().getConnection();
+            }
+            jdbcConnection.commit();
+            
+            DatabaseConnection connection = new JdbcConnection(jdbcConnection);
             Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
             database.setDatabaseChangeLogTableName(ContentEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogTableName());
             database.setDatabaseChangeLogLockTableName(ContentEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogLockTableName());
