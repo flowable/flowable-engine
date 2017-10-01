@@ -61,7 +61,7 @@ public class DmnDbSchemaManager implements DbSchemaManager {
                 liquibase.validate();
             }
         } catch (Exception e) {
-            throw new FlowableException("Error initialising dmn data model");
+            throw new FlowableException("Error initialising dmn data model", e);
         }
     }
 
@@ -77,7 +77,7 @@ public class DmnDbSchemaManager implements DbSchemaManager {
         }
         jdbcConnection.commit();
         
-        DatabaseConnection connection = new JdbcConnection(dmnEngineConfiguration.getDataSource().getConnection());
+        DatabaseConnection connection = new JdbcConnection(jdbcConnection);
         Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
         database.setDatabaseChangeLogTableName(DmnEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogTableName());
         database.setDatabaseChangeLogLockTableName(DmnEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogLockTableName());
