@@ -52,7 +52,7 @@ import java.util.Map;
  * @author Joram Barrez
  */
 public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionEntity> implements ExecutionEntityManager {
-    // todo faizal
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionEntityManagerImpl.class);
 
     protected ExecutionDataManager executionDataManager;
@@ -811,6 +811,11 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
                 if (MessageEventSubscriptionEntity.EVENT_TYPE.equals(eventSubscription.getEventType())) {
                     if (getEventDispatcher().isEnabled()) {
                         getEventDispatcher().dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_CANCELLED,
+                                eventSubscription.getActivityId(), eventSubscription.getEventName(), null, eventSubscription.getExecutionId(),
+                                eventSubscription.getProcessInstanceId(), eventSubscription.getProcessDefinitionId()));
+                    }
+                    if (getTransactionEventDispatcher().isEnabled()) {
+                        getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_CANCELLED,
                                 eventSubscription.getActivityId(), eventSubscription.getEventName(), null, eventSubscription.getExecutionId(),
                                 eventSubscription.getProcessInstanceId(), eventSubscription.getProcessDefinitionId()));
                     }
