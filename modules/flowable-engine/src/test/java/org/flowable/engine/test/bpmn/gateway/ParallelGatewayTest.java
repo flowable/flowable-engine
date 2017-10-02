@@ -16,11 +16,18 @@ package org.flowable.engine.test.bpmn.gateway;
 import java.util.List;
 
 import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.service.Task;
 import org.flowable.task.service.TaskQuery;
 import org.junit.Assert;
 
@@ -176,6 +183,73 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
                 Assert.assertNotNull(historicActivityInstance.getEndTime());
             }
         }
+    }
+
+    @Deployment
+    public void testNonTerminatingEndEventShouldNotRemoveSubscriptions() {
+        ProcessDefinition processDefinition = repositoryService
+                .createProcessDefinitionQuery()
+                .processDefinitionKey("ec7ca606-a4f2-11e7-abc4-cec278b6b50a")
+                .singleResult();
+
+        final ProcessInstance processInstance = runtimeService.createProcessInstanceBuilder()
+                .processDefinitionId(processDefinition.getId())
+                .start();
+
+        List<Task> tasks = taskService.createTaskQuery()
+                .processInstanceId(processInstance.getProcessInstanceId())
+                .list();
+
+        assertEquals(1, tasks.size());
+
+        String executionId = processEngine.getManagementService().executeCommand(new Command<String>() {
+            @Override
+            public String execute(CommandContext commandContext) {
+                EventSubscriptionQueryImpl q = new EventSubscriptionQueryImpl(commandContext);
+                q.processInstanceId(processInstance.getProcessInstanceId());
+
+                List<EventSubscription> subs = CommandContextUtil
+                        .getEventSubscriptionEntityManager()
+                        .findEventSubscriptionsByQueryCriteria(q);
+
+                assertEquals(1, subs.size());
+                EventSubscription sub = subs.get(0);
+                assertEquals(sub.getEventName(), "testmessage");
+
+                return sub.getExecutionId();
+            }
+        });
+        taskService.complete(tasks.get(0).getId());
+
+        tasks = taskService.createTaskQuery()
+                .processInstanceId(processInstance.getProcessInstanceId())
+                .taskName("task 2")
+                .list();
+        assertEquals(1, tasks.size());
+
+        taskService.complete(tasks.get(0).getId());
+
+        tasks = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).list();
+        assertEquals(1, tasks.size());
+
+        executionId = processEngine.getManagementService().executeCommand(new Command<String>() {
+            @Override
+            public String execute(CommandContext commandContext) {
+                EventSubscriptionQueryImpl q = new EventSubscriptionQueryImpl(commandContext);
+                q.processInstanceId(processInstance.getProcessInstanceId());
+
+                List<EventSubscription> subs = CommandContextUtil
+                        .getEventSubscriptionEntityManager()
+                        .findEventSubscriptionsByQueryCriteria(q);
+
+                assertEquals(1, subs.size());
+                EventSubscription sub = subs.get(0);
+                assertEquals(sub.getEventName(), "testmessage");
+
+                return sub.getExecutionId();
+            }
+        });
+
     }
 
 }
