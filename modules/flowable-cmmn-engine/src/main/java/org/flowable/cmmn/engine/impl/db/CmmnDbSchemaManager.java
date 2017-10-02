@@ -86,7 +86,9 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
         // For most databases, this is not a problem as DDL statements are not transactional.
         // However for some (e.g. sql server), this would remove all previous statements, which is not wanted,
         // hence the extra commit here.
-        jdbcConnection.commit();
+        if (!jdbcConnection.getAutoCommit()) {
+            jdbcConnection.commit();
+        }
         
         DatabaseConnection connection = new JdbcConnection(jdbcConnection);
         Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);

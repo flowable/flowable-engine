@@ -75,7 +75,10 @@ public class DmnDbSchemaManager implements DbSchemaManager {
         } else {
             jdbcConnection = CommandContextUtil.getDbSqlSession(commandContext).getSqlSession().getConnection();
         }
-        jdbcConnection.commit();
+        
+        if (!jdbcConnection.getAutoCommit()) {
+            jdbcConnection.commit();
+        }
         
         DatabaseConnection connection = new JdbcConnection(jdbcConnection);
         Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
