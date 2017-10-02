@@ -14,7 +14,6 @@ package org.flowable.engine.test.api.event;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
 import org.flowable.engine.common.impl.cfg.TransactionState;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.event.EventLogEntry;
@@ -214,7 +213,7 @@ public class ActivityEventTransactionDependentsTest extends PluggableFlowableTes
         }
     }
 
-    private class TransactionFlowableEventListener implements TransactionDependentFlowableEventListener {
+    private class TransactionFlowableEventListener implements org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener {
 
         private String onTransaction = "";
 

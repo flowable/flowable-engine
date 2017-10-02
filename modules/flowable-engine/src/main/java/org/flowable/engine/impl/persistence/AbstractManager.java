@@ -14,7 +14,7 @@
 package org.flowable.engine.impl.persistence;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventDispatcher;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventDispatcher;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
@@ -91,7 +91,7 @@ public abstract class AbstractManager {
         return getProcessEngineConfiguration().getEventDispatcher();
     }
 
-    protected TransactionDependentFlowableEventDispatcher getTransactionEventDispatcher() {
+    protected TransactionFlowableEventDispatcher getTransactionEventDispatcher() {
         return getProcessEngineConfiguration().getTransactionDependentEventDispatcher();
     }
 

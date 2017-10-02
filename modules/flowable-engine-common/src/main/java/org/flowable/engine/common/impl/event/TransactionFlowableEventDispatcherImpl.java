@@ -14,20 +14,20 @@ package org.flowable.engine.common.impl.event;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventType;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventDispatcher;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventDispatcher;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 
 /**
  * Class capable of dispatching events.
  *
  * @author Frederik Heremans
  */
-public class TransactionDependentFlowableEventDispatcherImpl implements TransactionDependentFlowableEventDispatcher {
+public class TransactionFlowableEventDispatcherImpl implements TransactionFlowableEventDispatcher {
 
     protected TransactionDependentFlowableEventSupport eventSupport;
     protected boolean enabled = true;
 
-    public TransactionDependentFlowableEventDispatcherImpl() {
+    public TransactionFlowableEventDispatcherImpl() {
         eventSupport = new TransactionDependentFlowableEventSupport();
     }
 
@@ -40,17 +40,17 @@ public class TransactionDependentFlowableEventDispatcherImpl implements Transact
     }
 
     @Override
-    public void addEventListener(TransactionDependentFlowableEventListener listenerToAdd) {
+    public void addEventListener(TransactionFlowableEventListener listenerToAdd) {
         eventSupport.addEventListener(listenerToAdd);
     }
 
     @Override
-    public void addEventListener(TransactionDependentFlowableEventListener listenerToAdd, FlowableEventType... types) {
+    public void addEventListener(TransactionFlowableEventListener listenerToAdd, FlowableEventType... types) {
         eventSupport.addEventListener(listenerToAdd, types);
     }
 
     @Override
-    public void removeEventListener(TransactionDependentFlowableEventListener listenerToRemove) {
+    public void removeEventListener(TransactionFlowableEventListener listenerToRemove) {
         eventSupport.removeEventListener(listenerToRemove);
     }
 

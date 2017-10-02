@@ -18,7 +18,7 @@ import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.TransactionEventListener;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 import org.flowable.engine.delegate.CustomPropertiesResolver;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.TaskListener;
@@ -28,7 +28,7 @@ import org.flowable.engine.impl.bpmn.helper.ClassDelegateFactory;
 import org.flowable.engine.impl.bpmn.helper.DefaultClassDelegateFactory;
 import org.flowable.engine.impl.bpmn.helper.DelegateExpressionFlowableEventListener;
 import org.flowable.engine.impl.bpmn.helper.DelegateFlowableEventListener;
-import org.flowable.engine.impl.bpmn.helper.DelegateFlowableTransactionDependentEventListener;
+import org.flowable.engine.impl.bpmn.helper.DelegateFlowableTransactionEventListener;
 import org.flowable.engine.impl.bpmn.helper.ErrorThrowingEventListener;
 import org.flowable.engine.impl.bpmn.helper.MessageThrowingEventListener;
 import org.flowable.engine.impl.bpmn.helper.SignalThrowingEventListener;
@@ -36,8 +36,8 @@ import org.flowable.engine.impl.bpmn.listener.DelegateExpressionCustomProperties
 import org.flowable.engine.impl.bpmn.listener.DelegateExpressionExecutionListener;
 import org.flowable.engine.impl.bpmn.listener.DelegateExpressionTaskListener;
 import org.flowable.engine.impl.bpmn.listener.DelegateExpressionTransactionDependentExecutionListener;
-import org.flowable.engine.impl.bpmn.listener.DelegateExpressionTransactionDependentFlowableEventListener;
 import org.flowable.engine.impl.bpmn.listener.DelegateExpressionTransactionDependentTaskListener;
+import org.flowable.engine.impl.bpmn.listener.DelegateExpressionTransactionFlowableEventListener;
 import org.flowable.engine.impl.bpmn.listener.ExpressionCustomPropertiesResolver;
 import org.flowable.engine.impl.bpmn.listener.ExpressionExecutionListener;
 import org.flowable.engine.impl.bpmn.listener.ExpressionTaskListener;
@@ -129,8 +129,8 @@ public class DefaultListenerFactory extends AbstractBehaviorFactory implements L
     }
 
     @Override
-    public TransactionDependentFlowableEventListener createClassDelegateTransactionDependentEventListener(TransactionEventListener eventListener) {
-        return new DelegateFlowableTransactionDependentEventListener(eventListener.getImplementation(), getEntityType(eventListener.getEntityType()), eventListener.getTransaction());
+    public TransactionFlowableEventListener createClassDelegateTransactionDependentEventListener(TransactionEventListener eventListener) {
+        return new DelegateFlowableTransactionEventListener(eventListener.getImplementation(), getEntityType(eventListener.getEntityType()), eventListener.getTransaction());
     }
 
     @Override
@@ -139,8 +139,8 @@ public class DefaultListenerFactory extends AbstractBehaviorFactory implements L
     }
 
     @Override
-    public TransactionDependentFlowableEventListener createDelegateExpressionTransactionDependentEventListener(TransactionEventListener eventListener) {
-        return new DelegateExpressionTransactionDependentFlowableEventListener(expressionManager.createExpression(eventListener.getImplementation()), getEntityType(eventListener.getEntityType()), eventListener.getTransaction());
+    public TransactionFlowableEventListener createDelegateExpressionTransactionDependentEventListener(TransactionEventListener eventListener) {
+        return new DelegateExpressionTransactionFlowableEventListener(expressionManager.createExpression(eventListener.getImplementation()), getEntityType(eventListener.getEntityType()), eventListener.getTransaction());
     }
 
     @Override

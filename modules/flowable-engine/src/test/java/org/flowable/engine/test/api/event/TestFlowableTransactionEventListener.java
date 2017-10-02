@@ -13,12 +13,12 @@
 package org.flowable.engine.test.api.event;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestFlowableTransactionEventListener implements TransactionDependentFlowableEventListener {
+public class TestFlowableTransactionEventListener implements TransactionFlowableEventListener {
 
     private String onTransaction;
     private List<FlowableEvent> eventsReceived;

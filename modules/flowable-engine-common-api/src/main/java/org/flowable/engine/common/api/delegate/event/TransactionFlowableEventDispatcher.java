@@ -18,14 +18,14 @@ package org.flowable.engine.common.api.delegate.event;
  *
  * @author Frederik Heremans
  */
-public interface TransactionDependentFlowableEventDispatcher {
+public interface TransactionFlowableEventDispatcher {
 
     /**
      * Adds an event-listener which will be notified of ALL events by the dispatcher.
      *
      * @param listenerToAdd the listener to add
      */
-    void addEventListener(TransactionDependentFlowableEventListener listenerToAdd);
+    void addEventListener(TransactionFlowableEventListener listenerToAdd);
 
     /**
      * Adds an event-listener which will only be notified when an event of the given types occurs.
@@ -33,7 +33,7 @@ public interface TransactionDependentFlowableEventDispatcher {
      * @param listenerToAdd the listener to add
      * @param types         types of events the listener should be notified for
      */
-    void addEventListener(TransactionDependentFlowableEventListener listenerToAdd, FlowableEventType... types);
+    void addEventListener(TransactionFlowableEventListener listenerToAdd, FlowableEventType... types);
 
     /**
      * Removes the given listener from this dispatcher. The listener will no longer be notified,
@@ -41,7 +41,7 @@ public interface TransactionDependentFlowableEventDispatcher {
      *
      * @param listenerToRemove listener to remove
      */
-    void removeEventListener(TransactionDependentFlowableEventListener listenerToRemove);
+    void removeEventListener(TransactionFlowableEventListener listenerToRemove);
 
     /**
      * Dispatches the given event to any listeners that are registered.

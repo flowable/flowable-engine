@@ -16,7 +16,7 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 import org.flowable.engine.common.impl.util.ReflectUtil;
 
 /**
@@ -28,14 +28,14 @@ import org.flowable.engine.common.impl.util.ReflectUtil;
  *
  * @author Frederik Heremans
  */
-public class DelegateFlowableTransactionDependentEventListener extends BaseDelegateTransactionEventListener {
+public class DelegateFlowableTransactionEventListener extends BaseDelegateTransactionEventListener {
 
     protected String className;
-    protected TransactionDependentFlowableEventListener delegateInstance;
+    protected TransactionFlowableEventListener delegateInstance;
     protected String onTransaction;
     protected boolean failOnException;
 
-    public DelegateFlowableTransactionDependentEventListener(String className, Class<?> entityClass, String transaction) {
+    public DelegateFlowableTransactionEventListener(String className, Class<?> entityClass, String transaction) {
         this.className = className;
         this.onTransaction = transaction;
         setEntityClass(entityClass);
@@ -67,11 +67,11 @@ public class DelegateFlowableTransactionDependentEventListener extends BaseDeleg
         return failOnException;
     }
 
-    protected TransactionDependentFlowableEventListener getDelegateInstance() {
+    protected TransactionFlowableEventListener getDelegateInstance() {
         if (delegateInstance == null) {
             Object instance = ReflectUtil.instantiate(className);
-            if (instance instanceof TransactionDependentFlowableEventListener) {
-                delegateInstance = (TransactionDependentFlowableEventListener) instance;
+            if (instance instanceof TransactionFlowableEventListener) {
+                delegateInstance = (TransactionFlowableEventListener) instance;
             } else {
                 // Force failing of the listener invocation, since the delegate
                 // cannot be created

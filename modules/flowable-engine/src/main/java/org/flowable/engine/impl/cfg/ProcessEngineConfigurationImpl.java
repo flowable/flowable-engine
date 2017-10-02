@@ -42,12 +42,12 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.common.impl.event.FlowableEventDispatcherImpl;
-import org.flowable.engine.common.impl.event.TransactionDependentFlowableEventDispatcherImpl;
+import org.flowable.engine.common.impl.event.TransactionFlowableEventDispatcherImpl;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -2104,24 +2104,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void initTransactionDependentEventDispatcher() {
         if (this.transactionDependentEventDispatcher == null) {
-            this.transactionDependentEventDispatcher = new TransactionDependentFlowableEventDispatcherImpl();
+            this.transactionDependentEventDispatcher = new TransactionFlowableEventDispatcherImpl();
             this.transactionDependentFactory = new DefaultTransactionDependentEventListenerFactory();
         }
 
         this.transactionDependentEventDispatcher.setEnabled(enableTransactionEventDispatcher);
 
         if (transactionDependentEventListeners != null) {
-            for (TransactionDependentFlowableEventListener listenerToAdd : transactionDependentEventListeners) {
+            for (TransactionFlowableEventListener listenerToAdd : transactionDependentEventListeners) {
                 this.transactionDependentEventDispatcher.addEventListener(listenerToAdd);
             }
         }
 
         if (transactionDependentTypedEventListeners != null) {
-            for (Entry<String, List<TransactionDependentFlowableEventListener>> listenersToAdd : transactionDependentTypedEventListeners.entrySet()) {
+            for (Entry<String, List<TransactionFlowableEventListener>> listenersToAdd : transactionDependentTypedEventListeners.entrySet()) {
                 // Extract types from the given string
                 FlowableEngineEventType[] types = FlowableEngineEventType.getTypesFromString(listenersToAdd.getKey());
 
-                for (TransactionDependentFlowableEventListener listenerToAdd : listenersToAdd.getValue()) {
+                for (TransactionFlowableEventListener listenerToAdd : listenersToAdd.getValue()) {
                     this.transactionDependentEventDispatcher.addEventListener(listenerToAdd, types);
                 }
             }
@@ -2998,7 +2998,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     @Override
-    public ProcessEngineConfigurationImpl setTransactionEventListeners(List<TransactionDependentFlowableEventListener> eventListeners) {
+    public ProcessEngineConfigurationImpl setTransactionEventListeners(List<TransactionFlowableEventListener> eventListeners) {
         this.transactionDependentEventListeners = eventListeners;
         return this;
     }

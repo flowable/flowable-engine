@@ -27,7 +27,7 @@ import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventDispatcher;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventDispatcher;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.util.CollectionUtil;
@@ -222,7 +222,7 @@ public class ProcessInstanceHelper {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(execution, variables, false));
         }
         if (CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().isEnabled()) {
-            TransactionDependentFlowableEventDispatcher transactionEventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher();
+            TransactionFlowableEventDispatcher transactionEventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher();
             transactionEventDispatcher.dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(execution, variables, false));
         }
     }

@@ -13,7 +13,7 @@
 package org.flowable.engine.impl.cmd;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -25,9 +25,9 @@ import org.flowable.engine.impl.util.CommandContextUtil;
  */
 public class RemoveTransactionEventListenerCommand implements Command<Void> {
 
-    protected TransactionDependentFlowableEventListener listener;
+    protected TransactionFlowableEventListener listener;
 
-    public RemoveTransactionEventListenerCommand(TransactionDependentFlowableEventListener listener) {
+    public RemoveTransactionEventListenerCommand(TransactionFlowableEventListener listener) {
         super();
         this.listener = listener;
     }

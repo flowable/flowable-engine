@@ -6,7 +6,7 @@ package org.flowable.engine.common.api.delegate.event;
  * @author Frederik Heremans
  */
 
-public interface TransactionDependentFlowableEventListener {
+public interface TransactionFlowableEventListener {
 
     String ON_TRANSACTION_BEFORE_COMMIT = "before-commit";
     String ON_TRANSACTION_COMMITTED = "committed";

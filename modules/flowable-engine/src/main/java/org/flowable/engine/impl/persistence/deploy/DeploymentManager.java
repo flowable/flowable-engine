@@ -20,7 +20,7 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventDispatcher;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventDispatcher;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.ProcessDefinitionQueryImpl;
@@ -192,7 +192,7 @@ public class DeploymentManager {
         // Remove any process definition from the cache
         List<ProcessDefinition> processDefinitions = new ProcessDefinitionQueryImpl().deploymentId(deploymentId).list();
         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
-        TransactionDependentFlowableEventDispatcher transactionEventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher();
+        TransactionFlowableEventDispatcher transactionEventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher();
 
         for (ProcessDefinition processDefinition : processDefinitions) {
 
@@ -223,7 +223,7 @@ public class DeploymentManager {
         }
     }
 
-    private void dispatchTransactionEvent(TransactionDependentFlowableEventDispatcher eventDispatcher, FlowableEntityEvent entityEvent) {
+    private void dispatchTransactionEvent(TransactionFlowableEventDispatcher eventDispatcher, FlowableEntityEvent entityEvent) {
         if (eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(entityEvent);
         }

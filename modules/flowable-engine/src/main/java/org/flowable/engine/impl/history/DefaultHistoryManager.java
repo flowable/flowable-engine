@@ -15,7 +15,7 @@ package org.flowable.engine.impl.history;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventDispatcher;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventDispatcher;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -411,7 +411,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     }
 
     private void dispatchTransactionEvent(FlowableEntityEvent entityEvent) {
-        TransactionDependentFlowableEventDispatcher transactionEventDispatcher = getTransactionEventDispatcher();
+        TransactionFlowableEventDispatcher transactionEventDispatcher = getTransactionEventDispatcher();
         if (transactionEventDispatcher != null && transactionEventDispatcher.isEnabled()) {
             transactionEventDispatcher.dispatchEvent(
                     entityEvent);

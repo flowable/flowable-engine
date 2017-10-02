@@ -15,7 +15,7 @@ package org.flowable.engine.impl.bpmn.helper;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 
 /**
  * Base implementation of a {@link FlowableEventListener}, used when creating event-listeners that
@@ -23,7 +23,7 @@ import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowabl
  *
  * @author Frederik Heremans
  */
-public abstract class BaseDelegateTransactionEventListener implements TransactionDependentFlowableEventListener {
+public abstract class BaseDelegateTransactionEventListener implements TransactionFlowableEventListener {
 
     protected Class<?> entityClass;
 

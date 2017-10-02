@@ -14,7 +14,7 @@ package org.flowable.engine.impl.persistence.entity;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventDispatcher;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventDispatcher;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
@@ -63,7 +63,7 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, entity));
         }
 
-        TransactionDependentFlowableEventDispatcher transactionEventDispatcher = getTransactionEventDispatcher();
+        TransactionFlowableEventDispatcher transactionEventDispatcher = getTransactionEventDispatcher();
         if (fireCreateEvent && transactionEventDispatcher.isEnabled()) {
             transactionEventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, entity));
             transactionEventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, entity));

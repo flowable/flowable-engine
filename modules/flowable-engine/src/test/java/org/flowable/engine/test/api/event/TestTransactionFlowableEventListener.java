@@ -13,7 +13,7 @@
 package org.flowable.engine.test.api.event;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.slf4j.Logger;
@@ -22,19 +22,19 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TestTransactionDependentFlowableEventListener implements TransactionDependentFlowableEventListener {
+public class TestTransactionFlowableEventListener implements TransactionFlowableEventListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(TestTransactionDependentFlowableEventListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(TestTransactionFlowableEventListener.class);
     private List<FlowableEvent> eventsReceived;
     private String onTransaction = "";
     private boolean ignoreRawActivityEvents = false;
 
 
-    public TestTransactionDependentFlowableEventListener() {
+    public TestTransactionFlowableEventListener() {
         eventsReceived = new ArrayList<>();
     }
 
-    public TestTransactionDependentFlowableEventListener(boolean ignoreRawActivityEvents) {
+    public TestTransactionFlowableEventListener(boolean ignoreRawActivityEvents) {
         eventsReceived = new ArrayList<>();
 //        this.ignoreRawActivityEvents = ignoreRawActivityEvents;
     }

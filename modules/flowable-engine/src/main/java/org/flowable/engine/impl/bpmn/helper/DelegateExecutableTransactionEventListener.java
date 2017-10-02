@@ -15,7 +15,7 @@ package org.flowable.engine.impl.bpmn.helper;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 
 /**
  * An {@link FlowableEventListener} implementation which uses a classname to create a delegate
@@ -28,11 +28,11 @@ import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowabl
  */
 public class DelegateExecutableTransactionEventListener extends BaseDelegateTransactionEventListener {
 
-    protected TransactionDependentFlowableEventListener delegateInstance;
+    protected TransactionFlowableEventListener delegateInstance;
     protected String onTransaction;
     protected boolean failOnException;
 
-    public DelegateExecutableTransactionEventListener(TransactionDependentFlowableEventListener listener) {
+    public DelegateExecutableTransactionEventListener(TransactionFlowableEventListener listener) {
         this.delegateInstance = listener;
     }
 

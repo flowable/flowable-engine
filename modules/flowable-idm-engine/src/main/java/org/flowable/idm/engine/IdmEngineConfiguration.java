@@ -17,7 +17,7 @@ import org.apache.ibatis.transaction.TransactionFactory;
 import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
@@ -844,7 +844,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
-    public IdmEngineConfiguration setTransactionEventListeners(List<TransactionDependentFlowableEventListener> eventListeners) {
+    public IdmEngineConfiguration setTransactionEventListeners(List<TransactionFlowableEventListener> eventListeners) {
         this.transactionDependentEventListeners = eventListeners;
         return this;
     }

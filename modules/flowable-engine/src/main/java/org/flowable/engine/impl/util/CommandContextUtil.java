@@ -20,7 +20,7 @@ import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.engine.FlowableEngineAgenda;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventDispatcher;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventDispatcher;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -504,7 +504,7 @@ public class CommandContextUtil {
         return getProcessEngineConfiguration(commandContext).getEventDispatcher();
     }
 
-    public static TransactionDependentFlowableEventDispatcher getTransactionEventDispatcher(CommandContext commandContext) {
+    public static TransactionFlowableEventDispatcher getTransactionEventDispatcher(CommandContext commandContext) {
         return getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher();
     }
 

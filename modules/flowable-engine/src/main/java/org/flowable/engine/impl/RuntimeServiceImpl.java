@@ -17,7 +17,7 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.form.FormData;
 import org.flowable.engine.impl.cmd.ActivateProcessInstanceCmd;
@@ -512,12 +512,12 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     }
 
     @Override
-    public void addTransactionEventListener(TransactionDependentFlowableEventListener listenerToAdd) {
+    public void addTransactionEventListener(TransactionFlowableEventListener listenerToAdd) {
         commandExecutor.execute(new AddTransactionEventListenerCommand(listenerToAdd));
     }
 
     @Override
-    public void addTransactionEventListener(TransactionDependentFlowableEventListener listenerToAdd, FlowableEngineEventType... types) {
+    public void addTransactionEventListener(TransactionFlowableEventListener listenerToAdd, FlowableEngineEventType... types) {
         commandExecutor.execute(new AddTransactionEventListenerCommand(listenerToAdd, types));
     }
 
@@ -527,7 +527,7 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     }
 
     @Override
-    public void removeTransactionEventListener(TransactionDependentFlowableEventListener listenerToRemove) {
+    public void removeTransactionEventListener(TransactionFlowableEventListener listenerToRemove) {
         commandExecutor.execute(new RemoveTransactionEventListenerCommand(listenerToRemove));
     }
 

@@ -13,11 +13,11 @@
 package org.flowable.engine.common.impl.transaction;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 import org.flowable.engine.common.impl.cfg.TransactionListener;
 
 public interface TransactionDependentFactory {
 
-    TransactionListener createFlowableTransactionEventListener(TransactionDependentFlowableEventListener listener, FlowableEvent event);
+    TransactionListener createFlowableTransactionEventListener(TransactionFlowableEventListener listener, FlowableEvent event);
 
 }

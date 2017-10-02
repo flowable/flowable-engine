@@ -15,7 +15,7 @@ package org.flowable.engine.impl.bpmn.listener;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.impl.bpmn.helper.BaseDelegateTransactionEventListener;
 import org.flowable.engine.impl.bpmn.helper.DelegateExpressionUtil;
@@ -26,15 +26,15 @@ import org.slf4j.LoggerFactory;
 /**
  * @author Yvo Swillens
  */
-public class DelegateExpressionTransactionDependentFlowableEventListener extends BaseDelegateTransactionEventListener {
+public class DelegateExpressionTransactionFlowableEventListener extends BaseDelegateTransactionEventListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DelegateExpressionTransactionDependentFlowableEventListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DelegateExpressionTransactionFlowableEventListener.class);
 
     protected Expression expression;
     protected String state;
     protected boolean failOnException = false;
 
-    public DelegateExpressionTransactionDependentFlowableEventListener(Expression expression, Class<?> entityClass, String transaction) {
+    public DelegateExpressionTransactionFlowableEventListener(Expression expression, Class<?> entityClass, String transaction) {
         this.expression = expression;
         this.state = transaction;
         this.entityClass = entityClass;
@@ -54,20 +54,20 @@ public class DelegateExpressionTransactionDependentFlowableEventListener extends
     public void onEvent(FlowableEvent event) {
         if (isValidEvent(event)) {
             Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, new NoExecutionVariableScope());
-            if (delegate instanceof TransactionDependentFlowableEventListener) {
+            if (delegate instanceof TransactionFlowableEventListener) {
                 // Cache result of isFailOnException() from delegate-instance
                 // until next event is received. This prevents us from having to resolve
                 // the expression twice when an error occurs.
-                failOnException = ((TransactionDependentFlowableEventListener) delegate).isFailOnException();
+                failOnException = ((TransactionFlowableEventListener) delegate).isFailOnException();
 
                 // Call the delegate
-                ((TransactionDependentFlowableEventListener) delegate).onEvent(event);
+                ((TransactionFlowableEventListener) delegate).onEvent(event);
             } else {
 
                 // Force failing, since the exception we're about to throw
                 // cannot be ignored, because it did not originate from the listener itself
                 failOnException = true;
-                throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did not resolve to an implementation of " + TransactionDependentFlowableEventListener.class.getName());
+                throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did not resolve to an implementation of " + TransactionFlowableEventListener.class.getName());
             }
 
         }

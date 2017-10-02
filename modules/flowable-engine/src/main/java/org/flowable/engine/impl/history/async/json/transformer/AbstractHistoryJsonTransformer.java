@@ -17,7 +17,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventDispatcher;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventDispatcher;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.AsyncHistoryDateUtil;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
@@ -86,7 +86,7 @@ public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTrans
     }
 
     protected void dispatchTransactionEvent(CommandContext commandContext, FlowableEvent event) {
-        TransactionDependentFlowableEventDispatcher transactionEventDispatcher = CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher();
+        TransactionFlowableEventDispatcher transactionEventDispatcher = CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher();
         if (transactionEventDispatcher != null && transactionEventDispatcher.isEnabled()) {
             transactionEventDispatcher.dispatchEvent(event);
         }

@@ -16,7 +16,7 @@ import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventType;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 import org.flowable.engine.common.impl.cfg.TransactionContext;
 import org.flowable.engine.common.impl.cfg.TransactionListener;
 import org.flowable.engine.common.impl.cfg.TransactionState;
@@ -40,15 +40,15 @@ public class TransactionDependentFlowableEventSupport {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransactionDependentFlowableEventSupport.class);
 
-    protected List<TransactionDependentFlowableEventListener> eventListeners;
-    protected Map<FlowableEventType, List<TransactionDependentFlowableEventListener>> typedListeners;
+    protected List<TransactionFlowableEventListener> eventListeners;
+    protected Map<FlowableEventType, List<TransactionFlowableEventListener>> typedListeners;
 
     public TransactionDependentFlowableEventSupport() {
         eventListeners = new CopyOnWriteArrayList<>();
         typedListeners = new HashMap<>();
     }
 
-    public synchronized void addEventListener(TransactionDependentFlowableEventListener listenerToAdd) {
+    public synchronized void addEventListener(TransactionFlowableEventListener listenerToAdd) {
         if (listenerToAdd == null) {
             throw new FlowableIllegalArgumentException("Listener cannot be null.");
         }
@@ -57,7 +57,7 @@ public class TransactionDependentFlowableEventSupport {
         }
     }
 
-    public synchronized void addEventListener(TransactionDependentFlowableEventListener listenerToAdd, FlowableEventType... types) {
+    public synchronized void addEventListener(TransactionFlowableEventListener listenerToAdd, FlowableEventType... types) {
         if (listenerToAdd == null) {
             throw new FlowableIllegalArgumentException("Listener cannot be null.");
         }
@@ -72,10 +72,10 @@ public class TransactionDependentFlowableEventSupport {
         }
     }
 
-    public void removeEventListener(TransactionDependentFlowableEventListener listenerToRemove) {
+    public void removeEventListener(TransactionFlowableEventListener listenerToRemove) {
         eventListeners.remove(listenerToRemove);
 
-        for (List<TransactionDependentFlowableEventListener> listeners : typedListeners.values()) {
+        for (List<TransactionFlowableEventListener> listeners : typedListeners.values()) {
             listeners.remove(listenerToRemove);
         }
     }
@@ -91,21 +91,21 @@ public class TransactionDependentFlowableEventSupport {
 
         // Call global listeners
         if (!eventListeners.isEmpty()) {
-            for (TransactionDependentFlowableEventListener listener : eventListeners) {
+            for (TransactionFlowableEventListener listener : eventListeners) {
                 dispatchEvent(event, listener);
             }
         }
 
         // Call typed listeners, if any
-        List<TransactionDependentFlowableEventListener> typed = typedListeners.get(event.getType());
+        List<TransactionFlowableEventListener> typed = typedListeners.get(event.getType());
         if (typed != null && !typed.isEmpty()) {
-            for (TransactionDependentFlowableEventListener listener : typed) {
+            for (TransactionFlowableEventListener listener : typed) {
                 dispatchEvent(event, listener);
             }
         }
     }
 
-    protected void dispatchEvent(FlowableEvent event, TransactionDependentFlowableEventListener listener) {
+    protected void dispatchEvent(FlowableEvent event, TransactionFlowableEventListener listener) {
         CommandContext commandContext = Context.getCommandContext();
         if (null == commandContext) return;
         AbstractEngineConfiguration engineConfiguration = commandContext.getCurrentEngineConfiguration();
@@ -133,8 +133,8 @@ public class TransactionDependentFlowableEventSupport {
     }
 
 
-    protected synchronized void addTypedEventListener(TransactionDependentFlowableEventListener listener, FlowableEventType type) {
-        List<TransactionDependentFlowableEventListener> listeners = typedListeners.get(type);
+    protected synchronized void addTypedEventListener(TransactionFlowableEventListener listener, FlowableEventType type) {
+        List<TransactionFlowableEventListener> listeners = typedListeners.get(type);
         if (listeners == null) {
             // Add an empty list of listeners for this type
             listeners = new CopyOnWriteArrayList<>();

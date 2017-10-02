@@ -7,7 +7,7 @@
 
         <extensionElements>
             <flowable:transactionEventListener
-                    class="org.flowable.engine.test.api.event.TestTransactionDependentFlowableEventListener"
+                    class="org.flowable.engine.test.api.event.TestTransactionFlowableEventListener"
                     entityType="task"/>
         </extensionElements>
 

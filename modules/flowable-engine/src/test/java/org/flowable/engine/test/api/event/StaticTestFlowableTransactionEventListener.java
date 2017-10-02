@@ -13,7 +13,7 @@
 package org.flowable.engine.test.api.event;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +23,7 @@ import java.util.List;
  *
  * @author Frederik Heremans
  */
-public class StaticTestFlowableTransactionEventListener implements TransactionDependentFlowableEventListener {
+public class StaticTestFlowableTransactionEventListener implements TransactionFlowableEventListener {
 
     private static List<FlowableEvent> eventsReceived = new ArrayList<>();
     private String onTransaction = "COMMITED";

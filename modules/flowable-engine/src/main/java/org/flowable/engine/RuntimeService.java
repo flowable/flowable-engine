@@ -19,7 +19,7 @@ import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.persistence.entity.VariableInstance;
@@ -1202,7 +1202,7 @@ public interface RuntimeService {
      *
      * @param listenerToAdd the listener to add
      */
-    void addTransactionEventListener(TransactionDependentFlowableEventListener listenerToAdd);
+    void addTransactionEventListener(TransactionFlowableEventListener listenerToAdd);
 
     /**
      * Adds an event-listener which will only be notified when an event occurs, which type is in the
@@ -1211,7 +1211,7 @@ public interface RuntimeService {
      * @param listenerToAdd the listener to add
      * @param types         types of events the listener should be notified for
      */
-    void addTransactionEventListener(TransactionDependentFlowableEventListener listenerToAdd, FlowableEngineEventType... types);
+    void addTransactionEventListener(TransactionFlowableEventListener listenerToAdd, FlowableEngineEventType... types);
 
     /**
      * Removes the given listener from this dispatcher. The listener will no longer be notified, regardless of the type(s) it was registered for in the first place.
@@ -1227,7 +1227,7 @@ public interface RuntimeService {
      * @param listenerToRemove
      *            listener to remove
      */
-    void removeTransactionEventListener(TransactionDependentFlowableEventListener listenerToRemove);
+    void removeTransactionEventListener(TransactionFlowableEventListener listenerToRemove);
 
     /**
      * Dispatches the given event to any listeners that are registered.

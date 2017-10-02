@@ -14,7 +14,7 @@ package org.flowable.engine.impl.bpmn.listener;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 import org.flowable.engine.common.impl.cfg.TransactionListener;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.ExecutionListener;
@@ -29,10 +29,10 @@ import org.slf4j.LoggerFactory;
 public class ExecuteEventListenerTransactionListener implements TransactionListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ExecuteEventListenerTransactionListener.class);
-    protected TransactionDependentFlowableEventListener listener;
+    protected TransactionFlowableEventListener listener;
     protected FlowableEvent flowableEvent;
 
-    public ExecuteEventListenerTransactionListener(TransactionDependentFlowableEventListener listener,
+    public ExecuteEventListenerTransactionListener(TransactionFlowableEventListener listener,
                                                    FlowableEvent flowableEvent) {
         this.listener = listener;
         this.flowableEvent = flowableEvent;
