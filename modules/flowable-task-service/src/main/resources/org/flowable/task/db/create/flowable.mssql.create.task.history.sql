@@ -5,6 +5,10 @@ create table ACT_HI_TASKINST (
     TASK_DEF_KEY_ nvarchar(255),
     PROC_INST_ID_ nvarchar(64),
     EXECUTION_ID_ nvarchar(64),
+    SCOPE_ID_ nvarchar(255),
+    SUB_SCOPE_ID_ nvarchar(255),
+    SCOPE_TYPE_ nvarchar(255),
+    SCOPE_DEFINITION_ID_ nvarchar(255),
     NAME_ nvarchar(255),
     PARENT_TASK_ID_ nvarchar(64),
     DESCRIPTION_ nvarchar(4000),
@@ -23,3 +27,7 @@ create table ACT_HI_TASKINST (
     LAST_UPDATED_TIME_ datetime2,
     primary key (ID_)
 );
+
+create index ACT_IDX_HI_TASK_SCOPE on ACT_HI_TASKINST(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_HI_TASK_SUB_SCOPE on ACT_HI_TASKINST(SUB_SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_HI_TASK_SCOPE_DEF on ACT_HI_TASKINST(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
