@@ -152,7 +152,7 @@ public abstract class AbstractEngineConfiguration {
      */
     protected int maxNrOfStatementsInBulkInsert = 100;
 
-    public int DEFAULT_MAX_NR_OF_STATEMENTS_BULK_INSERT_SQL_SERVER = 70; // currently Execution has most params (28). 2000 / 28 = 71.
+    public int DEFAULT_MAX_NR_OF_STATEMENTS_BULK_INSERT_SQL_SERVER = 60; // currently Execution has most params (31). 2000 / 31 = 64.
 
     protected Set<Class<?>> customMybatisMappers;
     protected Set<String> customMybatisXMLMappers;
@@ -364,6 +364,12 @@ public abstract class AbstractEngineConfiguration {
             } catch (SQLException e) {
                 LOGGER.error("Exception while closing the Database connection", e);
             }
+        }
+        
+        // Special care for MSSQL, as it has a hard limit of 2000 params per statement (incl bulk statement).
+        // Especially with executions, with 100 as default, this limit is passed.
+        if (DATABASE_TYPE_MSSQL.equals(databaseType)) {
+            maxNrOfStatementsInBulkInsert = DEFAULT_MAX_NR_OF_STATEMENTS_BULK_INSERT_SQL_SERVER;
         }
     }
     
