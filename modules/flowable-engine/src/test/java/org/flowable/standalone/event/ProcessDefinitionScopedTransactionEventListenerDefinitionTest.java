@@ -21,30 +21,32 @@ import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
-import org.flowable.engine.test.api.event.StaticTestFlowableEventListener;
-import org.flowable.engine.test.api.event.TestFlowableEventListener;
+import org.flowable.engine.test.api.event.StaticTestFlowableTransactionEventListener;
+import org.flowable.engine.test.api.event.TestFlowableTransactionEventListener;
 
 import java.util.List;
 
 /**
- * Test for event-listeners that are registered on a process-definition scope, rather than on the global engine-wide scope, declared in the BPMN XML.
- * 
+ * Test for event-listeners that are registered on a process-definition scope, rather than on the
+ * global engine-wide scope, declared in the BPMN XML.
+ *
  * @author Frederik Heremans
  */
-public class ProcessDefinitionScopedEventListenerDefinitionTest extends ResourceFlowableTestCase {
+public class ProcessDefinitionScopedTransactionEventListenerDefinitionTest extends ResourceFlowableTestCase {
 
-    public ProcessDefinitionScopedEventListenerDefinitionTest() {
-        super("org/flowable/standalone/event/flowable-eventlistener.cfg.xml");
+    protected TestFlowableTransactionEventListener testListenerBean;
+
+    public ProcessDefinitionScopedTransactionEventListenerDefinitionTest() {
+        super("org/flowable/standalone/event/flowable-transactionEventlistener.cfg.xml");
     }
 
-    protected TestFlowableEventListener testListenerBean;
-
     /**
-     * Test to verify listeners defined in the BPMN xml are added to the process definition and are active.
+     * Test to verify listeners defined in the BPMN xml are added to the process definition and are
+     * active.
      */
     @Deployment
     public void testProcessDefinitionListenerDefinition() throws Exception {
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testEventListeners");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testTransactionEventListeners");
         assertNotNull(testListenerBean);
 
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -63,7 +65,7 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
         assertEquals(processInstance.getId(), ((ProcessInstance) event.getEntity()).getId());
 
         // Check if listener, defined by classname, received all events
-        List<FlowableEvent> events = StaticTestFlowableEventListener.getEventsReceived();
+        List<FlowableEvent> events = StaticTestFlowableTransactionEventListener.getEventsReceived();
         assertFalse(events.isEmpty());
 
         boolean insertFound = false;
@@ -81,24 +83,26 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
     }
 
     /**
-     * Test to verify listeners defined in the BPMN xml with invalid class/delegateExpression values cause an exception when process is started.
+     * Test to verify listeners defined in the BPMN xml with invalid class/delegateExpression values
+     * cause an exception when process is started.
      */
     public void testProcessDefinitionListenerDefinitionError() throws Exception {
 
         // Deploy process with expression which references an unexisting bean
-        org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/standalone/event/invalidEventListenerExpression.bpmn20.xml").deploy();
+        org.flowable.engine.repository.Deployment deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/standalone/event/invalidTransactionEventListenerExpression.bpmn20.xml").deploy();
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testInvalidEventExpression");
         assertNotNull(processInstance);
         repositoryService.deleteDeployment(deployment.getId(), true);
 
         // Deploy process with listener which references an unexisting class
-//        deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/standalone/event/invalidEventListenerClass.bpmn20.xml").deploy();
-//        processInstance = runtimeService.startProcessInstan/ceByKey("testInvalidEventClass");
-//        repositoryService.deleteDeployment(deployment.getId(), true);
+        deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/standalone/event/invalidEventListenerClass.bpmn20.xml").deploy();
+        processInstance = runtimeService.startProcessInstanceByKey("testInvalidEventClass");
+        repositoryService.deleteDeployment(deployment.getId(), true);
     }
 
     /**
-     * Test to verify if event listeners defined in the BPMN XML which have illegal event-types cause an exception on deploy.
+     * Test to verify if event listeners defined in the BPMN XML which have illegal event-types
+     * cause an exception on deploy.
      */
     public void testProcessDefinitionListenerDefinitionIllegalType() throws Exception {
         // In case deployment doesn't fail, we delete the deployment in the
@@ -107,7 +111,7 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
         org.flowable.engine.repository.Deployment deployment = null;
         try {
 
-            deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/standalone/event/invalidEventListenerType.bpmn20.xml").deploy();
+            deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/standalone/event/invalidTransactionEventListenerType.bpmn20.xml").deploy();
 
             fail("Exception expected");
 
@@ -122,17 +126,18 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
     }
 
     /**
-     * Test to verify listeners defined in the BPMN xml are added to the process definition and are active, for all entity types
+     * Test to verify listeners defined in the BPMN xml are added to the process definition and are
+     * active, for all entity types
      */
     @Deployment
     public void testProcessDefinitionListenerDefinitionEntities() throws Exception {
-        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testEventListeners");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testTransactionEventListeners");
         assertNotNull(processInstance);
         Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         // Attachment entity
-        TestFlowableEventListener theListener = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("testAttachmentEventListener");
+        TestFlowableTransactionEventListener theListener = (TestFlowableTransactionEventListener) processEngineConfiguration.getBeans().get("testAttachmentTransactionEventListener");
         assertNotNull(theListener);
         assertEquals(0, theListener.getEventsReceived().size());
 
@@ -146,6 +151,6 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
     @Override
     protected void setUp() throws Exception {
         super.setUp();
-        testListenerBean = (TestFlowableEventListener) processEngineConfiguration.getBeans().get("testEventListener");
+        testListenerBean = (TestFlowableTransactionEventListener) processEngineConfiguration.getBeans().get("testTransactionEventListener");
     }
 }

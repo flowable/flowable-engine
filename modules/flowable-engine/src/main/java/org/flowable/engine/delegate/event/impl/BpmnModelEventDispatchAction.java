@@ -17,6 +17,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.impl.event.EventDispatchAction;
 import org.flowable.engine.common.impl.event.FlowableEventSupport;
+import org.flowable.engine.common.impl.event.TransactionDependentFlowableEventSupport;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
@@ -41,6 +42,7 @@ public class BpmnModelEventDispatchAction implements EventDispatchAction {
             BpmnModel bpmnModel = extractBpmnModelFromEvent(event);
             if (bpmnModel != null) {
                 ((FlowableEventSupport) bpmnModel.getEventSupport()).dispatchEvent(event);
+                ((TransactionDependentFlowableEventSupport) bpmnModel.getTransactionEventSupport()).dispatchEvent(event);
             }
         }
     }

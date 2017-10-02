@@ -2997,6 +2997,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    @Override
+    public ProcessEngineConfigurationImpl setTransactionEventListeners(List<TransactionDependentFlowableEventListener> eventListeners) {
+        this.transactionDependentEventListeners = eventListeners;
+        return this;
+    }
+
+
     public ProcessValidator getProcessValidator() {
         return processValidator;
     }

@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.common.impl.event;
 
+import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventType;
@@ -20,6 +21,7 @@ import org.flowable.engine.common.impl.cfg.TransactionContext;
 import org.flowable.engine.common.impl.cfg.TransactionListener;
 import org.flowable.engine.common.impl.cfg.TransactionState;
 import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -104,10 +106,16 @@ public class TransactionDependentFlowableEventSupport {
     }
 
     protected void dispatchEvent(FlowableEvent event, TransactionDependentFlowableEventListener listener) {
-
-        TransactionListener transactionListener = Context.getCommandContext().getCurrentEngineConfiguration().
+        CommandContext commandContext = Context.getCommandContext();
+        if (null == commandContext) return;
+        AbstractEngineConfiguration engineConfiguration = commandContext.getCurrentEngineConfiguration();
+        TransactionListener transactionListener = engineConfiguration.
                 getTransactionDependentFactory().createFlowableTransactionEventListener(listener, event);
 
+        if (null == listener.getOnTransaction()) {
+            LOGGER.warn("Missing TransactionState");
+            return;
+        }
         TransactionContext transactionContext = Context.getTransactionContext();
         if (listener.getOnTransaction().equals(TransactionState.COMMITTING.name())) {
             transactionContext.addTransactionListener(TransactionState.COMMITTING, transactionListener);
@@ -117,6 +125,8 @@ public class TransactionDependentFlowableEventSupport {
             transactionContext.addTransactionListener(TransactionState.ROLLINGBACK, transactionListener);
         } else if (listener.getOnTransaction().equals(TransactionState.ROLLED_BACK.name())) {
             transactionContext.addTransactionListener(TransactionState.ROLLED_BACK, transactionListener);
+        } else {
+            LOGGER.warn("Unrecognised TransactionState {}", listener.getOnTransaction());
         }
 
 

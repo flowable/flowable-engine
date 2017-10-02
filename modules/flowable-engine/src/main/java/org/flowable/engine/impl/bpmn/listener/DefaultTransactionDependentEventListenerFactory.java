@@ -16,12 +16,14 @@ import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.TransactionDependentFlowableEventListener;
 import org.flowable.engine.common.impl.cfg.TransactionListener;
 import org.flowable.engine.common.impl.transaction.TransactionDependentFactory;
+import org.flowable.engine.impl.bpmn.helper.DelegateExecutableTransactionEventListener;
 
 public class DefaultTransactionDependentEventListenerFactory implements TransactionDependentFactory {
 
+
     @Override
     public TransactionListener createFlowableTransactionEventListener(TransactionDependentFlowableEventListener listener, FlowableEvent event) {
-        TransactionDependentFlowableEventListener executionListener = new DelegateExpressionTransactionDependentFlowableEventListener(listener);
+        TransactionDependentFlowableEventListener executionListener = new DelegateExecutableTransactionEventListener(listener);
         return new ExecuteEventListenerTransactionListener(executionListener, event);
     }
 }

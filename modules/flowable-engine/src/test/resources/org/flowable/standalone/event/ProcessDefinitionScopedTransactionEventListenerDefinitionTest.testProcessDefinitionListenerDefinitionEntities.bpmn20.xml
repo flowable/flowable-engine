@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:activiti="http://activiti.org/bpmn"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" targetNamespace="Examples">
+
+    <process id="testTransactionEventListeners">
+        <extensionElements>
+            <activiti:transactionEventListener
+                    delegateExpression="${testAttachmentTransactionEventListener}"
+                    entityType="attachment" onTransaction="COMMITTING"/>
+            <activiti:transactionEventListener
+                    delegateExpression="${testCommentTransactionEventListener}" entityType="comment"
+                    onTransaction="COMMITTING"/>
+            <activiti:transactionEventListener
+                    delegateExpression="${testExecutionTransactionEventListener}"
+                    entityType="execution" onTransaction="COMMITTING"/>
+            <activiti:transactionEventListener
+                    delegateExpression="${testIdentityLinkTransactionEventListener}"
+                    entityType="identity-link" onTransaction="COMMITTING"/>
+            <activiti:transactionEventListener
+                    delegateExpression="${testJobTransactionEventListener}" entityType="job"
+                    onTransaction="COMMITTING"/>
+            <activiti:transactionEventListener
+                    delegateExpression="${testProcessDefinitionTransactionEventListener}"
+                    entityType="process-definition" onTransaction="COMMITTING"/>
+            <activiti:transactionEventListener
+                    delegateExpression="${testProcessInstanceTransactionEventListener}"
+                    entityType="process-instance" onTransaction="COMMITTING"/>
+            <activiti:transactionEventListener
+                    delegateExpression="${testTaskTransactionEventListener}" entityType="task"
+                    onTransaction="COMMITTING"/>
+        </extensionElements>
+        <startEvent id="theStart"/>
+        <sequenceFlow sourceRef="theStart" targetRef="task"/>
+        <userTask id="task"/>
+        <sequenceFlow sourceRef="task" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

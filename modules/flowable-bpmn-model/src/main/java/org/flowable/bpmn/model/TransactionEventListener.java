@@ -22,6 +22,7 @@ public class TransactionEventListener extends BaseElement {
     protected String events;
     protected String implementationType;
     protected String implementation;
+    protected String transaction;
     protected String entityType;
 
     public String getEvents() {
@@ -56,6 +57,14 @@ public class TransactionEventListener extends BaseElement {
         this.entityType = entityType;
     }
 
+    public String getTransaction() {
+        return transaction;
+    }
+
+    public void setTransaction(String transaction) {
+        this.transaction = transaction;
+    }
+
     public TransactionEventListener clone() {
         TransactionEventListener clone = new TransactionEventListener();
         clone.setValues(this);
@@ -67,5 +76,6 @@ public class TransactionEventListener extends BaseElement {
         setImplementation(otherListener.getImplementation());
         setImplementationType(otherListener.getImplementationType());
         setEntityType(otherListener.getEntityType());
+        setTransaction(otherListener.getTransaction());
     }
 }
