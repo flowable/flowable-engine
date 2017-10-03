@@ -190,10 +190,11 @@ public interface StencilConstants {
     final String PROPERTY_FORM_ENUM_VALUES_ID = "id";
 
     final String PROPERTY_DATA_PROPERTIES = "dataproperties";
-    final String PROPERTY_DATA_ID = "dataproperty_id";
-    final String PROPERTY_DATA_NAME = "dataproperty_name";
-    final String PROPERTY_DATA_TYPE = "dataproperty_type";
-    final String PROPERTY_DATA_VALUE = "dataproperty_value";
+    final String PROPERTY_DATA_PROPERTIES_NODE = "dataProperties";
+    final String PROPERTY_DATA_ID = "id";
+    final String PROPERTY_DATA_NAME = "name";
+    final String PROPERTY_DATA_TYPE = "type";
+    final String PROPERTY_DATA_VALUE = "value";
 
     final String PROPERTY_SCRIPT_FORMAT = "scriptformat";
     final String PROPERTY_SCRIPT_TEXT = "scripttext";

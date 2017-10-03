@@ -12,6 +12,8 @@
  */
 package org.flowable.bpmn.model;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * @author Lori Small
  */
@@ -19,7 +21,11 @@ public class LongDataObject extends ValuedDataObject {
 
     @Override
     public void setValue(Object value) {
-        this.value = Long.valueOf(value.toString());
+    	if (value instanceof String && !StringUtils.isEmpty(((String) value).trim())) {
+    		this.value = Long.valueOf(value.toString());
+    	} else if (value instanceof Number) {
+    		this.value = (Long) value;
+    	}
     }
 
     @Override
