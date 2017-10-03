@@ -93,9 +93,6 @@ public interface ExecutionEntity extends DelegateExecution, Execution, ProcessIn
 
     void setEnded(boolean isEnded);
 
-    @Override
-    void setEventName(String eventName);
-
     String getDeleteReason();
 
     void setDeleteReason(String deleteReason);
@@ -107,12 +104,6 @@ public interface ExecutionEntity extends DelegateExecution, Execution, ProcessIn
     boolean isEventScope();
 
     void setEventScope(boolean isEventScope);
-
-    @Override
-    boolean isMultiInstanceRoot();
-
-    @Override
-    void setMultiInstanceRoot(boolean isMultiInstanceRoot);
 
     void setName(String name);
 
@@ -128,25 +119,13 @@ public interface ExecutionEntity extends DelegateExecution, Execution, ProcessIn
 
     void setLockTime(Date lockTime);
 
-    @Override
-    boolean isDeleted();
-
-    @Override
-    void setDeleted(boolean isDeleted);
-
     void forceUpdate();
     
     String getStartActivityId();
 
     void setStartActivityId(String startActivityId);
 
-    @Override
-    String getStartUserId();
-
     void setStartUserId(String startUserId);
-
-    @Override
-    Date getStartTime();
 
     void setStartTime(Date startTime);
     
