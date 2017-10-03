@@ -139,7 +139,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
+public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(CmmnEngineConfiguration.class);
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/cmmn/db/mapping/mappings.xml";
@@ -638,6 +638,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
+    @Override
     public CmmnRuntimeService getCmmnRuntimeService() {
         return cmmnRuntimeService;
     }
@@ -647,6 +648,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
+    @Override
     public CmmnManagementService getCmmnManagementService() {
         return cmmnManagementService;
     }
@@ -656,6 +658,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
+    @Override
     public CmmnRepositoryService getCmmnRepositoryService() {
         return cmmnRepositoryService;
     }
@@ -665,6 +668,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
+    @Override
     public CmmnHistoryService getCmmnHistoryService() {
         return cmmnHistoryService;
     }
