@@ -452,7 +452,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected List<JobHandler> customJobHandlers;
     protected Map<String, JobHandler> jobHandlers;
-    protected AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler;
+    protected List<AsyncRunnableExecutionExceptionHandler> asyncRunnableExecutionExceptionHandlers;
 
     protected List<HistoryJobHandler> customHistoryJobHandlers;
     protected Map<String, HistoryJobHandler> historyJobHandlers;
@@ -738,7 +738,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // agenda factory
     protected FlowableEngineAgendaFactory agendaFactory;
-    
+
     protected DbSchemaManager variableDbSchemaManager;
     protected DbSchemaManager taskDbSchemaManager;
 
@@ -1307,7 +1307,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.jobServiceConfiguration.setJobHandlers(this.jobHandlers);
         this.jobServiceConfiguration.setHistoryJobHandlers(this.historyJobHandlers);
         this.jobServiceConfiguration.setFailedJobCommandFactory(this.failedJobCommandFactory);
-        this.jobServiceConfiguration.setAsyncRunnableExecutionExceptionHandler(this.asyncRunnableExecutionExceptionHandler);
+        this.jobServiceConfiguration.setAsyncRunnableExecutionExceptionHandlers(this.asyncRunnableExecutionExceptionHandlers);
         this.jobServiceConfiguration.setAsyncExecutorNumberOfRetries(this.asyncExecutorNumberOfRetries);
         this.jobServiceConfiguration.setAsyncExecutorResetExpiredJobsMaxTimeout(this.asyncExecutorResetExpiredJobsMaxTimeout);
 
@@ -3280,14 +3280,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.candidateManager = candidateManager;
     }
 
-    public AsyncRunnableExecutionExceptionHandler getAsyncRunnableExecutionExceptionHandler() {
-        return asyncRunnableExecutionExceptionHandler;
+    public List<AsyncRunnableExecutionExceptionHandler> getAsyncRunnableExecutionExceptionHandlers() {
+        return asyncRunnableExecutionExceptionHandlers;
     }
 
-    public ProcessEngineConfigurationImpl setAsyncRunnableExecutionExceptionHandler(
-            AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler) {
+    public ProcessEngineConfigurationImpl setAsyncRunnableExecutionExceptionHandlers(
+            List<AsyncRunnableExecutionExceptionHandler> asyncRunnableExecutionExceptionHandlers) {
 
-        this.asyncRunnableExecutionExceptionHandler = asyncRunnableExecutionExceptionHandler;
+        this.asyncRunnableExecutionExceptionHandlers = asyncRunnableExecutionExceptionHandlers;
         return this;
     }
 
@@ -3402,7 +3402,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.processInstanceStateChangedCallbacks = processInstanceStateChangedCallbacks;
         return this;
     }
-    
+
     public DbSchemaManager getVariableDbSchemaManager() {
         return variableDbSchemaManager;
     }
@@ -3411,7 +3411,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.variableDbSchemaManager = variableDbSchemaManager;
         return this;
     }
-    
+
     public DbSchemaManager getTaskDbSchemaManager() {
         return taskDbSchemaManager;
     }
