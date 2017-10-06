@@ -20,7 +20,9 @@
       <scriptTask id="scriptTask" name="Script task in subprocess" scriptFormat="groovy">
         <script>
           runtimeService = org.flowable.engine.impl.context.Context.getProcessEngineConfiguration().getRuntimeService();
-          runtimeService.setVariable(execution.getProcessInstanceId(), "virtualEngineName", execution.getTransientVariable("_virtualProcessEngine").getName());
+          virtualEngineName = org.flowable.engine.ProcessEngines.getProcessEngine((String)
+          execution.getVariable("_virtualProcessEngine")).getName()
+          runtimeService.setVariable(execution.getProcessInstanceId(), "virtualEngineName", virtualEngineName);
         </script>
       </scriptTask>
       <sequenceFlow id="flow3" sourceRef="scriptTask" targetRef="subProcessEnd" />
