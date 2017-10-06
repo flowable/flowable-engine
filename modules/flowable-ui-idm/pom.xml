@@ -7,19 +7,19 @@
   <artifactId>rds-ui-idm</artifactId>
   <packaging>pom</packaging>
   <version>1.2.0-SNAPSHOT</version>
-  
+
   <parent>
     <groupId>org.flowable</groupId>
     <artifactId>flowable-root</artifactId>
     <relativePath>../..</relativePath>
     <version>6.1.0</version>
   </parent>
-  
+
   <properties>
     	<!-- Maven build properties -->
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.7</java.version>
-		
+
 		<!-- Web container version -->
 		<tomcat.version>7.0.53</tomcat.version>
         <flowable.version>6.1.0</flowable.version>
@@ -28,7 +28,7 @@
 	<prerequisites>
 		<maven>3.0.0</maven>
 	</prerequisites>
-	
+
 	<modules>
 		<module>flowable-ui-idm-logic</module>
 		<module>flowable-ui-idm-rest</module>
@@ -59,7 +59,7 @@
 			<version>3.1.0</version>
 			<scope>provided</scope>
 		</dependency>
-    
+
         <!-- overrides what defined in parent due to project.version -->
         <dependency>
           <groupId>org.flowable</groupId>
@@ -363,6 +363,12 @@
 			<!-- Force alphabetical order to have a reproducible build -->
 			<runOrder>alphabetical</runOrder>
 		</configuration>
+      </plugin>
+    </plugin>
+      <plugin>
+        <!-- use later version so can get alt***DeploymentRepository properties -->
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>2.8</version>
       </plugin>
     </plugins>
   </build>
