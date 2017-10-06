@@ -364,7 +364,6 @@
 			<runOrder>alphabetical</runOrder>
 		</configuration>
       </plugin>
-    </plugin>
       <plugin>
         <!-- use later version so can get alt***DeploymentRepository properties -->
         <artifactId>maven-deploy-plugin</artifactId>
