@@ -112,11 +112,11 @@ public class FlowableEngineConfiguration {
         }
     }
 
-    @Bean(name = "cmmnEngineConfiguration")
-    public CmmnEngineConfigurationApi cmmnEngineConfiguration() {
-        ProcessEngineConfiguration processEngineConfiguration = processEngine().getProcessEngineConfiguration();
-        return EngineServiceUtil.getCmmnEngineConfiguration(processEngineConfiguration);
-    }
+//    @Bean(name = "cmmnEngineConfiguration")
+//    public CmmnEngineConfigurationApi cmmnEngineConfiguration() {
+//        ProcessEngineConfiguration processEngineConfiguration = processEngine().getProcessEngineConfiguration();
+//        return EngineServiceUtil.getCmmnEngineConfiguration(processEngineConfiguration);
+//    }
 
     @Bean(name = "dmnEngineConfiguration")
     public DmnEngineConfigurationApi dmnEngineConfiguration() {
@@ -288,20 +288,20 @@ public class FlowableEngineConfiguration {
         return dmnEngineConfiguration().getDmnHistoryService();
     }
 
-    @Bean
-    public CmmnRepositoryService cmmnRepositoryService() {
-        return cmmnEngineConfiguration().getCmmnRepositoryService();
-    }
-
-    @Bean
-    public CmmnRuntimeService cmmnRuntimeService() {
-        return cmmnEngineConfiguration().getCmmnRuntimeService();
-    }
-
-    @Bean
-    public CmmnHistoryService cmmnHistoryService() {
-        return cmmnEngineConfiguration().getCmmnHistoryService();
-    }
+//    @Bean
+//    public CmmnRepositoryService cmmnRepositoryService() {
+//        return cmmnEngineConfiguration().getCmmnRepositoryService();
+//    }
+//
+//    @Bean
+//    public CmmnRuntimeService cmmnRuntimeService() {
+//        return cmmnEngineConfiguration().getCmmnRuntimeService();
+//    }
+//
+//    @Bean
+//    public CmmnHistoryService cmmnHistoryService() {
+//        return cmmnEngineConfiguration().getCmmnHistoryService();
+//    }
 
     @Bean
     public ContentService contentService() {
