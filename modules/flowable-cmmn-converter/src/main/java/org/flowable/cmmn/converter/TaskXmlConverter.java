@@ -16,6 +16,8 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CmmnElement;
+import org.flowable.cmmn.model.ImplementationType;
+import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Task;
 
 /**
@@ -35,8 +37,38 @@ public class TaskXmlConverter extends PlanItemDefinitiomXmlConverter {
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        Task task = new Task();
+        Task task = null;
+        String type = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_TYPE);
+        
+        if (ServiceTask.JAVA_TASK.equals(type)) {
+            ServiceTask serviceTask = new ServiceTask();
+            serviceTask.setType(type);
+            String className = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_CLASS);
+            String expression = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_EXPRESSION);
+            String delegateExpression = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_DELEGATE_EXPRESSION);
+            
+            if (StringUtils.isNotEmpty(className)) {
+                serviceTask.setImplementation(className);
+                serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
+            
+            } else if (StringUtils.isNotEmpty(expression)) {
+                serviceTask.setImplementation(expression);
+                serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
+            
+            } else if (StringUtils.isNotEmpty(delegateExpression)) {
+                serviceTask.setImplementation(delegateExpression);
+                serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
+            }
+            
+            serviceTask.setResultVariableName(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_RESULT_VARIABLE_NAME));
+            task = serviceTask;
+            
+        } else {
+            task = new Task();
+        }
+
         convertCommonTaskAttributes(xtr, task);
+        
         return task;
     }
 
@@ -47,10 +79,10 @@ public class TaskXmlConverter extends PlanItemDefinitiomXmlConverter {
         if (StringUtils.isNotEmpty(isBlockingString)) {
             task.setBlocking(Boolean.valueOf(isBlockingString));
         }
-        
-        String className = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_CLASS);
-        if (StringUtils.isNotEmpty(className)) {
-            task.setClassName(className);
+
+        String isBlockingExpressionString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_IS_BLOCKING_EXPRESSION);
+        if (StringUtils.isNotEmpty(isBlockingExpressionString)) {
+            task.setBlockingExpression(isBlockingExpressionString);
         }
     }
     

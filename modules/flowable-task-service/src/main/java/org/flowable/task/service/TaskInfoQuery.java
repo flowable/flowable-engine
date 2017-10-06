@@ -196,6 +196,26 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * Only select tasks for the given execution.
      */
     T executionId(String executionId);
+    
+    /**
+     * Only select tasks for the given scope identifier. 
+     */
+    T scopeId(String scopeId);
+    
+    /**
+     * Only select tasks for the given sub scope identifier. 
+     */
+    T subScopeId(String subScopeId);
+    
+    /**
+     * Only select tasks for the given scope type. 
+     */
+    T scopeType(String scopeType);
+    
+    /**
+     * Only select tasks for the given scope definition identifier. 
+     */
+    T scopeDefinitionId(String scopeDefinitionId);
 
     /**
      * Only select tasks that are created on the given date.

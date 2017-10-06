@@ -39,13 +39,19 @@ public class SentryExport implements CmmnXmlConstants {
             
             // start standard event element
             xtw.writeStartElement(ELEMENT_STANDARD_EVENT);
-            
             xtw.writeCharacters(sentryOnPart.getStandardEvent());
-            
-            // end standard event element
             xtw.writeEndElement();
             
             // end sentry on part element
+            xtw.writeEndElement();
+        }
+        
+        // If part
+        if (sentry.getSentryIfPart() != null) {
+            xtw.writeStartElement(ELEMENT_IF_PART);
+            xtw.writeStartElement(ELEMENT_CONDITION);
+            xtw.writeCData(sentry.getSentryIfPart().getCondition());
+            xtw.writeEndElement();
             xtw.writeEndElement();
         }
         

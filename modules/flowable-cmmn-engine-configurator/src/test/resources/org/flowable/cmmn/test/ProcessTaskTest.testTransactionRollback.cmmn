@@ -38,7 +38,7 @@
             <task id="theTask" name="The Task" isBlocking="true" />
             <processTask id="theProcess" processRef="oneTaskProcess" isBlocking="false" />
             <milestone id="mileStone" name="Milestone" />
-            <task id="throwsExceptionTask" flowable:class="org.flowable.cmmn.test.delegate.TestThrowsExceptionDelegate" />
+            <task id="throwsExceptionTask" flowable:type="java" flowable:class="org.flowable.cmmn.test.delegate.TestThrowsExceptionDelegate" />
 
         </casePlanModel>
     </case>

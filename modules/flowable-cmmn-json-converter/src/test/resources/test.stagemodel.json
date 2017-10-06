@@ -11,13 +11,12 @@
         }
     },
     "properties":{
-        "case_id":"caseModel",
+        "case_id":"testCase",
         "name":"Test case",
         "documentation":"",
         "case_author":"",
         "case_version":"",
-        "case_namespace":"http://www.flowable.org/casedef",
-        "process_id":"testCase"
+        "case_namespace":"http://www.flowable.org/casedef"
     },
     "childShapes":[
         {

@@ -26,6 +26,7 @@
     <mapper resource="org/flowable/db/mapping/common.xml" />
     <mapper resource="org/flowable/db/mapping/entity/Attachment.xml" />
     <mapper resource="org/flowable/db/mapping/entity/ByteArray.xml" />
+    <mapper resource="org/flowable/variable/db/mapping/common.xml" />
     <mapper resource="org/flowable/variable/db/mapping/entity/ByteArray.xml" />
     <mapper resource="org/flowable/job/db/mapping/entity/ByteArray.xml" />
     <mapper resource="org/flowable/db/mapping/entity/Comment.xml" />

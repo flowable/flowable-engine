@@ -48,10 +48,6 @@ public class CmmnModel {
     
     protected Map<String, String> namespaceMap = new LinkedHashMap<>();
     
-    protected int planItemIndex = 0;
-    protected int sentryIndex = 0;
-    protected int sentryOnPartIndex = 0;
-    
     public void addCase(Case caze) {
         cases.add(caze);
     }
@@ -111,7 +107,7 @@ public class CmmnModel {
     public PlanItem findPlanItem(String id) {
         PlanItem foundPlanItem = null;
         for (Case caseModel : cases) {
-            foundPlanItem = caseModel.getPlanModel().findPlanItem(id);
+            foundPlanItem = caseModel.getPlanModel().findPlanItemInPlanFragmentOrUpwards(id);
             if (foundPlanItem != null) {
                 break;
             }
@@ -120,7 +116,7 @@ public class CmmnModel {
         if (foundPlanItem == null) {
             for (Case caseModel : cases) {
                 for (Stage stage : caseModel.getPlanModel().findPlanItemDefinitionsOfType(Stage.class, true)) {
-                    foundPlanItem = stage.findPlanItem(id);
+                    foundPlanItem = stage.findPlanItemInPlanFragmentOrUpwards(id);
                     if (foundPlanItem != null) {
                         break;
                     }
@@ -136,21 +132,6 @@ public class CmmnModel {
     
     public void addAssociation(Association association) {
         associations.add(association);
-    }
-    
-    public int nextPlanItemId() {
-        planItemIndex++;
-        return planItemIndex;
-    }
-    
-    public int nextSentryId() {
-        sentryIndex++;
-        return sentryIndex;
-    }
-    
-    public int nextSentryOnPartId() {
-        sentryOnPartIndex++;
-        return sentryOnPartIndex;
     }
     
     public void addCriterion(String key, Criterion criterion) {

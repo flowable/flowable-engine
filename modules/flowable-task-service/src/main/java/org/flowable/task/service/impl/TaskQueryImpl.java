@@ -74,6 +74,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String processInstanceId;
     protected List<String> processInstanceIds;
     protected String executionId;
+    protected String scopeId;
+    protected String subScopeId;
+    protected String scopeType;
+    protected String scopeDefinitionId;
     protected Date createTime;
     protected Date createTimeBefore;
     protected Date createTimeAfter;
@@ -665,6 +669,46 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.executionId = executionId;
         } else {
             this.executionId = executionId;
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQueryImpl scopeId(String scopeId) {
+        if (orActive) {
+            currentOrQueryObject.scopeId = scopeId;
+        } else {
+            this.scopeId = scopeId;
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQueryImpl subScopeId(String subScopeId) {
+        if (orActive) {
+            currentOrQueryObject.subScopeId = subScopeId;
+        } else {
+            this.subScopeId = subScopeId;
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQueryImpl scopeType(String scopeType) {
+        if (orActive) {
+            currentOrQueryObject.scopeType = scopeType;
+        } else {
+            this.scopeType = scopeType;
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQueryImpl scopeDefinitionId(String scopeDefinitionId) {
+        if (orActive) {
+            currentOrQueryObject.scopeDefinitionId = scopeDefinitionId;
+        } else {
+            this.scopeDefinitionId = scopeDefinitionId;
         }
         return this;
     }
@@ -1463,6 +1507,22 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public String getExecutionId() {
         return executionId;
+    }
+    
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
     }
 
     public String getTaskId() {

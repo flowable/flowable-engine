@@ -14,6 +14,8 @@ package org.flowable.cmmn.editor.json.converter;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnModel;
@@ -21,6 +23,8 @@ import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.Sentry;
+import org.flowable.cmmn.model.SentryIfPart;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -33,7 +37,6 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
 
     public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap,
             Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
-
         fillJsonTypes(convertersToCmmnMap);
         fillCmmnTypes(convertersToJsonMap);
     }
@@ -49,13 +52,11 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
 
     protected String getStencilId(BaseElement baseElement) {
         Criterion criterion = (Criterion) baseElement;
-        
         if (criterion.isEntryCriterion()) {
             return STENCIL_ENTRY_CRITERION;
         } else if (criterion.isExitCriterion()) {
             return STENCIL_EXIT_CRITERION;
         }
-        
         return STENCIL_ENTRY_CRITERION;
     }
 
@@ -74,10 +75,16 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
         elementNode.set("dockers", dockersArrayNode);
     }
 
+    @Override
     protected CaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, 
-                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel) {
+                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
         
         Criterion criterion = new Criterion();
+        String id = CmmnJsonConverterUtil.getElementId(elementNode);
+        if (StringUtils.isBlank(id)) {
+            id = "criterion_" + cmmnModelIdHelper.nextCriterionId();
+        }
+        criterion.setId(id);
         criterion.setTechnicalId(CmmnJsonConverterUtil.getShapeId(elementNode));
         String stencilId = CmmnJsonConverterUtil.getStencilId(elementNode);
         if (STENCIL_ENTRY_CRITERION.equals(stencilId)) {
@@ -95,7 +102,26 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
             cmmnModel.addCriterionTechnicalId(criterion.getTechnicalId(), criterionId);
         }
         
+        createSentry(elementNode, criterion, cmmnModelIdHelper);
+        
         return criterion;
+    }
+
+    protected void createSentry(JsonNode elementNode, Criterion criterion, CmmnModelIdHelper cmmnModelIdHelper) {
+        // Associate a sentry with the criterion. 
+        // The onparts will be added later, in the postprocessing.
+        Sentry sentry = new Sentry();
+        sentry.setId("sentry" + cmmnModelIdHelper.nextSentryId());
+        
+        String ifPartCondition = getPropertyValueAsString(PROPERTY_IF_PART_CONDITION, elementNode);
+        if (StringUtils.isNotBlank(ifPartCondition)) {
+            SentryIfPart sentryIfPart = new SentryIfPart();
+            sentryIfPart.setCondition(ifPartCondition);
+            sentry.setSentryIfPart(sentryIfPart);
+        }
+        
+        criterion.setSentryRef(sentry.getId());
+        criterion.setSentry(sentry);
     }
 
     private String lookForAttachedRef(String criterionId, JsonNode childShapesNode) {

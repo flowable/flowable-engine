@@ -22,9 +22,7 @@ public class ProcessTaskExport extends AbstractPlanItemDefinitionExport {
         // start process task element
         xtw.writeStartElement(ELEMENT_PROCESS_TASK);
         writeCommonPlanItemDefinitionAttributes(processTask, xtw);
-        if (!processTask.isBlocking()) {
-            xtw.writeAttribute(ATTRIBUTE_IS_BLOCKING, "false");
-        }
+        writeBlockingAttribute(xtw, processTask);
         
         // end process task element
         xtw.writeEndElement();

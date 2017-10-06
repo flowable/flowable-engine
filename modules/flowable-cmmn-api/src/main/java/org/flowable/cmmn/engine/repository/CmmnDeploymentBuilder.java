@@ -62,6 +62,11 @@ public interface CmmnDeploymentBuilder {
      * Gives the deployment the given parent deployment id.
      */
     CmmnDeploymentBuilder parentDeploymentId(String parentDeploymentId);
+    
+    /**
+     * If set, this deployment will be compared to any previous deployment. This means that every (non-generated) resource will be compared with the provided resources of this deployment.
+     */
+    CmmnDeploymentBuilder enableDuplicateFiltering();
 
     /**
      * Deploys all provided sources to the CMMN engine.

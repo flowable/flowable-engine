@@ -18,6 +18,7 @@ import java.util.List;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceQuery;
+import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.AbstractQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -106,6 +107,26 @@ public class PlanItemInstanceQueryImpl extends AbstractQuery<PlanItemInstanceQue
         }
         this.state = state;
         return this;
+    }
+    
+    @Override
+    public PlanItemInstanceQuery planItemInstanceStateActive() {
+        return planItemInstanceState(PlanItemInstanceState.ACTIVE);
+    }
+    
+    @Override
+    public PlanItemInstanceQuery planItemInstanceStateAvailable() {
+        return planItemInstanceState(PlanItemInstanceState.AVAILABLE);
+    }
+    
+    @Override
+    public PlanItemInstanceQuery planItemInstanceStateCompleted() {
+        return planItemInstanceState(PlanItemInstanceState.COMPLETED);
+    }
+    
+    @Override
+    public PlanItemInstanceQuery planItemInstanceStateTerminated() {
+        return planItemInstanceState(PlanItemInstanceState.TERMINATED);
     }
 
     @Override

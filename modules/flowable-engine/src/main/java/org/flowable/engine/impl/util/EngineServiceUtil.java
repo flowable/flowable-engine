@@ -12,6 +12,11 @@
  */
 package org.flowable.engine.impl.util;
 
+import org.flowable.cmmn.engine.CmmnEngineConfigurationApi;
+import org.flowable.cmmn.engine.CmmnHistoryService;
+import org.flowable.cmmn.engine.CmmnManagementService;
+import org.flowable.cmmn.engine.CmmnRepositoryService;
+import org.flowable.cmmn.engine.CmmnRuntimeService;
 import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentService;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
@@ -43,6 +48,52 @@ public class EngineServiceUtil {
         }
         
         return idmIdentityService;
+    }
+    
+    // CMMN ENGINE
+    
+    public static CmmnEngineConfigurationApi getCmmnEngineConfiguration(ProcessEngineConfiguration processEngineConfiguration) {
+        return (CmmnEngineConfigurationApi) processEngineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+    }
+    
+    public static CmmnRepositoryService getCmmnRepositoryService(ProcessEngineConfiguration processEngineConfiguration) {
+        CmmnRepositoryService cmmnRepositoryService = null;
+        CmmnEngineConfigurationApi cmmnEngineConfiguration = getCmmnEngineConfiguration(processEngineConfiguration);
+        if (cmmnEngineConfiguration != null) {
+            cmmnRepositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
+        }
+        
+        return cmmnRepositoryService;
+    }
+    
+    public static CmmnRuntimeService getCmmnRuntimeService(ProcessEngineConfiguration processEngineConfiguration) {
+        CmmnRuntimeService cmmnRuntimeService = null;
+        CmmnEngineConfigurationApi cmmnEngineConfiguration = getCmmnEngineConfiguration(processEngineConfiguration);
+        if (cmmnEngineConfiguration != null) {
+            cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
+        }
+        
+        return cmmnRuntimeService;
+    }
+    
+    public static CmmnHistoryService getCmmnHistoryService(ProcessEngineConfiguration processEngineConfiguration) {
+        CmmnHistoryService cmmnHistoryService = null;
+        CmmnEngineConfigurationApi cmmnEngineConfiguration = getCmmnEngineConfiguration(processEngineConfiguration);
+        if (cmmnEngineConfiguration != null) {
+            cmmnHistoryService = cmmnEngineConfiguration.getCmmnHistoryService();
+        }
+        
+        return cmmnHistoryService;
+    }
+    
+    public static CmmnManagementService getCmmnManagementService(ProcessEngineConfiguration processEngineConfiguration) {
+        CmmnManagementService cmmnManagementService = null;
+        CmmnEngineConfigurationApi cmmnEngineConfiguration = getCmmnEngineConfiguration(processEngineConfiguration);
+        if (cmmnEngineConfiguration != null) {
+            cmmnManagementService = cmmnEngineConfiguration.getCmmnManagementService();
+        }
+        
+        return cmmnManagementService;
     }
     
     // DMN ENGINE

@@ -14,6 +14,7 @@ package org.flowable.cmmn.editor.json.converter;
 
 import java.util.Map;
 
+import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.editor.json.model.ModelInfo;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
@@ -67,14 +68,15 @@ public class StageJsonConverter extends BaseCmmnJsonConverter implements FormAwa
         
         elementNode.set("childShapes", subProcessShapesArrayNode);
     }
-
+    
+    @Override
     protected CaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, 
-                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel) {
+                    BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
         
         Stage stage = new Stage();
 
         JsonNode childShapesArray = elementNode.get(EDITOR_CHILD_SHAPES);
-        processor.processJsonElements(childShapesArray, modelNode, stage, shapeMap, formMap, decisionTableMap, cmmnModel);
+        processor.processJsonElements(childShapesArray, modelNode, stage, shapeMap, formMap, decisionTableMap, cmmnModel, cmmnModelIdHelper);
         
         Stage parentStage = (Stage) parentElement;
         stage.setParent(parentStage);

@@ -17,30 +17,30 @@ import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 import java.util.Map;
 
+import org.flowable.engine.common.api.variable.VariableContainer;
 import org.flowable.engine.common.impl.javax.el.CompositeELResolver;
 import org.flowable.engine.common.impl.javax.el.ELContext;
 import org.flowable.engine.common.impl.javax.el.ELResolver;
 import org.flowable.engine.common.impl.javax.el.PropertyNotWritableException;
-import org.flowable.engine.impl.el.DefaultExpressionManager;
+import org.flowable.engine.impl.el.ProcessExpressionManager;
 import org.flowable.engine.impl.interceptor.DelegateInterceptor;
-import org.flowable.variable.service.delegate.VariableScope;
 
 /**
  * {@link org.flowable.engine.impl.el.DefaultExpressionManager} that exposes the simulation event in expressions
  *
  * @author martin.grofcik
  */
-public class SimulationExpressionManager extends DefaultExpressionManager {
+public class SimulationExpressionManager extends ProcessExpressionManager {
 
     public SimulationExpressionManager(DelegateInterceptor delegateInterceptor, Map<Object, Object> beans) {
-        super(delegateInterceptor, beans, true);
+        super(delegateInterceptor, beans);
     }
-
+    
     @Override
-    protected ELResolver createElResolver(VariableScope variableScope) {
+    protected ELResolver createElResolver(VariableContainer variableContainer) {
         CompositeELResolver compositeElResolver = new CompositeELResolver();
-        compositeElResolver.add(new SimulationScopeElResolver(variableScope));
-        compositeElResolver.add(super.createElResolver(variableScope));
+        compositeElResolver.add(new SimulationScopeElResolver(variableContainer));
+        compositeElResolver.add(super.createElResolver(variableContainer));
         return compositeElResolver;
     }
 
@@ -48,10 +48,10 @@ public class SimulationExpressionManager extends DefaultExpressionManager {
 
         public static final String EVENT_CALENDAR_KEY = "eventCalendar";
 
-        protected VariableScope variableScope;
+        protected VariableContainer variableContainer;
 
-        public SimulationScopeElResolver(VariableScope variableScope) {
-            this.variableScope = variableScope;
+        public SimulationScopeElResolver(VariableContainer variableContainer) {
+            this.variableContainer = variableContainer;
         }
 
         @Override

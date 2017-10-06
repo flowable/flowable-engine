@@ -88,7 +88,7 @@ import org.flowable.engine.impl.bpmn.behavior.SimulationSubProcessActivityBehavi
 import org.flowable.engine.impl.bpmn.data.SimpleDataInputAssociation;
 import org.flowable.engine.impl.bpmn.webservice.MessageImplicitDataOutputAssociation;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
-import org.flowable.variable.service.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 
 import java.util.List;
 

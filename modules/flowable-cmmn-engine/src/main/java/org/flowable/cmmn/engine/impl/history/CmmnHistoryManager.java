@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.history;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.runtime.MilestoneInstance;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Joram Barrez
@@ -25,5 +26,11 @@ public interface CmmnHistoryManager {
     void recordCaseInstanceEnd(String caseInstanceId);
     
     void recordMilestoneReached(MilestoneInstance milestoneInstance);
+    
+    void recordVariableCreate(VariableInstanceEntity variable);
+    
+    void recordVariableUpdate(VariableInstanceEntity variable);
+
+    void recordVariableRemoved(VariableInstanceEntity variable);
 
 }

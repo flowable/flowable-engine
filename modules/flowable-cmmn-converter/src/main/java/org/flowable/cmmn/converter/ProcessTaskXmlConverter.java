@@ -31,7 +31,6 @@ public class ProcessTaskXmlConverter extends TaskXmlConverter {
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         ProcessTask processTask = new ProcessTask();
         convertCommonTaskAttributes(xtr, processTask);
-        processTask.setProcessRefExpression(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_PROCESS_REF_EXPRESSION));
         processTask.setProcessRef(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_PROCESS_REF));
         return processTask;
     }

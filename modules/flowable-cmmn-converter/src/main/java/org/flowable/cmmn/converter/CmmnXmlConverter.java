@@ -35,6 +35,7 @@ import javax.xml.validation.Schema;
 import javax.xml.validation.SchemaFactory;
 import javax.xml.validation.Validator;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.exception.XMLException;
 import org.flowable.cmmn.converter.export.CaseExport;
 import org.flowable.cmmn.converter.export.CmmnDIExport;
@@ -92,6 +93,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new EntryCriterionXmlConverter());
         addElementConverter(new ExitCriterionXmlConverter());
         addElementConverter(new PlanItemOnPartXmlConverter());
+        addElementConverter(new SentryIfPartXmlConverter());
         addElementConverter(new CaseTaskXmlConverter());
         addElementConverter(new ProcessXmlConverter());
         addElementConverter(new ProcessTaskXmlConverter());
@@ -99,8 +101,12 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new CmmnDiEdgeXmlConverter());
         addElementConverter(new CmmnDiBoundsXmlConverter());
         addElementConverter(new CmmnDiWaypointXmlConverter());
+        
+        addElementConverter(new FieldExtensionXmlConverter());
 
         addTextConverter(new StandardEventXmlConverter());
+        addTextConverter(new ProcessRefExpressionXmlConverter());
+        addTextConverter(new ConditionXmlConverter());
     }
 
     public static void addElementConverter(BaseCmmnXmlConverter converter) {
@@ -310,6 +316,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         ensureIds(conversionHelper.getExitCriteria(), "exitCriterion_");
         ensureIds(conversionHelper.getSentries(), "sentry_");
         ensureIds(conversionHelper.getSentryOnParts(), "onPart_");
+        ensureIds(conversionHelper.getSentryIfParts(), "ifPart_");
         ensureIds(conversionHelper.getPlanItems(), "planItem_");
         ensureIds(conversionHelper.getPlanItemDefinitions(), "planItemDefinition_");
 
@@ -338,7 +345,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
     protected void processPlanFragment(CmmnModel cmmnModel, PlanFragment planFragment) {
         processPlanItems(cmmnModel, planFragment);
-        processSentries(planFragment);
+        processSentries(cmmnModel.getPrimaryCase().getPlanModel(), planFragment);
 
         if (planFragment instanceof Stage) {
             Stage stage = (Stage) planFragment;
@@ -373,7 +380,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 boolean exitCriteriaAllowed = true;
                 if (planItemDefinition instanceof Task) {
                     Task task = (Task) planItemDefinition;
-                    if (!task.isBlocking()) {
+                    if (!task.isBlocking() && StringUtils.isEmpty(task.getBlockingExpression())) {
                         exitCriteriaAllowed = false;
                     }
                 }
@@ -428,10 +435,10 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         }
     }
 
-    protected void processSentries(PlanFragment planFragment) {
+    protected void processSentries(Stage planModelStage, PlanFragment planFragment) {
         for (Sentry sentry : planFragment.getSentries()) {
             for (SentryOnPart onPart : sentry.getOnParts()) {
-                PlanItem planItem = sentry.getParent().findPlanItem(onPart.getSourceRef());
+                PlanItem planItem = planModelStage.findPlanItemInPlanFragmentOrDownwards(onPart.getSourceRef());
                 if (planItem != null) {
                     onPart.setSource(planItem);
                 } else {

@@ -22,8 +22,10 @@
   <!-- TASK INSERT -->
   
   <insert id="insertTask" parameterType="org.flowable.task.service.impl.persistence.entity.TaskEntityImpl">
-    insert into ${prefix}ACT_RU_TASK (ID_, REV_, NAME_, PARENT_TASK_ID_, DESCRIPTION_, PRIORITY_, CREATE_TIME_, OWNER_,
-                      ASSIGNEE_, DELEGATION_, EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_, TASK_DEF_KEY_, DUE_DATE_, CATEGORY_, SUSPENSION_STATE_, TENANT_ID_, FORM_KEY_, CLAIM_TIME_, IS_COUNT_ENABLED_, VAR_COUNT_, ID_LINK_COUNT_)
+    insert into ${prefix}ACT_RU_TASK (ID_, REV_, NAME_, PARENT_TASK_ID_, DESCRIPTION_, PRIORITY_, CREATE_TIME_, OWNER_, ASSIGNEE_, DELEGATION_, 
+                      EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_,
+                      TASK_DEF_KEY_, DUE_DATE_, CATEGORY_, SUSPENSION_STATE_, TENANT_ID_, FORM_KEY_, CLAIM_TIME_, 
+                      IS_COUNT_ENABLED_, VAR_COUNT_, ID_LINK_COUNT_)
     values (#{id, jdbcType=VARCHAR},
             1,
             #{name, jdbcType=VARCHAR},
@@ -37,6 +39,10 @@
             #{executionId, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
             #{processDefinitionId, jdbcType=VARCHAR},
+            #{scopeId, jdbcType=VARCHAR},
+            #{subScopeId, jdbcType=VARCHAR},
+            #{scopeType, jdbcType=VARCHAR},
+            #{scopeDefinitionId, jdbcType=VARCHAR},
             #{taskDefinitionKey, jdbcType=VARCHAR},
             #{dueDate, jdbcType=TIMESTAMP},
             #{category, jdbcType=VARCHAR},
@@ -51,8 +57,9 @@
   </insert>
 
   <insert id="bulkInsertTask" parameterType="java.util.List">
-    INSERT INTO ${prefix}ACT_RU_TASK (ID_, REV_, NAME_, PARENT_TASK_ID_, DESCRIPTION_, PRIORITY_, CREATE_TIME_, OWNER_,
-                      ASSIGNEE_, DELEGATION_, EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_, TASK_DEF_KEY_, DUE_DATE_, CATEGORY_, SUSPENSION_STATE_, TENANT_ID_, FORM_KEY_, CLAIM_TIME_, IS_COUNT_ENABLED_, VAR_COUNT_, ID_LINK_COUNT_)
+    INSERT INTO ${prefix}ACT_RU_TASK (ID_, REV_, NAME_, PARENT_TASK_ID_, DESCRIPTION_, PRIORITY_, CREATE_TIME_, OWNER_, ASSIGNEE_, DELEGATION_, 
+        EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, 
+        TASK_DEF_KEY_, DUE_DATE_, CATEGORY_, SUSPENSION_STATE_, TENANT_ID_, FORM_KEY_, CLAIM_TIME_, IS_COUNT_ENABLED_, VAR_COUNT_, ID_LINK_COUNT_)
     VALUES 
       <foreach collection="list" item="task" index="index" separator=","> 
         (#{task.id, jdbcType=VARCHAR},
@@ -68,6 +75,10 @@
          #{task.executionId, jdbcType=VARCHAR},
          #{task.processInstanceId, jdbcType=VARCHAR},
          #{task.processDefinitionId, jdbcType=VARCHAR},
+         #{task.scopeId, jdbcType=VARCHAR},
+         #{task.subScopeId, jdbcType=VARCHAR},
+         #{task.scopeType, jdbcType=VARCHAR},
+         #{task.scopeDefinitionId, jdbcType=VARCHAR},
          #{task.taskDefinitionKey, jdbcType=VARCHAR},
          #{task.dueDate, jdbcType=TIMESTAMP},
          #{task.category, jdbcType=VARCHAR},
@@ -84,9 +95,9 @@
   <insert id="bulkInsertTask" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL 
       <foreach collection="list" item="task" index="index">
-        INTO ${prefix}ACT_RU_TASK (ID_, REV_, NAME_, PARENT_TASK_ID_, DESCRIPTION_, PRIORITY_, CREATE_TIME_, OWNER_,
-             ASSIGNEE_, DELEGATION_, EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_, TASK_DEF_KEY_, DUE_DATE_, CATEGORY_,
-             SUSPENSION_STATE_, TENANT_ID_, FORM_KEY_, CLAIM_TIME_, IS_COUNT_ENABLED_, VAR_COUNT_, ID_LINK_COUNT_) VALUES
+        INTO ${prefix}ACT_RU_TASK (ID_, REV_, NAME_, PARENT_TASK_ID_, DESCRIPTION_, PRIORITY_, CREATE_TIME_, OWNER_, ASSIGNEE_, DELEGATION_, 
+              EXECUTION_ID_, PROC_INST_ID_, PROC_DEF_ID_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_, TASK_DEF_KEY_, 
+              DUE_DATE_, CATEGORY_, SUSPENSION_STATE_, TENANT_ID_, FORM_KEY_, CLAIM_TIME_, IS_COUNT_ENABLED_, VAR_COUNT_, ID_LINK_COUNT_) VALUES
         (#{task.id, jdbcType=VARCHAR},
          1,
          #{task.name, jdbcType=VARCHAR},
@@ -100,6 +111,10 @@
          #{task.executionId, jdbcType=VARCHAR},
          #{task.processInstanceId, jdbcType=VARCHAR},
          #{task.processDefinitionId, jdbcType=VARCHAR},
+         #{task.scopeId, jdbcType=VARCHAR},
+         #{task.subScopeId, jdbcType=VARCHAR},
+         #{task.scopeType, jdbcType=VARCHAR},
+         #{task.scopeDefinitionId, jdbcType=VARCHAR},
          #{task.taskDefinitionKey, jdbcType=VARCHAR},
          #{task.dueDate, jdbcType=TIMESTAMP},
          #{task.category, jdbcType=VARCHAR},
@@ -146,6 +161,18 @@
       </if>
       <if test="originalPersistentState.processDefinitionId != processDefinitionId">
           PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.scopeId != scopeId">
+          SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR}
+      </if>
+      <if test="originalPersistentState.subScopeId != subScopeId">
+          SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR}
+      </if>
+      <if test="originalPersistentState.scopeType != scopeType">
+          SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR}
+      </if>
+       <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
+          SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR}
       </if>
       <if test="originalPersistentState.description != description">
           DESCRIPTION_ = #{description, jdbcType=VARCHAR},
@@ -246,6 +273,10 @@
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR"/>
+    <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
+    <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
+    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
+    <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
     <result property="taskDefinitionKey" column="TASK_DEF_KEY_" jdbcType="VARCHAR"/>
     <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP"/>
     <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
@@ -272,6 +303,10 @@
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR"/>
+    <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
+    <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
+    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
+    <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
     <result property="taskDefinitionKey" column="TASK_DEF_KEY_" jdbcType="VARCHAR"/>
     <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP"/>
     <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
@@ -601,6 +636,18 @@
       <if test="executionId != null">
         and RES.EXECUTION_ID_ = #{executionId}
       </if>
+      <if test="scopeId != null">
+        and RES.SCOPE_ID_ = #{scopeId}
+      </if>
+      <if test="subScopeId != null">
+        and RES.SUB_SCOPE_ID_ = #{subScopeId}
+      </if>
+      <if test="scopeType != null">
+        and RES.SCOPE_TYPE_ = #{scopeType}
+      </if>
+      <if test="scopeDefinitionId != null">
+        and RES.SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
+      </if>
       <if test="createTime != null">
         and RES.CREATE_TIME_ = #{createTime}
       </if>
@@ -924,6 +971,18 @@
             </if>         
             <if test="orQueryObject.executionId != null">
               or RES.EXECUTION_ID_ = #{orQueryObject.executionId}
+            </if>
+            <if test="orQueryObject.scopeId != null">
+              and RES.SCOPE_ID_ = #{orQueryObject.scopeId}
+            </if>
+            <if test="orQueryObject.subScopeId != null">
+              and RES.SUB_SCOPE_ID_ = #{orQueryObject.subScopeId}
+            </if>
+            <if test="orQueryObject.scopeType != null">
+              and RES.SCOPE_TYPE_ = #{orQueryObject.scopeType}
+            </if>
+            <if test="orQueryObject.scopeDefinitionId != null">
+              and RES.SCOPE_DEFINITION_ID_ = #{orQueryObject.scopeDefinitionId}
             </if>
             <if test="orQueryObject.createTime != null">
               or RES.CREATE_TIME_ = #{orQueryObject.createTime}

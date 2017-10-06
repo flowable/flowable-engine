@@ -760,8 +760,8 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
     }
     
     @Override
-    protected String variableScopeType() {
-        return "execution";
+    protected boolean isPropagateToHistoricVariable() {
+        return false;
     }
 
     @Override

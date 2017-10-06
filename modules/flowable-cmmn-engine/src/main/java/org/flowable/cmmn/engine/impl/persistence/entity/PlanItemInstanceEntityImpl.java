@@ -12,21 +12,25 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.impl.variable.VariableScopeType;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.PlanItem;
-import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
 /**
  * @author Joram Barrez
  */
-public class PlanItemInstanceEntityImpl extends AbstractEntity implements PlanItemInstanceEntity {
+public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements PlanItemInstanceEntity {
     
     protected String caseDefinitionId;
     protected String caseInstanceId;
@@ -39,13 +43,13 @@ public class PlanItemInstanceEntityImpl extends AbstractEntity implements PlanIt
     protected String startUserId;
     protected String referenceId;
     protected String referenceType;
-    protected String tenantId;
+    protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     
     // Non-persisted
     protected PlanItem planItem;
     protected List<PlanItemInstanceEntity> children;
     protected PlanItemInstanceEntity stagePlanItemInstance;
-    protected List<SentryOnPartInstanceEntity> satisfiedSentryOnPartInstances;
+    protected List<SentryPartInstanceEntity> satisfiedSentryPartInstances;
     
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();
@@ -159,15 +163,52 @@ public class PlanItemInstanceEntityImpl extends AbstractEntity implements PlanIt
     }
     
     @Override
-    public List<SentryOnPartInstanceEntity> getSatisfiedSentryOnPartInstances() {
-        if (satisfiedSentryOnPartInstances == null) {
-            satisfiedSentryOnPartInstances = CommandContextUtil.getSentryOnPartInstanceEntityManager().findSentryOnPartInstancesByPlanItemInstanceId(id);
+    public List<SentryPartInstanceEntity> getSatisfiedSentryPartInstances() {
+        if (satisfiedSentryPartInstances == null) {
+            satisfiedSentryPartInstances = CommandContextUtil.getSentryPartInstanceEntityManager().findSentryPartInstancesByPlanItemInstanceId(id);
         }
-        return satisfiedSentryOnPartInstances;
+        return satisfiedSentryPartInstances;
     }
     
-    public void setSatisfiedSentryOnPartInstances(List<SentryOnPartInstanceEntity> satisfiedSentryOnPartInstances) {
-        this.satisfiedSentryOnPartInstances = satisfiedSentryOnPartInstances;
+    public void setSatisfiedSentryPartInstances(List<SentryPartInstanceEntity> satisfiedSentryPartInstances) {
+        this.satisfiedSentryPartInstances = satisfiedSentryPartInstances;
     }
-    
+
+    // VariableScopeImpl methods
+
+    @Override
+    protected Collection<VariableInstanceEntity> loadVariableInstances() {
+        return CommandContextUtil.getVariableService().findVariableInstanceBySubScopeIdAndScopeType(id, VariableScopeType.CMMN);
+    }
+
+    @Override
+    protected VariableScopeImpl getParentVariableScope() {
+        if (caseInstanceId != null) {
+            return (VariableScopeImpl) CommandContextUtil.getCaseInstanceEntityManager().findById(caseInstanceId);
+        }
+        return null;
+    }
+
+    @Override
+    protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
+        variableInstance.setScopeId(caseInstanceId);
+        variableInstance.setSubScopeId(id);
+        variableInstance.setScopeType(VariableScopeType.CMMN);
+    }
+
+    @Override
+    protected VariableInstanceEntity getSpecificVariable(String variableName) {
+        return CommandContextUtil.getVariableService().findVariableInstanceBySubScopeIdAndScopeTypeAndName(id, VariableScopeType.CMMN, variableName);
+    }
+
+    @Override
+    protected List<VariableInstanceEntity> getSpecificVariables(Collection<String> variableNames) {
+        return CommandContextUtil.getVariableService().findVariableInstancesBySubScopeIdAndScopeTypeAndNames(id, VariableScopeType.CMMN, variableNames);
+    }
+
+    @Override
+    protected boolean isPropagateToHistoricVariable() {
+        return true;
+    }
+
 }

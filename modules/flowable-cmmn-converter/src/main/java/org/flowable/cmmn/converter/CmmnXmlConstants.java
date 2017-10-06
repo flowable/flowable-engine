@@ -53,6 +53,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_STANDARD_EVENT = "standardEvent";
     String ELEMENT_ENTRY_CRITERION = "entryCriterion";
     String ELEMENT_EXIT_CRITERION = "exitCriterion";
+    String ELEMENT_IF_PART = "ifPart";
     String ELEMENT_EXTENSIONS = "extensions";
     
     String ELEMENT_PROCESS = "process";
@@ -66,12 +67,27 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_SOURCE_REF = "sourceRef";
     String ATTRIBUTE_SENTRY_REF = "sentryRef";
     String ATTRIBUTE_IS_BLOCKING = "isBlocking";
+    String ATTRIBUTE_IS_BLOCKING_EXPRESSION = "isBlockingExpression";
     
     String ATTRIBUTE_CASE_REF = "caseRef";
     String ATTRIBUTE_PROCESS_REF = "processRef";
-    String ATTRIBUTE_PROCESS_REF_EXPRESSION = "processRefExpression";
+    
+    String ELEMENT_PROCESS_REF_EXPRESSION = "processRefExpression";
+    String ELEMENT_CONDITION = "condition";
+    
+    String ATTRIBUTE_TYPE = "type";
     
     String ATTRIBUTE_CLASS = "class";
+    String ATTRIBUTE_EXPRESSION = "expression";
+    String ATTRIBUTE_DELEGATE_EXPRESSION = "delegateExpression";
+    
+    String ATTRIBUTE_RESULT_VARIABLE_NAME = "resultVariableName";
+    
+    String ELEMENT_FIELD = "field";
+    String ATTRIBUTE_FIELD_STRING = "stringValue";
+    String ATTRIBUTE_FIELD_EXPRESSION = "expression";
+    String ELEMENT_FIELD_STRING = "string";
+    String ELEMENT_FIELD_EXPRESSION = "expression";
     
     String ELEMENT_DI_CMMN = "CMMNDI";
     String ELEMENT_DI_DIAGRAM = "CMMNDiagram";

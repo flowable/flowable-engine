@@ -23,6 +23,7 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.http.HttpServiceTaskTestServer.HttpServiceTaskTestServlet;
 import org.flowable.variable.service.history.HistoricVariableInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -289,7 +290,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         Map<String, Object> variables = new HashMap<>();
         variables.put("method", "POST");
         variables.put("url", "https://localhost:9799/api?code=500");
-        variables.put("headers", "Content-Type: text/plain\nX-Request-ID: 623b94fc-14b8-4ee6-aed7-b16b9321e29f");
+        variables.put("headers", "Content-Type: text/plain\nX-Request-ID: 623b94fc-14b8-4ee6-aed7-b16b9321e29f\nhost:localhost:7000\nTest:");
         variables.put("body", body);
         variables.put("timeout", 2000);
         variables.put("ignore", true);
@@ -300,12 +301,18 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
 
         ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpPut5XX", variables);
         assertFalse(process.isEnded());
+        
+        Map<String, String> headerMap = HttpServiceTaskTestServlet.headerMap;
+        assertEquals("text/plain", headerMap.get("Content-Type"));
+        assertEquals("623b94fc-14b8-4ee6-aed7-b16b9321e29f", headerMap.get("X-Request-ID"));
+        assertEquals("localhost:7000", headerMap.get("Host"));
+        assertEquals("", headerMap.get("Test"));
 
         // Request assertions
         Map<String, Object> request = new HashMap<>();
         request.put("httpPost500.requestMethod", "POST");
         request.put("httpPost500.requestUrl", "https://localhost:9799/api?code=500");
-        request.put("httpPost500.requestHeaders", "Content-Type: text/plain\nX-Request-ID: 623b94fc-14b8-4ee6-aed7-b16b9321e29f");
+        request.put("httpPost500.requestHeaders", "Content-Type: text/plain\nX-Request-ID: 623b94fc-14b8-4ee6-aed7-b16b9321e29f\nhost:localhost:7000");
         request.put("httpPost500.requestBody", body);
         assertEquals(runtimeService, process.getId(), request);
         // Response assertions

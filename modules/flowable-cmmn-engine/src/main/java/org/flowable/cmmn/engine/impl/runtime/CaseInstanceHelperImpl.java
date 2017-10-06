@@ -19,13 +19,12 @@ import java.util.Map;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
-import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntity;
-import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.repository.CaseDefinition;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
+import org.flowable.cmmn.engine.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.engine.runtime.CaseInstanceState;
-import org.flowable.cmmn.model.Stage;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.callback.CallbackData;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
@@ -37,29 +36,62 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 public class CaseInstanceHelperImpl implements CaseInstanceHelper {
     
     @Override
-    public CaseInstanceEntity startCaseInstanceByKey(CommandContext commandContext, String caseDefinitionKey) {
-        CmmnDeploymentManager deploymentManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDeploymentManager();
-        CaseDefinition caseDefinition = deploymentManager.findDeployedLatestCaseDefinitionByKey(caseDefinitionKey);
-        if (caseDefinition == null) {
-            throw new FlowableObjectNotFoundException("No case definition found for key " + caseDefinitionKey, CaseDefinition.class);
+    public CaseInstanceEntity startCaseInstance(CaseInstanceBuilder caseInstanceBuilder) {
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+        
+        CaseDefinition caseDefinition = null;
+        if (caseInstanceBuilder.getCaseDefinitionId() != null) {
+            String caseDefinitionId = caseInstanceBuilder.getCaseDefinitionId();
+            CmmnDeploymentManager deploymentManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDeploymentManager();
+            if (caseDefinitionId != null) {
+                caseDefinition = deploymentManager.findDeployedCaseDefinitionById(caseDefinitionId);
+                if (caseDefinition == null) {
+                    throw new FlowableObjectNotFoundException("No case definition found for id " + caseDefinitionId, CaseDefinition.class);
+                }
+            }
+            
+        } else if (caseInstanceBuilder.getCaseDefinitionKey() != null) {
+            String caseDefinitionKey = caseInstanceBuilder.getCaseDefinitionKey();
+            CmmnDeploymentManager deploymentManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDeploymentManager();
+            caseDefinition = deploymentManager.findDeployedLatestCaseDefinitionByKey(caseDefinitionKey);
+            if (caseDefinition == null) {
+                throw new FlowableObjectNotFoundException("No case definition found for key " + caseDefinitionKey, CaseDefinition.class);
+            }
+            
         }
-        return startCaseInstance(commandContext, caseDefinition);
+        
+        return startCaseInstance(commandContext, caseDefinition, caseInstanceBuilder);
     }
     
-    public CaseInstanceEntity startCaseInstanceById(CommandContext commandContext, String caseDefinitionId) {
-        CmmnDeploymentManager deploymentManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDeploymentManager();
-        CaseDefinition caseDefinition = null;
-        if (caseDefinitionId != null) {
-            caseDefinition = deploymentManager.findDeployedCaseDefinitionById(caseDefinitionId);
-            if (caseDefinition == null) {
-                throw new FlowableObjectNotFoundException("No case definition found for id " + caseDefinitionId, CaseDefinition.class);
+    
+    protected CaseInstanceEntity startCaseInstance(CommandContext commandContext, CaseDefinition caseDefinition, CaseInstanceBuilder caseInstanceBuilder) {
+        CaseInstanceEntity caseInstanceEntity = createCaseInstanceEntity(commandContext, caseDefinition);
+        
+        if (caseInstanceBuilder.getName() != null) {
+            caseInstanceEntity.setName(caseInstanceBuilder.getName());
+        }
+        
+        if (caseInstanceBuilder.getBusinessKey() != null) {
+            caseInstanceEntity.setBusinessKey(caseInstanceBuilder.getBusinessKey());
+        }
+        
+        if (caseInstanceBuilder.getTenantId() != null) {
+            caseInstanceEntity.setTenantId(caseInstanceBuilder.getTenantId());
+        }
+        
+        Map<String, Object> variables = caseInstanceBuilder.getVariables();
+        if (variables != null) {
+            for (String variableName : variables.keySet()) {
+                caseInstanceEntity.setVariable(variableName, variables.get(variableName));
             }
         }
-        return startCaseInstance(commandContext, caseDefinition);
-    }
-
-    protected CaseInstanceEntity startCaseInstance(CommandContext commandContext, CaseDefinition caseDefinition) {
-        CaseInstanceEntity caseInstanceEntity = createCaseInstanceEntity(commandContext, caseDefinition);
+        
+        Map<String, Object> transientVariables = caseInstanceBuilder.getTransientVariables();
+        if (transientVariables != null) {
+            for (String variableName : transientVariables.keySet()) {
+                caseInstanceEntity.setTransientVariable(variableName, transientVariables.get(variableName));
+            }
+        }
         
         callCaseInstanceStateChangeCallbacks(commandContext, caseInstanceEntity, null, CaseInstanceState.ACTIVE);
         CommandContextUtil.getCmmnHistoryManager().recordCaseInstanceStart(caseInstanceEntity);
@@ -70,10 +102,6 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         return caseInstanceEntity;
     }
 
-    protected Stage getPlanModel(CommandContext commandContext, CaseDefinition caseDefinition) {
-        return CaseDefinitionUtil.getCmmnModel(caseDefinition.getId()).getPrimaryCase().getPlanModel();
-    }
-    
     protected CaseInstanceEntity createCaseInstanceEntity(CommandContext commandContext, CaseDefinition caseDefinition) {
         CaseInstanceEntityManager caseInstanceEntityManager = CommandContextUtil.getCaseInstanceEntityManager(commandContext);
         CaseInstanceEntity caseInstanceEntity = caseInstanceEntityManager.create();
@@ -83,7 +111,7 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         caseInstanceEntity.setTenantId(caseDefinition.getTenantId());
         caseInstanceEntityManager.insert(caseInstanceEntity);
         
-        caseInstanceEntity.setSatisfiedSentryOnPartInstances(new ArrayList<SentryOnPartInstanceEntity>(1));
+        caseInstanceEntity.setSatisfiedSentryPartInstances(new ArrayList<SentryPartInstanceEntity>(1));
         
         return caseInstanceEntity;
     }
@@ -94,11 +122,8 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
                     .getCmmnEngineConfiguration(commandContext).getCaseInstanceStateChangeCallbacks();
             if (caseInstanceCallbacks != null && caseInstanceCallbacks.containsKey(caseInstance.getCallbackType())) {
                 for (RuntimeInstanceStateChangeCallback caseInstanceCallback : caseInstanceCallbacks.get(caseInstance.getCallbackType())) {
-                    caseInstanceCallback.stateChanged(new CallbackData(caseInstance.getCallbackId(), 
-                                                                       caseInstance.getCallbackType(), 
-                                                                       caseInstance.getId(), 
-                                                                       oldState, 
-                                                                       newState));
+                    CallbackData callBackData = new CallbackData(caseInstance.getCallbackId(), caseInstance.getCallbackType(), caseInstance.getId(), oldState, newState);
+                    caseInstanceCallback.stateChanged(callBackData);
                 }
             }
         }

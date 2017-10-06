@@ -14,8 +14,8 @@
 package org.flowable.engine.impl.el;
 
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.variable.service.delegate.Expression;
 import org.flowable.engine.impl.Condition;
 
 /**

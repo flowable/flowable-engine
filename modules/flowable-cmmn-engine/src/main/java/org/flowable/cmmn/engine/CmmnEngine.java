@@ -35,4 +35,6 @@ public interface CmmnEngine {
     CmmnRepositoryService getCmmnRepositoryService();
     
     CmmnHistoryService getCmmnHistoryService();
+    
+    CmmnEngineConfiguration getCmmnEngineConfiguration();
 }

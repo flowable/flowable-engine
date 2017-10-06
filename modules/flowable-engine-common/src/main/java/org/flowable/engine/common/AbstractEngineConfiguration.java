@@ -46,6 +46,7 @@ import org.flowable.engine.common.impl.cfg.CommandExecutorImpl;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.cfg.TransactionContextFactory;
 import org.flowable.engine.common.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
+import org.flowable.engine.common.impl.db.CommonDbSchemaManager;
 import org.flowable.engine.common.impl.db.CustomMyBatisTypeHandlerConfig;
 import org.flowable.engine.common.impl.db.CustomMybatisTypeAliasConfig;
 import org.flowable.engine.common.impl.db.DbSchemaManager;
@@ -78,9 +79,7 @@ public abstract class AbstractEngineConfiguration {
      * Checks the version of the DB schema against the library when the form engine is being created and throws an exception if the versions don't match.
      */
     public static final String DB_SCHEMA_UPDATE_FALSE = "false";
-
     public static final String DB_SCHEMA_UPDATE_CREATE = "create";
-
     public static final String DB_SCHEMA_UPDATE_CREATE_DROP = "create-drop";
 
     /**
@@ -108,6 +107,7 @@ public abstract class AbstractEngineConfiguration {
     protected int jdbcPingConnectionNotUsedFor;
     protected int jdbcDefaultTransactionIsolationLevel;
     protected DataSource dataSource;
+    protected DbSchemaManager commonDbSchemaManager;
     protected DbSchemaManager dbSchemaManager;
 
     protected String databaseSchemaUpdate = DB_SCHEMA_UPDATE_FALSE;
@@ -152,7 +152,7 @@ public abstract class AbstractEngineConfiguration {
      */
     protected int maxNrOfStatementsInBulkInsert = 100;
 
-    public int DEFAULT_MAX_NR_OF_STATEMENTS_BULK_INSERT_SQL_SERVER = 70; // currently Execution has most params (28). 2000 / 28 = 71.
+    public int DEFAULT_MAX_NR_OF_STATEMENTS_BULK_INSERT_SQL_SERVER = 60; // currently Execution has most params (31). 2000 / 31 = 64.
 
     protected Set<Class<?>> customMybatisMappers;
     protected Set<String> customMybatisXMLMappers;
@@ -266,6 +266,16 @@ public abstract class AbstractEngineConfiguration {
 
     protected Clock clock;
     
+    // Variables
+    
+    public static final int DEFAULT_GENERIC_MAX_LENGTH_STRING = 4000;
+    public static final int DEFAULT_ORACLE_MAX_LENGTH_STRING = 2000;
+    
+    /**
+     * Define a max length for storing String variable types in the database. Mainly used for the Oracle NVARCHAR2 limit of 2000 characters
+     */
+    protected int maxLengthStringVariableType = -1;
+    
     // DataSource
     // ///////////////////////////////////////////////////////////////
 
@@ -354,6 +364,18 @@ public abstract class AbstractEngineConfiguration {
             } catch (SQLException e) {
                 LOGGER.error("Exception while closing the Database connection", e);
             }
+        }
+        
+        // Special care for MSSQL, as it has a hard limit of 2000 params per statement (incl bulk statement).
+        // Especially with executions, with 100 as default, this limit is passed.
+        if (DATABASE_TYPE_MSSQL.equals(databaseType)) {
+            maxNrOfStatementsInBulkInsert = DEFAULT_MAX_NR_OF_STATEMENTS_BULK_INSERT_SQL_SERVER;
+        }
+    }
+    
+    public void initDbSchemaManager() { 
+        if (this.commonDbSchemaManager == null) {
+            this.commonDbSchemaManager = new CommonDbSchemaManager();
         }
     }
 
@@ -594,6 +616,7 @@ public abstract class AbstractEngineConfiguration {
         configuration.setEnvironment(environment);
 
         initCustomMybatisMappers(configuration);
+        initMybatisTypeHandlers(configuration);
 
         configuration = parseMybatisConfiguration(parser);
         return configuration;
@@ -605,6 +628,10 @@ public abstract class AbstractEngineConfiguration {
                 configuration.addMapper(clazz);
             }
         }
+    }
+    
+    public void initMybatisTypeHandlers(Configuration configuration) {
+        // To be extended
     }
 
     public Configuration parseMybatisConfiguration(XMLConfigBuilder parser) {
@@ -706,6 +733,15 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setDbSchemaManager(DbSchemaManager dbSchemaManager) {
         this.dbSchemaManager = dbSchemaManager;
+        return this;
+    }
+
+    public DbSchemaManager getCommonDbSchemaManager() {
+        return commonDbSchemaManager;
+    }
+
+    public AbstractEngineConfiguration setCommonDbSchemaManager(DbSchemaManager commonDbSchemaManager) {
+        this.commonDbSchemaManager = commonDbSchemaManager;
         return this;
     }
 
@@ -1203,4 +1239,26 @@ public abstract class AbstractEngineConfiguration {
         this.clock = clock;
         return this;
     }
+    
+    public int getMaxLengthString() {
+        if (maxLengthStringVariableType == -1) {
+            if ("oracle".equalsIgnoreCase(databaseType)) {
+                return DEFAULT_ORACLE_MAX_LENGTH_STRING;
+            } else {
+                return DEFAULT_GENERIC_MAX_LENGTH_STRING;
+            }
+        } else {
+            return maxLengthStringVariableType;
+        }
+    }
+    
+    public int getMaxLengthStringVariableType() {
+        return maxLengthStringVariableType;
+    }
+
+    public AbstractEngineConfiguration setMaxLengthStringVariableType(int maxLengthStringVariableType) {
+        this.maxLengthStringVariableType = maxLengthStringVariableType;
+        return this;
+    }
+    
 }

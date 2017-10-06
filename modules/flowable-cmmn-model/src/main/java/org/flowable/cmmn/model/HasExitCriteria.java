@@ -19,6 +19,8 @@ import java.util.List;
  */
 public interface HasExitCriteria {
     
+    void addExitCriterion(Criterion exitCriterion);
+    
     List<Criterion> getExitCriteria();
     
     void setExitCriteria(List<Criterion> exitCriteria);

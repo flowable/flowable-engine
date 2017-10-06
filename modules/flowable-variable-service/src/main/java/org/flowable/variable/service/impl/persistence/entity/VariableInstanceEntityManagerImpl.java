@@ -91,6 +91,36 @@ public class VariableInstanceEntityManagerImpl extends AbstractEntityManager<Var
     public List<VariableInstanceEntity> findVariableInstancesByTaskAndNames(String taskId, Collection<String> names) {
         return variableInstanceDataManager.findVariableInstancesByTaskAndNames(taskId, names);
     }
+    
+    @Override
+    public List<VariableInstanceEntity> findVariableInstanceByScopeIdAndScopeType(String scopeId, String scopeType) {
+        return variableInstanceDataManager.findVariableInstanceByScopeIdAndScopeType(scopeId, scopeType);
+    }
+    
+    @Override
+    public VariableInstanceEntity findVariableInstanceByScopeIdAndScopeTypeAndName(String scopeId, String scopeType, String variableName) {
+        return variableInstanceDataManager.findVariableInstanceByScopeIdAndScopeTypeAndName(scopeId, scopeType, variableName);
+    }
+    
+    @Override
+    public List<VariableInstanceEntity> findVariableInstancesByScopeIdAndScopeTypeAndNames(String scopeId, String scopeType, Collection<String> variableNames) {
+        return variableInstanceDataManager.findVariableInstancesByScopeIdAndScopeTypeAndNames(scopeId, scopeType, variableNames);
+    }
+    
+    @Override
+    public List<VariableInstanceEntity> findVariableInstanceBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
+        return variableInstanceDataManager.findVariableInstanceBySubScopeIdAndScopeType(subScopeId, scopeType);
+    }
+
+    @Override
+    public VariableInstanceEntity findVariableInstanceBySubScopeIdAndScopeTypeAndName(String subScopeId, String scopeType, String variableName) {
+        return variableInstanceDataManager.findVariableInstanceBySubScopeIdAndScopeTypeAndName(subScopeId, scopeType, variableName);
+    }
+
+    @Override
+    public List<VariableInstanceEntity> findVariableInstancesBySubScopeIdAndScopeTypeAndNames(String subScopeId, String scopeType, Collection<String> variableNames) {
+        return variableInstanceDataManager.findVariableInstancesBySubScopeIdAndScopeTypeAndNames(subScopeId, scopeType, variableNames);
+    }
 
     @Override
     public void delete(VariableInstanceEntity entity, boolean fireDeleteEvent) {

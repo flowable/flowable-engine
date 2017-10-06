@@ -16,6 +16,7 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 
 public class CaseDefinitionEntityImpl extends AbstractEntity implements CaseDefinitionEntity {
@@ -28,7 +29,7 @@ public class CaseDefinitionEntityImpl extends AbstractEntity implements CaseDefi
     protected String resourceName;
     protected boolean isGraphicalNotationDefined;
     protected String deploymentId;
-    protected String tenantId;
+    protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     
     @Override
     public Object getPersistentState() {

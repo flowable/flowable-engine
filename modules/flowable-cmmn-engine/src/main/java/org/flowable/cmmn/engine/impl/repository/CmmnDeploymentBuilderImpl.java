@@ -36,6 +36,7 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
 
     protected CmmnDeploymentEntity deployment;
     protected boolean isCmmn20XsdValidationEnabled = true;
+    protected boolean isDuplicateFilterEnabled;
 
     public CmmnDeploymentBuilderImpl() {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
@@ -145,6 +146,12 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
         deployment.setParentDeploymentId(parentDeploymentId);
         return this;
     }
+    
+    @Override
+    public CmmnDeploymentBuilder enableDuplicateFiltering() {
+        this.isDuplicateFilterEnabled = true;
+        return this;
+    }
 
     public CmmnDeployment deploy() {
         return repositoryService.deploy(this);
@@ -156,6 +163,10 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
 
     public boolean isCmmnXsdValidationEnabled() {
         return isCmmn20XsdValidationEnabled;
+    }
+    
+    public boolean isDuplicateFilterEnabled() {
+        return isDuplicateFilterEnabled;
     }
 
 }

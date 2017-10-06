@@ -13,15 +13,15 @@
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import org.flowable.cmmn.engine.delegate.PlanItemJavaDelegate;
-import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
  */
-public class PlanItemJavaDelegateActivityBehavior implements CmmnActivityBehavior {
+public class PlanItemJavaDelegateActivityBehavior extends CoreCmmnActivityBehavior {
     
     protected PlanItemJavaDelegate planItemJavaDelegate;
 
@@ -30,9 +30,9 @@ public class PlanItemJavaDelegateActivityBehavior implements CmmnActivityBehavio
     }
     
     @Override
-    public void execute(DelegatePlanItemInstance planItemInstance) {
-        planItemJavaDelegate.execute(planItemInstance);
-        CommandContextUtil.getAgenda().planCompletePlanItem((PlanItemInstanceEntity) planItemInstance);
+    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+        planItemJavaDelegate.execute(planItemInstanceEntity);
+        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance(planItemInstanceEntity);
     }
 
 }

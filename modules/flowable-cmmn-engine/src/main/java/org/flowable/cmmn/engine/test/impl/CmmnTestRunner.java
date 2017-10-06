@@ -63,7 +63,7 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
         if (deploymentId != null) {
             deleteDeployment(deploymentId);
         }
-        assertDatabaseEmpty();
+        assertDatabaseEmpty(method);
     }
 
     protected String deployCmmnDefinition(FrameworkMethod method) {
@@ -115,10 +115,10 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
     }
     
     protected void deleteDeployment(String deploymentId) {
-        cmmnEngine.getCmmnRepositoryService().deleteDeploymentAndRelatedData(deploymentId);
+        cmmnEngine.getCmmnRepositoryService().deleteDeployment(deploymentId, true);
     }
     
-    protected void assertDatabaseEmpty() {
+    protected void assertDatabaseEmpty(FrameworkMethod method) {
         Map<String, Long> tableCounts = cmmnEngine.getCmmnManagementService().getTableCounts();
         
         StringBuilder outputMessage = new StringBuilder();
@@ -130,7 +130,7 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
         }
         
         if (outputMessage.length() > 0) {
-            outputMessage.insert(0, "DB NOT CLEAN: \n");
+            outputMessage.insert(0, "DB not clean for test " + getTestClass().getName() + "." + method.getName() + ": \n");
             LOGGER.error("\n");
             LOGGER.error(outputMessage.toString());
             Assert.fail(outputMessage.toString());

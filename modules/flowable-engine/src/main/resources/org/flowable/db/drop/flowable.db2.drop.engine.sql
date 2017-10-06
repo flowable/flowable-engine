@@ -1,5 +1,4 @@
 drop index ACT_IDX_EXEC_BUSKEY;
-drop index ACT_IDX_TASK_CREATE;
 drop index ACT_IDX_IDENT_LNK_USER;
 drop index ACT_IDX_IDENT_LNK_GROUP;
 drop index ACT_IDX_VARIABLE_TASK_ID;
@@ -40,9 +39,6 @@ alter table ACT_RU_VARIABLE
 alter table ACT_RU_VARIABLE
 	drop foreign key ACT_FK_VAR_PROCINST;    
 
-alter table ACT_RU_VARIABLE
-    drop foreign key ACT_FK_VAR_BYTEARRAY;
-    
 alter table ACT_RU_JOB 
     drop foreign key ACT_FK_JOB_EXECUTION;
     
@@ -111,15 +107,11 @@ alter table ACT_PROCDEF_INFO
 
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_;
 drop index ACT_IDX_ATHRZ_PROCEDEF;
-    
-drop table ACT_GE_PROPERTY;
-drop table ACT_GE_BYTEARRAY;
+
 drop table ACT_RE_DEPLOYMENT;
 drop table ACT_RE_MODEL;
 drop table ACT_RE_PROCDEF;
-drop table ACT_RU_VARIABLE;
 drop table ACT_RU_IDENTITYLINK;
-drop table ACT_RU_TASK;
 drop table ACT_RU_EXECUTION;
 drop table ACT_RU_JOB;
 drop table ACT_RU_TIMER_JOB;

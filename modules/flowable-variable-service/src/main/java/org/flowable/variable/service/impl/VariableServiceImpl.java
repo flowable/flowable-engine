@@ -82,6 +82,36 @@ public class VariableServiceImpl extends ServiceImpl implements VariableService 
     }
     
     @Override
+    public List<VariableInstanceEntity> findVariableInstanceByScopeIdAndScopeType(String scopeId, String scopeType) {
+        return getVariableInstanceEntityManager().findVariableInstanceByScopeIdAndScopeType(scopeId, scopeType);
+    }
+    
+    @Override
+    public VariableInstanceEntity findVariableInstanceByScopeIdAndScopeTypeAndName(String scopeId, String scopeType, String variableName) {
+        return getVariableInstanceEntityManager().findVariableInstanceByScopeIdAndScopeTypeAndName(scopeId, scopeType, variableName);
+    }
+    
+    @Override
+    public List<VariableInstanceEntity> findVariableInstancesByScopeIdAndScopeTypeAndNames(String scopeId, String scopeType, Collection<String> variableNames) {
+        return getVariableInstanceEntityManager().findVariableInstancesByScopeIdAndScopeTypeAndNames(scopeId, scopeType, variableNames); 
+    }
+    
+    @Override
+    public List<VariableInstanceEntity> findVariableInstanceBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
+        return getVariableInstanceEntityManager().findVariableInstanceBySubScopeIdAndScopeType(subScopeId, scopeType);
+    }
+
+    @Override
+    public VariableInstanceEntity findVariableInstanceBySubScopeIdAndScopeTypeAndName(String subScopeId, String scopeType, String variableName) {
+        return getVariableInstanceEntityManager().findVariableInstanceBySubScopeIdAndScopeTypeAndName(subScopeId, scopeType, variableName);
+    }
+
+    @Override
+    public List<VariableInstanceEntity> findVariableInstancesBySubScopeIdAndScopeTypeAndNames(String subScopeId, String scopeType, Collection<String> variableNames) {
+        return getVariableInstanceEntityManager().findVariableInstancesBySubScopeIdAndScopeTypeAndNames(subScopeId, scopeType, variableNames);
+    }
+    
+    @Override
     public VariableInstanceEntity createVariableInstance(String name, VariableType type, Object value) {
         return getVariableInstanceEntityManager().create(name, type, value);
     }
@@ -100,5 +130,5 @@ public class VariableServiceImpl extends ServiceImpl implements VariableService 
     public void deleteVariableInstanceMap(Map<String, VariableInstanceEntity> variableInstances) {
         getVariableInstanceEntityManager().deleteVariableInstanceMap(variableInstances);
     }
-    
+
 }

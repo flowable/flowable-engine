@@ -29,14 +29,17 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ProcessTask;
+import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.util.io.InputStreamSource;
 import org.flowable.engine.common.impl.util.io.StreamSource;
 import org.slf4j.Logger;
@@ -50,6 +53,7 @@ public class CmmnParserImpl implements CmmnParser {
     private final Logger logger = LoggerFactory.getLogger(CmmnParserImpl.class);
     
     protected CmmnActivityBehaviorFactory activityBehaviorFactory;
+    protected ExpressionManager expressionManager;
     
     public CmmnParseResult parse(CmmnResourceEntity resourceEntity) {
         CmmnParseResult parseResult = new CmmnParseResult();
@@ -130,12 +134,23 @@ public class CmmnParserImpl implements CmmnParser {
             } else if (planItemDefinition instanceof Task) {
                 Task task = (Task) planItemDefinition;
                 
-                if (StringUtils.isEmpty(task.getClassName())) {
-                    planItem.setBehavior(activityBehaviorFactory.createTaskActivityBehavior(planItem, task));
+                if (task instanceof ServiceTask) {
+                    ServiceTask serviceTask = (ServiceTask) task;
+                    if (StringUtils.isNotEmpty(serviceTask.getImplementation())) {
+                        if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(serviceTask.getImplementationType())) {
+                            planItem.setBehavior(activityBehaviorFactory.createCmmnClassDelegate(planItem, serviceTask));
+                            
+                        } else if (ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equals(serviceTask.getImplementationType())) {
+                            planItem.setBehavior(activityBehaviorFactory.createPlanItemExpressionActivityBehavior(planItem, serviceTask));
+                            
+                        } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(serviceTask.getImplementationType())) {
+                            planItem.setBehavior(activityBehaviorFactory.createPlanItemDelegateExpressionActivityBehavior(planItem, serviceTask));
+                        }
+                    }
+                    
                 } else {
-                    planItem.setBehavior(activityBehaviorFactory.createCmmnClassDelegate(planItem, task));
+                    planItem.setBehavior(activityBehaviorFactory.createTaskActivityBehavior(planItem, task));
                 }
-            
             }
             
             if (planItemDefinition instanceof PlanFragment) {
@@ -145,7 +160,7 @@ public class CmmnParserImpl implements CmmnParser {
         }
 
     }
-
+    
     public CmmnActivityBehaviorFactory getActivityBehaviorFactory() {
         return activityBehaviorFactory;
     }
@@ -154,4 +169,12 @@ public class CmmnParserImpl implements CmmnParser {
         this.activityBehaviorFactory = activityBehaviorFactory;
     }
 
+    public ExpressionManager getExpressionManager() {
+        return expressionManager;
+    }
+
+    public void setExpressionManager(ExpressionManager expressionManager) {
+        this.expressionManager = expressionManager;
+    }
+    
 }

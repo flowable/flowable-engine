@@ -27,6 +27,10 @@
         PROC_DEF_ID_,
         PROC_INST_ID_,
         EXECUTION_ID_,
+        SCOPE_ID_, 
+        SUB_SCOPE_ID_, 
+        SCOPE_TYPE_, 
+        SCOPE_DEFINITION_ID_,
         NAME_,
         PARENT_TASK_ID_,
         DESCRIPTION_,
@@ -50,6 +54,10 @@
         #{processDefinitionId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{executionId, jdbcType=VARCHAR},
+        #{scopeId, jdbcType=VARCHAR},
+        #{subScopeId, jdbcType=VARCHAR},
+        #{scopeType, jdbcType=VARCHAR},
+        #{scopeDefinitionId, jdbcType=VARCHAR},
         #{name ,jdbcType=VARCHAR},
         #{parentTaskId ,jdbcType=VARCHAR},
         #{description ,jdbcType=VARCHAR},
@@ -77,6 +85,10 @@
         PROC_DEF_ID_,
         PROC_INST_ID_,
         EXECUTION_ID_,
+        SCOPE_ID_, 
+        SUB_SCOPE_ID_, 
+        SCOPE_TYPE_, 
+        SCOPE_DEFINITION_ID_,
         NAME_,
         PARENT_TASK_ID_,
         DESCRIPTION_,
@@ -101,6 +113,10 @@
            #{historicTask.processDefinitionId, jdbcType=VARCHAR},
            #{historicTask.processInstanceId, jdbcType=VARCHAR},
            #{historicTask.executionId, jdbcType=VARCHAR},
+           #{historicTask.scopeId, jdbcType=VARCHAR},
+           #{historicTask.subScopeId, jdbcType=VARCHAR},
+           #{historicTask.scopeType, jdbcType=VARCHAR},
+           #{historicTask.scopeDefinitionId, jdbcType=VARCHAR},
            #{historicTask.name ,jdbcType=VARCHAR},
            #{historicTask.parentTaskId ,jdbcType=VARCHAR},
            #{historicTask.description ,jdbcType=VARCHAR},
@@ -130,6 +146,10 @@
             PROC_DEF_ID_,
             PROC_INST_ID_,
             EXECUTION_ID_,
+            SCOPE_ID_, 
+            SUB_SCOPE_ID_, 
+            SCOPE_TYPE_, 
+            SCOPE_DEFINITION_ID_,
             NAME_,
             PARENT_TASK_ID_,
             DESCRIPTION_,
@@ -153,6 +173,10 @@
              #{historicTask.processDefinitionId, jdbcType=VARCHAR},
              #{historicTask.processInstanceId, jdbcType=VARCHAR},
              #{historicTask.executionId, jdbcType=VARCHAR},
+             #{historicTask.scopeId, jdbcType=VARCHAR},
+             #{historicTask.subScopeId, jdbcType=VARCHAR},
+             #{historicTask.scopeType, jdbcType=VARCHAR},
+             #{historicTask.scopeDefinitionId, jdbcType=VARCHAR},
              #{historicTask.name ,jdbcType=VARCHAR},
              #{historicTask.parentTaskId ,jdbcType=VARCHAR},
              #{historicTask.description ,jdbcType=VARCHAR},
@@ -186,6 +210,18 @@
 	      <if test="originalPersistentState.executionId != executionId">
 	      	EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
 	      </if>
+          <if test="originalPersistentState.scopeId != scopeId">
+            SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR}
+          </if>
+          <if test="originalPersistentState.subScopeId != subScopeId">
+            SUB_SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR}
+          </if>
+          <if test="originalPersistentState.scopeType != scopeType">
+            SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR}
+          </if>
+          <if test="originalPersistentState.scopeDefinitionId != scopeDefinitionId">
+            SCOPE_DEFINITION_ID_ = #{scopeDefinitionId, jdbcType=VARCHAR}
+          </if>
 	      <if test="originalPersistentState.name != name">
 	      	NAME_ = #{name, jdbcType=VARCHAR},
 	      </if>
@@ -257,6 +293,10 @@
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
+    <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
+    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
+    <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="parentTaskId" column="PARENT_TASK_ID_" jdbcType="VARCHAR" />
     <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
@@ -282,6 +322,10 @@
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
+    <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
+    <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
+    <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="parentTaskId" column="PARENT_TASK_ID_" jdbcType="VARCHAR" />
     <result property="description" column="DESCRIPTION_" jdbcType="VARCHAR" />
@@ -577,6 +621,18 @@
       </if>
       <if test="executionId != null">
         and RES.EXECUTION_ID_ = #{executionId}
+      </if>
+      <if test="scopeId != null">
+        and RES.SCOPE_ID_ = #{scopeId}
+      </if>
+      <if test="subScopeId != null">
+        and RES.SUB_SCOPE_ID_ = #{subScopeId}
+      </if>
+      <if test="scopeType != null">
+        and RES.SCOPE_TYPE_ = #{scopeType}
+      </if>
+      <if test="scopeDefinitionId != null">
+        and RES.SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
       </if>
       <if test="taskName != null">
         and RES.NAME_ = #{taskName}
@@ -879,6 +935,18 @@
           </if>
           <if test="orQueryObject.executionId != null">
             or RES.EXECUTION_ID_ = #{orQueryObject.executionId}
+          </if>
+          <if test="orQueryObject.scopeId != null">
+            and RES.SCOPE_ID_ = #{orQueryObject.scopeId}
+          </if>
+          <if test="orQueryObject.subScopeId != null">
+            and RES.SUB_SCOPE_ID_ = #{orQueryObject.subScopeId}
+          </if>
+          <if test="orQueryObject.scopeType != null">
+            and RES.SCOPE_TYPE_ = #{orQueryObject.scopeType}
+          </if>
+          <if test="orQueryObject.scopeDefinitionId != null">
+            and RES.SCOPE_DEFINITION_ID_ = #{orQueryObject.scopeDefinitionId}
           </if>
           <if test="orQueryObject.taskName != null">
             or RES.NAME_ = #{orQueryObject.taskName}

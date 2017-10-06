@@ -31,9 +31,10 @@ import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.GraphicInfo;
+import org.flowable.cmmn.model.HasEntryCriteria;
+import org.flowable.cmmn.model.HasExitCriteria;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
-import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
 import org.flowable.cmmn.model.Stage;
 import org.slf4j.Logger;
@@ -71,6 +72,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, StencilConstants,
         AssociationJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
 
         // task types
+        TaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         HumanTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         DecisionTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         
@@ -141,7 +143,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, StencilConstants,
 
         ObjectNode propertiesNode = objectMapper.createObjectNode();
         if (StringUtils.isNotEmpty(caseModel.getId())) {
-            propertiesNode.put(PROPERTY_PROCESS_ID, caseModel.getId());
+            propertiesNode.put(PROPERTY_CASE_ID, caseModel.getId());
         }
         if (StringUtils.isNotEmpty(caseModel.getName())) {
             propertiesNode.put(PROPERTY_NAME, caseModel.getName());
@@ -151,7 +153,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, StencilConstants,
         }
         
         if (StringUtils.isNoneEmpty(model.getTargetNamespace())) {
-            propertiesNode.put(PROPERTY_PROCESS_NAMESPACE, model.getTargetNamespace());
+            propertiesNode.put(PROPERTY_CASE_NAMESPACE, model.getTargetNamespace());
         }
 
         modelNode.set(EDITOR_SHAPE_PROPERTIES, propertiesNode);
@@ -214,6 +216,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, StencilConstants,
     public CmmnModel convertToCmmnModel(JsonNode modelNode, Map<String, String> formKeyMap, Map<String, String> decisionTableKeyMap) {
 
         CmmnModel cmmnModel = new CmmnModel();
+        CmmnModelIdHelper cmmnModelIdHelper = new CmmnModelIdHelper();
 
         cmmnModel.setTargetNamespace("http://flowable.org/test");
         Map<String, JsonNode> shapeMap = new HashMap<>();
@@ -232,9 +235,9 @@ public class CmmnJsonConverter implements EditorJsonConstants, StencilConstants,
 
         Case caseModel = new Case();
         cmmnModel.getCases().add(caseModel);
-        caseModel.setId(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_PROCESS_ID, modelNode));
+        caseModel.setId(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_CASE_ID, modelNode));
         caseModel.setName(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_NAME, modelNode));
-        String namespace = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_PROCESS_NAMESPACE, modelNode);
+        String namespace = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_CASE_NAMESPACE, modelNode);
         if (StringUtils.isNotEmpty(namespace)) {
             cmmnModel.setTargetNamespace(namespace);
         }
@@ -250,15 +253,25 @@ public class CmmnJsonConverter implements EditorJsonConstants, StencilConstants,
         
         caseModel.setPlanModel(planModelStage);
         
-        processJsonElements(planModelShapesArray, modelNode, planModelStage, shapeMap, formKeyMap, decisionTableKeyMap, cmmnModel);
+        processJsonElements(planModelShapesArray, modelNode, planModelStage, shapeMap, formKeyMap, decisionTableKeyMap, cmmnModel, cmmnModelIdHelper);
 
-        // associations are now all on root level
+        List<String> planModelExitCriteriaRefs = new ArrayList<>();
         for (JsonNode shapeNode : shapesArrayNode) {
+            // associations are now all on root level
             if (STENCIL_ASSOCIATION.equalsIgnoreCase(CmmnJsonConverterUtil.getStencilId(shapeNode))) {
-
                 AssociationJsonConverter associationConverter = new AssociationJsonConverter();
-                Association association = associationConverter.convertJsonToElement(shapeNode, modelNode, this, planModelStage, shapeMap, cmmnModel);
+                Association association = associationConverter.convertJsonToElement(shapeNode, modelNode, this, planModelStage, shapeMap, cmmnModel, cmmnModelIdHelper);
                 cmmnModel.addAssociation(association);
+                
+            // exit criteria for the plan model are on the root level                
+            } else if (STENCIL_EXIT_CRITERION.equalsIgnoreCase(CmmnJsonConverterUtil.getStencilId(shapeNode))) {
+                JsonNode resourceNode = shapeNode.get(EDITOR_SHAPE_ID);
+                if (resourceNode != null) {
+                    planModelExitCriteriaRefs.add(resourceNode.asText());
+                    CriterionJsonConverter criterionJsonConverter = new CriterionJsonConverter();
+                    criterionJsonConverter.convertJsonToElement(shapeNode, modelNode, this, planModelStage, shapeMap, cmmnModel, cmmnModelIdHelper);
+                }
+                
             }
         }
         
@@ -266,15 +279,17 @@ public class CmmnJsonConverter implements EditorJsonConstants, StencilConstants,
         readEdgeDI(edgeMap, sourceAndTargetMap, cmmnModel);
 
         // post handling of process elements
-        Map<String, Association> associationMap = new HashMap<>();
-        postProcessAssociations(cmmnModel, associationMap);
-        postProcessElements(planModelStage, planModelStage.getPlanItems(), edgeMap, associationMap, cmmnModel);
+        Map<String, List<Association>> associationMap = postProcessAssociations(cmmnModel);
+        postProcessElements(planModelStage, planModelStage.getPlanItems(), edgeMap, associationMap, cmmnModel, cmmnModelIdHelper);
+        
+        // Create sentries for exit criteria on plan model
+        createSentryParts(planModelExitCriteriaRefs, planModelStage, associationMap, cmmnModel, cmmnModelIdHelper, null, planModelStage);
 
         return cmmnModel;
     }
 
     public void processJsonElements(JsonNode shapesArrayNode, JsonNode modelNode, BaseElement parentElement, Map<String, JsonNode> shapeMap,
-            Map<String, String> formMap, Map<String, String> decisionTableMap, CmmnModel cmmnModel) {
+            Map<String, String> formMap, Map<String, String> decisionTableMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
 
         for (JsonNode shapeNode : shapesArrayNode) {
             String stencilId = CmmnJsonConverterUtil.getStencilId(shapeNode);
@@ -289,14 +304,15 @@ public class CmmnJsonConverter implements EditorJsonConstants, StencilConstants,
                     ((FormAwareConverter) converterInstance).setFormMap(formMap);
                 }
 
-                converterInstance.convertToCmmnModel(shapeNode, modelNode, this, parentElement, shapeMap, cmmnModel);
+                converterInstance.convertToCmmnModel(shapeNode, modelNode, this, parentElement, shapeMap, cmmnModel, cmmnModelIdHelper);
             } catch (Exception e) {
-                LOGGER.error("Error converting {}", CmmnJsonConverterUtil.getStencilId(shapeNode), e);
+                LOGGER.error("Error converting {}", CmmnJsonConverterUtil.getStencilId(shapeNode));
             }
         }
     }
     
-    protected void postProcessAssociations(CmmnModel cmmnModel, Map<String, Association> associationMap) {
+    protected Map<String, List<Association>> postProcessAssociations(CmmnModel cmmnModel) {
+        Map<String, List<Association>> associationMap = new HashMap<>();
         for (Association association : cmmnModel.getAssociations()) {
             if (association.getSourceRef() == null || association.getTargetRef() == null) {
                 continue;
@@ -316,6 +332,9 @@ public class CmmnJsonConverter implements EditorJsonConstants, StencilConstants,
                 
                 sourceIsCriterion = false;
                 planItemDefinition = cmmnModel.findPlanItemDefinition(association.getSourceRef());
+                if (planItemDefinition == null) { // exit criteria on planmodel
+                    planItemDefinition = cmmnModel.findPlanItemDefinition(association.getTargetRef());
+                }
             }
             
             if (planItemDefinition == null) {
@@ -338,28 +357,61 @@ public class CmmnJsonConverter implements EditorJsonConstants, StencilConstants,
                 planItem.addOutgoingAssociation(association);
             }
             
-            associationMap.put(criterion.getId(), association);
+            if (!associationMap.containsKey(criterion.getId())) {
+                associationMap.put(criterion.getId(), new ArrayList<Association>());
+            }
+            associationMap.get(criterion.getId()).add(association);
         }
+        return associationMap;
     }
     
-    protected void postProcessElements(Stage planModelStage, List<PlanItem> planItems, Map<String, JsonNode> edgeMap, Map<String, Association> associationMap, CmmnModel cmmnModel) {
+    protected void postProcessElements(Stage parentStage, List<PlanItem> planItems, Map<String, JsonNode> edgeMap, 
+            Map<String, List<Association>> associationMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
+        
         for (PlanItem planItem : planItems) {
             PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
+            
             if (planItemDefinition instanceof Stage) {
                 Stage stage = (Stage) planItemDefinition;
-                postProcessElements(stage, stage.getPlanItems(), edgeMap, associationMap, cmmnModel);
+                postProcessElements(stage, stage.getPlanItems(), edgeMap, associationMap, cmmnModel, cmmnModelIdHelper);
+            }
             
-            } else if (CollectionUtils.isNotEmpty(planItem.getCriteriaRefs())) {
-                for (String criterionRef : planItem.getCriteriaRefs()) {
-                    String criterionId = cmmnModel.getCriterionId(criterionRef);
-                    if (criterionId == null) continue;
-                    
-                    Criterion criterion = cmmnModel.getCriterion(criterionId);
-                    if (criterion == null) continue;
-                    
-                    if (!associationMap.containsKey(criterion.getId())) continue;
-                    
-                    Association association = associationMap.get(criterion.getId());
+             if (CollectionUtils.isNotEmpty(planItem.getCriteriaRefs())) {
+                 createSentryParts(planItem.getCriteriaRefs(), parentStage, associationMap, cmmnModel, cmmnModelIdHelper, planItem, planItem);
+            }
+        }
+    }
+
+    protected void createSentryParts(List<String> criteriaRefs, Stage parentStage, Map<String, List<Association>> associationMap, CmmnModel cmmnModel, 
+            CmmnModelIdHelper cmmnModelIdHelper, HasEntryCriteria hasEntryCriteriaElement, HasExitCriteria hasExitCriteriaElement) {
+        
+        for (String criterionRef : criteriaRefs) {
+            String criterionId = cmmnModel.getCriterionId(criterionRef);
+            if (criterionId == null) {
+                continue;
+            }
+            
+            Criterion criterion = cmmnModel.getCriterion(criterionId);
+            if (criterion == null) {
+                continue;
+            }
+            
+            parentStage.addSentry(criterion.getSentry());
+            
+            boolean associationsFound = associationMap.containsKey(criterion.getId()); 
+            if (!associationsFound && criterion.getSentry() == null) {
+                continue;
+            } else {
+                if (criterion.isEntryCriterion()) {
+                    hasEntryCriteriaElement.addEntryCriterion(criterion);
+                } else if (criterion.isExitCriterion()) {
+                    hasExitCriteriaElement.addExitCriterion(criterion);
+                }
+            }
+            
+            if (associationsFound) {
+                List<Association> associations = associationMap.get(criterion.getId()); 
+                for (Association association : associations) {
                     PlanItem criterionPlanItem = null;
                     if (association.getSourceRef().equals(criterion.getId())) {
                         criterionPlanItem = (PlanItem) association.getTargetElement();
@@ -367,27 +419,15 @@ public class CmmnJsonConverter implements EditorJsonConstants, StencilConstants,
                         criterionPlanItem = (PlanItem) association.getSourceElement();
                     }
                     
-                    Sentry sentry = new Sentry();
-                    sentry.setId("sentry" + cmmnModel.nextSentryId());
                     SentryOnPart sentryOnPart = new SentryOnPart();
-                    sentryOnPart.setId("sentryOnPart" + cmmnModel.nextSentryOnPartId());
+                    sentryOnPart.setId("sentryOnPart" + cmmnModelIdHelper.nextSentryOnPartId());
                     sentryOnPart.setSourceRef(criterionPlanItem.getId());
                     sentryOnPart.setSource(criterionPlanItem);
-                    sentryOnPart.setStandardEvent("complete");
-                    sentry.addSentryOnPart(sentryOnPart);
-                    
-                    planModelStage.addSentry(sentry);
-                    
-                    criterion.setSentryRef(sentry.getId());
-                    criterion.setSentry(sentry);
-                    
-                    if (criterion.isEntryCriterion()) {
-                        planItem.addEntryCriterion(criterion);
-                    } else if (criterion.isExitCriterion()) {
-                        planItem.addExitCriterion(criterion);
-                    }
+                    sentryOnPart.setStandardEvent("complete"); // todo: needs to come from model
+                    criterion.getSentry().addSentryOnPart(sentryOnPart);
                 }
             }
+            
         }
     }
 
@@ -645,5 +685,34 @@ public class CmmnJsonConverter implements EditorJsonConstants, StencilConstants,
         graphicInfo.setX(x);
         graphicInfo.setY(y);
         return graphicInfo;
+    }
+    
+    public static class CmmnModelIdHelper {
+        
+        protected int planItemIndex = 0;
+        protected int criterionId = 0;
+        protected int sentryIndex = 0;
+        protected int sentryOnPartIndex = 0;
+        
+        public int nextPlanItemId() {
+            planItemIndex++;
+            return planItemIndex;
+        }
+        
+        public int nextCriterionId() {
+            criterionId++;
+            return criterionId;
+        }
+        
+        public int nextSentryId() {
+            sentryIndex++;
+            return sentryIndex;
+        }
+        
+        public int nextSentryOnPartId() {
+            sentryOnPartIndex++;
+            return sentryOnPartIndex;
+        }
+        
     }
 }

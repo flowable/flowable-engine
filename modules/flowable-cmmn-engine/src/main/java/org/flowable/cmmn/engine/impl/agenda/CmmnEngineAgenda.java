@@ -21,31 +21,29 @@ import org.flowable.engine.common.impl.agenda.Agenda;
  * @author Joram Barrez
  */
 public interface CmmnEngineAgenda extends Agenda {
-    
-    void planInitPlanModelOperation(CaseInstanceEntity caseInstanceEntity);
-    
-    void planInitStageOperation(PlanItemInstanceEntity planItemInstanceEntity);
-    
-    void planEvaluateCriteria(String caseInstanceEntityId);
-    
-    void planEvaluateCriteria(String caseInstanceEntityId, PlanItemLifeCycleEvent lifeCycleEvent);
-    
-    void planActivatePlanItem(PlanItemInstanceEntity planItemInstanceEntity);
 
-    void planCompletePlanItem(PlanItemInstanceEntity planItemInstanceEntity);
-    
-    void planOccurPlanItem(PlanItemInstanceEntity planItemInstanceEntity);
-    
-    void planExitPlanItem(PlanItemInstanceEntity planItemInstanceEntity);
-    
-    void planTerminatePlanItem(PlanItemInstanceEntity planItemInstanceEntity);
-    
-    void planTriggerPlanItem(PlanItemInstanceEntity planItemInstanceEntity);
-    
-    void planCompleteCase(CaseInstanceEntity caseInstanceEntity);
-    
-    void planTerminateCase(String caseInstanceEntityId, boolean manualTermination);
-    
-    void planTerminateCase(CaseInstanceEntity caseInstanceEntity, boolean manualTermination);
-    
+    void planInitPlanModelOperation(CaseInstanceEntity caseInstanceEntity);
+
+    void planInitStageOperation(PlanItemInstanceEntity planItemInstanceEntity);
+
+    void planActivatePlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity);
+
+    void planCompletePlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity);
+
+    void planOccurPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity);
+
+    void planExitPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity);
+
+    void planTerminatePlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity);
+
+    void planTriggerPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity);
+
+    void planCompleteCaseInstance(CaseInstanceEntity caseInstanceEntity);
+
+    void planTerminateCaseInstance(String caseInstanceEntityId, boolean manualTermination);
+
+    void planEvaluateCriteria(String caseInstanceEntityId);
+
+    void planEvaluateCriteria(String caseInstanceEntityId, PlanItemLifeCycleEvent lifeCycleEvent);
+
 }

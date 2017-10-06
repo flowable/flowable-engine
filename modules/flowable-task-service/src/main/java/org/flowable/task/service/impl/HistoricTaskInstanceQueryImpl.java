@@ -33,6 +33,7 @@ import org.flowable.variable.service.impl.types.VariableTypes;
 
 /**
  * @author Tom Baeyens
+ * @author Joram Barrez
  */
 public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<HistoricTaskInstanceQuery, HistoricTaskInstance> implements HistoricTaskInstanceQuery {
 
@@ -54,6 +55,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String processInstanceBusinessKeyLike;
     protected String processInstanceBusinessKeyLikeIgnoreCase;
     protected String executionId;
+    protected String scopeId;
+    protected String subScopeId;
+    protected String scopeType;
+    protected String scopeDefinitionId;
     protected String taskId;
     protected String taskName;
     protected String taskNameLike;
@@ -218,6 +223,46 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
             this.currentOrQueryObject.executionId = executionId;
         } else {
             this.executionId = executionId;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricTaskInstanceQueryImpl scopeId(String scopeId) {
+        if (inOrStatement) {
+            currentOrQueryObject.scopeId = scopeId;
+        } else {
+            this.scopeId = scopeId;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricTaskInstanceQueryImpl subScopeId(String subScopeId) {
+        if (inOrStatement) {
+            currentOrQueryObject.subScopeId = subScopeId;
+        } else {
+            this.subScopeId = subScopeId;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricTaskInstanceQueryImpl scopeType(String scopeType) {
+        if (inOrStatement) {
+            currentOrQueryObject.scopeType = scopeType;
+        } else {
+            this.scopeType = scopeType;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricTaskInstanceQueryImpl scopeDefinitionId(String scopeDefinitionId) {
+        if (inOrStatement) {
+            currentOrQueryObject.scopeDefinitionId = scopeDefinitionId;
+        } else {
+            this.scopeDefinitionId = scopeDefinitionId;
         }
         return this;
     }
@@ -1397,6 +1442,22 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getExecutionId() {
         return executionId;
+    }
+    
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
     }
 
     public String getProcessDefinitionId() {

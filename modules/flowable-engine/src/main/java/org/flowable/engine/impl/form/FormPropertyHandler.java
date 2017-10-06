@@ -20,7 +20,7 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.form.AbstractFormType;
 import org.flowable.engine.form.FormProperty;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.variable.service.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 
 /**

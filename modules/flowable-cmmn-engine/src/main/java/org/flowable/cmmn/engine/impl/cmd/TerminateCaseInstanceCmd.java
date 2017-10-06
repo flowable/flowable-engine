@@ -12,8 +12,6 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
-import java.io.Serializable;
-
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -24,7 +22,7 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 /**
  * @author Joram Barrez
  */
-public class TerminateCaseInstanceCmd implements Command<Void>, Serializable {
+public class TerminateCaseInstanceCmd implements Command<Void> {
 
     protected String caseInstanceId;
 
@@ -43,7 +41,7 @@ public class TerminateCaseInstanceCmd implements Command<Void>, Serializable {
             throw new FlowableObjectNotFoundException("Cannot find case instance entity for id " + caseInstanceId, CaseInstanceEntity.class);
         }
         
-        CommandContextUtil.getAgenda(commandContext).planTerminateCase(caseInstanceEntity, true);
+        CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstance(caseInstanceEntity.getId(), true);
         return null;
     }
 

@@ -12,8 +12,15 @@
  */
 package org.flowable.app.conf;
 
+import java.util.ArrayList;
+
+import javax.sql.DataSource;
+
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.app.events.TimerFiredEventHandler;
+import org.flowable.cmmn.engine.CmmnEngineConfigurationApi;
+import org.flowable.cmmn.engine.CmmnHistoryService;
+import org.flowable.cmmn.engine.CmmnRepositoryService;
+import org.flowable.cmmn.engine.CmmnRuntimeService;
 import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentService;
 import org.flowable.content.spring.SpringContentEngineConfiguration;
@@ -102,6 +109,12 @@ public class FlowableEngineConfiguration {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Bean(name = "cmmnEngineConfiguration")
+    public CmmnEngineConfigurationApi cmmnEngineConfiguration() {
+        ProcessEngineConfiguration processEngineConfiguration = processEngine().getProcessEngineConfiguration();
+        return EngineServiceUtil.getCmmnEngineConfiguration(processEngineConfiguration);
     }
 
     @Bean(name = "dmnEngineConfiguration")
@@ -272,6 +285,21 @@ public class FlowableEngineConfiguration {
     @Bean
     public DmnHistoryService dmnHistoryService() {
         return dmnEngineConfiguration().getDmnHistoryService();
+    }
+
+    @Bean
+    public CmmnRepositoryService cmmnRepositoryService() {
+        return cmmnEngineConfiguration().getCmmnRepositoryService();
+    }
+
+    @Bean
+    public CmmnRuntimeService cmmnRuntimeService() {
+        return cmmnEngineConfiguration().getCmmnRuntimeService();
+    }
+
+    @Bean
+    public CmmnHistoryService cmmnHistoryService() {
+        return cmmnEngineConfiguration().getCmmnHistoryService();
     }
 
     @Bean

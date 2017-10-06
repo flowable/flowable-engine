@@ -34,7 +34,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.impl.calendar.BusinessCalendar;
 import org.flowable.engine.impl.calendar.CycleBusinessCalendar;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.variable.service.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.variable.service.delegate.VariableScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

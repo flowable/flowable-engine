@@ -329,7 +329,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     public void recordVariableCreate(VariableInstanceEntity variable) {
         // Historic variables
         if (isHistoryLevelAtLeast(HistoryLevel.ACTIVITY)) {
-            CommandContextUtil.getHistoricVariableService().copyAndInsert(variable);
+            CommandContextUtil.getHistoricVariableService().createAndInsert(variable);
         }
     }
 
@@ -359,7 +359,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             if (historicProcessVariable != null) {
                 CommandContextUtil.getHistoricVariableService().copyVariableValue(historicProcessVariable, variable);
             } else {
-                CommandContextUtil.getHistoricVariableService().copyAndInsert(variable);
+                CommandContextUtil.getHistoricVariableService().createAndInsert(variable);
             }
         }
     }

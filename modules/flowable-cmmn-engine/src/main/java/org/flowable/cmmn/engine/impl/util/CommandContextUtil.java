@@ -12,6 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.util;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
@@ -23,19 +26,25 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEnti
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
-import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.db.DbSqlSession;
+import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
+import org.flowable.variable.service.HistoricVariableService;
+import org.flowable.variable.service.VariableService;
+import org.flowable.variable.service.VariableServiceConfiguration;
 
 /**
  * @author Joram Barrez
  */
 public class CommandContextUtil {
+    
+    public static final String ATTRIBUTE_INVOLVED_CASE_INSTANCE_IDS = "ctx.attribute.involvedCaseInstanceIds";
     
     public static CmmnEngineConfiguration getCmmnEngineConfiguration() {
         return getCmmnEngineConfiguration(getCommandContext());
@@ -43,6 +52,14 @@ public class CommandContextUtil {
     
     public static CmmnEngineConfiguration getCmmnEngineConfiguration(CommandContext commandContext) {
         return (CmmnEngineConfiguration) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+    }
+    
+    public static ExpressionManager getExpressionManager() {
+        return getExpressionManager(getCommandContext());
+    }
+    
+    public static ExpressionManager getExpressionManager(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getExpressionManager();
     }
     
     public static CmmnHistoryManager getCmmnHistoryManager() {
@@ -93,12 +110,12 @@ public class CommandContextUtil {
         return getCmmnEngineConfiguration(commandContext).getPlanItemInstanceEntityManager();
     }
     
-    public static SentryOnPartInstanceEntityManager getSentryOnPartInstanceEntityManager() {
-        return getSentryOnPartInstanceEntityManager(getCommandContext());
+    public static SentryPartInstanceEntityManager getSentryPartInstanceEntityManager() {
+        return getSentryPartInstanceEntityManager(getCommandContext());
     }
     
-    public static SentryOnPartInstanceEntityManager getSentryOnPartInstanceEntityManager(CommandContext commandContext) {
-        return getCmmnEngineConfiguration(commandContext).getSentryOnPartInstanceEntityManager();
+    public static SentryPartInstanceEntityManager getSentryPartInstanceEntityManager(CommandContext commandContext) {
+        return getCmmnEngineConfiguration(commandContext).getSentryPartInstanceEntityManager();
     }
     
     public static MilestoneInstanceEntityManager getMilestoneInstanceEntityManager() {
@@ -133,6 +150,40 @@ public class CommandContextUtil {
         return getCmmnEngineConfiguration(commandContext).getTableDataManager();
     }
     
+    public static VariableService getVariableService() {
+        return getVariableService(getCommandContext());
+    }
+    
+    public static VariableService getVariableService(CommandContext commandContext) {
+        VariableService variableService = null;
+        VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration(commandContext);
+        if (variableServiceConfiguration != null) {
+            variableService = variableServiceConfiguration.getVariableService();
+        }
+        return variableService;
+    }
+    
+    public static HistoricVariableService getHistoricVariableService() {
+        return getHistoricVariableService(getCommandContext());
+    }
+    
+    public static HistoricVariableService getHistoricVariableService(CommandContext commandContext) {
+        HistoricVariableService historicVariableService = null;
+        VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration(commandContext);
+        if (variableServiceConfiguration != null) {
+            historicVariableService = variableServiceConfiguration.getHistoricVariableService();
+        }
+        return historicVariableService;
+    }
+    
+    public static VariableServiceConfiguration getVariableServiceConfiguration() {
+        return getVariableServiceConfiguration(getCommandContext());
+    }
+    
+    public static VariableServiceConfiguration getVariableServiceConfiguration(CommandContext commandContext) {
+        return (VariableServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
+    }
+    
     public static CmmnEngineAgenda getAgenda() {
         return getAgenda(getCommandContext());
     }
@@ -155,6 +206,30 @@ public class CommandContextUtil {
     
     public static EntityCache getEntityCache(CommandContext commandContext) {
         return commandContext.getSession(EntityCache.class);
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static void addInvolvedCaseInstanceId(CommandContext commandContext, String caseInstanceId) {
+        if (caseInstanceId != null) {
+            Set<String> involvedCaseInstanceIds = null;
+            Object obj = commandContext.getAttribute(ATTRIBUTE_INVOLVED_CASE_INSTANCE_IDS);
+            if (obj != null) {
+                involvedCaseInstanceIds = (Set<String>) obj;
+            } else {
+                involvedCaseInstanceIds = new HashSet<>(1); // typically will be only 1 entry
+                commandContext.addAttribute(ATTRIBUTE_INVOLVED_CASE_INSTANCE_IDS, involvedCaseInstanceIds);
+            }
+            involvedCaseInstanceIds.add(caseInstanceId);
+        }
+    }
+    
+    @SuppressWarnings("unchecked")
+    public static Set<String> getInvolvedCaseInstanceIds(CommandContext commandContext) {
+         Object obj = commandContext.getAttribute(ATTRIBUTE_INVOLVED_CASE_INSTANCE_IDS);
+         if (obj != null) {
+             return (Set<String>) obj;
+         }
+         return null;
     }
     
     public static CaseInstanceHelper getCaseInstanceHelper() {

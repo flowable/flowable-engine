@@ -65,6 +65,26 @@ public interface TaskInfo {
      * Reference to the process definition or null if it is not related to a process.
      */
     String getProcessDefinitionId();
+    
+    /**
+     * Reference to a scope identifier or null if none is set (e.g. for bpmn process task it is null)
+     */
+    String getScopeId();
+    
+    /**
+     * Reference to a sub scope identifier or null if none is set (e.g. for bpmn process task it is null)
+     */
+    String getSubScopeId();
+    
+    /**
+     * Reference to a scope type or null if none is set (e.g. for bpmn process task it is null)
+     */
+    String getScopeType();
+    
+    /**
+     * Reference to a scope definition identifier or null if none is set (e.g. for bpmn process task it is null)
+     */
+    String getScopeDefinitionId();
 
     /** The date/time when this task was created */
     Date getCreateTime();

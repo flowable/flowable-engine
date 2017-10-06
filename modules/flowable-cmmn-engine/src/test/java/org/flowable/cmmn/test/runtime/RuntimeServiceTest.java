@@ -33,7 +33,7 @@ import org.junit.Test;
  * @author Joram Barrez
  */
 public class RuntimeServiceTest extends FlowableCmmnTestCase {
-    
+
     @Test
     @CmmnDeployment
     public void testStartSimplePassthroughCase() {
@@ -43,7 +43,7 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         assertNotNull(caseDefinition.getDeploymentId());
         assertTrue(caseDefinition.getVersion() > 0);
         
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceById(caseDefinition.getId());
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionId(caseDefinition.getId()).start();
         assertNotNull(caseInstance);
         assertEquals(caseDefinition.getId(), caseInstance.getCaseDefinitionId());
         assertNotNull(caseInstance.getStartTime());
@@ -66,14 +66,14 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
     @CmmnDeployment
     public void testStartSimplePassthroughCaseWithBlockingTask() {
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceById(caseDefinition.getId());
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionId(caseDefinition.getId()).start();
         assertEquals(CaseInstanceState.ACTIVE, caseInstance.getState());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         
-        assertEquals(4, cmmnRuntimeService.createPlanItemQuery().caseInstanceId(caseInstance.getId()).count());
+        assertEquals(4, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count());
         
-        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemQuery()
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .singleResult();
@@ -93,7 +93,7 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         assertEquals(1, historicMilestoneInstances.size());
         assertEquals("PlanItem Milestone One", historicMilestoneInstances.get(0).getName());
         
-        planItemInstance = cmmnRuntimeService.createPlanItemQuery()
+        planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE)
                 .singleResult();
@@ -112,34 +112,40 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
     public void testTerminateCaseInstance() {
         
         // Task A active
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
         cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
-        assertCaseInstanceFinished(caseInstance, 0);
+        assertCaseInstanceEnded(caseInstance, 0);
         
         // Task B active
-        caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
-        cmmnRuntimeService.triggerPlanItemInstance(cmmnRuntimeService.createPlanItemQuery()
+        caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        cmmnRuntimeService.triggerPlanItemInstance(cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId()).planItemInstanceState(PlanItemInstanceState.ACTIVE).singleResult().getId());
         cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
-        assertCaseInstanceFinished(caseInstance, 1);
+        assertCaseInstanceEnded(caseInstance, 1);
     }
     
     @Test
     @CmmnDeployment
     public void testTerminateCaseInstanceWithNestedStages() {
-        CaseInstance caseInstance = cmmnRuntimeService.startCaseInstanceByKey("myCase");
-        assertEquals(8, cmmnRuntimeService.createPlanItemQuery()
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("myCase").start();
+        assertEquals(8, cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId()).count());
         cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
-        assertCaseInstanceFinished(caseInstance, 0);
+        assertCaseInstanceEnded(caseInstance, 0);
     }
 
-    protected void assertCaseInstanceFinished(CaseInstance caseInstance, int nrOfExpectedMilestones) {
-        assertEquals(0, cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).count());
-        assertEquals(0, cmmnRuntimeService.createPlanItemQuery().caseInstanceId(caseInstance.getId()).count());
-        assertEquals(0, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
-        assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).finished().count());
-        assertEquals(nrOfExpectedMilestones, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+    @Test
+    @CmmnDeployment
+    public void testCaseInstanceProperties() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .name("test name")
+                .businessKey("test business key")
+                .start();
+        
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals("test name", caseInstance.getName());
+        assertEquals("test business key", caseInstance.getBusinessKey());
     }
-    
+
 }

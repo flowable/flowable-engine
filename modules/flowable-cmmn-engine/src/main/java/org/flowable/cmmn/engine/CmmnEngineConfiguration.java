@@ -20,6 +20,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.sql.DataSource;
+
+import org.apache.ibatis.session.Configuration;
+import org.apache.ibatis.type.JdbcType;
 import org.flowable.cmmn.engine.impl.CmmnEngineImpl;
 import org.flowable.cmmn.engine.impl.CmmnHistoryServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
@@ -29,6 +33,7 @@ import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaFactory;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaSessionFactory;
 import org.flowable.cmmn.engine.impl.agenda.DefaultCmmnEngineAgendaFactory;
 import org.flowable.cmmn.engine.impl.callback.ChildCaseInstanceStateChangeCallback;
+import org.flowable.cmmn.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
 import org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.db.CmmnDbSchemaManager;
 import org.flowable.cmmn.engine.impl.db.EntityDependencyOrder;
@@ -37,7 +42,9 @@ import org.flowable.cmmn.engine.impl.delegate.DefaultCmmnClassDelegateFactory;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.deployer.Deployer;
+import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
+import org.flowable.cmmn.engine.impl.history.CmmnHistoryVariableManager;
 import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.interceptor.CmmnCommandInvoker;
 import org.flowable.cmmn.engine.impl.parser.CmmnActivityBehaviorFactory;
@@ -60,8 +67,8 @@ import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityM
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManagerImpl;
-import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntityManager;
-import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntityManagerImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseDefinitionDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnDeploymentDataManager;
@@ -70,7 +77,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricCaseInstanc
 import org.flowable.cmmn.engine.impl.persistence.entity.data.HistoricMilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.MilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDataManager;
-import org.flowable.cmmn.engine.impl.persistence.entity.data.SentryOnPartInstanceDataManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.SentryPartInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCaseDefinitionDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisCaseInstanceDataManagerImpl;
@@ -80,7 +87,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisHistori
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisMilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisPlanItemInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
-import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisSentryOnPartInstanceDataManagerImpl;
+import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.MybatisSentryPartInstanceDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.TableDataManagerImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
 import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
@@ -88,8 +95,12 @@ import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelperImpl;
 import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
 import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
+import org.flowable.engine.common.impl.db.DbSchemaManager;
+import org.flowable.engine.common.impl.el.ExpressionManager;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
@@ -99,8 +110,34 @@ import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.task.service.impl.db.TaskDbSchemaManager;
+import org.flowable.variable.service.VariableServiceConfiguration;
+import org.flowable.variable.service.history.InternalHistoryVariableManager;
+import org.flowable.variable.service.impl.db.IbatisVariableTypeHandler;
+import org.flowable.variable.service.impl.db.VariableDbSchemaManager;
+import org.flowable.variable.service.impl.types.BooleanType;
+import org.flowable.variable.service.impl.types.ByteArrayType;
+import org.flowable.variable.service.impl.types.DateType;
+import org.flowable.variable.service.impl.types.DefaultVariableTypes;
+import org.flowable.variable.service.impl.types.DoubleType;
+import org.flowable.variable.service.impl.types.IntegerType;
+import org.flowable.variable.service.impl.types.JodaDateTimeType;
+import org.flowable.variable.service.impl.types.JodaDateType;
+import org.flowable.variable.service.impl.types.JsonType;
+import org.flowable.variable.service.impl.types.LongJsonType;
+import org.flowable.variable.service.impl.types.LongStringType;
+import org.flowable.variable.service.impl.types.LongType;
+import org.flowable.variable.service.impl.types.NullType;
+import org.flowable.variable.service.impl.types.SerializableType;
+import org.flowable.variable.service.impl.types.ShortType;
+import org.flowable.variable.service.impl.types.StringType;
+import org.flowable.variable.service.impl.types.UUIDType;
+import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.variable.service.impl.types.VariableTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
 
@@ -123,7 +160,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     protected CaseDefinitionDataManager caseDefinitionDataManager;
     protected CaseInstanceDataManager caseInstanceDataManager;
     protected PlanItemInstanceDataManager planItemInstanceDataManager;
-    protected SentryOnPartInstanceDataManager sentryOnPartInstanceDataManager;
+    protected SentryPartInstanceDataManager sentryPartInstanceDataManager;
     protected MilestoneInstanceDataManager milestoneInstanceDataManager;
     protected HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager;
     protected HistoricMilestoneInstanceDataManager historicMilestoneInstanceDataManager;
@@ -133,13 +170,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     protected CaseDefinitionEntityManager caseDefinitionEntityManager;
     protected CaseInstanceEntityManager caseInstanceEntityManager;
     protected PlanItemInstanceEntityManager planItemInstanceEntityManager;
-    protected SentryOnPartInstanceEntityManager sentryOnPartInstanceEntityManager;
+    protected SentryPartInstanceEntityManager sentryPartInstanceEntityManager;
     protected MilestoneInstanceEntityManager milestoneInstanceEntityManager;
     protected HistoricCaseInstanceDataManager historicCaseInstanceDataManager;
     protected HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager;
 
     protected CaseInstanceHelper caseInstanceHelper;
     protected CmmnHistoryManager cmmnHistoryManager;
+    protected ProcessInstanceService processInstanceService;
+    protected Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks;
 
     protected boolean enableSafeCmmnXml;
     protected CmmnActivityBehaviorFactory activityBehaviorFactory;
@@ -153,9 +192,31 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
 
     protected int caseDefinitionCacheLimit = -1;
     protected DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache;
+    
+    protected HistoryLevel historyLevel = HistoryLevel.AUDIT;
+    
+    protected ExpressionManager expressionManager;
+    protected List<FlowableFunctionDelegate> flowableFunctionDelegates;
+    protected List<FlowableFunctionDelegate> customFlowableFunctionDelegates;
+    
+    /**
+     * Using field injection together with a delegate expression for a service task / execution listener / task listener is not thread-sade , see user guide section 'Field Injection' for more
+     * information.
+     * <p>
+     * Set this flag to false to throw an exception at runtime when a field is injected and a delegateExpression is used.
+     */
+    protected DelegateExpressionFieldInjectionMode delegateExpressionFieldInjectionMode = DelegateExpressionFieldInjectionMode.MIXED;
 
-    protected ProcessInstanceService processInstanceService;
-    protected Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks;
+    // Variable support
+    protected DbSchemaManager variableDbSchemaManager;
+    protected DbSchemaManager taskDbSchemaManager;
+    protected VariableTypes variableTypes;
+    protected List<VariableType> customPreVariableTypes;
+    protected List<VariableType> customPostVariableTypes;
+    protected VariableServiceConfiguration variableServiceConfiguration;
+    protected InternalHistoryVariableManager internalHistoryVariableManager;
+    protected boolean serializableVariableTypeTrackDeserializedObjects = true;
+    protected ObjectMapper objectMapper = new ObjectMapper();
 
     public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResourceDefault() {
         return createCmmnEngineConfigurationFromResource("flowable.cmmn.cfg.xml", "cmmnEngineConfiguration");
@@ -195,14 +256,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         initTransactionContextFactory();
         initCommandExecutors();
         initIdGenerator();
+        initExpressionManager();
         initCmmnEngineAgendaFactory();
 
         if (usingRelationalDatabase) {
             initDataSource();
             initDbSchemaManager();
-            initDbSchema();
         }
 
+        initVariableTypes();
         initBeans();
         initTransactionFactory();
 
@@ -223,16 +285,52 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         initHistoryManager();
         initCaseInstanceCallbacks();
         initClock();
+        initVariableServiceConfiguration();
     }
 
+    @Override
+
     public void initDbSchemaManager() {
+        super.initDbSchemaManager();
+        initCmmnDbSchemaManager();
+        initVariableDbSchemaManager();
+        initTaskDbSchemaManager();
+    }
+
+    protected void initCmmnDbSchemaManager() {
         if (this.dbSchemaManager == null) {
             this.dbSchemaManager = new CmmnDbSchemaManager();
         }
     }
 
-    public void initDbSchema() {
-        ((CmmnDbSchemaManager) this.dbSchemaManager).initSchema(this);
+    protected void initVariableDbSchemaManager() {
+        if (this.variableDbSchemaManager == null) {
+            this.variableDbSchemaManager = new VariableDbSchemaManager();
+        }
+    }
+
+    protected void initTaskDbSchemaManager() {
+        if (this.taskDbSchemaManager == null) {
+            this.taskDbSchemaManager = new TaskDbSchemaManager();
+        }
+    }
+
+    @Override
+    public void initMybatisTypeHandlers(Configuration configuration) {
+        configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler(variableTypes));
+    }
+    
+    public void initExpressionManager() {
+        if (expressionManager == null) {
+            expressionManager = new CmmnExpressionManager(beans);
+        }
+        if (flowableFunctionDelegates == null) {
+            flowableFunctionDelegates = new ArrayList<>();
+        }
+        if (customFlowableFunctionDelegates != null) {
+            flowableFunctionDelegates.addAll(customFlowableFunctionDelegates);
+        }
+        expressionManager.setFunctionDelegates(flowableFunctionDelegates);
     }
 
     public void initCmmnEngineAgendaFactory() {
@@ -241,6 +339,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         }
     }
 
+    @Override
     public void initCommandInvoker() {
         if (commandInvoker == null) {
             commandInvoker = new CmmnCommandInvoker();
@@ -301,8 +400,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         if (planItemInstanceDataManager == null) {
             planItemInstanceDataManager = new MybatisPlanItemInstanceDataManagerImpl(this);
         }
-        if (sentryOnPartInstanceDataManager == null) {
-            sentryOnPartInstanceDataManager = new MybatisSentryOnPartInstanceDataManagerImpl(this);
+        if (sentryPartInstanceDataManager == null) {
+            sentryPartInstanceDataManager = new MybatisSentryPartInstanceDataManagerImpl(this);
         }
         if (milestoneInstanceDataManager == null) {
             milestoneInstanceDataManager = new MybatisMilestoneInstanceDataManager(this);
@@ -331,8 +430,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         if (planItemInstanceEntityManager == null) {
             planItemInstanceEntityManager = new PlanItemInstanceEntityManagerImpl(this, planItemInstanceDataManager);
         }
-        if (sentryOnPartInstanceEntityManager == null) {
-            sentryOnPartInstanceEntityManager = new SentryOnPartInstanceEntityManagerImpl(this, sentryOnPartInstanceDataManager);
+        if (sentryPartInstanceEntityManager == null) {
+            sentryPartInstanceEntityManager = new SentryPartInstanceEntityManagerImpl(this, sentryPartInstanceDataManager);
         }
         if (milestoneInstanceEntityManager == null) {
             milestoneInstanceEntityManager = new MilestoneInstanceEntityManagerImpl(this, milestoneInstanceDataManager);
@@ -355,6 +454,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         if (activityBehaviorFactory == null) {
             DefaultCmmnActivityBehaviorFactory defaultCmmnActivityBehaviorFactory = new DefaultCmmnActivityBehaviorFactory();
             defaultCmmnActivityBehaviorFactory.setClassDelegateFactory(classDelegateFactory);
+            defaultCmmnActivityBehaviorFactory.setExpressionManager(expressionManager);
             activityBehaviorFactory = defaultCmmnActivityBehaviorFactory;
         }
     }
@@ -413,6 +513,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         if (cmmnParser == null) {
             CmmnParserImpl cmmnParserImpl = new CmmnParserImpl();
             cmmnParserImpl.setActivityBehaviorFactory(activityBehaviorFactory);
+            cmmnParserImpl.setExpressionManager(expressionManager);
             cmmnParser = cmmnParserImpl;
         }
     }
@@ -465,6 +566,62 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         for (Class<? extends Entity> clazz : EntityDependencyOrder.DELETE_ORDER) {
             dbSqlSessionFactory.getDeletionOrder().add(clazz);
         }
+    }
+    
+    public void initVariableTypes() {
+        if (variableTypes == null) {
+            variableTypes = new DefaultVariableTypes();
+            if (customPreVariableTypes != null) {
+                for (VariableType customVariableType : customPreVariableTypes) {
+                    variableTypes.addType(customVariableType);
+                }
+            }
+            variableTypes.addType(new NullType());
+            variableTypes.addType(new StringType(getMaxLengthString()));
+            variableTypes.addType(new LongStringType(getMaxLengthString() + 1));
+            variableTypes.addType(new BooleanType());
+            variableTypes.addType(new ShortType());
+            variableTypes.addType(new IntegerType());
+            variableTypes.addType(new LongType());
+            variableTypes.addType(new DateType());
+            variableTypes.addType(new JodaDateType());
+            variableTypes.addType(new JodaDateTimeType());
+            variableTypes.addType(new DoubleType());
+            variableTypes.addType(new UUIDType());
+            variableTypes.addType(new JsonType(getMaxLengthString(), objectMapper));
+            variableTypes.addType(new LongJsonType(getMaxLengthString() + 1, objectMapper));
+            variableTypes.addType(new ByteArrayType());
+            variableTypes.addType(new SerializableType(serializableVariableTypeTrackDeserializedObjects));
+            if (customPostVariableTypes != null) {
+                for (VariableType customVariableType : customPostVariableTypes) {
+                    variableTypes.addType(customVariableType);
+                }
+            }
+        }
+    }
+    
+    public void initVariableServiceConfiguration() {
+        this.variableServiceConfiguration = new VariableServiceConfiguration();
+        
+        this.variableServiceConfiguration.setHistoryLevel(this.historyLevel);
+        this.variableServiceConfiguration.setClock(this.clock);
+        this.variableServiceConfiguration.setObjectMapper(this.objectMapper);
+        this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+
+        this.variableServiceConfiguration.setVariableTypes(this.variableTypes);
+        
+        if (this.internalHistoryVariableManager != null) {
+            this.variableServiceConfiguration.setInternalHistoryVariableManager(this.internalHistoryVariableManager);
+        } else {
+            this.variableServiceConfiguration.setInternalHistoryVariableManager(new CmmnHistoryVariableManager(cmmnHistoryManager));
+        }
+
+        this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
+        this.variableServiceConfiguration.setSerializableVariableTypeTrackDeserializedObjects(this.isSerializableVariableTypeTrackDeserializedObjects());
+
+        this.variableServiceConfiguration.init();
+
+        addServiceConfiguration(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG, this.variableServiceConfiguration);
     }
 
     @Override
@@ -580,12 +737,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
-    public SentryOnPartInstanceDataManager getSentryOnPartInstanceDataManager() {
-        return sentryOnPartInstanceDataManager;
+    public SentryPartInstanceDataManager getSentryPartInstanceDataManager() {
+        return sentryPartInstanceDataManager;
     }
 
-    public CmmnEngineConfiguration setSentryOnPartInstanceDataManager(SentryOnPartInstanceDataManager sentryOnPartInstanceDataManager) {
-        this.sentryOnPartInstanceDataManager = sentryOnPartInstanceDataManager;
+    public CmmnEngineConfiguration setSentryPartInstanceDataManager(SentryPartInstanceDataManager sentryPartInstanceDataManager) {
+        this.sentryPartInstanceDataManager = sentryPartInstanceDataManager;
         return this;
     }
 
@@ -661,12 +818,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
-    public SentryOnPartInstanceEntityManager getSentryOnPartInstanceEntityManager() {
-        return sentryOnPartInstanceEntityManager;
+    public SentryPartInstanceEntityManager getSentryPartInstanceEntityManager() {
+        return sentryPartInstanceEntityManager;
     }
 
-    public CmmnEngineConfiguration setSentryOnPartInstanceEntityManager(SentryOnPartInstanceEntityManager sentryOnPartInstanceEntityManager) {
-        this.sentryOnPartInstanceEntityManager = sentryOnPartInstanceEntityManager;
+    public CmmnEngineConfiguration setSentryPartInstanceEntityManager(SentryPartInstanceEntityManager sentryPartInstanceEntityManager) {
+        this.sentryPartInstanceEntityManager = sentryPartInstanceEntityManager;
         return this;
     }
 
@@ -829,6 +986,138 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
 
     public CmmnEngineConfiguration setCaseInstanceStateChangeCallbacks(Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks) {
         this.caseInstanceStateChangeCallbacks = caseInstanceStateChangeCallbacks;
+        return this;
+    }
+    
+    @Override
+    public CmmnEngineConfiguration setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
+        return this;
+    }
+
+    public HistoryLevel getHistoryLevel() {
+        return historyLevel;
+    }
+
+    public CmmnEngineConfiguration setHistoryLevel(HistoryLevel historyLevel) {
+        this.historyLevel = historyLevel;
+        return this;
+    }
+    
+    public ExpressionManager getExpressionManager() {
+        return expressionManager;
+    }
+
+    public CmmnEngineConfiguration setExpressionManager(ExpressionManager expressionManager) {
+        this.expressionManager = expressionManager;
+        return this;
+    }
+
+    public DelegateExpressionFieldInjectionMode getDelegateExpressionFieldInjectionMode() {
+        return delegateExpressionFieldInjectionMode;
+    }
+
+    public CmmnEngineConfiguration setDelegateExpressionFieldInjectionMode(DelegateExpressionFieldInjectionMode delegateExpressionFieldInjectionMode) {
+        this.delegateExpressionFieldInjectionMode = delegateExpressionFieldInjectionMode;
+        return this;
+    }
+
+    public List<FlowableFunctionDelegate> getFlowableFunctionDelegates() {
+        return flowableFunctionDelegates;
+    }
+
+    public CmmnEngineConfiguration setFlowableFunctionDelegates(List<FlowableFunctionDelegate> flowableFunctionDelegates) {
+        this.flowableFunctionDelegates = flowableFunctionDelegates;
+        return this;
+    }
+
+    public List<FlowableFunctionDelegate> getCustomFlowableFunctionDelegates() {
+        return customFlowableFunctionDelegates;
+    }
+
+    public CmmnEngineConfiguration setCustomFlowableFunctionDelegates(List<FlowableFunctionDelegate> customFlowableFunctionDelegates) {
+        this.customFlowableFunctionDelegates = customFlowableFunctionDelegates;
+        return this;
+    }
+
+    public DbSchemaManager getVariableDbSchemaManager() {
+        return variableDbSchemaManager;
+    }
+
+    public CmmnEngineConfiguration setVariableDbSchemaManager(DbSchemaManager variableDbSchemaManager) {
+        this.variableDbSchemaManager = variableDbSchemaManager;
+        return this;
+    }
+    
+    public DbSchemaManager getTaskDbSchemaManager() {
+        return taskDbSchemaManager;
+    }
+
+    public CmmnEngineConfiguration setTaskDbSchemaManager(DbSchemaManager taskDbSchemaManager) {
+        this.taskDbSchemaManager = taskDbSchemaManager;
+        return this;
+    }
+
+    public VariableTypes getVariableTypes() {
+        return variableTypes;
+    }
+
+    public CmmnEngineConfiguration setVariableTypes(VariableTypes variableTypes) {
+        this.variableTypes = variableTypes;
+        return this;
+    }
+    
+    public List<VariableType> getCustomPreVariableTypes() {
+        return customPreVariableTypes;
+    }
+
+    public CmmnEngineConfiguration setCustomPreVariableTypes(List<VariableType> customPreVariableTypes) {
+        this.customPreVariableTypes = customPreVariableTypes;
+        return this;
+    }
+
+    public List<VariableType> getCustomPostVariableTypes() {
+        return customPostVariableTypes;
+    }
+
+    public CmmnEngineConfiguration setCustomPostVariableTypes(List<VariableType> customPostVariableTypes) {
+        this.customPostVariableTypes = customPostVariableTypes;
+        return this;
+    }
+
+    public VariableServiceConfiguration getVariableServiceConfiguration() {
+        return variableServiceConfiguration;
+    }
+
+    public CmmnEngineConfiguration setVariableServiceConfiguration(VariableServiceConfiguration variableServiceConfiguration) {
+        this.variableServiceConfiguration = variableServiceConfiguration;
+        return this;
+    }
+    
+    public InternalHistoryVariableManager getInternalHistoryVariableManager() {
+        return internalHistoryVariableManager;
+    }
+
+    public CmmnEngineConfiguration setInternalHistoryVariableManager(InternalHistoryVariableManager internalHistoryVariableManager) {
+        this.internalHistoryVariableManager = internalHistoryVariableManager;
+        return this;
+    }
+
+    public boolean isSerializableVariableTypeTrackDeserializedObjects() {
+        return serializableVariableTypeTrackDeserializedObjects;
+    }
+
+    public CmmnEngineConfiguration setSerializableVariableTypeTrackDeserializedObjects(boolean serializableVariableTypeTrackDeserializedObjects) {
+        this.serializableVariableTypeTrackDeserializedObjects = serializableVariableTypeTrackDeserializedObjects;
+        return this;
+    }
+
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
+
+    public CmmnEngineConfiguration setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
         return this;
     }
 

@@ -13,10 +13,7 @@
 
 package org.flowable.engine.impl.cfg;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.InputStream;
-import java.io.Reader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -26,7 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.ServiceLoader;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -36,8 +32,6 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.xml.namespace.QName;
 
-import org.apache.ibatis.builder.xml.XMLConfigBuilder;
-import org.apache.ibatis.mapping.Environment;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
@@ -67,6 +61,8 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
+import org.flowable.engine.common.impl.db.DbSchemaManager;
+import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.event.FlowableEventDispatcherImpl;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.interceptor.Command;
@@ -162,11 +158,10 @@ import org.flowable.engine.impl.cmd.ValidateTaskRelatedEntityCountCfgCmd;
 import org.flowable.engine.impl.cmd.ValidateV5EntitiesCmd;
 import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.impl.db.EntityDependencyOrder;
-import org.flowable.engine.impl.db.IbatisVariableTypeHandler;
 import org.flowable.engine.impl.db.ProcessDbSchemaManager;
 import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
-import org.flowable.engine.impl.el.DefaultExpressionManager;
 import org.flowable.engine.impl.el.FlowableDateFunctionDelegate;
+import org.flowable.engine.impl.el.ProcessExpressionManager;
 import org.flowable.engine.impl.event.CompensationEventHandler;
 import org.flowable.engine.impl.event.EventHandler;
 import org.flowable.engine.impl.event.MessageEventHandler;
@@ -295,11 +290,13 @@ import org.flowable.task.service.InternalTaskLocalizationManager;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
+import org.flowable.task.service.impl.db.TaskDbSchemaManager;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
-import org.flowable.variable.service.impl.el.ExpressionManager;
+import org.flowable.variable.service.impl.db.IbatisVariableTypeHandler;
+import org.flowable.variable.service.impl.db.VariableDbSchemaManager;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.CustomObjectType;
@@ -327,6 +324,8 @@ import org.flowable.variable.service.impl.types.VariableTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -338,9 +337,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public static final String DEFAULT_WS_SYNC_FACTORY = "org.flowable.engine.impl.webservice.CxfWebServiceClientFactory";
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/db/mapping/mappings.xml";
-
-    public static final int DEFAULT_GENERIC_MAX_LENGTH_STRING = 4000;
-    public static final int DEFAULT_ORACLE_MAX_LENGTH_STRING = 2000;
 
     // SERVICES /////////////////////////////////////////////////////////////////
 
@@ -730,11 +726,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected DelegateExpressionFieldInjectionMode delegateExpressionFieldInjectionMode = DelegateExpressionFieldInjectionMode.MIXED;
 
     /**
-     * Define a max length for storing String variable types in the database. Mainly used for the Oracle NVARCHAR2 limit of 2000 characters
-     */
-    protected int maxLengthStringVariableType = -1;
-
-    /**
      * If set to true, enables bulk insert (grouping sql inserts together). Default true. For some databases (eg DB2 on Zos: https://activiti.atlassian.net/browse/ACT-4042) needs to be set to false
      */
     protected boolean isBulkInsertEnabled = true;
@@ -750,6 +741,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // agenda factory
     protected FlowableEngineAgendaFactory agendaFactory;
+
+    protected DbSchemaManager variableDbSchemaManager;
+    protected DbSchemaManager taskDbSchemaManager;
 
     // Backwards compatibility //////////////////////////////////////////////////////////////
 
@@ -808,7 +802,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         if (usingRelationalDatabase) {
             initDataSource();
-            initDbSchemaManager();
+            initDbSchemaManagers();
         }
 
         initHelpers();
@@ -924,42 +918,33 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
-    @Override
-    public void initDatabaseType() {
-        super.initDatabaseType();
-        // Special care for MSSQL, as it has a hard limit of 2000 params per statement (incl bulk statement).
-        // Especially with executions, with 100 as default, this limit is passed.
-        if (DATABASE_TYPE_MSSQL.equals(databaseType)) {
-            maxNrOfStatementsInBulkInsert = DEFAULT_MAX_NR_OF_STATEMENTS_BULK_INSERT_SQL_SERVER;
-        }
+    public void initDbSchemaManagers() {
+        super.initDbSchemaManager();
+        initProcessDbSchemaManager();
+        initVariableDbSchemaManager();
+        initTaskDbSchemaManager();
     }
 
-    public void initDbSchemaManager() {
+    protected void initProcessDbSchemaManager() {
         if (this.dbSchemaManager == null) {
             this.dbSchemaManager = new ProcessDbSchemaManager();
         }
     }
 
-    @Override
-    public Configuration initMybatisConfiguration(Environment environment, Reader reader, Properties properties) {
-        XMLConfigBuilder parser = new XMLConfigBuilder(reader, "", properties);
-        Configuration configuration = parser.getConfiguration();
-
-        if (databaseType != null) {
-            configuration.setDatabaseId(databaseType);
+    protected void initVariableDbSchemaManager() {
+        if (this.variableDbSchemaManager == null) {
+            this.variableDbSchemaManager = new VariableDbSchemaManager();
         }
+    }
 
-        configuration.setEnvironment(environment);
-
-        initMybatisTypeHandlers(configuration);
-        initCustomMybatisMappers(configuration);
-
-        configuration = parseMybatisConfiguration(parser);
-        return configuration;
+    protected void initTaskDbSchemaManager() {
+        if (this.taskDbSchemaManager == null) {
+            this.taskDbSchemaManager = new TaskDbSchemaManager();
+        }
     }
 
     public void initMybatisTypeHandlers(Configuration configuration) {
-        configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler());
+        configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler(variableTypes));
     }
 
     @Override
@@ -1844,18 +1829,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
-    public int getMaxLengthString() {
-        if (maxLengthStringVariableType == -1) {
-            if ("oracle".equalsIgnoreCase(databaseType)) {
-                return DEFAULT_ORACLE_MAX_LENGTH_STRING;
-            } else {
-                return DEFAULT_GENERIC_MAX_LENGTH_STRING;
-            }
-        } else {
-            return maxLengthStringVariableType;
-        }
-    }
-
     public void initFormEngines() {
         if (formEngines == null) {
             formEngines = new HashMap<>();
@@ -1900,9 +1873,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void initExpressionManager() {
         if (expressionManager == null) {
-            expressionManager = new DefaultExpressionManager(delegateInterceptor, beans, true);
+            expressionManager = new ProcessExpressionManager(delegateInterceptor, beans);
         }
-
         expressionManager.setFunctionDelegates(flowableFunctionDelegates);
     }
 
@@ -3446,6 +3418,24 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setProcessInstanceStateChangedCallbacks(Map<String, List<RuntimeInstanceStateChangeCallback>> processInstanceStateChangedCallbacks) {
         this.processInstanceStateChangedCallbacks = processInstanceStateChangedCallbacks;
+        return this;
+    }
+
+    public DbSchemaManager getVariableDbSchemaManager() {
+        return variableDbSchemaManager;
+    }
+
+    public ProcessEngineConfigurationImpl setVariableDbSchemaManager(DbSchemaManager variableDbSchemaManager) {
+        this.variableDbSchemaManager = variableDbSchemaManager;
+        return this;
+    }
+
+    public DbSchemaManager getTaskDbSchemaManager() {
+        return taskDbSchemaManager;
+    }
+
+    public ProcessEngineConfigurationImpl setTaskDbSchemaManager(DbSchemaManager taskDbSchemaManager) {
+        this.taskDbSchemaManager = taskDbSchemaManager;
         return this;
     }
 

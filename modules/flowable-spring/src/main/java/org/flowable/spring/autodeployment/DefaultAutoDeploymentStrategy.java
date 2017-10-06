@@ -41,9 +41,7 @@ public class DefaultAutoDeploymentStrategy extends AbstractAutoDeploymentStrateg
     @Override
     public void deployResources(final String deploymentNameHint, final Resource[] resources, final RepositoryService repositoryService) {
 
-        // Create a single deployment for all resources using the name hint as
-        // the
-        // literal name
+        // Create a single deployment for all resources using the name hint as the literal name
         final DeploymentBuilder deploymentBuilder = repositoryService.createDeployment().enableDuplicateFiltering().name(deploymentNameHint);
 
         for (final Resource resource : resources) {

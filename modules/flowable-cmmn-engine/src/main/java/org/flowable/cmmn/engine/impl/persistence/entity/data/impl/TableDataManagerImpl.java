@@ -24,10 +24,12 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEnti
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.SentryOnPartInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Joram Barrez
@@ -37,15 +39,17 @@ public class TableDataManagerImpl implements TableDataManager {
     public static Map<Class<? extends Entity>, String> entityToTableNameMap = new HashMap<>();
 
     static {
-        entityToTableNameMap.put(CmmnDeploymentEntity.class, "ACT_CMMN_RE_DEPLOYMENT");
-        entityToTableNameMap.put(CmmnResourceEntity.class, "ACT_CMMN_RE_DEPLOYMENT_RESOURCE");
-        entityToTableNameMap.put(CaseDefinitionEntity.class, "ACT_CMMN_RE_CASEDEF");
+        entityToTableNameMap.put(CmmnDeploymentEntity.class, "ACT_CMMN_DEPLOYMENT");
+        entityToTableNameMap.put(CmmnResourceEntity.class, "ACT_CMMN_DEPLOYMENT_RESOURCE");
+        entityToTableNameMap.put(CaseDefinitionEntity.class, "ACT_CMMN_CASEDEF");
         entityToTableNameMap.put(CaseInstanceEntity.class, "ACT_CMMN_RU_CASE_INST");
         entityToTableNameMap.put(PlanItemInstanceEntity.class, "ACT_CMMN_RU_PLAN_ITEM_INST");
-        entityToTableNameMap.put(SentryOnPartInstanceEntity.class, "ACT_CMMN_RU_SENTRY_ON_PART_INST");
+        entityToTableNameMap.put(SentryPartInstanceEntity.class, "ACT_CMMN_RU_SENTRY_PART_INST");
         entityToTableNameMap.put(MilestoneInstanceEntity.class, "ACT_CMMN_RU_MIL_INST");
         entityToTableNameMap.put(HistoricCaseInstanceEntity.class, "ACT_CMMN_HI_CASE_INST");
         entityToTableNameMap.put(HistoricMilestoneInstanceEntity.class, "ACT_CMMN_HI_MIL_INST");
+        entityToTableNameMap.put(VariableInstanceEntity.class, "ACT_RU_VARIABLE");
+        entityToTableNameMap.put(HistoricVariableInstanceEntity.class, "ACT_HI_VARINST");
     }
 
     public TableDataManagerImpl() {

@@ -14,46 +14,48 @@ package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import java.util.List;
 
+import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.StateTransition;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.runtime.DelegatePlanItemInstance;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.Stage;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
  */
-public class StageActivityBehavior implements PlanItemActivityBehavior {
+public class StageActivityBehavior extends CoreCmmnTriggerableActivityBehavior implements PlanItemActivityBehavior {
     
     protected Stage stage;
     
     public StageActivityBehavior(Stage stage) {
         this.stage = stage;
     }
-
+    
     @Override
-    public void execute(DelegatePlanItemInstance delegatePlanItemInstance) {
-        PlanItemInstanceEntity stagePlanItemInstanceEntity = (PlanItemInstanceEntity) delegatePlanItemInstance;
-        stagePlanItemInstanceEntity.setName(delegatePlanItemInstance.getPlanItem().getName());
-        CommandContextUtil.getAgenda().planInitStageOperation(stagePlanItemInstanceEntity);
+    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+        if (planItemInstanceEntity.getPlanItem().getName() != null) {
+            Expression nameExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(planItemInstanceEntity.getPlanItem().getName());
+            planItemInstanceEntity.setName(nameExpression.getValue(planItemInstanceEntity).toString());
+        }
+        CommandContextUtil.getAgenda(commandContext).planInitStageOperation(planItemInstanceEntity);
     }
     
     @Override
-    public void trigger(DelegatePlanItemInstance planItemInstance) {
-        CommandContext commandContext = CommandContextUtil.getCommandContext();
-        PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) planItemInstance;
-        List<PlanItemInstanceEntity> childPlanItemInstances = planItemInstanceEntity.getChildren();
+    public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstance) {
+        List<PlanItemInstanceEntity> childPlanItemInstances = planItemInstance.getChildren();
         if (childPlanItemInstances != null) {
             for (PlanItemInstanceEntity childPlanItemInstance : childPlanItemInstances) {
                 if (StateTransition.isPossible(planItemInstance, PlanItemTransition.COMPLETE)) {
-                    CommandContextUtil.getAgenda().planCompletePlanItem(childPlanItemInstance);
+                    CommandContextUtil.getAgenda().planCompletePlanItemInstance(childPlanItemInstance);
                 }
             }
         }
-        CommandContextUtil.getAgenda(commandContext).planCompletePlanItem((PlanItemInstanceEntity) planItemInstance);
+        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance((PlanItemInstanceEntity) planItemInstance);
     }
     
     @Override
@@ -71,9 +73,9 @@ public class StageActivityBehavior implements PlanItemActivityBehavior {
             for (PlanItemInstanceEntity childPlanItemInstance : childPlanItemInstances) {
                 if (StateTransition.isPossible(planItemInstance, transition)) {
                     if (PlanItemTransition.TERMINATE.equals(transition)) {
-                        CommandContextUtil.getAgenda().planTerminatePlanItem(childPlanItemInstance);
+                        CommandContextUtil.getAgenda().planTerminatePlanItemInstance(childPlanItemInstance);
                     } else if (PlanItemTransition.EXIT.equals(transition)) {
-                        CommandContextUtil.getAgenda().planExitPlanItem(childPlanItemInstance);
+                        CommandContextUtil.getAgenda().planExitPlanItemInstance(childPlanItemInstance);
                     }
                 }
             }
