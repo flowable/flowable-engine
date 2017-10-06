@@ -149,6 +149,10 @@ public interface DynamicBpmnService {
      *            the current processDefinitionInfo. This object will be modified.
      */
     void changeUserTaskCandidateGroups(String id, List<String> candidateGroups, ObjectNode infoNode);
+    
+    ObjectNode changeMultiInstanceCompletionCondition(String id, String completionCondition);
+
+    void changeMultiInstanceCompletionCondition(String id, String completionCondition, ObjectNode infoNode);
 
     ObjectNode changeDmnTaskDecisionTableKey(String id, String decisionTableKey);
 

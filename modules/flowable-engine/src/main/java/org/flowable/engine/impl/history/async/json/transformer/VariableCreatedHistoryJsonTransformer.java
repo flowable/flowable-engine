@@ -16,14 +16,14 @@ import java.util.Date;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
-import org.flowable.engine.impl.variable.VariableType;
-import org.flowable.engine.impl.variable.VariableTypes;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.variable.service.HistoricVariableService;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.variable.service.impl.types.VariableTypes;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -41,8 +41,8 @@ public class VariableCreatedHistoryJsonTransformer extends AbstractHistoryJsonTr
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-        HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager = commandContext.getProcessEngineConfiguration().getHistoricVariableInstanceEntityManager();
-        HistoricVariableInstanceEntity historicVariableInstanceEntity = historicVariableInstanceEntityManager.create();
+        HistoricVariableService historicVariableService = CommandContextUtil.getHistoricVariableService();
+        HistoricVariableInstanceEntity historicVariableInstanceEntity = historicVariableService.createHistoricVariableInstance();
         historicVariableInstanceEntity.setId(getStringFromJson(historicalData, HistoryJsonConstants.ID));
         historicVariableInstanceEntity.setProcessInstanceId(getStringFromJson(historicalData, HistoryJsonConstants.PROCESS_INSTANCE_ID));
         historicVariableInstanceEntity.setExecutionId(getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID));
@@ -50,7 +50,7 @@ public class VariableCreatedHistoryJsonTransformer extends AbstractHistoryJsonTr
         historicVariableInstanceEntity.setRevision(getIntegerFromJson(historicalData, HistoryJsonConstants.REVISION));
         historicVariableInstanceEntity.setName(getStringFromJson(historicalData, HistoryJsonConstants.NAME));
         
-        VariableTypes variableTypes = Context.getProcessEngineConfiguration().getVariableTypes();
+        VariableTypes variableTypes = CommandContextUtil.getProcessEngineConfiguration().getVariableTypes();
         VariableType variableType = variableTypes.getVariableType(getStringFromJson(historicalData, HistoryJsonConstants.VARIABLE_TYPE));
         
         historicVariableInstanceEntity.setVariableType(variableType);
@@ -69,7 +69,7 @@ public class VariableCreatedHistoryJsonTransformer extends AbstractHistoryJsonTr
         historicVariableInstanceEntity.setCreateTime(time);
         historicVariableInstanceEntity.setLastUpdatedTime(time);
 
-        historicVariableInstanceEntityManager.insert(historicVariableInstanceEntity);
+        historicVariableService.insertHistoricVariableInstance(historicVariableInstanceEntity);
     }
 
 }

@@ -755,7 +755,7 @@ public class DefaultProcessDiagramCanvas {
 
         int currentHeight = 0;
         // Prepare a list of lines of text we'll be drawing
-        List<TextLayout> layouts = new ArrayList<TextLayout>();
+        List<TextLayout> layouts = new ArrayList<>();
         String lastLine = null;
 
         LineBreakMeasurer measurer = new LineBreakMeasurer(characterIterator, g.getFontRenderContext());

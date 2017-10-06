@@ -22,17 +22,18 @@ import java.util.UUID;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.cmd.CancelJobsCmd;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Job;
-import org.flowable.engine.runtime.JobQuery;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.runtime.TimerJobQuery;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.service.Job;
+import org.flowable.job.service.JobQuery;
+import org.flowable.job.service.TimerJobQuery;
+import org.flowable.job.service.impl.cmd.CancelJobsCmd;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
 /**
  * @author Joram Barrez
@@ -61,6 +62,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
     /**
      * Setup will create - 3 process instances, each with one timer, each firing at t1/t2/t3 + 1 hour (see process) - 1 message
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
 
@@ -95,11 +97,12 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
         // Create one message
         messageId = commandExecutor.execute(new Command<String>() {
+            @Override
             public String execute(CommandContext commandContext) {
-                JobEntity message = commandContext.getJobEntityManager().create();
+                JobEntity message = CommandContextUtil.getJobService(commandContext).createJob();
                 message.setJobType(Job.JOB_TYPE_MESSAGE);
                 message.setRetries(3);
-                commandContext.getJobManager().scheduleAsyncJob(message);
+                CommandContextUtil.getJobService(commandContext).scheduleAsyncJob(message);
                 return message.getId();
             }
         });
@@ -170,7 +173,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
 
             @Override
             public Void execute(CommandContext commandContext) {
-                commandContext.getJobEntityManager().update(job);
+                CommandContextUtil.getJobService(commandContext).updateJob(job);
                 return null;
             }
             
@@ -521,8 +524,9 @@ public class JobQueryTest extends PluggableFlowableTestCase {
     private void createJobWithoutExceptionMsg() {
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
         commandExecutor.execute(new Command<Void>() {
+            @Override
             public Void execute(CommandContext commandContext) {
-                jobEntity = commandContext.getJobEntityManager().create();
+                jobEntity = CommandContextUtil.getJobService(commandContext).createJob();
                 jobEntity.setJobType(Job.JOB_TYPE_MESSAGE);
                 jobEntity.setLockOwner(UUID.randomUUID().toString());
                 jobEntity.setRetries(0);
@@ -532,7 +536,7 @@ public class JobQueryTest extends PluggableFlowableTestCase {
                 exception.printStackTrace(new PrintWriter(stringWriter));
                 jobEntity.setExceptionStacktrace(stringWriter.toString());
 
-                commandContext.getJobEntityManager().insert(jobEntity);
+                CommandContextUtil.getJobService(commandContext).insertJob(jobEntity);
 
                 assertNotNull(jobEntity.getId());
 
@@ -546,15 +550,16 @@ public class JobQueryTest extends PluggableFlowableTestCase {
     private void createJobWithoutExceptionStacktrace() {
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
         commandExecutor.execute(new Command<Void>() {
+            @Override
             public Void execute(CommandContext commandContext) {
-                jobEntity = commandContext.getJobEntityManager().create();
+                jobEntity = CommandContextUtil.getJobService(commandContext).createJob();
                 jobEntity.setJobType(Job.JOB_TYPE_MESSAGE);
                 jobEntity.setLockOwner(UUID.randomUUID().toString());
                 jobEntity.setRetries(0);
 
                 jobEntity.setExceptionMessage("I'm supposed to fail");
 
-                commandContext.getJobEntityManager().insert(jobEntity);
+                CommandContextUtil.getJobService(commandContext).insertJob(jobEntity);
 
                 assertNotNull(jobEntity.getId());
 
@@ -568,9 +573,10 @@ public class JobQueryTest extends PluggableFlowableTestCase {
     private void deleteJobInDatabase() {
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
         commandExecutor.execute(new Command<Void>() {
+            @Override
             public Void execute(CommandContext commandContext) {
 
-                commandContext.getJobEntityManager().delete(jobEntity.getId());
+                CommandContextUtil.getJobService(commandContext).deleteJob(jobEntity.getId());
                 return null;
             }
         });

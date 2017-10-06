@@ -49,6 +49,7 @@ public class CustomExtensionsConverterTest extends AbstractConverterTest {
         deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "customextensionsmodel.bpmn";
     }

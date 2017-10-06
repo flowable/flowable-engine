@@ -12,8 +12,6 @@
  */
 package org.flowable.admin.app.rest.client;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import org.flowable.admin.domain.EndpointType;
 import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.engine.FormDefinitionService;
@@ -26,6 +24,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author Bassam Al-Sarori
@@ -47,17 +47,6 @@ public class FormDefinitionClientResource extends AbstractClientResource {
             return clientService.getForm(serverConfig, formDefinitionId);
         } catch (FlowableServiceException e) {
             LOGGER.error("Error getting form definition {}", formDefinitionId, e);
-            throw new BadRequestException(e.getMessage());
-        }
-    }
-
-    @RequestMapping(value = "/rest/admin/process-definition-start-form-definition/{processDefinitionId}", method = RequestMethod.GET, produces = "application/json")
-    public JsonNode getProcessDefinitionStartForm(@PathVariable String processDefinitionId) throws BadRequestException {
-
-        ServerConfig serverConfig = retrieveServerConfig(EndpointType.FORM);
-        try {
-            return clientService.getProcessDefinitionStartForm(serverConfig, processDefinitionId);
-        } catch (FlowableServiceException e) {
             throw new BadRequestException(e.getMessage());
         }
     }

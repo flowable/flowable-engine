@@ -23,13 +23,15 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.Process;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
-import org.flowable.engine.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
-import org.flowable.engine.task.IdentityLinkType;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.identitylink.service.IdentityLinkService;
+import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 
 /**
  * Methods for working with deployments. Much of the actual work of {@link BpmnDeployer} is done by orchestrating the different pieces of work this class does; by having them here, we allow other
@@ -48,7 +50,7 @@ public class BpmnDeploymentHelper {
      */
     public void verifyProcessDefinitionsDoNotShareKeys(
             Collection<ProcessDefinitionEntity> processDefinitions) {
-        Set<String> keySet = new LinkedHashSet<String>();
+        Set<String> keySet = new LinkedHashSet<>();
         for (ProcessDefinitionEntity processDefinition : processDefinitions) {
             if (keySet.contains(processDefinition.getKey())) {
                 throw new FlowableException(
@@ -100,7 +102,7 @@ public class BpmnDeploymentHelper {
     public ProcessDefinitionEntity getMostRecentVersionOfProcessDefinition(ProcessDefinitionEntity processDefinition) {
         String key = processDefinition.getKey();
         String tenantId = processDefinition.getTenantId();
-        ProcessDefinitionEntityManager processDefinitionManager = Context.getCommandContext().getProcessEngineConfiguration().getProcessDefinitionEntityManager();
+        ProcessDefinitionEntityManager processDefinitionManager = CommandContextUtil.getProcessEngineConfiguration().getProcessDefinitionEntityManager();
 
         ProcessDefinitionEntity existingDefinition = null;
 
@@ -123,7 +125,7 @@ public class BpmnDeploymentHelper {
             throw new IllegalStateException("Provided process definition must have a deployment id.");
         }
 
-        ProcessDefinitionEntityManager processDefinitionManager = Context.getCommandContext().getProcessEngineConfiguration().getProcessDefinitionEntityManager();
+        ProcessDefinitionEntityManager processDefinitionManager = CommandContextUtil.getProcessEngineConfiguration().getProcessDefinitionEntityManager();
         ProcessDefinitionEntity persistedProcessDefinition = null;
         if (processDefinition.getTenantId() == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(processDefinition.getTenantId())) {
             persistedProcessDefinition = processDefinitionManager.findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinition.getKey());
@@ -171,19 +173,20 @@ public class BpmnDeploymentHelper {
             ProcessDefinitionEntity processDefinition, ExpressionType expressionType) {
 
         if (expressions != null) {
+            IdentityLinkService identityLinkService = CommandContextUtil.getIdentityLinkService();
             Iterator<String> iterator = expressions.iterator();
             while (iterator.hasNext()) {
                 @SuppressWarnings("cast")
                 String expression = iterator.next();
-                IdentityLinkEntity identityLink = commandContext.getIdentityLinkEntityManager().create();
-                identityLink.setProcessDef(processDefinition);
+                IdentityLinkEntity identityLink = identityLinkService.createIdentityLink();
+                identityLink.setProcessDefId(processDefinition.getId());
                 if (expressionType == ExpressionType.USER) {
                     identityLink.setUserId(expression);
                 } else if (expressionType == ExpressionType.GROUP) {
                     identityLink.setGroupId(expression);
                 }
                 identityLink.setType(IdentityLinkType.CANDIDATE);
-                commandContext.getIdentityLinkEntityManager().insert(identityLink);
+                identityLinkService.insertIdentityLink(identityLink);
             }
         }
 

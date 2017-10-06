@@ -13,12 +13,11 @@
 
 package org.flowable.rest.service.api.identity;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.io.ByteArrayOutputStream;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.apache.commons.io.IOUtils;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -35,9 +34,12 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
@@ -69,7 +71,7 @@ public class UserPictureResource extends BaseUserResource {
         }
 
         try {
-            return new ResponseEntity<byte[]>(IOUtils.toByteArray(userPicture.getInputStream()), responseHeaders, HttpStatus.OK);
+            return new ResponseEntity<>(IOUtils.toByteArray(userPicture.getInputStream()), responseHeaders, HttpStatus.OK);
         } catch (Exception e) {
             throw new FlowableException("Error exporting picture: " + e.getMessage(), e);
         }

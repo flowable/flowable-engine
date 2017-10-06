@@ -12,9 +12,9 @@
  */
 package org.flowable.dmn.spring;
 
-import org.flowable.dmn.engine.impl.interceptor.AbstractCommandInterceptor;
-import org.flowable.dmn.engine.impl.interceptor.Command;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.AbstractCommandInterceptor;
+import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,6 +36,7 @@ public class SpringTransactionInterceptor extends AbstractCommandInterceptor {
         this.transactionManager = transactionManager;
     }
 
+    @Override
     public <T> T execute(final CommandConfig config, final Command<T> command) {
         LOGGER.debug("Running command with propagation {}", config.getTransactionPropagation());
 
@@ -43,6 +44,7 @@ public class SpringTransactionInterceptor extends AbstractCommandInterceptor {
         transactionTemplate.setPropagationBehavior(getPropagation(config));
 
         T result = transactionTemplate.execute(new TransactionCallback<T>() {
+            @Override
             public T doInTransaction(TransactionStatus status) {
                 return next.execute(config, command);
             }

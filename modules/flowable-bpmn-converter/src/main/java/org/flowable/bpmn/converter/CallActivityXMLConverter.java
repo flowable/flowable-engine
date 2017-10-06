@@ -32,7 +32,7 @@ import org.flowable.bpmn.model.IOParameter;
  */
 public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
 
-    protected Map<String, BaseChildElementParser> childParserMap = new HashMap<String, BaseChildElementParser>();
+    protected Map<String, BaseChildElementParser> childParserMap = new HashMap<>();
 
     public CallActivityXMLConverter() {
         InParameterParser inParameterParser = new InParameterParser();
@@ -41,6 +41,7 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         childParserMap.put(outParameterParser.getElementName(), outParameterParser);
     }
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return CallActivity.class;
     }
@@ -58,6 +59,7 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         callActivity.setBusinessKey(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_BUSINESS_KEY, xtr));
         callActivity.setInheritBusinessKey(Boolean.parseBoolean(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_INHERIT_BUSINESS_KEY, xtr)));
         callActivity.setInheritVariables(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_INHERITVARIABLES, xtr)));
+        callActivity.setUseLocalScopeForOutParameters(Boolean.valueOf(BpmnXMLUtil.getAttributeValue(ATTRIBUTE_CALL_ACTIVITY_USE_LOCALSCOPE_FOR_OUTPARAMETERS, xtr)));
         parseChildElements(getXMLElementName(), callActivity, childParserMap, model, xtr);
         return callActivity;
     }
@@ -74,7 +76,12 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         if (callActivity.isInheritBusinessKey()) {
             writeQualifiedAttribute(ATTRIBUTE_CALL_ACTIVITY_INHERIT_BUSINESS_KEY, "true", xtw);
         }
-        xtw.writeAttribute(FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_CALL_ACTIVITY_INHERITVARIABLES, String.valueOf(callActivity.isInheritVariables()));
+        if (callActivity.isUseLocalScopeForOutParameters()) {
+            writeQualifiedAttribute(ATTRIBUTE_CALL_ACTIVITY_USE_LOCALSCOPE_FOR_OUTPARAMETERS, "true", xtw);
+        }
+        if (callActivity.isInheritVariables()) {
+            writeQualifiedAttribute(ATTRIBUTE_CALL_ACTIVITY_INHERITVARIABLES, "true", xtw);
+        }
     }
 
     @Override
@@ -123,10 +130,12 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
 
     public class InParameterParser extends BaseChildElementParser {
 
+        @Override
         public String getElementName() {
             return ELEMENT_CALL_ACTIVITY_IN_PARAMETERS;
         }
 
+        @Override
         public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
             String source = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE);
             String sourceExpression = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION);
@@ -149,10 +158,12 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
 
     public class OutParameterParser extends BaseChildElementParser {
 
+        @Override
         public String getElementName() {
             return ELEMENT_CALL_ACTIVITY_OUT_PARAMETERS;
         }
 
+        @Override
         public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
             String source = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE);
             String sourceExpression = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION);

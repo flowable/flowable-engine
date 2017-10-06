@@ -12,9 +12,6 @@
  */
 package org.flowable.form.engine.impl.cmd;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,16 +26,18 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.editor.form.converter.FormJsonConverter;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.engine.common.impl.el.VariableContainerWrapper;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.form.api.FormInstance;
 import org.flowable.form.api.FormInstanceQuery;
 import org.flowable.form.engine.FormEngineConfiguration;
-import org.flowable.form.engine.FormExpression;
-import org.flowable.form.engine.impl.interceptor.Command;
-import org.flowable.form.engine.impl.interceptor.CommandContext;
 import org.flowable.form.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.form.engine.impl.persistence.deploy.FormDefinitionCacheEntry;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
 import org.flowable.form.engine.impl.persistence.entity.FormInstanceEntity;
+import org.flowable.form.engine.impl.util.CommandContextUtil;
 import org.flowable.form.model.ExpressionFormField;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.FormFieldTypes;
@@ -47,6 +46,9 @@ import org.flowable.form.model.FormModel;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers
@@ -91,6 +93,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
         initializeValues(formDefinitionKey, parentDeploymentId, formDefinitionId, tenantId, taskId, processInstanceId, variables);
     }
 
+    @Override
     public FormInstanceModel execute(CommandContext commandContext) {
         if (formInstanceId == null && (taskId == null && processInstanceId == null)) {
             throw new FlowableException("A processtask id or process instance id should be provided");
@@ -115,17 +118,17 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
         if (variables != null) {
             this.variables = variables;
         } else {
-            this.variables = new HashMap<String, Object>();
+            this.variables = new HashMap<>();
         }
     }
 
     protected void fillFormFieldValues(FormInstance formInstance, FormInstanceModel formInstanceModel, CommandContext commandContext) {
 
-        FormEngineConfiguration formEngineConfiguration = commandContext.getFormEngineConfiguration();
+        FormEngineConfiguration formEngineConfiguration = CommandContextUtil.getFormEngineConfiguration();
         List<FormField> allFields = formInstanceModel.listAllFields();
         if (allFields != null) {
 
-            Map<String, JsonNode> formInstanceFieldMap = new HashMap<String, JsonNode>();
+            Map<String, JsonNode> formInstanceFieldMap = new HashMap<>();
             if (formInstance != null) {
                 fillFormInstanceValues(formInstanceModel, formInstance, formInstanceFieldMap, formEngineConfiguration.getObjectMapper());
                 fillVariablesWithFormValues(formInstanceFieldMap, allFields);
@@ -134,9 +137,9 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
             for (FormField field : allFields) {
                 if (field instanceof ExpressionFormField) {
                     ExpressionFormField expressionField = (ExpressionFormField) field;
-                    FormExpression formExpression = formEngineConfiguration.getExpressionManager().createExpression(expressionField.getExpression());
+                    Expression formExpression = formEngineConfiguration.getExpressionManager().createExpression(expressionField.getExpression());
                     try {
-                        field.setValue(formExpression.getValue(variables));
+                        field.setValue(formExpression.getValue(new VariableContainerWrapper(variables)));
                     } catch (Exception e) {
                         LOGGER.error("Error getting value for expression {} {}", expressionField.getExpression(), e.getMessage());
                     }
@@ -174,14 +177,14 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
     }
 
     protected FormDefinitionCacheEntry resolveFormDefinition(CommandContext commandContext) {
-        DeploymentManager deploymentManager = commandContext.getFormEngineConfiguration().getDeploymentManager();
+        DeploymentManager deploymentManager = CommandContextUtil.getFormEngineConfiguration().getDeploymentManager();
 
         // Find the form definition
         FormDefinitionEntity formDefinitionEntity = null;
 
         if (formInstanceId != null) {
 
-            FormInstanceEntity formInstanceEntity = commandContext.getFormEngineConfiguration().getFormInstanceDataManager().findById(formInstanceId);
+            FormInstanceEntity formInstanceEntity = CommandContextUtil.getFormEngineConfiguration().getFormInstanceDataManager().findById(formInstanceId);
             if (formInstanceEntity == null) {
                 throw new FlowableObjectNotFoundException("No form instance found for id = '" + formInstanceId + "'", FormInstanceEntity.class);
             }
@@ -238,7 +241,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
     }
 
     protected FormInstance resolveFormInstance(CommandContext commandContext) {
-        FormEngineConfiguration formEngineConfiguration = commandContext.getFormEngineConfiguration();
+        FormEngineConfiguration formEngineConfiguration = CommandContextUtil.getFormEngineConfiguration();
         FormInstanceQuery formInstanceQuery = formEngineConfiguration.getFormService().createFormInstanceQuery().formDefinitionId(formDefinitionId);
         if (formInstanceId != null) {
             formInstanceQuery.id(formInstanceId);
@@ -324,7 +327,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
             FormInstance formInstance, CommandContext commandContext) {
 
         FormDefinitionEntity formDefinitionEntity = formCacheEntry.getFormDefinitionEntity();
-        FormJsonConverter formJsonConverter = commandContext.getFormEngineConfiguration().getFormJsonConverter();
+        FormJsonConverter formJsonConverter = CommandContextUtil.getFormEngineConfiguration().getFormJsonConverter();
         FormModel formModel = formJsonConverter.convertToFormModel(formCacheEntry.getFormDefinitionJson(),
                 formDefinitionEntity.getId(), formDefinitionEntity.getVersion());
         FormInstanceModel formInstanceModel = new FormInstanceModel(formModel);

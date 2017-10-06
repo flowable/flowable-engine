@@ -12,10 +12,6 @@
  */
 package org.flowable.app.idm.service;
 
-import java.io.BufferedInputStream;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.app.security.SecurityUtils;
@@ -25,6 +21,10 @@ import org.flowable.idm.api.Picture;
 import org.flowable.idm.api.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 /**
  * @author Joram Barrez
@@ -55,7 +55,7 @@ public class ProfileServiceImpl extends AbstractIdmService implements ProfileSer
             throw new NotFoundException();
         }
         user.setPassword(newPassword);
-        identityService.saveUser(user);
+        identityService.updateUserPassword(user);
     }
 
     public Pair<String, InputStream> getProfilePicture() {

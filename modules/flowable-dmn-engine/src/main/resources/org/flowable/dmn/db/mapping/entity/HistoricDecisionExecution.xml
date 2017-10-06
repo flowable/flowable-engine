@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityImpl">
+  
+  <!-- HISTORIC DECISION EXECUTION INSERT -->
+
+  <insert id="insertHistoricDecisionExecution" parameterType="org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityImpl">
+    insert into ${prefix}ACT_DMN_HI_DECISION_EXECUTION(ID_, DECISION_DEFINITION_ID_, DEPLOYMENT_ID_, START_TIME_, END_TIME_, INSTANCE_ID_, EXECUTION_ID_, 
+    	ACTIVITY_ID_, FAILED_, TENANT_ID_, EXECUTION_JSON_)
+    values (#{id, jdbcType=VARCHAR},
+            #{decisionDefinitionId, jdbcType=VARCHAR},
+            #{deploymentId, jdbcType=VARCHAR},
+            #{startTime, jdbcType=TIMESTAMP},
+            #{endTime, jdbcType=TIMESTAMP},
+            #{instanceId, jdbcType=VARCHAR},
+            #{executionId, jdbcType=VARCHAR},
+            #{activityId, jdbcType=VARCHAR},
+            #{failed, jdbcType=BOOLEAN},
+            #{tenantId, jdbcType=VARCHAR},
+            #{executionJson, jdbcType=VARCHAR})
+  </insert>
+  
+  <!-- HISTORIC DECISION EXECUTION UPDATE -->
+
+  <update id="updateHistoricDecisionExecution" parameterType="org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityImpl">
+    update ${prefix}ACT_DMN_HI_DECISION_EXECUTION set EXECUTION_JSON_ = #{executionJson, jdbcType=VARCHAR}
+    where ID_ = #{id, jdbcType=VARCHAR}
+  </update>
+  
+  <!-- HISTORIC DECISION EXECUTION DELETE -->
+
+  <delete id="deleteHistoricDecisionExecutionsByDeploymentId" parameterType="string">
+    delete from ${prefix}ACT_DMN_HI_DECISION_EXECUTION where DEPLOYMENT_ID_ = #{deploymenId} 
+  </delete>
+  
+  <!-- HISTORIC DECISION EXECUTION RESULTMAP -->
+
+  <resultMap id="historicDecisionExecutionResultMap" type="org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="decisionDefinitionId" column="DECISION_DEFINITION_ID_" jdbcType="VARCHAR" />
+    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
+    <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
+    <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
+    <result property="instanceId" column="INSTANCE_ID_" jdbcType="VARCHAR"/>
+    <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR"/>
+    <result property="activityId" column="ACTIVITY_ID_" jdbcType="VARCHAR"/>
+    <result property="failed" column="FAILED_" jdbcType="BOOLEAN"/>
+    <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <result property="executionJson" column="EXECUTION_JSON_" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <!-- DECISION TABLE SELECT -->
+
+  <select id="selectHistoricDecisionExecution" parameterType="string" resultMap="historicDecisionExecutionResultMap">
+    select * from ${prefix}ACT_DMN_HI_DECISION_EXECUTION where ID_ = #{id, jdbcType=VARCHAR}
+  </select>
+
+  <select id="selectHistoricDecisionExecutionsByQueryCriteria" parameterType="org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryImpl" resultMap="historicDecisionExecutionResultMap">
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <include refid="selectHistoricDecisionExecutionsByQueryCriteriaSql"/>
+    ${orderBy}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+  </select>
+
+  <select id="selectHistoricDecisionExecutionCountByQueryCriteria" parameterType="org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryImpl" resultType="long">
+    select count(RES.ID_)
+    <include refid="selectHistoricDecisionExecutionsByQueryCriteriaSql"/>
+  </select>
+  
+  <sql id="selectHistoricDecisionExecutionsByQueryCriteriaSql">  
+    from ${prefix}ACT_DMN_HI_DECISION_EXECUTION RES
+    <if test="decisionKey != null">
+        left outer join ${prefix}ACT_DMN_DECISION_TABLE DEF on RES.DECISION_DEFINITION_ID_ = DEF.ID_
+    </if> 
+    <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+      <if test="ids != null and ids">
+        and RES.ID_ in
+        <foreach item="item" index="index" collection="ids" open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      <if test="decisionDefinitionId != null">
+        and RES.DECISION_DEFINITION_ID_ = #{decisionDefinitionId}
+      </if>
+      <if test="deploymentId != null">
+        and RES.DEPLOYMENT_ID_ = #{deploymentId}
+      </if>
+      <if test="decisionKey != null">
+        and DEF.KEY_ = #{decisionKey}
+      </if>
+      <if test="instanceId != null">
+        and RES.INSTANCE_ID_ = #{instanceId}
+      </if>
+      <if test="executionId != null">
+        and RES.EXECUTION_ID_ = #{executionId}
+      </if>
+      <if test="activityId != null">
+        and RES.ACTIVITY_ID_ = #{activityId}
+      </if>
+      <if test="failed != null">
+        and RES.FAILED_ = #{failed}
+      </if>
+      <if test="tenantId != null">
+        and RES.TENANT_ID_ = #{tenantId}
+      </if>
+      <if test="tenantIdLike != null">
+        and RES.TENANT_ID_ like #{tenantIdLike}
+      </if>
+      <if test="withoutTenantId">
+        and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
+      </if>
+    </where>
+  </sql>
+
+  <select id="selectHistoricDecisionExecutionByNativeQuery" parameterType="java.util.Map" resultMap="historicDecisionExecutionResultMap">
+    <include refid="org.flowable.dmn.engine.db.common.selectByNativeQuery"/>
+  </select>
+
+  <select id="selectHistoricDecisionExecutionCountByNativeQuery" parameterType="java.util.Map" resultType="long">
+    ${sql}
+  </select>
+</mapper>

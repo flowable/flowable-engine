@@ -12,14 +12,12 @@
  */
 package org.flowable.engine.impl.history.async;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.json.transformer.ActivityEndHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ActivityFullHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.ActivityStartHistoryJsonTransformer;
@@ -43,10 +41,12 @@ import org.flowable.engine.impl.history.async.json.transformer.TaskPropertyChang
 import org.flowable.engine.impl.history.async.json.transformer.VariableCreatedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.VariableRemovedHistoryJsonTransformer;
 import org.flowable.engine.impl.history.async.json.transformer.VariableUpdatedHistoryJsonTransformer;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
 
@@ -54,7 +54,7 @@ public class AsyncHistoryJobHandler extends AbstractAsyncHistoryJobHandler {
 
     public static final String JOB_TYPE = "async-history";
 
-    protected Map<String, List<HistoryJsonTransformer>> historyJsonTransformers = new HashMap<String, List<HistoryJsonTransformer>>();
+    protected Map<String, List<HistoryJsonTransformer>> historyJsonTransformers = new HashMap<>();
 
     @Override
     public String getType() {

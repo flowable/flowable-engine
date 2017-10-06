@@ -25,10 +25,10 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.flowable.engine.impl.cmd.ChangeDeploymentTenantIdCmd;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.flowable.task.service.Task;
 import org.junit.Assert;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -112,7 +112,7 @@ public class HistoricActivityInstanceCollectionResourceTest extends BaseSpringRe
 
         // Check presence of ID's
         if (expectedActivityIds != null) {
-            List<String> toBeFound = new ArrayList<String>(Arrays.asList(expectedActivityIds));
+            List<String> toBeFound = new ArrayList<>(Arrays.asList(expectedActivityIds));
             Iterator<JsonNode> it = dataNode.iterator();
             while (it.hasNext()) {
                 String activityId = it.next().get("activityId").textValue();

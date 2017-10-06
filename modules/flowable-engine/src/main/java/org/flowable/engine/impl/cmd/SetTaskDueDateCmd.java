@@ -14,10 +14,11 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Date;
 
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Brian Showers
@@ -33,6 +34,7 @@ public class SetTaskDueDateCmd extends NeedsActiveTaskCmd<Void> {
         this.dueDate = dueDate;
     }
 
+    @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
         if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
             Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
@@ -41,8 +43,8 @@ public class SetTaskDueDateCmd extends NeedsActiveTaskCmd<Void> {
         }
 
         task.setDueDate(dueDate);
-        commandContext.getHistoryManager().recordTaskInfoChange(task);
-        commandContext.getTaskEntityManager().update(task);
+        CommandContextUtil.getHistoryManager(commandContext).recordTaskInfoChange(task);
+        CommandContextUtil.getTaskService().updateTask(task, true);
         return null;
     }
 

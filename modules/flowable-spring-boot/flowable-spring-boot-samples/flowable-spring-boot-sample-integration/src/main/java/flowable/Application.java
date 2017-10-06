@@ -42,7 +42,7 @@ public class Application {
 
     public static class AnalysingService {
 
-        private final AtomicReference<String> stringAtomicReference = new AtomicReference<String>();
+        private final AtomicReference<String> stringAtomicReference = new AtomicReference<>();
 
         public void dump(String projectId) {
             this.stringAtomicReference.set(projectId);

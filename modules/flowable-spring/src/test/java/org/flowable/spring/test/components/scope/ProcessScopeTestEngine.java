@@ -25,7 +25,7 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
+import org.flowable.task.service.Task;
 import org.springframework.util.StringUtils;
 
 class ProcessScopeTestEngine {
@@ -42,7 +42,7 @@ class ProcessScopeTestEngine {
     }
 
     private StatefulObject run() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("customerId", customerId);
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("component-waiter", vars);

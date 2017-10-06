@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Joram Barrez
@@ -24,7 +24,7 @@ import org.flowable.engine.impl.persistence.entity.TaskEntity;
 public abstract class AbstractTaskEventHandler extends AbstractDatabaseEventLoggerEventHandler {
 
     protected Map<String, Object> handleCommonTaskFields(TaskEntity task) {
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
         putInMapIfNotNull(data, Fields.ID, task.getId());
         putInMapIfNotNull(data, Fields.NAME, task.getName());
         putInMapIfNotNull(data, Fields.TASK_DEFINITION_KEY, task.getTaskDefinitionKey());

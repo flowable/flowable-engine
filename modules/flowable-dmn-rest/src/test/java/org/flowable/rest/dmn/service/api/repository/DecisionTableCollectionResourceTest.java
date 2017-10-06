@@ -42,7 +42,7 @@ public class DecisionTableCollectionResourceTest extends BaseSpringDmnRestTestCa
 
             DmnDecisionTable decisionTwo = dmnRepositoryService.createDecisionTableQuery().decisionTableKey("decisionTwo").deploymentId(secondDeployment.getId()).singleResult();
 
-            String baseUrl = DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE_COLLETION);
+            String baseUrl = DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DECISION_TABLE_COLLECTION);
             assertResultsPresentInDataResponse(baseUrl, firstDecision.getId(), decisionTwo.getId(), latestDecision.getId());
 
             // Verify

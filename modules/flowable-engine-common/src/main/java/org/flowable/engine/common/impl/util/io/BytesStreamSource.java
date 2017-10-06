@@ -26,6 +26,7 @@ public class BytesStreamSource implements StreamSource {
         this.bytes = bytes;
     }
 
+    @Override
     public InputStream getInputStream() {
         return new ByteArrayInputStream(bytes);
     }

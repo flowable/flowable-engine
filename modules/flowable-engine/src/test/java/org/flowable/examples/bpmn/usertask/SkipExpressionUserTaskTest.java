@@ -13,52 +13,54 @@
 package org.flowable.examples.bpmn.usertask;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.history.HistoricActivityInstance;
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.service.history.HistoricTaskInstance;
 
 public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void test() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("skipExpressionUserTask");
-        List<Task> tasks = taskService.createTaskQuery().list();
+        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().list();
         assertEquals(1, tasks.size());
         taskService.complete(tasks.get(0).getId());
         assertEquals(0, taskService.createTaskQuery().list().size());
 
-        Map<String, Object> variables2 = new HashMap<String, Object>();
+        Map<String, Object> variables2 = new HashMap<>();
         variables2.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
         variables2.put("skip", false);
         ProcessInstance pi2 = runtimeService.startProcessInstanceByKey("skipExpressionUserTask", variables2);
-        List<Task> tasks2 = taskService.createTaskQuery().list();
+        List<org.flowable.task.service.Task> tasks2 = taskService.createTaskQuery().list();
         assertEquals(1, tasks2.size());
         taskService.complete(tasks2.get(0).getId());
         assertEquals(0, taskService.createTaskQuery().list().size());
 
-        Map<String, Object> variables3 = new HashMap<String, Object>();
+        Map<String, Object> variables3 = new HashMap<>();
         variables3.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
         variables3.put("skip", true);
         ProcessInstance pi3 = runtimeService.startProcessInstanceByKey("skipExpressionUserTask", variables3);
-        List<Task> tasks3 = taskService.createTaskQuery().list();
+        List<org.flowable.task.service.Task> tasks3 = taskService.createTaskQuery().list();
         assertEquals(0, tasks3.size());
     }
 
     @Deployment
     public void testWithCandidateGroups() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
         vars.put("skip", true);
         runtimeService.startProcessInstanceByKey("skipExpressionUserTask", vars);
@@ -67,14 +69,14 @@ public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testSkipMultipleTasks() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
         variables.put("skip1", true);
         variables.put("skip2", true);
         variables.put("skip3", false);
 
         runtimeService.startProcessInstanceByKey("skipExpressionUserTask-testSkipMultipleTasks", variables);
-        List<Task> tasks = taskService.createTaskQuery().list();
+        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().list();
         assertEquals(1, tasks.size());
         assertEquals("Task3", tasks.get(0).getName());
     }
@@ -84,13 +86,13 @@ public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
         SkipFlowableEventListener eventListener = new SkipFlowableEventListener();
         processEngine.getRuntimeService().addEventListener(eventListener);
         
-        Map<String, Object> variables2 = new HashMap<String, Object>();
+        Map<String, Object> variables2 = new HashMap<>();
         variables2.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
         variables2.put("skip", false);
         runtimeService.startProcessInstanceByKey("skipExpressionUserTask", variables2);
         assertEquals(1, eventListener.getCreatedEvents().size());
         assertEquals(0, eventListener.getCompletedEvents().size());
-        List<Task> tasks = taskService.createTaskQuery().list();
+        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().list();
         assertEquals(1, tasks.size());
         taskService.complete(tasks.get(0).getId());
         assertEquals(1, eventListener.getCompletedEvents().size());
@@ -98,7 +100,7 @@ public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
         
         eventListener.clearEvents();
 
-        Map<String, Object> variables3 = new HashMap<String, Object>();
+        Map<String, Object> variables3 = new HashMap<>();
         variables3.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
         variables3.put("skip", true);
         ProcessInstance skipPi = runtimeService.startProcessInstanceByKey("skipExpressionUserTask", variables3);
@@ -122,19 +124,22 @@ public class SkipExpressionUserTaskTest extends PluggableFlowableTestCase {
         }
     }
     
-    public class SkipFlowableEventListener implements FlowableEventListener {
-        
+    public class SkipFlowableEventListener extends AbstractFlowableEngineEventListener {
+
+        public SkipFlowableEventListener() {
+            super(new HashSet<>(Arrays.asList(FlowableEngineEventType.TASK_CREATED, FlowableEngineEventType.TASK_COMPLETED)));
+        }
         protected List<FlowableEvent> createdEvents = new ArrayList<>();
         protected List<FlowableEvent> completedEvents = new ArrayList<>();
 
         @Override
-        public void onEvent(FlowableEvent event) {
-            if (FlowableEngineEventType.TASK_CREATED == event.getType()) {
-                createdEvents.add(event);
-                
-            } else if (FlowableEngineEventType.TASK_COMPLETED == event.getType()) {
-                completedEvents.add(event);
-            }
+        protected void taskCreated(FlowableEngineEntityEvent event) {
+            createdEvents.add(event);
+        }
+
+        @Override
+        protected void taskCompleted(FlowableEngineEntityEvent event) {
+            completedEvents.add(event);
         }
 
         @Override

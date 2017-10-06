@@ -15,10 +15,10 @@ package org.flowable.engine.impl.persistence.entity.data.impl.cachematcher;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.engine.impl.persistence.CachedEntityMatcherAdapter;
+import org.flowable.engine.common.impl.db.CachedEntityMatcherAdapter;
+import org.flowable.engine.common.impl.db.SuspensionState;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
-import org.flowable.engine.impl.persistence.entity.SuspensionState;
 
 /**
  * @author Joram Barrez

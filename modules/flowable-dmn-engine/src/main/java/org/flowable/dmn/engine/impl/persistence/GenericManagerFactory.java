@@ -14,7 +14,7 @@
 package org.flowable.dmn.engine.impl.persistence;
 
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.AbstractCommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.Session;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
 
@@ -36,11 +36,13 @@ public class GenericManagerFactory implements SessionFactory {
         this(implementationClass, implementationClass);
     }
 
+    @Override
     public Class<?> getSessionType() {
         return typeClass;
     }
 
-    public Session openSession(AbstractCommandContext commandContext) {
+    @Override
+    public Session openSession(CommandContext commandContext) {
         try {
             return implementationClass.newInstance();
         } catch (Exception e) {

@@ -32,9 +32,9 @@ import org.flowable.engine.cfg.MailServerInfo;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,8 +80,8 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
             String textStr = textVar == null ? getStringFromField(text, execution) : getStringFromField(getExpression(execution, textVar), execution);
             String htmlStr = htmlVar == null ? getStringFromField(html, execution) : getStringFromField(getExpression(execution, htmlVar), execution);
             String charSetStr = getStringFromField(charset, execution);
-            List<File> files = new LinkedList<File>();
-            List<DataSource> dataSources = new LinkedList<DataSource>();
+            List<File> files = new LinkedList<>();
+            List<DataSource> dataSources = new LinkedList<>();
             getFilesFromFields(attachments, execution, files, dataSources);
 
             email = createEmail(textStr, htmlStr, attachmentsExist(files, dataSources));
@@ -178,7 +178,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
             fromAddress = from;
         } else { // use default configured from address in process engine config
             if (tenantId != null && tenantId.length() > 0) {
-                Map<String, MailServerInfo> mailServers = Context.getProcessEngineConfiguration().getMailServers();
+                Map<String, MailServerInfo> mailServers = CommandContextUtil.getProcessEngineConfiguration().getMailServers();
                 if (mailServers != null && mailServers.containsKey(tenantId)) {
                     MailServerInfo mailServerInfo = mailServers.get(tenantId);
                     fromAddress = mailServerInfo.getMailServerDefaultFrom();
@@ -186,7 +186,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
             }
 
             if (fromAddress == null) {
-                fromAddress = Context.getProcessEngineConfiguration().getMailServerDefaultFrom();
+                fromAddress = CommandContextUtil.getProcessEngineConfiguration().getMailServerDefaultFrom();
             }
         }
 
@@ -243,7 +243,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
     }
 
     protected void setMailServerProperties(Email email, String tenantId) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
 
         boolean isMailServerSet = false;
         if (tenantId != null && tenantId.length() > 0) {
@@ -390,7 +390,7 @@ public class MailActivityBehavior extends AbstractBpmnActivityBehavior {
 
     protected Expression getExpression(DelegateExecution execution, Expression var) {
         String variable = (String) execution.getVariable(var.getExpressionText());
-        return Context.getProcessEngineConfiguration().getExpressionManager().createExpression(variable);
+        return CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(variable);
     }
 
     protected void handleException(DelegateExecution execution, String msg, Exception e, boolean doIgnoreException, String exceptionVariable) {

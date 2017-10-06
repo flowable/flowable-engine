@@ -27,10 +27,12 @@ public class AtomicOperationTransitionDestroyScope implements AtomicOperation {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(AtomicOperationTransitionDestroyScope.class);
 
+    @Override
     public boolean isAsync(InterpretableExecution execution) {
         return false;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public void execute(InterpretableExecution execution) {
         InterpretableExecution propagatingExecution = null;

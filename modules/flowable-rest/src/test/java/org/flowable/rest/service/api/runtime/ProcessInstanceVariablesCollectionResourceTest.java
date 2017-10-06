@@ -54,7 +54,7 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
         Calendar cal = Calendar.getInstance();
 
         // Start process with all types of variables
-        Map<String, Object> processVariables = new HashMap<String, Object>();
+        Map<String, Object> processVariables = new HashMap<>();
         processVariables.put("stringProcVar", "This is a ProcVariable");
         processVariables.put("intProcVar", 123);
         processVariables.put("longProcVar", 1234L);
@@ -119,7 +119,7 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
         InputStream binaryContent = new ByteArrayInputStream("This is binary content".getBytes());
 
         // Add name, type and scope
-        Map<String, String> additionalFields = new HashMap<String, String>();
+        Map<String, String> additionalFields = new HashMap<>();
         additionalFields.put("name", "binaryVariable");
         additionalFields.put("type", "binary");
 
@@ -162,7 +162,7 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
         InputStream binaryContent = new ByteArrayInputStream(buffer.toByteArray());
 
         // Add name, type and scope
-        Map<String, String> additionalFields = new HashMap<String, String>();
+        Map<String, String> additionalFields = new HashMap<>();
         additionalFields.put("name", "serializableVariable");
         additionalFields.put("type", "serializable");
 
@@ -401,7 +401,7 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
     @Deployment(resources = { "org/flowable/rest/service/api/runtime/ProcessInstanceVariablesCollectionResourceTest.testProcess.bpmn20.xml" })
     public void testDeleteAllProcessVariables() throws Exception {
 
-        Map<String, Object> processVariables = new HashMap<String, Object>();
+        Map<String, Object> processVariables = new HashMap<>();
         processVariables.put("var1", "This is a ProcVariable");
         processVariables.put("var2", 123);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", processVariables);

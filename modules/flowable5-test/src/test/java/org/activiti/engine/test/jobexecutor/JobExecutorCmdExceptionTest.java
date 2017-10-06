@@ -13,11 +13,12 @@
 package org.activiti.engine.test.jobexecutor;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.runtime.Job;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.Job;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
 /**
  * @author Tom Baeyens
@@ -42,7 +43,7 @@ public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
 
             public String execute(CommandContext commandContext) {
                 JobEntity message = createTweetExceptionMessage();
-                commandContext.getJobManager().scheduleAsyncJob(message);
+                CommandContextUtil.getJobService(commandContext).scheduleAsyncJob(message);
                 return message.getId();
             }
         });
@@ -82,7 +83,7 @@ public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
 
             public String execute(CommandContext commandContext) {
                 JobEntity message = createTweetExceptionMessage();
-                commandContext.getJobManager().scheduleAsyncJob(message);
+                CommandContextUtil.getJobService(commandContext).scheduleAsyncJob(message);
                 return message.getId();
             }
         });
@@ -126,7 +127,7 @@ public class JobExecutorCmdExceptionTest extends PluggableFlowableTestCase {
     }
 
     protected JobEntity createTweetExceptionMessage() {
-        JobEntity message = processEngineConfiguration.getJobEntityManager().create();
+        JobEntity message = CommandContextUtil.getJobService().createJob();
         message.setJobType(JobEntity.JOB_TYPE_MESSAGE);
         message.setJobHandlerType("tweet-exception");
         message.setRetries(3);

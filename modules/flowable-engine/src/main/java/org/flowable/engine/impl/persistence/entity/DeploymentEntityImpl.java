@@ -22,7 +22,7 @@ import java.util.Map;
 
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -52,19 +52,21 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
 
     }
 
+    @Override
     public void addResource(ResourceEntity resource) {
         if (resources == null) {
-            resources = new HashMap<String, ResourceEntity>();
+            resources = new HashMap<>();
         }
         resources.put(resource.getName(), resource);
     }
 
     // lazy loading ///////////////////////////////////////////////////////////////
 
+    @Override
     public Map<String, ResourceEntity> getResources() {
         if (resources == null && id != null) {
-            List<ResourceEntity> resourcesList = Context.getCommandContext().getResourceEntityManager().findResourcesByDeploymentId(id);
-            resources = new HashMap<String, ResourceEntity>();
+            List<ResourceEntity> resourcesList = CommandContextUtil.getResourceEntityManager().findResourcesByDeploymentId(id);
+            resources = new HashMap<>();
             for (ResourceEntity resource : resourcesList) {
                 resources.put(resource.getName(), resource);
             }
@@ -72,8 +74,9 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
         return resources;
     }
 
+    @Override
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("category", this.category);
         persistentState.put("key", this.key);
         persistentState.put("tenantId", tenantId);
@@ -82,21 +85,23 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
 
     // Deployed artifacts manipulation ////////////////////////////////////////////
 
+    @Override
     public void addDeployedArtifact(Object deployedArtifact) {
         if (deployedArtifacts == null) {
-            deployedArtifacts = new HashMap<Class<?>, List<Object>>();
+            deployedArtifacts = new HashMap<>();
         }
 
         Class<?> clazz = deployedArtifact.getClass();
         List<Object> artifacts = deployedArtifacts.get(clazz);
         if (artifacts == null) {
-            artifacts = new ArrayList<Object>();
+            artifacts = new ArrayList<>();
             deployedArtifacts.put(clazz, artifacts);
         }
 
         artifacts.add(deployedArtifact);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T> List<T> getDeployedArtifacts(Class<T> clazz) {
         for (Class<?> deployedArtifactsClass : deployedArtifacts.keySet()) {
@@ -109,62 +114,77 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
 
     // getters and setters ////////////////////////////////////////////////////////
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public String getCategory() {
         return category;
     }
 
+    @Override
     public void setCategory(String category) {
         this.category = category;
     }
 
+    @Override
     public String getKey() {
         return key;
     }
 
+    @Override
     public void setKey(String key) {
         this.key = key;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 
+    @Override
     public void setResources(Map<String, ResourceEntity> resources) {
         this.resources = resources;
     }
 
+    @Override
     public Date getDeploymentTime() {
         return deploymentTime;
     }
 
+    @Override
     public void setDeploymentTime(Date deploymentTime) {
         this.deploymentTime = deploymentTime;
     }
 
+    @Override
     public boolean isNew() {
         return isNew;
     }
 
+    @Override
     public void setNew(boolean isNew) {
         this.isNew = isNew;
     }
 
+    @Override
     public String getEngineVersion() {
         return engineVersion;
     }
 
+    @Override
     public void setEngineVersion(String engineVersion) {
         this.engineVersion = engineVersion;
     }

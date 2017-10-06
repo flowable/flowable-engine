@@ -54,7 +54,7 @@ public class WebServiceTaskTest extends AbstractWebServiceTaskTest {
         final Calendar calendar = Calendar.getInstance();
         calendar.set(2015, Calendar.APRIL, 23, 0, 0, 0);
         final Date expectedDate = calendar.getTime();
-        final Map<String, Object> variables = new HashMap<String, Object>(1);
+        final Map<String, Object> variables = new HashMap<>(1);
         variables.put("startDate", expectedDate);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("webServiceInvocationDataStructure", variables);
         waitForJobExecutorToProcessAllJobs(10000L, 250L);

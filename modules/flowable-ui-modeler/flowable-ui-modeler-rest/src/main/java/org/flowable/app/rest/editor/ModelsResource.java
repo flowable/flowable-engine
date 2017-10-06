@@ -12,11 +12,6 @@
  */
 package org.flowable.app.rest.editor;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
@@ -30,7 +25,7 @@ import org.flowable.app.model.editor.ModelRepresentation;
 import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.api.ModelService;
 import org.flowable.app.service.editor.FlowableModelQueryService;
-import org.flowable.app.service.exception.BadRequestException;
+import org.flowable.app.service.exception.ConflictingRequestException;
 import org.flowable.app.service.exception.InternalServerErrorException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +37,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @RestController
 public class ModelsResource {
@@ -95,16 +95,19 @@ public class ModelsResource {
     @RequestMapping(value = "/rest/models", method = RequestMethod.POST, produces = "application/json")
     public ModelRepresentation createModel(@RequestBody ModelRepresentation modelRepresentation) {
         modelRepresentation.setKey(modelRepresentation.getKey().replaceAll(" ", ""));
-
-        ModelKeyRepresentation modelKeyInfo = modelService.validateModelKey(null, modelRepresentation.getModelType(), modelRepresentation.getKey());
-        if (modelKeyInfo.isKeyAlreadyExists()) {
-            throw new BadRequestException("Provided model key already exists: " + modelRepresentation.getKey());
-        }
+        checkForDuplicateKey(modelRepresentation);
 
         String json = modelService.createModelJson(modelRepresentation);
 
         Model newModel = modelService.createModel(modelRepresentation, json, SecurityUtils.getCurrentUserObject());
         return new ModelRepresentation(newModel);
+    }
+
+    protected void checkForDuplicateKey(ModelRepresentation modelRepresentation) {
+        ModelKeyRepresentation modelKeyInfo = modelService.validateModelKey(null, modelRepresentation.getModelType(), modelRepresentation.getKey());
+        if (modelKeyInfo.isKeyAlreadyExists()) {
+            throw new ConflictingRequestException("Provided model key already exists: " + modelRepresentation.getKey());
+        }
     }
 
     @RequestMapping(value = "/rest/models/{modelId}/clone", method = RequestMethod.POST, produces = "application/json")
@@ -120,12 +123,11 @@ public class ModelsResource {
         if (model == null) {
             throw new InternalServerErrorException("Error duplicating model : Unknown original model");
         }
-
-        if (modelRepresentation.getModelType() != null && modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_FORM)) {
-            // noting to do special for forms (just clone the json)
-        } else if (modelRepresentation.getModelType() != null && modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_APP)) {
-            // noting to do special for applications (just clone the json)
-        } else {
+        
+        modelRepresentation.setKey(modelRepresentation.getKey().replaceAll(" ", ""));
+        checkForDuplicateKey(modelRepresentation);
+        
+        if (modelRepresentation.getModelType() == null || modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_BPMN)) {            
             // BPMN model
             ObjectNode editorNode = null;
             try {

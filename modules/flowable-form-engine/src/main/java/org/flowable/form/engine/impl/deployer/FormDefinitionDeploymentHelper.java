@@ -21,10 +21,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.form.engine.FormEngineConfiguration;
-import org.flowable.form.engine.impl.context.Context;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntityManager;
 import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntity;
+import org.flowable.form.engine.impl.util.CommandContextUtil;
 
 /**
  * Methods for working with deployments. Much of the actual work of {@link FormDefinitionDeployer} is done by orchestrating the different pieces of work this class does; by having them here, we allow
@@ -39,7 +39,7 @@ public class FormDefinitionDeploymentHelper {
      *             if any two decision tables have the same key
      */
     public void verifyFormsDoNotShareKeys(Collection<FormDefinitionEntity> forms) {
-        Set<String> keySet = new LinkedHashSet<String>();
+        Set<String> keySet = new LinkedHashSet<>();
         for (FormDefinitionEntity form : forms) {
             if (keySet.contains(form.getKey())) {
                 throw new FlowableException("The deployment contains forms with the same key, this is not allowed");
@@ -83,7 +83,7 @@ public class FormDefinitionDeploymentHelper {
     public FormDefinitionEntity getMostRecentVersionOfForm(FormDefinitionEntity formDefinition) {
         String key = formDefinition.getKey();
         String tenantId = formDefinition.getTenantId();
-        FormDefinitionEntityManager formDefinitionEntityManager = Context.getCommandContext().getFormEngineConfiguration().getFormDefinitionEntityManager();
+        FormDefinitionEntityManager formDefinitionEntityManager = CommandContextUtil.getFormEngineConfiguration().getFormDefinitionEntityManager();
 
         FormDefinitionEntity existingDefinition = null;
 
@@ -106,7 +106,7 @@ public class FormDefinitionDeploymentHelper {
             throw new FlowableIllegalArgumentException("Provided form definition must have a deployment id.");
         }
 
-        FormDefinitionEntityManager formDefinitionEntityManager = Context.getCommandContext().getFormEngineConfiguration().getFormDefinitionEntityManager();
+        FormDefinitionEntityManager formDefinitionEntityManager = CommandContextUtil.getFormEngineConfiguration().getFormDefinitionEntityManager();
 
         FormDefinitionEntity persistedFormDefinition = null;
         if (formDefinition.getTenantId() == null || FormEngineConfiguration.NO_TENANT_ID.equals(formDefinition.getTenantId())) {

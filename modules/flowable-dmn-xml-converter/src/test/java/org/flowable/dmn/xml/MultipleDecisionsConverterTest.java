@@ -40,6 +40,7 @@ public class MultipleDecisionsConverterTest extends AbstractConverterTest {
         validateModel(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "multiple_decisions.dmn";
     }

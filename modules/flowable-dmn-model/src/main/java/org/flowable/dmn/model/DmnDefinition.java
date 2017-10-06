@@ -24,8 +24,8 @@ public class DmnDefinition extends NamedElement {
     protected String expressionLanguage;
     protected String typeLanguage;
     protected String namespace;
-    protected List<ItemDefinition> itemDefinitions = new ArrayList<ItemDefinition>();
-    protected List<Decision> decisions = new ArrayList<Decision>();
+    protected List<ItemDefinition> itemDefinitions = new ArrayList<>();
+    protected List<Decision> decisions = new ArrayList<>();
 
     public String getExpressionLanguage() {
         return expressionLanguage;

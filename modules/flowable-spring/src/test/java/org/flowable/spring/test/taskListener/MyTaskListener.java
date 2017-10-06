@@ -13,14 +13,15 @@
 
 package org.flowable.spring.test.taskListener;
 
-import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * @author Joram Barrez
  */
 public class MyTaskListener implements TaskListener {
 
+    @Override
     public void notify(DelegateTask delegateTask) {
         delegateTask.setVariable("calledThroughNotify", delegateTask.getName() + "-notify");
     }

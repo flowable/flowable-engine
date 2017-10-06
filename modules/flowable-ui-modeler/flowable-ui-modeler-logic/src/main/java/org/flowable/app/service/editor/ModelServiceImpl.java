@@ -54,6 +54,9 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.cmmn.converter.CmmnXmlConverter;
+import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter;
+import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.editor.language.json.converter.util.JsonConverterUtil;
@@ -98,6 +101,10 @@ public class ModelServiceImpl implements ModelService {
     protected BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
 
     protected BpmnXMLConverter bpmnXMLConverter = new BpmnXMLConverter();
+    
+    protected CmmnJsonConverter cmmnJsonConverter = new CmmnJsonConverter();
+
+    protected CmmnXmlConverter cmmnXMLConverter = new CmmnXmlConverter();
 
     @Override
     public Model getModel(String modelId) {
@@ -155,6 +162,18 @@ public class ModelServiceImpl implements ModelService {
         byte[] xmlBytes = bpmnXMLConverter.convertToXML(bpmnModel);
         return xmlBytes;
     }
+    
+    @Override
+    public byte[] getCmmnXML(AbstractModel model) {
+        CmmnModel cmmnModel = getCmmnModel(model);
+        return getCmmnXML(cmmnModel);
+    }
+
+    @Override
+    public byte[] getCmmnXML(CmmnModel cmmnModel) {
+        byte[] xmlBytes = cmmnXMLConverter.convertToXML(cmmnModel);
+        return xmlBytes;
+    }
 
     public ModelKeyRepresentation validateModelKey(Model model, Integer modelType, String key) {
         ModelKeyRepresentation modelKeyResponse = new ModelKeyRepresentation();
@@ -172,7 +191,7 @@ public class ModelServiceImpl implements ModelService {
 
         return modelKeyResponse;
     }
-    
+
     @Override
     public String createModelJson(ModelRepresentation model) {
         String json = null;
@@ -204,7 +223,45 @@ public class ModelServiceImpl implements ModelService {
                 LOGGER.error("Error creating app definition", e);
                 throw new InternalServerErrorException("Error creating app definition");
             }
+            
+        } else if (Integer.valueOf(AbstractModel.MODEL_TYPE_CMMN).equals(model.getModelType())) {
+            ObjectNode editorNode = objectMapper.createObjectNode();
+            editorNode.put("id", "canvas");
+            editorNode.put("resourceId", "canvas");
+            ObjectNode stencilSetNode = objectMapper.createObjectNode();
+            stencilSetNode.put("namespace", "http://b3mn.org/stencilset/cmmn1.1#");
+            editorNode.set("stencilset", stencilSetNode);
+            ObjectNode propertiesNode = objectMapper.createObjectNode();
+            propertiesNode.put("case_id", model.getKey());
+            propertiesNode.put("name", model.getName());
+            if (StringUtils.isNotEmpty(model.getDescription())) {
+                propertiesNode.put("documentation", model.getDescription());
+            }
+            editorNode.set("properties", propertiesNode);
 
+            ArrayNode childShapeArray = objectMapper.createArrayNode();
+            editorNode.set("childShapes", childShapeArray);
+            ObjectNode childNode = objectMapper.createObjectNode();
+            childShapeArray.add(childNode);
+            ObjectNode boundsNode = objectMapper.createObjectNode();
+            childNode.set("bounds", boundsNode);
+            ObjectNode lowerRightNode = objectMapper.createObjectNode();
+            boundsNode.set("lowerRight", lowerRightNode);
+            lowerRightNode.put("x", 758);
+            lowerRightNode.put("y", 754);
+            ObjectNode upperLeftNode = objectMapper.createObjectNode();
+            boundsNode.set("upperLeft", upperLeftNode);
+            upperLeftNode.put("x", 40);
+            upperLeftNode.put("y", 40);
+            childNode.set("childShapes", objectMapper.createArrayNode());
+            childNode.set("dockers", objectMapper.createArrayNode());
+            childNode.set("outgoing", objectMapper.createArrayNode());
+            childNode.put("resourceId", "casePlanModel");
+            ObjectNode stencilNode = objectMapper.createObjectNode();
+            childNode.set("stencil", stencilNode);
+            stencilNode.put("id", "CasePlanModel");
+            json = editorNode.toString();
+            
         } else {
             ObjectNode editorNode = objectMapper.createObjectNode();
             editorNode.put("id", "canvas");
@@ -243,7 +300,7 @@ public class ModelServiceImpl implements ModelService {
             stencilNode.put("id", "StartNoneEvent");
             json = editorNode.toString();
         }
-        
+
         return json;
     }
 
@@ -350,14 +407,14 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     public Model saveModel(String modelId, String name, String key, String description, String editorJson,
-            boolean newVersion, String newVersionComment, User updatedBy) {
+                           boolean newVersion, String newVersionComment, User updatedBy) {
 
         Model modelObject = modelRepository.get(modelId);
         return internalSave(name, key, description, editorJson, newVersion, newVersionComment, null, updatedBy, modelObject);
     }
 
     protected Model internalSave(String name, String key, String description, String editorJson, boolean newVersion,
-            String newVersionComment, byte[] imageBytes, User updatedBy, Model modelObject) {
+                                 String newVersionComment, byte[] imageBytes, User updatedBy, Model modelObject) {
 
         if (!newVersion) {
 
@@ -419,7 +476,7 @@ public class ModelServiceImpl implements ModelService {
         // Hence, we remove first all relations, comments, etc. while collecting all models.
         // Then, once all foreign key problem makers are removed, we remove the models
 
-        List<Model> allModels = new ArrayList<Model>();
+        List<Model> allModels = new ArrayList<>();
         internalDeleteModelAndChildren(model, allModels);
 
         for (Model modelToDelete : allModels) {
@@ -484,8 +541,8 @@ public class ModelServiceImpl implements ModelService {
     public BpmnModel getBpmnModel(AbstractModel model) {
         BpmnModel bpmnModel = null;
         try {
-            Map<String, Model> formMap = new HashMap<String, Model>();
-            Map<String, Model> decisionTableMap = new HashMap<String, Model>();
+            Map<String, Model> formMap = new HashMap<>();
+            Map<String, Model> decisionTableMap = new HashMap<>();
 
             List<Model> referencedModels = modelRepository.findByParentModelId(model.getId());
             for (Model childModel : referencedModels) {
@@ -511,12 +568,12 @@ public class ModelServiceImpl implements ModelService {
     public BpmnModel getBpmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap) {
         try {
             ObjectNode editorJsonNode = (ObjectNode) objectMapper.readTree(model.getModelEditorJson());
-            Map<String, String> formKeyMap = new HashMap<String, String>();
+            Map<String, String> formKeyMap = new HashMap<>();
             for (Model formModel : formMap.values()) {
                 formKeyMap.put(formModel.getId(), formModel.getKey());
             }
 
-            Map<String, String> decisionTableKeyMap = new HashMap<String, String>();
+            Map<String, String> decisionTableKeyMap = new HashMap<>();
             for (Model decisionTableModel : decisionTableMap.values()) {
                 decisionTableKeyMap.put(decisionTableModel.getId(), decisionTableModel.getKey());
             }
@@ -526,6 +583,55 @@ public class ModelServiceImpl implements ModelService {
         } catch (Exception e) {
             LOGGER.error("Could not generate BPMN 2.0 model for {}", model.getId(), e);
             throw new InternalServerErrorException("Could not generate BPMN 2.0 model");
+        }
+    }
+    
+    @Override
+    public CmmnModel getCmmnModel(AbstractModel model) {
+        CmmnModel cmmnModel = null;
+        try {
+            Map<String, Model> formMap = new HashMap<>();
+            Map<String, Model> decisionTableMap = new HashMap<>();
+
+            List<Model> referencedModels = modelRepository.findByParentModelId(model.getId());
+            for (Model childModel : referencedModels) {
+                if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
+                    formMap.put(childModel.getId(), childModel);
+
+                } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
+                    decisionTableMap.put(childModel.getId(), childModel);
+                }
+            }
+
+            cmmnModel = getCmmnModel(model, formMap, decisionTableMap);
+
+        } catch (Exception e) {
+            LOGGER.error("Could not generate CMMN model for {}", model.getId(), e);
+            throw new InternalServerErrorException("Could not generate CMMN model");
+        }
+
+        return cmmnModel;
+    }
+    
+    @Override
+    public CmmnModel getCmmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap) {
+        try {
+            ObjectNode editorJsonNode = (ObjectNode) objectMapper.readTree(model.getModelEditorJson());
+            Map<String, String> formKeyMap = new HashMap<>();
+            for (Model formModel : formMap.values()) {
+                formKeyMap.put(formModel.getId(), formModel.getKey());
+            }
+
+            Map<String, String> decisionTableKeyMap = new HashMap<>();
+            for (Model decisionTableModel : decisionTableMap.values()) {
+                decisionTableKeyMap.put(decisionTableModel.getId(), decisionTableModel.getKey());
+            }
+
+            return cmmnJsonConverter.convertToCmmnModel(editorJsonNode, formKeyMap, decisionTableKeyMap);
+
+        } catch (Exception e) {
+            LOGGER.error("Could not generate CMMN model for {}", model.getId(), e);
+            throw new InternalServerErrorException("Could not generate CMMN model");
         }
     }
 
@@ -579,6 +685,20 @@ public class ModelServiceImpl implements ModelService {
                 // Relations
                 handleBpmnProcessFormModelRelations(model, jsonNode);
                 handleBpmnProcessDecisionTaskModelRelations(model, jsonNode);
+                
+            } else if ((model.getModelType() == null || model.getModelType().intValue() == Model.MODEL_TYPE_CMMN)) {
+
+                // Thumbnail
+                /*byte[] thumbnail = modelImageService.generateThumbnailImage(model, jsonNode);
+                if (thumbnail != null) {
+                    model.setThumbnail(thumbnail);
+                }*/
+
+                modelRepository.save(model);
+
+                // Relations
+                //handleBpmnProcessFormModelRelations(model, jsonNode);
+                //handleBpmnProcessDecisionTaskModelRelations(model, jsonNode);
 
             } else if (model.getModelType().intValue() == Model.MODEL_TYPE_FORM ||
                     model.getModelType().intValue() == Model.MODEL_TYPE_DECISION_TABLE) {
@@ -636,7 +756,7 @@ public class ModelServiceImpl implements ModelService {
             return;
         }
 
-        Set<String> alreadyPersistedModelIds = new HashSet<String>(persistedModelRelations.size());
+        Set<String> alreadyPersistedModelIds = new HashSet<>(persistedModelRelations.size());
         for (ModelRelation persistedModelRelation : persistedModelRelations) {
             if (!idsReferencedInJson.contains(persistedModelRelation.getModelId())) {
                 // model used to be referenced, but not anymore. Delete it.

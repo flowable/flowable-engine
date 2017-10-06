@@ -29,6 +29,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
     @Bean
+    @Override
     public AuthenticationManager authenticationManager() throws Exception {
         return super.authenticationManager();
     }

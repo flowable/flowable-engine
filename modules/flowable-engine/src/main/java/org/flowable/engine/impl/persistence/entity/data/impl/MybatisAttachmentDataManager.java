@@ -17,13 +17,13 @@ import java.util.List;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntity;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityImpl;
-import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.AttachmentDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisAttachmentDataManager extends AbstractDataManager<AttachmentEntity> implements AttachmentDataManager {
+public class MybatisAttachmentDataManager extends AbstractProcessDataManager<AttachmentEntity> implements AttachmentDataManager {
 
     public MybatisAttachmentDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);

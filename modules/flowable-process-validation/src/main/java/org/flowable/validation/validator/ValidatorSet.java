@@ -53,7 +53,7 @@ public class ValidatorSet {
 
     public void addValidator(Validator validator) {
         if (validators == null) {
-            validators = new HashMap<Class<? extends Validator>, Validator>();
+            validators = new HashMap<>();
         }
         validators.put(validator.getClass(), validator);
     }

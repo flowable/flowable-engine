@@ -15,13 +15,14 @@ package org.flowable.idm.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.idm.api.PasswordEncoder;
 import org.flowable.idm.api.PasswordSalt;
 import org.flowable.idm.api.User;
-import org.flowable.idm.engine.impl.interceptor.Command;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
 import org.flowable.idm.engine.impl.persistence.entity.UserEntity;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -36,25 +37,28 @@ public class SaveUserCmd implements Command<Void>, Serializable {
         this.user = user;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (user == null) {
             throw new FlowableIllegalArgumentException("user is null");
         }
         
-        if (commandContext.getUserEntityManager().isNewUser(user)) {
+        if (CommandContextUtil.getUserEntityManager(commandContext).isNewUser(user)) {
             if (user.getPassword() != null) {
-                PasswordEncoder passwordEncoder = commandContext.getIdmEngineConfiguration().getPasswordEncoder();
-                PasswordSalt passwordSalt = commandContext.getIdmEngineConfiguration().getPasswordSalt();
+                PasswordEncoder passwordEncoder = CommandContextUtil.getIdmEngineConfiguration().getPasswordEncoder();
+                PasswordSalt passwordSalt = CommandContextUtil.getIdmEngineConfiguration().getPasswordSalt();
                 user.setPassword(passwordEncoder.encode(user.getPassword(), passwordSalt));
             }
             
             if (user instanceof UserEntity) {
-                commandContext.getUserEntityManager().insert((UserEntity) user, true);
+                CommandContextUtil.getUserEntityManager(commandContext).insert((UserEntity) user, true);
             } else {
-                commandContext.getDbSqlSession().insert((Entity) user);
+                CommandContextUtil.getDbSqlSession(commandContext).insert((Entity) user);
             }
         } else {
-            commandContext.getUserEntityManager().updateUser(user);
+            UserEntity dbUser = CommandContextUtil.getUserEntityManager().findById(user.getId());
+            user.setPassword(dbUser.getPassword());
+            CommandContextUtil.getUserEntityManager().updateUser(user);
         }
 
         return null;

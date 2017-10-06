@@ -15,9 +15,10 @@ package org.flowable.dmn.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.dmn.engine.impl.interceptor.Command;
-import org.flowable.dmn.engine.impl.interceptor.CommandContext;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
+import org.flowable.dmn.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Tijs Rademakers
@@ -31,7 +32,8 @@ public class GetDeploymentDecisionTableCmd implements Command<DecisionTableEntit
         this.decisionTableId = decisionTableId;
     }
 
+    @Override
     public DecisionTableEntity execute(CommandContext commandContext) {
-        return commandContext.getDmnEngineConfiguration().getDeploymentManager().findDeployedDecisionById(decisionTableId);
+        return CommandContextUtil.getDmnEngineConfiguration().getDeploymentManager().findDeployedDecisionById(decisionTableId);
     }
 }

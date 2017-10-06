@@ -27,7 +27,7 @@ public class TestFlowableEntityEventListener implements FlowableEventListener {
     public TestFlowableEntityEventListener(Class<?> entityClass) {
         this.entityClass = entityClass;
 
-        eventsReceived = new ArrayList<FlowableEvent>();
+        eventsReceived = new ArrayList<>();
     }
 
     public List<FlowableEvent> getEventsReceived() {

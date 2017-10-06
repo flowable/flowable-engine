@@ -21,18 +21,19 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.bpmn.helper.DelegateExpressionUtil;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.delegate.ActivityBehaviorInvocation;
 import org.flowable.engine.impl.delegate.TriggerableActivityBehavior;
 import org.flowable.engine.impl.delegate.invocation.JavaDelegateInvocation;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.common.api.delegate.Expression;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -71,18 +72,19 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
         }
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
 
         try {
             boolean isSkipExpressionEnabled = SkipExpressionUtil.isSkipExpressionEnabled(execution, skipExpression);
             if (!isSkipExpressionEnabled || (isSkipExpressionEnabled && !SkipExpressionUtil.shouldSkipFlowElement(execution, skipExpression))) {
 
-                if (Context.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
-                    ObjectNode taskElementProperties = Context.getBpmnOverrideElementProperties(serviceTaskId, execution.getProcessDefinitionId());
+                if (CommandContextUtil.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {
+                    ObjectNode taskElementProperties = BpmnOverrideContext.getBpmnOverrideElementProperties(serviceTaskId, execution.getProcessDefinitionId());
                     if (taskElementProperties != null && taskElementProperties.has(DynamicBpmnConstants.SERVICE_TASK_DELEGATE_EXPRESSION)) {
                         String overrideExpression = taskElementProperties.get(DynamicBpmnConstants.SERVICE_TASK_DELEGATE_EXPRESSION).asText();
                         if (StringUtils.isNotEmpty(overrideExpression) && !overrideExpression.equals(expression.getExpressionText())) {
-                            expression = Context.getProcessEngineConfiguration().getExpressionManager().createExpression(overrideExpression);
+                            expression = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager().createExpression(overrideExpression);
                         }
                     }
                 }
@@ -94,10 +96,10 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
                         ((AbstractBpmnActivityBehavior) delegate).setMultiInstanceActivityBehavior(getMultiInstanceActivityBehavior());
                     }
 
-                    Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new ActivityBehaviorInvocation((ActivityBehavior) delegate, execution));
+                    CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new ActivityBehaviorInvocation((ActivityBehavior) delegate, execution));
 
                 } else if (delegate instanceof JavaDelegate) {
-                    Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new JavaDelegateInvocation((JavaDelegate) delegate, execution));
+                    CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new JavaDelegateInvocation((JavaDelegate) delegate, execution));
                     leave(execution);
 
                 } else {

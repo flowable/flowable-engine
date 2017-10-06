@@ -25,13 +25,15 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.content.api.ContentItem;
+import org.flowable.content.api.ContentService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.form.api.FormService;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.FormFieldTypes;
 import org.flowable.form.model.FormModel;
@@ -51,9 +53,10 @@ public class GetStartFormModelCmd implements Command<FormModel>, Serializable {
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public FormModel execute(CommandContext commandContext) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-        if (!processEngineConfiguration.isFormEngineInitialized()) {
+        FormService formService = CommandContextUtil.getFormService();
+        if (formService == null) {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");
         }
 
@@ -65,7 +68,8 @@ public class GetStartFormModelCmd implements Command<FormModel>, Serializable {
         if (startElement instanceof StartEvent) {
             StartEvent startEvent = (StartEvent) startElement;
             if (StringUtils.isNotEmpty(startEvent.getFormKey())) {
-                formModel = processEngineConfiguration.getFormEngineFormService().getFormInstanceModelByKeyAndParentDeploymentId(
+                
+                formModel = formService.getFormInstanceModelByKeyAndParentDeploymentId(
                         startEvent.getFormKey(), processDefinition.getDeploymentId(), null, processInstanceId, null, processDefinition.getTenantId());
             }
         }
@@ -75,14 +79,15 @@ public class GetStartFormModelCmd implements Command<FormModel>, Serializable {
             throw new FlowableObjectNotFoundException("Form model for process definition " + processDefinitionId + " cannot be found");
         }
 
-        fetchRelatedContentInfoIfNeeded(formModel, processEngineConfiguration);
+        fetchRelatedContentInfoIfNeeded(formModel);
 
         return formModel;
     }
 
     @SuppressWarnings("unchecked")
-    protected void fetchRelatedContentInfoIfNeeded(FormModel formModel, ProcessEngineConfigurationImpl processEngineConfiguration) {
-        if (!processEngineConfiguration.isContentEngineInitialized()) {
+    protected void fetchRelatedContentInfoIfNeeded(FormModel formModel) {
+        ContentService contentService = CommandContextUtil.getContentService();
+        if (contentService == null) {
             return;
         }
 
@@ -96,15 +101,14 @@ public class GetStartFormModelCmd implements Command<FormModel>, Serializable {
 
                     } else if (formField.getValue() instanceof String) {
                         String[] splittedString = ((String) formField.getValue()).split(",");
-                        contentItemIds = new ArrayList<String>();
+                        contentItemIds = new ArrayList<>();
                         Collections.addAll(contentItemIds, splittedString);
                     }
 
                     if (contentItemIds != null) {
                         Set<String> contentItemIdSet = new HashSet<>(contentItemIds);
 
-                        List<ContentItem> contentItems = processEngineConfiguration.getContentService()
-                                .createContentItemQuery()
+                        List<ContentItem> contentItems = contentService.createContentItemQuery()
                                 .ids(contentItemIdSet)
                                 .list();
 

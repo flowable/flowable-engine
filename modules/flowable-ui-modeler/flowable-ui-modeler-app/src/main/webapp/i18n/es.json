@@ -317,6 +317,8 @@
         "POPUP": {
             "CREATE-TITLE": "Crear nueva tabla de decision",
             "CREATE-DESCRIPTION": "Es necesario dar un nombre par a la tabla de decision, es recomendable proporcionar una descripcion al mismo tiempo.",
+            "DUPLICATE-TITLE": "Duplicar tabla de decision",
+            "DUPLICATE-DESCRIPTION": "Puedes dar un nombre para la nueba tabla de decision es recomendable proporcionar una descripcion al mismo tiempo.",
             "SAVE-DESCRIPTION": "Es necesario proporcionar un nombre y un identificador unico para la tabla de decision, es recomendable proporcionar una descripcion al mismo tiempo",
             "DELETE-TITLE": "Borrar tabla de decision",
             "DELETE-DESCRIPTION": "Estas Seguro que deseas borrar esta tabla de decision \"{{name}}\"?",

@@ -15,7 +15,6 @@ package org.flowable.cdi.impl.event;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BusinessRuleTask;
 import org.flowable.bpmn.model.CallActivity;
@@ -25,6 +24,7 @@ import org.flowable.bpmn.model.EventGateway;
 import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.ExclusiveGateway;
 import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.InclusiveGateway;
 import org.flowable.bpmn.model.ManualTask;
@@ -50,13 +50,13 @@ import org.flowable.engine.parse.BpmnParseHandler;
 
 /**
  * {@link BpmnParseHandler} registering the {@link CdiExecutionListener} for distributing execution events using the cdi event infrastructure
- * 
+ *
  * @author Daniel Meyer
  * @author Joram Barrez
  */
 public class CdiEventSupportBpmnParseHandler implements BpmnParseHandler {
 
-    protected static final Set<Class<? extends BaseElement>> supportedTypes = new HashSet<Class<? extends BaseElement>>();
+    protected static final Set<Class<? extends BaseElement>> supportedTypes = new HashSet<>();
 
     static {
         supportedTypes.add(StartEvent.class);
@@ -87,10 +87,12 @@ public class CdiEventSupportBpmnParseHandler implements BpmnParseHandler {
         supportedTypes.add(SequenceFlow.class);
     }
 
+    @Override
     public Set<Class<? extends BaseElement>> getHandledTypes() {
         return supportedTypes;
     }
 
+    @Override
     public void parse(BpmnParse bpmnParse, BaseElement element) {
 
         if (element instanceof SequenceFlow) {

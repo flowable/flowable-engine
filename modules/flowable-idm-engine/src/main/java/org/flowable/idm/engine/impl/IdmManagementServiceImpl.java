@@ -18,58 +18,61 @@ import java.util.Map;
 import org.flowable.engine.common.api.management.TableMetaData;
 import org.flowable.engine.common.api.management.TablePageQuery;
 import org.flowable.engine.common.impl.cmd.CustomSqlExecution;
+import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.idm.api.IdmManagementService;
 import org.flowable.idm.engine.impl.cmd.ExecuteCustomSqlCmd;
 import org.flowable.idm.engine.impl.cmd.GetPropertiesCmd;
 import org.flowable.idm.engine.impl.cmd.GetTableCountCmd;
 import org.flowable.idm.engine.impl.cmd.GetTableMetaDataCmd;
 import org.flowable.idm.engine.impl.cmd.GetTableNameCmd;
-import org.flowable.idm.engine.impl.db.DbSqlSession;
-import org.flowable.idm.engine.impl.db.DbSqlSessionFactory;
-import org.flowable.idm.engine.impl.interceptor.Command;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tijs Rademakers
  */
 public class IdmManagementServiceImpl extends ServiceImpl implements IdmManagementService {
 
+    @Override
     public Map<String, Long> getTableCount() {
         return commandExecutor.execute(new GetTableCountCmd());
     }
 
+    @Override
     public String getTableName(Class<?> entityClass) {
         return commandExecutor.execute(new GetTableNameCmd(entityClass));
     }
 
+    @Override
     public TableMetaData getTableMetaData(String tableName) {
         return commandExecutor.execute(new GetTableMetaDataCmd(tableName));
     }
 
+    @Override
     public TablePageQuery createTablePageQuery() {
         return new TablePageQueryImpl(commandExecutor);
     }
 
+    @Override
     public Map<String, String> getProperties() {
         return commandExecutor.execute(new GetPropertiesCmd());
     }
 
+    @Override
     public String databaseSchemaUpgrade(final Connection connection, final String catalog, final String schema) {
         CommandConfig config = commandExecutor.getDefaultConfig().transactionNotSupported();
         return commandExecutor.execute(config, new Command<String>() {
+            @Override
             public String execute(CommandContext commandContext) {
-                DbSqlSessionFactory dbSqlSessionFactory = (DbSqlSessionFactory) commandContext.getSessionFactories().get(DbSqlSession.class);
-                DbSqlSession dbSqlSession = new DbSqlSession(dbSqlSessionFactory, connection, catalog, schema);
-                commandContext.getSessions().put(DbSqlSession.class, dbSqlSession);
-                return dbSqlSession.dbSchemaUpdate();
+                return CommandContextUtil.getIdmEngineConfiguration().getDbSchemaManager().dbSchemaUpdate();
             }
         });
     }
 
     public <MapperType, ResultType> ResultType executeCustomSql(CustomSqlExecution<MapperType, ResultType> customSqlExecution) {
         Class<MapperType> mapperClass = customSqlExecution.getMapperClass();
-        return commandExecutor.execute(new ExecuteCustomSqlCmd<MapperType, ResultType>(mapperClass, customSqlExecution));
+        return commandExecutor.execute(new ExecuteCustomSqlCmd<>(mapperClass, customSqlExecution));
     }
 
 }

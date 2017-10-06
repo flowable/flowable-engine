@@ -17,8 +17,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.engine.cfg.ProcessEngineConfigurator;
+import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.interceptor.CommandInterceptor;
 
 /**
  * @author Joram Barrez
@@ -28,7 +28,7 @@ public class FlowableProfiler implements ProcessEngineConfigurator {
     protected static FlowableProfiler INSTANCE = new FlowableProfiler();
 
     protected ProfileSession currentProfileSession;
-    protected List<ProfileSession> profileSessions = new ArrayList<ProfileSession>();
+    protected List<ProfileSession> profileSessions = new ArrayList<>();
 
     public static FlowableProfiler getInstance() {
         return INSTANCE;
@@ -38,7 +38,7 @@ public class FlowableProfiler implements ProcessEngineConfigurator {
     public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
 
         // Command interceptor
-        List<CommandInterceptor> interceptors = new ArrayList<CommandInterceptor>();
+        List<CommandInterceptor> interceptors = new ArrayList<>();
         interceptors.add(new TotalExecutionTimeCommandInterceptor());
         processEngineConfiguration.setCustomPreCommandInterceptors(interceptors);
 

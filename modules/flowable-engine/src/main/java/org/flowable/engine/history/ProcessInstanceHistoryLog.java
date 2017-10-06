@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.engine.IdentityService;
+import org.flowable.engine.common.api.history.HistoricData;
 import org.flowable.engine.runtime.ProcessInstance;
 
 /**

@@ -17,7 +17,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.flowable.dmn.api.DmnDecisionTable;
-import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
+import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.rest.dmn.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.rest.dmn.service.api.DmnRestUrls;
 
@@ -26,7 +26,7 @@ import org.flowable.rest.dmn.service.api.DmnRestUrls;
  */
 public class DecisionTableResourceDataResourceTest extends BaseSpringDmnRestTestCase {
 
-    @DmnDeploymentAnnotation(resources = { "org/flowable/rest/dmn/service/api/repository/simple.dmn" })
+    @DmnDeployment(resources = { "org/flowable/rest/dmn/service/api/repository/simple.dmn" })
     public void testGetDecisionTableResource() throws Exception {
 
         DmnDecisionTable decisionTable = dmnRepositoryService.createDecisionTableQuery().singleResult();

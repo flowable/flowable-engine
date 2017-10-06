@@ -15,10 +15,10 @@ package org.flowable.engine.impl.webservice;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.impl.bpmn.webservice.BpmnInterface;
 import org.flowable.engine.impl.bpmn.webservice.BpmnInterfaceImplementation;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.util.ReflectUtil;
 
 /**
  * Represents a WS implementation of a {@link BpmnInterface}
@@ -40,14 +40,14 @@ public class WSService implements BpmnInterfaceImplementation {
     public WSService(String name, String location, String wsdlLocation) {
         this.name = name;
         this.location = location;
-        this.operations = new HashMap<String, WSOperation>();
+        this.operations = new HashMap<>();
         this.wsdlLocation = wsdlLocation;
     }
 
     public WSService(String name, String location, SyncWebServiceClient client) {
         this.name = name;
         this.location = location;
-        this.operations = new HashMap<String, WSOperation>();
+        this.operations = new HashMap<>();
         this.client = client;
     }
 
@@ -64,6 +64,7 @@ public class WSService implements BpmnInterfaceImplementation {
         return this.client;
     }
 
+    @Override
     public String getName() {
         return this.name;
     }

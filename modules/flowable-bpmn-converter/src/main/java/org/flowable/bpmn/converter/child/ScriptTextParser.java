@@ -23,10 +23,12 @@ import org.flowable.bpmn.model.ScriptTask;
  */
 public class ScriptTextParser extends BaseChildElementParser {
 
+    @Override
     public String getElementName() {
         return ATTRIBUTE_TASK_SCRIPT_TEXT;
     }
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
         if (!(parentElement instanceof ScriptTask))
             return;

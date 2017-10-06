@@ -12,10 +12,14 @@
  */
 package org.flowable.form.model;
 
+import java.io.Serializable;
+
 /**
  * @author Tijs Rademakers
  */
-public class LayoutDefinition {
+public class LayoutDefinition implements Serializable {
+
+	private static final long serialVersionUID = 1L;
 
     protected Integer row;
 

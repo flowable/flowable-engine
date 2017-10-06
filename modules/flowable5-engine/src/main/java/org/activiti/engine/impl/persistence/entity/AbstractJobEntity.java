@@ -24,7 +24,7 @@ import org.activiti.engine.impl.db.HasRevision;
 import org.activiti.engine.impl.db.PersistentObject;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.service.Job;
 
 /**
  * Abstract job entity class.
@@ -43,6 +43,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
     protected int revision;
 
     protected Date duedate;
+    protected Date createTime;
 
     protected String executionId;
     protected String processInstanceId;
@@ -98,8 +99,9 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         }
     }
 
+    @Override
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("retries", retries);
         persistentState.put("duedate", duedate);
         persistentState.put("exceptionMessage", exceptionMessage);
@@ -107,28 +109,34 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         return persistentState;
     }
 
+    @Override
     public int getRevisionNext() {
         return revision + 1;
     }
 
     // getters and setters //////////////////////////////////////////////////////
 
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public void setId(String id) {
         this.id = id;
     }
 
+    @Override
     public int getRevision() {
         return revision;
     }
 
+    @Override
     public void setRevision(int revision) {
         this.revision = revision;
     }
 
+    @Override
     public Date getDuedate() {
         return duedate;
     }
@@ -137,6 +145,16 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         this.duedate = duedate;
     }
 
+    @Override
+    public Date getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Date createTime) {
+        this.createTime = createTime;
+    }
+
+    @Override
     public String getExecutionId() {
         return executionId;
     }
@@ -145,6 +163,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         this.executionId = executionId;
     }
 
+    @Override
     public int getRetries() {
         return retries;
     }
@@ -153,6 +172,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         this.retries = retries;
     }
 
+    @Override
     public String getProcessInstanceId() {
         return processInstanceId;
     }
@@ -161,6 +181,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public boolean isExclusive() {
         return isExclusive;
     }
@@ -169,6 +190,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         this.isExclusive = isExclusive;
     }
 
+    @Override
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
@@ -177,6 +199,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public String getJobHandlerType() {
         return jobHandlerType;
     }
@@ -185,6 +208,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         this.jobHandlerType = jobHandlerType;
     }
 
+    @Override
     public String getJobHandlerConfiguration() {
         return jobHandlerConfiguration;
     }
@@ -209,6 +233,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         this.endDate = endDate;
     }
 
+    @Override
     public String getExceptionMessage() {
         return exceptionMessage;
     }
@@ -217,6 +242,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         this.exceptionMessage = StringUtils.abbreviate(exceptionMessage, MAX_EXCEPTION_MESSAGE_LENGTH);
     }
 
+    @Override
     public String getJobType() {
         return jobType;
     }
@@ -225,6 +251,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         this.jobType = jobType;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }

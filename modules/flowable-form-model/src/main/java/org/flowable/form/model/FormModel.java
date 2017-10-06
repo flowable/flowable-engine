@@ -113,7 +113,7 @@ public class FormModel implements Serializable {
      * Helper methods
      */
     public Map<String, FormField> allFieldsAsMap() {
-        Map<String, FormField> result = new HashMap<String, FormField>();
+        Map<String, FormField> result = new HashMap<>();
         List<FormField> allFields = listAllFields();
         if (allFields != null) {
             for (FormField field : allFields) {
@@ -127,7 +127,7 @@ public class FormModel implements Serializable {
     }
 
     public List<FormField> listAllFields() {
-        List<FormField> listOfAllFields = new ArrayList<FormField>();
+        List<FormField> listOfAllFields = new ArrayList<>();
         collectSubFields(fields, listOfAllFields);
         return listOfAllFields;
     }

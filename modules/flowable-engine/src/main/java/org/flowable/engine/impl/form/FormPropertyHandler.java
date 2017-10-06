@@ -17,11 +17,11 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.form.AbstractFormType;
 import org.flowable.engine.form.FormProperty;
-import org.flowable.engine.impl.el.NoExecutionVariableScope;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 
 /**
  * @author Tom Baeyens
@@ -57,9 +57,7 @@ public class FormPropertyHandler implements Serializable {
             }
         } else {
             // Execution is null, the form-property is used in a start-form.
-            // Default value
-            // should be available (ACT-1028) even though no execution is
-            // available.
+            // Default value should be available (ACT-1028) even though no execution is available.
             if (defaultExpression != null) {
                 modelValue = defaultExpression.getValue(NoExecutionVariableScope.getSharedInstance());
             }

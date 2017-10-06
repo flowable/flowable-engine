@@ -16,12 +16,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.flowable.engine.common.impl.cfg.IdGenerator;
-import org.flowable.form.engine.impl.context.Context;
-import org.flowable.form.engine.impl.interceptor.CommandContext;
 import org.flowable.form.engine.impl.persistence.deploy.Deployer;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntityManager;
 import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntity;
+import org.flowable.form.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,6 +37,7 @@ public class FormDefinitionDeployer implements Deployer {
     protected FormDefinitionDeploymentHelper formDeploymentHelper;
     protected CachingAndArtifactsManager cachingAndArtifactsManager;
 
+    @Override
     public void deploy(FormDeploymentEntity deployment) {
         LOGGER.debug("Processing deployment {}", deployment.getName());
 
@@ -66,7 +66,7 @@ public class FormDefinitionDeployer implements Deployer {
      */
     protected Map<FormDefinitionEntity, FormDefinitionEntity> getPreviousVersionsOfFormDefinitions(ParsedDeployment parsedDeployment) {
 
-        Map<FormDefinitionEntity, FormDefinitionEntity> result = new LinkedHashMap<FormDefinitionEntity, FormDefinitionEntity>();
+        Map<FormDefinitionEntity, FormDefinitionEntity> result = new LinkedHashMap<>();
 
         for (FormDefinitionEntity newDefinition : parsedDeployment.getAllFormDefinitions()) {
             FormDefinitionEntity existingFormDefinition = formDeploymentHelper.getMostRecentVersionOfForm(newDefinition);
@@ -102,8 +102,7 @@ public class FormDefinitionDeployer implements Deployer {
      * Saves each decision table. It is assumed that the deployment is new, the definitions have never been saved before, and that they have all their values properly set up.
      */
     protected void persistFormDefinitions(ParsedDeployment parsedDeployment) {
-        CommandContext commandContext = Context.getCommandContext();
-        FormDefinitionEntityManager formDefinitionEntityManager = commandContext.getFormDefinitionEntityManager();
+        FormDefinitionEntityManager formDefinitionEntityManager = CommandContextUtil.getFormDefinitionEntityManager();
 
         for (FormDefinitionEntity formDefinition : parsedDeployment.getAllFormDefinitions()) {
             formDefinitionEntityManager.insert(formDefinition);

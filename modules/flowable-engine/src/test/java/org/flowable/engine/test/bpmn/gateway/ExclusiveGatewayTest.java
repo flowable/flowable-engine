@@ -20,10 +20,9 @@ import java.util.Map;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.service.Job;
 
 /**
  * @author Joram Barrez
@@ -42,7 +41,7 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
     @Deployment
     public void testSkipExpression() {
         for (int i = 1; i <= 3; i++) {
-            Map<String, Object> variables = new HashMap<String, Object>();
+            Map<String, Object> variables = new HashMap<>();
             variables.put("_FLOWABLE_SKIP_EXPRESSION_ENABLED", true);
             variables.put("input", -i);
 
@@ -102,21 +101,21 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
     public void testDecideBasedOnBeanProperty() {
         runtimeService.startProcessInstanceByKey("decisionBasedOnBeanProperty", CollectionUtil.singletonMap("order", new ExclusiveGatewayTestOrder(150)));
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
         assertEquals("Standard service", task.getName());
     }
 
     @Deployment
     public void testDecideBasedOnListOrArrayOfBeans() {
-        List<ExclusiveGatewayTestOrder> orders = new ArrayList<ExclusiveGatewayTestOrder>();
+        List<ExclusiveGatewayTestOrder> orders = new ArrayList<>();
         orders.add(new ExclusiveGatewayTestOrder(50));
         orders.add(new ExclusiveGatewayTestOrder(300));
         orders.add(new ExclusiveGatewayTestOrder(175));
 
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("decisionBasedOnListOrArrayOfBeans", CollectionUtil.singletonMap("orders", orders));
 
-        Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertNotNull(task);
         assertEquals("Gold Member service", task.getName());
 
@@ -134,7 +133,7 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
     public void testDecideBasedOnBeanMethod() {
         runtimeService.startProcessInstanceByKey("decisionBasedOnBeanMethod", CollectionUtil.singletonMap("order", new ExclusiveGatewayTestOrder(300)));
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
         assertEquals("Gold Member service", task.getName());
     }
@@ -154,7 +153,7 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
 
         // Input == 1 -> default is not selected
         String procId = runtimeService.startProcessInstanceByKey("exclusiveGwDefaultSequenceFlow", CollectionUtil.singletonMap("input", 1)).getId();
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Input is one", task.getName());
         runtimeService.deleteProcessInstance(procId, null);
 
@@ -201,14 +200,14 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
         assertNotNull(job);
 
         managementService.executeJob(job.getId());
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("Input is one", task.getName());
     }
 
     // From https://github.com/Activiti/Activiti/issues/796
     @Deployment
     public void testExclusiveDirectlyToEnd() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("input", 1);
         ProcessInstance startProcessInstanceByKey = runtimeService.startProcessInstanceByKey("exclusiveGateway", variables);
         long count = historyService.createHistoricActivityInstanceQuery()

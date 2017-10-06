@@ -23,16 +23,18 @@ public class PrivilegeEntityImpl extends AbstractEntity implements PrivilegeEnti
 
     @Override
     public Object getPersistentState() {
-        Map<String, String> state = new HashMap<String, String>();
+        Map<String, String> state = new HashMap<>();
         state.put("id", id);
         state.put("name", name);
         return state;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }

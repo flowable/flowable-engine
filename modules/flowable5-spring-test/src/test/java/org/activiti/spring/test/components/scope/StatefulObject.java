@@ -52,7 +52,7 @@ public class StatefulObject implements Serializable, InitializingBean {
 
         this.customerId = customerId;
 
-        logger.info("setting this {} instances 'customerId' to {}. The current executionId is {}", StatefulObject.class.getName(), this.customerId, this.executionId);
+        LOGGER.info("setting this {} instances 'customerId' to {}. The current executionId is {}", StatefulObject.class.getName(), this.customerId, this.executionId);
 
     }
 
@@ -106,6 +106,6 @@ public class StatefulObject implements Serializable, InitializingBean {
 
     public void afterPropertiesSet() throws Exception {
         Assert.notNull(this.processInstance, "the processInstance should be equal to the currently active processInstance!");
-        logger.info("the 'processInstance' property is non-null: PI ID#{}", this.processInstance.getId());
+        LOGGER.info("the 'processInstance' property is non-null: PI ID#{}", this.processInstance.getId());
     }
 }

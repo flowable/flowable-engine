@@ -43,7 +43,7 @@ public class IdmGroupsResource {
 
     @RequestMapping(method = RequestMethod.GET)
     public List<GroupRepresentation> getGroups(@RequestParam(required = false) String filter) {
-        List<GroupRepresentation> result = new ArrayList<GroupRepresentation>();
+        List<GroupRepresentation> result = new ArrayList<>();
         for (Group group : groupService.getGroups(filter)) {
             result.add(new GroupRepresentation(group));
         }
@@ -57,12 +57,12 @@ public class IdmGroupsResource {
 
     @RequestMapping(value = "/{groupId}/users", method = RequestMethod.GET)
     public ResultListDataRepresentation getGroupUsers(@PathVariable String groupId,
-            @RequestParam(required = false) String filter,
-            @RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer pageSize) {
+                                                      @RequestParam(required = false) String filter,
+                                                      @RequestParam(required = false) Integer page,
+                                                      @RequestParam(required = false) Integer pageSize) {
 
         List<User> users = groupService.getGroupUsers(groupId, filter, page, pageSize);
-        List<UserRepresentation> userRepresentations = new ArrayList<UserRepresentation>(users.size());
+        List<UserRepresentation> userRepresentations = new ArrayList<>(users.size());
         for (User user : users) {
             userRepresentations.add(new UserRepresentation(user));
         }

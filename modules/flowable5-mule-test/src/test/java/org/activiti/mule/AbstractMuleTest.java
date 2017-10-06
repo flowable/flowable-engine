@@ -17,12 +17,13 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.common.impl.db.DbSchemaManager;
+import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.ProcessEngineImpl;
-import org.flowable.engine.impl.db.DbSqlSession;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.junit.Assert;
 import org.mule.tck.junit4.FunctionalTestCase;
 import org.slf4j.Logger;
@@ -63,9 +64,9 @@ public abstract class AbstractMuleTest extends FunctionalTestCase {
             CommandConfig config = new CommandConfig().transactionNotSupported();
             commandExecutor.execute(config, new Command<Object>() {
                 public Object execute(CommandContext commandContext) {
-                    DbSqlSession session = commandContext.getSession(DbSqlSession.class);
-                    session.dbSchemaDrop();
-                    session.dbSchemaCreate();
+                    DbSchemaManager dbSchemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager();
+                    dbSchemaManager.dbSchemaDrop();
+                    dbSchemaManager.dbSchemaCreate();
                     return null;
                 }
             });

@@ -17,15 +17,24 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.cfg.TransactionContext;
+import org.flowable.engine.common.impl.cfg.TransactionState;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandContextCloseListener;
 import org.flowable.engine.common.impl.interceptor.Session;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandContextCloseListener;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AsyncHistorySession implements Session {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(AsyncHistorySession.class);
 
     protected CommandContext commandContext;
     protected AsyncHistoryListener asyncHistoryListener;
     protected CommandContextCloseListener commandContextCloseListener;
+    protected AsyncHistoryCommittedTransactionListener asyncHistoryCommittedTransactionListener;
 
     protected String tenantId;
     protected Map<String, List<Map<String, String>>> jobData;
@@ -34,10 +43,34 @@ public class AsyncHistorySession implements Session {
         this.commandContext = commandContext;
         this.asyncHistoryListener = asyncHistoryJobListener;
         initCommandContextCloseListener();
+        
+        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).isAsyncHistoryExecutorIsMessageQueueMode()) {
+            intitTransactionListener();
+        }
     }
 
     protected void initCommandContextCloseListener() {
         this.commandContextCloseListener = new AsyncHistorySessionCommandContextCloseListener(this, asyncHistoryListener); 
+    }
+    
+    protected void intitTransactionListener() {
+        
+        /* 
+         * The transaction listener needed to send a message to a message queue on state committed
+         * needs to be registered here, as in the MessageBasedJobManager#sendMessage (where it would make more sense),
+         * the TransactionContext has already been removed.
+         * 
+         * The message does need to be sent after commit, otherwise there can be race conditions between
+         * the db commit and the message handling. 
+         */
+        
+        TransactionContext transactionContext = Context.getTransactionContext();
+        if (transactionContext != null) {
+            this.asyncHistoryCommittedTransactionListener = new AsyncHistoryCommittedTransactionListener();
+            transactionContext.addTransactionListener(TransactionState.COMMITTED, asyncHistoryCommittedTransactionListener);
+        } else {
+            LOGGER.warn("No transaction context active, but one is required for proper message queue based async history.");
+        }
     }
 
     public void addHistoricData(String type, Map<String, String> data) {
@@ -46,7 +79,7 @@ public class AsyncHistorySession implements Session {
 
     public void addHistoricData(String type, Map<String, String> data, String tenantId) {
         
-        data.put(HistoryJsonConstants.TIMESTAMP, AsyncHistoryDateUtil.formatDate(commandContext.getProcessEngineConfiguration().getClock().getCurrentTime()));
+        data.put(HistoryJsonConstants.TIMESTAMP, AsyncHistoryDateUtil.formatDate(CommandContextUtil.getProcessEngineConfiguration(commandContext).getClock().getCurrentTime()));
         
         if (jobData == null) {
             jobData = new LinkedHashMap<>(); // linked: insertion order is important
@@ -86,6 +119,14 @@ public class AsyncHistorySession implements Session {
 
     public void setJobData(Map<String, List<Map<String, String>>> jobData) {
         this.jobData = jobData;
+    }
+    
+    public void addAsyncHistoryRunnableAfterCommit(Runnable runnable) {
+        if (asyncHistoryCommittedTransactionListener != null) {
+            asyncHistoryCommittedTransactionListener.addRunnable(runnable);
+        } else {
+            LOGGER.warn("Cannot register a Runnable instance when no transaction listener is active");
+        }
     }
     
 }

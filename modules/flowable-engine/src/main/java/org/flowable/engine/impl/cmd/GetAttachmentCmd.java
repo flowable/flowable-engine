@@ -15,8 +15,9 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.Attachment;
 
 /**
@@ -31,8 +32,9 @@ public class GetAttachmentCmd implements Command<Attachment>, Serializable {
         this.attachmentId = attachmentId;
     }
 
+    @Override
     public Attachment execute(CommandContext commandContext) {
-        return commandContext.getAttachmentEntityManager().findById(attachmentId);
+        return CommandContextUtil.getAttachmentEntityManager().findById(attachmentId);
     }
 
 }

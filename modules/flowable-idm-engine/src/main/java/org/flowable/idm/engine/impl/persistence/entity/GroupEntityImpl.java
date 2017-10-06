@@ -31,25 +31,30 @@ public class GroupEntityImpl extends AbstractEntity implements GroupEntity, Seri
     public GroupEntityImpl() {
     }
 
+    @Override
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("name", name);
         persistentState.put("type", type);
         return persistentState;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public String getType() {
         return type;
     }
 
+    @Override
     public void setType(String type) {
         this.type = type;
     }

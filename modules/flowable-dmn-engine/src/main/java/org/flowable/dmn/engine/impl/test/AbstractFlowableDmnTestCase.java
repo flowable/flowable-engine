@@ -17,17 +17,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.dmn.engine.impl.db.DbSqlSession;
-import org.flowable.dmn.engine.impl.interceptor.Command;
-import org.flowable.dmn.engine.impl.interceptor.CommandContext;
-import org.flowable.dmn.engine.impl.interceptor.CommandExecutor;
 import org.flowable.dmn.engine.test.DmnTestHelper;
-import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.junit.Assert;
 
 import junit.framework.AssertionFailedError;
@@ -38,7 +34,7 @@ import junit.framework.AssertionFailedError;
  */
 public abstract class AbstractFlowableDmnTestCase extends AbstractDmnTestCase {
 
-    private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = new ArrayList<String>();
+    private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = new ArrayList<>();
 
     static {
         TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_DMN_DATABASECHANGELOG");
@@ -48,13 +44,14 @@ public abstract class AbstractFlowableDmnTestCase extends AbstractDmnTestCase {
     protected DmnEngine dmnEngine;
 
     protected String deploymentIdFromDeploymentAnnotation;
-    protected List<String> deploymentIdsForAutoCleanup = new ArrayList<String>();
+    protected List<String> deploymentIdsForAutoCleanup = new ArrayList<>();
     protected Throwable exception;
 
     protected DmnEngineConfiguration dmnEngineConfiguration;
     protected DmnManagementService managementService;
     protected DmnRepositoryService repositoryService;
     protected DmnRuleService ruleService;
+    protected DmnHistoryService historyService;
 
     protected abstract void initializeDmnEngine();
 
@@ -67,6 +64,7 @@ public abstract class AbstractFlowableDmnTestCase extends AbstractDmnTestCase {
         managementService = null;
         repositoryService = null;
         ruleService = null;
+        historyService = null;
     }
 
     @Override
@@ -139,17 +137,6 @@ public abstract class AbstractFlowableDmnTestCase extends AbstractDmnTestCase {
 
             LOGGER.info("dropping and recreating db");
 
-            CommandExecutor commandExecutor = dmnEngine.getDmnEngineConfiguration().getCommandExecutor();
-            CommandConfig config = new CommandConfig().transactionNotSupported();
-            commandExecutor.execute(config, new Command<Object>() {
-                public Object execute(CommandContext commandContext) {
-                    DbSqlSession session = commandContext.getDbSqlSession();
-                    session.dbSchemaDrop();
-                    session.dbSchemaCreate();
-                    return null;
-                }
-            });
-
             if (exception != null) {
                 throw exception;
             } else {
@@ -165,6 +152,7 @@ public abstract class AbstractFlowableDmnTestCase extends AbstractDmnTestCase {
         managementService = dmnEngine.getDmnManagementService();
         repositoryService = dmnEngine.getDmnRepositoryService();
         ruleService = dmnEngine.getDmnRuleService();
+        historyService = dmnEngine.getDmnHistoryService();
     }
 
 }

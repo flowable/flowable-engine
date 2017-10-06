@@ -20,10 +20,9 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.service.Job;
 
 /**
  * @author Joram Barrez
@@ -52,7 +51,7 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testExpressionFieldInjection() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("name", "kermit");
         vars.put("gender", "male");
         vars.put("genderBean", new GenderBean());
@@ -66,7 +65,7 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
     
     @Deployment
     public void testServiceTaskWithSkipExpression() {
-      Map<String, Object> vars = new HashMap<String, Object>();
+      Map<String, Object> vars = new HashMap<>();
       vars.put("input", "test");
       vars.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
       vars.put("skip", true);
@@ -80,14 +79,14 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
     
     @Deployment
     public void testAsyncServiceTaskWithSkipExpression() {
-      Map<String, Object> vars = new HashMap<String, Object>();
+      Map<String, Object> vars = new HashMap<>();
       vars.put("input", "test");
       
       ProcessInstance pi = runtimeService.startProcessInstanceByKey("asyncServiceTask", vars);
       Job job = managementService.createJobQuery().processInstanceId(pi.getProcessInstanceId()).singleResult();
       assertNotNull(job);
       
-      vars = new HashMap<String, Object>();
+      vars = new HashMap<>();
       vars.put("_ACTIVITI_SKIP_EXPRESSION_ENABLED", true);
       vars.put("skip", true);
       runtimeService.setVariables(pi.getProcessInstanceId(), vars);
@@ -101,7 +100,7 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testExpressionFieldInjectionWithSkipExpression() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("name", "kermit");
         vars.put("gender", "male");
         vars.put("genderBean", new GenderBean());
@@ -116,7 +115,7 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
         assertEquals("timrek .rM olleH", runtimeService.getVariable(execution.getId(), "var2"));
         assertEquals("elam :si redneg ruoY", runtimeService.getVariable(execution.getId(), "var1"));
 
-        Map<String, Object> vars2 = new HashMap<String, Object>();
+        Map<String, Object> vars2 = new HashMap<>();
         vars2.put("name", "kermit");
         vars2.put("gender", "male");
         vars2.put("genderBean", new GenderBean());
@@ -159,7 +158,7 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
 
         // If variable value is != 'throw-exception', process goes
         // through service task and ends immediately
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("var", "no-exception");
         runtimeService.startProcessInstanceByKey("exceptionHandling", vars);
         assertEquals(0, runtimeService.createProcessInstanceQuery().count());
@@ -169,7 +168,7 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
         // and takes sequence flow to user task
         vars.put("var", "throw-exception");
         runtimeService.startProcessInstanceByKey("exceptionHandling", vars);
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Fix Exception", task.getName());
     }
 

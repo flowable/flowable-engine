@@ -14,7 +14,7 @@ package org.flowable.engine.impl.form;
 
 import org.flowable.engine.common.impl.de.odysseus.el.util.SimpleContext;
 import org.flowable.engine.common.impl.javax.el.VariableMapper;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Tom Baeyens
@@ -27,6 +27,7 @@ public class TaskElContext extends SimpleContext {
         this.taskVariableMapper = new TaskVariableMapper(task);
     }
 
+    @Override
     public VariableMapper getVariableMapper() {
         return taskVariableMapper;
     }

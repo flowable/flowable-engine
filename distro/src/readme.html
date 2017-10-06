@@ -26,6 +26,82 @@
 
 <h1>Flowable Release Notes</h1>
 
+<h3>Release Notes - Flowable - 6.1.2</h3>
+
+<h4>Bug fix release</h4>
+
+<p>Thanks to whee we found out that there's an issue with the release 6.1.1 when running it without an Internet connection <a href="https://forum.flowable.org/t/upgrading-6-1-0-to-6-1-1-could-not-read-idm-mybatis-configuration-file/753">https://forum.flowable.org/t/upgrading-6-1-0-to-6-1-1-could-not-read-idm-mybatis-configuration-file/753</a>.
+This was fixed with the following commit <a href="https://github.com/flowable/flowable-engine/commit/7338015dc8aadc984ff9dd4ad3385b6a7b4ace6f">https://github.com/flowable/flowable-engine/commit/7338015dc8aadc984ff9dd4ad3385b6a7b4ace6f</a>.
+Although an Internet connection is often available, we decided to do a bug fix release to prevent people from running into this issue.</p>
+
+<h3>Release Notes - Flowable - 6.1.1</h3>
+
+<h4>Highlights</h4>
+
+<ul>
+    <li>Introduction of audit history in the DMN Engine. When history is enabled in the DMN Engine, an audit log of each decision execution is stored in the DMN database.
+    By default the history is disabled.</li>
+    <li>Replaced the MVEL expression language in the DMN Engine with the same JUEL expression language as used in the BPMN and Form Engine.</li>
+    <li>Refactored DmnRuleService with new ExecuteDecisionBuilder and deprecated old execute decision methods.</li>
+    <li>Call activity - allow to set output parameters a local variables for multi instance executions.</li>
+    <li>Easier usage of async history in combination with a message queue (see <a href="https://github.com/flowable/flowable-examples/tree/master/async-history">https://github.com/flowable/flowable-examples/tree/master/async-history</a>)</li>
+    <li>Performance improvement: introduce grouping and compression for async history data</li>
+    <li>Various small bugfixes all around.</li>
+</ul>
+
+<h4>Community contributors</h4>
+
+<ul>
+    <li>Faizal Abdul Manan (faizal-manan)</li>
+    <li>David Malkovsky (dbmalkovsky)</li>
+    <li>Harsha Teja Kanna (h7kanna)</li>
+    <li>Lori Small (lsmall)</li>
+    <li>bsydow</li>
+    <li>stephraleigh</li>
+</ul>
+
+<h4>Upgrade notes</h4>
+
+<p><b>CommandContext and related classes package changes:</b></p>
+
+<p>
+As a result of a refactoring that involved consolidating various classes and moving them to the <i>flowable-engine-common</i> module, following <i>internal</i> classes have changed packages.
+</p>
+
+<p>
+The following applies to all engines (process, dmn, form, content and idm):
+</p>
+
+<ul>
+    <li>The <i>CommandContext</i> class is now in the <i>org.flowable.engine.common.impl.interceptor</i> package.</li>
+    <li>The various getter methods on the <i>CommandContext</i> that gave quick-access to various internal components are removed 
+    (because the CommandContext is now shared between all engines). All engines now have a <i>CommandContextUtil</i> class that 
+    should be used instead and which has said getter methods. The <i>org.flowable.engine.impl.context.Context</i> utlity class 
+    in the process engine is still there for backwards compatibility and can be used as before, but simply delegates to the <i>CommandContextUtil</i> methods.</li>
+    <li>The classes related to the command stack interceptors (<i>Command</i>, <i>CommandContextInterceptor</i>, <i>CommandExecutor</i>, <i>Log/Jta/RetryInterceptor</i>) are now in the <i>org.flowable.engine.common.impl.interceptor</i> package.</li>
+    <li>The <i>DbSqlSession</i> and <i>DbSqlSessionFactory</i> classes are now found in the <i>org.flowable.engine.common.impl.db</i> package.</li>
+    <li>Database schema management logic has moved from the <i>DbSqlSession</i> class to implementations of the <i>org.flowable.engine.common.impl.db.DbSchemaManager</i> interface.</li>
+    <li>The <i>GenericManagerFactory</i> class is now in the <i>org.flowable.engine.common.impl.persistence</i> package.</li>
+</ul>
+
+<p>
+The process engine now has the <i>org.flowable.engine.impl.util.EngineServiceUtil</i> utility class that can be used to get easily access to the configuration and services of the other engines.
+</p>
+
+<p><b>FlowableCancelledEvent.getCause() return value change</b></p>
+
+<p>
+The value that's passed in the <i>cause</i> of a <i>org.flowable.engine.delegate.event.FlowableCancelledEvent</i> has changed in the following cases:
+<ul>
+    <li>The event that is thrown for activities cancelled by a <i>message boundary event</i>.</li>
+    <li>The event that is thrown for activities cancelled by a <i>signal boundary event</i>.</li>
+    <li>The event that is thrown for activities cancelled by a <i>timer boundary event</i>.</li>
+</ul>
+Instead of passing an entity instance (MessageEventSubscriptionEntity, SignalEventSubscriptionEntity or JobEntity respectively) the BpmnModel
+counterpart, as an instance of a subclass of <i>org.flowable.bpmn.model.FlowElement</i>, is passed instead which is consistent with the general value of the <i>cause</i> property.
+Do note that due to the fact the return type of <i>getCause()</i> is <i>Object</i>, the compiler will not notice this, so best to look at the usage of the <i>FlowableCancelledEvent</i> in your code.
+</p>
+
 <h3>Release Notes - Flowable - 6.1.0</h3>
 
 <h4>Highlights</h4>

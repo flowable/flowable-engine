@@ -12,8 +12,8 @@
  */
 package org.flowable.idm.engine.impl;
 
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.idm.engine.IdmEngineConfiguration;
-import org.flowable.idm.engine.impl.interceptor.CommandExecutor;
 
 public abstract class ServiceImpl {
 

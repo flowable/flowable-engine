@@ -36,10 +36,12 @@ public class HttpResponseHandlerInvocation extends DelegateInvocation {
         this.httpResponse = httpResponse;
     }
 
+    @Override
     protected void invoke() {
         httpResponseHandlerInstance.handleHttpResponse(delegateExecution, httpResponse);
     }
 
+    @Override
     public Object getTarget() {
         return httpResponseHandlerInstance;
     }

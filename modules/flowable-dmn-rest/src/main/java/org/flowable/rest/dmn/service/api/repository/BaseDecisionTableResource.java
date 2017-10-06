@@ -47,7 +47,7 @@ public class BaseDecisionTableResource {
     /**
      * Returns the {@link DmnDecisionTable} that is requested. Throws the right exceptions when bad request was made or decision table is not found.
      */
-    protected DmnDecisionTable geDecisionTableFromRequest(String decisionTableId) {
+    protected DmnDecisionTable getDecisionTableFromRequest(String decisionTableId) {
         DmnDecisionTable decisionTable = dmnRepositoryService.getDecisionTable(decisionTableId);
 
         if (decisionTable == null) {

@@ -28,7 +28,7 @@ import org.activiti.engine.impl.javax.el.VariableMapper;
 
 /**
  * Simple context implementation.
- * 
+ *
  * @author Christoph Beck
  */
 public class SimpleContext extends ELContext {
@@ -42,7 +42,7 @@ public class SimpleContext extends ELContext {
 
         public void setFunction(String prefix, String localName, Method method) {
             if (map.isEmpty()) {
-                map = new HashMap<String, Method>();
+                map = new HashMap<>();
             }
             map.put(prefix + ":" + localName, method);
         }
@@ -59,7 +59,7 @@ public class SimpleContext extends ELContext {
         @Override
         public ValueExpression setVariable(String variable, ValueExpression expression) {
             if (map.isEmpty()) {
-                map = new HashMap<String, ValueExpression>();
+                map = new HashMap<>();
             }
             return map.put(variable, expression);
         }
@@ -138,7 +138,7 @@ public class SimpleContext extends ELContext {
 
     /**
      * Set our resolver.
-     * 
+     *
      * @param resolver
      */
     public void setELResolver(ELResolver resolver) {

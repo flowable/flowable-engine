@@ -13,22 +13,21 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
+import org.flowable.variable.service.history.HistoricVariableInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -37,11 +36,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * Modified the "createProcessInstance" method to conditionally call a "createProcessInstanceResponse" method with a different signature, which will conditionally return the process variables that
@@ -186,7 +188,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
 
         Map<String, Object> startVariables = null;
         if (request.getVariables() != null) {
-            startVariables = new HashMap<String, Object>();
+            startVariables = new HashMap<>();
             for (RestVariable variable : request.getVariables()) {
                 if (variable.getName() == null) {
                     throw new FlowableIllegalArgumentException("Variable name is required.");
@@ -197,7 +199,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
 
         Map<String, Object> transientVariables = null;
         if (request.getTransientVariables() != null) {
-            transientVariables = new HashMap<String, Object>();
+            transientVariables = new HashMap<>();
             for (RestVariable variable : request.getTransientVariables()) {
                 if (variable.getName() == null) {
                     throw new FlowableIllegalArgumentException("Variable name is required.");

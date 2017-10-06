@@ -20,9 +20,11 @@ import java.util.Set;
 
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentItemQuery;
-import org.flowable.content.engine.impl.interceptor.CommandContext;
-import org.flowable.content.engine.impl.interceptor.CommandExecutor;
+import org.flowable.content.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.AbstractQuery;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 
 /**
  * @author Tijs Rademakers
@@ -73,156 +75,187 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
         super(commandExecutor);
     }
 
+    @Override
     public ContentItemQueryImpl id(String id) {
         this.id = id;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl ids(Set<String> ids) {
         this.ids = ids;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl name(String name) {
         this.name = name;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl nameLike(String nameLike) {
         this.nameLike = nameLike;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl mimeType(String mimeType) {
         this.mimeType = mimeType;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl mimeTypeLike(String mimeTypeLike) {
         this.mimeTypeLike = mimeTypeLike;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl taskId(String taskId) {
         this.taskId = taskId;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl taskIdLike(String taskIdLike) {
         this.taskIdLike = taskIdLike;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl processInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl processInstanceIdLike(String processInstanceIdLike) {
         this.processInstanceIdLike = processInstanceIdLike;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl field(String field) {
         this.field = field;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl fieldLike(String fieldLike) {
         this.fieldLike = fieldLike;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl contentStoreId(String contentStoreId) {
         this.contentStoreId = contentStoreId;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl contentStoreIdLike(String contentStoreIdLike) {
         this.contentStoreIdLike = contentStoreIdLike;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl contentStoreName(String contentStoreName) {
         this.contentStoreName = contentStoreName;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl contentStoreNameLike(String contentStoreNameLike) {
         this.contentStoreNameLike = contentStoreNameLike;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl contentAvailable(Boolean contentAvailable) {
         this.contentAvailable = contentAvailable;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl contentSize(Long contentSize) {
         this.contentSize = contentSize;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl minContentSize(Long minContentSize) {
         this.minContentSize = minContentSize;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl maxContentSize(Long maxContentSize) {
         this.maxContentSize = maxContentSize;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl createdDate(Date createdDate) {
         this.createdDate = createdDate;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl createdDateBefore(Date createdDateBefore) {
         this.createdDateBefore = createdDateBefore;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl createdDateAfter(Date createdDateAfter) {
         this.createdDateAfter = createdDateAfter;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl createdBy(String createdBy) {
         this.createdBy = createdBy;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl createdByLike(String createdByLike) {
         this.createdByLike = createdByLike;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl lastModifiedDate(Date lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl lastModifiedDateBefore(Date lastModifiedDateBefore) {
         this.lastModifiedDateBefore = lastModifiedDateBefore;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl lastModifiedDateAfter(Date lastModifiedDateAfter) {
         this.lastModifiedDateAfter = lastModifiedDateAfter;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl lastModifiedBy(String lastModifiedBy) {
         this.lastModifiedBy = lastModifiedBy;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl lastModifiedByLike(String lastModifiedByLike) {
         this.lastModifiedByLike = lastModifiedByLike;
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl tenantId(String tenantId) {
         if (tenantId == null) {
             throw new FlowableIllegalArgumentException("deploymentTenantId is null");
@@ -231,6 +264,7 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl tenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
             throw new FlowableIllegalArgumentException("deploymentTenantIdLike is null");
@@ -239,6 +273,7 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
         return this;
     }
 
+    @Override
     public ContentItemQueryImpl withoutTenantId() {
         this.withoutTenantId = true;
         return this;
@@ -246,10 +281,12 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
 
     // sorting ////////////////////////////////////////////////////////
 
+    @Override
     public ContentItemQuery orderByCreatedDate() {
         return orderBy(ContentItemQueryProperty.CREATED_DATE);
     }
 
+    @Override
     public ContentItemQuery orderByTenantId() {
         return orderBy(ContentItemQueryProperty.TENANT_ID);
     }
@@ -259,13 +296,13 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
     @Override
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getContentItemEntityManager().findContentItemCountByQueryCriteria(this);
+        return CommandContextUtil.getContentItemEntityManager().findContentItemCountByQueryCriteria(this);
     }
 
     @Override
     public List<ContentItem> executeList(CommandContext commandContext) {
         checkQueryOk();
-        return commandContext.getContentItemEntityManager().findContentItemsByQueryCriteria(this);
+        return CommandContextUtil.getContentItemEntityManager().findContentItemsByQueryCriteria(this);
     }
 
     // getters ////////////////////////////////////////////////////////

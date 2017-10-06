@@ -12,20 +12,20 @@
  */
 package org.flowable.spring.integration;
 
-import org.springframework.integration.mapping.HeaderMapper;
-import org.springframework.messaging.MessageHeaders;
-
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentSkipListSet;
+
+import org.springframework.integration.mapping.HeaderMapper;
+import org.springframework.messaging.MessageHeaders;
 
 /**
  * @author Josh Long
  */
 public class ProcessVariableHeaderMapper implements HeaderMapper<Map<String, Object>> {
 
-    private final Set<String> keysToPreserve = new ConcurrentSkipListSet<String>();
+    private final Set<String> keysToPreserve = new ConcurrentSkipListSet<>();
 
     public ProcessVariableHeaderMapper(Set<String> sync) {
         this.keysToPreserve.addAll(sync);

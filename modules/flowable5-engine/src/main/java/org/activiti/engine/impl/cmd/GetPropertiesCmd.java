@@ -29,13 +29,14 @@ public class GetPropertiesCmd implements Command<Map<String, String>>, Serializa
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     @SuppressWarnings("unchecked")
     public Map<String, String> execute(CommandContext commandContext) {
         List<PropertyEntity> propertyEntities = commandContext
                 .getDbSqlSession()
                 .selectList("selectProperties");
 
-        Map<String, String> properties = new HashMap<String, String>();
+        Map<String, String> properties = new HashMap<>();
         for (PropertyEntity propertyEntity : propertyEntities) {
             properties.put(propertyEntity.getName(), propertyEntity.getValue());
         }

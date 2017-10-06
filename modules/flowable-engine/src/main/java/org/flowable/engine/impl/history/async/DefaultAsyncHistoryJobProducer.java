@@ -19,10 +19,11 @@ import java.util.zip.GZIPOutputStream;
 
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntityManager;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.HistoryJobService;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -33,6 +34,7 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
 
     protected boolean isJsonGzipCompressionEnabled;
     protected boolean isAsyncHistoryJsonGroupingEnabled;
+    protected int asyncHistoryJsonGroupingThreshold;
     
     @Override
     public void historyDataGenerated(List<ObjectNode> historyObjectNodes) {
@@ -41,37 +43,40 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
 
     protected void createJobsWithHistoricalData(List<ObjectNode> historyObjectNodes, CommandContext commandContext) {
         AsyncHistorySession asyncHistorySession = commandContext.getSession(AsyncHistorySession.class);
-        if (isAsyncHistoryJsonGroupingEnabled) {
-            HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession);
-            ArrayNode arrayNode = commandContext.getProcessEngineConfiguration().getObjectMapper().createArrayNode();
+        if (isAsyncHistoryJsonGroupingEnabled && historyObjectNodes.size() >= asyncHistoryJsonGroupingThreshold) {
+            String jobType = isJsonGzipCompressionEnabled ? AsyncHistoryJobZippedHandler.JOB_TYPE : AsyncHistoryJobHandler.JOB_TYPE;
+            HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession, jobType);
+            ArrayNode arrayNode = CommandContextUtil.getProcessEngineConfiguration(commandContext).getObjectMapper().createArrayNode();
             for (ObjectNode historyJsonNode : historyObjectNodes) {
                 arrayNode.add(historyJsonNode);
             }
-            addJsonToJob(commandContext, jobEntity, arrayNode);
+            addJsonToJob(commandContext, jobEntity, arrayNode, isJsonGzipCompressionEnabled);
+            
         } else {
             for (ObjectNode historyJsonNode : historyObjectNodes) {
-                HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession);
-                addJsonToJob(commandContext, jobEntity, historyJsonNode);
+                HistoryJobEntity jobEntity = createAndInsertJobEntity(commandContext, asyncHistorySession, AsyncHistoryJobHandler.JOB_TYPE);
+                addJsonToJob(commandContext, jobEntity, historyJsonNode, false);
             }
+            
         }
     }
     
-    protected HistoryJobEntity createAndInsertJobEntity(CommandContext commandContext, AsyncHistorySession asyncHistorySession) {
-        ProcessEngineConfiguration processEngineConfiguration = commandContext.getProcessEngineConfiguration();
-        HistoryJobEntityManager historyJobEntityManager = commandContext.getHistoryJobEntityManager();
-        HistoryJobEntity currentJobEntity = historyJobEntityManager.create();
-        currentJobEntity.setJobHandlerType(AsyncHistoryJobHandler.JOB_TYPE);
-        currentJobEntity.setRetries(commandContext.getProcessEngineConfiguration().getAsyncHistoryExecutorNumberOfRetries());
+    protected HistoryJobEntity createAndInsertJobEntity(CommandContext commandContext, AsyncHistorySession asyncHistorySession, String jobType) {
+        ProcessEngineConfiguration processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        HistoryJobService historyJobService = CommandContextUtil.getHistoryJobService(commandContext);
+        HistoryJobEntity currentJobEntity = historyJobService.createHistoryJob();
+        currentJobEntity.setJobHandlerType(jobType);
+        currentJobEntity.setRetries(CommandContextUtil.getProcessEngineConfiguration(commandContext).getAsyncHistoryExecutorNumberOfRetries());
         currentJobEntity.setTenantId(asyncHistorySession.getTenantId());
         currentJobEntity.setCreateTime(processEngineConfiguration.getClock().getCurrentTime());
-        historyJobEntityManager.insert(currentJobEntity);
+        historyJobService.scheduleHistoryJob(currentJobEntity);
         return currentJobEntity;
     }
 
-    protected void addJsonToJob(CommandContext commandContext, HistoryJobEntity jobEntity, JsonNode rootObjectNode) {
+    protected void addJsonToJob(CommandContext commandContext, HistoryJobEntity jobEntity, JsonNode rootObjectNode, boolean applyCompression) {
         try {
-            byte[] bytes = commandContext.getProcessEngineConfiguration().getObjectMapper().writeValueAsBytes(rootObjectNode);
-            if (isJsonGzipCompressionEnabled) {
+            byte[] bytes = CommandContextUtil.getProcessEngineConfiguration(commandContext).getObjectMapper().writeValueAsBytes(rootObjectNode);
+            if (applyCompression) {
                 bytes = compress(bytes);
             }
             jobEntity.setAdvancedJobHandlerConfigurationBytes(bytes);
@@ -105,6 +110,14 @@ public class DefaultAsyncHistoryJobProducer implements AsyncHistoryListener {
 
     public void setAsyncHistoryJsonGroupingEnabled(boolean isAsyncHistoryJsonGroupingEnabled) {
         this.isAsyncHistoryJsonGroupingEnabled = isAsyncHistoryJsonGroupingEnabled;
+    }
+
+    public int getAsyncHistoryJsonGroupingThreshold() {
+        return asyncHistoryJsonGroupingThreshold;
+    }
+
+    public void setAsyncHistoryJsonGroupingThreshold(int asyncHistoryJsonGroupingThreshold) {
+        this.asyncHistoryJsonGroupingThreshold = asyncHistoryJsonGroupingThreshold;
     }
     
 }

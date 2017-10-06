@@ -12,16 +12,16 @@
  */
 package org.flowable.dmn.engine.test.runtime;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
-import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
+import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author Yvo Swillens
@@ -32,7 +32,7 @@ public class StandaloneRuntimeTest {
     public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void ruleUsageExample() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         DmnRuleService dmnRuleService = dmnEngine.getDmnRuleService();
@@ -41,8 +41,11 @@ public class StandaloneRuntimeTest {
         inputVariables.put("inputVariable1", 2);
         inputVariables.put("inputVariable2", "test2");
 
-        Map<String, Object> result = dmnRuleService.executeDecisionByKeySingleResult("decision1", inputVariables);
-
+        Map<String, Object> result = dmnRuleService.createExecuteDecisionBuilder()
+                .decisionKey("decision1")
+                .variables(inputVariables)
+                .executeWithSingleResult();
+        
         Assert.assertEquals("result2", result.get("outputVariable1"));
     }
 }

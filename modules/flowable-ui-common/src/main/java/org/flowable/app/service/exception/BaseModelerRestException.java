@@ -74,7 +74,7 @@ public class BaseModelerRestException extends RuntimeException {
 
     public void addCustomData(String key, Object data) {
         if (customData == null) {
-            customData = new HashMap<String, Object>();
+            customData = new HashMap<>();
         }
         customData.put(key, data);
     }

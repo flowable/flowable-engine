@@ -39,6 +39,7 @@ public class EmptyExpressionsConverterTest extends AbstractConverterTest {
         validateModel(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "empty_expressions.dmn";
     }

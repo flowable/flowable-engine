@@ -15,7 +15,7 @@ package org.flowable.standalone.history;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * @author Frederik Heremans
@@ -24,6 +24,7 @@ public class VariableUpdateExecutionListener implements ExecutionListener {
 
     private Expression varName;
 
+    @Override
     public void notify(DelegateExecution execution) {
         String variableName = (String) varName.getValue(execution);
         execution.setVariable(variableName, "Event: " + execution.getEventName());

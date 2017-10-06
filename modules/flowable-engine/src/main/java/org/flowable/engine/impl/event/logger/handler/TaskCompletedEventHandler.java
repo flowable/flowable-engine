@@ -16,10 +16,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.FlowableEntityWithVariablesEvent;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntity;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Joram Barrez
@@ -40,7 +40,7 @@ public class TaskCompletedEventHandler extends AbstractTaskEventHandler {
         if (event instanceof FlowableEntityWithVariablesEvent) {
             FlowableEntityWithVariablesEvent activitiEntityWithVariablesEvent = (FlowableEntityWithVariablesEvent) event;
             if (activitiEntityWithVariablesEvent.getVariables() != null && !activitiEntityWithVariablesEvent.getVariables().isEmpty()) {
-                Map<String, Object> variableMap = new HashMap<String, Object>();
+                Map<String, Object> variableMap = new HashMap<>();
                 for (Object variableName : activitiEntityWithVariablesEvent.getVariables().keySet()) {
                     putInMapIfNotNull(variableMap, (String) variableName, activitiEntityWithVariablesEvent.getVariables().get(variableName));
                 }

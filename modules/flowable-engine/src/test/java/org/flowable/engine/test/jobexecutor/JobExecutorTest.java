@@ -19,11 +19,13 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.flowable.engine.impl.asyncexecutor.JobManager;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandExecutor;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntityManager;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.impl.asyncexecutor.JobManager;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
 
 /**
  * @author Tom Baeyens
@@ -33,14 +35,16 @@ public class JobExecutorTest extends JobExecutorTestCase {
     public void testBasicJobExecutorOperation() throws Exception {
         CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
         commandExecutor.execute(new Command<Void>() {
+            @Override
             public Void execute(CommandContext commandContext) {
-                JobManager jobManager = commandContext.getJobManager();
+                JobServiceConfiguration jobServiceConfiguration = (JobServiceConfiguration) processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
+                JobManager jobManager = jobServiceConfiguration.getJobManager();
                 jobManager.execute(createTweetMessage("message-one"));
                 jobManager.execute(createTweetMessage("message-two"));
                 jobManager.execute(createTweetMessage("message-three"));
                 jobManager.execute(createTweetMessage("message-four"));
 
-                TimerJobEntityManager timerJobManager = commandContext.getTimerJobEntityManager();
+                TimerJobEntityManager timerJobManager = jobServiceConfiguration.getTimerJobEntityManager();
                 timerJobManager.insert(createTweetTimer("timer-one", new Date()));
                 timerJobManager.insert(createTweetTimer("timer-one", new Date()));
                 timerJobManager.insert(createTweetTimer("timer-two", new Date()));
@@ -54,8 +58,8 @@ public class JobExecutorTest extends JobExecutorTestCase {
 
         waitForJobExecutorToProcessAllJobs(8000L, 200L);
 
-        Set<String> messages = new HashSet<String>(tweetHandler.getMessages());
-        Set<String> expectedMessages = new HashSet<String>();
+        Set<String> messages = new HashSet<>(tweetHandler.getMessages());
+        Set<String> expectedMessages = new HashSet<>();
         expectedMessages.add("message-one");
         expectedMessages.add("message-two");
         expectedMessages.add("message-three");
@@ -63,6 +67,6 @@ public class JobExecutorTest extends JobExecutorTestCase {
         expectedMessages.add("timer-one");
         expectedMessages.add("timer-two");
 
-        assertEquals(new TreeSet<String>(expectedMessages), new TreeSet<String>(messages));
+        assertEquals(new TreeSet<>(expectedMessages), new TreeSet<>(messages));
     }
 }

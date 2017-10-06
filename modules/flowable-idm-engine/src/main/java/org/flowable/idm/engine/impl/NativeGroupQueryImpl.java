@@ -15,10 +15,12 @@ package org.flowable.idm.engine.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.AbstractNativeQuery;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.NativeGroupQuery;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
-import org.flowable.idm.engine.impl.interceptor.CommandExecutor;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 public class NativeGroupQueryImpl extends AbstractNativeQuery<NativeGroupQuery, Group> implements NativeGroupQuery {
 
@@ -34,12 +36,14 @@ public class NativeGroupQueryImpl extends AbstractNativeQuery<NativeGroupQuery, 
 
     // results ////////////////////////////////////////////////////////////////
 
+    @Override
     public List<Group> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return commandContext.getGroupEntityManager().findGroupsByNativeQuery(parameterMap);
+        return CommandContextUtil.getGroupEntityManager(commandContext).findGroupsByNativeQuery(parameterMap);
     }
 
+    @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
-        return commandContext.getGroupEntityManager().findGroupCountByNativeQuery(parameterMap);
+        return CommandContextUtil.getGroupEntityManager(commandContext).findGroupCountByNativeQuery(parameterMap);
     }
 
 }

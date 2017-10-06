@@ -13,9 +13,10 @@
 package org.flowable.engine.impl.cmd;
 
 import org.flowable.engine.common.impl.db.IdBlock;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.PropertyEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -29,8 +30,9 @@ public class GetNextIdBlockCmd implements Command<IdBlock> {
         this.idBlockSize = idBlockSize;
     }
 
+    @Override
     public IdBlock execute(CommandContext commandContext) {
-        PropertyEntity property = (PropertyEntity) commandContext.getPropertyEntityManager().findById("next.dbid");
+        PropertyEntity property = (PropertyEntity) CommandContextUtil.getPropertyEntityManager(commandContext).findById("next.dbid");
         long oldValue = Long.parseLong(property.getValue());
         long newValue = oldValue + idBlockSize;
         property.setValue(Long.toString(newValue));

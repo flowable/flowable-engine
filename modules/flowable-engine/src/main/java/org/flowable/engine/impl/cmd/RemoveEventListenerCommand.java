@@ -14,8 +14,9 @@ package org.flowable.engine.impl.cmd;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * Command that removes an event-listener from the process engine.
@@ -37,7 +38,7 @@ public class RemoveEventListenerCommand implements Command<Void> {
             throw new FlowableIllegalArgumentException("listener is null.");
         }
 
-        commandContext.getProcessEngineConfiguration().getEventDispatcher().removeEventListener(listener);
+        CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().removeEventListener(listener);
 
         return null;
     }

@@ -41,6 +41,7 @@ public class ServiceTaskConverterTest extends AbstractConverterTest {
         validateModel(bpmnModel);
     }
 
+    @Override
     protected String getResource() {
         return "test.servicetaskmodel.json";
     }

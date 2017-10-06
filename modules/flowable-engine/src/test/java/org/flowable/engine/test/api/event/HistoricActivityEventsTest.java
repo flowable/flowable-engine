@@ -14,11 +14,11 @@ package org.flowable.engine.test.api.event;
 
 import java.util.List;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricActivityInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;

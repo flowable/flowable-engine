@@ -2,16 +2,16 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
   
-<mapper namespace="org.flowable.form.engine.impl.persistence.entity.ResourceEntityImpl">
+<mapper namespace="org.flowable.form.engine.impl.persistence.entity.FormResourceEntityImpl">
   
   <!-- RESOURCE INSERT -->
 
-  <insert id="insertResource" parameterType="org.flowable.form.engine.impl.persistence.entity.ResourceEntityImpl">
+  <insert id="insertFormResource" parameterType="org.flowable.form.engine.impl.persistence.entity.FormResourceEntityImpl">
     insert into ${prefix}ACT_FO_FORM_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_)
     values (#{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR}, #{bytes, jdbcType=${blobType}}, #{deploymentId, jdbcType=VARCHAR})  
   </insert>
 
-  <insert id="bulkInsertResource" parameterType="java.util.List">
+  <insert id="bulkInsertFormResource" parameterType="java.util.List">
     INSERT INTO ${prefix}ACT_FO_FORM_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_, GENERATED_) VALUES 
       <foreach collection="list" item="byteArr" index="index" separator=","> 
         (#{byteArr.id, jdbcType=VARCHAR},
@@ -22,7 +22,7 @@
       </foreach>
   </insert>
 
-  <insert id="bulkInsertResource" databaseId="oracle" parameterType="java.util.List">
+  <insert id="bulkInsertFormResource" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL
       <foreach collection="list" item="resource" index="index"> 
         INTO ${prefix}ACT_FO_FORM_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_, GENERATED_) VALUES 
@@ -37,7 +37,7 @@
   
   <!-- RESOURCE UPDATE -->
 
-  <update id="updateResource" parameterType="org.flowable.form.engine.impl.persistence.entity.ResourceEntityImpl">
+  <update id="updateFormResource" parameterType="org.flowable.form.engine.impl.persistence.entity.FormResourceEntityImpl">
     update ${prefix}ACT_FO_FORM_RESOURCE
     set
       RESOURCE_BYTES_ = #{bytes, jdbcType=${blobType}}
@@ -46,13 +46,13 @@
 
   <!-- RESOURCE DELETE -->
 
-  <delete id="deleteResourcesByDeploymentId" parameterType="string">
+  <delete id="deleteFormResourcesByDeploymentId" parameterType="string">
     delete from ${prefix}ACT_FO_FORM_RESOURCE where DEPLOYMENT_ID_ = #{id}
   </delete>
   
   <!-- RESOURCE RESULTMAP -->
 
-  <resultMap id="resourceResultMap" type="org.flowable.form.engine.impl.persistence.entity.ResourceEntityImpl">
+  <resultMap id="formResourceResultMap" type="org.flowable.form.engine.impl.persistence.entity.FormResourceEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR"/>
     <result property="bytes" column="RESOURCE_BYTES_" jdbcType="${blobType}"/>
@@ -60,21 +60,21 @@
   
   <!-- RESOURCE SELECT -->
 
-  <select id="selectResourceNamesByDeploymentId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultType="string">
+  <select id="selectFormResourceNamesByDeploymentId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultType="string">
     select NAME_ from ${prefix}ACT_FO_FORM_RESOURCE where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
   </select>
   
-  <select id="selectResourceByDeploymentIdAndResourceName" parameterType="map" resultMap="resourceResultMap">
+  <select id="selectFormResourceByDeploymentIdAndResourceName" parameterType="map" resultMap="formResourceResultMap">
     select * from ${prefix}ACT_FO_FORM_RESOURCE 
     where DEPLOYMENT_ID_ = #{deploymentId}
           AND NAME_ = #{resourceName}
   </select>
 
-  <select id="selectResourcesByDeploymentId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="resourceResultMap">
+  <select id="selectFormResourcesByDeploymentId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="formResourceResultMap">
     select * from ${prefix}ACT_FO_FORM_RESOURCE where DEPLOYMENT_ID_ = #{parameter} order by NAME_ asc
   </select>
   
-  <select id="selectResource" parameterType="string" resultMap="resourceResultMap">
+  <select id="selectFormResource" parameterType="string" resultMap="formResourceResultMap">
     select * from ${prefix}ACT_FO_FORM_RESOURCE where ID_ = #{id, jdbcType=VARCHAR}
   </select>
   

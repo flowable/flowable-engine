@@ -21,7 +21,6 @@ import org.flowable.engine.form.StartFormData;
 import org.flowable.engine.form.TaskFormData;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 public class FormPropertyDefaultValueTest extends PluggableFlowableTestCase {
@@ -29,7 +28,7 @@ public class FormPropertyDefaultValueTest extends PluggableFlowableTestCase {
     @Deployment
     public void testDefaultValue() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("FormPropertyDefaultValueTest.testDefaultValue");
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         TaskFormData formData = formService.getTaskFormData(task.getId());
         List<FormProperty> formProperties = formData.getFormProperties();
@@ -49,7 +48,7 @@ public class FormPropertyDefaultValueTest extends PluggableFlowableTestCase {
             }
         }
 
-        Map<String, String> formDataUpdate = new HashMap<String, String>();
+        Map<String, String> formDataUpdate = new HashMap<>();
         formDataUpdate.put("longExpressionProperty", "1");
         formDataUpdate.put("booleanProperty", "false");
         formService.submitTaskFormData(task.getId(), formDataUpdate);
@@ -85,7 +84,7 @@ public class FormPropertyDefaultValueTest extends PluggableFlowableTestCase {
 
         // Override 2 properties. The others should pe posted as the
         // default-value
-        Map<String, String> formDataUpdate = new HashMap<String, String>();
+        Map<String, String> formDataUpdate = new HashMap<>();
         formDataUpdate.put("longExpressionProperty", "1");
         formDataUpdate.put("booleanProperty", "false");
         ProcessInstance processInstance = formService.submitStartFormData(processDefinitionId, formDataUpdate);

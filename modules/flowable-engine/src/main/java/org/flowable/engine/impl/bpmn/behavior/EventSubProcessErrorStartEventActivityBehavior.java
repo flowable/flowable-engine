@@ -14,8 +14,8 @@
 package org.flowable.engine.impl.bpmn.behavior;
 
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * Implementation of the BPMN 2.0 event subprocess start event.
@@ -28,7 +28,7 @@ public class EventSubProcessErrorStartEventActivityBehavior extends FlowNodeActi
     
     @Override
     public void trigger(DelegateExecution execution, String signalName, Object signalData) {
-        Context.getCommandContext().getHistoryManager().recordActivityStart((ExecutionEntity) execution);
+        CommandContextUtil.getHistoryManager().recordActivityStart((ExecutionEntity) execution);
         super.trigger(execution, signalName, signalData);
     }
 

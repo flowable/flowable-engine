@@ -15,9 +15,10 @@ package org.flowable.idm.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.idm.api.UserQuery;
-import org.flowable.idm.engine.impl.interceptor.Command;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -26,8 +27,9 @@ public class CreateUserQueryCmd implements Command<UserQuery>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public UserQuery execute(CommandContext commandContext) {
-        return commandContext.getUserEntityManager().createNewUserQuery();
+        return CommandContextUtil.getUserEntityManager(commandContext).createNewUserQuery();
     }
 
 }

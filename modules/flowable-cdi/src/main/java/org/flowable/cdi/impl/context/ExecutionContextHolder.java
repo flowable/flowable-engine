@@ -22,7 +22,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
  */
 public class ExecutionContextHolder {
 
-    protected static ThreadLocal<Stack<ExecutionContext>> executionContextStackThreadLocal = new ThreadLocal<Stack<ExecutionContext>>();
+    protected static ThreadLocal<Stack<ExecutionContext>> executionContextStackThreadLocal = new ThreadLocal<>();
 
     public static ExecutionContext getExecutionContext() {
         return getStack(executionContextStackThreadLocal).peek();
@@ -44,7 +44,7 @@ public class ExecutionContextHolder {
     protected static <T> Stack<T> getStack(ThreadLocal<Stack<T>> threadLocal) {
         Stack<T> stack = threadLocal.get();
         if (stack == null) {
-            stack = new Stack<T>();
+            stack = new Stack<>();
             threadLocal.set(stack);
         }
         return stack;

@@ -18,7 +18,7 @@ import org.activiti.engine.impl.Condition;
 import org.activiti.engine.impl.context.Context;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -39,6 +39,7 @@ public class UelExpressionCondition implements Condition {
         this.initialConditionExpression = conditionExpression;
     }
 
+    @Override
     public boolean evaluate(String sequenceFlowId, DelegateExecution execution) {
         String conditionExpression = null;
         if (Context.getProcessEngineConfiguration().isEnableProcessDefinitionInfoCache()) {

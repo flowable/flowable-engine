@@ -21,8 +21,10 @@ import org.flowable.idm.api.Token;
  */
 public interface TokenEntity extends Token, Entity, HasRevision {
 
+    @Override
     void setId(String id);
 
+    @Override
     Object getPersistentState();
 
 }

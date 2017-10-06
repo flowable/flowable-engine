@@ -17,9 +17,10 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.idm.api.Group;
-import org.flowable.idm.engine.impl.interceptor.Command;
-import org.flowable.idm.engine.impl.interceptor.CommandContext;
+import org.flowable.idm.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -37,8 +38,9 @@ public class GetGroupsWithPrivilegeCmd implements Command<List<Group>>, Serializ
         this.name = name;
     }
 
+    @Override
     public List<Group> execute(CommandContext commandContext) {
-        return commandContext.getGroupEntityManager().findGroupsByPrivilegeId(name);
+        return CommandContextUtil.getGroupEntityManager(commandContext).findGroupsByPrivilegeId(name);
     }
 
 }

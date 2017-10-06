@@ -13,19 +13,17 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.task.Task;
 import org.flowable.rest.exception.FlowableForbiddenException;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
+import org.flowable.task.service.Task;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -35,10 +33,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.HashMap;
-import java.util.Map;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
@@ -173,7 +175,7 @@ public class TaskResource extends TaskBaseResource {
         Map<String, Object> transientVariablesToSet = null;
 
         if (actionRequest.getVariables() != null) {
-            variablesToSet = new HashMap<String, Object>();
+            variablesToSet = new HashMap<>();
             for (RestVariable var : actionRequest.getVariables()) {
                 if (var.getName() == null) {
                     throw new FlowableIllegalArgumentException("Variable name is required");
@@ -185,7 +187,7 @@ public class TaskResource extends TaskBaseResource {
         }
 
         if (actionRequest.getTransientVariables() != null) {
-            transientVariablesToSet = new HashMap<String, Object>();
+            transientVariablesToSet = new HashMap<>();
             for (RestVariable var : actionRequest.getTransientVariables()) {
                 if (var.getName() == null) {
                     throw new FlowableIllegalArgumentException("Transient variable name is required");

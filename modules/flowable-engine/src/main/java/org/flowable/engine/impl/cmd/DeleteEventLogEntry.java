@@ -12,8 +12,9 @@
  */
 package org.flowable.engine.impl.cmd;
 
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -28,7 +29,7 @@ public class DeleteEventLogEntry implements Command<Void> {
 
     @Override
     public Void execute(CommandContext commandContext) {
-        commandContext.getEventLogEntryEntityManager().deleteEventLogEntry(logNr);
+        CommandContextUtil.getEventLogEntryEntityManager(commandContext).deleteEventLogEntry(logNr);
         return null;
     }
 

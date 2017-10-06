@@ -17,11 +17,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
+import org.flowable.task.service.history.HistoricTaskInstance;
 
 public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
 
@@ -33,13 +32,13 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
 
     private ProcessInstance processInstance2;
 
-    private Task task1;
+    private org.flowable.task.service.Task task1;
 
-    private Task task2;
+    private org.flowable.task.service.Task task2;
 
-    private Task task3;
+    private org.flowable.task.service.Task task3;
 
-    private Task task4;
+    private org.flowable.task.service.Task task4;
 
     @Override
     protected void setUp() throws Exception {
@@ -63,9 +62,9 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
         processInstance2 = runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", "Two_", "Two_");
         runtimeService.setProcessInstanceName(processInstance2.getId(), "Two_");
 
-        Map<String, Object> vars1 = new HashMap<String, Object>();
+        Map<String, Object> vars1 = new HashMap<>();
         vars1.put("var1", "One%");
-        Map<String, Object> vars2 = new HashMap<String, Object>();
+        Map<String, Object> vars2 = new HashMap<>();
         vars2.put("var1", "Two_");
 
         task1 = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
@@ -427,10 +426,10 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
     public void testQueryByTaskDeleteReasonLike() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
             // make test data
-            Task task5 = taskService.newTask("task5");
+            org.flowable.task.service.Task task5 = taskService.newTask("task5");
             taskService.saveTask(task5);
             taskService.deleteTask(task5.getId(), "deleteReason%");
-            Task task6 = taskService.newTask("task6");
+            org.flowable.task.service.Task task6 = taskService.newTask("task6");
             taskService.saveTask(task6);
             taskService.deleteTask(task6.getId(), "deleteReason_");
 

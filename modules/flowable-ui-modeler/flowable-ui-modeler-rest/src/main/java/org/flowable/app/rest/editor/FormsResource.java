@@ -78,7 +78,7 @@ public class FormsResource {
             models = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_FORM, ModelSort.NAME_ASC);
         }
 
-        List<FormRepresentation> reps = new ArrayList<FormRepresentation>();
+        List<FormRepresentation> reps = new ArrayList<>();
 
         for (Model model : models) {
             reps.add(new FormRepresentation(model));

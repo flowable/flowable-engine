@@ -19,8 +19,8 @@ import java.util.Map;
 import org.activiti.engine.history.HistoricDetail;
 import org.activiti.engine.impl.HistoricDetailQueryImpl;
 import org.activiti.engine.impl.Page;
-import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.impl.persistence.AbstractManager;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 
 /**
  * @author Tom Baeyens

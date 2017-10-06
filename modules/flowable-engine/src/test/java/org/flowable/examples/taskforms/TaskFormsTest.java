@@ -18,7 +18,6 @@ import java.util.Map;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -27,12 +26,14 @@ import org.flowable.engine.test.Deployment;
  */
 public class TaskFormsTest extends PluggableFlowableTestCase {
 
+    @Override
     public void setUp() throws Exception {
         identityService.saveUser(identityService.newUser("fozzie"));
         identityService.saveGroup(identityService.newGroup("management"));
         identityService.createMembership("fozzie", "management");
     }
 
+    @Override
     public void tearDown() throws Exception {
         identityService.deleteGroup("management");
         identityService.deleteUser("fozzie");
@@ -52,14 +53,14 @@ public class TaskFormsTest extends PluggableFlowableTestCase {
         assertEquals("org/flowable/examples/taskforms/request.form", formService.getStartFormData(processDefinitionId).getFormKey());
 
         // Define variables that would be filled in through the form
-        Map<String, String> formProperties = new HashMap<String, String>();
+        Map<String, String> formProperties = new HashMap<>();
         formProperties.put("employeeName", "kermit");
         formProperties.put("numberOfDays", "4");
         formProperties.put("vacationMotivation", "I'm tired");
         formService.submitStartFormData(procDefId, formProperties);
 
         // Management should now have a task assigned to them
-        Task task = taskService.createTaskQuery().taskCandidateGroup("management").singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().taskCandidateGroup("management").singleResult();
         assertEquals("Vacation request by kermit", task.getDescription());
         Object taskForm = formService.getRenderedTaskForm(task.getId());
         assertNotNull(taskForm);
@@ -76,7 +77,7 @@ public class TaskFormsTest extends PluggableFlowableTestCase {
         assertNull(formService.getRenderedStartForm(procDefId));
 
         runtimeService.startProcessInstanceByKey("noStartOrTaskForm");
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
         assertNull(formService.getRenderedTaskForm(task.getId()));
     }
 

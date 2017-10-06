@@ -14,9 +14,9 @@
 package org.flowable.engine.impl.cmd;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.form.DefaultFormHandler;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.FormHandlerUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
@@ -57,6 +57,7 @@ public class GetFormKeyCmd implements Command<String> {
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public String execute(CommandContext commandContext) {
         ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
 

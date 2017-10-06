@@ -23,7 +23,7 @@ import org.flowable.engine.common.api.FlowableException;
 
 /**
  * This class contains one method - prepareVariables - that is used to copy variables from Camel into the process engine.
- * 
+ *
  * @author Ryan Johnston (@rjfsu), Tijs Rademakers, Arnold Schrijver
  * @author Saeid Mirzaei
  */
@@ -31,11 +31,11 @@ public class ExchangeUtils {
 
     public static final String CAMELBODY = "camelBody";
     protected static final String IGNORE_MESSAGE_PROPERTY = "CamelMessageHistory";
-    static Map<String, Pattern> patternsCache = new HashMap<String, Pattern>();
+    static Map<String, Pattern> patternsCache = new HashMap<>();
 
     /**
      * Copies variables from Camel into the process engine.
-     * 
+     * <p>
      * This method will copy the Camel body to the "camelBody" variable. It will copy the Camel body to individual variables within Flowable if it is of type Map&lt;String, Object&gt; or it will copy
      * the Object as it comes.
      * <ul>
@@ -44,7 +44,6 @@ public class ExchangeUtils {
      * Object&gt;</li>
      * <li>If the copyVariablesFromHeader parameter is set on the endpoint, each Camel Header will be copied to an individual process variable.</li>
      * </ul>
-     * 
      */
 
     private static Pattern createPattern(String propertyString, boolean asBoolean) {
@@ -70,7 +69,7 @@ public class ExchangeUtils {
     }
 
     public static Map<String, Object> prepareVariables(Exchange exchange, FlowableEndpoint endpoint) {
-        Map<String, Object> camelVarMap = new HashMap<String, Object>();
+        Map<String, Object> camelVarMap = new HashMap<>();
 
         String copyProperties = endpoint.getCopyVariablesFromProperties();
         // don't other if the property is null, or is a false
@@ -117,7 +116,7 @@ public class ExchangeUtils {
         if (camelBody instanceof Map<?, ?>) {
             Map<?, ?> camelBodyMap = (Map<?, ?>) camelBody;
             for (@SuppressWarnings("rawtypes")
-            Map.Entry e : camelBodyMap.entrySet()) {
+                    Map.Entry e : camelBodyMap.entrySet()) {
                 if (e.getKey() instanceof String && !IGNORE_MESSAGE_PROPERTY.equalsIgnoreCase((String) e.getKey())) {
                     camelVarMap.put((String) e.getKey(), e.getValue());
                 }
@@ -136,11 +135,9 @@ public class ExchangeUtils {
 
     /**
      * Gets the value of the Camel header that contains the userId to be set as the process initiator. Returns null if no header name was specified on the Camel route.
-     * 
-     * @param exchange
-     *            The Camel Exchange object
-     * @param endpoint
-     *            The endPoint implementation
+     *
+     * @param exchange The Camel Exchange object
+     * @param endpoint The endPoint implementation
      * @return The userId of the user to be set as the process initiator
      */
     public static String prepareInitiator(Exchange exchange, FlowableEndpoint endpoint) {

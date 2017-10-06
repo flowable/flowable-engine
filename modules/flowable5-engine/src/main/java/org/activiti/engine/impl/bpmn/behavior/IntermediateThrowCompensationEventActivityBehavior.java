@@ -57,6 +57,7 @@ public class IntermediateThrowCompensationEventActivityBehavior extends FlowNode
 
     }
 
+    @Override
     public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
 
         // join compensating executions

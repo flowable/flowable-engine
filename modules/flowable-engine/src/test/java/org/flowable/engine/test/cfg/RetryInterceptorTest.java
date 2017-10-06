@@ -19,12 +19,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
+import org.flowable.engine.common.impl.interceptor.RetryInterceptor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandInterceptor;
-import org.flowable.engine.impl.interceptor.RetryInterceptor;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -44,7 +44,7 @@ public class RetryInterceptorTest {
     public void setupProcessEngine() {
         ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) new StandaloneInMemProcessEngineConfiguration();
         processEngineConfiguration.setJdbcUrl("jdbc:h2:mem:retryInterceptorTest");
-        List<CommandInterceptor> interceptors = new ArrayList<CommandInterceptor>();
+        List<CommandInterceptor> interceptors = new ArrayList<>();
         retryInterceptor = new RetryInterceptor();
         interceptors.add(retryInterceptor);
         processEngineConfiguration.setCustomPreCommandInterceptors(interceptors);
@@ -73,6 +73,7 @@ public class RetryInterceptorTest {
 
     protected class CommandThrowingOptimisticLockingException implements Command<Void> {
 
+        @Override
         public Void execute(CommandContext commandContext) {
 
             counter.incrementAndGet();

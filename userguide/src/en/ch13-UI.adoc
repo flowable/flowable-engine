@@ -4,7 +4,7 @@
 
 Flowable provides several web applications to demonstrate and leverage the functionality provided by the Flowable project:
 
-* Flowable IDM: an IDentity Management application that provides single sign-on authentication functionality for all the Flowable UI applications, and, for users with the IDM administrative privilege, it also provides functionality to manage users, groups and privileges.
+* Flowable IDM: an Identity Management application that provides single sign-on authentication functionality for all the Flowable UI applications, and, for users with the IDM administrative privilege, it also provides functionality to manage users, groups and privileges.
 * Flowable Modeler: an application that allows users with modeler privileges to model processes, forms, decision tables and application definitions.
 * Flowable Task: a runtime task application that provides functionality to start process instances, edit task forms, complete tasks and query on tasks and process instances.
 * Flowable Admin: an administrative application that allows users with admin privilege to query the BPMN, DMN, form and content engines and provides several options to change process instances, tasks, jobs and so on. The admin application connects to the engines through the REST API that is deployed together with the Flowable Task app and the Flowable REST app.

@@ -24,8 +24,9 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.form.api.FormDefinition;
@@ -45,6 +46,7 @@ public class GetFormDefinitionsForProcessDefinitionCmd implements Command<List<F
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public List<FormDefinition> execute(CommandContext commandContext) {
         ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId);
 
@@ -58,15 +60,11 @@ public class GetFormDefinitionsForProcessDefinitionCmd implements Command<List<F
             throw new FlowableObjectNotFoundException("Cannot find bpmn model for process definition id: " + processDefinitionId, BpmnModel.class);
         }
 
-        if (!(commandContext.getProcessEngineConfiguration().isFormEngineInitialized())) {
-            throw new FlowableException("Form Engine is not initialized");
-        } else {
-            if (commandContext.getProcessEngineConfiguration().getFormEngineRepositoryService() == null) {
-                throw new FlowableException("Form repository service is not available");
-            }
+        if (CommandContextUtil.getFormRepositoryService() == null) {
+            throw new FlowableException("Form repository service is not available");
         }
 
-        formRepositoryService = commandContext.getProcessEngineConfiguration().getFormEngineRepositoryService();
+        formRepositoryService = CommandContextUtil.getFormRepositoryService();
         List<FormDefinition> formDefinitions = getFormDefinitionsFromModel(bpmnModel, processDefinition);
 
         return formDefinitions;

@@ -40,6 +40,7 @@ public class CallActivityConverterTest extends AbstractConverterTest {
         deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "callactivity.bpmn";
     }

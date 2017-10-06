@@ -13,14 +13,15 @@
 
 package org.flowable.engine.test.bpmn.multiinstance;
 
-import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * @author Joram Barrez
  */
 public class TaskCompletionListener implements TaskListener {
 
+    @Override
     public void notify(DelegateTask delegateTask) {
         Integer counter = (Integer) delegateTask.getVariable("taskListenerCounter");
         if (counter == null) {

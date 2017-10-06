@@ -14,9 +14,9 @@
 package org.flowable.rest.service.api.engine.variable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.rest.variable.EngineRestVariable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.flowable.rest.variable.EngineRestVariable;
 
 /**
  * Pojo representing a variable used in REST-service which defines it's name, variable, scope and type.

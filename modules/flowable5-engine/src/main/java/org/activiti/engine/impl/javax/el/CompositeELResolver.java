@@ -32,15 +32,13 @@ import java.util.List;
  * are collected and combined from all child ELResolvers for these methods.
  */
 public class CompositeELResolver extends ELResolver {
-    private final List<ELResolver> resolvers = new ArrayList<ELResolver>();
+    private final List<ELResolver> resolvers = new ArrayList<>();
 
     /**
      * Adds the given resolver to the list of component resolvers. Resolvers are consulted in the order in which they are added.
-     * 
-     * @param elResolver
-     *            The component resolver to add.
-     * @throws NullPointerException
-     *             If the provided resolver is null.
+     *
+     * @param elResolver The component resolver to add.
+     * @throws NullPointerException If the provided resolver is null.
      */
     public void add(ELResolver elResolver) {
         if (elResolver == null) {
@@ -53,13 +51,11 @@ public class CompositeELResolver extends ELResolver {
      * Returns the most general type that this resolver accepts for the property argument, given a base object. One use for this method is to assist tools in auto-completion. The result is obtained by
      * querying all component resolvers. The Class returned is the most specific class that is a common superclass of all the classes returned by each component resolver's getCommonPropertyType
      * method. If null is returned by a resolver, it is skipped.
-     * 
-     * @param context
-     *            The context of this evaluation.
-     * @param base
-     *            The base object to return the most general property type for, or null to enumerate the set of top-level variables that this resolver can evaluate.
+     *
+     * @param context The context of this evaluation.
+     * @param base    The base object to return the most general property type for, or null to enumerate the set of top-level variables that this resolver can evaluate.
      * @return null if this ELResolver does not know how to handle the given base object; otherwise Object.class if any type of property is accepted; otherwise the most general property type accepted
-     *         for the given base.
+     * for the given base.
      */
     @Override
     public Class<?> getCommonPropertyType(ELContext context, Object base) {
@@ -82,13 +78,11 @@ public class CompositeELResolver extends ELResolver {
      * collected from all component resolvers. The propertyResolved property of the ELContext is not relevant to this method. The results of all ELResolvers are concatenated. The Iterator returned is
      * an iterator over the collection of FeatureDescriptor objects returned by the iterators returned by each component resolver's getFeatureDescriptors method. If null is returned by a resolver, it
      * is skipped.
-     * 
-     * @param context
-     *            The context of this evaluation.
-     * @param base
-     *            The base object to return the most general property type for, or null to enumerate the set of top-level variables that this resolver can evaluate.
+     *
+     * @param context The context of this evaluation.
+     * @param base    The base object to return the most general property type for, or null to enumerate the set of top-level variables that this resolver can evaluate.
      * @return An Iterator containing zero or more (possibly infinitely more) FeatureDescriptor objects, or null if this resolver does not handle the given base object or that the results are too
-     *         complex to represent with this method
+     * complex to represent with this method
      */
     @Override
     public Iterator<FeatureDescriptor> getFeatureDescriptors(final ELContext context, final Object base) {
@@ -107,14 +101,17 @@ public class CompositeELResolver extends ELResolver {
                 return features;
             }
 
+            @Override
             public boolean hasNext() {
                 return features().hasNext();
             }
 
+            @Override
             public FeatureDescriptor next() {
                 return features().next();
             }
 
+            @Override
             public void remove() {
                 features().remove();
             }
@@ -133,20 +130,14 @@ public class CompositeELResolver extends ELResolver {
      * </ol>
      * If none of the component resolvers were able to perform this operation, the value null is returned and the propertyResolved flag remains set to false. Any exception thrown by component
      * resolvers during the iteration is propagated to the caller of this method.
-     * 
-     * @param context
-     *            The context of this evaluation.
-     * @param base
-     *            The base object to return the most general property type for, or null to enumerate the set of top-level variables that this resolver can evaluate.
-     * @param property
-     *            The property or variable to return the acceptable type for.
+     *
+     * @param context  The context of this evaluation.
+     * @param base     The base object to return the most general property type for, or null to enumerate the set of top-level variables that this resolver can evaluate.
+     * @param property The property or variable to return the acceptable type for.
      * @return If the propertyResolved property of ELContext was set to true, then the most general acceptable type; otherwise undefined.
-     * @throws NullPointerException
-     *             if context is null
-     * @throws PropertyNotFoundException
-     *             if base is not null and the specified property does not exist or is not readable.
-     * @throws ELException
-     *             if an exception was thrown while performing the property or variable resolution. The thrown exception must be included as the cause property of this exception, if available.
+     * @throws NullPointerException      if context is null
+     * @throws PropertyNotFoundException if base is not null and the specified property does not exist or is not readable.
+     * @throws ELException               if an exception was thrown while performing the property or variable resolution. The thrown exception must be included as the cause property of this exception, if available.
      */
     @Override
     public Class<?> getType(ELContext context, Object base, Object property) {
@@ -171,20 +162,14 @@ public class CompositeELResolver extends ELResolver {
      * </ol>
      * If none of the component resolvers were able to perform this operation, the value null is returned and the propertyResolved flag remains set to false. Any exception thrown by component
      * resolvers during the iteration is propagated to the caller of this method.
-     * 
-     * @param context
-     *            The context of this evaluation.
-     * @param base
-     *            The base object to return the most general property type for, or null to enumerate the set of top-level variables that this resolver can evaluate.
-     * @param property
-     *            The property or variable to return the acceptable type for.
+     *
+     * @param context  The context of this evaluation.
+     * @param base     The base object to return the most general property type for, or null to enumerate the set of top-level variables that this resolver can evaluate.
+     * @param property The property or variable to return the acceptable type for.
      * @return If the propertyResolved property of ELContext was set to true, then the result of the variable or property resolution; otherwise undefined.
-     * @throws NullPointerException
-     *             if context is null
-     * @throws PropertyNotFoundException
-     *             if base is not null and the specified property does not exist or is not readable.
-     * @throws ELException
-     *             if an exception was thrown while performing the property or variable resolution. The thrown exception must be included as the cause property of this exception, if available.
+     * @throws NullPointerException      if context is null
+     * @throws PropertyNotFoundException if base is not null and the specified property does not exist or is not readable.
+     * @throws ELException               if an exception was thrown while performing the property or variable resolution. The thrown exception must be included as the cause property of this exception, if available.
      */
     @Override
     public Object getValue(ELContext context, Object base, Object property) {
@@ -210,20 +195,14 @@ public class CompositeELResolver extends ELResolver {
      * </ol>
      * If none of the component resolvers were able to perform this operation, the value false is returned and the propertyResolved flag remains set to false. Any exception thrown by component
      * resolvers during the iteration is propagated to the caller of this method.
-     * 
-     * @param context
-     *            The context of this evaluation.
-     * @param base
-     *            The base object to return the most general property type for, or null to enumerate the set of top-level variables that this resolver can evaluate.
-     * @param property
-     *            The property or variable to return the acceptable type for.
+     *
+     * @param context  The context of this evaluation.
+     * @param base     The base object to return the most general property type for, or null to enumerate the set of top-level variables that this resolver can evaluate.
+     * @param property The property or variable to return the acceptable type for.
      * @return If the propertyResolved property of ELContext was set to true, then true if the property is read-only or false if not; otherwise undefined.
-     * @throws NullPointerException
-     *             if context is null
-     * @throws PropertyNotFoundException
-     *             if base is not null and the specified property does not exist or is not readable.
-     * @throws ELException
-     *             if an exception was thrown while performing the property or variable resolution. The thrown exception must be included as the cause property of this exception, if available.
+     * @throws NullPointerException      if context is null
+     * @throws PropertyNotFoundException if base is not null and the specified property does not exist or is not readable.
+     * @throws ELException               if an exception was thrown while performing the property or variable resolution. The thrown exception must be included as the cause property of this exception, if available.
      */
     @Override
     public boolean isReadOnly(ELContext context, Object base, Object property) {
@@ -248,23 +227,15 @@ public class CompositeELResolver extends ELResolver {
      * </ol>
      * If none of the component resolvers were able to perform this operation, the propertyResolved flag remains set to false. Any exception thrown by component resolvers during the iteration is
      * propagated to the caller of this method.
-     * 
-     * @param context
-     *            The context of this evaluation.
-     * @param base
-     *            The base object to return the most general property type for, or null to enumerate the set of top-level variables that this resolver can evaluate.
-     * @param property
-     *            The property or variable to return the acceptable type for.
-     * @param value
-     *            The value to set the property or variable to.
-     * @throws NullPointerException
-     *             if context is null
-     * @throws PropertyNotFoundException
-     *             if base is not null and the specified property does not exist or is not readable.
-     * @throws PropertyNotWritableException
-     *             if the given (base, property) pair is handled by this ELResolver but the specified variable or property is not writable.
-     * @throws ELException
-     *             if an exception was thrown while attempting to set the property or variable. The thrown exception must be included as the cause property of this exception, if available.
+     *
+     * @param context  The context of this evaluation.
+     * @param base     The base object to return the most general property type for, or null to enumerate the set of top-level variables that this resolver can evaluate.
+     * @param property The property or variable to return the acceptable type for.
+     * @param value    The value to set the property or variable to.
+     * @throws NullPointerException         if context is null
+     * @throws PropertyNotFoundException    if base is not null and the specified property does not exist or is not readable.
+     * @throws PropertyNotWritableException if the given (base, property) pair is handled by this ELResolver but the specified variable or property is not writable.
+     * @throws ELException                  if an exception was thrown while attempting to set the property or variable. The thrown exception must be included as the cause property of this exception, if available.
      */
     @Override
     public void setValue(ELContext context, Object base, Object property, Object value) {
@@ -279,16 +250,16 @@ public class CompositeELResolver extends ELResolver {
 
     /**
      * Attempts to resolve and invoke the given <code>method</code> on the given <code>base</code> object by querying all component resolvers.
-     * 
+     * <p>
      * <p>
      * If this resolver handles the given (base, method) pair, the <code>propertyResolved</code> property of the <code>ELContext</code> object must be set to <code>true</code> by the resolver, before
      * returning. If this property is not <code>true</code> after this method is called, the caller should ignore the return value.
      * </p>
-     * 
+     * <p>
      * <p>
      * First, <code>propertyResolved</code> is set to <code>false</code> on the provided <code>ELContext</code>.
      * </p>
-     * 
+     * <p>
      * <p>
      * Next, for each component resolver in this composite:
      * <ol>
@@ -297,26 +268,21 @@ public class CompositeELResolver extends ELResolver {
      * <li>Otherwise, iteration stops and no more component resolvers are considered. The value returned by <code>getValue()</code> is returned by this method.</li>
      * </ol>
      * </p>
-     * 
+     * <p>
      * <p>
      * If none of the component resolvers were able to perform this operation, the value <code>null</code> is returned and the <code>propertyResolved</code> flag remains set to <code>false</code>
      * </p>
-     * 
+     * <p>
      * <p>
      * Any exception thrown by component resolvers during the iteration is propagated to the caller of this method.
      * </p>
-     * 
-     * @param context
-     *            The context of this evaluation.
-     * @param base
-     *            The bean on which to invoke the method
-     * @param method
-     *            The simple name of the method to invoke. Will be coerced to a <code>String</code>. If method is "&lt;init&gt;"or "&lt;clinit&gt;" a NoSuchMethodException is raised.
-     * @param paramTypes
-     *            An array of Class objects identifying the method's formal parameter types, in declared order. Use an empty array if the method has no parameters. Can be <code>null</code>, in which
-     *            case the method's formal parameter types are assumed to be unknown.
-     * @param params
-     *            The parameters to pass to the method, or <code>null</code> if no parameters.
+     *
+     * @param context    The context of this evaluation.
+     * @param base       The bean on which to invoke the method
+     * @param method     The simple name of the method to invoke. Will be coerced to a <code>String</code>. If method is "&lt;init&gt;"or "&lt;clinit&gt;" a NoSuchMethodException is raised.
+     * @param paramTypes An array of Class objects identifying the method's formal parameter types, in declared order. Use an empty array if the method has no parameters. Can be <code>null</code>, in which
+     *                   case the method's formal parameter types are assumed to be unknown.
+     * @param params     The parameters to pass to the method, or <code>null</code> if no parameters.
      * @return The result of the method invocation (<code>null</code> if the method has a <code>void</code> return type).
      * @since 2.2
      */

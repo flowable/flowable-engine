@@ -26,10 +26,12 @@ import org.flowable.engine.delegate.DelegateExecution;
  */
 public class ReceiveTaskActivityBehavior extends TaskActivityBehavior {
 
+    @Override
     public void execute(DelegateExecution execution) {
         // Do nothing: waitstate behavior
     }
 
+    @Override
     public void signal(ActivityExecution execution, String signalName, Object data) throws Exception {
         leave(execution);
     }

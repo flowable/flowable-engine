@@ -28,7 +28,7 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
  */
 public class CurrentActivityExecutionListener implements ExecutionListener {
 
-    private static List<CurrentActivity> currentActivities = new ArrayList<CurrentActivity>();
+    private static List<CurrentActivity> currentActivities = new ArrayList<>();
 
     public static class CurrentActivity {
         private final String activityId;
@@ -48,6 +48,7 @@ public class CurrentActivityExecutionListener implements ExecutionListener {
         }
     }
 
+    @Override
     public void notify(DelegateExecution execution) {
         org.flowable.bpmn.model.Process process = ProcessDefinitionUtil.getProcess(execution.getProcessDefinitionId());
         String activityId = execution.getCurrentActivityId();

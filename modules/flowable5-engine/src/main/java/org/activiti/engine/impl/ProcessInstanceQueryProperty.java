@@ -21,14 +21,14 @@ import org.activiti.engine.runtime.ProcessInstanceQuery;
 
 /**
  * Contains the possible properties that can be used in a {@link ProcessInstanceQuery}.
- * 
+ *
  * @author Joram Barrez
  */
 public class ProcessInstanceQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, ProcessInstanceQueryProperty> properties = new HashMap<String, ProcessInstanceQueryProperty>();
+    private static final Map<String, ProcessInstanceQueryProperty> properties = new HashMap<>();
 
     public static final ProcessInstanceQueryProperty PROCESS_INSTANCE_ID = new ProcessInstanceQueryProperty("RES.ID_");
     public static final ProcessInstanceQueryProperty PROCESS_DEFINITION_KEY = new ProcessInstanceQueryProperty("ProcessDefinitionKey");
@@ -42,6 +42,7 @@ public class ProcessInstanceQueryProperty implements QueryProperty {
         properties.put(name, this);
     }
 
+    @Override
     public String getName() {
         return name;
     }

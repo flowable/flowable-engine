@@ -24,10 +24,12 @@ import org.flowable.bpmn.model.DataStoreReference;
  */
 public class DataStateParser extends BaseChildElementParser {
 
+    @Override
     public String getElementName() {
         return ELEMENT_DATA_STATE;
     }
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
         if (parentElement instanceof DataStore) {
             ((DataStore) parentElement).setDataState(xtr.getElementText());

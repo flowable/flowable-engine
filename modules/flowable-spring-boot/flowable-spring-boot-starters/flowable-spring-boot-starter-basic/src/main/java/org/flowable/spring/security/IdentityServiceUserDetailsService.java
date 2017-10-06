@@ -57,7 +57,7 @@ public class IdentityServiceUserDetailsService
         boolean active = true;
 
         // get the granted authorities
-        List<GrantedAuthority> grantedAuthorityList = new ArrayList<GrantedAuthority>();
+        List<GrantedAuthority> grantedAuthorityList = new ArrayList<>();
         List<Group> groupsForUser = identityService
                 .createGroupQuery()
                 .groupMember(user.getId())

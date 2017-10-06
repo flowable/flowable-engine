@@ -13,185 +13,52 @@
 
 package org.flowable.engine.impl.context;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-import java.util.Stack;
-
 import org.flowable.engine.FlowableEngineAgenda;
+import org.flowable.engine.common.impl.cfg.TransactionContext;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.transaction.TransactionContextHolder;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.cfg.TransactionContext;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionInfoCacheObject;
-
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
- * @author Tom Baeyens
- * @author Daniel Meyer
- * @author Joram Barrez
+ * Quick access methods (only useable when within a command execution) to the current 
+ * 
+ * - {@link org.flowable.engine.common.impl.interceptor.CommandContext},
+ * - {@link ProcessEngineConfigurationImpl}
+ * - {@link org.flowable.engine.common.impl.cfg.TransactionContext}
+ * 
+ * Note that this class is here for backwards compatibility.
+ * Use the engine-independent {@link org.flowable.engine.common.impl.context.Context} and {@link CommandContextUtil} when possible.
  */
 public class Context {
 
-    protected static ThreadLocal<Stack<CommandContext>> commandContextThreadLocal = new ThreadLocal<Stack<CommandContext>>();
-    protected static ThreadLocal<Stack<ProcessEngineConfigurationImpl>> processEngineConfigurationStackThreadLocal = new ThreadLocal<Stack<ProcessEngineConfigurationImpl>>();
-    protected static ThreadLocal<Map<String, ObjectNode>> bpmnOverrideContextThreadLocal = new ThreadLocal<Map<String, ObjectNode>>();
-
-    // Fallback handler is only set by the v5 CommandContextInterceptor
-    protected static ThreadLocal<Flowable5CompatibilityHandler> fallbackFlowable5CompatibilityHandlerThreadLocal = new ThreadLocal<Flowable5CompatibilityHandler>();
-
-    protected static ResourceBundle.Control resourceBundleControl = new ResourceBundleControl();
-
     public static CommandContext getCommandContext() {
-        Stack<CommandContext> stack = getStack(commandContextThreadLocal);
-        if (stack.isEmpty()) {
-            return null;
-        }
-        return stack.peek();
+        return CommandContextUtil.getCommandContext();
     }
 
     public static FlowableEngineAgenda getAgenda() {
-        return getCommandContext().getAgenda();
-    }
-
-    public static void setCommandContext(CommandContext commandContext) {
-        getStack(commandContextThreadLocal).push(commandContext);
-    }
-
-    public static void removeCommandContext() {
-        getStack(commandContextThreadLocal).pop();
+        return CommandContextUtil.getAgenda();
     }
 
     public static ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
-        Stack<ProcessEngineConfigurationImpl> stack = getStack(processEngineConfigurationStackThreadLocal);
-        if (stack.isEmpty()) {
-            return null;
-        }
-        return stack.peek();
+        return CommandContextUtil.getProcessEngineConfiguration();
     }
-
-    public static void setProcessEngineConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        getStack(processEngineConfigurationStackThreadLocal).push(processEngineConfiguration);
+    
+    public static ProcessEngineConfigurationImpl getProcessEngineConfiguration(CommandContext commandContext) {
+        return CommandContextUtil.getProcessEngineConfiguration(commandContext);
     }
-
-    public static void removeProcessEngineConfiguration() {
-        getStack(processEngineConfigurationStackThreadLocal).pop();
-    }
-
+    
     public static TransactionContext getTransactionContext() {
-        return (TransactionContext) TransactionContextHolder.getTransactionContext();
-    }
-
-    public static void setTransactionContext(TransactionContext transactionContext) {
-        TransactionContextHolder.setTransactionContext(transactionContext);
-    }
-
-    public static void removeTransactionContext() {
-        TransactionContextHolder.removeTransactionContext();
-    }
-
-    protected static <T> Stack<T> getStack(ThreadLocal<Stack<T>> threadLocal) {
-        Stack<T> stack = threadLocal.get();
-        if (stack == null) {
-            stack = new Stack<T>();
-            threadLocal.set(stack);
-        }
-        return stack;
-    }
-
-    public static ObjectNode getBpmnOverrideElementProperties(String id, String processDefinitionId) {
-        ObjectNode definitionInfoNode = getProcessDefinitionInfoNode(processDefinitionId);
-        ObjectNode elementProperties = null;
-        if (definitionInfoNode != null) {
-            elementProperties = getProcessEngineConfiguration().getDynamicBpmnService().getBpmnElementProperties(id, definitionInfoNode);
-        }
-        return elementProperties;
-    }
-
-    public static ObjectNode getLocalizationElementProperties(String language, String id, String processDefinitionId, boolean useFallback) {
-        ObjectNode definitionInfoNode = getProcessDefinitionInfoNode(processDefinitionId);
-        ObjectNode localizationProperties = null;
-        if (definitionInfoNode != null) {
-            if (!useFallback) {
-                localizationProperties = getProcessEngineConfiguration().getDynamicBpmnService().getLocalizationElementProperties(
-                        language, id, definitionInfoNode);
-
-            } else {
-                HashSet<Locale> candidateLocales = new LinkedHashSet<Locale>();
-                candidateLocales.addAll(resourceBundleControl.getCandidateLocales(id, Locale.forLanguageTag(language)));
-                for (Locale locale : candidateLocales) {
-                    localizationProperties = getProcessEngineConfiguration().getDynamicBpmnService().getLocalizationElementProperties(
-                            locale.toLanguageTag(), id, definitionInfoNode);
-
-                    if (localizationProperties != null) {
-                        break;
-                    }
-                }
-            }
-        }
-        return localizationProperties;
-    }
-
-    public static void removeBpmnOverrideContext() {
-        bpmnOverrideContextThreadLocal.remove();
-    }
-
-    protected static ObjectNode getProcessDefinitionInfoNode(String processDefinitionId) {
-        Map<String, ObjectNode> bpmnOverrideMap = getBpmnOverrideContext();
-        if (!bpmnOverrideMap.containsKey(processDefinitionId)) {
-            ProcessDefinitionInfoCacheObject cacheObject = getProcessEngineConfiguration().getDeploymentManager()
-                    .getProcessDefinitionInfoCache()
-                    .get(processDefinitionId);
-
-            addBpmnOverrideElement(processDefinitionId, cacheObject.getInfoNode());
-        }
-
-        return getBpmnOverrideContext().get(processDefinitionId);
-    }
-
-    protected static Map<String, ObjectNode> getBpmnOverrideContext() {
-        Map<String, ObjectNode> bpmnOverrideMap = bpmnOverrideContextThreadLocal.get();
-        if (bpmnOverrideMap == null) {
-            bpmnOverrideMap = new HashMap<String, ObjectNode>();
-        }
-        return bpmnOverrideMap;
-    }
-
-    protected static void addBpmnOverrideElement(String id, ObjectNode infoNode) {
-        Map<String, ObjectNode> bpmnOverrideMap = bpmnOverrideContextThreadLocal.get();
-        if (bpmnOverrideMap == null) {
-            bpmnOverrideMap = new HashMap<String, ObjectNode>();
-            bpmnOverrideContextThreadLocal.set(bpmnOverrideMap);
-        }
-        bpmnOverrideMap.put(id, infoNode);
+        return TransactionContextHolder.getTransactionContext();
     }
 
     public static Flowable5CompatibilityHandler getFlowable5CompatibilityHandler() {
-        return processEngineConfigurationStackThreadLocal.get().peek().getFlowable5CompatibilityHandler();
+        return getProcessEngineConfiguration().getFlowable5CompatibilityHandler();
     }
 
     public static Flowable5CompatibilityHandler getFallbackFlowable5CompatibilityHandler() {
-        return fallbackFlowable5CompatibilityHandlerThreadLocal.get();
+        return Flowable5CompatibilityContext.getFallbackFlowable5CompatibilityHandler();
     }
 
-    public static void setFallbackFlowable5CompatibilityHandler(Flowable5CompatibilityHandler flowable5CompatibilityHandler) {
-        fallbackFlowable5CompatibilityHandlerThreadLocal.set(flowable5CompatibilityHandler);
-    }
-
-    public static void removeFallbackFlowable5CompatibilityHandler() {
-        fallbackFlowable5CompatibilityHandlerThreadLocal.remove();
-    }
-
-    public static class ResourceBundleControl extends ResourceBundle.Control {
-        @Override
-        public List<Locale> getCandidateLocales(String baseName, Locale locale) {
-            return super.getCandidateLocales(baseName, locale);
-        }
-    }
 }

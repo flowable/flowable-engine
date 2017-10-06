@@ -28,12 +28,11 @@ import java.util.Map;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.history.HistoricDetail;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
@@ -41,8 +40,8 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.service.history.HistoricTaskInstance;
 
 /**
  * @author Frederik Heremans
@@ -52,23 +51,23 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testStartProcessInstanceWithVariables() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("basicType", new DummySerializable());
         runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
-        Task task = taskService.createTaskQuery().includeProcessVariables().singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().includeProcessVariables().singleResult();
         assertNotNull(task.getProcessVariables());
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testStartProcessInstanceWithLongStringVariable() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         StringBuilder longString = new StringBuilder();
         for (int i = 0; i < 4001; i++) {
             longString.append("c");
         }
         vars.put("longString", longString.toString());
         runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
-        Task task = taskService.createTaskQuery().includeProcessVariables().singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().includeProcessVariables().singleResult();
         assertNotNull(task.getProcessVariables());
         assertEquals(longString.toString(), task.getProcessVariables().get("longString"));
     }
@@ -203,13 +202,13 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testStartProcessInstanceFormWithoutFormKey() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("basicType", new DummySerializable());
 
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
 
         runtimeService.startProcessInstanceWithForm(processDefinition.getId(), null, vars, null);
-        Task task = taskService.createTaskQuery().includeProcessVariables().singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().includeProcessVariables().singleResult();
         assertNotNull(task.getProcessVariables());
     }
 
@@ -327,11 +326,11 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         List<String> activeActivities = runtimeService.getActiveActivityIds(processInstance.getId());
         assertEquals(5, activeActivities.size());
 
-        List<Task> tasks = taskService.createTaskQuery().list();
+        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().list();
         assertEquals(2, tasks.size());
 
-        Task parallelUserTask = null;
-        for (Task task : tasks) {
+        org.flowable.task.service.Task parallelUserTask = null;
+        for (org.flowable.task.service.Task task : tasks) {
             if (!task.getName().equals("ParallelUserTask") && !task.getName().equals("MainUserTask")) {
                 fail("Expected: <ParallelUserTask> or <MainUserTask> but was <" + task.getName() + ">.");
             }
@@ -352,8 +351,8 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         tasks = taskService.createTaskQuery().list();
         assertEquals(2, tasks.size());
 
-        Task beforeErrorUserTask = null;
-        for (Task task : tasks) {
+        org.flowable.task.service.Task beforeErrorUserTask = null;
+        for (org.flowable.task.service.Task task : tasks) {
             if (!task.getName().equals("BeforeError") && !task.getName().equals("MainUserTask")) {
                 fail("Expected: <BeforeError> or <MainUserTask> but was <" + task.getName() + ">.");
             }
@@ -371,8 +370,8 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         tasks = taskService.createTaskQuery().list();
         assertEquals(2, tasks.size());
 
-        Task afterErrorUserTask = null;
-        for (Task task : tasks) {
+        org.flowable.task.service.Task afterErrorUserTask = null;
+        for (org.flowable.task.service.Task task : tasks) {
             if (!task.getName().equals("AfterError") && !task.getName().equals("MainUserTask")) {
                 fail("Expected: <AfterError> or <MainUserTask> but was <" + task.getName() + ">.");
             }
@@ -419,7 +418,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     public void testSignalWithProcessVariables() {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testSignalWithProcessVariables");
-        Map<String, Object> processVariables = new HashMap<String, Object>();
+        Map<String, Object> processVariables = new HashMap<>();
         processVariables.put("variable", "value");
 
         // signal the execution while passing in the variables
@@ -508,7 +507,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testSetVariables() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("variable1", "value1");
         vars.put("variable2", "value2");
 
@@ -566,7 +565,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testRemoveVariable() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("variable1", "value1");
         vars.put("variable2", "value2");
 
@@ -584,12 +583,12 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneSubProcess.bpmn20.xml" })
     public void testRemoveVariableInParentScope() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("variable1", "value1");
         vars.put("variable2", "value2");
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess", vars);
-        Task currentTask = taskService.createTaskQuery().singleResult();
+        org.flowable.task.service.Task currentTask = taskService.createTaskQuery().singleResult();
 
         runtimeService.removeVariable(currentTask.getExecutionId(), "variable1");
 
@@ -610,7 +609,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testRemoveVariableLocal() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("variable1", "value1");
         vars.put("variable2", "value2");
 
@@ -626,12 +625,12 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneSubProcess.bpmn20.xml" })
     public void testRemoveVariableLocalWithParentScope() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("variable1", "value1");
         vars.put("variable2", "value2");
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess", vars);
-        Task currentTask = taskService.createTaskQuery().singleResult();
+        org.flowable.task.service.Task currentTask = taskService.createTaskQuery().singleResult();
         runtimeService.setVariableLocal(currentTask.getExecutionId(), "localVariable", "local value");
 
         assertEquals("local value", runtimeService.getVariableLocal(currentTask.getExecutionId(), "localVariable"));
@@ -661,7 +660,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testRemoveVariables() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("variable1", "value1");
         vars.put("variable2", "value2");
 
@@ -684,14 +683,14 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneSubProcess.bpmn20.xml" })
     public void testRemoveVariablesWithParentScope() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("variable1", "value1");
         vars.put("variable2", "value2");
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess", vars);
         runtimeService.setVariable(processInstance.getId(), "variable3", "value3");
 
-        Task currentTask = taskService.createTaskQuery().singleResult();
+        org.flowable.task.service.Task currentTask = taskService.createTaskQuery().singleResult();
 
         runtimeService.removeVariables(currentTask.getExecutionId(), vars.keySet());
 
@@ -724,14 +723,14 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneSubProcess.bpmn20.xml" })
     public void testRemoveVariablesLocalWithParentScope() {
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("variable1", "value1");
         vars.put("variable2", "value2");
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess", vars);
 
-        Task currentTask = taskService.createTaskQuery().singleResult();
-        Map<String, Object> varsToDelete = new HashMap<String, Object>();
+        org.flowable.task.service.Task currentTask = taskService.createTaskQuery().singleResult();
+        Map<String, Object> varsToDelete = new HashMap<>();
         varsToDelete.put("variable3", "value3");
         varsToDelete.put("variable4", "value4");
         varsToDelete.put("variable5", "value5");
@@ -932,7 +931,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testGetVariableExistingVariableNameWithCast() {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("var1", true);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", params);
         Boolean variableValue = runtimeService.getVariable(processInstance.getId(), "var1", Boolean.class);
@@ -941,7 +940,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testGetVariableExistingVariableNameWithInvalidCast() {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("var1", true);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", params);
         catchException(runtimeService).getVariable(processInstance.getId(), "var1", String.class);
@@ -959,7 +958,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testGetVariableLocalExistingVariableNameWithCast() {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("var1", true);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", params);
         Boolean variableValue = runtimeService.getVariableLocal(processInstance.getId(), "var1", Boolean.class);
@@ -968,7 +967,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testGetVariableLocalExistingVariableNameWithInvalidCast() {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("var1", true);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", params);
         catchException(runtimeService).getVariableLocal(processInstance.getId(), "var1", String.class);
@@ -981,7 +980,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
     public void testHistoricVariableRemovedWhenRuntimeVariableIsRemoved() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            Map<String, Object> vars = new HashMap<String, Object>();
+            Map<String, Object> vars = new HashMap<>();
             vars.put("var1", "Hello");
             vars.put("var2", "World");
             vars.put("var3", "!");
@@ -1051,7 +1050,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/twoTasksProcess.bpmn20.xml" })
     public void testSetCurrentActivityForSimpleProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -1076,7 +1075,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcess.bpmn20.xml" })
     public void testSetCurrentActivityForSubProcess() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();

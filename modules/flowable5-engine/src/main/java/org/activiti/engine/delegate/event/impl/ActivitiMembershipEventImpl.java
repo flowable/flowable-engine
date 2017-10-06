@@ -34,6 +34,7 @@ public class ActivitiMembershipEventImpl extends FlowableIdmEventImpl implements
         this.userId = userId;
     }
 
+    @Override
     public String getUserId() {
         return userId;
     }
@@ -42,6 +43,7 @@ public class ActivitiMembershipEventImpl extends FlowableIdmEventImpl implements
         this.groupId = groupId;
     }
 
+    @Override
     public String getGroupId() {
         return groupId;
     }

@@ -13,9 +13,9 @@
 
 package org.flowable.spring.test.executionListener;
 
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
+import org.flowable.task.service.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 

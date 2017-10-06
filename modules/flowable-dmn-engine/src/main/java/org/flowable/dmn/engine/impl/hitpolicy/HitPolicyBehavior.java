@@ -12,7 +12,7 @@
  */
 package org.flowable.dmn.engine.impl.hitpolicy;
 
-import org.flowable.dmn.engine.impl.mvel.MvelExecutionContext;
+import org.flowable.dmn.engine.impl.el.ELExecutionContext;
 
 /**
  * @author Yvo Swillens
@@ -23,9 +23,9 @@ public interface HitPolicyBehavior {
 
     boolean shouldContinueEvaluating(boolean ruleResult);
 
-    void evaluateRuleValidity(int ruleNumber, MvelExecutionContext executionContext);
+    void evaluateRuleValidity(int ruleNumber, ELExecutionContext executionContext);
 
-    void evaluateRuleConclusionValidity(Object resultValue, int ruleNumber, int ruleConclusionNumber, MvelExecutionContext executionContext);
+    void evaluateRuleConclusionValidity(Object resultValue, int ruleNumber, int ruleConclusionNumber, ELExecutionContext executionContext);
 
-    void composeOutput(String outputVariableId, Object executionVariable, MvelExecutionContext executionContext);
+    void composeOutput(String outputVariableId, Object executionVariable, ELExecutionContext executionContext);
 }

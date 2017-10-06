@@ -9,5 +9,10 @@
         <property name="jdbcDriver" value="org.h2.Driver" />
         <property name="jdbcUsername" value="sa" />
         <property name="jdbcPassword" value="" />
+
+        <!-- Database configurations -->
+        <property name="databaseSchemaUpdate" value="drop-create" />
+        
+        <property name="historyEnabled" value="true" />
     </bean>
 </beans>

@@ -17,9 +17,9 @@ import javax.sql.DataSource;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
-import org.flowable.idm.engine.impl.interceptor.CommandInterceptor;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -71,11 +71,11 @@ public class SpringIdmEngineConfiguration extends IdmEngineConfiguration impleme
     @Override
     public IdmEngineConfiguration setDataSource(DataSource dataSource) {
         if (dataSource instanceof TransactionAwareDataSourceProxy) {
-            return super.setDataSource(dataSource);
+            return (IdmEngineConfiguration) super.setDataSource(dataSource);
         } else {
             // Wrap datasource in Transaction-aware proxy
             DataSource proxiedDataSource = new TransactionAwareDataSourceProxy(dataSource);
-            return super.setDataSource(proxiedDataSource);
+            return (IdmEngineConfiguration) super.setDataSource(proxiedDataSource);
         }
     }
 

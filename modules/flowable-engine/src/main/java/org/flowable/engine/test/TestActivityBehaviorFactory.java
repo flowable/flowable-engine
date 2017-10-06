@@ -48,7 +48,7 @@ import org.flowable.bpmn.model.ThrowEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.Transaction;
 import org.flowable.bpmn.model.UserTask;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.AdhocSubProcessActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.BoundaryCancelEventActivityBehavior;
@@ -112,9 +112,9 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     protected ActivityBehaviorFactory wrappedActivityBehaviorFactory;
 
     protected boolean allServiceTasksNoOp;
-    protected Map<String, String> mockedClassDelegatesMapping = new HashMap<String, String>();
-    protected Set<String> noOpServiceTaskIds = new HashSet<String>();
-    protected Set<String> noOpServiceTaskClassNames = new HashSet<String>();
+    protected Map<String, String> mockedClassDelegatesMapping = new HashMap<>();
+    protected Set<String> noOpServiceTaskIds = new HashSet<>();
+    protected Set<String> noOpServiceTaskClassNames = new HashSet<>();
 
     public TestActivityBehaviorFactory() {
 
@@ -174,7 +174,7 @@ public class TestActivityBehaviorFactory extends AbstractBehaviorFactory impleme
     }
 
     private ClassDelegate createNoOpServiceTask(ServiceTask serviceTask) {
-        List<FieldDeclaration> fieldDeclarations = new ArrayList<FieldDeclaration>();
+        List<FieldDeclaration> fieldDeclarations = new ArrayList<>();
         fieldDeclarations.add(new FieldDeclaration("name", Expression.class.getName(), new FixedValue(serviceTask.getImplementation())));
         return new ClassDelegate(NoOpServiceTask.class, fieldDeclarations);
     }

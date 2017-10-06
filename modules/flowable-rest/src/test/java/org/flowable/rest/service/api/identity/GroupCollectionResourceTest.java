@@ -38,7 +38,7 @@ public class GroupCollectionResourceTest extends BaseSpringRestTestCase {
      */
     @Deployment
     public void testGetGroups() throws Exception {
-        List<Group> savedGroups = new ArrayList<Group>();
+        List<Group> savedGroups = new ArrayList<>();
         try {
             Group group1 = identityService.newGroup("testgroup1");
             group1.setName("Test group");

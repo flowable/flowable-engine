@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns:oryx="http://www.b3mn.org/oryx"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   width="371"
+   height="171"
+   version="1.0">
+  <oryx:magnets>
+       <oryx:magnet oryx:cx="1" oryx:cy="42" oryx:anchors="left" />
+       <oryx:magnet oryx:cx="1" oryx:cy="84" oryx:anchors="left" />
+       <oryx:magnet oryx:cx="1" oryx:cy="126" oryx:anchors="left" />
+
+       <oryx:magnet oryx:cx="92" oryx:cy="170" oryx:anchors="bottom" />
+       <oryx:magnet oryx:cx="184" oryx:cy="170" oryx:anchors="bottom" />
+       <oryx:magnet oryx:cx="276" oryx:cy="170" oryx:anchors="bottom" />
+
+       <oryx:magnet oryx:cx="370" oryx:cy="42" oryx:anchors="right" />
+       <oryx:magnet oryx:cx="370" oryx:cy="84" oryx:anchors="right" />
+       <oryx:magnet oryx:cx="370" oryx:cy="126" oryx:anchors="right" />
+
+       <oryx:magnet oryx:cx="92" oryx:cy="1" oryx:anchors="top" />
+       <oryx:magnet oryx:cx="184" oryx:cy="1" oryx:anchors="top" />
+       <oryx:magnet oryx:cx="276" oryx:cy="1" oryx:anchors="top" />
+
+       <oryx:magnet oryx:cx="185" oryx:cy="85" oryx:default="yes" />
+  </oryx:magnets>
+  <g pointer-events="fill" oryx:minimumSize="160 93">
+    <polygon id="bg_frame" points="10 0 360 0 370 10 370 160 360 170 10 170 0 160 0 10 10 0"  oryx:resize="vertical horizontal" stroke="black" fill="#ffffff"/>
+    <text 
+        font-size="12" 
+        id="text_name" 
+        x="13" 
+        y="2" 
+        oryx:align="top left"
+        oryx:fittoelem="bg_frame"
+        stroke="black">
+    </text>
+    <g id="autoComplete" display="none">
+          <path d="M180 155 L189 155 L189 167 L180 167 L180 167z" oryx:anchors="bottom" transform="translate(-13,0)"/>
+    </g>
+    
+    <g id="required" display="none">
+         <path fill="none" oryx:anchors="bottom" d="M183 154 L183 164 M183 166 L183 168" transform="translate(-23,0)"/>     
+    </g>
+
+    <g id="manualActivation" display="none">
+          <path d="M188 162 L178 155 L178 155 L178 167z" fill="none" oryx:anchors="bottom" transform="translate(6,0)"/>
+    </g>
+    
+    <g id="repetition" display="none">
+         <path d="M180 156 v12 M183 156 v12 M186 156 v12" fill="none" oryx:anchors="bottom" transform="translate(20,0)"/>
+    </g>
+  </g>
+</svg>

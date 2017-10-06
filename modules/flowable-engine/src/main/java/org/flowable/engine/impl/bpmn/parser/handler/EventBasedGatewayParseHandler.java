@@ -21,10 +21,12 @@ import org.flowable.engine.impl.bpmn.parser.BpmnParse;
  */
 public class EventBasedGatewayParseHandler extends AbstractActivityBpmnParseHandler<EventGateway> {
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return EventGateway.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, EventGateway gateway) {
         gateway.setBehavior(bpmnParse.getActivityBehaviorFactory().createEventBasedGatewayActivityBehavior(gateway));
     }

@@ -19,7 +19,6 @@ import java.util.Map;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -40,18 +39,18 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
     @Deployment
     public void testDecisionFunctionality() {
 
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
 
         // Test with input == 1
         variables.put("input", 1);
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("inclusiveGateway", variables);
-        List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
+        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
         assertEquals(3, tasks.size());
-        Map<String, String> expectedMessages = new HashMap<String, String>();
+        Map<String, String> expectedMessages = new HashMap<>();
         expectedMessages.put(TASK1_NAME, TASK1_NAME);
         expectedMessages.put(TASK2_NAME, TASK2_NAME);
         expectedMessages.put(TASK3_NAME, TASK3_NAME);
-        for (Task task : tasks) {
+        for (org.flowable.task.service.Task task : tasks) {
             expectedMessages.remove(task.getName());
         }
         assertEquals(0, expectedMessages.size());
@@ -61,10 +60,10 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         pi = runtimeService.startProcessInstanceByKey("inclusiveGateway", variables);
         tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
         assertEquals(2, tasks.size());
-        expectedMessages = new HashMap<String, String>();
+        expectedMessages = new HashMap<>();
         expectedMessages.put(TASK2_NAME, TASK2_NAME);
         expectedMessages.put(TASK3_NAME, TASK3_NAME);
-        for (Task task : tasks) {
+        for (org.flowable.task.service.Task task : tasks) {
             expectedMessages.remove(task.getName());
         }
         assertEquals(0, expectedMessages.size());
@@ -74,9 +73,9 @@ public class InclusiveGatewayTest extends PluggableFlowableTestCase {
         pi = runtimeService.startProcessInstanceByKey("inclusiveGateway", variables);
         tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
         assertEquals(1, tasks.size());
-        expectedMessages = new HashMap<String, String>();
+        expectedMessages = new HashMap<>();
         expectedMessages.put(TASK3_NAME, TASK3_NAME);
-        for (Task task : tasks) {
+        for (org.flowable.task.service.Task task : tasks) {
             expectedMessages.remove(task.getName());
         }
         assertEquals(0, expectedMessages.size());

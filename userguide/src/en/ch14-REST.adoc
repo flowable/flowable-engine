@@ -3057,8 +3057,6 @@ GET runtime/tasks
 |dueBefore|No|ISO Date|Only return tasks which are due before the given date.
 |dueAfter|No|ISO Date|Only return tasks which are due after the given date.
 |withoutDueDate|No|boolean|Only return tasks which don't have a due date. The property is ignored if the value is +false+.
-|withoutDueDate|No|boolean|Only return tasks which don't have a due date. The property is ignored if the value is +false+.
-|withoutDueDate|No|boolean|Only return tasks which don't have a due date. The property is ignored if the value is +false+.
 |excludeSubTasks|No|Boolean|Only return tasks that are not a subtask of another task.
 |active|No|Boolean|If +true+, only return tasks that are not suspended (either part of a process that is not suspended or not part of a process at all). If false, only tasks that are part of suspended process instances are returned.
 |includeTaskLocalVariables|No|Boolean|Indication to include task local variables in the result.
@@ -6514,7 +6512,7 @@ GET identity/users
 |firstName|Only return users with the given firstname|String
 |lastName|Only return users with the given lastname|String
 |email|Only return users with the given email|String
-|firstNameLike|Only return userswith a firstname like the given value. Use +%+ as wildcard-character.|String
+|firstNameLike|Only return users with a firstname like the given value. Use +%+ as wildcard-character.|String
 |lastNameLike|Only return users with a lastname like the given value. Use +%+ as wildcard-character.|String
 |emailLike|Only return users with an email like the given value. Use +%+ as wildcard-character.|String
 |memberOfGroup|Only return users which are a member of the given group.|String

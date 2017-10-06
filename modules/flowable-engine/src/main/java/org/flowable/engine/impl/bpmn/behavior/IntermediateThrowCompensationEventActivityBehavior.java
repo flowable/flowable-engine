@@ -23,12 +23,13 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowElementsContainer;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.ThrowEvent;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.ScopeUtil;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 
 /**
@@ -60,9 +61,9 @@ public class IntermediateThrowCompensationEventActivityBehavior extends FlowNode
         final String activityRef = compensateEventDefinition.getActivityRef();
 
         CommandContext commandContext = Context.getCommandContext();
-        EventSubscriptionEntityManager eventSubscriptionEntityManager = commandContext.getEventSubscriptionEntityManager();
+        EventSubscriptionEntityManager eventSubscriptionEntityManager = CommandContextUtil.getEventSubscriptionEntityManager(commandContext);
 
-        List<CompensateEventSubscriptionEntity> eventSubscriptions = new ArrayList<CompensateEventSubscriptionEntity>();
+        List<CompensateEventSubscriptionEntity> eventSubscriptions = new ArrayList<>();
         if (StringUtils.isNotEmpty(activityRef)) {
 
             // If an activity ref is provided, only that activity is compensated

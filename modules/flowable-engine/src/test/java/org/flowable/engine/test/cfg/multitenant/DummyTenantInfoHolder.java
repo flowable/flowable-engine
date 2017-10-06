@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.impl.cfg.multitenant.TenantInfoHolder;
+import org.flowable.engine.common.impl.cfg.multitenant.TenantInfoHolder;
 import org.flowable.engine.impl.identity.Authentication;
 
 /**
@@ -26,12 +26,13 @@ import org.flowable.engine.impl.identity.Authentication;
  */
 public class DummyTenantInfoHolder implements TenantInfoHolder {
 
-    protected Map<String, List<String>> tenantToUserMapping = new HashMap<String, List<String>>();
-    protected Map<String, String> userToTenantMapping = new HashMap<String, String>();
+    protected Map<String, List<String>> tenantToUserMapping = new HashMap<>();
+    protected Map<String, String> userToTenantMapping = new HashMap<>();
 
-    protected ThreadLocal<String> currentUserId = new ThreadLocal<String>();
-    protected ThreadLocal<String> currentTenantId = new ThreadLocal<String>();
+    protected ThreadLocal<String> currentUserId = new ThreadLocal<>();
+    protected ThreadLocal<String> currentTenantId = new ThreadLocal<>();
 
+    @Override
     public Collection<String> getAllTenants() {
         return tenantToUserMapping.keySet();
     }
@@ -51,14 +52,17 @@ public class DummyTenantInfoHolder implements TenantInfoHolder {
         currentTenantId.set(null);
     }
 
+    @Override
     public void setCurrentTenantId(String tenantid) {
         currentTenantId.set(tenantid);
     }
 
+    @Override
     public String getCurrentTenantId() {
         return currentTenantId.get();
     }
 
+    @Override
     public void clearCurrentTenantId() {
         currentTenantId.set(null);
     }

@@ -12,9 +12,6 @@
  */
 package org.activiti.engine.impl.persistence.deploy;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -28,6 +25,9 @@ import org.activiti.engine.impl.persistence.entity.ProcessDefinitionInfoEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * Default cache: keep everything in memory, unless a limit is set.
@@ -56,6 +56,7 @@ public class ProcessDefinitionInfoCache {
             // true will keep the 'access-order', which is needed to have a real LRU cache
             private static final long serialVersionUID = 1L;
 
+            @Override
             protected boolean removeEldestEntry(Map.Entry<String, ProcessDefinitionInfoCacheObject> eldest) {
                 boolean removeEldest = size() > limit;
                 if (removeEldest) {

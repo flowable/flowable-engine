@@ -19,10 +19,11 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
+import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.persistence.AbstractManager;
-import org.flowable.engine.impl.persistence.cache.EntityCache;
 import org.flowable.engine.impl.persistence.entity.CommentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
@@ -93,7 +94,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
             comment.setTime(getClock().getCurrentTime());
             comment.setTaskId(taskId);
             if (userId != null || forceNullUserId) {
-                if (create) {
+                if (create && !forceNullUserId) {
                     comment.setAction(Event.ACTION_ADD_USER_LINK);
                 } else {
                     comment.setAction(Event.ACTION_DELETE_USER_LINK);
@@ -127,7 +128,7 @@ public abstract class AbstractHistoryManager extends AbstractManager implements 
             comment.setTime(getClock().getCurrentTime());
             comment.setProcessInstanceId(processInstanceId);
             if (userId != null || forceNullUserId) {
-                if (create) {
+                if (create && !forceNullUserId) {
                     comment.setAction(Event.ACTION_ADD_USER_LINK);
                 } else {
                     comment.setAction(Event.ACTION_DELETE_USER_LINK);

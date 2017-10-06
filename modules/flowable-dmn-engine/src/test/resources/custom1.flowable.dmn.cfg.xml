@@ -10,9 +10,11 @@
         <property name="jdbcUsername" value="sa" />
         <property name="jdbcPassword" value="" />
 
-        <property name="postCustomExpressionFunctionRegistry" ref="additionalCustomExpressionFunctionRegistry" />
+        <property name="customFlowableFunctionDelegates">
+            <list>
+                <bean class="org.flowable.dmn.engine.test.TestCustomFunctionDelegate" />
+            </list>
+        </property>
     </bean>
-
-    <bean id="additionalCustomExpressionFunctionRegistry" class="org.flowable.dmn.engine.test.TestCustomExpressionFunctionRegistry"/>
 
 </beans>

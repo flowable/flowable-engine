@@ -16,10 +16,11 @@ import java.util.Map;
 
 import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.api.DmnRepositoryService;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.dmn.engine.impl.deployer.DmnResourceUtil;
 import org.flowable.engine.impl.persistence.deploy.Deployer;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,10 +42,10 @@ public class DmnDeployer implements Deployer {
 
         Map<String, ResourceEntity> resources = deployment.getResources();
         for (String resourceName : resources.keySet()) {
-            if (resourceName.endsWith(".dmn")) {
+            if (DmnResourceUtil.isDmnResource(resourceName)) {
                 LOGGER.info("DmnDeployer: processing resource {}", resourceName);
                 if (dmnDeploymentBuilder == null) {
-                    DmnRepositoryService dmnRepositoryService = Context.getProcessEngineConfiguration().getDmnEngineRepositoryService();
+                    DmnRepositoryService dmnRepositoryService = CommandContextUtil.getDmnRepositoryService();
                     dmnDeploymentBuilder = dmnRepositoryService.createDeployment();
                 }
 

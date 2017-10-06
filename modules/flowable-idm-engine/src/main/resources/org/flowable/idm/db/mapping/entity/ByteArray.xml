@@ -2,11 +2,11 @@
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="org.flowable.idm.engine.impl.persistence.entity.ByteArrayEntityImpl">
+<mapper namespace="org.flowable.idm.engine.impl.persistence.entity.IdmByteArrayEntityImpl">
 
   <!-- BYTE ARRAY INSERT -->
 
-  <insert id="insertByteArray" parameterType="org.flowable.idm.engine.impl.persistence.entity.ByteArrayEntityImpl">
+  <insert id="insertIdmByteArray" parameterType="org.flowable.idm.engine.impl.persistence.entity.IdmByteArrayEntityImpl">
     insert into ${prefix}ACT_ID_BYTEARRAY(ID_, REV_, NAME_, BYTES_)
     values (
       #{id, jdbcType=VARCHAR},
@@ -16,7 +16,7 @@
     )  
   </insert>
 
-  <insert id="bulkInsertByteArray" parameterType="java.util.List">
+  <insert id="bulkInsertIdmBByteArray" parameterType="java.util.List">
     insert into ${prefix}ACT_ID_BYTEARRAY(ID_, REV_, NAME_, BYTES_)
     values
       <foreach collection="list" item="byteArray" index="index" separator=","> 
@@ -27,7 +27,7 @@
       </foreach>
   </insert>
 
-  <insert id="bulkInsertByteArray" databaseId="oracle" parameterType="java.util.List">
+  <insert id="bulkInsertIdmBByteArray" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL 
       <foreach collection="list" item="byteArray" index="index">
         into ${prefix}ACT_ID_BYTEARRAY(ID_, REV_, NAME_, BYTES_) VALUES 
@@ -41,7 +41,7 @@
   
   <!-- BYTE ARRAY UPDATE -->
 
-  <update id="updateByteArray" parameterType="org.flowable.idm.engine.impl.persistence.entity.ByteArrayEntityImpl">
+  <update id="updateIdmBByteArray" parameterType="org.flowable.idm.engine.impl.persistence.entity.IdmByteArrayEntityImpl">
     update ${prefix}ACT_ID_BYTEARRAY 
     set
       REV_ = #{revisionNext, jdbcType=INTEGER},
@@ -52,21 +52,21 @@
   
   <!-- BYTE ARRAY DELETE -->
 
-  <select id="selectBytesOfByteArray" parameterType="string" resultType="hashmap">
+  <select id="selectBytesOfIdmByteArray" parameterType="string" resultType="hashmap">
     select BYTES_ from ${prefix}ACT_ID_BYTEARRAY where ID_ = #{id} and REV_ = #{revision}
   </select>
   
-  <delete id="deleteByteArray" parameterType="org.flowable.idm.engine.impl.persistence.entity.ByteArrayEntityImpl">
+  <delete id="deleteIdmByteArray" parameterType="org.flowable.idm.engine.impl.persistence.entity.IdmByteArrayEntityImpl">
     delete from ${prefix}ACT_ID_BYTEARRAY where ID_ = #{id} and REV_ = #{revision}
   </delete>
   
-  <delete id="deleteByteArrayNoRevisionCheck" parameterType="string">
+  <delete id="deleteIdmByteArrayNoRevisionCheck" parameterType="string">
     delete from ${prefix}ACT_ID_BYTEARRAY where ID_ = #{id}
   </delete>
 
   <!-- BYTE ARRAY RESULTMAP -->
   
-  <resultMap id="byteArrayResultMap" type="org.flowable.idm.engine.impl.persistence.entity.ByteArrayEntityImpl">
+  <resultMap id="idmByteArrayResultMap" type="org.flowable.idm.engine.impl.persistence.entity.IdmByteArrayEntityImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER"/>
     <result property="name" column="NAME_" jdbcType="VARCHAR"/>
@@ -75,11 +75,11 @@
 
   <!-- BYTE ARRAY SELECT -->
   
-  <select id="selectByteArrays" resultMap="byteArrayResultMap">
+  <select id="selectIdmByteArrays" resultMap="idmByteArrayResultMap">
     select * from ${prefix}ACT_ID_BYTEARRAY 
   </select>
   
-  <select id="selectByteArray" parameterType="string" resultMap="byteArrayResultMap">
+  <select id="selectIdmByteArray" parameterType="string" resultMap="idmByteArrayResultMap">
    select * from ${prefix}ACT_ID_BYTEARRAY where ID_ = #{id, jdbcType=VARCHAR}
   </select>
   

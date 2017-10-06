@@ -19,12 +19,12 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 
@@ -43,12 +43,13 @@ public class ChangeActivityStateCmd implements Command<Void> {
         this.startActivityId = changeActivityStateBuilder.getStartActivityId();
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (processInstanceId == null) {
             throw new FlowableIllegalArgumentException("Process instance id is required");
         }
 
-        ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         ExecutionEntity execution = executionEntityManager.findById(processInstanceId);
 
         if (execution == null) {
@@ -93,15 +94,15 @@ public class ChangeActivityStateCmd implements Command<Void> {
             }
         }
 
-        executionEntityManager.deleteExecutionAndRelatedData(activeExecutionEntity, "Change activity to " + startActivityId, false);
+        executionEntityManager.deleteExecutionAndRelatedData(activeExecutionEntity, "Change activity to " + startActivityId);
 
         if (deleteParentExecution) {
-            executionEntityManager.deleteExecutionAndRelatedData(parentExecution, "Change activity to " + startActivityId, false);
+            executionEntityManager.deleteExecutionAndRelatedData(parentExecution, "Change activity to " + startActivityId);
         }
 
         ExecutionEntity newChildExecution = executionEntityManager.createChildExecution(execution);
         newChildExecution.setCurrentFlowElement(startActivityElement);
-        Context.getAgenda().planContinueProcessOperation(newChildExecution);
+        CommandContextUtil.getAgenda().planContinueProcessOperation(newChildExecution);
 
         return null;
     }

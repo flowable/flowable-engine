@@ -15,12 +15,12 @@ package org.flowable.http.impl.handler;
 
 import java.util.List;
 
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.client.HttpClient;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.helper.AbstractClassDelegate;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.http.HttpRequest;
 import org.flowable.http.HttpResponse;
 import org.flowable.http.delegate.HttpRequestHandler;
@@ -48,15 +48,15 @@ public class ClassDelegateHttpHandler extends AbstractClassDelegate implements H
     }
     
     @Override
-    public void handleHttpRequest(DelegateExecution execution, HttpRequest httpRequest, CloseableHttpClient client) {
+    public void handleHttpRequest(DelegateExecution execution, HttpRequest httpRequest, HttpClient client) {
         HttpRequestHandler httpRequestHandler = getHttpRequestHandlerInstance();
-        Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new HttpRequestHandlerInvocation(httpRequestHandler, execution, httpRequest, client));
+        CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new HttpRequestHandlerInvocation(httpRequestHandler, execution, httpRequest, client));
     }
 
     @Override
     public void handleHttpResponse(DelegateExecution execution, HttpResponse httpResponse) {
         HttpResponseHandler httpResponseHandler = getHttpResponseHandlerInstance();
-        Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new HttpResponseHandlerInvocation(httpResponseHandler, execution, httpResponse));
+        CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(new HttpResponseHandlerInvocation(httpResponseHandler, execution, httpResponse));
     }
 
     protected HttpRequestHandler getHttpRequestHandlerInstance() {

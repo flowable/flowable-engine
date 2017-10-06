@@ -38,7 +38,7 @@ public class UserCollectionResourceTest extends BaseSpringRestTestCase {
      */
     @Deployment
     public void testGetUsers() throws Exception {
-        List<User> savedUsers = new ArrayList<User>();
+        List<User> savedUsers = new ArrayList<>();
         try {
             User user1 = identityService.newUser("testuser");
             user1.setFirstName("Fred");

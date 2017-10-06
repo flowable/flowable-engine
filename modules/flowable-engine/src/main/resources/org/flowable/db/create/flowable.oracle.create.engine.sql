@@ -1,29 +1,3 @@
-create table ACT_GE_PROPERTY (
-    NAME_ NVARCHAR2(64),
-    VALUE_ NVARCHAR2(300),
-    REV_ INTEGER,
-    primary key (NAME_)
-);
-
-insert into ACT_GE_PROPERTY
-values ('schema.version', '6.1.1.0', 1);
-
-insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.1.1.0)', 1);
-
-insert into ACT_GE_PROPERTY
-values ('next.dbid', '1', 1);
-
-create table ACT_GE_BYTEARRAY (
-    ID_ NVARCHAR2(64),
-    REV_ INTEGER,
-    NAME_ NVARCHAR2(255),
-    DEPLOYMENT_ID_ NVARCHAR2(64),
-    BYTES_ BLOB,
-    GENERATED_ NUMBER(1,0) CHECK (GENERATED_ IN (1,0)),
-    primary key (ID_)
-);
-
 create table ACT_RE_DEPLOYMENT (
     ID_ NVARCHAR2(64),
     NAME_ NVARCHAR2(255),
@@ -84,6 +58,8 @@ create table ACT_RU_EXECUTION (
     DEADLETTER_JOB_COUNT_ INTEGER,
     VAR_COUNT_ INTEGER, 
     ID_LINK_COUNT_ INTEGER,
+    CALLBACK_ID_ NVARCHAR2(255),
+    CALLBACK_TYPE_ NVARCHAR2(255),
     primary key (ID_)
 );
 
@@ -104,6 +80,7 @@ create table ACT_RU_JOB (
     REPEAT_ NVARCHAR2(255),
     HANDLER_TYPE_ NVARCHAR2(255),
     HANDLER_CFG_ NVARCHAR2(2000),
+    CREATE_TIME_ TIMESTAMP(6),
     TENANT_ID_ NVARCHAR2(255) DEFAULT '',
     primary key (ID_)
 );
@@ -125,6 +102,7 @@ create table ACT_RU_TIMER_JOB (
     REPEAT_ NVARCHAR2(255),
     HANDLER_TYPE_ NVARCHAR2(255),
     HANDLER_CFG_ NVARCHAR2(2000),
+    CREATE_TIME_ TIMESTAMP(6),
     TENANT_ID_ NVARCHAR2(255) DEFAULT '',
     primary key (ID_)
 );
@@ -144,6 +122,7 @@ create table ACT_RU_SUSPENDED_JOB (
     REPEAT_ NVARCHAR2(255),
     HANDLER_TYPE_ NVARCHAR2(255),
     HANDLER_CFG_ NVARCHAR2(2000),
+    CREATE_TIME_ TIMESTAMP(6),
     TENANT_ID_ NVARCHAR2(255) DEFAULT '',
     primary key (ID_)
 );
@@ -162,6 +141,7 @@ create table ACT_RU_DEADLETTER_JOB (
     REPEAT_ NVARCHAR2(255),
     HANDLER_TYPE_ NVARCHAR2(255),
     HANDLER_CFG_ NVARCHAR2(2000),
+    CREATE_TIME_ TIMESTAMP(6),
     TENANT_ID_ NVARCHAR2(255) DEFAULT '',
     primary key (ID_)
 );
@@ -177,8 +157,8 @@ create table ACT_RU_HISTORY_JOB (
     HANDLER_TYPE_ NVARCHAR2(255),
     HANDLER_CFG_ NVARCHAR2(2000),
     ADV_HANDLER_CFG_ID_ NVARCHAR2(64),
-    TENANT_ID_ NVARCHAR2(255) DEFAULT '',
     CREATE_TIME_ TIMESTAMP(6),
+    TENANT_ID_ NVARCHAR2(255) DEFAULT '',
     primary key (ID_)
 );
 
@@ -201,33 +181,6 @@ create table ACT_RE_PROCDEF (
     primary key (ID_)
 );
 
-create table ACT_RU_TASK (
-    ID_ NVARCHAR2(64),
-    REV_ INTEGER,
-    EXECUTION_ID_ NVARCHAR2(64),
-    PROC_INST_ID_ NVARCHAR2(64),
-    PROC_DEF_ID_ NVARCHAR2(64),
-    NAME_ NVARCHAR2(255),
-    PARENT_TASK_ID_ NVARCHAR2(64),
-    DESCRIPTION_ NVARCHAR2(2000),
-    TASK_DEF_KEY_ NVARCHAR2(255),
-    OWNER_ NVARCHAR2(255),
-    ASSIGNEE_ NVARCHAR2(255),
-    DELEGATION_ NVARCHAR2(64),
-    PRIORITY_ INTEGER,
-    CREATE_TIME_ TIMESTAMP(6),
-    DUE_DATE_ TIMESTAMP(6),
-    CATEGORY_ NVARCHAR2(255),
-    SUSPENSION_STATE_ INTEGER,
-    TENANT_ID_ NVARCHAR2(255) DEFAULT '',
-    FORM_KEY_ NVARCHAR2(255),
-    CLAIM_TIME_ TIMESTAMP(6),
-    IS_COUNT_ENABLED_ NUMBER(1,0) CHECK (IS_COUNT_ENABLED_ IN (1,0)),
-	VAR_COUNT_ INTEGER, 
-	ID_LINK_COUNT_ INTEGER,
-    primary key (ID_)
-);
-
 create table ACT_RU_IDENTITYLINK (
     ID_ NVARCHAR2(64),
     REV_ INTEGER,
@@ -237,22 +190,6 @@ create table ACT_RU_IDENTITYLINK (
     TASK_ID_ NVARCHAR2(64),
     PROC_INST_ID_ NVARCHAR2(64),
     PROC_DEF_ID_ NVARCHAR2(64),
-    primary key (ID_)
-);
-
-create table ACT_RU_VARIABLE (
-    ID_ NVARCHAR2(64) not null,
-    REV_ INTEGER,
-    TYPE_ NVARCHAR2(255) not null,
-    NAME_ NVARCHAR2(255) not null,
-    EXECUTION_ID_ NVARCHAR2(64),
-    PROC_INST_ID_ NVARCHAR2(64),
-    TASK_ID_ NVARCHAR2(64),
-    BYTEARRAY_ID_ NVARCHAR2(64),
-    DOUBLE_ NUMBER(*,10),
-    LONG_ NUMBER(19,0),
-    TEXT_ NVARCHAR2(2000),
-    TEXT2_ NVARCHAR2(2000),
     primary key (ID_)
 );
 
@@ -299,7 +236,6 @@ create table ACT_PROCDEF_INFO (
 
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDX_EXEC_ROOT on ACT_RU_EXECUTION(ROOT_PROC_INST_ID_);
-create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
 create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);
 create index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK(GROUP_ID_);
 create index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR(CONFIGURATION_);
@@ -387,12 +323,6 @@ alter table ACT_RU_VARIABLE
     foreign key (PROC_INST_ID_)
     references ACT_RU_EXECUTION(ID_);
 
-create index ACT_IDX_VAR_BYTEARRAY on ACT_RU_VARIABLE(BYTEARRAY_ID_);
-alter table ACT_RU_VARIABLE 
-    add constraint ACT_FK_VAR_BYTEARRAY 
-    foreign key (BYTEARRAY_ID_) 
-    references ACT_GE_BYTEARRAY (ID_);
-    
 create index ACT_IDX_JOB_EXECUTION_ID on ACT_RU_JOB(EXECUTION_ID_);
 alter table ACT_RU_JOB 
     add constraint ACT_FK_JOB_EXECUTION 
@@ -528,3 +458,9 @@ alter table ACT_PROCDEF_INFO
 alter table ACT_PROCDEF_INFO
     add constraint ACT_UNIQ_INFO_PROCDEF
     unique (PROC_DEF_ID_);
+    
+insert into ACT_GE_PROPERTY
+values ('schema.version', '6.2.0.0', 1);   
+
+insert into ACT_GE_PROPERTY
+values ('schema.history', 'create(6.2.0.0)', 1);  

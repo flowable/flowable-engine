@@ -13,7 +13,7 @@
 package org.flowable.dmn.engine.impl;
 
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.dmn.engine.impl.interceptor.CommandExecutor;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 
 public abstract class ServiceImpl {
 

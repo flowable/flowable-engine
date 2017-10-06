@@ -19,12 +19,6 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-
-import io.swagger.annotations.Authorization;
 import org.flowable.engine.FormService;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -40,6 +34,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Tijs Rademakers
@@ -102,7 +102,7 @@ public class FormDataResource {
             throw new FlowableIllegalArgumentException("The taskId or processDefinitionId property has to be provided");
         }
 
-        Map<String, String> propertyMap = new HashMap<String, String>();
+        Map<String, String> propertyMap = new HashMap<>();
         if (submitRequest.getProperties() != null) {
             for (RestFormProperty formProperty : submitRequest.getProperties()) {
                 propertyMap.put(formProperty.getId(), formProperty.getValue());

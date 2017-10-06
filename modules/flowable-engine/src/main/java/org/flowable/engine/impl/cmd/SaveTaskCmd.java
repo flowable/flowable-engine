@@ -16,18 +16,20 @@ import java.io.Serializable;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.delegate.TaskListener;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.history.HistoryLevel;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskInfo;
+import org.flowable.engine.impl.util.TaskHelper;
+import org.flowable.task.service.Task;
+import org.flowable.task.service.TaskInfo;
+import org.flowable.task.service.event.impl.FlowableTaskEventBuilder;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Joram Barrez
@@ -42,6 +44,7 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
         this.task = (TaskEntity) task;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (task == null) {
             throw new FlowableIllegalArgumentException("task is null");
@@ -54,36 +57,35 @@ public class SaveTaskCmd implements Command<Void>, Serializable {
         }
 
         if (task.getRevision() == 0) {
-            commandContext.getTaskEntityManager().insert(task, null, true);
+            TaskHelper.insertTask(task, null, true);
 
-            if (commandContext.getEventDispatcher().isEnabled()) {
-                commandContext.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
+            if (CommandContextUtil.getEventDispatcher().isEnabled()) {
+                CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
             }
 
         } else {
             
-            ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
 
-            TaskInfo originalTaskEntity = commandContext.getTaskEntityManager().findById(task.getId());
+            TaskInfo originalTaskEntity = CommandContextUtil.getTaskService().getTask(task.getId());
             
             if (originalTaskEntity == null && processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-                originalTaskEntity = commandContext.getHistoricTaskInstanceEntityManager().findById(task.getId());
+                originalTaskEntity = CommandContextUtil.getHistoricTaskService().getHistoricTask(task.getId());
             }
             
             String originalAssignee = originalTaskEntity.getAssignee();
             
-            commandContext.getHistoryManager().recordTaskInfoChange(task);
+            CommandContextUtil.getHistoryManager(commandContext).recordTaskInfoChange(task);
+            CommandContextUtil.getTaskService().updateTask(task, true);
             
             if (!StringUtils.equals(originalAssignee, task.getAssignee())) {
-                commandContext.getProcessEngineConfiguration().getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_ASSIGNMENT);
+                CommandContextUtil.getProcessEngineConfiguration(commandContext).getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_ASSIGNMENT);
                 
-                if (commandContext.getEventDispatcher().isEnabled()) {
-                    commandContext.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, task));
+                if (CommandContextUtil.getEventDispatcher().isEnabled()) {
+                    CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_ASSIGNED, task));
                 }
 
             }
-            
-            commandContext.getTaskEntityManager().update(task);
         }
 
         return null;

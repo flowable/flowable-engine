@@ -14,6 +14,7 @@ package org.flowable.engine.impl.calendar;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.TimeZone;
 
 import org.flowable.engine.common.api.FlowableException;
@@ -34,7 +35,11 @@ public class AdvancedSchedulerResolverWithTimeZone implements AdvancedSchedulerR
             if (duedateDescription.startsWith("R")) {
                 nextRun = new DurationHelper(duedateDescription, clockReader).getCalendarAfter(clockReader.getCurrentCalendar(timeZone));
             } else {
-                nextRun = new CronExpression(duedateDescription, clockReader, timeZone).getTimeAfter(clockReader.getCurrentCalendar(timeZone));
+                CronExpression cronExpression = new CronExpression(duedateDescription, clockReader);
+                cronExpression.setTimeZone(timeZone);
+                Date nextRunDate = cronExpression.getTimeAfter(clockReader.getCurrentCalendar(timeZone).getTime());
+                nextRun = new GregorianCalendar();
+                nextRun.setTime(nextRunDate);
             }
 
         } catch (Exception e) {

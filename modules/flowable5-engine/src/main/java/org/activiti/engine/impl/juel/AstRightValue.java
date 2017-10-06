@@ -27,6 +27,7 @@ public abstract class AstRightValue extends AstNode {
     /**
      * Answer <code>false</code>
      */
+    @Override
     public final boolean isLiteralText() {
         return false;
     }
@@ -34,6 +35,7 @@ public abstract class AstRightValue extends AstNode {
     /**
      * according to the spec, the result is undefined for rvalues, so answer <code>null</code>
      */
+    @Override
     public final Class<?> getType(Bindings bindings, ELContext context) {
         return null;
     }
@@ -41,6 +43,7 @@ public abstract class AstRightValue extends AstNode {
     /**
      * non-lvalues are always readonly, so answer <code>true</code>
      */
+    @Override
     public final boolean isReadOnly(Bindings bindings, ELContext context) {
         return true;
     }
@@ -48,26 +51,32 @@ public abstract class AstRightValue extends AstNode {
     /**
      * non-lvalues are always readonly, so throw an exception
      */
+    @Override
     public final void setValue(Bindings bindings, ELContext context, Object value) {
         throw new ELException(LocalMessages.get("error.value.set.rvalue", getStructuralId(bindings)));
     }
 
+    @Override
     public final MethodInfo getMethodInfo(Bindings bindings, ELContext context, Class<?> returnType, Class<?>[] paramTypes) {
         return null;
     }
 
+    @Override
     public final Object invoke(Bindings bindings, ELContext context, Class<?> returnType, Class<?>[] paramTypes, Object[] paramValues) {
         throw new ELException(LocalMessages.get("error.method.invalid", getStructuralId(bindings)));
     }
 
+    @Override
     public final boolean isLeftValue() {
         return false;
     }
 
+    @Override
     public boolean isMethodInvocation() {
         return false;
     }
 
+    @Override
     public final ValueReference getValueReference(Bindings bindings, ELContext context) {
         return null;
     }

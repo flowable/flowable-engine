@@ -22,9 +22,9 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableWrongDbException;
+import org.flowable.engine.common.impl.db.DbSqlSession;
+import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.impl.ProcessEngineImpl;
-import org.flowable.engine.impl.db.DbSqlSession;
-import org.flowable.engine.impl.db.DbSqlSessionFactory;
 
 /**
  * @author Tom Baeyens

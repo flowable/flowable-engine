@@ -12,9 +12,9 @@
  */
 package org.flowable.rest.dmn.service.api;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.text.MessageFormat;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Yvo Swillens
@@ -23,10 +23,13 @@ public final class DmnRestUrls {
 
     public static final String SEGMENT_REPOSITORY_RESOURCES = "dmn-repository";
     public static final String SEGMENT_RULES_RESOURCES = "dmn-rule";
+    public static final String SEGMENT_HISTORY_RESOURCES = "dmn-history";
 
     public static final String SEGMENT_DEPLOYMENT_RESOURCE = "deployments";
     public static final String SEGMENT_DEPLOYMENT_ARTIFACT_RESOURCE_CONTENT = "resourcedata";
     public static final String SEGMENT_DECISION_TABLE_RESOURCE = "decision-tables";
+    public static final String SEGMENT_HISTORIC_DECISION_EXECUTION_RESOURCE = "historic-decision-executions";
+    public static final String SEGMENT_HISTORIC_DECISION_EXECUTION_AUDITDATA = "auditdata";
     public static final String SEGMENT_DECISION_TABLE_MODEL = "model";
     public static final String SEGMENT_EXECUTE_RESOURCE = "execute";
     public static final String SEGMENT_EXECUTE_SINGLE_RESULT_RESOURCE = "single-result";
@@ -34,7 +37,7 @@ public final class DmnRestUrls {
     /**
      * URL template for a decision table collection: <i>/dmn-repository/decision-tables/{0:decisionTableId}</i>
      */
-    public static final String[] URL_DECISION_TABLE_COLLETION = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_DECISION_TABLE_RESOURCE };
+    public static final String[] URL_DECISION_TABLE_COLLECTION = { SEGMENT_REPOSITORY_RESOURCES, SEGMENT_DECISION_TABLE_RESOURCE };
 
     /**
      * URL template for a single decision table: <i>/dmn-repository/decision-tables/{0:decisionTableId}</i>
@@ -75,6 +78,21 @@ public final class DmnRestUrls {
      * URL template for a decision executor: <i>/dmn-rule/execute/single-result</i>
      */
     public static final String[] URL_RULE_SERVICE_EXECUTE_SINGLE_RESULT = { SEGMENT_RULES_RESOURCES, SEGMENT_EXECUTE_RESOURCE, SEGMENT_EXECUTE_SINGLE_RESULT_RESOURCE};
+    
+    /**
+     * URL template for a historic decision execution collection: <i>/dmn-history/historic-decision-executions</i>
+     */
+    public static final String[] URL_HISTORIC_DECISION_EXECUTION_COLLECTION = { SEGMENT_HISTORY_RESOURCES, SEGMENT_HISTORIC_DECISION_EXECUTION_RESOURCE };
+    
+    /**
+     * URL template for a historic decision execution: <i>/dmn-history/historic-decision-executions/{0:historicDecisionExecution}</i>
+     */
+    public static final String[] URL_HISTORIC_DECISION_EXECUTION = { SEGMENT_HISTORY_RESOURCES, SEGMENT_HISTORIC_DECISION_EXECUTION_RESOURCE, "{0}" };
+    
+    /**
+     * URL template for a historic decision execution audit data: <i>/dmn-history/historic-decision-executions/{0:historicDecisionExecution}/auditdata</i>
+     */
+    public static final String[] URL_HISTORIC_DECISION_EXECUTION_AUDITDATA = { SEGMENT_HISTORY_RESOURCES, SEGMENT_HISTORIC_DECISION_EXECUTION_RESOURCE, "{0}", SEGMENT_HISTORIC_DECISION_EXECUTION_AUDITDATA };
 
     /**
      * Creates an url based on the passed fragments and replaces any placeholders with the given arguments. The placeholders are following the {@link MessageFormat} convention (eg. {0} is replaced by

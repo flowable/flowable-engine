@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class DynamicProcessDefinitionSummary implements DynamicBpmnConstants {
 
-    private static final HashMap<String, PropertiesParser> summaryParsers = new HashMap<String, PropertiesParser>();
+    private static final HashMap<String, PropertiesParser> summaryParsers = new HashMap<>();
     private static final PropertiesParser defaultParser = new DefaultPropertiesParser();
     private BpmnModel bpmnModel;
     private ObjectNode processInfo;

@@ -20,11 +20,11 @@ import javax.sql.DataSource;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.FormEngines;
 import org.flowable.form.engine.impl.cfg.StandaloneFormEngineConfiguration;
-import org.flowable.form.engine.impl.interceptor.CommandInterceptor;
 import org.flowable.form.spring.autodeployment.AutoDeploymentStrategy;
 import org.flowable.form.spring.autodeployment.DefaultAutoDeploymentStrategy;
 import org.flowable.form.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
@@ -49,7 +49,7 @@ public class SpringFormEngineConfiguration extends FormEngineConfiguration imple
     protected String deploymentMode = "default";
     protected ApplicationContext applicationContext;
     protected Integer transactionSynchronizationAdapterOrder;
-    private Collection<AutoDeploymentStrategy> deploymentStrategies = new ArrayList<AutoDeploymentStrategy>();
+    private Collection<AutoDeploymentStrategy> deploymentStrategies = new ArrayList<>();
 
     public SpringFormEngineConfiguration() {
         this.transactionsExternallyManaged = true;
@@ -103,11 +103,11 @@ public class SpringFormEngineConfiguration extends FormEngineConfiguration imple
     @Override
     public FormEngineConfiguration setDataSource(DataSource dataSource) {
         if (dataSource instanceof TransactionAwareDataSourceProxy) {
-            return super.setDataSource(dataSource);
+            return (FormEngineConfiguration) super.setDataSource(dataSource);
         } else {
             // Wrap datasource in Transaction-aware proxy
             DataSource proxiedDataSource = new TransactionAwareDataSourceProxy(dataSource);
-            return super.setDataSource(proxiedDataSource);
+            return (FormEngineConfiguration) super.setDataSource(proxiedDataSource);
         }
     }
 

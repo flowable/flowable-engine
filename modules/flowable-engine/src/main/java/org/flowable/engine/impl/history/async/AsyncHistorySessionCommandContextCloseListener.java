@@ -17,9 +17,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandContextCloseListener;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.interceptor.CommandContextCloseListener;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -92,7 +93,7 @@ public class AsyncHistorySessionCommandContextCloseListener implements CommandCo
     }
     
     protected ObjectNode generateJson(CommandContext commandContext, String type, Map<String, String> historicData) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = commandContext.getProcessEngineConfiguration();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ObjectNode elementObjectNode = processEngineConfiguration.getObjectMapper().createObjectNode();
         elementObjectNode.put(HistoryJsonConstants.TYPE, type);
 

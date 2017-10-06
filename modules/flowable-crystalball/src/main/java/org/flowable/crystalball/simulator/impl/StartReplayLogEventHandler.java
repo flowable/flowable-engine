@@ -23,14 +23,16 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This class schedules replay start simulation event and takes care about process start and next event schedule
- * 
+ *
  * @author martin.grofcik
  */
 public class StartReplayLogEventHandler implements SimulationEventHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(StartReplayLogEventHandler.class.getName());
 
-    /** variable name where original process instance ID is stored - only for internal replay purposes */
+    /**
+     * variable name where original process instance ID is stored - only for internal replay purposes
+     */
     public static final String PROCESS_INSTANCE_ID = "_replay.processInstanceId";
     public static final String SIMULATION_RUN_ID = "_replay.simulationRunId";
 
@@ -57,7 +59,7 @@ public class StartReplayLogEventHandler implements SimulationEventHandler {
         // start process now
         String processDefinitionId = (String) event.getProperty(processToStartIdKey);
         String eventBusinessKey = (String) event.getProperty(this.businessKey);
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         Map<String, Object> processVariables = (Map<String, Object>) event.getProperty(variablesKey);
         if (processVariables != null) {
             variables.putAll(processVariables);

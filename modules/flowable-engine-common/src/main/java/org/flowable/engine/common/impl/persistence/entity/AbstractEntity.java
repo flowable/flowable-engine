@@ -40,38 +40,47 @@ public abstract class AbstractEntity implements Entity, HasRevision {
         this.id = id;
     }
 
+    @Override
     public int getRevisionNext() {
         return revision + 1;
     }
 
+    @Override
     public int getRevision() {
         return revision;
     }
 
+    @Override
     public void setRevision(int revision) {
         this.revision = revision;
     }
 
+    @Override
     public boolean isInserted() {
         return isInserted;
     }
 
+    @Override
     public void setInserted(boolean isInserted) {
         this.isInserted = isInserted;
     }
 
+    @Override
     public boolean isUpdated() {
         return isUpdated;
     }
 
+    @Override
     public void setUpdated(boolean isUpdated) {
         this.isUpdated = isUpdated;
     }
 
+    @Override
     public boolean isDeleted() {
         return isDeleted;
     }
 
+    @Override
     public void setDeleted(boolean isDeleted) {
         this.isDeleted = isDeleted;
     }

@@ -62,10 +62,19 @@ public class FlowElementValidator extends ProcessLevelValidator {
         if (multiInstanceLoopCharacteristics != null) {
 
             if (StringUtils.isEmpty(multiInstanceLoopCharacteristics.getLoopCardinality())
-                    && StringUtils.isEmpty(multiInstanceLoopCharacteristics.getInputDataItem())) {
+                    && StringUtils.isEmpty(multiInstanceLoopCharacteristics.getInputDataItem()) && StringUtils.isEmpty(multiInstanceLoopCharacteristics.getCollectionString())) {
 
                 addError(errors, Problems.MULTI_INSTANCE_MISSING_COLLECTION, process, activity,
-                        "Either loopCardinality or loopDataInputRef/activiti:collection must been set");
+                        "Either loopCardinality or loopDataInputRef/flowable:collection must been set");
+            }
+            
+            if (!StringUtils.isEmpty(multiInstanceLoopCharacteristics.getCollectionString())) {
+
+            	if (multiInstanceLoopCharacteristics.getHandler() == null) {
+            		// verify string parsing function attributes
+            		addError(errors, Problems.MULTI_INSTANCE_MISSING_COLLECTION_FUNCTION_PARAMETERS, process, activity,
+            				"The flowable:collection element string value requires the function parameters flowable:delegateExpression or flowable:class.");
+            	}
             }
 
         }

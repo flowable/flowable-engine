@@ -44,6 +44,7 @@ public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStr
     private DefaultAutoDeploymentStrategy classUnderTest;
 
     @Before
+    @Override
     public void before() throws Exception {
         super.before();
         classUnderTest = new DefaultAutoDeploymentStrategy();

@@ -21,14 +21,14 @@ import org.activiti.engine.runtime.JobQuery;
 
 /**
  * Contains the possible properties that can be used in a {@link JobQuery}.
- * 
+ *
  * @author Joram Barrez
  */
 public class JobQueryProperty implements QueryProperty {
 
     private static final long serialVersionUID = 1L;
 
-    private static final Map<String, JobQueryProperty> properties = new HashMap<String, JobQueryProperty>();
+    private static final Map<String, JobQueryProperty> properties = new HashMap<>();
 
     public static final JobQueryProperty JOB_ID = new JobQueryProperty("ID_");
     public static final JobQueryProperty PROCESS_INSTANCE_ID = new JobQueryProperty("RES.PROCESS_INSTANCE_ID_");
@@ -44,6 +44,7 @@ public class JobQueryProperty implements QueryProperty {
         properties.put(name, this);
     }
 
+    @Override
     public String getName() {
         return name;
     }

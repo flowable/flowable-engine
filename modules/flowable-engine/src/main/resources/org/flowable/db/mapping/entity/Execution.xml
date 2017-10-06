@@ -7,7 +7,11 @@
   <!-- EXECUTION INSERT -->
 
   <insert id="insertExecution" parameterType="org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl">
-    insert into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_, IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_, TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_, TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_)
+    insert into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_, 
+                                           IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_, 
+                                           TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_, 
+                                           TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
+                                           CALLBACK_ID_, CALLBACK_TYPE_)
     values (
       #{id ,jdbcType=VARCHAR},
       1,
@@ -37,12 +41,18 @@
       #{suspendedJobCount, jdbcType=INTEGER},
       #{deadLetterJobCount, jdbcType=INTEGER},
       #{variableCount, jdbcType=INTEGER},
-      #{identityLinkCount, jdbcType=INTEGER}
+      #{identityLinkCount, jdbcType=INTEGER},
+      #{callbackId, jdbcType=VARCHAR},
+      #{callbackType, jdbcType=VARCHAR}
     )
   </insert>
 
   <insert id="bulkInsertExecution" parameterType="java.util.List">
-    insert into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_, IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_, TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_, TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_)
+    insert into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_,
+                                           IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_,
+                                           TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_, 
+                                           TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
+                                           CALLBACK_ID_, CALLBACK_TYPE_)
     values 
       <foreach collection="list" item="execution" index="index" separator=",">
         (#{execution.id ,jdbcType=VARCHAR},
@@ -73,16 +83,23 @@
          #{execution.suspendedJobCount, jdbcType=INTEGER},
          #{execution.deadLetterJobCount, jdbcType=INTEGER},
          #{execution.variableCount, jdbcType=INTEGER},
-         #{execution.identityLinkCount, jdbcType=INTEGER})
+         #{execution.identityLinkCount, jdbcType=INTEGER},
+         #{execution.callbackId, jdbcType=VARCHAR},
+         #{execution.callbackType, jdbcType=VARCHAR}
+        )
       </foreach>
   </insert>
 
   <insert id="bulkInsertExecution" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL 
       <foreach collection="list" item="execution" index="index">
-        into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_,
-        IS_ACTIVE_, IS_CONCURRENT_, IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_, TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_, TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_) VALUES
-            (#{execution.id ,jdbcType=VARCHAR},
+        into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_, 
+                                        IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_,
+                                        TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_,
+                                        TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
+                                        CALLBACK_ID_, CALLBACK_TYPE_) VALUES
+            (
+             #{execution.id ,jdbcType=VARCHAR},
              1,
              #{execution.processInstanceId, jdbcType=VARCHAR},
              #{execution.businessKey, jdbcType=VARCHAR},
@@ -110,7 +127,10 @@
              #{execution.suspendedJobCount, jdbcType=INTEGER},
              #{execution.deadLetterJobCount, jdbcType=INTEGER},
              #{execution.variableCount, jdbcType=INTEGER},
-             #{execution.identityLinkCount, jdbcType=INTEGER})
+             #{execution.identityLinkCount, jdbcType=INTEGER},
+             #{execution.callbackId, jdbcType=VARCHAR},
+             #{execution.callbackType, jdbcType=VARCHAR}
+            )
       </foreach>
     SELECT * FROM dual
   </insert>
@@ -187,6 +207,12 @@
             <if test="originalPersistentState.identityLinkCount != identityLinkCount">
                 ID_LINK_COUNT_ = #{identityLinkCount, jdbcType=INTEGER}
             </if>
+            <if test="originalPersistentState.callbackId != callbackId">
+                CALLBACK_ID_ = #{callbackId, jdbcType=VARCHAR}
+            </if> 
+            <if test="originalPersistentState.callbackType != callbackType">
+                CALLBACK_ID_ = #{callbackType, jdbcType=VARCHAR}
+            </if>            
         </set>
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
@@ -290,6 +316,8 @@
     <result property="deadLetterJobCount" column="DEADLETTER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
+    <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
+    <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
   </resultMap>
   
   <resultMap id="processInstanceResultMap" type="org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl">
@@ -330,6 +358,8 @@
     <result property="deadLetterJobCount" column="DEADLETTER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
+    <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
+    <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
   </resultMap>
   
   <resultMap id="executionAndVariablesResultMap" type="org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl">
@@ -362,15 +392,17 @@
     <result property="deadLetterJobCount" column="DEADLETTER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
-    <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.engine.impl.persistence.entity.VariableInstanceEntityImpl">
+    <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
+    <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
+    <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
       <id property="id" column="VAR_ID_"/>
       <result property="name" column="VAR_NAME_" javaType="String" jdbcType="VARCHAR" />
-      <result property="type" column="VAR_TYPE_" javaType="org.flowable.engine.impl.variable.VariableType" jdbcType="VARCHAR" />
+      <result property="type" column="VAR_TYPE_" javaType="org.flowable.variable.service.impl.types.VariableType" jdbcType="VARCHAR" />
       <result property="revision" column="VAR_REV_" jdbcType="INTEGER" />
       <result property="processInstanceId" column="VAR_PROC_INST_ID_" jdbcType="VARCHAR" />
       <result property="executionId" column="VAR_EXECUTION_ID_" jdbcType="VARCHAR" />
       <result property="taskId" column="VAR_TASK_ID_" jdbcType="VARCHAR" />
-      <result property="byteArrayRef" column="VAR_BYTEARRAY_ID_" typeHandler="ByteArrayRefTypeHandler"/>
+      <result property="byteArrayRef" column="VAR_BYTEARRAY_ID_" typeHandler="VariableByteArrayRefTypeHandler"/>
       <result property="doubleValue" column="VAR_DOUBLE_" jdbcType="DOUBLE" />
       <result property="textValue" column="VAR_TEXT_" jdbcType="VARCHAR" />
       <result property="textValue2" column="VAR_TEXT2_" jdbcType="VARCHAR" />
@@ -413,15 +445,17 @@
     <result property="deadLetterJobCount" column="DEADLETTER_JOB_COUNT_" jdbcType="INTEGER" />
     <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
     <result property="identityLinkCount" column="ID_LINK_COUNT_" jdbcType="INTEGER" />
-    <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.engine.impl.persistence.entity.VariableInstanceEntityImpl">
+    <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
+    <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
+    <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
       <id property="id" column="VAR_ID_"/>
       <result property="name" column="VAR_NAME_" javaType="String" jdbcType="VARCHAR" />
-      <result property="type" column="VAR_TYPE_" javaType="org.flowable.engine.impl.variable.VariableType" jdbcType="VARCHAR" />
+      <result property="type" column="VAR_TYPE_" javaType="org.flowable.variable.service.impl.types.VariableType" jdbcType="VARCHAR" />
       <result property="revision" column="VAR_REV_" jdbcType="INTEGER" />
       <result property="processInstanceId" column="VAR_PROC_INST_ID_" jdbcType="VARCHAR" />
       <result property="executionId" column="VAR_EXECUTION_ID_" jdbcType="VARCHAR" />
       <result property="taskId" column="VAR_TASK_ID_" jdbcType="VARCHAR" />
-      <result property="byteArrayRef" column="VAR_BYTEARRAY_ID_" typeHandler="ByteArrayRefTypeHandler"/>
+      <result property="byteArrayRef" column="VAR_BYTEARRAY_ID_" typeHandler="VariableByteArrayRefTypeHandler"/>
       <result property="doubleValue" column="VAR_DOUBLE_" jdbcType="DOUBLE" />
       <result property="textValue" column="VAR_TEXT_" jdbcType="VARCHAR" />
       <result property="textValue2" column="VAR_TEXT2_" jdbcType="VARCHAR" />

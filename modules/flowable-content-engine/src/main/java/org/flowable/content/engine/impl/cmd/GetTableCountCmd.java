@@ -15,8 +15,9 @@ package org.flowable.content.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.Map;
 
-import org.flowable.content.engine.impl.interceptor.Command;
-import org.flowable.content.engine.impl.interceptor.CommandContext;
+import org.flowable.content.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Tom Baeyens
@@ -25,7 +26,8 @@ public class GetTableCountCmd implements Command<Map<String, Long>>, Serializabl
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public Map<String, Long> execute(CommandContext commandContext) {
-        return commandContext.getTableDataManager().getTableCount();
+        return CommandContextUtil.getTableDataManager(commandContext).getTableCount();
     }
 }

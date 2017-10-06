@@ -312,7 +312,7 @@ public class ProcessDefinitionQueryTest extends PluggableFlowableTestCase {
 
     public void testQueryByProcessDefinitionIds() {
         List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
-        Set<String> ids = new HashSet<String>();
+        Set<String> ids = new HashSet<>();
         for (ProcessDefinition processDefinition : processDefinitions) {
             ids.add(processDefinition.getId());
         }

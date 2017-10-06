@@ -14,8 +14,8 @@
 package org.activiti.engine.test.bpmn.event.compensate.helper;
 
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.JavaDelegate;
+import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * @author Daniel Meyer

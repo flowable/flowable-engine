@@ -48,6 +48,7 @@ public class MessageConverterTest extends AbstractConverterTest {
         assertEquals("writeReport2", message2.getId());
     }
 
+    @Override
     protected String getResource() {
         return "message.bpmn";
     }

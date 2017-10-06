@@ -84,6 +84,7 @@ public class Builder implements TreeBuilder {
     /**
      * Parse expression.
      */
+    @Override
     public Tree build(String expression) throws TreeBuilderException {
         try {
             return createParser(expression).tree();

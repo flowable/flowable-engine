@@ -14,8 +14,6 @@ package org.flowable.dmn.engine;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -29,9 +27,10 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.io.IOUtils;
-import org.flowable.dmn.engine.impl.util.ReflectUtil;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.flowable.engine.common.EngineInfo;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,10 +41,10 @@ public abstract class DmnEngines {
     public static final String NAME_DEFAULT = "default";
 
     protected static boolean isInitialized;
-    protected static Map<String, DmnEngine> dmnEngines = new HashMap<String, DmnEngine>();
-    protected static Map<String, EngineInfo> dmnEngineInfosByName = new HashMap<String, EngineInfo>();
-    protected static Map<String, EngineInfo> dmnEngineInfosByResourceUrl = new HashMap<String, EngineInfo>();
-    protected static List<EngineInfo> dmnEngineInfos = new ArrayList<EngineInfo>();
+    protected static Map<String, DmnEngine> dmnEngines = new HashMap<>();
+    protected static Map<String, EngineInfo> dmnEngineInfosByName = new HashMap<>();
+    protected static Map<String, EngineInfo> dmnEngineInfosByResourceUrl = new HashMap<>();
+    protected static List<EngineInfo> dmnEngineInfos = new ArrayList<>();
 
     /**
      * Initializes all dmn engines that can be found on the classpath for resources <code>flowable.dmn.cfg.xml</code> and for resources <code>flowable-dmn-context.xml</code> (Spring style
@@ -55,7 +54,7 @@ public abstract class DmnEngines {
         if (!isInitialized()) {
             if (dmnEngines == null) {
                 // Create new map to store dmn engines if current map is null
-                dmnEngines = new HashMap<String, DmnEngine>();
+                dmnEngines = new HashMap<>();
             }
             ClassLoader classLoader = DmnEngines.class.getClassLoader();
             Enumeration<URL> resources = null;
@@ -67,7 +66,7 @@ public abstract class DmnEngines {
 
             // Remove duplicated configuration URL's using set. Some
             // classloaders may return identical URL's twice, causing duplicate startups
-            Set<URL> configUrls = new HashSet<URL>();
+            Set<URL> configUrls = new HashSet<>();
             while (resources.hasMoreElements()) {
                 configUrls.add(resources.nextElement());
             }
@@ -150,18 +149,11 @@ public abstract class DmnEngines {
             dmnEngineInfosByName.put(dmnEngineName, dmnEngineInfo);
         } catch (Throwable e) {
             LOGGER.error("Exception while initializing dmn engine: {}", e.getMessage(), e);
-            dmnEngineInfo = new EngineInfo(null, resourceUrlString, getExceptionString(e));
+            dmnEngineInfo = new EngineInfo(null, resourceUrlString, ExceptionUtils.getStackTrace(e));
         }
         dmnEngineInfosByResourceUrl.put(resourceUrlString, dmnEngineInfo);
         dmnEngineInfos.add(dmnEngineInfo);
         return dmnEngineInfo;
-    }
-
-    private static String getExceptionString(Throwable e) {
-        StringWriter sw = new StringWriter();
-        PrintWriter pw = new PrintWriter(sw);
-        e.printStackTrace(pw);
-        return sw.toString();
     }
 
     protected static DmnEngine buildDmnEngine(URL resource) {
@@ -232,8 +224,8 @@ public abstract class DmnEngines {
      */
     public static synchronized void destroy() {
         if (isInitialized()) {
-            Map<String, DmnEngine> engines = new HashMap<String, DmnEngine>(dmnEngines);
-            dmnEngines = new HashMap<String, DmnEngine>();
+            Map<String, DmnEngine> engines = new HashMap<>(dmnEngines);
+            dmnEngines = new HashMap<>();
 
             for (String dmnEngineName : engines.keySet()) {
                 DmnEngine dmnEngine = engines.get(dmnEngineName);

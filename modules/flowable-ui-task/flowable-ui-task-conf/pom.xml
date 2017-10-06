@@ -7,7 +7,7 @@
 	<parent>
 		<groupId>org.flowable</groupId>
     	<artifactId>flowable-ui-task</artifactId>
-    	<version>6.1.1-SNAPSHOT</version>
+    	<version>6.2.0-SNAPSHOT</version>
 	</parent>
 	<packaging>jar</packaging>
 
@@ -94,6 +94,18 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-dmn-rest</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-cmmn-spring-configurator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-cmmn-engine</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-cmmn-model</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>

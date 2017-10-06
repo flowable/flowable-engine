@@ -13,20 +13,20 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.task.Attachment;
-import org.flowable.engine.task.Task;
 import org.flowable.rest.service.api.engine.AttachmentRequest;
 import org.flowable.rest.service.api.engine.AttachmentResponse;
+import org.flowable.task.service.Task;
+import org.flowable.task.service.history.HistoricTaskInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,11 +36,14 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
@@ -59,7 +62,7 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
     })
     @RequestMapping(value = "/runtime/tasks/{taskId}/attachments", method = RequestMethod.GET, produces = "application/json")
     public List<AttachmentResponse> getAttachments(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
-        List<AttachmentResponse> result = new ArrayList<AttachmentResponse>();
+        List<AttachmentResponse> result = new ArrayList<>();
         HistoricTaskInstance task = getHistoricTaskFromRequest(taskId);
 
         for (Attachment attachment : taskService.getTaskAttachments(task.getId())) {

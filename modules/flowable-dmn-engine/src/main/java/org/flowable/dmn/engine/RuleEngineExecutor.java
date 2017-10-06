@@ -12,19 +12,15 @@
  */
 package org.flowable.dmn.engine;
 
-import java.lang.reflect.Method;
-import java.util.Map;
-
-import org.flowable.dmn.api.RuleEngineExecutionResult;
+import org.flowable.dmn.api.DecisionExecutionAuditContainer;
+import org.flowable.dmn.engine.impl.ExecuteDecisionInfo;
 import org.flowable.dmn.model.Decision;
-import org.mvel2.integration.PropertyHandler;
 
 /**
  * @author Yvo Swillens
  */
 public interface RuleEngineExecutor {
 
-    RuleEngineExecutionResult execute(Decision decision, Map<String, Object> inputVariables,
-            Map<String, Method> customExpressionFunctions, Map<Class<?>, PropertyHandler> propertyHandlers);
+    DecisionExecutionAuditContainer execute(Decision decision, ExecuteDecisionInfo executeDecisionInfo);
 
 }

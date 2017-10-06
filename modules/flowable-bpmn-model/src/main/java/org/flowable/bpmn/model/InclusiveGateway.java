@@ -17,6 +17,7 @@ package org.flowable.bpmn.model;
  */
 public class InclusiveGateway extends Gateway {
 
+    @Override
     public InclusiveGateway clone() {
         InclusiveGateway clone = new InclusiveGateway();
         clone.setValues(this);

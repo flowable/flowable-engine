@@ -13,8 +13,8 @@
 package org.flowable.engine.impl.bpmn.behavior;
 
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Joram Barrez
@@ -23,8 +23,9 @@ public class NoneEndEventActivityBehavior extends FlowNodeActivityBehavior {
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public void execute(DelegateExecution execution) {
-        Context.getAgenda().planTakeOutgoingSequenceFlowsOperation((ExecutionEntity) execution, true);
+        CommandContextUtil.getAgenda().planTakeOutgoingSequenceFlowsOperation((ExecutionEntity) execution, true);
     }
 
 }

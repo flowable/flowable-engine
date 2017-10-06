@@ -41,6 +41,7 @@ public class TimerDefinitionConverterTest extends AbstractConverterTest {
         deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "timerCalendarDefinition.bpmn";
     }

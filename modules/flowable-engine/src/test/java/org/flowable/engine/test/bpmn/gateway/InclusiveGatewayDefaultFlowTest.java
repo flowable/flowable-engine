@@ -25,6 +25,7 @@ public class InclusiveGatewayDefaultFlowTest extends PluggableFlowableTestCase {
 
     private String deploymentId;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         deploymentId = repositoryService.createDeployment()
@@ -32,6 +33,7 @@ public class InclusiveGatewayDefaultFlowTest extends PluggableFlowableTestCase {
                 .deploy().getId();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         repositoryService.deleteDeployment(deploymentId, true);
         super.tearDown();
@@ -45,7 +47,7 @@ public class InclusiveGatewayDefaultFlowTest extends PluggableFlowableTestCase {
     }
 
     public void testCompatibleConditionFlow() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("var1", "true");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, variables);
 

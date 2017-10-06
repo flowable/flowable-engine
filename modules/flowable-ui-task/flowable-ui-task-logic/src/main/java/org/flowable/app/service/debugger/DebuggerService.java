@@ -15,7 +15,7 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.service.Job;
 import org.flowable.engine.runtime.ProcessDebugger;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

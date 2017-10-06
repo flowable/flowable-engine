@@ -101,6 +101,14 @@ public class ModelResource {
 
         try {
             updatedModel.updateModel(model);
+            
+            if (model.getModelType() != null && (Model.MODEL_TYPE_DECISION_TABLE == model.getModelType() || Model.MODEL_TYPE_FORM == model.getModelType())) {
+                ObjectNode modelNode = (ObjectNode) objectMapper.readTree(model.getModelEditorJson());
+                modelNode.put("name", model.getName());
+                modelNode.put("key", model.getKey());
+                model.setModelEditorJson(modelNode.toString());
+            }
+            
             modelRepository.save(model);
 
             ModelRepresentation result = new ModelRepresentation(model);

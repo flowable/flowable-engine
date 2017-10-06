@@ -19,15 +19,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.history.HistoricTaskInstanceQuery;
-import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.IdentityLinkInfo;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.identitylink.service.IdentityLinkInfo;
+import org.flowable.task.service.history.HistoricTaskInstance;
+import org.flowable.task.service.history.HistoricTaskInstanceQuery;
 
 /**
  * @author Tijs Rademakers
@@ -36,6 +35,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
 
     private List<String> taskIds;
 
+    @Override
     public void setUp() throws Exception {
 
         identityService.saveUser(identityService.newUser("kermit"));
@@ -52,6 +52,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
         taskIds = generateTestTasks();
     }
 
+    @Override
     public void tearDown() throws Exception {
         identityService.deleteGroup("accountancy");
         identityService.deleteGroup("management");
@@ -80,7 +81,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
             assertEquals(0, task.getProcessVariables().size());
             assertEquals(0, task.getTaskLocalVariables().size());
 
-            Map<String, Object> startMap = new HashMap<String, Object>();
+            Map<String, Object> startMap = new HashMap<>();
             startMap.put("processVar", true);
             runtimeService.startProcessInstanceByKey("oneTaskProcess", startMap);
             
@@ -188,7 +189,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
             assertEquals(0, task.getProcessVariables().size());
             assertEquals(0, task.getTaskLocalVariables().size());
 
-            Map<String, Object> startMap = new HashMap<String, Object>();
+            Map<String, Object> startMap = new HashMap<>();
             startMap.put("processVar", true);
             runtimeService.startProcessInstanceByKey("oneTaskProcess", startMap);
             
@@ -326,7 +327,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
     @Deployment
     public void testOrQueryMultipleVariableValues() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
-            Map<String, Object> startMap = new HashMap<String, Object>();
+            Map<String, Object> startMap = new HashMap<>();
             startMap.put("processVar", true);
             startMap.put("anotherProcessVar", 123);
             runtimeService.startProcessInstanceByKey("oneTaskProcess", startMap);
@@ -373,7 +374,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
 
             tasks = historyService.createHistoricTaskInstanceQuery().taskCandidateGroup("management").list();
             assertEquals(1, tasks.size());
-            List<String> groups = new ArrayList<String>();
+            List<String> groups = new ArrayList<>();
             groups.add("management");
             groups.add("accountancy");
             tasks = historyService.createHistoricTaskInstanceQuery().taskCandidateGroupIn(groups).list();
@@ -385,7 +386,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
             tasks = historyService.createHistoricTaskInstanceQuery().taskCandidateUser("gonzo").taskCandidateGroupIn(groups).list();
             assertEquals(1, tasks.size());
 
-            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             taskService.complete(task.getId());
 
             assertEquals(0, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
@@ -513,7 +514,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
             assertNull(historicTask.getDueDate());
 
             // Set due-date on task
-            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             Date dueDate = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("01/02/2003 01:12:13");
             task.setDueDate(dueDate);
             taskService.saveTask(task);
@@ -559,13 +560,13 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
      * Generates some test tasks. - 2 tasks where kermit is a candidate and 1 task where gonzo is assignee
      */
     private List<String> generateTestTasks() throws Exception {
-        List<String> ids = new ArrayList<String>();
+        List<String> ids = new ArrayList<>();
 
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
         // 2 tasks for kermit
         processEngineConfiguration.getClock().setCurrentTime(sdf.parse("01/01/2001 01:01:01.000"));
         for (int i = 0; i < 2; i++) {
-            Task task = taskService.newTask();
+            org.flowable.task.service.Task task = taskService.newTask();
             task.setName("testTask");
             task.setDescription("testTask description");
             task.setPriority(3);
@@ -577,7 +578,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
 
         processEngineConfiguration.getClock().setCurrentTime(sdf.parse("02/02/2002 02:02:02.000"));
         // 1 task for gonzo
-        Task task = taskService.newTask();
+        org.flowable.task.service.Task task = taskService.newTask();
         task.setName("gonzoTask");
         task.setDescription("gonzo description");
         task.setPriority(4);

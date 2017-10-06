@@ -65,8 +65,8 @@ public class BpmnDisplayJsonConverter {
     protected BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
 
     protected ObjectMapper objectMapper = new ObjectMapper();
-    protected List<String> eventElementTypes = new ArrayList<String>();
-    protected Map<String, InfoMapper> propertyMappers = new HashMap<String, InfoMapper>();
+    protected List<String> eventElementTypes = new ArrayList<>();
+    protected Map<String, InfoMapper> propertyMappers = new HashMap<>();
 
     public BpmnDisplayJsonConverter() {
         eventElementTypes.add("StartEvent");
@@ -246,12 +246,12 @@ public class BpmnDisplayJsonConverter {
 
                 if (element instanceof SubProcess) {
                     SubProcess subProcess = (SubProcess) element;
-                    
+
                     // skip collapsed sub processes
                     if (graphicInfo != null && graphicInfo.getExpanded() != null && !graphicInfo.getExpanded()) {
                         continue;
                     }
-                    
+
                     processElements(subProcess.getFlowElements(), model, elementArray, flowArray, diagramInfo);
                     processArtifacts(subProcess.getArtifacts(), model, elementArray, flowArray, diagramInfo);
                 }

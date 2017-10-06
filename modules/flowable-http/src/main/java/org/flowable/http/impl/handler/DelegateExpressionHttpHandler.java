@@ -14,13 +14,13 @@ package org.flowable.http.impl.handler;
 
 import java.util.List;
 
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.client.HttpClient;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.impl.bpmn.helper.DelegateExpressionUtil;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
-import org.flowable.engine.impl.context.Context;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.http.HttpRequest;
 import org.flowable.http.HttpResponse;
 import org.flowable.http.delegate.HttpRequestHandler;
@@ -43,20 +43,22 @@ public class DelegateExpressionHttpHandler implements HttpRequestHandler, HttpRe
         this.fieldDeclarations = fieldDeclarations;
     }
 
-    public void handleHttpRequest(DelegateExecution execution, HttpRequest httpRequest, CloseableHttpClient client) {
+    @Override
+    public void handleHttpRequest(DelegateExecution execution, HttpRequest httpRequest, HttpClient client) {
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, execution, fieldDeclarations);
         if (delegate instanceof HttpRequestHandler) {
-            Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(
+            CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(
                             new HttpRequestHandlerInvocation((HttpRequestHandler) delegate, execution, httpRequest, client));
         } else {
             throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did not resolve to an implementation of " + HttpRequestHandler.class);
         }
     }
     
+    @Override
     public void handleHttpResponse(DelegateExecution execution, HttpResponse httpResponse) {
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, execution, fieldDeclarations);
         if (delegate instanceof HttpResponseHandler) {
-            Context.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(
+            CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(
                             new HttpResponseHandlerInvocation((HttpResponseHandler) delegate, execution, httpResponse));
         } else {
             throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did not resolve to an implementation of " + HttpResponseHandler.class);

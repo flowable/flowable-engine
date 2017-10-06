@@ -51,6 +51,7 @@ public class AddIdentityLinkForProcessDefinitionCmd implements Command<Void>, Se
         }
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         ProcessDefinitionEntity processDefinition = commandContext
                 .getProcessDefinitionEntityManager()

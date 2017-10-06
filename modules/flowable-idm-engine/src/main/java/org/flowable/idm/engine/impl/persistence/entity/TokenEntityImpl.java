@@ -96,7 +96,7 @@ public class TokenEntityImpl extends AbstractEntity implements TokenEntity, Seri
 
     @Override
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("tokenValue", tokenValue);
         persistentState.put("tokenDate", tokenDate);
         persistentState.put("ipAddress", ipAddress);

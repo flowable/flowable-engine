@@ -147,6 +147,18 @@ function _drawServiceTask(element)
 	{
 		_drawSendTaskIcon(paper, element.x - 4, element.y - 4, element);
 	}
+	else if (element.taskType === "camel")
+    {
+        _drawCamelTaskIcon(paper, element.x + 4, element.y + 4);
+    }
+    else if (element.taskType === "mule")
+    {
+        _drawMuleTaskIcon(paper, element.x + 4, element.y + 4);
+    }
+    else if (element.taskType === "http")
+    {
+        _drawHttpTaskIcon(paper, element.x + 4, element.y + 4);
+    }
 	else if (element.stencilIconId)
 	{
 		paper.image("../service/stencilitem/" + element.stencilIconId + "/icon", element.x + 4, element.y + 4, 16, 16);
@@ -156,6 +168,13 @@ function _drawServiceTask(element)
 		_drawServiceTaskIcon(paper, element.x + 4, element.y + 4, element);
 	}
 	_addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+}
+
+function _drawHttpServiceTask(element)
+{
+    _drawTask(element);
+    _drawHttpTaskIcon(paper, element.x + 4, element.y + 4);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
 }
 
 function _drawCallActivity(element)

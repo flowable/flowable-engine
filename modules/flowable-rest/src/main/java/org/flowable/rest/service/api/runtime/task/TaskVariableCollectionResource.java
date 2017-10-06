@@ -13,21 +13,21 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.task.Task;
 import org.flowable.rest.exception.FlowableConflictException;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
+import org.flowable.task.service.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,13 +37,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
@@ -64,8 +67,8 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
     @RequestMapping(value = "/runtime/tasks/{taskId}/variables", method = RequestMethod.GET, produces = "application/json")
     public List<RestVariable> getVariables(@ApiParam(name = "taskId") @PathVariable String taskId, @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scope, HttpServletRequest request) {
 
-        List<RestVariable> result = new ArrayList<RestVariable>();
-        Map<String, RestVariable> variableMap = new HashMap<String, RestVariable>();
+        List<RestVariable> result = new ArrayList<>();
+        Map<String, RestVariable> variableMap = new HashMap<>();
 
         // Check if it's a valid task to get the variables for
         Task task = getTaskFromRequest(taskId);
@@ -121,8 +124,8 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
             result = setBinaryVariable((MultipartHttpServletRequest) request, task, true);
         } else {
 
-            List<RestVariable> inputVariables = new ArrayList<RestVariable>();
-            List<RestVariable> resultVariables = new ArrayList<RestVariable>();
+            List<RestVariable> inputVariables = new ArrayList<>();
+            List<RestVariable> resultVariables = new ArrayList<>();
             result = resultVariables;
 
             try {
@@ -142,7 +145,7 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
 
             RestVariableScope sharedScope = null;
             RestVariableScope varScope = null;
-            Map<String, Object> variablesToSet = new HashMap<String, Object>();
+            Map<String, Object> variablesToSet = new HashMap<>();
 
             for (RestVariable var : inputVariables) {
                 // Validate if scopes match

@@ -14,11 +14,11 @@ package org.flowable.engine.test.jobexecutor;
 
 import java.util.Date;
 
-import org.flowable.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntityImpl;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntityImpl;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntityImpl;
 
 /**
  * @author Tom Baeyens
@@ -27,10 +27,12 @@ public abstract class JobExecutorTestCase extends PluggableFlowableTestCase {
 
     protected TweetHandler tweetHandler = new TweetHandler();
 
+    @Override
     public void setUp() throws Exception {
         processEngineConfiguration.getJobHandlers().put(tweetHandler.getType(), tweetHandler);
     }
 
+    @Override
     public void tearDown() throws Exception {
         processEngineConfiguration.getJobHandlers().remove(tweetHandler.getType());
     }

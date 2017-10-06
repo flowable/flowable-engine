@@ -21,7 +21,7 @@ import java.util.List;
 public class DataGridRow {
 
     protected int index;
-    protected List<DataGridField> fields = new ArrayList<DataGridField>();
+    protected List<DataGridField> fields = new ArrayList<>();
 
     public int getIndex() {
         return index;
@@ -39,6 +39,7 @@ public class DataGridRow {
         this.fields = fields;
     }
 
+    @Override
     public DataGridRow clone() {
         DataGridRow clone = new DataGridRow();
         clone.setValues(this);
@@ -48,7 +49,7 @@ public class DataGridRow {
     public void setValues(DataGridRow otherRow) {
         setIndex(otherRow.getIndex());
 
-        fields = new ArrayList<DataGridField>();
+        fields = new ArrayList<>();
         if (otherRow.getFields() != null && !otherRow.getFields().isEmpty()) {
             for (DataGridField field : otherRow.getFields()) {
                 fields.add(field.clone());

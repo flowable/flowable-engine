@@ -64,6 +64,7 @@ public class DispatcherServletConfiguration extends WebMvcConfigurationSupport {
     }
 
     @Bean
+    @Override
     public RequestMappingHandlerMapping requestMappingHandlerMapping() {
         LOGGER.debug("Creating requestMappingHandlerMapping");
         RequestMappingHandlerMapping requestMappingHandlerMapping = new RequestMappingHandlerMapping();

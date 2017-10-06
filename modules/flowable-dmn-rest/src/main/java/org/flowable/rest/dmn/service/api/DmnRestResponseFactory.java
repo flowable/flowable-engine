@@ -18,9 +18,11 @@ import java.util.Map;
 
 import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.dmn.api.DmnDeployment;
+import org.flowable.dmn.api.DmnHistoricDecisionExecution;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.rest.dmn.service.api.decision.DmnRuleServiceResponse;
 import org.flowable.rest.dmn.service.api.decision.DmnRuleServiceSingleResponse;
+import org.flowable.rest.dmn.service.api.history.HistoricDecisionExecutionResponse;
 import org.flowable.rest.dmn.service.api.repository.DecisionTableResponse;
 import org.flowable.rest.dmn.service.api.repository.DmnDeploymentResponse;
 import org.flowable.rest.variable.BooleanRestVariableConverter;
@@ -123,6 +125,26 @@ public class DmnRestResponseFactory {
         }
 
         response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_RULE_SERVICE_EXECUTE));
+
+        return response;
+    }
+    
+    public List<HistoricDecisionExecutionResponse> createHistoricDecisionExecutionResponseList(List<DmnHistoricDecisionExecution> historicDecisionExecutions) {
+        DmnRestUrlBuilder urlBuilder = createUrlBuilder();
+        List<HistoricDecisionExecutionResponse> responseList = new ArrayList<>();
+        for (DmnHistoricDecisionExecution execution : historicDecisionExecutions) {
+            responseList.add(createHistoryDecisionExecutionResponse(execution, urlBuilder));
+        }
+        return responseList;
+    }
+    
+    public HistoricDecisionExecutionResponse createHistoryDecisionExecutionResponse(DmnHistoricDecisionExecution execution) {
+        return createHistoryDecisionExecutionResponse(execution, createUrlBuilder());
+    }
+    
+    public HistoricDecisionExecutionResponse createHistoryDecisionExecutionResponse(DmnHistoricDecisionExecution execution, DmnRestUrlBuilder urlBuilder) {
+        HistoricDecisionExecutionResponse response = new HistoricDecisionExecutionResponse(execution);
+        response.setUrl(urlBuilder.buildUrl(DmnRestUrls.URL_HISTORIC_DECISION_EXECUTION, execution.getId()));
 
         return response;
     }

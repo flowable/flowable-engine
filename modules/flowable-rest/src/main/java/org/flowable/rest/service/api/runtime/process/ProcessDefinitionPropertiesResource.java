@@ -13,12 +13,9 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.Authorization;
+import java.util.List;
+import java.util.Map;
+
 import org.flowable.engine.FormService;
 import org.flowable.engine.form.FormProperty;
 import org.flowable.engine.form.StartFormData;
@@ -27,8 +24,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Tijs Rademakers

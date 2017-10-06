@@ -15,10 +15,10 @@
           <output id="output1" label="Output 1" name="output1" typeRef="string" />
           <rule>
             <inputEntry id="inputEntry1">
-              <text><![CDATA[!= empty]]></text>
+              <text><![CDATA[!= ""]]></text>
             </inputEntry>
             <inputEntry id="inputEntry2">
-              <text><![CDATA[== empty]]></text>
+              <text><![CDATA[== ""]]></text>
             </inputEntry>
             <outputEntry id="outputEntry1">
               <text>'test1'</text>
@@ -26,7 +26,7 @@
           </rule>
           <rule>
             <inputEntry id="inputEntry3">
-              <text><![CDATA[== empty]]></text>
+              <text><![CDATA[== ""]]></text>
             </inputEntry>
             <inputEntry id="inputEntry4">
               <text><![CDATA[.contains('foobar')]]></text>

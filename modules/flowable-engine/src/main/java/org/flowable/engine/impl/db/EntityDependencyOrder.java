@@ -21,7 +21,6 @@ import org.flowable.engine.impl.persistence.entity.AttachmentEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ByteArrayEntityImpl;
 import org.flowable.engine.impl.persistence.entity.CommentEntityImpl;
 import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEntityImpl;
-import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntityImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityImpl;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntityImpl;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityImpl;
@@ -29,17 +28,10 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailAssignmentEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailEntityImpl;
-import org.flowable.engine.impl.persistence.entity.HistoricDetailTransitionInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricFormPropertyEntityImpl;
-import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricScopeInstanceEntityImpl;
-import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityImpl;
-import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntityImpl;
-import org.flowable.engine.impl.persistence.entity.IdentityLinkEntityImpl;
-import org.flowable.engine.impl.persistence.entity.JobEntityImpl;
 import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ModelEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityImpl;
@@ -47,18 +39,27 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityIm
 import org.flowable.engine.impl.persistence.entity.PropertyEntityImpl;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityImpl;
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntityImpl;
-import org.flowable.engine.impl.persistence.entity.SuspendedJobEntityImpl;
-import org.flowable.engine.impl.persistence.entity.TaskEntityImpl;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntityImpl;
-import org.flowable.engine.impl.persistence.entity.VariableInstanceEntityImpl;
+import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityImpl;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.JobByteArrayEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.JobEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityImpl;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntityImpl;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityImpl;
+import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl;
+import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntityImpl;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl;
 
 /**
  * Maintains a list of all the entities in order of dependency.
  */
 public class EntityDependencyOrder {
 
-    public static List<Class<? extends Entity>> DELETE_ORDER = new ArrayList<Class<? extends Entity>>();
-    public static List<Class<? extends Entity>> INSERT_ORDER = new ArrayList<Class<? extends Entity>>();
+    public static List<Class<? extends Entity>> DELETE_ORDER = new ArrayList<>();
+    public static List<Class<? extends Entity>> INSERT_ORDER = new ArrayList<>();
 
     static {
 
@@ -117,6 +118,8 @@ public class EntityDependencyOrder {
          * FK to DeploymentEntity
          */
         DELETE_ORDER.add(ByteArrayEntityImpl.class);
+        DELETE_ORDER.add(VariableByteArrayEntityImpl.class);
+        DELETE_ORDER.add(JobByteArrayEntityImpl.class);
 
         /*
          * FK from ModelEntity FK from JobEntity FK from VariableInstanceEntity
@@ -186,14 +189,13 @@ public class EntityDependencyOrder {
         DELETE_ORDER.add(HistoricVariableInstanceEntityImpl.class);
 
         DELETE_ORDER.add(HistoricDetailAssignmentEntityImpl.class);
-        DELETE_ORDER.add(HistoricDetailTransitionInstanceEntityImpl.class);
         DELETE_ORDER.add(HistoricDetailVariableInstanceUpdateEntityImpl.class);
         DELETE_ORDER.add(HistoricFormPropertyEntityImpl.class);
         DELETE_ORDER.add(HistoricDetailEntityImpl.class);
 
-        INSERT_ORDER = new ArrayList<Class<? extends Entity>>(DELETE_ORDER);
+        INSERT_ORDER = new ArrayList<>(DELETE_ORDER);
         Collections.reverse(INSERT_ORDER);
 
     }
-
+    
 }

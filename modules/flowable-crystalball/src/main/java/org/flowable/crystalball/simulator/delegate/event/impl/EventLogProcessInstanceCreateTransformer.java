@@ -59,7 +59,7 @@ public class EventLogProcessInstanceCreateTransformer extends EventLog2Simulatio
             String businessKeyValue = (String) data.get(Fields.BUSINESS_KEY);
             String processInstanceId = (String) data.get(Fields.PROCESS_INSTANCE_ID);
 
-            Map<String, Object> simEventProperties = new HashMap<String, Object>();
+            Map<String, Object> simEventProperties = new HashMap<>();
             simEventProperties.put(processDefinitionIdKey, processDefinitionId);
             simEventProperties.put(this.businessKey, businessKeyValue);
             simEventProperties.put(variablesKey, variableMap);

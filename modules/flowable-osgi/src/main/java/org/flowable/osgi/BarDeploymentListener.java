@@ -33,6 +33,7 @@ public class BarDeploymentListener implements ArtifactUrlTransformer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BarDeploymentListener.class);
 
+    @Override
     public URL transform(URL artifact) throws Exception {
         try {
             return new URL("bar", null, artifact.toString());
@@ -42,6 +43,7 @@ public class BarDeploymentListener implements ArtifactUrlTransformer {
         }
     }
 
+    @Override
     public boolean canHandle(File artifact) {
         JarFile jar = null;
         try {

@@ -17,10 +17,11 @@ import java.io.Serializable;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
-import org.flowable.engine.task.Task;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.task.service.Task;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Frederik Heremans
@@ -38,6 +39,7 @@ public class HasTaskVariableCmd implements Command<Boolean>, Serializable {
         this.isLocal = isLocal;
     }
 
+    @Override
     public Boolean execute(CommandContext commandContext) {
         if (taskId == null) {
             throw new FlowableIllegalArgumentException("taskId is null");
@@ -46,7 +48,7 @@ public class HasTaskVariableCmd implements Command<Boolean>, Serializable {
             throw new FlowableIllegalArgumentException("variableName is null");
         }
 
-        TaskEntity task = commandContext.getTaskEntityManager().findById(taskId);
+        TaskEntity task = CommandContextUtil.getTaskService().getTask(taskId);
 
         if (task == null) {
             throw new FlowableObjectNotFoundException("task " + taskId + " doesn't exist", Task.class);

@@ -86,7 +86,7 @@ public enum FlowableIdmEventType implements FlowableEventType {
      *             when one of the given string is not a valid type name
      */
     public static FlowableIdmEventType[] getTypesFromString(String string) {
-        List<FlowableIdmEventType> result = new ArrayList<FlowableIdmEventType>();
+        List<FlowableIdmEventType> result = new ArrayList<>();
         if (string != null && !string.isEmpty()) {
             String[] split = string.split(",");
             for (String typeName : split) {

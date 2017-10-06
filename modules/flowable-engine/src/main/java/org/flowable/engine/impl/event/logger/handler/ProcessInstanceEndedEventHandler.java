@@ -15,7 +15,7 @@ package org.flowable.engine.impl.event.logger.handler;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
@@ -30,7 +30,7 @@ public class ProcessInstanceEndedEventHandler extends AbstractDatabaseEventLogge
     public EventLogEntryEntity generateEventLogEntry(CommandContext commandContext) {
         ExecutionEntity processInstanceEntity = getEntityFromEvent();
 
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
         putInMapIfNotNull(data, Fields.ID, processInstanceEntity.getId());
         putInMapIfNotNull(data, Fields.BUSINESS_KEY, processInstanceEntity.getBusinessKey());
         putInMapIfNotNull(data, Fields.PROCESS_DEFINITION_ID, processInstanceEntity.getProcessDefinitionId());

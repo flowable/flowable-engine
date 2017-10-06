@@ -20,8 +20,8 @@ import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.HistoricVariableInstanceQueryImpl;
 import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.db.PersistentObject;
-import org.activiti.engine.impl.history.HistoryLevel;
 import org.activiti.engine.impl.persistence.AbstractManager;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 
 /**
  * @author Christian Lipphardt (camunda)

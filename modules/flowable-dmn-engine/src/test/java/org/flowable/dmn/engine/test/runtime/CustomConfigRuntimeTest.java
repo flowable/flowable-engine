@@ -12,19 +12,19 @@
  */
 package org.flowable.dmn.engine.test.runtime;
 
-import java.util.HashMap;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
+
 import java.util.Map;
 
-import org.apache.commons.lang3.StringUtils;
+import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnRuleService;
-import org.flowable.dmn.api.RuleEngineExecutionSingleResult;
 import org.flowable.dmn.engine.DmnEngine;
-import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
+import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
 import org.joda.time.LocalDate;
 import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
-import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -33,51 +33,52 @@ import org.junit.Test;
  */
 public class CustomConfigRuntimeTest {
 
-    public static String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000";
+    public static final String H2_TEST_JDBC_URL = "jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000";
 
     protected static final String ENGINE_CONFIG_1 = "custom1.flowable.dmn.cfg.xml";
     protected static final String ENGINE_CONFIG_2 = "custom2.flowable.dmn.cfg.xml";
 
     @Rule
-    public FlowableDmnRule activitiRule1 = new FlowableDmnRule(ENGINE_CONFIG_1);
+    public FlowableDmnRule flowableRule1 = new FlowableDmnRule(ENGINE_CONFIG_1);
 
     @Rule
-    public FlowableDmnRule activitiRule2 = new FlowableDmnRule(ENGINE_CONFIG_2);
+    public FlowableDmnRule flowableRule2 = new FlowableDmnRule(ENGINE_CONFIG_2);
 
     @Test
-    @DmnDeploymentAnnotation(resources = "org/flowable/dmn/engine/test/deployment/post_custom_expression_function_expression_1.dmn")
-    public void executeDecision_post_custom_expression_function() {
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/post_custom_expression_function_expression_1.dmn")
+    public void postCustomExpressionFunction() {
 
-        DmnEngine dmnEngine = activitiRule1.getDmnEngine();
+        DmnEngine dmnEngine = flowableRule1.getDmnEngine();
         DmnRuleService ruleService = dmnEngine.getDmnRuleService();
-
-        Map<String, Object> processVariablesInput = new HashMap<String, Object>();
 
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
         LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");
 
-        processVariablesInput.put("input1", localDate.toDate());
-        Map<String, Object> result = ruleService.executeDecisionByKeySingleResult("decision", processVariablesInput);
-        Assert.assertSame(String.class, result.get("output1").getClass());
-        Assert.assertEquals("test2", result.get("output1"));
+        Map<String, Object> result = ruleService.createExecuteDecisionBuilder()
+                .decisionKey("decision")
+                .variable("input1", localDate.toDate())
+                .executeWithSingleResult();
+        
+        assertSame(String.class, result.get("output1").getClass());
+        assertEquals("test2", result.get("output1"));
     }
 
     @Test
-    @DmnDeploymentAnnotation(resources = "org/flowable/dmn/engine/test/deployment/post_custom_expression_function_expression_1.dmn")
-    public void executeDecision_custom_expression_function_missing_default_function() {
+    @DmnDeployment(resources = "org/flowable/dmn/engine/test/deployment/post_custom_expression_function_expression_1.dmn")
+    public void customExpressionFunctionMissingDefaultFunction() {
 
-        DmnEngine dmnEngine = activitiRule2.getDmnEngine();
+        DmnEngine dmnEngine = flowableRule2.getDmnEngine();
         DmnRuleService ruleService = dmnEngine.getDmnRuleService();
-
-        Map<String, Object> processVariablesInput = new HashMap<String, Object>();
 
         DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("yyyy-MM-dd");
         LocalDate localDate = dateTimeFormatter.parseLocalDate("2015-09-18");
 
-        processVariablesInput.put("input1", localDate.toDate());
-        RuleEngineExecutionSingleResult result = ruleService.executeDecisionByKeySingleResultWithAuditTrail("decision", processVariablesInput);
-
-        Assert.assertNull(result.getDecisionResult());
-        Assert.assertNotEquals(true, StringUtils.isEmpty(result.getAuditTrail().getRuleExecutions().get(2).getConditionResults().get(1).getException()));
+        DecisionExecutionAuditContainer result = ruleService.createExecuteDecisionBuilder()
+                .decisionKey("decision")
+                .variable("input1", localDate.toDate())
+                .executeWithAuditTrail();
+        
+        assertEquals(0, result.getDecisionResult().size());
+        assertEquals(true, result.isFailed());
     }
 }

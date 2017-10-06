@@ -16,7 +16,7 @@ import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
-import org.flowable.dmn.api.DmnDeployment;
+import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
 import org.flowable.rest.dmn.service.api.BaseSpringDmnRestTestCase;
 import org.flowable.rest.dmn.service.api.DmnRestUrls;
@@ -33,7 +33,7 @@ public class DmnDeploymentResourceTest extends BaseSpringDmnRestTestCase {
      */
     @DmnDeploymentAnnotation(resources = { "org/flowable/rest/dmn/service/api/repository/simple.dmn" })
     public void testGetDeployment() throws Exception {
-        DmnDeployment existingDeployment = dmnRepositoryService.createDeploymentQuery().singleResult();
+        org.flowable.dmn.api.DmnDeployment existingDeployment = dmnRepositoryService.createDeploymentQuery().singleResult();
 
         HttpGet httpGet = new HttpGet(SERVER_URL_PREFIX + DmnRestUrls.createRelativeResourceUrl(DmnRestUrls.URL_DEPLOYMENT, existingDeployment.getId()));
         CloseableHttpResponse response = executeRequest(httpGet, HttpStatus.SC_OK);
@@ -76,10 +76,10 @@ public class DmnDeploymentResourceTest extends BaseSpringDmnRestTestCase {
     /**
      * Test deleting a single deployment. DELETE dmn-repository/deployments/{deploymentId}
      */
-    @DmnDeploymentAnnotation(resources = { "org/flowable/rest/dmn/service/api/repository/simple.dmn" })
+    @DmnDeployment(resources = { "org/flowable/rest/dmn/service/api/repository/simple.dmn" })
     public void testDeleteDeployment() throws Exception {
         dmnRepositoryService.createDeploymentQuery().singleResult();
-        DmnDeployment existingDeployment = dmnRepositoryService.createDeploymentQuery().singleResult();
+        org.flowable.dmn.api.DmnDeployment existingDeployment = dmnRepositoryService.createDeploymentQuery().singleResult();
         assertNotNull(existingDeployment);
 
         // Delete the deployment

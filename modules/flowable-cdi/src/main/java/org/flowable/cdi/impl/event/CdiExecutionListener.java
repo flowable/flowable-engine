@@ -27,10 +27,10 @@ import org.flowable.cdi.annotation.event.TakeTransitionLiteral;
 import org.flowable.cdi.impl.util.BeanManagerLookup;
 import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;
 import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 
@@ -76,7 +76,8 @@ public class CdiExecutionListener implements ExecutionListener, Serializable {
 
     protected BusinessProcessEvent createEvent(DelegateExecution execution) {
         ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(execution.getProcessDefinitionId());
-        Date now = Context.getProcessEngineConfiguration().getClock().getCurrentTime();
+        ProcessEngineConfiguration engineConfiguration = org.flowable.engine.impl.context.Context.getProcessEngineConfiguration(); 
+        Date now = engineConfiguration.getClock().getCurrentTime();
         return new CdiBusinessProcessEvent(activityId, transitionName, processDefinition, execution, type, execution.getProcessInstanceId(), execution.getId(), now);
     }
 

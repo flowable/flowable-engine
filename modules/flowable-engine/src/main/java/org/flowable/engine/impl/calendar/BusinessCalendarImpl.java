@@ -14,6 +14,7 @@ package org.flowable.engine.impl.calendar;
 
 import java.util.Date;
 
+import org.flowable.engine.common.impl.calendar.BusinessCalendar;
 import org.flowable.engine.common.runtime.ClockReader;
 import org.joda.time.DateTimeZone;
 import org.joda.time.format.ISODateTimeFormat;
@@ -34,6 +35,7 @@ public abstract class BusinessCalendarImpl implements BusinessCalendar {
         return resolveDuedate(duedateDescription, -1);
     }
 
+    @Override
     public abstract Date resolveDuedate(String duedateDescription, int maxIterations);
 
     @Override

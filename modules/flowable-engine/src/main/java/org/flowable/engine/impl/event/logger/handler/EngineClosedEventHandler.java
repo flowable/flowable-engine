@@ -17,7 +17,7 @@ import java.net.UnknownHostException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntity;
 
 /**
@@ -27,7 +27,7 @@ public class EngineClosedEventHandler extends AbstractDatabaseEventLoggerEventHa
 
     @Override
     public EventLogEntryEntity generateEventLogEntry(CommandContext commandContext) {
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
         try {
             data.put("ip", InetAddress.getLocalHost().getHostAddress()); // Note
                                                                          // that

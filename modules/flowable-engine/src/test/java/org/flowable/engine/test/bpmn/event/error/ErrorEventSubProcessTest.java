@@ -12,14 +12,21 @@
  */
 package org.flowable.engine.test.bpmn.event.error;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.task.Task;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 
 /**
  * @author Tijs Rademakers
  */
 public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
+    
+    private static final String STANDALONE_SUBPROCESS_FLAG_VARIABLE_NAME = "standalone";
+    private static final String LOCAL_ERROR_FLAG_VARIABLE_NAME = "localError";
+    private static final String PROCESS_KEY_UNDER_TEST = "helloWorldWithBothSubProcessTypes";
 
     @Deployment
     // an event subprocesses takes precedence over a boundary event
@@ -33,9 +40,9 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
     public void testErrorCodeTakesPrecedence() {
         String procId = runtimeService.startProcessInstanceByKey("CatchErrorInEmbeddedSubProcess").getId();
 
-        // The process will throw an error event, which is caught and escalated by a User Task
+        // The process will throw an error event, which is caught and escalated by a User org.flowable.task.service.Task
         assertEquals(1, taskService.createTaskQuery().taskDefinitionKey("taskAfterErrorCatch2").count());
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Escalated Task", task.getName());
 
         // Completing the task will end the process instance
@@ -80,15 +87,26 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
         String procId = runtimeService.startProcessInstanceByKey("testThrowErrorInScriptTaskInsideCallActivitiCatchInTopLevelProcess").getId();
         assertThatErrorHasBeenCaught(procId);
     }
+    
+    @Deployment(resources = {"org/flowable/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchMultipleRethrowParent.bpmn",
+                    "org/flowable/engine/test/bpmn/event/error/ErrorEventSubProcessTest.testCatchMultipleRethrowSubProcess.bpmn"})
+    public void testMultipleRethrowEvents() {
+        Map<String, Object> variableMap = new HashMap<>();
+        variableMap.put(LOCAL_ERROR_FLAG_VARIABLE_NAME, true);
+        variableMap.put(STANDALONE_SUBPROCESS_FLAG_VARIABLE_NAME, true);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(PROCESS_KEY_UNDER_TEST, variableMap);
+        
+        assertNotNull(processInstance.getId());
+    }
 
     private void assertThatErrorHasBeenCaught(String procId) {
         // The process will throw an error event,
-        // which is caught and escalated by a User Task
+        // which is caught and escalated by a User org.flowable.task.service.Task
         assertEquals("No tasks found in task list.", 1, taskService.createTaskQuery().count());
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Escalated Task", task.getName());
 
-        // Completing the Task will end the process instance
+        // Completing the org.flowable.task.service.Task will end the process instance
         taskService.complete(task.getId());
         assertProcessEnded(procId);
     }

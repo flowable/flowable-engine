@@ -19,7 +19,7 @@ import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.jobexecutor.JobHandler;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 
 /**
  * Job entity for persisting executable jobs.
@@ -51,6 +51,7 @@ public class JobEntity extends AbstractJobEntity {
         this.processInstanceId = te.getProcessInstanceId();
         this.processDefinitionId = te.getProcessDefinitionId();
         this.exceptionMessage = te.getExceptionMessage();
+        this.createTime = te.getCreateTime();
         setExceptionStacktrace(te.getExceptionStacktrace());
 
         // Inherit tenant
@@ -122,11 +123,13 @@ public class JobEntity extends AbstractJobEntity {
         }
     }
 
+    @Override
     public void setExecution(ExecutionEntity execution) {
         super.setExecution(execution);
         execution.addJob(this);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public Object getPersistentState() {
         Map<String, Object> persistentState = (Map<String, Object>) super.getPersistentState();

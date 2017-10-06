@@ -37,10 +37,10 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.flowable.bpmn.model.Import;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.impl.bpmn.data.SimpleStructureDefinition;
 import org.flowable.engine.impl.bpmn.data.StructureDefinition;
 import org.flowable.engine.impl.bpmn.parser.XMLImporter;
-import org.flowable.engine.impl.util.ReflectUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -62,11 +62,11 @@ import com.sun.tools.xjc.api.XJC;
  */
 public class WSDLImporter implements XMLImporter {
 
-    protected Map<String, WSService> wsServices = new HashMap<String, WSService>();
+    protected Map<String, WSService> wsServices = new HashMap<>();
 
-    protected Map<String, WSOperation> wsOperations = new HashMap<String, WSOperation>();
+    protected Map<String, WSOperation> wsOperations = new HashMap<>();
 
-    protected Map<String, StructureDefinition> structures = new HashMap<String, StructureDefinition>();
+    protected Map<String, StructureDefinition> structures = new HashMap<>();
 
     protected String wsdlLocation;
 
@@ -76,6 +76,7 @@ public class WSDLImporter implements XMLImporter {
         this.namespace = "";
     }
 
+    @Override
     public void importFrom(Import theImport, String sourceSystemId) {
         this.namespace = theImport.getNamespace() == null ? "" : theImport.getNamespace() + ":";
         this.importFrom(theImport.getLocation());
@@ -220,14 +221,17 @@ public class WSDLImporter implements XMLImporter {
         }
     }
 
+    @Override
     public Map<String, StructureDefinition> getStructures() {
         return this.structures;
     }
 
+    @Override
     public Map<String, WSService> getServices() {
         return this.wsServices;
     }
 
+    @Override
     public Map<String, WSOperation> getOperations() {
         return this.wsOperations;
     }

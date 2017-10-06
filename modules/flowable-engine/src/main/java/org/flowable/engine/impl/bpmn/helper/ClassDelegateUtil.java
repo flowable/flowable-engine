@@ -19,8 +19,8 @@ import java.util.List;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
-import org.flowable.engine.impl.util.ReflectUtil;
 
 /**
  * @author Joram Barrez

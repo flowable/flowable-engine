@@ -13,6 +13,15 @@
 
 package org.flowable.spring.test.junit4;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.TaskService;
+import org.flowable.engine.test.Deployment;
+import org.flowable.engine.test.FlowableRule;
+import org.flowable.task.service.Task;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -20,16 +29,6 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-
-import org.flowable.engine.ProcessEngine;
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.TaskService;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.test.FlowableRule;
-import org.flowable.engine.test.Deployment;
 
 /**
  * @author Joram Barrez

@@ -70,8 +70,8 @@ public class DisplayJsonClientResource extends AbstractClientResource {
     protected ProcessInstanceService processInstanceService;
 
     protected ObjectMapper objectMapper = new ObjectMapper();
-    protected List<String> eventElementTypes = new ArrayList<String>();
-    protected Map<String, InfoMapper> propertyMappers = new HashMap<String, InfoMapper>();
+    protected List<String> eventElementTypes = new ArrayList<>();
+    protected Map<String, InfoMapper> propertyMappers = new HashMap<>();
 
     public DisplayJsonClientResource() {
         eventElementTypes.add("StartEvent");
@@ -128,10 +128,10 @@ public class DisplayJsonClientResource extends AbstractClientResource {
 
             try {
                 GraphicInfo diagramInfo = new GraphicInfo();
-                Set<String> completedElements = new HashSet<String>(completedActivityInstances);
+                Set<String> completedElements = new HashSet<>(completedActivityInstances);
                 completedElements.addAll(completedFlows);
 
-                Set<String> currentElements = new HashSet<String>(currentActivityinstances);
+                Set<String> currentElements = new HashSet<>(currentActivityinstances);
 
                 processProcessElements(config, pojoModel, displayNode, diagramInfo, completedElements, currentElements);
 
@@ -169,12 +169,63 @@ public class DisplayJsonClientResource extends AbstractClientResource {
         return displayNode;
     }
 
-    protected List<String> gatherCompletedFlows(List<String> completedActivityInstances,
-            List<String> currentActivityinstances, BpmnModel pojoModel) {
+    @RequestMapping(value = "/rest/admin/process-instances/{processInstanceId}/history-model-json", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getHistoryProcessInstanceModelJSON(@PathVariable String processInstanceId, @RequestParam(required = true) String processDefinitionId) {
+        ObjectNode displayNode = objectMapper.createObjectNode();
 
-        List<String> completedFlows = new ArrayList<String>();
-        List<String> activities = new ArrayList<String>(completedActivityInstances);
-        activities.addAll(currentActivityinstances);
+        ServerConfig config = retrieveServerConfig(EndpointType.PROCESS);
+        BpmnModel pojoModel = clientService.getProcessDefinitionModel(config, processDefinitionId);
+
+        if (!pojoModel.getLocationMap().isEmpty()) {
+
+            // Fetch process-instance activities
+            List<String> completedActivityInstances = processInstanceService.getCompletedActivityInstancesAndProcessDefinitionId(config, processInstanceId);
+
+            // Gather completed flows
+            List<String> completedFlows = gatherCompletedFlows(completedActivityInstances, null, pojoModel);
+
+            try {
+                GraphicInfo diagramInfo = new GraphicInfo();
+                Set<String> completedElements = new HashSet<>(completedActivityInstances);
+                completedElements.addAll(completedFlows);
+
+                processProcessElements(config, pojoModel, displayNode, diagramInfo, completedElements, null);
+
+                displayNode.put("diagramBeginX", diagramInfo.getX());
+                displayNode.put("diagramBeginY", diagramInfo.getY());
+                displayNode.put("diagramWidth", diagramInfo.getWidth());
+                displayNode.put("diagramHeight", diagramInfo.getHeight());
+
+                if (completedActivityInstances != null) {
+                    ArrayNode completedActivities = displayNode.putArray("completedActivities");
+                    for (String completed : completedActivityInstances) {
+                        completedActivities.add(completed);
+                    }
+                }
+
+                if (completedFlows != null) {
+                    ArrayNode completedSequenceFlows = displayNode.putArray("completedSequenceFlows");
+                    for (String current : completedFlows) {
+                        completedSequenceFlows.add(current);
+                    }
+                }
+
+            } catch (Exception e) {
+                LOGGER.error("Error creating model JSON", e);
+            }
+        }
+
+        return displayNode;
+    }
+
+    protected List<String> gatherCompletedFlows(List<String> completedActivityInstances,
+                                                List<String> currentActivityinstances, BpmnModel pojoModel) {
+
+        List<String> completedFlows = new ArrayList<>();
+        List<String> activities = new ArrayList<>(completedActivityInstances);
+        if (currentActivityinstances != null) {
+            activities.addAll(currentActivityinstances);
+        }
 
         // TODO: not a robust way of checking when parallel paths are active, should be revisited
         // Go over all activities and check if it's possible to match any outgoing paths against the activities
@@ -261,8 +312,8 @@ public class DisplayJsonClientResource extends AbstractClientResource {
     }
 
     protected void processElements(Collection<FlowElement> elementList,
-            BpmnModel model, ArrayNode elementArray, ArrayNode flowArray,
-            GraphicInfo diagramInfo, Set<String> completedElements, Set<String> currentElements) {
+                                   BpmnModel model, ArrayNode elementArray, ArrayNode flowArray,
+                                   GraphicInfo diagramInfo, Set<String> completedElements, Set<String> currentElements) {
 
         for (FlowElement element : elementList) {
 
@@ -385,12 +436,12 @@ public class DisplayJsonClientResource extends AbstractClientResource {
 
     protected void fillGraphicInfo(ObjectNode elementNode, GraphicInfo graphicInfo, boolean includeWidthAndHeight) {
         commonFillGraphicInfo(elementNode, graphicInfo.getX(),
-                graphicInfo.getY(), graphicInfo.getWidth(),
-                graphicInfo.getHeight(), includeWidthAndHeight);
+            graphicInfo.getY(), graphicInfo.getWidth(),
+            graphicInfo.getHeight(), includeWidthAndHeight);
     }
 
     protected void commonFillGraphicInfo(ObjectNode elementNode, double x,
-            double y, double width, double height, boolean includeWidthAndHeight) {
+                                         double y, double width, double height, boolean includeWidthAndHeight) {
 
         elementNode.put("x", x);
         elementNode.put("y", y);

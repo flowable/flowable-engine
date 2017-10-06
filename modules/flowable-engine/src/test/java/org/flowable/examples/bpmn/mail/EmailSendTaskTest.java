@@ -70,7 +70,7 @@ public class EmailSendTaskTest extends PluggableFlowableTestCase {
         Date now = new Date();
         String orderId = "123456";
 
-        Map<String, Object> vars = new HashMap<String, Object>();
+        Map<String, Object> vars = new HashMap<>();
         vars.put("sender", from);
         vars.put("recipient", recipient);
         vars.put("recipientName", recipientName);

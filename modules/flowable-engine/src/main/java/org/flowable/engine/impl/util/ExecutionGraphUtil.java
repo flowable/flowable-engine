@@ -19,11 +19,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.bpmn.model.EventSubProcess;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowElementsContainer;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -34,10 +36,10 @@ public class ExecutionGraphUtil {
      * Takes in a collection of executions belonging to the same process instance. Orders the executions in a list, first elements are the leaf, last element is the root elements.
      */
     public static List<ExecutionEntity> orderFromRootToLeaf(Collection<ExecutionEntity> executions) {
-        List<ExecutionEntity> orderedList = new ArrayList<ExecutionEntity>(executions.size());
+        List<ExecutionEntity> orderedList = new ArrayList<>(executions.size());
 
         // Root elements
-        HashSet<String> previousIds = new HashSet<String>();
+        HashSet<String> previousIds = new HashSet<>();
         for (ExecutionEntity execution : executions) {
             if (execution.getParentId() == null) {
                 orderedList.add(execution);
@@ -95,11 +97,17 @@ public class ExecutionGraphUtil {
             throw new FlowableException("Invalid targetElementId '" + targetElementId + "': no element found for this id n process definition '" + processDefinitionId + "'");
         }
 
-        Set<String> visitedElements = new HashSet<String>();
+        Set<String> visitedElements = new HashSet<>();
         return isReachable(process, sourceElement, targetElement, visitedElements);
     }
 
     public static boolean isReachable(Process process, FlowNode sourceElement, FlowNode targetElement, Set<String> visitedElements) {
+        
+        // Special case: start events in an event subprocess might exist as an execution and are most likely be able to reach the target
+        // when the target is in the event subprocess, but should be ignored as they are not 'real' runtime executions (but rather waiting for a trigger)
+        if (sourceElement instanceof StartEvent && isInEventSubprocess(sourceElement)) {
+            return false;
+        }
 
         // No outgoing seq flow: could be the end of eg . the process or an embedded subprocess
         if (sourceElement.getOutgoingFlows().size() == 0) {
@@ -137,6 +145,22 @@ public class ExecutionGraphUtil {
             }
         }
 
+        return false;
+    }
+
+    protected static boolean isInEventSubprocess(FlowNode flowNode) {
+        FlowElementsContainer flowElementsContainer = flowNode.getParentContainer();
+        while (flowElementsContainer != null) {
+            if (flowElementsContainer instanceof EventSubProcess) {
+                return true;
+            }
+            
+            if (flowElementsContainer instanceof FlowElement) {
+                flowElementsContainer = ((FlowElement) flowElementsContainer).getParentContainer();
+            } else {
+                flowElementsContainer = null;
+            }
+        }
         return false;
     }
 

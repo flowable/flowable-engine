@@ -12,13 +12,13 @@
  */
 package org.flowable.engine.common.impl.cfg;
 
-import org.flowable.engine.common.impl.interceptor.AbstractCommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Tom Baeyens
  */
-public interface TransactionContextFactory<T extends BaseTransactionListener<C>, C extends AbstractCommandContext> {
+public interface TransactionContextFactory {
 
-    BaseTransactionContext<T, C> openTransactionContext(C commandContext);
+    TransactionContext openTransactionContext(CommandContext commandContext);
 
 }

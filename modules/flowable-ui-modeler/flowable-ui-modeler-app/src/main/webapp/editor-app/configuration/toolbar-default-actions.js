@@ -344,7 +344,14 @@ angular.module('flowableModeler').controller('SaveModelCtrl', [ '$rootScope', '$
 
     $scope.saveAndClose = function () {
     	$scope.save(function() {
-    		$location.path('/processes');
+            if (editorManager.getStencilData()) {
+                var stencilNameSpace = editorManager.getStencilData().namespace;
+                if (stencilNameSpace !== undefined && stencilNameSpace !== null && stencilNameSpace.indexOf('cmmn1.1') !== -1) {
+                    $location.path("/casemodels");
+                	return;
+            	}
+        	}
+        	$location.path('/processes');
     	});
     };
     
@@ -469,8 +476,15 @@ angular.module('flowableModeler').controller('SaveModelCtrl', [ '$rootScope', '$
             } else if($scope.error.conflictResolveAction === 'saveAs') {
                 $scope.save(function() {
                     $rootScope.ignoreChanges = true;  // Otherwise will get pop up that changes are not saved.
+                    if (editorManager.getStencilData()) {
+                        var stencilNameSpace = editorManager.getStencilData().namespace;
+                        if (stencilNameSpace !== undefined && stencilNameSpace !== null && stencilNameSpace.indexOf('cmmn1.1') !== -1) {
+                            $location.path("/casemodels");
+                            return;
+                        }
+                    }
                     $location.path('/processes');
-                });
+            	});
             }
         }
     };

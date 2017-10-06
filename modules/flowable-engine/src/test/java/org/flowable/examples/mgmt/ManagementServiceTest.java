@@ -18,8 +18,9 @@ import java.util.Map;
 
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.common.api.management.TableMetaData;
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.persistence.entity.PropertyEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 
@@ -40,7 +41,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
 
             @Override
             public Void execute(CommandContext commandContext) {
-                List<PropertyEntity> properties = commandContext.getProcessEngineConfiguration().getPropertyEntityManager().findAll();
+                List<PropertyEntity> properties = Context.getProcessEngineConfiguration().getPropertyEntityManager().findAll();
                 for (PropertyEntity propertyEntity : properties) {
                     LOGGER.info("!!!Property {} {}", propertyEntity.getName(), propertyEntity.getValue());
                 }
@@ -49,7 +50,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
             
         });
 
-        assertEquals(new Long(5), tableCount.get(tablePrefix + "ACT_GE_PROPERTY"));
+        assertEquals(new Long(8), tableCount.get(tablePrefix + "ACT_GE_PROPERTY"));
         assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_GE_BYTEARRAY"));
         assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_RE_DEPLOYMENT"));
         assertEquals(new Long(0), tableCount.get(tablePrefix + "ACT_RU_EXECUTION"));
@@ -67,7 +68,7 @@ public class ManagementServiceTest extends PluggableFlowableTestCase {
 
         TableMetaData tableMetaData = managementService.getTableMetaData(tablePrefix + "ACT_RU_TASK");
         assertEquals(tableMetaData.getColumnNames().size(), tableMetaData.getColumnTypes().size());
-        assertEquals(23, tableMetaData.getColumnNames().size());
+        assertEquals(27, tableMetaData.getColumnNames().size());
 
         int assigneeIndex = tableMetaData.getColumnNames().indexOf("ASSIGNEE_");
         int createTimeIndex = tableMetaData.getColumnNames().indexOf("CREATE_TIME_");

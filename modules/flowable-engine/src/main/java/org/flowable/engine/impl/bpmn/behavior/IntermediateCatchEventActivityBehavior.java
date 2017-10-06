@@ -20,17 +20,19 @@ import org.flowable.bpmn.model.EventGateway;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IntermediateCatchEvent;
 import org.flowable.bpmn.model.SequenceFlow;
+import org.flowable.engine.common.impl.context.Context;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.history.DeleteReason;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 public class IntermediateCatchEventActivityBehavior extends AbstractBpmnActivityBehavior {
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public void execute(DelegateExecution execution) {
         // Do nothing: waitstate behavior
     }
@@ -57,8 +59,8 @@ public class IntermediateCatchEventActivityBehavior extends AbstractBpmnActivity
      * Should be subclassed by the more specific types. For an intermediate catch without type, it's simply leaving the event.
      */
     public void eventCancelledByEventGateway(DelegateExecution execution) {
-        Context.getCommandContext().getExecutionEntityManager().deleteExecutionAndRelatedData((ExecutionEntity) execution,
-                DeleteReason.EVENT_BASED_GATEWAY_CANCEL, false);
+        CommandContextUtil.getExecutionEntityManager().deleteExecutionAndRelatedData((ExecutionEntity) execution,
+                DeleteReason.EVENT_BASED_GATEWAY_CANCEL);
     }
 
     protected EventGateway getPrecedingEventBasedGateway(DelegateExecution execution) {
@@ -90,7 +92,7 @@ public class IntermediateCatchEventActivityBehavior extends AbstractBpmnActivity
 
         // Gather all activity ids for the events after the event based gateway that need to be destroyed
         List<SequenceFlow> outgoingSequenceFlows = eventGateway.getOutgoingFlows();
-        Set<String> eventActivityIds = new HashSet<String>(outgoingSequenceFlows.size() - 1); // -1, the event being triggered does not need to be deleted
+        Set<String> eventActivityIds = new HashSet<>(outgoingSequenceFlows.size() - 1); // -1, the event being triggered does not need to be deleted
         for (SequenceFlow outgoingSequenceFlow : outgoingSequenceFlows) {
             if (outgoingSequenceFlow.getTargetFlowElement() != null
                     && !outgoingSequenceFlow.getTargetFlowElement().getId().equals(execution.getCurrentActivityId())) {
@@ -99,7 +101,7 @@ public class IntermediateCatchEventActivityBehavior extends AbstractBpmnActivity
         }
 
         CommandContext commandContext = Context.getCommandContext();
-        ExecutionEntityManager executionEntityManager = commandContext.getExecutionEntityManager();
+        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
 
         // Find the executions
         List<ExecutionEntity> executionEntities = executionEntityManager

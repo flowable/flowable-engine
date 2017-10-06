@@ -12,7 +12,7 @@
  */
 package org.flowable.http;
 
-import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.client.HttpClient;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.http.delegate.HttpRequestHandler;
 
@@ -21,7 +21,7 @@ public class SimpleHttpRequestHandler implements HttpRequestHandler {
     private static final long serialVersionUID = 1L;
     
     @Override
-    public void handleHttpRequest(DelegateExecution execution, HttpRequest httpRequest, CloseableHttpClient client) {
+    public void handleHttpRequest(DelegateExecution execution, HttpRequest httpRequest, HttpClient client) {
         httpRequest.setUrl("http://localhost:9798/test");
         httpRequest.setMethod("GET");
     }

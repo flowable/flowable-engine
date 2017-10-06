@@ -36,6 +36,7 @@ public class MessageEventDefinition extends EventDefinition {
         this.messageExpression = messageExpression;
     }
 
+    @Override
     public MessageEventDefinition clone() {
         MessageEventDefinition clone = new MessageEventDefinition();
         clone.setValues(this);

@@ -32,7 +32,7 @@ import org.flowable.engine.common.api.FlowableException;
  * This class has been modified to be consistent with the changes to CamelBehavior and its implementations. The set of changes significantly increases the flexibility of our Camel integration, as you
  * can either choose one of three "out-of-the-box" modes, or you can choose to create your own. Please reference the comments for the "CamelBehavior" class for more information on the out-of-the-box
  * implementation class options.
- * 
+ *
  * @author Ryan Johnston (@rjfsu), Tijs Rademakers, Arnold Schrijver
  */
 public class FlowableEndpoint extends DefaultEndpoint {
@@ -59,7 +59,7 @@ public class FlowableEndpoint extends DefaultEndpoint {
 
     protected String processInitiatorHeaderName;
 
-    protected Map<String, Object> returnVarMap = new HashMap<String, Object>();
+    protected Map<String, Object> returnVarMap = new HashMap<>();
 
     protected long timeout = 5000;
 
@@ -78,6 +78,7 @@ public class FlowableEndpoint extends DefaultEndpoint {
         flowableConsumer.getProcessor().process(ex);
     }
 
+    @Override
     public Producer createProducer() throws Exception {
         FlowableProducer producer = new FlowableProducer(this, getTimeout(), getTimeResolution());
         producer.setRuntimeService(runtimeService);
@@ -86,6 +87,7 @@ public class FlowableEndpoint extends DefaultEndpoint {
         return producer;
     }
 
+    @Override
     public Consumer createConsumer(Processor processor) throws Exception {
         return new FlowableConsumer(this, processor);
     }
@@ -101,6 +103,7 @@ public class FlowableEndpoint extends DefaultEndpoint {
         flowableConsumer = null;
     }
 
+    @Override
     public boolean isSingleton() {
         return true;
     }

@@ -15,8 +15,8 @@ package org.flowable.examples.bpmn.tasklistener;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * @author Saeid Mirzaei
@@ -25,7 +25,7 @@ import org.flowable.engine.delegate.TaskListener;
 public class TaskDeleteListener implements TaskListener {
 
     private static final long serialVersionUID = 1L;
-    private static List<String> messages = new ArrayList<String>();
+    private static List<String> messages = new ArrayList<>();
 
     public static List<String> getCurrentMessages() {
         return messages;

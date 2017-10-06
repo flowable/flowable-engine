@@ -17,16 +17,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.db.DbSchemaManager;
+import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.FormEngineConfiguration;
-import org.flowable.form.engine.impl.db.DbSqlSession;
-import org.flowable.form.engine.impl.interceptor.Command;
-import org.flowable.form.engine.impl.interceptor.CommandContext;
-import org.flowable.form.engine.impl.interceptor.CommandExecutor;
+import org.flowable.form.engine.impl.util.CommandContextUtil;
 import org.flowable.form.engine.test.FormTestHelper;
 import org.junit.Assert;
 
@@ -38,7 +39,7 @@ import junit.framework.AssertionFailedError;
  */
 public abstract class AbstractFlowableTestCase extends AbstractTestCase {
 
-    private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = new ArrayList<String>();
+    private static final List<String> TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK = new ArrayList<>();
 
     static {
         TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_FO_DATABASECHANGELOG");
@@ -48,7 +49,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
     protected FormEngine formEngine;
 
     protected String deploymentIdFromDeploymentAnnotation;
-    protected List<String> deploymentIdsForAutoCleanup = new ArrayList<String>();
+    protected List<String> deploymentIdsForAutoCleanup = new ArrayList<>();
     protected Throwable exception;
 
     protected FormEngineConfiguration formEngineConfiguration;
@@ -142,10 +143,11 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
             CommandExecutor commandExecutor = formEngine.getFormEngineConfiguration().getCommandExecutor();
             CommandConfig config = new CommandConfig().transactionNotSupported();
             commandExecutor.execute(config, new Command<Object>() {
+                @Override
                 public Object execute(CommandContext commandContext) {
-                    DbSqlSession session = commandContext.getDbSqlSession();
-                    session.dbSchemaDrop();
-                    session.dbSchemaCreate();
+                    DbSchemaManager dbSchemaManager = CommandContextUtil.getFormEngineConfiguration(commandContext).getDbSchemaManager();
+                    dbSchemaManager.dbSchemaDrop();
+                    dbSchemaManager.dbSchemaCreate();
                     return null;
                 }
             });

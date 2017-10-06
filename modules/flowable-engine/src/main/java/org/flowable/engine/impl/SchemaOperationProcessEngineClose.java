@@ -12,8 +12,11 @@
  */
 package org.flowable.engine.impl;
 
-import org.flowable.engine.impl.interceptor.Command;
-import org.flowable.engine.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.interceptor.Command;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.db.ProcessDbSchemaManager;
+import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -21,8 +24,12 @@ import org.flowable.engine.impl.interceptor.CommandContext;
  */
 public class SchemaOperationProcessEngineClose implements Command<Void> {
 
+    @Override
     public Void execute(CommandContext commandContext) {
-        commandContext.getDbSqlSession().performSchemaOperationsProcessEngineClose();
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        if (processEngineConfiguration.isUsingRelationalDatabase()) {
+            ((ProcessDbSchemaManager) (processEngineConfiguration.getDbSchemaManager())).performSchemaOperationsProcessEngineClose();
+        }
         return null;
     }
 }

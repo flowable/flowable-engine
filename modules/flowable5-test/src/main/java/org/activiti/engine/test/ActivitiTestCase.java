@@ -15,8 +15,6 @@ package org.activiti.engine.test;
 
 import java.util.Date;
 
-import junit.framework.TestCase;
-
 import org.activiti.engine.impl.test.TestHelper;
 import org.activiti.engine.test.mock.ActivitiMockSupport;
 import org.flowable.engine.FormService;
@@ -30,6 +28,8 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.test.Deployment;
+
+import junit.framework.TestCase;
 
 /**
  * Convenience for ProcessEngine and services initialization in the form of a JUnit base class.

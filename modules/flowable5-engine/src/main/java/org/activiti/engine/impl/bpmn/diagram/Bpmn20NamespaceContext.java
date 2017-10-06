@@ -25,9 +25,9 @@ import javax.xml.xpath.XPath;
 
 /**
  * XML {@link NamespaceContext} containing the namespaces used by BPMN 2.0 XML documents.
- *
+ * <p>
  * Can be used in {@link XPath#setNamespaceContext(NamespaceContext)}.
- * 
+ *
  * @author Falko Menge
  */
 public class Bpmn20NamespaceContext implements NamespaceContext {
@@ -40,7 +40,7 @@ public class Bpmn20NamespaceContext implements NamespaceContext {
     /**
      * This is a protected filed so you can extend that context with your own namespaces if necessary
      */
-    protected Map<String, String> namespaceUris = new HashMap<String, String>();
+    protected Map<String, String> namespaceUris = new HashMap<>();
 
     public Bpmn20NamespaceContext() {
         namespaceUris.put(BPMN, "http://www.omg.org/spec/BPMN/20100524/MODEL");
@@ -49,20 +49,23 @@ public class Bpmn20NamespaceContext implements NamespaceContext {
         namespaceUris.put(OMGDI, "http://www.omg.org/spec/DD/20100524/DC");
     }
 
+    @Override
     public String getNamespaceURI(String prefix) {
         return namespaceUris.get(prefix);
     }
 
+    @Override
     public String getPrefix(String namespaceURI) {
         return getKeyByValue(namespaceUris, namespaceURI);
     }
 
+    @Override
     public Iterator<String> getPrefixes(String namespaceURI) {
         return getKeysByValue(namespaceUris, namespaceURI).iterator();
     }
 
     private static <T, E> Set<T> getKeysByValue(Map<T, E> map, E value) {
-        Set<T> keys = new HashSet<T>();
+        Set<T> keys = new HashSet<>();
         for (Entry<T, E> entry : map.entrySet()) {
             if (value.equals(entry.getValue())) {
                 keys.add(entry.getKey());

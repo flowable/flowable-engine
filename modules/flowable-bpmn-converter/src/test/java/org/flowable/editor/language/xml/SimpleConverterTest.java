@@ -42,6 +42,7 @@ public class SimpleConverterTest extends AbstractConverterTest {
         deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "simplemodel.bpmn";
     }

@@ -12,15 +12,15 @@
  */
 package org.flowable.camel;
 
-import org.apache.camel.CamelContext;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.camel.CamelContext;
+
 public class SimpleContextProvider implements ContextProvider {
 
-    private Map<String, CamelContext> contexts = new HashMap<String, CamelContext>();
+    private Map<String, CamelContext> contexts = new HashMap<>();
 
     public SimpleContextProvider(Map<String, CamelContext> contexts) {
         this.contexts = contexts;
@@ -30,6 +30,7 @@ public class SimpleContextProvider implements ContextProvider {
         this(Collections.singletonMap(processName, ctx));
     }
 
+    @Override
     public CamelContext getContext(String processName) {
         return contexts.get(processName);
     }

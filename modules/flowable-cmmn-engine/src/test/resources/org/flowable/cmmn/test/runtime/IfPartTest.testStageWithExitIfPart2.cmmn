@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+  <case id="testStageWithExitIfPart" name="testStageWithExitIfPart">
+    <casePlanModel id="casePlanModel" name="testStageWithExitIfPart">
+      <planItem id="planItem1" name="A" definitionRef="sid-C3667DEB-E198-4E7E-BDDC-C6F92E6BCD7F"></planItem>
+      <planItem id="planItem4" definitionRef="sid-3B7B0D2E-4C58-4D4A-82C3-55CD93141667" name="The Stage">
+        <entryCriterion id="sid-992B7FB1-4712-4F08-BF9C-313880A8E139" sentryRef="sentry1"></entryCriterion>
+        <exitCriterion id="sid-89B2156C-EFD1-4BC5-9595-7EF73BFFE79F" sentryRef="sentry2"></exitCriterion>
+        <exitCriterion id="sid-1E8087C3-7E51-4E15-A972-E5125589D0FC" sentryRef="sentry3"></exitCriterion>
+      </planItem>
+      <sentry id="sentry1">
+        <ifPart>
+          <condition><![CDATA[${caseInstance.getVariable('enableStage') != null && enableStage}]]></condition>
+        </ifPart>
+      </sentry>
+      <sentry id="sentry2">
+        <ifPart>
+          <condition><![CDATA[${caseInstance.getVariable('stageExitVariable') != null && stageExitVariable}]]></condition>
+        </ifPart>
+      </sentry>
+      <sentry id="sentry3">
+        <planItemOnPart id="sentryOnPart1" sourceRef="planItem1">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <task id="sid-C3667DEB-E198-4E7E-BDDC-C6F92E6BCD7F" name="A"></task>
+      <stage id="sid-3B7B0D2E-4C58-4D4A-82C3-55CD93141667" name="The Stage">
+        <planItem id="planItem2" name="B" definitionRef="sid-AE0B3627-E05A-4E3F-9A68-70007708690C"></planItem>
+        <planItem id="planItem3" name="C" definitionRef="sid-80372593-1D3A-4C67-B79F-DC85D4E41A76"></planItem>
+        <task id="sid-AE0B3627-E05A-4E3F-9A68-70007708690C" name="B"></task>
+        <task id="sid-80372593-1D3A-4C67-B79F-DC85D4E41A76" name="C"></task>
+      </stage>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_testStageWithExitIfPart">
+      <cmmndi:CMMNShape id="CMMNShape_casePlanModel" cmmnElementRef="casePlanModel">
+        <dc:Bounds height="712.0" width="968.0" x="30.0" y="30.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+        <dc:Bounds height="80.0" width="100.0" x="785.0" y="425.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem4" cmmnElementRef="planItem4">
+        <dc:Bounds height="306.0" width="576.0" x="102.0" y="302.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_sid-992B7FB1-4712-4F08-BF9C-313880A8E139" cmmnElementRef="sid-992B7FB1-4712-4F08-BF9C-313880A8E139">
+        <dc:Bounds height="22.0" width="14.0" x="94.13933902966205" y="411.0461991049882"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_sid-89B2156C-EFD1-4BC5-9595-7EF73BFFE79F" cmmnElementRef="sid-89B2156C-EFD1-4BC5-9595-7EF73BFFE79F">
+        <dc:Bounds height="22.0" width="14.0" x="671.8405226523423" y="376.0375240818018"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_sid-1E8087C3-7E51-4E15-A972-E5125589D0FC" cmmnElementRef="sid-1E8087C3-7E51-4E15-A972-E5125589D0FC">
+        <dc:Bounds height="22.0" width="14.0" x="671.568027434405" y="478.0706436684628"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+        <dc:Bounds height="80.0" width="100.0" x="185.0" y="411.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem3" cmmnElementRef="planItem3">
+        <dc:Bounds height="80.0" width="100.0" x="340.0" y="415.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="CMMNEdge_sid-C09B854A-D959-4BF2-8356-98D223DA0284" cmmnElementRef="sid-1E8087C3-7E51-4E15-A972-E5125589D0FC" targetCMMNElementRef="planItem1">
+        <di:waypoint x="684.4687649013687" y="487.34323111654857"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>

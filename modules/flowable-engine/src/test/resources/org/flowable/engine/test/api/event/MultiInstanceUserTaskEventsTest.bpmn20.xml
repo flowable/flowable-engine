@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="edoras vis" exporterVersion="DEVELOPER"
+             targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+  <message id="message1" name="cancel"/>
+  <process id="multiInstanceUserTaskEvents" isExecutable="true" name="multi-instance user task events">
+    <startEvent id="startevent1"/>
+
+    <endEvent id="endEvent1">
+       <terminateEventDefinition></terminateEventDefinition>
+    </endEvent>
+
+    <boundaryEvent attachedToRef="task2" id="cancelBoundaryEvent1">
+      <messageEventDefinition messageRef="message1" />
+    </boundaryEvent>
+    <userTask id="task1" name="User Task1">
+    </userTask>
+    <userTask id="task2" name="Multi User Task-${loopCounter}">
+        <multiInstanceLoopCharacteristics isSequential="false">
+            <loopCardinality>2</loopCardinality>
+        </multiInstanceLoopCharacteristics>
+    </userTask>
+
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="task1"/>
+    <sequenceFlow id="flow2" sourceRef="startevent1" targetRef="task2"/>
+
+    <sequenceFlow id="flow5" sourceRef="task1" targetRef="endEvent1"/>
+    <sequenceFlow id="flow3" sourceRef="task2" targetRef="endEvent1"/>
+    <sequenceFlow id="flow4" sourceRef="cancelBoundaryEvent1" targetRef="endEvent1"/>
+
+  </process>
+</definitions>

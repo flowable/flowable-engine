@@ -12,15 +12,11 @@
  */
 package org.flowable.engine.impl.history.async;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.util.zip.GZIPInputStream;
-
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.util.IoUtil;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.jobexecutor.HistoryJobHandler;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.HistoryJobHandler;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,19 +24,15 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 
 public abstract class AbstractAsyncHistoryJobHandler implements HistoryJobHandler {
 
-    protected boolean isJsonGzipCompressionEnabled;
     protected boolean isAsyncHistoryJsonGroupingEnabled;
 
     @Override
     public void execute(HistoryJobEntity job, String configuration, CommandContext commandContext) {
-        ObjectMapper objectMapper = commandContext.getProcessEngineConfiguration().getObjectMapper();
+        ObjectMapper objectMapper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getObjectMapper();
         if (job.getAdvancedJobHandlerConfigurationByteArrayRef() != null) {
             try {
 
-                byte[] bytes = job.getAdvancedJobHandlerConfigurationByteArrayRef().getBytes();
-                if (isJsonGzipCompressionEnabled) {
-                    bytes = decompress(bytes);
-                }
+                byte[] bytes = getJobBytes(job);
                 JsonNode historyNode = objectMapper.readTree(bytes);
                 if (isAsyncHistoryJsonGroupingEnabled() && historyNode.isArray()) {
                     ArrayNode arrayNode = (ArrayNode) historyNode;
@@ -62,25 +54,11 @@ public abstract class AbstractAsyncHistoryJobHandler implements HistoryJobHandle
         }
     }
 
-    protected byte[] decompress(final byte[] compressed) {
-        try (ByteArrayInputStream bais = new ByteArrayInputStream(compressed)) {
-            try (GZIPInputStream gis = new GZIPInputStream(bais)) {
-                return IoUtil.readInputStream(gis, "async-history-configuration");
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("Error while decompressing json bytes", e);
-        }
+    protected byte[] getJobBytes(HistoryJobEntity job) {
+        return job.getAdvancedJobHandlerConfigurationByteArrayRef().getBytes();
     }
 
     protected abstract void processHistoryJson(CommandContext commandContext, HistoryJobEntity job, JsonNode historyNode);
-
-    public boolean isJsonGzipCompressionEnabled() {
-        return isJsonGzipCompressionEnabled;
-    }
-
-    public void setJsonGzipCompressionEnabled(boolean isJsonGzipCompressionEnabled) {
-        this.isJsonGzipCompressionEnabled = isJsonGzipCompressionEnabled;
-    }
 
     public boolean isAsyncHistoryJsonGroupingEnabled() {
         return isAsyncHistoryJsonGroupingEnabled;

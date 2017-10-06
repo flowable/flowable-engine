@@ -20,14 +20,14 @@ import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityImpl;
-import org.flowable.dmn.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.dmn.engine.impl.persistence.entity.data.AbstractDmnDataManager;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DmnDeploymentDataManager;
 
 /**
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class MybatisDmnDeploymentDataManager extends AbstractDataManager<DmnDeploymentEntity> implements DmnDeploymentDataManager {
+public class MybatisDmnDeploymentDataManager extends AbstractDmnDataManager<DmnDeploymentEntity> implements DmnDeploymentDataManager {
 
     public MybatisDmnDeploymentDataManager(DmnEngineConfiguration dmnEngineConfiguration) {
         super(dmnEngineConfiguration);
@@ -45,29 +45,29 @@ public class MybatisDmnDeploymentDataManager extends AbstractDataManager<DmnDepl
 
     @Override
     public long findDeploymentCountByQueryCriteria(DmnDeploymentQueryImpl deploymentQuery) {
-        return (Long) getDbSqlSession().selectOne("selectDeploymentCountByQueryCriteria", deploymentQuery);
+        return (Long) getDbSqlSession().selectOne("selectDmnDeploymentCountByQueryCriteria", deploymentQuery);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<DmnDeployment> findDeploymentsByQueryCriteria(DmnDeploymentQueryImpl deploymentQuery) {
-        return getDbSqlSession().selectList("selectDeploymentsByQueryCriteria", deploymentQuery);
+        return getDbSqlSession().selectList("selectDmnDeploymentsByQueryCriteria", deploymentQuery);
     }
 
     @Override
     public List<String> getDeploymentResourceNames(String deploymentId) {
-        return getDbSqlSession().getSqlSession().selectList("selectResourceNamesByDeploymentId", deploymentId);
+        return getDbSqlSession().getSqlSession().selectList("selectDmnResourceNamesByDeploymentId", deploymentId);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public List<DmnDeployment> findDeploymentsByNativeQuery(Map<String, Object> parameterMap) {
-        return getDbSqlSession().selectListWithRawParameter("selectDeploymentByNativeQuery", parameterMap);
+        return getDbSqlSession().selectListWithRawParameter("selectDmnDeploymentByNativeQuery", parameterMap);
     }
 
     @Override
     public long findDeploymentCountByNativeQuery(Map<String, Object> parameterMap) {
-        return (Long) getDbSqlSession().selectOne("selectDeploymentCountByNativeQuery", parameterMap);
+        return (Long) getDbSqlSession().selectOne("selectDmnDeploymentCountByNativeQuery", parameterMap);
     }
 
 }

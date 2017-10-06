@@ -43,6 +43,7 @@ public class SubProcessConverterNoDITest extends AbstractConverterTest {
         deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "subprocessmodel-noDI.bpmn";
     }

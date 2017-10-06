@@ -15,6 +15,7 @@ package org.activiti.engine.impl.interceptor;
 
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
+import org.flowable.engine.impl.context.Flowable5CompatibilityContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +36,7 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
         this.processEngineConfiguration = processEngineConfiguration;
     }
 
+    @Override
     public <T> T execute(CommandConfig config, Command<T> command) {
         CommandContext context = Context.getCommandContext();
 
@@ -52,7 +54,7 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
             // Push on stack
             Context.setCommandContext(context);
             Context.setProcessEngineConfiguration(processEngineConfiguration);
-            org.flowable.engine.impl.context.Context.setFallbackFlowable5CompatibilityHandler(processEngineConfiguration.getFlowable5CompatibilityHandler());
+            Flowable5CompatibilityContext.setFallbackFlowable5CompatibilityHandler(processEngineConfiguration.getFlowable5CompatibilityHandler());
 
             return next.execute(config, command);
 

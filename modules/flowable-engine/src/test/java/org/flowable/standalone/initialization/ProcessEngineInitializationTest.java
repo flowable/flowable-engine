@@ -21,9 +21,9 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableWrongDbException;
+import org.flowable.engine.common.impl.db.DbSqlSession;
+import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.impl.ProcessEngineImpl;
-import org.flowable.engine.impl.db.DbSqlSession;
-import org.flowable.engine.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.impl.test.AbstractTestCase;
 
 /**
@@ -53,7 +53,7 @@ public class ProcessEngineInitializationTest extends AbstractTestCase {
         SqlSession sqlSession = sqlSessionFactory.openSession();
         boolean success = false;
         try {
-            Map<String, Object> parameters = new HashMap<String, Object>();
+            Map<String, Object> parameters = new HashMap<>();
             parameters.put("name", "schema.version");
             parameters.put("value", "25.7");
             parameters.put("revision", 1);

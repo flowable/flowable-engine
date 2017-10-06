@@ -45,7 +45,7 @@ public class MessageEventReceivedCmd extends NeedsActiveExecutionCmd<Void> {
             if (processVariables instanceof Serializable) {
                 this.payload = (Serializable) processVariables;
             } else {
-                this.payload = new HashMap<String, Object>(processVariables);
+                this.payload = new HashMap<>(processVariables);
             }
 
         } else {
@@ -61,6 +61,7 @@ public class MessageEventReceivedCmd extends NeedsActiveExecutionCmd<Void> {
         this.async = async;
     }
 
+    @Override
     protected Void execute(CommandContext commandContext, ExecutionEntity execution) {
         if (messageName == null) {
             throw new ActivitiIllegalArgumentException("messageName cannot be null");

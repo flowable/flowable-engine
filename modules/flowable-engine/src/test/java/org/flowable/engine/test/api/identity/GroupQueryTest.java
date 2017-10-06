@@ -26,6 +26,7 @@ import org.flowable.idm.api.GroupQuery;
  */
 public class GroupQueryTest extends PluggableFlowableTestCase {
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
 

@@ -35,6 +35,7 @@ public class OtherToolImportConverterTest extends AbstractConverterTest {
         deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "othertoolimport.bpmn";
     }

@@ -13,19 +13,19 @@
 
 package org.flowable.spring.test.taskListener;
 
-import org.flowable.bpmn.model.Task;
-import org.flowable.engine.delegate.TransactionDependentTaskListener;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import org.flowable.bpmn.model.Task;
+import org.flowable.engine.delegate.TransactionDependentTaskListener;
 
 /**
  * @author Yvo Swillens
  */
 public class MyTransactionDependentTaskListener implements TransactionDependentTaskListener {
 
-    protected List<CurrentTask> currentTasks = new ArrayList<CurrentTask>();
+    protected List<CurrentTask> currentTasks = new ArrayList<>();
 
     @Override
     public void notify(String processInstanceId, String executionId, Task task, Map<String, Object> executionVariables, Map<String, Object> customPropertiesMap) {

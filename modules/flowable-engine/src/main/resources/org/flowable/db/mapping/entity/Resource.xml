@@ -37,8 +37,6 @@
     SELECT * FROM dual
   </insert>
   
-  <!-- RESOURCE UPDATE -->
-
   <!-- RESOURCE DELETE -->
 
   <delete id="deleteResourcesByDeploymentId" parameterType="string">

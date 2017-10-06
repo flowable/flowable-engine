@@ -42,6 +42,7 @@ public class DataStore extends BaseElement {
         this.itemSubjectRef = itemSubjectRef;
     }
 
+    @Override
     public DataStore clone() {
         DataStore clone = new DataStore();
         clone.setValues(this);

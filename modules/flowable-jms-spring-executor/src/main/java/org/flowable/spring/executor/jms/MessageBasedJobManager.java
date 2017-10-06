@@ -12,65 +12,31 @@
  */
 package org.flowable.spring.executor.jms;
 
-import java.util.Date;
-
 import javax.jms.JMSException;
 import javax.jms.Message;
 import javax.jms.Session;
 
-import org.flowable.engine.common.impl.cfg.TransactionState;
-import org.flowable.engine.impl.asyncexecutor.DefaultJobManager;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.cfg.TransactionListener;
-import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.runtime.JobInfo;
+import org.flowable.engine.impl.asyncexecutor.message.AbstractMessageBasedJobManager;
+import org.flowable.job.service.HistoryJob;
+import org.flowable.job.service.JobInfo;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.core.MessageCreator;
 
 /**
  * @author Joram Barrez
  */
-public class MessageBasedJobManager extends DefaultJobManager {
-
+public class MessageBasedJobManager extends AbstractMessageBasedJobManager {
+    
     protected JmsTemplate jmsTemplate;
-
-    public MessageBasedJobManager() {
-        super(null);
-    }
-
-    public MessageBasedJobManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        super(processEngineConfiguration);
-    }
+    protected JmsTemplate historyJmsTemplate;
 
     @Override
-    protected void triggerExecutorIfNeeded(final JobEntity jobEntity) {
-        sendMessage(jobEntity);
-    }
-
-    @Override
-    public void unacquire(final JobInfo job) {
-
-        if (job instanceof JobEntity) {
-            JobEntity jobEntity = (JobEntity) job;
-
-            // When unacquiring, we up the lock time again., so that it isn't cleared by the reset expired thread.
-            jobEntity.setLockExpirationTime(new Date(processEngineConfiguration.getClock().getCurrentTime().getTime()
-                    + processEngineConfiguration.getAsyncExecutor().getAsyncJobLockTimeInMillis()));
-        }
-
-        sendMessage(job);
-    }
-
     protected void sendMessage(final JobInfo job) {
-        Context.getTransactionContext().addTransactionListener(TransactionState.COMMITTED, new TransactionListener() {
-            public void execute(CommandContext commandContext) {
-                jmsTemplate.send(new MessageCreator() {
-                    public Message createMessage(Session session) throws JMSException {
-                        return session.createTextMessage(job.getId());
-                    }
-                });
+        JmsTemplate actualJmsTemplate = (job instanceof HistoryJob) ? historyJmsTemplate : jmsTemplate;
+        actualJmsTemplate.send(new MessageCreator() {
+            @Override
+            public Message createMessage(Session session) throws JMSException {
+                return session.createTextMessage(job.getId());
             }
         });
     }
@@ -83,4 +49,12 @@ public class MessageBasedJobManager extends DefaultJobManager {
         this.jmsTemplate = jmsTemplate;
     }
 
+    public JmsTemplate getHistoryJmsTemplate() {
+        return historyJmsTemplate;
+    }
+
+    public void setHistoryJmsTemplate(JmsTemplate historyJmsTemplate) {
+        this.historyJmsTemplate = historyJmsTemplate;
+    }
+    
 }

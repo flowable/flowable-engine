@@ -18,7 +18,7 @@ import java.util.Map;
 import org.flowable.form.engine.impl.parser.FormDefinitionParse;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
 import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntity;
-import org.flowable.form.engine.impl.persistence.entity.ResourceEntity;
+import org.flowable.form.engine.impl.persistence.entity.FormResourceEntity;
 import org.flowable.form.model.FormModel;
 
 /**
@@ -34,12 +34,12 @@ public class ParsedDeployment {
 
     protected List<FormDefinitionEntity> formDefinitions;
     protected Map<FormDefinitionEntity, FormDefinitionParse> mapFormDefinitionsToParses;
-    protected Map<FormDefinitionEntity, ResourceEntity> mapFormDefinitionsToResources;
+    protected Map<FormDefinitionEntity, FormResourceEntity> mapFormDefinitionsToResources;
 
     public ParsedDeployment(
             FormDeploymentEntity entity, List<FormDefinitionEntity> formDefinitions,
             Map<FormDefinitionEntity, FormDefinitionParse> mapFormDefinitionsToParses,
-            Map<FormDefinitionEntity, ResourceEntity> mapFormDefinitionsToResources) {
+            Map<FormDefinitionEntity, FormResourceEntity> mapFormDefinitionsToResources) {
 
         this.deploymentEntity = entity;
         this.formDefinitions = formDefinitions;
@@ -55,7 +55,7 @@ public class ParsedDeployment {
         return formDefinitions;
     }
 
-    public ResourceEntity getResourceForFormDefinition(FormDefinitionEntity formDefinition) {
+    public FormResourceEntity getResourceForFormDefinition(FormDefinitionEntity formDefinition) {
         return mapFormDefinitionsToResources.get(formDefinition);
     }
 
