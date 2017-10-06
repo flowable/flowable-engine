@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.app.events.TimerFiredEventHandler;
 import org.flowable.cmmn.engine.CmmnEngineConfigurationApi;
 import org.flowable.cmmn.engine.CmmnHistoryService;
 import org.flowable.cmmn.engine.CmmnRepositoryService;
