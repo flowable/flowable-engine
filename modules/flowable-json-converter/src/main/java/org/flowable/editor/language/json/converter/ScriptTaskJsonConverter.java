@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,6 +12,7 @@
  */
 package org.flowable.editor.language.json.converter;
 
+import java.util.Iterator;
 import java.util.Map;
 
 import org.flowable.bpmn.model.BaseElement;
@@ -20,6 +21,8 @@ import org.flowable.bpmn.model.ScriptTask;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import static org.flowable.editor.language.json.converter.util.JsonConverterUtil.getProperties;
 
 /**
  * @author Tijs Rademakers
@@ -34,6 +37,10 @@ public class ScriptTaskJsonConverter extends BaseBpmnJsonConverter {
 
     public static void fillJsonTypes(Map<String, Class<? extends BaseBpmnJsonConverter>> convertersToBpmnMap) {
         convertersToBpmnMap.put(STENCIL_TASK_SCRIPT, ScriptTaskJsonConverter.class);
+        convertersToBpmnMap.put(STENCIL_SIMULATION_ASSERT_THAT, ScriptTaskJsonConverter.class);
+        convertersToBpmnMap.put(STENCIL_SIMULATION_CLAIM, ScriptTaskJsonConverter.class);
+        convertersToBpmnMap.put(STENCIL_SIMULATION_COMPLETE, ScriptTaskJsonConverter.class);
+        convertersToBpmnMap.put(STENCIL_SIMULATION_START_PROCESS, ScriptTaskJsonConverter.class);
     }
 
     public static void fillBpmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseBpmnJsonConverter>> convertersToJsonMap) {
@@ -56,7 +63,21 @@ public class ScriptTaskJsonConverter extends BaseBpmnJsonConverter {
     protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
         ScriptTask task = new ScriptTask();
         task.setScriptFormat(getPropertyValueAsString(PROPERTY_SCRIPT_FORMAT, elementNode));
-        task.setScript(getPropertyValueAsString(PROPERTY_SCRIPT_TEXT, elementNode));
+        task.setScript(getScriptText(elementNode));
         return task;
+    }
+
+    private String getScriptText(JsonNode elementNode) {
+        JsonNode properties = getProperties(elementNode);
+        if (properties != null && properties.fields() != null) {
+            Iterator<String> fieldNames = properties.fieldNames();
+            while(fieldNames.hasNext()) {
+                String fieldName = fieldNames.next();
+                if (fieldName.startsWith(PROPERTY_SCRIPT_TEXT)) {
+                    return getPropertyValueAsString(fieldName, elementNode);
+                }
+            }
+        }
+        return null;
     }
 }

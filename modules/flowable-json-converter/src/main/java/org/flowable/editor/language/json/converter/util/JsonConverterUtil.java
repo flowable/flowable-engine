@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -68,18 +68,24 @@ public class JsonConverterUtil implements EditorJsonConstants, StencilConstants 
     }
 
     public static JsonNode getProperty(String name, JsonNode objectNode) {
-        JsonNode propertyNode = null;
-        if (objectNode.get(EDITOR_SHAPE_PROPERTIES) != null) {
-            JsonNode propertiesNode = objectNode.get(EDITOR_SHAPE_PROPERTIES);
-            propertyNode = propertiesNode.get(name);
+        JsonNode propertiesNode = getProperties(objectNode);
+        if (propertiesNode != null) {
+            return propertiesNode.get(name);
         }
-        return propertyNode;
+        return null;
+    }
+
+    public static JsonNode getProperties(JsonNode objectNode) {
+        if (objectNode.get(EDITOR_SHAPE_PROPERTIES) != null) {
+            return objectNode.get(EDITOR_SHAPE_PROPERTIES);
+        }
+        return null;
     }
 
     /**
      * Usable for BPMN 2.0 editor json: traverses all child shapes (also nested), goes into the properties and sees if there is a matching property in the 'properties' of the childshape and returns
      * those in a list.
-     * 
+     *
      * Returns a map with said json nodes, with the key the name of the childshape.
      */
 
@@ -160,7 +166,7 @@ public class JsonConverterUtil implements EditorJsonConstants, StencilConstants 
 
     /**
      * Loops through a list of {@link JsonNode} instances, and stores the given property with given type in the returned list.
-     * 
+     *
      * In Java 8, this probably could be done a lot cooler.
      */
     public static Set<Long> gatherLongPropertyFromJsonNodes(Iterable<JsonNode> jsonNodes, String propertyName) {

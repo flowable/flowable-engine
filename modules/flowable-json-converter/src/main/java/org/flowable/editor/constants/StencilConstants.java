@@ -30,7 +30,6 @@ public interface StencilConstants {
     final String STENCIL_EVENT_END_TERMINATE = "EndTerminateEvent";
 
     final String STENCIL_SUB_PROCESS = "SubProcess";
-    final String STENCIL_SIMULATION_SUB_PROCESS = "SimulationSubProcess";
     final String STENCIL_COLLAPSED_SUB_PROCESS = "CollapsedSubProcess";
     final String STENCIL_EVENT_SUB_PROCESS = "EventSubProcess";
     final String STENCIL_ADHOC_SUB_PROCESS = "AdhocSubProcess";
@@ -79,6 +78,13 @@ public interface StencilConstants {
 
     final String STENCIL_TEXT_ANNOTATION = "TextAnnotation";
     final String STENCIL_DATA_STORE = "DataStore";
+
+    // crystalball
+    final String STENCIL_SIMULATION_SUB_PROCESS = "SimulationSubProcess";
+    final String STENCIL_SIMULATION_START_PROCESS = "crbStartProcessEvent";
+    final String STENCIL_SIMULATION_CLAIM = "crbClaimEvent";
+    final String STENCIL_SIMULATION_COMPLETE = "crbCompleteEvent";
+    final String STENCIL_SIMULATION_ASSERT_THAT = "crbAssertThat";
 
     final String PROPERTY_VALUE_YES = "Yes";
     final String PROPERTY_VALUE_NO = "No";
