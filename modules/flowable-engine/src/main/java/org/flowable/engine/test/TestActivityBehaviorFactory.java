@@ -12,13 +12,6 @@
  */
 package org.flowable.engine.test;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BusinessRuleTask;
@@ -101,7 +94,6 @@ import org.flowable.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.el.FixedValue;
 import org.flowable.engine.impl.test.NoOpServiceTask;
-import org.flowable.variable.service.delegate.Expression;
 
 import java.util.ArrayList;
 import java.util.HashMap;
