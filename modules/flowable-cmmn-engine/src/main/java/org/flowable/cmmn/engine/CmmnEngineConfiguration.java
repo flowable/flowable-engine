@@ -638,6 +638,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    @Override
     public CmmnRuntimeService getCmmnRuntimeService() {
         return cmmnRuntimeService;
     }
@@ -647,6 +648,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    @Override
     public CmmnManagementService getCmmnManagementService() {
         return cmmnManagementService;
     }
@@ -656,6 +658,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    @Override
     public CmmnRepositoryService getCmmnRepositoryService() {
         return cmmnRepositoryService;
     }
@@ -665,6 +668,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    @Override
     public CmmnHistoryService getCmmnHistoryService() {
         return cmmnHistoryService;
     }
