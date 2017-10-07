@@ -131,6 +131,11 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
         deployment.setCategory(category);
         return this;
     }
+    
+    public CmmnDeploymentBuilder key(String key) {
+        deployment.setKey(key);
+        return this;
+    }
 
     public CmmnDeploymentBuilder disableSchemaValidation() {
         this.isCmmn20XsdValidationEnabled = false;

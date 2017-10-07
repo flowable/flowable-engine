@@ -16,6 +16,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.CmmnRepositoryService;
+import org.flowable.cmmn.engine.CmmnRuntimeService;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManager;
@@ -41,6 +43,7 @@ import org.flowable.variable.service.VariableServiceConfiguration;
 
 /**
  * @author Joram Barrez
+ * @author Tijs Rademakers
  */
 public class CommandContextUtil {
     
@@ -52,6 +55,14 @@ public class CommandContextUtil {
     
     public static CmmnEngineConfiguration getCmmnEngineConfiguration(CommandContext commandContext) {
         return (CmmnEngineConfiguration) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+    }
+    
+    public static CmmnRepositoryService getCmmnRepositoryService() {
+        return getCmmnEngineConfiguration().getCmmnRepositoryService();
+    }
+    
+    public static CmmnRuntimeService getCmmnRuntimeService() {
+        return getCmmnEngineConfiguration().getCmmnRuntimeService();
     }
     
     public static ExpressionManager getExpressionManager() {

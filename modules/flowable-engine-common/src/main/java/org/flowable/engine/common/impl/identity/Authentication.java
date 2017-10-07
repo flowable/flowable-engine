@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.impl.identity;
+package org.flowable.engine.common.impl.identity;
 
 /**
  * @author Tom Baeyens

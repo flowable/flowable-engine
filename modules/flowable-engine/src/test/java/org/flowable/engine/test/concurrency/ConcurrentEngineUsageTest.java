@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.apache.ibatis.exceptions.PersistenceException;
 import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.impl.identity.Authentication;
+import org.flowable.engine.common.impl.identity.Authentication;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;

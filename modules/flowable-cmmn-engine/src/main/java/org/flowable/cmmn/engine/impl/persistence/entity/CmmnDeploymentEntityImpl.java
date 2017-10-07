@@ -34,6 +34,7 @@ public class CmmnDeploymentEntityImpl extends AbstractEntityNoRevision implement
 
     protected String name;
     protected String category;
+    protected String key;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     protected String parentDeploymentId;
     protected Map<String, CmmnResourceEntity> resources;
@@ -117,6 +118,14 @@ public class CmmnDeploymentEntityImpl extends AbstractEntityNoRevision implement
 
     public void setCategory(String category) {
         this.category = category;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
     }
 
     public String getTenantId() {

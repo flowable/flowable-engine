@@ -15,10 +15,10 @@ package org.flowable.engine.impl;
 import java.util.List;
 
 import org.flowable.engine.IdentityService;
+import org.flowable.engine.common.impl.identity.Authentication;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.GetPotentialStarterGroupsCmd;
 import org.flowable.engine.impl.cmd.GetPotentialStarterUsersCmd;
-import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.util.EngineServiceUtil;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.GroupQuery;

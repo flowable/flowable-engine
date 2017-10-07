@@ -60,17 +60,27 @@ public abstract class ServiceSqlScriptBasedDbSchemaManager extends AbstractSqlSc
         String feedback = null;
         if (isTablePresent(table)) {
             String dbVersion = getSchemaVersion();
-            int matchingVersionIndex = FlowableVersions.getFlowableVersionForDbVersion(dbVersion);
+            String compareWithVersion = null;
+            if (dbVersion == null) {
+                compareWithVersion = "6.1.2.0"; // last version before services were separated. Start upgrading from this point.
+            } else {
+                compareWithVersion = dbVersion;
+            }
+            
+            int matchingVersionIndex = FlowableVersions.getFlowableVersionForDbVersion(compareWithVersion);
             boolean isUpgradeNeeded = (matchingVersionIndex != (FlowableVersions.FLOWABLE_VERSIONS.size() - 1));
             if (isUpgradeNeeded) {
                 dbSchemaUpgrade(schemaComponent, matchingVersionIndex);
                 if (isHistoryUsed()) {
                     dbSchemaUpgrade(schemaComponentHistory, matchingVersionIndex);
                 }
-                setProperty(schemaVersionProperty, FlowableVersions.CURRENT_VERSION);
+                
+                if (dbVersion != null) {
+                    setProperty(schemaVersionProperty, FlowableVersions.CURRENT_VERSION);
+                }
             }
             
-            feedback = "upgraded from " + dbVersion + " to " + FlowableVersions.CURRENT_VERSION;
+            feedback = "upgraded from " + compareWithVersion + " to " + FlowableVersions.CURRENT_VERSION;
         } else {
             dbSchemaCreate();
         }
@@ -84,9 +94,6 @@ public abstract class ServiceSqlScriptBasedDbSchemaManager extends AbstractSqlSc
     protected String getSchemaVersion() {
         // The service schema version properties were introduced in 6.2.0.
         String dbVersion = getProperty(schemaVersionProperty);
-        if (dbVersion == null) {
-            return "6.1.2.0"; // last version before services were separated. Start upgrading from this point.
-        }
         return dbVersion;
     }
 

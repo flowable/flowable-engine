@@ -12,9 +12,6 @@
  */
 package org.flowable.app.service.editor;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -51,6 +48,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
@@ -125,6 +125,27 @@ public class FlowableModelQueryService {
 
         List<String> addedModelIds = new ArrayList<>();
         List<Model> models = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_BPMN, ModelSort.MODIFIED_DESC);
+
+        if (CollectionUtils.isNotEmpty(models)) {
+            for (Model model : models) {
+                if (!addedModelIds.contains(model.getId())) {
+                    addedModelIds.add(model.getId());
+                    ModelRepresentation representation = createModelRepresentation(model);
+                    resultList.add(representation);
+                }
+            }
+        }
+
+        ResultListDataRepresentation result = new ResultListDataRepresentation(resultList);
+        return result;
+    }
+    
+    public ResultListDataRepresentation getCmmnModelsToIncludeInAppDefinition() {
+
+        List<ModelRepresentation> resultList = new ArrayList<>();
+
+        List<String> addedModelIds = new ArrayList<>();
+        List<Model> models = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_CMMN, ModelSort.MODIFIED_DESC);
 
         if (CollectionUtils.isNotEmpty(models)) {
             for (Model model : models) {

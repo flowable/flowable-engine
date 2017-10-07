@@ -16,6 +16,7 @@ import org.flowable.cmmn.engine.CmmnHistoryService;
 import org.flowable.cmmn.engine.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.engine.history.HistoricMilestoneInstanceQuery;
 import org.flowable.cmmn.engine.history.HistoricVariableInstanceQuery;
+import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoricVariableInstanceQueryImpl;
 
 /**
@@ -37,5 +38,9 @@ public class CmmnHistoryServiceImpl extends ServiceImpl implements CmmnHistorySe
     public HistoricVariableInstanceQuery createHistoricVariableInstanceQuery() {
         return new CmmnHistoricVariableInstanceQueryImpl(commandExecutor);
     }
-    
+
+    @Override
+    public void deleteHistoricCaseInstance(String caseInstanceId) {
+        commandExecutor.execute(new DeleteHistoricCaseInstanceCmd(caseInstanceId));
+    }
 }

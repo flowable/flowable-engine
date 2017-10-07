@@ -21,6 +21,7 @@ import org.flowable.cmmn.engine.CmmnEngineConfigurationApi;
 import org.flowable.cmmn.engine.CmmnHistoryService;
 import org.flowable.cmmn.engine.CmmnRepositoryService;
 import org.flowable.cmmn.engine.CmmnRuntimeService;
+import org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator;
 import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentService;
 import org.flowable.content.spring.SpringContentEngineConfiguration;
@@ -175,6 +176,9 @@ public class FlowableEngineConfiguration {
 
         processEngineConfiguration.setDisableIdmEngine(true);
         processEngineConfiguration.addConfigurator(new SpringFormEngineConfigurator());
+        
+        SpringCmmnEngineConfigurator cmmnEngineConfigurator = new SpringCmmnEngineConfigurator();
+        processEngineConfiguration.addConfigurator(cmmnEngineConfigurator);
         
         SpringDmnEngineConfiguration dmnEngineConfiguration = new SpringDmnEngineConfiguration();
         dmnEngineConfiguration.setHistoryEnabled(true);

@@ -121,6 +121,11 @@ public class FlowableTaskQueryService {
         if (processInstanceIdNode != null && !processInstanceIdNode.isNull()) {
             handleProcessInstanceFiltering(currentUser, taskInfoQueryWrapper, processInstanceIdNode);
         }
+        
+        JsonNode caseInstanceIdNode = requestNode.get("caseInstanceId");
+        if (caseInstanceIdNode != null && !caseInstanceIdNode.isNull()) {
+            handleCaseInstanceFiltering(currentUser, taskInfoQueryWrapper, caseInstanceIdNode);
+        }
 
         JsonNode textNode = requestNode.get("text");
         if (textNode != null && !textNode.isNull()) {
@@ -188,6 +193,11 @@ public class FlowableTaskQueryService {
     protected void handleProcessInstanceFiltering(User currentUser, TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode processInstanceIdNode) {
         String processInstanceId = processInstanceIdNode.asText();
         taskInfoQueryWrapper.getTaskInfoQuery().processInstanceId(processInstanceId);
+    }
+    
+    protected void handleCaseInstanceFiltering(User currentUser, TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode caseInstanceIdNode) {
+        String caseInstanceId = caseInstanceIdNode.asText();
+        taskInfoQueryWrapper.getTaskInfoQuery().scopeId(caseInstanceId).scopeType("cmmn");
     }
 
     protected void handleTextFiltering(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode textNode) {

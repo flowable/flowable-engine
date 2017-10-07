@@ -19,9 +19,11 @@ import org.flowable.cmmn.engine.CmmnRepositoryService;
 import org.flowable.cmmn.engine.impl.cmd.DeleteDeploymentCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeployCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetCmmnModelCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetDeploymentCaseDefinitionCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetDeploymentResourceNamesCmd;
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentBuilderImpl;
+import org.flowable.cmmn.engine.repository.CaseDefinition;
 import org.flowable.cmmn.engine.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.engine.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.repository.CmmnDeploymentBuilder;
@@ -57,6 +59,11 @@ public class CmmnRepositoryServiceImpl extends ServiceImpl implements CmmnReposi
     
     public CmmnDeployment deploy(CmmnDeploymentBuilderImpl deploymentBuilder) {
         return commandExecutor.execute(new DeployCmd(deploymentBuilder));
+    }
+    
+    @Override
+    public CaseDefinition getCaseDefinition(String caseDefinitionId) {
+        return commandExecutor.execute(new GetDeploymentCaseDefinitionCmd(caseDefinitionId));
     }
     
     @Override

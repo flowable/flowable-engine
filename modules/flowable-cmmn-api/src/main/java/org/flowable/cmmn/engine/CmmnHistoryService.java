@@ -27,4 +27,5 @@ public interface CmmnHistoryService {
     
     HistoricVariableInstanceQuery createHistoricVariableInstanceQuery();
 
+    void deleteHistoricCaseInstance(String caseInstanceId);
 }

@@ -52,6 +52,11 @@ public interface CmmnDeploymentBuilder {
      * Gives the deployment the given category.
      */
     CmmnDeploymentBuilder category(String category);
+    
+    /**
+     * Gives the deployment the given key.
+     */
+    CmmnDeploymentBuilder key(String key);
 
     /**
      * Gives the deployment the given tenant id.

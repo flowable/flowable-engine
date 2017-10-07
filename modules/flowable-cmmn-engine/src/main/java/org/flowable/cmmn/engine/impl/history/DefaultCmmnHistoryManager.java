@@ -12,7 +12,10 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
+import java.util.List;
+
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.history.HistoricCaseInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricCaseInstanceEntityManager;
@@ -74,6 +77,27 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             historicMilestoneInstanceEntity.setElementId(milestoneInstance.getElementId());
             historicMilestoneInstanceEntity.setTimeStamp(cmmnEngineConfiguration.getClock().getCurrentTime());
             historicMilestoneInstanceEntityManager.insert(historicMilestoneInstanceEntity);
+        }
+    }
+    
+    @Override
+    public void recordCaseInstanceDeleted(String caseInstanceId) {
+        if (cmmnEngineConfiguration.getHistoryLevel() != HistoryLevel.NONE) {
+            HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
+            HistoricCaseInstanceEntity historicCaseInstance = historicCaseInstanceEntityManager.findById(caseInstanceId);
+
+            cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager().deleteByCaseDefinitionId(caseInstanceId);
+           
+            if (historicCaseInstance != null) {
+                historicCaseInstanceEntityManager.delete(historicCaseInstance);
+            }
+
+            // Also delete any sub cases that may be active
+
+            List<HistoricCaseInstance> selectList = historicCaseInstanceEntityManager.createHistoricCaseInstanceQuery().caseInstanceParentId(caseInstanceId).list();
+            for (HistoricCaseInstance child : selectList) {
+                recordCaseInstanceDeleted(child.getId());
+            }
         }
     }
 
