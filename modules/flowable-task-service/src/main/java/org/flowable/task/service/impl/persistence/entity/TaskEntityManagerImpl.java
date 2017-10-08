@@ -89,6 +89,11 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     public List<TaskEntity> findTasksByProcessInstanceId(String processInstanceId) {
         return taskDataManager.findTasksByProcessInstanceId(processInstanceId);
     }
+    
+    @Override
+    public List<TaskEntity> findTasksBySubScopeIdScopeType(String subScopeId, String scopeType) {
+        return taskDataManager.findTasksBySubScopeIdScopeType(subScopeId, scopeType);
+    }
 
     @Override
     public List<Task> findTasksByQueryCriteria(TaskQueryImpl taskQuery) {

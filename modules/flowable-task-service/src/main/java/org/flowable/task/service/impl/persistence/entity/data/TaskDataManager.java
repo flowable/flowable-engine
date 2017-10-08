@@ -28,6 +28,8 @@ public interface TaskDataManager extends DataManager<TaskEntity> {
     List<TaskEntity> findTasksByExecutionId(final String executionId);
 
     List<TaskEntity> findTasksByProcessInstanceId(String processInstanceId);
+    
+    List<TaskEntity> findTasksBySubScopeIdScopeType(String subScopeId, String scopeType);
 
     List<Task> findTasksByQueryCriteria(TaskQueryImpl taskQuery);
 

@@ -364,6 +364,12 @@
     where T.PROC_INST_ID_ = #{parameter}
   </select>
   
+  <select id="selectTasksBySubScopeIdAndScopeType" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="taskResultMap">
+    select T.*
+    from ${prefix}ACT_RU_TASK T
+    where T.SUB_SCOPE_ID_ = #{parameter.subScopeId, jdbcType=VARCHAR} and T.SCOPE_TYPE_ = #{parameter.scopeType, jdbcType=VARCHAR}
+  </select>
+  
   <!-- Using distinct here because a task can appear multiple times in a resultset when -->
   <select id="selectTaskByQueryCriteria" parameterType="org.flowable.task.service.impl.TaskQueryImpl" resultMap="taskResultMap">
     <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>

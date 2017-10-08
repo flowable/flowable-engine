@@ -45,11 +45,10 @@ public class CompleteTaskCmd implements Command<Void> {
             throw new FlowableIllegalArgumentException("Null task id");
         }
         
-        TaskEntity taskEntity = CommandContextUtil.getTaskService().getTask(taskId);
+        TaskEntity taskEntity = CommandContextUtil.getTaskService(commandContext).getTask(taskId);
         if (taskEntity == null) {
             throw new FlowableObjectNotFoundException("Could not find task entity for id " + taskId, TaskEntity.class);
         }
-        CommandContextUtil.getTaskService(commandContext).deleteTask(taskEntity, true);
         
         String planItemInstanceId = taskEntity.getSubScopeId();
         PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceId);

@@ -15,7 +15,10 @@ package org.flowable.cmmn.test.task;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.variable.VariableScopeType;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
+import org.flowable.cmmn.engine.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.task.service.Task;
@@ -35,6 +38,23 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         assertEquals("johnDoe", task.getAssignee());
         
         cmmnTaskService.complete(task.getId());
+        assertCaseInstanceEnded(caseInstance);
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testTriggerOneHumanTaskCaseProgrammatically() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceStateActive().singleResult();
+        assertEquals(planItemInstance.getId(), task.getSubScopeId());
+        assertEquals(planItemInstance.getCaseInstanceId(), task.getScopeId());
+        assertEquals(planItemInstance.getCaseDefinitionId(), task.getScopeDefinitionId());
+        assertEquals(VariableScopeType.CMMN, task.getScopeType());
+        
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstance.getId());
+        assertEquals(0, cmmnTaskService.createTaskQuery().count());
         assertCaseInstanceEnded(caseInstance);
     }
 

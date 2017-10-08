@@ -242,6 +242,20 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior {
         if (!PlanItemInstanceState.ACTIVE.equals(planItemInstance.getState())) {
             throw new FlowableException("Can only trigger a human task plan item that is in the ACTIVE state");
         }
+        
+        TaskService taskService = CommandContextUtil.getTaskService(commandContext);
+        List<TaskEntity> taskEntities = taskService.findTasksBySubScopeIdScopeType(planItemInstance.getId(), VariableScopeType.CMMN);
+        if (taskEntities == null || taskEntities.isEmpty()) {
+            throw new FlowableException("No task entity found for plan item instance " + planItemInstance.getId());
+        }
+        
+        // Should be only one
+        for (TaskEntity taskEntity : taskEntities) {
+            if (!taskEntity.isDeleted()) {
+                taskService.deleteTask(taskEntity, true);
+            }
+        }
+        
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance((PlanItemInstanceEntity) planItemInstance);
     }
 
