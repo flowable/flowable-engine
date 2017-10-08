@@ -37,9 +37,9 @@ import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
-import org.flowable.identitylink.service.IdentityLink;
 import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
+import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.variable.service.HistoricVariableService;
@@ -222,6 +222,14 @@ public class CommandContextUtil {
     
     public static TaskService getTaskService(CommandContext commandContext) {
         return getTaskServiceConfiguration(commandContext).getTaskService();
+    }
+    
+    public static HistoricTaskService getHistoricTaskService() {
+        return getHistoricTaskService(getCommandContext());
+    }
+    
+    public static HistoricTaskService getHistoricTaskService(CommandContext commandContext) {
+        return getTaskServiceConfiguration(commandContext).getHistoricTaskService();
     }
     
     public static TaskServiceConfiguration getTaskServiceConfiguration() {

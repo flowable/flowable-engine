@@ -73,6 +73,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior {
             handleCandidateGroups(commandContext, planItemInstanceEntity, expressionManager, taskEntity);
             
             taskService.insertTask(taskEntity, true);
+            CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskCreated(taskEntity);
             
         } else {
             // if not blocking, treat as a manual task. No need to create a task entry.
@@ -253,6 +254,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior {
         for (TaskEntity taskEntity : taskEntities) {
             if (!taskEntity.isDeleted()) {
                 taskService.deleteTask(taskEntity, true);
+                CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskEnd(taskEntity, null);
             }
         }
         

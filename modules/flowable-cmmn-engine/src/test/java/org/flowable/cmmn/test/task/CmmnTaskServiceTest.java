@@ -14,14 +14,16 @@ package org.flowable.cmmn.test.task;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
-import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.variable.VariableScopeType;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.cmmn.engine.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.task.service.Task;
+import org.flowable.task.service.history.HistoricTaskInstance;
 import org.junit.Test;
 
 /**
@@ -37,8 +39,20 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         assertNotNull(task);
         assertEquals("johnDoe", task.getAssignee());
         
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertNotNull(historicTaskInstance);
+            assertNull(historicTaskInstance.getEndTime());
+        }
+        
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
+        
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertNotNull(historicTaskInstance);
+            assertNotNull(historicTaskInstance.getEndTime());
+        }
     }
     
     @Test

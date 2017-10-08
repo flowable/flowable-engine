@@ -12,12 +12,41 @@
  */
 package org.flowable.cmmn.engine.history;
 
-import org.flowable.engine.common.api.query.Query;
+import java.util.Date;
+
+import org.flowable.task.service.TaskInfoQuery;
 import org.flowable.task.service.history.HistoricTaskInstance;
 
 /**
  * @author Joram Barrez
  */
-public interface HistoricTaskInstanceQuery extends Query<HistoricTaskInstanceQuery, HistoricTaskInstance> {
+public interface HistoricTaskInstanceQuery extends TaskInfoQuery<HistoricTaskInstanceQuery, HistoricTaskInstance> {
+    
+    HistoricTaskInstanceQuery caseInstanceId(String caseInstanceId);
+    
+    HistoricTaskInstanceQuery caseDefinitionId(String caseDefinitionId);
+    
+    HistoricTaskInstanceQuery planItemInstanceId(String planItemInstanceId);
+    
+    HistoricTaskInstanceQuery taskDeleteReason(String taskDeleteReason);
+
+    HistoricTaskInstanceQuery taskDeleteReasonLike(String taskDeleteReasonLike);
+
+    HistoricTaskInstanceQuery finished();
+
+    HistoricTaskInstanceQuery unfinished();
+
+    HistoricTaskInstanceQuery taskParentTaskId(String parentTaskId);
+
+    HistoricTaskInstanceQuery taskCompletedOn(Date endDate);
+
+    HistoricTaskInstanceQuery taskCompletedBefore(Date endDate);
+
+    HistoricTaskInstanceQuery taskCompletedAfter(Date endDate);
+
+    HistoricTaskInstanceQuery orderByHistoricTaskInstanceDuration();
+    HistoricTaskInstanceQuery orderByHistoricTaskInstanceStartTime();
+    HistoricTaskInstanceQuery orderByHistoricTaskInstanceEndTime();
+    HistoricTaskInstanceQuery orderByDeleteReason();
 
 }

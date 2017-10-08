@@ -10,13 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.impl.task;
+package org.flowable.cmmn.engine.impl;
 
 import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnTaskService;
-import org.flowable.cmmn.engine.impl.ServiceImpl;
 import org.flowable.cmmn.engine.impl.cmd.CompleteTaskCmd;
+import org.flowable.cmmn.engine.impl.task.CmmnTaskQueryImpl;
 import org.flowable.cmmn.engine.task.TaskQuery;
 
 /**
