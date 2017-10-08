@@ -1,0 +1,4 @@
+drop index ACT_IDX_IDENT_LNK_USER;
+drop index ACT_IDX_IDENT_LNK_GROUP;
+
+drop table ACT_RU_IDENTITYLINK;

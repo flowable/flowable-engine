@@ -23,6 +23,7 @@ import org.flowable.cmmn.engine.CmmnHistoryService;
 import org.flowable.cmmn.engine.CmmnManagementService;
 import org.flowable.cmmn.engine.CmmnRepositoryService;
 import org.flowable.cmmn.engine.CmmnRuntimeService;
+import org.flowable.cmmn.engine.CmmnTaskService;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
 import org.junit.After;
@@ -44,6 +45,7 @@ public class FlowableCmmnTestCase {
     protected CmmnManagementService cmmnManagementService;
     protected CmmnRepositoryService cmmnRepositoryService;
     protected CmmnRuntimeService cmmnRuntimeService;
+    protected CmmnTaskService cmmnTaskService;
     protected CmmnHistoryService cmmnHistoryService;
     
     protected String deploymentId;
@@ -71,6 +73,7 @@ public class FlowableCmmnTestCase {
         this.cmmnRepositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
         this.cmmnManagementService = cmmnEngineConfiguration.getCmmnManagementService();
         this.cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
+        this.cmmnTaskService = cmmnEngineConfiguration.getCmmnTaskService();
         this.cmmnHistoryService = cmmnEngineConfiguration.getCmmnHistoryService();
     }
     

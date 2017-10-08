@@ -25,9 +25,7 @@ public class HumanTask extends Task {
     protected String priority;
     protected String formKey;
     protected String dueDate;
-    protected String businessCalendarName;
     protected String category;
-    protected String extensionId;
     protected List<String> candidateUsers = new ArrayList<>();
     protected List<String> candidateGroups = new ArrayList<>();
 
@@ -71,32 +69,12 @@ public class HumanTask extends Task {
         this.dueDate = dueDate;
     }
 
-    public String getBusinessCalendarName() {
-        return businessCalendarName;
-    }
-
-    public void setBusinessCalendarName(String businessCalendarName) {
-        this.businessCalendarName = businessCalendarName;
-    }
-
     public String getCategory() {
         return category;
     }
 
     public void setCategory(String category) {
         this.category = category;
-    }
-
-    public String getExtensionId() {
-        return extensionId;
-    }
-
-    public void setExtensionId(String extensionId) {
-        this.extensionId = extensionId;
-    }
-
-    public boolean isExtended() {
-        return extensionId != null && !extensionId.isEmpty();
     }
 
     public List<String> getCandidateUsers() {
@@ -129,7 +107,6 @@ public class HumanTask extends Task {
         setDueDate(otherElement.getDueDate());
         setPriority(otherElement.getPriority());
         setCategory(otherElement.getCategory());
-        setExtensionId(otherElement.getExtensionId());
         
         setCandidateGroups(new ArrayList<>(otherElement.getCandidateGroups()));
         setCandidateUsers(new ArrayList<>(otherElement.getCandidateUsers()));

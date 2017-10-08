@@ -1,6 +1,4 @@
 drop index ACT_IDX_EXEC_BUSKEY;
-drop index ACT_IDX_IDENT_LNK_USER;
-drop index ACT_IDX_IDENT_LNK_GROUP;
 drop index ACT_IDX_VARIABLE_TASK_ID;
 
 alter table ACT_GE_BYTEARRAY 
@@ -111,7 +109,6 @@ drop index ACT_IDX_ATHRZ_PROCEDEF;
 drop table ACT_RE_DEPLOYMENT;
 drop table ACT_RE_MODEL;
 drop table ACT_RE_PROCDEF;
-drop table ACT_RU_IDENTITYLINK;
 drop table ACT_RU_EXECUTION;
 drop table ACT_RU_JOB;
 drop table ACT_RU_TIMER_JOB;

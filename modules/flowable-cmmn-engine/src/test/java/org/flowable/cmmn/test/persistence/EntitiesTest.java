@@ -99,7 +99,7 @@ public class EntitiesTest {
             for (int i = 0; i < nodeList.getLength(); i++) {
                 Node node = nodeList.item(i);
                 String resource = node.getAttributes().getNamedItem("resource").getTextContent();
-                if (resource.startsWith("org/flowable/cmmn")) {
+                if (resource.startsWith("org/flowable/cmmn") && !resource.contains("common.xml")) {
                     resource = resource.replaceAll("org/flowable/cmmn/db/mapping/entity/", "");
                     resource = resource.replaceAll(".xml", "");
                     resources.add(resource);

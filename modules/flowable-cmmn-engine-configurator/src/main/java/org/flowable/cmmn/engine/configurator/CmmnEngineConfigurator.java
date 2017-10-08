@@ -65,6 +65,10 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
         initialiseCommonProperties(processEngineConfiguration, cmmnEngineConfiguration);
         initProcessInstanceService(processEngineConfiguration);
         initProcessInstanceStateChangedCallbacks(processEngineConfiguration);
+        
+        cmmnEngineConfiguration.setEnableTaskRelationshipCounts(processEngineConfiguration.getPerformanceSettings().isEnableTaskRelationshipCounts());
+        cmmnEngineConfiguration.setTaskQueryLimit(processEngineConfiguration.getTaskQueryLimit());
+        cmmnEngineConfiguration.setHistoricTaskQueryLimit(processEngineConfiguration.getHistoricTaskQueryLimit());
 
         initCmmnEngine();
     }

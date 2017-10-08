@@ -1230,7 +1230,7 @@
   </sql>  
 
   <select id="selectTaskByNativeQuery" parameterType="java.util.Map" resultMap="taskResultMap">
-  	<include refid="org.flowable.engine.db.common.selectByNativeQuery"/>
+  	<include refid="org.flowable.task.service.db.common.selectByNativeQuery"/>
   </select>
   
   <select id="selectTaskCountByNativeQuery" parameterType="java.util.Map" resultType="long">
