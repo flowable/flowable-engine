@@ -11,8 +11,8 @@
     values(
         #{id, jdbcType=VARCHAR},
         #{name, jdbcType=VARCHAR},
-        #{key, jdbcType=VARCHAR},
         #{category, jdbcType=VARCHAR},
+        #{key, jdbcType=VARCHAR},
         #{tenantId, jdbcType=VARCHAR},
         #{deploymentTime, jdbcType=TIMESTAMP},
         #{parentDeploymentId, jdbcType=VARCHAR}
