@@ -31,6 +31,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.service.IdentityLinkInfo;
 import org.flowable.task.service.DelegationState;
+import org.flowable.task.service.Task;
 import org.flowable.task.service.TaskQuery;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -879,6 +880,146 @@ public class TaskQueryTest extends PluggableFlowableTestCase {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             historyService.deleteHistoricTaskInstance(assigneeToKermit.getId());
         }
+    }
+
+    public void testQueryCandidateAssignedToOthers() {
+        List<String> createdTasks = new ArrayList<>();
+        Task kermitAssigneeTask = taskService.newTask();
+        kermitAssigneeTask.setName("new kermit assignee task");
+        taskService.saveTask(kermitAssigneeTask);
+        taskService.setAssignee(kermitAssigneeTask.getId(), "kermit");
+        createdTasks.add(kermitAssigneeTask.getId());
+
+        Task magementTask = taskService.newTask();
+        magementTask.setName("new management task");
+        taskService.saveTask(magementTask);
+        taskService.setAssignee(magementTask.getId(), "gozzie");
+        taskService.addCandidateGroup(magementTask.getId(), "management");
+        createdTasks.add(magementTask.getId());
+
+
+        List<Task> kermitCandidateTasks = taskService.createTaskQuery()
+                .taskCandidateUser("kermit")
+                .taskName("testTask")
+                .list();
+
+        for (Task t : kermitCandidateTasks) {
+            taskService.setAssignee(t.getId(), "gonzo");
+        }
+
+        List<Task> tasks = taskService.createTaskQuery()
+                .taskCandidateUser("kermit")
+                .list();
+        assertEquals(5, tasks.size());
+
+        tasks = taskService.createTaskQuery()
+                .taskCandidateUser("kermit")
+                .candidateAssignedToOthers()
+                .list();
+        assertEquals(12, tasks.size());
+
+        tasks = taskService.createTaskQuery()
+                .taskCandidateOrAssigned("kermit")
+                .list();
+        assertEquals(6, tasks.size());
+
+        tasks = taskService.createTaskQuery()
+                .taskCandidateOrAssigned("kermit")
+                .candidateAssignedToOthers()
+                .list();
+        assertEquals(13, tasks.size());
+
+        tasks = taskService.createTaskQuery()
+                .taskCandidateOrAssigned("gonzo")
+                .taskCandidateGroup("management")
+                .list();
+        assertEquals(10, tasks.size());
+
+        tasks = taskService.createTaskQuery()
+                .taskCandidateOrAssigned("gonzo")
+                .taskCandidateGroup("management")
+                .candidateAssignedToOthers()
+                .list();
+        assertEquals(11, tasks.size());
+
+        taskService.deleteTasks(createdTasks, true);
+    }
+
+    public void testQueryCandidateAssignedToOthersOr() {
+        List<String> createdTasks = new ArrayList<>();
+        Task kermitAssigneeTask = taskService.newTask();
+        kermitAssigneeTask.setName("new kermit assignee task");
+        taskService.saveTask(kermitAssigneeTask);
+        taskService.setAssignee(kermitAssigneeTask.getId(), "kermit");
+        createdTasks.add(kermitAssigneeTask.getId());
+
+        Task magementTask = taskService.newTask();
+        magementTask.setName("new management task");
+        taskService.saveTask(magementTask);
+        taskService.setAssignee(magementTask.getId(), "gozzie");
+        taskService.addCandidateGroup(magementTask.getId(), "management");
+        createdTasks.add(magementTask.getId());
+
+
+        List<Task> kermitCandidateTasks = taskService.createTaskQuery()
+                .taskCandidateUser("kermit")
+                .taskName("testTask")
+                .list();
+
+        for (Task t : kermitCandidateTasks) {
+            taskService.setAssignee(t.getId(), "gonzo");
+        }
+
+        List<Task> tasks = taskService.createTaskQuery()
+                .or()
+                .taskCandidateUser("kermit")
+                .taskCandidateGroup("management")
+                .endOr()
+                .list();
+        assertEquals(3, tasks.size());
+
+        tasks = taskService.createTaskQuery()
+                .or()
+                .taskCandidateUser("kermit")
+                .taskCandidateGroup("management")
+                .candidateAssignedToOthers()
+                .endOr()
+                .list();
+        assertEquals(10, tasks.size());
+
+        tasks = taskService.createTaskQuery()
+                .or()
+                .taskCandidateOrAssigned("kermit")
+                .endOr()
+                .list();
+        assertEquals(6, tasks.size());
+
+        tasks = taskService.createTaskQuery()
+                .or()
+                .taskCandidateOrAssigned("kermit")
+                .candidateAssignedToOthers()
+                .endOr()
+                .list();
+        assertEquals(13, tasks.size());
+
+        tasks = taskService.createTaskQuery()
+                .or()
+                .taskCandidateOrAssigned("gonzo")
+                .taskCandidateGroup("management")
+                .endOr()
+                .list();
+        assertEquals(10, tasks.size());
+
+        tasks = taskService.createTaskQuery()
+                .or()
+                .taskCandidateOrAssigned("gonzo")
+                .taskCandidateGroup("management")
+                .candidateAssignedToOthers()
+                .endOr()
+                .list();
+        assertEquals(11, tasks.size());
+
+        taskService.deleteTasks(createdTasks, true);
     }
 
     public void testQueryByNullCandidateGroup() {

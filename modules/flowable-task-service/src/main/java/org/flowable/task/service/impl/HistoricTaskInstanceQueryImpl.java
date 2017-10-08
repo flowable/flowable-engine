@@ -76,6 +76,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String taskOwnerLikeIgnoreCase;
     protected String taskAssignee;
     protected String taskAssigneeLike;
+    protected boolean candidateAssignedToOthers;
     protected String taskAssigneeLikeIgnoreCase;
     protected List<String> taskAssigneeIds;
     protected String taskDefinitionKey;
@@ -1091,6 +1092,16 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     }
 
     @Override
+    public HistoricTaskInstanceQuery candidateAssignedToOthers() {
+        if (inOrStatement) {
+            this.currentOrQueryObject.candidateAssignedToOthers = true;
+        } else {
+            this.candidateAssignedToOthers = true;
+        }
+        return this;
+    }
+
+    @Override
     public HistoricTaskInstanceQuery taskCandidateUser(String candidateUser) {
         if (candidateUser == null) {
             throw new FlowableIllegalArgumentException("Candidate user is null");
@@ -1678,6 +1689,14 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getCandidateGroup() {
         return candidateGroup;
+    }
+
+    public boolean isCandidateAssignedToOthers() {
+        return candidateAssignedToOthers;
+    }
+
+    public void setCandidateAssignedToOthers(boolean candidateAssignedToOthers) {
+        this.candidateAssignedToOthers = candidateAssignedToOthers;
     }
 
     public String getInvolvedUser() {

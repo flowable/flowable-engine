@@ -139,6 +139,11 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      */
     T taskInvolvedUser(String involvedUser);
 
+    /**
+     * Allows to select a task using {@link #taskCandidateGroup(String)} {@link #taskCandidateGroupIn(List)} or {@link #taskCandidateUser(String)} but ignore the assignee value instead of querying for an empty asisgnee.
+     */
+    T candidateAssignedToOthers();
+
     /** Only select tasks for which users in the given group are candidates. */
     T taskCandidateGroup(String candidateGroup);
 
