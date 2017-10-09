@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -28,7 +29,7 @@ public class CmmnHistoryTaskManager implements InternalHistoryTaskManager {
 
     @Override
     public void recordTaskInfoChange(TaskEntity taskEntity) {
-        
+        CommandContextUtil.getHistoricTaskService().recordTaskInfoChange(taskEntity);
     }
 
 }

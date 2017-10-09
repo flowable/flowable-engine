@@ -18,6 +18,9 @@ alter table ACT_RU_EXECUTION
 
 alter table ACT_RU_IDENTITYLINK
     drop foreign key ACT_FK_TSKASS_TASK;
+    
+alter table ACT_RU_IDENTITYLINK
+    drop foreign key ACT_FK_IDL_PROCINST;  
 
 alter table ACT_RU_IDENTITYLINK
     drop foreign key ACT_FK_ATHRZ_PROCEDEF;
