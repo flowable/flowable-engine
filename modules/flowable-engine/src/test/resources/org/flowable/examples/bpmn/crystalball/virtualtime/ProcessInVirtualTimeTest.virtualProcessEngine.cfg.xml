@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+
+    <bean id="virtualProcessEngineConfiguration"
+          class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+
+        <property name="engineName" value="virtual-flowable"/>
+        <property name="jdbcUrl" value="jdbc:h2:mem:simulation-run-flowable;DB_CLOSE_DELAY=1000"/>
+        <property name="jdbcDriver" value="org.h2.Driver"/>
+        <property name="jdbcUsername" value="sa"/>
+        <property name="jdbcPassword" value=""/>
+
+        <property name="clock" ref="clock"/>
+        <property name="disableIdmEngine" value="true"/>
+
+        <!--
+        command context reuse is not possible when there are 2 engines running -> both with different
+        process definitions in the repository.
+        -->
+        <property name="defaultCommandConfig">
+            <bean class="org.flowable.engine.common.impl.interceptor.CommandConfig">
+                <constructor-arg name="contextReusePossible" value="false"/>
+            </bean>
+        </property>
+
+        <!-- Database configurations -->
+        <property name="databaseSchemaUpdate" value="true"/>
+
+    </bean>
+
+    <bean id="clock" class="org.flowable.engine.common.impl.util.DefaultClockImpl"/>
+
+</beans>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.flowable.org/processdef">
+    <process id="oneTaskProcessSimulationTest" name="oneTaskProcessSimulationTest" isExecutable="true">
+        <startEvent id="_startTest"></startEvent>
+        <sequenceFlow id="sequenceFlow1-2825583d-573c-4d34-acdd-6c289c08ffb6" sourceRef="_startTest"
+                      targetRef="_testSubProcess"></sequenceFlow>
+        <subProcess id="_testSubProcess" name="subProcess">
+            <extensionElements>
+                <flowable:type><![CDATA[simulation]]></flowable:type>
+                <flowable:virtualEngineConfiguration><![CDATA[org/flowable/crystalball/examples/ProcessInVirtualTimeTest-virtualEngine.cfg.xml]]></flowable:virtualEngineConfiguration>
+            </extensionElements>
+            <startEvent id="startEvent1"></startEvent>
+            <scriptTask id="deployProcess" name="Deploy oneTaskProcess process" scriptFormat="groovy"
+                        flowable:autoStoreVariables="false">
+                <script><![CDATA[import static org.flowable.crystalball.simulator.SimUtils.*;
+
+getVirtualProcessEngine(execution).getRepositoryService().
+createDeployment().addClasspathResource("org/flowable/crystalball/examples/oneTaskProcessWithEscalation.bpmn20.xml").deploy();]]></script>
+            </scriptTask>
+            <scriptTask id="setTimeToEpoch" name="Set time to epoch" scriptFormat="groovy"
+                        flowable:autoStoreVariables="false">
+                <script><![CDATA[import static org.flowable.crystalball.simulator.SimUtils.*;
+
+setVirtualTime(execution, new java.util.Date(0));]]></script>
+            </scriptTask>
+            <scriptTask id="startProcess" name="Start oneTaskProcess process" scriptFormat="groovy"
+                        flowable:autoStoreVariables="false">
+                <script><![CDATA[import static org.flowable.crystalball.simulator.SimUtils.*;
+
+processInstanceBuilder = getVirtualProcessEngine(execution).getRuntimeService().createProcessInstanceBuilder().processDefinitionKey('oneTaskProcess');
+execution.setVariable('processInstanceId', processInstanceBuilder.start().getId());]]></script>
+            </scriptTask>
+            <scriptTask id="claimTask2" name="Claim task userTask to user &quot;admin&quot;" flowable:async="true"
+                        flowable:exclusive="false" scriptFormat="groovy" flowable:autoStoreVariables="false">
+                <script><![CDATA[import static org.flowable.crystalball.simulator.SimUtils.*;
+
+setVirtualTime(execution, new java.util.Date(1000));
+processInstanceIds = getSubProcessInstanceIds(processInstanceId, execution);
+taskId = getVirtualProcessEngine(execution).getTaskService().createTaskQuery().processInstanceIdIn(processInstanceIds).taskDefinitionKey("userTask").singleResult().getId();
+getVirtualProcessEngine(execution).getTaskService().claim(taskId, 'admin');]]></script>
+            </scriptTask>
+            <scriptTask id="completeTask3" name="Complete task userTask" flowable:async="true"
+                        flowable:exclusive="false" scriptFormat="groovy" flowable:autoStoreVariables="false">
+                <script><![CDATA[import static org.flowable.crystalball.simulator.SimUtils.*;
+
+setVirtualTime(execution, new java.util.Date(10000));
+processInstanceIds = getSubProcessInstanceIds(processInstanceId, execution);
+taskId = getVirtualProcessEngine(execution).getTaskService().createTaskQuery().processInstanceIdIn(processInstanceIds).taskDefinitionKey("userTask").singleResult().getId();
+getVirtualProcessEngine(execution).getTaskService().complete(taskId);]]></script>
+            </scriptTask>
+            <scriptTask id="assertion" name="assertThat" flowable:async="true" flowable:exclusive="false"
+                        scriptFormat="groovy" flowable:autoStoreVariables="false">
+                <script><![CDATA[import static org.flowable.crystalball.simulator.SimUtils.* ;
+import static org.hamcrest.Matchers.lessThan;
+import static org.flowable.engine.test.MatcherAssert.assertThat;
+
+events = getVirtualProcessEngine(execution).getManagementService().getEventLogEntriesByProcessInstanceId(processInstanceId)
+events.each {
+    assertThat("All time stamps must be before EPOCH + 2.0001sec", it.getTimeStamp(), lessThan(new Date(2001)));
+}
+]]></script>
+            </scriptTask>
+            <endEvent id="end"></endEvent>
+            <sequenceFlow id="sequenceFlow1-74bbb9e0-6a34-4f15-bda1-b3f3652517ab" sourceRef="startEvent1"
+                          targetRef="deployProcess"></sequenceFlow>
+            <sequenceFlow id="sequenceFlow1-74bbb9eb-6a34-4f15-bda1-b3f3652517ab" sourceRef="deployProcess"
+                          targetRef="setTimeToEpoch"></sequenceFlow>
+            <sequenceFlow id="sequenceFlow1-74bbbbeb-6a34-4f15-bda1-b3f3652517ab" sourceRef="setTimeToEpoch"
+                          targetRef="startProcess"></sequenceFlow>
+            <sequenceFlow id="sequenceFlow2-63bbb8db-ed79-49dd-99a5-54bed5074b26" sourceRef="startProcess"
+                          targetRef="claimTask2"></sequenceFlow>
+            <sequenceFlow id="sequenceFlow3-1878b2a7-686e-4523-a749-300f6cdf2595" sourceRef="claimTask2"
+                          targetRef="completeTask3"></sequenceFlow>
+            <sequenceFlow id="sequenceFlow4-2733be17-cb5e-438d-84b9-472b7a7e8ec2" sourceRef="completeTask3"
+                          targetRef="assertion"></sequenceFlow>
+            <sequenceFlow id="sequenceFlow5-f962b32c-aa98-4b48-8e15-26262a6e817a" sourceRef="assertion"
+                          targetRef="end"></sequenceFlow>
+        </subProcess>
+        <sequenceFlow id="sequenceFlow2-8dd2a267-2cfa-45fa-bd88-1690c4ceb79a" sourceRef="_testSubProcess"
+                      targetRef="_endTest"></sequenceFlow>
+        <endEvent id="_endTest"></endEvent>
+    </process>
+</definitions>

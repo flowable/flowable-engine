@@ -331,7 +331,7 @@ public class ModelServiceImpl implements ModelService {
 
     protected List<ObjectNode> addAssertion(List<ObjectNode> nodes) {
         nodes.add(nodes.size(), createScriptTask(nodes.size(), "assertion", "assertThat",
-                "import static org.flowable.app.service.runtime.TestHelper.* ;\n" +
+                "import static org.flowable.crystalball.simulator.SimUtils.* ;\n" +
                         "import static org.hamcrest.core.Is.is;\n" +
                         "import static org.flowable.engine.test.MatcherAssert.assertThat;\n" +
                         "\n" +
@@ -455,7 +455,7 @@ public class ModelServiceImpl implements ModelService {
                     try {
                         StringBuilder variablesScript = getVariablesScript(eventLogEntry);
                         nodes.add(createScriptTask(position++, "startProcess", "Start " + key + " process",
-                                "import static org.flowable.app.service.runtime.TestHelper.*;\n" +
+                                "import static org.flowable.crystalball.simulator.SimUtils.*;\n" +
                                         "\n" +
                                         "processInstanceBuilder = getVirtualProcessEngine(execution).getRuntimeService().createProcessInstanceBuilder().processDefinitionKey('" +
                                         key + "');\n" +
@@ -473,7 +473,7 @@ public class ModelServiceImpl implements ModelService {
                         Object messageName = objectMapper.readValue(eventLogEntry.get("data").binaryValue(), Map.class).get("messageName");
                         nodes.add(createScriptTask(position, "sendMessage" + position++, "Send message " + messageName,
 
-                        "import static org.flowable.app.service.runtime.TestHelper.*;\n" +
+                        "import static org.flowable.crystalball.simulator.SimUtils.*;\n" +
                                 "\n" +
                                 "runtimeService = getVirtualProcessEngine(execution).getRuntimeService()\n" +
                                 "subscription= runtimeService.createEventSubscriptionQuery().processInstanceId(processInstanceId)" +
@@ -492,7 +492,7 @@ public class ModelServiceImpl implements ModelService {
                         String taskDefinitionKey = (String) objectMapper.readValue(eventLogEntry.get("data").binaryValue(), Map.class).get("taskDefinitionKey");
                     nodes.add(createScriptTask(position, "claimTask" + position++, "Claim task " +
                                     taskDefinitionKey + " to user "+ eventLogEntry.get("userId"),
-                            "import static org.flowable.app.service.runtime.TestHelper.*;\n" +
+                            "import static org.flowable.crystalball.simulator.SimUtils.*;\n" +
                                     "\n" +
                                     "processInstanceIds = getSubProcessInstanceIds(processInstanceId, execution);\n" +
                                     "taskId = getVirtualProcessEngine(execution).getTaskService().createTaskQuery().processInstanceIdIn(processInstanceIds)." +
@@ -505,7 +505,7 @@ public class ModelServiceImpl implements ModelService {
                     break;
                 case "TIMER_FIRED":
                     nodes.add(createScriptTask(position, "fireAllTimers" + position++, "Fire all timers",
-                            "import static org.flowable.app.service.runtime.TestHelper.*;\n" +
+                            "import static org.flowable.crystalball.simulator.SimUtils.*;\n" +
                                     "\n" +
                                     "processInstanceIds = getSubProcessInstanceIds(processInstanceId, execution);\n" +
                                     "managementService = getVirtualProcessEngine(execution).getManagementService();\n" +
@@ -522,7 +522,7 @@ public class ModelServiceImpl implements ModelService {
                     try {
                         String taskDefinitionKey = (String) objectMapper.readValue(eventLogEntry.get("data").binaryValue(), Map.class).get("taskDefinitionKey");
                         nodes.add(createScriptTask(position, "completeTask"+position++, "Complete task "+ taskDefinitionKey,
-                            "import static org.flowable.app.service.runtime.TestHelper.*;\n" +
+                            "import static org.flowable.crystalball.simulator.SimUtils.*;\n" +
                                     "\n" +
                                     "processInstanceIds = getSubProcessInstanceIds(processInstanceId, execution);\n" +
                                     "taskId = getVirtualProcessEngine(execution).getTaskService().createTaskQuery()." +

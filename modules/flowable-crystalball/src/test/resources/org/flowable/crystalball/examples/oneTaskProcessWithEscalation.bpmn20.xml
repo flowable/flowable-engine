@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.activiti.org/test">
+
+  <process id="oneTaskProcess" name="One task Process">
+    <documentation>This is a process for testing purposes</documentation>
+
+    <startEvent id="theStart"/>
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="userTask"/>
+
+    <userTask id="userTask"/>
+
+    <sequenceFlow id="flow2" sourceRef="userTask" targetRef="theEnd"/>
+    <endEvent id="theEnd"/>
+
+    <boundaryEvent id="escalationTimer" attachedToRef="userTask" cancelActivity="true">
+      <timerEventDefinition>
+        <timeDuration>PT10H</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+
+    <sequenceFlow id="flow3" sourceRef="escalationTimer" targetRef="escalationUserTask"/>
+    <userTask id="escalationUserTask" name="Escalation"/>
+
+    <sequenceFlow id="flow4" sourceRef="escalationUserTask" targetRef="theEnd"/>
+
+  </process>
+
+</definitions>
