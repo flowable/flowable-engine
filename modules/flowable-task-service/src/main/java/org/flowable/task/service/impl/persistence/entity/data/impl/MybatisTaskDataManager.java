@@ -25,6 +25,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
 import org.flowable.task.service.impl.persistence.entity.data.TaskDataManager;
 import org.flowable.task.service.impl.persistence.entity.data.impl.cachematcher.TasksByExecutionIdMatcher;
+import org.flowable.task.service.impl.persistence.entity.data.impl.cachematcher.TasksByScopeIdAndScopeTypeMatcher;
 import org.flowable.task.service.impl.persistence.entity.data.impl.cachematcher.TasksBySubScopeIdAndScopeTypeMatcher;
 import org.flowable.task.service.impl.util.CommandContextUtil;
 
@@ -35,7 +36,9 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
 
     protected CachedEntityMatcher<TaskEntity> tasksByExecutionIdMatcher = new TasksByExecutionIdMatcher();
     
-    protected CachedEntityMatcher<TaskEntity> tasksBySubScopeIdAndScopeType = new TasksBySubScopeIdAndScopeTypeMatcher();
+    protected CachedEntityMatcher<TaskEntity> tasksBySubScopeIdAndScopeTypeMatcher = new TasksBySubScopeIdAndScopeTypeMatcher();
+    
+    protected CachedEntityMatcher<TaskEntity> tasksByScopeIdAndScopeTypeMatcher = new TasksByScopeIdAndScopeTypeMatcher();
 
     @Override
     public Class<? extends TaskEntity> getManagedEntityClass() {
@@ -59,11 +62,19 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
     }
     
     @Override
-    public List<TaskEntity> findTasksBySubScopeIdScopeType(String subScopeId, String scopeType) {
+    public List<TaskEntity> findTasksByScopeIdAndScopeType(String scopeId, String scopeType) {
+        Map<String, String> params = new HashMap<>();
+        params.put("scopeId", scopeId);
+        params.put("scopeType", scopeType);
+        return getList("selectTasksByScopeIdAndScopeType", params, tasksByScopeIdAndScopeTypeMatcher, true);
+    }
+    
+    @Override
+    public List<TaskEntity> findTasksBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
         Map<String, String> params = new HashMap<>();
         params.put("subScopeId", subScopeId);
         params.put("scopeType", scopeType);
-        return getList("selectTasksBySubScopeIdAndScopeType", params, tasksBySubScopeIdAndScopeType, true);
+        return getList("selectTasksBySubScopeIdAndScopeType", params, tasksBySubScopeIdAndScopeTypeMatcher, true);
     }
 
     @Override

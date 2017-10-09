@@ -96,6 +96,8 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected List<String> processCategoryNotInList;
     protected String deploymentId;
     protected List<String> deploymentIds;
+    protected String cmmnDeploymentId;
+    protected List<String> cmmnDeploymentIds;
     protected String processInstanceBusinessKey;
     protected String processInstanceBusinessKeyLike;
     protected String processInstanceBusinessKeyLikeIgnoreCase;
@@ -1163,6 +1165,26 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
         return this;
     }
+    
+    @Override
+    public TaskQuery cmmnDeploymentId(String cmmnDeploymentId) {
+        if (orActive) {
+            currentOrQueryObject.cmmnDeploymentId = cmmnDeploymentId;
+        } else {
+            this.cmmnDeploymentId = cmmnDeploymentId;
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQuery cmmnDeploymentIdIn(List<String> cmmnDeploymentIds) {
+        if (orActive) {
+            currentOrQueryObject.cmmnDeploymentIds = cmmnDeploymentIds;
+        } else {
+            this.cmmnDeploymentIds = cmmnDeploymentIds;
+        }
+        return this;
+    }
 
     public TaskQuery dueDate(Date dueDate) {
         if (orActive) {
@@ -1700,6 +1722,14 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public List<String> getDeploymentIds() {
         return deploymentIds;
+    }
+    
+    public String getCmmnDeploymentId() {
+        return cmmnDeploymentId;
+    }
+
+    public List<String> getCmmnDeploymentIds() {
+        return cmmnDeploymentIds;
     }
 
     public String getProcessInstanceBusinessKeyLike() {

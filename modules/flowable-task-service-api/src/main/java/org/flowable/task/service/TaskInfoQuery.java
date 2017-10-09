@@ -347,6 +347,16 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * Only select tasks which are part of a process instance which has the given deployment id.
      */
     T deploymentIdIn(List<String> deploymentIds);
+    
+    /**
+     * Only select tasks which are related to a case instance for to the given deployment id.
+     */
+    T cmmnDeploymentId(String cmmnDeploymentId);
+    
+    /**
+     * Only select tasks which are related to a case instances for the given deployment id.
+     */
+    T cmmnDeploymentIdIn(List<String> cmmnDeploymentIds);
 
     /**
      * Only select tasks which have a local task variable with the given name set to the given value.

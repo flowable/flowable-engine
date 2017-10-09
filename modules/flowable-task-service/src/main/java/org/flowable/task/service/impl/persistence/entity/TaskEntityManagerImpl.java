@@ -91,8 +91,13 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     }
     
     @Override
-    public List<TaskEntity> findTasksBySubScopeIdScopeType(String subScopeId, String scopeType) {
-        return taskDataManager.findTasksBySubScopeIdScopeType(subScopeId, scopeType);
+    public List<TaskEntity> findTasksByScopeIdAndScopeType(String scopeId, String scopeType) {
+        return taskDataManager.findTasksByScopeIdAndScopeType(scopeId, scopeType);
+    }
+    
+    @Override
+    public List<TaskEntity> findTasksBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
+        return taskDataManager.findTasksBySubScopeIdAndScopeType(subScopeId, scopeType);
     }
 
     @Override

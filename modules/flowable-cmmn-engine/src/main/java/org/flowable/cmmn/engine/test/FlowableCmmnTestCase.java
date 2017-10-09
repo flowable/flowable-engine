@@ -84,6 +84,13 @@ public class FlowableCmmnTestCase {
         }
     }
     
+    protected void deployOneHumanTaskCaseModel() {
+        deploymentId = cmmnRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/one-human-task-model.cmmn")
+                .deploy()
+                .getId();
+    }
+    
     protected void deployOneTaskCaseModel() {
         deploymentId = cmmnRepositoryService.createDeployment()
                 .addClasspathResource("org/flowable/cmmn/test/one-task-model.cmmn")

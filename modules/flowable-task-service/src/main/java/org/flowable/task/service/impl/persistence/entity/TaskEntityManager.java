@@ -29,7 +29,9 @@ public interface TaskEntityManager extends EntityManager<TaskEntity> {
 
     List<TaskEntity> findTasksByProcessInstanceId(String processInstanceId);
     
-    List<TaskEntity> findTasksBySubScopeIdScopeType(String subScopeId, String scopeType);
+    List<TaskEntity> findTasksByScopeIdAndScopeType(String scopeId, String scopeType);
+    
+    List<TaskEntity> findTasksBySubScopeIdAndScopeType(String subScopeId, String scopeType);
 
     List<Task> findTasksByQueryCriteria(TaskQueryImpl taskQuery);
 

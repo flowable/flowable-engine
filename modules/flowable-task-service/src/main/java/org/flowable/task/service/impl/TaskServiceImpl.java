@@ -55,7 +55,7 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     
     @Override
     public List<TaskEntity> findTasksBySubScopeIdScopeType(String subScopeId, String scopeType) {
-        return getTaskEntityManager().findTasksBySubScopeIdScopeType(subScopeId, scopeType);
+        return getTaskEntityManager().findTasksBySubScopeIdAndScopeType(subScopeId, scopeType);
     }
 
     @Override
