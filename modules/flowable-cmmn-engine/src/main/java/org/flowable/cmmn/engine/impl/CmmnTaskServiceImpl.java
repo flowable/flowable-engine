@@ -16,8 +16,8 @@ import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnTaskService;
 import org.flowable.cmmn.engine.impl.cmd.CompleteTaskCmd;
-import org.flowable.cmmn.engine.impl.task.CmmnTaskQueryImpl;
-import org.flowable.cmmn.engine.task.TaskQuery;
+import org.flowable.task.service.TaskQuery;
+import org.flowable.task.service.impl.TaskQueryImpl;
 
 /**
  * @author Joram Barrez
@@ -41,7 +41,7 @@ public class CmmnTaskServiceImpl extends ServiceImpl implements CmmnTaskService 
     
     @Override
     public TaskQuery createTaskQuery() {
-        return new CmmnTaskQueryImpl(commandExecutor);
+        return new TaskQueryImpl(commandExecutor);
     }
 
 }

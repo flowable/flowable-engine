@@ -16,7 +16,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.flowable.cmmn.engine.impl.variable.VariableScopeType;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.cmmn.engine.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
@@ -24,6 +23,7 @@ import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.task.service.Task;
 import org.flowable.task.service.history.HistoricTaskInstance;
+import org.flowable.variable.service.type.VariableScopeType;
 import org.junit.Test;
 
 /**

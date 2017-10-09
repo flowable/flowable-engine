@@ -10,20 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.task;
-
-import org.flowable.task.service.Task;
-import org.flowable.task.service.TaskInfoQuery;
+package org.flowable.variable.service.type;
 
 /**
  * @author Joram Barrez
  */
-public interface TaskQuery extends TaskInfoQuery<TaskQuery, Task>  {
+public interface VariableScopeType {
     
-    TaskQuery caseInstanceId(String caseInstanceId);
-    
-    TaskQuery caseDefinitionId(String caseDefinitionId);
-    
-    TaskQuery planItemInstanceId(String planItemInstanceId);
+    String CMMN = "cmmn";
 
 }

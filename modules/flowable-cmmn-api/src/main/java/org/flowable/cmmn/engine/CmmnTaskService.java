@@ -14,7 +14,7 @@ package org.flowable.cmmn.engine;
 
 import java.util.Map;
 
-import org.flowable.cmmn.engine.task.TaskQuery;
+import org.flowable.task.service.TaskQuery;
 
 /**
  * @author Joram Barrez

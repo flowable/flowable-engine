@@ -30,6 +30,7 @@ import org.flowable.task.service.impl.util.CommandContextUtil;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 import org.flowable.variable.service.impl.QueryVariableValue;
 import org.flowable.variable.service.impl.types.VariableTypes;
+import org.flowable.variable.service.type.VariableScopeType;
 
 /**
  * @author Tom Baeyens
@@ -223,6 +224,42 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
             this.currentOrQueryObject.executionId = executionId;
         } else {
             this.executionId = executionId;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricTaskInstanceQueryImpl caseInstanceId(String caseInstanceId) {
+        if (inOrStatement) {
+            currentOrQueryObject.scopeId(caseInstanceId);
+            currentOrQueryObject.scopeType(VariableScopeType.CMMN);
+        } else {
+            this.scopeId(caseInstanceId);
+            this.scopeType(VariableScopeType.CMMN);
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricTaskInstanceQueryImpl caseDefinitionId(String caseDefinitionId) {
+        if (inOrStatement) {
+            currentOrQueryObject.scopeDefinitionId(caseDefinitionId);
+            currentOrQueryObject.scopeType(VariableScopeType.CMMN);
+        } else {
+            this.scopeDefinitionId(caseDefinitionId);
+            this.scopeType(VariableScopeType.CMMN);
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricTaskInstanceQueryImpl planItemInstanceId(String planItemInstanceId) {
+        if (inOrStatement) {
+            currentOrQueryObject.subScopeId(planItemInstanceId);
+            currentOrQueryObject.scopeType(VariableScopeType.CMMN);
+        } else {
+            this.subScopeId(planItemInstanceId);
+            this.scopeType(VariableScopeType.CMMN);
         }
         return this;
     }

@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.query.Query;
+import org.flowable.identitylink.service.IdentityLink;
 import org.flowable.task.service.history.HistoricTaskInstanceQuery;
 
 /**
@@ -196,6 +197,21 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * Only select tasks for the given execution.
      */
     T executionId(String executionId);
+    
+    /**
+     * Only select tasks for the given case instance.
+     */
+    T caseInstanceId(String caseInstanceId);
+    
+    /**
+     * Only select tasks for the given case definition.
+     */
+    T caseDefinitionId(String caseDefinitionId);
+    
+    /**
+     * Only select tasks for the given plan item instance. 
+     */
+    T planItemInstanceId(String planItemInstanceId);
     
     /**
      * Only select tasks for the given scope identifier. 
