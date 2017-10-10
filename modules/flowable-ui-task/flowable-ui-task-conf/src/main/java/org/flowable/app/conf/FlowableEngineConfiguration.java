@@ -113,11 +113,11 @@ public class FlowableEngineConfiguration {
         }
     }
 
-//    @Bean(name = "cmmnEngineConfiguration")
-//    public CmmnEngineConfigurationApi cmmnEngineConfiguration() {
-//        ProcessEngineConfiguration processEngineConfiguration = processEngine().getProcessEngineConfiguration();
-//        return EngineServiceUtil.getCmmnEngineConfiguration(processEngineConfiguration);
-//    }
+    @Bean(name = "cmmnEngineConfiguration")
+    public CmmnEngineConfigurationApi cmmnEngineConfiguration() {
+        ProcessEngineConfiguration processEngineConfiguration = processEngine().getProcessEngineConfiguration();
+        return EngineServiceUtil.getCmmnEngineConfiguration(processEngineConfiguration);
+    }
 
     @Bean(name = "dmnEngineConfiguration")
     public DmnEngineConfigurationApi dmnEngineConfiguration() {
