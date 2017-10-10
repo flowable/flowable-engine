@@ -15,6 +15,9 @@
             <column name="CATEGORY_" type="varchar(255)">
                 <constraints nullable="true" />
             </column>
+            <column name="KEY_" type="varchar(255)">
+                <constraints nullable="true" />
+            </column>
             <column name="DEPLOY_TIME_" type="datetime">
                 <constraints nullable="true" />
             </column>

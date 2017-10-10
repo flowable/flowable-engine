@@ -37,6 +37,8 @@ public interface CmmnDeploymentEntity extends CmmnDeployment, Entity {
     void setName(String name);
 
     void setCategory(String category);
+    
+    void setKey(String key);
 
     void setTenantId(String tenantId);
 

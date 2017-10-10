@@ -23,6 +23,7 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.task.service.TaskQuery;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.history.HistoricTaskInstance;
 import org.flowable.task.service.history.HistoricTaskInstanceQuery;
@@ -30,6 +31,7 @@ import org.flowable.task.service.impl.util.CommandContextUtil;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 import org.flowable.variable.service.impl.QueryVariableValue;
 import org.flowable.variable.service.impl.types.VariableTypes;
+import org.flowable.variable.service.type.VariableScopeType;
 
 /**
  * @author Tom Baeyens
@@ -49,6 +51,8 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected List<String> processCategoryNotInList;
     protected String deploymentId;
     protected List<String> deploymentIds;
+    protected String cmmnDeploymentId;
+    protected List<String> cmmnDeploymentIds;
     protected String processInstanceId;
     protected List<String> processInstanceIds;
     protected String processInstanceBusinessKey;
@@ -146,7 +150,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
 
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
-        if (tasks != null && taskServiceConfiguration.isEnableLocalization()) {
+        if (tasks != null && taskServiceConfiguration.getInternalTaskLocalizationManager() != null && taskServiceConfiguration.isEnableLocalization()) {
             for (HistoricTaskInstance task : tasks) {
                 taskServiceConfiguration.getInternalTaskLocalizationManager().localize(task, locale, withLocalizationFallback);
             }
@@ -223,6 +227,42 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
             this.currentOrQueryObject.executionId = executionId;
         } else {
             this.executionId = executionId;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricTaskInstanceQueryImpl caseInstanceId(String caseInstanceId) {
+        if (inOrStatement) {
+            currentOrQueryObject.scopeId(caseInstanceId);
+            currentOrQueryObject.scopeType(VariableScopeType.CMMN);
+        } else {
+            this.scopeId(caseInstanceId);
+            this.scopeType(VariableScopeType.CMMN);
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricTaskInstanceQueryImpl caseDefinitionId(String caseDefinitionId) {
+        if (inOrStatement) {
+            currentOrQueryObject.scopeDefinitionId(caseDefinitionId);
+            currentOrQueryObject.scopeType(VariableScopeType.CMMN);
+        } else {
+            this.scopeDefinitionId(caseDefinitionId);
+            this.scopeType(VariableScopeType.CMMN);
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricTaskInstanceQueryImpl planItemInstanceId(String planItemInstanceId) {
+        if (inOrStatement) {
+            currentOrQueryObject.subScopeId(planItemInstanceId);
+            currentOrQueryObject.scopeType(VariableScopeType.CMMN);
+        } else {
+            this.subScopeId(planItemInstanceId);
+            this.scopeType(VariableScopeType.CMMN);
         }
         return this;
     }
@@ -397,6 +437,26 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
             currentOrQueryObject.deploymentIds = deploymentIds;
         } else {
             this.deploymentIds = deploymentIds;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricTaskInstanceQuery cmmnDeploymentId(String cmmnDeploymentId) {
+        if (inOrStatement) {
+            currentOrQueryObject.cmmnDeploymentId = cmmnDeploymentId;
+        } else {
+            this.cmmnDeploymentId = cmmnDeploymentId;
+        }
+        return this;
+    }
+    
+    @Override
+    public HistoricTaskInstanceQuery cmmnDeploymentIdIn(List<String> cmmnDeploymentIds) {
+        if (inOrStatement) {
+            currentOrQueryObject.cmmnDeploymentIds = cmmnDeploymentIds;
+        } else {
+            this.cmmnDeploymentIds = cmmnDeploymentIds;
         }
         return this;
     }
@@ -1498,6 +1558,14 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public List<String> getDeploymentIds() {
         return deploymentIds;
+    }
+    
+    public String getCmmnDeploymentId() {
+        return cmmnDeploymentId;
+    }
+
+    public List<String> getCmmnDeploymentIds() {
+        return cmmnDeploymentIds;
     }
 
     public String getProcessInstanceBusinessKeyLike() {

@@ -15,11 +15,21 @@ package org.flowable.app.service.editor;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
+
+import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.flowable.app.domain.editor.AppDefinition;
 import org.flowable.app.domain.editor.Model;
 import org.flowable.app.service.api.AppDefinitionService;
@@ -88,7 +98,49 @@ public class AppDefinitionPublishService extends BaseAppDefinitionService {
         entityBuilder.addBinaryBody("artifact", zipArtifact, ContentType.DEFAULT_BINARY, artifactName);
 
         HttpEntity entity = entityBuilder.build();
-        executePostRequest(deployApiUrl, basicAuthUser, basicAuthPassword, entity, HttpStatus.SC_CREATED);
+        httpPost.setEntity(entity);
+
+        HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+        try {
+            SSLContextBuilder builder = new SSLContextBuilder();
+            builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+            clientBuilder.setSSLSocketFactory(
+                    new SSLConnectionSocketFactory(builder.build(), new HostnameVerifier() {
+                        @Override
+                        public boolean verify(String s, SSLSession sslSession) {
+                            return true;
+                        }
+                    })
+            );
+
+        } catch (Exception e) {
+            LOGGER.error("Could not configure SSL for http client", e);
+            throw new InternalServerErrorException("Could not configure SSL for http client", e);
+        }
+
+        CloseableHttpClient client = clientBuilder.build();
+
+        try {
+            HttpResponse response = client.execute(httpPost);
+            if (response.getStatusLine().getStatusCode() == HttpStatus.SC_CREATED) {
+                return;
+            } else {
+                LOGGER.error("Invalid deploy result code: {}", response.getStatusLine());
+                throw new InternalServerErrorException("Invalid deploy result code: " + response.getStatusLine());
+            }
+
+        } catch (IOException ioe) {
+            LOGGER.error("Error calling deploy endpoint", ioe);
+            throw new InternalServerErrorException("Error calling deploy endpoint: " + ioe.getMessage());
+        } finally {
+            if (client != null) {
+                try {
+                    client.close();
+                } catch (IOException e) {
+                    LOGGER.warn("Exception while closing http client", e);
+                }
+            }
+        }
     }
 
     protected String encode(String string) {

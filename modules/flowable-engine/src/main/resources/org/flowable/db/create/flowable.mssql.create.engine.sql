@@ -181,18 +181,6 @@ create table ACT_RE_PROCDEF (
     primary key (ID_)
 );
 
-create table ACT_RU_IDENTITYLINK (
-    ID_ nvarchar(64),
-    REV_ int,
-    GROUP_ID_ nvarchar(255),
-    TYPE_ nvarchar(255),
-    USER_ID_ nvarchar(255),
-    TASK_ID_ nvarchar(64),
-    PROC_INST_ID_ nvarchar(64),
-    PROC_DEF_ID_ nvarchar(64),
-    primary key (ID_)
-);
-
 create table ACT_RU_EVENT_SUBSCR (
     ID_ nvarchar(64) not null,
     REV_ int,
@@ -234,8 +222,6 @@ create table ACT_PROCDEF_INFO (
 
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDX_EXEC_ROOT on ACT_RU_EXECUTION(ROOT_PROC_INST_ID_);
-create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);
-create index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK(GROUP_ID_);
 create index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR(CONFIGURATION_);
 create index ACT_IDX_VARIABLE_TASK_ID on ACT_RU_VARIABLE(TASK_ID_);
 create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);

@@ -15,7 +15,7 @@ package org.flowable.cmmn.engine.configurator.impl.deployer;
 import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnRepositoryService;
-import org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.repository.CmmnDeploymentBuilder;
 import org.flowable.engine.impl.persistence.deploy.Deployer;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
@@ -30,12 +30,6 @@ public class CmmnDeployer implements Deployer {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(CmmnDeployer.class);
     
-    protected CmmnEngineConfigurator cmmnEngineConfigurator;
-    
-    public CmmnDeployer(CmmnEngineConfigurator cmmnEngineConfigurator) {
-        this.cmmnEngineConfigurator = cmmnEngineConfigurator;
-    }
-
     @Override
     public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
         if (!deployment.isNew()) {
@@ -50,7 +44,7 @@ public class CmmnDeployer implements Deployer {
             if (org.flowable.cmmn.engine.impl.deployer.CmmnDeployer.isCmmnResource(resourceName)) {
                 LOGGER.info("CmmnDeployer: processing resource {}", resourceName);
                 if (cmmnDeploymentBuilder == null) {
-                    CmmnRepositoryService cmmnRepositoryService = cmmnEngineConfigurator.getCmmnEngine().getCmmnRepositoryService();
+                    CmmnRepositoryService cmmnRepositoryService = CommandContextUtil.getCmmnRepositoryService();
                     cmmnDeploymentBuilder = cmmnRepositoryService.createDeployment();
                 }
                 cmmnDeploymentBuilder.addBytes(resourceName, resources.get(resourceName).getBytes());
@@ -59,6 +53,7 @@ public class CmmnDeployer implements Deployer {
 
         if (cmmnDeploymentBuilder != null) {
             cmmnDeploymentBuilder.parentDeploymentId(deployment.getId());
+            cmmnDeploymentBuilder.key(deployment.getKey());
             if (deployment.getTenantId() != null && deployment.getTenantId().length() > 0) {
                 cmmnDeploymentBuilder.tenantId(deployment.getTenantId());
             }

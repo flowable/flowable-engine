@@ -1,6 +1,4 @@
 drop index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION;
-drop index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK;
-drop index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK;
 drop index ACT_IDX_VARIABLE_TASK_ID on ACT_RU_VARIABLE;
 drop index ACT_IDX_INFO_PROCDEF on ACT_PROCDEF_INFO;
 
@@ -21,6 +19,9 @@ alter table ACT_RU_EXECUTION
 
 alter table ACT_RU_IDENTITYLINK
     drop FOREIGN KEY ACT_FK_TSKASS_TASK;
+    
+alter table ACT_RU_IDENTITYLINK
+    drop FOREIGN KEY ACT_FK_IDL_PROCINST;    
 
 alter table ACT_RU_IDENTITYLINK
     drop FOREIGN KEY ACT_FK_ATHRZ_PROCEDEF;
@@ -111,7 +112,6 @@ drop index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR;
     
 drop table if exists ACT_RE_DEPLOYMENT;
 drop table if exists ACT_RE_MODEL;
-drop table if exists ACT_RU_IDENTITYLINK;
 drop table if exists ACT_RE_PROCDEF;
 drop table if exists ACT_RU_EXECUTION;
 drop table if exists ACT_RU_JOB;

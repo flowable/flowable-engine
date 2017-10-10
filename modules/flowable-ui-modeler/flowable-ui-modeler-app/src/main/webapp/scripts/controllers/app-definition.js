@@ -21,8 +21,20 @@ angular.module('flowableModeler')
     $scope.model = {
         // Store the main model id, this points to the current version of a model,
         // even when we're showing history
-        latestModelId: $routeParams.modelId
+        latestModelId: $routeParams.modelId,
+        activeTab: 'bpmn'
     };
+    
+    $scope.tabs = [
+        {
+            id: 'bpmn',
+            title: 'BPMN models'
+        },
+        {
+            id: 'cmmn',
+            title: 'CMMN models'
+        }
+    ];
 
     $scope.loadApp = function() {
     	var url;

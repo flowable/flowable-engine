@@ -119,6 +119,7 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
         try {
             
             getCommonDbSchemaManager().dbSchemaCreate();
+            getIdentityLinkDbSchemaManager().dbSchemaCreate();
             getTaskDbSchemaManager().dbSchemaCreate();
             getVariableDbSchemaManager().dbSchemaCreate();
             
@@ -151,6 +152,13 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
         }
         
         try {
+            getIdentityLinkDbSchemaManager().dbSchemaDrop();
+        } catch (Exception e) {
+            LOGGER.info("Error dropping identity link tables", e);
+        }
+        
+        
+        try {
             getCommonDbSchemaManager().dbSchemaDrop();
         } catch (Exception e) {
             LOGGER.info("Error dropping common tables", e);
@@ -162,6 +170,7 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
         try {
             
             getCommonDbSchemaManager().dbSchemaUpdate();
+            getIdentityLinkDbSchemaManager().dbSchemaUpdate();
             getTaskDbSchemaManager().dbSchemaUpdate();
             getVariableDbSchemaManager().dbSchemaUpdate();
             
@@ -176,6 +185,10 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
     
     protected DbSchemaManager getCommonDbSchemaManager() {
         return CommandContextUtil.getCmmnEngineConfiguration().getCommonDbSchemaManager();
+    }
+    
+    protected DbSchemaManager getIdentityLinkDbSchemaManager() {
+        return CommandContextUtil.getCmmnEngineConfiguration().getIdentityLinkDbSchemaManager();
     }
     
     protected DbSchemaManager getVariableDbSchemaManager() {

@@ -138,7 +138,7 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
     public String getProperty(String propertyName) {
         PreparedStatement statement = null;
         try {
-            String tableName = PROPERTY_TABLE;
+            String tableName = getPropertyTable();
             if (!getDbSqlSession().getDbSqlSessionFactory().isTablePrefixIsSchema()) {
                 tableName = prependDatabaseTablePrefix(tableName);
             }
@@ -167,7 +167,7 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
         PreparedStatement statement = null;
         PreparedStatement statement2 = null;
         try {
-            String tableName = PROPERTY_TABLE;
+            String tableName = getPropertyTable();
             if (!getDbSqlSession().getDbSqlSessionFactory().isTablePrefixIsSchema()) {
                 tableName = prependDatabaseTablePrefix(tableName);
             }
@@ -202,6 +202,10 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
         }
     }
     
+    protected String getPropertyTable() {
+        return PROPERTY_TABLE;
+    }
+    
     public String getResourceForDbOperation(String directory, String operation, String component, String databaseType) {
         return getResourcesRootDirectory() + directory + "/flowable." + databaseType + "." + operation + "." + component + ".sql";
     }
@@ -219,7 +223,7 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
             inputStream = ReflectUtil.getResourceAsStream(resourceName);
             if (inputStream == null) {
                 if (isOptional) {
-                    LOGGER.info("no schema resource {} for {}", resourceName, operation);
+                    LOGGER.debug("no schema resource {} for {}", resourceName, operation);
                 } else {
                     throw new FlowableException("resource '" + resourceName + "' is not available");
                 }

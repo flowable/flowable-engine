@@ -30,6 +30,8 @@ public interface CmmnEngine {
     
     CmmnRuntimeService getCmmnRuntimeService();
     
+    CmmnTaskService getCmmnTaskService();
+    
     CmmnManagementService getCmmnManagementService();
     
     CmmnRepositoryService getCmmnRepositoryService();

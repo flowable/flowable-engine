@@ -14,6 +14,7 @@ package org.flowable.cmmn.converter;
 
 import javax.xml.stream.XMLStreamReader;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.HumanTask;
 
@@ -31,6 +32,30 @@ public class HumanTaskXmlConverter extends TaskXmlConverter {
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         HumanTask task = new HumanTask();
         convertCommonTaskAttributes(xtr, task);
+        
+        task.setAssignee(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_ASSIGNEE));
+        task.setOwner(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_OWNER));
+        task.setPriority(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_PRIORITY));
+        task.setFormKey(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_FORM_KEY));
+        task.setDueDate(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_DUE_DATE));
+        task.setCategory(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_CATEGORY));
+        
+        String candidateUsersString =  xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_USER_CANDIDATEUSERS);
+        if (StringUtils.isNotEmpty(candidateUsersString)) {
+            String[] candidateUsers = candidateUsersString.split(",");
+            for (String candidateUser : candidateUsers) {
+                task.getCandidateUsers().add(candidateUser);
+            }
+        }
+        
+        String candidateGroupsString =  xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_USER_CANDIDATEGROUPS);
+        if (StringUtils.isNotEmpty(candidateGroupsString)) {
+            String[] candidateGroups = candidateGroupsString.split(",");
+            for (String candidateGroup : candidateGroups) {
+                task.getCandidateUsers().add(candidateGroup);
+            }
+        }
+        
         return task;
     }
 

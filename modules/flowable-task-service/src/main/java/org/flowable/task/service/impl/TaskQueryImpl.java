@@ -31,6 +31,7 @@ import org.flowable.task.service.impl.util.CommandContextUtil;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 import org.flowable.variable.service.impl.QueryVariableValue;
 import org.flowable.variable.service.impl.types.VariableTypes;
+import org.flowable.variable.service.type.VariableScopeType;
 
 /**
  * @author Joram Barrez
@@ -95,6 +96,8 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected List<String> processCategoryNotInList;
     protected String deploymentId;
     protected List<String> deploymentIds;
+    protected String cmmnDeploymentId;
+    protected List<String> cmmnDeploymentIds;
     protected String processInstanceBusinessKey;
     protected String processInstanceBusinessKeyLike;
     protected String processInstanceBusinessKeyLikeIgnoreCase;
@@ -674,6 +677,42 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     }
     
     @Override
+    public TaskQuery caseInstanceId(String caseInstanceId) {
+        if (orActive) {
+            currentOrQueryObject.scopeId(caseInstanceId);
+            currentOrQueryObject.scopeType(VariableScopeType.CMMN);
+        } else {
+            this.scopeId(caseInstanceId);
+            this.scopeType(VariableScopeType.CMMN);
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQuery caseDefinitionId(String caseDefinitionId) {
+        if (orActive) {
+            currentOrQueryObject.scopeDefinitionId(caseDefinitionId);
+            currentOrQueryObject.scopeType(VariableScopeType.CMMN);
+        } else {
+            this.scopeDefinitionId(caseDefinitionId);
+            this.scopeType(VariableScopeType.CMMN);
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQuery planItemInstanceId(String planItemInstanceId) {
+        if (orActive) {
+            currentOrQueryObject.subScopeId(planItemInstanceId);
+            currentOrQueryObject.scopeType(VariableScopeType.CMMN);
+        } else {
+            this.subScopeId(planItemInstanceId);
+            this.scopeType(VariableScopeType.CMMN);
+        }
+        return this;
+    }
+    
+    @Override
     public TaskQueryImpl scopeId(String scopeId) {
         if (orActive) {
             currentOrQueryObject.scopeId = scopeId;
@@ -1126,6 +1165,26 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
         return this;
     }
+    
+    @Override
+    public TaskQuery cmmnDeploymentId(String cmmnDeploymentId) {
+        if (orActive) {
+            currentOrQueryObject.cmmnDeploymentId = cmmnDeploymentId;
+        } else {
+            this.cmmnDeploymentId = cmmnDeploymentId;
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQuery cmmnDeploymentIdIn(List<String> cmmnDeploymentIds) {
+        if (orActive) {
+            currentOrQueryObject.cmmnDeploymentIds = cmmnDeploymentIds;
+        } else {
+            this.cmmnDeploymentIds = cmmnDeploymentIds;
+        }
+        return this;
+    }
 
     public TaskQuery dueDate(Date dueDate) {
         if (orActive) {
@@ -1435,7 +1494,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
 
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
-        if (tasks != null && taskServiceConfiguration.isEnableLocalization()) {
+        if (tasks != null && taskServiceConfiguration.getInternalTaskLocalizationManager() != null && taskServiceConfiguration.isEnableLocalization()) {
             for (Task task : tasks) {
                 taskServiceConfiguration.getInternalTaskLocalizationManager().localize(task, locale, withLocalizationFallback);
             }
@@ -1663,6 +1722,14 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public List<String> getDeploymentIds() {
         return deploymentIds;
+    }
+    
+    public String getCmmnDeploymentId() {
+        return cmmnDeploymentId;
+    }
+
+    public List<String> getCmmnDeploymentIds() {
+        return cmmnDeploymentIds;
     }
 
     public String getProcessInstanceBusinessKeyLike() {

@@ -68,6 +68,11 @@ public class ModelsResource {
     public ResultListDataRepresentation getModelsToIncludeInAppDefinition() {
         return modelQueryService.getModelsToIncludeInAppDefinition();
     }
+    
+    @RequestMapping(value = "/rest/cmmn-models-for-app-definition", method = RequestMethod.GET, produces = "application/json")
+    public ResultListDataRepresentation getCmmnModelsToIncludeInAppDefinition() {
+        return modelQueryService.getCmmnModelsToIncludeInAppDefinition();
+    }
 
     @RequestMapping(value = "/rest/import-process-model", method = RequestMethod.POST, produces = "application/json")
     public ModelRepresentation importProcessModel(HttpServletRequest request, @RequestParam("file") MultipartFile file) {

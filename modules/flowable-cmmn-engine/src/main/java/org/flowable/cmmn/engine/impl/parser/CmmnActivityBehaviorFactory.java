@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.parser;
 
 import org.flowable.cmmn.engine.impl.behavior.impl.CaseTaskActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.HumanTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.MilestoneActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemDelegateExpressionActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemExpressionActivityBehavior;
@@ -21,6 +22,7 @@ import org.flowable.cmmn.engine.impl.behavior.impl.StageActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.TaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegate;
 import org.flowable.cmmn.model.CaseTask;
+import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.ProcessTask;
@@ -38,6 +40,8 @@ public interface CmmnActivityBehaviorFactory {
     MilestoneActivityBehavior createMilestoneActivityBehavior(PlanItem planItem, Milestone milestone);
     
     TaskActivityBehavior createTaskActivityBehavior(PlanItem planItem, Task task);
+    
+    HumanTaskActivityBehavior createHumanTaskActivityBehavior(PlanItem planItem, HumanTask humanTask);
     
     CaseTaskActivityBehavior createCaseTaskActivityBehavior(PlanItem planItem, CaseTask caseTask);
     

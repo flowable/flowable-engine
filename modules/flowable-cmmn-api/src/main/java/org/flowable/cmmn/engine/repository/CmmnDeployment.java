@@ -23,6 +23,8 @@ public interface CmmnDeployment {
     Date getDeploymentTime();
 
     String getCategory();
+    
+    String getKey();
 
     String getTenantId();
 

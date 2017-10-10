@@ -89,6 +89,15 @@ public interface CmmnXmlConstants {
     String ELEMENT_FIELD_STRING = "string";
     String ELEMENT_FIELD_EXPRESSION = "expression";
     
+    String ATTRIBUTE_ASSIGNEE = "assignee";
+    String ATTRIBUTE_OWNER = "owner";
+    String ATTRIBUTE_PRIORITY = "priority";
+    String ATTRIBUTE_FORM_KEY = "formKey";
+    String ATTRIBUTE_DUE_DATE = "dueDate";
+    String ATTRIBUTE_CATEGORY = "category";
+    String ATTRIBUTE_USER_CANDIDATEUSERS = "candidateUsers";
+    String ATTRIBUTE_USER_CANDIDATEGROUPS = "candidateGroups";
+    
     String ELEMENT_DI_CMMN = "CMMNDI";
     String ELEMENT_DI_DIAGRAM = "CMMNDiagram";
     String ELEMENT_DI_SHAPE = "CMMNShape";

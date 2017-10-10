@@ -273,6 +273,7 @@ import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.parse.BpmnParseHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
+import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.flowable.job.service.HistoryJobHandler;
@@ -741,7 +742,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // agenda factory
     protected FlowableEngineAgendaFactory agendaFactory;
-
+    protected DbSchemaManager identityLinkDbSchemaManager;
     protected DbSchemaManager variableDbSchemaManager;
     protected DbSchemaManager taskDbSchemaManager;
 
@@ -921,6 +922,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void initDbSchemaManagers() {
         super.initDbSchemaManager();
         initProcessDbSchemaManager();
+        initIdentityLinkDbSchemaManager();
         initVariableDbSchemaManager();
         initTaskDbSchemaManager();
     }
@@ -940,6 +942,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected void initTaskDbSchemaManager() {
         if (this.taskDbSchemaManager == null) {
             this.taskDbSchemaManager = new TaskDbSchemaManager();
+        }
+    }
+
+    protected void initIdentityLinkDbSchemaManager() {
+        if (this.identityLinkDbSchemaManager == null) {
+            this.identityLinkDbSchemaManager = new IdentityLinkDbSchemaManager();
         }
     }
 
@@ -3436,6 +3444,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setTaskDbSchemaManager(DbSchemaManager taskDbSchemaManager) {
         this.taskDbSchemaManager = taskDbSchemaManager;
+        return this;
+    }
+
+    public DbSchemaManager getIdentityLinkDbSchemaManager() {
+        return identityLinkDbSchemaManager;
+    }
+
+    public ProcessEngineConfigurationImpl setIdentityLinkDbSchemaManager(DbSchemaManager identityLinkDbSchemaManager) {
+        this.identityLinkDbSchemaManager = identityLinkDbSchemaManager;
         return this;
     }
 
