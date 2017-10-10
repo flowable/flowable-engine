@@ -32,6 +32,8 @@ public class MultiInstanceExport implements BpmnXMLConstants {
         if (activity.getLoopCharacteristics() != null) {
             MultiInstanceLoopCharacteristics multiInstanceObject = activity.getLoopCharacteristics();
             CollectionHandler handler = multiInstanceObject.getHandler();
+            boolean didWriteExtensionStartElement = false;
+
             if (StringUtils.isNotEmpty(multiInstanceObject.getLoopCardinality()) || StringUtils.isNotEmpty(multiInstanceObject.getInputDataItem())
                     || StringUtils.isNotEmpty(multiInstanceObject.getCompletionCondition()) || StringUtils.isNotEmpty(multiInstanceObject.getCollectionString())) {
 
@@ -41,24 +43,16 @@ public class MultiInstanceExport implements BpmnXMLConstants {
                 if (handler == null && StringUtils.isNotEmpty(multiInstanceObject.getInputDataItem())) {
                     BpmnXMLUtil.writeQualifiedAttribute(ATTRIBUTE_MULTIINSTANCE_COLLECTION, multiInstanceObject.getInputDataItem(), xtw);
                 }
+
                 if (StringUtils.isNotEmpty(multiInstanceObject.getElementVariable())) {
                     BpmnXMLUtil.writeQualifiedAttribute(ATTRIBUTE_MULTIINSTANCE_VARIABLE, multiInstanceObject.getElementVariable(), xtw);
                 }
-                if (StringUtils.isNotEmpty(multiInstanceObject.getLoopCardinality())) {
-                    xtw.writeStartElement(ELEMENT_MULTIINSTANCE_CARDINALITY);
-                    xtw.writeCharacters(multiInstanceObject.getLoopCardinality());
-                    xtw.writeEndElement();
-                }
-                if (StringUtils.isNotEmpty(multiInstanceObject.getCompletionCondition())) {
-                    xtw.writeStartElement(ELEMENT_MULTIINSTANCE_CONDITION);
-                    xtw.writeCharacters(multiInstanceObject.getCompletionCondition());
-                    xtw.writeEndElement();
-                }
 
-                // check for collection element handler
+                // check for collection element handler extension first since process validation is order-dependent
                 if (handler != null) {
                     // start extensions
                     xtw.writeStartElement(ELEMENT_EXTENSIONS);
+                    didWriteExtensionStartElement = true;
                     
                     // start collection element
                     xtw.writeStartElement(FLOWABLE_EXTENSIONS_NAMESPACE, ELEMENT_MULTIINSTANCE_COLLECTION);
@@ -84,17 +78,31 @@ public class MultiInstanceExport implements BpmnXMLConstants {
                 }
                 
             	
-            	// check for extension elements
+            	// check for other custom extension elements
                 Map<String, List<ExtensionElement>> extensions = multiInstanceObject.getExtensionElements();
                 if (!extensions.isEmpty()) {
-                	BpmnXMLUtil.writeExtensionElements(multiInstanceObject, handler != null, model.getNamespaces(), xtw);
+                	didWriteExtensionStartElement = BpmnXMLUtil.writeExtensionElements(multiInstanceObject, didWriteExtensionStartElement, model.getNamespaces(), xtw);
                 }
 
-            	// end extensions element
-            	if (handler != null) {
-            		xtw.writeEndElement();
-            	}
+                // end extensions element
+                if (didWriteExtensionStartElement) {
+                	xtw.writeEndElement();
+                }
 
+                // process validation expects other child elements to come after extensions
+                if (StringUtils.isNotEmpty(multiInstanceObject.getLoopCardinality())) {
+                    xtw.writeStartElement(ELEMENT_MULTIINSTANCE_CARDINALITY);
+                    xtw.writeCharacters(multiInstanceObject.getLoopCardinality());
+                    xtw.writeEndElement();
+                }
+
+            	if (StringUtils.isNotEmpty(multiInstanceObject.getCompletionCondition())) {
+                    xtw.writeStartElement(ELEMENT_MULTIINSTANCE_CONDITION);
+                    xtw.writeCharacters(multiInstanceObject.getCompletionCondition());
+                    xtw.writeEndElement();
+                }
+
+                // end multi-instance element
                 xtw.writeEndElement();
             }
         }

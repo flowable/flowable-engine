@@ -41,6 +41,7 @@
              <flowable:expression>${potentialOwnerList}</flowable:expression>
           </flowable:collection>
         </extensionElements>
+        <completionCondition>${nrOfInstances==2}</completionCondition>
       </multiInstanceLoopCharacteristics>
       </userTask>
       <sequenceFlow id="subFlowId1" sourceRef="subStartEvent" targetRef="subUserTask1"></sequenceFlow>
