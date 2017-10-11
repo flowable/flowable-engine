@@ -53,6 +53,7 @@ public class HistoricVariableInstanceEntityManagerImpl extends AbstractEntityMan
         historicVariableInstance.setName(variableInstance.getName());
         historicVariableInstance.setVariableType(variableInstance.getType());
         historicVariableInstance.setScopeId(variableInstance.getScopeId());
+        historicVariableInstance.setSubScopeId(variableInstance.getSubScopeId());
         historicVariableInstance.setScopeType(variableInstance.getScopeType());
 
         copyVariableValue(historicVariableInstance, variableInstance);

@@ -126,18 +126,21 @@ public class VariablesTest extends FlowableCmmnTestCase {
         assertEquals(caseInstance.getId(), historicVariableInstance.getScopeId());
         assertEquals(VariableScopeType.CMMN, historicVariableInstance.getScopeType());
         assertEquals("test", historicVariableInstance.getValue());
+        assertNull(historicVariableInstance.getSubScopeId());
         
         assertEquals(123, cmmnRuntimeService.getVariable(caseInstance.getId(), "intVar"));
         historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("intVar").singleResult();
         assertEquals(caseInstance.getId(), historicVariableInstance.getScopeId());
         assertEquals(VariableScopeType.CMMN, historicVariableInstance.getScopeType());
         assertEquals(123, historicVariableInstance.getValue());
+        assertNull(historicVariableInstance.getSubScopeId());
         
         assertEquals(123.123, cmmnRuntimeService.getVariable(caseInstance.getId(), "doubleVar"));
         historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("doubleVar").singleResult();
         assertEquals(caseInstance.getId(), historicVariableInstance.getScopeId());
         assertEquals(VariableScopeType.CMMN, historicVariableInstance.getScopeType());
         assertEquals(123.123, historicVariableInstance.getValue());
+        assertNull(historicVariableInstance.getSubScopeId());
         
         // Update variables
         Map<String, Object> newVariables = new HashMap<>();
