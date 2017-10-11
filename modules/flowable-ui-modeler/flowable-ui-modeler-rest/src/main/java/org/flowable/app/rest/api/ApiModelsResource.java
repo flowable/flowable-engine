@@ -60,6 +60,11 @@ public class ApiModelsResource {
         return modelQueryService.importProcessModel(request, file);
     }
 
+    @RequestMapping(value = "/editor/import-simulation-model", method = RequestMethod.POST, produces = "application/json")
+    public ModelRepresentation importTestModel(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
+        return modelQueryService.importSimulationModel(request, file);
+    }
+
     @RequestMapping(value = "/editor/models", method = RequestMethod.POST, produces = "application/json")
     public ModelRepresentation createModel(@RequestBody ModelRepresentation modelRepresentation, @RequestParam(required = false) String skeleton) {
         modelRepresentation.setKey(modelRepresentation.getKey().replaceAll(" ", ""));

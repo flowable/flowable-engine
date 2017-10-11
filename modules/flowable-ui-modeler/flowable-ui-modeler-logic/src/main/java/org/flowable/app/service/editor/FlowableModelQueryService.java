@@ -121,31 +121,24 @@ public class FlowableModelQueryService {
 
     public ResultListDataRepresentation getModelsToIncludeInAppDefinition() {
 
-        List<ModelRepresentation> resultList = new ArrayList<>();
-
-        List<String> addedModelIds = new ArrayList<>();
-        List<Model> models = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_BPMN, ModelSort.MODIFIED_DESC);
-
-        if (CollectionUtils.isNotEmpty(models)) {
-            for (Model model : models) {
-                if (!addedModelIds.contains(model.getId())) {
-                    addedModelIds.add(model.getId());
-                    ModelRepresentation representation = createModelRepresentation(model);
-                    resultList.add(representation);
-                }
-            }
-        }
-
-        ResultListDataRepresentation result = new ResultListDataRepresentation(resultList);
+        ResultListDataRepresentation result = getModelsByType(AbstractModel.MODEL_TYPE_BPMN);
         return result;
     }
-    
+
     public ResultListDataRepresentation getCmmnModelsToIncludeInAppDefinition() {
 
+        return getModelsByType(AbstractModel.MODEL_TYPE_CMMN);
+    }
+
+    public ResultListDataRepresentation getTestModelsToIncludeInAppDefinition() {
+        return getModelsByType(AbstractModel.MODEL_TYPE_SIMULATION);
+    }
+
+    protected ResultListDataRepresentation getModelsByType(int modelType) {
         List<ModelRepresentation> resultList = new ArrayList<>();
 
         List<String> addedModelIds = new ArrayList<>();
-        List<Model> models = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_CMMN, ModelSort.MODIFIED_DESC);
+        List<Model> models = modelRepository.findByModelType(modelType, ModelSort.MODIFIED_DESC);
 
         if (CollectionUtils.isNotEmpty(models)) {
             for (Model model : models) {
@@ -162,7 +155,14 @@ public class FlowableModelQueryService {
     }
 
     public ModelRepresentation importProcessModel(HttpServletRequest request, MultipartFile file) {
+        return importProcessModelWithType(file, AbstractModel.MODEL_TYPE_BPMN);
+    }
 
+    public ModelRepresentation importSimulationModel(HttpServletRequest request, MultipartFile file) {
+        return importProcessModelWithType(file, AbstractModel.MODEL_TYPE_SIMULATION);
+    }
+
+    protected ModelRepresentation importProcessModelWithType(MultipartFile file, int modelType) {
         String fileName = file.getOriginalFilename();
         if (fileName != null && (fileName.endsWith(".bpmn") || fileName.endsWith(".bpmn20.xml"))) {
             try {
@@ -192,7 +192,7 @@ public class FlowableModelQueryService {
                 model.setKey(process.getId());
                 model.setName(name);
                 model.setDescription(description);
-                model.setModelType(AbstractModel.MODEL_TYPE_BPMN);
+                model.setModelType(modelType);
                 Model newModel = modelService.createModel(model, modelNode.toString(), SecurityUtils.getCurrentUserObject());
                 return new ModelRepresentation(newModel);
 

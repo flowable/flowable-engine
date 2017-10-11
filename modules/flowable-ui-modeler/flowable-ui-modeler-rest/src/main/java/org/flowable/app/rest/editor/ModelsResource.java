@@ -68,10 +68,15 @@ public class ModelsResource {
     public ResultListDataRepresentation getModelsToIncludeInAppDefinition() {
         return modelQueryService.getModelsToIncludeInAppDefinition();
     }
-    
+
     @RequestMapping(value = "/rest/cmmn-models-for-app-definition", method = RequestMethod.GET, produces = "application/json")
     public ResultListDataRepresentation getCmmnModelsToIncludeInAppDefinition() {
         return modelQueryService.getCmmnModelsToIncludeInAppDefinition();
+    }
+
+    @RequestMapping(value = "/rest/simulation-models-for-app-definition", method = RequestMethod.GET, produces = "application/json")
+    public ResultListDataRepresentation getTestModelsToIncludeInAppDefinition() {
+        return modelQueryService.getTestModelsToIncludeInAppDefinition();
     }
 
     @RequestMapping(value = "/rest/import-process-model", method = RequestMethod.POST, produces = "application/json")
@@ -79,11 +84,31 @@ public class ModelsResource {
         return modelQueryService.importProcessModel(request, file);
     }
 
+    @RequestMapping(value = "/rest/import-simulation-model", method = RequestMethod.POST, produces = "application/json")
+    public ModelRepresentation importTestModel(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
+        return modelQueryService.importSimulationModel(request, file);
+    }
+
     /*
      * specific endpoint for IE9 flash upload component
      */
     @RequestMapping(value = "/rest/import-process-model/text", method = RequestMethod.POST)
     public String importProcessModelText(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
+
+        ModelRepresentation modelRepresentation = modelQueryService.importProcessModel(request, file);
+        String modelRepresentationJson = null;
+        try {
+            modelRepresentationJson = objectMapper.writeValueAsString(modelRepresentation);
+        } catch (Exception e) {
+            LOGGER.error("Error while processing Model representation json", e);
+            throw new InternalServerErrorException("Model Representation could not be saved");
+        }
+
+        return modelRepresentationJson;
+    }
+
+    @RequestMapping(value = "/rest/import-simulation-model/text", method = RequestMethod.POST)
+    public String importTestModelText(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
 
         ModelRepresentation modelRepresentation = modelQueryService.importProcessModel(request, file);
         String modelRepresentationJson = null;
@@ -131,7 +156,8 @@ public class ModelsResource {
         modelRepresentation.setKey(modelRepresentation.getKey().replaceAll(" ", ""));
         checkForDuplicateKey(modelRepresentation);
 
-        if (modelRepresentation.getModelType() == null || modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_BPMN)) {
+        if (modelRepresentation.getModelType() == null || modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_BPMN) ||
+                modelRepresentation.getModelType().equals(AbstractModel.MODEL_TYPE_SIMULATION)) {
             // BPMN model
             ObjectNode editorNode = null;
             try {

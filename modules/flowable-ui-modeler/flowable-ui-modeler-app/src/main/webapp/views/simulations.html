@@ -1,0 +1,98 @@
+
+<div class="subheader">
+	<div class="fixed-container">
+		<div class="btn-group pull-right">
+			<button type="button" class="btn btn-default" ng-click="createSimulation()" translate>SIMULATION-LIST.ACTION.CREATE</button>
+			<button type="button" class="btn btn-default" ng-click="importSimulation()" translate>SIMULATION-LIST.ACTION.IMPORT</button>
+		</div>
+		<h2>{{'SIMULATION-LIST.TITLE' | translate}}</h2>
+	</div>
+</div>
+<div class="container-fluid content" auto-height offset="40">
+		<div class="col-xs-2 filter-wrapper">
+			<div class="input-group">
+				<span class="input-group-addon"> <i
+					class="glyphicon glyphicon-search"></i>
+				</span> <input type="text" ng-model="model.pendingFilterText" class="form-control" ng-change="filterDelayed()"
+					placeholder="{{'SIMULATION-LIST.SEARCH-PLACEHOLDER' | translate}}">
+			</div>
+			<ul class="filter-list">
+				<li ng-repeat="filter in model.filters" ng-class="{'current' : filter.id == model.activeFilter.id}">
+					<a ng-click="activateFilter(filter)">{{'SIMULATION-LIST.FILTER.' + filter.labelKey | translate}}</a>
+				</li>
+			</ul>
+		</div>
+
+		<div class="col-xs-10 item-wrapper" id="list-items">
+			<div class="dropdown-subtle pull-right">
+				<div class="btn-group btn-group-sm" activiti-fix-dropdown-bug>
+					<button type="button" class="btn btn-default dropdown-toggle"
+						data-toggle="dropdown">{{'SIMULATION-LIST.SORT.' + model.activeSort.labelKey | translate}} <i class="caret"></i></button>
+					<ul class="dropdown-menu pull-right">
+						<li ng-repeat="sort in model.sorts">
+							<a ng-click="activateSort(sort)">{{'SIMULATION-LIST.SORT.' + sort.labelKey | translate}}</a>
+						</li>
+					</ul>
+				</div>
+			</div>
+			<div class="message clearfix">
+				<div class="loading pull-left" ng-show="model.loading">
+					<div class="l1"></div><div class="l2"></div><div class="l2"></div>
+				</div>
+				<div ng-if="!model.loading">
+					<span ng-if="model.simulations.size > 1">{{'SIMULATION-LIST.FILTER.' + model.activeFilter.labelKey + '-COUNT' | translate:model.simulations}}</span>
+					<span ng-if="model.simulations.size == 1">{{'SIMULATION-LIST.FILTER.' + model.activeFilter.labelKey + '-ONE' | translate}}</span>
+					<span ng-if="model.simulations.size > 0 && model.filterText !='' && model.filterText !== undefined">{{'SIMULATION-LIST.FILTER.FILTER-TEXT' | translate:model}}</span>
+					<span ng-if="model.simulations.size == 0 && model.filterText !='' && model.filterText !== undefined">{{'SIMULATION-LIST.FILTER.FILTER-TEXT-EMPTY' | translate:model}}</span>
+				</div>
+			</div>
+
+            <div class="help-container fixed" ng-if="model.simulations.size == 0 && (!model.filterText || model.filterText == '')">
+                <div>
+                    <div class="help-text wide">
+                        <div class="description">
+                            {{'SIMULATION-LIST.FILTER.SIMULATIONS-EMPTY' | translate}}
+                        </div>
+                        <div class="help-entry" ng-click="createSimulation()">
+                            <span class="glyphicon glyphicon-plus-sign"></span>
+                            <span translate="SIMULATION-LIST.FILTER.SIMULATIONS-BPMN-HINT"></span>
+                            <br>
+                        </div>
+						<div class="help-entry" ng-click="importSimulation()">
+                            <span class="glyphicon glyphicon-plus-sign"></span>
+                            <span translate="SIMULATION-LIST.FILTER.SIMULATIONS-BPMN-IMPORT-HINT"></span>
+                            <br>
+                        </div>
+                    </div>
+                </div>
+            </div>
+			<div class="item fadein" ng-repeat="simulation in model.simulations.data track by $index">
+				<div class="item-box" ng-style="{'background-image': 'url(\'' + config.contextRoot + '/app/rest/models/' + simulation.id + '/thumbnail?version=' + imageVersion + '\')'}" ng-click="showSimulationDetails(simulation);">
+					<div class="actions">
+						<span class="badge">v{{simulation.version}}</span>
+						<div class="btn-group pull-right">
+							<button id="detailsButton" type="button" ng-click="showSimulationDetails(simulation); $event.stopPropagation();" class="btn btn-default" title="{{'SIMULATION.ACTION.DETAILS' | translate}}">
+								<i class="glyphicon glyphicon-search"></i>
+							</button>
+							<button id="editButton" type="button" ng-click="editSimulationDetails(simulation); $event.stopPropagation();" class="btn btn-default" title="{{'SIMULATION.ACTION.OPEN-IN-EDITOR' | translate}}">
+								<i class="glyphicon glyphicon-edit"></i>
+							</button>
+						</div>
+					</div>
+					<div class="details">
+						<h3 class="truncate" title="{{simulation.name}}">
+							{{simulation.name}}
+						</h3>
+						<div class="basic-details truncate">
+							<span><i class="glyphicon glyphicon-user"></i> {{simulation.createdBy}}</span> <span title="{{simulation.lastUpdated | dateformat:'LLLL'}}"><i class="glyphicon glyphicon-pencil"></i> {{simulation.lastUpdated | dateformat}}</span>
+						</div>
+						<p>{{simulation.description}}</p>
+					</div>
+				</div>
+			</div>
+
+			<div class="show-more" ng-if="model.simulations.data.length < model.simulations.total">
+				<a>{{'SIMULATIONS-LIST.ACTION.SHOW-MORE' | translate}}</a>
+			</div>
+		</div>
+</div>

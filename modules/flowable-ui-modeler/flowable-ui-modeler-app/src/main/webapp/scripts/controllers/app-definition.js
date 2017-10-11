@@ -24,7 +24,7 @@ angular.module('flowableModeler')
         latestModelId: $routeParams.modelId,
         activeTab: 'bpmn'
     };
-    
+
     $scope.tabs = [
         {
             id: 'bpmn',
@@ -33,6 +33,10 @@ angular.module('flowableModeler')
         {
             id: 'cmmn',
             title: 'CMMN models'
+        },
+        {
+            id: 'simulation',
+            title: 'Simulation models'
         }
     ];
 

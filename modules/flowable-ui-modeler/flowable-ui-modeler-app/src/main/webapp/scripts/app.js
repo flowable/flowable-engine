@@ -64,6 +64,18 @@ flowableModeler
             templateUrl: appResourceRoot + 'views/process.html',
             controller: 'ProcessCtrl'
         })
+        .when('/simulations', {
+            templateUrl: appResourceRoot + 'views/simulations.html',
+            controller: 'SimulationsCtrl'
+        })
+        .when('/simulations/:modelId', {
+            templateUrl: appResourceRoot + 'views/simulation.html',
+            controller: 'TestCtrl'
+        })
+        .when('/simulations/:modelId/history/:modelHistoryId', {
+            templateUrl: appResourceRoot + 'views/simulation.html',
+            controller: 'TestCtrl'
+        })
         .when('/casemodels', {
             templateUrl: appResourceRoot + 'views/casemodels.html',
             controller: 'CaseModelsCtrl'
@@ -128,12 +140,12 @@ flowableModeler
             templateUrl: appResourceRoot + 'views/app-definition-builder.html',
             controller: 'AppDefinitionBuilderController'
         });
-            
+
         if (FLOWABLE.CONFIG.appDefaultRoute) {
             $routeProvider.when('/', {
                 redirectTo: FLOWABLE.CONFIG.appDefaultRoute
             });
-            
+
         } else {
             $routeProvider.when('/', {
                 redirectTo: '/processes'
@@ -217,6 +229,11 @@ flowableModeler
                     'id': 'decision-tables',
                     'title': 'GENERAL.NAVIGATION.DECISION-TABLES',
                     'path': '/decision-tables'
+                },
+                {
+                    'id': 'simulations',
+                    'title': 'GENERAL.NAVIGATION.SIMULATIONS',
+                    'path': '/simulations'
                 },
                 {
                     'id': 'apps',
@@ -321,14 +338,14 @@ flowableModeler
                     });
                 }
             };
-            
+
             $http.get(FLOWABLE.CONFIG.contextRoot + '/app/rest/account')
 	        	.success(function (data, status, headers, config) {
 	              	$rootScope.account = data;
 	               	$rootScope.invalidCredentials = false;
 	 				$rootScope.authenticated = true;
 	          	});
-	          	
+
 	        $rootScope.logout = function () {
                 $rootScope.authenticated = false;
                 $rootScope.authenticationError = false;

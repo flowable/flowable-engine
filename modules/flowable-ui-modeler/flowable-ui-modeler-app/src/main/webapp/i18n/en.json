@@ -6,6 +6,7 @@
             "CASEMODELS": "Case models",
             "FORMS": "Forms",
             "DECISION-TABLES": "Decision Tables",
+            "SIMULATIONS": "Simulations",
             "APPS": "Apps"
         },
         "TITLE": {
@@ -60,7 +61,7 @@
         "ACTION" : {
             "CREATE": "Create Process",
             "IMPORT": "Import Process",
-            "CREATE_TEST": "Create Process Test"
+            "CREATE_SIMULATION": "Create Process Test"
         },
 
         "FILTER" : {
@@ -69,7 +70,7 @@
             "PROCESSES-ONE": "There is one process model",
             "PROCESSES-EMPTY": "There is no process model created yet. You can design process models, user forms and then bundle them up into a process app. The first step is to create a process model:",
             "PROCESSES-BPMN-HINT": "Create a BPMN model using the BPMN Visual Editor.",
-            "PROCESSES-BPMN-TEST-HINT": "Create a BPMN process test model using the BPMN Visual Editor.",
+            "PROCESSES-BPMN-SIMULATION-HINT": "Create a BPMN process simulation model using the BPMN Visual Editor.",
             "PROCESSES-BPMN-IMPORT-HINT": "You can also import existing BPMN models.",
             "FILTER-TEXT": ", matching \"{{filterText}}\"",
             "FILTER-TEXT-EMPTY": "There are no process models matching \"{{filterText}}\"",
@@ -86,7 +87,38 @@
             "NAME-DESC": "Name, Z-A"
         }
     },
-    
+
+    "SIMULATION-LIST" : {
+        "TITLE" : "Simulation Models",
+        "SEARCH-PLACEHOLDER": "Search",
+        "ACTION" : {
+            "CREATE": "Create Simulation",
+            "IMPORT": "Import Simulation"
+        },
+
+        "FILTER" : {
+            "SIMULATIONS": "Simulation models",
+            "SIMULATIONS-COUNT": "There are {{total}} simulation models",
+            "SIMULATIONS-ONE": "There is one simulation model",
+            "SIMULATIONS-EMPTY": "There is no simulation model created yet. You can design simulation models, user forms and then bundle them up into a process app. The first step is to create a simulation model:",
+            "SIMULATIONS-BPMN-HINT": "Create a simulation model using the BPMN Visual Editor.",
+            "SIMULATIONS-BPMN-IMPORT-HINT": "You can also import existing simulation models.",
+            "FILTER-TEXT": ", matching \"{{filterText}}\"",
+            "FILTER-TEXT-EMPTY": "There are no simulation models matching \"{{filterText}}\"",
+            "RECENT": "Recent",
+            "RECENT-COUNT": "{{total}} recently used models",
+            "RECENT-ONE": "One recently used models",
+            "RECENT-EMPTY": "No recently used models"
+        },
+
+        "SORT": {
+            "MODIFIED-ASC": "Oldest",
+            "MODIFIED-DESC": "Last modified",
+            "NAME-ASC": "Name, A-Z",
+            "NAME-DESC": "Name, Z-A"
+        }
+    },
+
     "CASE-LIST" : {
         "TITLE" : "Case Models",
         "SEARCH-PLACEHOLDER": "Search",
@@ -267,6 +299,73 @@
         }
     },
 
+    "SIMULATION": {
+      "NAME": "Model name",
+      "KEY": "Model key",
+      "DESCRIPTION": "Description",
+      "SKELETON": "Simulation skeleton",
+      "VERSION-COMMENT": "Version comment",
+      "ACTION": {
+            "DETAILS": "Show details",
+            "EDIT": "Modify model properties",
+            "DUPLICATE": "Duplicate this model",
+            "EXPORT_BPMN20": "Export to BPMN 2.0",
+            "DELETE": "Delete this model",
+            "CREATE-CONFIRM": "Create new model",
+            "DUPLICATE-CONFIRM": "Duplicate the model",
+            "OPEN-IN-EDITOR": "Visual Editor",
+            "EDIT-CONFIRM": "Save",
+            "DELETE-CONFIRM": "Delete simulation model",
+            "USE-AS-NEW-VERSION": "Use as new version",
+            "FAVORITE": "Favorite this model"
+
+        },
+        "DETAILS": {
+          "HISTORY-TITLE": "History",
+          "LAST-UPDATED-BY": "Last updated by {{lastUpdatedBy}} - {{lastUpdated | dateformat}}",
+          "CREATED-BY": "Created by {{createdBy}}",
+          "NO-DESCRIPTION": "This model has no description. Modify the model properties to add one"
+        },
+
+        "POPUP": {
+          "CREATE-TITLE": "Create a new simulation model",
+          "DUPLICATE-TITLE": "Duplicate the simulation model",
+          "CREATE-DESCRIPTION": "You need to give a name for the new model and you may want to add a description at the same time.",
+          "DUPLICATE-DESCRIPTION": "You can change the name for the new model and you may want to change the description at the same time.",
+          "EDIT-DESCRIPTION": "Change any of the model properties below and then press Save to update the model.",
+          "DELETE-DESCRIPTION": "Are you sure you want to delete the simulation model \"{{name}}\"?",
+          "EDIT-TITLE":"Edit model details",
+          "DELETE-TITLE": "Delete model",
+          "DELETE-LOADING-RELATIONS": "Checking model usage...",
+          "DELETE-RELATIONS-DESCRIPTION-SINGLE": "This model cannot be deleted, because another model is using it:",
+          "DELETE-RELATIONS-DESCRIPTION": "This model cannot be deleted, because it is used by other models:",
+          "DELETE-PROCESS-RELATION": "Simulation model",
+          "DELETE-FORM-RELATION": "Form model",
+          "DELETE-APP-RELATION": "App model",
+          "IMPORT-DESCRIPTION": "Please browse for or drop a BPMN XML definition with an .bpmn or .bpmn20.xml extension",
+          "IMPORT-TITLE": "Import a simulation model",
+          "USE-AS-NEW-TITLE": "Use as new version",
+          "USE-AS-NEW-DESCRIPTION": "Are you sure you want to use version {{version}} to create a new version of \"{{name}}\"?",
+          "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "Could not fully restore the app model to the chosen version: some referenced models are missing due to being deleted in the past. Please update the app model accordingly. Missing models:",
+          "USE-AS-NEW-UNRESOLVED-MODEL": "Model '{{name}}' with internal id {{id}}, created by {{createdBy}}",
+          "SHARED-WITH": "Shared with",
+          "PERMISSION": "Permission",
+          "ACTIONS": "Actions",
+          "IMPORT": {
+              "DROPZONE": "Drop a .bpmn or .bpmn20.xml BPMN XML file",
+              "CANCEL-UPLOAD": "Cancel the upload",
+              "ERROR": "Error while processing the BPMN XML file",
+              "NO-DROP": "Drag and drop not supported"
+          }
+        },
+        "ALERT": {
+          "EDIT-CONFIRM": "Model updated"
+        },
+        "ERROR": {
+          "NOT-FOUND": "The requested model does not exist"
+        }
+    },
+
     "SUBPROCESS": {
         "NAME": "Sub process name",
         "DESCRIPTION": "Description",
@@ -278,7 +377,7 @@
             "CREATE-DESCRIPTION": "You need to give a name for the new sub process and you may want to add a description at the same time."
         }
     },
-    
+
     "CASE": {
       "NAME": "Model name",
       "KEY": "Model key",
@@ -551,13 +650,13 @@
             "UPLOAD": "Upload",
             "EXPRESSION": "Expression",
             "DECIMAL": "Decimal",
-	    "HYPERLINK": "Hyperlink" 
+	    "HYPERLINK": "Hyperlink"
         },
         "TABS": {
             "GENERAL": "General",
             "OPTIONS": "Options",
             "UPLOAD-OPTIONS": "Upload options",
-	    "ADVANCED-OPTIONS":"Advanced" 
+	    "ADVANCED-OPTIONS":"Advanced"
         },
         "VERSION": "Version {{version}}",
         "LAST-UPDATED": "Last updated by {{lastUpdatedBy}}, {{lastUpdated | dateformat}}",

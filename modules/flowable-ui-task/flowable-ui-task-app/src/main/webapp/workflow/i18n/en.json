@@ -196,7 +196,7 @@
         }
     },
     "PROCESS": {
-        "TEST": {
+        "SIMULATION": {
             "POPUP": {
                 "CREATE-TITLE": "Create a new business process model",
                 "CREATE-DESCRIPTION": "You need to give a name for the new model and you may want to add a description at the same time."
@@ -252,7 +252,82 @@
             "SHOW-DIAGRAM": "Show diagram",
             "EXECUTE": "Execute",
             "LOG": "Log",
-            "CREATE-TEST": "Create Process Test",
+            "CANCEL": "Cancel process",
+            "DELETE": "Delete process",
+            "ADD-COMMENT": "+ Add comment",
+            "ADD-COMMENT-CONFIRM": "Add comment",
+            "AUDIT-LOG": "Audit Log"
+        },
+        "FIELD": {
+            "BUSINESS-KEY": "Business key",
+            "CATEGORY": "Category",
+            "PROCESS-DEFINITION": "Process definition",
+            "STARTED": "Started",
+            "STARTED-BY": "Started by",
+            "ENDED": "Ended",
+            "NAME": "Process instance name",
+            "NAME-PLACEHOLDER" : "Enter an optional name for the process being started"
+        },
+        "SECTION": {
+            "ACTIVE-TASKS": "Active tasks",
+            "START-FORM": "Start form",
+            "COMPLETED-TASKS": "Completed tasks",
+            "COMMENTS": "Comments",
+            "CONTENT" : "Content"
+        },
+        "POPUP": {
+            "CANCEL-TITLE": "Cancel the process?",
+            "CANCEL-DESCRIPTION": "Are you sure you want to cancel process {{name}}?",
+            "DELETE-TITLE": "Delete the process?",
+            "DELETE-DESCRIPTION": "Are you sure you want to delete process {{name}}? All tasks, content and comments related to this process will be deleted permanently."
+        }
+    },
+    "SIMULATION": {
+        "ALERT": {
+            "COMMENT-ADDED": "Comment was added",
+            "STARTED": "A new  \"{{simulationDefinitionName}}\" process was started",
+            "START-PROCESS-CONTENT-ADD-FAILED": "Failed to add {{noOfFiles}} file(s) to the process"
+        },
+        "TITLE": {
+            "DIAGRAM": "Process diagram",
+            "EXPRESSION": "Expression",
+            "SCRIPT": "Script"
+        },
+        "FILTER": {
+            "CREATED-DESC": "Newest first",
+            "CREATED-ASC": "Oldest first",
+            "ENDED-DESC": "Completed most recently",
+            "ENDED-ASC": "Completed least recently",
+            "STATE-SUMMARY": "Showing {{state.title | translate}} processes",
+            "STATE": "Process State",
+            "STATE-RUNNING": "running",
+            "STATE-COMPLETED": "completed",
+            "STATE-ALL": "all"
+        },
+        "MESSAGE": {
+            "NO-DESCRIPTION": "This process instance has no description",
+            "NO-FILTER": "Showing all process instances, not filtered",
+            "NO-INSTANCES": "No matching process instances found...",
+            "NO-INSTANCES-HELP": "There are no processes that are running now. If your processes have completed, you can find them using the filter for the process list. To get going with something new you can:",
+            "NO-INSTANCES-HELP-START": "Start a new process and track its progress",
+            "NO-TASKS": "No tasks are currently active ...",
+            "NO-COMPLETED-TASKS": "No tasks have been completed yet...",
+            "NO-BUSINESS-KEY": "No business key set",
+            "CATEGORY": "Category: {{processDefinitionCategory}}",
+            "NEW-COMMENT-PLACEHOLDER": "Enter a comment to add to this process",
+            "COMMENT-HEADER": "Added by {{createdBy | username}}, {{created | dateformat:\"fromNow\"}}",
+            "SELECT-DEFINITION": "Select a process to start from the list below",
+            "NO-PROCESS-DEFINITIONS": "You cannot start a process since there are no process definitions available",
+            "START-PROCESS": "Start Process",
+            "STARTED-BY": "Started by",
+            "NO-PROCESS-DEFINITION-SELECTED-HELP": "Please select a process definition"
+        },
+        "ACTION" : {
+            "CREATE": "+ Start a process",
+            "BACK-TO-LIST": "Back to process instances",
+            "SHOW-DIAGRAM": "Show diagram",
+            "EXECUTE": "Execute",
+            "LOG": "Log",
             "CANCEL": "Cancel process",
             "DELETE": "Delete process",
             "ADD-COMMENT": "+ Add comment",

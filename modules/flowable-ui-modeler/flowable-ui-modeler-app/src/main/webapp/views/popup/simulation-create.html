@@ -1,10 +1,10 @@
 
-<div class="modal" ng-controller="CreateNewProcessTestModelCtrl">
+<div class="modal" ng-controller="CreateNewSimulationModelCtrl">
 	<div class="modal-dialog">
 		<div class="modal-content">
-			<div class="modal-header"><h2>{{'PROCESS.POPUP.CREATE-TITLE' | translate}}</h2></div>
+			<div class="modal-header"><h2>{{'SIMULATION.POPUP.CREATE-TITLE' | translate}}</h2></div>
 			<div class="modal-body">
-				<p>{{'PROCESS.POPUP.CREATE-DESCRIPTION' | translate}}</p>
+				<p>{{'SIMULATION.POPUP.CREATE-DESCRIPTION' | translate}}</p>
 				<div ng-if="model.errorMessage && model.errorMessage.length > 0" class="alert error" style="font-size: 14px; margin-top:20px">
                   <div class="popup-error" style="font-size: 14px">
                     <span class="glyphicon glyphicon-remove-circle"></span>
@@ -12,23 +12,23 @@
                   </div>
                 </div>
 				<div class="form-group">
-				    <label for="newProcessName">{{'PROCESS.NAME' | translate}}</label>
+				    <label for="newSimulationName">{{'SIMULATION.NAME' | translate}}</label>
 				    <input ng-disabled="model.loading" type="text" class="form-control"
-			               id="newProcessName" ng-model="model.process.name" auto-focus editor-input-check>
+			               id="newSimulationName" ng-model="model.simulation.name" auto-focus editor-input-check>
 				</div>
 				<div class="form-group">
-				    <label for="newProcessKey">{{'PROCESS.KEY' | translate}}</label>
+				    <label for="newSimulationKey">{{'SIMULATION.KEY' | translate}}</label>
 				    <input ng-disabled="model.loading" type="text" class="form-control"
-			               id="newProcessKey" ng-model="model.process.key" editor-input-check>
+			               id="newSimulationKey" ng-model="model.simulation.key" editor-input-check>
 				</div>
 				<div class="form-group">
-				    <label for="newProcessDescription">{{'PROCESS.DESCRIPTION' | translate}}</label>
-					<textarea ng-disabled="model.loading" class="form-control" id="newProcessDescription" rows="5" ng-model="model.process.description"></textarea>
+				    <label for="newsimulationDescription">{{'SIMULATION.DESCRIPTION' | translate}}</label>
+					<textarea ng-disabled="model.loading" class="form-control" id="newsimulationDescription" rows="5" ng-model="model.simulation.description"></textarea>
 				</div>
 				<div class="form-group">
-				    <label for="newProcessSkeleton">{{'PROCESS.SKELETON' | translate}}</label>
+				    <label for="newSimulationSkeleton">{{'SIMULATION.SKELETON' | translate}}</label>
 				    <input ng-disabled="model.loading" type="text" class="form-control"
-			               id="newProcessSkeleton" ng-model="model.skeleton" editor-input-check>
+			               id="newSimulationSkeleton" ng-model="model.skeleton" editor-input-check>
 				</div>
 			</div>
 
@@ -37,8 +37,8 @@
 					<button type="button" class="btn btn-sm btn-default" ng-click="cancel()" ng-disabled="model.loading">
 						{{'GENERAL.ACTION.CANCEL' | translate}}
 					</button>
-					<button type="button" class="btn btn-sm btn-default" ng-click="ok()" ng-disabled="model.loading || !model.process.name || model.process.name.length == 0 || !model.process.key || model.process.key.length == 0">
-						{{'PROCESS.ACTION.CREATE-CONFIRM' | translate}}
+					<button type="button" class="btn btn-sm btn-default" ng-click="ok()" ng-disabled="model.loading || !model.simulation.name || model.simulation.name.length == 0 || !model.simulation.key || model.simulation.key.length == 0">
+						{{'SIMULATION.ACTION.CREATE-CONFIRM' | translate}}
 					</button>
 				</div>
 				<div class="loading pull-right" ng-show="model.loading">

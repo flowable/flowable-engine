@@ -1052,7 +1052,8 @@ public class ModelServiceImpl implements ModelService {
                 throw new InternalServerErrorException("Could not deserialize json model");
             }
 
-            if ((model.getModelType() == null || model.getModelType().intValue() == Model.MODEL_TYPE_BPMN)) {
+            if ((model.getModelType() == null || model.getModelType().intValue() == Model.MODEL_TYPE_BPMN
+            || model.getModelType().intValue() == Model.MODEL_TYPE_SIMULATION)) {
 
                 // Thumbnail
                 byte[] thumbnail = modelImageService.generateThumbnailImage(model, jsonNode);

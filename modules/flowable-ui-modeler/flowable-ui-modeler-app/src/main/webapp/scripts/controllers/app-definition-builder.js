@@ -11,23 +11,23 @@
  * limitations under the License.
  */
 angular.module('flowableModeler')
-  .controller('AppDefinitionBuilderController', ['$rootScope', '$scope', '$translate', '$http', '$location', '$routeParams', '$modal', '$popover', '$timeout', 
+  .controller('AppDefinitionBuilderController', ['$rootScope', '$scope', '$translate', '$http', '$location', '$routeParams', '$modal', '$popover', '$timeout',
                               function ($rootScope, $scope, $translate, $http, $location, $routeParams, $modal, $popover, $timeout) {
 
     // Main page (needed for visual indicator of current page)
     $rootScope.setMainPageById('apps');
-    
+
     // Initialize model
     $scope.model = {
         // Store the main model id, this points to the current version of a model,
         // even when we're showing history
         latestModelId: $routeParams.modelId
     };
-    
+
     $scope.appBuilder = {
         activeTab: 'bpmn'
     };
-    
+
     $scope.tabs = [
         {
             id: 'bpmn',
@@ -36,9 +36,13 @@ angular.module('flowableModeler')
         {
             id: 'cmmn',
             title: 'CMMN models'
+        },
+        {
+            id: 'simulations',
+            title: 'Simulation models'
         }
     ];
-    
+
     $scope.loadApp = function() {
     	$http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/' + $routeParams.modelId}).
         	success(function(data, status, headers, config) {
@@ -59,7 +63,7 @@ angular.module('flowableModeler')
     $scope.$on('$destroy', function() {
         $rootScope.currentAppDefinition = undefined;
     });
-    
+
     $scope.editIncludedModels = function() {
         _internalCreateModal({
             template: 'views/popup/app-definition-models-included.html?version=' + Date.now(),
@@ -114,9 +118,9 @@ angular.module('flowableModeler')
         'glyphicon-earphone', 'glyphicon-phone-alt', 'glyphicon-tower',
         'glyphicon-stats', 'glyphicon-cloud-download',
         'glyphicon-cloud-upload', 'glyphicon-tree-conifer',
-        'glyphicon-tree-deciduous' 
+        'glyphicon-tree-deciduous'
     ];
-    
+
     // TODO: add themes and perhaps have colors inside JS instead of different css-classes for each theme
     $scope.availableThemes = [
         'theme-1', 'theme-2', 'theme-3',
@@ -124,12 +128,12 @@ angular.module('flowableModeler')
         'theme-7', 'theme-8', 'theme-9',
         'theme-10'
     ];
-    
+
     $scope.changeIcon = function($event) {
       if (!$scope.changeIconState) {
         var state = {};
         $scope.changeIconState = state;
-        
+
         // Create popover
         state.popover = $popover(angular.element($event.currentTarget), {
           template: 'views/popover/select-app-icon.html',
@@ -137,27 +141,27 @@ angular.module('flowableModeler')
           show: true,
           scope: $scope
         });
-        
+
         var destroy = function() {
           state.popover.destroy();
           delete $scope.changeIconState;
         };
-        
+
         // When popup is hidden or scope is destroyed, hide popup
         state.popover.$scope.$on('tooltip.hide', destroy);
         $scope.$on('$destroy', destroy);
       }
     };
-    
+
     $scope.selectIcon = function(icon) {
         $rootScope.currentAppDefinition.definition.icon = icon;
     };
-    
+
     $scope.changeTheme = function($event) {
       if(!$scope.changeThemeState) {
         var state = {};
         $scope.changeThemeState = state;
-        
+
         // Create popover
         state.popover = $popover(angular.element($event.currentTarget), {
           template: 'views/popover/select-app-theme.html',
@@ -165,22 +169,22 @@ angular.module('flowableModeler')
           show: true,
           scope: $scope
         });
-        
+
         var destroy = function() {
           state.popover.destroy();
           delete $scope.changeThemeState;
         };
-        
+
         // When popup is hidden or scope is destroyed, hide popup
         state.popover.$scope.$on('tooltip.hide', destroy);
         $scope.$on('$destroy', destroy);
       }
     };
-    
+
     $scope.selectTheme = function(theme) {
         $rootScope.currentAppDefinition.definition.theme = theme;
     };
-    
+
     $scope.loadApp();
 }]);
 
@@ -191,21 +195,28 @@ angular.module('flowableModeler')
         loading: false,
         selectedModels: [],
         selectedCmmnModels: [],
+        selectedTestModels: [],
         activeTab: 'bpmn'
     };
-    
+
     if ($rootScope.currentAppDefinition.definition.models) {
         for (var i = 0; i < $rootScope.currentAppDefinition.definition.models.length; i++) {
             $scope.popup.selectedModels.push($rootScope.currentAppDefinition.definition.models[i].id);
         }
     }
-    
+
     if ($rootScope.currentAppDefinition.definition.cmmnModels) {
         for (var i = 0; i < $rootScope.currentAppDefinition.definition.cmmnModels.length; i++) {
             $scope.popup.selectedCmmnModels.push($rootScope.currentAppDefinition.definition.cmmnModels[i].id);
         }
     }
-    
+
+    if ($rootScope.currentAppDefinition.definition.simulationModels) {
+        for (var i = 0; i < $rootScope.currentAppDefinition.definition.simulationModels.length; i++) {
+            $scope.popup.selectedTestModels.push($rootScope.currentAppDefinition.definition.simulationModels[i].id);
+        }
+    }
+
     $scope.tabs = [
         {
             id: 'bpmn',
@@ -214,12 +225,16 @@ angular.module('flowableModeler')
         {
             id: 'cmmn',
             title: 'CMMN models'
+        },
+        {
+            id: 'simulation',
+            title: 'Simulation models'
         }
     ];
-    
+
     $scope.loadModels = function() {
         $scope.popup.loading = true;
-        
+
         $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models-for-app-definition'}).
           success(function(data, status, headers, config) {
               $scope.popup.models = data;
@@ -228,7 +243,7 @@ angular.module('flowableModeler')
           error(function(data, status, headers, config) {
              $scope.popup.loading = false;
           });
-          
+
         $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/cmmn-models-for-app-definition'}).
           success(function(data, status, headers, config) {
               $scope.popup.cmmnModels = data;
@@ -237,8 +252,18 @@ angular.module('flowableModeler')
           error(function(data, status, headers, config) {
              $scope.popup.loading = false;
           });
+
+        $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/simulation-models-for-app-definition'}).
+          success(function(data, status, headers, config) {
+              $scope.popup.simulationModels = data;
+              $scope.popup.loading = false;
+          }).
+          error(function(data, status, headers, config) {
+             $scope.popup.loading = false;
+          });
+
     };
-    
+
     $scope.selectModel = function(model) {
         var index = $scope.popup.selectedModels.indexOf(model.id);
         if (index >= 0) {
@@ -246,7 +271,7 @@ angular.module('flowableModeler')
         } else {
             $scope.popup.selectedModels.push(model.id);
         }
-        
+
         var modelArray = [];
         for (var i = 0; i < $scope.popup.models.data.length; i++) {
             if ($scope.popup.selectedModels.indexOf($scope.popup.models.data[i].id) >= 0) {
@@ -269,7 +294,7 @@ angular.module('flowableModeler')
         }
         $rootScope.currentAppDefinition.definition.models = modelArray;
     };
-    
+
     $scope.selectCmmnModel = function(model) {
         var index = $scope.popup.selectedCmmnModels.indexOf(model.id);
         if (index >= 0) {
@@ -277,7 +302,7 @@ angular.module('flowableModeler')
         } else {
             $scope.popup.selectedCmmnModels.push(model.id);
         }
-        
+
         var modelArray = [];
         for (var i = 0; i < $scope.popup.cmmnModels.data.length; i++) {
             if ($scope.popup.selectedCmmnModels.indexOf($scope.popup.cmmnModels.data[i].id) >= 0) {
@@ -300,7 +325,38 @@ angular.module('flowableModeler')
         }
         $rootScope.currentAppDefinition.definition.cmmnModels = modelArray;
     };
-    
+
+    $scope.selectTestModel = function(model) {
+        var index = $scope.popup.selectedTestModels.indexOf(model.id);
+        if (index >= 0) {
+            $scope.popup.selectedTestModels.splice(index, 1);
+        } else {
+            $scope.popup.selectedTestModels.push(model.id);
+        }
+
+        var modelArray = [];
+        for (var i = 0; i < $scope.popup.simulationModels.data.length; i++) {
+            if ($scope.popup.selectedTestModels.indexOf($scope.popup.simulationModels.data[i].id) >= 0) {
+                var selectedModel = $scope.popup.simulationModels.data[i];
+                var summaryModel = {
+                    id: selectedModel.id,
+                    name: selectedModel.name,
+                    version: selectedModel.version,
+                    modelType: selectedModel.modelType,
+                    description: selectedModel.description,
+                    stencilSetId: selectedModel.stencilSet,
+                    createdByFullName: selectedModel.createdByFullName,
+                    createdBy: selectedModel.createdBy,
+                    lastUpdatedByFullName: selectedModel.lastUpdatedByFullName,
+                    lastUpdatedBy: selectedModel.lastUpdatedBy,
+                    lastUpdated: selectedModel.lastUpdated
+                };
+                modelArray.push(summaryModel);
+            }
+        }
+        $rootScope.currentAppDefinition.definition.simulationModels = modelArray;
+    };
+
     $scope.isModelSelected = function(model) {
         if ($scope.popup.selectedModels.indexOf(model.id) >= 0) {
             return true;
@@ -308,7 +364,7 @@ angular.module('flowableModeler')
             return false;
         }
     };
-    
+
     $scope.isCmmnModelSelected = function(model) {
         if ($scope.popup.selectedCmmnModels.indexOf(model.id) >= 0) {
             return true;
@@ -316,10 +372,18 @@ angular.module('flowableModeler')
             return false;
         }
     };
-    
+
+    $scope.isTestModelSelected = function(model) {
+        if ($scope.popup.selectedTestModels.indexOf(model.id) >= 0) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+
     $scope.close = function() {
         $scope.$hide();
     };
-    
+
     $scope.loadModels();
 }]);

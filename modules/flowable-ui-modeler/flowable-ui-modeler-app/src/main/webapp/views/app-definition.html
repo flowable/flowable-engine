@@ -32,14 +32,14 @@
 				ng-disabled="!model.app.latestVersion">
 				<i class="glyphicon glyphicon-trash"></i>
 			</button>
-		</div>		
+		</div>
 		<div class="pull-right">
 			<a ng-click="returnToList()" class="action">&larr; {{'GENERAL.ACTION.RETURN-TO-LIST' | translate}}</a>
 		</div>
 		<h2><span class="version">v{{model.app.version}}</span>{{model.app.name}}</h2>
 		<div class="clearfix">
 			<div class="col-xs-4 details">
-				<span><i class="glyphicon glyphicon-user"></i>{{'APP.DETAILS.CREATED-BY' | translate:model.app}}</span> 
+				<span><i class="glyphicon glyphicon-user"></i>{{'APP.DETAILS.CREATED-BY' | translate:model.app}}</span>
 				<span><i class="glyphicon glyphicon-pencil"></i>{{'APP.DETAILS.LAST-UPDATED-BY' | translate:model.app}}</span>
 			</div>
 			<div class="col-xs-8 details clearfix">
@@ -97,16 +97,16 @@
                     </div>
                 </div>
             </div>
-            
+
             <br/>
-            
+
             <div class="row">
-                
+
                 <div class="tabs-wrapper">
 
                 <div tab-control="tabs" active-tab="model.activeTab">
                 </div>
-                
+
                 <div class="col-xs-12 item-wrapper" ng-show="model.activeTab == 'bpmn'">
                     <div class="item fadein" ng-repeat="model in model.appDefinition.definition.models">
                         <div class="item-box" ng-style="{'background-image': 'url(\'' + config.contextRoot + '/app/rest/models/' + model.id + '/thumbnail\')'}">
@@ -122,9 +122,25 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="col-xs-12 item-wrapper" ng-show="model.activeTab == 'cmmn'">
                     <div class="item fadein" ng-repeat="model in model.appDefinition.definition.cmmnModels">
+                        <div class="item-box" ng-style="{'background-image': 'url(\'' + config.contextRoot + '/app/rest/models/' + model.id + '/thumbnail\')'}">
+                            <div class="actions">
+                                <span class="badge">v{{model.version}}</span>
+                            </div>
+                            <div class="details">
+                                <h3 class="truncate" title="{{model.name}}">
+                                    {{model.name}}
+                                </h3>
+                                <p>{{model.description}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-12 item-wrapper" ng-show="model.activeTab == 'test'">
+                    <div class="item fadein" ng-repeat="model in model.appDefinition.definition.simulationModels">
                         <div class="item-box" ng-style="{'background-image': 'url(\'' + config.contextRoot + '/app/rest/models/' + model.id + '/thumbnail\')'}">
                             <div class="actions">
                                 <span class="badge">v{{model.version}}</span>
