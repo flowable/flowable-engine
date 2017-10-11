@@ -37,6 +37,11 @@ import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
+import org.flowable.identitylink.service.IdentityLinkService;
+import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
+import org.flowable.task.service.HistoricTaskService;
+import org.flowable.task.service.TaskService;
+import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.variable.service.HistoricVariableService;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
@@ -187,12 +192,52 @@ public class CommandContextUtil {
         return historicVariableService;
     }
     
+    public static IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration() { 
+        return getIdentityLinkServiceConfiguration(getCommandContext());
+    }
+    
+    public static IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration(CommandContext commandContext) {
+        return (IdentityLinkServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG);
+    }
+    
+    public static IdentityLinkService getIdentityLinkService() {
+        return getIdentityLinkService(getCommandContext());
+    }
+    
+    public static IdentityLinkService getIdentityLinkService(CommandContext commandContext) {
+        return getIdentityLinkServiceConfiguration(commandContext).getIdentityLinkService();
+    }
+    
     public static VariableServiceConfiguration getVariableServiceConfiguration() {
         return getVariableServiceConfiguration(getCommandContext());
     }
     
     public static VariableServiceConfiguration getVariableServiceConfiguration(CommandContext commandContext) {
         return (VariableServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
+    }
+    
+    public static TaskService getTaskService() {
+        return getTaskService(getCommandContext());
+    }
+    
+    public static TaskService getTaskService(CommandContext commandContext) {
+        return getTaskServiceConfiguration(commandContext).getTaskService();
+    }
+    
+    public static HistoricTaskService getHistoricTaskService() {
+        return getHistoricTaskService(getCommandContext());
+    }
+    
+    public static HistoricTaskService getHistoricTaskService(CommandContext commandContext) {
+        return getTaskServiceConfiguration(commandContext).getHistoricTaskService();
+    }
+    
+    public static TaskServiceConfiguration getTaskServiceConfiguration() {
+        return getTaskServiceConfiguration(getCommandContext());
+    }
+    
+    public static TaskServiceConfiguration getTaskServiceConfiguration(CommandContext commandContext) {
+        return (TaskServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
     }
     
     public static CmmnEngineAgenda getAgenda() {

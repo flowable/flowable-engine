@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.common.impl.db;
 
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableWrongDbException;
 import org.flowable.engine.common.impl.FlowableVersions;
 
@@ -40,10 +41,14 @@ public abstract class ServiceSqlScriptBasedDbSchemaManager extends AbstractSqlSc
                 throw new FlowableWrongDbException(FlowableVersions.CURRENT_VERSION, dbVersion);
             }
         } else {
-            executeMandatorySchemaResource("create", schemaComponent);
-            if (isHistoryUsed()) {
-                executeMandatorySchemaResource("create", schemaComponentHistory);
-            }
+            internalDbSchemaCreate();
+        }
+    }
+
+    protected void internalDbSchemaCreate() {
+        executeMandatorySchemaResource("create", schemaComponent);
+        if (isHistoryUsed()) {
+            executeMandatorySchemaResource("create", schemaComponentHistory);
         }
     }
 
@@ -92,9 +97,18 @@ public abstract class ServiceSqlScriptBasedDbSchemaManager extends AbstractSqlSc
     }
 
     protected String getSchemaVersion() {
-        // The service schema version properties were introduced in 6.2.0.
+        if (schemaVersionProperty == null) {
+            throw new FlowableException("Schema version property is not set");
+        }
         String dbVersion = getProperty(schemaVersionProperty);
+        if (dbVersion == null) {
+            return getUpgradeStartVersion();
+        }
         return dbVersion;
+    }
+    
+    protected String getUpgradeStartVersion() {
+        return "6.1.2.0"; // last version before most services were separated. Start upgrading from this point.
     }
 
 }

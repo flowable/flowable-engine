@@ -1,6 +1,4 @@
 drop index ACT_IDX_EXEC_BUSKEY;
-drop index ACT_IDX_IDENT_LNK_USER;
-drop index ACT_IDX_IDENT_LNK_GROUP;
 drop index ACT_IDX_VARIABLE_TASK_ID;
 
 alter table ACT_GE_BYTEARRAY 
@@ -20,6 +18,9 @@ alter table ACT_RU_EXECUTION
 
 alter table ACT_RU_IDENTITYLINK
     drop foreign key ACT_FK_TSKASS_TASK;
+    
+alter table ACT_RU_IDENTITYLINK
+    drop foreign key ACT_FK_IDL_PROCINST;  
 
 alter table ACT_RU_IDENTITYLINK
     drop foreign key ACT_FK_ATHRZ_PROCEDEF;
@@ -48,9 +49,6 @@ alter table ACT_RU_JOB
 alter table ACT_RU_JOB 
     drop foreign key ACT_FK_JOB_PROC_DEF;
 
-alter table ACT_RU_JOB 
-    drop foreign key ACT_FK_JOB_EXCEPTION;
-    
 alter table ACT_RU_TIMER_JOB 
     drop foreign key ACT_FK_TIMER_JOB_EXECUTION;
     
@@ -59,9 +57,6 @@ alter table ACT_RU_TIMER_JOB
     
 alter table ACT_RU_TIMER_JOB 
     drop foreign key ACT_FK_TIMER_JOB_PROC_DEF;
-    
-alter table ACT_RU_TIMER_JOB 
-    drop foreign key ACT_FK_TIMER_JOB_EXCEPTION;
     
 alter table ACT_RU_SUSPENDED_JOB 
     drop foreign key ACT_FK_SUSPENDED_JOB_EXECUTION;
@@ -72,9 +67,6 @@ alter table ACT_RU_SUSPENDED_JOB
 alter table ACT_RU_SUSPENDED_JOB 
     drop foreign key ACT_FK_SUSPENDED_JOB_PROC_DEF;
     
-alter table ACT_RU_SUSPENDED_JOB 
-    drop foreign key ACT_FK_SUSPENDED_JOB_EXCEPTION;
-    
 alter table ACT_RU_DEADLETTER_JOB 
     drop foreign key ACT_FK_DEADLETTER_JOB_EXECUTION;
     
@@ -83,9 +75,6 @@ alter table ACT_RU_DEADLETTER_JOB
     
 alter table ACT_RU_DEADLETTER_JOB 
     drop foreign key ACT_FK_DEADLETTER_JOB_PROC_DEF;
-    
-alter table ACT_RU_DEADLETTER_JOB 
-    drop foreign key ACT_FK_DEADLETTER_JOB_EXCEPTION;
     
 alter table ACT_RU_EVENT_SUBSCR
     drop foreign key ACT_FK_EVENT_EXEC;
@@ -111,13 +100,7 @@ drop index ACT_IDX_ATHRZ_PROCEDEF;
 drop table ACT_RE_DEPLOYMENT;
 drop table ACT_RE_MODEL;
 drop table ACT_RE_PROCDEF;
-drop table ACT_RU_IDENTITYLINK;
 drop table ACT_RU_EXECUTION;
-drop table ACT_RU_JOB;
-drop table ACT_RU_TIMER_JOB;
-drop table ACT_RU_SUSPENDED_JOB;
-drop table ACT_RU_DEADLETTER_JOB;
-drop table ACT_RU_HISTORY_JOB;
 drop table ACT_RU_EVENT_SUBSCR;
 drop table ACT_EVT_LOG;
 drop table ACT_PROCDEF_INFO;

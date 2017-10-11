@@ -24,8 +24,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanc
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.MilestoneInstance;
 import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -109,28 +108,37 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     }
 
     @Override
-    public void recordVariableUpdate(VariableInstanceEntity variable) {
+    public void recordVariableUpdate(VariableInstanceEntity variableInstanceEntity) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            CommandContext commandContext = CommandContextUtil.getCommandContext();
-            HistoricVariableInstanceEntity historicProcessVariable = CommandContextUtil
-                    .getHistoricVariableService(commandContext).getHistoricVariableInstance(variable.getId());
-            if (historicProcessVariable != null) {
-                CommandContextUtil.getHistoricVariableService(commandContext).copyVariableValue(historicProcessVariable, variable);
-            } else {
-                CommandContextUtil.getHistoricVariableService(commandContext).createAndInsert(variable);
-            }
+            CommandContextUtil.getHistoricVariableService().recordVariableUpdate(variableInstanceEntity);
         }
     }
 
     @Override
-    public void recordVariableRemoved(VariableInstanceEntity variable) {
+    public void recordVariableRemoved(VariableInstanceEntity variableInstanceEntity) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            CommandContext commandContext = CommandContextUtil.getCommandContext();
-            HistoricVariableInstanceEntity historicProcessVariable = CommandContextUtil
-                    .getHistoricVariableService(commandContext).getHistoricVariableInstance(variable.getId());
-            if (historicProcessVariable != null) {
-                CommandContextUtil.getHistoricVariableService(commandContext).deleteHistoricVariableInstance(historicProcessVariable);
-            }
+            CommandContextUtil.getHistoricVariableService().recordVariableRemoved(variableInstanceEntity);
+        }
+    }
+
+    @Override
+    public void recordTaskCreated(TaskEntity task) {
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+            CommandContextUtil.getHistoricTaskService().recordTaskCreated(task);
+        }
+    }
+
+    @Override
+    public void recordTaskEnd(TaskEntity task, String deleteReason) {
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+            CommandContextUtil.getHistoricTaskService().recordTaskEnd(task, deleteReason);
+        }
+    }
+
+    @Override
+    public void recordTaskInfoChange(TaskEntity taskEntity) {
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
+            CommandContextUtil.getHistoricTaskService().recordTaskInfoChange(taskEntity);
         }
     }
 

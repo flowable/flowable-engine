@@ -89,8 +89,10 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     public void dbSchemaCreate() {
         
         getCommonDbSchemaManager().dbSchemaCreate();
+        getIdentityLinkDbSchemaManager().dbSchemaCreate();
         getTaskDbSchemaManager().dbSchemaCreate();
         getVariableDbSchemaManager().dbSchemaCreate();
+        getJobDbSchemaManager().dbSchemaCreate();
         
         if (isEngineTablePresent()) {
             String dbVersion = getDbVersion();
@@ -126,6 +128,12 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         } catch (Exception e) {
             LOGGER.info("Error dropping engine tables", e);
         }
+        
+        try {
+            getJobDbSchemaManager().dbSchemaDrop();
+        } catch (Exception e) {
+            LOGGER.info("Error dropping job tables", e);
+        }
      
         try {
             getVariableDbSchemaManager().dbSchemaDrop();
@@ -137,6 +145,12 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
             getTaskDbSchemaManager().dbSchemaDrop();
         } catch (Exception e) {
             LOGGER.info("Error dropping task tables", e);
+        }
+        
+        try {
+            getIdentityLinkDbSchemaManager().dbSchemaDrop();
+        } catch (Exception e) {
+            LOGGER.info("Error dropping identity link tables", e);
         }
         
         try {
@@ -156,8 +170,10 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     public String dbSchemaUpdate() {
         
         getCommonDbSchemaManager().dbSchemaUpdate();
+        getIdentityLinkDbSchemaManager().dbSchemaUpdate();
         getTaskDbSchemaManager().dbSchemaUpdate();
         getVariableDbSchemaManager().dbSchemaUpdate();
+        getJobDbSchemaManager().dbSchemaUpdate();
 
         String feedback = null;
         boolean isUpgradeNeeded = false;
@@ -311,12 +327,20 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         return CommandContextUtil.getProcessEngineConfiguration().getCommonDbSchemaManager();
     }
     
+    protected DbSchemaManager getIdentityLinkDbSchemaManager() {
+        return CommandContextUtil.getProcessEngineConfiguration().getIdentityLinkDbSchemaManager();
+    }
+    
     protected DbSchemaManager getVariableDbSchemaManager() {
         return CommandContextUtil.getProcessEngineConfiguration().getVariableDbSchemaManager();
     }
     
     protected DbSchemaManager getTaskDbSchemaManager() {
         return CommandContextUtil.getProcessEngineConfiguration().getTaskDbSchemaManager();
+    }
+    
+    protected DbSchemaManager getJobDbSchemaManager() {
+        return CommandContextUtil.getProcessEngineConfiguration().getJobDbSchemaManager();
     }
     
     @Override

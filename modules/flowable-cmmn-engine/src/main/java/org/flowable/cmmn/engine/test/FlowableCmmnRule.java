@@ -23,6 +23,7 @@ import org.flowable.cmmn.engine.CmmnHistoryService;
 import org.flowable.cmmn.engine.CmmnManagementService;
 import org.flowable.cmmn.engine.CmmnRepositoryService;
 import org.flowable.cmmn.engine.CmmnRuntimeService;
+import org.flowable.cmmn.engine.CmmnTaskService;
 import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
 import org.flowable.engine.common.api.FlowableException;
 import org.junit.internal.AssumptionViolatedException;
@@ -77,6 +78,7 @@ public class FlowableCmmnRule implements TestRule {
     protected CmmnEngine cmmnEngine;
     protected CmmnRepositoryService cmmnRepositoryService;
     protected CmmnRuntimeService cmmnRuntimeService;
+    protected CmmnTaskService cmmnTaskService;
     protected CmmnHistoryService cmmnHistoryService;
     protected CmmnManagementService cmmnManagementService;
 
@@ -202,6 +204,7 @@ public class FlowableCmmnRule implements TestRule {
         cmmnEngineConfiguration = cmmnEngine.getCmmnEngineConfiguration();
         cmmnRepositoryService = cmmnEngine.getCmmnRepositoryService();
         cmmnRuntimeService = cmmnEngine.getCmmnRuntimeService();
+        cmmnTaskService = cmmnEngine.getCmmnTaskService();
         cmmnHistoryService = cmmnEngine.getCmmnHistoryService();
         cmmnManagementService = cmmnEngine.getCmmnManagementService();
     }

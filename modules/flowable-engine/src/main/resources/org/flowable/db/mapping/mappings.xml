@@ -49,6 +49,7 @@
     <mapper resource="org/flowable/db/mapping/entity/Resource.xml" />
     <mapper resource="org/flowable/job/db/mapping/entity/SuspendedJob.xml" />
     <mapper resource="org/flowable/db/mapping/entity/TableData.xml" />
+    <mapper resource="org/flowable/task/db/mapping/common.xml" />
     <mapper resource="org/flowable/task/db/mapping/entity/Task.xml" />
     <mapper resource="org/flowable/job/db/mapping/entity/TimerJob.xml" />
     <mapper resource="org/flowable/variable/db/mapping/entity/VariableInstance.xml" />

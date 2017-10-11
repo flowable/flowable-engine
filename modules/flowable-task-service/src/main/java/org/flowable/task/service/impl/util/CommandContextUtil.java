@@ -16,6 +16,7 @@ import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
+import org.flowable.identitylink.service.HistoricIdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
@@ -58,6 +59,14 @@ public class CommandContextUtil {
             return (IdentityLinkServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG);
         }
         return null;
+    }
+    
+    public static HistoricIdentityLinkService getHistoricIdentityLinkService() {
+        return getHistoricIdentityLinkService(getCommandContext());
+    }
+    
+    public static HistoricIdentityLinkService getHistoricIdentityLinkService(CommandContext commandContext) {
+        return getIdentityLinkServiceConfiguration(commandContext).getHistoricIdentityLinkService();
     }
     
     public static DbSqlSession getDbSqlSession() {
