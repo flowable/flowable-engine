@@ -77,6 +77,11 @@ public interface CmmnXmlConstants {
     
     String ATTRIBUTE_TYPE = "type";
     
+    String ATTRIBUTE_ASSIGNEE = "assignee";
+    String ATTRIBUTE_OWNER = "owner";
+    String ATTRIBUTE_CANDIDATE_USERS = "candidateUsers";
+    String ATTRIBUTE_CANDIDATE_GROUPS = "candidateGroups";
+    
     String ATTRIBUTE_CLASS = "class";
     String ATTRIBUTE_EXPRESSION = "expression";
     String ATTRIBUTE_DELEGATE_EXPRESSION = "delegateExpression";

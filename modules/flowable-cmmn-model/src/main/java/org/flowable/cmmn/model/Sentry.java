@@ -20,16 +20,9 @@ import java.util.List;
  */
 public class Sentry extends CaseElement {
     
-    protected String name;
     protected List<SentryOnPart> onParts = new ArrayList<>();
     protected SentryIfPart sentryIfPart;
     
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
-    }
     public List<SentryOnPart> getOnParts() {
         return onParts;
     }

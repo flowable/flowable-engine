@@ -33,16 +33,20 @@ import org.flowable.app.repository.editor.ModelRepository;
 import org.flowable.app.service.api.ModelService;
 import org.flowable.app.service.exception.BadRequestException;
 import org.flowable.app.service.exception.InternalServerErrorException;
+import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.cmmn.converter.CmmnXmlConverter;
+import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
 import org.flowable.editor.dmn.converter.DmnJsonConverter;
+import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -62,9 +66,15 @@ public class BaseAppDefinitionService {
 
     @Autowired
     protected ObjectMapper objectMapper;
+    
+    protected BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
+    protected BpmnXMLConverter bpmnXMLConverter = new BpmnXMLConverter();
 
     protected DmnJsonConverter dmnJsonConverter = new DmnJsonConverter();
     protected DmnXMLConverter dmnXMLConverter = new DmnXMLConverter();
+    
+    protected CmmnJsonConverter cmmnJsonConverter = new CmmnJsonConverter();
+    protected CmmnXmlConverter cmmnXMLConverter = new CmmnXmlConverter();
 
     protected Map<String, StartEvent> processNoneStartEvents(BpmnModel bpmnModel) {
         Map<String, StartEvent> startEventMap = new HashMap<>();
@@ -132,9 +142,11 @@ public class BaseAppDefinitionService {
 
             Map<String, Model> formMap = new HashMap<>();
             Map<String, Model> decisionTableMap = new HashMap<>();
+            Map<String, Model> caseModelMap = new HashMap<>();
+            Map<String, Model> processModelMap = new HashMap<>();
 
             createDeployableBpmnModels(appDefinitionModel, appDefinition, deployableAssets, formMap, decisionTableMap);
-            createDeployableCmmnModels(appDefinitionModel, appDefinition, deployableAssets, formMap, decisionTableMap);
+            createDeployableCmmnModels(appDefinitionModel, appDefinition, deployableAssets, formMap, decisionTableMap, caseModelMap, processModelMap);
 
             if (formMap.size() > 0) {
                 for (String formId : formMap.keySet()) {
@@ -156,6 +168,34 @@ public class BaseAppDefinitionService {
                         deployableAssets.put("dmn-" + decisionTableInfo.getKey() + ".dmn", dmnXMLBytes);
                     } catch (Exception e) {
                         throw new InternalServerErrorException(String.format("Error converting decision table %s to XML", decisionTableInfo.getName()));
+                    }
+                }
+            }
+            
+            if (caseModelMap.size() > 0) {
+                for (String caseModelId : caseModelMap.keySet()) {
+                    Model caseInfo = caseModelMap.get(caseModelId);
+                    try {
+                        JsonNode caseNode = objectMapper.readTree(caseInfo.getModelEditorJson());
+                        CmmnModel cmmnModel = cmmnJsonConverter.convertToCmmnModel(caseNode);
+                        byte[] cmmnXMLBytes = cmmnXMLConverter.convertToXML(cmmnModel);
+                        deployableAssets.put("cmmn-" + caseInfo.getKey() + ".cmmn", cmmnXMLBytes);
+                    } catch (Exception e) {
+                        throw new InternalServerErrorException(String.format("Error converting CMMN model %s to XML", caseInfo.getName()));
+                    }
+                }
+            }
+            
+            if (processModelMap.size() > 0) {
+                for (String processModelId : processModelMap.keySet()) {
+                    Model processInfo = processModelMap.get(processModelId);
+                    try {
+                        JsonNode processNode = objectMapper.readTree(processInfo.getModelEditorJson());
+                        BpmnModel bpmnModel = bpmnJsonConverter.convertToBpmnModel(processNode);
+                        byte[] bpmnXMLBytes = bpmnXMLConverter.convertToXML(bpmnModel);
+                        deployableAssets.put("bpmn-" + processInfo.getKey() + ".bpmn", bpmnXMLBytes);
+                    } catch (Exception e) {
+                        throw new InternalServerErrorException(String.format("Error converting BPMN model %s to XML", processInfo.getName()));
                     }
                 }
             }
@@ -199,7 +239,7 @@ public class BaseAppDefinitionService {
     }
     
     protected void createDeployableCmmnModels(Model appDefinitionModel, AppDefinition appDefinition, Map<String, byte[]> deployableAssets, 
-                    Map<String, Model> formMap, Map<String, Model> decisionTableMap) {
+                    Map<String, Model> formMap, Map<String, Model> decisionTableMap, Map<String, Model> caseModelMap, Map<String, Model> processModelMap) {
         
         for (AppModelDefinition appModelDef : appDefinition.getCmmnModels()) {
 
@@ -215,10 +255,16 @@ public class BaseAppDefinitionService {
 
                 } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
                     decisionTableMap.put(childModel.getId(), childModel);
+                
+                } else if (Model.MODEL_TYPE_CMMN == childModel.getModelType()) {
+                    caseModelMap.put(childModel.getId(), childModel);
+                
+                } else if (Model.MODEL_TYPE_BPMN == childModel.getModelType()) {
+                    processModelMap.put(childModel.getId(), childModel);
                 }
             }
 
-            CmmnModel cmmnModel = modelService.getCmmnModel(caseModel, formMap, decisionTableMap);
+            CmmnModel cmmnModel = modelService.getCmmnModel(caseModel, formMap, decisionTableMap, caseModelMap, processModelMap);
 
             byte[] modelXML = modelService.getCmmnXML(cmmnModel);
             deployableAssets.put(caseModel.getKey().replaceAll(" ", "") + ".cmmn", modelXML);

@@ -15,14 +15,17 @@ package org.flowable.cmmn.editor.constants;
 /**
  * @author Tijs Rademakers
  */
-public interface StencilConstants {
+public interface CmmnStencilConstants {
 
     // stencil items
     String STENCIL_PLANMODEL = "PlanModel";
     String STENCIL_STAGE = "Stage";
     String STENCIL_TASK = "Task";
     String STENCIL_TASK_HUMAN = "HumanTask";
+    String STENCIL_TASK_SERVICE = "ServiceTask";
     String STENCIL_TASK_DECISION = "DecisionTask";
+    String STENCIL_TASK_CASE = "CaseTask";
+    String STENCIL_TASK_PROCESS = "ProcessTask";
     String STENCIL_MILESTONE = "Milestone";
 
     String STENCIL_ENTRY_CRITERION = "EntryCriterion";
@@ -81,6 +84,24 @@ public interface StencilConstants {
     String PROPERTY_DECISIONTABLE_REFERENCE_NAME = "decisiontablereferencename";
     String PROPERTY_DECISIONTABLE_REFERENCE_KEY = "decisionTableReferenceKey";
     
+    String PROPERTY_CASE_REFERENCE = "casetaskcasereference";
+    
+    String PROPERTY_PROCESS_REFERENCE = "processtaskprocessreference";
+    
     String PROPERTY_IF_PART_CONDITION = "ifpartcondition";
+    
+    String PROPERTY_HTTPTASK_REQ_METHOD = "httptaskrequestmethod";
+    String PROPERTY_HTTPTASK_REQ_URL = "httptaskrequesturl";
+    String PROPERTY_HTTPTASK_REQ_HEADERS = "httptaskrequestheaders";
+    String PROPERTY_HTTPTASK_REQ_BODY  = "httptaskrequestbody";
+    String PROPERTY_HTTPTASK_REQ_TIMEOUT = "httptaskrequesttimeout";
+    String PROPERTY_HTTPTASK_REQ_DISALLOW_REDIRECTS = "httptaskdisallowredirects";
+    String PROPERTY_HTTPTASK_REQ_FAIL_STATUS_CODES = "httptaskfailstatuscodes";
+    String PROPERTY_HTTPTASK_REQ_HANDLE_STATUS_CODES = "httptaskhandlestatuscodes";
+    String PROPERTY_HTTPTASK_REQ_IGNORE_EXCEPTION = "httptaskignoreexception";
+    String PROPERTY_HTTPTASK_RESPONSE_VARIABLE_NAME = "httptaskresponsevariablename";
+    String PROPERTY_HTTPTASK_SAVE_REQUEST_VARIABLES = "httptasksaverequestvariables";
+    String PROPERTY_HTTPTASK_SAVE_RESPONSE_PARAMETERS = "httptasksaveresponseparameters";
+    String PROPERTY_HTTPTASK_RESULT_VARIABLE_PREFIX = "httptaskresultvariableprefix";
     
 }

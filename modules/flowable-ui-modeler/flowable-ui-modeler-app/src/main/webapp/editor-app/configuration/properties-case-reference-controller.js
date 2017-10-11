@@ -11,12 +11,12 @@
  * limitations under the License.
  */
 
-angular.module('flowableModeler').controller('FlowableCollapsedSubprocessReferenceCtrl',
+angular.module('flowableModeler').controller('FlowableCaseReferenceCtrl',
     [ '$scope', '$modal', '$http', function($scope, $modal, $http) {
 	
      // Config for the modal window
      var opts = {
-         template:  'editor-app/configuration/properties/subprocess-reference-popup.html?version=' + Date.now(),
+         template:  'editor-app/configuration/properties/case-reference-popup.html?version=' + Date.now(),
          scope: $scope
      };
 
@@ -24,9 +24,9 @@ angular.module('flowableModeler').controller('FlowableCollapsedSubprocessReferen
         _internalCreateModal(opts, $modal, $scope);
 }]);
 
-angular.module('flowableModeler').controller('FlowableCollapsedSubprocessReferencePopupCtrl', [ '$scope', '$http', function($scope, $http) {
+angular.module('flowableModeler').controller('FlowableCaseReferencePopupCtrl', [ '$scope', '$http', 'editorManager', function($scope, $http, editorManager) {
 	
-    $scope.state = {'loadingSubprocesses' : true, 'error' : false};
+    $scope.state = {'loadingCases' : true, 'error' : false};
     
     // Close button handler
     $scope.close = function() {
@@ -34,21 +34,21 @@ angular.module('flowableModeler').controller('FlowableCollapsedSubprocessReferen
         $scope.$hide();
     };
     
-    // Selecting/deselecting a subprocess
-    $scope.selectSubProcess = function(sub, $event) {
+    // Selecting/deselecting a case
+    $scope.selectCase = function(caseModel, $event) {
    	 	$event.stopPropagation();
-   	 	if ($scope.selectedSubProcess && $scope.selectedSubProcess.id && sub.id == $scope.selectedSubProcess.id) {
+   	 	if ($scope.selectedCase && $scope.selectedCase.id && caseModel.id == $scope.selectedCase.id) {
    	 		// un-select the current selection
-   	 		$scope.selectedSubProcess = null;
+   	 		$scope.selectedCase = null;
    	 	} else {
-   	 		$scope.selectedSubProcess = sub;
+   	 		$scope.selectedCase = caseModel;
    	 	}
     };
     
     // Saving the selected value
     $scope.save = function() {
-   	 	if ($scope.selectedSubProcess) {
-   	 		$scope.property.value = {'id' : $scope.selectedSubProcess.id, 'name' : $scope.selectedSubProcess.name};
+   	 	if ($scope.selectedCase) {
+   	 		$scope.property.value = {'id' : $scope.selectedCase.id, 'name' : $scope.selectedCase.name};
    	 	} else {
    	 		$scope.property.value = null; 
    	 	}
@@ -56,25 +56,25 @@ angular.module('flowableModeler').controller('FlowableCollapsedSubprocessReferen
    	 	$scope.close();
     };
     
-    $scope.loadProcesses = function() {
-   	 
-    	$http.get(FLOWABLE.CONFIG.contextRoot + '/app/rest/models?filter=myprocesses')
+    $scope.loadCases = function() {
+   	    var modelMetaData = editorManager.getBaseModelData();
+    	$http.get(FLOWABLE.CONFIG.contextRoot + '/app/rest/case-models?excludeId=' + modelMetaData.modelId)
     		.success(
     			function(response) {
-    				$scope.state.loadingSubprocesses = false;
-    				$scope.state.subprocessError = false;
-    				$scope.subProcesses = response.data;
+    				$scope.state.loadingCases = false;
+    				$scope.state.caseError = false;
+    				$scope.caseModels = response.data;
     			})
     		.error(
     			function(data, status, headers, config) {
-    				$scope.state.loadingSubprocesses = false;
-    				$scope.state.subprocessError = true;
+    				$scope.state.loadingCases = false;
+    				$scope.state.caseError = true;
     			});
     };
     
     if ($scope.property && $scope.property.value && $scope.property.value.id) {
-   	 	$scope.selectedSubProcess = $scope.property.value;
+   	 	$scope.selectedCase = $scope.property.value;
     }
     
-    $scope.loadProcesses();  
+    $scope.loadCases();  
 }]);

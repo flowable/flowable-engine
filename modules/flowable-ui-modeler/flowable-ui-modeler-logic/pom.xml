@@ -55,6 +55,10 @@
             <artifactId>flowable-cmmn-json-converter</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-cmmn-image-generator</artifactId>
+        </dependency>
+        <dependency>
         	<groupId>org.flowable</groupId>
         	<artifactId>flowable-dmn-xml-converter</artifactId>
         </dependency>

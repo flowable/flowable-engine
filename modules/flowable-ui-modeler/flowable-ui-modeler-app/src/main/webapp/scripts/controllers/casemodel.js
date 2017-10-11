@@ -43,32 +43,32 @@ angular.module('flowableModeler')
     			($routeParams.modelHistoryId == undefined ? '' : '/history/' + $routeParams.modelHistoryId) + '/cmmn?version=' + Date.now();
 
 
-        	  /*$rootScope.$on('$routeChangeStart', function(event, next, current) {
-        		  jQuery('.qtip').qtip('destroy', true);
-        	  });
-        	  
-	          $timeout(function() {
-	            jQuery("#bpmnModel").attr('data-model-id', $routeParams.modelId);
-	            jQuery("#bpmnModel").attr('data-model-type', 'design');
-	            
-	            // in case we want to show a historic model, include additional attribute on the div
-	            if(!$scope.model.process.latestVersion) {
-	              jQuery("#bpmnModel").attr('data-history-id', $routeParams.modelHistoryId);
-	            }
+    	  $rootScope.$on('$routeChangeStart', function(event, next, current) {
+    		  jQuery('.qtip').qtip('destroy', true);
+    	  });
+    	  
+          $timeout(function() {
+            jQuery("#cmmnModel").attr('data-model-id', $routeParams.modelId);
+            jQuery("#cmmnModel").attr('data-model-type', 'design');
+            
+            // in case we want to show a historic model, include additional attribute on the div
+            if(!$scope.model.caseModel.latestVersion) {
+              jQuery("#cmmnModel").attr('data-history-id', $routeParams.modelHistoryId);
+            }
 
-                var viewerUrl = appResourceRoot + "display/displaymodel.html?version=" + Date.now();
+            var viewerUrl = appResourceRoot + "display-cmmn/displaymodel.html?version=" + Date.now();
 
-                // If Flowable has been deployed inside an AMD environment Raphael will fail to register
-                // itself globally until displaymodel.js (which depends ona global Raphale variable) is running,
-                // therefore remove AMD's define method until we have loaded in Raphael and displaymodel.js
-                // and assume/hope its not used during.
-                var amdDefine = window.define;
-                window.define = undefined;
-                ResourceService.loadFromHtml(viewerUrl, function(){
-                    // Restore AMD's define method again
-                    window.define = amdDefine;
-                });
-              });*/
+            // If Flowable has been deployed inside an AMD environment Raphael will fail to register
+            // itself globally until displaymodel.js (which depends ona global Raphael variable) is running,
+            // therefore remove AMD's define method until we have loaded in Raphael and displaymodel.js
+            // and assume/hope its not used during.
+            var amdDefine = window.define;
+            window.define = undefined;
+            ResourceService.loadFromHtml(viewerUrl, function(){
+                // Restore AMD's define method again
+                window.define = amdDefine;
+            });
+          });
 
         }).error(function(data, status, headers, config) {
           $scope.returnToList();

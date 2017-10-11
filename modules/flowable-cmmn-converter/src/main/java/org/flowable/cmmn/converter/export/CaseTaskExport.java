@@ -14,6 +14,7 @@ package org.flowable.cmmn.converter.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CaseTask;
 
 public class CaseTaskExport extends AbstractPlanItemDefinitionExport {
@@ -23,6 +24,10 @@ public class CaseTaskExport extends AbstractPlanItemDefinitionExport {
         xtw.writeStartElement(ELEMENT_CASE_TASK);
         writeCommonPlanItemDefinitionAttributes(caseTask, xtw);
         writeBlockingAttribute(xtw, caseTask);
+        
+        if (StringUtils.isNotEmpty(caseTask.getCaseRef())) {
+            xtw.writeAttribute(ATTRIBUTE_CASE_REF, caseTask.getCaseRef());
+        }
         
         // end case task element
         xtw.writeEndElement();

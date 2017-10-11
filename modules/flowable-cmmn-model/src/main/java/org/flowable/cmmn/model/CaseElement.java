@@ -14,7 +14,16 @@ package org.flowable.cmmn.model;
 
 public class CaseElement extends CmmnElement {
     
+    protected String name;
     protected PlanFragment parent;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
     public PlanFragment getParent() {
         return parent;

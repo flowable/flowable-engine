@@ -19,14 +19,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.constants.EditorJsonConstants;
-import org.flowable.cmmn.editor.constants.StencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverterUtil;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 
-public class JsonConverterUtil implements EditorJsonConstants, StencilConstants {
+public class CmmnModelJsonConverterUtil implements EditorJsonConstants, CmmnStencilConstants {
 
     public static String getPropertyValueAsString(String name, JsonNode objectNode) {
         String propertyValue = null;
@@ -83,13 +83,13 @@ public class JsonConverterUtil implements EditorJsonConstants, StencilConstants 
      * Returns a map with said json nodes, with the key the name of the childshape.
      */
 
-    protected static List<JsonLookupResult> getBpmnProcessModelChildShapesPropertyValues(JsonNode editorJsonNode, String propertyName, List<String> allowedStencilTypes) {
+    protected static List<JsonLookupResult> getCmmnModelChildShapesPropertyValues(JsonNode editorJsonNode, String propertyName, List<String> allowedStencilTypes) {
         List<JsonLookupResult> result = new ArrayList<>();
-        internalGetBpmnProcessChildShapePropertyValues(editorJsonNode, propertyName, allowedStencilTypes, result);
+        internalGetCmmnChildShapePropertyValues(editorJsonNode, propertyName, allowedStencilTypes, result);
         return result;
     }
 
-    protected static void internalGetBpmnProcessChildShapePropertyValues(JsonNode editorJsonNode, String propertyName,
+    protected static void internalGetCmmnChildShapePropertyValues(JsonNode editorJsonNode, String propertyName,
             List<String> allowedStencilTypes, List<JsonLookupResult> result) {
 
         JsonNode childShapesNode = editorJsonNode.get("childShapes");
@@ -115,7 +115,7 @@ public class JsonConverterUtil implements EditorJsonConstants, StencilConstants 
 
                 // Potential nested child shapes
                 if (childShapeNode.has("childShapes")) {
-                    internalGetBpmnProcessChildShapePropertyValues(childShapeNode, propertyName, allowedStencilTypes, result);
+                    internalGetCmmnChildShapePropertyValues(childShapeNode, propertyName, allowedStencilTypes, result);
                 }
 
             }
@@ -125,13 +125,25 @@ public class JsonConverterUtil implements EditorJsonConstants, StencilConstants 
     public static List<JsonLookupResult> getCmmnModelFormReferences(JsonNode editorJsonNode) {
         List<String> allowedStencilTypes = new ArrayList<>();
         allowedStencilTypes.add(STENCIL_TASK_HUMAN);
-        return getBpmnProcessModelChildShapesPropertyValues(editorJsonNode, "formreference", allowedStencilTypes);
+        return getCmmnModelChildShapesPropertyValues(editorJsonNode, "formreference", allowedStencilTypes);
     }
 
     public static List<JsonLookupResult> getCmmnModelDecisionTableReferences(JsonNode editorJsonNode) {
         List<String> allowedStencilTypes = new ArrayList<>();
         allowedStencilTypes.add(STENCIL_TASK_DECISION);
-        return getBpmnProcessModelChildShapesPropertyValues(editorJsonNode, "decisiontaskdecisiontablereference", allowedStencilTypes);
+        return getCmmnModelChildShapesPropertyValues(editorJsonNode, "decisiontaskdecisiontablereference", allowedStencilTypes);
+    }
+    
+    public static List<JsonLookupResult> getCmmnModelCaseReferences(JsonNode editorJsonNode) {
+        List<String> allowedStencilTypes = new ArrayList<>();
+        allowedStencilTypes.add(STENCIL_TASK_CASE);
+        return getCmmnModelChildShapesPropertyValues(editorJsonNode, PROPERTY_CASE_REFERENCE, allowedStencilTypes);
+    }
+    
+    public static List<JsonLookupResult> getCmmnModelProcessReferences(JsonNode editorJsonNode) {
+        List<String> allowedStencilTypes = new ArrayList<>();
+        allowedStencilTypes.add(STENCIL_TASK_PROCESS);
+        return getCmmnModelChildShapesPropertyValues(editorJsonNode, PROPERTY_PROCESS_REFERENCE, allowedStencilTypes);
     }
 
     // APP MODEL
@@ -150,7 +162,7 @@ public class JsonConverterUtil implements EditorJsonConstants, StencilConstants 
 
     public static Set<String> getAppModelReferencedModelIds(JsonNode appModelJson) {
         if (appModelJson.has("models")) {
-            return JsonConverterUtil.gatherStringPropertyFromJsonNodes(appModelJson.get("models"), "id");
+            return CmmnModelJsonConverterUtil.gatherStringPropertyFromJsonNodes(appModelJson.get("models"), "id");
         }
         return Collections.emptySet();
     }
