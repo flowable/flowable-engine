@@ -71,6 +71,8 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
         cmmnEngineConfiguration.setHistoricTaskQueryLimit(processEngineConfiguration.getHistoricTaskQueryLimit());
 
         initCmmnEngine();
+        
+        initServiceConfigurations(processEngineConfiguration, cmmnEngineConfiguration);
     }
 
     protected void initProcessInstanceService(ProcessEngineConfigurationImpl processEngineConfiguration) {

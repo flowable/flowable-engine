@@ -36,6 +36,8 @@ public class SpringFormEngineConfigurator extends FormEngineConfigurator {
         formEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
 
         initFormEngine();
+        
+        initServiceConfigurations(processEngineConfiguration, formEngineConfiguration);
     }
 
     @Override
