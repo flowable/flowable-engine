@@ -75,7 +75,7 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
     }
     
     @Test
-    public void testQuertByCaseDefinitionId() {
+    public void testQueryByCaseDefinitionId() {
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
         assertNotNull(caseDefinition);
         assertEquals(NR_CASE_INSTANCES, cmmnTaskService.createTaskQuery().caseDefinitionId(caseDefinition.getId()).list().size());

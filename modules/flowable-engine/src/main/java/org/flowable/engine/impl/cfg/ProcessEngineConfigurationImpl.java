@@ -286,6 +286,7 @@ import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
+import org.flowable.job.service.impl.db.JobDbSchemaManager;
 import org.flowable.task.service.InternalTaskLocalizationManager;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
 import org.flowable.task.service.TaskServiceConfiguration;
@@ -743,6 +744,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected DbSchemaManager identityLinkDbSchemaManager;
     protected DbSchemaManager variableDbSchemaManager;
     protected DbSchemaManager taskDbSchemaManager;
+    protected DbSchemaManager jobDbSchemaManager;
 
     // Backwards compatibility //////////////////////////////////////////////////////////////
 
@@ -923,6 +925,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initIdentityLinkDbSchemaManager();
         initVariableDbSchemaManager();
         initTaskDbSchemaManager();
+        initJobDbSchemaManager();
     }
 
     protected void initProcessDbSchemaManager() {
@@ -946,6 +949,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected void initIdentityLinkDbSchemaManager() {
         if (this.identityLinkDbSchemaManager == null) {
             this.identityLinkDbSchemaManager = new IdentityLinkDbSchemaManager();
+        }
+    }
+    
+    protected void initJobDbSchemaManager() {
+        if (this.jobDbSchemaManager == null) {
+            this.jobDbSchemaManager = new JobDbSchemaManager();
         }
     }
 
@@ -3436,6 +3445,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setIdentityLinkDbSchemaManager(DbSchemaManager identityLinkDbSchemaManager) {
         this.identityLinkDbSchemaManager = identityLinkDbSchemaManager;
+        return this;
+    }
+    
+    public DbSchemaManager getJobDbSchemaManager() {
+        return jobDbSchemaManager;
+    }
+
+    public ProcessEngineConfigurationImpl setJobDbSchemaManager(DbSchemaManager jobDbSchemaManager) {
+        this.jobDbSchemaManager = jobDbSchemaManager;
         return this;
     }
 

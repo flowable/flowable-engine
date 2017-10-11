@@ -92,6 +92,7 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         getIdentityLinkDbSchemaManager().dbSchemaCreate();
         getTaskDbSchemaManager().dbSchemaCreate();
         getVariableDbSchemaManager().dbSchemaCreate();
+        getJobDbSchemaManager().dbSchemaCreate();
         
         if (isEngineTablePresent()) {
             String dbVersion = getDbVersion();
@@ -126,6 +127,12 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
             
         } catch (Exception e) {
             LOGGER.info("Error dropping engine tables", e);
+        }
+        
+        try {
+            getJobDbSchemaManager().dbSchemaDrop();
+        } catch (Exception e) {
+            LOGGER.info("Error dropping job tables", e);
         }
      
         try {
@@ -166,6 +173,7 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         getIdentityLinkDbSchemaManager().dbSchemaUpdate();
         getTaskDbSchemaManager().dbSchemaUpdate();
         getVariableDbSchemaManager().dbSchemaUpdate();
+        getJobDbSchemaManager().dbSchemaUpdate();
 
         String feedback = null;
         boolean isUpgradeNeeded = false;
@@ -329,6 +337,10 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     
     protected DbSchemaManager getTaskDbSchemaManager() {
         return CommandContextUtil.getProcessEngineConfiguration().getTaskDbSchemaManager();
+    }
+    
+    protected DbSchemaManager getJobDbSchemaManager() {
+        return CommandContextUtil.getProcessEngineConfiguration().getJobDbSchemaManager();
     }
     
     @Override
