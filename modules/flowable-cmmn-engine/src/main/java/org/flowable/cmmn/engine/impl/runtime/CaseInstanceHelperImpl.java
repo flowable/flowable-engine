@@ -28,6 +28,7 @@ import org.flowable.cmmn.engine.runtime.CaseInstanceState;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.callback.CallbackData;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
+import org.flowable.engine.common.impl.identity.Authentication;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
@@ -109,6 +110,11 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         caseInstanceEntity.setStartTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
         caseInstanceEntity.setState(CaseInstanceState.ACTIVE);
         caseInstanceEntity.setTenantId(caseDefinition.getTenantId());
+        
+        String authenticatedUserId = Authentication.getAuthenticatedUserId();
+
+        caseInstanceEntity.setStartUserId(authenticatedUserId);
+        
         caseInstanceEntityManager.insert(caseInstanceEntity);
         
         caseInstanceEntity.setSatisfiedSentryPartInstances(new ArrayList<SentryPartInstanceEntity>(1));

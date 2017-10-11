@@ -55,7 +55,7 @@ public class CaseTaskActivityBehavior extends TaskActivityBehavior implements Pl
         planItemInstanceEntity.setReferenceType(PlanItemInstanceCallbackType.CHILD_CASE);
         planItemInstanceEntity.setReferenceId(caseInstanceEntity.getId());
         
-        if (!determineIsBlocking(planItemInstanceEntity)) {
+        if (!evaluateIsBlocking(planItemInstanceEntity)) {
             CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance((PlanItemInstanceEntity) planItemInstanceEntity);
         }
     }

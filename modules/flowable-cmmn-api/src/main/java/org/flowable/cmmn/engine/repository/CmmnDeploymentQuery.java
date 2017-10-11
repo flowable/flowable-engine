@@ -13,6 +13,8 @@
 
 package org.flowable.cmmn.engine.repository;
 
+import java.util.List;
+
 import org.flowable.cmmn.engine.CmmnRepositoryService;
 import org.flowable.engine.common.api.query.Query;
 
@@ -35,6 +37,11 @@ public interface CmmnDeploymentQuery extends Query<CmmnDeploymentQuery, CmmnDepl
      * Only select deployments with the given deployment id.
      */
     CmmnDeploymentQuery deploymentId(String deploymentId);
+    
+    /**
+     * Only select deployments with the given deployment ids.
+     */
+    CmmnDeploymentQuery deploymentIds(List<String> deploymentIds);
 
     /**
      * Only select deployments with the given name.
@@ -59,6 +66,13 @@ public interface CmmnDeploymentQuery extends Query<CmmnDeploymentQuery, CmmnDepl
      * @see CmmnDeploymentBuilder#category(String)
      */
     CmmnDeploymentQuery deploymentCategoryNotEquals(String categoryNotEquals);
+    
+    /**
+     * Only select deployments with the given key.
+     * 
+     * @see CmmnDeploymentBuilder#key(String)
+     */
+    CmmnDeploymentQuery deploymentKey(String key);
 
     /**
      * Only select deployment that have the given tenant id.
@@ -84,6 +98,11 @@ public interface CmmnDeploymentQuery extends Query<CmmnDeploymentQuery, CmmnDepl
      * Only select deployments with a parent deployment id like the given one.
      */
     CmmnDeploymentQuery parentDeploymentIdLike(String parentDeploymentIdLike);
+    
+    /**
+     * Only select deployments where the deployment time is the latest value. Can only be used together with the deployment key.
+     */
+    CmmnDeploymentQuery latest();
 
     // sorting ////////////////////////////////////////////////////////
 

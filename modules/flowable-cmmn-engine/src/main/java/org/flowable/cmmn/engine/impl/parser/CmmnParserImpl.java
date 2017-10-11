@@ -29,6 +29,7 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanFragment;
@@ -118,6 +119,10 @@ public class CmmnParserImpl implements CmmnParser {
             if (planItemDefinition instanceof Stage) {
                 Stage stage = (Stage) planItemDefinition;
                 planItem.setBehavior(activityBehaviorFactory.createStageActivityBehavoir(planItem, stage));
+                
+            } else if (planItemDefinition instanceof HumanTask) { 
+                HumanTask humanTask = (HumanTask) planItemDefinition;
+                planItem.setBehavior(activityBehaviorFactory.createHumanTaskActivityBehavior(planItem, humanTask));
                 
             } else if (planItemDefinition instanceof CaseTask) {
                 CaseTask caseTask = (CaseTask) planItemDefinition;

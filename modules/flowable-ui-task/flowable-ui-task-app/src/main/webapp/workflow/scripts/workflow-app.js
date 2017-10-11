@@ -96,6 +96,10 @@ flowableApp
             templateUrl: appResourceRoot + 'views/process.html',
             controller: 'ProcessController'
         })
+        .when('/cases', {
+            templateUrl: appResourceRoot + 'views/cases.html',
+            controller: 'CasesController'
+        })
         .otherwise({
             redirectTo: FLOWABLE.CONFIG.appDefaultRoute || '/tasks'
         });
@@ -119,8 +123,8 @@ flowableApp
        // turn loading bar spinner off (angular-loading-bar lib)
        cfpLoadingBarProvider.includeSpinner = false;
     }])
-    .run(['$rootScope', '$routeParams', '$timeout', '$translate', '$location', '$http', '$window', 'appResourceRoot', 'AppDefinitionService', 'ProcessService',
-        function($rootScope, $routeParams, $timeout, $translate, $location, $http, $window, appResourceRoot, AppDefinitionService, ProcessService) {
+    .run(['$rootScope', '$routeParams', '$timeout', '$translate', '$location', '$http', '$window', 'appResourceRoot', 'AppDefinitionService', 'ProcessService', 'CaseService',
+        function($rootScope, $routeParams, $timeout, $translate, $location, $http, $window, appResourceRoot, AppDefinitionService, ProcessService, CaseService) {
 
         // set angular translate fallback language
         $translate.fallbackLanguage(['en']);
@@ -171,6 +175,11 @@ flowableApp
                 'id': 'processes',
                 'title': 'GENERAL.NAVIGATION.PROCESSES',
                 'path': '/processes'
+            },
+            {
+                'id': 'cases',
+                'title': 'GENERAL.NAVIGATION.CASES',
+                'path': '/cases'
             }
         ];
 
@@ -276,6 +285,12 @@ flowableApp
         	ProcessService.getProcessDefinitions(deploymentKey).then(function(response) {
         		$rootScope.root.processDefinitions = response.data;
         	});
+        };
+        
+        $rootScope.loadCaseDefinitions = function(deploymentKey) {
+            CaseService.getCaseDefinitions(deploymentKey).then(function(response) {
+                $rootScope.root.caseDefinitions = response.data;
+            });
         };
 
         $rootScope.$on("$locationChangeStart",
