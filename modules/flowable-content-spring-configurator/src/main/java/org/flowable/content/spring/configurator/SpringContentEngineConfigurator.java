@@ -36,6 +36,8 @@ public class SpringContentEngineConfigurator extends ContentEngineConfigurator {
         contentEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
         
         initContentEngine();
+        
+        initServiceConfigurations(processEngineConfiguration, contentEngineConfiguration);
     }
 
     @Override

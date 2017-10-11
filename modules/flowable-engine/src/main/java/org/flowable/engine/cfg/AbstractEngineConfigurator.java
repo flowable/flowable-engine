@@ -151,7 +151,6 @@ public abstract class AbstractEngineConfigurator implements ProcessEngineConfigu
 
     protected void initialiseCommonProperties(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
         initEngineConfigurations(processEngineConfiguration, targetEngineConfiguration);
-        initServiceConfigurations(processEngineConfiguration, targetEngineConfiguration);
         initCommandContextFactory(processEngineConfiguration, targetEngineConfiguration);
         initIdGenerator(processEngineConfiguration, targetEngineConfiguration);
         
@@ -171,7 +170,12 @@ public abstract class AbstractEngineConfigurator implements ProcessEngineConfigu
     }
     
     protected void initServiceConfigurations(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
-        targetEngineConfiguration.setServiceConfigurations(processEngineConfiguration.getServiceConfigurations());
+        for (String serviceConfigurationKey : processEngineConfiguration.getServiceConfigurations().keySet()) {
+            if (targetEngineConfiguration.getServiceConfigurations() == null 
+                    || !targetEngineConfiguration.getServiceConfigurations().containsKey(serviceConfigurationKey)) {
+                targetEngineConfiguration.addServiceConfiguration(serviceConfigurationKey, processEngineConfiguration.getServiceConfigurations().get(serviceConfigurationKey));
+            }
+        }
     }
 
     protected void initCommandContextFactory(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {

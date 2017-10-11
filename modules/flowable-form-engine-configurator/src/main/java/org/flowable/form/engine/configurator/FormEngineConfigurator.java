@@ -79,6 +79,8 @@ public class FormEngineConfigurator extends AbstractEngineConfigurator {
         initialiseCommonProperties(processEngineConfiguration, formEngineConfiguration);
 
         initFormEngine();
+        
+        initServiceConfigurations(processEngineConfiguration, formEngineConfiguration);
     }
     
     @Override
