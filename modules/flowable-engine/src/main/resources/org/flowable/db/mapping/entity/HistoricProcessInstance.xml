@@ -176,13 +176,13 @@
 	      DELETE_REASON_ = #{deleteReason, jdbcType=VARCHAR},
 	    </if>
 	    <if test="originalPersistentState.name != name">
-	      NAME_ = #{name, jdbcType=VARCHAR}
+	      NAME_ = #{name, jdbcType=VARCHAR},
 	    </if>
         <if test="originalPersistentState.callbackId != callbackId">
-          CALLBACK_ID_ = #{callbackId, jdbcType=VARCHAR}
+          CALLBACK_ID_ = #{callbackId, jdbcType=VARCHAR},
         </if> 
         <if test="originalPersistentState.callbackType != callbackType">
-          CALLBACK_ID_ = #{callbackType, jdbcType=VARCHAR}
+          CALLBACK_TYPE_ = #{callbackType, jdbcType=VARCHAR}
         </if>    
       </set>
     where ID_ = #{id}
@@ -224,6 +224,8 @@
     <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
+    <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
   </resultMap>
   
   <resultMap id="historicProcessInstanceAndVariablesResultMap" type="org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl">
@@ -246,6 +248,8 @@
     <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
+    <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
     <collection property="queryVariables" column="EXECUTION_ID_" javaType="ArrayList" ofType="org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityImpl">
       <id property="id" column="VAR_ID_"/>
       <result property="name" column="VAR_NAME_" javaType="String" jdbcType="VARCHAR" />

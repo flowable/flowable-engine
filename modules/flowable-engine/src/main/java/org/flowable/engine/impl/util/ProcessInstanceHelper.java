@@ -229,6 +229,15 @@ public class ProcessInstanceHelper {
                                 initiatorVariableName, initialFlowElement.getId());
 
         processInstance.setName(processInstanceName);
+        
+        // Callbacks
+        if (callbackId != null) {
+            processInstance.setCallbackId(callbackId);
+        }
+        if (callbackType != null) {
+            processInstance.setCallbackType(callbackType);
+        }
+
 
         CommandContextUtil.getHistoryManager(commandContext).recordProcessInstanceStart(processInstance);
 
@@ -252,14 +261,6 @@ public class ProcessInstanceHelper {
             }
         }
         
-        // Callbacks
-        if (callbackId != null) {
-            processInstance.setCallbackId(callbackId);
-        }
-        if (callbackType != null) {
-            processInstance.setCallbackType(callbackType);
-        }
-
         // Fire events
         if (eventDispatcherEnabled) {
             CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher()
