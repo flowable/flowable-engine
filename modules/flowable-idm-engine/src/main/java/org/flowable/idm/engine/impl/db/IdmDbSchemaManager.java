@@ -46,7 +46,7 @@ public class IdmDbSchemaManager extends ServiceSqlScriptBasedDbSchemaManager {
    
    @Override
    protected String getUpgradeStartVersion() {
-       return "59900";
+       return "5.99.0.0";
    }
    
    @Override
@@ -59,6 +59,15 @@ public class IdmDbSchemaManager extends ServiceSqlScriptBasedDbSchemaManager {
            super.internalDbSchemaCreate();
        }
    } 
+   
+   @Override
+   protected boolean isUpdateNeeded() {
+       boolean propertyTablePresent = isTablePresent(IDM_PROPERTY_TABLE);
+       if (!propertyTablePresent) {
+           return isIdmGroupTablePresent();
+       }
+       return true;
+   }
    
    public boolean isIdmGroupTablePresent() {
        return isTablePresent("ACT_ID_GROUP");

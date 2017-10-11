@@ -136,12 +136,14 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
     }
     
     public String getProperty(String propertyName) {
+        String tableName = getPropertyTable();
+        if (!getDbSqlSession().getDbSqlSessionFactory().isTablePrefixIsSchema()) {
+            tableName = prependDatabaseTablePrefix(tableName);
+        }
+        
         PreparedStatement statement = null;
         try {
-            String tableName = getPropertyTable();
-            if (!getDbSqlSession().getDbSqlSessionFactory().isTablePrefixIsSchema()) {
-                tableName = prependDatabaseTablePrefix(tableName);
-            }
+            
             statement = getDbSqlSession().getSqlSession().getConnection()
                     .prepareStatement("select VALUE_ from " + tableName + " where NAME_ = ?");
             statement.setString(1, propertyName);
@@ -152,7 +154,7 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
                 return null;
             }
         } catch (SQLException e) {
-            throw new FlowableException("Could not read property " + propertyName + " from ACT_GE_PROPERTY", e);
+            return null;
         } finally {
             if (statement != null) {
                 try {

@@ -35,7 +35,7 @@ public abstract class ServiceSqlScriptBasedDbSchemaManager extends AbstractSqlSc
     
     @Override
     public void dbSchemaCreate() {
-        if (isTablePresent(table)) {
+        if (isUpdateNeeded()) {
             String dbVersion = getSchemaVersion();
             if (!FlowableVersions.CURRENT_VERSION.equals(dbVersion)) {
                 throw new FlowableWrongDbException(FlowableVersions.CURRENT_VERSION, dbVersion);
@@ -63,7 +63,7 @@ public abstract class ServiceSqlScriptBasedDbSchemaManager extends AbstractSqlSc
     @Override
     public String dbSchemaUpdate() {
         String feedback = null;
-        if (isTablePresent(table)) {
+        if (isUpdateNeeded()) {
             String dbVersion = getSchemaVersion();
             String compareWithVersion = null;
             if (dbVersion == null) {
@@ -90,6 +90,10 @@ public abstract class ServiceSqlScriptBasedDbSchemaManager extends AbstractSqlSc
             dbSchemaCreate();
         }
         return feedback;
+    }
+
+    protected boolean isUpdateNeeded() {
+        return isTablePresent(table);
     }
     
     protected boolean isHistoryUsed() {
