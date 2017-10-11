@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.cmd;
+package org.flowable.cmmn.engine.impl.cmd;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,15 +22,17 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.CmmnRepositoryService;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.engine.repository.CaseDefinition;
+import org.flowable.cmmn.engine.repository.CmmnDeployment;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.form.api.FormService;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.FormFieldTypes;
@@ -53,7 +55,7 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
 
     @Override
     public FormModel execute(CommandContext commandContext) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         FormService formService = CommandContextUtil.getFormService();
         if (formService == null) {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");
@@ -65,10 +67,10 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
         }
 
         Map<String, Object> variables = new HashMap<>();
-        if (task.getProcessInstanceId() != null) {
-            List<HistoricVariableInstance> variableInstances = processEngineConfiguration.getHistoryService()
+        if (task.getScopeId() != null) {
+            List<HistoricVariableInstance> variableInstances = cmmnEngineConfiguration.getCmmnHistoryService()
                     .createHistoricVariableInstanceQuery()
-                    .processInstanceId(task.getProcessInstanceId())
+                    .caseInstanceId(task.getScopeId())
                     .list();
 
             for (HistoricVariableInstance historicVariableInstance : variableInstances) {
@@ -77,10 +79,15 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
         }
 
         String parentDeploymentId = null;
-        if (StringUtils.isNotEmpty(task.getProcessDefinitionId())) {
-            ProcessDefinition processDefinition = processEngineConfiguration.getRepositoryService()
-                    .getProcessDefinition(task.getProcessDefinitionId());
-            parentDeploymentId = processDefinition.getDeploymentId();
+        if (StringUtils.isNotEmpty(task.getScopeDefinitionId())) {
+            CmmnRepositoryService cmmnRepositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
+            CaseDefinition caseDefinition = cmmnRepositoryService.getCaseDefinition(task.getScopeDefinitionId());
+            CmmnDeployment cmmnDeployment = cmmnRepositoryService.createDeploymentQuery().deploymentId(caseDefinition.getDeploymentId()).singleResult();
+            if (cmmnDeployment.getParentDeploymentId() != null) {
+                parentDeploymentId = cmmnDeployment.getParentDeploymentId();
+            } else {
+                parentDeploymentId = cmmnDeployment.getId();
+            }
         }
 
         FormModel formModel = null;

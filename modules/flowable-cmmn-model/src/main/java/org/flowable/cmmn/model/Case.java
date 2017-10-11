@@ -18,6 +18,7 @@ import java.util.Map;
 public class Case extends CmmnElement {
     
     protected String name;
+    protected String initiatorVariableName;
     protected Stage planModel;
     protected Map<String, CaseElement> allCaseElements = new HashMap<>();
     
@@ -34,6 +35,14 @@ public class Case extends CmmnElement {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getInitiatorVariableName() {
+        return initiatorVariableName;
+    }
+
+    public void setInitiatorVariableName(String initiatorVariableName) {
+        this.initiatorVariableName = initiatorVariableName;
     }
 
     public Stage getPlanModel() {

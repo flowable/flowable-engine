@@ -34,18 +34,23 @@ public class DocumentationXmlConverter extends BaseCmmnXmlConverter {
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        String documentation = xtr.getText();
-        if (StringUtils.isNotEmpty(documentation)) {
-            conversionHelper.getCurrentCmmnElement().setDocumentation(documentation);
-            
+        try {
             String textFormat = xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_TEXT_FORMAT);
             if (StringUtils.isEmpty(textFormat)) {
                 textFormat = "text/plain";
             }
-            conversionHelper.getCurrentCmmnElement().setDocumentationTextFormat(textFormat);
             
+            String documentation = xtr.getElementText();
+            if (StringUtils.isNotEmpty(documentation)) {
+                conversionHelper.getCurrentCmmnElement().setDocumentation(documentation);
+                conversionHelper.getCurrentCmmnElement().setDocumentationTextFormat(textFormat);
+            }
+            
+            return null;
+            
+        } catch (Exception e) {
+            throw new CmmnXMLException("Error reading documentation element", e);
         }
-        return null;
     }
     
 }

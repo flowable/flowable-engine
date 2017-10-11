@@ -15,6 +15,7 @@ package org.flowable.app.service.runtime;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.model.common.UserRepresentation;
 import org.flowable.app.model.runtime.TaskRepresentation;
 import org.flowable.app.security.SecurityUtils;
@@ -54,13 +55,18 @@ public class FlowableTaskActionService extends FlowableAbstractTaskService {
         }
 
         if (!permissionService.isTaskOwnerOrAssignee(currentUser, task)) {
-            if (!permissionService.validateIfUserIsInitiatorAndCanCompleteTask(currentUser, task)) {
+            if (StringUtils.isEmpty(task.getScopeType()) && !permissionService.validateIfUserIsInitiatorAndCanCompleteTask(currentUser, task)) {
                 throw new NotPermittedException();
             }
         }
 
         try {
-            taskService.complete(task.getId());
+            if (StringUtils.isEmpty(task.getScopeType())) {
+                taskService.complete(task.getId());
+            } else {
+                cmmnTaskService.complete(task.getId());
+            }
+            
         } catch (FlowableException e) {
             LOGGER.error("Error completing task {}", taskId, e);
             throw new BadRequestException("Task " + taskId + " can't be completed", e);

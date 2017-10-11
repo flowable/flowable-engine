@@ -62,6 +62,16 @@
       "popular" : true
     } ]
   }, {
+    "name" : "case_initiatorvariablenamepackage",
+    "properties" : [ {
+      "id" : "case_initiatorvariablename",
+      "type" : "String",
+      "title" : "Initiator variable name",
+      "value" : "",
+      "description" : "Sets the variable name to be used for the case initiator value.",
+      "popular" : true
+    } ]
+  }, {
     "name" : "case_authorpackage",
     "properties" : [ {
       "id" : "case_author",
@@ -493,7 +503,7 @@
     "groups" : [ "Diagram" ],
     "mayBeRoot" : true,
     "hide" : true,
-    "propertyPackages" : [ "case_idpackage", "namepackage", "documentationpackage", "case_authorpackage", "case_versionpackage", "case_namespacepackage"],
+    "propertyPackages" : [ "case_idpackage", "namepackage", "documentationpackage", "case_initiatorvariablenamepackage", "case_authorpackage", "case_versionpackage", "case_namespacepackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ ]
   }, {

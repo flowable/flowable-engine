@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.cmd;
+package org.flowable.cmmn.engine.impl.cmd;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -19,12 +19,13 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentService;
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.form.model.FormField;
@@ -81,19 +82,45 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
 
             if (task.getProcessInstanceId() != null) {
                 formService.saveFormInstance(formVariables, formModel, task.getId(), task.getProcessInstanceId(), task.getProcessDefinitionId());
-            } else {
+            } else if (task.getScopeId() != null) {
                 formService.saveFormInstanceWithScopeId(formVariables, formModel, task.getId(), task.getScopeId(), task.getScopeType(), task.getScopeDefinitionId());
             }
 
             processUploadFieldsIfNeeded(formModel, task, commandContext);
 
-            TaskHelper.completeTask(task, formVariables, transientVariables, localScope, commandContext);
+            completeTask(commandContext, task, formVariables);
 
         } else {
-            TaskHelper.completeTask(task, variables, transientVariables, localScope, commandContext);
+            completeTask(commandContext, task, variables);
         }
         
         return null;
+    }
+    
+    protected void completeTask(CommandContext commandContext, TaskEntity task, Map<String, Object> taskVariables) {
+        String planItemInstanceId = task.getSubScopeId();
+        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceId);
+        if (planItemInstanceEntity == null) {
+            throw new FlowableException("Could not find plan item instance for task " + taskId);
+        }
+        
+        if (taskVariables != null) {
+            if (localScope) {
+                task.setVariablesLocal(taskVariables);
+            } else {
+                task.setVariables(taskVariables);
+            }
+        }
+        
+        if (transientVariables != null) {
+            if (localScope) {
+                task.setTransientVariablesLocal(transientVariables);
+            } else {
+                task.setTransientVariables(transientVariables);
+            }
+        }
+        
+        CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstance(planItemInstanceEntity);
     }
 
     /**

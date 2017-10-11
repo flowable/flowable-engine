@@ -17,5 +17,6 @@ public interface CmmnEngineConfigurationApi {
     public CmmnManagementService getCmmnManagementService();
     public CmmnRepositoryService getCmmnRepositoryService();
     public CmmnRuntimeService getCmmnRuntimeService();
+    public CmmnTaskService getCmmnTaskService();
     public CmmnHistoryService getCmmnHistoryService();
 }

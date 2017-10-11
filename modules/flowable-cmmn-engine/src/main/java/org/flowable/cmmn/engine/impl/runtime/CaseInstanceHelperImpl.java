@@ -25,6 +25,8 @@ import org.flowable.cmmn.engine.repository.CaseDefinition;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.cmmn.engine.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.engine.runtime.CaseInstanceState;
+import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.callback.CallbackData;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
@@ -78,6 +80,14 @@ public class CaseInstanceHelperImpl implements CaseInstanceHelper {
         
         if (caseInstanceBuilder.getTenantId() != null) {
             caseInstanceEntity.setTenantId(caseInstanceBuilder.getTenantId());
+        }
+        
+        CmmnDeploymentManager deploymentManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getDeploymentManager();
+        CmmnModel cmmnModel = deploymentManager.resolveCaseDefinition(caseDefinition).getCmmnModel();
+        Case caseModel = cmmnModel.getCaseById(caseDefinition.getKey());
+        
+        if (caseModel.getInitiatorVariableName() != null) {
+            caseInstanceEntity.setVariable(caseModel.getInitiatorVariableName(), Authentication.getAuthenticatedUserId());
         }
         
         Map<String, Object> variables = caseInstanceBuilder.getVariables();

@@ -21,8 +21,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.editor.constants.EditorJsonConstants;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
+import org.flowable.cmmn.editor.constants.EditorJsonConstants;
 import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
 import org.flowable.cmmn.editor.json.model.ModelInfo;
 import org.flowable.cmmn.model.Association;
@@ -160,6 +160,9 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         if (StringUtils.isNotEmpty(caseModel.getDocumentation())) {
             propertiesNode.put(PROPERTY_DOCUMENTATION, caseModel.getDocumentation());
         }
+        if (StringUtils.isNotEmpty(caseModel.getInitiatorVariableName())) {
+            propertiesNode.put(PROPERTY_CASE_INITIATOR_VARIABLE_NAME,  caseModel.getInitiatorVariableName());
+        }
         
         if (StringUtils.isNoneEmpty(model.getTargetNamespace())) {
             propertiesNode.put(PROPERTY_CASE_NAMESPACE, model.getTargetNamespace());
@@ -247,6 +250,11 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         cmmnModel.getCases().add(caseModel);
         caseModel.setId(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_CASE_ID, modelNode));
         caseModel.setName(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_NAME, modelNode));
+        caseModel.setInitiatorVariableName(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_CASE_INITIATOR_VARIABLE_NAME, modelNode));
+        if (StringUtils.isEmpty(caseModel.getInitiatorVariableName())) {
+            caseModel.setInitiatorVariableName("initiator");
+        }
+        
         String namespace = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_CASE_NAMESPACE, modelNode);
         if (StringUtils.isNotEmpty(namespace)) {
             cmmnModel.setTargetNamespace(namespace);

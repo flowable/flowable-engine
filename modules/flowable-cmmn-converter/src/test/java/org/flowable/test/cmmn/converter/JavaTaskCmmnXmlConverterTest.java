@@ -57,6 +57,7 @@ public class JavaTaskCmmnXmlConverterTest extends AbstractConverterTest {
         // Case
         Case caze = cmmnModel.getCases().get(0);
         assertEquals("javaCase", caze.getId());
+        assertEquals("test", caze.getInitiatorVariableName());
         
         // Plan model
         Stage planModel = caze.getPlanModel();

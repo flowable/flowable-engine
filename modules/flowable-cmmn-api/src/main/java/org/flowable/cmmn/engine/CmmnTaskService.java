@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine;
 
 import java.util.Map;
 
+import org.flowable.form.model.FormModel;
 import org.flowable.task.service.TaskQuery;
 
 /**
@@ -26,6 +27,16 @@ public interface CmmnTaskService {
     void complete(String taskId, Map<String, Object> variables);
     
     void complete(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables);
+    
+    void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables);
+
+    void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
+            Map<String, Object> variables, Map<String, Object> transientVariables);
+
+    void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
+            Map<String, Object> variables, boolean localScope);
+
+    FormModel getTaskFormModel(String taskId);
     
     TaskQuery createTaskQuery();
     

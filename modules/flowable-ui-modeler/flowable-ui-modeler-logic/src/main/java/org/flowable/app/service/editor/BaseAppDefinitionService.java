@@ -15,6 +15,7 @@ package org.flowable.app.service.editor;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -145,8 +146,7 @@ public class BaseAppDefinitionService {
             Map<String, Model> caseModelMap = new HashMap<>();
             Map<String, Model> processModelMap = new HashMap<>();
 
-            createDeployableBpmnModels(appDefinitionModel, appDefinition, deployableAssets, formMap, decisionTableMap);
-            createDeployableCmmnModels(appDefinitionModel, appDefinition, deployableAssets, formMap, decisionTableMap, caseModelMap, processModelMap);
+            createDeployableAppModels(appDefinitionModel, appDefinition, deployableAssets, formMap, decisionTableMap, caseModelMap, processModelMap);
 
             if (formMap.size() > 0) {
                 for (String formId : formMap.keySet()) {
@@ -171,34 +171,6 @@ public class BaseAppDefinitionService {
                     }
                 }
             }
-            
-            if (caseModelMap.size() > 0) {
-                for (String caseModelId : caseModelMap.keySet()) {
-                    Model caseInfo = caseModelMap.get(caseModelId);
-                    try {
-                        JsonNode caseNode = objectMapper.readTree(caseInfo.getModelEditorJson());
-                        CmmnModel cmmnModel = cmmnJsonConverter.convertToCmmnModel(caseNode);
-                        byte[] cmmnXMLBytes = cmmnXMLConverter.convertToXML(cmmnModel);
-                        deployableAssets.put("cmmn-" + caseInfo.getKey() + ".cmmn", cmmnXMLBytes);
-                    } catch (Exception e) {
-                        throw new InternalServerErrorException(String.format("Error converting CMMN model %s to XML", caseInfo.getName()));
-                    }
-                }
-            }
-            
-            if (processModelMap.size() > 0) {
-                for (String processModelId : processModelMap.keySet()) {
-                    Model processInfo = processModelMap.get(processModelId);
-                    try {
-                        JsonNode processNode = objectMapper.readTree(processInfo.getModelEditorJson());
-                        BpmnModel bpmnModel = bpmnJsonConverter.convertToBpmnModel(processNode);
-                        byte[] bpmnXMLBytes = bpmnXMLConverter.convertToXML(bpmnModel);
-                        deployableAssets.put("bpmn-" + processInfo.getKey() + ".bpmn", bpmnXMLBytes);
-                    } catch (Exception e) {
-                        throw new InternalServerErrorException(String.format("Error converting BPMN model %s to XML", processInfo.getName()));
-                    }
-                }
-            }
 
             deployZipArtifact = createDeployZipArtifact(deployableAssets);
         }
@@ -206,27 +178,50 @@ public class BaseAppDefinitionService {
         return deployZipArtifact;
     }
     
-    protected void createDeployableBpmnModels(Model appDefinitionModel, AppDefinition appDefinition, Map<String, byte[]> deployableAssets, 
-                    Map<String, Model> formMap, Map<String, Model> decisionTableMap) {
+    protected void createDeployableAppModels(Model appDefinitionModel, AppDefinition appDefinition, Map<String, byte[]> deployableAssets, 
+                    Map<String, Model> formMap, Map<String, Model> decisionTableMap, Map<String, Model> caseModelMap, Map<String, Model> processModelMap) {
         
-        for (AppModelDefinition appModelDef : appDefinition.getModels()) {
+        List<AppModelDefinition> appModels = new ArrayList<>(appDefinition.getModels());
+        appModels.addAll(appDefinition.getCmmnModels());
+        
+        for (AppModelDefinition appModelDef : appModels) {
+            
+            if (caseModelMap.containsKey(appModelDef.getId()) || processModelMap.containsKey(appModelDef.getId())) {
+                return;
+            }
 
-            AbstractModel processModel = modelService.getModel(appModelDef.getId());
-            if (processModel == null) {
+            AbstractModel model = modelService.getModel(appModelDef.getId());
+            if (model == null) {
                 throw new BadRequestException(String.format("Model %s for app definition %s could not be found", appModelDef.getId(), appDefinitionModel.getId()));
             }
 
-            List<Model> referencedModels = modelRepository.findByParentModelId(processModel.getId());
-            for (Model childModel : referencedModels) {
-                if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
-                    formMap.put(childModel.getId(), childModel);
+            createDeployableModels(model, deployableAssets, formMap, decisionTableMap, caseModelMap, processModelMap);
+        }
+    }
+    
+    protected void createDeployableModels(AbstractModel parentModel, Map<String, byte[]> deployableAssets, 
+                    Map<String, Model> formMap, Map<String, Model> decisionTableMap, Map<String, Model> caseModelMap, Map<String, Model> processModelMap) {
+        
+        List<Model> referencedModels = modelRepository.findByParentModelId(parentModel.getId());
+        for (Model childModel : referencedModels) {
+            if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
+                formMap.put(childModel.getId(), childModel);
 
-                } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
-                    decisionTableMap.put(childModel.getId(), childModel);
-                }
+            } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
+                decisionTableMap.put(childModel.getId(), childModel);
+            
+            } else if (Model.MODEL_TYPE_CMMN == childModel.getModelType()) {
+                caseModelMap.put(childModel.getId(), childModel);
+                createDeployableModels(childModel, deployableAssets, formMap, decisionTableMap, caseModelMap, processModelMap);
+            
+            } else if (Model.MODEL_TYPE_BPMN == childModel.getModelType()) {
+                processModelMap.put(childModel.getId(), childModel);
+                createDeployableModels(childModel, deployableAssets, formMap, decisionTableMap, caseModelMap, processModelMap);
             }
+        }
 
-            BpmnModel bpmnModel = modelService.getBpmnModel(processModel, formMap, decisionTableMap);
+        if (parentModel.getModelType() == null || parentModel.getModelType() == AbstractModel.MODEL_TYPE_BPMN) {
+            BpmnModel bpmnModel = modelService.getBpmnModel(parentModel, formMap, decisionTableMap);
             Map<String, StartEvent> startEventMap = processNoneStartEvents(bpmnModel);
 
             for (Process process : bpmnModel.getProcesses()) {
@@ -234,40 +229,13 @@ public class BaseAppDefinitionService {
             }
 
             byte[] modelXML = modelService.getBpmnXML(bpmnModel);
-            deployableAssets.put(processModel.getKey().replaceAll(" ", "") + ".bpmn", modelXML);
-        }
-    }
+            deployableAssets.put(parentModel.getKey().replaceAll(" ", "") + ".bpmn", modelXML);
+            
+        } else {
+            CmmnModel cmmnModel = modelService.getCmmnModel(parentModel, formMap, decisionTableMap, caseModelMap, processModelMap);
     
-    protected void createDeployableCmmnModels(Model appDefinitionModel, AppDefinition appDefinition, Map<String, byte[]> deployableAssets, 
-                    Map<String, Model> formMap, Map<String, Model> decisionTableMap, Map<String, Model> caseModelMap, Map<String, Model> processModelMap) {
-        
-        for (AppModelDefinition appModelDef : appDefinition.getCmmnModels()) {
-
-            AbstractModel caseModel = modelService.getModel(appModelDef.getId());
-            if (caseModel == null) {
-                throw new BadRequestException(String.format("Model %s for app definition %s could not be found", appModelDef.getId(), appDefinitionModel.getId()));
-            }
-
-            List<Model> referencedModels = modelRepository.findByParentModelId(caseModel.getId());
-            for (Model childModel : referencedModels) {
-                if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
-                    formMap.put(childModel.getId(), childModel);
-
-                } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
-                    decisionTableMap.put(childModel.getId(), childModel);
-                
-                } else if (Model.MODEL_TYPE_CMMN == childModel.getModelType()) {
-                    caseModelMap.put(childModel.getId(), childModel);
-                
-                } else if (Model.MODEL_TYPE_BPMN == childModel.getModelType()) {
-                    processModelMap.put(childModel.getId(), childModel);
-                }
-            }
-
-            CmmnModel cmmnModel = modelService.getCmmnModel(caseModel, formMap, decisionTableMap, caseModelMap, processModelMap);
-
             byte[] modelXML = modelService.getCmmnXML(cmmnModel);
-            deployableAssets.put(caseModel.getKey().replaceAll(" ", "") + ".cmmn", modelXML);
+            deployableAssets.put(parentModel.getKey().replaceAll(" ", "") + ".cmmn", modelXML);
         }
     }
 

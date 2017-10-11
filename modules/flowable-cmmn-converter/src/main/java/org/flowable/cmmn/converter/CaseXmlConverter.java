@@ -36,6 +36,8 @@ public class CaseXmlConverter extends BaseCmmnXmlConverter {
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         Case caze = new Case();
         caze.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
+        caze.setInitiatorVariableName(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_INITIATOR_VARIABLE_NAME));
+        
         conversionHelper.getCmmnModel().addCase(caze);
         conversionHelper.setCurrentCase(caze);
         return caze;

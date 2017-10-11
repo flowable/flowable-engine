@@ -703,6 +703,7 @@ public class ModelServiceImpl implements ModelService {
                 modelRepository.save(model);
 
                 // Relations
+                handleCmmnFormModelRelations(model, jsonNode);
                 handleCmmnCaseModelRelations(model, jsonNode);
                 handleCmmnProcessModelRelations(model, jsonNode);
 
@@ -739,6 +740,13 @@ public class ModelServiceImpl implements ModelService {
         Set<String> decisionTableIds = JsonConverterUtil.gatherStringPropertyFromJsonNodes(decisionTableNodes, "id");
 
         handleModelRelations(bpmnProcessModel, decisionTableIds, ModelRelationTypes.TYPE_DECISION_TABLE_MODEL_CHILD);
+    }
+    
+    protected void handleCmmnFormModelRelations(AbstractModel caseModel, ObjectNode editorJsonNode) {
+        List<JsonNode> formReferenceNodes = CmmnModelJsonConverterUtil.filterOutJsonNodes(CmmnModelJsonConverterUtil.getCmmnModelFormReferences(editorJsonNode));
+        Set<String> formIds = JsonConverterUtil.gatherStringPropertyFromJsonNodes(formReferenceNodes, "id");
+
+        handleModelRelations(caseModel, formIds, ModelRelationTypes.TYPE_FORM_MODEL_CHILD);
     }
     
     protected void handleCmmnCaseModelRelations(AbstractModel caseModel, ObjectNode editorJsonNode) {

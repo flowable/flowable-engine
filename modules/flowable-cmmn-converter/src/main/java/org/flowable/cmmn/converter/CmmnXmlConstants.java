@@ -62,6 +62,7 @@ public interface CmmnXmlConstants {
     
     String ATTRIBUTE_ID = "id";
     String ATTRIBUTE_NAME = "name";
+    String ATTRIBUTE_INITIATOR_VARIABLE_NAME = "initiatorVariableName";
     String ATTRIBUTE_TEXT_FORMAT = "textFormat";
     String ATTRIBUTE_DEFINITION_REF = "definitionRef";
     String ATTRIBUTE_SOURCE_REF = "sourceRef";
@@ -77,11 +78,6 @@ public interface CmmnXmlConstants {
     
     String ATTRIBUTE_TYPE = "type";
     
-    String ATTRIBUTE_ASSIGNEE = "assignee";
-    String ATTRIBUTE_OWNER = "owner";
-    String ATTRIBUTE_CANDIDATE_USERS = "candidateUsers";
-    String ATTRIBUTE_CANDIDATE_GROUPS = "candidateGroups";
-    
     String ATTRIBUTE_CLASS = "class";
     String ATTRIBUTE_EXPRESSION = "expression";
     String ATTRIBUTE_DELEGATE_EXPRESSION = "delegateExpression";
@@ -96,12 +92,12 @@ public interface CmmnXmlConstants {
     
     String ATTRIBUTE_ASSIGNEE = "assignee";
     String ATTRIBUTE_OWNER = "owner";
+    String ATTRIBUTE_CANDIDATE_USERS = "candidateUsers";
+    String ATTRIBUTE_CANDIDATE_GROUPS = "candidateGroups";
     String ATTRIBUTE_PRIORITY = "priority";
     String ATTRIBUTE_FORM_KEY = "formKey";
     String ATTRIBUTE_DUE_DATE = "dueDate";
     String ATTRIBUTE_CATEGORY = "category";
-    String ATTRIBUTE_USER_CANDIDATEUSERS = "candidateUsers";
-    String ATTRIBUTE_USER_CANDIDATEGROUPS = "candidateGroups";
     
     String ELEMENT_DI_CMMN = "CMMNDI";
     String ELEMENT_DI_DIAGRAM = "CMMNDiagram";

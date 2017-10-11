@@ -45,6 +45,10 @@ public class HumanTaskExport extends AbstractPlanItemDefinitionExport {
                             convertListToCommaSeparatedString(humanTask.getCandidateGroups()));
         }
         
+        if (StringUtils.isNotEmpty(humanTask.getFormKey())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_FORM_KEY, humanTask.getFormKey());
+        }
+        
         // end human task element
         xtw.writeEndElement();
     }

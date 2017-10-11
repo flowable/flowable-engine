@@ -63,22 +63,52 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior {
             
             taskEntity.setTaskDefinitionKey(humanTask.getId());
             
+            handleTaskName(planItemInstanceEntity, expressionManager, taskEntity);
+            handleTaskDescription(planItemInstanceEntity, expressionManager, taskEntity);
             handleAssignee(planItemInstanceEntity, taskService, expressionManager, taskEntity);
             handleOwner(planItemInstanceEntity, taskService, expressionManager, taskEntity);
-            handlePrioroty(planItemInstanceEntity, expressionManager, taskEntity);
+            handlePriority(planItemInstanceEntity, expressionManager, taskEntity);
             handleFormKey(planItemInstanceEntity, expressionManager, taskEntity);
             handleDueDate(commandContext, planItemInstanceEntity, expressionManager, taskEntity);
             handleCategory(planItemInstanceEntity, expressionManager, taskEntity);
+            
+            taskService.insertTask(taskEntity, true);
+            
             handleCandidateUsers(commandContext, planItemInstanceEntity, expressionManager, taskEntity);
             handleCandidateGroups(commandContext, planItemInstanceEntity, expressionManager, taskEntity);
             
-            taskService.insertTask(taskEntity, true);
             CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskCreated(taskEntity);
             
         } else {
             // if not blocking, treat as a manual task. No need to create a task entry.
             CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance((PlanItemInstanceEntity) planItemInstanceEntity);
             
+        }
+    }
+    
+    protected void handleTaskName(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager, TaskEntity taskEntity) {
+        if (StringUtils.isNotEmpty(humanTask.getName())) {
+            Object name = expressionManager.createExpression(humanTask.getName()).getValue(planItemInstanceEntity);
+            if (name != null) {
+                if (name instanceof String) {
+                    taskEntity.setName((String) name);
+                } else {
+                    throw new FlowableIllegalArgumentException("name expression does not resolve to a string: " + humanTask.getName());
+                }
+            }
+        }
+    }
+    
+    protected void handleTaskDescription(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager, TaskEntity taskEntity) {
+        if (StringUtils.isNotEmpty(humanTask.getDocumentation())) {
+            Object description = expressionManager.createExpression(humanTask.getDocumentation()).getValue(planItemInstanceEntity);
+            if (description != null) {
+                if (description instanceof String) {
+                    taskEntity.setDescription((String) description);
+                } else {
+                    throw new FlowableIllegalArgumentException("documentation expression does not resolve to a string: " + humanTask.getDocumentation());
+                }
+            }
         }
     }
 
@@ -108,8 +138,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior {
         }
     }
 
-    protected void handlePrioroty(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager,
-            TaskEntity taskEntity) {
+    protected void handlePriority(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager, TaskEntity taskEntity) {
         if (StringUtils.isNotEmpty(humanTask.getPriority())) {
             Object priority = expressionManager.createExpression(humanTask.getPriority()).getValue(planItemInstanceEntity);
             if (priority != null) {

@@ -42,6 +42,7 @@ public interface CmmnStencilConstants {
     String PROPERTY_DOCUMENTATION = "documentation";
 
     String PROPERTY_CASE_ID = "case_id";
+    String PROPERTY_CASE_INITIATOR_VARIABLE_NAME = "case_initiatorvariablename";
     String PROPERTY_CASE_VERSION = "case_version";
     String PROPERTY_CASE_AUTHOR = "case_author";
     String PROPERTY_CASE_NAMESPACE = "case_namespace";

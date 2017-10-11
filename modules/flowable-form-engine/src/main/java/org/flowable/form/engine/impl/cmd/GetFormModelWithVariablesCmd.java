@@ -59,28 +59,24 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
     protected String formDefinitionKey;
     protected String parentDeploymentId;
     protected String formDefinitionId;
-    protected String processInstanceId;
     protected String taskId;
     protected String tenantId;
     protected Map<String, Object> variables;
 
-    public GetFormModelWithVariablesCmd(String formDefinitionKey, String formDefinitionId, String processInstanceId, String taskId, Map<String, Object> variables) {
+    public GetFormModelWithVariablesCmd(String formDefinitionKey, String formDefinitionId, String taskId, Map<String, Object> variables) {
         initializeValues(formDefinitionKey, formDefinitionId, null, variables);
-        this.processInstanceId = processInstanceId;
         this.taskId = taskId;
     }
 
-    public GetFormModelWithVariablesCmd(String formDefinitionKey, String parentDeploymentId, String formDefinitionId, String processInstanceId, String taskId, Map<String, Object> variables) {
+    public GetFormModelWithVariablesCmd(String formDefinitionKey, String parentDeploymentId, String formDefinitionId, String taskId, Map<String, Object> variables) {
         initializeValues(formDefinitionKey, formDefinitionId, null, variables);
         this.parentDeploymentId = parentDeploymentId;
-        this.processInstanceId = processInstanceId;
         this.taskId = taskId;
     }
 
-    public GetFormModelWithVariablesCmd(String formDefinitionKey, String parentDeploymentId, String formDefinitionId, String processInstanceId, String taskId, String tenantId, Map<String, Object> variables) {
+    public GetFormModelWithVariablesCmd(String formDefinitionKey, String parentDeploymentId, String formDefinitionId, String taskId, String tenantId, Map<String, Object> variables) {
         initializeValues(formDefinitionKey, formDefinitionId, null, variables);
         this.parentDeploymentId = parentDeploymentId;
-        this.processInstanceId = processInstanceId;
         this.taskId = taskId;
         this.tenantId = tenantId;
     }
@@ -114,7 +110,7 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
             Map<String, JsonNode> formInstanceFieldMap = new HashMap<>();
             if (formInstance != null) {
                 fillFormInstanceValues(formInstance, formInstanceFieldMap, formEngineConfiguration.getObjectMapper());
-                fillVariablesWithFormInstanceValues(formInstanceFieldMap, allFields);
+                fillVariablesWithFormInstanceValues(formInstanceFieldMap, allFields, formInstance.getId());
             }
 
             for (FormField field : allFields) {
@@ -227,7 +223,7 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
         }
     }
 
-    public void fillVariablesWithFormInstanceValues(Map<String, JsonNode> formInstanceFieldMap, List<FormField> allFields) {
+    public void fillVariablesWithFormInstanceValues(Map<String, JsonNode> formInstanceFieldMap, List<FormField> allFields, String formInstanceId) {
         for (FormField field : allFields) {
 
             JsonNode fieldValueNode = formInstanceFieldMap.get(field.getId());
@@ -247,7 +243,7 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
                     }
                     
                 } catch (Exception e) {
-                    LOGGER.error("Error parsing form date value for process instance {} with value {}", processInstanceId, fieldValue, e);
+                    LOGGER.error("Error parsing form date value for form instance {} with value {}", formInstanceId, fieldValue, e);
                 }
 
             } else {

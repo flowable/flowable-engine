@@ -74,6 +74,21 @@ public interface FormInstanceQuery extends Query<FormInstanceQuery, FormInstance
      * Only select submitted forms with a process definition id like the given string.
      */
     FormInstanceQuery processDefinitionIdLike(String processDefinitionIdLike);
+    
+    /**
+     * Only select submitted forms with the given scope id.
+     */
+    FormInstanceQuery scopeId(String scopeId);
+    
+    /**
+     * Only select submitted forms with the given scope type.
+     */
+    FormInstanceQuery scopeType(String scopeType);
+    
+    /**
+     * Only select submitted forms with the given scope definition id.
+     */
+    FormInstanceQuery scopeDefinitionId(String scopeDefinitionId);
 
     /**
      * Only select submitted forms submitted on the given time
