@@ -37,6 +37,7 @@ public class HistoricCaseInstanceQueryImpl extends AbstractQuery<HistoricCaseIns
     protected String caseDefinitionCategory;
     protected Integer caseDefinitionVersion;
     protected String caseInstanceId;
+    protected Set<String> caseInstanceIds;
     protected String businessKey;
     protected String caseInstanceParentId;
     protected String deploymentId;
@@ -115,6 +116,15 @@ public class HistoricCaseInstanceQueryImpl extends AbstractQuery<HistoricCaseIns
             throw new FlowableIllegalArgumentException("Case instance id is null");
         }
         this.caseInstanceId = caseInstanceId;
+        return this;
+    }
+    
+    @Override
+    public HistoricCaseInstanceQueryImpl caseInstanceIds(Set<String> caseInstanceIds) {
+        if (caseInstanceIds == null) {
+            throw new FlowableIllegalArgumentException("Case instance ids is null");
+        }
+        this.caseInstanceIds = caseInstanceIds;
         return this;
     }
 

@@ -24,6 +24,7 @@ import org.flowable.app.model.runtime.TaskUpdateRepresentation;
 import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.api.UserCache.CachedUser;
 import org.flowable.app.service.exception.NotFoundException;
+import org.flowable.cmmn.engine.repository.CaseDefinition;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.identitylink.service.IdentityLinkType;
@@ -50,16 +51,26 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
         User currentUser = SecurityUtils.getCurrentUserObject();
         HistoricTaskInstance task = permissionService.validateReadPermissionOnTask(currentUser, taskId);
 
-        ProcessDefinition processDefinition = null;
+        TaskRepresentation rep = null;
         if (StringUtils.isNotEmpty(task.getProcessDefinitionId())) {
             try {
-                processDefinition = repositoryService.getProcessDefinition(task.getProcessDefinitionId());
+                ProcessDefinition processDefinition = repositoryService.getProcessDefinition(task.getProcessDefinitionId());
+                rep = new TaskRepresentation(task, processDefinition);
+                
             } catch (FlowableException e) {
                 LOGGER.error("Error getting process definition {}", task.getProcessDefinitionId(), e);
             }
+            
+        } else if (StringUtils.isNotEmpty(task.getScopeDefinitionId())) {
+            try {
+                CaseDefinition caseDefinition = cmmnRepositoryService.getCaseDefinition(task.getScopeDefinitionId());
+                rep = new TaskRepresentation(task, caseDefinition);
+                
+            } catch (FlowableException e) {
+                LOGGER.error("Error getting case definition {}", task.getScopeDefinitionId(), e);
+            }
         }
 
-        TaskRepresentation rep = new TaskRepresentation(task, processDefinition);
         fillPermissionInformation(rep, task, currentUser);
 
         // Populate the people

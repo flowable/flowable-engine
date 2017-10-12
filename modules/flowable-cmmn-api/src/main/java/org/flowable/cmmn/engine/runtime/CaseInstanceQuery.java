@@ -29,6 +29,7 @@ public interface CaseInstanceQuery extends Query<CaseInstanceQuery, CaseInstance
     CaseInstanceQuery caseDefinitionName(String caseDefinitionName);
     CaseInstanceQuery caseDefinitionVersion(Integer caseDefinitionVersion);
     CaseInstanceQuery caseInstanceId(String caseInstanceId);
+    CaseInstanceQuery caseInstanceIds(Set<String> caseInstanceIds);
     CaseInstanceQuery caseInstanceBusinessKey(String caseInstanceBusinessKey);
     CaseInstanceQuery caseInstanceParentId(String parentId);
     CaseInstanceQuery caseInstanceStartedBefore(Date beforeTime);

@@ -154,6 +154,7 @@
             "ASSIGNEE": "Assignee",
             "DUE": "Due",
             "PROCESS-INSTANCE": "Part of process",
+            "CASE-INSTANCE": "Part of case",
             "ENDED": "Ended",
             "DURATION": "Duration"
         },

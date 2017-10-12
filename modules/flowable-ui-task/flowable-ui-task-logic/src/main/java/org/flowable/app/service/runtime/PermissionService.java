@@ -24,6 +24,8 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.cmmn.engine.CmmnHistoryService;
+import org.flowable.cmmn.engine.history.HistoricCaseInstance;
 import org.flowable.content.api.ContentItem;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.HistoryService;
@@ -63,6 +65,9 @@ public class PermissionService {
 
     @Autowired
     protected HistoryService historyService;
+    
+    @Autowired
+    protected CmmnHistoryService cmmnHistoryService;
 
     @Autowired
     protected RemoteIdmService remoteIdmService;
@@ -144,6 +149,15 @@ public class PermissionService {
                             }
                         }
                     }
+                }
+            }
+            
+        } else if (task.getScopeId() != null) {
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(task.getScopeId()).singleResult();
+            if (historicCaseInstance != null && StringUtils.isNotEmpty(historicCaseInstance.getStartUserId())) {
+                String caseInstanceStartUserId = historicCaseInstance.getStartUserId();
+                if (String.valueOf(user.getId()).equals(caseInstanceStartUserId)) {
+                    canCompleteTask = true;
                 }
             }
         }

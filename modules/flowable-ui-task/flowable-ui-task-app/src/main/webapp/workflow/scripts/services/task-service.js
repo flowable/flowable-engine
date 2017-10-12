@@ -241,18 +241,5 @@ angular.module('flowableApp').service('TaskService', ['$http', '$q', '$rootScope
             var promise = deferred.promise;
             return promise;
         };
-
-        this.getProcessInstanceVariables = function(taskId) {
-          var data = {
-            taskId: taskId
-          };
-
-          return httpAsPromise(
-            {
-              method: 'GET',
-              url: FLOWABLE.CONFIG.contextRoot + '/app/rest/task-forms/' + taskId + '/variables',
-              data: data
-            }
-          );
-        }
+        
     }]);

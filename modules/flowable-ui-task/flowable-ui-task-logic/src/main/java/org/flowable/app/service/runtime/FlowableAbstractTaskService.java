@@ -23,6 +23,7 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.cmmn.engine.CmmnRepositoryService;
 import org.flowable.cmmn.engine.CmmnTaskService;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.HistoryService;
@@ -42,6 +43,9 @@ public abstract class FlowableAbstractTaskService {
 
     @Autowired
     protected RepositoryService repositoryService;
+    
+    @Autowired
+    protected CmmnRepositoryService cmmnRepositoryService;
 
     @Autowired
     protected TaskService taskService;

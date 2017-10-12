@@ -224,6 +224,15 @@
             <if test="excludeTaskRelated">
                 and RES.TASK_ID_ is NULL
             </if>
+            <if test="scopeId != null">
+                and RES.SCOPE_ID_ = #{scopeId}
+            </if>
+            <if test="subScopeId != null">
+                and RES.SUB_SCOPE_ID_ = #{subScopeId}
+            </if>
+            <if test="scopeType != null">
+                and RES.SCOPE_TYPE_ = #{scopeType}
+            </if>
             <if test="variableName != null">
                 and RES.NAME_ = #{variableName}
             </if>

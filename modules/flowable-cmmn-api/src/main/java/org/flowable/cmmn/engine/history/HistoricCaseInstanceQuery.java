@@ -30,6 +30,11 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
     HistoricCaseInstanceQuery caseInstanceId(String caseInstanceId);
     
     /**
+     * Only select historic case instances with one the given identifiers.
+     */
+    HistoricCaseInstanceQuery caseInstanceIds(Set<String> caseInstanceIds);
+    
+    /**
      * Only select historic case instances with the given business key.
      */
     HistoricCaseInstanceQuery caseInstanceBusinessKey(String caseInstanceBusinessKey);
