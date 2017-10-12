@@ -21,8 +21,8 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.AbstractQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.job.service.Job;
-import org.flowable.job.service.JobQuery;
+import org.flowable.job.api.Job;
+import org.flowable.job.api.JobQuery;
 import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**

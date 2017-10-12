@@ -37,7 +37,7 @@ public class BulkDeleteNoHistoryTest extends ResourceFlowableTestCase {
         }
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                 .singleResult();
         assertNotNull(task);
 

@@ -22,7 +22,7 @@
 
 	<properties>
 		<flowable.artifact>
-			org.flowable.job
+			org.flowable.job.api
 		</flowable.artifact>
 	</properties>
 

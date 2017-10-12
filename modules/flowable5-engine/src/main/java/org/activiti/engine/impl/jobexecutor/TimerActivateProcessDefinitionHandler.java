@@ -16,7 +16,7 @@ import org.activiti.engine.impl.cmd.ActivateProcessDefinitionCmd;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.util.json.JSONObject;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 
 /**
  * @author Joram Barrez

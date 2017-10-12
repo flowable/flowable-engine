@@ -15,7 +15,7 @@ package org.flowable.job.service.impl.asyncexecutor;
 import java.util.LinkedList;
 import java.util.UUID;
 
-import org.flowable.job.service.JobInfo;
+import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.cmd.UnacquireOwnedJobsCmd;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;

@@ -19,7 +19,7 @@ import org.flowable.cmmn.engine.impl.cmd.CompleteTaskCmd;
 import org.flowable.cmmn.engine.impl.cmd.CompleteTaskWithFormCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetTaskFormModelCmd;
 import org.flowable.form.model.FormModel;
-import org.flowable.task.service.TaskQuery;
+import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.impl.TaskQueryImpl;
 
 /**

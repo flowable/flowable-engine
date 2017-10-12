@@ -17,7 +17,7 @@ import java.io.Serializable;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 import org.flowable.job.service.InternalJobManager;
 import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;

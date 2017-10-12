@@ -16,8 +16,8 @@ package org.flowable.cmmn.engine.impl.task;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.variable.api.type.VariableScopeType;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
-import org.flowable.variable.service.type.VariableScopeType;
 
 /**
  * @author Joram Barrez

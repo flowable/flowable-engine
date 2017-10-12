@@ -37,16 +37,16 @@ import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.job.service.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
 import org.flowable.form.api.FormDefinition;
-import org.flowable.identitylink.service.IdentityLink;
-import org.flowable.identitylink.service.history.HistoricIdentityLink;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
+import org.flowable.job.api.Job;
 import org.flowable.rest.application.ContentTypeResolver;
 import org.flowable.rest.service.api.engine.AttachmentResponse;
 import org.flowable.rest.service.api.engine.CommentResponse;
@@ -88,9 +88,9 @@ import org.flowable.rest.variable.LongRestVariableConverter;
 import org.flowable.rest.variable.RestVariableConverter;
 import org.flowable.rest.variable.ShortRestVariableConverter;
 import org.flowable.rest.variable.StringRestVariableConverter;
-import org.flowable.task.service.Task;
-import org.flowable.task.service.history.HistoricTaskInstance;
-import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 
 /**
  * Default implementation of a {@link RestResponseFactory}.

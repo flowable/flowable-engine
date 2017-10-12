@@ -39,7 +39,7 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
         // Test with input == 1
         variables.put("input", 1);
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("exclusiveGateway", variables);
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals("Send e-mail for more information", task.getName());
 
         // Test with input == 2

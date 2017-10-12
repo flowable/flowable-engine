@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.variable.service.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Joram Barrez

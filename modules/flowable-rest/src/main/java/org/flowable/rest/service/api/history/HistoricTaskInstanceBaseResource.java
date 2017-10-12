@@ -23,7 +23,7 @@ import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
-import org.flowable.task.service.history.HistoricTaskInstanceQuery;
+import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -20,7 +20,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.api.IdentityLink;
 
 /**
  * Test case for all {@link FlowableEvent}s related to process definitions.
@@ -132,7 +132,7 @@ public class IdentityLinkEventsTest extends PluggableFlowableTestCase {
         Authentication.setAuthenticatedUserId(null);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         // Add identity link
@@ -195,7 +195,7 @@ public class IdentityLinkEventsTest extends PluggableFlowableTestCase {
         Authentication.setAuthenticatedUserId(null);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         // Add identity link

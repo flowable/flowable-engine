@@ -42,7 +42,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertNotNull(processInstance);
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         // Check create event
@@ -120,7 +120,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
         listener.clearEventsReceived();
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         // Set assignee through API
@@ -187,7 +187,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
         listener.clearEventsReceived();
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         // Delete process, should delete task as well, but not complete
@@ -219,7 +219,7 @@ public class TaskEventsTest extends PluggableFlowableTestCase {
             runtimeService.startProcessInstanceByKey("testTaskLocalVars");
 
             // Fetch first task
-            org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
             // Complete first task
             Map<String, Object> taskParams = new HashMap<String, Object>();

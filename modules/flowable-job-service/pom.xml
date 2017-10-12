@@ -89,10 +89,10 @@
 
 	<properties>
 		<flowable.artifact>
-			org.flowable.job
+			org.flowable.job.service
 		</flowable.artifact>
 		<flowable.osgi.export.additional>
-			org.flowable.job.db.mapping.entity
+			org.flowable.job.service.db.mapping.entity
 		</flowable.osgi.export.additional>
         <flowable.osgi.import.additional>
             javax.enterprise.concurrent;resolution:=optional,

@@ -234,8 +234,8 @@ import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
-import org.flowable.variable.service.impl.types.VariableType;
-import org.flowable.variable.service.impl.types.VariableTypes;
+import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.api.types.VariableTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

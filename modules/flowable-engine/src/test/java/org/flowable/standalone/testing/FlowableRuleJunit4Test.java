@@ -43,7 +43,7 @@ public class FlowableRuleJunit4Test {
         runtimeService.startProcessInstanceByKey("ruleUsage");
 
         TaskService taskService = activitiRule.getTaskService();
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("My Task", task.getName());
 
         taskService.complete(task.getId());

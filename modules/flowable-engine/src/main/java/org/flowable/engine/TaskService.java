@@ -27,13 +27,13 @@ import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
 import org.flowable.form.model.FormModel;
-import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
-import org.flowable.task.service.DelegationState;
-import org.flowable.task.service.NativeTaskQuery;
-import org.flowable.task.service.Task;
-import org.flowable.task.service.TaskQuery;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
+import org.flowable.task.api.DelegationState;
+import org.flowable.task.api.NativeTaskQuery;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskQuery;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
  * Service which provides access to {@link Task} and form related operations.

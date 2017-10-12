@@ -53,7 +53,7 @@ public class IdmTransactionsTest extends PluggableFlowableTestCase {
         assertEquals(0, identityService.createUserQuery().list().size());
 
         runtimeService.startProcessInstanceByKey("testProcess");
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
         taskService.complete(task.getId());
         assertEquals(1, identityService.createUserQuery().list().size());
@@ -67,7 +67,7 @@ public class IdmTransactionsTest extends PluggableFlowableTestCase {
         assertEquals(0, identityService.createUserQuery().list().size());
 
         runtimeService.startProcessInstanceByKey("testProcess");
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
         // Completing the task throws an exception
         try {

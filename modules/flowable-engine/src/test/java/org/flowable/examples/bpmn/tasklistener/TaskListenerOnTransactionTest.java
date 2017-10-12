@@ -39,7 +39,7 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenersOnCompleteCommitted", variables);
 
         // task 1 has committed listener
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         // task 2 has rolled-back listener
@@ -67,7 +67,7 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenersOnCompleteCommitted", variables);
 
         // task 1 has before-commit listener
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         // task 2 has rolled-back listener
@@ -105,7 +105,7 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("taskListenersOnCompleteExecutionVariables");
 
         // task 1 has committed listener
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         // task 2 has committed listener
@@ -141,7 +141,7 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
 
         ProcessInstance secondProcessInstance = runtimeService.startProcessInstanceByKey("secondTransactionDependentTaskListenerProcess");
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         assertProcessEnded(secondProcessInstance.getId());
@@ -166,7 +166,7 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
 
         runtimeService.startProcessInstanceByKey("transactionDependentTaskListenerProcess");
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         List<CurrentTaskTransactionDependentTaskListener.CurrentTask> currentTasks = CurrentTaskTransactionDependentTaskListener.getCurrentTasks();

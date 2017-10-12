@@ -14,10 +14,10 @@ package org.flowable.http.async;
 
 import java.util.List;
 
-import org.flowable.job.service.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.http.HttpServiceTaskTestCase;
+import org.flowable.job.api.Job;
 
 /**
  * @author Harsha Teja Kanna

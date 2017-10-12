@@ -78,10 +78,10 @@
 
 	<properties>
 		<flowable.artifact>
-			org.flowable.task
+			org.flowable.task.service
 		</flowable.artifact>
 		<flowable.osgi.export.additional>
-			org.flowable.task.db.mapping.entity
+			org.flowable.task.service.db.mapping.entity
 		</flowable.osgi.export.additional>
 	</properties>
 

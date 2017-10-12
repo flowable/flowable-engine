@@ -56,10 +56,10 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
         runtimeService.signalEventReceived("mySignal");
         assertEquals(0, getAllEventSubscriptions().size());
 
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertEquals(2, tasks.size());
 
-        for (org.flowable.task.service.Task task : tasks) {
+        for (org.flowable.task.api.Task task : tasks) {
             assertEquals("Task after signal", task.getName());
         }
 

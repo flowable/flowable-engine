@@ -30,10 +30,10 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
-import org.flowable.identitylink.service.history.HistoricIdentityLink;
 import org.flowable.idm.api.User;
-import org.flowable.task.service.TaskInfo;
+import org.flowable.task.api.TaskInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class FlowableAbstractTaskService {

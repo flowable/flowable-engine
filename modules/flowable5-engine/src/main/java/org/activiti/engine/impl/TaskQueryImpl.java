@@ -30,8 +30,8 @@ import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.idm.api.Group;
-import org.flowable.task.service.DelegationState;
-import org.flowable.variable.service.impl.types.VariableTypes;
+import org.flowable.task.api.DelegationState;
+import org.flowable.variable.api.types.VariableTypes;
 
 /**
  * @author Joram Barrez

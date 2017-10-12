@@ -35,7 +35,7 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.flowable.variable.service.type.VariableScopeType;
+import org.flowable.variable.api.type.VariableScopeType;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 

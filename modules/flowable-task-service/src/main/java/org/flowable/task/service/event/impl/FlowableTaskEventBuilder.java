@@ -17,7 +17,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.impl.event.FlowableEntityEventImpl;
 import org.flowable.engine.common.impl.event.FlowableEventImpl;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.Task;
 
 /**
  * Builder class used to create {@link FlowableEvent} implementations.

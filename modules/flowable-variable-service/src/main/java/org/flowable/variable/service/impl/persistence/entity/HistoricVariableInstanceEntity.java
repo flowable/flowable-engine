@@ -17,9 +17,9 @@ import java.util.Date;
 
 import org.flowable.engine.common.impl.db.HasRevision;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.variable.service.history.HistoricVariableInstance;
-import org.flowable.variable.service.impl.types.ValueFields;
-import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * @author Christian Lipphardt (camunda)

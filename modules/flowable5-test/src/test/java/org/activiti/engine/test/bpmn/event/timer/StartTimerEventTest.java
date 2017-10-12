@@ -27,8 +27,8 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.test.Deployment;
-import org.flowable.job.service.Job;
-import org.flowable.job.service.TimerJobQuery;
+import org.flowable.job.api.Job;
+import org.flowable.job.api.TimerJobQuery;
 
 /**
  * @author Joram Barrez

@@ -108,10 +108,10 @@ public class DynamicProcessDefinitionSummaryTest extends PluggableFlowableTestCa
         // verify if runtime is up to date
         runtimeService.startProcessInstanceById(processDefinitionId);
         // bob and david both should have a single task.
-        org.flowable.task.service.Task bobTask = taskService.createTaskQuery().taskCandidateUser("bob").singleResult();
+        org.flowable.task.api.Task bobTask = taskService.createTaskQuery().taskCandidateUser("bob").singleResult();
         assertThat("Bob must have one task", bobTask, is(notNullValue()));
 
-        org.flowable.task.service.Task davidTask = taskService.createTaskQuery().taskCandidateUser("david").singleResult();
+        org.flowable.task.api.Task davidTask = taskService.createTaskQuery().taskCandidateUser("david").singleResult();
         assertThat("David must have one task", davidTask, is(not(nullValue())));
     }
 
@@ -140,10 +140,10 @@ public class DynamicProcessDefinitionSummaryTest extends PluggableFlowableTestCa
         // verify if runtime is up to date
         runtimeService.startProcessInstanceById(processDefinitionId);
 
-        org.flowable.task.service.Task bobTask = taskService.createTaskQuery().taskCandidateUser("bob").singleResult();
+        org.flowable.task.api.Task bobTask = taskService.createTaskQuery().taskCandidateUser("bob").singleResult();
         assertThat("Bob must have one task", bobTask, is(notNullValue()));
 
-        List<org.flowable.task.service.Task> davidTasks = taskService.createTaskQuery().taskCandidateUser("david").list();
+        List<org.flowable.task.api.Task> davidTasks = taskService.createTaskQuery().taskCandidateUser("david").list();
         assertThat("David must have two task", davidTasks.size(), is(2));
     }
 

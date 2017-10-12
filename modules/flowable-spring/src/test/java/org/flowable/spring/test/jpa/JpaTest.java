@@ -6,7 +6,7 @@ import java.util.Map;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.Task;
 import org.springframework.test.context.ContextConfiguration;
 
 /**

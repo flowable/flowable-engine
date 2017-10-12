@@ -41,7 +41,7 @@ public class StandaloneDatabaseEventLoggerTest extends PluggableFlowableTestCase
 
     public void testStandaloneTaskEvents() throws Exception {
 
-        org.flowable.task.service.Task task = taskService.newTask();
+        org.flowable.task.api.Task task = taskService.newTask();
         task.setAssignee("kermit");
         task.setTenantId("myTenant");
         taskService.saveTask(task);

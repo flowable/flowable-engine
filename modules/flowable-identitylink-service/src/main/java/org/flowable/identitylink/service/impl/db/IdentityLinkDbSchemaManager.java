@@ -30,7 +30,7 @@ public class IdentityLinkDbSchemaManager extends ServiceSqlScriptBasedDbSchemaMa
 
     @Override
     protected String getResourcesRootDirectory() {
-        return "org/flowable/identitylink/db/";
+        return "org/flowable/identitylink/service/db/";
     }
 
 }

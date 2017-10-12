@@ -21,7 +21,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.variable.service.event.FlowableVariableEvent;
+import org.flowable.variable.api.event.FlowableVariableEvent;
 
 import java.util.Set;
 

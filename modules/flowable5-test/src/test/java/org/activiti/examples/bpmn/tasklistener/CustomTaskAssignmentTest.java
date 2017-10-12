@@ -101,7 +101,7 @@ public class CustomTaskAssignmentTest extends PluggableFlowableTestCase {
     public void testReleaseTask() throws Exception {
         runtimeService.startProcessInstanceByKey("releaseTaskProcess");
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().taskAssignee("fozzie").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskAssignee("fozzie").singleResult();
         assertNotNull(task);
         String taskId = task.getId();
 

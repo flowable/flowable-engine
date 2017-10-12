@@ -60,7 +60,7 @@ public class TaskFormsTest extends PluggableFlowableTestCase {
         formService.submitStartFormData(procDefId, formProperties);
 
         // Management should now have a task assigned to them
-        org.flowable.task.service.Task task = taskService.createTaskQuery().taskCandidateGroup("management").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskCandidateGroup("management").singleResult();
         assertEquals("Vacation request by kermit", task.getDescription());
         Object taskForm = formService.getRenderedTaskForm(task.getId());
         assertNotNull(taskForm);
@@ -77,7 +77,7 @@ public class TaskFormsTest extends PluggableFlowableTestCase {
         assertNull(formService.getRenderedStartForm(procDefId));
 
         runtimeService.startProcessInstanceByKey("noStartOrTaskForm");
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNull(formService.getRenderedTaskForm(task.getId()));
     }
 

@@ -27,9 +27,9 @@ import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
-import org.flowable.identitylink.service.history.HistoricIdentityLink;
-import org.flowable.task.service.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 /**
  * @author Tom Baeyens
@@ -46,7 +46,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss");
 
         // Set priority to non-default value
-        org.flowable.task.service.Task runtimeTask = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
+        org.flowable.task.api.Task runtimeTask = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
         runtimeTask.setPriority(1234);
 
         // Set due-date
@@ -130,7 +130,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         processEngineConfiguration.getClock().reset();
 
         // Set priority to non-default value
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(finishedInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(finishedInstance.getId()).singleResult();
         task.setPriority(1234);
         task.setOwner("fozzie");
         Date dueDate = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("01/02/2003 04:05:06");
@@ -294,7 +294,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
     @Deployment
     public void testHistoricIdentityLinksForTaskOwner() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTaskProcess");
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         String taskId = task.getId();
@@ -330,7 +330,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
             assertNotNull(link.getCreateTime());
         }
 
-        org.flowable.task.service.Task secondTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task secondTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(secondTask);
 
         secondTask.setOwner("fozzie");
@@ -344,7 +344,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
     @Deployment
     public void testHistoricIdentityLinksOnTaskClaim() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTaskProcess");
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         // over a time period the task can be claimed by multiple users we must keep track of who claimed it
@@ -427,7 +427,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         historicIdentityLinksForProcess = historyService.getHistoricIdentityLinksForProcessInstance(processInstance.getId());
         assertEquals(3, historicIdentityLinksForProcess.size());
 
-        org.flowable.task.service.Task secondTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task secondTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(secondTask);
 
         String secondTaskId = secondTask.getId();
@@ -463,7 +463,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         processEngineConfiguration.getClock().reset();
 
         // Set priority to non-default value
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(finishedInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(finishedInstance.getId()).singleResult();
         task.setPriority(1234);
         task.setOwner("fozzie");
         Date dueDate = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss").parse("01/02/2003 04:05:06");
@@ -548,7 +548,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
         assertEquals(0, historyService.createHistoricTaskInstanceQuery().or().processDefinitionKey("unexistingdefinitionkey").endOr().count());
 
         // Process definition key and ad hoc task
-        org.flowable.task.service.Task adhocTask = taskService.newTask();
+        org.flowable.task.api.Task adhocTask = taskService.newTask();
         taskService.saveTask(adhocTask);
         
         waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
@@ -665,7 +665,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
     @Deployment
     public void testHistoricTaskInstanceQueryProcessFinished() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TwoTaskHistoricTaskQueryTest");
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         
         waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
@@ -730,7 +730,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
     @Deployment
     public void testHistoricIdentityLinksOnTask() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("historicIdentityLinks");
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         // Set additional identity-link not coming from process
@@ -821,7 +821,7 @@ public class HistoricTaskInstanceTest extends PluggableFlowableTestCase {
     @Deployment
     public void testVariableUpdateOrderHistoricTaskInstance() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("historicTask");
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         // Update task and process-variable 10 times

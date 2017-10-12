@@ -19,8 +19,8 @@ import org.flowable.engine.form.StartFormData;
 import org.flowable.engine.form.TaskFormData;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
-import org.flowable.task.service.Task;
-import org.flowable.task.service.TaskQuery;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskQuery;
 
 /**
  * Access to form data and rendered forms for starting new process instances and completing tasks.

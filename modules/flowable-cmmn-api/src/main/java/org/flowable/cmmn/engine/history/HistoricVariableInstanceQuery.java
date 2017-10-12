@@ -15,7 +15,7 @@ package org.flowable.cmmn.engine.history;
 import java.util.Set;
 
 import org.flowable.engine.common.api.query.Query;
-import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 
 /**
  * @author Joram Barrez

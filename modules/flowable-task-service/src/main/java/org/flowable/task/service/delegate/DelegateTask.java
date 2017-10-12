@@ -17,10 +17,10 @@ import java.util.Date;
 import java.util.Set;
 
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
-import org.flowable.task.service.DelegationState;
-import org.flowable.variable.service.delegate.VariableScope;
+import org.flowable.task.api.DelegationState;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Joram Barrez

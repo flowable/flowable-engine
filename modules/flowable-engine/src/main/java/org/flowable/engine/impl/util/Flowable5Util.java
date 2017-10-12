@@ -22,8 +22,8 @@ import org.flowable.engine.impl.context.Flowable5CompatibilityContext;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.job.service.Job;
-import org.flowable.job.service.JobInfo;
+import org.flowable.job.api.Job;
+import org.flowable.job.api.JobInfo;
 
 /**
  * @author Joram Barrez

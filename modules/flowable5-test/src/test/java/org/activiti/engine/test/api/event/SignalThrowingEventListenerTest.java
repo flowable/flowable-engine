@@ -20,7 +20,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 
 /**
  * Test case for all {@link FlowableEventListener}s that throws a signal BPMN event when an {@link FlowableEvent} has been dispatched.
@@ -44,7 +44,7 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
             assertNotNull(processInstance);
 
             // Fetch the task and re-assign it to trigger the event-listener
-            org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                     .singleResult();
             assertNotNull(task);
             taskService.setAssignee(task.getId(), "kermit");
@@ -57,7 +57,7 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
             assertNotNull(task);
             assertEquals("kermit", task.getAssignee());
 
-            org.flowable.task.service.Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+            org.flowable.task.api.Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                     .taskDefinitionKey("boundaryTask")
                     .singleResult();
             assertNotNull(boundaryTask);
@@ -73,7 +73,7 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
 
         // Fetch the task and re-assign it to trigger the event-listener
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                 .singleResult();
         assertNotNull(task);
         taskService.setAssignee(task.getId(), "kermit");
@@ -86,7 +86,7 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
         assertNotNull(task);
         assertEquals("kermit", task.getAssignee());
 
-        org.flowable.task.service.Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        org.flowable.task.api.Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                 .taskDefinitionKey("boundaryTask")
                 .singleResult();
         assertNotNull(boundaryTask);
@@ -106,7 +106,7 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
             assertNotNull(processInstance);
 
             // Fetch the task and re-assign it to trigger the event-listener
-            org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                     .singleResult();
             assertNotNull(task);
             taskService.setAssignee(task.getId(), "kermit");
@@ -118,7 +118,7 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
                     .singleResult();
             assertNull(task);
 
-            org.flowable.task.service.Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+            org.flowable.task.api.Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                     .taskDefinitionKey("boundaryTask")
                     .singleResult();
             assertNotNull(boundaryTask);
@@ -257,7 +257,7 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
                     .singleResult();
             assertNotNull(externalProcess);
 
-            org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                     .singleResult();
             assertNotNull(task);
 
@@ -299,7 +299,7 @@ public class SignalThrowingEventListenerTest extends PluggableFlowableTestCase {
                 .singleResult();
         assertNotNull(externalProcess);
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                 .singleResult();
         assertNotNull(task);
 

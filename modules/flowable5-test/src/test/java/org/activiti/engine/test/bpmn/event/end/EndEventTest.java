@@ -26,7 +26,7 @@ public class EndEventTest extends PluggableFlowableTestCase {
     @Deployment
     public void testConcurrentEndOfSameProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskWithDelay");
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
 
         // We will now start two threads that both complete the task.

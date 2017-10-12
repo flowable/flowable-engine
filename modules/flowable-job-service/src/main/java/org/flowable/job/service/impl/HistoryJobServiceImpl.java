@@ -14,7 +14,7 @@ package org.flowable.job.service.impl;
 
 import java.util.List;
 
-import org.flowable.job.service.HistoryJob;
+import org.flowable.job.api.HistoryJob;
 import org.flowable.job.service.HistoryJobService;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;

@@ -131,7 +131,7 @@ public class ChangeConfigAndRebootEngineTest extends ResourceFlowableTestCase {
     }
 
     protected void finishProcessInstance(ProcessInstance processInstance) {
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());

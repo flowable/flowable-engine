@@ -39,7 +39,7 @@ public class CommentEventsTest extends PluggableFlowableTestCase {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-            org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             assertNotNull(task);
 
             // Create link-comment
@@ -72,7 +72,7 @@ public class CommentEventsTest extends PluggableFlowableTestCase {
 
     public void testCommentEntityEventsStandaloneTask() throws Exception {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
-            org.flowable.task.service.Task task = null;
+            org.flowable.task.api.Task task = null;
             try {
                 task = taskService.newTask();
                 taskService.saveTask(task);

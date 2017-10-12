@@ -26,7 +26,7 @@
 
 	<properties>
 		<flowable.artifact>
-			org.flowable.task.service
+			org.flowable.task.api
 		</flowable.artifact>
 	</properties>
 

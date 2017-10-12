@@ -76,7 +76,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
 
         // get task from first subprocess
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
         Map<String, String> taskFormVariables = new HashMap<>();
         taskFormVariables.put("test", "begin");

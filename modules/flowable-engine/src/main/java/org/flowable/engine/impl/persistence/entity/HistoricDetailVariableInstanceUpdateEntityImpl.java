@@ -14,7 +14,7 @@
 package org.flowable.engine.impl.persistence.entity;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * @author Tom Baeyens

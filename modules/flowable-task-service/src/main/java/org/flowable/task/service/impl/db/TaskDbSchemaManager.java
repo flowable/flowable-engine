@@ -30,7 +30,7 @@ public class TaskDbSchemaManager extends ServiceSqlScriptBasedDbSchemaManager {
     
     @Override
     protected String getResourcesRootDirectory() {
-        return "org/flowable/task/db/";
+        return "org/flowable/task/service/db/";
     }
 
 }

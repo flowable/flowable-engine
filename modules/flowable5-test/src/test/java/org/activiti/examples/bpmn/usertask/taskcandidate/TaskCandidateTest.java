@@ -70,7 +70,7 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("singleCandidateGroup");
 
         // org.flowable.task.service.Task should not yet be assigned to kermit
-        List<org.flowable.task.service.Task> tasks = taskService
+        List<org.flowable.task.api.Task> tasks = taskService
                 .createTaskQuery()
                 .taskAssignee(KERMIT)
                 .list();
@@ -79,7 +79,7 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
         // The task should be visible in the candidate task list
         tasks = taskService.createTaskQuery().taskCandidateUser(KERMIT).list();
         assertEquals(1, tasks.size());
-        org.flowable.task.service.Task task = tasks.get(0);
+        org.flowable.task.api.Task task = tasks.get(0);
         assertEquals("Pay out expenses", task.getName());
 
         // Claim the task
@@ -111,7 +111,7 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("multipleCandidatesGroup");
 
         // org.flowable.task.service.Task should not yet be assigned to anyone
-        List<org.flowable.task.service.Task> tasks = taskService
+        List<org.flowable.task.api.Task> tasks = taskService
                 .createTaskQuery()
                 .taskAssignee(KERMIT)
                 .list();
@@ -134,7 +134,7 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
 
         // Gonzo claims the task
         tasks = taskService.createTaskQuery().taskCandidateUser(GONZO).list();
-        org.flowable.task.service.Task task = tasks.get(0);
+        org.flowable.task.api.Task task = tasks.get(0);
         assertEquals("Approve expenses", task.getName());
         taskService.claim(task.getId(), GONZO);
 
@@ -165,10 +165,10 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
         assertEquals(1, taskService.createTaskQuery().taskCandidateUser(GONZO).list().size());
         assertEquals(1, taskService.createTaskQuery().taskCandidateUser(KERMIT).list().size());
 
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().taskInvolvedUser(KERMIT).list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskInvolvedUser(KERMIT).list();
         assertEquals(1, tasks.size());
 
-        org.flowable.task.service.Task task = tasks.get(0);
+        org.flowable.task.api.Task task = tasks.get(0);
         taskService.setVariableLocal(task.getId(), "taskVar", 123);
         tasks = taskService.createTaskQuery().taskInvolvedUser(KERMIT).includeProcessVariables().includeTaskLocalVariables().list();
         task = tasks.get(0);

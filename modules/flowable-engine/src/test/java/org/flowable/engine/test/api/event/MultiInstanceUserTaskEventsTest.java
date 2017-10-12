@@ -136,10 +136,10 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         taskEntity = (TaskEntity) entityEvent.getEntity();
         assertEquals("Multi User Task-1", taskEntity.getName());
 
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(3, tasks.size());
-        org.flowable.task.service.Task userTask1 = null;
-        for (org.flowable.task.service.Task task : tasks) {
+        org.flowable.task.api.Task userTask1 = null;
+        for (org.flowable.task.api.Task task : tasks) {
             if ("User Task1".equals(task.getName())) {
                 userTask1 = task;
                 break;
@@ -593,9 +593,9 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         testListener.getEventsReceived().clear();
         idx = 0;
 
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(1, tasks.size());
-        org.flowable.task.service.Task userTask1 = tasks.get(0);
+        org.flowable.task.api.Task userTask1 = tasks.get(0);
         assertEquals("User Task1 in Parent", userTask1.getName());
 
         // complete task1 in parent so we flow to terminate end
@@ -740,10 +740,10 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         testListener.getEventsReceived().clear();
         idx = 0;
 
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(3, tasks.size());
-        org.flowable.task.service.Task userTask1 = null;
-        for (org.flowable.task.service.Task t : tasks) {
+        org.flowable.task.api.Task userTask1 = null;
+        for (org.flowable.task.api.Task t : tasks) {
             if ("User Task1 in Parent".equals(t.getName())) {
                 userTask1 = t;
                 break;

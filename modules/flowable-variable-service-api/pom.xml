@@ -22,7 +22,7 @@
 
 	<properties>
 		<flowable.artifact>
-			org.flowable.variable
+			org.flowable.variable.api
 		</flowable.artifact>
 	</properties>
 

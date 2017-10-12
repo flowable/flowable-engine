@@ -29,7 +29,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.Task;
 import org.junit.Before;
 import org.junit.Test;
 

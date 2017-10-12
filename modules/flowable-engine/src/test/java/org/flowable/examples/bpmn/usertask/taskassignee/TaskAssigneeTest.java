@@ -32,9 +32,9 @@ public class TaskAssigneeTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskAssigneeExampleProcess");
 
         // Get task list
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().taskAssignee("kermit").list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee("kermit").list();
         assertEquals(1, tasks.size());
-        org.flowable.task.service.Task myTask = tasks.get(0);
+        org.flowable.task.api.Task myTask = tasks.get(0);
         assertEquals("Schedule meeting", myTask.getName());
         assertEquals("Schedule an engineering meeting for next week with the new hire.", myTask.getDescription());
 

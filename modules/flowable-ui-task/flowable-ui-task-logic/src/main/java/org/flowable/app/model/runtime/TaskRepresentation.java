@@ -19,9 +19,9 @@ import org.flowable.app.model.common.AbstractRepresentation;
 import org.flowable.app.model.common.UserRepresentation;
 import org.flowable.cmmn.engine.repository.CaseDefinition;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.task.service.Task;
-import org.flowable.task.service.TaskInfo;
-import org.flowable.task.service.history.HistoricTaskInstance;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;

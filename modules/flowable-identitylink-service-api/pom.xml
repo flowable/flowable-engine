@@ -22,11 +22,8 @@
 
 	<properties>
 		<flowable.artifact>
-			org.flowable.identitylink
+			org.flowable.identitylink.api
 		</flowable.artifact>
-		<flowable.osgi.export.additional>
-			org.flowable.identitylink.db.mapping.entity
-		</flowable.osgi.export.additional>
 	</properties>
 
 	<build>

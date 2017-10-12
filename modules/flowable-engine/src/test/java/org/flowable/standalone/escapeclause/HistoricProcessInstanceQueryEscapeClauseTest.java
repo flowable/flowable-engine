@@ -59,7 +59,7 @@ public class HistoricProcessInstanceQueryEscapeClauseTest extends AbstractEscape
         processInstance2 = runtimeService.startProcessInstanceByKeyAndTenantId("oneTaskProcess", vars, "Two_");
         runtimeService.setProcessInstanceName(processInstance2.getId(), "Two_");
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();

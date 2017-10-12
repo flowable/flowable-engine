@@ -105,7 +105,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
             fail("ActivitiException expected");
         } catch (FlowableObjectNotFoundException ae) {
             assertTextPresent("Task 'unexistingtask' not found", ae.getMessage());
-            assertEquals(org.flowable.task.service.Task.class, ae.getObjectClass());
+            assertEquals(org.flowable.task.api.Task.class, ae.getObjectClass());
         }
     }
 
@@ -134,7 +134,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         Map<String, Object> variables = runtimeService.getVariables(processInstanceId);
         assertEquals(expectedVariables, variables);
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         String taskId = task.getId();
         TaskFormData taskForm = formService.getTaskFormData(taskId);
         assertEquals(deploymentIdFromDeploymentAnnotation, taskForm.getDeploymentId());
@@ -403,7 +403,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
     public void testGetTaskFormKey() {
         String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
         runtimeService.startProcessInstanceById(processDefinitionId);
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
         String expectedFormKey = formService.getTaskFormData(task.getId()).getFormKey();
         String actualFormKey = formService.getTaskFormKey(task.getProcessDefinitionId(), task.getTaskDefinitionKey());
@@ -413,7 +413,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
     @Deployment
     public void testGetTaskFormKeyWithExpression() {
         runtimeService.startProcessInstanceByKey("FormsProcess", CollectionUtil.singletonMap("dynamicKey", "test"));
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
         assertEquals("test", formService.getTaskFormData(task.getId()).getFormKey());
     }
@@ -427,7 +427,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinition.getKey());
         assertNotNull(processInstance);
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         Map<String, String> properties = new HashMap<>();
@@ -449,7 +449,7 @@ public class FormServiceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey(processDefinition.getKey());
         assertNotNull(processInstance);
 
-        org.flowable.task.service.Task task = null;
+        org.flowable.task.api.Task task = null;
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 

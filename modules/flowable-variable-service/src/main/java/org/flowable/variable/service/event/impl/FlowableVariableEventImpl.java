@@ -14,8 +14,8 @@ package org.flowable.variable.service.event.impl;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.impl.event.FlowableEventImpl;
-import org.flowable.variable.service.event.FlowableVariableEvent;
-import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.variable.api.event.FlowableVariableEvent;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * Implementation of {@link FlowableVariableEvent}.

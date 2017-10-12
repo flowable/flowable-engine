@@ -14,6 +14,9 @@ package org.flowable.variable.service.impl.types;
 
 import java.util.UUID;
 
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.api.types.VariableType;
+
 /**
  * @author Birger Zimmermann
  */

@@ -29,7 +29,7 @@ public class MessageNonInterruptingBoundaryEventTest extends PluggableFlowableTe
 
         assertEquals(3, runtimeService.createExecutionQuery().count());
 
-        org.flowable.task.service.Task userTask = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
+        org.flowable.task.api.Task userTask = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
         assertNotNull(userTask);
 
         Execution execution = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();

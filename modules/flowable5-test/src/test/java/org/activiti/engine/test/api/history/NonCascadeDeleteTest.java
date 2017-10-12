@@ -26,7 +26,7 @@ public class NonCascadeDeleteTest extends PluggableFlowableTestCase {
                 .deploy().getId();
 
         processInstanceId = runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY).getId();
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
         taskService.complete(task.getId());
 
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {

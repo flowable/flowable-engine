@@ -16,7 +16,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.common.api.query.QueryProperty;
-import org.flowable.task.service.TaskQuery;
+import org.flowable.task.api.TaskQuery;
 
 /**
  * Contains the possible properties that can be used in a {@link TaskQuery}.

@@ -29,8 +29,8 @@ import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.cmmn.engine.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.flowable.variable.service.history.HistoricVariableInstance;
-import org.flowable.variable.service.type.VariableScopeType;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.type.VariableScopeType;
 import org.junit.Test;
 
 /**

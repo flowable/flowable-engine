@@ -22,7 +22,7 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.db.BulkDeleteable;
 import org.activiti.engine.impl.db.PersistentObject;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.api.IdentityLink;
 
 /**
  * @author Joram Barrez

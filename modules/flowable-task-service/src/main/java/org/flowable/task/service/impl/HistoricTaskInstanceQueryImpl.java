@@ -23,14 +23,14 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.service.TaskServiceConfiguration;
-import org.flowable.task.service.history.HistoricTaskInstance;
-import org.flowable.task.service.history.HistoricTaskInstanceQuery;
 import org.flowable.task.service.impl.util.CommandContextUtil;
+import org.flowable.variable.api.type.VariableScopeType;
+import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 import org.flowable.variable.service.impl.QueryVariableValue;
-import org.flowable.variable.service.impl.types.VariableTypes;
-import org.flowable.variable.service.type.VariableScopeType;
 
 /**
  * @author Tom Baeyens

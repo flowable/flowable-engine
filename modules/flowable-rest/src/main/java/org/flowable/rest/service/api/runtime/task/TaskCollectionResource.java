@@ -23,7 +23,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.api.RequestUtil;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RequestBody;

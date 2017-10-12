@@ -37,8 +37,8 @@ import org.flowable.form.api.FormService;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.FormFieldTypes;
 import org.flowable.form.model.FormModel;
-import org.flowable.task.service.history.HistoricTaskInstance;
-import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 
 /**
  * @author Tijs Rademakers
