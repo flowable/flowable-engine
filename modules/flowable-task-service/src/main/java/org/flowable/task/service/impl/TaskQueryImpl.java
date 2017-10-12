@@ -69,6 +69,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String candidateUser;
     protected String candidateGroup;
     protected List<String> candidateGroups;
+    protected boolean ignoreAssigneeValue;
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
@@ -564,6 +565,16 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.candidateGroups = candidateGroups;
         } else {
             this.candidateGroups = candidateGroups;
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQuery ignoreAssigneeValue() {
+        if (orActive) {
+            currentOrQueryObject.ignoreAssigneeValue = true;
+        } else {
+            this.ignoreAssigneeValue = true;
         }
         return this;
     }
@@ -1554,6 +1565,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public String getCandidateGroup() {
         return candidateGroup;
+    }
+
+    public boolean isIgnoreAssigneeValue() {
+        return ignoreAssigneeValue;
     }
 
     public String getProcessInstanceId() {

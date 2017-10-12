@@ -416,6 +416,85 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
             assertEquals(1, tasks.size());
         }
     }
+    
+    @Deployment(resources = { "org/flowable/engine/test/api/history/HistoricTaskAndVariablesQueryTest.testCandidate.bpmn20.xml" })
+    public void testIgnoreAssigneeValue() {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+
+            String taskId = taskService
+                    .createTaskQuery()
+                    .processInstanceId(processInstance.getProcessInstanceId())
+                    .list()
+                    .get(0)
+                    .getId();
+            taskService.setAssignee(taskId, "kermit");
+
+            List<HistoricTaskInstance> tasks = historyService
+                    .createHistoricTaskInstanceQuery()
+                    .taskCandidateUser("kermit")
+                    .list();
+            assertEquals(2, tasks.size());
+
+            tasks = historyService
+                    .createHistoricTaskInstanceQuery()
+                    .taskCandidateUser("kermit")
+                    .ignoreAssigneeValue()
+                    .list();
+            assertEquals(3, tasks.size());
+
+
+            tasks = historyService
+                    .createHistoricTaskInstanceQuery()
+                    .taskCandidateGroup("management")
+                    .list();
+            assertEquals(0, tasks.size());
+
+            tasks = historyService
+                    .createHistoricTaskInstanceQuery()
+                    .taskCandidateGroup("management")
+                    .ignoreAssigneeValue()
+                    .list();
+            assertEquals(1, tasks.size());
+        }
+    }
+
+    @Deployment(resources = {"org/flowable/engine/test/api/history/HistoricTaskAndVariablesQueryTest.testCandidate.bpmn20.xml"})
+    public void testIgnoreAssigneeValueOr() {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
+
+            String taskId = taskService
+                    .createTaskQuery()
+                    .processInstanceId(processInstance.getProcessInstanceId())
+                    .list()
+                    .get(0)
+                    .getId();
+            taskService.setAssignee(taskId, "kermit");
+
+
+            List<HistoricTaskInstance>  tasks = historyService.createHistoricTaskInstanceQuery()
+                    .or()
+                    .taskCandidateUser("kermit")
+                    .taskAssignee("gonzo")
+                    .ignoreAssigneeValue()
+                    .endOr()
+                    .list();
+
+
+            assertEquals(4, tasks.size());
+
+            tasks = historyService.createHistoricTaskInstanceQuery()
+                    .or()
+                    .taskCandidateUser("kermit")
+                    .taskAssignee("gonzo")
+                    .endOr()
+                    .list();
+            assertEquals(3, tasks.size());
+        }
+    }
 
     public void testQueryWithPagingAndVariables() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {

@@ -23,7 +23,6 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
-import org.flowable.task.service.TaskQuery;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.history.HistoricTaskInstance;
 import org.flowable.task.service.history.HistoricTaskInstanceQuery;
@@ -88,6 +87,7 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
     protected String candidateGroup;
     private List<String> candidateGroups;
     protected String involvedUser;
+    protected boolean ignoreAssigneeValue;
     protected Integer taskPriority;
     protected Integer taskMinPriority;
     protected Integer taskMaxPriority;
@@ -1213,6 +1213,16 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
         }
         return this;
     }
+    
+    @Override
+    public HistoricTaskInstanceQuery ignoreAssigneeValue() {
+        if (inOrStatement) {
+            this.currentOrQueryObject.ignoreAssigneeValue = true;
+        } else {
+            this.ignoreAssigneeValue = true;
+        }
+        return this;
+    }
 
     @Override
     public HistoricTaskInstanceQuery taskTenantId(String tenantId) {
@@ -1750,6 +1760,10 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
 
     public String getInvolvedUser() {
         return involvedUser;
+    }
+
+    public boolean isIgnoreAssigneeValue() {
+        return ignoreAssigneeValue;
     }
 
     public String getProcessDefinitionKeyLikeIgnoreCase() {

@@ -139,6 +139,11 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      * Only select tasks for which there exist an {@link IdentityLink} with the given user, including tasks which have been assigned to the given user (assignee) or owned by the given user (owner).
      */
     T taskInvolvedUser(String involvedUser);
+    
+    /**
+     * Allows to select a task using {@link #taskCandidateGroup(String)} {@link #taskCandidateGroupIn(List)} or {@link #taskCandidateUser(String)} but ignore the assignee value instead of querying for an empty assignee.
+     */
+    T ignoreAssigneeValue();
 
     /** Only select tasks for which users in the given group are candidates. */
     T taskCandidateGroup(String candidateGroup);

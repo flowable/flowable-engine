@@ -796,7 +796,9 @@
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
       </if>
       <if test="candidateUser != null || candidateGroups != null">
-        and RES.ASSIGNEE_ is null
+        <if test="!ignoreAssigneeValue">
+            and RES.ASSIGNEE_ is null
+        </if>
         and HI.TYPE_ = 'candidate'
         and
         (
@@ -1120,8 +1122,12 @@
             or (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
           </if>
           <if test="orQueryObject.candidateUser != null || orQueryObject.candidateGroups != null">
-            or (RES.ASSIGNEE_ is null
-            and HI_OR${orIndex}.TYPE_ = 'candidate'
+            or (HI_OR${orIndex}.TYPE_ = 'candidate'
+            
+            <if test="!orQueryObject.ignoreAssigneeValue">
+                and RES.ASSIGNEE_ is null
+            </if>
+            
             and
             (
               <if test="orQueryObject.candidateUser != null">
