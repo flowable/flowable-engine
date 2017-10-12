@@ -85,10 +85,10 @@ angular.module('flowableModeler').controller('FlowableDataPropertiesPopupCtrl',
                 enableHorizontalScrollbar: 0,
                 enableColumnMenus: false,
                 enableSorting: false,
-                columnDefs: [{field: 'id', displayName: $scope.labels.idLabel},
-                    {field: 'name', displayName: $scope.labels.nameLabel},
-                    {field: 'type', displayName: $scope.labels.typeLabel},
-                    {field: 'value', displayName: $scope.labels.valueLabel}]
+                columnDefs: [{field: 'dataproperty_id', displayName: $scope.labels.idLabel},
+                    {field: 'dataproperty_name', displayName: $scope.labels.nameLabel},
+                    {field: 'dataproperty_type', displayName: $scope.labels.typeLabel},
+                    {field: 'dataproperty_value', displayName: $scope.labels.valueLabel}]
             };
             
             $scope.enumGridOptions = {
@@ -157,9 +157,9 @@ angular.module('flowableModeler').controller('FlowableDataPropertiesPopupCtrl',
         var propertyIndex = 1;
         $scope.addNewProperty = function () {
             var newProperty = {
-                id: 'new_data_object_' + propertyIndex++,
-                name: '',
-                type: 'string',
+                dataproperty_id: 'new_data_object_' + propertyIndex++,
+                dataproperty_name: '',
+                dataproperty_type: 'string',
                 readable: true,
                 writable: true
             };

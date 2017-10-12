@@ -28,15 +28,15 @@
             
                             <div class="form-group">
             			   		<label for="idField">{{'PROPERTY.DATAPROPERTIES.ID' | translate}}</label>
-            			   		<input id="idField" class="form-control" type="text" ng-model="selectedProperty.id" placeholder="{{'PROPERTY.DATAPROPERTIES.ID.PLACEHOLDER' | translate }}" />
+            			   		<input id="idField" class="form-control" type="text" ng-model="selectedProperty.dataproperty_id" placeholder="{{'PROPERTY.DATAPROPERTIES.ID.PLACEHOLDER' | translate }}" />
             				</div>
             				<div class="form-group">
             			   		<label for="nameField">{{'PROPERTY.DATAPROPERTIES.NAME' | translate}}</label>
-            			   		<input id="nameField" class="form-control" type="text" ng-model="selectedProperty.name" placeholder="{{'PROPERTY.DATAPROPERTIES.NAME.PLACEHOLDER' | translate }}" />
+            			   		<input id="nameField" class="form-control" type="text" ng-model="selectedProperty.dataproperty_name" placeholder="{{'PROPERTY.DATAPROPERTIES.NAME.PLACEHOLDER' | translate }}" />
             				</div>
             				<div class="form-group">
             			   		<label for="typeField">{{'PROPERTY.DATAPROPERTIES.TYPE' | translate}}</label>
-            			   		<select id="typeField" class="form-control" ng-model="selectedProperty.type" ng-change="propertyTypeChanged()">
+            			   		<select id="typeField" class="form-control" ng-model="selectedProperty.dataproperty_type" ng-change="propertyTypeChanged()">
                                     <option selected>string</option>
                                     <option>boolean</option>
                                     <option>datetime</option>
@@ -47,7 +47,7 @@
             				</div>
                             <div class="form-group">
             			   		<label for="valueField">{{'PROPERTY.DATAPROPERTIES.VALUE' | translate}}</label>
-            			   		<input id="valueField" class="form-control" type="text" ng-model="selectedProperty.value" placeholder="{{'PROPERTY.DATAPROPERTIES.VALUE.PLACEHOLDER' | translate }}" />
+            			   		<input id="valueField" class="form-control" type="text" ng-model="selectedProperty.dataproperty_value" placeholder="{{'PROPERTY.DATAPROPERTIES.VALUE.PLACEHOLDER' | translate }}" />
             				</div>
                         </div>
                         <div ng-show="!selectedProperty" class="muted no-property-selected" translate>PROPERTY.DATAPROPERTIES.EMPTY</div>

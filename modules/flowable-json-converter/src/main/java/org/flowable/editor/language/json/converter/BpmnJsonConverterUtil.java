@@ -515,7 +515,7 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
                 }
             }
 
-            JsonNode itemsArrayNode = objectNode.get(PROPERTY_DATA_PROPERTIES_NODE);
+            JsonNode itemsArrayNode = objectNode.get(EDITOR_PROPERTIES_GENERAL_ITEMS);
             if (itemsArrayNode != null) {
                 for (JsonNode dataNode : itemsArrayNode) {
 
@@ -603,7 +603,7 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
             itemsNode.add(propertyItemNode);
         }
 
-        dataPropertiesNode.set(PROPERTY_DATA_PROPERTIES_NODE, itemsNode);
+        dataPropertiesNode.set(EDITOR_PROPERTIES_GENERAL_ITEMS, itemsNode);
         propertiesNode.set(PROPERTY_DATA_PROPERTIES, dataPropertiesNode);
     }
 

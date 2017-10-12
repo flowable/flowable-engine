@@ -177,65 +177,65 @@
         "properties" : { "documentation" : "",
             "name" : "",
             "dataproperties" : { "dataProperties" : [
-                                { "id" : "dObj7",
-                                  "name" : "SubStringTest",
-                                  "type" : "string",
-                                  "value" : "Testing456"
+                                { "dataproperty_id" : "dObj7",
+                                  "dataproperty_name" : "SubStringTest",
+                                  "dataproperty_type" : "string",
+                                  "dataproperty_value" : "Testing456"
                                 },
-                                { "id" : "dObj8",
-                                  "name" : "SubBooleanTest",
-                                  "type" : "boolean",
-                                  "value" : "false"
+                                { "dataproperty_id" : "dObj8",
+                                  "dataproperty_name" : "SubBooleanTest",
+                                  "dataproperty_type" : "boolean",
+                                  "dataproperty_value" : "false"
                                 },
-                                { "id" : "dObj9",
-                                  "name" : "SubDateTest",
-                                  "type" : "datetime",
-                                  "value" : "2013-11-11"
+                                { "dataproperty_id" : "dObj9",
+                                  "dataproperty_name" : "SubDateTest",
+                                  "dataproperty_type" : "datetime",
+                                  "dataproperty_value" : "2013-11-11"
                                 },
-                                { "id" : "dObj10",
-                                  "name" : "SubDoubleTest",
-                                  "type" : "double",
-                                  "value" : "678912345"
+                                { "dataproperty_id" : "dObj10",
+                                  "dataproperty_name" : "SubDoubleTest",
+                                  "dataproperty_type" : "double",
+                                  "dataproperty_value" : "678912345"
                                 },
-                                { "id" : "dObj11",
-                                  "name" : "SubIntegerTest",
-                                  "type" : "int",
-                                  "value" : "45"
+                                { "dataproperty_id" : "dObj11",
+                                  "dataproperty_name" : "SubIntegerTest",
+                                  "dataproperty_type" : "int",
+                                  "dataproperty_value" : "45"
                                 },
-                                { "id" : "dObj12",
-                                  "name" : "SubLongTest",
-                                  "type" : "long",
-                                  "value" : "456123"
+                                { "dataproperty_id" : "dObj12",
+                                  "dataproperty_name" : "SubLongTest",
+                                  "dataproperty_type" : "long",
+                                  "dataproperty_value" : "456123"
                                 },
-                                { "id" : "dObj19",
-                                  "name" : "SubStringTest2",
-                                  "type" : "string",
-                                  "value" : ""
+                                { "dataproperty_id" : "dObj19",
+                                  "dataproperty_name" : "SubStringTest2",
+                                  "dataproperty_type" : "string",
+                                  "dataproperty_value" : ""
                                 },
-                                { "id" : "dObj20",
-                                  "name" : "SubBooleanTest2",
-                                  "type" : "boolean",
-                                  "value" : ""
+                                { "dataproperty_id" : "dObj20",
+                                  "dataproperty_name" : "SubBooleanTest2",
+                                  "dataproperty_type" : "boolean",
+                                  "dataproperty_value" : ""
                                 },
-                                { "id" : "dObj21",
-                                  "name" : "SubDateTest2",
-                                  "type" : "datetime",
-                                  "value" : ""
+                                { "dataproperty_id" : "dObj21",
+                                  "dataproperty_name" : "SubDateTest2",
+                                  "dataproperty_type" : "datetime",
+                                  "dataproperty_value" : ""
                                 },
-                                { "id" : "dObj22",
-                                  "name" : "SubDoubleTest2",
-                                  "type" : "double",
-                                  "value" : ""
+                                { "dataproperty_id" : "dObj22",
+                                  "dataproperty_name" : "SubDoubleTest2",
+                                  "dataproperty_type" : "double",
+                                  "dataproperty_value" : ""
                                 },
-                                { "id" : "dObj23",
-                                  "name" : "SubIntegerTest2",
-                                  "type" : "int",
-                                  "value" : ""
+                                { "dataproperty_id" : "dObj23",
+                                  "dataproperty_name" : "SubIntegerTest2",
+                                  "dataproperty_type" : "int",
+                                  "dataproperty_value" : ""
                                 },
-                                { "id" : "dObj24",
-                                  "name" : "SubLongTest2",
-                                  "type" : "long",
-                                  "value" : ""
+                                { "dataproperty_id" : "dObj24",
+                                  "dataproperty_name" : "SubLongTest2",
+                                  "dataproperty_type" : "long",
+                                  "dataproperty_value" : ""
                                 }
                               ],
                            "totalCount" : 12
@@ -419,65 +419,65 @@
   "properties" : { "documentation" : "",
       "executionlisteners" : "",
       "dataproperties" : { "dataProperties" : [
-                          { "id" : "dObj1",
-                            "name" : "StringTest",
-                            "type" : "string",
-                            "value" : "Testing123"
+                          { "dataproperty_id" : "dObj1",
+                            "dataproperty_name" : "StringTest",
+                            "dataproperty_type" : "string",
+                            "dataproperty_value" : "Testing123"
                           },
-                          { "id" : "dObj2",
-                            "name" : "BooleanTest",
-                            "type" : "boolean",
-                            "value" : "true"
+                          { "dataproperty_id" : "dObj2",
+                            "dataproperty_name" : "BooleanTest",
+                            "dataproperty_type" : "boolean",
+                            "dataproperty_value" : "true"
                           },
-                          { "id" : "dObj3",
-                            "name" : "DateTest",
-                            "type" : "datetime",
-                            "value" : "2013-09-16T11:23:00"
+                          { "dataproperty_id" : "dObj3",
+                            "dataproperty_name" : "DateTest",
+                            "dataproperty_type" : "datetime",
+                            "dataproperty_value" : "2013-09-16T11:23:00"
                           },
-                          { "id" : "dObj4",
-                            "name" : "DoubleTest",
-                            "type" : "double",
-                            "value" : "123456789"
+                          { "dataproperty_id" : "dObj4",
+                            "dataproperty_name" : "DoubleTest",
+                            "dataproperty_type" : "double",
+                            "dataproperty_value" : "123456789"
                           },
-                          { "id" : "dObj5",
-                            "name" : "IntegerTest",
-                            "type" : "int",
-                            "value" : "123"
+                          { "dataproperty_id" : "dObj5",
+                            "dataproperty_name" : "IntegerTest",
+                            "dataproperty_type" : "int",
+                            "dataproperty_value" : "123"
                           },
-                          { "id" : "dObj6",
-                            "name" : "LongTest",
-                            "type" : "long",
-                            "value" : "-123456"
+                          { "dataproperty_id" : "dObj6",
+                            "dataproperty_name" : "LongTest",
+                            "dataproperty_type" : "long",
+                            "dataproperty_value" : "-123456"
                           },
-                          { "id" : "dObj13",
-                            "name" : "StringTest2",
-                            "type" : "string",
-                            "value" : ""
+                          { "dataproperty_id" : "dObj13",
+                            "dataproperty_name" : "StringTest2",
+                            "dataproperty_type" : "string",
+                            "dataproperty_value" : ""
                           },
-                          { "id" : "dObj14",
-                            "name" : "BooleanTest2",
-                            "type" : "boolean",
-                            "value" : ""
+                          { "dataproperty_id" : "dObj14",
+                            "dataproperty_name" : "BooleanTest2",
+                            "dataproperty_type" : "boolean",
+                            "dataproperty_value" : ""
                           },
-                          { "id" : "dObj15",
-                            "name" : "DateTest2",
-                            "type" : "datetime",
-                            "value" : ""
+                          { "dataproperty_id" : "dObj15",
+                            "dataproperty_name" : "DateTest2",
+                            "dataproperty_type" : "datetime",
+                            "dataproperty_value" : ""
                           },
-                          { "id" : "dObj16",
-                            "name" : "DoubleTest2",
-                            "type" : "double",
-                            "value" : ""
+                          { "dataproperty_id" : "dObj16",
+                            "dataproperty_name" : "DoubleTest2",
+                            "dataproperty_type" : "double",
+                            "dataproperty_value" : ""
                           },
-                          { "id" : "dObj17",
-                            "name" : "IntegerTest2",
-                            "type" : "int",
-                            "value" : ""
+                          { "dataproperty_id" : "dObj17",
+                            "dataproperty_name" : "IntegerTest2",
+                            "dataproperty_type" : "int",
+                            "dataproperty_value" : ""
                           },
-                          { "id" : "dObj18",
-                            "name" : "LongTest2",
-                            "type" : "long",
-                            "value" : ""
+                          { "dataproperty_id" : "dObj18",
+                            "dataproperty_name" : "LongTest2",
+                            "dataproperty_type" : "long",
+                            "dataproperty_value" : ""
                           }
                         ],
                       "totalCount" : 12

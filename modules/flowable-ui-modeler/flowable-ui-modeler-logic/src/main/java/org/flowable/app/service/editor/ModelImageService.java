@@ -221,6 +221,7 @@ public class ModelImageService {
                 if (flowList != null) {
                     graphicInfoList.addAll(flowList);
                 }
+                
             // no graphic info for Data Objects    
             } else if (!DataObject.class.isInstance(flowElement)) {
                 graphicInfoList.add(bpmnModel.getGraphicInfo(flowElement.getId()));
