@@ -21,6 +21,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.HumanTask;
@@ -285,8 +286,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
         // Should be only one
         for (TaskEntity taskEntity : taskEntities) {
             if (!taskEntity.isDeleted()) {
-                taskService.deleteTask(taskEntity, true);
-                CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskEnd(taskEntity, null);
+                TaskHelper.deleteTask(taskEntity, null, false, true);
             }
         }
         
@@ -299,7 +299,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             TaskService taskService = CommandContextUtil.getTaskService(commandContext);
             List<TaskEntity> taskEntities = taskService.findTasksBySubScopeIdScopeType(planItemInstance.getId(), VariableScopeType.CMMN);
             for (TaskEntity taskEntity : taskEntities) {
-                taskService.deleteTask(taskEntity, true);
+                TaskHelper.deleteTask(taskEntity, "cmmn-state-transition-" + transition, false, true);
             }
         }
     }

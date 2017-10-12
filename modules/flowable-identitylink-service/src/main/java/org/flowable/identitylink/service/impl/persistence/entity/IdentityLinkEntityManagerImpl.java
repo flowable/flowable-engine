@@ -18,6 +18,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.IdentityLinkType;
@@ -47,7 +48,8 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
     public void deleteIdentityLink(IdentityLinkEntity identityLink) {
         delete(identityLink, false);
         
-        if (getEventDispatcher().isEnabled()) {
+        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             getEventDispatcher().dispatchEvent(FlowableIdentityLinkEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, identityLink));
         }
     }
@@ -81,7 +83,7 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
     public List<IdentityLinkEntity> findIdentityLinkByProcessDefinitionUserAndGroup(String processDefinitionId, String userId, String groupId) {
         return identityLinkDataManager.findIdentityLinkByProcessDefinitionUserAndGroup(processDefinitionId, userId, groupId);
     }
-
+    
     @Override
     public IdentityLinkEntity addProcessInstanceIdentityLink(String processInstanceId, String userId, String groupId, String type) {
         IdentityLinkEntity identityLinkEntity = identityLinkDataManager.create();

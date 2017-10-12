@@ -23,6 +23,7 @@ import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.engine.common.impl.identity.Authentication;
 import org.flowable.task.service.Task;
+import org.flowable.task.service.history.HistoricTaskInstance;
 import org.junit.Test;
 
 /**
@@ -87,6 +88,16 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
         assertCaseInstanceEnded(caseInstance);
         
+        List<HistoricTaskInstance> historicTaskInstances = cmmnHistoryService.createHistoricTaskInstanceQuery().list();
+        assertEquals(3, historicTaskInstances.size());
+        for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
+            assertNotNull(historicTaskInstance.getStartTime());
+            assertNotNull(historicTaskInstance.getEndTime());
+            if (!historicTaskInstance.getName().equals("A")) {
+                assertEquals("cmmn-state-transition-terminate-case", historicTaskInstance.getDeleteReason());
+            }
+        }
+        
         // Completing C should delete B
         CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("humanTaskCompletionExits")
@@ -100,6 +111,15 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
         cmmnTaskService.complete(taskA.getId());
         assertCaseInstanceEnded(caseInstance2);
         
+        historicTaskInstances = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance2.getId()).list();
+        assertEquals(3, historicTaskInstances.size());
+        for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
+            assertNotNull(historicTaskInstance.getStartTime());
+            assertNotNull(historicTaskInstance.getEndTime());
+            if (historicTaskInstance.getName().equals("B")) {
+                assertEquals("cmmn-state-transition-exit", historicTaskInstance.getDeleteReason());
+            }
+        }
     }
     
 }

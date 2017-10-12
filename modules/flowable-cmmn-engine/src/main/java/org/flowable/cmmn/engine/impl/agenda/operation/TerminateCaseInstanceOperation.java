@@ -42,5 +42,10 @@ public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOp
             CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstance(planItemInstanceEntity);
         }
     }
+    
+    @Override
+    protected String getDeleteReason() {
+        return "cmmn-state-transition-terminate-case";
+    }
 
 }

@@ -18,6 +18,7 @@ import java.util.List;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
+import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.cmmn.engine.runtime.CaseInstanceQuery;
@@ -72,11 +73,11 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
     }
     
     @Override
-    public void deleteCaseInstanceAndRelatedData(String caseInstanceId) {
+    public void deleteCaseInstanceAndRelatedData(String caseInstanceId, String deleteReason) {
         CaseInstanceEntity caseInstanceEntity = caseInstanceDataManager.findById(caseInstanceId);
 
         CommandContext commandContext = CommandContextUtil.getCommandContext();
-
+        
         // Variables
         VariableInstanceEntityManager variableInstanceEntityManager 
             = CommandContextUtil.getVariableServiceConfiguration(commandContext).getVariableInstanceEntityManager();
@@ -90,7 +91,7 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         TaskEntityManager taskEntityManager = CommandContextUtil.getTaskServiceConfiguration(commandContext).getTaskEntityManager();
         List<TaskEntity> taskEntities = taskEntityManager.findTasksByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
         for (TaskEntity taskEntity : taskEntities) {
-            taskEntityManager.delete(taskEntity);
+            TaskHelper.deleteTask(taskEntity, deleteReason, false, true);
         }
         
         // Sentry part instances
