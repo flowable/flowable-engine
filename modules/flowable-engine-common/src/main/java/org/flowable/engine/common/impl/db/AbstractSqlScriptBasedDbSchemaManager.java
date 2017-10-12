@@ -165,47 +165,6 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
         }
     }
     
-    public void setProperty(String propertyName, String value) {
-        
-        String tableName = getPropertyTable();
-        if (!getDbSqlSession().getDbSqlSessionFactory().isTablePrefixIsSchema()) {
-            tableName = prependDatabaseTablePrefix(tableName);
-        }
-        
-        PreparedStatement statement = null;
-        PreparedStatement statement2 = null;
-        try {
-            statement = getDbSqlSession().getSqlSession().getConnection()
-                    .prepareStatement("update " + tableName + " set VALUE_ = ? where NAME_ = ?");
-            statement.setString(1, value);
-            statement.setString(2, propertyName);
-            int result = statement.executeUpdate();
-            
-            // Property does not exist yet, insert the property
-            if (result == 0) {
-                statement2 = getDbSqlSession().getSqlSession().getConnection()
-                        .prepareStatement("insert into " + tableName + "(NAME_, VALUE_, REV_) values(?, ?, ?)");
-                statement2.setString(1, propertyName);
-                statement2.setString(2, value);
-                statement2.setInt(3, 1);
-                statement2.executeUpdate();
-            }
-        } catch (SQLException e) {
-            throw new FlowableException("Could not set property " + propertyName + " in " + tableName, e);
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) { }
-            }
-            if (statement2 != null) {
-                try {
-                    statement2.close();
-                } catch (SQLException e) { }
-            }
-        }
-    }
-    
     protected String getPropertyTable() {
         return PROPERTY_TABLE;
     }
