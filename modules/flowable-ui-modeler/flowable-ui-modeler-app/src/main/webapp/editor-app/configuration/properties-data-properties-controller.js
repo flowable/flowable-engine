@@ -33,11 +33,11 @@ angular.module('flowableModeler').controller('FlowableDataPropertiesPopupCtrl',
 
         // Put json representing data properties on scope
         if ($scope.property.value !== undefined && $scope.property.value !== null
-            && $scope.property.value.dataProperties !== undefined
-            && $scope.property.value.dataProperties !== null) {
+            && $scope.property.value.items !== undefined
+            && $scope.property.value.items !== null) {
             // Note that we clone the json object rather then setting it directly,
-            // this to cope with the fact that the user can click the cancel button and no changes should have happended
-            $scope.dataProperties = angular.copy($scope.property.value.dataProperties);
+            // this to cope with the fact that the user can click the cancel button and no changes should have happened
+            $scope.dataProperties = angular.copy($scope.property.value.items);
             
             for (var i = 0; i < $scope.dataProperties.length; i++) {
 			    var dataProperty = $scope.dataProperties[i];
@@ -306,7 +306,7 @@ angular.module('flowableModeler').controller('FlowableDataPropertiesPopupCtrl',
 
             if ($scope.dataProperties.length > 0) {
                 $scope.property.value = {};
-                $scope.property.value.dataProperties = $scope.dataProperties;
+                $scope.property.value.items = $scope.dataProperties;
             } else {
                 $scope.property.value = null;
             }

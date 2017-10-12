@@ -176,7 +176,7 @@
           ],
         "properties" : { "documentation" : "",
             "name" : "",
-            "dataproperties" : { "dataProperties" : [
+            "dataproperties" : { "items" : [
                                 { "dataproperty_id" : "dObj7",
                                   "dataproperty_name" : "SubStringTest",
                                   "dataproperty_type" : "string",
@@ -418,7 +418,7 @@
     ],
   "properties" : { "documentation" : "",
       "executionlisteners" : "",
-      "dataproperties" : { "dataProperties" : [
+      "dataproperties" : { "items" : [
                           { "dataproperty_id" : "dObj1",
                             "dataproperty_name" : "StringTest",
                             "dataproperty_type" : "string",
