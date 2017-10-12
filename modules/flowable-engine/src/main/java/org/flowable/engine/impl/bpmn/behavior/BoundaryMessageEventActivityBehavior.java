@@ -59,21 +59,8 @@ public class BoundaryMessageEventActivityBehavior extends BoundaryEventActivityB
 
         CommandContextUtil.getEventSubscriptionEntityManager(commandContext).insertMessageEvent(messageName, executionEntity);
 
-        dispatchEvent(commandContext, executionEntity, messageName);
-        dispatchTransactionEvent(commandContext, executionEntity, messageName);
-    }
-
-    private void dispatchEvent(CommandContext commandContext, ExecutionEntity executionEntity, String messageName) {
         if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
             CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
-                    .dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING, executionEntity.getActivityId(), messageName,
-                            null, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()));
-        }
-    }
-
-    private void dispatchTransactionEvent(CommandContext commandContext, ExecutionEntity executionEntity, String messageName) {
-        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher()
                     .dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING, executionEntity.getActivityId(), messageName,
                             null, executionEntity.getId(), executionEntity.getProcessInstanceId(), executionEntity.getProcessDefinitionId()));
         }

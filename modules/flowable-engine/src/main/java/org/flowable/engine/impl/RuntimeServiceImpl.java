@@ -17,13 +17,11 @@ import org.flowable.engine.RuntimeService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.form.FormData;
 import org.flowable.engine.impl.cmd.ActivateProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.AddEventListenerCommand;
 import org.flowable.engine.impl.cmd.AddIdentityLinkForProcessInstanceCmd;
-import org.flowable.engine.impl.cmd.AddTransactionEventListenerCommand;
 import org.flowable.engine.impl.cmd.ChangeActivityStateCmd;
 import org.flowable.engine.impl.cmd.CompleteAdhocSubProcessCmd;
 import org.flowable.engine.impl.cmd.DeleteIdentityLinkForProcessInstanceCmd;
@@ -48,7 +46,6 @@ import org.flowable.engine.impl.cmd.HasExecutionVariableCmd;
 import org.flowable.engine.impl.cmd.MessageEventReceivedCmd;
 import org.flowable.engine.impl.cmd.RemoveEventListenerCommand;
 import org.flowable.engine.impl.cmd.RemoveExecutionVariablesCmd;
-import org.flowable.engine.impl.cmd.RemoveTransactionEventListenerCommand;
 import org.flowable.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.flowable.engine.impl.cmd.SetProcessInstanceBusinessKeyCmd;
 import org.flowable.engine.impl.cmd.SetProcessInstanceNameCmd;
@@ -512,23 +509,8 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     }
 
     @Override
-    public void addTransactionEventListener(TransactionFlowableEventListener listenerToAdd) {
-        commandExecutor.execute(new AddTransactionEventListenerCommand(listenerToAdd));
-    }
-
-    @Override
-    public void addTransactionEventListener(TransactionFlowableEventListener listenerToAdd, FlowableEngineEventType... types) {
-        commandExecutor.execute(new AddTransactionEventListenerCommand(listenerToAdd, types));
-    }
-
-    @Override
     public void removeEventListener(FlowableEventListener listenerToRemove) {
         commandExecutor.execute(new RemoveEventListenerCommand(listenerToRemove));
-    }
-
-    @Override
-    public void removeTransactionEventListener(TransactionFlowableEventListener listenerToRemove) {
-        commandExecutor.execute(new RemoveTransactionEventListenerCommand(listenerToRemove));
     }
 
     @Override

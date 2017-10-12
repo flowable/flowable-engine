@@ -17,11 +17,11 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
@@ -537,10 +537,14 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         VariableInstanceEntity result = super.createVariableInstance(variableName, value, sourceActivityExecution);
 
         // Dispatch event, if needed
-        dispatchEvent(FlowableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_CREATED, variableName, value, result.getType(), result.getTaskId(), result.getExecutionId(), getProcessInstanceId(),
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        if (processEngineConfiguration != null && processEngineConfiguration.getEventDispatcher().isEnabled()) {
+            processEngineConfiguration
+                    .getEventDispatcher()
+                    .dispatchEvent(
+                            FlowableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_CREATED, variableName, value, result.getType(), result.getTaskId(), result.getExecutionId(), getProcessInstanceId(),
                                     getProcessDefinitionId()));
-        dispatchTransactionEvent(FlowableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_CREATED, variableName, value, result.getType(), result.getTaskId(), result.getExecutionId(), getProcessInstanceId(),
-                getProcessDefinitionId()));
+        }
         return result;
     }
 
@@ -549,25 +553,13 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
         super.updateVariableInstance(variableInstance, value, sourceActivityExecution);
 
         // Dispatch event, if needed
-        dispatchEvent(FlowableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_UPDATED, variableInstance.getName(), value, variableInstance.getType(), variableInstance.getTaskId(),
-                variableInstance.getExecutionId(), getProcessInstanceId(), getProcessDefinitionId()));
-        dispatchTransactionEvent(FlowableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_UPDATED, variableInstance.getName(), value, variableInstance.getType(), variableInstance.getTaskId(),
-                variableInstance.getExecutionId(), getProcessInstanceId(), getProcessDefinitionId()));
-    }
-
-    private void dispatchEvent(FlowableEvent flowableEvent) {
-        if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration()
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+        if (processEngineConfiguration != null && processEngineConfiguration.getEventDispatcher().isEnabled()) {
+            processEngineConfiguration
                     .getEventDispatcher()
-                    .dispatchEvent(flowableEvent);
-        }
-    }
-
-    private void dispatchTransactionEvent(FlowableEvent flowableEvent) {
-        if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration()
-                    .getTransactionDependentEventDispatcher()
-                    .dispatchEvent(flowableEvent);
+                    .dispatchEvent(
+                            FlowableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_UPDATED, variableInstance.getName(), value, variableInstance.getType(), variableInstance.getTaskId(),
+                                    variableInstance.getExecutionId(), getProcessInstanceId(), getProcessDefinitionId()));
         }
     }
 

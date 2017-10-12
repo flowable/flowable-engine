@@ -14,7 +14,6 @@
 package org.flowable.engine.impl.persistence.entity;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventDispatcher;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableVariableEvent;
@@ -142,13 +141,6 @@ public class VariableInstanceEntityManagerImpl extends AbstractEntityManager<Var
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, entity));
 
             eventDispatcher.dispatchEvent(createVariableDeleteEvent(entity));
-        }
-
-        TransactionFlowableEventDispatcher transactionEventDispatcher = getTransactionEventDispatcher();
-        if (fireDeleteEvent && transactionEventDispatcher.isEnabled()) {
-            transactionEventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, entity));
-
-            transactionEventDispatcher.dispatchEvent(createVariableDeleteEvent(entity));
         }
 
     }

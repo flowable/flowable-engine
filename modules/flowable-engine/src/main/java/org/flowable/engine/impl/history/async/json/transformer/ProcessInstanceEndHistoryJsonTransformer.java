@@ -57,7 +57,6 @@ public class ProcessInstanceEndHistoryJsonTransformer extends AbstractHistoryJso
             }
     
             dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
-            dispatchTransactionEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
 
         } else {
             historicProcessInstance = historicProcessInstanceEntityManager.create();
@@ -79,7 +78,6 @@ public class ProcessInstanceEndHistoryJsonTransformer extends AbstractHistoryJso
             historicProcessInstanceEntityManager.insert(historicProcessInstance, false);
     
             dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
-            dispatchTransactionEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
 
             historicProcessInstance.setEndActivityId(getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID));
             
@@ -95,7 +93,6 @@ public class ProcessInstanceEndHistoryJsonTransformer extends AbstractHistoryJso
             historicProcessInstanceEntityManager.update(historicProcessInstance, false);
     
             dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
-            dispatchTransactionEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
         }
     }
 

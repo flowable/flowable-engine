@@ -55,22 +55,11 @@ public class SetDeploymentCategoryCmd implements Command<Void> {
         // Update category
         deployment.setCategory(category);
 
-        dispatchEvent(commandContext, deployment);
-        dispatchTransactionEvent(commandContext, deployment);
-
-        return null;
-    }
-
-    private void dispatchEvent(CommandContext commandContext, DeploymentEntity deployment) {
         if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
             CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, deployment));
         }
-    }
 
-    private void dispatchTransactionEvent(CommandContext commandContext, DeploymentEntity deployment) {
-        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, deployment));
-        }
+        return null;
     }
 
     public String getDeploymentId() {

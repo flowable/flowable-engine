@@ -19,7 +19,6 @@ import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.persistence.entity.VariableInstance;
@@ -1198,22 +1197,6 @@ public interface RuntimeService {
     void addEventListener(FlowableEventListener listenerToAdd, FlowableEngineEventType... types);
 
     /**
-     * Adds an event-listener which will be notified of ALL events by the transaction dispatcher.
-     *
-     * @param listenerToAdd the listener to add
-     */
-    void addTransactionEventListener(TransactionFlowableEventListener listenerToAdd);
-
-    /**
-     * Adds an event-listener which will only be notified when an event occurs, which type is in the
-     * given types.
-     *
-     * @param listenerToAdd the listener to add
-     * @param types         types of events the listener should be notified for
-     */
-    void addTransactionEventListener(TransactionFlowableEventListener listenerToAdd, FlowableEngineEventType... types);
-
-    /**
      * Removes the given listener from this dispatcher. The listener will no longer be notified, regardless of the type(s) it was registered for in the first place.
      * 
      * @param listenerToRemove
@@ -1222,19 +1205,11 @@ public interface RuntimeService {
     void removeEventListener(FlowableEventListener listenerToRemove);
 
     /**
-     * Removes the given listener from this dispatcher. The listener will no longer be notified, regardless of the type(s) it was registered for in the first place.
-     *
-     * @param listenerToRemove
-     *            listener to remove
-     */
-    void removeTransactionEventListener(TransactionFlowableEventListener listenerToRemove);
-
-    /**
      * Dispatches the given event to any listeners that are registered.
-     *
+     * 
      * @param event
      *            event to dispatch.
-     *
+     * 
      * @throws FlowableException
      *             if an exception occurs when dispatching the event or when the {@link FlowableEventDispatcher} is disabled.
      * @throws FlowableIllegalArgumentException

@@ -14,7 +14,6 @@ package org.flowable.engine.impl.util;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventDispatcher;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
@@ -65,19 +64,6 @@ public class TaskHelper {
             CommandContextUtil.getIdentityLinkEntityManager(commandContext).involveUser(processInstanceEntity, Authentication.getAuthenticatedUserId(), IdentityLinkType.PARTICIPANT);
         }
 
-        dispatchEvent(taskEntity, variables, localScope);
-        dispatchTransactionEvent(taskEntity, variables, localScope);
-
-        CommandContextUtil.getTaskEntityManager(commandContext).deleteTask(taskEntity, null, false, true);
-
-        // Continue process (if not a standalone task)
-        if (taskEntity.getExecutionId() != null) {
-            ExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager(commandContext).findById(taskEntity.getExecutionId());
-            CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(executionEntity);
-        }
-    }
-
-    private static void dispatchEvent(TaskEntity taskEntity, Map<String, Object> variables, boolean localScope) {
         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
         if (eventDispatcher.isEnabled()) {
             if (variables != null) {
@@ -86,16 +72,13 @@ public class TaskHelper {
                 eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_COMPLETED, taskEntity));
             }
         }
-    }
 
-    private static void dispatchTransactionEvent(TaskEntity taskEntity, Map<String, Object> variables, boolean localScope) {
-        TransactionFlowableEventDispatcher transactionEventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher();
-        if (transactionEventDispatcher.isEnabled()) {
-            if (variables != null) {
-                transactionEventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityWithVariablesEvent(FlowableEngineEventType.TASK_COMPLETED, taskEntity, variables, localScope));
-            } else {
-                transactionEventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_COMPLETED, taskEntity));
-            }
+        CommandContextUtil.getTaskEntityManager(commandContext).deleteTask(taskEntity, null, false, true);
+
+        // Continue process (if not a standalone task)
+        if (taskEntity.getExecutionId() != null) {
+            ExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager(commandContext).findById(taskEntity.getExecutionId());
+            CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(executionEntity);
         }
     }
 

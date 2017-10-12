@@ -82,8 +82,11 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
         LOGGER.debug("Executing activityBehavior {} on activity '{}' with execution {}", activityBehavior.getClass(), flowNode.getId(), execution.getId());
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-        dispatchEvent(processEngineConfiguration, flowNode);
-        dispatchTransactionEvent(processEngineConfiguration, flowNode);
+        if (processEngineConfiguration != null && processEngineConfiguration.getEventDispatcher().isEnabled()) {
+            processEngineConfiguration.getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, flowNode.getId(), flowNode.getName(), execution.getId(),
+                            execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
+        }
 
         try {
             activityBehavior.execute(execution);
@@ -95,22 +98,6 @@ public class ContinueMultiInstanceOperation extends AbstractOperation {
                 LogMDC.putMDCExecution(execution);
             }
             throw e;
-        }
-    }
-
-    private void dispatchEvent(ProcessEngineConfigurationImpl processEngineConfiguration, FlowNode flowNode) {
-        if (processEngineConfiguration != null && processEngineConfiguration.getEventDispatcher().isEnabled()) {
-            processEngineConfiguration.getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, flowNode.getId(), flowNode.getName(), execution.getId(),
-                            execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
-        }
-    }
-
-    private void dispatchTransactionEvent(ProcessEngineConfigurationImpl processEngineConfiguration, FlowNode flowNode) {
-        if (processEngineConfiguration != null && processEngineConfiguration.getTransactionDependentEventDispatcher().isEnabled()) {
-            processEngineConfiguration.getTransactionDependentEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, flowNode.getId(), flowNode.getName(), execution.getId(),
-                            execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
         }
     }
 

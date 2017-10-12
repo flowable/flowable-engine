@@ -137,7 +137,6 @@ public abstract class AbstractEngineConfigurator implements ProcessEngineConfigu
         initSessionFactories(processEngineConfiguration, targetEngineConfiguration);
         initDbProperties(processEngineConfiguration, targetEngineConfiguration);
         initEventDispatcher(processEngineConfiguration, targetEngineConfiguration);
-        initTransactionDependentEventDispatcher(processEngineConfiguration, targetEngineConfiguration);
         initClock(processEngineConfiguration, targetEngineConfiguration);
     }
 
@@ -197,12 +196,6 @@ public abstract class AbstractEngineConfigurator implements ProcessEngineConfigu
     protected void initEventDispatcher(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
         if (processEngineConfiguration.getEventDispatcher() != null) {
             targetEngineConfiguration.setEventDispatcher(processEngineConfiguration.getEventDispatcher());
-        }
-    }
-
-    protected void initTransactionDependentEventDispatcher(ProcessEngineConfigurationImpl processEngineConfiguration, AbstractEngineConfiguration targetEngineConfiguration) {
-        if (processEngineConfiguration.getTransactionDependentEventDispatcher() != null) {
-            targetEngineConfiguration.setTransactionDependentEventDispatcher(processEngineConfiguration.getTransactionDependentEventDispatcher());
         }
     }
 

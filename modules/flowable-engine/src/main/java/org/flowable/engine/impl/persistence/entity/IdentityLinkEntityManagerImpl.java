@@ -83,8 +83,9 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
             }
         }
 
-        dispatchEvent(identityLink);
-        dispatchTransactionEvent(identityLink);
+        if (getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, identityLink));
+        }
     }
 
     @Override
@@ -272,18 +273,5 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
     public void setIdentityLinkDataManager(IdentityLinkDataManager identityLinkDataManager) {
         this.identityLinkDataManager = identityLinkDataManager;
     }
-
-    private void dispatchEvent(IdentityLinkEntity identityLink) {
-        if (getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, identityLink));
-        }
-    }
-
-    private void dispatchTransactionEvent(IdentityLinkEntity identityLink) {
-        if (getTransactionEventDispatcher().isEnabled()) {
-            getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, identityLink));
-        }
-    }
-
 
 }

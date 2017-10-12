@@ -14,7 +14,6 @@
 package org.flowable.idm.engine.impl.persistence;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventDispatcher;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.idm.engine.IdmEngineConfiguration;
@@ -57,10 +56,6 @@ public abstract class AbstractManager {
 
     protected FlowableEventDispatcher getEventDispatcher() {
         return getIdmEngineConfiguration().getEventDispatcher();
-    }
-
-    protected TransactionFlowableEventDispatcher getTransactionEventDispatcher() {
-        return getIdmEngineConfiguration().getTransactionDependentEventDispatcher();
     }
 
     protected GroupEntityManager getGroupEntityManager() {

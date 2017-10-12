@@ -75,8 +75,6 @@ public class SubProcessInstanceHistoryJsonTransformer extends AbstractHistoryJso
             // Fire event
             dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(
                     FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, subProcessInstance));
-            dispatchTransactionEvent(commandContext, FlowableEventBuilder.createEntityEvent(
-                    FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, subProcessInstance));
         }
         
         String executionId = getStringFromJson(historicalData, HistoryJsonConstants.EXECUTION_ID);

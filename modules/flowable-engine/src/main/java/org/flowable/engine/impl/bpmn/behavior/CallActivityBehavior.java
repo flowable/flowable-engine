@@ -117,10 +117,10 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         CommandContextUtil.getHistoryManager(commandContext).recordSubProcessInstanceStart(executionEntity, subProcessInstance);
 
         boolean eventDispatcherEnabled = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled();
-        dispatchEvent(subProcessInstance, eventDispatcherEnabled);
-
-        boolean transactionEventDispatcherEnabled = CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().isEnabled();
-        dispatchTransactionEvent(subProcessInstance, transactionEventDispatcherEnabled);
+        if (eventDispatcherEnabled) {
+            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, subProcessInstance));
+        }
 
         // process template-defined data objects
         subProcessInstance.setVariables(processDataObjects(subProcess.getDataObjects()));
@@ -160,24 +160,6 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         if (eventDispatcherEnabled) {
             CommandContextUtil.getEventDispatcher(commandContext)
                     .dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(subProcessInitialExecution, variables, false));
-        }
-        if (transactionEventDispatcherEnabled) {
-            CommandContextUtil.getTransactionEventDispatcher(commandContext)
-                    .dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(subProcessInitialExecution, variables, false));
-        }
-    }
-
-    private void dispatchEvent(ExecutionEntity subProcessInstance, boolean eventDispatcherEnabled) {
-        if (eventDispatcherEnabled) {
-            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, subProcessInstance));
-        }
-    }
-
-    private void dispatchTransactionEvent(ExecutionEntity subProcessInstance, boolean transactionEventDispatcherEnabled) {
-        if (transactionEventDispatcherEnabled) {
-            CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, subProcessInstance));
         }
     }
 

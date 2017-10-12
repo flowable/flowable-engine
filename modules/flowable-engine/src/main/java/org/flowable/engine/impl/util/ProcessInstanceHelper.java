@@ -25,9 +25,7 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventDispatcher;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.util.CollectionUtil;
@@ -161,9 +159,10 @@ public class ProcessInstanceHelper {
         CommandContextUtil.getHistoryManager(commandContext).recordProcessInstanceStart(processInstance);
 
         boolean eventDispatcherEnabled = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled();
-        boolean transactionEventDispatcherEnabled = CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().isEnabled();
-        dispatchEvent(eventDispatcherEnabled, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, processInstance));
-        dispatchTransactionEvent(transactionEventDispatcherEnabled, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, processInstance));
+        if (eventDispatcherEnabled) {
+            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_CREATED, processInstance));
+        }
 
         processInstance.setVariables(processDataObjects(process.getDataObjects()));
 
@@ -180,8 +179,10 @@ public class ProcessInstanceHelper {
         }
 
         // Fire events
-        dispatchEvent(eventDispatcherEnabled, FlowableEventBuilder.createEntityWithVariablesEvent(FlowableEngineEventType.ENTITY_INITIALIZED, processInstance, variables, false));
-        dispatchTransactionEvent(transactionEventDispatcherEnabled, FlowableEventBuilder.createEntityWithVariablesEvent(FlowableEngineEventType.ENTITY_INITIALIZED, processInstance, variables, false));
+        if (eventDispatcherEnabled) {
+            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher()
+                    .dispatchEvent(FlowableEventBuilder.createEntityWithVariablesEvent(FlowableEngineEventType.ENTITY_INITIALIZED, processInstance, variables, false));
+        }
 
         // Create the first execution that will visit all the process definition elements
         ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager(commandContext).createChildExecution(processInstance);
@@ -192,20 +193,6 @@ public class ProcessInstanceHelper {
         }
 
         return processInstance;
-    }
-
-    private void dispatchEvent(boolean eventDispatcherEnabled, FlowableEntityEvent entityEvent) {
-        if (eventDispatcherEnabled) {
-            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    entityEvent);
-        }
-    }
-
-    private void dispatchTransactionEvent(boolean transactionEventDispatcherEnabled, FlowableEntityEvent entityEvent) {
-        if (transactionEventDispatcherEnabled) {
-            CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().dispatchEvent(
-                    entityEvent);
-        }
     }
 
     public void startProcessInstance(ExecutionEntity processInstance, CommandContext commandContext, Map<String, Object> variables) {
@@ -220,10 +207,6 @@ public class ProcessInstanceHelper {
         if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             FlowableEventDispatcher eventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher();
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(execution, variables, false));
-        }
-        if (CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().isEnabled()) {
-            TransactionFlowableEventDispatcher transactionEventDispatcher = CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher();
-            transactionEventDispatcher.dispatchEvent(FlowableEventBuilder.createProcessStartedEvent(execution, variables, false));
         }
     }
     
@@ -303,43 +286,19 @@ public class ProcessInstanceHelper {
 
         if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             for (MessageEventSubscriptionEntity messageEventSubscription : messageEventSubscriptions) {
-                dispatchMessageEvent(commandContext, messageEventSubscription);
-                dispatchMessageTransactionEvent(commandContext, messageEventSubscription);
+                CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
+                        .dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING, messageEventSubscription.getActivityId(),
+                                messageEventSubscription.getEventName(), null, messageEventSubscription.getExecution().getId(),
+                                messageEventSubscription.getProcessInstanceId(), messageEventSubscription.getProcessDefinitionId()));
             }
 
             for (SignalEventSubscriptionEntity signalEventSubscription : signalEventSubscriptions) {
-                dispathSignalEvent(commandContext, signalEventSubscription);
-                dispathSignalTransactionEvent(commandContext, signalEventSubscription);
+                CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
+                        .dispatchEvent(FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING, signalEventSubscription.getActivityId(),
+                                signalEventSubscription.getEventName(), null, signalEventSubscription.getExecution().getId(),
+                                signalEventSubscription.getProcessInstanceId(), signalEventSubscription.getProcessDefinitionId()));
             }
         }
-    }
-
-    private void dispathSignalEvent(CommandContext commandContext, SignalEventSubscriptionEntity signalEventSubscription) {
-        CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
-                .dispatchEvent(FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING, signalEventSubscription.getActivityId(),
-                        signalEventSubscription.getEventName(), null, signalEventSubscription.getExecution().getId(),
-                        signalEventSubscription.getProcessInstanceId(), signalEventSubscription.getProcessDefinitionId()));
-    }
-
-    private void dispatchMessageEvent(CommandContext commandContext, MessageEventSubscriptionEntity messageEventSubscription) {
-        CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
-                .dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING, messageEventSubscription.getActivityId(),
-                        messageEventSubscription.getEventName(), null, messageEventSubscription.getExecution().getId(),
-                        messageEventSubscription.getProcessInstanceId(), messageEventSubscription.getProcessDefinitionId()));
-    }
-
-    private void dispathSignalTransactionEvent(CommandContext commandContext, SignalEventSubscriptionEntity signalEventSubscription) {
-        CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher()
-                .dispatchEvent(FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNAL_WAITING, signalEventSubscription.getActivityId(),
-                        signalEventSubscription.getEventName(), null, signalEventSubscription.getExecution().getId(),
-                        signalEventSubscription.getProcessInstanceId(), signalEventSubscription.getProcessDefinitionId()));
-    }
-
-    private void dispatchMessageTransactionEvent(CommandContext commandContext, MessageEventSubscriptionEntity messageEventSubscription) {
-        CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher()
-                .dispatchEvent(FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_WAITING, messageEventSubscription.getActivityId(),
-                        messageEventSubscription.getEventName(), null, messageEventSubscription.getExecution().getId(),
-                        messageEventSubscription.getProcessInstanceId(), messageEventSubscription.getProcessDefinitionId()));
     }
 
     protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {

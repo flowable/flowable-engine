@@ -82,8 +82,10 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
         }
 
         for (SignalEventSubscriptionEntity signalEventSubscriptionEntity : subscriptionEntities) {
-            dispatchEvent(eventSubscriptionName, signalEventSubscriptionEntity);
-            dispatchTransactionEvent(eventSubscriptionName, signalEventSubscriptionEntity);
+            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, signalEventSubscriptionEntity.getActivityId(), eventSubscriptionName,
+                            null, signalEventSubscriptionEntity.getExecutionId(), signalEventSubscriptionEntity.getProcessInstanceId(),
+                            signalEventSubscriptionEntity.getProcessDefinitionId()));
 
             if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, signalEventSubscriptionEntity.getProcessDefinitionId())) {
                 Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
@@ -95,20 +97,6 @@ public class IntermediateThrowSignalEventActivityBehavior extends AbstractBpmnAc
         }
 
         CommandContextUtil.getAgenda(commandContext).planTakeOutgoingSequenceFlowsOperation((ExecutionEntity) execution, true);
-    }
-
-    private void dispatchEvent(String eventSubscriptionName, SignalEventSubscriptionEntity signalEventSubscriptionEntity) {
-        CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, signalEventSubscriptionEntity.getActivityId(), eventSubscriptionName,
-                        null, signalEventSubscriptionEntity.getExecutionId(), signalEventSubscriptionEntity.getProcessInstanceId(),
-                        signalEventSubscriptionEntity.getProcessDefinitionId()));
-    }
-
-    private void dispatchTransactionEvent(String eventSubscriptionName, SignalEventSubscriptionEntity signalEventSubscriptionEntity) {
-        CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().dispatchEvent(
-                FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, signalEventSubscriptionEntity.getActivityId(), eventSubscriptionName,
-                        null, signalEventSubscriptionEntity.getExecutionId(), signalEventSubscriptionEntity.getProcessInstanceId(),
-                        signalEventSubscriptionEntity.getProcessDefinitionId()));
     }
 
 }

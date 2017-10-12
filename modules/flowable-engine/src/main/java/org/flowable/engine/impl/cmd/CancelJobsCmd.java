@@ -13,7 +13,6 @@
 
 package org.flowable.engine.impl.cmd;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
@@ -52,8 +51,9 @@ public class CancelJobsCmd implements Command<Void>, Serializable {
 
             if (jobToDelete != null) {
                 // When given job doesn't exist, ignore
-                dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
-                dispatchTransactionEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
+                if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
+                    CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
+                }
 
                 CommandContextUtil.getJobEntityManager(commandContext).delete(jobToDelete);
 
@@ -62,25 +62,14 @@ public class CancelJobsCmd implements Command<Void>, Serializable {
 
                 if (timerJobToDelete != null) {
                     // When given job doesn't exist, ignore
-                    dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timerJobToDelete));
-                    dispatchTransactionEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timerJobToDelete));
+                    if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
+                        CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timerJobToDelete));
+                    }
 
                     CommandContextUtil.getTimerJobEntityManager(commandContext).delete(timerJobToDelete);
                 }
             }
         }
         return null;
-    }
-
-    private void dispatchEvent(CommandContext commandContext, FlowableEntityEvent entityEvent) {
-        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().dispatchEvent(entityEvent);
-        }
-    }
-
-    private void dispatchTransactionEvent(CommandContext commandContext, FlowableEntityEvent entityEvent) {
-        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher().dispatchEvent(entityEvent);
-        }
     }
 }

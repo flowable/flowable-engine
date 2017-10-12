@@ -65,23 +65,11 @@ public class DeleteAttachmentCmd implements Command<Object>, Serializable {
             CommandContextUtil.getHistoryManager(commandContext).createAttachmentComment(attachment.getTaskId(), attachment.getProcessInstanceId(), attachment.getName(), false);
         }
 
-        dispatchEvent(commandContext, attachment, processInstanceId, processDefinitionId);
-        dispatchTransactionEvent(commandContext, attachment, processInstanceId, processDefinitionId);
-        return null;
-    }
-
-    private void dispatchEvent(CommandContext commandContext, AttachmentEntity attachment, String processInstanceId, String processDefinitionId) {
         if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
             CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
                     .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, attachment, processInstanceId, processInstanceId, processDefinitionId));
         }
-    }
-
-    private void dispatchTransactionEvent(CommandContext commandContext, AttachmentEntity attachment, String processInstanceId, String processDefinitionId) {
-        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher()
-                    .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, attachment, processInstanceId, processInstanceId, processDefinitionId));
-        }
+        return null;
     }
 
 }

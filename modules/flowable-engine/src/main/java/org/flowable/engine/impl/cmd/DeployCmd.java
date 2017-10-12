@@ -14,7 +14,6 @@ package org.flowable.engine.impl.cmd;
 
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
@@ -106,8 +105,9 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
         // Save the data
         CommandContextUtil.getDeploymentEntityManager(commandContext).insert(deployment);
 
-        dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, deployment));
-        dispatchTransactionEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, deployment));
+        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, deployment));
+        }
 
         // Deployment settings
         Map<String, Object> deploymentSettings = new HashMap<>();
@@ -121,22 +121,11 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
             scheduleProcessDefinitionActivation(commandContext, deployment);
         }
 
-        dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, deployment));
-        dispatchTransactionEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, deployment));
+        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
+            CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, deployment));
+        }
 
         return deployment;
-    }
-
-    private void dispatchEvent(CommandContext commandContext, FlowableEntityEvent entityEvent) {
-        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().dispatchEvent(entityEvent);
-        }
-    }
-
-    private void dispatchTransactionEvent(CommandContext commandContext, FlowableEntityEvent entityEvent) {
-        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher().dispatchEvent(entityEvent);
-        }
     }
 
     protected Deployment deployAsFlowable5ProcessDefinition(CommandContext commandContext) {

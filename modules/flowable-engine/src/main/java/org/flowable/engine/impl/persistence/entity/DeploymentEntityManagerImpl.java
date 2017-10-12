@@ -141,9 +141,6 @@ public class DeploymentEntityManagerImpl extends AbstractEntityManager<Deploymen
                 if (getEventDispatcher().isEnabled()) {
                     getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timerStartJob, null, null, processDefinition.getId()));
                 }
-                if (getTransactionEventDispatcher().isEnabled()) {
-                    getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timerStartJob, null, null, processDefinition.getId()));
-                }
 
                 getTimerJobEntityManager().delete(timerStartJob);
             }

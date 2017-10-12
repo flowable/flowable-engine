@@ -45,7 +45,6 @@ public class DeleteHistoryJobCmd implements Command<Object>, Serializable {
         HistoryJobEntity jobToDelete = getJobToDelete(commandContext);
 
         sendCancelEvent(jobToDelete);
-        sendCancelTransactionEvent(jobToDelete);
 
         CommandContextUtil.getHistoryJobEntityManager(commandContext).delete(jobToDelete);
         return null;
@@ -54,12 +53,6 @@ public class DeleteHistoryJobCmd implements Command<Object>, Serializable {
     protected void sendCancelEvent(HistoryJobEntity jobToDelete) {
         if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
-        }
-    }
-
-    protected void sendCancelTransactionEvent(HistoryJobEntity jobToDelete) {
-        if (CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
         }
     }
 

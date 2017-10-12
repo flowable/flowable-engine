@@ -156,8 +156,10 @@ public class DefaultJobManager implements JobManager {
             processEngineConfiguration.getTimerJobEntityManager().delete(timerJob);
             scheduleTimer(rescheduledTimerJob);
 
-            dispatchEvent(rescheduledTimerJob, timerJob);
-            dispatchTransactionEvent(rescheduledTimerJob, timerJob);
+            if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+                CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                        FlowableEventBuilder.createJobRescheduledEvent(FlowableEngineEventType.JOB_RESCHEDULED, rescheduledTimerJob, timerJob.getId()));
+            }
 
             // job rescheduled event should occur before new timer scheduled event
             sendTimerScheduledEvent(rescheduledTimerJob);
@@ -687,20 +689,4 @@ public class DefaultJobManager implements JobManager {
     protected ExecutionEntityManager getExecutionEntityManager() {
         return processEngineConfiguration.getExecutionEntityManager();
     }
-
-    private void dispatchEvent(TimerJobEntity rescheduledTimerJob, TimerJobEntity timerJob) {
-        if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createJobRescheduledEvent(FlowableEngineEventType.JOB_RESCHEDULED, rescheduledTimerJob, timerJob.getId()));
-        }
-    }
-
-    private void dispatchTransactionEvent(TimerJobEntity rescheduledTimerJob, TimerJobEntity timerJob) {
-        if (CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createJobRescheduledEvent(FlowableEngineEventType.JOB_RESCHEDULED, rescheduledTimerJob, timerJob.getId()));
-        }
-    }
-
-
 }

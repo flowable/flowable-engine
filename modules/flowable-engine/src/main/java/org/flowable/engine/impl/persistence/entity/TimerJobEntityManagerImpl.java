@@ -170,8 +170,9 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
         }
 
         // Send event
-        dispatchEvent();
-        dispatchTransactionEvent();
+        if (getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        }
     }
 
     /**
@@ -266,18 +267,4 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
     public void setJobDataManager(TimerJobDataManager jobDataManager) {
         this.jobDataManager = jobDataManager;
     }
-
-    private void dispatchEvent() {
-        if (getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
-        }
-    }
-
-    private void dispatchTransactionEvent() {
-        if (getTransactionEventDispatcher().isEnabled()) {
-            getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
-        }
-    }
-
-
 }

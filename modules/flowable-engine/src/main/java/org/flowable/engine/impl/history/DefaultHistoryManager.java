@@ -13,9 +13,7 @@
 
 package org.flowable.engine.impl.history;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventDispatcher;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -66,8 +64,11 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
                 historicProcessInstance.setEndActivityId(activityId);
 
                 // Fire event
-                dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
-                dispatchTransactionEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
+                FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+                if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                    eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(
+                            FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
+                }
 
             }
         }
@@ -93,8 +94,11 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             getHistoricProcessInstanceEntityManager().insert(historicProcessInstance, false);
 
             // Fire event
-            dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
-            dispatchTransactionEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
+            FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(
+                        FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
+            }
 
         }
     }
@@ -107,8 +111,11 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             getHistoricProcessInstanceEntityManager().insert(historicProcessInstance, false);
 
             // Fire event
-            dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
-            dispatchTransactionEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
+            FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+            if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                eventDispatcher.dispatchEvent(
+                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
+            }
 
             HistoricActivityInstanceEntity activityInstance = findActivityInstance(parentExecution, false, true);
             if (activityInstance != null) {
@@ -172,8 +179,11 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
                 }
 
                 // Fire event
-                dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstanceEntity));
-                dispatchTransactionEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstanceEntity));
+                FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+                if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                    eventDispatcher.dispatchEvent(
+                            FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstanceEntity));
+                }
 
             }
         }
@@ -187,8 +197,11 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
                 historicActivityInstance.markEnded(deleteReason);
 
                 // Fire event
-                dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
-                dispatchTransactionEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
+                FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+                if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+                    eventDispatcher.dispatchEvent(
+                            FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
+                }
             }
         }
     }
@@ -401,22 +414,5 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             }
         }
     }
-
-    private void dispatchEvent(FlowableEntityEvent entityEvent) {
-        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
-        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            eventDispatcher.dispatchEvent(
-                    entityEvent);
-        }
-    }
-
-    private void dispatchTransactionEvent(FlowableEntityEvent entityEvent) {
-        TransactionFlowableEventDispatcher transactionEventDispatcher = getTransactionEventDispatcher();
-        if (transactionEventDispatcher != null && transactionEventDispatcher.isEnabled()) {
-            transactionEventDispatcher.dispatchEvent(
-                    entityEvent);
-        }
-    }
-
 
 }

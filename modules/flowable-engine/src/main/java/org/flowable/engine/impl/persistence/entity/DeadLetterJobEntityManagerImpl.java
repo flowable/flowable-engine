@@ -105,9 +105,6 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
         if (getEventDispatcher().isEnabled()) {
             getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
         }
-        if (getTransactionEventDispatcher().isEnabled()) {
-            getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
-        }
     }
 
     /**

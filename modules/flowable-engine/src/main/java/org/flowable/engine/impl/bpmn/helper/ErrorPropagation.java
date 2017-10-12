@@ -176,34 +176,34 @@ public class ErrorPropagation {
                                                 "ERROR_EVENT " + errorId, false, false, false);
 
                 // Event
-                dispatchEvent(processInstanceEntity);
-                dispatchTransactionEvent(processInstanceEntity);
+                if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+                    CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher()
+                            .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_COMPLETED_WITH_ERROR_END_EVENT, processInstanceEntity));
+                }
             }
-            
+
             executeEventHandler(matchingEvent, parentExecution, currentExecution, errorId);
-            
+
         } else {
             throw new FlowableException("No matching parent execution for error code " + errorId + " found");
         }
     }
 
-    private static void dispatchEvent(ExecutionEntity processInstanceEntity) {
-        if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher()
-                    .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_COMPLETED_WITH_ERROR_END_EVENT, processInstanceEntity));
-        }
-    }
-
-    private static void dispatchTransactionEvent(ExecutionEntity processInstanceEntity) {
-        if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher()
-                    .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_COMPLETED_WITH_ERROR_END_EVENT, processInstanceEntity));
-        }
-    }
-
     protected static void executeEventHandler(Event event, ExecutionEntity parentExecution, ExecutionEntity currentExecution, String errorId) {
-        dispatchEvent(event, parentExecution, errorId);
-        dispatchTransactionEvent(event, parentExecution, errorId);
+        if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentExecution.getProcessDefinitionId());
+            if (bpmnModel != null) {
+
+                String errorCode = bpmnModel.getErrors().get(errorId);
+                if (errorCode == null) {
+                    errorCode = errorId;
+                }
+
+                CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                        FlowableEventBuilder.createErrorEvent(FlowableEngineEventType.ACTIVITY_ERROR_RECEIVED, event.getId(), errorId, errorCode, parentExecution.getId(),
+                                parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId()));
+            }
+        }
 
         if (event instanceof StartEvent) {
             ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
@@ -232,40 +232,6 @@ public class ErrorPropagation {
             }
 
             CommandContextUtil.getAgenda().planTriggerExecutionOperation(boundaryExecution);
-        }
-    }
-
-    private static void dispatchEvent(Event event, ExecutionEntity parentExecution, String errorId) {
-        if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentExecution.getProcessDefinitionId());
-            if (bpmnModel != null) {
-
-                String errorCode = bpmnModel.getErrors().get(errorId);
-                if (errorCode == null) {
-                    errorCode = errorId;
-                }
-
-                CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                        FlowableEventBuilder.createErrorEvent(FlowableEngineEventType.ACTIVITY_ERROR_RECEIVED, event.getId(), errorId, errorCode, parentExecution.getId(),
-                                parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId()));
-            }
-        }
-    }
-
-    private static void dispatchTransactionEvent(Event event, ExecutionEntity parentExecution, String errorId) {
-        if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().isEnabled()) {
-            BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(parentExecution.getProcessDefinitionId());
-            if (bpmnModel != null) {
-
-                String errorCode = bpmnModel.getErrors().get(errorId);
-                if (errorCode == null) {
-                    errorCode = errorId;
-                }
-
-                CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().dispatchEvent(
-                        FlowableEventBuilder.createErrorEvent(FlowableEngineEventType.ACTIVITY_ERROR_RECEIVED, event.getId(), errorId, errorCode, parentExecution.getId(),
-                                parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId()));
-            }
         }
     }
 

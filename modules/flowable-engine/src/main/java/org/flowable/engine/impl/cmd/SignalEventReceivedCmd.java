@@ -106,8 +106,10 @@ public class SignalEventReceivedCmd implements Command<Void> {
                     compatibilityHandler.signalEventReceived(signalEventSubscriptionEntity, payload, async);
 
                 } else {
-                    dispatchEvent(signalEventSubscriptionEntity);
-                    dispatchTransactionEvent(signalEventSubscriptionEntity);
+                    CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                            FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, signalEventSubscriptionEntity.getActivityId(), eventName,
+                                    payload, signalEventSubscriptionEntity.getExecutionId(), signalEventSubscriptionEntity.getProcessInstanceId(),
+                                    signalEventSubscriptionEntity.getProcessDefinitionId()));
 
                     eventSubscriptionEntityManager.eventReceived(signalEventSubscriptionEntity, payload, async);
                 }
@@ -115,20 +117,6 @@ public class SignalEventReceivedCmd implements Command<Void> {
         }
 
         return null;
-    }
-
-    private void dispatchEvent(SignalEventSubscriptionEntity signalEventSubscriptionEntity) {
-        CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, signalEventSubscriptionEntity.getActivityId(), eventName,
-                        payload, signalEventSubscriptionEntity.getExecutionId(), signalEventSubscriptionEntity.getProcessInstanceId(),
-                        signalEventSubscriptionEntity.getProcessDefinitionId()));
-    }
-
-    private void dispatchTransactionEvent(SignalEventSubscriptionEntity signalEventSubscriptionEntity) {
-        CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().dispatchEvent(
-                FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, signalEventSubscriptionEntity.getActivityId(), eventName,
-                        payload, signalEventSubscriptionEntity.getExecutionId(), signalEventSubscriptionEntity.getProcessInstanceId(),
-                        signalEventSubscriptionEntity.getProcessDefinitionId()));
     }
 
 }

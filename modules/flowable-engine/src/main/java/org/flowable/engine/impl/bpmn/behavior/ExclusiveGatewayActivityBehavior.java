@@ -55,8 +55,11 @@ public class ExclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
 
         ExclusiveGateway exclusiveGateway = (ExclusiveGateway) execution.getCurrentFlowElement();
 
-        dispatchEvent(execution, exclusiveGateway);
-        dispatchTransactionEvent(execution, exclusiveGateway);
+        if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, exclusiveGateway.getId(), exclusiveGateway.getName(), execution.getId(),
+                            execution.getProcessInstanceId(), execution.getProcessDefinitionId(), exclusiveGateway));
+        }
 
         SequenceFlow outgoingSequenceFlow = null;
         SequenceFlow defaultSequenceFlow = null;
@@ -101,21 +104,5 @@ public class ExclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
         }
 
         super.leave(execution);
-    }
-
-    private void dispatchEvent(DelegateExecution execution, ExclusiveGateway exclusiveGateway) {
-        if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, exclusiveGateway.getId(), exclusiveGateway.getName(), execution.getId(),
-                            execution.getProcessInstanceId(), execution.getProcessDefinitionId(), exclusiveGateway));
-        }
-    }
-
-    private void dispatchTransactionEvent(DelegateExecution execution, ExclusiveGateway exclusiveGateway) {
-        if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, exclusiveGateway.getId(), exclusiveGateway.getName(), execution.getId(),
-                            execution.getProcessInstanceId(), execution.getProcessDefinitionId(), exclusiveGateway));
-        }
     }
 }

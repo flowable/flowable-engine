@@ -910,8 +910,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initDeployers();
         initEventHandlers();
         initFailedJobCommandFactory();
-        initEventDispatcher();
         initTransactionDependentEventDispatcher();
+        initEventDispatcher();
         initProcessValidator();
         initDatabaseEventLogging();
         initFlowable5CompatibilityHandler();

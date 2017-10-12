@@ -54,8 +54,6 @@ public class ActivityStartHistoryJsonTransformer extends AbstractHistoryJsonTran
         historicActivityInstanceEntityManager.insert(historicActivityInstanceEntity);
         dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(
                 FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstanceEntity));
-        dispatchTransactionEvent(commandContext, FlowableEventBuilder.createEntityEvent(
-                FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstanceEntity));
     }
 
 }

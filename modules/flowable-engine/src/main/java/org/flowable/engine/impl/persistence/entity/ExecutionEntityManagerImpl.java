@@ -17,7 +17,6 @@ import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
@@ -52,7 +51,7 @@ import java.util.Map;
  * @author Joram Barrez
  */
 public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionEntity> implements ExecutionEntityManager {
-    // todo faizal
+
     private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionEntityManagerImpl.class);
 
     protected ExecutionDataManager executionDataManager;
@@ -251,12 +250,12 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         }
 
         // Fire events
-        dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processInstanceExecution));
-        dispatchTransactionEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processInstanceExecution));
+        if (getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, processInstanceExecution));
+        }
 
         return processInstanceExecution;
     }
-
 
     /**
      * Creates a new execution. properties processDefinition, processInstance and activity will be initialized.
@@ -285,10 +284,6 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         if (getEventDispatcher().isEnabled()) {
             getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, childExecution));
             getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, childExecution));
-        }
-        if (getTransactionEventDispatcher().isEnabled()) {
-            getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, childExecution));
-            getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, childExecution));
         }
 
         return childExecution;
@@ -322,9 +317,6 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
 
         if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, subProcessInstance));
-        }
-        if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, subProcessInstance));
         }
 
         return subProcessInstance;
@@ -401,12 +393,6 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
                                             callActivityElement.getName(), miExecutionEntity.getId(), miExecutionEntity.getProcessInstanceId(), 
                                             miExecutionEntity.getProcessDefinitionId(), "callActivity", deleteReason));
                         }
-                        if (getTransactionEventDispatcher().isEnabled()) {
-                            FlowElement callActivityElement = miExecutionEntity.getCurrentFlowElement();
-                            getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createActivityCancelledEvent(callActivityElement.getId(),
-                                    callActivityElement.getName(), miExecutionEntity.getId(), miExecutionEntity.getProcessInstanceId(),
-                                    miExecutionEntity.getProcessDefinitionId(), "callActivity", deleteReason));
-                        }
                     }
                 }
 
@@ -419,12 +405,6 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
                                     callActivityElement.getName(), subExecutionEntity.getId(), subExecutionEntity.getProcessInstanceId(), 
                                     subExecutionEntity.getProcessDefinitionId(), "callActivity", deleteReason));
                 }
-                if (getTransactionEventDispatcher().isEnabled()) {
-                    FlowElement callActivityElement = subExecutionEntity.getCurrentFlowElement();
-                    getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createActivityCancelledEvent(callActivityElement.getId(),
-                            callActivityElement.getName(), subExecutionEntity.getId(), subExecutionEntity.getProcessInstanceId(),
-                            subExecutionEntity.getProcessDefinitionId(), "callActivity", deleteReason));
-                }
             }
         }
 
@@ -432,10 +412,6 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
 
         if (getEventDispatcher().isEnabled()) {
             getEventDispatcher().dispatchEvent(FlowableEventBuilder.createCancelledEvent(execution.getProcessInstanceId(),
-                    execution.getProcessInstanceId(), null, deleteReason));
-        }
-        if (getTransactionEventDispatcher().isEnabled()) {
-            getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createCancelledEvent(execution.getProcessInstanceId(),
                     execution.getProcessInstanceId(), null, deleteReason));
         }
 
@@ -476,7 +452,6 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         
         if (cancel) {
             dispatchActivityCancelled(executionEntity, cancelActivity != null ? cancelActivity : executionEntity.getCurrentFlowElement());
-            dispatchTransactionActivityCancelled(executionEntity, cancelActivity != null ? cancelActivity : executionEntity.getCurrentFlowElement());
         }
     }
 
@@ -510,12 +485,6 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
                                     callActivityElement.getName(), subExecutionEntity.getId(), processInstanceId, subExecutionEntity.getProcessDefinitionId(), 
                                     "callActivity", deleteReason));
                 }
-                if (getTransactionEventDispatcher().isEnabled() && fireEvents) {
-                    FlowElement callActivityElement = subExecutionEntity.getCurrentFlowElement();
-                    getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createActivityCancelledEvent(callActivityElement.getId(),
-                            callActivityElement.getName(), subExecutionEntity.getId(), processInstanceId, subExecutionEntity.getProcessDefinitionId(),
-                            "callActivity", deleteReason));
-                }
             }
         }
 
@@ -532,11 +501,8 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         if (getEventDispatcher().isEnabled() && fireEvents) {
             if (!cancel) {
                 getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_COMPLETED, processInstanceEntity));
-                getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_COMPLETED, processInstanceEntity));
             } else {
                 getEventDispatcher().dispatchEvent(FlowableEventBuilder.createCancelledEvent(processInstanceEntity.getId(),
-                        processInstanceEntity.getId(), processInstanceEntity.getProcessDefinitionId(), deleteReason));
-                getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createCancelledEvent(processInstanceEntity.getId(),
                         processInstanceEntity.getId(), processInstanceEntity.getProcessDefinitionId(), deleteReason));
             }
         }
@@ -645,22 +611,12 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         FlowElement currentFlowElement = execution.getCurrentFlowElement();
         if (currentFlowElement instanceof FlowNode) {
             dispatchActivityCancelled(execution, cancelActivity);
-            dispatchTransactionActivityCancelled(execution, cancelActivity);
         }
     }
     
     protected void dispatchActivityCancelled(ExecutionEntity execution, FlowElement cancelActivity) {
         CommandContextUtil.getProcessEngineConfiguration()
                 .getEventDispatcher()
-                .dispatchEvent(
-                        FlowableEventBuilder.createActivityCancelledEvent(execution.getCurrentFlowElement().getId(),
-                                execution.getCurrentFlowElement().getName(), execution.getId(), execution.getProcessInstanceId(),
-                                execution.getProcessDefinitionId(), getActivityType((FlowNode) execution.getCurrentFlowElement()), cancelActivity));
-    }
-
-    protected void dispatchTransactionActivityCancelled(ExecutionEntity execution, FlowElement cancelActivity) {
-        CommandContextUtil.getProcessEngineConfiguration()
-                .getTransactionDependentEventDispatcher()
                 .dispatchEvent(
                         FlowableEventBuilder.createActivityCancelledEvent(execution.getCurrentFlowElement().getId(),
                                 execution.getCurrentFlowElement().getName(), execution.getId(), execution.getProcessInstanceId(),
@@ -762,8 +718,9 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
             Collection<TimerJobEntity> timerJobsForExecution = timerJobEntityManager.findJobsByExecutionId(executionEntity.getId());
             for (TimerJobEntity job : timerJobsForExecution) {
                 timerJobEntityManager.delete(job);
-                dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
-                dispatchTransactionEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
+                if (getEventDispatcher().isEnabled()) {
+                    getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
+                }
             }
         }
 
@@ -773,8 +730,9 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
             Collection<JobEntity> jobsForExecution = jobEntityManager.findJobsByExecutionId(executionEntity.getId());
             for (JobEntity job : jobsForExecution) {
                 getJobEntityManager().delete(job);
-                dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
-                dispatchTransactionEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
+                if (getEventDispatcher().isEnabled()) {
+                    getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
+                }
             }
         }
 
@@ -784,8 +742,9 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
             Collection<SuspendedJobEntity> suspendedJobsForExecution = suspendedJobEntityManager.findJobsByExecutionId(executionEntity.getId());
             for (SuspendedJobEntity job : suspendedJobsForExecution) {
                 suspendedJobEntityManager.delete(job);
-                dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
-                dispatchTransactionEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
+                if (getEventDispatcher().isEnabled()) {
+                    getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
+                }
             }
         }
 
@@ -795,8 +754,9 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
             Collection<DeadLetterJobEntity> deadLetterJobsForExecution = deadLetterJobEntityManager.findJobsByExecutionId(executionEntity.getId());
             for (DeadLetterJobEntity job : deadLetterJobsForExecution) {
                 deadLetterJobEntityManager.delete(job);
-                dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
-                dispatchTransactionEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
+                if (getEventDispatcher().isEnabled()) {
+                    getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
+                }
             }
         }
 
@@ -846,8 +806,9 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
             executionEntity.setBusinessKey(businessKey);
             getHistoryManager().updateProcessBusinessKeyInHistory(executionEntity);
 
-            dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, executionEntity));
-            dispatchTransactionEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, executionEntity));
+            if (getEventDispatcher().isEnabled()) {
+                getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, executionEntity));
+            }
 
             return businessKey;
         }
@@ -860,18 +821,6 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
 
     public void setExecutionDataManager(ExecutionDataManager executionDataManager) {
         this.executionDataManager = executionDataManager;
-    }
-
-    private void dispatchEvent(FlowableEntityEvent entityEvent) {
-        if (getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(entityEvent);
-        }
-    }
-
-    private void dispatchTransactionEvent(FlowableEntityEvent entityEvent) {
-        if (getTransactionEventDispatcher().isEnabled()) {
-            getTransactionEventDispatcher().dispatchEvent(entityEvent);
-        }
     }
 
 }

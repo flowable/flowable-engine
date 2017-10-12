@@ -59,23 +59,12 @@ public class TriggerCmd extends NeedsActiveExecutionCmd<Object> {
             execution.setTransientVariables(transientVariables);
         }
 
-        dispatchEvent(execution);
-        dispatchTransactionEvent(execution);
-
-        CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(execution);
-        return null;
-    }
-
-    private void dispatchEvent(ExecutionEntity execution) {
         CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
                 FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, execution.getCurrentActivityId(), null,
                         null, execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId()));
-    }
 
-    private void dispatchTransactionEvent(ExecutionEntity execution) {
-        CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().dispatchEvent(
-                FlowableEventBuilder.createSignalEvent(FlowableEngineEventType.ACTIVITY_SIGNALED, execution.getCurrentActivityId(), null,
-                        null, execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId()));
+        CommandContextUtil.getAgenda(commandContext).planTriggerExecutionOperation(execution);
+        return null;
     }
 
     @Override

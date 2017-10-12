@@ -212,26 +212,14 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
             processEngineConfiguration.getListenerNotificationHelper().executeTaskListeners(task, TaskListener.EVENTNAME_CREATE);
 
             // All properties set, now firing 'create' events
-            dispatchEvent(task);
-            dispatchTransactionEvent(task);
+            if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
+                CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
+                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
+            }
 
         } else {
             taskEntityManager.deleteTask(task, null, false, false);
             leave(execution);
-        }
-    }
-
-    private void dispatchEvent(TaskEntity task) {
-        if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
-        }
-    }
-
-    private void dispatchTransactionEvent(TaskEntity task) {
-        if (CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
         }
     }
 

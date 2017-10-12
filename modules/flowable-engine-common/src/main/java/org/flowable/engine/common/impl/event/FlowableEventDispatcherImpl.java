@@ -42,6 +42,14 @@ public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
         return enabled;
     }
 
+    public boolean isTransactionEnabled() {
+        return Context.getCommandContext().getCurrentEngineConfiguration().isEnableTransactionEventDispatcher();
+    }
+
+    public void setTransactionEnabled(boolean transactionEnabled) {
+        Context.getCommandContext().getCurrentEngineConfiguration().setEnableTransactionEventDispatcher(transactionEnabled);
+    }
+
     @Override
     public void addEventListener(FlowableEventListener listenerToAdd) {
         eventSupport.addEventListener(listenerToAdd);
@@ -71,6 +79,8 @@ public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
                     eventDispatchAction.dispatchEvent(commandContext, eventSupport, event);
                 }
             }
+            if (engineConfiguration.isEnableTransactionEventDispatcher())
+                engineConfiguration.getTransactionDependentEventDispatcher().dispatchEvent(event);
         }
     }
 

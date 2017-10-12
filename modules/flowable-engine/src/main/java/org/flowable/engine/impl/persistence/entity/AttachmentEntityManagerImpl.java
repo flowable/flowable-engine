@@ -59,7 +59,6 @@ public class AttachmentEntityManagerImpl extends AbstractEntityManager<Attachmen
         checkHistoryEnabled();
         List<AttachmentEntity> attachments = findAttachmentsByTaskId(taskId);
         boolean dispatchEvents = getEventDispatcher().isEnabled();
-        boolean dispatchTransactionEvents = getTransactionEventDispatcher().isEnabled();
 
         String processInstanceId = null;
         String processDefinitionId = null;
@@ -86,10 +85,6 @@ public class AttachmentEntityManagerImpl extends AbstractEntityManager<Attachmen
 
             if (dispatchEvents) {
                 getEventDispatcher().dispatchEvent(
-                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, attachment, executionId, processInstanceId, processDefinitionId));
-            }
-            if (dispatchTransactionEvents) {
-                getTransactionEventDispatcher().dispatchEvent(
                         FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, attachment, executionId, processInstanceId, processDefinitionId));
             }
         }

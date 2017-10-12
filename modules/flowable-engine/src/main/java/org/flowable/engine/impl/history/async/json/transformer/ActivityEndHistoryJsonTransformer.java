@@ -47,8 +47,6 @@ public class ActivityEndHistoryJsonTransformer extends AbstractNeedsUnfinishedHi
 
             dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(
                             FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstanceEntity));
-            dispatchTransactionEvent(commandContext, FlowableEventBuilder.createEntityEvent(
-                    FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstanceEntity));
         }
     }
 

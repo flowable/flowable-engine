@@ -105,8 +105,9 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
         }
 
         // Send event
-        dispatchEvent();
-        dispatchTransactionEvent();
+        if (getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        }
     }
 
     /**
@@ -144,18 +145,4 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
     public void setJobDataManager(SuspendedJobDataManager jobDataManager) {
         this.jobDataManager = jobDataManager;
     }
-
-    private void dispatchEvent() {
-        if (getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
-        }
-    }
-
-    private void dispatchTransactionEvent() {
-        if (getTransactionEventDispatcher().isEnabled()) {
-            getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
-        }
-    }
-
-
 }

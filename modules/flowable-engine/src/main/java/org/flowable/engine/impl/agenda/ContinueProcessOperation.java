@@ -223,8 +223,11 @@ public class ContinueProcessOperation extends AbstractOperation {
         LOGGER.debug("Executing activityBehavior {} on activity '{}' with execution {}", activityBehavior.getClass(), flowNode.getId(), execution.getId());
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
-        dispatchActivityStartEvent(processEngineConfiguration, flowNode);
-        dispatchActivityStartTransactionEvent(processEngineConfiguration, flowNode);
+        if (processEngineConfiguration != null && processEngineConfiguration.getEventDispatcher().isEnabled()) {
+            processEngineConfiguration.getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, flowNode.getId(), flowNode.getName(), execution.getId(),
+                            execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
+        }
 
         try {
             activityBehavior.execute(execution);
@@ -247,8 +250,23 @@ public class ContinueProcessOperation extends AbstractOperation {
 
         // Firing event that transition is being taken
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
-        dispatchEvent(processEngineConfiguration, sequenceFlow);
-        dispatchTransactionEvent(processEngineConfiguration, sequenceFlow);
+        if (processEngineConfiguration != null && processEngineConfiguration.getEventDispatcher().isEnabled()) {
+            FlowElement sourceFlowElement = sequenceFlow.getSourceFlowElement();
+            FlowElement targetFlowElement = sequenceFlow.getTargetFlowElement();
+            processEngineConfiguration.getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createSequenceFlowTakenEvent(
+                            execution,
+                            FlowableEngineEventType.SEQUENCEFLOW_TAKEN,
+                            sequenceFlow.getId(),
+                            sourceFlowElement != null ? sourceFlowElement.getId() : null,
+                            sourceFlowElement != null ? sourceFlowElement.getName() : null,
+                            sourceFlowElement != null ? sourceFlowElement.getClass().getName() : null,
+                            sourceFlowElement != null ? ((FlowNode) sourceFlowElement).getBehavior() : null,
+                            targetFlowElement != null ? targetFlowElement.getId() : null,
+                            targetFlowElement != null ? targetFlowElement.getName() : null,
+                            targetFlowElement != null ? targetFlowElement.getClass().getName() : null,
+                            targetFlowElement != null ? ((FlowNode) targetFlowElement).getBehavior() : null));
+        }
 
         FlowElement targetFlowElement = sequenceFlow.getTargetFlowElement();
         execution.setCurrentFlowElement(targetFlowElement);
@@ -287,59 +305,4 @@ public class ContinueProcessOperation extends AbstractOperation {
         }
     }
 
-    private void dispatchActivityStartEvent(ProcessEngineConfigurationImpl processEngineConfiguration, FlowNode flowNode) {
-        if (processEngineConfiguration != null && processEngineConfiguration.getEventDispatcher().isEnabled()) {
-            processEngineConfiguration.getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, flowNode.getId(), flowNode.getName(), execution.getId(),
-                            execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
-        }
-    }
-
-    private void dispatchActivityStartTransactionEvent(ProcessEngineConfigurationImpl processEngineConfiguration, FlowNode flowNode) {
-        if (processEngineConfiguration != null && processEngineConfiguration.getTransactionDependentEventDispatcher().isEnabled()) {
-            processEngineConfiguration.getTransactionDependentEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, flowNode.getId(), flowNode.getName(), execution.getId(),
-                            execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
-        }
-    }
-
-    private void dispatchEvent(ProcessEngineConfigurationImpl processEngineConfiguration, SequenceFlow sequenceFlow) {
-        if (processEngineConfiguration != null && processEngineConfiguration.getEventDispatcher().isEnabled()) {
-            FlowElement sourceFlowElement = sequenceFlow.getSourceFlowElement();
-            FlowElement targetFlowElement = sequenceFlow.getTargetFlowElement();
-            processEngineConfiguration.getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createSequenceFlowTakenEvent(
-                            execution,
-                            FlowableEngineEventType.SEQUENCEFLOW_TAKEN,
-                            sequenceFlow.getId(),
-                            sourceFlowElement != null ? sourceFlowElement.getId() : null,
-                            sourceFlowElement != null ? sourceFlowElement.getName() : null,
-                            sourceFlowElement != null ? sourceFlowElement.getClass().getName() : null,
-                            sourceFlowElement != null ? ((FlowNode) sourceFlowElement).getBehavior() : null,
-                            targetFlowElement != null ? targetFlowElement.getId() : null,
-                            targetFlowElement != null ? targetFlowElement.getName() : null,
-                            targetFlowElement != null ? targetFlowElement.getClass().getName() : null,
-                            targetFlowElement != null ? ((FlowNode) targetFlowElement).getBehavior() : null));
-        }
-    }
-
-    private void dispatchTransactionEvent(ProcessEngineConfigurationImpl processEngineConfiguration, SequenceFlow sequenceFlow) {
-        if (processEngineConfiguration != null && processEngineConfiguration.getTransactionDependentEventDispatcher().isEnabled()) {
-            FlowElement sourceFlowElement = sequenceFlow.getSourceFlowElement();
-            FlowElement targetFlowElement = sequenceFlow.getTargetFlowElement();
-            processEngineConfiguration.getTransactionDependentEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createSequenceFlowTakenEvent(
-                            execution,
-                            FlowableEngineEventType.SEQUENCEFLOW_TAKEN,
-                            sequenceFlow.getId(),
-                            sourceFlowElement != null ? sourceFlowElement.getId() : null,
-                            sourceFlowElement != null ? sourceFlowElement.getName() : null,
-                            sourceFlowElement != null ? sourceFlowElement.getClass().getName() : null,
-                            sourceFlowElement != null ? ((FlowNode) sourceFlowElement).getBehavior() : null,
-                            targetFlowElement != null ? targetFlowElement.getId() : null,
-                            targetFlowElement != null ? targetFlowElement.getName() : null,
-                            targetFlowElement != null ? targetFlowElement.getClass().getName() : null,
-                            targetFlowElement != null ? ((FlowNode) targetFlowElement).getBehavior() : null));
-        }
-    }
 }

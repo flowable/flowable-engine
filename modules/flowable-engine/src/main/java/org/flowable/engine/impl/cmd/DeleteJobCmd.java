@@ -55,7 +55,6 @@ public class DeleteJobCmd implements Command<Object>, Serializable {
         }
 
         sendCancelEvent(jobToDelete);
-        sendCancelTransactionEvent(jobToDelete);
 
         CommandContextUtil.getJobEntityManager(commandContext).delete(jobToDelete);
         return null;
@@ -64,12 +63,6 @@ public class DeleteJobCmd implements Command<Object>, Serializable {
     protected void sendCancelEvent(JobEntity jobToDelete) {
         if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
-        }
-    }
-
-    protected void sendCancelTransactionEvent(JobEntity jobToDelete) {
-        if (CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
         }
     }
 

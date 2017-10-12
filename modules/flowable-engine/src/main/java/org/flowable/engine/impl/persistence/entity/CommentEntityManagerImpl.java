@@ -49,7 +49,7 @@ public class CommentEntityManagerImpl extends AbstractEntityManager<CommentEntit
         insert(commentEntity, false);
 
         Comment comment = (Comment) commentEntity;
-        if (getEventDispatcher().isEnabled() || getTransactionEventDispatcher().isEnabled()) {
+        if (getEventDispatcher().isEnabled()) {
             // Forced to fetch the process-instance to associate the right
             // process definition
             String processDefinitionId = null;
@@ -60,18 +60,10 @@ public class CommentEntityManagerImpl extends AbstractEntityManager<CommentEntit
                     processDefinitionId = process.getProcessDefinitionId();
                 }
             }
-            if (getEventDispatcher().isEnabled()) {
-                getEventDispatcher().dispatchEvent(
-                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, commentEntity, processInstanceId, processInstanceId, processDefinitionId));
-                getEventDispatcher().dispatchEvent(
-                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, commentEntity, processInstanceId, processInstanceId, processDefinitionId));
-            }
-            if (getTransactionEventDispatcher().isEnabled()) {
-                getTransactionEventDispatcher().dispatchEvent(
-                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, commentEntity, processInstanceId, processInstanceId, processDefinitionId));
-                getTransactionEventDispatcher().dispatchEvent(
-                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, commentEntity, processInstanceId, processInstanceId, processDefinitionId));
-            }
+            getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, commentEntity, processInstanceId, processInstanceId, processDefinitionId));
+            getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, commentEntity, processInstanceId, processInstanceId, processDefinitionId));
         }
     }
     
@@ -81,7 +73,7 @@ public class CommentEntityManagerImpl extends AbstractEntityManager<CommentEntit
 
         CommentEntity updatedCommentEntity = update(commentEntity, false);
 
-        if (getEventDispatcher().isEnabled() || getTransactionEventDispatcher().isEnabled()) {
+        if (getEventDispatcher().isEnabled()) {
             // Forced to fetch the process-instance to associate the right
             // process definition
             String processDefinitionId = null;
@@ -92,14 +84,8 @@ public class CommentEntityManagerImpl extends AbstractEntityManager<CommentEntit
                     processDefinitionId = process.getProcessDefinitionId();
                 }
             }
-            if (getEventDispatcher().isEnabled()) {
-                getEventDispatcher().dispatchEvent(
-                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, commentEntity, processInstanceId, processInstanceId, processDefinitionId));
-            }
-            if (getTransactionEventDispatcher().isEnabled()) {
-                getTransactionEventDispatcher().dispatchEvent(
-                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, commentEntity, processInstanceId, processInstanceId, processDefinitionId));
-            }
+            getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, commentEntity, processInstanceId, processInstanceId, processDefinitionId));
         }
         
         return updatedCommentEntity;
@@ -176,7 +162,7 @@ public class CommentEntityManagerImpl extends AbstractEntityManager<CommentEntit
         delete(commentEntity, false);
 
         Comment comment = (Comment) commentEntity;
-        if (getEventDispatcher().isEnabled() || getTransactionEventDispatcher().isEnabled()) {
+        if (getEventDispatcher().isEnabled()) {
             // Forced to fetch the process-instance to associate the right
             // process definition
             String processDefinitionId = null;
@@ -187,14 +173,8 @@ public class CommentEntityManagerImpl extends AbstractEntityManager<CommentEntit
                     processDefinitionId = process.getProcessDefinitionId();
                 }
             }
-            if (getEventDispatcher().isEnabled()) {
-                getEventDispatcher().dispatchEvent(
-                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, commentEntity, processInstanceId, processInstanceId, processDefinitionId));
-            }
-            if (getTransactionEventDispatcher().isEnabled()) {
-                getTransactionEventDispatcher().dispatchEvent(
-                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, commentEntity, processInstanceId, processInstanceId, processDefinitionId));
-            }
+            getEventDispatcher().dispatchEvent(
+                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, commentEntity, processInstanceId, processInstanceId, processDefinitionId));
         }
     }
 

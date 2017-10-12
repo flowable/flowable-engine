@@ -46,7 +46,6 @@ public class DeleteTimerJobCmd implements Command<Object>, Serializable {
         TimerJobEntity jobToDelete = getJobToDelete(commandContext);
 
         sendCancelEvent(jobToDelete);
-        sendCancelTransactionEvent(jobToDelete);
 
         CommandContextUtil.getTimerJobEntityManager(commandContext).delete(jobToDelete);
         return null;
@@ -55,12 +54,6 @@ public class DeleteTimerJobCmd implements Command<Object>, Serializable {
     protected void sendCancelEvent(TimerJobEntity jobToDelete) {
         if (CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
             CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
-        }
-    }
-
-    protected void sendCancelTransactionEvent(TimerJobEntity jobToDelete) {
-        if (CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration().getTransactionDependentEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobToDelete));
         }
     }
 

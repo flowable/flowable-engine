@@ -63,8 +63,9 @@ public class HistoryJobEntityManagerImpl extends JobInfoEntityManagerImpl<Histor
         deleteAdvancedJobHandlerConfigurationByteArrayRef(jobEntity);
 
         // Send event
-        dispatchEvent();
-        dispatchTransactionEvent();
+        if (getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        }
     }
 
     /**
@@ -87,8 +88,9 @@ public class HistoryJobEntityManagerImpl extends JobInfoEntityManagerImpl<Histor
     @Override
     public void deleteNoCascade(HistoryJobEntity historyJobEntity) {
         super.delete(historyJobEntity);
-        dispatchEvent();
-        dispatchTransactionEvent();
+        if (getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        }
     }
 
     public HistoryJobDataManager getHistoryJobDataManager() {
@@ -98,18 +100,5 @@ public class HistoryJobEntityManagerImpl extends JobInfoEntityManagerImpl<Histor
     public void setHistoryJobDataManager(HistoryJobDataManager historyJobDataManager) {
         this.historyJobDataManager = historyJobDataManager;
     }
-
-    private void dispatchEvent() {
-        if (getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
-        }
-    }
-
-    private void dispatchTransactionEvent() {
-        if (getTransactionEventDispatcher().isEnabled()) {
-            getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
-        }
-    }
-
 
 }

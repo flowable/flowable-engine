@@ -36,13 +36,6 @@ public class MessageEventHandler extends AbstractEventHandler {
         // As stated in the FlowableEventType java-doc, the message-event is
         // thrown before the actual message has been sent
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
-        dispatchEvent(eventSubscription, payload, processEngineConfiguration);
-        dispatchTransactionEvent(eventSubscription, payload, processEngineConfiguration);
-
-        super.handleEvent(eventSubscription, payload, commandContext);
-    }
-
-    private void dispatchEvent(EventSubscriptionEntity eventSubscription, Object payload, ProcessEngineConfigurationImpl processEngineConfiguration) {
         if (processEngineConfiguration.getEventDispatcher().isEnabled()) {
             processEngineConfiguration
                     .getEventDispatcher()
@@ -50,16 +43,8 @@ public class MessageEventHandler extends AbstractEventHandler {
                             FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_RECEIVED, eventSubscription.getActivityId(), eventSubscription.getEventName(), payload,
                                     eventSubscription.getExecutionId(), eventSubscription.getProcessInstanceId(), eventSubscription.getExecution().getProcessDefinitionId()));
         }
-    }
 
-    private void dispatchTransactionEvent(EventSubscriptionEntity eventSubscription, Object payload, ProcessEngineConfigurationImpl processEngineConfiguration) {
-        if (processEngineConfiguration.getTransactionDependentEventDispatcher().isEnabled()) {
-            processEngineConfiguration
-                    .getTransactionDependentEventDispatcher()
-                    .dispatchEvent(
-                            FlowableEventBuilder.createMessageEvent(FlowableEngineEventType.ACTIVITY_MESSAGE_RECEIVED, eventSubscription.getActivityId(), eventSubscription.getEventName(), payload,
-                                    eventSubscription.getExecutionId(), eventSubscription.getProcessInstanceId(), eventSubscription.getExecution().getProcessDefinitionId()));
-        }
+        super.handleEvent(eventSubscription, payload, commandContext);
     }
 
 }

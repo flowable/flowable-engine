@@ -58,23 +58,11 @@ public class SaveAttachmentCmd implements Command<Object>, Serializable {
         updateAttachment.setName(attachment.getName());
         updateAttachment.setDescription(attachment.getDescription());
 
-        dispatchEvent(commandContext, processInstanceId, processDefinitionId);
-        dispatchTransactionEvent(commandContext, processInstanceId, processDefinitionId);
-
-        return null;
-    }
-
-    private void dispatchEvent(CommandContext commandContext, String processInstanceId, String processDefinitionId) {
         if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled()) {
             CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher()
                     .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, attachment, processInstanceId, processInstanceId, processDefinitionId));
         }
-    }
 
-    private void dispatchTransactionEvent(CommandContext commandContext, String processInstanceId, String processDefinitionId) {
-        if (CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration(commandContext).getTransactionDependentEventDispatcher()
-                    .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, attachment, processInstanceId, processInstanceId, processDefinitionId));
-        }
+        return null;
     }
 }

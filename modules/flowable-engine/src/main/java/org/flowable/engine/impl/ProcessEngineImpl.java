@@ -91,7 +91,6 @@ public class ProcessEngineImpl implements ProcessEngine {
         }
 
         processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CREATED));
-        processEngineConfiguration.getTransactionDependentEventDispatcher().dispatchEvent(FlowableEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CREATED));
 
         if (asyncExecutor != null && asyncExecutor.isAutoActivate()) {
             asyncExecutor.start();
@@ -120,7 +119,6 @@ public class ProcessEngineImpl implements ProcessEngine {
         }
 
         processEngineConfiguration.getEventDispatcher().dispatchEvent(FlowableEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CLOSED));
-        processEngineConfiguration.getTransactionDependentEventDispatcher().dispatchEvent(FlowableEventBuilder.createGlobalEvent(FlowableEngineEventType.ENGINE_CLOSED));
     }
 
     // getters and setters

@@ -99,8 +99,9 @@ public class JobEntityManagerImpl extends JobInfoEntityManagerImpl<JobEntity> im
         removeExecutionLink(jobEntity);
 
         // Send event
-        dispatchEvent();
-        dispatchTransactionEvent();
+        if (getEventDispatcher().isEnabled()) {
+            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        }
     }
 
     @Override
@@ -143,18 +144,5 @@ public class JobEntityManagerImpl extends JobInfoEntityManagerImpl<JobEntity> im
     public void setJobDataManager(JobDataManager jobDataManager) {
         this.jobDataManager = jobDataManager;
     }
-
-    private void dispatchEvent() {
-        if (getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
-        }
-    }
-
-    private void dispatchTransactionEvent() {
-        if (getTransactionEventDispatcher().isEnabled()) {
-            getTransactionEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
-        }
-    }
-
 
 }
