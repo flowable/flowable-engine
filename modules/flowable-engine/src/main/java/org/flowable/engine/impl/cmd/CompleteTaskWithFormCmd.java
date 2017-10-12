@@ -79,7 +79,11 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
             // Extract raw variables and complete the task
             Map<String, Object> formVariables = formService.getVariablesFromFormSubmission(formModel, variables, outcome);
 
-            formService.saveFormInstance(formVariables, formModel, task.getId(), task.getProcessInstanceId());
+            if (task.getProcessInstanceId() != null) {
+                formService.saveFormInstance(formVariables, formModel, task.getId(), task.getProcessInstanceId(), task.getProcessDefinitionId());
+            } else {
+                formService.saveFormInstanceWithScopeId(formVariables, formModel, task.getId(), task.getScopeId(), task.getScopeType(), task.getScopeDefinitionId());
+            }
 
             processUploadFieldsIfNeeded(formModel, task, commandContext);
 

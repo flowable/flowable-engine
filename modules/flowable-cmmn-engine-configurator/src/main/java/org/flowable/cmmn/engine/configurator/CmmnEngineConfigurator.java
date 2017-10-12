@@ -40,7 +40,6 @@ import org.flowable.engine.impl.persistence.deploy.Deployer;
 public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
 
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
-    protected CmmnEngine cmmnEngine;
 
     @Override
     public int getPriority() {
@@ -49,7 +48,7 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
 
     @Override
     protected List<Deployer> getCustomDeployers() {
-        return Collections.<Deployer>singletonList(new CmmnDeployer(this));
+        return Collections.<Deployer>singletonList(new CmmnDeployer());
     }
 
     @Override
@@ -66,8 +65,14 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
         initialiseCommonProperties(processEngineConfiguration, cmmnEngineConfiguration);
         initProcessInstanceService(processEngineConfiguration);
         initProcessInstanceStateChangedCallbacks(processEngineConfiguration);
+        
+        cmmnEngineConfiguration.setEnableTaskRelationshipCounts(processEngineConfiguration.getPerformanceSettings().isEnableTaskRelationshipCounts());
+        cmmnEngineConfiguration.setTaskQueryLimit(processEngineConfiguration.getTaskQueryLimit());
+        cmmnEngineConfiguration.setHistoricTaskQueryLimit(processEngineConfiguration.getHistoricTaskQueryLimit());
 
-        this.cmmnEngine = initCmmnEngine();
+        initCmmnEngine();
+        
+        initServiceConfigurations(processEngineConfiguration, cmmnEngineConfiguration);
     }
 
     protected void initProcessInstanceService(ProcessEngineConfigurationImpl processEngineConfiguration) {
@@ -111,13 +116,4 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
         return this;
     }
-
-    public CmmnEngine getCmmnEngine() {
-        return cmmnEngine;
-    }
-
-    public void setCmmnEngine(CmmnEngine cmmnEngine) {
-        this.cmmnEngine = cmmnEngine;
-    }
-
 }

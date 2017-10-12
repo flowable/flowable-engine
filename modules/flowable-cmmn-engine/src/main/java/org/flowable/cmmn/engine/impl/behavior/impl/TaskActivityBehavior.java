@@ -38,12 +38,12 @@ public class TaskActivityBehavior extends CoreCmmnTriggerableActivityBehavior {
     
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        if (!determineIsBlocking(planItemInstanceEntity)) {
+        if (!evaluateIsBlocking(planItemInstanceEntity)) {
             CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance((PlanItemInstanceEntity) planItemInstanceEntity);
         }
     }
 
-    protected boolean determineIsBlocking(DelegatePlanItemInstance planItemInstance) {
+    protected boolean evaluateIsBlocking(DelegatePlanItemInstance planItemInstance) {
         boolean blocking = isBlocking;
         if (StringUtils.isNotEmpty(isBlockingExpression)) {
             Expression expression = CommandContextUtil.getExpressionManager().createExpression(isBlockingExpression);

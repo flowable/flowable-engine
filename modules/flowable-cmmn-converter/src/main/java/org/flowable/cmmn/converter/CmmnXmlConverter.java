@@ -399,9 +399,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 ProcessTask processTask = (ProcessTask) planItemDefinition;
                 if (processTask.getProcessRef() != null) {
                     org.flowable.cmmn.model.Process process = cmmnModel.getProcessById(processTask.getProcessRef());
-                    if (process == null) {
-                        throw new FlowableException("Could not find process element for reference " + processTask.getProcessRef());
-                    } else {
+                    if (process != null) {
                         processTask.setProcess(process);
                     }
                 }

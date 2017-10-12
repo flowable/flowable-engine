@@ -18,11 +18,11 @@ import static org.junit.Assert.assertThat;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.impl.identity.Authentication;
+import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.engine.common.impl.identity.Authentication;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 import org.hamcrest.core.Is;
 

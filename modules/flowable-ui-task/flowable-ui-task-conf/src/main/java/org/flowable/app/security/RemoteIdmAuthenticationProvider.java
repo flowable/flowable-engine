@@ -33,7 +33,7 @@ public class RemoteIdmAuthenticationProvider implements AuthenticationProvider {
             grantedAuthorities.add(new SimpleGrantedAuthority(privilege));
         }
 
-        org.flowable.engine.impl.identity.Authentication.setAuthenticatedUserId(user.getId());
+        org.flowable.engine.common.impl.identity.Authentication.setAuthenticatedUserId(user.getId());
 
         Authentication auth = new UsernamePasswordAuthenticationToken(authentication.getPrincipal(),
                 authentication.getCredentials(), grantedAuthorities);

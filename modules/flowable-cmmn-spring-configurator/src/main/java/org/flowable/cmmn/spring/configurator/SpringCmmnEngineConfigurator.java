@@ -41,6 +41,8 @@ public class SpringCmmnEngineConfigurator extends CmmnEngineConfigurator {
                         springProcessEngineConfiguration.getApplicationContext(), springProcessEngineConfiguration.getBeans()));
 
         initCmmnEngine();
+        
+        initServiceConfigurations(processEngineConfiguration, cmmnEngineConfiguration);
     }
 
     @Override

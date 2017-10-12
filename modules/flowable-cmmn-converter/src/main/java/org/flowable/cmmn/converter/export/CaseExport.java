@@ -28,6 +28,10 @@ public class CaseExport implements CmmnXmlConstants {
         if (StringUtils.isNotEmpty(caseModel.getName())) {
             xtw.writeAttribute(ATTRIBUTE_NAME, caseModel.getName());
         }
+        
+        if (StringUtils.isNotEmpty(caseModel.getInitiatorVariableName())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_INITIATOR_VARIABLE_NAME, caseModel.getInitiatorVariableName());
+        }
 
         if (StringUtils.isNotEmpty(caseModel.getDocumentation())) {
 

@@ -43,6 +43,9 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
     protected String processInstanceIdLike;
     protected String processDefinitionId;
     protected String processDefinitionIdLike;
+    protected String scopeId;
+    protected String scopeType;
+    protected String scopeDefinitionId;
     protected Date submittedDate;
     protected Date submittedDateBefore;
     protected Date submittedDateAfter;
@@ -120,6 +123,24 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
     @Override
     public FormInstanceQueryImpl processDefinitionIdLike(String processDefinitionIdLike) {
         this.processDefinitionIdLike = processDefinitionIdLike;
+        return this;
+    }
+    
+    @Override
+    public FormInstanceQueryImpl scopeId(String scopeId) {
+        this.scopeId = scopeId;
+        return this;
+    }
+    
+    @Override
+    public FormInstanceQueryImpl scopeType(String scopeType) {
+        this.scopeType = scopeType;
+        return this;
+    }
+    
+    @Override
+    public FormInstanceQueryImpl scopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
         return this;
     }
 
@@ -243,6 +264,18 @@ public class FormInstanceQueryImpl extends AbstractQuery<FormInstanceQuery, Form
 
     public String getProcessDefinitionIdLike() {
         return processDefinitionIdLike;
+    }
+
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
     }
 
     public Date getSubmittedDate() {

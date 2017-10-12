@@ -19,13 +19,15 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.impl.variable.VariableScopeType;
 import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.cmmn.engine.runtime.CaseInstanceQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
+import org.flowable.variable.service.type.VariableScopeType;
 
 /**
  * @author Joram Barrez
@@ -76,12 +78,19 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         CommandContext commandContext = CommandContextUtil.getCommandContext();
 
         // Variables
-        CommandContextUtil.getVariableServiceConfiguration(commandContext).getVariableInstanceEntityManager();
-        VariableInstanceEntityManager variableInstanceEntityManager = getVariableInstanceEntityManager();
+        VariableInstanceEntityManager variableInstanceEntityManager 
+            = CommandContextUtil.getVariableServiceConfiguration(commandContext).getVariableInstanceEntityManager();
         List<VariableInstanceEntity> variableInstanceEntities = variableInstanceEntityManager
                 .findVariableInstanceByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
         for (VariableInstanceEntity variableInstanceEntity : variableInstanceEntities) {
             variableInstanceEntityManager.delete(variableInstanceEntity);
+        }
+        
+        // Tasks
+        TaskEntityManager taskEntityManager = CommandContextUtil.getTaskServiceConfiguration(commandContext).getTaskEntityManager();
+        List<TaskEntity> taskEntities = taskEntityManager.findTasksByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
+        for (TaskEntity taskEntity : taskEntities) {
+            taskEntityManager.delete(taskEntity);
         }
         
         // Sentry part instances

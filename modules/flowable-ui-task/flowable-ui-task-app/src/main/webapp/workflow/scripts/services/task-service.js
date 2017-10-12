@@ -45,7 +45,25 @@ angular.module('flowableApp').service('TaskService', ['$http', '$q', '$rootScope
                     data: data
                 }
             );
+        };
+        
+        this.getCaseInstanceTasks = function(caseInstanceId, isCompleted) {
 
+            var data = {
+                caseInstanceId: caseInstanceId
+            };
+
+            if (isCompleted) {
+                data.state = 'completed'
+            }
+
+            return httpAsPromise(
+                {
+                    method: 'POST',
+                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/query/tasks',
+                    data: data
+                }
+            );
         };
 
         this.involveUserInTask = function(userId, taskId) {

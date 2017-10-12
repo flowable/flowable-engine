@@ -7,11 +7,12 @@
   <!-- DEPLOYMENT INSERT -->
   
   <insert id="insertCmmnDeployment" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityImpl">
-    insert into ${prefix}ACT_CMMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_)
+    insert into ${prefix}ACT_CMMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_)
     values(
         #{id, jdbcType=VARCHAR},
         #{name, jdbcType=VARCHAR},
         #{category, jdbcType=VARCHAR},
+        #{key, jdbcType=VARCHAR},
         #{tenantId, jdbcType=VARCHAR},
         #{deploymentTime, jdbcType=TIMESTAMP},
         #{parentDeploymentId, jdbcType=VARCHAR}
@@ -25,6 +26,9 @@
     <set>
       <if test="originalPersistentState.category != category">
         CATEGORY_ = #{category, jdbcType=VARCHAR},
+      </if>
+      <if test="originalPersistentState.key != key">
+        KEY_ = #{key, jdbcType=VARCHAR},
       </if>
       <if test="originalPersistentState.tenantId != tenantId">
         TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
@@ -45,6 +49,7 @@
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="category" column="CATEGORY_" jdbcType="VARCHAR" />
+    <result property="key" column="KEY_" jdbcType="VARCHAR" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     <result property="parentDeploymentId" column="PARENT_DEPLOYMENT_ID_" jdbcType="VARCHAR" />
     <result property="deploymentTime" column="DEPLOY_TIME_" jdbcType="TIMESTAMP"/>
@@ -79,6 +84,13 @@
       <if test="deploymentId != null">
         RES.ID_ = #{deploymentId}
       </if>
+      <if test="deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0">
+        and RES.ID_ IN
+        <foreach item="deploymentId" index="index" collection="deploymentIds" 
+                 open="(" separator="," close=")">
+          #{deploymentId}
+        </foreach>
+      </if>
       <if test="name != null">
         and RES.NAME_ = #{name}
       </if>
@@ -90,6 +102,9 @@
       </if>
       <if test="categoryNotEquals != null">
         and ( RES.CATEGORY_ &lt;&gt; #{categoryNotEquals} OR RES.CATEGORY_ is null )  
+      </if>
+      <if test="key != null">
+        and RES.KEY_ = #{key}
       </if>
       <if test="withoutTenantId">
         and (RES.TENANT_ID_ = '' or RES.TENANT_ID_ is null)
@@ -105,6 +120,16 @@
       </if>
       <if test="tenantIdLike != null">
         and RES.TENANT_ID_ like #{tenantIdLike}
+      </if>
+      <if test="latest">
+        and RES.DEPLOY_TIME_ = (select max(DEPLOY_TIME_) from ${prefix}ACT_RE_DEPLOYMENT where KEY_ = RES.KEY_ 
+             <if test="tenantId != null">
+               and TENANT_ID_ = #{tenantId}
+             </if>
+             <if test="tenantIdLike != null">
+               and TENANT_ID_ like #{tenantIdLike}${wildcardEscapeClause}
+             </if>
+        )
       </if>
     </where>
   </sql>

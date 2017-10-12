@@ -31,12 +31,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Tijs Rademakers
  */
 public class StageJsonConverter extends BaseCmmnJsonConverter implements FormAwareConverter, FormKeyAwareConverter,
-        DecisionTableAwareConverter, DecisionTableKeyAwareConverter {
+        DecisionTableAwareConverter, DecisionTableKeyAwareConverter, CaseModelAwareConverter, ProcessModelAwareConverter {
 
     protected Map<String, String> formMap;
     protected Map<String, ModelInfo> formKeyMap;
     protected Map<String, String> decisionTableMap;
     protected Map<String, ModelInfo> decisionTableKeyMap;
+    protected Map<String, String> caseModelMap;
+    protected Map<String, String> processModelMap;
 
     public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap,
             Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
@@ -76,7 +78,8 @@ public class StageJsonConverter extends BaseCmmnJsonConverter implements FormAwa
         Stage stage = new Stage();
 
         JsonNode childShapesArray = elementNode.get(EDITOR_CHILD_SHAPES);
-        processor.processJsonElements(childShapesArray, modelNode, stage, shapeMap, formMap, decisionTableMap, cmmnModel, cmmnModelIdHelper);
+        processor.processJsonElements(childShapesArray, modelNode, stage, shapeMap, formMap, decisionTableMap, 
+                        caseModelMap, processModelMap, cmmnModel, cmmnModelIdHelper);
         
         Stage parentStage = (Stage) parentElement;
         stage.setParent(parentStage);
@@ -102,5 +105,15 @@ public class StageJsonConverter extends BaseCmmnJsonConverter implements FormAwa
     @Override
     public void setDecisionTableKeyMap(Map<String, ModelInfo> decisionTableKeyMap) {
         this.decisionTableKeyMap = decisionTableKeyMap;
+    }
+    
+    @Override
+    public void setCaseModelMap(Map<String, String> caseModelMap) {
+        this.caseModelMap = caseModelMap;
+    }
+
+    @Override
+    public void setProcessModelMap(Map<String, String> processModelMap) {
+        this.processModelMap = processModelMap;
     }
 }

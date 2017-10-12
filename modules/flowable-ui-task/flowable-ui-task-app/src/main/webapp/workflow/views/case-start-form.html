@@ -1,0 +1,31 @@
+<div class="main-content" ng-controller="CaseStartFormController">
+
+    <div class="header" ng-show="model.caseInstance">
+        
+        <h2> {{model.caseInstance.name && model.caseInstance.name ||
+            model.caseInstance.caseDefinitionName}}</h2>
+
+        <div class="detail">
+            <span class="label" ng-show="model.caseInstance.startedBy">{{'PROCESS.FIELD.STARTED-BY' | translate}}: </span>
+            <span user-name="model.caseInstance.startedBy" ng-show="model.caseInstance.startedBy"></span>
+            <span class="label">{{'PROCESS.FIELD.STARTED' | translate}}: </span>
+            <span title="{{model.caseInstance.started | dateformat}}">{{model.caseInstance.started | dateformat:'fromNow'}}</span>
+            <span class="label" ng-show="model.caseInstance.ended">{{'PROCESS.FIELD.ENDED' | translate}}: </span>
+            <span ng-show="model.caseInstance.ended" title="{{model.caseInstance.ended | dateformat}}">{{model.caseInstance.ended | dateformat:'fromNow'}}</span>
+            <span ng-if="model.caseInstance.id" class="label">{{'TASK.FIELD.PROCESS-INSTANCE' | translate}}: </span>
+            <span ng-if="model.caseInstance.id">
+                <a ng-click="openCaseInstance()">{{model.caseInstance.name && model.caseInstance.name || model.caseInstance.caseDefinitionName}}</a>
+            </span>
+        </div>
+    </div>
+
+    <div class="content clearfix" auto-height offset="6" ng-if="model.caseInstance && model.formData">
+        <!-- FORM -->
+        <div class="section">
+            <activiti-form form-definition="model.formData"
+                           hide-buttons="true">
+            </activiti-form>
+        </div>
+
+    </div>
+</div>

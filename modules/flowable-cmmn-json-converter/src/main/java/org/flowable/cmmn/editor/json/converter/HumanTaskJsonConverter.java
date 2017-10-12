@@ -273,7 +273,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
                     task.setCandidateUsers(getValueAsList(PROPERTY_USERTASK_CANDIDATE_USERS, assignmentDefNode));
                     task.setCandidateGroups(getValueAsList(PROPERTY_USERTASK_CANDIDATE_GROUPS, assignmentDefNode));
 
-                    if (StringUtils.isNotEmpty(task.getAssignee()) && !"$INITIATOR".equalsIgnoreCase(task.getAssignee())) {
+                    if (StringUtils.isNotEmpty(task.getAssignee())) {
 
                         if (canCompleteTaskNode != null && !canCompleteTaskNode.isNull()) {
                             addInitiatorCanCompleteExtensionElement(Boolean.valueOf(canCompleteTaskNode.asText()), task);
@@ -281,7 +281,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
                             addInitiatorCanCompleteExtensionElement(false, task);
                         }
 
-                    } else if (StringUtils.isNotEmpty(task.getAssignee()) && "$INITIATOR".equalsIgnoreCase(task.getAssignee())) {
+                    } else if (StringUtils.isNotEmpty(task.getAssignee())) {
                         addInitiatorCanCompleteExtensionElement(true, task);
                     }
 
@@ -302,7 +302,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
                             fillCandidateGroups(idmDefNode, canCompleteTaskNode, task);
 
                         } else {
-                            task.setAssignee("$INITIATOR");
+                            task.setAssignee("${" + cmmnModel.getPrimaryCase().getInitiatorVariableName() + "}");
                             addExtensionElement("flowable-idm-initiator", String.valueOf(true), task);
                         }
                     }

@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.impl.identity.Authentication;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.event.logger.EventLogger;
 import org.flowable.engine.impl.event.logger.handler.Fields;
-import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;

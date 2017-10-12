@@ -41,6 +41,8 @@ public class SpringDmnEngineConfigurator extends DmnEngineConfigurator {
                         springProcessEngineConfiguration.getApplicationContext(), springProcessEngineConfiguration.getBeans()));
 
         initDmnEngine();
+        
+        initServiceConfigurations(processEngineConfiguration, dmnEngineConfiguration);
     }
 
     @Override

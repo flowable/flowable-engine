@@ -31,5 +31,15 @@
     <mapper resource="org/flowable/variable/db/mapping/entity/ByteArray.xml" />
     <mapper resource="org/flowable/variable/db/mapping/entity/VariableInstance.xml" />
     <mapper resource="org/flowable/variable/db/mapping/entity/HistoricVariableInstance.xml" />
+    
+    <!-- Identity link support -->
+    <mapper resource="org/flowable/identitylink/db/mapping/entity/IdentityLink.xml" />
+    <mapper resource="org/flowable/identitylink/db/mapping/entity/HistoricIdentityLink.xml" />
+    
+    <!-- Task support -->
+    <mapper resource="org/flowable/task/db/mapping/common.xml" />
+    <mapper resource="org/flowable/task/db/mapping/entity/Task.xml" />
+    <mapper resource="org/flowable/task/db/mapping/entity/HistoricTaskInstance.xml" />
+    
   </mappers>
 </configuration>

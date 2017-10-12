@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine;
 import org.flowable.cmmn.engine.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.engine.history.HistoricMilestoneInstanceQuery;
 import org.flowable.cmmn.engine.history.HistoricVariableInstanceQuery;
+import org.flowable.task.service.history.HistoricTaskInstanceQuery;
 
 /**
  * @author Joram Barrez
@@ -26,5 +27,8 @@ public interface CmmnHistoryService {
     HistoricMilestoneInstanceQuery createHistoricMilestoneInstanceQuery();
     
     HistoricVariableInstanceQuery createHistoricVariableInstanceQuery();
+    
+    HistoricTaskInstanceQuery createHistoricTaskInstanceQuery();
 
+    void deleteHistoricCaseInstance(String caseInstanceId);
 }

@@ -217,7 +217,7 @@ public class VariableInstanceEntityImpl extends AbstractEntity implements Variab
     
     @Override
     public String getSubScopeId() {
-        return scopeId;
+        return subScopeId;
     }
     
     @Override

@@ -510,6 +510,9 @@
     <if test="deploymentId != null || (deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0)">
       left outer join ${prefix}ACT_RE_PROCDEF DEPLOY_P ON RES.PROC_DEF_ID_ = DEPLOY_P.ID_
     </if>
+    <if test="cmmnDeploymentId != null || (cmmnDeploymentIds != null &amp;&amp; cmmnDeploymentIds.size() &gt; 0)">
+      left outer join ${prefix}ACT_CMMN_CASEDEF DEPLOY_C ON RES.SCOPE_DEFINITION_ID_ = DEPLOY_C.ID_
+    </if>
     <foreach collection="queryVariableValues" index="index" item="var">
       <choose>
         <when test="var.local">
@@ -532,6 +535,9 @@
       </if>
       <if test="orQueryObject.deploymentId != null || (orQueryObject.deploymentIds != null &amp;&amp; orQueryObject.deploymentIds.size() &gt; 0)">
         left outer join ${prefix}ACT_RE_PROCDEF DEPLOY_P_OR${orIndex} ON RES.PROC_DEF_ID_ = DEPLOY_P_OR${orIndex}.ID_
+      </if>
+      <if test="orQueryObject.cmmnDeploymentId != null || (orQueryObject.cmmnDeploymentIds != null &amp;&amp; orQueryObject.cmmnDeploymentId.size() &gt; 0)">
+        left outer join ${prefix}ACT_CMMN_CASEDEF DEPLOY_C_OR${orIndex} ON RES.SCOPE_DEFINITION_ID_ = DEPLOY_C_OR${orIndex}.ID_
       </if>
       <if test="orQueryObject.queryVariableValues.size() &gt; 0">
         <if test="orQueryObject.hasLocalQueryVariableValue()">
@@ -584,15 +590,41 @@
           #{processCategory}
         </foreach>
       </if>
-      <if test="deploymentId != null">
+      <if test="deploymentId != null &amp;&amp; cmmnDeploymentId == null">
         and DEPLOY_P.DEPLOYMENT_ID_ = #{deploymentId}
       </if>
-      <if test="deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0">
+      <if test="deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0 &amp;&amp; cmmnDeploymentIds == null">
         and DEPLOY_P.DEPLOYMENT_ID_ IN
         <foreach item="deployment" index="index" collection="deploymentIds" 
                  open="(" separator="," close=")">
           #{deployment}
         </foreach>
+      </if>
+      <if test="cmmnDeploymentId != null &amp;&amp; deploymentId == null">
+        and DEPLOY_C.DEPLOYMENT_ID_ = #{cmmnDeploymentId}
+      </if>
+      <if test="cmmnDeploymentIds != null &amp;&amp; cmmnDeploymentIds.size() &gt; 0 &amp;&amp; deploymentIds == null">
+        and DEPLOY_C.DEPLOYMENT_ID_ IN
+        <foreach item="deployment" index="index" collection="cmmnDeploymentIds" 
+                 open="(" separator="," close=")">
+          #{deployment}
+        </foreach>
+      </if>
+      <if test="deploymentId != null &amp;&amp; cmmnDeploymentId != null">
+        and (DEPLOY_P.DEPLOYMENT_ID_ = #{deploymentId} or DEPLOY_C.DEPLOYMENT_ID = #{cmmnDeploymentId})
+      </if>
+      <if test="cmmnDeploymentIds != null &amp;&amp; cmmnDeploymentIds.size() &gt; 0 &amp;&amp; deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0">
+        and (
+            DEPLOY_P.DEPLOYMENT_ID_ IN
+            <foreach item="deployment" index="index" collection="deploymentIds" open="(" separator="," close=")">
+                #{deployment}
+            </foreach>
+            or
+            DEPLOY_C.DEPLOYMENT_ID_ IN
+            <foreach item="cmmnDeployment" index="index" collection="cmmnDeploymentIds" open="(" separator="," close=")">
+                #{cmmnDeployment}
+            </foreach>
+        )
       </if>
       <if test="processInstanceId != null">
         and RES.PROC_INST_ID_ = #{processInstanceId}
@@ -908,6 +940,16 @@
               #{deployment}
             </foreach>
           </if>
+          <if test="orQueryObject.cmmnDeploymentId != null">
+            or DEPLOY_C_OR${orIndex}.DEPLOYMENT_ID_ = #{orQueryObject.cmmnDeploymentId}
+          </if>
+          <if test="orQueryObject.cmmnDeploymentIds != null &amp;&amp; orQueryObject.cmmnDeploymentIds.size() &gt; 0">
+            or DEPLOY_C_OR${orIndex}.DEPLOYMENT_ID_ IN
+            <foreach item="deployment" index="index" collection="orQueryObject.cmmnDeploymentIds" 
+                     open="(" separator="," close=")">
+              #{deployment}
+            </foreach>
+          </if>
           <if test="orQueryObject.processInstanceId != null">
             or RES.PROC_INST_ID_ = #{orQueryObject.processInstanceId}
           </if>
@@ -1196,7 +1238,7 @@
   </sql>
 
   <select id="selectHistoricTaskInstanceByNativeQuery" parameterType="java.util.Map" resultMap="historicTaskInstanceResultMap">
-    <include refid="org.flowable.engine.db.common.selectByNativeQuery"/>
+    <include refid="org.flowable.task.service.db.common.selectByNativeQuery"/>
   </select>
   
   <select id="selectHistoricTaskInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">

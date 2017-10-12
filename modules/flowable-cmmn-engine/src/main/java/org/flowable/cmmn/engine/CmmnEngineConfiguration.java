@@ -28,6 +28,7 @@ import org.flowable.cmmn.engine.impl.CmmnEngineImpl;
 import org.flowable.cmmn.engine.impl.CmmnHistoryServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnManagementServiceImpl;
 import org.flowable.cmmn.engine.impl.CmmnRepositoryServiceImpl;
+import org.flowable.cmmn.engine.impl.CmmnTaskServiceImpl;
 import org.flowable.cmmn.engine.impl.ServiceImpl;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaFactory;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaSessionFactory;
@@ -44,6 +45,7 @@ import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.deployer.Deployer;
 import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
+import org.flowable.cmmn.engine.impl.history.CmmnHistoryTaskManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryVariableManager;
 import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.interceptor.CmmnCommandInvoker;
@@ -94,6 +96,7 @@ import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelperImpl;
 import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
+import org.flowable.cmmn.engine.impl.task.DefaultCmmnTaskVariableScopeResolver;
 import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
@@ -110,6 +113,11 @@ import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
+import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
+import org.flowable.task.service.InternalTaskVariableScopeResolver;
+import org.flowable.task.service.TaskServiceConfiguration;
+import org.flowable.task.service.history.InternalHistoryTaskManager;
 import org.flowable.task.service.impl.db.TaskDbSchemaManager;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
@@ -139,7 +147,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
+public class CmmnEngineConfiguration extends AbstractEngineConfiguration implements CmmnEngineConfigurationApi {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(CmmnEngineConfiguration.class);
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/cmmn/db/mapping/mappings.xml";
@@ -150,6 +158,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     protected CmmnEngineAgendaFactory cmmnEngineAgendaFactory;
 
     protected CmmnRuntimeService cmmnRuntimeService = new CmmnRuntimeServiceImpl();
+    protected CmmnTaskService cmmnTaskService = new CmmnTaskServiceImpl();
     protected CmmnManagementService cmmnManagementService = new CmmnManagementServiceImpl();
     protected CmmnRepositoryService cmmnRepositoryService = new CmmnRepositoryServiceImpl();
     protected CmmnHistoryService cmmnHistoryService = new CmmnHistoryServiceImpl();
@@ -207,9 +216,22 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
      */
     protected DelegateExpressionFieldInjectionMode delegateExpressionFieldInjectionMode = DelegateExpressionFieldInjectionMode.MIXED;
 
-    // Variable support
+    protected DbSchemaManager identityLinkDbSchemaManager;
     protected DbSchemaManager variableDbSchemaManager;
     protected DbSchemaManager taskDbSchemaManager;
+    
+    // Identitylink support
+    protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
+    
+    // Task support
+    protected TaskServiceConfiguration taskServiceConfiguration;
+    protected InternalHistoryTaskManager internalHistoryTaskManager;
+    protected InternalTaskVariableScopeResolver internalTaskVariableScopeResolver;
+    protected boolean isEnableTaskRelationshipCounts;
+    protected int taskQueryLimit;
+    protected int historicTaskQueryLimit;
+    
+    // Variable support
     protected VariableTypes variableTypes;
     protected List<VariableType> customPreVariableTypes;
     protected List<VariableType> customPostVariableTypes;
@@ -285,7 +307,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         initHistoryManager();
         initCaseInstanceCallbacks();
         initClock();
+        initIdentityLinkServiceConfiguration();
         initVariableServiceConfiguration();
+        initTaskServiceConfiguration();
     }
 
     @Override
@@ -293,6 +317,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     public void initDbSchemaManager() {
         super.initDbSchemaManager();
         initCmmnDbSchemaManager();
+        initIdentityLinkDbSchemaManager();
         initVariableDbSchemaManager();
         initTaskDbSchemaManager();
     }
@@ -312,6 +337,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
     protected void initTaskDbSchemaManager() {
         if (this.taskDbSchemaManager == null) {
             this.taskDbSchemaManager = new TaskDbSchemaManager();
+        }
+    }
+    
+    protected void initIdentityLinkDbSchemaManager() {
+        if (this.identityLinkDbSchemaManager == null) {
+            this.identityLinkDbSchemaManager = new IdentityLinkDbSchemaManager();
         }
     }
 
@@ -369,6 +400,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
 
     protected void initServices() {
         initService(cmmnRuntimeService);
+        initService(cmmnTaskService);;
         initService(cmmnManagementService);
         initService(cmmnRepositoryService);
         initService(cmmnHistoryService);
@@ -623,6 +655,46 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
 
         addServiceConfiguration(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG, this.variableServiceConfiguration);
     }
+    
+    public void initTaskServiceConfiguration() {
+        this.taskServiceConfiguration = new TaskServiceConfiguration();
+        this.taskServiceConfiguration.setHistoryLevel(this.historyLevel);
+        this.taskServiceConfiguration.setClock(this.clock);
+        this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
+        this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+
+        if (this.internalHistoryTaskManager != null) {
+            this.taskServiceConfiguration.setInternalHistoryTaskManager(this.internalHistoryTaskManager);
+        } else {
+            this.taskServiceConfiguration.setInternalHistoryTaskManager(new CmmnHistoryTaskManager(cmmnHistoryManager));
+        }
+
+        if (this.internalTaskVariableScopeResolver != null) {
+            this.taskServiceConfiguration.setInternalTaskVariableScopeResolver(this.internalTaskVariableScopeResolver);
+        } else {
+            this.taskServiceConfiguration.setInternalTaskVariableScopeResolver(new DefaultCmmnTaskVariableScopeResolver(this));
+        }
+
+        this.taskServiceConfiguration.setEnableTaskRelationshipCounts(this.isEnableTaskRelationshipCounts);
+        this.taskServiceConfiguration.setTaskQueryLimit(this.taskQueryLimit);
+        this.taskServiceConfiguration.setHistoricTaskQueryLimit(this.historicTaskQueryLimit);
+
+        this.taskServiceConfiguration.init();
+
+        addServiceConfiguration(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG, this.taskServiceConfiguration);
+    }
+    
+    public void initIdentityLinkServiceConfiguration() {
+        this.identityLinkServiceConfiguration = new IdentityLinkServiceConfiguration();
+        this.identityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
+        this.identityLinkServiceConfiguration.setClock(this.clock);
+        this.identityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
+        this.identityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+
+        this.identityLinkServiceConfiguration.init();
+
+        addServiceConfiguration(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG, this.identityLinkServiceConfiguration);
+    }
 
     @Override
     public String getEngineName() {
@@ -638,6 +710,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
+    @Override
     public CmmnRuntimeService getCmmnRuntimeService() {
         return cmmnRuntimeService;
     }
@@ -646,7 +719,17 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.cmmnRuntimeService = cmmnRuntimeService;
         return this;
     }
+    
+    public CmmnTaskService getCmmnTaskService() {
+        return cmmnTaskService;
+    }
 
+    public CmmnEngineConfiguration setCmmnTaskService(CmmnTaskService cmmnTaskService) {
+        this.cmmnTaskService = cmmnTaskService;
+        return this;
+    }
+
+    @Override
     public CmmnManagementService getCmmnManagementService() {
         return cmmnManagementService;
     }
@@ -656,6 +739,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
+    @Override
     public CmmnRepositoryService getCmmnRepositoryService() {
         return cmmnRepositoryService;
     }
@@ -665,6 +749,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
 
+    @Override
     public CmmnHistoryService getCmmnHistoryService() {
         return cmmnHistoryService;
     }
@@ -1039,6 +1124,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.customFlowableFunctionDelegates = customFlowableFunctionDelegates;
         return this;
     }
+    
+    public DbSchemaManager getIdentityLinkDbSchemaManager() {
+        return identityLinkDbSchemaManager;
+    }
+
+    public CmmnEngineConfiguration setIdentityLinkDbSchemaManager(DbSchemaManager identityLinkDbSchemaManager) {
+        this.identityLinkDbSchemaManager = identityLinkDbSchemaManager;
+        return this;
+    }
 
     public DbSchemaManager getVariableDbSchemaManager() {
         return variableDbSchemaManager;
@@ -1084,6 +1178,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         this.customPostVariableTypes = customPostVariableTypes;
         return this;
     }
+    
+    public IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration() {
+        return identityLinkServiceConfiguration;
+    }
+
+    public CmmnEngineConfiguration setIdentityLinkServiceConfiguration(IdentityLinkServiceConfiguration identityLinkServiceConfiguration) {
+        this.identityLinkServiceConfiguration = identityLinkServiceConfiguration;
+        return this;
+    }
 
     public VariableServiceConfiguration getVariableServiceConfiguration() {
         return variableServiceConfiguration;
@@ -1094,6 +1197,60 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration {
         return this;
     }
     
+    public TaskServiceConfiguration getTaskServiceConfiguration() {
+        return taskServiceConfiguration;
+    }
+
+    public CmmnEngineConfiguration setTaskServiceConfiguration(TaskServiceConfiguration taskServiceConfiguration) {
+        this.taskServiceConfiguration = taskServiceConfiguration;
+        return this;
+    }
+    
+    public InternalHistoryTaskManager getInternalHistoryTaskManager() {
+        return internalHistoryTaskManager;
+    }
+
+    public CmmnEngineConfiguration setInternalHistoryTaskManager(InternalHistoryTaskManager internalHistoryTaskManager) {
+        this.internalHistoryTaskManager = internalHistoryTaskManager;
+        return this;
+    }
+    
+    public InternalTaskVariableScopeResolver getInternalTaskVariableScopeResolver() {
+        return internalTaskVariableScopeResolver;
+    }
+
+    public CmmnEngineConfiguration setInternalTaskVariableScopeResolver(InternalTaskVariableScopeResolver internalTaskVariableScopeResolver) {
+        this.internalTaskVariableScopeResolver = internalTaskVariableScopeResolver;
+        return this;
+    }
+
+    public boolean isEnableTaskRelationshipCounts() {
+        return isEnableTaskRelationshipCounts;
+    }
+
+    public CmmnEngineConfiguration setEnableTaskRelationshipCounts(boolean isEnableTaskRelationshipCounts) {
+        this.isEnableTaskRelationshipCounts = isEnableTaskRelationshipCounts;
+        return this;
+    }
+
+    public int getTaskQueryLimit() {
+        return taskQueryLimit;
+    }
+
+    public CmmnEngineConfiguration setTaskQueryLimit(int taskQueryLimit) {
+        this.taskQueryLimit = taskQueryLimit;
+        return this;
+    }
+
+    public int getHistoricTaskQueryLimit() {
+        return historicTaskQueryLimit;
+    }
+
+    public CmmnEngineConfiguration setHistoricTaskQueryLimit(int historicTaskQueryLimit) {
+        this.historicTaskQueryLimit = historicTaskQueryLimit;
+        return this;
+    }
+
     public InternalHistoryVariableManager getInternalHistoryVariableManager() {
         return internalHistoryVariableManager;
     }

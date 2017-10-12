@@ -55,5 +55,7 @@ public interface HistoricVariableInstance extends HistoricData {
     
     String getScopeId();
     
+    String getSubScopeId();
+    
     String getScopeType();
 }

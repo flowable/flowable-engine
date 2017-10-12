@@ -1,6 +1,4 @@
 drop index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION;
-drop index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK;
-drop index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK;
 drop index ACT_IDX_VARIABLE_TASK_ID on ACT_RU_VARIABLE;
 drop index ACT_IDX_INFO_PROCDEF on ACT_PROCDEF_INFO;
 
@@ -21,6 +19,9 @@ alter table ACT_RU_EXECUTION
 
 alter table ACT_RU_IDENTITYLINK
     drop FOREIGN KEY ACT_FK_TSKASS_TASK;
+    
+alter table ACT_RU_IDENTITYLINK
+    drop FOREIGN KEY ACT_FK_IDL_PROCINST;    
 
 alter table ACT_RU_IDENTITYLINK
     drop FOREIGN KEY ACT_FK_ATHRZ_PROCEDEF;
@@ -49,9 +50,6 @@ alter table ACT_RU_JOB
 alter table ACT_RU_JOB 
     drop foreign key ACT_FK_JOB_PROC_DEF;
 
-alter table ACT_RU_JOB 
-    drop foreign key ACT_FK_JOB_EXCEPTION;
-    
 alter table ACT_RU_TIMER_JOB 
     drop foreign key ACT_FK_TIMER_JOB_EXECUTION;
     
@@ -60,9 +58,6 @@ alter table ACT_RU_TIMER_JOB
     
 alter table ACT_RU_TIMER_JOB 
     drop foreign key ACT_FK_TIMER_JOB_PROC_DEF;
-    
-alter table ACT_RU_TIMER_JOB 
-    drop foreign key ACT_FK_TIMER_JOB_EXCEPTION;
     
 alter table ACT_RU_SUSPENDED_JOB 
     drop foreign key ACT_FK_SUSPENDED_JOB_EXECUTION;
@@ -73,9 +68,6 @@ alter table ACT_RU_SUSPENDED_JOB
 alter table ACT_RU_SUSPENDED_JOB 
     drop foreign key ACT_FK_SUSPENDED_JOB_PROC_DEF;
     
-alter table ACT_RU_SUSPENDED_JOB 
-    drop foreign key ACT_FK_SUSPENDED_JOB_EXCEPTION;
-    
 alter table ACT_RU_DEADLETTER_JOB 
     drop foreign key ACT_FK_DEADLETTER_JOB_EXECUTION;
     
@@ -84,9 +76,6 @@ alter table ACT_RU_DEADLETTER_JOB
     
 alter table ACT_RU_DEADLETTER_JOB 
     drop foreign key ACT_FK_DEADLETTER_JOB_PROC_DEF;
-    
-alter table ACT_RU_DEADLETTER_JOB 
-    drop foreign key ACT_FK_DEADLETTER_JOB_EXCEPTION;
     
 alter table ACT_RU_EVENT_SUBSCR
     drop FOREIGN KEY ACT_FK_EVENT_EXEC;
@@ -111,14 +100,8 @@ drop index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR;
     
 drop table if exists ACT_RE_DEPLOYMENT;
 drop table if exists ACT_RE_MODEL;
-drop table if exists ACT_RU_IDENTITYLINK;
 drop table if exists ACT_RE_PROCDEF;
 drop table if exists ACT_RU_EXECUTION;
-drop table if exists ACT_RU_JOB;
-drop table if exists ACT_RU_TIMER_JOB;
-drop table if exists ACT_RU_SUSPENDED_JOB;
-drop table if exists ACT_RU_DEADLETTER_JOB;
-drop table if exists ACT_RU_HISTORY_JOB;
 drop table if exists ACT_RU_EVENT_SUBSCR;
 drop table if exists ACT_EVT_LOG;
 drop table if exists ACT_PROCDEF_INFO;
