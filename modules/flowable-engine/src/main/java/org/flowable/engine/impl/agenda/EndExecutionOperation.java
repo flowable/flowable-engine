@@ -175,10 +175,6 @@ public class EndExecutionOperation extends AbstractOperation {
                         FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, subProcess.getId(), subProcess.getName(),
                                 parentExecution.getId(), parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId(), subProcess));
 
-                CommandContextUtil.getTransactionEventDispatcher(commandContext).dispatchEvent(
-                        FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, subProcess.getId(), subProcess.getName(),
-                                parentExecution.getId(), parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId(), subProcess));
-
                 ExecutionEntity subProcessParentExecution = parentExecution.getParent();
                 if (getNumberOfActiveChildExecutionsForExecution(executionEntityManager, subProcessParentExecution.getId()) == 0) {
                     if (subProcessParentExecution.getCurrentFlowElement() instanceof SubProcess) {
@@ -278,9 +274,6 @@ public class EndExecutionOperation extends AbstractOperation {
         executionEntityManager.deleteExecutionAndRelatedData(parentExecution, null);
 
         CommandContextUtil.getEventDispatcher(commandContext).dispatchEvent(
-                FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, subProcess.getId(), subProcess.getName(),
-                        parentExecution.getId(), parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId(), subProcess));
-        CommandContextUtil.getTransactionEventDispatcher(commandContext).dispatchEvent(
                 FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, subProcess.getId(), subProcess.getName(),
                         parentExecution.getId(), parentExecution.getProcessInstanceId(), parentExecution.getProcessDefinitionId(), subProcess));
         return executionToContinue;

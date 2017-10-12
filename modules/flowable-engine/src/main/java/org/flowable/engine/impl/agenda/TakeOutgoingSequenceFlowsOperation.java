@@ -121,9 +121,6 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
                 CommandContextUtil.getEventDispatcher(commandContext).dispatchEvent(
                         FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, flowNode.getId(), flowNode.getName(),
                                 execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
-                CommandContextUtil.getTransactionEventDispatcher(commandContext).dispatchEvent(
-                        FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, flowNode.getId(), flowNode.getName(),
-                                execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
             }
 
         }
