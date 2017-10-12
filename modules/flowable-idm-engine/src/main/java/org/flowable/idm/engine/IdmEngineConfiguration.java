@@ -438,7 +438,6 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
             this.eventDispatcher = new FlowableEventDispatcherImpl();
         }
 
-        enableTransactionEventDispatcher = false;
         this.eventDispatcher.setEnabled(enableEventDispatcher);
 
         if (eventListeners != null) {

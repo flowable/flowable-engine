@@ -25,7 +25,6 @@ import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 import org.flowable.engine.common.impl.cfg.CommandExecutorImpl;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
@@ -156,8 +155,6 @@ public abstract class AbstractEngineConfiguration {
     protected Map<String, List<FlowableEventListener>> typedEventListeners;
     protected List<EventDispatchAction> additionalEventDispatchActions;
 
-    protected boolean enableTransactionEventDispatcher = true;
-    protected TransactionFlowableEventDispatcher transactionDependentEventDispatcher;
     protected List<TransactionFlowableEventListener> transactionDependentEventListeners;
     protected Map<String, List<TransactionFlowableEventListener>> transactionDependentTypedEventListeners;
     protected TransactionDependentFactory transactionDependentFactory;
@@ -1009,15 +1006,6 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
-    public boolean isEnableTransactionEventDispatcher() {
-        return enableTransactionEventDispatcher;
-    }
-
-    public AbstractEngineConfiguration setEnableTransactionEventDispatcher(boolean enableTransactionEventDispatcher) {
-        this.enableTransactionEventDispatcher = enableTransactionEventDispatcher;
-        return this;
-    }
-
     public FlowableEventDispatcher getEventDispatcher() {
         return eventDispatcher;
     }
@@ -1060,15 +1048,6 @@ public abstract class AbstractEngineConfiguration {
 
     public void setTransactionDependentFactory(TransactionDependentFactory transactionDependentFactory) {
         this.transactionDependentFactory = transactionDependentFactory;
-    }
-
-    public TransactionFlowableEventDispatcher getTransactionDependentEventDispatcher() {
-        return transactionDependentEventDispatcher;
-    }
-
-    public AbstractEngineConfiguration setTransactionDependentEventDispatcher(TransactionFlowableEventDispatcher transactionDependentEventDispatcher) {
-        this.transactionDependentEventDispatcher = transactionDependentEventDispatcher;
-        return this;
     }
 
     public List<TransactionFlowableEventListener> getTransactionDependentEventListeners() {

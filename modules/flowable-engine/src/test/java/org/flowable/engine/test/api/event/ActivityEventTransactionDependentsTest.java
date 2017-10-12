@@ -53,7 +53,6 @@ public class ActivityEventTransactionDependentsTest extends PluggableFlowableTes
         if (listener != null) {
             listener.clearEventsReceived();
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
-            processEngineConfiguration.getTransactionDependentEventDispatcher().removeEventListener(committedTransactionDependentListener);
         }
 
         // Remove entries
@@ -74,7 +73,6 @@ public class ActivityEventTransactionDependentsTest extends PluggableFlowableTes
         listener = new StandardFlowableEventListener();
         committedTransactionDependentListener = new TransactionFlowableEventListener(TransactionState.COMMITTED.name());
         processEngineConfiguration.getEventDispatcher().addEventListener(listener);
-        processEngineConfiguration.getTransactionDependentEventDispatcher().addEventListener(committedTransactionDependentListener);
     }
 
     /**

@@ -28,10 +28,12 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
 
     protected FlowableEventSupport eventSupport;
+    protected TransactionDependentFlowableEventSupport transactionEventSupport;
     protected boolean enabled = true;
 
     public FlowableEventDispatcherImpl() {
         eventSupport = new FlowableEventSupport();
+        transactionEventSupport = new TransactionDependentFlowableEventSupport();
     }
 
     public void setEnabled(boolean enabled) {
@@ -40,14 +42,6 @@ public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
 
     public boolean isEnabled() {
         return enabled;
-    }
-
-    public boolean isTransactionEnabled() {
-        return Context.getCommandContext().getCurrentEngineConfiguration().isEnableTransactionEventDispatcher();
-    }
-
-    public void setTransactionEnabled(boolean transactionEnabled) {
-        Context.getCommandContext().getCurrentEngineConfiguration().setEnableTransactionEventDispatcher(transactionEnabled);
     }
 
     @Override
@@ -69,6 +63,7 @@ public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
     public void dispatchEvent(FlowableEvent event) {
         if (enabled) {
             eventSupport.dispatchEvent(event);
+            transactionEventSupport.dispatchEvent(event);
         }
 
         CommandContext commandContext = Context.getCommandContext();
@@ -79,8 +74,6 @@ public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
                     eventDispatchAction.dispatchEvent(commandContext, eventSupport, event);
                 }
             }
-            if (engineConfiguration.isEnableTransactionEventDispatcher())
-                engineConfiguration.getTransactionDependentEventDispatcher().dispatchEvent(event);
         }
     }
 

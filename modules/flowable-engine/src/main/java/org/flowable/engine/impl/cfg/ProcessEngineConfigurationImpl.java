@@ -47,7 +47,6 @@ import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.common.impl.event.FlowableEventDispatcherImpl;
-import org.flowable.engine.common.impl.event.TransactionFlowableEventDispatcherImpl;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -100,7 +99,6 @@ import org.flowable.engine.impl.bpmn.deployer.EventSubscriptionManager;
 import org.flowable.engine.impl.bpmn.deployer.ParsedDeploymentBuilderFactory;
 import org.flowable.engine.impl.bpmn.deployer.ProcessDefinitionDiagramHelper;
 import org.flowable.engine.impl.bpmn.deployer.TimerManager;
-import org.flowable.engine.impl.bpmn.listener.DefaultTransactionDependentEventListenerFactory;
 import org.flowable.engine.impl.bpmn.listener.ListenerNotificationHelper;
 import org.flowable.engine.impl.bpmn.parser.BpmnParseHandlers;
 import org.flowable.engine.impl.bpmn.parser.BpmnParser;
@@ -910,7 +908,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initDeployers();
         initEventHandlers();
         initFailedJobCommandFactory();
-        initTransactionDependentEventDispatcher();
         initEventDispatcher();
         initProcessValidator();
         initDatabaseEventLogging();
@@ -2096,33 +2093,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
                 for (FlowableEventListener listenerToAdd : listenersToAdd.getValue()) {
                     this.eventDispatcher.addEventListener(listenerToAdd, types);
-                }
-            }
-        }
-
-    }
-
-    public void initTransactionDependentEventDispatcher() {
-        if (this.transactionDependentEventDispatcher == null) {
-            this.transactionDependentEventDispatcher = new TransactionFlowableEventDispatcherImpl();
-            this.transactionDependentFactory = new DefaultTransactionDependentEventListenerFactory();
-        }
-
-        this.transactionDependentEventDispatcher.setEnabled(enableTransactionEventDispatcher);
-
-        if (transactionDependentEventListeners != null) {
-            for (TransactionFlowableEventListener listenerToAdd : transactionDependentEventListeners) {
-                this.transactionDependentEventDispatcher.addEventListener(listenerToAdd);
-            }
-        }
-
-        if (transactionDependentTypedEventListeners != null) {
-            for (Entry<String, List<TransactionFlowableEventListener>> listenersToAdd : transactionDependentTypedEventListeners.entrySet()) {
-                // Extract types from the given string
-                FlowableEngineEventType[] types = FlowableEngineEventType.getTypesFromString(listenersToAdd.getKey());
-
-                for (TransactionFlowableEventListener listenerToAdd : listenersToAdd.getValue()) {
-                    this.transactionDependentEventDispatcher.addEventListener(listenerToAdd, types);
                 }
             }
         }
