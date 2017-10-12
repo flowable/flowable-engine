@@ -34,6 +34,10 @@ FLOWABLE.PROPERTY_CONFIG =
         "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/ordering-property-write-template.html"
     },
+    "oryx-dataproperties-complex": {
+        "readModeTemplateUrl": "editor-app/configuration/properties/data-properties-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/data-properties-write-template.html"
+    },
     "oryx-formproperties-complex": {
         "readModeTemplateUrl": "editor-app/configuration/properties/form-properties-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/form-properties-write-template.html"

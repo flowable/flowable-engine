@@ -787,6 +787,16 @@
     "PROPERTY.FIELDS.STRING.PLACEHOLDER" : "Enter a string",
     "PROPERTY.FIELDS.IMPLEMENTATION" : "Implementation",
 
+    "PROPERTY.DATAPROPERTIES.VALUES" : "{{length}} data objects",
+    "PROPERTY.DATAPROPERTIES.EMPTY" : "No data objects configured",
+    "PROPERTY.DATAPROPERTIES.ID" : "Id",
+    "PROPERTY.DATAPROPERTIES.ID.PLACEHOLDER" : "Enter an id",
+    "PROPERTY.DATAPROPERTIES.NAME" : "Name",
+    "PROPERTY.DATAPROPERTIES.NAME.PLACEHOLDER" : "Enter a name",
+    "PROPERTY.DATAPROPERTIES.TYPE" : "Type",
+    "PROPERTY.DATAPROPERTIES.VALUE.PLACEHOLDER" : "Enter a value (optional)",
+    "PROPERTY.DATAPROPERTIES.VALUE" : "Default Value",
+
     "PROPERTY.FORMPROPERTIES.VALUE" : "{{length}} form properties",
     "PROPERTY.FORMPROPERTIES.EMPTY" : "No form properties selected",
     "PROPERTY.FORMPROPERTIES.ID" : "Id",

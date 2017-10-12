@@ -515,7 +515,7 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
                 }
             }
 
-            JsonNode itemsArrayNode = objectNode.get(EDITOR_PROPERTIES_GENERAL_ITEMS);
+            JsonNode itemsArrayNode = objectNode.get(PROPERTY_DATA_PROPERTIES_NODE);
             if (itemsArrayNode != null) {
                 for (JsonNode dataNode : itemsArrayNode) {
 
@@ -542,21 +542,27 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
                         }
 
                         if (null != dataObject) {
-                            dataObject.setId(dataIdNode.asText());
-                            dataObject.setName(dataNode.get(PROPERTY_DATA_NAME).asText());
+                        	dataObject.setId(dataIdNode.asText());
+                        	dataObject.setName(dataNode.get(PROPERTY_DATA_NAME).asText());
 
-                            itemSubjectRef.setStructureRef("xsd:" + dataType);
-                            dataObject.setItemSubjectRef(itemSubjectRef);
+                        	itemSubjectRef.setStructureRef("xsd:" + dataType);
+                        	dataObject.setItemSubjectRef(itemSubjectRef);
 
-                            if (dataObject instanceof DateDataObject) {
-                                try {
-                                    dataObject.setValue(dateTimeFormatter.parseDateTime(dataNode.get(PROPERTY_DATA_VALUE).asText()).toDate());
-                                } catch (Exception e) {
-                                    LOGGER.error("Error converting {}", dataObject.getName(), e);
-                                }
-                            } else {
-                                dataObject.setValue(dataNode.get(PROPERTY_DATA_VALUE).asText());
-                            }
+                        	JsonNode valueNode = dataNode.get(PROPERTY_DATA_VALUE);
+                        	if (valueNode != null) {
+                				String dateValue = valueNode.asText();
+                        		if (dataObject instanceof DateDataObject) {
+                        			try {
+                        				if (!StringUtils.isEmpty(dateValue.trim())) {
+                        					dataObject.setValue(dateTimeFormatter.parseDateTime(dateValue).toDate());
+                        				}
+                        			} catch (Exception e) {
+                        				LOGGER.error("Error converting {}", dataObject.getName(), e);
+                        			}
+                        		} else {
+                        			dataObject.setValue(dateValue);
+                        		}
+                        	}
 
                             dataObjects.add(dataObject);
                         }
@@ -597,8 +603,8 @@ public class BpmnJsonConverterUtil implements EditorJsonConstants, StencilConsta
             itemsNode.add(propertyItemNode);
         }
 
-        dataPropertiesNode.set(EDITOR_PROPERTIES_GENERAL_ITEMS, itemsNode);
-        propertiesNode.set("dataproperties", dataPropertiesNode);
+        dataPropertiesNode.set(PROPERTY_DATA_PROPERTIES_NODE, itemsNode);
+        propertiesNode.set(PROPERTY_DATA_PROPERTIES, dataPropertiesNode);
     }
 
     public static JsonNode validateIfNodeIsTextual(JsonNode node) {

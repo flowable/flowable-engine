@@ -12,6 +12,8 @@
  */
 package org.flowable.bpmn.model;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * @author Lori Small
  */
@@ -19,7 +21,11 @@ public class IntegerDataObject extends ValuedDataObject {
 
     @Override
     public void setValue(Object value) {
-        this.value = Integer.valueOf(value.toString());
+    	if (value instanceof String && !StringUtils.isEmpty(((String) value).trim())) {
+    		this.value = Integer.valueOf(value.toString());
+    	} else if (value instanceof Number) {
+    		this.value = (Integer) value;
+    	}
     }
 
     @Override
