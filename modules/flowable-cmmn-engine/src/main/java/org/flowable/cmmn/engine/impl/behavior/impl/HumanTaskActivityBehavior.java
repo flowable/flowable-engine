@@ -18,10 +18,13 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.HumanTask;
+import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.Expression;
@@ -38,7 +41,7 @@ import org.joda.time.Period;
 /**
  * @author Joram Barrez
  */
-public class HumanTaskActivityBehavior extends TaskActivityBehavior {
+public class HumanTaskActivityBehavior extends TaskActivityBehavior implements PlanItemActivityBehavior {
     
     protected HumanTask humanTask;
     
@@ -288,6 +291,17 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior {
         }
         
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance((PlanItemInstanceEntity) planItemInstance);
+    }
+    
+    @Override
+    public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
+        if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
+            TaskService taskService = CommandContextUtil.getTaskService(commandContext);
+            List<TaskEntity> taskEntities = taskService.findTasksBySubScopeIdScopeType(planItemInstance.getId(), VariableScopeType.CMMN);
+            for (TaskEntity taskEntity : taskEntities) {
+                taskService.deleteTask(taskEntity, true);
+            }
+        }
     }
 
 }

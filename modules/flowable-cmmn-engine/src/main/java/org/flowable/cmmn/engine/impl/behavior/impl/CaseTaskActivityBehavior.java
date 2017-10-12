@@ -79,10 +79,10 @@ public class CaseTaskActivityBehavior extends TaskActivityBehavior implements Pl
     }
 
     @Override
-    public void onStateTransition(DelegatePlanItemInstance planItemInstance, String transition) {
+    public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
         if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
             // The plan item will be deleted by the regular TerminatePlanItemOperation
-            CommandContextUtil.getAgenda().planTerminateCaseInstance(planItemInstance.getReferenceId(), true);
+            CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstance(planItemInstance.getReferenceId(), true);
         }
     }
     
