@@ -117,5 +117,9 @@ FLOWABLE.PROPERTY_CONFIG =
     "oryx-processtaskprocessreference-complex": {
         "readModeTemplateUrl": "editor-app/configuration/properties/process-reference-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/process-reference-write-template.html"
+    },
+    "flowable-transitionevent" : {
+        "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/transition-event-write-template.html"
     }
 };

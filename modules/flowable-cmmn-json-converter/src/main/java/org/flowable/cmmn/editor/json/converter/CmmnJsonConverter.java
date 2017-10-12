@@ -290,7 +290,6 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
                     CriterionJsonConverter criterionJsonConverter = new CriterionJsonConverter();
                     criterionJsonConverter.convertJsonToElement(shapeNode, modelNode, this, planModelStage, shapeMap, cmmnModel, cmmnModelIdHelper);
                 }
-                
             }
         }
         
@@ -451,7 +450,12 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
                     sentryOnPart.setId("sentryOnPart" + cmmnModelIdHelper.nextSentryOnPartId());
                     sentryOnPart.setSourceRef(criterionPlanItem.getId());
                     sentryOnPart.setSource(criterionPlanItem);
-                    sentryOnPart.setStandardEvent("complete"); // todo: needs to come from model
+                    
+                    if (StringUtils.isNotEmpty(association.getTransitionEvent())) {
+                        sentryOnPart.setStandardEvent(association.getTransitionEvent());
+                    } else {
+                        sentryOnPart.setStandardEvent("complete");
+                    }
                     criterion.getSentry().addSentryOnPart(sentryOnPart);
                 }
             }

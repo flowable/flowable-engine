@@ -337,6 +337,28 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             association.setId(diEdge.getId());
             association.setSourceRef(diEdge.getCmmnElementRef());
             association.setTargetRef(diEdge.getTargetCmmnElementRef());
+            
+            String planItemSourceRef = null;
+            PlanItem planItem = cmmnModel.findPlanItem(association.getSourceRef());
+            if (planItem == null) {
+                planItem = cmmnModel.findPlanItem(association.getTargetRef());
+                planItemSourceRef = association.getTargetRef();
+            } else {
+                planItemSourceRef = association.getSourceRef();
+            }
+            
+            if (planItem != null) {
+                for (Criterion criterion : planItem.getEntryCriteria()) {
+                    Sentry sentry = criterion.getSentry();
+                    if (sentry.getOnParts().size() > 0) {
+                        SentryOnPart sentryOnPart = sentry.getOnParts().get(0);
+                        if (planItemSourceRef.equals(sentryOnPart.getSourceRef())) {
+                            association.setTransitionEvent(sentryOnPart.getStandardEvent());
+                        }
+                    }
+                }
+            }
+            
             cmmnModel.addAssociation(association);
 
             cmmnModel.addFlowGraphicInfoList(association.getId(), diEdge.getWaypoints());
