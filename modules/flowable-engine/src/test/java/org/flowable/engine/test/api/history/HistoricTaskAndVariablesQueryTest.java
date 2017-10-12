@@ -430,6 +430,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
                     .get(0)
                     .getId();
             taskService.setAssignee(taskId, "kermit");
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             List<HistoricTaskInstance> tasks = historyService
                     .createHistoricTaskInstanceQuery()
@@ -443,7 +444,6 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
                     .ignoreAssigneeValue()
                     .list();
             assertEquals(3, tasks.size());
-
 
             tasks = historyService
                     .createHistoricTaskInstanceQuery()
@@ -473,7 +473,7 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
                     .get(0)
                     .getId();
             taskService.setAssignee(taskId, "kermit");
-
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
 
             List<HistoricTaskInstance>  tasks = historyService.createHistoricTaskInstanceQuery()
                     .or()
@@ -482,7 +482,6 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
                     .ignoreAssigneeValue()
                     .endOr()
                     .list();
-
 
             assertEquals(4, tasks.size());
 
