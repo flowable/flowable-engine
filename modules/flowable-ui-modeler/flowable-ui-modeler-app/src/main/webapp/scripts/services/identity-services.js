@@ -41,7 +41,7 @@ angular.module('flowableModeler').service('UserService', ['$http', '$q',
 
             return httpAsPromise({
                 method: 'GET',
-                url: FLOWABLE.CONFIG.contextRoot + '/app/rest/editor-users',
+                url: FLOWABLE.APP_URL.getEditorUsersUrl(),
                 params: params
             });
         };
@@ -74,7 +74,7 @@ angular.module('flowableModeler').service('GroupService', ['$http', '$q',
 
             return httpAsPromise({
                 method: 'GET',
-                url: FLOWABLE.CONFIG.contextRoot + '/app/rest/editor-groups',
+                url: FLOWABLE.APP_URL.getEditorGroupsUrl(),
                 params: params
             });
         };
