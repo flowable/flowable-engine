@@ -367,6 +367,11 @@
 		<copy todir="${target.distro.root}/docs/userguide">
 			<fileset dir="../userguide/target/html/en" />
 		</copy>
+		<ant antfile="../userguide-cmmn/build.xml" inheritall="false" />
+        <mkdir dir="${target.distro.root}/docs/userguide-cmmn" />
+        <copy todir="${target.distro.root}/docs/userguide-cmmn">
+            <fileset dir="../userguide-cmmn/target/html/en" />
+        </copy>
 		<ant antfile="../userguide-dmn/build.xml" inheritall="false" />
 		<mkdir dir="${target.distro.root}/docs/userguide-dmn" />
 		<copy todir="${target.distro.root}/docs/userguide-dmn">
@@ -397,6 +402,10 @@
 		<copy todir="${flowable.website}/userguide" overwrite="true">
 			<fileset dir="../userguide/target/html/en" />
 		</copy>
+		<mkdir dir="${flowable.website}/userguide-cmmn" />
+        <copy todir="${flowable.website}/userguide-cmmn" overwrite="true">
+            <fileset dir="../userguide-cmmn/target/html/en" />
+        </copy>
 		<mkdir dir="${flowable.website}/userguide-dmn" />
 		<copy todir="${flowable.website}/userguide-dmn" overwrite="true">
 			<fileset dir="../userguide-dmn/target/html/en" />
