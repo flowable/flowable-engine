@@ -1,1 +1,3 @@
 include::ch01-Introduction.adoc[]
+
+include::ch06-cmmn.adoc[]

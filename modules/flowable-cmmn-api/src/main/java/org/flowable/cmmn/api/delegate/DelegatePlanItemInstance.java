@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.delegate;
+package org.flowable.cmmn.api.delegate;
 
 import java.util.Date;
 
