@@ -13,6 +13,10 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
@@ -21,10 +25,6 @@ import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.CountingTaskEntity;
 import org.flowable.engine.impl.persistence.entity.data.IdentityLinkDataManager;
 import org.flowable.engine.task.IdentityLinkType;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * @author Tom Baeyens

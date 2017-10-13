@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.cmd;
 
+import java.io.Serializable;
+
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.interceptor.Command;
@@ -23,8 +25,6 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.Serializable;
 
 /**
  * @author Tijs Rademakers

@@ -13,6 +13,10 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.delegate.VariableScope;
@@ -29,10 +33,6 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 /**
  * @author Tijs Rademakers

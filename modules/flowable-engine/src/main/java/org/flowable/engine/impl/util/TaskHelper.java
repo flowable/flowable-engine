@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.util;
 
+import java.util.Map;
+
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -24,8 +26,6 @@ import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.task.DelegationState;
 import org.flowable.engine.task.IdentityLinkType;
 
-import java.util.Map;
-
 /**
  * @author Joram Barrez
  * @author Marcus Klimstra
@@ -33,7 +33,7 @@ import java.util.Map;
 public class TaskHelper {
 
     public static void completeTask(TaskEntity taskEntity, Map<String, Object> variables,
-                                    Map<String, Object> transientVariables, boolean localScope, CommandContext commandContext) {
+            Map<String, Object> transientVariables, boolean localScope, CommandContext commandContext) {
         // Task complete logic
 
         if (taskEntity.getDelegationState() != null && taskEntity.getDelegationState() == DelegationState.PENDING) {

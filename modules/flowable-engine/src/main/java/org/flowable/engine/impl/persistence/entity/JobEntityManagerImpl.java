@@ -13,6 +13,8 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
+import java.util.List;
+
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
@@ -21,8 +23,6 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.data.JobDataManager;
 import org.flowable.engine.runtime.Job;
-
-import java.util.List;
 
 /**
  * @author Tom Baeyens

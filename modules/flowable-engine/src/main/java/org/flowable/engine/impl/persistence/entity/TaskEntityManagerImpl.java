@@ -13,6 +13,9 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
+import java.util.List;
+import java.util.Map;
+
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
@@ -27,9 +30,6 @@ import org.flowable.engine.impl.persistence.entity.data.TaskDataManager;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.task.IdentityLinkType;
 import org.flowable.engine.task.Task;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Tom Baeyens

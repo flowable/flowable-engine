@@ -13,6 +13,11 @@
 
 package org.flowable.engine.impl.history;
 
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
@@ -31,11 +36,6 @@ import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.engine.task.IdentityLinkType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
 
 /**
  * Manager class that centralises recording of all history-related operations that are originated from inside the engine.
@@ -114,7 +114,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
             FlowableEventDispatcher eventDispatcher = getEventDispatcher();
             if (eventDispatcher != null && eventDispatcher.isEnabled()) {
                 eventDispatcher.dispatchEvent(
-                        FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
+                                FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
             }
 
             HistoricActivityInstanceEntity activityInstance = findActivityInstance(parentExecution, false, true);
@@ -182,7 +182,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
                 FlowableEventDispatcher eventDispatcher = getEventDispatcher();
                 if (eventDispatcher != null && eventDispatcher.isEnabled()) {
                     eventDispatcher.dispatchEvent(
-                            FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstanceEntity));
+                                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_CREATED, historicActivityInstanceEntity));
                 }
 
             }
@@ -200,7 +200,7 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
                 FlowableEventDispatcher eventDispatcher = getEventDispatcher();
                 if (eventDispatcher != null && eventDispatcher.isEnabled()) {
                     eventDispatcher.dispatchEvent(
-                            FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
+                                    FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_ACTIVITY_INSTANCE_ENDED, historicActivityInstance));
                 }
             }
         }

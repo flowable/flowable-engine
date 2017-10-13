@@ -12,6 +12,17 @@
  */
 package org.flowable.engine.impl.persistence.entity;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
@@ -24,17 +35,6 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.DelegationState;
 import org.flowable.engine.task.IdentityLink;
 import org.flowable.engine.task.IdentityLinkType;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Tom Baeyens
