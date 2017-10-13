@@ -22,11 +22,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
+import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.delegate.PlanItemJavaDelegate;
-import org.flowable.cmmn.engine.history.HistoricMilestoneInstance;
-import org.flowable.cmmn.engine.runtime.CaseInstance;
-import org.flowable.cmmn.engine.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.variable.api.history.HistoricVariableInstance;

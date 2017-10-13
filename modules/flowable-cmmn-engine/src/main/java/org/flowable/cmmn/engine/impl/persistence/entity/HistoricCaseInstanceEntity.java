@@ -14,7 +14,7 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.Date;
 
-import org.flowable.cmmn.engine.history.HistoricCaseInstance;
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 
 /**

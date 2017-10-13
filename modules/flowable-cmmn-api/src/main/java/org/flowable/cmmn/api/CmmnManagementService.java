@@ -10,28 +10,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.repository;
+package org.flowable.cmmn.api;
 
-public interface CaseDefinition {
+import java.util.Collection;
+import java.util.Map;
 
-    String getId();
+/**
+ * @author Joram Barrez
+ */
+public interface CmmnManagementService {
 
-    String getCategory();
-
-    String getName();
-
-    String getKey();
-
-    String getDescription();
-
-    int getVersion();
-
-    String getResourceName();
-
-    String getDeploymentId();
-
-    boolean hasGraphicalNotation();
-
-    String getTenantId();
-
+    Map<String, Long> getTableCounts();
+    
+    Collection<String> getTableNames();
+    
 }

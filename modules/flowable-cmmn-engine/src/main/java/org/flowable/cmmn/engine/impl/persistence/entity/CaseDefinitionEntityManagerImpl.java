@@ -15,12 +15,12 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseDefinitionDataManager;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryImpl;
-import org.flowable.cmmn.engine.repository.CaseDefinition;
-import org.flowable.cmmn.engine.repository.CaseDefinitionQuery;
-import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;

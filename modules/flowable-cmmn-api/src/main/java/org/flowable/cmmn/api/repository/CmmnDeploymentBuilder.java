@@ -10,11 +10,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.repository;
+package org.flowable.cmmn.api.repository;
 
 import java.io.InputStream;
 
-import org.flowable.cmmn.engine.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnRepositoryService;
 
 /**
  * Builder for creating new deployments, similar to the bpmn deployment builder.

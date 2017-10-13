@@ -12,9 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.runtime.CaseInstanceState;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**

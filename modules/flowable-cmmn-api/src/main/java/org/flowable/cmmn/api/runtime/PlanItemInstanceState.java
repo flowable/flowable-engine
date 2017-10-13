@@ -10,20 +10,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.history;
+package org.flowable.cmmn.api.runtime;
 
-import java.util.Date;
+public interface PlanItemInstanceState {
 
-/**
- * @author Joram Barrez
- */
-public interface HistoricMilestoneInstance {
+    /*
+     * The case states according to the CMMN spec
+     */
     
-    String getId();
-    String getName();
-    Date getTimeStamp();
-    String getCaseInstanceId();
-    String getCaseDefinitionId();
-    String getElementId();
+    String ACTIVE = "active";
+    String AVAILABLE = "available";
+    String ENABLED = "enabled";
+    String DISABLED = "disabled";
+    String COMPLETED = "completed";
+    String FAILED = "failed";
+    String SUSPENDED = "suspended";
+    String CLOSED = "closed";
+    String TERMINATED = "terminated";
+    
     
 }

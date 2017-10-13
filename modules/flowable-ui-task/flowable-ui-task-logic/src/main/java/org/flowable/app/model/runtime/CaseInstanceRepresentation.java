@@ -18,9 +18,9 @@ import java.util.List;
 
 import org.flowable.app.model.common.AbstractRepresentation;
 import org.flowable.app.model.common.UserRepresentation;
-import org.flowable.cmmn.engine.history.HistoricCaseInstance;
-import org.flowable.cmmn.engine.repository.CaseDefinition;
-import org.flowable.cmmn.engine.runtime.CaseInstance;
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
+import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.idm.api.User;
 
 /**

@@ -13,7 +13,7 @@
 
 package org.flowable.cmmn.spring.autodeployment;
 
-import org.flowable.cmmn.engine.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.springframework.core.io.Resource;
 
 /**

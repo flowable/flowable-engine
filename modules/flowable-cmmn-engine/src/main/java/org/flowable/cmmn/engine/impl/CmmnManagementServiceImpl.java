@@ -15,7 +15,7 @@ package org.flowable.cmmn.engine.impl;
 import java.util.Collection;
 import java.util.Map;
 
-import org.flowable.cmmn.engine.CmmnManagementService;
+import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.engine.impl.cmd.GetTableCountsCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetTableNamesCmd;
 

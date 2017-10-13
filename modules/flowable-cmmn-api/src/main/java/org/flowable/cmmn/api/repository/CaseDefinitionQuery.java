@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.cmmn.engine.repository;
+package org.flowable.cmmn.api.repository;
 
 import java.util.Set;
 

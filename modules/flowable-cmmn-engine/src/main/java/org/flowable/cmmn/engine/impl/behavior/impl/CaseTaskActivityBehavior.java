@@ -12,7 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
-import org.flowable.cmmn.engine.PlanItemInstanceCallbackType;
+import org.flowable.cmmn.api.PlanItemInstanceCallbackType;
+import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
@@ -20,8 +22,6 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceBuilderImpl;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.runtime.CaseInstanceBuilder;
-import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.engine.common.api.FlowableException;

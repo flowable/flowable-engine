@@ -10,20 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.runtime;
+package org.flowable.cmmn.api;
 
-import java.util.Date;
+public interface CmmnEngineConfigurationApi {
 
-/**
- * @author Joram Barrez
- */
-public interface MilestoneInstance {
-    
-    String getId();
-    String getName();
-    Date getTimeStamp();
-    String getCaseInstanceId();
-    String getCaseDefinitionId();
-    String getElementId();
-
+    public CmmnManagementService getCmmnManagementService();
+    public CmmnRepositoryService getCmmnRepositoryService();
+    public CmmnRuntimeService getCmmnRuntimeService();
+    public CmmnTaskService getCmmnTaskService();
+    public CmmnHistoryService getCmmnHistoryService();
 }

@@ -10,11 +10,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine;
+package org.flowable.cmmn.api;
 
-import org.flowable.cmmn.engine.history.HistoricCaseInstanceQuery;
-import org.flowable.cmmn.engine.history.HistoricMilestoneInstanceQuery;
-import org.flowable.cmmn.engine.history.HistoricVariableInstanceQuery;
+import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
+import org.flowable.cmmn.api.history.HistoricMilestoneInstanceQuery;
+import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
 import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 
 /**

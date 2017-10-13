@@ -16,9 +16,9 @@ package org.flowable.cmmn.engine.impl.repository;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.repository.CaseDefinition;
-import org.flowable.cmmn.engine.repository.CaseDefinitionQuery;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.AbstractQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;

@@ -15,14 +15,14 @@ package org.flowable.cmmn.engine.impl.repository;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
+import org.flowable.cmmn.api.repository.CmmnDeployment;
+import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.CmmnRepositoryServiceImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.repository.CmmnDeployment;
-import org.flowable.cmmn.engine.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.util.IoUtil;

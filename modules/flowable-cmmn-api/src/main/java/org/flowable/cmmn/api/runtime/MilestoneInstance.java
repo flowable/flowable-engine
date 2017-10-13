@@ -10,26 +10,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.history;
+package org.flowable.cmmn.api.runtime;
 
 import java.util.Date;
 
 /**
  * @author Joram Barrez
  */
-public interface HistoricCaseInstance {
+public interface MilestoneInstance {
     
     String getId();
     String getName();
-    String getParentId();
-    String getBusinessKey();
+    Date getTimeStamp();
+    String getCaseInstanceId();
     String getCaseDefinitionId();
-    String getState();
-    Date getStartTime();
-    Date getEndTime();
-    String getStartUserId();
-    String getCallbackId();
-    String getCallbackType();
-    String getTenantId();
-    
+    String getElementId();
+
 }

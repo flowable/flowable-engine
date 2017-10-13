@@ -10,25 +10,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.runtime;
+package org.flowable.cmmn.api.repository;
 
-import java.util.Date;
+public interface CaseDefinition {
 
-/**
- * @author Joram Barrez
- */
-public interface CaseInstance {
-    
     String getId();
-    String getParentId();
-    String getBusinessKey();
+
+    String getCategory();
+
     String getName();
-    String getCaseDefinitionId();
-    String getState();
-    Date getStartTime();
-    String getStartUserId();
-    String getCallbackId();
-    String getCallbackType();
+
+    String getKey();
+
+    String getDescription();
+
+    int getVersion();
+
+    String getResourceName();
+
+    String getDeploymentId();
+
+    boolean hasGraphicalNotation();
+
     String getTenantId();
-    
+
 }

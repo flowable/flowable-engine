@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.flowable.app.model.common.AbstractRepresentation;
 import org.flowable.app.model.common.UserRepresentation;
-import org.flowable.cmmn.engine.repository.CaseDefinition;
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskInfo;

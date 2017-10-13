@@ -20,11 +20,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.cmmn.engine.CmmnRepositoryService;
-import org.flowable.cmmn.engine.repository.CaseDefinition;
-import org.flowable.cmmn.engine.repository.CaseDefinitionQuery;
-import org.flowable.cmmn.engine.repository.CmmnDeployment;
-import org.flowable.cmmn.engine.repository.CmmnDeploymentQuery;
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
+import org.flowable.cmmn.api.repository.CmmnDeploymentQuery;
 import org.flowable.engine.common.impl.util.IoUtil;
 import org.junit.After;
 import org.junit.Test;

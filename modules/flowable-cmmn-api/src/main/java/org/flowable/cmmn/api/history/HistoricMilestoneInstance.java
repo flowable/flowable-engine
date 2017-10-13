@@ -10,18 +10,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine;
+package org.flowable.cmmn.api.history;
 
-import java.util.Collection;
-import java.util.Map;
+import java.util.Date;
 
 /**
  * @author Joram Barrez
  */
-public interface CmmnManagementService {
-
-    Map<String, Long> getTableCounts();
+public interface HistoricMilestoneInstance {
     
-    Collection<String> getTableNames();
+    String getId();
+    String getName();
+    Date getTimeStamp();
+    String getCaseInstanceId();
+    String getCaseDefinitionId();
+    String getElementId();
     
 }

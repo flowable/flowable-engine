@@ -15,13 +15,13 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.runtime.CaseInstance;
-import org.flowable.cmmn.engine.runtime.CaseInstanceQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;

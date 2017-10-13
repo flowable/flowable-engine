@@ -17,7 +17,7 @@ import org.flowable.app.model.runtime.SaveFormRepresentation;
 import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.exception.NotFoundException;
 import org.flowable.app.service.exception.NotPermittedException;
-import org.flowable.cmmn.engine.CmmnTaskService;
+import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.TaskService;

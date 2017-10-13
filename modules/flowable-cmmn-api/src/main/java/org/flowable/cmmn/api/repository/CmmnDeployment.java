@@ -10,23 +10,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.runtime;
+package org.flowable.cmmn.api.repository;
 
-public interface PlanItemInstanceState {
+import java.util.Date;
 
-    /*
-     * The case states according to the CMMN spec
-     */
+public interface CmmnDeployment {
+
+    String getId();
+
+    String getName();
+
+    Date getDeploymentTime();
+
+    String getCategory();
     
-    String ACTIVE = "active";
-    String AVAILABLE = "available";
-    String ENABLED = "enabled";
-    String DISABLED = "disabled";
-    String COMPLETED = "completed";
-    String FAILED = "failed";
-    String SUSPENDED = "suspended";
-    String CLOSED = "closed";
-    String TERMINATED = "terminated";
-    
+    String getKey();
+
+    String getTenantId();
+
+    String getParentDeploymentId();
     
 }

@@ -11,11 +11,11 @@
  * limitations under the License.
  */
 
-package org.flowable.cmmn.engine.repository;
+package org.flowable.cmmn.api.repository;
 
 import java.util.List;
 
-import org.flowable.cmmn.engine.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.engine.common.api.query.Query;
 
 /**

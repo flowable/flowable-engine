@@ -18,7 +18,7 @@ import static org.junit.Assert.assertNull;
 
 import java.util.List;
 
-import org.flowable.cmmn.engine.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.engine.common.impl.identity.Authentication;

@@ -10,14 +10,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine;
+package org.flowable.cmmn.api;
 
 import java.util.Map;
 
-import org.flowable.cmmn.engine.runtime.CaseInstanceBuilder;
-import org.flowable.cmmn.engine.runtime.CaseInstanceQuery;
-import org.flowable.cmmn.engine.runtime.MilestoneInstanceQuery;
-import org.flowable.cmmn.engine.runtime.PlanItemInstanceQuery;
+import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
+import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
+import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 
 /**
  * @author Joram Barrez

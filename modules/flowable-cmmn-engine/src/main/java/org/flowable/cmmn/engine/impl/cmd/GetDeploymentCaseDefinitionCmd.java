@@ -15,8 +15,8 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.repository.CaseDefinition;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 

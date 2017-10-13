@@ -16,9 +16,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.runtime.CaseInstance;
-import org.flowable.cmmn.engine.runtime.CaseInstanceQuery;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.AbstractQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;

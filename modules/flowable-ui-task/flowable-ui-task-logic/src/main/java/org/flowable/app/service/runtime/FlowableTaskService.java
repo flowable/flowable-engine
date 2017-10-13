@@ -24,7 +24,7 @@ import org.flowable.app.model.runtime.TaskUpdateRepresentation;
 import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.api.UserCache.CachedUser;
 import org.flowable.app.service.exception.NotFoundException;
-import org.flowable.cmmn.engine.repository.CaseDefinition;
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.identitylink.api.history.HistoricIdentityLink;

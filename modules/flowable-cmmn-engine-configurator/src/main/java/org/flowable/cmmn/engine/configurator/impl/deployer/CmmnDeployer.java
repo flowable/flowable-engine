@@ -14,9 +14,9 @@ package org.flowable.cmmn.engine.configurator.impl.deployer;
 
 import java.util.Map;
 
-import org.flowable.cmmn.engine.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.repository.CmmnDeploymentBuilder;
 import org.flowable.engine.impl.persistence.deploy.Deployer;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ResourceEntity;

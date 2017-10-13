@@ -14,7 +14,7 @@ package org.flowable.cmmn.engine.impl;
 
 import java.util.Map;
 
-import org.flowable.cmmn.engine.CmmnTaskService;
+import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.engine.impl.cmd.CompleteTaskCmd;
 import org.flowable.cmmn.engine.impl.cmd.CompleteTaskWithFormCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetTaskFormModelCmd;

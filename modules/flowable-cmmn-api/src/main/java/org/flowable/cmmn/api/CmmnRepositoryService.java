@@ -10,15 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine;
+package org.flowable.cmmn.api;
 
 import java.io.InputStream;
 import java.util.List;
 
-import org.flowable.cmmn.engine.repository.CaseDefinition;
-import org.flowable.cmmn.engine.repository.CaseDefinitionQuery;
-import org.flowable.cmmn.engine.repository.CmmnDeploymentBuilder;
-import org.flowable.cmmn.engine.repository.CmmnDeploymentQuery;
+import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
+import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
+import org.flowable.cmmn.api.repository.CmmnDeploymentQuery;
 import org.flowable.cmmn.model.CmmnModel;
 
 public interface CmmnRepositoryService {
