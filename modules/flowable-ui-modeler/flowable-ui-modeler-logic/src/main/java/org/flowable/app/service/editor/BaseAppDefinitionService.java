@@ -135,7 +135,7 @@ public class BaseAppDefinitionService {
         byte[] deployZipArtifact = null;
         Map<String, byte[]> deployableAssets = new HashMap<>();
 
-        if (CollectionUtils.isNotEmpty(appDefinition.getModels())) {
+        if (CollectionUtils.isNotEmpty(appDefinition.getModels()) || CollectionUtils.isNotEmpty(appDefinition.getCmmnModels())) {
             String appDefinitionJson = getAppDefinitionJson(appDefinitionModel, appDefinition);
             byte[] appDefinitionJsonBytes = appDefinitionJson.getBytes(StandardCharsets.UTF_8);
 
@@ -181,8 +181,14 @@ public class BaseAppDefinitionService {
     protected void createDeployableAppModels(Model appDefinitionModel, AppDefinition appDefinition, Map<String, byte[]> deployableAssets, 
                     Map<String, Model> formMap, Map<String, Model> decisionTableMap, Map<String, Model> caseModelMap, Map<String, Model> processModelMap) {
         
-        List<AppModelDefinition> appModels = new ArrayList<>(appDefinition.getModels());
-        appModels.addAll(appDefinition.getCmmnModels());
+        List<AppModelDefinition> appModels = new ArrayList<>();
+        if (appDefinition.getModels() != null) {
+            appModels.addAll(appDefinition.getModels());
+        }
+        
+        if (appDefinition.getCmmnModels() != null) {
+            appModels.addAll(appDefinition.getCmmnModels());
+        }
         
         for (AppModelDefinition appModelDef : appModels) {
             
