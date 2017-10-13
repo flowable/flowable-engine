@@ -28,12 +28,13 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
 
     protected FlowableEventSupport eventSupport;
-    protected TransactionDependentFlowableEventSupport transactionEventSupport;
+    //    protected TransactionDependentFlowableEventSupport transactionEventSupport;
     protected boolean enabled = true;
+    protected boolean enableTransactionEvent = true;
 
     public FlowableEventDispatcherImpl() {
         eventSupport = new FlowableEventSupport();
-        transactionEventSupport = new TransactionDependentFlowableEventSupport();
+//        transactionEventSupport = new TransactionDependentFlowableEventSupport();
     }
 
     public void setEnabled(boolean enabled) {
@@ -42,6 +43,14 @@ public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
 
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public boolean isTransactionEnabled() {
+        return enableTransactionEvent;
+    }
+
+    public void setTransactionEnabled(boolean enabled) {
+        this.enableTransactionEvent = enabled;
     }
 
     @Override
@@ -59,11 +68,26 @@ public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
         eventSupport.removeEventListener(listenerToRemove);
     }
 
+//    @Override
+//    public void addEventListener(TransactionFlowableEventListener listenerToAdd) {
+//        transactionEventSupport.addEventListener(listenerToAdd);
+//    }
+
+//    @Override
+//    public void addEventListener(TransactionFlowableEventListener listenerToAdd, FlowableEventType... types) {
+//        transactionEventSupport.addEventListener(listenerToAdd, types);
+//    }
+
+//    @Override
+//    public void removeEventListener(TransactionFlowableEventListener listenerToRemove) {
+//        transactionEventSupport.removeEventListener(listenerToRemove);
+//    }
+
     @Override
     public void dispatchEvent(FlowableEvent event) {
         if (enabled) {
             eventSupport.dispatchEvent(event);
-            transactionEventSupport.dispatchEvent(event);
+//            if (enableTransactionEvent) transactionEventSupport.dispatchEvent(event);
         }
 
         CommandContext commandContext = Context.getCommandContext();

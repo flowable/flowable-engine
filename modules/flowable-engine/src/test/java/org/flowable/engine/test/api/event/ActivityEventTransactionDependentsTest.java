@@ -36,7 +36,8 @@ public class ActivityEventTransactionDependentsTest extends PluggableFlowableTes
 
     protected EventLogger databaseEventLogger;
     private StandardFlowableEventListener listener;
-    private TransactionFlowableEventListener committedTransactionDependentListener;
+    private TestTransactionFlowableEventListener committedTransactionDependentListener;
+    private ThrowingExceptionFlowableEventListener exceptionListener;
 
     @Override
     protected void setUp() throws Exception {
@@ -55,6 +56,15 @@ public class ActivityEventTransactionDependentsTest extends PluggableFlowableTes
             processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
         }
 
+        if (exceptionListener != null) {
+            processEngineConfiguration.getEventDispatcher().removeEventListener(exceptionListener);
+            exceptionListener = null;
+        }
+
+        if (committedTransactionDependentListener != null) {
+            processEngineConfiguration.getEventDispatcher().removeEventListener(committedTransactionDependentListener);
+            committedTransactionDependentListener = null;
+        }
         // Remove entries
         for (EventLogEntry eventLogEntry : managementService.getEventLogEntries(null, null)) {
             managementService.deleteEventLogEntry(eventLogEntry.getLogNumber());
@@ -63,6 +73,7 @@ public class ActivityEventTransactionDependentsTest extends PluggableFlowableTes
         // Database event logger teardown
         runtimeService.removeEventListener(databaseEventLogger);
 
+        processEngineConfiguration.getEventDispatcher().setTransactionEnabled(false);
         super.tearDown();
     }
 
@@ -71,8 +82,11 @@ public class ActivityEventTransactionDependentsTest extends PluggableFlowableTes
         super.initializeServices();
 
         listener = new StandardFlowableEventListener();
-        committedTransactionDependentListener = new TransactionFlowableEventListener(TransactionState.COMMITTED.name());
+        committedTransactionDependentListener = new TestTransactionFlowableEventListener();
+        committedTransactionDependentListener.setOnTransaction(TransactionState.COMMITTED.name());
         processEngineConfiguration.getEventDispatcher().addEventListener(listener);
+        processEngineConfiguration.getEventDispatcher().addEventListener(committedTransactionDependentListener);
+        processEngineConfiguration.getEventDispatcher().setTransactionEnabled(true);
     }
 
     /**
@@ -84,7 +98,7 @@ public class ActivityEventTransactionDependentsTest extends PluggableFlowableTes
     public void testFailedTransaction() throws Exception {
         // We're interested in the raw events, alter the listener to keep those as well
 
-        ThrowingExceptionFlowableEventListener exceptionListener = new ThrowingExceptionFlowableEventListener();
+        exceptionListener = new ThrowingExceptionFlowableEventListener();
         processEngineConfiguration.getEventDispatcher().addEventListener(exceptionListener);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("activityProcess");
         assertNotNull(processInstance);
@@ -103,8 +117,6 @@ public class ActivityEventTransactionDependentsTest extends PluggableFlowableTes
         assertTrue(listener.isEventTriggered(FlowableEngineEventType.TASK_COMPLETED));
         assertFalse(committedTransactionDependentListener.isEventTriggered(FlowableEngineEventType.TASK_COMPLETED));
 
-
-        processEngineConfiguration.getEventDispatcher().removeEventListener(exceptionListener);
     }
 
     @Deployment
@@ -211,52 +223,52 @@ public class ActivityEventTransactionDependentsTest extends PluggableFlowableTes
         }
     }
 
-    private class TransactionFlowableEventListener implements org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener {
-
-        private String onTransaction = "";
-
-        private List<FlowableEvent> eventsReceived;
-
-        public TransactionFlowableEventListener(String onTransaction) {
-            this.eventsReceived = new ArrayList<>();
-            this.onTransaction = onTransaction;
-        }
-
-        @Override
-        public void onEvent(FlowableEvent event) {
-            eventsReceived.add(event);
-            LOGGER.debug("{} {} event triggered ... {}", onTransaction, event.getType(), eventsReceived.size());
-        }
-
-        public List<FlowableEvent> getEventsReceived() {
-            return eventsReceived;
-        }
-
-        public void clearEventsReceived() {
-            eventsReceived.clear();
-        }
-
-        public boolean isEventTriggered(FlowableEngineEventType flowableEvent) {
-            for (FlowableEvent event : eventsReceived) {
-                if (event.getType() == flowableEvent) return true;
-            }
-            return false;
-        }
-
-        @Override
-        public String getOnTransaction() {
-            return onTransaction;
-        }
-
-        @Override
-        public void setOnTransaction(String onTransaction) {
-
-            this.onTransaction = onTransaction;
-        }
-
-        @Override
-        public boolean isFailOnException() {
-            return false;
-        }
-    }
+//    private class TransactionFlowableEventListener implements org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener {
+//
+//        private String onTransaction = "";
+//
+//        private List<FlowableEvent> eventsReceived;
+//
+//        public TransactionFlowableEventListener(String onTransaction) {
+//            this.eventsReceived = new ArrayList<>();
+//            this.onTransaction = onTransaction;
+//        }
+//
+//        @Override
+//        public void onEvent(FlowableEvent event) {
+//            eventsReceived.add(event);
+//            LOGGER.debug("{} {} event triggered ... {}", onTransaction, event.getType(), eventsReceived.size());
+//        }
+//
+//        public List<FlowableEvent> getEventsReceived() {
+//            return eventsReceived;
+//        }
+//
+//        public void clearEventsReceived() {
+//            eventsReceived.clear();
+//        }
+//
+//        public boolean isEventTriggered(FlowableEngineEventType flowableEvent) {
+//            for (FlowableEvent event : eventsReceived) {
+//                if (event.getType() == flowableEvent) return true;
+//            }
+//            return false;
+//        }
+//
+//        @Override
+//        public String getOnTransaction() {
+//            return onTransaction;
+//        }
+//
+//        @Override
+//        public void setOnTransaction(String onTransaction) {
+//
+//            this.onTransaction = onTransaction;
+//        }
+//
+//        @Override
+//        public boolean isFailOnException() {
+//            return false;
+//        }
+//    }
 }

@@ -171,6 +171,10 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         return new StandaloneInMemIdmEngineConfiguration();
     }
 
+    public IdmEngineConfiguration() {
+        this.enableTransactionEventDispatcher = false;
+    }
+
     // buildProcessEngine
     // ///////////////////////////////////////////////////////
 
@@ -439,6 +443,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         }
 
         this.eventDispatcher.setEnabled(enableEventDispatcher);
+        this.eventDispatcher.setTransactionEnabled(enableTransactionEventDispatcher);
 
         if (eventListeners != null) {
             for (FlowableEventListener listenerToAdd : eventListeners) {

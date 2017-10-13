@@ -150,6 +150,7 @@ public abstract class AbstractEngineConfiguration {
     protected Map<Class<?>, SessionFactory> sessionFactories;
 
     protected boolean enableEventDispatcher = true;
+    protected boolean enableTransactionEventDispatcher = true;
     protected FlowableEventDispatcher eventDispatcher;
     protected List<FlowableEventListener> eventListeners;
     protected Map<String, List<FlowableEventListener>> typedEventListeners;
