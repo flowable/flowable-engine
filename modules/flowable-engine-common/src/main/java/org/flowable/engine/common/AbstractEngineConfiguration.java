@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -176,9 +176,9 @@ public abstract class AbstractEngineConfiguration {
     /**
      * Flag that can be set to configure or not a relational database is used. This is useful for custom implementations that do not use relational databases
      * at all.
-     * 
+     *
      * If true (default), the {@link AbstractEngineConfiguration#getDatabaseSchemaUpdate()} value will be used to determine what needs to happen wrt the database schema.
-     * 
+     *
      * If false, no validation or schema creation will be done. That means that the database schema must have been created 'manually' before but the engine does not validate whether the schema is
      * correct. The {@link AbstractEngineConfiguration#getDatabaseSchemaUpdate()} value will not be used.
      */
@@ -187,7 +187,7 @@ public abstract class AbstractEngineConfiguration {
     /**
      * Allows configuring a database table prefix which is used for all runtime operations of the process engine. For example, if you specify a prefix named 'PRE1.', Flowable will query for executions
      * in a table named 'PRE1.ACT_RU_EXECUTION_'.
-     * 
+     *
      * <p />
      * <strong>NOTE: the prefix is not respected by automatic database schema management. If you use {@link AbstractEngineConfiguration#DB_SCHEMA_UPDATE_CREATE_DROP} or
      * {@link AbstractEngineConfiguration#DB_SCHEMA_UPDATE_TRUE}, Flowable will create the database tables using the default names, regardless of the prefix configured here.</strong>
@@ -196,7 +196,7 @@ public abstract class AbstractEngineConfiguration {
 
     /**
      * Escape character for doing wildcard searches.
-     * 
+     *
      * This will be added at then end of queries that include for example a LIKE clause. For example: SELECT * FROM table WHERE column LIKE '%\%%' ESCAPE '\';
      */
     protected String databaseWildcardEscapeCharacter;
@@ -218,7 +218,7 @@ public abstract class AbstractEngineConfiguration {
      */
     protected boolean tablePrefixIsSchema;
 
-    protected Properties databaseTypeMappings = getDefaultDatabaseTypeMappings();
+    protected static Properties databaseTypeMappings = getDefaultDatabaseTypeMappings();
 
     public static final String DATABASE_TYPE_H2 = "h2";
     public static final String DATABASE_TYPE_HSQL = "hsql";
