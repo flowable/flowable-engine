@@ -538,7 +538,7 @@ Properties:
 
 A service task is visualized as a rounded rectangle with a cog icon in the top left corner:
 
-image::images/cmmn.humantask.png[align="center"]
+image::images/cmmn.servicetask.png[align="center"]
 
 ==== Milestone
 
