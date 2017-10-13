@@ -161,6 +161,11 @@ public class ModelImageService {
             org.flowable.cmmn.model.GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(caseModel.getPlanModel().getId());
             scaleCmmnGraphicInfo(graphicInfo, scaleFactor);
             
+            for (Criterion criterion : caseModel.getPlanModel().getExitCriteria()) {
+                org.flowable.cmmn.model.GraphicInfo criterionGraphicInfo = cmmnModel.getGraphicInfo(criterion.getId());
+                scaleCmmnGraphicInfo(criterionGraphicInfo, scaleFactor);
+            }
+            
             scalePlanItems(caseModel.getPlanModel().getPlanItems(), cmmnModel, scaleFactor);
         }
         
