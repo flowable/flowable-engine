@@ -539,7 +539,7 @@
     "hide" : true,
     "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage" ],
     "hiddenPropertyPackages" : [ ],
-    "roles" : [ "StageActivity", "all" ]
+    "roles" : [ "StageActivity", "all", "association_start", "association_end" ]
   }, {
     "type" : "node",
     "id" : "Task",
