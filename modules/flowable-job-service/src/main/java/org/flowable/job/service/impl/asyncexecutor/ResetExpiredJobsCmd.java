@@ -16,7 +16,7 @@ import java.util.Collection;
 
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.flowable.job.service.impl.persistence.entity.JobInfoEntityManager;
 import org.flowable.job.service.impl.util.CommandContextUtil;

@@ -213,6 +213,11 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
             Stage planModel = caseModel.getPlanModel();
             GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(planModel.getId());
             caseDiagramCanvas.drawStage(planModel.getName(), graphicInfo, scaleFactor);
+            
+            for (Criterion criterion : planModel.getExitCriteria()) {
+                ActivityDrawInstruction criterionInstruction = activityDrawInstructions.get(criterion.getClass());
+                criterionInstruction.draw(caseDiagramCanvas, cmmnModel, criterion);
+            }
 
             for (PlanItem planItem : caseModel.getPlanModel().getPlanItems()) {
                 drawActivity(caseDiagramCanvas, cmmnModel, planItem, scaleFactor);

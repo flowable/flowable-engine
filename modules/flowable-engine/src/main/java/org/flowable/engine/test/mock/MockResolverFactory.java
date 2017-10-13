@@ -15,7 +15,7 @@ package org.flowable.engine.test.mock;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.scripting.Resolver;
 import org.flowable.engine.impl.scripting.ResolverFactory;
-import org.flowable.variable.service.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * This is a bridge resolver, making available any objects registered through {@link org.flowable.engine.test.mock.Mocks#register} inside scripts supported by process execution. <br>

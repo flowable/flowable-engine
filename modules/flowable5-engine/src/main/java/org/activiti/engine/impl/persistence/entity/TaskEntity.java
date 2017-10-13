@@ -42,8 +42,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.TaskListener;
-import org.flowable.identitylink.service.IdentityLink;
-import org.flowable.task.service.DelegationState;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.task.api.DelegationState;
 import org.flowable.task.service.delegate.DelegateTask;
 
 /**

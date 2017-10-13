@@ -19,7 +19,7 @@ import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.util.ReflectUtil;
-import org.flowable.variable.service.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Joram Barrez

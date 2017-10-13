@@ -25,7 +25,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
  */
 public class TestFlowableEntityEventTaskListener extends TestFlowableEntityEventListener {
 
-    private List<org.flowable.task.service.Task> tasks;
+    private List<org.flowable.task.api.Task> tasks;
 
     public TestFlowableEntityEventTaskListener(Class<?> entityClass) {
         super(entityClass);
@@ -41,12 +41,12 @@ public class TestFlowableEntityEventTaskListener extends TestFlowableEntityEvent
     @Override
     public void onEvent(FlowableEvent event) {
         super.onEvent(event);
-        if (event instanceof FlowableEntityEvent && org.flowable.task.service.Task.class.isAssignableFrom(((FlowableEntityEvent) event).getEntity().getClass())) {
-            tasks.add(copy((org.flowable.task.service.Task) ((FlowableEntityEvent) event).getEntity()));
+        if (event instanceof FlowableEntityEvent && org.flowable.task.api.Task.class.isAssignableFrom(((FlowableEntityEvent) event).getEntity().getClass())) {
+            tasks.add(copy((org.flowable.task.api.Task) ((FlowableEntityEvent) event).getEntity()));
         }
     }
 
-    protected org.flowable.task.service.Task copy(org.flowable.task.service.Task aTask) {
+    protected org.flowable.task.api.Task copy(org.flowable.task.api.Task aTask) {
         TaskEntity ent = CommandContextUtil.getTaskService().createTask();
         ent.setId(aTask.getId());
         ent.setName(aTask.getName());
@@ -58,7 +58,7 @@ public class TestFlowableEntityEventTaskListener extends TestFlowableEntityEvent
         return ent;
     }
 
-    public List<org.flowable.task.service.Task> getTasks() {
+    public List<org.flowable.task.api.Task> getTasks() {
         return tasks;
     }
 }

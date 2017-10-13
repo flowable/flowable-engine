@@ -100,6 +100,57 @@
 			<fileset dir="../modules/flowable-secure-javascript/target">
 				<include name="flowable-secure-javascript-*.jar" />
 			</fileset>
+			<fileset dir="../modules/flowable-identitylink-service-api/target">
+                <include name="flowable-identitylink-service-api-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-identitylink-service/target">
+                <include name="flowable-identitylink-service-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-job-service-api/target">
+                <include name="flowable-job-service-api-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-job-service/target">
+                <include name="flowable-job-service-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-task-service-api/target">
+                <include name="flowable-task-service-api-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-task-service/target">
+                <include name="flowable-task-service-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-variable-service-api/target">
+                <include name="flowable-variable-service-api-*.jar" />
+            </fileset>
+            <fileset dir="../modules/flowable-variable-service/target">
+                <include name="flowable-variable-service-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-cmmn-api/target">
+                <include name="flowable-cmmn-api-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-cmmn-converter/target">
+                <include name="flowable-cmmn-converter-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-cmmn-engine/target">
+                <include name="flowable-cmmn-engine-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-cmmn-engine-configurator/target">
+                <include name="flowable-cmmn-engine-configurator-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-cmmn-image-generator/target">
+                <include name="flowable-cmmn-image-generator-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-cmmn-json-converter/target">
+                <include name="flowable-cmmn-json-converter-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-cmmn-model/target">
+                <include name="flowable-cmmn-model-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-cmmn-spring/target">
+                <include name="flowable-cmmn-spring-*.jar" />
+            </fileset>
+			<fileset dir="../modules/flowable-cmmn-spring-configurator/target">
+                <include name="flowable-cmmn-spring-configurator-*.jar" />
+            </fileset>
 			<fileset dir="../modules/flowable-dmn-model/target">
 				<include name="flowable-dmn-model-*.jar" />
 			</fileset>
@@ -364,14 +415,7 @@
 	<target name="copy.sql">
 		<!-- COPY SQL -->
 		<copy todir="${target.distro.root}/database">
-			<fileset dir="../modules/flowable-engine/src/main/resources/org/flowable/db">
-				<include name="create/**" />
-				<include name="drop/**" />
-				<include name="upgrade/**" />
-			</fileset>
-		</copy>
-		<copy todir="${target.distro.root}/database/idm">
-			<fileset dir="../modules/flowable-idm-engine/src/main/resources/org/flowable/idm/db">
+			<fileset dir="sql">
 				<include name="create/**" />
 				<include name="drop/**" />
 				<include name="upgrade/**" />

@@ -14,6 +14,7 @@ package org.flowable.cmmn.engine.impl.behavior;
 
 import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.model.PlanItemTransition;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * Behavior interface, like the {@link CmmnActivityBehavior} and {@link CmmnTriggerableActivityBehavior} interfaces,
@@ -28,6 +29,6 @@ import org.flowable.cmmn.model.PlanItemTransition;
  */
 public interface PlanItemActivityBehavior extends CmmnTriggerableActivityBehavior {
  
-    void onStateTransition(DelegatePlanItemInstance planItemInstance, String transition);
+    void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition);
     
 }

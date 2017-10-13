@@ -12,7 +12,7 @@
  */
 package org.flowable.job.service.impl.asyncexecutor;
 
-import org.flowable.job.service.JobInfo;
+import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
@@ -20,7 +20,7 @@ import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-import org.flowable.variable.service.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * Contains methods that are not tied to any specific job type (async, timer, suspended or deadletter), but which are generally applicable or are about going from one type to another.

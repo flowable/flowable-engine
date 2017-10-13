@@ -23,16 +23,17 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
-import org.flowable.cmmn.engine.CmmnTaskService;
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
-import org.flowable.identitylink.service.history.HistoricIdentityLink;
 import org.flowable.idm.api.User;
-import org.flowable.task.service.TaskInfo;
+import org.flowable.task.api.TaskInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class FlowableAbstractTaskService {
@@ -42,6 +43,9 @@ public abstract class FlowableAbstractTaskService {
 
     @Autowired
     protected RepositoryService repositoryService;
+    
+    @Autowired
+    protected CmmnRepositoryService cmmnRepositoryService;
 
     @Autowired
     protected TaskService taskService;

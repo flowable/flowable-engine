@@ -14,7 +14,7 @@ package org.flowable.spring;
 
 import java.util.concurrent.RejectedExecutionException;
 
-import org.flowable.job.service.JobInfo;
+import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnable;
 import org.springframework.core.task.TaskExecutor;

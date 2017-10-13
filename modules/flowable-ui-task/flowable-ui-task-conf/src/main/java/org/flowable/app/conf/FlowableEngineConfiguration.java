@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.engine.CmmnEngineConfigurationApi;
-import org.flowable.cmmn.engine.CmmnHistoryService;
-import org.flowable.cmmn.engine.CmmnRepositoryService;
-import org.flowable.cmmn.engine.CmmnRuntimeService;
-import org.flowable.cmmn.engine.CmmnTaskService;
+import org.flowable.cmmn.api.CmmnEngineConfigurationApi;
+import org.flowable.cmmn.api.CmmnHistoryService;
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator;
 import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentService;

@@ -45,9 +45,9 @@ public class FinancialReportProcessTest extends PluggableFlowableTestCase {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("financialReport");
 
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().taskCandidateUser("fozzie").list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskCandidateUser("fozzie").list();
         assertEquals(1, tasks.size());
-        org.flowable.task.service.Task task = tasks.get(0);
+        org.flowable.task.api.Task task = tasks.get(0);
         assertEquals("Write monthly financial report", task.getName());
 
         taskService.claim(task.getId(), "fozzie");

@@ -31,7 +31,7 @@ import org.flowable.engine.test.profiler.FlowableProfiler;
 import org.flowable.engine.test.profiler.ProfileSession;
 import org.flowable.engine.test.profiler.ProfilingDbSqlSessionFactory;
 import org.flowable.engine.test.profiler.TotalExecutionTimeCommandInterceptor;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.junit.Assert;
 
@@ -280,7 +280,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     public void testOneTaskProcess() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             deployStartProcessInstanceAndProfile("process-usertask-01.bpmn20.xml", "process-usertask-01", false);
-            org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
             taskService.complete(task.getId());
             stopProfiling();
     
@@ -327,7 +327,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     public void testOneTaskWithBoundaryTimerProcess() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             deployStartProcessInstanceAndProfile("process-usertask-02.bpmn20.xml", "process-usertask-02", false);
-            org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
             taskService.complete(task.getId());
             stopProfiling();
     
@@ -357,7 +357,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             // TODO: move to separate class
             deployStartProcessInstanceAndProfile("process-usertask-01.bpmn20.xml", "process-usertask-01", false);
-            org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
     
             long variableCount = 3;
     
@@ -390,7 +390,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             // TODO: move to separate class
             deployStartProcessInstanceAndProfile("process-usertask-01.bpmn20.xml", "process-usertask-01", false);
-            org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
     
             taskService.claim(task.getId(), "firstUser");
             taskService.unclaim(task.getId());
@@ -409,7 +409,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             // TODO: move to separate class
             deployStartProcessInstanceAndProfile("process-usertask-01.bpmn20.xml", "process-usertask-01", false);
-            org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
     
             taskService.addCandidateUser(task.getId(), "user01");
             taskService.addCandidateUser(task.getId(), "user02");
@@ -453,7 +453,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             // TODO: move to separate class
             deployStartProcessInstanceAndProfile("process-usertask-01.bpmn20.xml", "process-usertask-01", false);
-            org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
     
             taskService.addCandidateGroup(task.getId(), "group01");
             taskService.addCandidateGroup(task.getId(), "group02");

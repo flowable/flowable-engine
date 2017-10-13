@@ -20,7 +20,7 @@ import java.util.Map;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
-import org.flowable.task.service.TaskQuery;
+import org.flowable.task.api.TaskQuery;
 
 /**
  * @author Tijs Rademakers
@@ -57,7 +57,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
 
     @Deployment
     public void testQuery() {
-        org.flowable.task.service.Task task = taskService.createTaskQuery().includeTaskLocalVariables().taskAssignee("gonzo").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().includeTaskLocalVariables().taskAssignee("gonzo").singleResult();
         Map<String, Object> variableMap = task.getTaskLocalVariables();
         assertEquals(3, variableMap.size());
         assertEquals(0, task.getProcessVariables().size());
@@ -68,7 +68,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
         assertNotNull(variableMap.get("testVarBinary"));
         assertEquals("This is a binary variable", new String((byte[]) variableMap.get("testVarBinary")));
 
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertEquals(3, tasks.size());
 
         task = taskService.createTaskQuery().includeProcessVariables().taskAssignee("gonzo").singleResult();
@@ -133,14 +133,14 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
     }
 
     public void testQueryWithPagingAndVariables() {
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery()
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery()
                 .includeProcessVariables()
                 .includeTaskLocalVariables()
                 .orderByTaskPriority()
                 .desc()
                 .listPage(0, 1);
         assertEquals(1, tasks.size());
-        org.flowable.task.service.Task task = tasks.get(0);
+        org.flowable.task.api.Task task = tasks.get(0);
         Map<String, Object> variableMap = task.getTaskLocalVariables();
         assertEquals(3, variableMap.size());
         assertEquals("someVariable", variableMap.get("testVar"));
@@ -186,20 +186,20 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
 
     // Unit test for https://activiti.atlassian.net/browse/ACT-4152
     public void testQueryWithIncludeTaskVariableAndTaskCategory() {
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().taskAssignee("gonzo").list();
-        for (org.flowable.task.service.Task task : tasks) {
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee("gonzo").list();
+        for (org.flowable.task.api.Task task : tasks) {
             assertNotNull(task.getCategory());
             assertEquals("testCategory", task.getCategory());
         }
 
         tasks = taskService.createTaskQuery().taskAssignee("gonzo").includeTaskLocalVariables().list();
-        for (org.flowable.task.service.Task task : tasks) {
+        for (org.flowable.task.api.Task task : tasks) {
             assertNotNull(task.getCategory());
             assertEquals("testCategory", task.getCategory());
         }
 
         tasks = taskService.createTaskQuery().taskAssignee("gonzo").includeProcessVariables().list();
-        for (org.flowable.task.service.Task task : tasks) {
+        for (org.flowable.task.api.Task task : tasks) {
             assertNotNull(task.getCategory());
             assertEquals("testCategory", task.getCategory());
         }
@@ -216,7 +216,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
 
             // limit results to 2000 and set maxResults for paging to 200
             // please see MNT-16040
-            List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery()
+            List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery()
                     .includeProcessVariables()
                     .includeTaskLocalVariables()
                     .limitTaskVariables(taskVariablesLimit)
@@ -245,7 +245,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
         startMap.put("anotherProcessVar", 123);
         runtimeService.startProcessInstanceByKey("oneTaskProcess", startMap);
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().includeProcessVariables().or().processVariableValueEquals("undefined", 999).processVariableValueEquals("anotherProcessVar", 123).endOr().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().includeProcessVariables().or().processVariableValueEquals("undefined", 999).processVariableValueEquals("anotherProcessVar", 123).endOr().singleResult();
         assertEquals(1, task.getProcessVariables().size());
         assertEquals(123, task.getProcessVariables().get("anotherProcessVar"));
 
@@ -287,7 +287,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
             query1 = query1.processVariableValueEquals("anotherProcessVar", i);
         }
         query1 = query1.endOr();
-        org.flowable.task.service.Task task = query1.singleResult();
+        org.flowable.task.api.Task task = query1.singleResult();
         assertEquals(2, task.getProcessVariables().size());
         assertEquals(123, task.getProcessVariables().get("anotherProcessVar"));
     }
@@ -302,7 +302,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
         // 2 tasks for kermit
         processEngineConfiguration.getClock().setCurrentTime(sdf.parse("01/01/2001 01:01:01.000"));
         for (int i = 0; i < 2; i++) {
-            org.flowable.task.service.Task task = taskService.newTask();
+            org.flowable.task.api.Task task = taskService.newTask();
             task.setName("testTask");
             task.setDescription("testTask description");
             task.setPriority(3);
@@ -315,7 +315,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
 
         processEngineConfiguration.getClock().setCurrentTime(sdf.parse("02/02/2002 02:02:02.000"));
         // 1 task for gonzo
-        org.flowable.task.service.Task task = taskService.newTask();
+        org.flowable.task.api.Task task = taskService.newTask();
         task.setName("gonzoTask");
         task.setDescription("gonzo description");
         task.setPriority(4);
@@ -339,7 +339,7 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm:ss.SSS");
         processEngineConfiguration.getClock().setCurrentTime(sdf.parse("01/01/2001 01:01:01.000"));
         for (int i = 0; i < 100; i++) {
-            org.flowable.task.service.Task task = taskService.newTask();
+            org.flowable.task.api.Task task = taskService.newTask();
             task.setName("testTask");
             task.setDescription("testTask description");
             task.setPriority(3);

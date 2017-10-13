@@ -14,9 +14,9 @@ package org.flowable.cmmn.engine.impl.persistence.entity.data;
 
 import java.util.List;
 
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryImpl;
-import org.flowable.cmmn.engine.repository.CaseDefinition;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 
 /**

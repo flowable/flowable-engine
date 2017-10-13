@@ -19,7 +19,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableExceptionEvent;
 import org.flowable.engine.common.impl.event.FlowableEntityEventImpl;
 import org.flowable.engine.common.impl.event.FlowableEntityExceptionEventImpl;
 import org.flowable.engine.common.impl.event.FlowableEventImpl;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 
 /**
  * Builder class used to create {@link FlowableEvent} implementations.

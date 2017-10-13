@@ -15,12 +15,12 @@ package org.flowable.cmmn.engine.impl.history;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.cmmn.engine.history.HistoricVariableInstanceQuery;
+import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
 import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.type.VariableScopeType;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
-import org.flowable.variable.service.type.VariableScopeType;
 
 /**
  * Wrapper class around the {@link HistoricVariableInstanceQueryImpl} from the variable service,

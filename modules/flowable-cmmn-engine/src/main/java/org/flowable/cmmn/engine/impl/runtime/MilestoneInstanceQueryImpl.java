@@ -15,9 +15,9 @@ package org.flowable.cmmn.engine.impl.runtime;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.cmmn.api.runtime.MilestoneInstance;
+import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.runtime.MilestoneInstance;
-import org.flowable.cmmn.engine.runtime.MilestoneInstanceQuery;
 import org.flowable.engine.common.impl.AbstractQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;

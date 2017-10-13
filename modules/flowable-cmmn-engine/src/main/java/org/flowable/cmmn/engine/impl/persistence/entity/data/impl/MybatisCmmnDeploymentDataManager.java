@@ -14,13 +14,13 @@ package org.flowable.cmmn.engine.impl.persistence.entity.data.impl;
 
 import java.util.List;
 
+import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnDeploymentDataManager;
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl;
-import org.flowable.cmmn.engine.repository.CmmnDeployment;
 
 /**
  * @author Joram Barrez

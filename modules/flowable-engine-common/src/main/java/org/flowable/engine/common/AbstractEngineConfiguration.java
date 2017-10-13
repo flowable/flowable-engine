@@ -414,7 +414,7 @@ public abstract class AbstractEngineConfiguration {
 
     public void initSchemaCommandConfig() {
         if (schemaCommandConfig == null) {
-            schemaCommandConfig = new CommandConfig().transactionNotSupported();
+            schemaCommandConfig = new CommandConfig();
         }
     }
     

@@ -15,17 +15,20 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseDefinitionDataManager;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryImpl;
-import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
-import org.flowable.cmmn.engine.repository.CaseDefinition;
-import org.flowable.cmmn.engine.repository.CaseDefinitionQuery;
-import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityManager;
+import org.flowable.variable.api.type.VariableScopeType;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManager;
-import org.flowable.variable.service.type.VariableScopeType;
 
 
 /**
@@ -83,11 +86,18 @@ public class CaseDefinitionEntityManagerImpl extends AbstractCmmnEntityManager<C
         List<CaseInstanceEntity> caseInstances = caseInstanceEntityManager.findCaseInstancesByCaseDefinitionId(caseDefinitionId);
         
         for (CaseInstance caseInstance : caseInstances) {
-            caseInstanceEntityManager.deleteCaseInstanceAndRelatedData(caseInstance.getId());
+            caseInstanceEntityManager.deleteCaseInstanceAndRelatedData(caseInstance.getId(), null);
         }
         
         if (cascadeHistory) {
             getHistoricMilestoneInstanceEntityManager().deleteByCaseDefinitionId(caseDefinitionId);
+            
+            HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager = getHistoricTaskInstanceEntityManager();
+            List<HistoricTaskInstance> historicTaskInstances = historicTaskInstanceEntityManager
+                    .findHistoricTaskInstancesByQueryCriteria(new HistoricTaskInstanceQueryImpl().scopeDefinitionId(caseDefinitionId).scopeType(VariableScopeType.CMMN)); 
+            for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
+                historicTaskInstanceEntityManager.delete((HistoricTaskInstanceEntity) historicTaskInstance);
+            }
             
             HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = getHistoricCaseInstanceEntityManager();
             List<HistoricCaseInstanceEntity> historicCaseInstanceEntities = historicCaseInstanceEntityManager.findHistoricCaseInstancesByCaseDefinitionId(caseDefinitionId);

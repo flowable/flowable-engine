@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.cmmn.engine.repository.CmmnDeployment;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 
 /**

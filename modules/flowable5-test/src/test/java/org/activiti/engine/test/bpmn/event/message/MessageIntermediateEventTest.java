@@ -45,7 +45,7 @@ public class MessageIntermediateEventTest extends PluggableFlowableTestCase {
 
         runtimeService.messageEventReceived(messageName, execution.getId());
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery()
+        org.flowable.task.api.Task task = taskService.createTaskQuery()
                 .singleResult();
         assertNotNull(task);
         taskService.complete(task.getId());
@@ -73,7 +73,7 @@ public class MessageIntermediateEventTest extends PluggableFlowableTestCase {
 
         runtimeService.messageEventReceived(messageName, executions.get(0).getId());
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery()
+        org.flowable.task.api.Task task = taskService.createTaskQuery()
                 .singleResult();
         assertNull(task);
 

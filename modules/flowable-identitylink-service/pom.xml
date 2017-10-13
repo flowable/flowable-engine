@@ -80,10 +80,10 @@
 
 	<properties>
 		<flowable.artifact>
-			org.flowable.identitylink
+			org.flowable.identitylink.service
 		</flowable.artifact>
 		<flowable.osgi.export.additional>
-			org.flowable.identitylink.db.mapping.entity
+			org.flowable.identitylink.service.db.mapping.entity
 		</flowable.osgi.export.additional>
 	</properties>
 
@@ -159,5 +159,29 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+    
+    <profiles>
+        <profile>
+            <id>distro</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.1.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 
 </project>

@@ -35,7 +35,7 @@ public class SerializableVariableTest extends PluggableFlowableTestCase {
 
         // There is a task here, such the VariableInstanceEntityImpl is inserter first, and updated later
         // (instead of being inserted/updated in the same Tx)
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         TestSerializableVariable testSerializableVariable = (TestSerializableVariable) runtimeService.getVariable(processInstance.getId(), "myVar");

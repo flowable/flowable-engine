@@ -21,9 +21,9 @@ import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
-import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.Assert;
 
 /**

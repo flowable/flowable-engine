@@ -18,7 +18,7 @@ import java.util.List;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.api.IdentityLink;
 
 /**
  * @author Marcus Klimstra
@@ -37,7 +37,7 @@ public class InstanceInvolvementTest extends PluggableFlowableTestCase {
         String instanceId = startProcessAsUser("threeParallelTasks", "user1");
 
         // there are supposed to be 3 tasks
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().processInstanceId(instanceId).list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(instanceId).list();
         assertEquals(3, tasks.size());
 
         // "user1" should now be involved as the starter of the new process

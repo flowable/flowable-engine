@@ -17,13 +17,13 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntity;
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentBuilderImpl;
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.repository.CmmnDeployment;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 

@@ -12,11 +12,6 @@
  */
 package org.flowable.app.service.editor;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -35,6 +30,7 @@ import org.flowable.bpmn.model.Artifact;
 import org.flowable.bpmn.model.Association;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.DataObject;
 import org.flowable.bpmn.model.ErrorEventDefinition;
 import org.flowable.bpmn.model.Event;
 import org.flowable.bpmn.model.EventDefinition;
@@ -56,6 +52,11 @@ import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 @Component
 public class BpmnDisplayJsonConverter {
@@ -168,7 +169,11 @@ public class BpmnDisplayJsonConverter {
     protected void processElements(Collection<FlowElement> elementList, BpmnModel model, ArrayNode elementArray, ArrayNode flowArray, GraphicInfo diagramInfo) {
 
         for (FlowElement element : elementList) {
-            if (element instanceof SequenceFlow) {
+            // ignore data objects in visual representation
+            if (DataObject.class.isInstance(element)) {
+                continue;
+                
+            } else if (element instanceof SequenceFlow) {
                 ObjectNode elementNode = objectMapper.createObjectNode();
                 SequenceFlow flow = (SequenceFlow) element;
                 elementNode.put("id", flow.getId());

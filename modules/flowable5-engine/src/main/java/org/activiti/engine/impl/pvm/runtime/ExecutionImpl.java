@@ -37,7 +37,7 @@ import org.activiti.engine.impl.pvm.process.TransitionImpl;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

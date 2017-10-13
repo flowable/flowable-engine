@@ -13,7 +13,7 @@
 
 package org.flowable.job.service.impl.asyncexecutor;
 
-import org.flowable.job.service.JobInfo;
+import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 
 /**

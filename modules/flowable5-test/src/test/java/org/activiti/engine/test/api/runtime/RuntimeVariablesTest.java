@@ -22,7 +22,7 @@ import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
  * @author Daisuke Yoshimoto
@@ -33,8 +33,8 @@ public class RuntimeVariablesTest extends PluggableFlowableTestCase {
     public void testGetVariablesByExecutionIds() {
         ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        org.flowable.task.service.Task task1 = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
-        org.flowable.task.service.Task task2 = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
+        org.flowable.task.api.Task task1 = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
+        org.flowable.task.api.Task task2 = taskService.createTaskQuery().processInstanceId(processInstance2.getId()).singleResult();
 
         // org.flowable.task.service.Task local variables
         taskService.setVariableLocal(task1.getId(), "taskVar1", "sayHello1");
@@ -68,7 +68,7 @@ public class RuntimeVariablesTest extends PluggableFlowableTestCase {
     })
     public void testGetVariablesByExecutionIdsForSerializableType() {
         ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        org.flowable.task.service.Task task1 = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
+        org.flowable.task.api.Task task1 = taskService.createTaskQuery().processInstanceId(processInstance1.getId()).singleResult();
 
         StringBuilder sb = new StringBuilder("a");
         for (int i = 0; i < 4001; i++) {
@@ -114,8 +114,8 @@ public class RuntimeVariablesTest extends PluggableFlowableTestCase {
             }
         }
 
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        for (org.flowable.task.service.Task task : tasks) {
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        for (org.flowable.task.api.Task task : tasks) {
             taskService.setVariableLocal(task.getId(), "taskVar", "taskVar");
         }
 

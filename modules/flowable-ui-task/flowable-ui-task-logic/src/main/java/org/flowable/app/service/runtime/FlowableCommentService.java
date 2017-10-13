@@ -28,7 +28,7 @@ import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.task.Comment;
 import org.flowable.idm.api.User;
-import org.flowable.task.service.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -19,7 +19,7 @@ import org.activiti.engine.ActivitiObjectNotFoundException;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.api.IdentityLink;
 
 /**
  * @author Marcus Klimstra

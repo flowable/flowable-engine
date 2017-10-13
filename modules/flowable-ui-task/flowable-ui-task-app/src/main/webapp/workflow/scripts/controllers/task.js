@@ -235,10 +235,16 @@ angular.module('flowableApp')
                 $scope.loadComments();
                 $scope.loadRelatedContent();
 
-                if($scope.model.task.processInstanceId) {
+                if ($scope.model.task.processInstanceId) {
                     $scope.loadProcessInstance();
                 } else {
                     $scope.model.processInstance = null;
+                }
+                
+                if ($scope.model.task.scopeId) {
+                    $scope.loadCaseInstance();
+                } else {
+                    $scope.model.caseInstance = null;
                 }
 
                 $scope.refreshInvolvmentSummary();
@@ -483,7 +489,6 @@ angular.module('flowableApp')
         });
     };
 
-    // TODO: move process instance loading to separate service and merge with process.js
     $scope.loadProcessInstance = function() {
         $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/process-instances/' + $scope.model.task.processInstanceId}).
             success(function(response, status, headers, config) {
@@ -501,6 +506,25 @@ angular.module('flowableApp')
             path = "/apps/" + $rootScope.activeAppDefinition.id;
         }
         $location.path(path + "/processes");
+    };
+    
+    $scope.loadCaseInstance = function() {
+        $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/case-instances/' + $scope.model.task.scopeId}).
+            success(function(response, status, headers, config) {
+                $scope.model.caseInstance = response;
+            }).
+            error(function(response, status, headers, config) {
+                // Do nothing. User is not allowed to see the process instance
+            });
+    };
+
+    $scope.openCaseInstance = function(id) {
+        $rootScope.root.selectedCaseId = id;
+        var path='';
+        if($rootScope.activeAppDefinition && !FLOWABLE.CONFIG.integrationProfile) {
+            path = "/apps/" + $rootScope.activeAppDefinition.id;
+        }
+        $location.path(path + "/cases");
     };
 
     $scope.returnToTaskList = function() {

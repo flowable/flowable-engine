@@ -22,6 +22,7 @@ import org.flowable.app.util.ImageGenerator;
 import org.flowable.bpmn.model.Artifact;
 import org.flowable.bpmn.model.Association;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.bpmn.model.DataObject;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.GraphicInfo;
 import org.flowable.bpmn.model.Lane;
@@ -160,6 +161,11 @@ public class ModelImageService {
             org.flowable.cmmn.model.GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(caseModel.getPlanModel().getId());
             scaleCmmnGraphicInfo(graphicInfo, scaleFactor);
             
+            for (Criterion criterion : caseModel.getPlanModel().getExitCriteria()) {
+                org.flowable.cmmn.model.GraphicInfo criterionGraphicInfo = cmmnModel.getGraphicInfo(criterion.getId());
+                scaleCmmnGraphicInfo(criterionGraphicInfo, scaleFactor);
+            }
+            
             scalePlanItems(caseModel.getPlanModel().getPlanItems(), cmmnModel, scaleFactor);
         }
         
@@ -220,7 +226,9 @@ public class ModelImageService {
                 if (flowList != null) {
                     graphicInfoList.addAll(flowList);
                 }
-            } else {
+                
+            // no graphic info for Data Objects    
+            } else if (!DataObject.class.isInstance(flowElement)) {
                 graphicInfoList.add(bpmnModel.getGraphicInfo(flowElement.getId()));
             }
 

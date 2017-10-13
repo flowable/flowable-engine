@@ -37,7 +37,7 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
         assertEquals("No tasks found in task list.", 1, taskService.createTaskQuery()
                 .taskDefinitionKey("taskAfterErrorCatch2") // <!>
                 .count());
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Escalated Task", task.getName());
 
         // Completing the org.flowable.task.service.Task will end the process instance
@@ -88,7 +88,7 @@ public class ErrorEventSubProcessTest extends PluggableFlowableTestCase {
         // The process will throw an error event,
         // which is caught and escalated by a User org.flowable.task.service.Task
         assertEquals("No tasks found in task list.", 1, taskService.createTaskQuery().count());
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Escalated Task", task.getName());
 
         // Completing the org.flowable.task.service.Task will end the process instance

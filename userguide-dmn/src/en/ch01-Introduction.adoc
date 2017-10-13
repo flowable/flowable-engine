@@ -45,7 +45,7 @@ Further in this user guide, there is a section on <<eclipseDesignerInstallation,
 We expect developers to have have read link:$$http://www.catb.org/~esr/faqs/smart-questions.html$$[How to ask questions the smart way].
 
 
-After you've done that you can post questions and comments on link:$$http://forums.flowable.org$$[the Users forum] and create issues in link:$$https://github.com/flowable/flowable-engine/issues$$[our Github issue tracker].
+After you've done that you can post questions and comments on link:$$https://forum.flowable.org$$[the Users forum] and create issues in link:$$https://github.com/flowable/flowable-engine/issues$$[our Github issue tracker].
 
 
 [[experimental]]

@@ -21,7 +21,7 @@ import java.util.Map;
 import org.activiti.engine.impl.JobQueryImpl;
 import org.activiti.engine.impl.Page;
 import org.activiti.engine.impl.persistence.AbstractManager;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 
 /**
  * @author Joram Barrez

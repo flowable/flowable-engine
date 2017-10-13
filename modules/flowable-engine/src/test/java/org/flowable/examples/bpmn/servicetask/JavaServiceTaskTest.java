@@ -22,7 +22,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 
 /**
  * @author Joram Barrez
@@ -168,7 +168,7 @@ public class JavaServiceTaskTest extends PluggableFlowableTestCase {
         // and takes sequence flow to user task
         vars.put("var", "throw-exception");
         runtimeService.startProcessInstanceByKey("exceptionHandling", vars);
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Fix Exception", task.getName());
     }
 

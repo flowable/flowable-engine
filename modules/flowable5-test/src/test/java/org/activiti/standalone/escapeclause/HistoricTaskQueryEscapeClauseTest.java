@@ -19,7 +19,7 @@ import java.util.Map;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.task.service.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
 
@@ -31,13 +31,13 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
 
     private ProcessInstance processInstance2;
 
-    private org.flowable.task.service.Task task1;
+    private org.flowable.task.api.Task task1;
 
-    private org.flowable.task.service.Task task2;
+    private org.flowable.task.api.Task task2;
 
-    private org.flowable.task.service.Task task3;
+    private org.flowable.task.api.Task task3;
 
-    private org.flowable.task.service.Task task4;
+    private org.flowable.task.api.Task task4;
 
     @Override
     protected void setUp() throws Exception {
@@ -331,10 +331,10 @@ public class HistoricTaskQueryEscapeClauseTest extends AbstractEscapeClauseTestC
     public void testQueryByTaskDeleteReasonLike() {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             // make test data
-            org.flowable.task.service.Task task5 = taskService.newTask("task5");
+            org.flowable.task.api.Task task5 = taskService.newTask("task5");
             taskService.saveTask(task5);
             taskService.deleteTask(task5.getId(), "deleteReason%");
-            org.flowable.task.service.Task task6 = taskService.newTask("task6");
+            org.flowable.task.api.Task task6 = taskService.newTask("task6");
             taskService.saveTask(task6);
             taskService.deleteTask(task6.getId(), "deleteReason_");
 

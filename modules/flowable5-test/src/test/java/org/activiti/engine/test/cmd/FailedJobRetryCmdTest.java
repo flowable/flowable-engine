@@ -16,7 +16,7 @@ import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 
 /**
  * @author Saeid Mirzaei

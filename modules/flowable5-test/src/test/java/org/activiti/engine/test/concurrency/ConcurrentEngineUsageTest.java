@@ -150,7 +150,7 @@ public class ConcurrentEngineUsageTest extends PluggableFlowableTestCase {
                     numberOfProcesses = numberOfProcesses - 1;
                 } else {
                     // Finish a task
-                    List<org.flowable.task.service.Task> taskToComplete = taskService.createTaskQuery().taskAssignee(drivingUser).listPage(0, 1);
+                    List<org.flowable.task.api.Task> taskToComplete = taskService.createTaskQuery().taskAssignee(drivingUser).listPage(0, 1);
                     tasksAvailable = !taskToComplete.isEmpty();
                     if (tasksAvailable) {
                         retryFinishTask(taskToComplete.get(0).getId());

@@ -30,6 +30,8 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 
 public class FormDbSchemaManager implements DbSchemaManager {
     
+    public static String LIQUIBASE_CHANGELOG = "org/flowable/form/db/liquibase/flowable-form-db-changelog.xml";
+    
     @Override
     public void dbSchemaCreate() {
         Liquibase liquibase = createLiquibaseInstance();
@@ -85,7 +87,7 @@ public class FormDbSchemaManager implements DbSchemaManager {
                 database.setLiquibaseCatalogName(formEngineConfiguration.getDatabaseCatalog());
             }
 
-            Liquibase liquibase = new Liquibase("org/flowable/form/db/liquibase/flowable-form-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
+            Liquibase liquibase = new Liquibase(LIQUIBASE_CHANGELOG, new ClassLoaderResourceAccessor(), database);
             return liquibase;
 
         } catch (Exception e) {

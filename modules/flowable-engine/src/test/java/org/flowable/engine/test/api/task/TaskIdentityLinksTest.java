@@ -22,9 +22,9 @@ import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.task.Event;
 import org.flowable.engine.test.Deployment;
-import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
-import org.flowable.identitylink.service.history.HistoricIdentityLink;
 
 import junit.framework.AssertionFailedError;
 
@@ -331,7 +331,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
     }
 
     public void testDeleteAssignee() {
-        org.flowable.task.service.Task task = taskService.newTask();
+        org.flowable.task.api.Task task = taskService.newTask();
         task.setAssignee("nonExistingUser");
         taskService.saveTask(task);
 
@@ -346,7 +346,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
     }
 
     public void testDeleteOwner() {
-        org.flowable.task.service.Task task = taskService.newTask();
+        org.flowable.task.api.Task task = taskService.newTask();
         task.setOwner("nonExistingUser");
         taskService.saveTask(task);
 
@@ -403,7 +403,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
     public void testCustomIdentityLink() {
         runtimeService.startProcessInstanceByKey("customIdentityLink");
 
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().taskInvolvedUser("kermit").list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskInvolvedUser("kermit").list();
         assertEquals(1, tasks.size());
 
         List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(tasks.get(0).getId());

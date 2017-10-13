@@ -19,8 +19,8 @@ import java.util.List;
 
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.util.DateToStringSerializer;
-import org.flowable.task.service.DelegationState;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.DelegationState;
+import org.flowable.task.api.Task;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 

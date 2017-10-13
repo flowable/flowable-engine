@@ -15,9 +15,9 @@ package org.flowable.cmmn.engine.impl.util;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.CmmnRepositoryService;
-import org.flowable.cmmn.engine.CmmnRuntimeService;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManager;

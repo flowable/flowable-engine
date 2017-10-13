@@ -25,7 +25,7 @@ public class ActivitiTestCaseTest extends FlowableTestCase {
     public void testSimpleProcess() {
         runtimeService.startProcessInstanceByKey("simpleProcess");
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("My Task", task.getName());
 
         taskService.complete(task.getId());

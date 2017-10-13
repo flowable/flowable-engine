@@ -16,15 +16,19 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.flowable.cmmn.engine.runtime.CaseInstance;
+import java.util.List;
+
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.engine.common.impl.identity.Authentication;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.junit.Test;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class HumanTaskTest extends FlowableCmmnTestCase {
     
@@ -64,6 +68,58 @@ public class HumanTaskTest extends FlowableCmmnTestCase {
                         .singleResult().getValue());
         
         Authentication.setAuthenticatedUserId(null);
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testTaskCompletionExitsStage() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("humanTaskCompletionExits")
+                .start();
+        assertNotNull(caseInstance);
+        
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertEquals("A", tasks.get(0).getName());
+        assertEquals("B", tasks.get(1).getName());
+        assertEquals("C", tasks.get(2).getName());
+        
+        // Completing A should delete B and C
+        cmmnTaskService.complete(tasks.get(0).getId());
+        assertEquals(0, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        assertCaseInstanceEnded(caseInstance);
+        
+        List<HistoricTaskInstance> historicTaskInstances = cmmnHistoryService.createHistoricTaskInstanceQuery().list();
+        assertEquals(3, historicTaskInstances.size());
+        for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
+            assertNotNull(historicTaskInstance.getStartTime());
+            assertNotNull(historicTaskInstance.getEndTime());
+            if (!historicTaskInstance.getName().equals("A")) {
+                assertEquals("cmmn-state-transition-terminate-case", historicTaskInstance.getDeleteReason());
+            }
+        }
+        
+        // Completing C should delete B
+        CaseInstance caseInstance2 = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("humanTaskCompletionExits")
+                .start();
+        assertNotNull(caseInstance2);
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance2.getId()).orderByTaskName().asc().list();
+        cmmnTaskService.complete(tasks.get(2).getId());
+        
+        Task taskA = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance2.getId()).orderByTaskName().asc().singleResult();
+        assertNotNull(taskA);
+        cmmnTaskService.complete(taskA.getId());
+        assertCaseInstanceEnded(caseInstance2);
+        
+        historicTaskInstances = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance2.getId()).list();
+        assertEquals(3, historicTaskInstances.size());
+        for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
+            assertNotNull(historicTaskInstance.getStartTime());
+            assertNotNull(historicTaskInstance.getEndTime());
+            if (historicTaskInstance.getName().equals("B")) {
+                assertEquals("cmmn-state-transition-exit", historicTaskInstance.getDeleteReason());
+            }
+        }
     }
     
 }

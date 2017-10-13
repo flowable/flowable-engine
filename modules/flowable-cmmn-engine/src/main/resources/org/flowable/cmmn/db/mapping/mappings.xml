@@ -27,19 +27,19 @@
     <mapper resource="org/flowable/cmmn/db/mapping/entity/HistoricMilestoneInstance.xml" />
     
     <!-- Variable support -->
-    <mapper resource="org/flowable/variable/db/mapping/common.xml" />
-    <mapper resource="org/flowable/variable/db/mapping/entity/ByteArray.xml" />
-    <mapper resource="org/flowable/variable/db/mapping/entity/VariableInstance.xml" />
-    <mapper resource="org/flowable/variable/db/mapping/entity/HistoricVariableInstance.xml" />
+    <mapper resource="org/flowable/variable/service/db/mapping/common.xml" />
+    <mapper resource="org/flowable/variable/service/db/mapping/entity/ByteArray.xml" />
+    <mapper resource="org/flowable/variable/service/db/mapping/entity/VariableInstance.xml" />
+    <mapper resource="org/flowable/variable/service/db/mapping/entity/HistoricVariableInstance.xml" />
     
     <!-- Identity link support -->
-    <mapper resource="org/flowable/identitylink/db/mapping/entity/IdentityLink.xml" />
-    <mapper resource="org/flowable/identitylink/db/mapping/entity/HistoricIdentityLink.xml" />
+    <mapper resource="org/flowable/identitylink/service/db/mapping/entity/IdentityLink.xml" />
+    <mapper resource="org/flowable/identitylink/service/db/mapping/entity/HistoricIdentityLink.xml" />
     
     <!-- Task support -->
-    <mapper resource="org/flowable/task/db/mapping/common.xml" />
-    <mapper resource="org/flowable/task/db/mapping/entity/Task.xml" />
-    <mapper resource="org/flowable/task/db/mapping/entity/HistoricTaskInstance.xml" />
+    <mapper resource="org/flowable/task/service/db/mapping/common.xml" />
+    <mapper resource="org/flowable/task/service/db/mapping/entity/Task.xml" />
+    <mapper resource="org/flowable/task/service/db/mapping/entity/HistoricTaskInstance.xml" />
     
   </mappers>
 </configuration>

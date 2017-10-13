@@ -24,7 +24,7 @@ import org.activiti.engine.impl.javax.el.PropertyNotFoundException;
 import org.activiti.engine.impl.javax.el.ValueExpression;
 import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.common.api.variable.VariableContainer;
-import org.flowable.variable.service.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * Expression implementation backed by a JUEL {@link ValueExpression}.

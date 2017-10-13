@@ -37,7 +37,7 @@ public class TaskAssignmentCandidateTest extends PluggableFlowableTestCase {
     @Deployment
     public void testCandidateGroups() {
         runtimeService.startProcessInstanceByKey("taskCandidateExample");
-        List<org.flowable.task.service.Task> tasks = taskService
+        List<org.flowable.task.api.Task> tasks = taskService
                 .createTaskQuery()
                 .taskCandidateGroup("management")
                 .list();

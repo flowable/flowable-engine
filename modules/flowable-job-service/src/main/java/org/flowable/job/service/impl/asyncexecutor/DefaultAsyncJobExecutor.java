@@ -23,7 +23,7 @@ import org.apache.commons.lang3.concurrent.BasicThreadFactory;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.job.service.JobInfo;
+import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

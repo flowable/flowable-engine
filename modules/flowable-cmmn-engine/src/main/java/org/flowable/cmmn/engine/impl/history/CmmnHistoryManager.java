@@ -12,8 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.history;
 
+import org.flowable.cmmn.api.runtime.MilestoneInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
-import org.flowable.cmmn.engine.runtime.MilestoneInstance;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 

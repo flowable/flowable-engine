@@ -492,6 +492,16 @@
       "description" : "An expression that must be true to satisfy the sentry",
       "popular" : true
     } ]
+  }, {
+    "name" : "transitioneventpackage",
+    "properties" : [ {
+      "id" : "transitionevent",
+      "type" : "flowable-transitionevent",
+      "title" : "Transition event type",
+      "value" : "complete",
+      "description" : "The type of the transition event",
+      "popular" : true
+    } ]
   } ],
   "stencils" : [ {
     "type" : "node",
@@ -529,7 +539,7 @@
     "hide" : true,
     "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage" ],
     "hiddenPropertyPackages" : [ ],
-    "roles" : [ "StageActivity", "all" ]
+    "roles" : [ "StageActivity", "all", "association_start", "association_end" ]
   }, {
     "type" : "node",
     "id" : "Task",
@@ -629,7 +639,7 @@
     "layout" : [ {
       "type" : "layout.bpmn2_0.sequenceflow"
     } ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "transitioneventpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "ConnectingObjectsMorph", "all" ]
   }],

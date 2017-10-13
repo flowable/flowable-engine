@@ -158,6 +158,13 @@
             <if test="caseInstanceId != null">
                 RES.ID_ = #{caseInstanceId}
             </if>
+            <if test="caseInstanceIds != null &amp;&amp; caseInstanceIds.size() &gt; 0">
+                and RES.ID_ IN
+                <foreach item="caseInstanceId" index="index" collection="caseInstanceIds" 
+                         open="(" separator="," close=")">
+                  #{caseInstanceId}
+                </foreach>
+            </if>
             <if test="caseDefinitionId != null">
                 and RES.CASE_DEF_ID_ = #{caseDefinitionId}
             </if>
@@ -188,7 +195,7 @@
                          open="(" separator="," close=")">
                   #{deploymentId}
                 </foreach>
-              </if>
+            </if>
             <if test="businessKey != null">
                 and RES.BUSINESS_KEY_ = #{businessKey}
             </if>

@@ -30,6 +30,12 @@ import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.api.UserCache;
 import org.flowable.app.service.api.UserCache.CachedUser;
 import org.flowable.app.service.exception.BadRequestException;
+import org.flowable.cmmn.api.CmmnHistoryService;
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
+import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
@@ -40,9 +46,9 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.idm.api.User;
-import org.flowable.task.service.TaskInfo;
-import org.flowable.task.service.TaskInfoQueryWrapper;
-import org.flowable.task.service.history.HistoricTaskInstanceQuery;
+import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.TaskInfoQueryWrapper;
+import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,15 +77,24 @@ public class FlowableTaskQueryService {
 
     @Autowired
     protected RepositoryService repositoryService;
+    
+    @Autowired
+    protected CmmnRepositoryService cmmnRepositoryService;
 
     @Autowired
     protected TaskService taskService;
 
     @Autowired
     protected RuntimeService runtimeService;
+    
+    @Autowired
+    protected CmmnRuntimeService cmmnRuntimeService;
 
     @Autowired
     protected HistoryService historyService;
+    
+    @Autowired
+    protected CmmnHistoryService cmmnHistoryService;
 
     @Autowired
     protected UserCache userCache;
@@ -172,13 +187,14 @@ public class FlowableTaskQueryService {
         List<? extends TaskInfo> tasks = taskInfoQueryWrapper.getTaskInfoQuery().listPage(page * size, size);
 
         JsonNode includeProcessInstanceNode = requestNode.get("includeProcessInstance");
-        // todo Once a ProcessInstanceInfo class has been implement use it instead rather than just the name
         Map<String, String> processInstancesNames = new HashMap<>();
+        Map<String, String> caseInstancesNames = new HashMap<>();
         if (includeProcessInstanceNode != null) {
             handleIncludeProcessInstance(taskInfoQueryWrapper, includeProcessInstanceNode, tasks, processInstancesNames);
+            handleIncludeCaseInstance(taskInfoQueryWrapper, includeProcessInstanceNode, tasks, caseInstancesNames);
         }
 
-        ResultListDataRepresentation result = new ResultListDataRepresentation(convertTaskInfoList(tasks, processInstancesNames));
+        ResultListDataRepresentation result = new ResultListDataRepresentation(convertTaskInfoList(tasks, processInstancesNames, caseInstancesNames));
 
         // In case we're not on the first page and the size exceeds the page size, we need to do an additional count for the total
         if (page != 0 || tasks.size() == size) {
@@ -312,26 +328,58 @@ public class FlowableTaskQueryService {
             }
         }
     }
+    
+    protected void handleIncludeCaseInstance(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode includeProcessInstanceNode, List<? extends TaskInfo> tasks, Map<String, String> caseInstanceNames) {
+        if (includeProcessInstanceNode.asBoolean() && CollectionUtils.isNotEmpty(tasks)) {
+            Set<String> caseInstanceIds = new HashSet<>();
+            for (TaskInfo task : tasks) {
+                if (task.getScopeId() != null) {
+                    caseInstanceIds.add(task.getScopeId());
+                }
+            }
+            if (CollectionUtils.isNotEmpty(caseInstanceIds)) {
+                if (taskInfoQueryWrapper.getTaskInfoQuery() instanceof HistoricTaskInstanceQuery) {
+                    List<HistoricCaseInstance> caseInstances = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceIds(caseInstanceIds).list();
+                    for (HistoricCaseInstance caseInstance : caseInstances) {
+                        caseInstanceNames.put(caseInstance.getId(), caseInstance.getName());
+                    }
+                } else {
+                    List<CaseInstance> caseInstances = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceIds(caseInstanceIds).list();
+                    for (CaseInstance caseInstance : caseInstances) {
+                        caseInstanceNames.put(caseInstance.getId(), caseInstance.getName());
+                    }
+                }
+            }
+        }
+    }
 
-    protected List<TaskRepresentation> convertTaskInfoList(List<? extends TaskInfo> tasks, Map<String, String> processInstanceNames) {
+    protected List<TaskRepresentation> convertTaskInfoList(List<? extends TaskInfo> tasks, Map<String, String> processInstanceNames, Map<String, String> caseInstancesNames) {
         List<TaskRepresentation> result = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(tasks)) {
             for (TaskInfo task : tasks) {
-                ProcessDefinitionEntity processDefinition = null;
-                if (task.getProcessDefinitionId() != null) {
-                    processDefinition = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(task.getProcessDefinitionId());
+                
+                TaskRepresentation taskRepresentation = null;
+                if (task.getScopeDefinitionId() != null) {
+                    CaseDefinition caseDefinition = cmmnRepositoryService.getCaseDefinition(task.getScopeDefinitionId());
+                    taskRepresentation = new TaskRepresentation(task, caseDefinition, caseInstancesNames.get(task.getScopeId()));
+                    
+                } else {
+                    ProcessDefinitionEntity processDefinition = null;
+                    if (task.getProcessDefinitionId() != null) {
+                        processDefinition = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(task.getProcessDefinitionId());
+                    }
+                    taskRepresentation = new TaskRepresentation(task, processDefinition, processInstanceNames.get(task.getProcessInstanceId()));
                 }
-                TaskRepresentation representation = new TaskRepresentation(task, processDefinition, processInstanceNames.get(task.getProcessInstanceId()));
 
                 if (StringUtils.isNotEmpty(task.getAssignee())) {
                     CachedUser cachedUser = userCache.getUser(task.getAssignee());
                     if (cachedUser != null && cachedUser.getUser() != null) {
                         User assignee = cachedUser.getUser();
-                        representation.setAssignee(new UserRepresentation(assignee));
+                        taskRepresentation.setAssignee(new UserRepresentation(assignee));
                     }
                 }
 
-                result.add(representation);
+                result.add(taskRepresentation);
             }
         }
         return result;

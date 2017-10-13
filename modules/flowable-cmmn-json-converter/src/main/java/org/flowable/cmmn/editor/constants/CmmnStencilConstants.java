@@ -91,6 +91,8 @@ public interface CmmnStencilConstants {
     
     String PROPERTY_IF_PART_CONDITION = "ifpartcondition";
     
+    String PROPERTY_TRANSITION_EVENT = "transitionevent";
+    
     String PROPERTY_HTTPTASK_REQ_METHOD = "httptaskrequestmethod";
     String PROPERTY_HTTPTASK_REQ_URL = "httptaskrequesturl";
     String PROPERTY_HTTPTASK_REQ_HEADERS = "httptaskrequestheaders";

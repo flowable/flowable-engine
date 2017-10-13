@@ -15,10 +15,10 @@ package org.flowable.cmmn.engine.impl.runtime;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.runtime.PlanItemInstance;
-import org.flowable.cmmn.engine.runtime.PlanItemInstanceQuery;
-import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.AbstractQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;

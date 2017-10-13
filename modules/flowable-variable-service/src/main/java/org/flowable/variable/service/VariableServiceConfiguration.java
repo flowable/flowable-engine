@@ -13,6 +13,7 @@
 package org.flowable.variable.service;
 
 import org.flowable.engine.common.AbstractServiceConfiguration;
+import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.HistoricVariableServiceImpl;
 import org.flowable.variable.service.impl.VariableServiceImpl;
@@ -28,7 +29,6 @@ import org.flowable.variable.service.impl.persistence.entity.data.VariableInstan
 import org.flowable.variable.service.impl.persistence.entity.data.impl.MybatisHistoricVariableInstanceDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.MybatisVariableByteArrayDataManager;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.MybatisVariableInstanceDataManager;
-import org.flowable.variable.service.impl.types.VariableTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

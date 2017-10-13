@@ -16,10 +16,10 @@ import java.util.List;
 
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.TimerJobQueryImpl;
-import org.flowable.variable.service.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * {@link EntityManager} responsible for {@link TimerJobEntity} instances.

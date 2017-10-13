@@ -44,7 +44,7 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
         Map<String, Object> varMap = new HashMap<>();
         varMap.put("test", "test");
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess", varMap);
-        org.flowable.task.service.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals("Task in subprocess", subProcessTask.getName());
 
         // get variables for execution id user task, should return the new value
@@ -98,7 +98,7 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
         varMap.put("test", "test");
         varMap.put("helloWorld", "helloWorld");
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess", varMap);
-        org.flowable.task.service.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         runtimeService.setVariableLocal(pi.getProcessInstanceId(), "mainProcessLocalVariable", "Hello World");
 
         assertEquals("Task in subprocess", subProcessTask.getName());
@@ -157,7 +157,7 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
         // active
         Map<String, Object> varMap = new HashMap<>();
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("nestedSubProcess", varMap);
-        org.flowable.task.service.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals("Task in subprocess1", subProcessTask.getName());
 
         // get variables for execution id user task, should return the new value
@@ -203,9 +203,9 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
         // the subprocess scope is destroyed and the complete process ends
         taskService.complete(subProcessTask.getId());
 
-        List<org.flowable.task.service.Task> subProcessTasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
+        List<org.flowable.task.api.Task> subProcessTasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
 
-        for (org.flowable.task.service.Task subProcTask : subProcessTasks) {
+        for (org.flowable.task.api.Task subProcTask : subProcessTasks) {
             if (subProcTask.getName().equals("Task in subprocess2")) {
                 // get variables for execution id user task, should return the
                 // old value
@@ -236,7 +236,7 @@ public class VariableScopeTest extends PluggableFlowableTestCase {
         }
 
         // finish process
-        for (org.flowable.task.service.Task subProcTask : subProcessTasks) {
+        for (org.flowable.task.api.Task subProcTask : subProcessTasks) {
             taskService.complete(subProcTask.getId());
         }
     }

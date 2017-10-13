@@ -19,9 +19,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.data.VariableInstanceDataManager;
-import org.flowable.variable.service.impl.types.VariableType;
 
 /**
  * @author Tom Baeyens

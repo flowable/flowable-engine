@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.Task;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.TaskQueryImpl;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;

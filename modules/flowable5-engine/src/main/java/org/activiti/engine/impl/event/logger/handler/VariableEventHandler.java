@@ -30,8 +30,8 @@ import org.activiti.engine.impl.variable.SerializableType;
 import org.activiti.engine.impl.variable.ShortType;
 import org.activiti.engine.impl.variable.StringType;
 import org.activiti.engine.impl.variable.UUIDType;
-import org.flowable.variable.service.event.FlowableVariableEvent;
-import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.variable.api.event.FlowableVariableEvent;
+import org.flowable.variable.api.types.VariableType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

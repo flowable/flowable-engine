@@ -14,9 +14,9 @@ package org.flowable.cmmn.engine.delegate;
 
 import java.util.Date;
 
-import org.flowable.cmmn.engine.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.model.PlanItem;
-import org.flowable.variable.service.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Joram Barrez

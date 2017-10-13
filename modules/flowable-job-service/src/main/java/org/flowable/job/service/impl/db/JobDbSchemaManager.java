@@ -29,7 +29,7 @@ public class JobDbSchemaManager extends ServiceSqlScriptBasedDbSchemaManager {
 
     @Override
     protected String getResourcesRootDirectory() {
-        return "org/flowable/job/db/";
+        return "org/flowable/job/service/db/";
     }
 
 }

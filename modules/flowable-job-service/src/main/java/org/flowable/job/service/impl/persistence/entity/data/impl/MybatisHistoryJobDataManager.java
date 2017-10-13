@@ -20,7 +20,7 @@ import java.util.Map;
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.db.AbstractDataManager;
 import org.flowable.engine.common.impl.db.ListQueryParameterObject;
-import org.flowable.job.service.HistoryJob;
+import org.flowable.job.api.HistoryJob;
 import org.flowable.job.service.impl.HistoryJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntityImpl;

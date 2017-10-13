@@ -22,11 +22,11 @@ import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.CmmnRepositoryService;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.repository.CaseDefinition;
-import org.flowable.cmmn.engine.repository.CmmnDeployment;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -37,8 +37,8 @@ import org.flowable.form.api.FormService;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.FormFieldTypes;
 import org.flowable.form.model.FormModel;
-import org.flowable.task.service.history.HistoricTaskInstance;
-import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 
 /**
  * @author Tijs Rademakers

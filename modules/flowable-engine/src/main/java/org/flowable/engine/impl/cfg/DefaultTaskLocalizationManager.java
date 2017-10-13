@@ -16,9 +16,9 @@ package org.flowable.engine.impl.cfg;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.InternalTaskLocalizationManager;
-import org.flowable.task.service.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 
 import com.fasterxml.jackson.databind.JsonNode;

@@ -33,7 +33,7 @@ public class TaskBatchDeleteTest extends PluggableFlowableTestCase {
         // org.flowable.task.service.Task 1, Identity link pointing to task 1, org.flowable.task.service.Task 2
         // The task deletes shouldn't be batched in this case, keeping the
         // related entity delete order
-        org.flowable.task.service.Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskOne").singleResult();
+        org.flowable.task.api.Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("taskOne").singleResult();
         assertNotNull(firstTask);
 
         taskService.complete(firstTask.getId());
@@ -51,11 +51,11 @@ public class TaskBatchDeleteTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
         assertFalse(processInstance.isEnded());
 
-        org.flowable.task.service.Task lastTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("multiInstance").listPage(4, 1).get(0);
+        org.flowable.task.api.Task lastTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("multiInstance").listPage(4, 1).get(0);
 
         taskService.addCandidateGroup(lastTask.getId(), "sales");
 
-        org.flowable.task.service.Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("multiInstance").listPage(0, 1).get(0);
+        org.flowable.task.api.Task firstTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("multiInstance").listPage(0, 1).get(0);
         assertNotNull(firstTask);
 
         taskService.complete(firstTask.getId());

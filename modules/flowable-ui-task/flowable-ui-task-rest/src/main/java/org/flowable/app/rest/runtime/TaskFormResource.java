@@ -12,10 +12,7 @@
  */
 package org.flowable.app.rest.runtime;
 
-import java.util.List;
-
 import org.flowable.app.model.runtime.CompleteFormRepresentation;
-import org.flowable.app.model.runtime.ProcessInstanceVariableRepresentation;
 import org.flowable.app.model.runtime.SaveFormRepresentation;
 import org.flowable.app.service.runtime.FlowableTaskFormService;
 import org.flowable.form.model.FormModel;
@@ -53,10 +50,5 @@ public class TaskFormResource {
     @RequestMapping(value = "/{taskId}/save-form", method = RequestMethod.POST, produces = "application/json")
     public void saveTaskForm(@PathVariable String taskId, @RequestBody SaveFormRepresentation saveFormRepresentation) {
         taskFormService.saveTaskForm(taskId, saveFormRepresentation);
-    }
-
-    @RequestMapping(value = "/{taskId}/variables", method = RequestMethod.GET, produces = "application/json")
-    public List<ProcessInstanceVariableRepresentation> getProcessInstanceVariables(@PathVariable String taskId) {
-        return taskFormService.getProcessInstanceVariables(taskId);
     }
 }

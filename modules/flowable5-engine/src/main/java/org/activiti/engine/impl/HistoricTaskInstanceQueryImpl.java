@@ -30,7 +30,7 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.idm.api.Group;
-import org.flowable.variable.service.impl.types.VariableTypes;
+import org.flowable.variable.api.types.VariableTypes;
 
 /**
  * @author Tom Baeyens

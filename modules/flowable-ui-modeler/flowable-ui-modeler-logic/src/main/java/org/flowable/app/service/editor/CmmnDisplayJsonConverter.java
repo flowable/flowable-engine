@@ -86,6 +86,8 @@ public class CmmnDisplayJsonConverter {
             elementNode.put("type", "PlanModel");
             elementArray.add(elementNode);
             
+            processCriteria(caseObject.getPlanModel().getExitCriteria(), "ExitCriterion", pojoModel, elementArray);
+            
             processElements(caseObject.getPlanModel().getPlanItems(), pojoModel, elementArray, flowArray, diagramInfo);
         }
         

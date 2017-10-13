@@ -79,10 +79,6 @@ public abstract class ServiceSqlScriptBasedDbSchemaManager extends AbstractSqlSc
                 if (isHistoryUsed()) {
                     dbSchemaUpgrade(schemaComponentHistory, matchingVersionIndex);
                 }
-                
-                if (dbVersion != null) {
-                    setProperty(schemaVersionProperty, FlowableVersions.CURRENT_VERSION);
-                }
             }
             
             feedback = "upgraded from " + compareWithVersion + " to " + FlowableVersions.CURRENT_VERSION;

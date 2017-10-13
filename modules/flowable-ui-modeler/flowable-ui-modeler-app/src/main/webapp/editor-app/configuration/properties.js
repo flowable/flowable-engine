@@ -34,6 +34,10 @@ FLOWABLE.PROPERTY_CONFIG =
         "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/ordering-property-write-template.html"
     },
+    "oryx-dataproperties-complex": {
+        "readModeTemplateUrl": "editor-app/configuration/properties/data-properties-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/data-properties-write-template.html"
+    },
     "oryx-formproperties-complex": {
         "readModeTemplateUrl": "editor-app/configuration/properties/form-properties-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/form-properties-write-template.html"
@@ -113,5 +117,9 @@ FLOWABLE.PROPERTY_CONFIG =
     "oryx-processtaskprocessreference-complex": {
         "readModeTemplateUrl": "editor-app/configuration/properties/process-reference-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/process-reference-write-template.html"
+    },
+    "flowable-transitionevent" : {
+        "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/transition-event-write-template.html"
     }
 };

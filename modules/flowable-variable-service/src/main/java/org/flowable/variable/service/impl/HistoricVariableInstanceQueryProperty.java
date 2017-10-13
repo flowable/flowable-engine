@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.common.api.query.QueryProperty;
-import org.flowable.variable.service.history.HistoricVariableInstanceQuery;
+import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
 
 /**
  * Contains the possible properties which can be used in a {@link HistoricVariableInstanceQuery}.

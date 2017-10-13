@@ -16,7 +16,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.job.service.JobInfo;
+import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;

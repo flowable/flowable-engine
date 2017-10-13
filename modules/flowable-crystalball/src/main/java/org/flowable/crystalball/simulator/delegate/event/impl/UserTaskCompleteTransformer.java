@@ -20,7 +20,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.Task;
 
 /**
  * @author martin.grofcik

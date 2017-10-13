@@ -43,7 +43,7 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.apache.ibatis.session.RowBounds;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

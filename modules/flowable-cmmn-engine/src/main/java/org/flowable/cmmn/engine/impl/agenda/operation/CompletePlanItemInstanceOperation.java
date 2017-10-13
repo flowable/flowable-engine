@@ -12,8 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
