@@ -16,7 +16,7 @@ import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.variable.service.event.FlowableVariableEvent;
+import org.flowable.variable.api.event.FlowableVariableEvent;
 
 /**
  * Test case for all {@link FlowableEvent}s related to variables.
@@ -31,7 +31,7 @@ public class StandaloneTaskVariableEventsTest extends PluggableFlowableTestCase 
      * Test to check create, update an delete behavior for variables on a task not related to a process.
      */
     public void testTaskVariableStandalone() throws Exception {
-        org.flowable.task.service.Task newTask = taskService.newTask();
+        org.flowable.task.api.Task newTask = taskService.newTask();
         try {
             taskService.saveTask(newTask);
 

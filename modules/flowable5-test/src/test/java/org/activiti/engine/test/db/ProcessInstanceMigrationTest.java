@@ -30,7 +30,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.task.service.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 /**
  * @author Falko Menge
@@ -312,7 +312,7 @@ public class ProcessInstanceMigrationTest extends PluggableFlowableTestCase {
             commandExecutor.execute(new SetProcessDefinitionVersionCmd(pi.getId(), 2));
 
             // check UserTask
-            org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
             assertEquals(newProcessDefinition.getId(), task.getProcessDefinitionId());
             assertEquals("testFormKey", formService.getTaskFormData(task.getId()).getFormKey());
 

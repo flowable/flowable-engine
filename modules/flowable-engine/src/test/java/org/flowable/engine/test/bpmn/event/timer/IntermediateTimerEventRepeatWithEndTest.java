@@ -22,7 +22,7 @@ import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -66,12 +66,12 @@ public class IntermediateTimerEventRepeatWithEndTest extends PluggableFlowableTe
         runtimeService.setVariable(processInstance.getId(), "EndDateForCatch1", dateStr1);
         runtimeService.setVariable(processInstance.getId(), "EndDateForCatch2", dateStr2);
 
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertEquals(1, tasks.size());
 
         tasks = taskService.createTaskQuery().list();
         assertEquals(1, tasks.size());
-        org.flowable.task.service.Task task = tasks.get(0);
+        org.flowable.task.api.Task task = tasks.get(0);
         assertEquals("Task A", task.getName());
 
         // Test Timer Catch Intermediate Events after completing org.flowable.task.service.Task A (endDate not reached but it will be executed according to the expression)

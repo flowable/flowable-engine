@@ -102,7 +102,7 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("decisionBasedOnBeanProperty",
                 CollectionUtil.singletonMap("order", new ExclusiveGatewayTestOrder(150)));
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
         assertEquals("Standard service", task.getName());
     }
@@ -117,7 +117,7 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey(
                 "decisionBasedOnListOrArrayOfBeans", CollectionUtil.singletonMap("orders", orders));
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertNotNull(task);
         assertEquals("Gold Member service", task.getName());
 
@@ -137,7 +137,7 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("decisionBasedOnBeanMethod",
                 CollectionUtil.singletonMap("order", new ExclusiveGatewayTestOrder(300)));
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
         assertEquals("Gold Member service", task.getName());
     }
@@ -159,7 +159,7 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
         // Input == 1 -> default is not selected
         String procId = runtimeService.startProcessInstanceByKey("exclusiveGwDefaultSequenceFlow",
                 CollectionUtil.singletonMap("input", 1)).getId();
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Input is one", task.getName());
         runtimeService.deleteProcessInstance(procId, null);
 

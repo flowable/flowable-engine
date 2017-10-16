@@ -13,7 +13,7 @@
 package org.activiti.engine.impl.variable;
 
 import org.activiti.engine.ActivitiException;
-import org.flowable.variable.service.impl.types.ValueFields;
+import org.flowable.variable.api.types.ValueFields;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

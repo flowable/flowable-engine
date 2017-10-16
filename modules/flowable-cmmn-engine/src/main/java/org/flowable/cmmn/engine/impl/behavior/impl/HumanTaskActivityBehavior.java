@@ -18,10 +18,14 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.task.TaskHelper;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.HumanTask;
+import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.Expression;
@@ -31,14 +35,14 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-import org.flowable.variable.service.type.VariableScopeType;
+import org.flowable.variable.api.type.VariableScopeType;
 import org.joda.time.DateTime;
 import org.joda.time.Period;
 
 /**
  * @author Joram Barrez
  */
-public class HumanTaskActivityBehavior extends TaskActivityBehavior {
+public class HumanTaskActivityBehavior extends TaskActivityBehavior implements PlanItemActivityBehavior {
     
     protected HumanTask humanTask;
     
@@ -63,22 +67,52 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior {
             
             taskEntity.setTaskDefinitionKey(humanTask.getId());
             
+            handleTaskName(planItemInstanceEntity, expressionManager, taskEntity);
+            handleTaskDescription(planItemInstanceEntity, expressionManager, taskEntity);
             handleAssignee(planItemInstanceEntity, taskService, expressionManager, taskEntity);
             handleOwner(planItemInstanceEntity, taskService, expressionManager, taskEntity);
-            handlePrioroty(planItemInstanceEntity, expressionManager, taskEntity);
+            handlePriority(planItemInstanceEntity, expressionManager, taskEntity);
             handleFormKey(planItemInstanceEntity, expressionManager, taskEntity);
             handleDueDate(commandContext, planItemInstanceEntity, expressionManager, taskEntity);
             handleCategory(planItemInstanceEntity, expressionManager, taskEntity);
+            
+            taskService.insertTask(taskEntity, true);
+            
             handleCandidateUsers(commandContext, planItemInstanceEntity, expressionManager, taskEntity);
             handleCandidateGroups(commandContext, planItemInstanceEntity, expressionManager, taskEntity);
             
-            taskService.insertTask(taskEntity, true);
             CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskCreated(taskEntity);
             
         } else {
             // if not blocking, treat as a manual task. No need to create a task entry.
             CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance((PlanItemInstanceEntity) planItemInstanceEntity);
             
+        }
+    }
+    
+    protected void handleTaskName(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager, TaskEntity taskEntity) {
+        if (StringUtils.isNotEmpty(humanTask.getName())) {
+            Object name = expressionManager.createExpression(humanTask.getName()).getValue(planItemInstanceEntity);
+            if (name != null) {
+                if (name instanceof String) {
+                    taskEntity.setName((String) name);
+                } else {
+                    throw new FlowableIllegalArgumentException("name expression does not resolve to a string: " + humanTask.getName());
+                }
+            }
+        }
+    }
+    
+    protected void handleTaskDescription(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager, TaskEntity taskEntity) {
+        if (StringUtils.isNotEmpty(humanTask.getDocumentation())) {
+            Object description = expressionManager.createExpression(humanTask.getDocumentation()).getValue(planItemInstanceEntity);
+            if (description != null) {
+                if (description instanceof String) {
+                    taskEntity.setDescription((String) description);
+                } else {
+                    throw new FlowableIllegalArgumentException("documentation expression does not resolve to a string: " + humanTask.getDocumentation());
+                }
+            }
         }
     }
 
@@ -108,8 +142,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior {
         }
     }
 
-    protected void handlePrioroty(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager,
-            TaskEntity taskEntity) {
+    protected void handlePriority(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager, TaskEntity taskEntity) {
         if (StringUtils.isNotEmpty(humanTask.getPriority())) {
             Object priority = expressionManager.createExpression(humanTask.getPriority()).getValue(planItemInstanceEntity);
             if (priority != null) {
@@ -253,12 +286,22 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior {
         // Should be only one
         for (TaskEntity taskEntity : taskEntities) {
             if (!taskEntity.isDeleted()) {
-                taskService.deleteTask(taskEntity, true);
-                CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskEnd(taskEntity, null);
+                TaskHelper.deleteTask(taskEntity, null, false, true);
             }
         }
         
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance((PlanItemInstanceEntity) planItemInstance);
+    }
+    
+    @Override
+    public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
+        if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
+            TaskService taskService = CommandContextUtil.getTaskService(commandContext);
+            List<TaskEntity> taskEntities = taskService.findTasksBySubScopeIdScopeType(planItemInstance.getId(), VariableScopeType.CMMN);
+            for (TaskEntity taskEntity : taskEntities) {
+                TaskHelper.deleteTask(taskEntity, "cmmn-state-transition-" + transition, false, true);
+            }
+        }
     }
 
 }

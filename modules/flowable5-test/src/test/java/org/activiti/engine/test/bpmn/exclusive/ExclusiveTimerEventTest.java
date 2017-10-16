@@ -18,7 +18,7 @@ import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.job.service.TimerJobQuery;
+import org.flowable.job.api.TimerJobQuery;
 
 public class ExclusiveTimerEventTest extends PluggableFlowableTestCase {
 

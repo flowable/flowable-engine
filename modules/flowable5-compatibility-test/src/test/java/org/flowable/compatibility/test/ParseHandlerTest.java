@@ -17,7 +17,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
-import org.flowable.task.service.Task;
+import org.flowable.task.api.Task;
 import org.junit.Test;
 
 public class ParseHandlerTest extends AbstractFlowable6CompatibilityTest {

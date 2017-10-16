@@ -23,7 +23,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.data.AttachmentDataManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.Attachment;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.Task;
 
 /**
  * @author Tom Baeyens

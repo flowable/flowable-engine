@@ -29,8 +29,8 @@ import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.variable.service.history.HistoricVariableInstance;
-import org.flowable.variable.service.history.HistoricVariableInstanceQuery;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
 
 public class CallActivityTest extends ResourceFlowableTestCase {
 

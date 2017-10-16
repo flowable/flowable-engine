@@ -107,7 +107,7 @@ public class ProcessDefinitionCacheTest extends PvmTestCase {
 
         // Complete the task. That will end the process instance
         TaskService taskService = processEngine.getTaskService();
-        org.flowable.task.service.Task task = taskService
+        org.flowable.task.api.Task task = taskService
                 .createTaskQuery()
                 .list()
                 .get(0);
@@ -167,7 +167,7 @@ public class ProcessDefinitionCacheTest extends PvmTestCase {
         // Start process instance on second engine
         String processDefinitionId = repositoryService2.createProcessDefinitionQuery().singleResult().getId();
         runtimeService2.startProcessInstanceById(processDefinitionId);
-        org.flowable.task.service.Task task = taskService2.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService2.createTaskQuery().singleResult();
         assertEquals("original task", task.getName());
 
         // Delete the deployment on second process engine

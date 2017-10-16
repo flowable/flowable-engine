@@ -14,9 +14,12 @@ package org.flowable.cmmn.engine.impl;
 
 import java.util.Map;
 
-import org.flowable.cmmn.engine.CmmnTaskService;
+import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.engine.impl.cmd.CompleteTaskCmd;
-import org.flowable.task.service.TaskQuery;
+import org.flowable.cmmn.engine.impl.cmd.CompleteTaskWithFormCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetTaskFormModelCmd;
+import org.flowable.form.model.FormModel;
+import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.impl.TaskQueryImpl;
 
 /**
@@ -37,6 +40,30 @@ public class CmmnTaskServiceImpl extends ServiceImpl implements CmmnTaskService 
     @Override
     public void complete(String taskId, Map<String, Object> variables, Map<String, Object> transientVariables) {
         commandExecutor.execute(new CompleteTaskCmd(taskId, variables, transientVariables));        
+    }
+    
+    @Override
+    public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome, Map<String, Object> variables) {
+        commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables));
+    }
+
+    @Override
+    public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
+            Map<String, Object> variables, Map<String, Object> transientVariables) {
+
+        commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables, transientVariables));
+    }
+
+    @Override
+    public void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
+            Map<String, Object> variables, boolean localScope) {
+
+        commandExecutor.execute(new CompleteTaskWithFormCmd(taskId, formDefinitionId, outcome, variables, localScope));
+    }
+
+    @Override
+    public FormModel getTaskFormModel(String taskId) {
+        return commandExecutor.execute(new GetTaskFormModelCmd(taskId));
     }
     
     @Override

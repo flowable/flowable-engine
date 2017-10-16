@@ -61,6 +61,8 @@ public class DmnEngineConfigurator extends AbstractEngineConfigurator {
         initialiseCommonProperties(processEngineConfiguration, dmnEngineConfiguration);
 
         initDmnEngine();
+        
+        initServiceConfigurations(processEngineConfiguration, dmnEngineConfiguration);
     }
     
     @Override

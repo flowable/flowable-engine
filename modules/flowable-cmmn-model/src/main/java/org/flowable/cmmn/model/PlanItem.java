@@ -20,7 +20,6 @@ import java.util.List;
  */
 public class PlanItem extends CaseElement implements HasEntryCriteria, HasExitCriteria, HasAssociations {
     
-    protected String name;
     protected String definitionRef;
     protected PlanItemDefinition planItemDefinition;
     protected List<String> criteriaRefs = new ArrayList<>();
@@ -30,14 +29,6 @@ public class PlanItem extends CaseElement implements HasEntryCriteria, HasExitCr
     protected List<Association> outgoingAssociations = new ArrayList<>();
     
     protected Object behavior;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
 
     public String getDefinitionRef() {
         return definitionRef;

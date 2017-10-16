@@ -152,6 +152,12 @@
             <if test="caseInstanceId != null">
                 and RES.ID_ = #{caseInstanceId}
             </if>
+            <if test="caseInstanceIds != null">
+                and RES.ID_ IN
+                <foreach item="caseInstanceId" index="index" collection="caseInstanceIds" open="(" separator="," close=")">
+                    #{caseInstanceId}
+                </foreach>
+            </if>
             <if test="caseDefinitionId != null">
                 RES.CASE_DEF_ID_ = #{caseDefinitionId}
             </if>

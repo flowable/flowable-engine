@@ -17,13 +17,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.flowable.cmmn.api.CmmnHistoryService;
+import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.CmmnHistoryService;
-import org.flowable.cmmn.engine.CmmnManagementService;
-import org.flowable.cmmn.engine.CmmnRepositoryService;
-import org.flowable.cmmn.engine.CmmnRuntimeService;
-import org.flowable.cmmn.engine.CmmnTaskService;
 import org.flowable.cmmn.engine.test.impl.CmmnTestHelper;
 import org.flowable.engine.common.api.FlowableException;
 import org.junit.internal.AssumptionViolatedException;
@@ -34,7 +34,7 @@ import org.junit.runners.model.MultipleFailureException;
 import org.junit.runners.model.Statement;
 
 /**
- * Convenience for ProcessEngine and services initialization in the form of a JUnit rule.
+ * Convenience for CmmnEngine and services initialization in the form of a JUnit rule.
  * 
  * <p>
  * Usage:
@@ -51,13 +51,13 @@ import org.junit.runners.model.Statement;
  * </pre>
  * 
  * <p>
- * The ProcessEngine and the services will be made available to the test class through the getters of the FlowableRule. The processEngine will be initialized by default with the flowable.cfg.xml
- * resource on the classpath. To specify a different configuration file, pass the resource location in {@link #FlowableRule(String) the appropriate constructor}. Process engines will be cached
- * statically. Right before the first time the setUp is called for a given configuration resource, the process engine will be constructed.
+ * The CmmnEngine and the services will be made available to the test class through the getters of the FlowableCmmnRule. The cmmnEngine will be initialized by default with the flowable.cfg.xml
+ * resource on the classpath. To specify a different configuration file, pass the resource location in {@link #FlowableCmmnRule(String) the appropriate constructor}. Cmmn engines will be cached
+ * statically. Right before the first time the setUp is called for a given configuration resource, the cmmn engine will be constructed.
  * </p>
  * 
  * <p>
- * You can declare a deployment with the {@link Deployment} annotation. This base class will make sure that this deployment gets deployed before the setUp and
+ * You can declare a deployment with the {@link CmmnDeployment} annotation. This base class will make sure that this deployment gets deployed before the setUp and
  * {@link CmmnRepositoryService#deleteDeployment(String, boolean) cascade deleted} after the tearDown.
  * </p>
  * 

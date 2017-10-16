@@ -45,7 +45,7 @@ import org.flowable.rest.service.HttpMultipartHelper;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.rest.util.TestServerUtil;
 import org.flowable.rest.util.TestServerUtil.TestServer;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.Task;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;

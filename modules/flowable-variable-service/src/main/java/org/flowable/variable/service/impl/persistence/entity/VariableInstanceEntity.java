@@ -14,7 +14,8 @@ package org.flowable.variable.service.impl.persistence.entity;
 
 import org.flowable.engine.common.impl.db.HasRevision;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * @author Tom Baeyens

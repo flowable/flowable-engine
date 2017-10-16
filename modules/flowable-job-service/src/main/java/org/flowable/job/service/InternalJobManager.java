@@ -13,9 +13,10 @@
 
 package org.flowable.job.service;
 
+import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
-import org.flowable.variable.service.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Tijs Rademakers

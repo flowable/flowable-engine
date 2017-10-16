@@ -13,7 +13,7 @@
 package org.flowable.app.model.runtime;
 
 import org.flowable.app.model.common.AbstractRepresentation;
-import org.flowable.cmmn.engine.repository.CaseDefinition;
+import org.flowable.cmmn.api.repository.CaseDefinition;
 
 /**
  * REST representation of a case definition.

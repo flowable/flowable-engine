@@ -15,8 +15,8 @@ package org.flowable.spring.test.expression.callactivity;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
-import org.flowable.task.service.Task;
-import org.flowable.task.service.TaskQuery;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskQuery;
 import org.springframework.test.context.ContextConfiguration;
 
 /**

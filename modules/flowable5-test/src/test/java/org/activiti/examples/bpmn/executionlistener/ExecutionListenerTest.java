@@ -44,7 +44,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         assertEquals("businessKey123", businessKey);
 
         // Transition take executionListener will set 2 variables
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
         taskService.complete(task.getId());
 

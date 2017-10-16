@@ -12,11 +12,11 @@
  */
 package org.flowable.engine.impl.util;
 
-import org.flowable.cmmn.engine.CmmnEngineConfigurationApi;
-import org.flowable.cmmn.engine.CmmnHistoryService;
-import org.flowable.cmmn.engine.CmmnManagementService;
-import org.flowable.cmmn.engine.CmmnRepositoryService;
-import org.flowable.cmmn.engine.CmmnRuntimeService;
+import org.flowable.cmmn.api.CmmnEngineConfigurationApi;
+import org.flowable.cmmn.api.CmmnHistoryService;
+import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentService;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;

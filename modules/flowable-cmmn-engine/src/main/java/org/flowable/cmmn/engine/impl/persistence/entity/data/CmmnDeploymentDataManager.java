@@ -14,9 +14,9 @@ package org.flowable.cmmn.engine.impl.persistence.entity.data;
 
 import java.util.List;
 
+import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl;
-import org.flowable.cmmn.engine.repository.CmmnDeployment;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 
 /**

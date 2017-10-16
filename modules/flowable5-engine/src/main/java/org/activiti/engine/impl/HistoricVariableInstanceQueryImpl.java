@@ -26,7 +26,7 @@ import org.activiti.engine.impl.persistence.entity.HistoricVariableInstanceEntit
 import org.activiti.engine.impl.variable.CacheableVariable;
 import org.activiti.engine.impl.variable.JPAEntityListVariableType;
 import org.activiti.engine.impl.variable.JPAEntityVariableType;
-import org.flowable.variable.service.impl.types.VariableTypes;
+import org.flowable.variable.api.types.VariableTypes;
 
 /**
  * @author Christian Lipphardt (camunda)

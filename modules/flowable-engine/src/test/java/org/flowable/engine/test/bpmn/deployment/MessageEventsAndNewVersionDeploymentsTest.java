@@ -54,10 +54,10 @@ public class MessageEventsAndNewVersionDeploymentsTest extends PluggableFlowable
 
         assertReceiveMessage("myMessage", 2);
 
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertEquals(2, tasks.size());
 
-        for (org.flowable.task.service.Task task : tasks) {
+        for (org.flowable.task.api.Task task : tasks) {
             assertEquals("Task after message", task.getName());
         }
 

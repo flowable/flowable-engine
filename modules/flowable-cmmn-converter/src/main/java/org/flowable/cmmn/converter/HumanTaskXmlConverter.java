@@ -40,7 +40,7 @@ public class HumanTaskXmlConverter extends TaskXmlConverter {
         task.setDueDate(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_DUE_DATE));
         task.setCategory(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_CATEGORY));
         
-        String candidateUsersString =  xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_USER_CANDIDATEUSERS);
+        String candidateUsersString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_CANDIDATE_USERS);
         if (StringUtils.isNotEmpty(candidateUsersString)) {
             String[] candidateUsers = candidateUsersString.split(",");
             for (String candidateUser : candidateUsers) {
@@ -48,11 +48,11 @@ public class HumanTaskXmlConverter extends TaskXmlConverter {
             }
         }
         
-        String candidateGroupsString =  xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_USER_CANDIDATEGROUPS);
+        String candidateGroupsString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_CANDIDATE_GROUPS);
         if (StringUtils.isNotEmpty(candidateGroupsString)) {
             String[] candidateGroups = candidateGroupsString.split(",");
             for (String candidateGroup : candidateGroups) {
-                task.getCandidateUsers().add(candidateGroup);
+                task.getCandidateGroups().add(candidateGroup);
             }
         }
         

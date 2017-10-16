@@ -17,7 +17,7 @@ import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.task.service.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 /**
  * @author Rich Kroll, Tijs Rademakers
@@ -27,7 +27,7 @@ public class ScriptTaskListenerTest extends PluggableFlowableTestCase {
     @Deployment(resources = { "org/flowable/examples/bpmn/tasklistener/ScriptTaskListenerTest.bpmn20.xml" })
     public void testScriptTaskListener() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("scriptTaskListenerProcess");
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Name does not match", "All your base are belong to us", task.getName());
 
         taskService.complete(task.getId());

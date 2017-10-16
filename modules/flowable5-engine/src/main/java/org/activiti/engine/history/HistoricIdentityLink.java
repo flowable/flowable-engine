@@ -14,7 +14,7 @@
 package org.activiti.engine.history;
 
 import org.activiti.engine.task.IdentityLinkType;
-import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.UserQuery;
 

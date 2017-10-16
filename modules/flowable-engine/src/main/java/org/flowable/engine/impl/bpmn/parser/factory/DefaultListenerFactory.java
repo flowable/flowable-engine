@@ -46,9 +46,9 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
-import org.flowable.identitylink.service.IdentityLink;
-import org.flowable.job.service.Job;
-import org.flowable.task.service.Task;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.job.api.Job;
+import org.flowable.task.api.Task;
 
 /**
  * Default implementation of the {@link ListenerFactory}. Used when no custom {@link ListenerFactory} is injected on the {@link ProcessEngineConfigurationImpl}.

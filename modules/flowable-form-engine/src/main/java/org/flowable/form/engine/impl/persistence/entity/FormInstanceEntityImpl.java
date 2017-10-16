@@ -32,6 +32,9 @@ public class FormInstanceEntityImpl extends AbstractEntityNoRevision implements 
     protected String taskId;
     protected String processInstanceId;
     protected String processDefinitionId;
+    protected String scopeId;
+    protected String scopeType;
+    protected String scopeDefinitionId;
     protected Date submittedDate;
     protected String submittedBy;
     protected String formValuesId;
@@ -88,6 +91,36 @@ public class FormInstanceEntityImpl extends AbstractEntityNoRevision implements 
     @Override
     public void setProcessDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
+    }
+
+    @Override
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    @Override
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    @Override
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    @Override
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
+    @Override
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
+    }
+
+    @Override
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
     }
 
     @Override

@@ -27,8 +27,8 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.task.service.Task;
-import org.flowable.task.service.TaskQuery;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskQuery;
 import org.junit.Assert;
 
 /**
@@ -77,7 +77,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
 
         // After process starts, only task 0 should be active
         TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
-        List<org.flowable.task.service.Task> tasks = query.list();
+        List<org.flowable.task.api.Task> tasks = query.list();
         assertEquals(1, tasks.size());
         assertEquals("Task 0", tasks.get(0).getName());
 
@@ -120,7 +120,7 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
         // After process start we have two tasks, one from the parent and one
         // from the sub process
         TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc();
-        List<org.flowable.task.service.Task> tasks = query.list();
+        List<org.flowable.task.api.Task> tasks = query.list();
         assertEquals(2, tasks.size());
         assertEquals("Another task", tasks.get(0).getName());
         assertEquals("Some Task", tasks.get(1).getName());

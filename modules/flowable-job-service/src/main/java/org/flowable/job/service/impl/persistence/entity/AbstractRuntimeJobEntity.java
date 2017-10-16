@@ -14,7 +14,7 @@ package org.flowable.job.service.impl.persistence.entity;
 
 import java.util.Date;
 
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 
 /**
  * @author Tijs Rademakers

@@ -14,7 +14,7 @@ package org.flowable.cmmn.editor.json.converter;
 
 import java.util.Map;
 
-import org.flowable.cmmn.editor.constants.StencilConstants;
+import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnModel;
@@ -44,7 +44,7 @@ public class TaskJsonConverter extends BaseCmmnJsonConverter {
     
     @Override
     protected String getStencilId(BaseElement baseElement) {
-        return StencilConstants.STENCIL_TASK;
+        return CmmnStencilConstants.STENCIL_TASK;
     }
 
     @Override

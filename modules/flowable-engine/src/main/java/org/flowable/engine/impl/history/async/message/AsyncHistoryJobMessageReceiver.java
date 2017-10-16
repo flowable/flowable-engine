@@ -21,7 +21,7 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.asyncexecutor.message.AsyncJobMessageReceiver;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.job.service.HistoryJob;
+import org.flowable.job.api.HistoryJob;
 import org.flowable.job.service.HistoryJobService;
 import org.flowable.job.service.impl.HistoryJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;

@@ -89,7 +89,7 @@ public class TablePageQueryTest extends PluggableFlowableTestCase {
     private List<String> generateDummyTasks(int nrOfTasks) {
         ArrayList<String> taskIds = new ArrayList<String>();
         for (int i = 0; i < nrOfTasks; i++) {
-            org.flowable.task.service.Task task = taskService.newTask();
+            org.flowable.task.api.Task task = taskService.newTask();
             task.setName(String.valueOf((char) ('A' + i)));
             taskService.saveTask(task);
             taskIds.add(task.getId());

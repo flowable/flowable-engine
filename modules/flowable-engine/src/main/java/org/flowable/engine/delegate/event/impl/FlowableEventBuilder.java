@@ -37,10 +37,10 @@ import org.flowable.engine.impl.context.ExecutionContext;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
-import org.flowable.job.service.Job;
-import org.flowable.task.service.Task;
-import org.flowable.variable.service.event.FlowableVariableEvent;
-import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.job.api.Job;
+import org.flowable.task.api.Task;
+import org.flowable.variable.api.event.FlowableVariableEvent;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * Builder class used to create {@link FlowableEvent} implementations.

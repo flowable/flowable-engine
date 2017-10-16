@@ -16,7 +16,7 @@ public class FormPropertyDefaultValueTest extends PluggableFlowableTestCase {
     @Deployment
     public void testDefaultValue() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("FormPropertyDefaultValueTest.testDefaultValue");
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         TaskFormData formData = formService.getTaskFormData(task.getId());
         List<FormProperty> formProperties = formData.getFormProperties();

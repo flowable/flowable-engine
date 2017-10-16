@@ -14,6 +14,7 @@ package org.flowable.cmmn.converter.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.ProcessTask;
 
 public class ProcessTaskExport extends AbstractPlanItemDefinitionExport {
@@ -23,6 +24,10 @@ public class ProcessTaskExport extends AbstractPlanItemDefinitionExport {
         xtw.writeStartElement(ELEMENT_PROCESS_TASK);
         writeCommonPlanItemDefinitionAttributes(processTask, xtw);
         writeBlockingAttribute(xtw, processTask);
+        
+        if (StringUtils.isNotEmpty(processTask.getProcessRef())) {
+            xtw.writeAttribute(ATTRIBUTE_PROCESS_REF, processTask.getProcessRef());
+        }
         
         // end process task element
         xtw.writeEndElement();

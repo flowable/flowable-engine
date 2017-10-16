@@ -53,7 +53,7 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
         for (int i = 0; i < 4; i++) {
             processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, String.valueOf(i), startMap).getId());
             if (i == 0) {
-                org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(0)).singleResult();
+                org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(0)).singleResult();
                 taskService.complete(task.getId());
             }
         }

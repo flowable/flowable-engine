@@ -21,7 +21,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.rest.service.api.engine.RestIdentityLink;

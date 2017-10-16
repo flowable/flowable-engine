@@ -16,7 +16,7 @@ import java.util.Map;
 
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.variable.service.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * This class provides simulation run for replay purposes replay uses real time and running engine to execute simulation events.

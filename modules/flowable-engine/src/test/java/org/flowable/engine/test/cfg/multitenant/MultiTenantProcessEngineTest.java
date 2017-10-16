@@ -159,7 +159,7 @@ public class MultiTenantProcessEngineTest {
         vars.put("data", "Hello from " + userId);
 
         ProcessInstance processInstance = processEngine.getRuntimeService().startProcessInstanceByKey("oneTaskProcess", vars);
-        List<org.flowable.task.service.Task> tasks = processEngine.getTaskService().createTaskQuery().processInstanceId(processInstance.getId()).list();
+        List<org.flowable.task.api.Task> tasks = processEngine.getTaskService().createTaskQuery().processInstanceId(processInstance.getId()).list();
         System.out.println("Got " + tasks.size() + " tasks");
 
         System.out.println("Got " + processEngine.getHistoryService().createHistoricProcessInstanceQuery().count() + " process instances in the system");
@@ -174,7 +174,7 @@ public class MultiTenantProcessEngineTest {
     private void completeTasks(String userId) {
         tenantInfoHolder.setCurrentUserId(userId);
 
-        for (org.flowable.task.service.Task task : processEngine.getTaskService().createTaskQuery().list()) {
+        for (org.flowable.task.api.Task task : processEngine.getTaskService().createTaskQuery().list()) {
             processEngine.getTaskService().complete(task.getId());
         }
 

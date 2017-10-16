@@ -13,7 +13,7 @@
 
 package org.flowable.spring;
 
-import org.flowable.job.service.JobInfo;
+import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnable;
 import org.slf4j.Logger;

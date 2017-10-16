@@ -14,6 +14,7 @@ package org.flowable.task.service;
 
 import java.util.List;
 
+import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**

@@ -12,8 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.behavior;
 
-import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
-import org.flowable.cmmn.engine.delegate.PlanItemJavaDelegate;
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.model.PlanItem;
 

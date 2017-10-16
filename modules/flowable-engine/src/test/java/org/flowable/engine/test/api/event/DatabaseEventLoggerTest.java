@@ -289,7 +289,7 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
         }
 
         // Completing two tasks
-        for (org.flowable.task.service.Task task : taskService.createTaskQuery().list()) {
+        for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
             Authentication.setAuthenticatedUserId(task.getAssignee());
             Map<String, Object> varMap = new HashMap<>();
             varMap.put("test", "test");
@@ -537,7 +537,7 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
 
     public void testStandaloneTaskEvents() throws JsonParseException, JsonMappingException, IOException {
 
-        org.flowable.task.service.Task task = taskService.newTask();
+        org.flowable.task.api.Task task = taskService.newTask();
         task.setAssignee("kermit");
         task.setTenantId("myTenant");
         taskService.saveTask(task);

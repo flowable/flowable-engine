@@ -54,7 +54,7 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
         getDataManager().insert(entity);
 
         FlowableEventDispatcher eventDispatcher = getEventDispatcher();
-        if (fireCreateEvent && eventDispatcher.isEnabled()) {
+        if (fireCreateEvent && eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableIdentityLinkEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, entity));
             eventDispatcher.dispatchEvent(FlowableIdentityLinkEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, entity));
         }
@@ -69,8 +69,9 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
     public EntityImpl update(EntityImpl entity, boolean fireUpdateEvent) {
         EntityImpl updatedEntity = getDataManager().update(entity);
 
-        if (fireUpdateEvent && getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableIdentityLinkEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, entity));
+        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+        if (fireUpdateEvent && eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableIdentityLinkEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_UPDATED, entity));
         }
 
         return updatedEntity;
@@ -91,8 +92,9 @@ public abstract class AbstractEntityManager<EntityImpl extends Entity> extends A
     public void delete(EntityImpl entity, boolean fireDeleteEvent) {
         getDataManager().delete(entity);
 
-        if (fireDeleteEvent && getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableIdentityLinkEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, entity));
+        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+        if (fireDeleteEvent && eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableIdentityLinkEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, entity));
         }
     }
 

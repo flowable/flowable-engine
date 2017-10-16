@@ -23,15 +23,17 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.idm.api.User;
-import org.flowable.task.service.TaskInfo;
+import org.flowable.task.api.TaskInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class FlowableAbstractTaskService {
@@ -41,9 +43,15 @@ public abstract class FlowableAbstractTaskService {
 
     @Autowired
     protected RepositoryService repositoryService;
+    
+    @Autowired
+    protected CmmnRepositoryService cmmnRepositoryService;
 
     @Autowired
     protected TaskService taskService;
+    
+    @Autowired
+    protected CmmnTaskService cmmnTaskService;
     
     @Autowired
     protected HistoryService historyService;
@@ -57,7 +65,7 @@ public abstract class FlowableAbstractTaskService {
     public void fillPermissionInformation(TaskRepresentation taskRepresentation, TaskInfo task, User currentUser) {
         verifyProcessInstanceStartUser(taskRepresentation, task);
 
-        List<IdentityLink> taskIdentityLinks = taskService.getIdentityLinksForTask(task.getId());
+        List<HistoricIdentityLink> taskIdentityLinks = historyService.getHistoricIdentityLinksForTask(task.getId());
         verifyCandidateGroups(taskRepresentation, currentUser, taskIdentityLinks);
         verifyCandidateUsers(taskRepresentation, currentUser, taskIdentityLinks);
     }
@@ -83,14 +91,14 @@ public abstract class FlowableAbstractTaskService {
         }
     }
     
-    protected void verifyCandidateGroups(TaskRepresentation taskRepresentation, User currentUser, List<IdentityLink> taskIdentityLinks) {
+    protected void verifyCandidateGroups(TaskRepresentation taskRepresentation, User currentUser, List<HistoricIdentityLink> taskIdentityLinks) {
         List<RemoteGroup> userGroups = remoteIdmService.getUser(currentUser.getId()).getGroups();
         taskRepresentation.setMemberOfCandidateGroup(userGroupsMatchTaskCandidateGroups(userGroups, taskIdentityLinks));
     }
     
-    protected boolean userGroupsMatchTaskCandidateGroups(List<RemoteGroup> userGroups, List<IdentityLink> taskIdentityLinks) {
+    protected boolean userGroupsMatchTaskCandidateGroups(List<RemoteGroup> userGroups, List<HistoricIdentityLink> taskIdentityLinks) {
         for (RemoteGroup group : userGroups) {
-            for (IdentityLink identityLink : taskIdentityLinks) {
+            for (HistoricIdentityLink identityLink : taskIdentityLinks) {
                 if (identityLink.getGroupId() != null 
                         && identityLink.getType().equals(IdentityLinkType.CANDIDATE) 
                         && group.getId().equals(identityLink.getGroupId())) {
@@ -101,12 +109,12 @@ public abstract class FlowableAbstractTaskService {
         return false;
     }
     
-    protected void verifyCandidateUsers(TaskRepresentation taskRepresentation, User currentUser, List<IdentityLink> taskIdentityLinks) {
+    protected void verifyCandidateUsers(TaskRepresentation taskRepresentation, User currentUser, List<HistoricIdentityLink> taskIdentityLinks) {
         taskRepresentation.setMemberOfCandidateUsers(currentUserMatchesTaskCandidateUsers(currentUser, taskIdentityLinks));
     }
     
-    protected boolean currentUserMatchesTaskCandidateUsers(User currentUser, List<IdentityLink> taskIdentityLinks) {
-        for (IdentityLink identityLink : taskIdentityLinks) {
+    protected boolean currentUserMatchesTaskCandidateUsers(User currentUser, List<HistoricIdentityLink> taskIdentityLinks) {
+        for (HistoricIdentityLink identityLink : taskIdentityLinks) {
             if (identityLink.getUserId() != null
                     && identityLink.getType().equals(IdentityLinkType.CANDIDATE)
                     && identityLink.getUserId().equals(currentUser.getId())) {

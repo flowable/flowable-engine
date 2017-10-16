@@ -21,8 +21,8 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.AbstractQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.job.service.HistoryJob;
-import org.flowable.job.service.HistoryJobQuery;
+import org.flowable.job.api.HistoryJob;
+import org.flowable.job.api.HistoryJobQuery;
 import org.flowable.job.service.impl.util.CommandContextUtil;
 
 /**

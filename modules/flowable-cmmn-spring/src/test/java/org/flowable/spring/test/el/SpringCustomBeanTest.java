@@ -16,11 +16,11 @@ package org.flowable.spring.test.el;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import org.flowable.cmmn.engine.CmmnRuntimeService;
-import org.flowable.cmmn.engine.repository.CmmnDeployment;
-import org.flowable.cmmn.engine.runtime.CaseInstance;
-import org.flowable.cmmn.engine.runtime.PlanItemInstance;
-import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
+import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.FlowableCmmnRule;
 import org.junit.Assert;
 import org.junit.Rule;

@@ -155,32 +155,39 @@
             <if test="caseDefinitionKey != null or caseDefinitionKeys != null or caseDefinitionCategory != null or caseDefinitionName != null or deploymentId != null or deploymentIds != null">
                 inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF
             </if>
-            <if test="caseDefinitionId != null">
-                RES.CASE_DEF_ID_ = #{caseDefinitionId}
-            </if>
-            <if test="caseDefinitionKey != null">
-                CASE_DEF.KEY_ = #{caseDefinitionId}
-            </if>
             <if test="caseInstanceId != null">
                 RES.ID_ = #{caseInstanceId}
             </if>
+            <if test="caseInstanceIds != null &amp;&amp; caseInstanceIds.size() &gt; 0">
+                and RES.ID_ IN
+                <foreach item="caseInstanceId" index="index" collection="caseInstanceIds" 
+                         open="(" separator="," close=")">
+                  #{caseInstanceId}
+                </foreach>
+            </if>
+            <if test="caseDefinitionId != null">
+                and RES.CASE_DEF_ID_ = #{caseDefinitionId}
+            </if>
+            <if test="caseDefinitionKey != null">
+                and CASE_DEF.KEY_ = #{caseDefinitionId}
+            </if>
             <if test="caseDefinitionKeys != null">
-                CASE_DEF.KEY_ IN
+                and CASE_DEF.KEY_ IN
                 <foreach item="caseDefinitionKey" index="index" collection="caseDefinitionKeys" open="(" separator="," close=")">
                     #{caseDefinitionKey}
                 </foreach>
             </if>
             <if test="caseDefinitionCategory != null">
-                CASE_DEF.CATEGORY_ = #{caseDefinitionCategory}
+                and CASE_DEF.CATEGORY_ = #{caseDefinitionCategory}
             </if>
             <if test="caseDefinitionName != null">
-                CASE_DEF.NAME_ = #{caseDefinitionName}
+                and CASE_DEF.NAME_ = #{caseDefinitionName}
             </if>
             <if test="caseInstanceParentId != null">
-                RES.PARENT_ID_ = #{caseInstanceParentId}
+                and RES.PARENT_ID_ = #{caseInstanceParentId}
             </if>
             <if test="deploymentId != null">
-                CASE_DEF.DEPLOYMENT_ID_ = #{deploymentId}
+                and CASE_DEF.DEPLOYMENT_ID_ = #{deploymentId}
             </if>
             <if test="deploymentIds != null &amp;&amp; deploymentIds.size() &gt; 0">
                 and CASE_DEF.DEPLOYMENT_ID_ IN
@@ -188,9 +195,9 @@
                          open="(" separator="," close=")">
                   #{deploymentId}
                 </foreach>
-              </if>
+            </if>
             <if test="businessKey != null">
-                RES.BUSINESS_KEY_ = #{businessKey}
+                and RES.BUSINESS_KEY_ = #{businessKey}
             </if>
             <if test="finished">
                 and RES.END_TIME_ is not null
@@ -211,7 +218,7 @@
                 and RES.END_TIME_ &gt;= #{finishedAfter}
             </if>
             <if test="startedBy != null">
-                RES.START_USER_ID_ = #{startedBy}
+                and RES.START_USER_ID_ = #{startedBy}
             </if>
             <if test="callbackId != null">
                 and RES.CALLBACK_ID_ = #{callbackId}
@@ -220,10 +227,10 @@
                 and RES.CALLBACK_TYPE_ = #{callbackType}
             </if>
             <if test="tenantId != null">
-                RES.TENANT_ID_ = #{tenantId}
+                and RES.TENANT_ID_ = #{tenantId}
             </if>
             <if test="withoutTenantId">
-                RES.TENANT_ID_ is null or RES.TENANT_ID_ = ''
+                and RES.TENANT_ID_ is null or RES.TENANT_ID_ = ''
             </if>
         </where>
     </sql>

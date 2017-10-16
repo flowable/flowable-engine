@@ -28,7 +28,7 @@ public class HistoricProcessInstanceQueryTest extends PluggableFlowableTestCase 
     public void testLocalization() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("historicProcessLocalization");
         String processInstanceId = processInstance.getId();
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstanceId).singleResult();
         taskService.complete(task.getId());
 
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {

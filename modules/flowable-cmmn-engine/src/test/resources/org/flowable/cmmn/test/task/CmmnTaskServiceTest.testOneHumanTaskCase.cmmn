@@ -10,7 +10,9 @@
     <case id="oneHumanTaskCase">
         <casePlanModel id="myPlanModel" name="My CasePlanModel">
             <planItem id="planItem1" name="The Task" definitionRef="theTask" />
-            <humanTask id="theTask" name="The Task" isBlocking="true" flowable:assignee="johnDoe" />
+            <humanTask id="theTask" name="The Task" isBlocking="true" flowable:assignee="johnDoe">
+                <documentation>This is a test documentation</documentation>
+            </humanTask>
         </casePlanModel>
     </case>
 

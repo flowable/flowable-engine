@@ -17,7 +17,7 @@ import org.flowable.engine.history.ProcessInstanceHistoryLog;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
 import org.flowable.engine.test.Deployment;
-import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 /**
@@ -85,7 +85,7 @@ public class HistoricJPAVariableTest extends AbstractFlowableTestCase {
         // in the DB.
         this.processInstanceId = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables).getId();
 
-        for (org.flowable.task.service.Task task : taskService.createTaskQuery().includeTaskLocalVariables().list()) {
+        for (org.flowable.task.api.Task task : taskService.createTaskQuery().includeTaskLocalVariables().list()) {
             taskService.complete(task.getId());
         }
 
@@ -112,7 +112,7 @@ public class HistoricJPAVariableTest extends AbstractFlowableTestCase {
         this.processInstanceId = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables).getId();
 
         // Finish tasks
-        for (org.flowable.task.service.Task task : taskService.createTaskQuery().includeTaskLocalVariables().list()) {
+        for (org.flowable.task.api.Task task : taskService.createTaskQuery().includeTaskLocalVariables().list()) {
             taskService.complete(task.getId());
         }
 
@@ -140,7 +140,7 @@ public class HistoricJPAVariableTest extends AbstractFlowableTestCase {
         this.processInstanceId = runtimeService.startProcessInstanceByKey("JPAVariableProcess", variables).getId();
 
         // Finish tasks
-        for (org.flowable.task.service.Task task : taskService.createTaskQuery().includeProcessVariables().list()) {
+        for (org.flowable.task.api.Task task : taskService.createTaskQuery().includeProcessVariables().list()) {
             taskService.setVariable(task.getId(), "simpleEntityFieldAccess", simpleEntityFieldAccess);
             taskService.complete(task.getId());
         }

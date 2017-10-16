@@ -12,10 +12,12 @@
  */
 package org.flowable.app.rest.editor;
 
+import org.flowable.app.domain.editor.AbstractModel;
 import org.flowable.app.domain.editor.Model;
 import org.flowable.app.domain.editor.ModelHistory;
 import org.flowable.app.service.api.ModelService;
 import org.flowable.app.service.editor.BpmnDisplayJsonConverter;
+import org.flowable.app.service.editor.CmmnDisplayJsonConverter;
 import org.flowable.bpmn.model.GraphicInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,6 +37,9 @@ public class EditorDisplayJsonClientResource {
 
     @Autowired
     protected BpmnDisplayJsonConverter bpmnDisplayJsonConverter;
+    
+    @Autowired
+    protected CmmnDisplayJsonConverter cmmnDisplayJsonConverter;
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
@@ -42,7 +47,11 @@ public class EditorDisplayJsonClientResource {
     public JsonNode getModelJSON(@PathVariable String processModelId) {
         ObjectNode displayNode = objectMapper.createObjectNode();
         Model model = modelService.getModel(processModelId);
-        bpmnDisplayJsonConverter.processProcessElements(model, displayNode, new GraphicInfo());
+        if (model.getModelType() != null && AbstractModel.MODEL_TYPE_CMMN == model.getModelType()) {
+            cmmnDisplayJsonConverter.processCaseElements(model, displayNode, new org.flowable.cmmn.model.GraphicInfo());
+        } else {
+            bpmnDisplayJsonConverter.processProcessElements(model, displayNode, new GraphicInfo());
+        }
         return displayNode;
     }
 
@@ -50,7 +59,11 @@ public class EditorDisplayJsonClientResource {
     public JsonNode getModelHistoryJSON(@PathVariable String processModelId, @PathVariable String processModelHistoryId) {
         ObjectNode displayNode = objectMapper.createObjectNode();
         ModelHistory model = modelService.getModelHistory(processModelId, processModelHistoryId);
-        bpmnDisplayJsonConverter.processProcessElements(model, displayNode, new GraphicInfo());
+        if (model.getModelType() != null && AbstractModel.MODEL_TYPE_CMMN == model.getModelType()) {
+            cmmnDisplayJsonConverter.processCaseElements(model, displayNode, new org.flowable.cmmn.model.GraphicInfo());
+        } else {
+            bpmnDisplayJsonConverter.processProcessElements(model, displayNode, new GraphicInfo());
+        }
         return displayNode;
     }
 }

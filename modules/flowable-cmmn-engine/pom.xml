@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
 
@@ -10,7 +11,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.2.0-SNAPSHOT</version>
+        <version>6.2.1-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -37,6 +38,18 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-task-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-form-model</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-form-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-content-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.liquibase</groupId>
@@ -95,7 +108,97 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
-    
+
+    <properties>
+        <flowable.artifact>
+            org.flowable.cmmn.engine
+        </flowable.artifact>
+        <flowable.osgi.export.additional>
+            org.flowable.cmmn.db.mapping.entity
+        </flowable.osgi.export.additional>
+        <flowable.osgi.import.additional>
+            junit*;resolution:=optional,
+            org.junit*;resolution:=optional,
+            com.sun*;resolution:=optional,
+            javax.activation*;resolution:=optional,
+            javax.persistence*;resolution:=optional,
+            org.apache.commons.codec*;resolution:=optional,
+            org.apache.commons.mail*;resolution:=optional,
+            org.apache.xerces*;resolution:=optional,
+            org.springframework*;resolution:=optional,
+            com.fasterxml*;resolution:=optional,
+            javax.transaction;resolution:=optional,
+            javax.enterprise.concurrent;resolution:=optional,
+        </flowable.osgi.import.additional>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>cleanVersions</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>bundle-manifest</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>manifest</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <!--This plugin's configuration is used to store Eclipse 
+                    m2e settings only. It has no influence on the Maven build itself. -->
+                <plugin>
+                    <groupId>org.eclipse.m2e</groupId>
+                    <artifactId>lifecycle-mapping</artifactId>
+                    <version>1.0.0</version>
+                    <configuration>
+                        <lifecycleMappingMetadata>
+                            <pluginExecutions>
+                                <pluginExecution>
+                                    <pluginExecutionFilter>
+                                        <groupId>org.apache.felix</groupId>
+                                        <artifactId>
+                                            maven-bundle-plugin
+                                        </artifactId>
+                                        <versionRange>
+                                            [2.1.0,)
+                                        </versionRange>
+                                        <goals>
+                                            <goal>cleanVersions</goal>
+                                            <goal>manifest</goal>
+                                        </goals>
+                                    </pluginExecutionFilter>
+                                    <action>
+                                        <ignore></ignore>
+                                    </action>
+                                </pluginExecution>
+                            </pluginExecutions>
+                        </lifecycleMappingMetadata>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
     <profiles>
         <profile>
             <id>errorLogging</id>
@@ -103,8 +206,8 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be a bug with antrun 
-                            see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <!-- only worked with this version, there might be 
+                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
                         <version>1.4</version>
                         <executions>
                             <execution>
@@ -115,8 +218,12 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <echo message="updating log4j configuration to error logging" />
-                                        <copy file="${basedir}/../../qa/logging/log4j.properties" todir="target/test-classes" overwrite="true" />
+                                        <echo
+                                            message="updating log4j configuration to error logging" />
+                                        <copy
+                                            file="${basedir}/../../qa/logging/log4j.properties"
+                                            todir="target/test-classes"
+                                            overwrite="true" />
                                     </tasks>
                                 </configuration>
                             </execution>
@@ -125,7 +232,7 @@
                 </plugins>
             </build>
         </profile>
-        
+
         <!-- database qa profile -->
         <profile>
             <id>database</id>
@@ -138,8 +245,8 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be a bug with antrun 
-                            see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <!-- only worked with this version, there might be 
+                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
                         <version>1.4</version>
                         <executions>
                             <execution>
@@ -150,9 +257,12 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <echo message="updating flowable configuration to db ${database}" />
-                                        <copy file="${basedir}/../../qa/db/flowable.cmmn.cfg.xml"
-                                            todir="target/test-classes" overwrite="true">
+                                        <echo
+                                            message="updating flowable configuration to db ${database}" />
+                                        <copy
+                                            file="${basedir}/../../qa/db/flowable.cmmn.cfg.xml"
+                                            todir="target/test-classes"
+                                            overwrite="true">
                                             <filterset
                                                 filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${database}.properties" />
                                         </copy>
@@ -167,8 +277,10 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <echo message="dropping schema in ${database}" />
-                                        <java classname="org.flowable.cmmn.engine.impl.db.DbSchemaDrop"
+                                        <echo
+                                            message="dropping schema in ${database}" />
+                                        <java
+                                            classname="org.flowable.cmmn.engine.impl.db.DbSchemaDrop"
                                             classpathref="maven.test.classpath" />
                                     </tasks>
                                 </configuration>
@@ -190,8 +302,8 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be a bug with antrun 
-                            see http://jira.codehaus.org/browse/MANTRUN-109 -->
+                        <!-- only worked with this version, there might be 
+                            a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
                         <version>1.4</version>
                         <executions>
                             <execution>
@@ -204,8 +316,10 @@
                                     <tasks>
                                         <echo
                                             message="updating flowable configuration to db ${databasewithschema}" />
-                                        <copy file="${basedir}/../../qa/db/schema/flowable.cmmn.cfg.xml"
-                                            todir="target/test-classes" overwrite="true">
+                                        <copy
+                                            file="${basedir}/../../qa/db/schema/flowable.cmmn.cfg.xml"
+                                            todir="target/test-classes"
+                                            overwrite="true">
                                             <filterset
                                                 filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasewithschema}.properties" />
                                         </copy>
@@ -220,8 +334,10 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <echo message="dropping schema in ${databasewithschema}" />
-                                        <java classname="org.flowable.cmmn.engine.impl.db.DbSchemaDrop"
+                                        <echo
+                                            message="dropping schema in ${databasewithschema}" />
+                                        <java
+                                            classname="org.flowable.cmmn.engine.impl.db.DbSchemaDrop"
                                             classpathref="maven.test.classpath" />
                                     </tasks>
                                 </configuration>
@@ -264,7 +380,7 @@
                 </dependency>
             </dependencies>
         </profile>
-        
+
         <profile>
             <id>oraclewithschemaasynchistory</id>
             <activation>
@@ -281,7 +397,7 @@
                 </dependency>
             </dependencies>
         </profile>
-        
+
         <profile>
             <id>db2</id>
             <activation>
@@ -298,7 +414,7 @@
                 </dependency>
             </dependencies>
         </profile>
-        
+
         <profile>
             <id>db2asynchistory</id>
             <activation>
@@ -315,6 +431,28 @@
                 </dependency>
             </dependencies>
         </profile>
+
+        <profile>
+            <id>distro</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-source-plugin</artifactId>
+                        <version>2.1.1</version>
+                        <executions>
+                            <execution>
+                                <id>attach-sources</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>jar-no-fork</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
     </profiles>
-    
+
 </project>

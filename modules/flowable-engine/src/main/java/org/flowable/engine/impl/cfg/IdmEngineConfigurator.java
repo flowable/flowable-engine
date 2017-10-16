@@ -73,6 +73,8 @@ public class IdmEngineConfigurator extends AbstractEngineConfigurator {
         initialiseCommonProperties(processEngineConfiguration, idmEngineConfiguration);
         
         idmEngineConfiguration.buildIdmEngine();
+        
+        initServiceConfigurations(processEngineConfiguration, idmEngineConfiguration);
     }
     
     @Override

@@ -25,6 +25,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityMa
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityManager;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntityManager;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
 
@@ -89,6 +90,10 @@ public abstract class AbstractCmmnManager {
     
     protected HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager() {
         return cmmnEngineConfiguration.getVariableServiceConfiguration().getHistoricVariableInstanceEntityManager();
+    }
+    
+    protected HistoricTaskInstanceEntityManager getHistoricTaskInstanceEntityManager() {
+        return cmmnEngineConfiguration.getTaskServiceConfiguration().getHistoricTaskInstanceEntityManager();
     }
 
     protected CmmnEngineConfiguration getCmmnEngineConfiguration() {

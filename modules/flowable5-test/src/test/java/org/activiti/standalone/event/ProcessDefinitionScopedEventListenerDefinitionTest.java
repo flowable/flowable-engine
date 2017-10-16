@@ -47,7 +47,7 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testEventListeners");
         assertNotNull(testListenerBean);
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         // Check if the listener (defined as bean) received events (only creation, not other events)
@@ -137,7 +137,7 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
     public void testProcessDefinitionListenerDefinitionEntities() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testEventListeners");
         assertNotNull(processInstance);
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         // Attachment entity

@@ -19,8 +19,8 @@ import java.util.Map;
 
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.VariableServiceConfiguration;
-import org.flowable.variable.service.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.data.HistoricVariableInstanceDataManager;
 
@@ -53,6 +53,7 @@ public class HistoricVariableInstanceEntityManagerImpl extends AbstractEntityMan
         historicVariableInstance.setName(variableInstance.getName());
         historicVariableInstance.setVariableType(variableInstance.getType());
         historicVariableInstance.setScopeId(variableInstance.getScopeId());
+        historicVariableInstance.setSubScopeId(variableInstance.getSubScopeId());
         historicVariableInstance.setScopeType(variableInstance.getScopeType());
 
         copyVariableValue(historicVariableInstance, variableInstance);

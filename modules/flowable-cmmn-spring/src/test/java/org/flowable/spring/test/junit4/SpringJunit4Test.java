@@ -14,7 +14,7 @@ package org.flowable.spring.test.junit4;
 
 import static org.junit.Assert.assertNotNull;
 
-import org.flowable.cmmn.engine.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnRule;
 import org.junit.Rule;

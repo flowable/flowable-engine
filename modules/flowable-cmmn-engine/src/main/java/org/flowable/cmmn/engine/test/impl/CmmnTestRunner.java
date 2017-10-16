@@ -15,10 +15,10 @@ package org.flowable.cmmn.engine.test.impl;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.CmmnRepositoryService;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
-import org.flowable.cmmn.engine.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.engine.common.api.FlowableException;
 import org.junit.Assert;

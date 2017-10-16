@@ -35,8 +35,8 @@ import org.flowable.form.api.FormService;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.FormFieldTypes;
 import org.flowable.form.model.FormModel;
-import org.flowable.task.service.history.HistoricTaskInstance;
-import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 
 /**
  * @author Tijs Rademakers
@@ -90,7 +90,7 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
 
         } else {
             formModel = formService.getFormModelWithVariablesByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId,
-                            task.getProcessInstanceId(), taskId, variables, task.getTenantId());
+                            taskId, variables, task.getTenantId());
         }
 
         // If form does not exists, we don't want to leak out this info to just anyone

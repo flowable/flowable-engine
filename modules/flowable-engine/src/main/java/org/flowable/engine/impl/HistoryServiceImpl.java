@@ -28,13 +28,13 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.DeleteHistoricProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.DeleteHistoricTaskInstanceCmd;
 import org.flowable.engine.impl.cmd.GetHistoricIdentityLinksForTaskCmd;
-import org.flowable.identitylink.service.history.HistoricIdentityLink;
-import org.flowable.task.service.history.HistoricTaskInstanceQuery;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.service.history.NativeHistoricTaskInstanceQuery;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
 import org.flowable.task.service.impl.NativeHistoricTaskInstanceQueryImpl;
-import org.flowable.variable.service.history.HistoricVariableInstanceQuery;
-import org.flowable.variable.service.history.NativeHistoricVariableInstanceQuery;
+import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
+import org.flowable.variable.api.history.NativeHistoricVariableInstanceQuery;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.NativeHistoricVariableInstanceQueryImpl;
 

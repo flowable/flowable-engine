@@ -20,12 +20,16 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.cmmn.engine.history.HistoricMilestoneInstance;
-import org.flowable.cmmn.engine.runtime.CaseInstance;
-import org.flowable.cmmn.engine.runtime.PlanItemInstance;
-import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.api.PlanItemInstanceCallbackType;
+import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
+import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
-import org.flowable.task.service.Task;
+import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.task.api.Task;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -76,7 +80,21 @@ public class ProcessTaskTest extends AbstractProcessEngineIntegrationTest {
                 .list();
         assertEquals(1, planItemInstances.size());
         assertEquals("The Process", planItemInstances.get(0).getName());
+        assertNotNull(planItemInstances.get(0).getReferenceId());
+        assertEquals(PlanItemInstanceCallbackType.CHILD_PROCESS, planItemInstances.get(0).getReferenceType());
         assertEquals(0, cmmnHistoryService.createHistoricMilestoneInstanceQuery().count());
+        
+        ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().singleResult();
+        assertNotNull(processInstance);
+        assertNotNull(processInstance.getCallbackId());
+        assertNotNull(processInstance.getCallbackType());
+        
+        if (processEngine.getProcessEngineConfiguration().getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricProcessInstance historicProcessInstance = processEngine.getHistoryService().createHistoricProcessInstanceQuery()
+                    .processInstanceId(processInstance.getId()).singleResult();
+            assertEquals(processInstance.getCallbackId(), historicProcessInstance.getCallbackId());
+            assertEquals(processInstance.getCallbackType(), historicProcessInstance.getCallbackType());
+        }
         
         // Completing task will trigger completion of process task plan item
         processEngine.getTaskService().complete(task.getId());

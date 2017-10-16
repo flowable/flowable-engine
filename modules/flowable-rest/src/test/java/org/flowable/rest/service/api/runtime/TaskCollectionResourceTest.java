@@ -30,8 +30,8 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
-import org.flowable.task.service.DelegationState;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.DelegationState;
+import org.flowable.task.api.Task;
 import org.junit.Assert;
 
 import com.fasterxml.jackson.databind.JsonNode;

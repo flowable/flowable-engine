@@ -18,7 +18,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 
 import org.flowable.engine.common.impl.cfg.multitenant.TenantInfoHolder;
-import org.flowable.job.service.JobInfo;
+import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;

@@ -130,7 +130,6 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
         if (formRequest.getFormDefinitionKey() != null) {
             formModel = formService.getFormModelWithVariablesByKey(
                     formRequest.getFormDefinitionKey(),
-                    formRequest.getProcessInstanceId(),
                     formRequest.getTaskId(),
                     formRequest.getVariables(),
                     formRequest.getTenantId());
@@ -138,7 +137,6 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
         } else if (formRequest.getFormDefinitionId() != null) {
             formModel = formService.getFormModelWithVariablesById(
                     formRequest.getFormDefinitionId(),
-                    formRequest.getProcessInstanceId(),
                     formRequest.getTaskId(),
                     formRequest.getVariables(),
                     formRequest.getTenantId());
@@ -151,7 +149,13 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
             throw new FlowableObjectNotFoundException("Could not find a form definition");
         }
 
-        formService.createFormInstance(formRequest.getVariables(), formModel, formRequest.getTaskId(),
-                formRequest.getProcessInstanceId());
+        if (formRequest.getScopeId() != null) {
+            formService.createFormInstanceWithScopeId(formRequest.getVariables(), formModel, formRequest.getTaskId(),
+                            formRequest.getScopeId(), formRequest.getScopeType(), formRequest.getScopeDefinitionId());
+            
+        } else {
+            formService.createFormInstance(formRequest.getVariables(), formModel, formRequest.getTaskId(),
+                            formRequest.getProcessInstanceId(), formRequest.getProcessDefinitionId());
+        }
     }
 }

@@ -19,8 +19,8 @@ import static org.junit.Assert.assertTrue;
 import java.io.InputStream;
 import java.util.List;
 
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
-import org.flowable.cmmn.engine.repository.CaseDefinition;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.model.CmmnModel;
@@ -45,7 +45,7 @@ public class DeploymentTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testCaseDefinitionDeployed() throws Exception {
-        org.flowable.cmmn.engine.repository.CmmnDeployment cmmnDeployment = cmmnRepositoryService.createDeploymentQuery().singleResult();
+        org.flowable.cmmn.api.repository.CmmnDeployment cmmnDeployment = cmmnRepositoryService.createDeploymentQuery().singleResult();
         assertNotNull(cmmnDeployment);
         
         List<String> resourceNames = cmmnRepositoryService.getDeploymentResourceNames(cmmnDeployment.getId());
