@@ -39,7 +39,7 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "History" }, description = "Manage History", authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricDetailCollectionResource extends HistoricDetailBaseResource {
 
-    @ApiOperation(value = "Get historic detail", tags = { "History" }, notes = "")
+    @ApiOperation(value = "Get historic detail", tags = { "History" }, nickname="listHistoricDetails", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "The id of the historic detail.", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "The process instance id of the historic detail.", paramType = "query"),

@@ -51,7 +51,7 @@ public class UserInfoCollectionResource extends BaseUserResource {
     @Autowired
     protected IdentityService identityService;
 
-    @ApiOperation(value = "List a user’s info", tags = { "Users" }, nickname = "listUsersInfo")
+    @ApiOperation(value = "List a user’s info", tags = { "Users" }, nickname = "listUserInfo")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the user was found and list of info (key and url) is returned."),
             @ApiResponse(code = 404, message = "Indicates the requested user was not found.")

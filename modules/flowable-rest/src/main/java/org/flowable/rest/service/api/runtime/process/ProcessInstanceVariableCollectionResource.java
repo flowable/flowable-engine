@@ -43,7 +43,7 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Process Instances" }, description = "Manage Process Instances", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceVariableCollectionResource extends BaseVariableCollectionResource {
 
-    @ApiOperation(value = "List of variables for a process instance", tags = {
+    @ApiOperation(value = "List of variables for a process instance", nickname="listProcessInstanceVariables", tags = {
             "Process Instances" }, notes = "In case the variable is a binary variable or serializable, the valueUrl points to an URL to fetch the raw value. If it’s a plain variable, the value is present in the response. Note that only local scoped variables are returned, as there is no global scope for process-instance variables.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the process instance was found and variables are returned."),

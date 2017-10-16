@@ -77,7 +77,7 @@ public class DeploymentCollectionResource {
     @Autowired
     protected RepositoryService repositoryService;
 
-    @ApiOperation(value = "List of Deployments", tags = { "Deployment" })
+    @ApiOperation(value = "List of Deployments", tags = { "Deployment" }, nickname="listDeployments")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return deployments with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return deployments with a name like the given name.", paramType = "query"),
@@ -85,7 +85,7 @@ public class DeploymentCollectionResource {
             @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return deployments which don’t have the given category.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return deployments with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return deployments with a tenantId like the given value.", paramType = "query"),
-            @ApiImplicitParam(name = "withoutTenantId", dataType = "string", value = "If true, only returns deployments without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
+            @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns deployments without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,name,deployTime,tenantId", paramType = "query"),
     })
     @ApiResponses(value = {
@@ -130,7 +130,7 @@ public class DeploymentCollectionResource {
                     + "\n"
                     + "An additional parameter (form-field) can be passed in the request body with name tenantId. The value of this field will be used as the id of the tenant this deployment is done in.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates the deployment was created."),
+            @ApiResponse(code = 201, message = "Indicates the deployment was created."),
             @ApiResponse(code = 400, message = "Indicates there was no content present in the request body or the content mime-type is not supported for deployment. The status-description contains additional information.")
     })
     @ApiImplicitParams({

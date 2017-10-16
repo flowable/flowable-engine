@@ -59,7 +59,7 @@ public class HistoryDecisionExecutionCollectionResource {
     @Autowired
     protected DmnHistoryService dmnHistoryService;
 
-    @ApiOperation(value = "List of historic decision executions", tags = { "Historic Decision Executions" })
+    @ApiOperation(value = "List of historic decision executions", nickname ="listHistoricDecisionExecutions", tags = { "Historic Decision Executions" })
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return historic decision executions with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "decisionDefinitionId", dataType = "string", value = "Only return historic decision executions with the given definition id.", paramType = "query"),

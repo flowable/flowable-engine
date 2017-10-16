@@ -60,7 +60,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
     @Autowired
     protected HistoryService historyService;
 
-    @ApiOperation(value = "List of process instances", tags = { "Process Instances" })
+    @ApiOperation(value = "List of process instances", nickname ="listProcessInstances", tags = { "Process Instances" })
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionKey", dataType = "string", value = "Only return process instances with the given process definition key.", paramType = "query"),
@@ -78,8 +78,8 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,processDefinitionId,tenantId,processDefinitionKey", paramType = "query"),
     })
     @ApiResponses(value = {
-            @ApiResponse(code = 204, message = "Indicates request was successful and the process-instances are returned"),
-            @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
+            @ApiResponse(code = 200, message = "Indicates request was successful and the process-instances are returned"),
+            @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
     @RequestMapping(value = "/runtime/process-instances", method = RequestMethod.GET, produces = "application/json")
     public DataResponse getProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {

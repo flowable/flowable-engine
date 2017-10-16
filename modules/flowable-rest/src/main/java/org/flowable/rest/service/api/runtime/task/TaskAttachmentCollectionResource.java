@@ -55,7 +55,7 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @ApiOperation(value = "Get all attachments on a task", tags = { "Tasks" })
+    @ApiOperation(value = "Get all attachments on a task", nickname="listTaskAttachments", tags = { "Tasks" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task was found and the attachments are returned."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")

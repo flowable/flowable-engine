@@ -51,13 +51,14 @@ public class FormDefinitionResourceDataResource {
     @Autowired
     protected ContentTypeResolver contentTypeResolver;
 
-    @ApiOperation(value = "List of form definitions", tags = { "Form Definitions" })
+    @ApiOperation(value = "get a form definition resource content", nickname = "getFormDefinitionContent", tags = { "Form Definitions" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates both form definition and resource have been found and the resource data has been returned."),
             @ApiResponse(code = 404, message = "Indicates the requested form definition was not found or there is no resource with the given id present in the process definition. The status-description contains additional information.")
     })
     @RequestMapping(value = "/form-repository/form-definitions/{formDefinitionId}/resourcedata", method = RequestMethod.GET, produces = "application/json")
     @ResponseBody
+    //FIXME Name of the method ?
     public byte[] getDecisionTableResource(@ApiParam(name = "formDefinitionId") @PathVariable String formDefinitionId, HttpServletResponse response) {
         FormDefinition formDefinition = formRepositoryService.getFormDefinition(formDefinitionId);
 

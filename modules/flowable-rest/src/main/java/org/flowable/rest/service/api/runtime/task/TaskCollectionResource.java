@@ -48,7 +48,7 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
 public class TaskCollectionResource extends TaskBaseResource {
 
-    @ApiOperation(value = "List of tasks", tags = { "Tasks" })
+    @ApiOperation(value = "List of tasks", nickname="listTasks", tags = { "Tasks" })
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return tasks with a name like the given name.", paramType = "query"),

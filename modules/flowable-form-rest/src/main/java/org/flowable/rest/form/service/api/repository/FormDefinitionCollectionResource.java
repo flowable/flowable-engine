@@ -63,7 +63,7 @@ public class FormDefinitionCollectionResource {
     @Autowired
     protected FormRepositoryService formRepositoryService;
 
-    @ApiOperation(value = "List of form definitions", tags = { "Form Definitions" })
+    @ApiOperation(value = "List of form definitions",  nickname = "listFormDefinitions", tags = { "Form Definitions" })
     @ApiImplicitParams({
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return form definitions with the given category.", paramType = "query"),
             @ApiImplicitParam(name = "categoryLike", dataType = "string", value = "Only return form definitions with a category like the given value.", paramType = "query"),
@@ -87,8 +87,8 @@ public class FormDefinitionCollectionResource {
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "key,category,id,version,name,deploymentId,tenantId", paramType = "query"),
     })
     @ApiResponses(value = {
-            @ApiResponse(code = 204, message = "Indicates request was successful and the form definitions are returned"),
-            @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
+            @ApiResponse(code = 200, message = "Indicates request was successful and the form definitions are returned"),
+            @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
     @RequestMapping(value = "/form-repository/form-definitions", method = RequestMethod.GET, produces = "application/json")
     public DataResponse getForms(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {

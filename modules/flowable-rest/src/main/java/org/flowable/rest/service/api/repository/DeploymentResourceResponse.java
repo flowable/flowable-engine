@@ -49,6 +49,7 @@ public class DeploymentResourceResponse {
         this.url = url;
     }
 
+    @ApiModelProperty(value = "For a single resource contains the actual URL to use for retrieving the binary resource")
     public String getUrl() {
         return url;
     }

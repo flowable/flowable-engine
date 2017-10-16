@@ -42,7 +42,7 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Form Instances" }, description = "Manage Form Instances", authorizations = { @Authorization(value = "basicAuth") })
 public class FormInstanceCollectionResource extends BaseFormInstanceResource {
 
-    @ApiOperation(value = "List of form instances", tags = { "Form Instances" })
+    @ApiOperation(value = "List of form instances", nickname = "listFormInstances", tags = { "Form Instances" })
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return form instances with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "formDefinitionId", dataType = "string", value = "Only return form instances with the given form definition id.", paramType = "query"),
@@ -61,8 +61,8 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "submittedDate,tenantId", paramType = "query"),
     })
     @ApiResponses(value = {
-            @ApiResponse(code = 204, message = "Indicates request was successful and the form instances are returned"),
-            @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
+            @ApiResponse(code = 200, message = "Indicates request was successful and the form instances are returned"),
+            @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
     @RequestMapping(value = "/form/form-instances", method = RequestMethod.GET, produces = "application/json")
     public DataResponse getFormInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {

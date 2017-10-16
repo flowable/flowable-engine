@@ -36,7 +36,7 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessDefinitionFormDefinitionCollectionResource extends BaseProcessDefinitionResource {
 
-    @ApiOperation(value = "Get all form definitions for a process-definition", tags = { "Process Definitions" })
+    @ApiOperation(value = "Get all form definitions for a process-definition", nickname = "listProcessDefinitionFormDefinitions", tags = { "Process Definitions" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the process definition was found and the form definitions are returned.", response = FormDefinition.class, responseContainer = "List"),
             @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")

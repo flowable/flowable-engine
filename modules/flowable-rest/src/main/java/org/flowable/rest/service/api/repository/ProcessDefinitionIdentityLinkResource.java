@@ -47,7 +47,7 @@ public class ProcessDefinitionIdentityLinkResource extends BaseProcessDefinition
 
     @ApiOperation(value = "Get a candidate starter from a process definition", tags = { "Process Definitions" })
     @ApiResponses(value = {
-            @ApiResponse(code = 204, message = "Indicates the process definition was found and the identity link was returned."),
+            @ApiResponse(code = 200, message = "Indicates the process definition was found and the identity link was returned."),
             @ApiResponse(code = 404, message = "Indicates the requested process definition was not found or the process definition doesn’t have an identity-link that matches the url.")
     })
     @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/identitylinks/{family}/{identityId}", method = RequestMethod.GET, produces = "application/json")

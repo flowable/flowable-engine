@@ -62,7 +62,7 @@ public class DecisionTableCollectionResource {
     @Autowired
     protected DmnRepositoryService dmnRepositoryService;
 
-    @ApiOperation(value = "List of decision tables", tags = { "Decision Tables" })
+    @ApiOperation(value = "List of decision tables", tags = { "Decision Tables" }, nickname = "listDecisionTables")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return decision tables with the given category.", paramType = "query"),
             @ApiImplicitParam(name = "categoryLike", dataType = "string", value = "Only return decision tables with a category like the given name.", paramType = "query"),

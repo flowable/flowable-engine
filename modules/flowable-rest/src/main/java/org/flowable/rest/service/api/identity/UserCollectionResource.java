@@ -67,7 +67,7 @@ public class UserCollectionResource {
     @Autowired
     protected IdentityService identityService;
 
-    @ApiOperation(value = "Get a list of users", tags = { "Users" })
+    @ApiOperation(value = "Get a list of users", nickname = "listUsers", tags = { "Users" })
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return group with the given id", paramType = "query"),
             @ApiImplicitParam(name = "firstName", dataType = "string", value = "Only return users with the given firstname", paramType = "query"),

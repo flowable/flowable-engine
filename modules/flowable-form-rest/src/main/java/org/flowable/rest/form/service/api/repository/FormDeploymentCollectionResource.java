@@ -69,7 +69,7 @@ public class FormDeploymentCollectionResource {
     @Autowired
     protected FormRepositoryService formRepositoryService;
 
-    @ApiOperation(value = "List of Form Deployments", tags = { "Form Deployments" })
+    @ApiOperation(value = "List of Form Deployments", nickname = "listFormDeployments", tags = { "Form Deployments" })
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return form deployments with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return form deployments with a name like the given name.", paramType = "query"),
@@ -77,7 +77,7 @@ public class FormDeploymentCollectionResource {
             @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return form deployments which don’t have the given category.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return form deployments with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return form deployments with a tenantId like the given value.", paramType = "query"),
-            @ApiImplicitParam(name = "withoutTenantId", dataType = "string", value = "If true, only returns form deployments without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
+            @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns form deployments without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,name,deployTime,tenantId", paramType = "query"),
     })
     @ApiResponses(value = {
@@ -120,7 +120,7 @@ public class FormDeploymentCollectionResource {
     @ApiOperation(value = "Create a new form deployment", tags = {
             "Form Deployments" }, consumes = "multipart/form-data", produces = "application/json", notes = "The request body should contain data of type multipart/form-data. There should be exactly one file in the request, any additional files will be ignored. The deployment name is the name of the file-field passed in. Make sure the file-name ends with .form or .xml.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates the form deployment was created."),
+            @ApiResponse(code = 201, message = "Indicates the form deployment was created."),
             @ApiResponse(code = 400, message = "Indicates there was no content present in the request body or the content mime-type is not supported for form deployment. The status-description contains additional information.")
     })
     @ApiImplicitParams({

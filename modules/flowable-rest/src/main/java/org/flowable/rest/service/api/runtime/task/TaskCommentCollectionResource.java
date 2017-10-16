@@ -47,7 +47,7 @@ public class TaskCommentCollectionResource extends TaskBaseResource {
 
     @ApiOperation(value = "Get all comments on a task", tags = { "Tasks" }, nickname = "listTaskComments")
     @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Indicates the task was found and the comments are returned."),
+            @ApiResponse(code = 200, message = "Indicates the task was found and the comments are returned."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
     @RequestMapping(value = "/runtime/tasks/{taskId}/comments", method = RequestMethod.GET, produces = "application/json")

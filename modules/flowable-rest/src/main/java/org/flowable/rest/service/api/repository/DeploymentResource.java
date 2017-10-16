@@ -54,7 +54,7 @@ public class DeploymentResource {
             @ApiResponse(code = 404, message = "Indicates the requested deployment was not found.")
     })
     @RequestMapping(value = "/repository/deployments/{deploymentId}", method = RequestMethod.GET, produces = "application/json")
-    public DeploymentResponse getDeployment(@ApiParam(name = "deploymentId") @PathVariable String deploymentId, HttpServletRequest request) {
+    public DeploymentResponse getDeployment(@ApiParam(name = "deploymentId", value ="The id of the deployment to get.") @PathVariable String deploymentId, HttpServletRequest request) {
         Deployment deployment = repositoryService.createDeploymentQuery().deploymentId(deploymentId).singleResult();
 
         if (deployment == null) {

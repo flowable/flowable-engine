@@ -67,7 +67,7 @@ public class ProcessInstanceVariableResource extends BaseExecutionVariableResour
 
     @ApiOperation(value = "Update a single variable on a process instance", tags = { "Process Instances" }, nickname = "updateProcessInstanceVariable")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates both the process instance and variable were found and variable is updated."),
+            @ApiResponse(code = 201, message = "Indicates both the process instance and variable were found and variable is updated."),
             @ApiResponse(code = 404, message = "Indicates the requested process instance was not found or the process instance does not have a variable with the given name. Status description contains additional information about the error.")
     })
     @RequestMapping(value = "/runtime/process-instances/{processInstanceId}/variables/{variableName}", method = RequestMethod.PUT, produces = "application/json")

@@ -44,7 +44,7 @@ import io.swagger.annotations.Authorization;
 public class ExecutionCollectionResource extends ExecutionBaseResource {
 
     // FIXME naming issue ?
-    @ApiOperation(value = "List of executions", tags = { "Executions" }, nickname = "getExecutions")
+    @ApiOperation(value = "List of executions", tags = { "Executions" }, nickname = "listExecutions")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "activityId", dataType = "string", value = "Only return executions with the given activity id.", paramType = "query"),
@@ -61,7 +61,7 @@ public class ExecutionCollectionResource extends ExecutionBaseResource {
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the executions are returned"),
-            @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
+            @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
     @RequestMapping(value = "/runtime/executions", method = RequestMethod.GET, produces = "application/json")
     public DataResponse getProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
@@ -121,6 +121,7 @@ public class ExecutionCollectionResource extends ExecutionBaseResource {
         return getQueryResponse(queryRequest, allRequestParams, request.getRequestURL().toString().replace("/runtime/executions", ""));
     }
 
+    //FIXME Documentation ?
     @ApiOperation(value = "Signal event received", tags = { "Executions" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the executions are returned"),

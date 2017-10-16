@@ -53,7 +53,7 @@ public class HistoricProcessInstanceCommentCollectionResource {
     @Autowired
     protected TaskService taskService;
 
-    @ApiOperation(value = "Get all comments on a historic process instance", tags = { "History" }, notes = "")
+    @ApiOperation(value = "Get all comments on a historic process instance", nickname="listHistoricProcessInstanceComments", tags = { "History" }, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the process instance was found and the comments are returned."),
             @ApiResponse(code = 404, message = "Indicates that the historic process instance could not be found.") })

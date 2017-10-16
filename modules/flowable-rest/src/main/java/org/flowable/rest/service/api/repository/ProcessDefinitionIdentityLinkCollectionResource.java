@@ -43,7 +43,7 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessDefinitionIdentityLinkCollectionResource extends BaseProcessDefinitionResource {
 
-    @ApiOperation(value = "Get all candidate starters for a process-definition", tags = { "Process Definitions" })
+    @ApiOperation(value = "Get all candidate starters for a process-definition", nickname = "listProcessDefinitionIdentityLinks", tags = { "Process Definitions" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the process definition was found and the requested identity links are returned."),
             @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
