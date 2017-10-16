@@ -263,13 +263,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
     
     @Override
     protected void initDbSqlSessionFactoryEntitySettings() {
-        for (Class<? extends Entity> clazz : EntityDependencyOrder.INSERT_ORDER) {
-            dbSqlSessionFactory.getInsertionOrder().add(clazz);
-        }
-        
-        for (Class<? extends Entity> clazz : EntityDependencyOrder.DELETE_ORDER) {
-            dbSqlSessionFactory.getDeletionOrder().add(clazz);
-        }
+        defaultInitDbSqlSessionFactoryEntitySettings(EntityDependencyOrder.INSERT_ORDER, EntityDependencyOrder.DELETE_ORDER);
     }
 
     // command executors

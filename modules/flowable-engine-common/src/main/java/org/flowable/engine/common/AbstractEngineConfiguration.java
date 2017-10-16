@@ -62,6 +62,7 @@ import org.flowable.engine.common.impl.interceptor.LogInterceptor;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.common.impl.interceptor.TransactionContextInterceptor;
 import org.flowable.engine.common.impl.persistence.StrongUuidGenerator;
+import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.common.impl.util.DefaultClockImpl;
 import org.flowable.engine.common.impl.util.IoUtil;
 import org.flowable.engine.common.runtime.Clock;
@@ -143,6 +144,12 @@ public abstract class AbstractEngineConfiguration {
     protected SqlSessionFactory sqlSessionFactory;
     protected TransactionFactory transactionFactory;
     protected TransactionContextFactory transactionContextFactory;
+    
+    /**
+     * If set to true, enables bulk insert (grouping sql inserts together). Default true. 
+     * For some databases (eg DB2+z/OS) needs to be set to false.
+     */
+    protected boolean isBulkInsertEnabled = true;
     
     /**
      * Some databases have a limit of how many parameters one sql insert can have (eg SQL Server, 2000 params (!= insert statements) ). Tweak this parameter in case of exceptions indicating too much
@@ -546,6 +553,20 @@ public abstract class AbstractEngineConfiguration {
     }
     
     protected abstract void initDbSqlSessionFactoryEntitySettings();
+    
+    protected void defaultInitDbSqlSessionFactoryEntitySettings(List<Class<? extends Entity>> insertOrder, List<Class<? extends Entity>> deleteOrder) {
+        for (Class<? extends Entity> clazz : insertOrder) {
+            dbSqlSessionFactory.getInsertionOrder().add(clazz);
+
+            if (isBulkInsertEnabled) {
+                dbSqlSessionFactory.getBulkInserteableEntityClasses().add(clazz);
+            }
+        }
+
+        for (Class<? extends Entity> clazz : deleteOrder) {
+            dbSqlSessionFactory.getDeletionOrder().add(clazz);
+        }
+    }
 
     public void initTransactionFactory() {
         if (transactionFactory == null) {
@@ -1057,6 +1078,15 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setMaxNrOfStatementsInBulkInsert(int maxNrOfStatementsInBulkInsert) {
         this.maxNrOfStatementsInBulkInsert = maxNrOfStatementsInBulkInsert;
+        return this;
+    }
+    
+    public boolean isBulkInsertEnabled() {
+        return isBulkInsertEnabled;
+    }
+
+    public AbstractEngineConfiguration setBulkInsertEnabled(boolean isBulkInsertEnabled) {
+        this.isBulkInsertEnabled = isBulkInsertEnabled;
         return this;
     }
 

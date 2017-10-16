@@ -22,6 +22,48 @@
             #{resourceRef, typeHandler=ResourceRefTypeHandler},
             #{tenantId, jdbcType=VARCHAR})
   </insert>
+  
+  
+  <insert id="bulkInsertFormInstance" parameterType="java.util.List">
+    insert into ${prefix}ACT_FO_FORM_INSTANCE(ID_, FORM_DEFINITION_ID_, TASK_ID_, PROC_INST_ID_, PROC_DEF_ID_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_,
+                    SUBMITTED_DATE_, SUBMITTED_BY_, FORM_VALUES_ID_, TENANT_ID_)
+    values 
+    <foreach collection="list" item="formInstance" index="index" separator=",">
+        (#{formInstance.id, jdbcType=VARCHAR},
+         #{formInstance.formDefinitionId, jdbcType=VARCHAR},
+         #{formInstance.taskId, jdbcType=VARCHAR},
+         #{formInstance.processInstanceId, jdbcType=VARCHAR}, 
+         #{formInstance.processDefinitionId, jdbcType=VARCHAR},
+         #{formInstance.scopeId, jdbcType=VARCHAR},
+         #{formInstance.scopeType, jdbcType=VARCHAR},
+         #{formInstance.scopeDefinitionId, jdbcType=VARCHAR},
+         #{formInstance.submittedDate, jdbcType=TIMESTAMP},
+         #{formInstance.submittedBy, jdbcType=VARCHAR},
+         #{formInstance.resourceRef, typeHandler=ResourceRefTypeHandler},
+         #{formInstance.tenantId, jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+  
+  <insert id="bulkInsertFormInstance" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL
+    <foreach collection="list" item="formInstance" index="index" separator=",">
+        INTO ${prefix}ACT_FO_FORM_INSTANCE(ID_, FORM_DEFINITION_ID_, TASK_ID_, PROC_INST_ID_, PROC_DEF_ID_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_,
+                    SUBMITTED_DATE_, SUBMITTED_BY_, FORM_VALUES_ID_, TENANT_ID_) VALUES 
+        (#{formInstance.id, jdbcType=VARCHAR},
+         #{formInstance.formDefinitionId, jdbcType=VARCHAR},
+         #{formInstance.taskId, jdbcType=VARCHAR},
+         #{formInstance.processInstanceId, jdbcType=VARCHAR}, 
+         #{formInstance.processDefinitionId, jdbcType=VARCHAR},
+         #{formInstance.scopeId, jdbcType=VARCHAR},
+         #{formInstance.scopeType, jdbcType=VARCHAR},
+         #{formInstance.scopeDefinitionId, jdbcType=VARCHAR},
+         #{formInstance.submittedDate, jdbcType=TIMESTAMP},
+         #{formInstance.submittedBy, jdbcType=VARCHAR},
+         #{formInstance.resourceRef, typeHandler=ResourceRefTypeHandler},
+         #{formInstance.tenantId, jdbcType=VARCHAR})
+    </foreach>
+    SELECT * FROM dual
+  </insert>
 
   <update id="updateFormInstance" parameterType="org.flowable.form.engine.impl.persistence.entity.FormInstanceEntityImpl">
     update ${prefix}ACT_FO_FORM_INSTANCE

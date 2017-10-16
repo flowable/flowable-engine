@@ -11,26 +11,24 @@
     values (#{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR}, #{bytes, jdbcType=${blobType}}, #{deploymentId, jdbcType=VARCHAR})  
   </insert>
 
-  <insert id="bulkCmmnInsertResource" parameterType="java.util.List">
-    INSERT INTO ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_, GENERATED_) VALUES 
+  <insert id="bulkInsertCmmnResource" parameterType="java.util.List">
+    INSERT INTO ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_) VALUES 
       <foreach collection="list" item="resource" index="index" separator=","> 
         (#{resource.id, jdbcType=VARCHAR},
          #{resource.name, jdbcType=VARCHAR},
          #{resource.bytes, jdbcType=${blobType}},
-         #{resource.deploymentId, jdbcType=VARCHAR},
-         #{resource.generated, jdbcType=BOOLEAN})
+         #{resource.deploymentId, jdbcType=VARCHAR})
       </foreach>
   </insert>
 
-  <insert id="bulkCmmnInsertResource" databaseId="oracle" parameterType="java.util.List">
+  <insert id="bulkInsertCmmnResource" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL
       <foreach collection="list" item="resource" index="index"> 
-        INTO ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_, GENERATED_) VALUES 
+        INTO ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_) VALUES 
         (#{resource.id, jdbcType=VARCHAR},
          #{resource.name, jdbcType=VARCHAR},
          #{resource.bytes, jdbcType=${blobType}},
-         #{resource.deploymentId, jdbcType=VARCHAR},
-         #{resource.generated, jdbcType=BOOLEAN})
+         #{resource.deploymentId, jdbcType=VARCHAR})
       </foreach>
     SELECT * FROM dual
   </insert>
