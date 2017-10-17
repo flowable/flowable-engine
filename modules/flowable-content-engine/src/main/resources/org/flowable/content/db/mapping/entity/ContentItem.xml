@@ -100,7 +100,7 @@
     
      <insert id="bulkInsertContentItem" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
-        <foreach collection="list" item="contentItem" index="index" separator=",">
+        <foreach collection="list" item="contentItem" index="index">
             INTO ${prefix}ACT_CO_CONTENT_ITEM (
                 ID_,
                 NAME_,

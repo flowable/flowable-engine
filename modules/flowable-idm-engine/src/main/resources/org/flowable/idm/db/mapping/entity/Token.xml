@@ -55,7 +55,7 @@
   
   <insert id="bulkInsertToken" databaseId="oracle" parameterType="java.util.List">
       INSERT ALL
-      <foreach collection="list" item="token" index="index" separator=",">
+      <foreach collection="list" item="token" index="index">
         INTO ${prefix}ACT_ID_TOKEN (
             ID_,
             REV_, 

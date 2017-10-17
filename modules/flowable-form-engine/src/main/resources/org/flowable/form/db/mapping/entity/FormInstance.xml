@@ -46,7 +46,7 @@
   
   <insert id="bulkInsertFormInstance" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL
-    <foreach collection="list" item="formInstance" index="index" separator=",">
+    <foreach collection="list" item="formInstance" index="index">
         INTO ${prefix}ACT_FO_FORM_INSTANCE(ID_, FORM_DEFINITION_ID_, TASK_ID_, PROC_INST_ID_, PROC_DEF_ID_, SCOPE_ID_, SCOPE_TYPE_, SCOPE_DEFINITION_ID_,
                     SUBMITTED_DATE_, SUBMITTED_BY_, FORM_VALUES_ID_, TENANT_ID_) VALUES 
         (#{formInstance.id, jdbcType=VARCHAR},

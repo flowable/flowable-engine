@@ -35,7 +35,7 @@
   
    <insert id="bulkInsertDmnDeployment" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL
-    <foreach collection="list" item="deployment" index="index" separator=",">
+    <foreach collection="list" item="deployment" index="index">
         INTO ${prefix}ACT_DMN_DEPLOYMENT(ID_, NAME_, CATEGORY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_) VALUES
         (
             #{deployment.id, jdbcType=VARCHAR}, 
