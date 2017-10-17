@@ -70,11 +70,11 @@ flowableModeler
         })
         .when('/simulations/:modelId', {
             templateUrl: appResourceRoot + 'views/simulation.html',
-            controller: 'TestCtrl'
+            controller: 'SimulationCtrl'
         })
         .when('/simulations/:modelId/history/:modelHistoryId', {
             templateUrl: appResourceRoot + 'views/simulation.html',
-            controller: 'TestCtrl'
+            controller: 'SimulationCtrl'
         })
         .when('/casemodels', {
             templateUrl: appResourceRoot + 'views/casemodels.html',
@@ -129,6 +129,10 @@ flowableModeler
             controller: 'FormBuilderController'
         })
         .when('/case-editor/:modelId', {
+            templateUrl: appResourceRoot + 'editor-app/editor.html',
+            controller: 'EditorController'
+        })
+        .when('/simulation-editor/:modelId', {
             templateUrl: appResourceRoot + 'editor-app/editor.html',
             controller: 'EditorController'
         })

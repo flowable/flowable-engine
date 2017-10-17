@@ -53,7 +53,7 @@ public class StencilSetResource {
         }
     }
 
-    @RequestMapping(value = "/rest/stencil-sets/simulationEditor", method = RequestMethod.GET, produces = "application/json")
+    @RequestMapping(value = "/rest/stencil-sets/simulationeditor", method = RequestMethod.GET, produces = "application/json")
     public JsonNode getStencilSetForTestEditor() {
         try {
             JsonNode stencilNode = objectMapper.readTree(this.getClass().getClassLoader().getResourceAsStream("stencilset_simulation.json"));

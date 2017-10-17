@@ -12,6 +12,7 @@
  */
 package org.flowable.app.domain.editor;
 
+import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
@@ -25,9 +26,9 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 @JsonInclude(Include.NON_NULL)
 public class AppDefinition {
 
-    protected List<AppModelDefinition> models;
-    protected List<AppModelDefinition> cmmnModels;
-    protected List<AppModelDefinition> simulationModels;
+    protected List<AppModelDefinition> models = Collections.EMPTY_LIST;
+    protected List<AppModelDefinition> cmmnModels = Collections.EMPTY_LIST;
+    protected List<AppModelDefinition> simulationModels = Collections.EMPTY_LIST;
     protected String theme;
     protected String icon;
     protected String groupsAccess;

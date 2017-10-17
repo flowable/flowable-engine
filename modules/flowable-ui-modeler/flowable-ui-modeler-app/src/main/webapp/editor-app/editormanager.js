@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -149,7 +149,7 @@ angular.module("flowableModeler").factory("editorManager", ["$http", function ($
                     child.set("id", childShape.resourceId);
                     child.set("type", stencilId);
                     child.set("current", childShape.resourceId === this.current);
-                    
+
                     //check if childshapes
 
                     if (stencilId === "CollapsedSubProcess") {
@@ -182,9 +182,9 @@ angular.module("flowableModeler").factory("editorManager", ["$http", function ($
         },
         getModel: function () {
             this.syncCanvasTracker();
-            
+
             var modelMetaData = this.getBaseModelData();
-            
+
             var stencilId = undefined;
             var stencilSetNamespace = undefined;
             var stencilSetUrl = undefined;
@@ -192,6 +192,10 @@ angular.module("flowableModeler").factory("editorManager", ["$http", function ($
                 stencilId = 'CMMNDiagram';
                 stencilSetNamespace = 'http://b3mn.org/stencilset/cmmn1.1#';
                 stencilSetUrl = '../editor/stencilsets/cmmn1.1/cmmn1.1.json';
+            } else if (modelMetaData.model.stencilset.namespace == 'http://b3mn.org/stencilset/simulation0.1#') {
+                stencilId = 'CMMNDiagram';
+                stencilSetNamespace = 'http://b3mn.org/stencilset/simulation0.1#';
+                stencilSetUrl = '../editor/stencilsets/simulation0.1/simulation0.1.json';
             } else {
                 stencilId = 'BPMNDiagram';
                 stencilSetNamespace = 'http://b3mn.org/stencilset/bpmn2.0#';
@@ -229,7 +233,7 @@ angular.module("flowableModeler").factory("editorManager", ["$http", function ($
             if(!config.model.childShapes){
                 config.model.childShapes = [];
             }
-            
+
             this.findAndRegisterCanvas(config.model.childShapes); //this will remove any childshapes of a collapseable subprocess.
             this.canvasTracker.set(config.modelId, JSON.stringify(config.model.childShapes)); //this will be overwritten almost instantly.
 
@@ -262,7 +266,7 @@ angular.module("flowableModeler").factory("editorManager", ["$http", function ($
             for (var i = 0; i < parent.childShapes.length; i++) {
                 var childShape = parent.childShapes[i]
                 if(childShape.stencil.id === "CollapsedSubProcess"){
-                    
+
                     var elements = this.canvasTracker.get(childShape.resourceId);
                     if(elements){
                         elements = JSON.parse(elements);

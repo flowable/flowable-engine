@@ -18,14 +18,16 @@ public class AppDefinitionPublishRepresentation extends AbstractRepresentation {
 
     protected String comment;
     protected Boolean force;
+    protected Boolean includeSimulationModels;
 
     public AppDefinitionPublishRepresentation() {
 
     }
 
-    public AppDefinitionPublishRepresentation(String comment, Boolean force) {
+    public AppDefinitionPublishRepresentation(String comment, Boolean force, Boolean includeSimulationModels) {
         this.comment = comment;
         this.force = force;
+        this.includeSimulationModels = includeSimulationModels;
     }
 
     public String getComment() {
@@ -42,6 +44,14 @@ public class AppDefinitionPublishRepresentation extends AbstractRepresentation {
 
     public void setForce(Boolean force) {
         this.force = force;
+    }
+
+    public Boolean getIncludeSimulationModels() {
+        return includeSimulationModels;
+    }
+
+    public void setIncludeSimulationModels(Boolean includeSimulationModels) {
+        this.includeSimulationModels = includeSimulationModels;
     }
 
 }

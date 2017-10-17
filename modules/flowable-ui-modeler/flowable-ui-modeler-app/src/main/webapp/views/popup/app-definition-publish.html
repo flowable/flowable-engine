@@ -39,6 +39,13 @@
                     </ul>
                 </div>
 
+                <div class="checkbox ng-scope" ng-if="model.appDefinition.definition.simulationModels">
+                    <label class="ng-binding">
+                        <input type="checkbox" ng-model="popup.includeSimulationModels" class="ng-pristine ng-untouched ng-valid">
+                        {{'APP.POPUP.PUBLISH-SIMULATION-MODELS' | translate}}
+                    </label>
+                </div>
+
 			</div>
 			<div class="modal-footer">
 				<div class="pull-right" ng-if="popup.error == undefined || popup.error == null || (popup.error && popup.error.type != 'processModelAlreadyUsed')">

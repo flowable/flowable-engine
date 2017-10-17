@@ -605,6 +605,7 @@
           "PUBLISH-ERROR-PROCESS-ALREADY-USED": "Following process models are already used in another app. Is this ok?",
           "PUBLISH-ERROR-PROCESS-ALREADY-USED-APP": "App",
           "PUBLISH-ERROR-PROCDEF-DUPLICATE-KEYS": "Invalid app: duplicate process identifiers found (change the \"id\" property of the offending process models):",
+          "PUBLISH-SIMULATION-MODELS": "Include simulation models",
           "DELETE-TITLE": "Delete app definition",
           "DELETE-DESCRIPTION": "Are you sure you want to delete the app definition \"{{name}}\"?",
           "DELETE-DESCRIPTION-WITH-RUNTIME": "Are you sure you want to delete the app definition \"{{name}}\"? Note that this app definition has been deployed to the task landing page and by confirming, the app will be removed from the task app landing page.",

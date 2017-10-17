@@ -134,7 +134,7 @@ angular.module('flowableModeler')
         $scope.editSimulationDetails = function (simulation) {
             if (simulation) {
                 $rootScope.editorHistory = [];
-                $location.path("/editor/" + simulation.id);
+                $location.path("/simulationeditor/" + simulation.id);
             }
         };
 
@@ -180,7 +180,7 @@ angular.module('flowableModeler')
 
                     $scope.model.loading = false;
                     $rootScope.editorHistory = [];
-                    $location.path("/simulationEditor/" + data.id);
+                    $location.path("/simulationeditor/" + data.id);
                 }).error(function (data, status, headers, config) {
                     $scope.model.loading = false;
                     $scope.model.errorMessage = data.message;

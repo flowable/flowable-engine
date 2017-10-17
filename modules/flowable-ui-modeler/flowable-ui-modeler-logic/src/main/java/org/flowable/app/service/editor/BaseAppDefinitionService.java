@@ -119,7 +119,7 @@ public class BaseAppDefinitionService {
         return appDefinition;
     }
 
-    protected byte[] createDeployableZipArtifact(Model appDefinitionModel, AppDefinition appDefinition) {
+    protected byte[] createDeployableZipArtifact(Model appDefinitionModel, AppDefinition appDefinition, Boolean includeSimulationModels) {
 
         byte[] deployZipArtifact = null;
         Map<String, byte[]> deployableAssets = new HashMap<>();
@@ -135,6 +135,9 @@ public class BaseAppDefinitionService {
 
             createDeployableBpmnModels(appDefinitionModel, appDefinition, deployableAssets, formMap, decisionTableMap);
             createDeployableCmmnModels(appDefinitionModel, appDefinition, deployableAssets, formMap, decisionTableMap);
+            if (includeSimulationModels != null && includeSimulationModels) {
+                createDeployableSimulationModels(appDefinitionModel, appDefinition, deployableAssets, formMap, decisionTableMap);
+            }
 
             if (formMap.size() > 0) {
                 for (String formId : formMap.keySet()) {
@@ -165,11 +168,46 @@ public class BaseAppDefinitionService {
 
         return deployZipArtifact;
     }
-    
-    protected void createDeployableBpmnModels(Model appDefinitionModel, AppDefinition appDefinition, Map<String, byte[]> deployableAssets, 
+
+    protected void createDeployableBpmnModels(Model appDefinitionModel, AppDefinition appDefinition, Map<String, byte[]> deployableAssets,
                     Map<String, Model> formMap, Map<String, Model> decisionTableMap) {
-        
-        for (AppModelDefinition appModelDef : appDefinition.getModels()) {
+        createDeployableBpmnBasedModels(appDefinitionModel, deployableAssets, formMap, decisionTableMap, appDefinition.getModels());
+    }
+
+    protected void createDeployableCmmnModels(Model appDefinitionModel, AppDefinition appDefinition, Map<String, byte[]> deployableAssets,
+                    Map<String, Model> formMap, Map<String, Model> decisionTableMap) {
+
+        for (AppModelDefinition appModelDef : appDefinition.getCmmnModels()) {
+
+            AbstractModel caseModel = modelService.getModel(appModelDef.getId());
+            if (caseModel == null) {
+                throw new BadRequestException(String.format("Model %s for app definition %s could not be found", appModelDef.getId(), appDefinitionModel.getId()));
+            }
+
+            List<Model> referencedModels = modelRepository.findByParentModelId(caseModel.getId());
+            for (Model childModel : referencedModels) {
+                if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
+                    formMap.put(childModel.getId(), childModel);
+
+                } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
+                    decisionTableMap.put(childModel.getId(), childModel);
+                }
+            }
+
+            CmmnModel cmmnModel = modelService.getCmmnModel(caseModel, formMap, decisionTableMap);
+
+            byte[] modelXML = modelService.getCmmnXML(cmmnModel);
+            deployableAssets.put(caseModel.getKey().replaceAll(" ", "") + ".cmmn", modelXML);
+        }
+    }
+
+    protected void createDeployableSimulationModels(Model appDefinitionModel, AppDefinition appDefinition, Map<String, byte[]> deployableAssets,
+                                              Map<String, Model> formMap, Map<String, Model> decisionTableMap) {
+        createDeployableBpmnBasedModels(appDefinitionModel, deployableAssets, formMap, decisionTableMap, appDefinition.getSimulationModels());
+    }
+
+    private void createDeployableBpmnBasedModels(Model appDefinitionModel, Map<String, byte[]> deployableAssets, Map<String, Model> formMap, Map<String, Model> decisionTableMap, List<AppModelDefinition> bpmnBasedModels) {
+        for (AppModelDefinition appModelDef : bpmnBasedModels) {
 
             AbstractModel processModel = modelService.getModel(appModelDef.getId());
             if (processModel == null) {
@@ -195,33 +233,6 @@ public class BaseAppDefinitionService {
 
             byte[] modelXML = modelService.getBpmnXML(bpmnModel);
             deployableAssets.put(processModel.getKey().replaceAll(" ", "") + ".bpmn", modelXML);
-        }
-    }
-    
-    protected void createDeployableCmmnModels(Model appDefinitionModel, AppDefinition appDefinition, Map<String, byte[]> deployableAssets, 
-                    Map<String, Model> formMap, Map<String, Model> decisionTableMap) {
-        
-        for (AppModelDefinition appModelDef : appDefinition.getCmmnModels()) {
-
-            AbstractModel caseModel = modelService.getModel(appModelDef.getId());
-            if (caseModel == null) {
-                throw new BadRequestException(String.format("Model %s for app definition %s could not be found", appModelDef.getId(), appDefinitionModel.getId()));
-            }
-
-            List<Model> referencedModels = modelRepository.findByParentModelId(caseModel.getId());
-            for (Model childModel : referencedModels) {
-                if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
-                    formMap.put(childModel.getId(), childModel);
-
-                } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
-                    decisionTableMap.put(childModel.getId(), childModel);
-                }
-            }
-
-            CmmnModel cmmnModel = modelService.getCmmnModel(caseModel, formMap, decisionTableMap);
-
-            byte[] modelXML = modelService.getCmmnXML(cmmnModel);
-            deployableAssets.put(caseModel.getKey().replaceAll(" ", "") + ".cmmn", modelXML);
         }
     }
 

@@ -286,7 +286,7 @@ public class ModelServiceImpl implements ModelService {
 
 
     protected String getInitialProcessModelContent(ModelRepresentation modelRepresentation, String skeletonId) {
-        ObjectNode editorNode = createTestProcessModel(modelRepresentation);
+        ObjectNode editorNode = createProcessModel(modelRepresentation, StringUtils.isNotEmpty(skeletonId));
         ArrayNode childShapeArray = objectMapper.createArrayNode();
         editorNode.set("childShapes", childShapeArray);
         JsonNode eventLogEntriesForProcessInstanceId = getEventLogEntriesForProcessInstanceId(skeletonId);
@@ -393,7 +393,7 @@ public class ModelServiceImpl implements ModelService {
     }
 
     protected JsonNode getEventLogEntriesForProcessInstanceId(String processInstanceId) {
-        if (processInstanceId != null) {
+        if (StringUtils.isNotEmpty(processInstanceId)) {
             String eventLogApiUrl = environment.getRequiredProperty("deployment.api.url");
             String basicAuthUser = environment.getRequiredProperty("idm.admin.user");
             String basicAuthPassword = environment.getRequiredProperty("idm.admin.password");
@@ -425,12 +425,12 @@ public class ModelServiceImpl implements ModelService {
         }
     }
 
-    protected ObjectNode createTestProcessModel(ModelRepresentation modelRepresentation) {
+    protected ObjectNode createProcessModel(ModelRepresentation modelRepresentation, boolean isTest) {
         ObjectNode editorNode = objectMapper.createObjectNode();
         editorNode.put("id", "canvas");
         editorNode.put("resourceId", "canvas");
         ObjectNode stencilSetNode = objectMapper.createObjectNode();
-        stencilSetNode.put("namespace", "http://b3mn.org/stencilset/bpmn2.0#");
+        stencilSetNode.put("namespace", isTest ? "http://b3mn.org/stencilset/simulation0.1#" : "http://b3mn.org/stencilset/bpmn2.0#");
         editorNode.set("stencilset", stencilSetNode);
         ObjectNode propertiesNode = objectMapper.createObjectNode();
         propertiesNode.put("process_id", modelRepresentation.getKey());

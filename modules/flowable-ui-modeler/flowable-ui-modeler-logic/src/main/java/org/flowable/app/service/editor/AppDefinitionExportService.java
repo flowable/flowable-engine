@@ -145,7 +145,7 @@ public class AppDefinitionExportService extends BaseAppDefinitionService {
         try {
             response.setHeader("Content-Disposition", "attachment; filename=\"" + appDefinition.getName() + ".bar\"; filename*=utf-8''" + UriUtils.encode(appDefinition.getName() + ".bar", "utf-8"));
 
-            byte[] deployZipArtifact = createDeployableZipArtifact(appModel, appDefinition.getDefinition());
+            byte[] deployZipArtifact = createDeployableZipArtifact(appModel, appDefinition.getDefinition(), true);
 
             ServletOutputStream servletOutputStream = response.getOutputStream();
             response.setContentType("application/zip");

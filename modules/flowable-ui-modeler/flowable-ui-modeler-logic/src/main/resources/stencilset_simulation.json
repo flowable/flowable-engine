@@ -1,6 +1,6 @@
 {
-  "title" : "Process editor",
-  "namespace" : "http://b3mn.org/stencilset/bpmn2.0#",
+  "title" : "Simulation editor",
+  "namespace" : "http://b3mn.org/stencilset/simulation0.1#",
   "description" : "BPMN process editor",
   "propertyPackages" : [ {
     "name" : "process_idpackage",

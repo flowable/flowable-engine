@@ -38,7 +38,7 @@ angular.module('flowableModeler')
             title: 'CMMN models'
         },
         {
-            id: 'simulations',
+            id: 'simulation',
             title: 'Simulation models'
         }
     ];
@@ -195,7 +195,7 @@ angular.module('flowableModeler')
         loading: false,
         selectedModels: [],
         selectedCmmnModels: [],
-        selectedTestModels: [],
+        selectedSimulationModels: [],
         activeTab: 'bpmn'
     };
 
@@ -213,7 +213,7 @@ angular.module('flowableModeler')
 
     if ($rootScope.currentAppDefinition.definition.simulationModels) {
         for (var i = 0; i < $rootScope.currentAppDefinition.definition.simulationModels.length; i++) {
-            $scope.popup.selectedTestModels.push($rootScope.currentAppDefinition.definition.simulationModels[i].id);
+            $scope.popup.selectedSimulationModels.push($rootScope.currentAppDefinition.definition.simulationModels[i].id);
         }
     }
 
@@ -326,17 +326,17 @@ angular.module('flowableModeler')
         $rootScope.currentAppDefinition.definition.cmmnModels = modelArray;
     };
 
-    $scope.selectTestModel = function(model) {
-        var index = $scope.popup.selectedTestModels.indexOf(model.id);
+    $scope.selectSimulationModel = function(model) {
+        var index = $scope.popup.selectedSimulationModels.indexOf(model.id);
         if (index >= 0) {
-            $scope.popup.selectedTestModels.splice(index, 1);
+            $scope.popup.selectedSimulationModels.splice(index, 1);
         } else {
-            $scope.popup.selectedTestModels.push(model.id);
+            $scope.popup.selectedSimulationModels.push(model.id);
         }
 
         var modelArray = [];
         for (var i = 0; i < $scope.popup.simulationModels.data.length; i++) {
-            if ($scope.popup.selectedTestModels.indexOf($scope.popup.simulationModels.data[i].id) >= 0) {
+            if ($scope.popup.selectedSimulationModels.indexOf($scope.popup.simulationModels.data[i].id) >= 0) {
                 var selectedModel = $scope.popup.simulationModels.data[i];
                 var summaryModel = {
                     id: selectedModel.id,
@@ -373,8 +373,8 @@ angular.module('flowableModeler')
         }
     };
 
-    $scope.isTestModelSelected = function(model) {
-        if ($scope.popup.selectedTestModels.indexOf(model.id) >= 0) {
+    $scope.isSimulationModelSelected = function(model) {
+        if ($scope.popup.selectedSimulationModels.indexOf(model.id) >= 0) {
             return true;
         } else {
             return false;

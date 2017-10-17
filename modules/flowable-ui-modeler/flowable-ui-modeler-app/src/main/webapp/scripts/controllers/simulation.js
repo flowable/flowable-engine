@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 angular.module('flowableModeler')
-  .controller('TestCtrl', ['$rootScope', '$scope', '$translate', '$http', '$location', '$routeParams','$modal', '$popover', '$timeout', 'appResourceRoot', 'ResourceService',
+  .controller('SimulationCtrl', ['$rootScope', '$scope', '$translate', '$http', '$location', '$routeParams','$modal', '$popover', '$timeout', 'appResourceRoot', 'ResourceService',
                               function ($rootScope, $scope, $translate, $http, $location, $routeParams, $modal, $popover, $timeout, appResourceRoot, ResourceService) {
 
     // Main page (needed for visual indicator of current page)
@@ -116,14 +116,14 @@ angular.module('flowableModeler')
         $location.path("/simulations/");
     };
 
-    $scope.editTest = function() {
+    $scope.editProcess = function() {
         _internalCreateModal({
     		template: 'views/popup/model-edit.html',
 	        scope: $scope
     	}, $modal, $scope);
     };
 
-    $scope.duplicateTest = function() {
+    $scope.duplicateProcess = function() {
       var modalInstance = _internalCreateModal({
         template: 'views/popup/test-duplicate.html?version=' + Date.now()
       }, $modal, $scope);
@@ -131,7 +131,7 @@ angular.module('flowableModeler')
       modalInstance.$scope.originalModel = $scope.model;
     };
 
-    $scope.deleteTest = function() {
+    $scope.deleteProcess = function() {
         _internalCreateModal({
     		template: 'views/popup/model-delete.html',
     		scope: $scope
@@ -140,7 +140,7 @@ angular.module('flowableModeler')
 
     $scope.openEditor = function() {
       if ($scope.model.process) {
-        $location.path("/simulationEditor/" + $scope.model.process.id);
+        $location.path("/simulation-editor/" + $scope.model.process.id);
       }
     };
 

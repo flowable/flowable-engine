@@ -36,6 +36,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.ssl.SSLContextBuilder;
 import org.flowable.app.domain.editor.AppDefinition;
 import org.flowable.app.domain.editor.Model;
+import org.flowable.app.model.editor.AppDefinitionPublishRepresentation;
 import org.flowable.app.service.api.AppDefinitionService;
 import org.flowable.app.service.exception.InternalServerErrorException;
 import org.flowable.idm.api.User;
@@ -45,8 +46,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static org.flowable.app.rest.HttpRequestHelper.executePostRequest;
 
 /**
  * Can't merge this with {@link AppDefinitionService}, as it doesn't have visibility of domain models needed to do the publication.
@@ -62,10 +61,10 @@ public class AppDefinitionPublishService extends BaseAppDefinitionService {
     @Autowired
     protected Environment environment;
 
-    public void publishAppDefinition(String comment, Model appDefinitionModel, User user) {
+    public void publishAppDefinition(AppDefinitionPublishRepresentation publishConfiguration, Model appDefinitionModel, User user) {
 
         // Create new version of the app model
-        modelService.createNewModelVersion(appDefinitionModel, comment, user);
+        modelService.createNewModelVersion(appDefinitionModel, publishConfiguration.getComment(), user);
 
         String deployableZipName = appDefinitionModel.getKey() + ".zip";
 
@@ -78,7 +77,7 @@ public class AppDefinitionPublishService extends BaseAppDefinitionService {
         }
 
         if (appDefinition != null) {
-            byte[] deployZipArtifact = createDeployableZipArtifact(appDefinitionModel, appDefinition);
+            byte[] deployZipArtifact = createDeployableZipArtifact(appDefinitionModel, appDefinition, publishConfiguration.getIncludeSimulationModels());
 
             if (deployZipArtifact != null) {
                 deployZipArtifact(deployableZipName, deployZipArtifact, appDefinitionModel.getKey(), appDefinitionModel.getName());

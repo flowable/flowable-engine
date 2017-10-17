@@ -95,7 +95,8 @@
                             {{'APP.ACTION.EDIT-MODELS' | translate}}
                         </button>
                     </div>
-                    <div class="no-results" ng-show="!currentAppDefinition.definition.models.length && !currentAppDefinition.definition.cmmnModels.length">
+                    <div class="no-results" ng-show="!currentAppDefinition.definition.models.length && !currentAppDefinition.definition.cmmnModels.length
+                                                        && !currentAppDefinition.definition.simulationModels.length">
                         {{'APP.DETAILS.NO-MODELS-SELECTED' | translate}}
                     </div>
                 </div>

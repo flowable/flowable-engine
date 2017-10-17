@@ -203,13 +203,15 @@ angular.module('flowableModeler')
 
     $scope.popup = {
         loading: false,
-        comment: ''
+        comment: '',
+        includeSimulationModels: true
     };
 
     $scope.ok = function (force) {
         $scope.popup.loading = true;
         var data = {
-            comment: $scope.popup.comment
+            comment: $scope.popup.comment,
+            includeSimulationModels: $scope.popup.includeSimulationModels
         };
 
         if (force !== undefined && force !== null && force === true) {
