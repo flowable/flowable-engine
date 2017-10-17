@@ -196,9 +196,9 @@
         }
     },
     "PROCESS": {
-        "SIMULATION": {
+        "TEST": {
             "POPUP": {
-                "CREATE-TITLE": "Create a new business process model",
+                "CREATE-TITLE": "Create a new test model",
                 "CREATE-DESCRIPTION": "You need to give a name for the new model and you may want to add a description at the same time."
             },
             "NAME": "Model name",
@@ -250,6 +250,7 @@
             "CREATE": "+ Start a process",
             "BACK-TO-LIST": "Back to process instances",
             "SHOW-DIAGRAM": "Show diagram",
+            "CREATE-SIMULATION": "Create test",
             "EXECUTE": "Execute",
             "LOG": "Log",
             "CANCEL": "Cancel process",

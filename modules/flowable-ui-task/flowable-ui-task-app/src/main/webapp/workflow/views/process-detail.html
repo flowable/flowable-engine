@@ -43,7 +43,7 @@
     <div class="header" ng-if="!newProcessInstance && model.processInstance">
         <div class="btn-group pull-right"
              ng-show="model.processInstance.graphicalNotationDefined && !model.processInstance.ended">
-            <button class="btn" id="generateTestTrigger" translate="PROCESS.ACTION.CREATE-TEST"
+            <button class="btn" id="generateTestTrigger" translate="PROCESS.ACTION.CREATE-SIMULATION"
                     ng-click="showCreateProcessTestDialog()"></button>
         </div>
         <div class="btn-group pull-right" ng-show="model.processInstance.startedBy.id == ('' + account.id)">
