@@ -110,6 +110,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     public void testConnectTimeout() {
         try {
             runtimeService.startProcessInstanceByKey("connectTimeout");
+            fail("FlowableException expected");
         } catch (final Exception e) {
             assertTrue(e instanceof FlowableException);
             assertTrue(e.getCause() instanceof IOException);
@@ -120,6 +121,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     public void testRequestTimeout() {
         try {
             runtimeService.startProcessInstanceByKey("requestTimeout");
+            fail("FlowableException expected");
         } catch (final Exception e) {
             assertTrue(e instanceof FlowableException);
             assertTrue(e.getCause() instanceof SocketException);
@@ -130,6 +132,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     public void testDisallowRedirects() {
         try {
             runtimeService.startProcessInstanceByKey("disallowRedirects");
+            fail("FlowableException expected");
         } catch (Exception e) {
             assertTrue(e instanceof FlowableException);
             assertEquals("HTTP302", e.getMessage());
@@ -141,6 +144,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         ProcessInstance process = null;
         try {
             process = runtimeService.startProcessInstanceByKey("failStatusCodes");
+            fail("FlowableException expected");
         } catch (Exception e) {
             assertTrue(e instanceof FlowableException);
             assertEquals("HTTP400", e.getMessage());
@@ -206,6 +210,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
     public void testHttpGet4XX() {
         try {
             runtimeService.startProcessInstanceByKey("testHttpGet4XX");
+            fail("FlowableException expected");
         } catch (Exception e) {
             assertTrue(e instanceof FlowableException);
             assertEquals("HTTP404", e.getMessage());
