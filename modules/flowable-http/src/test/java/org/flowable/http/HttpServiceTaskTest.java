@@ -25,8 +25,6 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.http.HttpServiceTaskTestServer.HttpServiceTaskTestServlet;
 import org.flowable.variable.api.history.HistoricVariableInstance;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,8 +33,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * @author Harsha Teja Kanna
  */
 public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(HttpServiceTaskTest.class);
 
     private ObjectMapper mapper = new ObjectMapper();
 
