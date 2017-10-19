@@ -286,7 +286,7 @@ public class ModelServiceImpl implements ModelService {
 
 
     protected String getInitialProcessModelContent(ModelRepresentation modelRepresentation, String skeletonId) {
-        ObjectNode editorNode = createProcessModel(modelRepresentation, StringUtils.isNotEmpty(skeletonId));
+        ObjectNode editorNode = createProcessModel(modelRepresentation, isTest(modelRepresentation));
         ArrayNode childShapeArray = objectMapper.createArrayNode();
         editorNode.set("childShapes", childShapeArray);
         JsonNode eventLogEntriesForProcessInstanceId = getEventLogEntriesForProcessInstanceId(skeletonId);
@@ -308,6 +308,10 @@ public class ModelServiceImpl implements ModelService {
         );
 
         return editorNode.toString();
+    }
+
+    private boolean isTest(ModelRepresentation modelRepresentation) {
+        return Integer.valueOf(AbstractModel.MODEL_TYPE_SIMULATION).equals(modelRepresentation.getModelType());
     }
 
     private List<ObjectNode> addUserTask() {
