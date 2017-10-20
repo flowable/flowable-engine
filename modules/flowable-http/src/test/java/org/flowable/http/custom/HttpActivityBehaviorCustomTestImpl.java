@@ -16,8 +16,6 @@ import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.http.HttpActivityBehavior;
 import org.flowable.http.HttpRequest;
 import org.flowable.http.HttpResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Implementation of HttpActivityBehavior to test custom behavior class
@@ -27,8 +25,6 @@ import org.slf4j.LoggerFactory;
 public class HttpActivityBehaviorCustomTestImpl extends HttpActivityBehavior {
 
     private static final long serialVersionUID = 1L;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(HttpActivityBehaviorCustomTestImpl.class);
 
     @Override
     protected HttpResponse perform(DelegateExecution execution, HttpRequest request) {

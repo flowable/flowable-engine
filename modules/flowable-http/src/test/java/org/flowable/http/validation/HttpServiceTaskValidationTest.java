@@ -31,6 +31,7 @@ public class HttpServiceTaskValidationTest extends HttpServiceTaskTestCase {
     public void testInvalidProcess() {
         try {
             runtimeService.startProcessInstanceByKey("validateProcess");
+            fail("FlowableException expected");
         } catch (Exception e) {
             assertTrue(e instanceof FlowableException);
             assertEquals(HTTP_TASK_REQUEST_METHOD_INVALID, e.getMessage());
@@ -41,6 +42,7 @@ public class HttpServiceTaskValidationTest extends HttpServiceTaskTestCase {
     public void testInvalidHeaders() {
         try {
             runtimeService.startProcessInstanceByKey("invalidHeaders");
+            fail("FlowableException expected");
         } catch (Exception e) {
             assertTrue(e instanceof FlowableException);
             assertEquals(HTTP_TASK_REQUEST_HEADERS_INVALID, e.getMessage());
@@ -51,6 +53,7 @@ public class HttpServiceTaskValidationTest extends HttpServiceTaskTestCase {
     public void testInvalidFlags() {
         try {
             runtimeService.startProcessInstanceByKey("invalidFlags");
+            fail("FlowableException expected");
         } catch (Exception e) {
             assertTrue(e instanceof FlowableException);
             assertEquals(HTTP_TASK_REQUEST_FIELD_INVALID, e.getMessage());
@@ -64,6 +67,7 @@ public class HttpServiceTaskValidationTest extends HttpServiceTaskTestCase {
 
         try {
             runtimeService.startProcessInstanceByKey("invalidTimeout", variables);
+            fail("FlowableException expected");
         } catch (Exception e) {
             assertTrue(e instanceof FlowableException);
             assertTextPresent(HTTP_TASK_REQUEST_FIELD_INVALID, e.getMessage());

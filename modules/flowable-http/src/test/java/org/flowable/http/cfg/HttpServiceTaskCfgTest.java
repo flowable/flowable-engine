@@ -42,6 +42,7 @@ public class HttpServiceTaskCfgTest extends HttpServiceTaskCfgTestCase {
     public void testHttpsSelfSignedFail() {
         try {
             runtimeService.startProcessInstanceByKey("httpsSelfSignedFail").getId();
+            fail("FlowableException expected");
         } catch (Exception e) {
             assertTrue(e instanceof FlowableException);
             assertTrue(e.getCause() instanceof SSLHandshakeException);
