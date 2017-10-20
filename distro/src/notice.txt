@@ -148,14 +148,15 @@ io.swagger						swagger-annotations			1.5.10			Apache License 2.0
 io.swagger						swagger-models				1.5.10			Apache License 2.0
 javax.activation				activation					1.1.1			COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
 javax.annotation				jsr250-api					1.0				COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
-javax.mail						mail						1.4.7			CDDL-GPLv2+CE
+javax.mail						mail						1.4.1			CDDL-GPLv2+CE
 joda-time						joda-time					2.6				Apache 2
 log4j							log4j						1.2.17			The Apache Software License, Version 2.0
 math.geom2d						javaGeom					0.11.1			Lesser General Public License version 2.0 (LGPLv2)
-org.apache.commons				commons-email				1.4				Apache License, Version 2.0
+org.apache.commons				commons-email				1.5				Apache License, Version 2.0
 org.apache.commons				commons-lang3				3.3.2			The Apache Software License, Version 2.0
 org.apache.httpcomponents		httpclient					4.5.3			Apache License, Version 2.0
-org.apache.httpcomponents		httpcore					4.3.2			Apache License, Version 2.0
+org.apache.httpcomponents		httpcore					4.4.6			Apache License, Version 2.0
+org.apache.httpcomponents		httpmime					4.5.3			Apache License, Version 2.0
 org.apache.geronimo.bundles		json						20090211_1		The Apache Software License, Version 2.0
 org.codehaus.groovy				groovy-all					2.4.8			The Apache Software License, Version 2.0
 org.liquibase					liquibase-core				3.5.3			Apache License, Version 2.0
@@ -165,22 +166,22 @@ org.mvel						mvel2						2.2.6.Final		The Apache Software License, Version 2.0
 org.slf4j						jcl-over-slf4j				1.7.6			MIT License
 org.slf4j						slf4j-api					1.7.6			MIT License
 org.slf4j						slf4j-log4j12				1.7.6			MIT License
-org.springframework				spring-beans				4.2.5.RELEASE	The Apache Software License, Version 2.0
-org.springframework				spring-core					4.2.5.RELEASE	The Apache Software License, Version 2.0
-org.springframework				spring-context				4.2.5.RELEASE	The Apache Software License, Version 2.0
-org.springframework				spring-context-support		4.2.5.RELEASE	The Apache Software License, Version 2.0
-org.springframework				spring-jdbc					4.2.5.RELEASE	The Apache Software License, Version 2.0
-org.springframework				spring-tx					4.2.5.RELEASE	The Apache Software License, Version 2.0
-org.springframework				spring-web					4.2.5.RELEASE	The Apache Software License, Version 2.0
-org.springframework				spring-webmvc				4.2.5.RELEASE	The Apache Software License, Version 2.0
-org.springframework				spring-aop					4.2.5.RELEASE	The Apache Software License, Version 2.0
-org.springframework				spring-core					4.2.5.RELEASE	The Apache Software License, Version 2.0
-org.springframework				spring-expression			4.2.5.RELEASE	The Apache Software License, Version 2.0
-org.springframework				spring-orm					4.2.5.RELEASE	The Apache Software License, Version 2.0
-org.springframework.security	spring-security-config		4.0.4.RELEASE	The Apache Software License, Version 2.0
-org.springframework.security	spring-security-core		4.0.4.RELEASE	The Apache Software License, Version 2.0
-org.springframework.security	spring-security-crypto		4.0.4.RELEASE	The Apache Software License, Version 2.0
-org.springframework.security	spring-security-web			4.0.4.RELEASE	The Apache Software License, Version 2.0
+org.springframework				spring-beans				4.3.9.RELEASE	The Apache Software License, Version 2.0
+org.springframework				spring-core					4.3.9.RELEASE	The Apache Software License, Version 2.0
+org.springframework				spring-context				4.3.9.RELEASE	The Apache Software License, Version 2.0
+org.springframework				spring-context-support		4.3.9.RELEASE	The Apache Software License, Version 2.0
+org.springframework				spring-jdbc					4.3.9.RELEASE	The Apache Software License, Version 2.0
+org.springframework				spring-tx					4.3.9.RELEASE	The Apache Software License, Version 2.0
+org.springframework				spring-web					4.3.9.RELEASE	The Apache Software License, Version 2.0
+org.springframework				spring-webmvc				4.3.9.RELEASE	The Apache Software License, Version 2.0
+org.springframework				spring-aop					4.3.9.RELEASE	The Apache Software License, Version 2.0
+org.springframework				spring-core					4.3.9.RELEASE	The Apache Software License, Version 2.0
+org.springframework				spring-expression			4.3.9.RELEASE	The Apache Software License, Version 2.0
+org.springframework				spring-orm					4.3.9.RELEASE	The Apache Software License, Version 2.0
+org.springframework.security	spring-security-config		4.2.3.RELEASE	The Apache Software License, Version 2.0
+org.springframework.security	spring-security-core		4.2.3.RELEASE	The Apache Software License, Version 2.0
+org.springframework.security	spring-security-crypto		4.2.3.RELEASE	The Apache Software License, Version 2.0
+org.springframework.security	spring-security-web			4.2.3.RELEASE	The Apache Software License, Version 2.0
 org.tinyjee.jgraphx				jgraphx						1.10.4.1		JGraph Ltd - 3 clause BSD license
 org.yaml						snakeyaml					1.17			The Apache Software License, Version 2.0
 xerces							xercesImpl					2.10.0			The Apache Software License, Version 2.0
