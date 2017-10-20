@@ -27,9 +27,9 @@ import org.flowable.idm.api.User;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -54,7 +54,7 @@ public class UserPictureResource extends BaseUserResource {
             @ApiResponse(code = 200, message = "Indicates the user was found and has a picture, which is returned in the body."),
             @ApiResponse(code = 404, message = "Indicates the requested user was not found or the user does not have a profile picture. Status-description contains additional information about the error.")
     })
-    @RequestMapping(value = "/identity/users/{userId}/picture", method = RequestMethod.GET)
+    @GetMapping("/identity/users/{userId}/picture")
     public ResponseEntity<byte[]> getUserPicture(@ApiParam(name = "userId") @PathVariable String userId, HttpServletRequest request, HttpServletResponse response) {
         User user = getUserFromRequest(userId);
         Picture userPicture = identityService.getUserPicture(user.getId());
@@ -85,7 +85,7 @@ public class UserPictureResource extends BaseUserResource {
             @ApiResponse(code = 200, message = "Indicates the user was found and the picture has been updated. The response-body is left empty intentionally."),
             @ApiResponse(code = 404, message = "Indicates the requested user was not found.")
     })
-    @RequestMapping(value = "/identity/users/{userId}/picture", method = RequestMethod.PUT)
+    @PutMapping("/identity/users/{userId}/picture")
     public void updateUserPicture(@ApiParam(name = "userId") @PathVariable String userId, HttpServletRequest request, HttpServletResponse response) {
         User user = getUserFromRequest(userId);
 

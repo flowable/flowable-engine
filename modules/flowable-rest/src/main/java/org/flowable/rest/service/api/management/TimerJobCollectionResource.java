@@ -24,8 +24,7 @@ import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.api.RequestUtil;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -77,7 +76,7 @@ public class TimerJobCollectionResource {
             @ApiResponse(code = 200, message = "Indicates the requested jobs were returned."),
             @ApiResponse(code = 400, message = "Indicates an illegal value has been used in a url query parameter or the both 'messagesOnly' and 'timersOnly' are used as parameters. Status description contains additional details about the error.")
     })
-    @RequestMapping(value = "/management/timer-jobs", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/management/timer-jobs", produces = "application/json")
     public DataResponse getJobs(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         TimerJobQuery query = managementService.createTimerJobQuery();
 
