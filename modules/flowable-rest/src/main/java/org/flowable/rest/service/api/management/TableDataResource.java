@@ -23,9 +23,8 @@ import org.flowable.engine.common.api.management.TablePageQuery;
 import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -64,7 +63,7 @@ public class TableDataResource {
             @ApiResponse(code = 200, message = "Indicates the table exists and the table row data is returned"),
             @ApiResponse(code = 404, message = "Indicates the requested table does not exist.")
     })
-    @RequestMapping(value = "/management/tables/{tableName}/data", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/management/tables/{tableName}/data", produces = "application/json")
     public DataResponse getTableData(@ApiParam(name = "tableName") @PathVariable String tableName, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         // Check if table exists before continuing
         if (managementService.getTableMetaData(tableName) == null) {

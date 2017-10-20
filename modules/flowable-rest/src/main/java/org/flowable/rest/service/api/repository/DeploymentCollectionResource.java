@@ -36,8 +36,8 @@ import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -91,7 +91,7 @@ public class DeploymentCollectionResource {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the request was successful."),
     })
-    @RequestMapping(value = "/repository/deployments", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/repository/deployments", produces = "application/json")
     public DataResponse getDeployments(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
 
@@ -136,7 +136,7 @@ public class DeploymentCollectionResource {
     @ApiImplicitParams({
         @ApiImplicitParam(name="file", paramType = "form", dataType = "java.io.File")
     })
-    @RequestMapping(value = "/repository/deployments", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
+    @PostMapping(value = "/repository/deployments", produces = "application/json", consumes = "multipart/form-data")
     public DeploymentResponse uploadDeployment(@ApiParam(name = "deploymentKey") @RequestParam(value = "deploymentKey", required = false) String deploymentKey,
             @ApiParam(name = "deploymentName") @RequestParam(value = "deploymentName", required = false) String deploymentName,
             @ApiParam(name = "tenantId") @RequestParam(value = "tenantId", required = false) String tenantId,

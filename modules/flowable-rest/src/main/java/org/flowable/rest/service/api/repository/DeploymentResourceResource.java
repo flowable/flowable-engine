@@ -23,9 +23,8 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.rest.application.ContentTypeResolver;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -64,7 +63,7 @@ public class DeploymentResourceResource {
             @ApiResponse(code = 404, message = "Indicates the requested deployment was not found or there is no resource with the given id present in the deployment. The status-description contains additional information.")
     })
     // FIXME Why ** ?
-    @RequestMapping(value = "/repository/deployments/{deploymentId}/resources/**", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/repository/deployments/{deploymentId}/resources/**", produces = "application/json")
     public DeploymentResourceResponse getDeploymentResource(@ApiParam(name = "deploymentId") @PathVariable("deploymentId") String deploymentId, HttpServletRequest request) {
 
         // Check if deployment exists

@@ -17,9 +17,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.form.api.FormDefinition;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -41,7 +40,7 @@ public class ProcessDefinitionFormDefinitionCollectionResource extends BaseProce
             @ApiResponse(code = 200, message = "Indicates the process definition was found and the form definitions are returned.", response = FormDefinition.class, responseContainer = "List"),
             @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
     })
-    @RequestMapping(value = "/repository/process-definitions/{processDefinitionId}/form-definitions", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/repository/process-definitions/{processDefinitionId}/form-definitions", produces = "application/json")
     public List<FormDefinitionResponse> getFormDefinitionsForProcessDefinition(
             @ApiParam(name = "processDefinitionId") @PathVariable String processDefinitionId,
             HttpServletRequest request) {

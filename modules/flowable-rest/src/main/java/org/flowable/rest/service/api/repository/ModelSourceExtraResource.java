@@ -21,10 +21,9 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.repository.Model;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
@@ -43,14 +42,13 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Models" }, description = "Manage Models", authorizations = { @Authorization(value = "basicAuth") })
 public class ModelSourceExtraResource extends BaseModelSourceResource {
 
-    @RequestMapping(value = "/repository/models/{modelId}/source-extra", method = RequestMethod.GET)
+    @GetMapping("/repository/models/{modelId}/source-extra")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the model was found and source is returned."),
             @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
     })
     @ApiOperation(value = "Get the extra editor source for a model", tags = {
             "Models" }, notes = "Response body contains the model’s raw editor source. The response’s content-type is set to application/octet-stream, regardless of the content of the source.")
-    @ResponseBody
     protected byte[] getModelBytes(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletResponse response) {
         byte[] editorSource = repositoryService.getModelEditorSourceExtra(modelId);
         if (editorSource == null) {
@@ -66,7 +64,7 @@ public class ModelSourceExtraResource extends BaseModelSourceResource {
             @ApiResponse(code = 200, message = "Indicates the model was found and the extra source has been updated."),
             @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
     })
-    @RequestMapping(value = "/repository/models/{modelId}/source-extra", method = RequestMethod.PUT)
+    @PutMapping("/repository/models/{modelId}/source-extra")
     protected void setModelSource(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletRequest request, HttpServletResponse response) {
         Model model = getModelFromRequest(modelId);
         if (model != null) {
