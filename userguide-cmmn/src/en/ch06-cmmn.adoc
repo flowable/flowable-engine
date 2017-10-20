@@ -2,7 +2,7 @@
 
 === What is CMMN?
 
-The Case Management Model and Notation (CMMN) is a standard notation and formal specification by the link:$$http://www.omg.org/spec/CMMN/$$[Object Management Group] for repesenting case models.
+The Case Management Model and Notation (CMMN) is a standard notation and formal specification by the link:$$http://www.omg.org/spec/CMMN/$$[Object Management Group] for representing case models.
 
 Flowable contains: 
 
@@ -94,7 +94,7 @@ Some observations:
 
 In this section we're going to build a simple case model and execute it programmatically through the Java API's of the Flowable CMMN engine in a simple command line example.
 
-The case model we'll build is a (simplified) _employee onboarding_ case with two stages: a phase before and phase after the potential employee has started. In the first stage, someone from the HR departement will complete the tasks, while in the second stage it is the employee completing them. Also, at any point in time, the potential employee can reject the job and stop the whole case instance.
+The case model we'll build is a (simplified) _employee onboarding_ case with two stages: a phase before and phase after the potential employee has started. In the first stage, someone from the HR department will complete the tasks, while in the second stage it is the employee completing them. Also, at any point in time, the potential employee can reject the job and stop the whole case instance.
 
 Note that only stages and human tasks are used. In a real case model, there will most likely other plan item types too, like milestones, nested stages, automated tasks, etc.
 
@@ -370,7 +370,7 @@ Task for HR : Create email address
 Task for employee: Reject job
 ----
 
-When the three tasks of HR are completed, the 'Send joining letter to candidate' taks should be available:
+When the three tasks of HR are completed, the 'Send joining letter to candidate' task should be available:
 
 [source,java,linenums]
 ----
@@ -459,7 +459,7 @@ This chapter covers the CMMN 1.1 constructs supported by Flowable, as well as ex
 
 ==== Stage
 
-A stage is used to group plan items together. It is typicaly used to define "phases" in a case instance.
+A stage is used to group plan items together. It is typically used to define "phases" in a case instance.
 
 A stage is a plan item itself, and thus can have entry and exit criteria. Plan items contained within a stage are only available when the parent stage moves to the _active_ state. Stages can be nested in other stages. 
 
@@ -489,7 +489,7 @@ A human task is used to model work that needs to be done by a human, typically t
 
 A human task is a plan item, which means that beyond a human task entry aso a _PlanItemInstance_ is created and it can be queried via the _PlanItemInstanceQuery_.
 
-Human tasks can be queried throught the _org.flowable.task.api.TaskQuery_ API. Historic task data can be queries through the _org.flowable.task.api.history.HistoricTaskInstanceQuery_.
+Human tasks can be queried through the _org.flowable.task.api.TaskQuery_ API. Historic task data can be queries through the _org.flowable.task.api.history.HistoricTaskInstanceQuery_.
 
 Properties:
 
@@ -498,8 +498,8 @@ Properties:
 * *blockingExpression*: an expression that evaluates to a boolean indicating whether the tasks blocks.
 * *assignee* : an expression (can be a static text value) that is used to determine to who the human task is assigned.
 * *owner* : an expression (can be a static text value) that is used to determine to who is the owner of the human task.
-* *candidateUsers* : an expression (can be a static text value) that resolves to a comma-seperated list of Strings that is used to determine which users are candidate for this human task.
-* *candidateGroups* : an expression (can be a static text value) that resolves to a comma-seperated list of Strings that is used to determine to which groups the task is assigned.
+* *candidateUsers* : an expression (can be a static text value) that resolves to a comma-separated list of Strings that is used to determine which users are candidate for this human task.
+* *candidateGroups* : an expression (can be a static text value) that resolves to a comma-separated list of Strings that is used to determine to which groups the task is assigned.
 * *form key*: an expression that determines a key when using forms. Can be retrieved via the API afterwards.
 * *Due date* an expression that resolves to java.util.Date or a ISO-8601 date string.
 * *Priority*: an expression that resolves to an integer. Can be used in the TaskQuery API to filter tasks.

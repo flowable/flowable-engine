@@ -119,7 +119,7 @@ Every case instance needs and uses data to execute the steps it's made up of. In
 
 A case instance can have variables (called _case variables_), but also _plan items_ (which are enabled plan items) and human tasks can have variables. A case instance can have any number of variables. Each variable is stored in a row in the _ACT_RU_VARIABLE_ database table.
 
-The _createCaseInstanceBuilder_ method has optional methopds to provide the variables when the case instance is created and started. For example, from the _CmmnRuntimeService_:
+The _createCaseInstanceBuilder_ method has optional methods to provide the variables when the case instance is created and started. For example, from the _CmmnRuntimeService_:
 
 [source,java,linenums]
 ----

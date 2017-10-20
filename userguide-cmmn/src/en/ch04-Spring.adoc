@@ -6,7 +6,7 @@ While you can definitely use Flowable without Spring, we've provided some very n
 
 === CmmnEngineFactoryBean
 
-The +CmmnEngine+ can be configured as a regular Spring bean. The starting point of the integration is the class +org.flowable.cmmn.spring.CmmnEngineFactoryBeann+. That bean takes a CMMN engine configuration and creates the CMMN engine.  This means that the creation and configuration of properties for Spring is the same as documented in the <<configuration,configuration section>>. For Spring integration, the configuration and engine beans will look like this:
+The +CmmnEngine+ can be configured as a regular Spring bean. The starting point of the integration is the class +org.flowable.cmmn.spring.CmmnEngineFactoryBean+. That bean takes a CMMN engine configuration and creates the CMMN engine.  This means that the creation and configuration of properties for Spring is the same as documented in the <<configuration,configuration section>>. For Spring integration, the configuration and engine beans will look like this:
 
 [source,xml,linenums]
 ----
