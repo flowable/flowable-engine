@@ -1,0 +1,11 @@
+
+include::{snippets}/group-collection-resource-mvc-test/test-get-groups/1/auto-section.adoc[]
+
+include::{snippets}/group-collection-resource-mvc-test/test-get-groups/2/auto-section.adoc[]
+
+include::{snippets}/group-collection-resource-mvc-test/test-get-groups/3/auto-section.adoc[]
+
+include::{snippets}/group-collection-resource-mvc-test/test-get-groups/4/auto-section.adoc[]
+
+include::{snippets}/group-collection-resource-mvc-test/test-get-groups/5/auto-section.adoc[]
+
