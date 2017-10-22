@@ -69,7 +69,7 @@ public class EventSubscriptionCollectionResource {
             @ApiResponse(code = 400, message = "Indicates an illegal value has been used in a url query parameter. Status description contains additional details about the error.")
     })
     @RequestMapping(value = "/runtime/event-subscriptions", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getJobs(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<EventSubscriptionResponse> getJobs(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         EventSubscriptionQuery query = runtimeService.createEventSubscriptionQuery();
 
         if (allRequestParams.containsKey("id")) {

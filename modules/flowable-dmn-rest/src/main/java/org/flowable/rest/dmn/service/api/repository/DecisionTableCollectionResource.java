@@ -84,7 +84,7 @@ public class DecisionTableCollectionResource {
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format or that latest is used with other parameters other than key and keyLike. The status-message contains additional information.")
     })
     @RequestMapping(value = "/dmn-repository/decision-tables", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getDecisionTables(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<DecisionTableResponse> getDecisionTables(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         DmnDecisionTableQuery decisionTableQuery = dmnRepositoryService.createDecisionTableQuery();
 
         // Populate filter-parameters

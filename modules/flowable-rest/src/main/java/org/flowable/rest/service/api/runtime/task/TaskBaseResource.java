@@ -118,7 +118,7 @@ public class TaskBaseResource {
         }
     }
 
-    protected DataResponse getTasksFromQueryRequest(TaskQueryRequest request, Map<String, String> requestParams) {
+    protected DataResponse<TaskResponse> getTasksFromQueryRequest(TaskQueryRequest request, Map<String, String> requestParams) {
 
         TaskQuery taskQuery = taskService.createTaskQuery();
 

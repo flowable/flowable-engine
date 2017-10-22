@@ -47,7 +47,7 @@ public class ExecutionQueryResource extends ExecutionBaseResource {
             @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
     @RequestMapping(value = "/query/executions", method = RequestMethod.POST, produces = "application/json")
-    public DataResponse queryProcessInstances(@RequestBody ExecutionQueryRequest queryRequest, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<ExecutionResponse> queryProcessInstances(@RequestBody ExecutionQueryRequest queryRequest, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
 
         return getQueryResponse(queryRequest, allRequestParams, request.getRequestURL().toString().replace("/query/executions", ""));
     }

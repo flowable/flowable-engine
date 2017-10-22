@@ -45,7 +45,7 @@ public class ContentItemQueryResource extends ContentItemBaseResource {
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format. The status-message contains additional information.")
     })
     @RequestMapping(value = "/query/content-items", method = RequestMethod.POST, produces = "application/json")
-    public DataResponse getQueryResult(@RequestBody ContentItemQueryRequest request, @ApiParam(hidden = true) @RequestParam Map<String, String> requestParams, HttpServletRequest httpRequest) {
+    public DataResponse<ContentItemResponse> getQueryResult(@RequestBody ContentItemQueryRequest request, @ApiParam(hidden = true) @RequestParam Map<String, String> requestParams, HttpServletRequest httpRequest) {
 
         return getContentItemsFromQueryRequest(request, requestParams);
     }

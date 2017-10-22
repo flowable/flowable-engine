@@ -45,7 +45,7 @@ public class HistoricTaskInstanceQueryResource extends HistoricTaskInstanceBaseR
             @ApiResponse(code = 404, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.") })
     // FIXME Naming issue ?
     @RequestMapping(value = "/query/historic-task-instances", method = RequestMethod.POST, produces = "application/json")
-    public DataResponse queryProcessInstances(@RequestBody HistoricTaskInstanceQueryRequest queryRequest, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<HistoricTaskInstanceResponse> queryProcessInstances(@RequestBody HistoricTaskInstanceQueryRequest queryRequest, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
 
         return getQueryResponse(queryRequest, allRequestParams, request.getRequestURL().toString().replace("/query/historic-task-instances", ""));
     }

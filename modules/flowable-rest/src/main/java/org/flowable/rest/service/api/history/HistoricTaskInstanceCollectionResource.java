@@ -90,7 +90,7 @@ public class HistoricTaskInstanceCollectionResource extends HistoricTaskInstance
             @ApiResponse(code = 200, message = "Indicates that historic task instances could be queried."),
             @ApiResponse(code = 404, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.") })
     @RequestMapping(value = "/history/historic-task-instances", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getHistoricProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<HistoricTaskInstanceResponse> getHistoricProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         // Populate query based on request
         HistoricTaskInstanceQueryRequest queryRequest = new HistoricTaskInstanceQueryRequest();
 

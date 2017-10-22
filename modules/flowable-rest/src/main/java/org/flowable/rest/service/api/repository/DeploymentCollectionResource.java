@@ -92,7 +92,7 @@ public class DeploymentCollectionResource {
             @ApiResponse(code = 200, message = "Indicates the request was successful."),
     })
     @GetMapping(value = "/repository/deployments", produces = "application/json")
-    public DataResponse getDeployments(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<DeploymentResponse> getDeployments(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
 
         // Apply filters
@@ -121,8 +121,7 @@ public class DeploymentCollectionResource {
             }
         }
 
-        DataResponse response = new DeploymentsPaginateList(restResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
-        return response;
+        return new DeploymentsPaginateList(restResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
     }
 
     @ApiOperation(value = "Create a new deployment", tags = {

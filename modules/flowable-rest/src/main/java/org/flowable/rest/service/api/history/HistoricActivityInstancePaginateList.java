@@ -15,13 +15,14 @@ package org.flowable.rest.service.api.history;
 
 import java.util.List;
 
+import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.rest.api.AbstractPaginateList;
 import org.flowable.rest.service.api.RestResponseFactory;
 
 /**
  * @author Tijs Rademakers
  */
-public class HistoricActivityInstancePaginateList extends AbstractPaginateList {
+public class HistoricActivityInstancePaginateList extends AbstractPaginateList<HistoricActivityInstanceResponse, HistoricActivityInstance> {
 
     protected RestResponseFactory restResponseFactory;
 
@@ -29,9 +30,8 @@ public class HistoricActivityInstancePaginateList extends AbstractPaginateList {
         this.restResponseFactory = restResponseFactory;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    protected List processList(List list) {
+    protected List<HistoricActivityInstanceResponse> processList(List<HistoricActivityInstance> list) {
         return restResponseFactory.createHistoricActivityInstanceResponseList(list);
     }
 }
