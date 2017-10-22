@@ -51,7 +51,7 @@ public class HistoricActivityInstanceBaseResource {
     @Autowired
     protected HistoryService historyService;
 
-    protected DataResponse getQueryResponse(HistoricActivityInstanceQueryRequest queryRequest, Map<String, String> allRequestParams) {
+    protected DataResponse<HistoricActivityInstanceResponse> getQueryResponse(HistoricActivityInstanceQueryRequest queryRequest, Map<String, String> allRequestParams) {
         HistoricActivityInstanceQuery query = historyService.createHistoricActivityInstanceQuery();
 
         // Populate query based on request

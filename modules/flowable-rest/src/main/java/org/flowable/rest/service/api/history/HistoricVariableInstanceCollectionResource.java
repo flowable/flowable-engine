@@ -51,7 +51,7 @@ public class HistoricVariableInstanceCollectionResource extends HistoricVariable
             @ApiResponse(code = 200, message = "Indicates that historic variable instances could be queried."),
             @ApiResponse(code = 400, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.") })
     @RequestMapping(value = "/history/historic-variable-instances", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getHistoricActivityInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<HistoricVariableInstanceResponse> getHistoricActivityInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         HistoricVariableInstanceQueryRequest query = new HistoricVariableInstanceQueryRequest();
 
         // Populate query based on request

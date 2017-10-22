@@ -14,13 +14,14 @@ package org.flowable.rest.form.service.api.repository;
 
 import java.util.List;
 
+import org.flowable.form.api.FormDeployment;
 import org.flowable.rest.api.AbstractPaginateList;
 import org.flowable.rest.form.FormRestResponseFactory;
 
 /**
  * @author Yvo Swillens
  */
-public class FormDeploymentsPaginateList extends AbstractPaginateList {
+public class FormDeploymentsPaginateList extends AbstractPaginateList<FormDeploymentResponse, FormDeployment> {
 
     protected FormRestResponseFactory formRestResponseFactory;
 
@@ -28,9 +29,8 @@ public class FormDeploymentsPaginateList extends AbstractPaginateList {
         this.formRestResponseFactory = formRestResponseFactory;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    protected List processList(List list) {
+    protected List<FormDeploymentResponse> processList(List<FormDeployment> list) {
         return formRestResponseFactory.createFormDeploymentResponseList(list);
     }
 }

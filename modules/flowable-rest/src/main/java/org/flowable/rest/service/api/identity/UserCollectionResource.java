@@ -84,7 +84,7 @@ public class UserCollectionResource {
             @ApiResponse(code = 200, message = "Indicates the group exists and is returned.")
     })
     @GetMapping(value = "/identity/users", produces = "application/json")
-    public DataResponse getUsers(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<UserResponse> getUsers(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         UserQuery query = identityService.createUserQuery();
 
         if (allRequestParams.containsKey("id")) {

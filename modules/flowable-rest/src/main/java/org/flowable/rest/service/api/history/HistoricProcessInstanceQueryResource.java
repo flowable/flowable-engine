@@ -44,7 +44,7 @@ public class HistoricProcessInstanceQueryResource extends HistoricProcessInstanc
             @ApiResponse(code = 200, message = "Indicates request was successful and the process instances are returned"),
             @ApiResponse(code = 400, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.") })
     @RequestMapping(value = "/query/historic-process-instances", method = RequestMethod.POST, produces = "application/json")
-    public DataResponse queryProcessInstances(@RequestBody HistoricProcessInstanceQueryRequest queryRequest, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<HistoricProcessInstanceResponse> queryProcessInstances(@RequestBody HistoricProcessInstanceQueryRequest queryRequest, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
 
         return getQueryResponse(queryRequest, allRequestParams);
     }

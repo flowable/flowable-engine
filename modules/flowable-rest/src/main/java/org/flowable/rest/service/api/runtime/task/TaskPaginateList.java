@@ -17,11 +17,12 @@ import java.util.List;
 
 import org.flowable.rest.api.AbstractPaginateList;
 import org.flowable.rest.service.api.RestResponseFactory;
+import org.flowable.task.api.Task;
 
 /**
  * @author Frederik Heremans
  */
-public class TaskPaginateList extends AbstractPaginateList {
+public class TaskPaginateList extends AbstractPaginateList<TaskResponse, Task> {
 
     protected RestResponseFactory restResponseFactory;
 
@@ -29,9 +30,8 @@ public class TaskPaginateList extends AbstractPaginateList {
         this.restResponseFactory = restResponseFactory;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    protected List processList(List list) {
+    protected List<TaskResponse> processList(List<Task> list) {
         return restResponseFactory.createTaskResponseList(list);
     }
 }

@@ -64,7 +64,7 @@ public class ExecutionCollectionResource extends ExecutionBaseResource {
             @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
     @RequestMapping(value = "/runtime/executions", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<ExecutionResponse> getProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         // Populate query based on request
         ExecutionQueryRequest queryRequest = new ExecutionQueryRequest();
 

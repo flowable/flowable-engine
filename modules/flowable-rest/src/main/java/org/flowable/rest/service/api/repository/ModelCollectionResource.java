@@ -83,7 +83,7 @@ public class ModelCollectionResource extends BaseModelResource {
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format. The status-message contains additional information.")
     })
     @GetMapping(value = "/repository/models", produces = "application/json")
-    public DataResponse getModels(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<ModelResponse> getModels(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         ModelQuery modelQuery = repositoryService.createModelQuery();
 
         if (allRequestParams.containsKey("id")) {

@@ -77,7 +77,7 @@ public class TimerJobCollectionResource {
             @ApiResponse(code = 400, message = "Indicates an illegal value has been used in a url query parameter or the both 'messagesOnly' and 'timersOnly' are used as parameters. Status description contains additional details about the error.")
     })
     @GetMapping(value = "/management/timer-jobs", produces = "application/json")
-    public DataResponse getJobs(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<JobResponse> getJobs(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         TimerJobQuery query = managementService.createTimerJobQuery();
 
         if (allRequestParams.containsKey("id")) {

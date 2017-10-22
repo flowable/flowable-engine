@@ -80,7 +80,7 @@ public class GroupCollectionResource {
             @ApiResponse(code = 200, message = "Indicates the requested groups were returned.")
     })
     @GetMapping(value = "/identity/groups", produces = "application/json")
-    public DataResponse getGroups(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<GroupResponse> getGroups(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         GroupQuery query = identityService.createGroupQuery();
 
         if (allRequestParams.containsKey("id")) {

@@ -84,7 +84,7 @@ public class FormDeploymentCollectionResource {
             @ApiResponse(code = 200, message = "Indicates the request was successful."),
     })
     @RequestMapping(value = "/form-repository/deployments", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getDeployments(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
+    public DataResponse<FormDeploymentResponse> getDeployments(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         FormDeploymentQuery deploymentQuery = formRepositoryService.createDeploymentQuery();
 
         // Apply filters
@@ -113,8 +113,7 @@ public class FormDeploymentCollectionResource {
             }
         }
 
-        DataResponse response = new FormDeploymentsPaginateList(formRestResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
-        return response;
+        return new FormDeploymentsPaginateList(formRestResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
     }
 
     @ApiOperation(value = "Create a new form deployment", tags = {
