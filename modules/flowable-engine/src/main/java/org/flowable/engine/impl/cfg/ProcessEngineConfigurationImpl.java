@@ -77,7 +77,6 @@ import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.compatibility.DefaultFlowable5CompatibilityHandlerFactory;
@@ -726,11 +725,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      */
     protected DelegateExpressionFieldInjectionMode delegateExpressionFieldInjectionMode = DelegateExpressionFieldInjectionMode.MIXED;
 
-    /**
-     * If set to true, enables bulk insert (grouping sql inserts together). Default true. For some databases (eg DB2 on Zos: https://activiti.atlassian.net/browse/ACT-4042) needs to be set to false
-     */
-    protected boolean isBulkInsertEnabled = true;
-
     protected ObjectMapper objectMapper = new ObjectMapper();
 
     /**
@@ -1137,22 +1131,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     @Override
     protected void initDbSqlSessionFactoryEntitySettings() {
-        for (Class<? extends Entity> clazz : EntityDependencyOrder.INSERT_ORDER) {
-            // All entities except one of the bpmn engine are bulk inserteable
-            dbSqlSessionFactory.getInsertionOrder().add(clazz);
-
-            if (isBulkInsertEnabled) {
-                dbSqlSessionFactory.getBulkInserteableEntityClasses().add(clazz);
-            }
-        }
+        defaultInitDbSqlSessionFactoryEntitySettings(EntityDependencyOrder.INSERT_ORDER, EntityDependencyOrder.DELETE_ORDER);
 
         // Oracle doesn't support bulk inserting for event log entries
         if (isBulkInsertEnabled && "oracle".equals(databaseType)) {
             dbSqlSessionFactory.getBulkInserteableEntityClasses().remove(EventLogEntryEntityImpl.class);
-        }
-
-        for (Class<? extends Entity> clazz : EntityDependencyOrder.DELETE_ORDER) {
-            dbSqlSessionFactory.getDeletionOrder().add(clazz);
         }
     }
 
@@ -2964,15 +2947,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setEnableDatabaseEventLogging(boolean enableDatabaseEventLogging) {
         this.enableDatabaseEventLogging = enableDatabaseEventLogging;
-        return this;
-    }
-
-    public boolean isBulkInsertEnabled() {
-        return isBulkInsertEnabled;
-    }
-
-    public ProcessEngineConfigurationImpl setBulkInsertEnabled(boolean isBulkInsertEnabled) {
-        this.isBulkInsertEnabled = isBulkInsertEnabled;
         return this;
     }
 

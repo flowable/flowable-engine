@@ -145,17 +145,15 @@ public class ParallelGatewayTest extends PluggableFlowableTestCase {
     // Test to verify ACT-1755
     @Deployment
     public void testHistoryTables() {
-
-        ProcessInstance pi = runtimeService.startProcessInstanceByKey("testHistoryRecords");
-
-        List<HistoricActivityInstance> history = historyService.createHistoricActivityInstanceQuery().processInstanceId(pi.getId()).list();
-
-        for (HistoricActivityInstance h : history) {
-            if (h.getActivityId().equals("parallelgateway2")) {
-                assertNotNull(h.getEndTime());
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            ProcessInstance pi = runtimeService.startProcessInstanceByKey("testHistoryRecords");
+            List<HistoricActivityInstance> history = historyService.createHistoricActivityInstanceQuery().processInstanceId(pi.getId()).list();
+            for (HistoricActivityInstance h : history) {
+                if (h.getActivityId().equals("parallelgateway2")) {
+                    assertNotNull(h.getEndTime());
+                }
             }
         }
-
     }
 
     @Deployment

@@ -20,8 +20,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.flowable.engine.ManagementService;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -47,7 +46,7 @@ public class TableCollectionResource {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the request was successful.")
     })
-    @RequestMapping(value = "/management/tables", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/management/tables", produces = "application/json")
     public List<TableResponse> getTables(HttpServletRequest request) {
         return restResponseFactory.createTableResponseList(managementService.getTableCount());
     }

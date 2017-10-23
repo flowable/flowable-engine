@@ -91,7 +91,7 @@ public class FormDefinitionCollectionResource {
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
     @RequestMapping(value = "/form-repository/form-definitions", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getForms(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<FormDefinitionResponse> getForms(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         FormDefinitionQuery formDefinitionQuery = formRepositoryService.createFormDefinitionQuery();
 
         // Populate filter-parameters

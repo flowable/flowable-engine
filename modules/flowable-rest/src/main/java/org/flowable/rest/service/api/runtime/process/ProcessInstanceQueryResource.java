@@ -46,7 +46,7 @@ public class ProcessInstanceQueryResource extends BaseProcessInstanceResource {
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
     @RequestMapping(value = "/query/process-instances", method = RequestMethod.POST, produces = "application/json")
-    public DataResponse queryProcessInstances(@RequestBody ProcessInstanceQueryRequest queryRequest, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams,
+    public DataResponse<ProcessInstanceResponse> queryProcessInstances(@RequestBody ProcessInstanceQueryRequest queryRequest, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams,
             HttpServletRequest request) {
 
         return getQueryResponse(queryRequest, allRequestParams);

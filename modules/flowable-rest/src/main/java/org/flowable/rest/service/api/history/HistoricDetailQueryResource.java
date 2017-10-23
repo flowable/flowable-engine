@@ -44,7 +44,7 @@ public class HistoricDetailQueryResource extends HistoricDetailBaseResource {
             @ApiResponse(code = 200, message = "Indicates request was successful and the historic details are returned"),
             @ApiResponse(code = 400, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.") })
     @RequestMapping(value = "/query/historic-detail", method = RequestMethod.POST, produces = "application/json")
-    public DataResponse queryHistoricDetail(@RequestBody HistoricDetailQueryRequest queryRequest, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<HistoricDetailResponse> queryHistoricDetail(@RequestBody HistoricDetailQueryRequest queryRequest, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
 
         return getQueryResponse(queryRequest, allRequestParams);
     }

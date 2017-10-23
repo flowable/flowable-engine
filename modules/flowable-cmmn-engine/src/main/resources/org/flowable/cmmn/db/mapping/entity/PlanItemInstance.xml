@@ -60,7 +60,7 @@
                 #{planItemInstance.caseDefinitionId ,jdbcType=VARCHAR},
                 #{planItemInstance.caseInstanceId ,jdbcType=VARCHAR},
                 #{planItemInstance.stageInstanceId ,jdbcType=VARCHAR},
-                #{planItemInstance.elementId ,jdbcType=VARCHAR},
+                #{planItemInstance.isStage ,jdbcType=VARCHAR},
                 #{planItemInstance.elementId ,jdbcType=VARCHAR},
                 #{planItemInstance.name ,jdbcType=VARCHAR},
                 #{planItemInstance.state ,jdbcType=VARCHAR},

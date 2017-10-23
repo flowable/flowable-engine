@@ -58,7 +58,7 @@ public class HistoricActivityInstanceCollectionResource extends HistoricActivity
             @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns instances without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query")
     })
     @RequestMapping(value = "/history/historic-activity-instances", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getHistoricActivityInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<HistoricActivityInstanceResponse> getHistoricActivityInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         HistoricActivityInstanceQueryRequest query = new HistoricActivityInstanceQueryRequest();
 
         // Populate query based on request

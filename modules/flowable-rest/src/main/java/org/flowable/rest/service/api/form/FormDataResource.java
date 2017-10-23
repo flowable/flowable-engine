@@ -29,9 +29,9 @@ import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.runtime.process.ProcessInstanceResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -58,7 +58,7 @@ public class FormDataResource {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates that form data could be queried."),
             @ApiResponse(code = 404, message = "Indicates that form data could not be found.") })
-    @RequestMapping(value = "/form/form-data", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/form/form-data", produces = "application/json")
     public FormDataResponse getFormData(@RequestParam(value = "taskId", required = false) String taskId,
             @RequestParam(value = "processDefinitionId", required = false) String processDefinitionId, HttpServletRequest request) {
 
@@ -91,7 +91,7 @@ public class FormDataResource {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the form data was submitted"),
             @ApiResponse(code = 400, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.") })
-    @RequestMapping(value = "/form/form-data", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/form/form-data", produces = "application/json")
     public ProcessInstanceResponse submitForm(@RequestBody SubmitFormRequest submitRequest, HttpServletRequest request, HttpServletResponse response) {
 
         if (submitRequest == null) {

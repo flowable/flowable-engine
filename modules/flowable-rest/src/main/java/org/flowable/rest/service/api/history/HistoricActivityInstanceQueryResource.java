@@ -44,7 +44,7 @@ public class HistoricActivityInstanceQueryResource extends HistoricActivityInsta
             @ApiResponse(code = 200, message = "Indicates request was successful and the activities are returned"),
             @ApiResponse(code = 400, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information") })
     @RequestMapping(value = "/query/historic-activity-instances", method = RequestMethod.POST, produces = "application/json")
-    public DataResponse queryActivityInstances(@RequestBody HistoricActivityInstanceQueryRequest queryRequest, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<HistoricActivityInstanceResponse> queryActivityInstances(@RequestBody HistoricActivityInstanceQueryRequest queryRequest, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
 
         return getQueryResponse(queryRequest, allRequestParams);
     }

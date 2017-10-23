@@ -45,7 +45,7 @@ public class FormInstanceQueryResource extends BaseFormInstanceResource {
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
     @RequestMapping(value = "/query/form-instances", method = RequestMethod.POST, produces = "application/json")
-    public DataResponse queryFormInstances(@RequestBody FormInstanceQueryRequest queryRequest, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<FormInstanceResponse> queryFormInstances(@RequestBody FormInstanceQueryRequest queryRequest, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
 
         return getQueryResponse(queryRequest, allRequestParams);
     }

@@ -15,13 +15,14 @@ package org.flowable.rest.service.api.runtime.process;
 
 import java.util.List;
 
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.rest.api.AbstractPaginateList;
 import org.flowable.rest.service.api.RestResponseFactory;
 
 /**
  * @author Frederik Heremans
  */
-public class ProcessInstancePaginateList extends AbstractPaginateList {
+public class ProcessInstancePaginateList extends AbstractPaginateList<ProcessInstanceResponse, ProcessInstance> {
 
     protected RestResponseFactory restResponseFactory;
 
@@ -29,9 +30,8 @@ public class ProcessInstancePaginateList extends AbstractPaginateList {
         this.restResponseFactory = restResponseFactory;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    protected List processList(List list) {
+    protected List<ProcessInstanceResponse> processList(List<ProcessInstance> list) {
         return restResponseFactory.createProcessInstanceResponseList(list);
     }
 }

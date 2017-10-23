@@ -78,7 +78,7 @@ public class HistoryDecisionExecutionCollectionResource {
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format. The status-message contains additional information.")
     })
     @RequestMapping(value = "/dmn-history/historic-decision-executions", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getDecisionTables(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    public DataResponse<HistoricDecisionExecutionResponse> getDecisionTables(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         DmnHistoricDecisionExecutionQuery historicDecisionExecutionQuery = dmnHistoryService.createHistoricDecisionExecutionQuery();
 
         // Populate filter-parameters

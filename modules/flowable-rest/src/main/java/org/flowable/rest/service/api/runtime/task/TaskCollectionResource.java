@@ -99,7 +99,7 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format or that delegationState has an invalid value (other than pending and resolved). The status-message contains additional information.")
     })
     @RequestMapping(value = "/runtime/tasks", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getTasks(@ApiParam(hidden = true) @RequestParam Map<String, String> requestParams, HttpServletRequest httpRequest) {
+    public DataResponse<TaskResponse> getTasks(@ApiParam(hidden = true) @RequestParam Map<String, String> requestParams, HttpServletRequest httpRequest) {
         // Create a Task query request
         TaskQueryRequest request = new TaskQueryRequest();
 

@@ -84,7 +84,7 @@ public class DmnDeploymentCollectionResource {
             @ApiResponse(code = 200, message = "Indicates the request was successful."),
     })
     @RequestMapping(value = "/dmn-repository/deployments", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getDeployments(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
+    public DataResponse<DmnDeploymentResponse> getDeployments(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         DmnDeploymentQuery deploymentQuery = dmnRepositoryService.createDeploymentQuery();
 
         // Apply filters
@@ -113,8 +113,7 @@ public class DmnDeploymentCollectionResource {
             }
         }
 
-        DataResponse response = new DmnDeploymentsPaginateList(dmnRestResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
-        return response;
+        return new DmnDeploymentsPaginateList(dmnRestResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
     }
 
     @ApiOperation(value = "Create a new decision table deployment", tags = {

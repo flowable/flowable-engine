@@ -38,8 +38,8 @@
                 #{historicCaseInstance.startTime ,jdbcType=TIMESTAMP},
                 #{historicCaseInstance.endTime ,jdbcType=TIMESTAMP},
                 #{historicCaseInstance.startUserId ,jdbcType=VARCHAR},
-                #{caseInstance.callbackId, jdbcType=VARCHAR},
-                #{caseInstance.callbackType, jdbcType=VARCHAR},
+                #{historicCaseInstance.callbackId, jdbcType=VARCHAR},
+                #{historicCaseInstance.callbackType, jdbcType=VARCHAR},
                 #{historicCaseInstance.tenantId ,jdbcType=VARCHAR}
             )
         </foreach>
@@ -60,8 +60,8 @@
                 #{historicCaseInstance.startTime ,jdbcType=TIMESTAMP},
                 #{historicCaseInstance.endTime ,jdbcType=TIMESTAMP},
                 #{historicCaseInstance.startUserId ,jdbcType=VARCHAR},
-                #{caseInstance.callbackId, jdbcType=VARCHAR},
-                #{caseInstance.callbackType, jdbcType=VARCHAR},
+                #{historicCaseInstance.callbackId, jdbcType=VARCHAR},
+                #{historicCaseInstance.callbackType, jdbcType=VARCHAR},
                 #{historicCaseInstance.tenantId ,jdbcType=VARCHAR}
             )
         </foreach>

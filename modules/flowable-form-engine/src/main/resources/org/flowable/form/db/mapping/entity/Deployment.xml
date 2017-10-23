@@ -8,8 +8,40 @@
   
   <insert id="insertFormDeployment" parameterType="org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntityImpl">
     insert into ${prefix}ACT_FO_FORM_DEPLOYMENT(ID_, NAME_, CATEGORY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_)
-    values(#{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR}, #{category, jdbcType=VARCHAR}, #{tenantId, jdbcType=VARCHAR}, 
-    #{deploymentTime, jdbcType=TIMESTAMP}, #{parentDeploymentId, jdbcType=VARCHAR})
+    values
+    (#{id, jdbcType=VARCHAR}, 
+     #{name, jdbcType=VARCHAR}, 
+     #{category, jdbcType=VARCHAR}, 
+     #{tenantId, jdbcType=VARCHAR}, 
+     #{deploymentTime, jdbcType=TIMESTAMP}, 
+     #{parentDeploymentId, jdbcType=VARCHAR})
+  </insert>
+  
+   <insert id="bulkInsertFormDeployment" parameterType="java.util.List">
+    insert into ${prefix}ACT_FO_FORM_DEPLOYMENT(ID_, NAME_, CATEGORY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_)
+    values
+    <foreach collection="list" item="formDeployment" index="index" separator=",">
+        (#{formDeployment.id, jdbcType=VARCHAR}, 
+         #{formDeployment.name, jdbcType=VARCHAR}, 
+         #{formDeployment.category, jdbcType=VARCHAR}, 
+         #{formDeployment.tenantId, jdbcType=VARCHAR}, 
+         #{formDeploymentdeploymentTime, jdbcType=TIMESTAMP}, 
+         #{formDeployment.parentDeploymentId, jdbcType=VARCHAR})
+    </foreach>         
+  </insert>
+  
+  <insert id="bulkInsertFormDeployment" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL
+    <foreach collection="list" item="formDeployment" index="index">
+         INTO ${prefix}ACT_FO_FORM_DEPLOYMENT(ID_, NAME_, CATEGORY_, TENANT_ID_, DEPLOY_TIME_, PARENT_DEPLOYMENT_ID_) VALUES
+         (#{formDeployment.id, jdbcType=VARCHAR}, 
+          #{formDeployment.name, jdbcType=VARCHAR}, 
+          #{formDeployment.category, jdbcType=VARCHAR}, 
+          #{formDeployment.tenantId, jdbcType=VARCHAR}, 
+          #{formDeploymentdeploymentTime, jdbcType=TIMESTAMP}, 
+          #{formDeployment.parentDeploymentId, jdbcType=VARCHAR})
+    </foreach>
+    SELECT * FROM dual
   </insert>
 
   <!-- DEPLOYMENT UPDATE -->

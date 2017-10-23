@@ -99,7 +99,7 @@ public class ContentItemCollectionResource extends ContentItemBaseResource {
             @ApiResponse(code = 200, message = "The content items are returned.")
     })
     @RequestMapping(value = "/content-service/content-items", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getContentItems(@ApiParam(hidden = true) @RequestParam Map<String, String> requestParams, HttpServletRequest httpRequest) {
+    public DataResponse<ContentItemResponse> getContentItems(@ApiParam(hidden = true) @RequestParam Map<String, String> requestParams, HttpServletRequest httpRequest) {
         // Create a Content item query request
         ContentItemQueryRequest request = new ContentItemQueryRequest();
 

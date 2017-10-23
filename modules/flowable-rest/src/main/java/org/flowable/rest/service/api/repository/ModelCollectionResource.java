@@ -25,9 +25,9 @@ import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ModelQuery;
 import org.flowable.rest.api.DataResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -82,8 +82,8 @@ public class ModelCollectionResource extends BaseModelResource {
             @ApiResponse(code = 200, message = "Indicates request was successful and the models are returned"),
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format. The status-message contains additional information.")
     })
-    @RequestMapping(value = "/repository/models", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getModels(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    @GetMapping(value = "/repository/models", produces = "application/json")
+    public DataResponse<ModelResponse> getModels(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         ModelQuery modelQuery = repositoryService.createModelQuery();
 
         if (allRequestParams.containsKey("id")) {
@@ -147,7 +147,7 @@ public class ModelCollectionResource extends BaseModelResource {
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the model was created.")
     })
-    @RequestMapping(value = "/repository/models", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/repository/models", produces = "application/json")
     public ModelResponse createModel(@RequestBody ModelRequest modelRequest, HttpServletRequest request, HttpServletResponse response) {
         Model model = repositoryService.newModel();
         model.setCategory(modelRequest.getCategory());

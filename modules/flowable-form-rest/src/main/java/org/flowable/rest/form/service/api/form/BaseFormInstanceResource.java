@@ -41,7 +41,7 @@ public class BaseFormInstanceResource {
     @Autowired
     protected FormRestResponseFactory restResponseFactory;
 
-    protected DataResponse getQueryResponse(FormInstanceQueryRequest queryRequest, Map<String, String> requestParams) {
+    protected DataResponse<FormInstanceResponse> getQueryResponse(FormInstanceQueryRequest queryRequest, Map<String, String> requestParams) {
 
         FormInstanceQuery query = formService.createFormInstanceQuery();
 

@@ -164,7 +164,6 @@
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpmime</artifactId>
-			<version>4.3.5</version>
 			<scope>test</scope>
 		</dependency>
 
