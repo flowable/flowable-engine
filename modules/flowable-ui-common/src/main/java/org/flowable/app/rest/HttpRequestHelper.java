@@ -64,12 +64,12 @@ public class HttpRequestHelper {
         try {
             HttpResponse response = client.execute(httpPost);
             if (!(response.getStatusLine().getStatusCode() == expectedResponse)) {
-                log.error("Invalid request {} result code: {}", url, response.getStatusLine());
-                throw new InternalServerErrorException("Invalid request "+ url +" result code: " + response.getStatusLine());
+                log.error("Invalid request {} result code: {}", httpPost.getURI(), response.getStatusLine());
+                throw new InternalServerErrorException("Invalid request "+ httpPost.getURI() +" result code: " + response.getStatusLine());
             }
         } catch (IOException ioe) {
-            log.error("Error calling endpoint {}", url, ioe);
-            throw new InternalServerErrorException("Error calling endpoint "+ url +" : " + ioe.getMessage());
+            log.error("Error calling endpoint {}", httpPost.getURI(), ioe);
+            throw new InternalServerErrorException("Error calling endpoint "+ httpPost.getURI() +" : " + ioe.getMessage());
         } finally {
             if (client != null) {
                 try {

@@ -205,7 +205,7 @@ angular.module('flowableApp')
                 if ($scope.model.processInstance.ended) {
                     jQuery("#bpmnModel").attr('data-history-id', $scope.model.processInstance.id);
                 }
-                
+
                 var viewerUrl = appResourceRoot + "../display/displaymodel.html?version=" + Date.now();
 
                 // If Flowable has been deployed inside an AMD environment Raphael will fail to register
@@ -311,7 +311,7 @@ angular.module('flowableApp')
                 name: 'processTest',
                 key: 'processTest',
                 description: '',
-                modelType: 0,
+                modelType: 6,
             }
         };
 

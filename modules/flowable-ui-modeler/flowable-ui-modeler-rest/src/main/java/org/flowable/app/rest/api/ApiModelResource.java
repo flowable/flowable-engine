@@ -12,9 +12,8 @@
  */
 package org.flowable.app.rest.api;
 
-import java.text.ParseException;
-import java.util.Date;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.domain.editor.Model;
 import org.flowable.app.model.editor.ModelKeyRepresentation;
@@ -38,11 +37,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.text.ParseException;
+import java.util.Date;
 
 @RestController
 public class ApiModelResource {
@@ -160,6 +160,23 @@ public class ApiModelResource {
             modelNode.set("model", editorJsonNode);
         }
         return modelNode;
+    }
+
+    @RequestMapping(value = "/editor/models/create", method = RequestMethod.POST, produces = "application/json")
+    public ModelRepresentation createModel(@RequestBody ModelRepresentation modelRepresentation, @RequestParam(required = false) String skeleton) {
+        modelRepresentation.setKey(modelRepresentation.getKey().replaceAll(" ", ""));
+        checkForDuplicateKey(modelRepresentation);
+
+        Model newModel = modelService.createModel(modelRepresentation,
+                modelService.createModelJson(modelRepresentation, skeleton), SecurityUtils.getCurrentUserObject());
+        return new ModelRepresentation(newModel);
+    }
+
+    protected void checkForDuplicateKey(ModelRepresentation modelRepresentation) {
+        ModelKeyRepresentation modelKeyInfo = modelService.validateModelKey(null, modelRepresentation.getModelType(), modelRepresentation.getKey());
+        if (modelKeyInfo.isKeyAlreadyExists()) {
+            throw new ConflictingRequestException("Provided model key already exists: " + modelRepresentation.getKey());
+        }
     }
 
     /**

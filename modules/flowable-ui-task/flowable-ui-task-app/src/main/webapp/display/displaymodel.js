@@ -195,10 +195,10 @@ function _addHoverLogic(element, type, defaultColor)
     });
 }
 
-function _breakpointRestCall(actionType, activityId) {
+function _breakpointRestCall(url, activityId) {
     $.ajax({
-        type: actionType,
-        url: '../app/rest/debugger/breakpoints',
+        type: 'POST',
+        url: url,
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify({
             activityId: activityId
@@ -211,6 +211,13 @@ function _breakpointRestCall(actionType, activityId) {
             alert("error");
         }
     })
+}
+
+function _deleteBreakpoint(activityId) {
+    _breakpointRestCall('../app/rest/debugger/breakpoints/delete', activityId);
+}
+function _addBreakpoint(activityId) {
+    _breakpointRestCall('../app/rest/debugger/breakpoints', activityId);
 }
 
 function _drawBreakpoint(element, breakpoints) {
@@ -229,13 +236,13 @@ function _drawBreakpoint(element, breakpoints) {
         breakpointTipText = breakpointTipText + "<br/> Click to remove breakpoint";
         breakpointStrokeColor = "red";
         circle.click(function () {
-            _breakpointRestCall("DELETE", element.id);
+            _deleteBreakpoint(element.id);
         });
-        
+
     } else {
         breakpointTipText = breakpointTipText + "<br/> Click to add breakpoint";
         circle.click(function () {
-            _breakpointRestCall("POST", element.id);
+            _addBreakpoint(element.id);
         });
     }
 

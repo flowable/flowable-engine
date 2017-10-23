@@ -73,7 +73,7 @@ public class ProcessInstanceResource {
         if (!modelApiUrl.endsWith("/")) {
             modelApiUrl = modelApiUrl.concat("/");
         }
-        modelApiUrl = modelApiUrl.concat("api/editor/models?skeleton=" + skeleton);
+        modelApiUrl = modelApiUrl.concat("api/editor/models/create?skeleton=" + skeleton);
 
         executePostRequest(modelApiUrl, basicAuthUser, basicAuthPassword, new StringEntity(data, ContentType.create("application/json", "UTF-8")), org.apache.http.HttpStatus.SC_OK);
     }

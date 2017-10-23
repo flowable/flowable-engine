@@ -64,7 +64,7 @@ public class DebuggerResource {
         debuggerService.continueExecution(executionId);
     }
 
-    @RequestMapping(value = "/rest/debugger/breakpoints", method = RequestMethod.DELETE)
+    @RequestMapping(value = "/rest/debugger/breakpoints/delete", method = RequestMethod.POST)
     public void deleteBreakPoints(@RequestBody BreakpointRepresentation breakpointRepresentation) {
         debuggerService.removeBreakpoint(breakpointRepresentation);
     }

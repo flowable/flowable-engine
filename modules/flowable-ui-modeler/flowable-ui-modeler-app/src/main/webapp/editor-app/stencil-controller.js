@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,7 +32,7 @@ angular.module('flowableModeler')
 
         // Code that is dependent on an initialised Editor is wrapped in a promise for the editor
         $scope.editorFactory.promise.then(function () {
-        
+
         	/* Build stencil item list */
 
             // Build simple json representation of stencil set
@@ -62,38 +62,38 @@ angular.module('flowableModeler')
 
             var quickMenuDefinition = undefined;
             var ignoreForPaletteDefinition = undefined;
-            
+
             if (data.namespace == 'http://b3mn.org/stencilset/cmmn1.1#') {
                 quickMenuDefinition = ['HumanTask', 'Association'];
                 ignoreForPaletteDefinition = ['CasePlanModel'];
-                
+
             } else {
-                quickMenuDefinition = ['UserTask', 'EndNoneEvent', 'ExclusiveGateway', 
+                quickMenuDefinition = ['UserTask', 'EndNoneEvent', 'ExclusiveGateway',
                                          'CatchTimerEvent', 'ThrowNoneEvent', 'TextAnnotation',
                                          'SequenceFlow', 'Association'];
-                                         
+
                 ignoreForPaletteDefinition = ['SequenceFlow', 'MessageFlow', 'Association', 'DataAssociation', 'DataStore', 'SendTask'];
             }
-             
+
             var quickMenuItems = [];
-              
+
             var morphRoles = [];
-            for (var i = 0; i < data.rules.morphingRules.length; i++) 
+            for (var i = 0; i < data.rules.morphingRules.length; i++)
             {
                 var role = data.rules.morphingRules[i].role;
                 var roleItem = {'role': role, 'morphOptions': []};
                 morphRoles.push(roleItem);
             }
-          
+
             // Check all received items
             for (var stencilIndex = 0; stencilIndex < data.stencils.length; stencilIndex++) {
-            
+
                 // Check if the root group is the 'diagram' group. If so, this item should not be shown.
                 var currentGroupName = data.stencils[stencilIndex].groups[0];
                 if (currentGroupName === 'Diagram' || currentGroupName === 'Form') {
                     continue;  // go to next item
                 }
-                
+
                 var removed = false;
                 if (data.stencils[stencilIndex].removed) {
                     removed = true;
@@ -126,7 +126,7 @@ angular.module('flowableModeler')
 
                     }
                 }
-                
+
                 // Construct the stencil item
                 var stencilItem = {'id': data.stencils[stencilIndex].id,
                     'name': data.stencils[stencilIndex].title,
@@ -139,22 +139,22 @@ angular.module('flowableModeler')
                     'canConnect': false,
                     'canConnectTo': false,
                     'canConnectAssociation': false};
-                
+
                 if (data.stencils[stencilIndex].customIconId && data.stencils[stencilIndex].customIconId > 0) {
                     stencilItem.customIcon = true;
                     stencilItem.icon = data.stencils[stencilIndex].customIconId;
                 }
-                
+
                 if (!removed) {
                     if (quickMenuDefinition.indexOf(stencilItem.id) >= 0) {
                       quickMenuItems[quickMenuDefinition.indexOf(stencilItem.id)] = stencilItem;
                     }
                 }
-                
+
                 if (stencilItem.id === 'TextAnnotation' || stencilItem.id === 'BoundaryCompensationEvent') {
                   stencilItem.canConnectAssociation = true;
                 }
-                
+
                 for (var i = 0; i < data.stencils[stencilIndex].roles.length; i++) {
                   var stencilRole = data.stencils[stencilIndex].roles[i];
                   if (data.namespace == 'http://b3mn.org/stencilset/cmmn1.1#') {
@@ -163,7 +163,7 @@ angular.module('flowableModeler')
                       } else if (stencilRole === 'association_end') {
                         stencilItem.canConnectTo = true;
                       }
-                      
+
                   } else {
                       if (stencilRole === 'sequence_start') {
                         stencilItem.canConnect = true;
@@ -171,7 +171,7 @@ angular.module('flowableModeler')
                         stencilItem.canConnectTo = true;
                       }
                   }
-                  
+
                   for (var j = 0; j < morphRoles.length; j++) {
                     if (stencilRole === morphRoles[j].role) {
                       if (!removed) {
@@ -197,13 +197,13 @@ angular.module('flowableModeler')
                     }
                 }
             }
-            
+
             for (var i = 0; i < stencilItemGroups.length; i++)  {
               if (stencilItemGroups[i].paletteItems && stencilItemGroups[i].paletteItems.length == 0) {
                 stencilItemGroups[i].visible = false;
               }
             }
-            
+
             $scope.stencilItemGroups = stencilItemGroups;
 
             var containmentRules = [];
@@ -212,7 +212,7 @@ angular.module('flowableModeler')
                 containmentRules.push(rule);
             }
             $scope.containmentRules = containmentRules;
-            
+
             // remove quick menu items which are not available anymore due to custom pallette
             var availableQuickMenuItems = [];
             for (var i = 0; i < quickMenuItems.length; i++) {
@@ -220,7 +220,7 @@ angular.module('flowableModeler')
                     availableQuickMenuItems[availableQuickMenuItems.length] = quickMenuItems[i];
                 }
             }
-            
+
             $scope.quickMenuItems = availableQuickMenuItems;
             $scope.morphRoles = morphRoles;
 
@@ -238,12 +238,13 @@ angular.module('flowableModeler')
 
                     var selectedShape = shapes.first();
                     var stencil = selectedShape.getStencil();
-                    
-                    if ($rootScope.selectedElementBeforeScrolling && stencil.id().indexOf('BPMNDiagram') !== -1 && stencil.id().indexOf('CMMNDiagram') !== -1) {
+
+                    if ($rootScope.selectedElementBeforeScrolling && stencil.id().indexOf('BPMNDiagram') !== -1 && stencil.id().indexOf('CMMNDiagram') !== -1
+                        && stencil.id().indexOf('SimulationDiagram') !== -1) {
                       // ignore canvas event because of empty selection when scrolling stops
                       return;
                     }
-                    
+
                     if ($rootScope.selectedElementBeforeScrolling && $rootScope.selectedElementBeforeScrolling.getId() === selectedShape.getId()) {
                       $rootScope.selectedElementBeforeScrolling = null;
                       return;
@@ -251,7 +252,7 @@ angular.module('flowableModeler')
 
                     // Store previous selection
                     $scope.previousSelectedShape = $scope.selectedShape;
-                    
+
                     // Only do something if another element is selected (Oryx fires this event multiple times)
                     if ($scope.selectedShape !== undefined && $scope.selectedShape.getId() === selectedShape.getId()) {
                         if ($rootScope.forceSelectionRefresh) {
@@ -296,7 +297,7 @@ angular.module('flowableModeler')
                             if (selectedShape.properties.get(key) === 'true') {
                                 selectedShape.properties.set(key, true);
                             }
-                            
+
                             if (FLOWABLE.UI_CONFIG.showRemovedProperties == false && property.isHidden())
                             {
                               continue;
@@ -311,7 +312,7 @@ angular.module('flowableModeler')
                                 'hidden': property.isHidden(),
                                 'value': selectedShape.properties.get(key)
                             };
-                            
+
                             if ((currentProperty.type === 'complex' || currentProperty.type === 'multiplecomplex') && currentProperty.value && currentProperty.value.length > 0) {
                                 try {
                                     currentProperty.value = JSON.parse(currentProperty.value);
@@ -358,23 +359,23 @@ angular.module('flowableModeler')
                     });
                 }
             });
-            
+
             editorManager.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, function (event) {
-              
+
               FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS);
               var shapes = event.elements;
-                
+
               if (shapes && shapes.length == 1) {
 
               	  var selectedShape = shapes.first();
-              
+
                   var a = editorManager.getCanvas().node.getScreenCTM();
-              
+
 	              var absoluteXY = selectedShape.absoluteXY();
-	              
+
 	              absoluteXY.x *= a.a;
 	              absoluteXY.y *= a.d;
-	              
+
 	              var additionalIEZoom = 1;
 	              if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
                         var ua = navigator.userAgent;
@@ -386,16 +387,16 @@ angular.module('flowableModeler')
                             }
                         }
                   }
-	                    
+
 	              if (additionalIEZoom === 1) {
 	                   absoluteXY.y = absoluteXY.y - jQuery("#canvasSection").offset().top + 5;
 	                         absoluteXY.x = absoluteXY.x - jQuery("#canvasSection").offset().left;
-	              
+
 	              } else {
 	                   var canvasOffsetLeft = jQuery("#canvasSection").offset().left;
 	                   var canvasScrollLeft = jQuery("#canvasSection").scrollLeft();
 	                   var canvasScrollTop = jQuery("#canvasSection").scrollTop();
-	                   
+
 	                   var offset = a.e - (canvasOffsetLeft * additionalIEZoom);
 	                   var additionaloffset = 0;
 	                   if (offset > 10) {
@@ -404,10 +405,10 @@ angular.module('flowableModeler')
 	                   absoluteXY.y = absoluteXY.y - (jQuery("#canvasSection").offset().top * additionalIEZoom) + 5 + ((canvasScrollTop * additionalIEZoom) - canvasScrollTop);
 	                         absoluteXY.x = absoluteXY.x - (canvasOffsetLeft * additionalIEZoom) + additionaloffset + ((canvasScrollLeft * additionalIEZoom) - canvasScrollLeft);
                   }
-	              
+
 	              var bounds = new ORYX.Core.Bounds(a.e + absoluteXY.x, a.f + absoluteXY.y, a.e + absoluteXY.x + a.a*selectedShape.bounds.width(), a.f + absoluteXY.y + a.d*selectedShape.bounds.height());
 	              var shapeXY = bounds.upperLeft();
-	              
+
 	              var stencilItem = $scope.getStencilItemById(selectedShape.getStencil().idWithoutNs());
 	              var morphShapes = [];
 	              if (stencilItem && stencilItem.morphRole) {
@@ -417,27 +418,27 @@ angular.module('flowableModeler')
 	                      }
 	                  }
 	              }
-              
+
               	  var x = shapeXY.x;
             	  if (bounds.width() < 48) {
               		  x -= 24;
             	  }
-              
+
               	  if (morphShapes && morphShapes.length > 0) {
                 	// In case the element is not wide enough, start the 2 bottom-buttons more to the left
                 	// to prevent overflow in the right-menu
-                
+
                 	var morphButton = document.getElementById('morph-button');
                 	morphButton.style.display = "block";
                 	morphButton.style.left = x + 24 +'px';
                 	morphButton.style.top = (shapeXY.y+bounds.height() + 2) + 'px';
               	  }
-              
+
               	  var deleteButton = document.getElementById('delete-button');
               	  deleteButton.style.display = "block";
               	  deleteButton.style.left = x + 'px';
               	  deleteButton.style.top = (shapeXY.y+bounds.height() + 2) + 'px';
-              	  
+
               	  var editable = selectedShape._stencil._jsonStencil.id.endsWith('CollapsedSubProcess') ;
 				  var editButton = document.getElementById('edit-button');
 				  if (editable) {
@@ -448,11 +449,11 @@ angular.module('flowableModeler')
 					 	editButton.style.left = x + 24 +'px';
 					  }
 					  editButton.style.top = (shapeXY.y+bounds.height() + 2) + 'px';
-					  
+
 				  } else {
 					  editButton.style.display = "none";
 				  }
-              
+
               	  if (stencilItem && (stencilItem.canConnect || stencilItem.canConnectAssociation)) {
 	                var quickButtonCounter = 0;
 	                var quickButtonX = shapeXY.x+bounds.width() + 5;
@@ -464,11 +465,11 @@ angular.module('flowableModeler')
 	                      quickButtonX = shapeXY.x+bounds.width() + 5;
 	                      quickButtonY += 24;
 	                      quickButtonCounter = 1;
-	                      
+
 	                    } else if (quickButtonCounter > 1) {
 	                      quickButtonX += 24;
 	                    }
-	                    
+
 	                    obj.style.display = "block";
 	                    obj.style.left = quickButtonX + 'px';
 	                    obj.style.top = quickButtonY + 'px';
@@ -477,7 +478,7 @@ angular.module('flowableModeler')
                   }
                }
             });
-            
+
             if (!$rootScope.stencilInitialized) {
               FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS, function (event) {
                 jQuery('.Oryx_button').each(function(i, obj) {
@@ -501,7 +502,7 @@ angular.module('flowableModeler')
                           || event.property.value.length == 0);
                   }
               });
-              
+
               FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_SHOW_VALIDATION_POPUP, function (event) {
                   // Method to open validation dialog
                   var showValidationDialog = function() {
@@ -513,24 +514,24 @@ angular.module('flowableModeler')
 
                   showValidationDialog();
               });
-              
+
               FLOWABLE.eventBus.addListener(FLOWABLE.eventBus.EVENT_TYPE_NAVIGATE_TO_PROCESS, function (event) {
                   var modelMetaData = editorManager.getBaseModelData();
                   $rootScope.editorHistory.push({
-                        id: modelMetaData.modelId, 
-                        name: modelMetaData.name, 
+                        id: modelMetaData.modelId,
+                        name: modelMetaData.name,
                         type: 'bpmnmodel'
                   });
-                  
+
               	  $window.location.href = "../editor/#/editor/" + event.processId;
               });
-              
+
               $rootScope.stencilInitialized = true;
             }
-            
+
             $scope.morphShape = function() {
               $scope.safeApply(function () {
-                
+
                 var shapes = editorManager.getSelection();
                 if (shapes && shapes.length == 1) {
                   $rootScope.currentSelectedShape = shapes.first();
@@ -557,18 +558,18 @@ angular.module('flowableModeler')
                 }
               });
             };
-            
+
             $scope.deleteShape = function() {
               FLOWABLE.TOOLBAR.ACTIONS.deleteItem({'$scope': $scope, 'editorManager': editorManager});
             };
-            
+
             $scope.quickAddItem = function(newItemId) {
               $scope.safeApply(function () {
-                
+
                 var shapes = editorManager.getSelection();
                 if (shapes && shapes.length == 1) {
                   $rootScope.currentSelectedShape = shapes.first();
-                  
+
                   var containedStencil = undefined;
                   var stencilSets = editorManager.getStencilSets().values();
                   for (var i = 0; i < stencilSets.length; i++) {
@@ -581,31 +582,31 @@ angular.module('flowableModeler')
                     	}
                     }
                   }
-                  
+
                   if (!containedStencil) return;
-                  
+
                   var option = {type: $scope.currentSelectedShape.getStencil().namespace() + newItemId, namespace: $scope.currentSelectedShape.getStencil().namespace()};
                   option['connectedShape'] = $rootScope.currentSelectedShape;
                   option['parent'] = $rootScope.currentSelectedShape.parent;
                   option['containedStencil'] = containedStencil;
-                
+
                   var args = { sourceShape: $rootScope.currentSelectedShape, targetStencil: containedStencil };
                   var targetStencil = editorManager.getRules().connectMorph(args);
-                  
+
                   // Check if there can be a target shape
-                  if (!targetStencil) { 
-                  	return; 
+                  if (!targetStencil) {
+                  	return;
                   }
-                  
+
                   option['connectingType'] = targetStencil.id();
 
                   var command = new FLOWABLE.CreateCommand(option, undefined, undefined, editorManager.getEditor());
-                
+
                   editorManager.executeCommands([command]);
                 }
               });
             };
-            
+
             $scope.editShape = function(){
 				editorManager.edit($scope.selectedShape.resourceId);
 			};
@@ -759,7 +760,7 @@ angular.module('flowableModeler')
          */
 
         $scope.dropCallback = function (event, ui) {
-          
+
             editorManager.handleEvents({
                 type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
                 highlightId: "shapeRepo.attached"
@@ -768,20 +769,20 @@ angular.module('flowableModeler')
                 type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
                 highlightId: "shapeRepo.added"
             });
-            
+
             editorManager.handleEvents({
                 type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
                 highlightId: "shapeMenu"
             });
-            
+
             FLOWABLE.eventBus.dispatch(FLOWABLE.eventBus.EVENT_TYPE_HIDE_SHAPE_BUTTONS);
 
             if ($scope.dragCanContain) {
 
               var item = $scope.getStencilItemById(ui.draggable[0].id);
-              
+
               var pos = {x: event.pageX, y: event.pageY};
-              
+
               var additionalIEZoom = 1;
               if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
                 var ua = navigator.userAgent;
@@ -793,7 +794,7 @@ angular.module('flowableModeler')
                   }
                 }
               }
-              
+
               var screenCTM = editorManager.getCanvas().node.getScreenCTM();
 
               // Correcting the UpperLeft-Offset
@@ -802,11 +803,11 @@ angular.module('flowableModeler')
               // Correcting the Zoom-Factor
               pos.x /= screenCTM.a;
               pos.y /= screenCTM.d;
-                
+
               // Correcting the ScrollOffset
               pos.x -= document.documentElement.scrollLeft;
               pos.y -= document.documentElement.scrollTop;
-                
+
               var parentAbs = $scope.dragCurrentParent.absoluteXY();
               pos.x -= parentAbs.x;
               pos.y -= parentAbs.y;
@@ -847,47 +848,47 @@ angular.module('flowableModeler')
                 option.connectedShape = currentSelectedShape;
                 option.parent = $scope.dragCurrentParent;
                 option.containedStencil = containedStencil;
-	                
-                // If the ctrl key is not pressed, 
-                // snapp the new shape to the center 
+
+                // If the ctrl key is not pressed,
+                // snapp the new shape to the center
                 // if it is near to the center of the other shape
                 if (!event.ctrlKey) {
                   // Get the center of the shape
                   var cShape = currentSelectedShape.bounds.center();
-                  // Snapp +-20 Pixel horizontal to the center 
+                  // Snapp +-20 Pixel horizontal to the center
                   if (20 > Math.abs(cShape.x - pos.x)) {
                     pos.x = cShape.x;
                   }
-                  // Snapp +-20 Pixel vertical to the center 
+                  // Snapp +-20 Pixel vertical to the center
                   if (20 > Math.abs(cShape.y - pos.y)) {
                     pos.y = cShape.y;
                   }
                 }
-	                
+
                 option.position = pos;
-	              
-                if (containedStencil.idWithoutNs() !== 'SequenceFlow' && containedStencil.idWithoutNs() !== 'Association' && 
+
+                if (containedStencil.idWithoutNs() !== 'SequenceFlow' && containedStencil.idWithoutNs() !== 'Association' &&
                         containedStencil.idWithoutNs() !== 'MessageFlow' && containedStencil.idWithoutNs() !== 'DataAssociation') {
-	                        
+
                   var args = { sourceShape: currentSelectedShape, targetStencil: containedStencil };
                   var targetStencil = editorManager.getRules().connectMorph(args);
                   if (!targetStencil) { // Check if there can be a target shape
-                  	return; 
+                  	return;
                   }
                   option.connectingType = targetStencil.id();
                 }
-	  
+
                 var command = new FLOWABLE.CreateCommand(option, $scope.dropTargetElement, pos, editorManager.getEditor());
-	              
+
                 editorManager.executeCommands([command]);
               }
-	                
+
             } else {
               var canAttach = false;
               if (containedStencil.idWithoutNs() === 'BoundaryErrorEvent' || containedStencil.idWithoutNs() === 'BoundaryTimerEvent' ||
                     containedStencil.idWithoutNs() === 'BoundarySignalEvent' || containedStencil.idWithoutNs() === 'BoundaryMessageEvent' ||
                     containedStencil.idWithoutNs() === 'BoundaryCancelEvent' || containedStencil.idWithoutNs() === 'BoundaryCompensationEvent') {
-                    
+
                 // Modify position, otherwise boundary event will get position related to left corner of the canvas instead of the container
                 pos = editorManager.eventCoordinates( event );
                 canAttach = true;
@@ -990,18 +991,18 @@ angular.module('flowableModeler')
                 ui.helper.addClass('stencil-item-dragged');
             }
         };
-        
+
         $scope.startDragCallbackQuickMenu = function (event, ui) {
             $scope.dragModeOver = false;
             $scope.quickMenu = true;
         };
-        
+
         $scope.dragCallback = function (event, ui) {
-          
+
             if ($scope.dragModeOver != false) {
-              
+
                 var coord = editorManager.eventCoordinatesXY(event.pageX, event.pageY);
-                
+
                 var additionalIEZoom = 1;
                 if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
                     var ua = navigator.userAgent;
@@ -1013,14 +1014,14 @@ angular.module('flowableModeler')
                         }
                     }
                 }
-                
+
                 if (additionalIEZoom !== 1) {
                      coord.x = coord.x / additionalIEZoom;
                      coord.y = coord.y / additionalIEZoom;
                 }
-                
+
                 var aShapes = editorManager.getCanvas().getAbstractShapesAtPosition(coord);
-                
+
                 if (aShapes.length <= 0) {
                     if (event.helper) {
                         $scope.dragCanContain = false;
@@ -1036,13 +1037,13 @@ angular.module('flowableModeler')
                   	var item = $scope.getStencilItemById(event.target.id);
                     var parentCandidate = aShapes[0];
 
-                    if (item.id === 'Lane' || item.id === 'BoundaryErrorEvent' || item.id === 'BoundaryMessageEvent' || 
+                    if (item.id === 'Lane' || item.id === 'BoundaryErrorEvent' || item.id === 'BoundaryMessageEvent' ||
                             item.id === 'BoundarySignalEvent' || item.id === 'BoundaryTimerEvent' ||
-                            item.id === 'BoundaryCancelEvent' || item.id === 'BoundaryCompensationEvent' || 
+                            item.id === 'BoundaryCancelEvent' || item.id === 'BoundaryCompensationEvent' ||
                             item.id === 'EntryCriterion') {
-                        
+
                         $scope.dragCanContain = false;
-                        
+
                         // Show Highlight
                         editorManager.handleEvents({
                             type: ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
@@ -1051,12 +1052,12 @@ angular.module('flowableModeler')
                             style: ORYX.CONFIG.SELECTION_HIGHLIGHT_STYLE_RECTANGLE,
                             color: ORYX.CONFIG.SELECTION_INVALID_COLOR
                         });
-                        
+
                     } else {
                         $scope.dragCanContain = true;
                         $scope.dragCurrentParent = parentCandidate;
                         $scope.dragCurrentParentId = parentCandidate.id;
-                        
+
                         editorManager.handleEvents({
                             type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
                             highlightId: "shapeRepo.added"
@@ -1067,25 +1068,25 @@ angular.module('flowableModeler')
                         type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
                         highlightId: "shapeRepo.attached"
                     });
-                    
+
                     return false;
-                    
+
                 } else  {
                     var item = $scope.getStencilItemById(event.target.id);
-                    
+
                     var parentCandidate = aShapes.reverse().find(function (candidate) {
                         return (candidate instanceof ORYX.Core.Canvas
                             || candidate instanceof ORYX.Core.Node
                             || candidate instanceof ORYX.Core.Edge);
                     });
-                    
+
                     if (!parentCandidate) {
                         $scope.dragCanContain = false;
                         return false;
                     }
-                    
+
                     if (item.type === "node") {
-                        
+
                         // check if the draggable is a boundary event and the parent an Activity
                         var _canContain = false;
                         var parentStencilId = parentCandidate.getStencil().id();
@@ -1096,29 +1097,29 @@ angular.module('flowableModeler')
 
                         var parentItem = $scope.getStencilItemById(parentCandidate.getStencil().idWithoutNs());
                         if (parentItem.roles.indexOf('Activity') > -1) {
-                            if (item.roles.indexOf('IntermediateEventOnActivityBoundary') > -1 
+                            if (item.roles.indexOf('IntermediateEventOnActivityBoundary') > -1
                                 || item.roles.indexOf('EntryCriterionOnItemBoundary') > -1
                                 || item.roles.indexOf('ExitCriterionOnItemBoundary') > -1) {
                                 _canContain = true;
                             }
-                            
+
                         } else if(parentItem.roles.indexOf('StageActivity') > -1) {
                             if (item.roles.indexOf('EntryCriterionOnItemBoundary') > -1
                                 || item.roles.indexOf('ExitCriterionOnItemBoundary') > -1) {
                                 _canContain = true;
                             }
-                        
-                        } else if(parentItem.roles.indexOf('StageModelActivity') > -1) { 
+
+                        } else if(parentItem.roles.indexOf('StageModelActivity') > -1) {
                             if (item.roles.indexOf('ExitCriterionOnItemBoundary') > -1) {
                                 _canContain = true;
                             }
-                        
+
                         } else if (parentCandidate.getStencil().idWithoutNs() === 'Pool') {
                           	if (item.id === 'Lane') {
                             	_canContain = true;
                           	}
                         }
-                        
+
                         if (_canContain) {
                             editorManager.handleEvents({
                                 type: ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
@@ -1132,7 +1133,7 @@ angular.module('flowableModeler')
                                 type: ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE,
                                 highlightId: "shapeRepo.added"
                             });
-                            
+
                         } else {
                             for (var i = 0; i < $scope.containmentRules.length; i++) {
                                 var rule = $scope.containmentRules[i];
@@ -1149,7 +1150,7 @@ angular.module('flowableModeler')
                                     }
                                 }
                             }
-                            
+
                             // Show Highlight
                             editorManager.handleEvents({
                                 type: ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
@@ -1168,11 +1169,11 @@ angular.module('flowableModeler')
                         $scope.dragCurrentParentId = parentCandidate.id;
                         $scope.dragCurrentParentStencil = parentStencilId;
                         $scope.dragCanContain = _canContain;
-                        
-                    } else  { 
+
+                    } else  {
                       var canvasCandidate = editorManager.getCanvas();
                       var canConnect = false;
-                      
+
                       var targetStencil = $scope.getStencilItemById(parentCandidate.getStencil().idWithoutNs());
 	                  if (targetStencil) {
 	                    var associationConnect = false;
@@ -1181,18 +1182,18 @@ angular.module('flowableModeler')
 	                    } else if (stencil.idWithoutNs() === 'DataAssociation' && curCan.getStencil().idWithoutNs() === 'DataStore') {
                             associationConnect = true;
                         }
-	                    
+
 	                    if (targetStencil.canConnectTo || associationConnect) {
 	                      canConnect = true;
 	                    }
 	                  }
-                      
+
                       //Edge
                       $scope.dragCurrentParent = canvasCandidate;
                       $scope.dragCurrentParentId = canvasCandidate.id;
                       $scope.dragCurrentParentStencil = canvasCandidate.getStencil().id();
                       $scope.dragCanContain = canConnect;
-                        
+
                       // Show Highlight
                       editorManager.handleEvents({
                             type: ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
@@ -1209,12 +1210,12 @@ angular.module('flowableModeler')
                 }
             }
         };
-        
+
         $scope.dragCallbackQuickMenu = function (event, ui) {
-          
+
             if ($scope.dragModeOver != false) {
                 var coord = editorManager.eventCoordinatesXY(event.pageX, event.pageY);
-                
+
                 var additionalIEZoom = 1;
                 if (!isNaN(screen.logicalXDPI) && !isNaN(screen.systemXDPI)) {
                     var ua = navigator.userAgent;
@@ -1226,14 +1227,14 @@ angular.module('flowableModeler')
                         }
                     }
                 }
-                
+
                 if (additionalIEZoom !== 1) {
                      coord.x = coord.x / additionalIEZoom;
                      coord.y = coord.y / additionalIEZoom;
                 }
-                
+
                 var aShapes = editorManager.getCanvas().getAbstractShapesAtPosition(coord);
-               
+
                 if (aShapes.length <= 0) {
                     if (event.helper) {
                         $scope.dragCanContain = false;
@@ -1244,7 +1245,7 @@ angular.module('flowableModeler')
                 if (aShapes[0] instanceof ORYX.Core.Canvas) {
                     editorManager.getCanvas().setHightlightStateBasedOnX(coord.x);
                 }
-                
+
                 var stencil = undefined;
                 var stencilSets = editorManager.getStencilSets().values();
                 for (var i = 0; i < stencilSets.length; i++) {
@@ -1256,7 +1257,7 @@ angular.module('flowableModeler')
                   			break;
                 		}
                     }
-              
+
               		if (!stencil) {
                 		var edges = stencilSet.edges();
                   		for (var j = 0; j < edges.length; j++) {
@@ -1267,14 +1268,14 @@ angular.module('flowableModeler')
                       	}
               		}
               	}
-            
+
                 var candidate = aShapes.last();
-                
+
                 var isValid = false;
                 if (stencil.type() === "node")  {
             		//check containment rules
             		var canContain = editorManager.getRules().canContain({containingShape:candidate, containedStencil:stencil});
-            
+
             		var parentCandidate = aShapes.reverse().find(function (candidate) {
                         return (candidate instanceof ORYX.Core.Canvas
                             || candidate instanceof ORYX.Core.Node
@@ -1285,22 +1286,22 @@ angular.module('flowableModeler')
                         $scope.dragCanContain = false;
                         return false;
                     }
-            
+
             		$scope.dragCurrentParent = parentCandidate;
                     $scope.dragCurrentParentId = parentCandidate.id;
                     $scope.dragCurrentParentStencil = parentCandidate.getStencil().id();
                     $scope.dragCanContain = canContain;
                     $scope.dropTargetElement = parentCandidate;
                     isValid = canContain;
-      
+
           		} else { //Edge
-          
+
             		var shapes = editorManager.getSelection();
                 	if (shapes && shapes.length == 1) {
                   		var currentSelectedShape = shapes.first();
                   		var curCan = candidate;
                   		var canConnect = false;
-                  
+
                   		var targetStencil = $scope.getStencilItemById(curCan.getStencil().idWithoutNs());
                   		if (targetStencil) {
                     		var associationConnect = false;
@@ -1309,34 +1310,34 @@ angular.module('flowableModeler')
                     		} else if (stencil.idWithoutNs() === 'DataAssociation' && curCan.getStencil().idWithoutNs() === 'DataStore') {
                         		associationConnect = true;
                     		}
-                    
+
                     		if (targetStencil.canConnectTo || associationConnect) {
                     			while (!canConnect && curCan && !(curCan instanceof ORYX.Core.Canvas)) {
                       				candidate = curCan;
                       				//check connection rules
                       				canConnect = editorManager.getRules().canConnect({
-	                                  sourceShape: currentSelectedShape, 
-	                                  edgeStencil: stencil, 
+	                                  sourceShape: currentSelectedShape,
+	                                  edgeStencil: stencil,
 	                                  targetShape: curCan
-	                                }); 
+	                                });
                       				curCan = curCan.parent;
                     			}
                     		}
                   		}
                   		var parentCandidate = editorManager.getCanvas();
-                
+
                 		isValid = canConnect;
                 		$scope.dragCurrentParent = parentCandidate;
                         $scope.dragCurrentParentId = parentCandidate.id;
                         $scope.dragCurrentParentStencil = parentCandidate.getStencil().id();
                 		$scope.dragCanContain = canConnect;
                 		$scope.dropTargetElement = candidate;
-                	}   
-            
-          		} 
+                	}
+
+          		}
 
                 editorManager.handleEvents({
-          			type:   ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW, 
+          			type:   ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW,
           			highlightId:'shapeMenu',
           			elements: [candidate],
           			color: isValid ? ORYX.CONFIG.SELECTION_VALID_COLOR : ORYX.CONFIG.SELECTION_INVALID_COLOR
@@ -1369,9 +1370,9 @@ FLOWABLE.CreateCommand = ORYX.Core.Command.extend({
         this.parent = option.parent;
         this.currentReference = currentReference;
         this.shapeOptions = option.shapeOptions;
-  },      
+  },
   execute: function(){
-    
+
     if (this.shape) {
       if (this.shape instanceof ORYX.Core.Node) {
         this.parent.add(this.shape);
@@ -1382,9 +1383,9 @@ FLOWABLE.CreateCommand = ORYX.Core.Command.extend({
           this.edge.dockers.last().setDockedShape(this.shape);
           this.edge.dockers.last().setReferencePoint(this.targetRefPos);
         }
-        
+
         this.facade.setSelection([this.shape]);
-        
+
       } else if (this.shape instanceof ORYX.Core.Edge) {
         this.facade.getCanvas().add(this.shape);
         this.shape.dockers.first().setDockedShape(this.connectedShape);
@@ -1395,14 +1396,14 @@ FLOWABLE.CreateCommand = ORYX.Core.Command.extend({
       this.shape = this.facade.createShape(this.option);
       this.edge = (!(this.shape instanceof ORYX.Core.Edge)) ? this.shape.getIncomingShapes().first() : undefined;
     }
-    
+
     if (this.currentReference && this.position) {
-      
+
       if (this.shape instanceof ORYX.Core.Edge) {
-      
+
         if (!(this.currentReference instanceof ORYX.Core.Canvas)) {
           this.shape.dockers.last().setDockedShape(this.currentReference);
-          
+
           if (this.currentReference.getStencil().idWithoutNs() === 'TextAnnotation')
           {
             var midpoint = {};
@@ -1420,7 +1421,7 @@ FLOWABLE.CreateCommand = ORYX.Core.Command.extend({
         }
         this.sourceRefPos = this.shape.dockers.first().referencePoint;
         this.targetRefPos = this.shape.dockers.last().referencePoint;
-        
+
       } else if (this.edge){
         this.sourceRefPos = this.edge.dockers.first().referencePoint;
         this.targetRefPos = this.edge.dockers.last().referencePoint;
@@ -1430,7 +1431,7 @@ FLOWABLE.CreateCommand = ORYX.Core.Command.extend({
       var connectedShape = this.connectedShape;
       var bc = connectedShape.bounds;
       var bs = this.shape.bounds;
-      
+
       var pos = bc.center();
       if(containedStencil.defaultAlign()==="north") {
         pos.y -= (bc.height() / 2) + ORYX.CONFIG.SHAPEMENU_CREATE_OFFSET + (bs.height()/2);
@@ -1453,26 +1454,26 @@ FLOWABLE.CreateCommand = ORYX.Core.Command.extend({
       } else {
         pos.x += (bc.width() / 2) + ORYX.CONFIG.SHAPEMENU_CREATE_OFFSET + (bs.width()/2);
       }
-      
+
       // Move shape to the new position
       this.shape.bounds.centerMoveTo(pos);
-      
+
       // Move all dockers of a node to the position
       if (this.shape instanceof ORYX.Core.Node){
         (this.shape.dockers||[]).each(function(docker){
           docker.bounds.centerMoveTo(pos);
         });
       }
-      
+
       //this.shape.update();
       this.position = pos;
-      
+
       if (this.edge){
         this.sourceRefPos = this.edge.dockers.first().referencePoint;
         this.targetRefPos = this.edge.dockers.last().referencePoint;
       }
     }
-    
+
     this.facade.getCanvas().update();
     this.facade.updateSelection();
 

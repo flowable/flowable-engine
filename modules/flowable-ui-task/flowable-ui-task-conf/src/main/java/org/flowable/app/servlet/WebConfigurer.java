@@ -95,10 +95,18 @@ public class WebConfigurer implements ServletContextListener {
         appDispatcherServlet.setLoadOnStartup(1);
         appDispatcherServlet.setAsyncSupported(true);
 
+        initSpringDebuggerRest(servletContext, rootContext);
         initSpringProcessRest(servletContext, rootContext);
         initSpringDMNRest(servletContext, rootContext);
         initSpringFormRest(servletContext, rootContext);
         initSpringContentRest(servletContext, rootContext);
+    }
+
+    /**
+     * Initializes debugger rests .
+     */
+    private ServletRegistration.Dynamic initSpringDebuggerRest(ServletContext servletContext, AnnotationConfigWebApplicationContext rootContext) {
+        return initSpringRestComponent(servletContext, rootContext, "debugger-api", DebuggerDispatcherServletConfiguration.class);
     }
 
     /**

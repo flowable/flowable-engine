@@ -36,5 +36,13 @@ FLOWABLE.URL = {
 
     validateModel: function(){
 		return FLOWABLE.CONFIG.contextRoot + '/app/rest/model/validate';
+    },
+
+    getBreakPoints: function () {
+        return FLOWABLE.CONFIG.contextRoot + '/app/rest/debugger/breakpoints?version=' + Date.now();
+    },
+
+    deleteBreakPoints: function () {
+        return FLOWABLE.CONFIG.contextRoot + '/app/rest/debugger/breakpoints/delete?version=' + Date.now();
     }
 };
