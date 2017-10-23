@@ -3,6 +3,7 @@ package org.flowable.app.rest.editor;
 import com.google.common.base.Function;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +70,7 @@ public class DebuggerForwardingResource {
         String basicAuthPassword = environment.getRequiredProperty("idm.admin.password");
         String breakpointUrl = getBreakpointUrl().concat(url);
 
-        executePostRequest(breakpointUrl, basicAuthUser, basicAuthPassword, new StringEntity(breakpointRepresentation),
+        executePostRequest(breakpointUrl, basicAuthUser, basicAuthPassword, new StringEntity(breakpointRepresentation, ContentType.APPLICATION_JSON),
                 200);
     }
 

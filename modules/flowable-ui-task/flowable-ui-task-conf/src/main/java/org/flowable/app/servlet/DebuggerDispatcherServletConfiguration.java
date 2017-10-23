@@ -22,7 +22,7 @@ import org.springframework.scheduling.annotation.EnableAsync;
  * @author: martin.grofcik
  */
 @Configuration
-@ComponentScan(value = { "org.flowable.app.rest.runtime"})
+@ComponentScan(value = { "org.flowable.app.rest.runtime.api"})
 @EnableAsync
 public class DebuggerDispatcherServletConfiguration extends BaseDispatcherServletConfiguration {
 

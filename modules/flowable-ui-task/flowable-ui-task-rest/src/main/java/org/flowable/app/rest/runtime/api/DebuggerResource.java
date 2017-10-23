@@ -10,10 +10,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.app.rest.runtime;
+package org.flowable.app.rest.runtime.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flowable.app.model.debugger.BreakpointRepresentation;
+import org.flowable.app.rest.runtime.EventLogInsertRequest;
 import org.flowable.app.service.runtime.DebuggerService;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.common.impl.interceptor.Command;

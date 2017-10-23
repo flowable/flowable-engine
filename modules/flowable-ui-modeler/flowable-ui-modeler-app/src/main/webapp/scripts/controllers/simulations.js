@@ -134,7 +134,7 @@ angular.module('flowableModeler')
         $scope.editSimulationDetails = function (simulation) {
             if (simulation) {
                 $rootScope.editorHistory = [];
-                $location.path("/simulationeditor/" + simulation.id);
+                $location.path("/editor/" + simulation.id);
             }
         };
 
