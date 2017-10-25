@@ -69,6 +69,8 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
             } catch (FlowableException e) {
                 LOGGER.error("Error getting case definition {}", task.getScopeDefinitionId(), e);
             }
+        } else {
+            rep = new TaskRepresentation(task);
         }
 
         fillPermissionInformation(rep, task, currentUser);
