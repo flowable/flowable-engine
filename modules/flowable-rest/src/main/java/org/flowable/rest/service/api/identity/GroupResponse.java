@@ -18,9 +18,21 @@ package org.flowable.rest.service.api.identity;
  */
 public class GroupResponse {
 
+    /**
+     * The id of the group.
+     */
     protected String id;
+    /**
+     * The URL for the group location.
+     */
     protected String url;
+    /**
+     * The name of the group.
+     */
     protected String name;
+    /**
+     * The type of the group.
+     */
     protected String type;
 
     public String getId() {

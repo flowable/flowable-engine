@@ -69,6 +69,10 @@
 		<flowable.osgi.remove.headers>Ignore-Package,Include-Resource,Private-Package,Bundle-DocURL</flowable.osgi.remove.headers>
 		<flowable.osgi.include.resource>{maven-resources}</flowable.osgi.include.resource>
 		<flowable.osgi.embed></flowable.osgi.embed>
+
+		<!-- REST properties -->
+		<spring.auto.restdocs.version>1.0.9</spring.auto.restdocs.version>
+		<spring.restdocs.version>1.2.2.RELEASE</spring.restdocs.version>
 	</properties>
 
 	<dependencyManagement>
