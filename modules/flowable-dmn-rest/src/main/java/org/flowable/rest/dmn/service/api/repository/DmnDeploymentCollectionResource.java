@@ -12,20 +12,7 @@
  */
 package org.flowable.rest.dmn.service.api.repository;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import io.swagger.annotations.*;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.api.DmnDeploymentBuilder;
@@ -40,12 +27,17 @@ import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.dmn.service.api.DmnRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Yvo Swillens
@@ -69,7 +61,7 @@ public class DmnDeploymentCollectionResource {
     @Autowired
     protected DmnRepositoryService dmnRepositoryService;
 
-    @ApiOperation(value = "List of decision table deployments", tags = { "Deployment" }, nickname = "listDmnDeployments")
+    @ApiOperation(value = "List of decision table deployments", tags = { "Deployment" }, nickname = "listDecisionTableDeployments")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return decision table deployments with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return decision table deployments with a name like the given name.", paramType = "query"),
@@ -83,7 +75,7 @@ public class DmnDeploymentCollectionResource {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the request was successful."),
     })
-    @RequestMapping(value = "/dmn-repository/deployments", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/dmn-repository/deployments", produces = "application/json")
     public DataResponse<DmnDeploymentResponse> getDeployments(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         DmnDeploymentQuery deploymentQuery = dmnRepositoryService.createDeploymentQuery();
 
@@ -116,7 +108,7 @@ public class DmnDeploymentCollectionResource {
         return new DmnDeploymentsPaginateList(dmnRestResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
     }
 
-    @ApiOperation(value = "Create a new decision table deployment", tags = {
+    @ApiOperation(value = "Create a new decision table deployment", nickname = "uploadDecistionTableDeployment", tags = {
             "Deployment" }, consumes = "multipart/form-data", produces = "application/json", notes = "The request body should contain data of type multipart/form-data. There should be exactly one file in the request, any additional files will be ignored. The deployment name is the name of the file-field passed in. If multiple resources need to be deployed in a single deployment, compress the resources in a zip and make sure the file-name ends with .bar or .zip.\n"
                     + "\n"
                     + "An additional parameter (form-field) can be passed in the request body with name tenantId. The value of this field will be used as the id of the tenant this deployment is done in.")
@@ -127,7 +119,7 @@ public class DmnDeploymentCollectionResource {
     @ApiImplicitParams({
         @ApiImplicitParam(name="file", paramType = "form", dataType = "java.io.File")
     })
-    @RequestMapping(value = "/dmn-repository/deployments", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
+    @PostMapping(value = "/dmn-repository/deployments", produces = "application/json", consumes = "multipart/form-data")
     public DmnDeploymentResponse uploadDeployment(@ApiParam(name = "tenantId") @RequestParam(value = "tenantId", required = false) String tenantId, HttpServletRequest request, HttpServletResponse response) {
 
         if (!(request instanceof MultipartHttpServletRequest)) {

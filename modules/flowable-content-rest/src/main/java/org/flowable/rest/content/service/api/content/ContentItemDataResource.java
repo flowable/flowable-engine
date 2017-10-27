@@ -13,12 +13,7 @@
 
 package org.flowable.rest.content.service.api.content;
 
-import java.io.InputStream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import io.swagger.annotations.Authorization;
+import io.swagger.annotations.*;
 import org.apache.commons.io.IOUtils;
 import org.flowable.content.api.ContentItem;
 import org.flowable.engine.common.api.FlowableException;
@@ -30,18 +25,16 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.InputStream;
 
 /**
  * @author Tijs Rademakers
@@ -59,7 +52,7 @@ public class ContentItemDataResource extends ContentItemBaseResource {
             @ApiResponse(code = 200, message = "Indicates the content item was found and the requested content is returned."),
             @ApiResponse(code = 404, message = "Indicates the content item was not found or the content item doesn’t have a binary stream available. Status message provides additional information.")
     })
-    @RequestMapping(value = "/content-service/content-items/{contentItemId}/data", method = RequestMethod.GET)
+    @GetMapping(value = "/content-service/content-items/{contentItemId}/data")
     public ResponseEntity<byte[]> getContentItemData(@ApiParam(name = "contentItemId") @PathVariable("contentItemId") String contentItemId, HttpServletResponse response) {
 
         ContentItem contentItem = getContentItemFromRequest(contentItemId);
@@ -100,7 +93,7 @@ public class ContentItemDataResource extends ContentItemBaseResource {
             @ApiResponse(code = 201, message = "Indicates the content item data was saved and the result is returned."),
             @ApiResponse(code = 400, message = "Indicates required content item data is missing from the request.")
     })
-    @RequestMapping(value = "/content-service/content-items/{contentItemId}/data", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/content-service/content-items/{contentItemId}/data", produces = "application/json")
     public ContentItemResponse saveContentItemData(@ApiParam(name = "contentItemId") @PathVariable("contentItemId") String contentItemId,
             HttpServletRequest request, HttpServletResponse response) {
 

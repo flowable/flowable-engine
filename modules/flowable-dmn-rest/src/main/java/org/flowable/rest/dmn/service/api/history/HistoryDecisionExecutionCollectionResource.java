@@ -12,11 +12,7 @@
  */
 package org.flowable.rest.dmn.service.api.history;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
+import io.swagger.annotations.*;
 import org.flowable.dmn.api.DmnHistoricDecisionExecutionQuery;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.engine.impl.HistoricDecisionExecutionQueryProperty;
@@ -24,19 +20,13 @@ import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.dmn.service.api.DmnRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -77,7 +67,7 @@ public class HistoryDecisionExecutionCollectionResource {
             @ApiResponse(code = 200, message = "Indicates request was successful and the historic decision executions are returned"),
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format. The status-message contains additional information.")
     })
-    @RequestMapping(value = "/dmn-history/historic-decision-executions", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/dmn-history/historic-decision-executions", produces = "application/json")
     public DataResponse<HistoricDecisionExecutionResponse> getDecisionTables(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         DmnHistoricDecisionExecutionQuery historicDecisionExecutionQuery = dmnHistoryService.createHistoricDecisionExecutionQuery();
 

@@ -12,11 +12,7 @@
  */
 package org.flowable.rest.form.service.api.repository;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
+import io.swagger.annotations.*;
 import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.form.api.FormDefinitionQuery;
 import org.flowable.form.api.FormRepositoryService;
@@ -24,19 +20,13 @@ import org.flowable.form.engine.impl.FormQueryProperty;
 import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.form.FormRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Yvo Swillens
@@ -90,7 +80,7 @@ public class FormDefinitionCollectionResource {
             @ApiResponse(code = 200, message = "Indicates request was successful and the form definitions are returned"),
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
-    @RequestMapping(value = "/form-repository/form-definitions", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/form-repository/form-definitions", produces = "application/json")
     public DataResponse<FormDefinitionResponse> getForms(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         FormDefinitionQuery formDefinitionQuery = formRepositoryService.createFormDefinitionQuery();
 

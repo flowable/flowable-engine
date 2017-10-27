@@ -13,13 +13,8 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.annotations.*;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.task.Attachment;
@@ -29,21 +24,18 @@ import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Frederik Heremans
@@ -60,7 +52,7 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
             @ApiResponse(code = 200, message = "Indicates the task was found and the attachments are returned."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
-    @RequestMapping(value = "/runtime/tasks/{taskId}/attachments", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/runtime/tasks/{taskId}/attachments", produces = "application/json")
     public List<AttachmentResponse> getAttachments(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
         List<AttachmentResponse> result = new ArrayList<>();
         HistoricTaskInstance task = getHistoricTaskFromRequest(taskId);
@@ -90,7 +82,7 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
             @ApiResponse(code = 400, message = "Indicates the attachment name is missing from the request."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
-    @RequestMapping(value = "/runtime/tasks/{taskId}/attachments", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/runtime/tasks/{taskId}/attachments", produces = "application/json")
     public AttachmentResponse createAttachment(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request, HttpServletResponse response) {
 
         AttachmentResponse result = null;

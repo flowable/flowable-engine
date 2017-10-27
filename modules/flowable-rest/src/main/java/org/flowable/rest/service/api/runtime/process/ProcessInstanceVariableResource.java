@@ -13,9 +13,8 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.annotations.*;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
@@ -26,21 +25,11 @@ import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableSc
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Frederik Heremans
@@ -57,7 +46,7 @@ public class ProcessInstanceVariableResource extends BaseExecutionVariableResour
             @ApiResponse(code = 200, message = "Indicates both the process instance and variable were found and variable is returned."),
             @ApiResponse(code = 404, message = "Indicates the requested process instance was not found or the process instance does not have a variable with the given name. Status description contains additional information about the error.")
     })
-    @RequestMapping(value = "/runtime/process-instances/{processInstanceId}/variables/{variableName}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/runtime/process-instances/{processInstanceId}/variables/{variableName}", produces = "application/json")
     public RestVariable getVariable(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
             @RequestParam(value = "scope", required = false) String scope, HttpServletRequest request) {
 
@@ -70,7 +59,7 @@ public class ProcessInstanceVariableResource extends BaseExecutionVariableResour
             @ApiResponse(code = 201, message = "Indicates both the process instance and variable were found and variable is updated."),
             @ApiResponse(code = 404, message = "Indicates the requested process instance was not found or the process instance does not have a variable with the given name. Status description contains additional information about the error.")
     })
-    @RequestMapping(value = "/runtime/process-instances/{processInstanceId}/variables/{variableName}", method = RequestMethod.PUT, produces = "application/json")
+    @PutMapping(value = "/runtime/process-instances/{processInstanceId}/variables/{variableName}", produces = "application/json")
     public RestVariable updateVariable(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
             HttpServletRequest request) {
 
@@ -110,7 +99,7 @@ public class ProcessInstanceVariableResource extends BaseExecutionVariableResour
             @ApiResponse(code = 204, message = "Indicates the variable was found and has been deleted. Response-body is intentionally empty."),
             @ApiResponse(code = 404, message = "Indicates the requested variable was not found.")
     })
-    @RequestMapping(value = "/runtime/process-instances/{processInstanceId}/variables/{variableName}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/runtime/process-instances/{processInstanceId}/variables/{variableName}")
     public void deleteVariable(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
             @RequestParam(value = "scope", required = false) String scope, HttpServletResponse response) {
 

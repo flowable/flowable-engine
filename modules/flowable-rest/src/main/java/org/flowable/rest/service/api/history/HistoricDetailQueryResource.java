@@ -13,23 +13,15 @@
 
 package org.flowable.rest.service.api.history;
 
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
+import io.swagger.annotations.*;
 import org.flowable.rest.api.DataResponse;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -43,7 +35,7 @@ public class HistoricDetailQueryResource extends HistoricDetailBaseResource {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the historic details are returned"),
             @ApiResponse(code = 400, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.") })
-    @RequestMapping(value = "/query/historic-detail", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/query/historic-detail", produces = "application/json")
     public DataResponse<HistoricDetailResponse> queryHistoricDetail(@RequestBody HistoricDetailQueryRequest queryRequest, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
 
         return getQueryResponse(queryRequest, allRequestParams);

@@ -13,33 +13,20 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import io.swagger.annotations.*;
 import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.api.RequestUtil;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -77,12 +64,12 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiImplicitParam(name = "processDefinitionName", dataType = "string", value = "Only return tasks which are part of a process instance which has a process definition with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionNameLike", dataType = "string", value = "Only return tasks which are part of a process instance which has a process definition with a name like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "executionId", dataType = "string", value = "Only return tasks which are part of the execution with the given id.", paramType = "query"),
-            @ApiImplicitParam(name = "createdOn", dataType = "string", value = "Only return tasks which are created on the given date.", paramType = "query"),
-            @ApiImplicitParam(name = "createdBefore", dataType = "string", value = "Only return tasks which are created before the given date.", paramType = "query"),
-            @ApiImplicitParam(name = "createdAfter", dataType = "string", value = "Only return tasks which are created after the given date.", paramType = "query"),
-            @ApiImplicitParam(name = "dueOn", dataType = "string", value = "Only return tasks which are due on the given date.", paramType = "query"),
-            @ApiImplicitParam(name = "dueBefore", dataType = "string", value = "Only return tasks which are due before the given date.", paramType = "query"),
-            @ApiImplicitParam(name = "dueAfter", dataType = "string", value = "Only return tasks which are due after the given date.", paramType = "query"),
+            @ApiImplicitParam(name = "createdOn", dataType = "string",format = "date-time", value = "Only return tasks which are created on the given date.", paramType = "query"),
+            @ApiImplicitParam(name = "createdBefore", dataType = "string",format = "date-time", value = "Only return tasks which are created before the given date.", paramType = "query"),
+            @ApiImplicitParam(name = "createdAfter", dataType = "string",format = "date-time", value = "Only return tasks which are created after the given date.", paramType = "query"),
+            @ApiImplicitParam(name = "dueOn", dataType = "string",format = "date-time", value = "Only return tasks which are due on the given date.", paramType = "query"),
+            @ApiImplicitParam(name = "dueBefore", dataType = "string", format = "date-time", value = "Only return tasks which are due before the given date.", paramType = "query"),
+            @ApiImplicitParam(name = "dueAfter", dataType = "string", format = "date-time", value = "Only return tasks which are due after the given date.", paramType = "query"),
             @ApiImplicitParam(name = "withoutDueDate", dataType = "boolean", value = "Only return tasks which don’t have a due date. The property is ignored if the value is false.", paramType = "query"),
             @ApiImplicitParam(name = "excludeSubTasks", dataType = "boolean", value = "Only return tasks that are not a subtask of another task.", paramType = "query"),
             @ApiImplicitParam(name = "active", dataType = "boolean", value = "If true, only return tasks that are not suspended (either part of a process that is not suspended or not part of a process at all). If false, only tasks that are part of suspended process instances are returned.", paramType = "query"),
@@ -98,7 +85,7 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiResponse(code = 200, message = "Indicates request was successful and the tasks are returned"),
             @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format or that delegationState has an invalid value (other than pending and resolved). The status-message contains additional information.")
     })
-    @RequestMapping(value = "/runtime/tasks", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/runtime/tasks", produces = "application/json")
     public DataResponse<TaskResponse> getTasks(@ApiParam(hidden = true) @RequestParam Map<String, String> requestParams, HttpServletRequest httpRequest) {
         // Create a Task query request
         TaskQueryRequest request = new TaskQueryRequest();
@@ -288,7 +275,7 @@ public class TaskCollectionResource extends TaskBaseResource {
             @ApiResponse(code = 201, message = "Indicates request was successful and the tasks are returned"),
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format or that delegationState has an invalid value (other than pending and resolved). The status-message contains additional information.")
     })
-    @RequestMapping(value = "/runtime/tasks", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/runtime/tasks", produces = "application/json")
     public TaskResponse createTask(@RequestBody TaskRequest taskRequest, HttpServletRequest request, HttpServletResponse response) {
 
         Task task = taskService.newTask();
