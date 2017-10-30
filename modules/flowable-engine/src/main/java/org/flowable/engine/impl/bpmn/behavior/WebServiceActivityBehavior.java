@@ -77,12 +77,24 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
     protected Map<String, ItemDefinition> itemDefinitionMap = new HashMap<String, ItemDefinition>();
     protected Map<String, MessageDefinition> messageDefinitionMap = new HashMap<String, MessageDefinition>();
 
+    private boolean definitionMapsFilled = false;
+
+    private final Object definitionMapsFillingLock = new Object();
+
     public WebServiceActivityBehavior() {
         itemDefinitionMap.put("http://www.w3.org/2001/XMLSchema:string", new ItemDefinition("http://www.w3.org/2001/XMLSchema:string", new ClassStructureDefinition(String.class)));
     }
 
     public void execute(DelegateExecution execution) {
+
         BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(execution.getProcessDefinitionId());
+        synchronized (this.definitionMapsFillingLock) {
+            if (!definitionMapsFilled) {
+                fillDefinitionMaps(bpmnModel);
+                definitionMapsFilled = true;
+            }
+        }
+
         FlowElement flowElement = execution.getCurrentFlowElement();
 
         IOSpecification ioSpecification = null;
@@ -109,8 +121,6 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
         }
 
         MessageInstance message = null;
-
-        fillDefinitionMaps(bpmnModel);
 
         Operation operation = operationMap.get(operationRef);
 
