@@ -13,10 +13,11 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
+import io.swagger.annotations.ApiModelProperty;
+import org.flowable.rest.service.api.engine.variable.RestVariable;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.flowable.rest.service.api.engine.variable.RestVariable;
 
 /**
  * Modified to add a "completed" flag, which lets the caller know if the process instance has run to completion without encountering a wait state or experiencing an error/ exception.
@@ -39,6 +40,7 @@ public class ProcessInstanceResponse {
     // Added by Ryan Johnston
     protected boolean completed;
 
+    @ApiModelProperty(example = "187")
     public String getId() {
         return id;
     }
@@ -47,6 +49,7 @@ public class ProcessInstanceResponse {
         this.id = id;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/repository/process-definitions/processOne%3A1%3A4")
     public String getUrl() {
         return url;
     }
@@ -55,6 +58,7 @@ public class ProcessInstanceResponse {
         this.url = url;
     }
 
+    @ApiModelProperty(example = "myBusinessKey")
     public String getBusinessKey() {
         return businessKey;
     }
@@ -79,6 +83,7 @@ public class ProcessInstanceResponse {
         this.ended = ended;
     }
 
+    @ApiModelProperty(example = "oneTaskProcess:1:158")
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
@@ -87,6 +92,7 @@ public class ProcessInstanceResponse {
         this.processDefinitionId = processDefinitionId;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/repository/process-definitions/processOne%3A1%3A4")
     public String getProcessDefinitionUrl() {
         return processDefinitionUrl;
     }
@@ -95,6 +101,7 @@ public class ProcessInstanceResponse {
         this.processDefinitionUrl = processDefinitionUrl;
     }
 
+    @ApiModelProperty(example = "processTask")
     public String getActivityId() {
         return activityId;
     }
@@ -119,6 +126,7 @@ public class ProcessInstanceResponse {
         this.tenantId = tenantId;
     }
 
+    @ApiModelProperty(example = "null")
     public String getTenantId() {
         return tenantId;
     }
