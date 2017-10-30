@@ -21,8 +21,7 @@ import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.engine.ContentEngines;
 import org.flowable.engine.common.EngineInfo;
 import org.flowable.engine.common.api.FlowableException;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
@@ -36,7 +35,7 @@ public class ContentEngineResource {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the engine info is returned."),
     })
-    @RequestMapping(value = "/content-management/engine", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/content-management/engine", produces = "application/json")
     public ContentEngineInfoResponse getEngineInfo() {
         ContentEngineInfoResponse response = new ContentEngineInfoResponse();
 

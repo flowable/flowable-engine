@@ -63,7 +63,7 @@ public class ProcessDefinitionCollectionResource {
     @Autowired
     protected RepositoryService repositoryService;
 
-    @ApiOperation(value = "List of process definitions", tags = { "Process Definitions" })
+    @ApiOperation(value = "List of process definitions", tags = { "Process Definitions" }, nickname = "listProcessDefinitions")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "version", dataType = "integer", value = "Only return process definitions with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return process definitions with the given name.", paramType = "query"),

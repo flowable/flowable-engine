@@ -50,7 +50,7 @@ public class DeploymentResourceResponse {
         this.url = url;
     }
 
-    @ApiModelProperty(example = "http://localhost:8081/flowable-rest/service/repository/deployments/10/resources/diagrams%2Fmy-process.bpmn20.xml")
+    @ApiModelProperty(value = "For a single resource contains the actual URL to use for retrieving the binary resource", example = "http://localhost:8081/flowable-rest/service/repository/deployments/10/resources/diagrams%2Fmy-process.bpmn20.xml")
     public String getUrl() {
         return url;
     }

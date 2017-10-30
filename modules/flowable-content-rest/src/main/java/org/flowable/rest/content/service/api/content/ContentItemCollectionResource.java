@@ -12,11 +12,14 @@
  */
 package org.flowable.rest.content.service.api.content;
 
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentService;
@@ -27,22 +30,16 @@ import org.flowable.rest.api.RequestUtil;
 import org.flowable.rest.content.ContentRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -60,7 +57,7 @@ public class ContentItemCollectionResource extends ContentItemBaseResource {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @ApiOperation(value = "Get all content items", tags = { "Content item" })
+    @ApiOperation(value = "Get all content items", tags = { "Content item" }, nickname = "listContentItems")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return content items with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return content items with the given name.", paramType = "query"),
@@ -76,19 +73,19 @@ public class ContentItemCollectionResource extends ContentItemBaseResource {
             @ApiImplicitParam(name = "contentStoreName", dataType = "string", value = "Only return content items with the given content store name.", paramType = "query"),
             @ApiImplicitParam(name = "contentStoreNameLike", dataType = "string", value = "Only return content items with a content store name like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "contentAvailable", dataType = "boolean", value = "Only return content items with or without content available.", paramType = "query"),
-            @ApiImplicitParam(name = "contentSize", dataType = "long", value = "Only return content items with the given content size.", paramType = "query"),
-            @ApiImplicitParam(name = "minimumContentSize", dataType = "long", value = "Only return content items with the a minimum content size of the given value.", paramType = "query"),
-            @ApiImplicitParam(name = "maximumContentSize", dataType = "long", value = "Only return content items with the a maximum content size of the given value.", paramType = "query"),
+            @ApiImplicitParam(name = "contentSize", dataType = "number", format ="int64", value = "Only return content items with the given content size.", paramType = "query"),
+            @ApiImplicitParam(name = "minimumContentSize", dataType = "number", format ="int64", value = "Only return content items with the a minimum content size of the given value.", paramType = "query"),
+            @ApiImplicitParam(name = "maximumContentSize", dataType = "number", format ="int64", value = "Only return content items with the a maximum content size of the given value.", paramType = "query"),
             @ApiImplicitParam(name = "field", dataType = "string", value = "Only return content items with the given field.", paramType = "query"),
             @ApiImplicitParam(name = "fieldLike", dataType = "string", value = "Only return content items with a field like the given value.", paramType = "query"),
-            @ApiImplicitParam(name = "createdOn", dataType = "date", value = "Only return content items with the given create date.", paramType = "query"),
-            @ApiImplicitParam(name = "createdBefore", dataType = "date", value = "Only return content items before given create date.", paramType = "query"),
-            @ApiImplicitParam(name = "createdAfter", dataType = "date", value = "Only return content items after given create date.", paramType = "query"),
+            @ApiImplicitParam(name = "createdOn", dataType = "string", format = "date-time", value = "Only return content items with the given create date.", paramType = "query"),
+            @ApiImplicitParam(name = "createdBefore", dataType = "string", format = "date-time", value = "Only return content items before given create date.", paramType = "query"),
+            @ApiImplicitParam(name = "createdAfter", dataType = "string", format = "date-time", value = "Only return content items after given create date.", paramType = "query"),
             @ApiImplicitParam(name = "createdBy", dataType = "string", value = "Only return content items with the given created by.", paramType = "query"),
             @ApiImplicitParam(name = "createdByLike", dataType = "string", value = "Only return content items with a created by like the given value.", paramType = "query"),
-            @ApiImplicitParam(name = "lastModifiedOn", dataType = "date", value = "Only return content items with the given last modified date.", paramType = "query"),
-            @ApiImplicitParam(name = "lastModifiedBefore", dataType = "date", value = "Only return content items before given last modified date.", paramType = "query"),
-            @ApiImplicitParam(name = "lastModifiedAfter", dataType = "date", value = "Only return content items after given last modified date.", paramType = "query"),
+            @ApiImplicitParam(name = "lastModifiedOn", dataType = "string", format = "date-time", value = "Only return content items with the given last modified date.", paramType = "query"),
+            @ApiImplicitParam(name = "lastModifiedBefore", dataType = "string", format = "date-time", value = "Only return content items before given last modified date.", paramType = "query"),
+            @ApiImplicitParam(name = "lastModifiedAfter", dataType = "string", format = "date-time", value = "Only return content items after given last modified date.", paramType = "query"),
             @ApiImplicitParam(name = "lastModifiedBy", dataType = "string", value = "Only return content items with the given last modified by.", paramType = "query"),
             @ApiImplicitParam(name = "lastModifiedByLike", dataType = "string", value = "Only return content items with a last modified by like the given value.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return content items with the given tenantId.", paramType = "query"),
@@ -98,7 +95,7 @@ public class ContentItemCollectionResource extends ContentItemBaseResource {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "The content items are returned.")
     })
-    @RequestMapping(value = "/content-service/content-items", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/content-service/content-items", produces = "application/json")
     public DataResponse<ContentItemResponse> getContentItems(@ApiParam(hidden = true) @RequestParam Map<String, String> requestParams, HttpServletRequest httpRequest) {
         // Create a Content item query request
         ContentItemQueryRequest request = new ContentItemQueryRequest();
@@ -261,7 +258,7 @@ public class ContentItemCollectionResource extends ContentItemBaseResource {
             @ApiResponse(code = 201, message = "Indicates the content item was created and the result is returned."),
             @ApiResponse(code = 400, message = "Indicates required content item info is missing from the request.")
     })
-    @RequestMapping(value = "/content-service/content-items", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/content-service/content-items", produces = "application/json")
     public ContentItemResponse createContentItem(HttpServletRequest request, HttpServletResponse response) {
         ContentItemResponse result = null;
         if (request instanceof MultipartHttpServletRequest) {

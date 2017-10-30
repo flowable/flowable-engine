@@ -35,7 +35,7 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessDefinitionDecisionTableCollectionResource extends BaseProcessDefinitionResource {
 
-    @ApiOperation(value = "Get all decision tables for a process-definition", tags = { "Process Definitions" })
+    @ApiOperation(value = "Get all decision tables for a process-definition", nickname = "listProcessDefinitionDecisionTables", tags = { "Process Definitions" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the process definition was found and the decision tables are returned.", response = DmnDecisionTable.class, responseContainer = "List"),
             @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")

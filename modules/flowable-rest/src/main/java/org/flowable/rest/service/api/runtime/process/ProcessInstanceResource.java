@@ -13,26 +13,27 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.rest.exception.FlowableConflictException;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.rest.exception.FlowableConflictException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Frederik Heremans
@@ -46,7 +47,7 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
             @ApiResponse(code = 200, message = "Indicates the process instance was found and returned."),
             @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
     })
-    @RequestMapping(value = "/runtime/process-instances/{processInstanceId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/runtime/process-instances/{processInstanceId}", produces = "application/json")
     public ProcessInstanceResponse getProcessInstance(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request) {
         return restResponseFactory.createProcessInstanceResponse(getProcessInstanceFromRequest(processInstanceId));
     }
@@ -56,7 +57,7 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
             @ApiResponse(code = 204, message = "Indicates the process instance was found and deleted. Response body is left empty intentionally."),
             @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
     })
-    @RequestMapping(value = "/runtime/process-instances/{processInstanceId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/runtime/process-instances/{processInstanceId}")
     public void deleteProcessInstance(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestParam(value = "deleteReason", required = false) String deleteReason, HttpServletResponse response) {
 
         ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
@@ -77,7 +78,7 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
             @ApiResponse(code = 409, message = "Indicates the requested process instance action cannot be executed since the process-instance is already activated/suspended."),
             @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
     })
-    @RequestMapping(value = "/runtime/process-instances/{processInstanceId}", method = RequestMethod.PUT, produces = "application/json")
+    @PutMapping(value = "/runtime/process-instances/{processInstanceId}", produces = "application/json")
     public ProcessInstanceResponse performProcessInstanceAction(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestBody ProcessInstanceActionRequest actionRequest, HttpServletRequest request) {
 
         ProcessInstance processInstance = getProcessInstanceFromRequest(processInstanceId);
@@ -99,7 +100,7 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
             @ApiResponse(code = 409, message = "Indicates the requested process instance action cannot be executed since the process-instance is already activated/suspended."),
             @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
     })
-    @RequestMapping(value = "/runtime/process-instances/{processInstanceId}/change-state", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/runtime/process-instances/{processInstanceId}/change-state", produces = "application/json")
     public void changeActivityState(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId,
             @RequestBody ProcessInstanceChangeActivityStateRequest activityStateRequest, HttpServletRequest request) {
 

@@ -50,7 +50,7 @@ public class DeploymentResourceCollectionResource {
     @Autowired
     protected RepositoryService repositoryService;
 
-    @ApiOperation(value = "List resources in a deployment", tags = { "Deployment" }, notes = "The dataUrl property in the resulting JSON for a single resource contains the actual URL to use for retrieving the binary resource.")
+    @ApiOperation(value = "List resources in a deployment", tags = { "Deployment" }, nickname="listDeploymentResources", notes = "The dataUrl property in the resulting JSON for a single resource contains the actual URL to use for retrieving the binary resource.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the deployment was found and the resource list has been returned."),
             @ApiResponse(code = 404, message = "Indicates the requested deployment was not found.")

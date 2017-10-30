@@ -13,26 +13,6 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.rest.exception.FlowableForbiddenException;
-import org.flowable.rest.service.api.engine.variable.RestVariable;
-import org.flowable.task.api.Task;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -41,6 +21,26 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.rest.exception.FlowableForbiddenException;
+import org.flowable.rest.service.api.engine.variable.RestVariable;
+import org.flowable.task.api.Task;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Frederik Heremans
@@ -54,7 +54,7 @@ public class TaskResource extends TaskBaseResource {
             @ApiResponse(code = 200, message = "Indicates the task was found and returned."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
-    @RequestMapping(value = "/runtime/tasks/{taskId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/runtime/tasks/{taskId}", produces = "application/json")
     public TaskResponse getTask(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request) {
         return restResponseFactory.createTaskResponse(getTaskFromRequest(taskId));
     }
@@ -66,7 +66,7 @@ public class TaskResource extends TaskBaseResource {
             @ApiResponse(code = 404, message = "Indicates the requested task was not found."),
             @ApiResponse(code = 409, message = "Indicates the requested task was updated simultaneously.")
     })
-    @RequestMapping(value = "/runtime/tasks/{taskId}", method = RequestMethod.PUT, produces = "application/json")
+    @PutMapping(value = "/runtime/tasks/{taskId}", produces = "application/json")
     public TaskResponse updateTask(@ApiParam(name = "taskId") @PathVariable String taskId, @RequestBody TaskRequest taskRequest, HttpServletRequest request) {
 
         if (taskRequest == null) {
@@ -113,7 +113,7 @@ public class TaskResource extends TaskBaseResource {
             @ApiResponse(code = 404, message = "Indicates the requested task was not found."),
             @ApiResponse(code = 409, message = "Indicates the action cannot be performed due to a conflict. Either the task was updates simultaneously or the task was claimed by another user, in case of the claim action.")
     })
-    @RequestMapping(value = "/runtime/tasks/{taskId}", method = RequestMethod.POST)
+    @PostMapping(value = "/runtime/tasks/{taskId}")
     @ResponseStatus(value = HttpStatus.OK)
     public void executeTaskAction(@ApiParam(name = "taskId") @PathVariable String taskId, @RequestBody TaskActionRequest actionRequest) {
         if (actionRequest == null) {
@@ -149,7 +149,7 @@ public class TaskResource extends TaskBaseResource {
             @ApiResponse(code = 403, message = "Indicates the requested task cannot be deleted because it’s part of a workflow."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
     })
-    @RequestMapping(value = "/runtime/tasks/{taskId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/runtime/tasks/{taskId}")
     public void deleteTask(@ApiParam(name = "taskId") @PathVariable String taskId, @ApiParam(hidden = true) @RequestParam(value = "cascadeHistory", required = false) Boolean cascadeHistory,
             @ApiParam(hidden = true) @RequestParam(value = "deleteReason", required = false) String deleteReason, HttpServletResponse response) {
 

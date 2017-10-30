@@ -13,9 +13,15 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
@@ -25,23 +31,16 @@ import org.flowable.task.api.Task;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Frederik Heremans
@@ -59,7 +58,7 @@ public class TaskVariableResource extends TaskVariableBaseResource {
             @ApiResponse(code = 200, message = "Indicates the task was found and the requested variables are returned."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have a variable with the given name (in the given scope). Status message provides additional information.")
     })
-    @RequestMapping(value = "/runtime/tasks/{taskId}/variables/{variableName}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/runtime/tasks/{taskId}/variables/{variableName}", produces = "application/json")
     public RestVariable getVariable(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
             @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scope,
             HttpServletRequest request, HttpServletResponse response) {
@@ -89,7 +88,7 @@ public class TaskVariableResource extends TaskVariableBaseResource {
             @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have a variable with the given name in the given scope. Status message contains additional information about the error."),
             @ApiResponse(code = 415, message = "Indicates the serializable data contains an object for which no class is present in the JVM running the Flowable engine and therefore cannot be deserialized."),
     })
-    @RequestMapping(value = "/runtime/tasks/{taskId}/variables/{variableName}", method = RequestMethod.PUT, produces = "application/json")
+    @PutMapping(value = "/runtime/tasks/{taskId}/variables/{variableName}", produces = "application/json")
     public RestVariable updateVariable(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId,
             @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
             @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scope,
@@ -133,7 +132,7 @@ public class TaskVariableResource extends TaskVariableBaseResource {
             @ApiResponse(code = 204, message = "Indicates the task variable was found and has been deleted. Response-body is intentionally empty."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have a variable with the given name. Status message contains additional information about the error.")
     })
-    @RequestMapping(value = "/runtime/tasks/{taskId}/variables/{variableName}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/runtime/tasks/{taskId}/variables/{variableName}")
     public void deleteVariable(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId,
             @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
             @ApiParam(hidden = true) @RequestParam(value = "scope", required = false) String scopeString,

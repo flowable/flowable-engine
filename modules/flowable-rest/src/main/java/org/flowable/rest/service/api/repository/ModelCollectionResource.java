@@ -60,7 +60,7 @@ public class ModelCollectionResource extends BaseModelResource {
         allowedSortProperties.put("tenantId", ModelQueryProperty.MODEL_TENANT_ID);
     }
 
-    @ApiOperation(value = "Get a list of models", tags = { "Models" })
+    @ApiOperation(value = "Get a list of models", nickname= "listModels", tags = { "Models" })
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return models with the given category.", paramType = "query"),
@@ -145,7 +145,7 @@ public class ModelCollectionResource extends BaseModelResource {
     @ApiOperation(value = "Create a model", tags = {
             "Models" }, notes = "All request values are optional. For example, you can only include the name attribute in the request body JSON-object, only setting the name of the model, leaving all other fields null.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates the model was created.")
+            @ApiResponse(code = 201, message = "Indicates the model was created.")
     })
     @PostMapping(value = "/repository/models", produces = "application/json")
     public ModelResponse createModel(@RequestBody ModelRequest modelRequest, HttpServletRequest request, HttpServletResponse response) {

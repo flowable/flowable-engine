@@ -66,7 +66,7 @@ public class GroupCollectionResource {
     @Autowired
     protected IdentityService identityService;
 
-    @ApiOperation(value = "Get a list of groups", tags = { "Groups" }, produces = "application/json")
+    @ApiOperation(value = "Get a list of groups", nickname="listGroups", tags = { "Groups" }, produces = "application/json")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return group with the given id", paramType = "query"),
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return groups with the given name", paramType = "query"),

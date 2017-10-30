@@ -53,7 +53,7 @@ public class GroupResource extends BaseGroupResource {
     @ApiOperation(value = "Update a group", tags = {
             "Groups" }, notes = "All request values are optional. For example, you can only include the name attribute in the request body JSON-object, only updating the name of the group, leaving all other fields unaffected. When an attribute is explicitly included and is set to null, the group-value will be updated to null.")
     @ApiResponses(value = {
-            @ApiResponse(code = 201, message = "Indicates the group was updated."),
+            @ApiResponse(code = 200, message = "Indicates the group was updated."),
             @ApiResponse(code = 404, message = "Indicates the requested group was not found."),
             @ApiResponse(code = 409, message = "Indicates the requested group was updated simultaneously.")
     })
