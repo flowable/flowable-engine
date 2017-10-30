@@ -13,11 +13,11 @@
 
 package org.flowable.rest.service.api.history;
 
-import java.util.Date;
-
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.swagger.annotations.ApiModelProperty;
 import org.flowable.rest.util.DateToStringSerializer;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.util.Date;
 
 /**
  * @author Tijs Rademakers
@@ -43,6 +43,7 @@ public class HistoricActivityInstanceResponse {
     protected Long durationInMillis;
     protected String tenantId;
 
+    @ApiModelProperty(example = "5")
     public String getId() {
         return id;
     }
@@ -51,6 +52,7 @@ public class HistoricActivityInstanceResponse {
         this.id = id;
     }
 
+    @ApiModelProperty(example = "4")
     public String getActivityId() {
         return activityId;
     }
@@ -59,6 +61,7 @@ public class HistoricActivityInstanceResponse {
         this.activityId = activityId;
     }
 
+    @ApiModelProperty(example = "My user task")
     public String getActivityName() {
         return activityName;
     }
@@ -67,6 +70,7 @@ public class HistoricActivityInstanceResponse {
         this.activityName = activityName;
     }
 
+    @ApiModelProperty(example = "userTask")
     public String getActivityType() {
         return activityType;
     }
@@ -75,6 +79,7 @@ public class HistoricActivityInstanceResponse {
         this.activityType = activityType;
     }
 
+    @ApiModelProperty(example = "oneTaskProcess%3A1%3A4")
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
@@ -83,6 +88,7 @@ public class HistoricActivityInstanceResponse {
         this.processDefinitionId = processDefinitionId;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/repository/process-definitions/oneTaskProcess%3A1%3A4")
     public String getProcessDefinitionUrl() {
         return processDefinitionUrl;
     }
@@ -91,6 +97,7 @@ public class HistoricActivityInstanceResponse {
         this.processDefinitionUrl = processDefinitionUrl;
     }
 
+    @ApiModelProperty(example = "3")
     public String getProcessInstanceId() {
         return processInstanceId;
     }
@@ -99,6 +106,7 @@ public class HistoricActivityInstanceResponse {
         this.processInstanceId = processInstanceId;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/history/historic-process-instances/3")
     public String getProcessInstanceUrl() {
         return processInstanceUrl;
     }
@@ -107,6 +115,7 @@ public class HistoricActivityInstanceResponse {
         this.processInstanceUrl = processInstanceUrl;
     }
 
+    @ApiModelProperty(example = "4")
     public String getExecutionId() {
         return executionId;
     }
@@ -115,6 +124,7 @@ public class HistoricActivityInstanceResponse {
         this.executionId = executionId;
     }
 
+    @ApiModelProperty(example = "4")
     public String getTaskId() {
         return taskId;
     }
@@ -123,6 +133,7 @@ public class HistoricActivityInstanceResponse {
         this.taskId = taskId;
     }
 
+    @ApiModelProperty(example = "null")
     public String getCalledProcessInstanceId() {
         return calledProcessInstanceId;
     }
@@ -131,6 +142,7 @@ public class HistoricActivityInstanceResponse {
         this.calledProcessInstanceId = calledProcessInstanceId;
     }
 
+    @ApiModelProperty(example = "fozzie")
     public String getAssignee() {
         return assignee;
     }
@@ -139,6 +151,7 @@ public class HistoricActivityInstanceResponse {
         this.assignee = assignee;
     }
 
+    @ApiModelProperty(example = "2013-04-17T10:17:43.902+0000")
     public Date getStartTime() {
         return startTime;
     }
@@ -147,6 +160,7 @@ public class HistoricActivityInstanceResponse {
         this.startTime = startTime;
     }
 
+    @ApiModelProperty(example = "2013-04-18T14:06:32.715+0000")
     public Date getEndTime() {
         return endTime;
     }
@@ -155,6 +169,7 @@ public class HistoricActivityInstanceResponse {
         this.endTime = endTime;
     }
 
+    @ApiModelProperty(example = "86400056")
     public Long getDurationInMillis() {
         return durationInMillis;
     }
@@ -167,6 +182,7 @@ public class HistoricActivityInstanceResponse {
         this.tenantId = tenantId;
     }
 
+    @ApiModelProperty(example = "null")
     public String getTenantId() {
         return tenantId;
     }
