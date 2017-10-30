@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author Frederik Heremans
  */
@@ -30,6 +32,7 @@ public class ExecutionResponse {
     protected String activityId;
     protected String tenantId;
 
+    @ApiModelProperty(example = "5")
     public String getId() {
         return id;
     }
@@ -38,6 +41,7 @@ public class ExecutionResponse {
         this.id = id;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/runtime/executions/5")
     public String getUrl() {
         return url;
     }
@@ -46,6 +50,7 @@ public class ExecutionResponse {
         this.url = url;
     }
 
+    @ApiModelProperty(example = "null")
     public String getParentId() {
         return parentId;
     }
@@ -54,6 +59,7 @@ public class ExecutionResponse {
         this.parentId = parentId;
     }
 
+    @ApiModelProperty(example = "null")
     public String getParentUrl() {
         return parentUrl;
     }
@@ -62,6 +68,7 @@ public class ExecutionResponse {
         this.parentUrl = parentUrl;
     }
 
+    @ApiModelProperty(example = "null")
     public String getSuperExecutionId() {
         return superExecutionId;
     }
@@ -70,6 +77,7 @@ public class ExecutionResponse {
         this.superExecutionId = superExecutionId;
     }
 
+    @ApiModelProperty(example = "null")
     public String getSuperExecutionUrl() {
         return superExecutionUrl;
     }
@@ -78,6 +86,7 @@ public class ExecutionResponse {
         this.superExecutionUrl = superExecutionUrl;
     }
 
+    @ApiModelProperty(example = "5")
     public String getProcessInstanceId() {
         return processInstanceId;
     }
@@ -86,6 +95,7 @@ public class ExecutionResponse {
         this.processInstanceId = processInstanceId;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/runtime/process-instances/5")
     public String getProcessInstanceUrl() {
         return processInstanceUrl;
     }
@@ -102,6 +112,7 @@ public class ExecutionResponse {
         this.suspended = suspended;
     }
 
+    @ApiModelProperty(example = "null")
     public String getActivityId() {
         return activityId;
     }
@@ -110,6 +121,7 @@ public class ExecutionResponse {
         this.activityId = activityId;
     }
 
+    @ApiModelProperty(example = "null")
     public String getTenantId() {
         return tenantId;
     }

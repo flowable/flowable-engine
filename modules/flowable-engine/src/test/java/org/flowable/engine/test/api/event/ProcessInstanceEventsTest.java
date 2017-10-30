@@ -231,7 +231,7 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         String processDefinitionId = processInstance.getProcessDefinitionId();
 
         // Check create-event one main process the second one Scope execution, and the third one subprocess
-        assertEquals(11, listener.getEventsReceived().size());
+        assertEquals(12, listener.getEventsReceived().size());
         assertTrue(listener.getEventsReceived().get(0) instanceof FlowableEngineEntityEvent);
 
         // process instance created event
@@ -290,26 +290,33 @@ public class ProcessInstanceEventsTest extends PluggableFlowableTestCase {
         assertEquals(FlowableEngineEventType.PROCESS_CREATED, event.getType());
         subProcessEntity = (ExecutionEntity) event.getEntity();
         assertEquals(processExecutionId, subProcessEntity.getSuperExecutionId());
-
-        // sub process instance start created event
+        
+        // sub process instance initialized event
         event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(8);
+        assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
+        assertEquals(subProcessInstanceId, event.getExecutionId());
+        String subProcessDefinitionId = ((ExecutionEntity) event.getEntity()).getProcessDefinitionId();
+        assertNotNull(subProcessDefinitionId);
+
+        // sub process instance child execution created event
+        event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(9);
         assertEquals(FlowableEngineEventType.ENTITY_CREATED, event.getType());
         assertEquals(subProcessInstanceId, event.getProcessInstanceId());
         assertNotEquals(subProcessInstanceId, event.getExecutionId());
-        String subProcessDefinitionId = ((ExecutionEntity) event.getEntity()).getProcessDefinitionId();
+        subProcessDefinitionId = ((ExecutionEntity) event.getEntity()).getProcessDefinitionId();
         assertNotNull(subProcessDefinitionId);
         ProcessDefinition subProcessDefinition = repositoryService.getProcessDefinition(subProcessDefinitionId);
         assertEquals("simpleSubProcess", subProcessDefinition.getKey());
 
-        // sub process instance start initialized event
-        event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(9);
+        // sub process instance child execution initialized event
+        event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(10);
         assertEquals(FlowableEngineEventType.ENTITY_INITIALIZED, event.getType());
         assertEquals(subProcessInstanceId, event.getProcessInstanceId());
         assertNotEquals(subProcessInstanceId, event.getExecutionId());
         subProcessDefinitionId = ((ExecutionEntity) event.getEntity()).getProcessDefinitionId();
         assertNotNull(subProcessDefinitionId);
 
-        event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(10);
+        event = (FlowableEngineEntityEvent) listener.getEventsReceived().get(11);
         assertEquals(FlowableEngineEventType.PROCESS_STARTED, event.getType());
         assertEquals(subProcessInstanceId, event.getProcessInstanceId());
         assertEquals(subProcessDefinitionId, event.getProcessDefinitionId());
