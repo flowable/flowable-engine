@@ -12,6 +12,7 @@
  */
 package org.flowable.rest.dmn.service.api.repository;
 
+import io.swagger.annotations.ApiModelProperty;
 import org.flowable.dmn.api.DmnDecisionTable;
 
 /**
@@ -44,6 +45,7 @@ public class DecisionTableResponse {
         setTenantId(decisionTable.getTenantId());
     }
 
+    @ApiModelProperty(example = "46b0379c-c0a1-11e6-bc93-6ab56fad108a")
     public String getId() {
         return id;
     }
@@ -52,6 +54,7 @@ public class DecisionTableResponse {
         this.id = id;
     }
 
+    @ApiModelProperty(example = "http://localhost:8080/flowable-rest/dmn-api/dmn-repository/decision-tables/46b0379c-c0a1-11e6-bc93-6ab56fad108a")
     public String getUrl() {
         return url;
     }
@@ -60,6 +63,7 @@ public class DecisionTableResponse {
         this.url = url;
     }
 
+    @ApiModelProperty(example = "dmnTest")
     public String getCategory() {
         return category;
     }
@@ -68,6 +72,7 @@ public class DecisionTableResponse {
         this.category = category;
     }
 
+    @ApiModelProperty(example = "Decision Table One")
     public String getName() {
         return name;
     }
@@ -76,6 +81,7 @@ public class DecisionTableResponse {
         this.name = name;
     }
 
+    @ApiModelProperty(example = "DecisionTableOne")
     public String getKey() {
         return key;
     }
@@ -84,6 +90,7 @@ public class DecisionTableResponse {
         this.key = key;
     }
 
+    @ApiModelProperty(example = "This is a simple description")
     public String getDescription() {
         return description;
     }
@@ -92,6 +99,7 @@ public class DecisionTableResponse {
         this.description = description;
     }
 
+    @ApiModelProperty(example = "3")
     public int getVersion() {
         return version;
     }
@@ -100,6 +108,7 @@ public class DecisionTableResponse {
         this.version = version;
     }
 
+    @ApiModelProperty(example = "dmn-DecisionTableOne.dmn")
     public String getResourceName() {
         return resourceName;
     }
@@ -108,6 +117,7 @@ public class DecisionTableResponse {
         this.resourceName = resourceName;
     }
 
+    @ApiModelProperty(example = "46aa6b3a-c0a1-11e6-bc93-6ab56fad108a")
     public String getDeploymentId() {
         return deploymentId;
     }
@@ -116,6 +126,7 @@ public class DecisionTableResponse {
         this.deploymentId = deploymentId;
     }
 
+    @ApiModelProperty(example = "5001")
     public String getParentDeploymentId() {
         return parentDeploymentId;
     }
@@ -124,6 +135,7 @@ public class DecisionTableResponse {
         this.parentDeploymentId = parentDeploymentId;
     }
 
+    @ApiModelProperty(example = "null")
     public String getTenantId() {
         return tenantId;
     }

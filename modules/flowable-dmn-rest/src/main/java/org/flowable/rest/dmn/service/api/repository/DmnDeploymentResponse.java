@@ -12,10 +12,10 @@
  */
 package org.flowable.rest.dmn.service.api.repository;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.swagger.annotations.ApiModelProperty;
 import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.rest.util.DateToStringSerializer;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import java.util.Date;
 
@@ -43,6 +43,7 @@ public class DmnDeploymentResponse {
         setUrl(url);
     }
 
+    @ApiModelProperty(example = "03ab310d-c1de-11e6-a4f4-62ce84ef239e")
     public String getId() {
         return id;
     }
@@ -51,6 +52,7 @@ public class DmnDeploymentResponse {
         this.id = id;
     }
 
+    @ApiModelProperty(example = "dmnTest")
     public String getName() {
         return name;
     }
@@ -59,6 +61,7 @@ public class DmnDeploymentResponse {
         this.name = name;
     }
 
+    @ApiModelProperty(example = "2016-12-14T10:16:37.000+01:00")
     public Date getDeploymentTime() {
         return deploymentTime;
     }
@@ -67,6 +70,7 @@ public class DmnDeploymentResponse {
         this.deploymentTime = deploymentTime;
     }
 
+    @ApiModelProperty(example = "dmnExamples")
     public String getCategory() {
         return category;
     }
@@ -75,6 +79,7 @@ public class DmnDeploymentResponse {
         this.category = category;
     }
 
+    @ApiModelProperty(example = "http://localhost:8080/flowable-rest/dmn-api/dmn-repository/deployments/03ab310d-c1de-11e6-a4f4-62ce84ef239e")
     public String getUrl() {
         return url;
     }
@@ -83,6 +88,7 @@ public class DmnDeploymentResponse {
         this.url = url;
     }
 
+    @ApiModelProperty(example = "17510")
     public String getParentDeploymentId() {
         return parentDeploymentId;
     }
@@ -91,6 +97,7 @@ public class DmnDeploymentResponse {
         this.parentDeploymentId = parentDeploymentId;
     }
 
+    @ApiModelProperty(example = "null")
     public String getTenantId() {
         return tenantId;
     }
