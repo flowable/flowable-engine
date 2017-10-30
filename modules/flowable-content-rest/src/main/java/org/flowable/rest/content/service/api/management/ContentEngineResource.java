@@ -12,7 +12,11 @@
  */
 package org.flowable.rest.content.service.api.management;
 
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.engine.ContentEngines;
 import org.flowable.engine.common.EngineInfo;

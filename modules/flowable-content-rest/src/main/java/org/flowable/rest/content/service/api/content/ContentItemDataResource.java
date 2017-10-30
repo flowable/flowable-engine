@@ -13,7 +13,12 @@
 
 package org.flowable.rest.content.service.api.content;
 
-import io.swagger.annotations.*;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.apache.commons.io.IOUtils;
 import org.flowable.content.api.ContentItem;
 import org.flowable.engine.common.api.FlowableException;
