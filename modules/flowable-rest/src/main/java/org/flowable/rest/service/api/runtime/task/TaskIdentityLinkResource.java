@@ -39,10 +39,10 @@ import java.util.List;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Tasks Identity Links" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
 public class TaskIdentityLinkResource extends TaskBaseResource {
 
-    @ApiOperation(value = "Get a single identity link on a task", tags = { "Tasks" }, nickname = "getTaskInstanceIdentityLinks")
+    @ApiOperation(value = "Get a single identity link on a task", tags = { "Tasks Identity Links" }, nickname = "getTaskInstanceIdentityLinks")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task and identity link was found and returned."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have the requested identityLink. The status contains additional information about this error.")
@@ -60,7 +60,7 @@ public class TaskIdentityLinkResource extends TaskBaseResource {
         return restResponseFactory.createRestIdentityLink(link);
     }
 
-    @ApiOperation(value = "Delete an identity link on a task", tags = { "Tasks" }, nickname = "deleteTaskInstanceIdentityLinks")
+    @ApiOperation(value = "Delete an identity link on a task", tags = { "Tasks Identity Links" }, nickname = "deleteTaskInstanceIdentityLinks")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the task and identity link were found and the link has been deleted. Response-body is intentionally empty."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have the requested identityLink. The status contains additional information about this error.")

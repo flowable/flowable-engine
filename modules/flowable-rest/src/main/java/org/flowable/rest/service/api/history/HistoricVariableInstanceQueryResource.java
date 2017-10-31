@@ -35,7 +35,8 @@ import java.util.Map;
 @Api(tags = { "History" }, description = "Manage History", authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricVariableInstanceQueryResource extends HistoricVariableInstanceBaseResource {
 
-    @ApiOperation(value = "Query for historic variable instances", tags = { "History" }, notes = "All supported JSON parameter fields allowed are exactly the same as the parameters found for getting a collection of historic process instances,"
+    @ApiOperation(value = "Query for historic variable instances", tags = { "History", "Query" },
+            notes = "All supported JSON parameter fields allowed are exactly the same as the parameters found for getting a collection of historic process instances,"
             + " but passed in as JSON-body arguments rather than URL-parameters to allow for more advanced querying and preventing errors with request-uri’s that are too long. "
             + "On top of that, the query allows for filtering based on process variables. "
             + "The variables property is a JSON-array containing objects with the format as described here.")
