@@ -36,8 +36,8 @@ import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -77,7 +77,7 @@ public class DeploymentCollectionResource {
     @Autowired
     protected RepositoryService repositoryService;
 
-    @ApiOperation(value = "List of Deployments", tags = { "Deployment" })
+    @ApiOperation(value = "List of Deployments", tags = { "Deployment" }, nickname="listDeployments")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return deployments with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return deployments with a name like the given name.", paramType = "query"),
@@ -85,14 +85,14 @@ public class DeploymentCollectionResource {
             @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return deployments which don’t have the given category.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return deployments with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return deployments with a tenantId like the given value.", paramType = "query"),
-            @ApiImplicitParam(name = "withoutTenantId", dataType = "string", value = "If true, only returns deployments without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
+            @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns deployments without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,name,deployTime,tenantId", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the request was successful."),
     })
-    @RequestMapping(value = "/repository/deployments", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getDeployments(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    @GetMapping(value = "/repository/deployments", produces = "application/json")
+    public DataResponse<DeploymentResponse> getDeployments(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         DeploymentQuery deploymentQuery = repositoryService.createDeploymentQuery();
 
         // Apply filters
@@ -121,8 +121,7 @@ public class DeploymentCollectionResource {
             }
         }
 
-        DataResponse response = new DeploymentsPaginateList(restResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
-        return response;
+        return new DeploymentsPaginateList(restResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
     }
 
     @ApiOperation(value = "Create a new deployment", tags = {
@@ -130,13 +129,13 @@ public class DeploymentCollectionResource {
                     + "\n"
                     + "An additional parameter (form-field) can be passed in the request body with name tenantId. The value of this field will be used as the id of the tenant this deployment is done in.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates the deployment was created."),
+            @ApiResponse(code = 201, message = "Indicates the deployment was created."),
             @ApiResponse(code = 400, message = "Indicates there was no content present in the request body or the content mime-type is not supported for deployment. The status-description contains additional information.")
     })
     @ApiImplicitParams({
         @ApiImplicitParam(name="file", paramType = "form", dataType = "java.io.File")
     })
-    @RequestMapping(value = "/repository/deployments", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
+    @PostMapping(value = "/repository/deployments", produces = "application/json", consumes = "multipart/form-data")
     public DeploymentResponse uploadDeployment(@ApiParam(name = "deploymentKey") @RequestParam(value = "deploymentKey", required = false) String deploymentKey,
             @ApiParam(name = "deploymentName") @RequestParam(value = "deploymentName", required = false) String deploymentName,
             @ApiParam(name = "tenantId") @RequestParam(value = "tenantId", required = false) String tenantId,

@@ -18,11 +18,10 @@ import java.util.List;
 /**
  * @author Tijs Rademakers
  */
-public class DefaultPaginateList extends AbstractPaginateList {
+public class DefaultPaginateList<T> extends AbstractPaginateList<T, T> {
 
-    @SuppressWarnings("rawtypes")
     @Override
-    protected List processList(List list) {
+    protected List<T> processList(List<T> list) {
         return list;
     }
 }

@@ -13,6 +13,7 @@
 package org.flowable.rest.variable;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Pojo representing a variable used in REST-service which defines it's name, variable and type.
@@ -26,6 +27,7 @@ public class EngineRestVariable {
     private Object value;
     private String valueUrl;
 
+    @ApiModelProperty(example = "myVariable")
     public String getName() {
         return name;
     }
@@ -34,6 +36,7 @@ public class EngineRestVariable {
         this.name = name;
     }
 
+    @ApiModelProperty(example = "string")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public String getType() {
         return type;
@@ -43,6 +46,7 @@ public class EngineRestVariable {
         this.type = type;
     }
 
+    @ApiModelProperty(example = "test")
     public Object getValue() {
         return value;
     }

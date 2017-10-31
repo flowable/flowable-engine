@@ -29,6 +29,7 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.impl.identity.Authentication;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
@@ -335,8 +336,9 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
             IdentityLinkUtil.createProcessInstanceIdentityLink(subProcessInstance, authenticatedUserId, null, IdentityLinkType.STARTER);
         }
 
-        if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, subProcessInstance));
+        FlowableEventDispatcher flowableEventDispatcher = processEngineConfiguration.getEventDispatcher();
+        if (flowableEventDispatcher != null && flowableEventDispatcher.isEnabled()) {
+            flowableEventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, subProcessInstance));
         }
 
         return subProcessInstance;

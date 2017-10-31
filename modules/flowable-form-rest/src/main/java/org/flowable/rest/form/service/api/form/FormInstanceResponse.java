@@ -12,9 +12,10 @@
  */
 package org.flowable.rest.form.service.api.form;
 
-import java.util.Date;
-
+import io.swagger.annotations.ApiModelProperty;
 import org.flowable.form.api.FormInstance;
+
+import java.util.Date;
 
 /**
  * @author Yvo Swillens
@@ -44,6 +45,7 @@ public class FormInstanceResponse {
         this.tenantId = formInstance.getTenantId();
     }
 
+    @ApiModelProperty(example = "48b9ac82-f1d3-11e6-8549-acde48001122")
     public String getId() {
         return id;
     }
@@ -52,6 +54,7 @@ public class FormInstanceResponse {
         this.id = id;
     }
 
+    @ApiModelProperty(example = "818e4703-f1d2-11e6-8549-acde48001122")
     public String getFormDefinitionId() {
         return formDefinitionId;
     }
@@ -60,6 +63,7 @@ public class FormInstanceResponse {
         this.formDefinitionId = formDefinitionId;
     }
 
+    @ApiModelProperty(example = "88")
     public String getTaskId() {
         return taskId;
     }
@@ -68,6 +72,7 @@ public class FormInstanceResponse {
         this.taskId = taskId;
     }
 
+    @ApiModelProperty(example = "66")
     public String getProcessInstanceId() {
         return processInstanceId;
     }
@@ -76,6 +81,7 @@ public class FormInstanceResponse {
         this.processInstanceId = processInstanceId;
     }
 
+    @ApiModelProperty(example = "oneTaskProcess:1:158")
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
@@ -84,6 +90,7 @@ public class FormInstanceResponse {
         this.processDefinitionId = processDefinitionId;
     }
 
+    @ApiModelProperty(example = "2013-04-17T10:17:43.902+0000")
     public Date getSubmittedDate() {
         return submittedDate;
     }
@@ -92,6 +99,7 @@ public class FormInstanceResponse {
         this.submittedDate = submittedDate;
     }
 
+    @ApiModelProperty(example = "testUser")
     public String getSubmittedBy() {
         return submittedBy;
     }
@@ -100,6 +108,7 @@ public class FormInstanceResponse {
         this.submittedBy = submittedBy;
     }
 
+    @ApiModelProperty(example = "818e4703-f1d2-11e6-8549-acde48001110")
     public String getFormValuesId() {
         return formValuesId;
     }
@@ -108,6 +117,7 @@ public class FormInstanceResponse {
         this.formValuesId = formValuesId;
     }
 
+    @ApiModelProperty(example = "null")
     public String getTenantId() {
         return tenantId;
     }
@@ -116,6 +126,7 @@ public class FormInstanceResponse {
         this.tenantId = tenantId;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/form/form-instances/48b9ac82-f1d3-11e6-8549-acde48001122")
     public String getUrl() {
         return url;
     }

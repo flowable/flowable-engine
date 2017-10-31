@@ -45,7 +45,7 @@ public class HistoricVariableInstanceBaseResource {
     @Autowired
     protected HistoryService historyService;
 
-    protected DataResponse getQueryResponse(HistoricVariableInstanceQueryRequest queryRequest, Map<String, String> allRequestParams) {
+    protected DataResponse<HistoricVariableInstanceResponse> getQueryResponse(HistoricVariableInstanceQueryRequest queryRequest, Map<String, String> allRequestParams) {
         HistoricVariableInstanceQuery query = historyService.createHistoricVariableInstanceQuery();
 
         // Populate query based on request

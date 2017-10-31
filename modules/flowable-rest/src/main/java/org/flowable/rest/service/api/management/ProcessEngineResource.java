@@ -19,8 +19,7 @@ import org.flowable.engine.common.EngineInfo;
 import org.flowable.engine.common.api.FlowableException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -44,7 +43,7 @@ public class ProcessEngineResource {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the engine info is returned."),
     })
-    @RequestMapping(value = "/management/engine", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/management/engine", produces = "application/json")
     public ProcessEngineInfoResponse getEngineInfo() {
         ProcessEngineInfoResponse response = new ProcessEngineInfoResponse();
 

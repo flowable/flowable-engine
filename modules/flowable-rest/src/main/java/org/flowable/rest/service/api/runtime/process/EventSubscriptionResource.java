@@ -13,24 +13,22 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.flowable.engine.RuntimeService;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.runtime.EventSubscription;
-import org.flowable.rest.service.api.RestResponseFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import org.flowable.engine.RuntimeService;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.runtime.EventSubscription;
+import org.flowable.rest.service.api.RestResponseFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Tijs Rademakers
@@ -50,7 +48,7 @@ public class EventSubscriptionResource {
             @ApiResponse(code = 200, message = "Indicates the event subscription exists and is returned."),
             @ApiResponse(code = 404, message = "Indicates the requested event subscription does not exist.")
     })
-    @RequestMapping(value = "/runtime/event-subscriptions/{eventSubscriptionId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/runtime/event-subscriptions/{eventSubscriptionId}", produces = "application/json")
     public EventSubscriptionResponse getEventSubscription(@ApiParam(name = "eventSubscriptionId") @PathVariable String eventSubscriptionId, HttpServletRequest request) {
         EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery().id(eventSubscriptionId).singleResult();
 

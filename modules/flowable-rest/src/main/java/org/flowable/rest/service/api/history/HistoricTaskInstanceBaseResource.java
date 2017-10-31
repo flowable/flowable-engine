@@ -63,7 +63,7 @@ public class HistoricTaskInstanceBaseResource {
     @Autowired
     protected HistoryService historyService;
 
-    protected DataResponse getQueryResponse(HistoricTaskInstanceQueryRequest queryRequest, Map<String, String> allRequestParams, String serverRootUrl) {
+    protected DataResponse<HistoricTaskInstanceResponse> getQueryResponse(HistoricTaskInstanceQueryRequest queryRequest, Map<String, String> allRequestParams, String serverRootUrl) {
         HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
         // Populate query based on request

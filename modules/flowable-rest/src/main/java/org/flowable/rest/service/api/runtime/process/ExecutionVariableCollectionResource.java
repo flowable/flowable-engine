@@ -13,26 +13,26 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.flowable.engine.runtime.Execution;
-import org.flowable.rest.service.api.RestResponseFactory;
-import org.flowable.rest.service.api.engine.variable.RestVariable;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.rest.service.api.RestResponseFactory;
+import org.flowable.rest.service.api.engine.variable.RestVariable;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * @author Frederik Heremans
@@ -46,7 +46,7 @@ public class ExecutionVariableCollectionResource extends BaseVariableCollectionR
             @ApiResponse(code = 200, message = "Indicates the execution was found and variables are returned."),
             @ApiResponse(code = 404, message = "Indicates the requested execution was not found.")
     })
-    @RequestMapping(value = "/runtime/executions/{executionId}/variables", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/runtime/executions/{executionId}/variables", produces = "application/json")
     public List<RestVariable> getVariables(@ApiParam(name = "executionId") @PathVariable String executionId, @RequestParam(value = "scope", required = false) String scope, HttpServletRequest request) {
 
         Execution execution = getExecutionFromRequest(executionId);
@@ -59,7 +59,7 @@ public class ExecutionVariableCollectionResource extends BaseVariableCollectionR
             @ApiResponse(code = 400, message = "Indicates the request body is incomplete or contains illegal values. The status description contains additional information about the error."),
             @ApiResponse(code = 404, message = "Indicates the requested execution was not found.")
     })
-    @RequestMapping(value = "/runtime/executions/{executionId}/variables", method = RequestMethod.PUT, produces = "application/json")
+    @PutMapping(value = "/runtime/executions/{executionId}/variables", produces = "application/json")
     public Object createOrUpdateExecutionVariable(@ApiParam(name = "executionId") @PathVariable String executionId, HttpServletRequest request, HttpServletResponse response) {
 
         Execution execution = getExecutionFromRequest(executionId);
@@ -75,7 +75,7 @@ public class ExecutionVariableCollectionResource extends BaseVariableCollectionR
             @ApiResponse(code = 409, message = "Indicates the execution was found but already contains a variable with the given name. Use the update-method instead.")
 
     })
-    @RequestMapping(value = "/runtime/executions/{executionId}/variables", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/runtime/executions/{executionId}/variables", produces = "application/json")
     public Object createExecutionVariable(@ApiParam(name = "executionId") @PathVariable String executionId, HttpServletRequest request, HttpServletResponse response) {
 
         Execution execution = getExecutionFromRequest(executionId);
@@ -88,7 +88,7 @@ public class ExecutionVariableCollectionResource extends BaseVariableCollectionR
             @ApiResponse(code = 204, message = "Indicates the execution was found and variables have been deleted."),
             @ApiResponse(code = 404, message = "Indicates the requested execution was not found.")
     })
-    @RequestMapping(value = "/runtime/executions/{executionId}/variables", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/runtime/executions/{executionId}/variables")
     public void deleteLocalVariables(@ApiParam(name = "executionId") @PathVariable String executionId, HttpServletResponse response) {
         Execution execution = getExecutionFromRequest(executionId);
         deleteAllLocalVariables(execution, response);

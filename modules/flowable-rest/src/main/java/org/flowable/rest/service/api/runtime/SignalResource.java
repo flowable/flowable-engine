@@ -25,9 +25,8 @@ import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.runtime.process.SignalEventReceivedRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import io.swagger.annotations.Api;
@@ -57,7 +56,7 @@ public class SignalResource {
             @ApiResponse(code = 202, message = "Indicated signal processing is queued as a job, ready to be executed."),
             @ApiResponse(code = 400, message = "Signal not processed. The signal name is missing or variables are used together with async, which is not allowed. Response body contains additional information about the error.")
     })
-    @RequestMapping(value = "/runtime/signals", method = RequestMethod.POST)
+    @PostMapping(value = "/runtime/signals")
     public void signalEventReceived(@RequestBody SignalEventReceivedRequest signalRequest, HttpServletResponse response) {
         if (signalRequest.getSignalName() == null) {
             throw new FlowableIllegalArgumentException("signalName is required");

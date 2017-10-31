@@ -13,23 +13,25 @@
 
 package org.flowable.rest.api;
 
+import java.util.List;
+
 /**
  * @author Tijs Rademakers
  */
-public class DataResponse {
+public class DataResponse<T> {
 
-    Object data;
+    List<T> data;
     long total;
     int start;
     String sort;
     String order;
     int size;
 
-    public Object getData() {
+    public List<T> getData() {
         return data;
     }
 
-    public DataResponse setData(Object data) {
+    public DataResponse<T> setData(List<T> data) {
         this.data = data;
         return this;
     }

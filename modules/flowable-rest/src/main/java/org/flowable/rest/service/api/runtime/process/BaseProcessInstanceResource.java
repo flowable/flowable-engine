@@ -50,7 +50,7 @@ public class BaseProcessInstanceResource {
     @Autowired
     protected RuntimeService runtimeService;
 
-    protected DataResponse getQueryResponse(ProcessInstanceQueryRequest queryRequest, Map<String, String> requestParams) {
+    protected DataResponse<ProcessInstanceResponse> getQueryResponse(ProcessInstanceQueryRequest queryRequest, Map<String, String> requestParams) {
 
         ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
 

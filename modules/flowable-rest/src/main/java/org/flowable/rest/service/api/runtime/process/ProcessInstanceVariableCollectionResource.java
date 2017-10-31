@@ -13,28 +13,28 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.flowable.engine.runtime.Execution;
-import org.flowable.rest.service.api.RestResponseFactory;
-import org.flowable.rest.service.api.engine.variable.RestVariable;
-import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import org.flowable.engine.runtime.Execution;
+import org.flowable.rest.service.api.RestResponseFactory;
+import org.flowable.rest.service.api.engine.variable.RestVariable;
+import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -43,13 +43,13 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Process Instances" }, description = "Manage Process Instances", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceVariableCollectionResource extends BaseVariableCollectionResource {
 
-    @ApiOperation(value = "List of variables for a process instance", tags = {
+    @ApiOperation(value = "List of variables for a process instance", nickname="listProcessInstanceVariables", tags = {
             "Process Instances" }, notes = "In case the variable is a binary variable or serializable, the valueUrl points to an URL to fetch the raw value. If it’s a plain variable, the value is present in the response. Note that only local scoped variables are returned, as there is no global scope for process-instance variables.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the process instance was found and variables are returned."),
             @ApiResponse(code = 400, message = "Indicates the requested process instance was not found.")
     })
-    @RequestMapping(value = "/runtime/process-instances/{processInstanceId}/variables", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/runtime/process-instances/{processInstanceId}/variables", produces = "application/json")
     public List<RestVariable> getVariables(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, @RequestParam(value = "scope", required = false) String scope, HttpServletRequest request) {
 
         Execution execution = getProcessInstanceFromRequest(processInstanceId);
@@ -78,7 +78,7 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
             @ApiResponse(code = 415, message = "Indicates the serializable data contains an object for which no class is present in the JVM running the Flowable engine and therefore cannot be deserialized.")
 
     })
-    @RequestMapping(value = "/runtime/process-instances/{processInstanceId}/variables", method = RequestMethod.PUT, produces = "application/json")
+    @PutMapping(value = "/runtime/process-instances/{processInstanceId}/variables", produces = "application/json")
     public Object createOrUpdateExecutionVariable(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request, HttpServletResponse response) {
 
         Execution execution = getProcessInstanceFromRequest(processInstanceId);
@@ -102,7 +102,7 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
             @ApiResponse(code = 409, message = "Indicates the process instance was found but already contains a variable with the given name (only thrown when POST method is used). Use the update-method instead."),
 
     })
-    @RequestMapping(value = "/runtime/process-instances/{processInstanceId}/variables", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/runtime/process-instances/{processInstanceId}/variables", produces = "application/json")
     public Object createExecutionVariable(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request, HttpServletResponse response) {
 
         Execution execution = getProcessInstanceFromRequest(processInstanceId);
@@ -115,7 +115,7 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
             @ApiResponse(code = 204, message = "Indicates variables were found and have been deleted. Response-body is intentionally empty."),
             @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")
     })
-    @RequestMapping(value = "/runtime/process-instances/{processInstanceId}/variables", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/runtime/process-instances/{processInstanceId}/variables")
     public void deleteLocalVariables(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletResponse response) {
         Execution execution = getProcessInstanceFromRequest(processInstanceId);
         deleteAllLocalVariables(execution, response);

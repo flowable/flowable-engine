@@ -13,8 +13,6 @@
 package org.flowable.http;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Http Server and API to test HTTP Activity
@@ -22,8 +20,6 @@ import org.slf4j.LoggerFactory;
  * @author Harsha Teja Kanna
  */
 public abstract class HttpServiceTaskTestCase extends PluggableFlowableTestCase {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(HttpServiceTaskTestCase.class);
 
     @Override
     protected void setUp() throws Exception {
