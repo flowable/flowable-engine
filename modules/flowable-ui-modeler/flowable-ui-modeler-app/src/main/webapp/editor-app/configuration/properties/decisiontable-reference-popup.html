@@ -25,7 +25,7 @@
                                <input type="checkbox" value="option1" ng-click="selectDecisionTable(decisionTable, $event)" ng-checked="decisionTable.id == selectedDecisionTable.id" />
                            </div>
                            <h4>{{decisionTable.name}}</h4>
-                           <img ng-src="{{config.contextRoot}}/app/rest/models/{{decisionTable.id}}/thumbnail" />
+                           <img ng-src="{{getModelThumbnailUrl(decisionTable.id)}}" />
                          </div>
                          <div ng-show="state.loadingDecisionTables">
                             <p class="loading" translate>PROPERTY.DECISIONTABLEREFERENCE.DECISIONTABLE.LOADING</p>

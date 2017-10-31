@@ -63,7 +63,7 @@ angular.module('flowableModeler')
     			$scope.model.description
     		};
 
-    		$http({method: 'PUT', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.popup.id, data: updateData}).
+    		$http({method: 'PUT', url: FLOWABLE.APP_URL.getModelUrl($scope.popup.id), data: updateData}).
     			success(function(data, status, headers, config) {
     				if ($scope.model.process) {
     					$scope.model.process = data;
@@ -138,7 +138,7 @@ angular.module('flowableModeler')
         };
 
         // Loading relations when opening
-        $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.popup.model.id + '/parent-relations'}).
+        $http({method: 'GET', url: FLOWABLE.APP_URL.getModelParentRelationsUrl($scope.popup.model.id)}).
             success(function (data, status, headers, config) {
                 $scope.popup.loading = false;
                 $scope.popup.loadingRelations = false;
@@ -156,7 +156,7 @@ angular.module('flowableModeler')
                 cascade: $scope.popup.cascade === 'true'
             };
 
-            $http({method: 'DELETE', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.popup.model.id, params: params}).
+            $http({method: 'DELETE', url: FLOWABLE.APP_URL.getModelUrl($scope.popup.model.id), params: params}).
                 success(function (data, status, headers, config) {
                     $scope.$hide();
                     $scope.popup.loading = false;
@@ -214,7 +214,7 @@ angular.module('flowableModeler')
 			comment: $scope.popup.comment
 		};
 
-		$http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.popup.latestModelId + '/history/' + $scope.popup.model.id, data: actionData}).
+		$http({method: 'POST', url: FLOWABLE.APP_URL.getModelHistoryUrl($scope.popup.latestModelId, $scope.popup.model.id), data: actionData}).
 			success(function(data, status, headers, config) {
 
                 var backToOverview = function() {
