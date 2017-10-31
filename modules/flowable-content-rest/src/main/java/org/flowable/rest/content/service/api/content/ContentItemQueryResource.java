@@ -35,8 +35,8 @@ import java.util.Map;
 @Api(tags = { "Content item" }, description = "Query content items", authorizations = { @Authorization(value = "basicAuth") })
 public class ContentItemQueryResource extends ContentItemBaseResource {
 
-    @ApiOperation(value = "Query for content items", tags = {
-            "Content item" }, notes = "All supported JSON parameter fields allowed are exactly the same as the parameters found for getting a collection of content items, but passed in as JSON-body arguments rather than URL-parameters to allow for more advanced querying and preventing errors with request-uri’s that are too long.")
+    @ApiOperation(value = "Query for content items", tags = {"Content item", "Query" },
+            notes = "All supported JSON parameter fields allowed are exactly the same as the parameters found for getting a collection of content items, but passed in as JSON-body arguments rather than URL-parameters to allow for more advanced querying and preventing errors with request-uri’s that are too long.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the content items are returned."),
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format. The status-message contains additional information.")

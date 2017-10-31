@@ -41,7 +41,7 @@ import java.io.ObjectOutputStream;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Tasks Variables" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
 public class TaskVariableDataResource extends TaskVariableBaseResource {
 
     @GetMapping
@@ -52,7 +52,7 @@ public class TaskVariableDataResource extends TaskVariableBaseResource {
             @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have a variable with the given name (in the given scope). Status message provides additional information.")
     })
     @ApiOperation(value = "Get the binary data for a variable", tags = {
-            "Tasks" }, nickname = "geTaskVariableData", notes = "The response body contains the binary value of the variable. When the variable is of type binary, the content-type of the response is set to application/octet-stream, regardless of the content of the variable or the request accept-type header. In case of serializable, application/x-java-serialized-object is used as content-type.")
+            "Tasks Variables" }, nickname = "geTaskVariableData", notes = "The response body contains the binary value of the variable. When the variable is of type binary, the content-type of the response is set to application/octet-stream, regardless of the content of the variable or the request accept-type header. In case of serializable, application/x-java-serialized-object is used as content-type.")
     @ResponseBody
     public byte[] getVariableData(@ApiParam(name = "taskId") @PathVariable("taskId") String taskId,
             @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,

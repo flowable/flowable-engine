@@ -122,7 +122,7 @@ public class ExecutionCollectionResource extends ExecutionBaseResource {
     //FIXME Documentation ?
     @ApiOperation(value = "Signal event received", tags = { "Executions" })
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates request was successful and the executions are returned"),
+            @ApiResponse(code = 204, message = "Indicates request was successful and the executions are returned"),
             @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
     @PutMapping(value = "/runtime/executions")

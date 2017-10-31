@@ -37,10 +37,10 @@ import java.util.List;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Tasks Identity Links" }, description = "Manage Tasks Identity Links", authorizations = { @Authorization(value = "basicAuth") })
 public class TaskIdentityLinkCollectionResource extends TaskBaseResource {
 
-    @ApiOperation(value = "Get all identity links for a task", tags = { "Tasks" }, nickname = "listTasksInstanceIdentityLinks")
+    @ApiOperation(value = "Get all identity links for a task", tags = { "Tasks Identity Links" }, nickname = "listTasksInstanceIdentityLinks")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task was found and the requested identity links are returned."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
@@ -51,7 +51,7 @@ public class TaskIdentityLinkCollectionResource extends TaskBaseResource {
         return restResponseFactory.createRestIdentityLinks(taskService.getIdentityLinksForTask(task.getId()));
     }
 
-    @ApiOperation(value = "Create an identity link on a task", tags = { "Tasks" }, nickname = "createTaskInstanceIdentityLinks", notes = "## Request body (user)\n\n"
+    @ApiOperation(value = "Create an identity link on a task", tags = { "Tasks Identity Links" }, nickname = "createTaskInstanceIdentityLinks", notes = "## Request body (user)\n\n"
             + " ```JSON\n" + "{\n" + "  \"userId\" : \"kermit\",\n" + "  \"type\" : \"candidate\",\n" + "} ```"
             + "\n\n\n"
             + "## Request body (group)\n\n"

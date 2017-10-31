@@ -36,10 +36,10 @@ import java.util.List;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Tasks Identity Links" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
 public class TaskIdentityLinkFamilyResource extends TaskBaseResource {
 
-    @ApiOperation(value = "Get all identitylinks for a task for either groups or users", tags = { "Tasks" }, notes = "## Get all identitylinks for a task URL\n\n"
+    @ApiOperation(value = "Get all identitylinks for a task for either groups or users", tags = { "Tasks Identity Links" }, notes = "## Get all identitylinks for a task URL\n\n"
             + " ```\n GET runtime/tasks/{taskId}/identitylinks/users\n" + "GET runtime/tasks/{taskId}/identitylinks/groups  ```"
             + "\n\n\n"
             + "Returns only identity links targetting either users or groups. Response body and status-codes are exactly the same as when getting the full list of identity links for a task.")

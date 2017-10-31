@@ -14,6 +14,8 @@
 package org.flowable.rest.content.service.api.content;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -94,11 +96,14 @@ public class ContentItemDataResource extends ContentItemBaseResource {
 
     @ApiOperation(value = "Save the content item data", tags = { "Content item" }, notes = "## Save the content item data with an attached file\n\n"
             + "The request should be of type multipart/form-data. There should be a single file-part included with the binary value of the content item.")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "file", dataType = "file", paramType = "form", required = true)
+    })
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the content item data was saved and the result is returned."),
             @ApiResponse(code = 400, message = "Indicates required content item data is missing from the request.")
     })
-    @PostMapping(value = "/content-service/content-items/{contentItemId}/data", produces = "application/json")
+    @PostMapping(value = "/content-service/content-items/{contentItemId}/data", produces = "application/json", consumes = "multipart/form-data")
     public ContentItemResponse saveContentItemData(@ApiParam(name = "contentItemId") @PathVariable("contentItemId") String contentItemId,
             HttpServletRequest request, HttpServletResponse response) {
 

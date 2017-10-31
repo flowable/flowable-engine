@@ -33,7 +33,7 @@ public class TableResponse {
         this.name = name;
     }
 
-    @ApiModelProperty(example = "http://localhost:8182/management/tables/ACT_RU_VARIABLE")
+    @ApiModelProperty(example = "http://localhost:8080/flowable-rest/service/management/tables/ACT_RU_VARIABLE")
     public String getUrl() {
         return url;
     }

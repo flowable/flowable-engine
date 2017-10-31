@@ -15,6 +15,8 @@ package org.flowable.rest.service.api.runtime.process;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -66,12 +68,28 @@ public class ExecutionVariableResource extends BaseExecutionVariableResource {
         return getVariableFromRequest(execution, variableName, scope, false);
     }
 
-    @ApiOperation(value = "Update a variable on an execution", tags = { "Executions" }, nickname = "updateExecutionVariable")
+    // FIXME OASv3 to solve Multiple Endpoint issue
+    @ApiOperation(value = "Update a variable on an execution", tags = { "Executions" }, nickname = "updateExecutionVariable",
+            notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable) or by passing a multipart/form-data Object.\n"
+                    + "NB: Swagger V2 specification doesn't support this use case that's why this endpoint might be buggy/incomplete if used with other tools.")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "body", type = "org.flowable.rest.service.api.engine.variable.RestVariable", value = "Update a variable on an execution", paramType = "body", example = "{\n" +
+                    "    \"name\":\"intProcVar\"\n" +
+                    "    \"type\":\"integer\"\n" +
+                    "    \"value\":123,\n" +
+                    "    \"scope\":\"global\"\n" +
+                    " }"),
+            @ApiImplicitParam(name = "file", dataType = "file", paramType = "form"),
+            @ApiImplicitParam(name = "name", dataType = "string", paramType = "form", example = "intProcVar"),
+            @ApiImplicitParam(name = "type", dataType = "string", paramType = "form", example = "integer"),
+            @ApiImplicitParam(name = "scope", dataType = "string",  paramType = "form", example = "global"),
+
+    })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates both the process instance and variable were found and variable is updated."),
             @ApiResponse(code = 404, message = "Indicates the requested process instance was not found or the process instance does not have a variable with the given name. Status description contains additional information about the error.")
     })
-    @PutMapping(value = "/runtime/executions/{executionId}/variables/{variableName}", produces = "application/json")
+    @PutMapping(value = "/runtime/executions/{executionId}/variables/{variableName}", produces = "application/json", consumes = {"application/json", "multipart/form-data"})
     public RestVariable updateVariable(@ApiParam(name = "executionId") @PathVariable("executionId") String executionId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName, HttpServletRequest request) {
 
         Execution execution = getExecutionFromRequest(executionId);

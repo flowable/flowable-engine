@@ -92,7 +92,7 @@ public class DeploymentResponse {
         this.tenantId = tenantId;
     }
 
-    @ApiModelProperty(example = "null")
+    @ApiModelProperty(example = "")
     public String getTenantId() {
         return tenantId;
     }
