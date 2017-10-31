@@ -126,7 +126,7 @@ based on process variables. The process variables must contain the ISO 8601 (or 
 </boundaryEvent>
 ----
 
-*Note:* timers are only fired when the job or async executor is enabled (_jobExecutorActivate_ or _asyncExecutorActivate_ must be set to +true+ in the +flowable.cfg.xml+, because the job and async executor are disabled by default).
+*Note:* timers are only fired when the async executor is enabled (_asyncExecutorActivate_ must be set to +true+ in the +flowable.cfg.xml+, because the async executor is disabled by default).
 
 
 [[bpmnErrorEventDefinition]]
@@ -954,7 +954,7 @@ There is a key difference between the interrupting and non interrupting timer ev
 <boundaryEvent id="escalationTimer" cancelActivity="false" attachedToRef="firstLineSupport"/>
 ----
 
-*Note:* boundary timer events are only fired when the job or async executor is enabled (_jobExecutorActivate_ or _asyncExecutorActivate_ needs to be set to +true+ in the +flowable.cfg.xml+, since the job and async executor are disabled by default).
+*Note:* boundary timer events are only fired when the async executor is enabled (_asyncExecutorActivate_ needs to be set to +true+ in the +flowable.cfg.xml+, since the async executor is disabled by default).
 
 
 [[bpmnKnownIssueBoundaryEvent]]
