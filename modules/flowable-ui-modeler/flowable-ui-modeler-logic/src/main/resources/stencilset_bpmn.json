@@ -64,6 +64,16 @@
       "popular" : true
     } ]
   }, {
+    "name" : "isexecutablepackage",
+    "properties" : [ {
+      "id" : "isexecutable",
+      "type" : "Boolean",
+      "title" : "Is executable",
+      "value" : "true",
+      "description" : "Is the process executable?",
+      "popular" : true
+    } ]
+  }, {
 	"name" : "process_potentialstarteruserpackage",
 	"properties" : [ {
 		"id" : "process_potentialstarteruser",
@@ -961,7 +971,7 @@
     "groups" : [ "Diagram" ],
     "mayBeRoot" : true,
     "hide" : true,
-    "propertyPackages" : [ "process_idpackage", "namepackage", "documentationpackage", "process_authorpackage", "process_versionpackage", "process_namespacepackage", "datapropertiespackage", "executionlistenerspackage", "eventlistenerspackage", "signaldefinitionspackage", "messagedefinitionspackage", "process_potentialstarteruserpackage","process_potentialstartergrouppackage" ],
+    "propertyPackages" : [ "process_idpackage", "namepackage", "documentationpackage", "process_authorpackage", "process_versionpackage", "process_namespacepackage", "isexecutablepackage", "datapropertiespackage", "executionlistenerspackage", "eventlistenerspackage", "signaldefinitionspackage", "messagedefinitionspackage", "process_potentialstarteruserpackage","process_potentialstartergrouppackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ ]
   }, {
@@ -1415,7 +1425,7 @@
     "layout" : [ {
       "type" : "layout.bpmn2_0.pool"
     } ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "process_idpackage" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "process_idpackage", "isexecutablepackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "canContainArtifacts", "all" ]
   }, {
