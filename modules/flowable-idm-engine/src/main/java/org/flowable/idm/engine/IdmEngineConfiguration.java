@@ -12,7 +12,7 @@
  */
 package org.flowable.idm.engine;
 
-import com.seal.process.flowable.identity.SealIdentityServiceImpl;
+import org.flowable.idm.engine.impl.SealIdentityServiceImpl;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
