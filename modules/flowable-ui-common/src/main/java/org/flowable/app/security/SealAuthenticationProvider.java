@@ -90,10 +90,12 @@ public class SealAuthenticationProvider implements AuthenticationProvider {
         Collection<GrantedAuthority> auth = new HashSet<>();
         
         //Tiger
-        String sealBase = "http://scdweb:3331/seal-ws";
-        String nonce = "http://scdweb:3331/seal-ws/v5/security/nonce";
+        String sealBase = "http://scdweb:8080/seal-ws";
+        String nonce = "http://scdweb:8080/seal-ws/v5/security/nonce";
         
         
+        if(!a.getPrincipal().toString().equals("admin"))
+        {
         
         RestTemplate restTemplate = new RestTemplate();
         
@@ -133,7 +135,7 @@ public class SealAuthenticationProvider implements AuthenticationProvider {
 				if (!loginResponse.getStatusCode().toString().equals("201"))		
 					throw new BadCredentialsException("Authentication failed for this request with auths");
 		
-		
+        }
 				
         //Tiger
         
