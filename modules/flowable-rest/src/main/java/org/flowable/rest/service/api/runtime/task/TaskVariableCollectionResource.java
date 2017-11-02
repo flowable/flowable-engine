@@ -192,7 +192,7 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
         return result;
     }
 
-    @ApiOperation(value = "Delete all local variables on a task", tags = {"Tasks Variables"})
+    @ApiOperation(value = "Delete all local variables on a task", tags = { "Tasks" })
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates all local task variables have been deleted. Response-body is intentionally empty."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")

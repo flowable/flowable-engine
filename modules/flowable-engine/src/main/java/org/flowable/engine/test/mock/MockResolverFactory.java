@@ -30,7 +30,6 @@ import org.flowable.variable.api.delegate.VariableScope;
  * <br>
  * &lt;bean id=&quot;processEngineConfiguration&quot;<br>
  * class=&quot;org.flowable.engine.impl.cfg. StandaloneInMemProcessEngineConfiguration&quot;&gt;<br>
- * &lt;property name=&quot;jobExecutorActivate&quot; value=&quot;false&quot; /&gt;<br>
  * &lt;property name=&quot;expressionManager&quot;&gt;<br>
  * &lt;bean class=&quot;org.flowable.engine.test.mock.MockExpressionManager&quot; /&gt;<br>
  * &lt;/property&gt;<br>

@@ -27,10 +27,10 @@ angular.module('flowableModeler')
     $scope.loadProcess = function() {
       var url;
       if ($routeParams.modelHistoryId) {
-        url = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $routeParams.modelId
+        url = FLOWABLE.APP_URL.getModelUrl($routeParams.modelId);
           + '/history/' + $routeParams.modelHistoryId;
       } else {
-        url = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $routeParams.modelId;
+        url = FLOWABLE.APP_URL.getModelUrl($routeParams.modelId);
       }
       
       $http({method: 'GET', url: url}).
@@ -39,8 +39,9 @@ angular.module('flowableModeler')
           
           $scope.loadVersions();
 
-          $scope.model.bpmn20DownloadUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $routeParams.modelId +
-    			($routeParams.modelHistoryId == undefined ? '' : '/history/' + $routeParams.modelHistoryId) + '/bpmn20?version=' + Date.now();
+          $scope.model.bpmn20DownloadUrl = $routeParams.modelHistoryId == undefined ?
+              FLOWABLE.APP_URL.getModelBpmn20ExportUrl($routeParams.modelId) :
+              FLOWABLE.APP_URL.getModelHistoryBpmn20ExportUrl($routeParams.modelId, $routeParams.modelHistoryId);
 
 
         	  $rootScope.$on('$routeChangeStart', function(event, next, current) {
@@ -88,7 +89,7 @@ angular.module('flowableModeler')
         includeLatestVersion: !$scope.model.process.latestVersion  
       };
       
-      $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.model.latestModelId +'/history', params: params}).
+      $http({method: 'GET', url: FLOWABLE.APP_URL.getModelHistoriesUrl($scope.model.latestModelId), params: params}).
       success(function(data, status, headers, config) {
         if ($scope.model.process.latestVersion) {
           if (!data.data) {

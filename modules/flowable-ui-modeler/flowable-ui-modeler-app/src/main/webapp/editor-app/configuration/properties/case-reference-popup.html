@@ -24,7 +24,7 @@
                                <input type="checkbox" value="option1" ng-click="selectCase(caseModel, $event)" ng-checked="caseModel.id == selectedCase.id" />
                            </div>
                            <h4>{{caseModel.name}}</h4>
-                           <img ng-src="{{config.contextRoot}}/app/rest/models/{{caseModel.id}}/thumbnail" />
+                           <img ng-src="{{getModelThumbnailUrl(caseModel.id)}}" />
                          </div>
                          <div ng-show="state.loadingCases">
                             <p class="loading" translate>PROPERTY.CASEREFERENCE.CASE.LOADING</p>

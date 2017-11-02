@@ -58,7 +58,7 @@ angular.module('flowableModeler').controller('FlowableProcessReferencePopupCtrl'
     
     $scope.loadProcesses = function() {
    	 
-    	$http.get(FLOWABLE.CONFIG.contextRoot + '/app/rest/models?modelType=0')
+    	$http.get(FLOWABLE.APP_URL.getModelsUrl("?modelType=0"))
     		.success(
     			function(response) {
     				$scope.state.loadingProcesses = false;

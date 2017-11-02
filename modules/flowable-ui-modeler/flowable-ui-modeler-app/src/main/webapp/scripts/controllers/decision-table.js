@@ -67,11 +67,11 @@ angular.module('flowableModeler')
             $scope.loadDecisionTable = function() {
                 var url, decisionTableUrl;
                 if ($routeParams.modelHistoryId) {
-                    url = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $routeParams.modelId + '/history/' + $routeParams.modelHistoryId;
-                    decisionTableUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/decision-table-models/history/' + $routeParams.modelHistoryId;
+                    url = FLOWABLE.APP_URL.getModelHistoryUrl($routeParams.modelId, $routeParams.modelHistoryId);
+                    decisionTableUrl = FLOWABLE.APP_URL.getDecisionTableModelsHistoryUrl($routeParams.modelHistoryId);
                 } else {
-                    url = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $routeParams.modelId;
-                    decisionTableUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/decision-table-models/' + $routeParams.modelId;
+                    url = FLOWABLE.APP_URL.getModelUrl($routeParams.modelId);
+                    decisionTableUrl = FLOWABLE.APP_URL.getDecisionTableModelUrl($routeParams.modelId);
                 }
 
                 $http({method: 'GET', url: url}).
@@ -99,7 +99,7 @@ angular.module('flowableModeler')
                     favorite: !$scope.model.decisionTable.favorite
                 };
 
-                $http({method: 'PUT', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.model.latestModelId, data: data}).
+                $http({method: 'PUT', url: FLOWABLE.APP_URL.getModelUrl($scope.model.latestModelId), data: data}).
                     success(function(data, status, headers, config) {
                         $scope.model.favoritePending = false;
                         if ($scope.model.decisionTable.favorite) {
@@ -120,7 +120,7 @@ angular.module('flowableModeler')
                     includeLatestVersion: !$scope.model.decisionTable.latestVersion
                 };
 
-                $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.model.latestModelId + '/history', params: params}).
+                $http({method: 'GET', url: FLOWABLE.APP_URL.getModelHistoriesUrl($scope.model.latestModelId), params: params}).
                     success(function(data, status, headers, config) {
                         if ($scope.model.decisionTable.latestVersion) {
                             if (!data.data) {

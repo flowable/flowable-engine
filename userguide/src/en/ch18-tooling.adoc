@@ -59,8 +59,8 @@ Here is a list available attributes and operations at this moment. This list may
 ||method|suspendProcessDefinitionByKey(String id)|Suspends the process definition with the given +key+
 ||method|activatedProcessDefinitionByKey(String id)|Activates the process definition with the given +key+
 ||method|deployProcessDefinition(String resourceName, String processDefinitionFile)|Deploys the process definition file
-|JobExecutorMBean|attribute|isJobExecutorActivated|Returns true if job executor is activated, false otherwise
-||method|setJobExecutorActivate(Boolean active)|Activates and Deactivates Job executor based on the given boolean
+|JobExecutorMBean|attribute|isJobExecutorActivated|Returns true if the async job executor is activated, false otherwise
+||method|setJobExecutorActivate(Boolean active)|Activates and Deactivates the async job executor based on the given boolean
 
 |===============
 
