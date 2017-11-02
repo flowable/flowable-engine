@@ -22,7 +22,6 @@ import java.util.Map;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.User;
-import org.flowable.idm.engine.impl.UserQueryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +75,7 @@ public class SealUserQueryImpl extends UserQueryImpl {
         List<User> all = new ArrayList<>();
         all.add(createMirrorSealUser("aghonim"));
         all.add(createMirrorSealUser("admin"));
+        all.add(createMirrorSealUser("root"));
         return all;
     }
 
@@ -124,7 +124,7 @@ public class SealUserQueryImpl extends UserQueryImpl {
 
             @Override
             public String getPassword() {
-                return "test";
+                return "pwd999";
             }
 
             @Override
