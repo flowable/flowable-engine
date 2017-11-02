@@ -53,8 +53,8 @@ public class ContentItemDataResource extends ContentItemBaseResource {
     @Autowired
     protected ContentRestResponseFactory contentRestResponseFactory;
 
-    @ApiOperation(value = "Get the data of a content item", tags = {
-            "Content item" }, notes = "The response body contains the binary content. By default, the content-type of the response is set to application/octet-stream unless the content item type contains a valid mime type.")
+    @ApiOperation(value = "Get the data of a content item", tags = {"Content item" },
+            notes = "The response body contains the binary content. By default, the content-type of the response is set to application/octet-stream unless the content item type contains a valid mime type.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the content item was found and the requested content is returned."),
             @ApiResponse(code = 404, message = "Indicates the content item was not found or the content item doesn’t have a binary stream available. Status message provides additional information.")
@@ -94,7 +94,7 @@ public class ContentItemDataResource extends ContentItemBaseResource {
         }
     }
 
-    @ApiOperation(value = "Save the content item data", tags = { "Content item" }, notes = "## Save the content item data with an attached file\n\n"
+    @ApiOperation(value = "Save the content item data", tags = { "Content item" }, notes = "Save the content item data with an attached file"
             + "The request should be of type multipart/form-data. There should be a single file-part included with the binary value of the content item.")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "file", dataType = "file", paramType = "form", required = true)

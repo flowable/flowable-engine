@@ -13,11 +13,12 @@
 
 package org.flowable.rest.service.api.repository;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.identitylink.service.IdentityLinkType;
@@ -29,12 +30,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * @author Frederik Heremans
@@ -43,7 +41,7 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Process Definitions" }, description = "Manage Process Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessDefinitionIdentityLinkCollectionResource extends BaseProcessDefinitionResource {
 
-    @ApiOperation(value = "Get all candidate starters for a process-definition", nickname = "listProcessDefinitionIdentityLinks", tags = { "Process Definitions" })
+    @ApiOperation(value = "List candidate starters for a process-definition", nickname = "listProcessDefinitionIdentityLinks", tags = { "Process Definitions" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the process definition was found and the requested identity links are returned."),
             @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
@@ -54,11 +52,8 @@ public class ProcessDefinitionIdentityLinkCollectionResource extends BaseProcess
         return restResponseFactory.createRestIdentityLinks(repositoryService.getIdentityLinksForProcessDefinition(processDefinition.getId()));
     }
 
-    @ApiOperation(value = "Add a candidate starter to a process definition", tags = { "Process Definitions" }, notes = "## For a User\n\n"
-            + " ```JSON\n" + "{\n" + "  \"user\" : \"kermit\"\n" + "} ```"
-            + "\n\n"
-            + "## For a Group\n\n"
-            + " ```JSON\n" + "{\n" + "  \"groupId\" : \"sales\"\n" + "} ```")
+    @ApiOperation(value = "Add a candidate starter to a process definition", tags = { "Process Definitions" },
+            notes = "It's possible to add either a user or a group.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the process definition was found and the identity link was created."),
             @ApiResponse(code = 400, message = "Indicates the body doesn't contains the correct information."),

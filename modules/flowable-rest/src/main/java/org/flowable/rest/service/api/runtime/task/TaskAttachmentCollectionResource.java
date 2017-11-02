@@ -48,13 +48,13 @@ import java.util.Map;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Tasks Attachments"}, description = "Manage Tasks Attachments", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Task Attachments"}, description = "Manage Tasks Attachments", authorizations = { @Authorization(value = "basicAuth") })
 public class TaskAttachmentCollectionResource extends TaskBaseResource {
 
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @ApiOperation(value = "Get all attachments on a task", nickname="listTaskAttachments", tags = { "Tasks Attachments" })
+    @ApiOperation(value = "List attachments on a task", nickname="listTaskAttachments", tags = { "Task Attachments" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task was found and the attachments are returned."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
@@ -72,7 +72,7 @@ public class TaskAttachmentCollectionResource extends TaskBaseResource {
     }
 
     // FIXME OASv3 to solve Multiple Endpoint issue
-    @ApiOperation(value = "Create a new attachment on a task, containing a link to an external resource or an attached file", tags = { "Tasks Attachments" },
+    @ApiOperation(value = "Create a new attachment on a task, containing a link to an external resource or an attached file", tags = { "Task Attachments" },
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (AttachmentRequest) to link an external resource or by passing a multipart/form-data Object to attach a file.\n"
                     + "NB: Swagger V2 specification doesn't support this use case that's why this endpoint might be buggy/incomplete if used with other tools.")
     @ApiImplicitParams({

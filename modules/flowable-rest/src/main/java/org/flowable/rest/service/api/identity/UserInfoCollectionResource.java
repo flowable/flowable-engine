@@ -13,11 +13,12 @@
 
 package org.flowable.rest.service.api.identity;
 
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.idm.api.User;
@@ -31,12 +32,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 
 /**
  * @author Frederik Heremans
@@ -51,7 +49,7 @@ public class UserInfoCollectionResource extends BaseUserResource {
     @Autowired
     protected IdentityService identityService;
 
-    @ApiOperation(value = "List a user’s info", tags = { "Users" }, nickname = "listUserInfo")
+    @ApiOperation(value = "List user’s info", tags = { "Users" }, nickname = "listUserInfo")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the user was found and list of info (key and url) is returned."),
             @ApiResponse(code = 404, message = "Indicates the requested user was not found.")

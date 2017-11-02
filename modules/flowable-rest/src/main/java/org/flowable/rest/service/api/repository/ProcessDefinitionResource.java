@@ -13,10 +13,12 @@
 
 package org.flowable.rest.service.api.repository;
 
-import java.util.Date;
-
-import javax.servlet.http.HttpServletRequest;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.rest.exception.FlowableConflictException;
@@ -26,12 +28,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
+import java.util.Date;
 
 /**
  * @author Frederik Heremans
@@ -53,15 +51,8 @@ public class ProcessDefinitionResource extends BaseProcessDefinitionResource {
     }
 
     // FIXME Unique endpoint but with multiple actions
-    @ApiOperation(value = "Execute actions for a process definition (Update category, Suspend or Activate)", tags = { "Process Definitions" }, notes = "## Update category for a process definition\n\n"
-            + " ```JSON\n" + "{\n" + "  \"category\" : \"updatedcategory\"\n" + "} ```"
-            + "\n\n\n"
-            + "## Suspend a process definition\n\n"
-            + "```JSON\n {\n" + "  \"action\" : \"suspend\",\n" + "  \"includeProcessInstances\" : \"false\",\n" + "  \"date\" : \"2013-04-15T00:42:12Z\"\n" + "} ```"
-            + "\n\n\n"
-            + "## Activate a process definition\n\n"
-            + "```JSON\n {\n" + "  \"action\" : \"activate\",\n" + "  \"includeProcessInstances\" : \"true\",\n" + "  \"date\" : \"2013-04-15T00:42:12Z\"\n" + "} ```"
-            + "")
+    @ApiOperation(value = "Execute actions for a process definition", tags = { "Process Definitions" },
+            notes = "Execute actions for a process definition (Update category, Suspend or Activate)")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates action has been executed for the specified process. (category altered, activate or suspend)"),
             @ApiResponse(code = 400, message = "Indicates no category was defined in the request body."),

@@ -36,7 +36,7 @@ import java.util.Map;
 @RestController
 public class HistoricActivityInstanceCollectionResource extends HistoricActivityInstanceBaseResource {
 
-    @ApiOperation(value = "Get historic activity instances", tags = { "History" }, nickname = "listHistoricActivityInstances")
+    @ApiOperation(value = "List historic activity instances", tags = { "History" }, nickname = "listHistoricActivityInstances")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates that historic activity instances could be queried."),
             @ApiResponse(code = 400, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.") })

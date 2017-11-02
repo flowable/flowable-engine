@@ -48,7 +48,7 @@ public class FormDefinitionResourceDataResource {
     @Autowired
     protected ContentTypeResolver contentTypeResolver;
 
-    @ApiOperation(value = "get a form definition resource content", nickname = "getFormDefinitionContent", tags = { "Form Definitions" })
+    @ApiOperation(value = "Get a form definition resource content", nickname = "getFormDefinitionContent", tags = { "Form Definitions" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates both form definition and resource have been found and the resource data has been returned."),
             @ApiResponse(code = 404, message = "Indicates the requested form definition was not found or there is no resource with the given id present in the process definition. The status-description contains additional information.")

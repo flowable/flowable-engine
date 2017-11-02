@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History" }, description = "Manage History", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Process" }, description = "Manage History Process Instances", authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricProcessInstanceResource {
 
     @Autowired
@@ -46,7 +46,7 @@ public class HistoricProcessInstanceResource {
     @Autowired
     protected HistoryService historyService;
 
-    @ApiOperation(value = "Get a historic process instance", tags = { "History" }, nickname = "getHistoricProcessInstance")
+    @ApiOperation(value = "Get a historic process instance", tags = { "History Process" }, nickname = "getHistoricProcessInstance")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates that the historic process instances could be found."),
             @ApiResponse(code = 404, message = "Indicates that the historic process instances could not be found.") })
@@ -55,7 +55,7 @@ public class HistoricProcessInstanceResource {
         return restResponseFactory.createHistoricProcessInstanceResponse(getHistoricProcessInstanceFromRequest(processInstanceId));
     }
 
-    @ApiOperation(value = " Delete a historic process instance", tags = { "History" }, nickname = "deleteHitoricProcessInstance")
+    @ApiOperation(value = " Delete a historic process instance", tags = { "History Process" }, nickname = "deleteHistoricProcessInstance")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates that the historic process instance was deleted."),
             @ApiResponse(code = 404, message = "Indicates that the historic process instance could not be found.") })

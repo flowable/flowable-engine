@@ -34,10 +34,10 @@ import java.util.Map;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History" }, description = "Manage History", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Process" }, description = "Manage History Process Instances", authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricProcessInstanceCollectionResource extends HistoricProcessInstanceBaseResource {
 
-    @ApiOperation(value = "List of historic process instances", tags = { "History" }, nickname = "listHistoricProcessInstances")
+    @ApiOperation(value = "List of historic process instances", tags = { "History Process" }, nickname = "listHistoricProcessInstances")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "An id of the historic process instance.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionKey", dataType = "string", value = "The process definition key of the historic process instance.", paramType = "query"),
