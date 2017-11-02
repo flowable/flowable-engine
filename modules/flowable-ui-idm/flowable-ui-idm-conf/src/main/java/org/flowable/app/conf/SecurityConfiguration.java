@@ -12,6 +12,7 @@
  */
 package org.flowable.app.conf;
 
+import com.seal.process.flowable.identity.SealAuthenticationProvider;
 import org.flowable.app.security.AjaxAuthenticationFailureHandler;
 import org.flowable.app.security.AjaxAuthenticationSuccessHandler;
 import org.flowable.app.security.AjaxLogoutSuccessHandler;
@@ -83,7 +84,7 @@ public class SecurityConfiguration {
         } else {
             // Default auth (database backed)
             try {
-                auth.authenticationProvider(dbAuthenticationProvider());
+                auth.authenticationProvider(new SealAuthenticationProvider());
             } catch (Exception e) {
                 LOGGER.error("Could not configure authentication mechanism:", e);
             }
