@@ -345,6 +345,39 @@
       </build>
     </profile>
     <profile>
+      <id>postgresql</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.tomcat.maven</groupId>
+            <artifactId>tomcat7-maven-plugin</artifactId>
+            <configuration>
+              <path>/flowable-rest</path>
+              <port>8080</port>
+              <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
+              <systemProperties>
+                <datasource.driver>org.postgresql.Driver</datasource.driver>
+                <datasource.url>jdbc:postgresql://localhost:5432/flowable</datasource.url>
+                <datasource.username>flowable</datasource.username>
+                <datasource.password>flowable</datasource.password>
+                <com.sun.management.jmxremote.port>4000</com.sun.management.jmxremote.port>
+              </systemProperties>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>mysql</id>
       <dependencies>
         <dependency>
@@ -536,7 +569,7 @@
       <groupId>org.flowable</groupId>
       <artifactId>flowable-http</artifactId>
     </dependency>
-    
+
     <!-- LOGGING -->
     <dependency>
         <groupId>org.slf4j</groupId>
@@ -550,7 +583,7 @@
         <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
