@@ -18,20 +18,25 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.flowable.app.security.DefaultPrivileges;
-import org.flowable.engine.common.api.query.QueryProperty;
-import org.flowable.engine.common.impl.AbstractQuery;
-import org.flowable.engine.common.impl.Direction;
 
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.Privilege;
 import org.flowable.idm.api.User;
-import org.flowable.idm.api.UserQuery;
-import org.flowable.idm.engine.impl.IdmIdentityServiceImpl;
 import org.flowable.idm.engine.impl.UserQueryImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+interface DefaultPrivileges {
+
+    String ACCESS_IDM = "access-idm";
+
+    String ACCESS_MODELER = "access-modeler";
+
+    String ACCESS_ADMIN = "access-admin";
+
+    String ACCESS_TASK = "access-task";
+
+}
 
 public class SealUserQueryImpl extends UserQueryImpl {
 
