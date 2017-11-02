@@ -108,7 +108,11 @@
 			<version>0.4.1</version>
 			<scope>test</scope>
 		</dependency>
-
+	 <dependency>
+	  <groupId>com.seal.process</groupId>
+	  <artifactId>seal-flowable-identity</artifactId>
+	  <version>${project.version}</version>
+	 </dependency>
 	</dependencies>
 
 	<build>
