@@ -57,7 +57,7 @@ public class ContentItemCollectionResource extends ContentItemBaseResource {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @ApiOperation(value = "Get all content items", tags = { "Content item" }, nickname = "listContentItems")
+    @ApiOperation(value = "List content items", tags = { "Content item" }, nickname = "listContentItems")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return content items with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return content items with the given name.", paramType = "query"),

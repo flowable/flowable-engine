@@ -47,7 +47,7 @@ public class EventSubscriptionCollectionResource {
     @Autowired
     protected RuntimeService runtimeService;
 
-    @ApiOperation(value = "Get a list of event subscriptions", tags = { "Event subscriptions" }, nickname = "listEventSubscriptions")
+    @ApiOperation(value = "List of event subscriptions", tags = { "Event subscriptions" }, nickname = "listEventSubscriptions")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return event subscriptions with the given id", paramType = "query"),
             @ApiImplicitParam(name = "eventType", dataType = "string", value = "Only return event subscriptions with the given event type", paramType = "query"),

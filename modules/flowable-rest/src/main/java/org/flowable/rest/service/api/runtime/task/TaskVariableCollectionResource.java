@@ -56,7 +56,7 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @ApiOperation(value = "Get all variables for a task", tags = {"Tasks Variables" }, nickname = "listTaskVariables")
+    @ApiOperation(value = "List variables for a task", tags = {"Tasks Variables" }, nickname = "listTaskVariables")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task was found and the requested variables are returned"),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found..")

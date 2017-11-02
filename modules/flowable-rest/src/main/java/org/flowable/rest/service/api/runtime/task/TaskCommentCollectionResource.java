@@ -43,7 +43,7 @@ import java.util.List;
 @Api(tags = { "Tasks Comments" }, description = "Manage Tasks Comments", authorizations = { @Authorization(value = "basicAuth") })
 public class TaskCommentCollectionResource extends TaskBaseResource {
 
-    @ApiOperation(value = "Get all comments on a task", tags = { "Tasks Comments" }, nickname = "listTaskComments")
+    @ApiOperation(value = "List comments on a task", tags = { "Tasks Comments" }, nickname = "listTaskComments")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task was found and the comments are returned."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")

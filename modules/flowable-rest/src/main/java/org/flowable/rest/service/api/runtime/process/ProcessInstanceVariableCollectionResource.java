@@ -45,7 +45,7 @@ import java.util.Map;
 @Api(tags = { "Process Instances Variables" }, description = "Manage Process Instances Variables", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceVariableCollectionResource extends BaseVariableCollectionResource {
 
-    @ApiOperation(value = "List of variables for a process instance", nickname="listProcessInstanceVariables", tags = {"Process Instances Variables" },
+    @ApiOperation(value = "List variables for a process instance", nickname="listProcessInstanceVariables", tags = {"Process Instances Variables" },
             notes = "In case the variable is a binary variable or serializable, the valueUrl points to an URL to fetch the raw value. If it’s a plain variable, the value is present in the response. Note that only local scoped variables are returned, as there is no global scope for process-instance variables.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the process instance was found and variables are returned."),
@@ -82,7 +82,7 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
             @ApiResponse(code = 415, message = "Indicates the serializable data contains an object for which no class is present in the JVM running the Flowable engine and therefore cannot be deserialized.")
 
     })
-    @PutMapping(value = "/runtime/process-instances/{processInstanceId}/variables", produces = "application/json")
+    @PutMapping(value = "/runtime/process-instances/{processInstanceId}/variables", produces = "application/json", consumes = {"application/json", "multipart/form-data"})
     public Object createOrUpdateExecutionVariable(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request, HttpServletResponse response) {
 
         Execution execution = getProcessInstanceFromRequest(processInstanceId);
@@ -113,7 +113,7 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
             @ApiResponse(code = 409, message = "Indicates the process instance was found but already contains a variable with the given name (only thrown when POST method is used). Use the update-method instead."),
 
     })
-    @PostMapping(value = "/runtime/process-instances/{processInstanceId}/variables", produces = "application/json")
+    @PostMapping(value = "/runtime/process-instances/{processInstanceId}/variables", produces = "application/json", consumes = {"application/json", "multipart/form-data"})
     public Object createExecutionVariable(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId, HttpServletRequest request, HttpServletResponse response) {
 
         Execution execution = getProcessInstanceFromRequest(processInstanceId);

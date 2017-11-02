@@ -32,10 +32,10 @@ import java.util.Map;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History" }, description = "Manage History", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Process" }, description = "Manage History Process Instances", authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricProcessInstanceQueryResource extends HistoricProcessInstanceBaseResource {
 
-    @ApiOperation(value = "Query for historic process instances", tags = {"History", "Query" }, nickname = "queryHistoricProcessInstance",
+    @ApiOperation(value = "Query for historic process instances", tags = {"History Process", "Query" }, nickname = "queryHistoricProcessInstance",
             notes = "All supported JSON parameter fields allowed are exactly the same as the parameters found for getting a collection of historic process instances, but passed in as JSON-body arguments rather than URL-parameters to allow for more advanced querying and preventing errors with request-uri’s that are too long. On top of that, the query allows for filtering based on process variables. The variables property is a JSON-array containing objects with the format as described here.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the process instances are returned"),

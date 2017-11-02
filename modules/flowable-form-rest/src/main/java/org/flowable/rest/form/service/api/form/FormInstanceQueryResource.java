@@ -34,7 +34,8 @@ import java.util.Map;
 @Api(tags = { "Form Instances" }, description = "Manage Form Instances", authorizations = { @Authorization(value = "basicAuth") })
 public class FormInstanceQueryResource extends BaseFormInstanceResource {
 
-    @ApiOperation(value = "Query form instances", tags = {"Form Instances", "Query" }, notes = "The request body can contain all possible filters that can be used in the List form instances URL query. On top of these, it’s possible to provide an array of variables to include in the query, with their format described here.\n"
+    @ApiOperation(value = "Query form instances", tags = {"Form Instances", "Query" },
+            notes = "The request body can contain all possible filters that can be used in the List form instances URL query. On top of these, it’s possible to provide an array of variables to include in the query, with their format described here.\n"
                     + "\n" + "The general paging and sorting query-parameters can be used for this URL.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the form instances are returned"),

@@ -35,7 +35,7 @@ import java.util.List;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History" }, description = "Manage History", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Process" }, description = "Manage History Process Instances", authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricProcessInstanceIdentityLinkCollectionResource {
 
     @Autowired
@@ -44,7 +44,7 @@ public class HistoricProcessInstanceIdentityLinkCollectionResource {
     @Autowired
     protected HistoryService historyService;
 
-    @ApiOperation(value = "Get the identity links of a historic process instance", nickname="listHistoricProcessInstanceIdentityLinks", tags = { "History" }, notes = "")
+    @ApiOperation(value = "List identity links of a historic process instance", nickname="listHistoricProcessInstanceIdentityLinks", tags = { "History Process" }, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates request was successful and the identity links are returned", response = HistoricIdentityLinkResponse.class, responseContainer = "List"),
             @ApiResponse(code = 404, message = "Indicates the process instance could not be found..") })

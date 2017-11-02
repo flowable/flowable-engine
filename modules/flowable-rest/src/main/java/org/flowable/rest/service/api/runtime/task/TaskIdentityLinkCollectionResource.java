@@ -40,7 +40,7 @@ import java.util.List;
 @Api(tags = { "Tasks Identity Links" }, description = "Manage Tasks Identity Links", authorizations = { @Authorization(value = "basicAuth") })
 public class TaskIdentityLinkCollectionResource extends TaskBaseResource {
 
-    @ApiOperation(value = "Get all identity links for a task", tags = { "Tasks Identity Links" }, nickname = "listTasksInstanceIdentityLinks")
+    @ApiOperation(value = "List identity links for a task", tags = { "Tasks Identity Links" }, nickname = "listTasksInstanceIdentityLinks")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task was found and the requested identity links are returned."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
@@ -51,12 +51,8 @@ public class TaskIdentityLinkCollectionResource extends TaskBaseResource {
         return restResponseFactory.createRestIdentityLinks(taskService.getIdentityLinksForTask(task.getId()));
     }
 
-    @ApiOperation(value = "Create an identity link on a task", tags = { "Tasks Identity Links" }, nickname = "createTaskInstanceIdentityLinks", notes = "## Request body (user)\n\n"
-            + " ```JSON\n" + "{\n" + "  \"userId\" : \"kermit\",\n" + "  \"type\" : \"candidate\",\n" + "} ```"
-            + "\n\n\n"
-            + "## Request body (group)\n\n"
-            + " ```JSON\n" + "{\n" + "  \"groupId\" : \"sales\",\n" + "  \"type\" : \"candidate\",\n" + "} ```"
-            + "\n\n\n")
+    @ApiOperation(value = "Create an identity link on a task", tags = { "Tasks Identity Links" }, nickname = "createTaskInstanceIdentityLinks",
+            notes = "It's possible to add either a user or a group.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the task was found and the identity link was created."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have the requested identityLink. The status contains additional information about this error.")

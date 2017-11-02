@@ -40,7 +40,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "History" }, description = "Manage History", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Process" }, description = "Manage History Process Instances", authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricProcessInstanceCommentResource {
 
     @Autowired
@@ -52,7 +52,7 @@ public class HistoricProcessInstanceCommentResource {
     @Autowired
     protected TaskService taskService;
 
-    @ApiOperation(value = "Get a comment on a historic process instance", tags = { "History" }, notes = "")
+    @ApiOperation(value = "Get a comment on a historic process instance", tags = { "History Process" }, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the historic process instance and comment were found and the comment is returned."),
             @ApiResponse(code = 404, message = "Indicates the requested historic process instance was not found or the historic process instance doesn’t have a comment with the given ID.") })
@@ -69,7 +69,7 @@ public class HistoricProcessInstanceCommentResource {
         return restResponseFactory.createRestComment(comment);
     }
 
-    @ApiOperation(value = "Delete a comment on a historic process instance", tags = { "History" }, notes = "")
+    @ApiOperation(value = "Delete a comment on a historic process instance", tags = { "History Process" }, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the historic process instance and comment were found and the comment is deleted. Response body is left empty intentionally."),
             @ApiResponse(code = 404, message = "Indicates the requested historic process instance was not found or the historic process instance doesn’t have a comment with the given ID.") })

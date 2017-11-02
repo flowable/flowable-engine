@@ -87,26 +87,8 @@ public class TaskResource extends TaskBaseResource {
         return restResponseFactory.createTaskResponse(task);
     }
 
-    @ApiOperation(value = "Tasks actions", tags = { "Tasks" }, notes = "## Complete a task - Request Body\n\n"
-            + " ```JSON\n" + "{\n" + "  \"action\" : \"complete\",\n" + "  \"variables\" : []\n" + "} ```"
-            + "Completes the task. Optional variable array can be passed in using the variables property. More information about the variable format can be found in the REST variables section. Note that the variable-scope that is supplied is ignored and the variables are set on the parent-scope unless a variable exists in a local scope, which is overridden in this case. This is the same behavior as the TaskService.completeTask(taskId, variables) invocation.\n"
-            + "\n"
-            + "Note that also a transientVariables property is accepted as part of this json, that follows the same structure as the variables property."
-            + "\n\n\n"
-            + "## Claim a task - Request Body \n\n"
-            + " ```JSON\n" + "{\n" + "  \"action\" : \"claim\",\n" + "  \"assignee\" : \"userWhoClaims\"\n" + "} ```"
-            + "\n\n\n"
-            + "Claims the task by the given assignee. If the assignee is null, the task is assigned to no-one, claimable again."
-            + "\n\n\n"
-            + "## Delegate a task - Request Body \n\n"
-            + " ```JSON\n" + "{\n" + "  \"action\" : \"delegate\",\n" + "  \"assignee\" : \"userToDelegateTo\"\n" + "} ```"
-            + "\n\n\n"
-            + "Delegates the task to the given assignee. The assignee is required."
-            + "\n\n\n"
-            + "## Suspend a process instance\n\n"
-            + " ```JSON\n" + "{\n" + "  \"action\" : \"resolve\"\n" + "} ```"
-            + "\n\n\n"
-            + "Resolves the task delegation. The task is assigned back to the task owner (if any).")
+    @ApiOperation(value = "Tasks actions", tags = { "Tasks" },
+            notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the action was executed."),
             @ApiResponse(code = 400, message = "When the body contains an invalid value or when the assignee is missing when the action requires it."),
