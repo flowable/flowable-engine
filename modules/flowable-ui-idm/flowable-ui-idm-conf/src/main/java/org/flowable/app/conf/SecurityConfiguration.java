@@ -12,7 +12,7 @@
  */
 package org.flowable.app.conf;
 
-import com.seal.process.flowable.identity.SealAuthenticationProvider;
+import org.flowable.app.security.SealAuthenticationProvider;
 import org.flowable.app.security.AjaxAuthenticationFailureHandler;
 import org.flowable.app.security.AjaxAuthenticationSuccessHandler;
 import org.flowable.app.security.AjaxLogoutSuccessHandler;
