@@ -50,13 +50,13 @@ import java.util.Map;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Tasks Variables" }, description = "Manage Tasks variables", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Task Variables" }, description = "Manage Tasks variables", authorizations = { @Authorization(value = "basicAuth") })
 public class TaskVariableCollectionResource extends TaskVariableBaseResource {
 
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @ApiOperation(value = "List variables for a task", tags = {"Tasks Variables" }, nickname = "listTaskVariables")
+    @ApiOperation(value = "List variables for a task", tags = {"Task Variables" }, nickname = "listTaskVariables")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task was found and the requested variables are returned"),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found..")
@@ -90,7 +90,7 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
     }
 
     // FIXME OASv3 to solve Multiple Endpoint issue
-    @ApiOperation(value = "Create new variables on a task", tags = { "Tasks", "Tasks Variables" },
+    @ApiOperation(value = "Create new variables on a task", tags = { "Tasks", "Task Variables" },
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable or an Array of RestVariable) or by passing a multipart/form-data Object.\n"
                     + "It's possible to create simple (non-binary) variable or list of variables or new binary variable \n"
                     + "Any number of variables can be passed into the request body array.\n"

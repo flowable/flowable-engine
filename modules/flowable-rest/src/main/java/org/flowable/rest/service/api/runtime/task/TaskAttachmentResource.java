@@ -38,10 +38,10 @@ import javax.servlet.http.HttpServletResponse;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Tasks Attachments" }, description = "Manage Tasks Attachments", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Task Attachments" }, description = "Manage Tasks Attachments", authorizations = { @Authorization(value = "basicAuth") })
 public class TaskAttachmentResource extends TaskBaseResource {
 
-    @ApiOperation(value = "Get an attachment on a task", tags = { "Tasks Attachments" })
+    @ApiOperation(value = "Get an attachment on a task", tags = { "Task Attachments" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task and attachment were found and the attachment is returned."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found or the tasks doesn’t have a attachment with the given ID.")
@@ -59,7 +59,7 @@ public class TaskAttachmentResource extends TaskBaseResource {
         return restResponseFactory.createAttachmentResponse(attachment);
     }
 
-    @ApiOperation(value = "Delete an attachment on a task", tags = { "Tasks Attachments"})
+    @ApiOperation(value = "Delete an attachment on a task", tags = { "Task Attachments"})
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the task and attachment were found and the attachment is deleted. Response body is left empty intentionally."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found or the tasks doesn’t have a attachment with the given ID.")

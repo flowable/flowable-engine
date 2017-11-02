@@ -42,10 +42,10 @@ import java.util.Map;
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "Process Instances Variables" }, description = "Manage Process Instances Variables", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Instance Variables" }, description = "Manage Process Instances Variables", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceVariableCollectionResource extends BaseVariableCollectionResource {
 
-    @ApiOperation(value = "List variables for a process instance", nickname="listProcessInstanceVariables", tags = {"Process Instances Variables" },
+    @ApiOperation(value = "List variables for a process instance", nickname="listProcessInstanceVariables", tags = {"Process Instance Variables" },
             notes = "In case the variable is a binary variable or serializable, the valueUrl points to an URL to fetch the raw value. If it’s a plain variable, the value is present in the response. Note that only local scoped variables are returned, as there is no global scope for process-instance variables.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the process instance was found and variables are returned."),
@@ -59,7 +59,7 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
     }
 
     // FIXME OASv3 to solve Multiple Endpoint issue
-    @ApiOperation(value = "Update a multiple/single (non)binary variable on a process instance", tags = { "Process Instances Variables" }, nickname = "createOrUpdateProcessVariable",
+    @ApiOperation(value = "Update a multiple/single (non)binary variable on a process instance", tags = { "Process Instance Variables" }, nickname = "createOrUpdateProcessVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable or an array of RestVariable) or by passing a multipart/form-data Object.\n"
                     + "Nonexistent variables are created on the process-instance and existing ones are overridden without any error.\n"
                     + "Any number of variables can be passed into the request body array.\n"
@@ -90,7 +90,7 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
     }
 
     // FIXME OASv3 to solve Multiple Endpoint issue
-    @ApiOperation(value = "Create variables or new binary variable on a process instance", tags = { "Process Instances Variables" }, nickname = "createProcessInstanceVariable",
+    @ApiOperation(value = "Create variables or new binary variable on a process instance", tags = { "Process Instance Variables" }, nickname = "createProcessInstanceVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable or an array of RestVariable) or by passing a multipart/form-data Object.\n"
                     + "Nonexistent variables are created on the process-instance and existing ones are overridden without any error.\n"
                     + "Any number of variables can be passed into the request body array.\n"
@@ -121,7 +121,7 @@ public class ProcessInstanceVariableCollectionResource extends BaseVariableColle
     }
 
     // FIXME Documentation
-    @ApiOperation(value = "Delete all variables", tags = { "Process Instances Variables" }, nickname = "deleteLocalProcessVariable")
+    @ApiOperation(value = "Delete all variables", tags = { "Process Instance Variables" }, nickname = "deleteLocalProcessVariable")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates variables were found and have been deleted. Response-body is intentionally empty."),
             @ApiResponse(code = 404, message = "Indicates the requested process instance was not found.")

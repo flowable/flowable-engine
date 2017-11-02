@@ -33,10 +33,10 @@ import javax.servlet.http.HttpServletResponse;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Instances Variables" }, description = "Manage Process Instances Variables", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Instance Variables" }, description = "Manage Process Instances Variables", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceVariableDataResource extends BaseExecutionVariableResource {
 
-    @ApiOperation(value = "Get the binary data for a variable", tags = { "Process Instances Variables" }, nickname = "getProcessInstanceVariableData")
+    @ApiOperation(value = "Get the binary data for a variable", tags = { "Process Instance Variables" }, nickname = "getProcessInstanceVariableData")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the process instance was found and the requested variables are returned."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have a variable with the given name (in the given scope). Status message provides additional information.")

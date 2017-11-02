@@ -41,10 +41,10 @@ import java.io.ObjectOutputStream;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Tasks Variables" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Task Variables" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
 public class TaskVariableDataResource extends TaskVariableBaseResource {
 
-    @ApiOperation(value = "Get the binary data for a variable", tags = {"Tasks Variables" }, nickname = "geTaskVariableData",
+    @ApiOperation(value = "Get the binary data for a variable", tags = {"Task Variables" }, nickname = "getTaskVariableData",
             notes = "The response body contains the binary value of the variable. When the variable is of type binary, the content-type of the response is set to application/octet-stream, regardless of the content of the variable or the request accept-type header. In case of serializable, application/x-java-serialized-object is used as content-type.")
     @ApiImplicitParams(@ApiImplicitParam(name = "scope", dataType = "string", value = "Scope of variable to be returned. When local, only task-local variable value is returned. When global, only variable value from the task’s parent execution-hierarchy are returned. When the parameter is omitted, a local variable will be returned if it exists, otherwise a global variable.", paramType = "query"))
     @ApiResponses(value = {

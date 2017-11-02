@@ -37,10 +37,10 @@ import javax.servlet.http.HttpServletResponse;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Tasks Comments" }, description = "Manage Tasks Comments", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Task Comments" }, description = "Manage Tasks Comments", authorizations = { @Authorization(value = "basicAuth") })
 public class TaskCommentResource extends TaskBaseResource {
 
-    @ApiOperation(value = " Get a comment on a task", tags = { "Tasks Comments" }, nickname = "getTaskComment")
+    @ApiOperation(value = " Get a comment on a task", tags = { "Task Comments" }, nickname = "getTaskComment")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task and comment were found and the comment is returned."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found or the tasks doesn’t have a comment with the given ID.")
@@ -58,7 +58,7 @@ public class TaskCommentResource extends TaskBaseResource {
         return restResponseFactory.createRestComment(comment);
     }
 
-    @ApiOperation(value = "Delete a comment on a task", tags = { "Tasks Comments" }, nickname = "deleteTaskComment")
+    @ApiOperation(value = "Delete a comment on a task", tags = { "Task Comments" }, nickname = "deleteTaskComment")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the task and comment were found and the comment is deleted. Response body is left empty intentionally."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found or the tasks doesn’t have a comment with the given ID.")
