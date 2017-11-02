@@ -7,7 +7,6 @@ package org.flowable.app.security;
 
 import java.util.Collection;
 import java.util.HashSet;
-import org.flowable.app.security.FlowableAppUser;
 import org.flowable.idm.api.User;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -86,7 +85,7 @@ public class SealAuthenticationProvider implements AuthenticationProvider {
 
     @Override
     public boolean supports(Class<?> type) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return true;
     }
 
 }
