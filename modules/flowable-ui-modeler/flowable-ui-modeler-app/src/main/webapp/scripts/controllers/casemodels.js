@@ -104,7 +104,7 @@ angular.module('flowableModeler')
 	    }, $modal, $scope);
 	  };
 
-	  $scope.importCase = function () {
+	  $scope.importCaseModel = function () {
           _internalCreateModal({
               template: 'views/popup/casemodel-import.html?version=' + Date.now()
           }, $modal, $scope);

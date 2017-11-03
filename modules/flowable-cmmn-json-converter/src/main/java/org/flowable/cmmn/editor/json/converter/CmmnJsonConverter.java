@@ -24,7 +24,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.constants.EditorJsonConstants;
 import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
-import org.flowable.cmmn.editor.json.model.ModelInfo;
+import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.Association;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.Case;
@@ -110,7 +110,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         return convertToJson(model, null, null);
     }
 
-    public ObjectNode convertToJson(CmmnModel model, Map<String, ModelInfo> formKeyMap, Map<String, ModelInfo> decisionTableKeyMap) {
+    public ObjectNode convertToJson(CmmnModel model, Map<String, CmmnModelInfo> formKeyMap, Map<String, CmmnModelInfo> decisionTableKeyMap) {
         ObjectNode modelNode = objectMapper.createObjectNode();
         double maxX = 0.0;
         double maxY = 0.0;
@@ -135,7 +135,6 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         }
 
         modelNode.set("bounds", CmmnJsonConverterUtil.createBoundsNode(maxX, maxY, 0, 0));
-        modelNode.put("resourceId", "canvas");
 
         ObjectNode stencilNode = objectMapper.createObjectNode();
         stencilNode.put("id", "CMMNDiagram");
@@ -172,8 +171,9 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         
         Stage planModelStage = caseModel.getPlanModel();
         GraphicInfo planModelGraphicInfo = model.getGraphicInfo(planModelStage.getId());
-        ObjectNode planModelNode = CmmnJsonConverterUtil.createChildShape(planModelStage.getId(), STENCIL_STAGE, planModelGraphicInfo.getX() + planModelGraphicInfo.getWidth(),
+        ObjectNode planModelNode = CmmnJsonConverterUtil.createChildShape(planModelStage.getId(), STENCIL_PLANMODEL, planModelGraphicInfo.getX() + planModelGraphicInfo.getWidth(),
                         planModelGraphicInfo.getY() + planModelGraphicInfo.getHeight(), planModelGraphicInfo.getX(), planModelGraphicInfo.getY());
+        planModelNode.putArray(EDITOR_OUTGOING);
         shapesArrayNode.add(planModelNode);
         
         ArrayNode planModelShapesArrayNode = objectMapper.createArrayNode();
@@ -191,7 +191,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
     }
 
     public void processPlanItems(Stage stage, CmmnModel model, ArrayNode shapesArrayNode,
-            Map<String, ModelInfo> formKeyMap, Map<String, ModelInfo> decisionTableKeyMap, double subProcessX, double subProcessY) {
+            Map<String, CmmnModelInfo> formKeyMap, Map<String, CmmnModelInfo> decisionTableKeyMap, double subProcessX, double subProcessY) {
 
         for (PlanItem planItem : stage.getPlanItems()) {
             processPlanItem(planItem, stage, model, shapesArrayNode, formKeyMap, decisionTableKeyMap, subProcessX, subProcessY);
@@ -199,7 +199,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
     }
 
     protected void processPlanItem(PlanItem planItem, Stage stage, CmmnModel model,
-            ArrayNode shapesArrayNode, Map<String, ModelInfo> formKeyMap, Map<String, ModelInfo> decisionTableKeyMap, double containerX, double containerY) {
+            ArrayNode shapesArrayNode, Map<String, CmmnModelInfo> formKeyMap, Map<String, CmmnModelInfo> decisionTableKeyMap, double containerX, double containerY) {
 
         PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
         Class<? extends BaseCmmnJsonConverter> converter = convertersToJsonMap.get(planItemDefinition.getClass());
@@ -422,6 +422,10 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             if (criterion == null) {
                 continue;
             }
+            
+            // replace criterion attachedToRefId to from plan item definition id to plan item id
+            PlanItemDefinition planItemDefinition = cmmnModel.findPlanItemDefinition(criterion.getAttachedToRefId());
+            criterion.setAttachedToRefId(planItemDefinition.getPlanItemRef());
             
             parentStage.addSentry(criterion.getSentry());
             

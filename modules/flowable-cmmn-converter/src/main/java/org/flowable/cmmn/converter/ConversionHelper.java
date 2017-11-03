@@ -103,6 +103,7 @@ public class ConversionHelper {
             CmmnElement cmmnElement = iterator.previous();
             if (cmmnElement instanceof HasEntryCriteria) {
                 hasEntryCriteria = (HasEntryCriteria) cmmnElement;
+                entryCriterion.setAttachedToRefId(cmmnElement.getId());
             }
         }
         if (hasEntryCriteria != null) {

@@ -12,13 +12,13 @@
  */
 package org.flowable.cmmn.editor.json.model;
 
-public class ModelInfo {
+public class CmmnModelInfo {
 
     protected String id;
     protected String name;
     protected String key;
 
-    public ModelInfo(String id, String name, String key) {
+    public CmmnModelInfo(String id, String name, String key) {
         this.id = id;
         this.name = name;
         this.key = key;

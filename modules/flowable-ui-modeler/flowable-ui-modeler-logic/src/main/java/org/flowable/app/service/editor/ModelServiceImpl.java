@@ -842,8 +842,10 @@ public class ModelServiceImpl implements ModelService {
     
     protected Map<String, String> convertToModelKeyMap(Map<String, Model> modelMap) {
         Map<String, String> modelKeyMap = new HashMap<>();
-        for (Model formModel : modelMap.values()) {
-            modelKeyMap.put(formModel.getId(), formModel.getKey());
+        if (modelMap != null) {
+            for (Model formModel : modelMap.values()) {
+                modelKeyMap.put(formModel.getId(), formModel.getKey());
+            }
         }
         
         return modelKeyMap;

@@ -24,7 +24,6 @@ public class Criterion extends CaseElement implements HasAssociations {
     protected String sentryRef;
     protected Sentry sentry;
     protected String attachedToRefId;
-    protected BaseElement attachedToRef;
     protected boolean isEntryCriterion;
     protected boolean isExitCriterion;
     protected List<Association> incomingAssociations = new ArrayList<>();
@@ -53,12 +52,6 @@ public class Criterion extends CaseElement implements HasAssociations {
     }
     public void setAttachedToRefId(String attachedToRefId) {
         this.attachedToRefId = attachedToRefId;
-    }
-    public BaseElement getAttachedToRef() {
-        return attachedToRef;
-    }
-    public void setAttachedToRef(BaseElement attachedToRef) {
-        this.attachedToRef = attachedToRef;
     }
     public boolean isEntryCriterion() {
         return isEntryCriterion;
