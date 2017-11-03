@@ -37,6 +37,7 @@ public class TaskRepresentation extends AbstractRepresentation {
     protected String id;
     protected String name;
     protected String description;
+    protected String definitionKey;
     protected String category;
     protected UserRepresentation assignee;
     protected Date created;
@@ -129,6 +130,7 @@ public class TaskRepresentation extends AbstractRepresentation {
         this.id = taskInfo.getId();
         this.name = taskInfo.getName();
         this.description = taskInfo.getDescription();
+        this.definitionKey = taskInfo.getTaskDefinitionKey();
         this.category = taskInfo.getCategory();
         this.created = taskInfo.getCreateTime();
         this.dueDate = taskInfo.getDueDate();
@@ -184,6 +186,14 @@ public class TaskRepresentation extends AbstractRepresentation {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getDefinitionKey() {
+        return definitionKey;
+    }
+
+    public void setDefinitionKey(String definitionKey) {
+        this.definitionKey = definitionKey;
     }
 
     public String getCategory() {

@@ -51,6 +51,10 @@ angular.module('flowableApp')
 	    claimButtonDisabled: false,
         uploadInProgress: false
 	};
+	
+	$scope.advise = {
+        message: ''
+    };
 
     $scope.activeTab = 'form';
 
@@ -256,6 +260,13 @@ angular.module('flowableApp')
                     });
                 } else {
                     $scope.model.formData = undefined;
+                }
+                
+                if ($scope.model.task.definitionKey && $scope.model.task.definitionKey == 'adviseTask') {
+                    $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/advise/' + taskId}).
+                        success(function(response, status, headers, config) {
+                            $scope.advise.message = response.advise;
+                        });
                 }
 
                 $scope.model.taskUpdating = false;

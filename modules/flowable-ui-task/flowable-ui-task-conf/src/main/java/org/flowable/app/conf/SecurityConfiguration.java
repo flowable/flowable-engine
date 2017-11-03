@@ -30,6 +30,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -93,26 +94,31 @@ public class SecurityConfiguration {
 
         @Autowired
         protected AjaxLogoutSuccessHandler ajaxLogoutSuccessHandler;
+        
+        @Override
+        public void configure(WebSecurity web) throws Exception {
+            web.ignoring().antMatchers("/app/rest/adviseservice");
+        }
 
         @Override
         protected void configure(HttpSecurity http) throws Exception {
             http
-                    .sessionManagement()
+                .sessionManagement()
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                    .and()
+                .and()
                     .addFilterBefore(flowableCookieFilter, UsernamePasswordAuthenticationFilter.class)
                     .logout()
                     .logoutUrl("/app/logout")
                     .logoutSuccessHandler(ajaxLogoutSuccessHandler)
                     .addLogoutHandler(new ClearFlowableCookieLogoutHandler())
-                    .and()
+                .and()
                     .csrf()
                     .disable() // Disabled, cause enabling it will cause sessions
                     .headers()
                     .frameOptions()
                     .sameOrigin()
                     .addHeaderWriter(new XXssProtectionHeaderWriter())
-                    .and()
+                .and()
                     .authorizeRequests()
                     .antMatchers("/app/rest/**").hasAuthority(DefaultPrivileges.ACCESS_TASK);
         }

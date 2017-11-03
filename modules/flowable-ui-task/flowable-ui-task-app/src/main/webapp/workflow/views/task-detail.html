@@ -162,6 +162,8 @@
         <!-- FORM -->
         <div class="section" ng-show="activeTab == 'form' && model.formData != null && model.formData != undefined">
 
+            <span ng-show="advise.message && advise.message.length > 0">Machine learning resulted in an advise of {{advise.message}}</span>
+
             <!-- unclaimed task-->
             <div ng-if="model.task.assignee == null || model.task.assignee == undefined">
                 <activiti-form form-definition="model.formData" task-id="model.task.id"
