@@ -40,7 +40,7 @@ public class TableCollectionResource {
     @Autowired
     protected ManagementService managementService;
 
-    @ApiOperation(value = " List of tables", tags = { "Database tables" }, nickname = "listTables")
+    @ApiOperation(value = " List tables", tags = { "Database tables" }, nickname = "listTables")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the request was successful.")
     })

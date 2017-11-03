@@ -50,13 +50,13 @@ import java.util.Map;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Task Variables" }, description = "Manage Tasks variables", authorizations = { @Authorization(value = "basicAuth") })
 public class TaskVariableCollectionResource extends TaskVariableBaseResource {
 
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @ApiOperation(value = "Get all variables for a task", tags = { "Tasks" }, nickname = "listTaskVariables")
+    @ApiOperation(value = "List variables for a task", tags = {"Task Variables" }, nickname = "listTaskVariables")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task was found and the requested variables are returned"),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found..")
@@ -89,22 +89,22 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
         return result;
     }
 
-    // FIXME Multiple Endpoints
-    @ApiOperation(value = "Create new variables on a task", tags = { "Tasks" }, notes = "## Request body for creating simple (non-binary) variables\n\n"
-            + " ```JSON\n" + "[\n" + "  {\n" + "    \"name\" : \"myTaskVariable\",\n" + "    \"scope\" : \"local\",\n" + "    \"type\" : \"string\",\n"
-            + "    \"value\" : \"Hello my friend\"\n" + "  },\n" + "  {\n" + "\n" + "  }\n" + "] ```"
-            + "\n\n\n"
-            + "The request body should be an array containing one or more JSON-objects representing the variables that should be created.\n" + "\n"
-            + "- *name*: Required name of the variable\n" + "\n" + "scope: Scope of variable that is created. If omitted, local is assumed.\n" + "\n"
-            + "- *type*: Type of variable that is created. If omitted, reverts to raw JSON-value type (string, boolean, integer or double).\n" + "\n"
-            + "- *value*: Variable value.\n" + "\n" + "More information about the variable format can be found in the REST variables section."
-            + "\n\n\n"
-            + "## Request body for Creating a new binary variable\n\n"
-            + "The request should be of type multipart/form-data. There should be a single file-part included with the binary value of the variable. On top of that, the following additional form-fields can be present:\n"
-            + "\n"
-            + "- *name*: Required name of the variable.\n" + "\n" + "scope: Scope of variable that is created. If omitted, local is assumed.\n" + "\n"
-            + "- *type*: Type of variable that is created. If omitted, binary is assumed and the binary data in the request will be stored as an array of bytes."
-            + "\n\n\n")
+    // FIXME OASv3 to solve Multiple Endpoint issue
+    @ApiOperation(value = "Create new variables on a task", tags = { "Tasks", "Task Variables" },
+            notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable or an Array of RestVariable) or by passing a multipart/form-data Object.\n"
+                    + "It's possible to create simple (non-binary) variable or list of variables or new binary variable \n"
+                    + "Any number of variables can be passed into the request body array.\n"
+                    + "NB: Swagger V2 specification doesn't support this use case that's why this endpoint might be buggy/incomplete if used with other tools.")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "body", type = "org.flowable.rest.service.api.engine.variable.RestVariable", value = "Create a variable on a task", paramType = "body", example = "{\n" +
+                    "    \"name\":\"intProcVar\"\n" +
+                    "    \"type\":\"integer\"\n" +
+                    "    \"value\":123,\n" +
+                    " }"),
+            @ApiImplicitParam(name = "name", value = "Required name of the variable", dataType = "string", paramType = "form", example = "Simple content item"),
+            @ApiImplicitParam(name = "type", value = "Type of variable that is created. If omitted, reverts to raw JSON-value type (string, boolean, integer or double)",dataType = "string", paramType = "form", example = "integer"),
+            @ApiImplicitParam(name = "scope",value = "Scope of variable that is created. If omitted, local is assumed.", dataType = "string",  paramType = "form", example = "local")
+    })
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the variables were created and the result is returned."),
             @ApiResponse(code = 400, message = "Indicates the name of a variable to create was missing or that an attempt is done to create a variable on a standalone task (without a process associated) with scope global or an empty array of variables was included in the request or request did not contain an array of variables. Status message provides additional information."),
@@ -112,7 +112,7 @@ public class TaskVariableCollectionResource extends TaskVariableBaseResource {
             @ApiResponse(code = 409, message = "Indicates the task already has a variable with the given name. Use the PUT method to update the task variable instead."),
             @ApiResponse(code = 415, message = "Indicates the serializable data contains an object for which no class is present in the JVM running the Flowable engine and therefore cannot be deserialized.")
     })
-    @PostMapping(value = "/runtime/tasks/{taskId}/variables", produces = "application/json")
+    @PostMapping(value = "/runtime/tasks/{taskId}/variables", produces = "application/json", consumes = {"application/json", "multipart/form-data"})
     public Object createTaskVariable(@ApiParam(name = "taskId") @PathVariable String taskId, HttpServletRequest request, HttpServletResponse response) {
 
         Task task = getTaskFromRequest(taskId);

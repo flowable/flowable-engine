@@ -36,6 +36,7 @@ import java.util.Map;
 @Api(tags = { "History" }, description = "Manage History", authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricDetailCollectionResource extends HistoricDetailBaseResource {
 
+    // FIXME rename as List Historic Details ? It returns a Data Response.
     @ApiOperation(value = "Get historic detail", tags = { "History" }, nickname="listHistoricDetails", notes = "")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "The id of the historic detail.", paramType = "query"),

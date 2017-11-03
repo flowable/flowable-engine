@@ -13,13 +13,13 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
-import java.util.List;
-
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import io.swagger.annotations.ApiModelProperty;
 import org.flowable.rest.service.api.RestActionRequest;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import java.util.List;
 
 /**
  * @author Frederik Heremans
@@ -39,6 +39,7 @@ public class TaskActionRequest extends RestActionRequest {
         this.assignee = assignee;
     }
 
+    @ApiModelProperty(value = "If action is claim or delegate, you can use this parameter to set the assignee associated ", example = "userWhoClaims/userToDelegateTo")
     public String getAssignee() {
         return assignee;
     }
@@ -47,11 +48,13 @@ public class TaskActionRequest extends RestActionRequest {
         this.variables = variables;
     }
 
+    @ApiModelProperty(value = "If action is complete, you can use this parameter to set variables ")
     @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
     public List<RestVariable> getVariables() {
         return variables;
     }
 
+    @ApiModelProperty(value = "If action is complete, you can use this parameter to set transient variables ")
     public List<RestVariable> getTransientVariables() {
         return transientVariables;
     }
@@ -59,6 +62,12 @@ public class TaskActionRequest extends RestActionRequest {
     @JsonTypeInfo(use = Id.CLASS, defaultImpl = RestVariable.class)
     public void setTransientVariables(List<RestVariable> transientVariables) {
         this.transientVariables = transientVariables;
+    }
+
+    @Override
+    @ApiModelProperty(value = "Action to perform: Either complete, claim, delegate or resolve", example = "complete", required = true)
+    public String getAction() {
+        return super.getAction();
     }
 
 }

@@ -33,16 +33,16 @@ import javax.servlet.http.HttpServletResponse;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Instances" }, description = "Manage Process Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Instance Variables" }, description = "Manage Process Instances Variables", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceVariableDataResource extends BaseExecutionVariableResource {
 
-    @GetMapping(value = "/runtime/process-instances/{processInstanceId}/variables/{variableName}/data")
+    @ApiOperation(value = "Get the binary data for a variable", tags = { "Process Instance Variables" }, nickname = "getProcessInstanceVariableData")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the process instance was found and the requested variables are returned."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found or the task doesn’t have a variable with the given name (in the given scope). Status message provides additional information.")
     })
-    @ApiOperation(value = "Get the binary data for a variable", tags = { "Process Instances" }, nickname = "getProcessInstanceVariableData")
     @ResponseBody
+    @GetMapping(value = "/runtime/process-instances/{processInstanceId}/variables/{variableName}/data")
     public byte[] getVariableData(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
             @RequestParam(value = "scope", required = false) String scope,
             HttpServletRequest request, HttpServletResponse response) {

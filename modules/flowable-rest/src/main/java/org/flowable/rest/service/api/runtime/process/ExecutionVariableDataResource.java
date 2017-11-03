@@ -43,12 +43,12 @@ import java.io.ObjectOutputStream;
 @Api(tags = { "Executions" }, description = "Manage Executions", authorizations = { @Authorization(value = "basicAuth") })
 public class ExecutionVariableDataResource extends BaseExecutionVariableResource {
 
-    @GetMapping(value = "/runtime/executions/{executionId}/variables/{variableName}/data")
+    @ApiOperation(value = "Get the binary data for an execution", tags = { "Executions" }, nickname = "getExecutionVariableData")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the execution was found and the requested variables are returned."),
             @ApiResponse(code = 404, message = "Indicates the requested execution was not found or the task doesn’t have a variable with the given name (in the given scope). Status message provides additional information.")
     })
-    @ApiOperation(value = "Get the binary data for an execution", tags = { "Executions" }, nickname = "getExecutionVariableData")
+    @GetMapping(value = "/runtime/executions/{executionId}/variables/{variableName}/data")
     @ResponseBody
     public byte[] getVariableData(@ApiParam(name = "executionId") @PathVariable("executionId") String executionId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
             @RequestParam(value = "scope", required = false) String scope,

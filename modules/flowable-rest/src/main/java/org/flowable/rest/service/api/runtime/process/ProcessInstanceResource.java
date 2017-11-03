@@ -66,12 +66,7 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
         response.setStatus(HttpStatus.NO_CONTENT.value());
     }
 
-    @ApiOperation(value = "Activate or suspend a process instance", tags = { "Process Instances" }, notes = "## Activate a process instance\n\n"
-            + " ```JSON\n" + "{\n" + "  \"action\" : \"suspend\"\n" + "} ```"
-            + "\n\n\n"
-            + "## Suspend a process instance\n\n"
-            + " ```JSON\n" + "{\n" + "  \"action\" : \"activate\"\n" + "} ```"
-            + "\n\n\n")
+    @ApiOperation(value = "Activate or suspend a process instance", tags = { "Process Instances" })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the process instance was found and action was executed."),
             @ApiResponse(code = 400, message = "\t\n" + "Indicates an invalid action was supplied."),
@@ -92,9 +87,8 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
         throw new FlowableIllegalArgumentException("Invalid action: '" + actionRequest.getAction() + "'.");
     }
 
-    @ApiOperation(value = "Change the state a process instance", tags = { "Process Instances" }, notes = "```JSON\n" + "{\n" + "  \"cancelActivityId\" : \"task2\"\n"
-            + "  \"startActivityId\" : \"task1\"\n } ```"
-            + "\n\n\n")
+    @ApiOperation(value = "Change the state a process instance", tags = { "Process Instances" },
+            notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the process instance was found and change state activity was executed."),
             @ApiResponse(code = 409, message = "Indicates the requested process instance action cannot be executed since the process-instance is already activated/suspended."),

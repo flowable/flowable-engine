@@ -58,6 +58,37 @@
         </profile>
 
         <profile>
+            <id>postgresql</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.tomcat.maven</groupId>
+                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <configuration>
+                            <path>/flowable-admin</path>
+                            <port>9988</port>
+                            <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
+                            <systemProperties>
+                                <datasource.driver>org.postgresql.Driver</datasource.driver>
+                                <datasource.url>jdbc:postgresql://localhost:5432/flowable</datasource.url>
+                                <datasource.username>flowable</datasource.username>
+                                <datasource.password>flowable</datasource.password>
+                                <com.sun.management.jmxremote.port>4000</com.sun.management.jmxremote.port>
+                            </systemProperties>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
             <id>dev</id>
             <dependencies>
                 <dependency>

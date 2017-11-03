@@ -40,10 +40,10 @@ import java.util.List;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Tasks" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Task Comments" }, description = "Manage Tasks Comments", authorizations = { @Authorization(value = "basicAuth") })
 public class TaskCommentCollectionResource extends TaskBaseResource {
 
-    @ApiOperation(value = "Get all comments on a task", tags = { "Tasks" }, nickname = "listTaskComments")
+    @ApiOperation(value = "List comments on a task", tags = { "Task Comments" }, nickname = "listTaskComments")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task was found and the comments are returned."),
             @ApiResponse(code = 404, message = "Indicates the requested task was not found.")
@@ -54,7 +54,7 @@ public class TaskCommentCollectionResource extends TaskBaseResource {
         return restResponseFactory.createRestCommentList(taskService.getTaskComments(task.getId()));
     }
 
-    @ApiOperation(value = "Create a new comment on a task", tags = { "Tasks" }, nickname = "createTaskComments")
+    @ApiOperation(value = "Create a new comment on a task", tags = { "Task Comments" }, nickname = "createTaskComments")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the comment was created and the result is returned."),
             @ApiResponse(code = 400, message = "Indicates the comment is missing from the request."),

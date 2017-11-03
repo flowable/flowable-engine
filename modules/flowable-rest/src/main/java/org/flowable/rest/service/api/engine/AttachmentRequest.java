@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.engine;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author Frederik Heremans
  */
@@ -23,6 +25,7 @@ public class AttachmentRequest {
     private String type;
     private String externalUrl;
 
+    @ApiModelProperty(example = "SimpleAttachment")
     public String getName() {
         return name;
     }
@@ -31,6 +34,7 @@ public class AttachmentRequest {
         this.name = name;
     }
 
+    @ApiModelProperty(example = "This a simple attachment description")
     public String getDescription() {
         return description;
     }
@@ -39,6 +43,7 @@ public class AttachmentRequest {
         this.description = description;
     }
 
+    @ApiModelProperty(example = "mySimpleType")
     public String getType() {
         return type;
     }
@@ -47,6 +52,7 @@ public class AttachmentRequest {
         this.type = type;
     }
 
+    @ApiModelProperty(example = "http://www.flowable.org")
     public String getExternalUrl() {
         return externalUrl;
     }

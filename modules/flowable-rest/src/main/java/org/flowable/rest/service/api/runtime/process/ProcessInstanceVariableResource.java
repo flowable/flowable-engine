@@ -15,6 +15,8 @@ package org.flowable.rest.service.api.runtime.process;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
@@ -45,13 +47,13 @@ import javax.servlet.http.HttpServletResponse;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Instances" }, description = "Manage Process Instances", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Instance Variables" }, description = "Manage Process Instances", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceVariableResource extends BaseExecutionVariableResource {
 
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @ApiOperation(value = "Get a variable for a process instance", tags = { "Process Instances" }, nickname = "getProcessInstanceVariable")
+    @ApiOperation(value = "Get a variable for a process instance", tags = { "Process Instance Variables" }, nickname = "getProcessInstanceVariable")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates both the process instance and variable were found and variable is returned."),
             @ApiResponse(code = 404, message = "Indicates the requested process instance was not found or the process instance does not have a variable with the given name. Status description contains additional information about the error.")
@@ -64,12 +66,27 @@ public class ProcessInstanceVariableResource extends BaseExecutionVariableResour
         return getVariableFromRequest(execution, variableName, scope, false);
     }
 
-    @ApiOperation(value = "Update a single variable on a process instance", tags = { "Process Instances" }, nickname = "updateProcessInstanceVariable")
+    // FIXME OASv3 to solve Multiple Endpoint issue
+    @ApiOperation(value = "Update a single variable on a process instance", tags = { "Process Instance Variables" }, nickname = "updateProcessInstanceVariable",
+            notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable) or by passing a multipart/form-data Object.\n"
+                    + "Nonexistent variables are created on the process-instance and existing ones are overridden without any error.\n"
+                    + "Note that scope is ignored, only local variables can be set in a process instance.\n"
+                    + "NB: Swagger V2 specification doesn't support this use case that's why this endpoint might be buggy/incomplete if used with other tools.")
+    @ApiImplicitParams({
+            @ApiImplicitParam(name = "body", type = "org.flowable.rest.service.api.engine.variable.RestVariable", value = "Create a variable on a process instance", paramType = "body", example = "{\n" +
+                    "    \"name\":\"intProcVar\"\n" +
+                    "    \"type\":\"integer\"\n" +
+                    "    \"value\":123,\n" +
+                    " }"),
+            @ApiImplicitParam(name = "file", dataType = "file", paramType = "form"),
+            @ApiImplicitParam(name = "name", dataType = "string", paramType = "form", example = "Simple content item"),
+            @ApiImplicitParam(name = "type", dataType = "string", paramType = "form", example = "integer"),
+    })
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates both the process instance and variable were found and variable is updated."),
             @ApiResponse(code = 404, message = "Indicates the requested process instance was not found or the process instance does not have a variable with the given name. Status description contains additional information about the error.")
     })
-    @PutMapping(value = "/runtime/process-instances/{processInstanceId}/variables/{variableName}", produces = "application/json")
+    @PutMapping(value = "/runtime/process-instances/{processInstanceId}/variables/{variableName}", produces = "application/json", consumes = {"application/json", "multipart/form-data"})
     public RestVariable updateVariable(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "variableName") @PathVariable("variableName") String variableName,
             HttpServletRequest request) {
 
@@ -104,7 +121,7 @@ public class ProcessInstanceVariableResource extends BaseExecutionVariableResour
     }
 
     // FIXME Documentation
-    @ApiOperation(value = "Delete a variable", tags = { "Process Instances" }, nickname = "deleteProcessInstanceVariable")
+    @ApiOperation(value = "Delete a variable", tags = { "Process Instance Variables" }, nickname = "deleteProcessInstanceVariable")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the variable was found and has been deleted. Response-body is intentionally empty."),
             @ApiResponse(code = 404, message = "Indicates the requested variable was not found.")

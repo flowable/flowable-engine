@@ -115,7 +115,8 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
         return getQueryResponse(queryRequest, allRequestParams);
     }
 
-    @ApiOperation(value = "Store a form instance", tags = { "Form Instances" }, nickname = "storeFormInstance", notes = "Provide either a FormDefinitionKey or a FormDefinitionId together with the other properties.")
+    @ApiOperation(value = "Store a form instance", tags = { "Form Instances" }, nickname = "storeFormInstance",
+            notes = "Provide either a FormDefinitionKey or a FormDefinitionId together with the other properties.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the form instance was stored."),
             @ApiResponse(code = 404, message = "Indicates the related form model was not found.")

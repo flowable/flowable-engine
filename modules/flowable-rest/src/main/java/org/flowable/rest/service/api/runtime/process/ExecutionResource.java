@@ -48,20 +48,7 @@ public class ExecutionResource extends ExecutionBaseResource {
         return restResponseFactory.createExecutionResponse(getExecutionFromRequest(executionId));
     }
 
-    @ApiOperation(value = "Execute an action on an execution", tags = { "Executions" }, notes = "## Request body (signal an execution):\n\n"
-            + " ```JSON\n" + "{\n" + "  \"action\":\"signal\"\n" + "} ```"
-            + "\n\n\n"
-            + "Both a variables and transientVariables property is accepted with following structure"
-            + " ```JSON\n" + "{\n" + "  \"action\":\"signal\",\n" + "  \"variables\" : [\n" + "    {\n" + "      \"name\": \"myVar\",\n"
-            + "      \"value\": \"someValue\"\n" + "    }\n" + "  ]\n" + "}```"
-            + "\n\n\n"
-            + "## Request body (signal event received for execution)\n\n"
-            + " ```JSON\n" + "{\n" + "  \"action\":\"signal\"\n" + "} ```"
-            + "\n\n\n"
-            + "Notifies the execution that a signal event has been received, requires a signalName parameter. Optional variables can be passed that are set on the execution before the action is executed."
-            + "## Request body (signal event received for execution)\n\n"
-            + " ```JSON\n" + "{\n" + "  \"action\":\"messageEventReceived\",\n" + "  \"messageName\":\"myMessage\"\n" + "  \"variables\": [  ]\n" + "} ```"
-            + "\n\n\n")
+    @ApiOperation(value = "Execute an action on an execution", tags = { "Executions" }, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the execution was found and the action is performed."),
             @ApiResponse(code = 204, message = "Indicates the execution was found, the action was performed and the action caused the execution to end."),

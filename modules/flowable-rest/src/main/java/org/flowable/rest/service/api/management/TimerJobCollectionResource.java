@@ -49,7 +49,7 @@ public class TimerJobCollectionResource {
     protected ManagementService managementService;
 
     // Fixme documentation & real parameters
-    @ApiOperation(value = "Get a list of timer jobs", tags = { "Jobs" }, nickname = "listTimerJobs")
+    @ApiOperation(value = "List timer jobs", tags = { "Jobs" }, nickname = "listTimerJobs")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return job with the given id", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "Only return jobs part of a process with the given id", paramType = "query"),
