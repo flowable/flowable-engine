@@ -249,9 +249,6 @@
         </profile>
         <profile>
             <id>postgresql</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
             <dependencies>
                 <dependency>
                     <groupId>org.postgresql</groupId>
