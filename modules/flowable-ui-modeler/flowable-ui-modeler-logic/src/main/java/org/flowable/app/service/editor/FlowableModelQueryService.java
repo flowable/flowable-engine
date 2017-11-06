@@ -44,6 +44,9 @@ import org.flowable.cmmn.converter.CmmnXmlConverter;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.dmn.model.DmnDefinition;
+import org.flowable.dmn.xml.converter.DmnXMLConverter;
+import org.flowable.editor.dmn.converter.DmnJsonConverter;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.slf4j.Logger;
@@ -85,6 +88,9 @@ public class FlowableModelQueryService {
     
     protected CmmnXmlConverter cmmnXmlConverter = new CmmnXmlConverter();
     protected CmmnJsonConverter cmmnJsonConverter = new CmmnJsonConverter();
+    
+    protected DmnXMLConverter dmnXmlConverter = new DmnXMLConverter();
+    protected DmnJsonConverter dmnJsonConverter = new DmnJsonConverter();
 
     public ResultListDataRepresentation getModels(String filter, String sort, Integer modelType, HttpServletRequest request) {
 
@@ -258,6 +264,42 @@ public class FlowableModelQueryService {
             }
         } else {
             throw new BadRequestException("Invalid file name, only .cmmn and .cmmn.xml files are supported not " + fileName);
+        }
+    }
+    
+    public ModelRepresentation importDmnModel(HttpServletRequest request, MultipartFile file) {
+
+        String fileName = file.getOriginalFilename();
+        if (fileName != null && (fileName.endsWith(".dmn") || fileName.endsWith(".xml"))) {
+            try {
+                XMLInputFactory xif = XmlUtil.createSafeXmlInputFactory();
+                InputStreamReader xmlIn = new InputStreamReader(file.getInputStream(), "UTF-8");
+                XMLStreamReader xtr = xif.createXMLStreamReader(xmlIn);
+                DmnDefinition dmnDefinition = dmnXmlConverter.convertToDmnModel(xtr);
+                if (CollectionUtils.isEmpty(dmnDefinition.getDecisions())) {
+                    throw new BadRequestException("No decision found in definition " + fileName);
+                }
+
+                ObjectNode modelNode = dmnJsonConverter.convertToJson(dmnDefinition);
+
+                String name = dmnDefinition.getName();
+                
+                ModelRepresentation model = new ModelRepresentation();
+                model.setKey(dmnDefinition.getId());
+                model.setName(name);
+                model.setModelType(AbstractModel.MODEL_TYPE_DECISION_TABLE);
+                Model newModel = modelService.createModel(model, modelNode.toString(), SecurityUtils.getCurrentUserObject());
+                return new ModelRepresentation(newModel);
+
+            } catch (BadRequestException e) {
+                throw e;
+
+            } catch (Exception e) {
+                LOGGER.error("Import failed for {}", fileName, e);
+                throw new BadRequestException("Import failed for " + fileName + ", error message " + e.getMessage());
+            }
+        } else {
+            throw new BadRequestException("Invalid file name, only .dmn and .xml files are supported not " + fileName);
         }
     }
 

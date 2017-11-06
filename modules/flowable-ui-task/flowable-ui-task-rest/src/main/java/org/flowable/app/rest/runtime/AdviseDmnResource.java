@@ -24,6 +24,10 @@ import javax.xml.stream.XMLStreamReader;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.ByteArrayBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.flowable.app.service.exception.InternalServerErrorException;
@@ -43,7 +47,6 @@ import org.flowable.dmn.model.RuleInputClauseContainer;
 import org.flowable.dmn.model.RuleOutputClauseContainer;
 import org.flowable.dmn.model.UnaryTests;
 import org.flowable.dmn.xml.converter.DmnXMLConverter;
-import org.flowable.editor.dmn.converter.DmnJsonConverter;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.DeploymentBuilder;
@@ -78,7 +81,6 @@ public class AdviseDmnResource {
     protected Environment environment;
     
     protected DmnXMLConverter dmnXMLConverter = new DmnXMLConverter();
-    protected DmnJsonConverter dmnJsonConverter = new DmnJsonConverter();
 
     @RequestMapping(value = "/rest/advisedmn", method = RequestMethod.GET, produces = "application/json")
     public void adviseForTask(@RequestParam(name="processDefinitionKey") String processDefinitionKey, @RequestParam(name="definitionKey") String definitionKey) {
@@ -248,6 +250,8 @@ public class AdviseDmnResource {
             newDeploymentBuilder.addBytes("advise.dmn", xmlBytes);
             newDeploymentBuilder.deploy();
             
+            importDmnModel(xmlBytes);
+            
         } catch (Exception e) {
             LOGGER.error("Error creating the DMN model", e);
             throw new InternalServerErrorException("Error creating the DMN model: " + e.getMessage());
@@ -296,6 +300,36 @@ public class AdviseDmnResource {
             InputStream responseContent = response.getEntity().getContent();
             String strResponse = IOUtils.toString(responseContent, "utf-8");
             return objectMapper.readTree(strResponse);
+            
+        } catch (Exception e) {
+            LOGGER.error("Error calling advise service endpoint", e);
+            throw new InternalServerErrorException("Error calling advise service endpoint: " + e.getMessage());
+            
+        } finally {
+            if (client != null) {
+                try {
+                    client.close();
+                } catch (IOException e) {
+                    LOGGER.warn("Exception while closing http client", e);
+                }
+            }
+        }
+    }
+    
+    protected void importDmnModel(byte[] xmlBytes) {
+        String modelerUrl = environment.getRequiredProperty("import.dmn.url");
+
+        HttpPost httpPost = new HttpPost(modelerUrl);
+        MultipartEntityBuilder entityBuilder = MultipartEntityBuilder.create();
+        entityBuilder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+        entityBuilder.addPart("file", new ByteArrayBody(xmlBytes, "advise.dmn"));
+        httpPost.setEntity(entityBuilder.build());
+
+        HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+        CloseableHttpClient client = clientBuilder.build();
+
+        try {
+            client.execute(httpPost);
             
         } catch (Exception e) {
             LOGGER.error("Error calling advise service endpoint", e);

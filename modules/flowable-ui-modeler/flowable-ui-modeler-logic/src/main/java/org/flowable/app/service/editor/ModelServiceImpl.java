@@ -319,17 +319,21 @@ public class ModelServiceImpl implements ModelService {
 
     @Override
     public Model createModel(ModelRepresentation model, String editorJson, User createdBy) {
+        String userId = null;
+        if (createdBy != null) {
+            userId = createdBy.getId();
+        }
         Model newModel = new Model();
         newModel.setVersion(1);
         newModel.setName(model.getName());
         newModel.setKey(model.getKey());
         newModel.setModelType(model.getModelType());
         newModel.setCreated(Calendar.getInstance().getTime());
-        newModel.setCreatedBy(createdBy.getId());
+        newModel.setCreatedBy(userId);
         newModel.setDescription(model.getDescription());
         newModel.setModelEditorJson(editorJson);
         newModel.setLastUpdated(Calendar.getInstance().getTime());
-        newModel.setLastUpdatedBy(createdBy.getId());
+        newModel.setLastUpdatedBy(userId);
 
         persistModel(newModel);
         return newModel;

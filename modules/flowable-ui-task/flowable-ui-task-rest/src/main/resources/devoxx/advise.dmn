@@ -1,32 +1,32 @@
 <definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="adviseDecision" name="Advise decision" namespace="http://www.flowable.org/dmn">
   <decision id="decision1" name="Advise Decision">
     <decisionTable id="decisionTable" hitPolicy="FIRST">
-      <input>
+      <input label="Age">
         <inputExpression id="inputVariable1" typeRef="number">
           <text>age</text>
         </inputExpression>
       </input>
-      <input>
+      <input label="Age">
         <inputExpression id="inputVariable2" typeRef="number">
           <text>age</text>
         </inputExpression>
       </input>
-      <input>
+      <input label="Nationality">
         <inputExpression id="inputVariable3" typeRef="string">
           <text>nationality</text>
         </inputExpression>
       </input>
-      <input>
+      <input label="Nationality">
         <inputExpression id="inputVariable4" typeRef="string">
           <text>nationality</text>
         </inputExpression>
       </input>
-      <input>
+      <input label="Nationality">
         <inputExpression id="inputVariable5" typeRef="string">
           <text>nationality</text>
         </inputExpression>
       </input>
-      <input>
+      <input label="Nationality">
         <inputExpression id="inputVariable6" typeRef="string">
           <text>nationality</text>
         </inputExpression>

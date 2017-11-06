@@ -12,8 +12,6 @@
  */
 package org.flowable.app.rest.api;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.flowable.app.domain.editor.Model;
@@ -33,6 +31,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 public class ApiModelsResource {
@@ -58,6 +58,11 @@ public class ApiModelsResource {
     @RequestMapping(value = "/editor/import-process-model", method = RequestMethod.POST, produces = "application/json")
     public ModelRepresentation importProcessModel(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
         return modelQueryService.importProcessModel(request, file);
+    }
+    
+    @RequestMapping(value = "/editor/import-dmn-model", method = RequestMethod.POST, produces = "application/json")
+    public ModelRepresentation importDmnModel(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
+        return modelQueryService.importDmnModel(request, file);
     }
 
     @RequestMapping(value = "/editor/models", method = RequestMethod.POST, produces = "application/json")
