@@ -103,6 +103,17 @@ public class AdviseServiceResource {
             throw new InternalServerErrorException("Error getting advise", e);
         }
     }
+    
+    @RequestMapping(value = "/rest/advisedata", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getAdviseData(@RequestParam(name="processDefinitionId") String processDefinitionId, @RequestParam(name="definitionKey") String definitionKey) {
+        try {
+            return getAdviseNode();
+            
+        } catch (Exception e) {
+            LOGGER.error("Error getting advise data", e);
+            throw new InternalServerErrorException("Error getting advise data", e);
+        }
+    }
 
     protected JsonNode getAdviseNode() throws Exception {
         return objectMapper.readTree("[{\"conditions\":[{\"variableName\":\"age\",\"operation\":\"LTE\",\"rightValue\":29.0}," + 

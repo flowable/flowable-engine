@@ -97,7 +97,9 @@ public class SecurityConfiguration {
         
         @Override
         public void configure(WebSecurity web) throws Exception {
-            web.ignoring().antMatchers("/app/rest/adviseservice");
+            web.ignoring()
+                .antMatchers("/app/rest/adviseservice")
+                .antMatchers("/app/rest/advisedata");
         }
 
         @Override

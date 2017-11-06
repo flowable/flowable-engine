@@ -1,0 +1,60 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="adviseDecision" name="Advise decision" namespace="http://www.flowable.org/dmn">
+  <decision id="decision1" name="Advise Decision">
+    <decisionTable id="decisionTable" hitPolicy="FIRST">
+      <input>
+        <inputExpression id="inputVariable1" typeRef="number">
+          <text>age</text>
+        </inputExpression>
+      </input>
+      <input>
+        <inputExpression id="inputVariable2" typeRef="number">
+          <text>age</text>
+        </inputExpression>
+      </input>
+      <input>
+        <inputExpression id="inputVariable3" typeRef="string">
+          <text>nationality</text>
+        </inputExpression>
+      </input>
+      <input>
+        <inputExpression id="inputVariable4" typeRef="string">
+          <text>nationality</text>
+        </inputExpression>
+      </input>
+      <input>
+        <inputExpression id="inputVariable5" typeRef="string">
+          <text>nationality</text>
+        </inputExpression>
+      </input>
+      <input>
+        <inputExpression id="inputVariable6" typeRef="string">
+          <text>nationality</text>
+        </inputExpression>
+      </input>
+      <output id="output1" label="Advise" name="advise" typeRef="string"></output>
+      <rule>
+        <inputEntry id="inputEntry1_1">
+          <text><![CDATA[< 29]]></text>
+        </inputEntry>
+        <inputEntry id="inputEntry1_2">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="inputEntry1_3">
+          <text>== 'Dutch'</text>
+        </inputEntry>
+        <inputEntry id="inputEntry1_4">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="inputEntry1_5">
+          <text>-</text>
+        </inputEntry>
+        <inputEntry id="inputEntry1_6">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="outputEntry1_1">
+          <text>Reject</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>
