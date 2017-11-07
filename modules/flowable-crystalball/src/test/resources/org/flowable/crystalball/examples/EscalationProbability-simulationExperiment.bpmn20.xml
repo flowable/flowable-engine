@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.flowable.org/processdef">
+    <process id="simulationExperiment" name="Execute simulation experiment" isExecutable="true">
+        <startEvent id="_startSimulationExperiment"></startEvent>
+        <sequenceFlow sourceRef="_startSimulationExperiment" targetRef="initializeVariables"/>
+
+        <scriptTask id="initializeVariables" name="Initialize variables" scriptFormat="groovy">
+            <script>
+                <![CDATA[
+                execution.getParent().setVariable("escalated", 0);
+]]>
+            </script>
+        </scriptTask>
+
+        <sequenceFlow sourceRef="initializeVariables" targetRef="simulationRunSubProcess"/>
+
+        <subProcess id="simulationRunSubProcess" name="simulationRunSubProcess">
+            <multiInstanceLoopCharacteristics isSequential="true">
+                <loopCardinality>100</loopCardinality>
+            </multiInstanceLoopCharacteristics>
+
+            <startEvent id="simulationRunStartEvent"/>
+            <sequenceFlow sourceRef="simulationRunStartEvent" targetRef="executeSimulationRun"/>
+
+
+            <callActivity id="executeSimulationRun" calledElement="simulationRun" name="Execute simulation run">
+                <extensionElements>
+                    <flowable:out source="isEscalated" target="isEscalated"></flowable:out>
+                </extensionElements>
+            </callActivity>
+
+            <sequenceFlow sourceRef="executeSimulationRun" targetRef="evaluate"/>
+
+            <scriptTask id="evaluate" name="Evaluate simulation run results" scriptFormat="groovy">
+                <script>
+                    <![CDATA[
+                    if (isEscalated) {
+                        execution.getParent().setVariable("escalated", escalated+1);
+                    }
+                    println(" progress: " + (loopCounter+1) + "%");
+    ]]>
+                </script>
+            </scriptTask>
+
+            <sequenceFlow sourceRef="evaluate" targetRef="simulationRunEndEvent"/>
+            <endEvent id="simulationRunEndEvent"/>
+        </subProcess>
+
+        <sequenceFlow sourceRef="simulationRunSubProcess" targetRef="print"/>
+        <scriptTask id="print" name="print results" scriptFormat="groovy">
+            <script>
+                <![CDATA[
+                println("The probability that the task is escalated is: " + escalated +"%");
+]]>
+            </script>
+        </scriptTask>
+
+        <sequenceFlow sourceRef="print" targetRef="waitToAssertInJUnitTest"/>
+
+        <receiveTask id="waitToAssertInJUnitTest"/>
+
+        <sequenceFlow sourceRef="waitToAssertInJUnitTest" targetRef="endEvent"/>
+        <endEvent id="endEvent"/>
+    </process>
+</definitions>

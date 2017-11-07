@@ -25,27 +25,11 @@ import java.util.Random;
 import static org.flowable.engine.impl.bpmn.behavior.SimulationSubProcessActivityBehavior.VIRTUAL_PROCESS_ENGINE_VARIABLE_NAME;
 
 /**
- * Simulation utils used in the simulation run and scenario. e.g. random number generator should be centralized for all sim runs.
+ * Simulation utils used in the simulation run and scenario.
  *
  * @author martin.grofcik
  */
-
 public class SimUtils {
-    /**
-     * main random number generator
-     */
-    private static volatile ThreadLocal<Random> randomGenerator = new ThreadLocal<>();
-
-    public static void setSeed(long seed) {
-        randomGenerator.set(new Random(seed));
-    }
-
-    public static int getRandomInt(int max) {
-        if (randomGenerator.get() == null) {
-            randomGenerator.set(new Random());
-        }
-        return randomGenerator.get().nextInt(max);
-    }
 
     @SuppressWarnings("unused")
     public static List<String> getSubProcessInstanceIds(String rootProcessInstanceId, DelegateExecution execution) {

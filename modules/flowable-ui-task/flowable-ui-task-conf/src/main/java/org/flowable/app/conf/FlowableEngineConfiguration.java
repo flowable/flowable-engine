@@ -27,6 +27,8 @@ import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentService;
 import org.flowable.content.spring.SpringContentEngineConfiguration;
 import org.flowable.content.spring.configurator.SpringContentEngineConfigurator;
+import org.flowable.crystalball.simulator.RandomNumberGenerator;
+import org.flowable.crystalball.simulator.impl.DefaultUniformRandomNumberGenerator;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
 import org.flowable.dmn.api.DmnHistoryService;
 import org.flowable.dmn.api.DmnRepositoryService;
@@ -308,5 +310,10 @@ public class FlowableEngineConfiguration {
     @Bean
     public ContentService contentService() {
         return contentEngineConfiguration().getContentService();
+    }
+
+    @Bean
+    public RandomNumberGenerator randomNumberGenerator() {
+        return new DefaultUniformRandomNumberGenerator();
     }
 }

@@ -180,7 +180,7 @@ angular.module('flowableModeler')
 
                     $scope.model.loading = false;
                     $rootScope.editorHistory = [];
-                    $location.path("/simulationeditor/" + data.id);
+                    $location.path("/editor/" + data.id);
                 }).error(function (data, status, headers, config) {
                     $scope.model.loading = false;
                     $scope.model.errorMessage = data.message;

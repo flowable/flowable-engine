@@ -23,8 +23,9 @@
 
     <sequenceFlow id="flow3" sourceRef="escalationTimer" targetRef="escalationUserTask"/>
     <userTask id="escalationUserTask" name="Escalation"/>
+    <endEvent id="theEscalationEnd"/>
 
-    <sequenceFlow id="flow4" sourceRef="escalationUserTask" targetRef="theEnd"/>
+    <sequenceFlow id="flow4" sourceRef="escalationUserTask" targetRef="theEscalationEnd"/>
 
   </process>
 

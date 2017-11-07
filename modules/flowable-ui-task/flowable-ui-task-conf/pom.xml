@@ -12,7 +12,7 @@
 	<packaging>jar</packaging>
 
 	<dependencies>
-	
+
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-ui-task-logic</artifactId>
@@ -129,7 +129,7 @@
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
         </dependency>
-        
+
 		<!-- JSON -->
         <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
@@ -183,7 +183,7 @@
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
         </dependency>
-        
+
         <!-- SPRING -->
         <dependency>
             <groupId>org.springframework</groupId>
@@ -242,12 +242,16 @@
         	<groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-crystalball</artifactId>
+        </dependency>
 
-	</dependencies>
+    </dependencies>
 
 	<!-- BUILD -->
 	<build>
-	
+
 		<plugins>
 			<plugin>
 				<groupId>org.zeroturnaround</groupId>
@@ -263,7 +267,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			
+
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-eclipse-plugin</artifactId>
@@ -274,11 +278,11 @@
 				</configuration>
 			</plugin>
 		</plugins>
-		
-		
+
+
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
+				<!--This plugin's configuration is used to store Eclipse m2e settings
 					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
@@ -313,7 +317,7 @@
 			</plugins>
 		</pluginManagement>
 	</build>
-	
+
 	<profiles>
 		<profile>
 			<id>distro</id>
