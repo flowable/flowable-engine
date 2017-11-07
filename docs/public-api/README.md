@@ -47,8 +47,15 @@ You can retrieve the Swagger Specification for Flowable API by following links b
 
 ## Open API Specification V3
 
-The latest version of the Open API Specification V3 (or OAS) has been release mid 2017. 
-We plan to provide Flowable REST API OAS in a near future.
+You can retrieve the OpenApi Specification (V3) for Flowable API by following links below.
+
+
+| API Name |
+|:---:|
+| [Process API](/references/oas/process/flowable-swagger-process.yaml) |    
+| [Form API](/references/oas/form/flowable-swagger-form.yaml) | 
+| [Decision API](/references/oas/decision/flowable-swagger-decision.yaml) |  
+| [Content API](/references/oas/content/flowable-swagger-content.yaml) |   
 
 # Tools
 
