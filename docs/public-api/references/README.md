@@ -23,12 +23,12 @@ You can retrieve the Swagger Specification (V2) for Flowable API by following li
 You can retrieve the OpenApi Specification (V3) for Flowable API by following links below.
 
 
-| API Name | Syntax Validation  | 
-|:---:|:---:|
-| [Process API](/oas/process/flowable-swagger-process.yaml) | <img src="http://online.swagger.io/validator?url=https://raw.githubusercontent.com/flowable/flowable-engine/master/docs/public-api/references/oas/process/flowable-swagger-process.yaml">  |  
-| [Form API](/oas/form/flowable-swagger-form.yaml) |  <img src="http://online.swagger.io/validator?url=https://raw.githubusercontent.com/flowable/flowable-engine/master/docs/public-api/references/oas/form/flowable-swagger-form.yaml"> |  
-| [Decision API](/oas/decision/flowable-swagger-decision.yaml) |  <img src="http://online.swagger.io/validator?url=https://raw.githubusercontent.com/flowable/flowable-engine/master/docs/public-api/references/oas/decision/flowable-swagger-decision.yaml"> | 
-| [Content API](/oas/content/flowable-swagger-content.yaml) | <img src="http://online.swagger.io/validator?url=https://raw.githubusercontent.com/flowable/flowable-engine/master/docs/public-api/references/oas/content/flowable-swagger-content.yaml">  | 
+| API Name |
+|:---:|
+| [Process API](/oas/process/flowable-swagger-process.yaml) |    
+| [Form API](/oas/form/flowable-swagger-form.yaml) | 
+| [Decision API](/oas/decision/flowable-swagger-decision.yaml) |  
+| [Content API](/oas/content/flowable-swagger-content.yaml) |   
 
 
 
