@@ -4,7 +4,7 @@
 
 ### Work in progress
 
-OpenApi Specification files are not currently complete for the Flowable Public API.
+OpenApi Specification files **are not currently complete** for the Flowable Public API.
 
 
 
