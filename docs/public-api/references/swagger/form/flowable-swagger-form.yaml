@@ -1,0 +1,1102 @@
+---
+swagger: "2.0"
+info:
+  description: "# flowable / flow??b(??)l /\n\n- a compact and highly efficient workflow\
+    \ and Business Process Management (BPM) platform for developers, system admins\
+    \ and business users.\n- a lightning fast, tried and tested BPMN 2 process engine\
+    \ written in Java. It is Apache 2.0 licensed open source, with a committed community.\n\
+    - can run embedded in a Java application, or as a service on a server, a cluster,\
+    \ and in the cloud. It integrates perfectly with Spring. With a rich Java and\
+    \ REST API, it is the ideal engine for orchestrating human or system activities."
+  version: "v1"
+  title: "Flowable Form REST API"
+  contact:
+    name: "Flowable"
+    url: "http://www.flowable.org/"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "localhost:8080"
+basePath: "/flowable-rest/form-api"
+tags:
+- name: "Engine"
+- name: "Form Definitions"
+- name: "Form Deployments"
+- name: "Form Instance Models"
+- name: "Form Instances"
+- name: "Form Models"
+- name: "Query"
+schemes:
+- "http"
+- "https"
+paths:
+  /form-management/engine:
+    get:
+      tags:
+      - "Engine"
+      summary: "Get form engine info"
+      description: "Returns a read-only view of the engine that is used in this REST-service."
+      operationId: "getEngineInfo"
+      produces:
+      - "application/json"
+      parameters: []
+      responses:
+        200:
+          description: "Indicates the engine info is returned."
+          schema:
+            $ref: "#/definitions/FormEngineInfoResponse"
+      security:
+      - basicAuth: []
+  /form-repository/deployments:
+    get:
+      tags:
+      - "Form Deployments"
+      summary: "List of Form Deployments"
+      description: ""
+      operationId: "listFormDeployments"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "name"
+        in: "query"
+        description: "Only return form deployments with the given name."
+        required: false
+        type: "string"
+      - name: "nameLike"
+        in: "query"
+        description: "Only return form deployments with a name like the given name."
+        required: false
+        type: "string"
+      - name: "category"
+        in: "query"
+        description: "Only return form deployments with the given category."
+        required: false
+        type: "string"
+      - name: "categoryNotEquals"
+        in: "query"
+        description: "Only return form deployments which don?t have the given category."
+        required: false
+        type: "string"
+      - name: "tenantId"
+        in: "query"
+        description: "Only return form deployments with the given tenantId."
+        required: false
+        type: "string"
+      - name: "tenantIdLike"
+        in: "query"
+        description: "Only return form deployments with a tenantId like the given\
+          \ value."
+        required: false
+        type: "string"
+      - name: "withoutTenantId"
+        in: "query"
+        description: "If true, only returns form deployments without a tenantId set.\
+          \ If false, the withoutTenantId parameter is ignored."
+        required: false
+        type: "boolean"
+      - name: "sort"
+        in: "query"
+        description: "Property to sort on, to be used together with the order."
+        required: false
+        type: "string"
+        enum:
+        - "id"
+        - "name"
+        - "deployTime"
+        - "tenantId"
+      responses:
+        200:
+          description: "Indicates the request was successful."
+          schema:
+            $ref: "#/definitions/DataResponseFormDeployment"
+      security:
+      - basicAuth: []
+    post:
+      tags:
+      - "Form Deployments"
+      summary: "Create a new form deployment"
+      description: "The request body should contain data of type multipart/form-data.\
+        \ There should be exactly one file in the request, any additional files will\
+        \ be ignored. The deployment name is the name of the file-field passed in.\
+        \ Make sure the file-name ends with .form or .xml."
+      operationId: "uploadDeployment"
+      consumes:
+      - "multipart/form-data"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "tenantId"
+        in: "query"
+        required: false
+        type: "string"
+      - name: "file"
+        in: "formData"
+        required: false
+        type: "file"
+      responses:
+        200:
+          description: "successful operation"
+          schema:
+            $ref: "#/definitions/FormDeployment"
+        201:
+          description: "Indicates the form deployment was created."
+        400:
+          description: "Indicates there was no content present in the request body\
+            \ or the content mime-type is not supported for form deployment. The status-description\
+            \ contains additional information."
+      security:
+      - basicAuth: []
+  /form-repository/deployments/{deploymentId}:
+    get:
+      tags:
+      - "Form Deployments"
+      summary: "Get a form deployment"
+      description: ""
+      operationId: "getFormDeployment"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "deploymentId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the form deployment was found and returned."
+          schema:
+            $ref: "#/definitions/FormDeployment"
+        404:
+          description: "Indicates the requested form deployment was not found."
+      security:
+      - basicAuth: []
+    delete:
+      tags:
+      - "Form Deployments"
+      summary: "Delete a form deployment"
+      description: ""
+      operationId: "deleteFormDeployment"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "deploymentId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        204:
+          description: "Indicates the form deployment was found and has been deleted.\
+            \ Response-body is intentionally empty."
+        404:
+          description: "Indicates the requested form deployment was not found."
+      security:
+      - basicAuth: []
+  /form-repository/deployments/{deploymentId}/resourcedata/{resourceName}:
+    get:
+      tags:
+      - "Form Deployments"
+      summary: "Get a form deployment resource content"
+      description: "The response body will contain the binary resource-content for\
+        \ the requested resource. The response content-type will be the same as the\
+        \ type returned in the resources mimeType property. Also, a content-disposition\
+        \ header is set, allowing browsers to download the file instead of displaying\
+        \ it."
+      operationId: "getFormDeploymentResource"
+      parameters:
+      - name: "deploymentId"
+        in: "path"
+        required: true
+        type: "string"
+      - name: "resourceName"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates both form deployment and resource have been found\
+            \ and the resource data has been returned."
+          schema:
+            type: "array"
+            items:
+              type: "string"
+              format: "byte"
+        404:
+          description: "Indicates the requested form deployment was not found or there\
+            \ is no resource with the given id present in the form deployment. The\
+            \ status-description contains additional information."
+      security:
+      - basicAuth: []
+  /form-repository/form-definitions:
+    get:
+      tags:
+      - "Form Definitions"
+      summary: "List of form definitions"
+      description: ""
+      operationId: "listFormDefinitions"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "category"
+        in: "query"
+        description: "Only return form definitions with the given category."
+        required: false
+        type: "string"
+      - name: "categoryLike"
+        in: "query"
+        description: "Only return form definitions with a category like the given\
+          \ value."
+        required: false
+        type: "string"
+      - name: "categoryNotEquals"
+        in: "query"
+        description: "Only return form definitions not with the given category."
+        required: false
+        type: "string"
+      - name: "key"
+        in: "query"
+        description: "Only return form definitions with the given key."
+        required: false
+        type: "string"
+      - name: "keyLike"
+        in: "query"
+        description: "Only return form definitions with a key like the given value."
+        required: false
+        type: "string"
+      - name: "name"
+        in: "query"
+        description: "Only return form definitions with the given name."
+        required: false
+        type: "string"
+      - name: "nameLike"
+        in: "query"
+        description: "Only return form definitions with a name like the given value."
+        required: false
+        type: "string"
+      - name: "resourceName"
+        in: "query"
+        description: "Only return form definitions with the given resource name."
+        required: false
+        type: "string"
+      - name: "resourceNameLike"
+        in: "query"
+        description: "Only return form definitions a resource name like the given\
+          \ value."
+        required: false
+        type: "string"
+      - name: "version"
+        in: "query"
+        description: "Only return form definitions with the given version."
+        required: false
+        type: "string"
+      - name: "versionGreaterThan"
+        in: "query"
+        description: "Only return form definitions with a version greater than the\
+          \ given value."
+        required: false
+        type: "string"
+      - name: "versionGreaterThanOrEquals"
+        in: "query"
+        description: "Only return form definitions with a version greater than or\
+          \ equal to the given value."
+        required: false
+        type: "string"
+      - name: "versionLowerThan"
+        in: "query"
+        description: "Only return form definitions with a version lower than the given\
+          \ value."
+        required: false
+        type: "string"
+      - name: "versionLowerThanOrEquals"
+        in: "query"
+        description: "Only return form definitions with a version lower than or equal\
+          \ to the given value."
+        required: false
+        type: "string"
+      - name: "deploymentId"
+        in: "query"
+        description: "Only return form definitions with the given deployment id."
+        required: false
+        type: "string"
+      - name: "tenantId"
+        in: "query"
+        description: "Only return form definitions with the given tenant id."
+        required: false
+        type: "string"
+      - name: "tenantIdLike"
+        in: "query"
+        description: "Only return form definitions with a tenant id like the given\
+          \ value."
+        required: false
+        type: "string"
+      - name: "withoutTenantId"
+        in: "query"
+        description: "Only return form definitions without a tenant id."
+        required: false
+        type: "string"
+      - name: "latest"
+        in: "query"
+        description: "If true; only the latest versions will be returned."
+        required: false
+        type: "boolean"
+      - name: "sort"
+        in: "query"
+        description: "Property to sort on, to be used together with the order."
+        required: false
+        type: "string"
+        enum:
+        - "key"
+        - "category"
+        - "id"
+        - "version"
+        - "name"
+        - "deploymentId"
+        - "tenantId"
+      responses:
+        200:
+          description: "Indicates request was successful and the form definitions\
+            \ are returned"
+          schema:
+            $ref: "#/definitions/DataResponseFormDefinitionResponse"
+        400:
+          description: "Indicates a parameter was passed in the wrong format . The\
+            \ status-message contains additional information."
+      security:
+      - basicAuth: []
+  /form-repository/form-definitions/{formDefinitionId}:
+    get:
+      tags:
+      - "Form Definitions"
+      summary: "Get a form definition"
+      description: ""
+      operationId: "getForm"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "formDefinitionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the form definition was found returned."
+          schema:
+            $ref: "#/definitions/FormDefinitionResponse"
+        404:
+          description: "Indicates the form definition was not found."
+      security:
+      - basicAuth: []
+  /form-repository/form-definitions/{formDefinitionId}/model:
+    get:
+      tags:
+      - "Form Definitions"
+      summary: "Get a form definition Form model"
+      description: ""
+      operationId: "getFormDefinitionFormModel"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "formDefinitionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the form definition Form model was found returned."
+          schema:
+            $ref: "#/definitions/FormModel"
+        404:
+          description: "Indicates the form definition Form model was not found."
+      security:
+      - basicAuth: []
+  /form-repository/form-definitions/{formDefinitionId}/resourcedata:
+    get:
+      tags:
+      - "Form Definitions"
+      summary: "Get a form definition resource content"
+      description: ""
+      operationId: "getFormDefinitionContent"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "formDefinitionId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates both form definition and resource have been found\
+            \ and the resource data has been returned."
+          schema:
+            type: "array"
+            items:
+              type: "string"
+              format: "byte"
+        404:
+          description: "Indicates the requested form definition was not found or there\
+            \ is no resource with the given id present in the process definition.\
+            \ The status-description contains additional information."
+      security:
+      - basicAuth: []
+  /form/form-instance-model:
+    post:
+      tags:
+      - "Form Instance Models"
+      summary: "Get a form instance model"
+      description: ""
+      operationId: "getFormInstanceModel"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "formInstanceModelRequest"
+        required: false
+        schema:
+          $ref: "#/definitions/FormRequest"
+      responses:
+        200:
+          description: "Indicates the form instance was found and the model is returned."
+          schema:
+            $ref: "#/definitions/FormInstanceModelResponse"
+        404:
+          description: "Indicates the form instance was not found."
+      security:
+      - basicAuth: []
+  /form/form-instance/{formInstanceId}:
+    get:
+      tags:
+      - "Form Instances"
+      summary: "Get a form instance"
+      description: ""
+      operationId: "getFormInstance"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "formInstanceId"
+        in: "path"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "Indicates the form instance was found and returned."
+          schema:
+            $ref: "#/definitions/FormInstanceResponse"
+        404:
+          description: "Indicates the requested form instance was not found."
+      security:
+      - basicAuth: []
+  /form/form-instances:
+    get:
+      tags:
+      - "Form Instances"
+      summary: "List of form instances"
+      description: ""
+      operationId: "listFormInstances"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "query"
+        description: "Only return form instances with the given id."
+        required: false
+        type: "string"
+      - name: "formDefinitionId"
+        in: "query"
+        description: "Only return form instances with the given form definition id."
+        required: false
+        type: "string"
+      - name: "formDefinitionIdLike"
+        in: "query"
+        description: "Only return form instances with a form definition id like the\
+          \ given value."
+        required: false
+        type: "string"
+      - name: "taskId"
+        in: "query"
+        description: "Only return form instances with the given task id."
+        required: false
+        type: "string"
+      - name: "taskIdLike"
+        in: "query"
+        description: "Only return form instances with a task id like the given value."
+        required: false
+        type: "string"
+      - name: "processInstanceId"
+        in: "query"
+        description: "Only return form instances with the given process instance id."
+        required: false
+        type: "string"
+      - name: "processInstanceIdLike"
+        in: "query"
+        description: "Only return form instances with a process instance id like the\
+          \ given value."
+        required: false
+        type: "string"
+      - name: "processDefinitionId"
+        in: "query"
+        description: "Only return form instances with the given process definition\
+          \ id."
+        required: false
+        type: "string"
+      - name: "processDefinitionIdLike"
+        in: "query"
+        description: "Only return form instances with a process definition id like\
+          \ the given value."
+        required: false
+        type: "string"
+      - name: "submittedBy"
+        in: "query"
+        description: "Only return form instances submitted by the given value."
+        required: false
+        type: "string"
+      - name: "submittedByLike"
+        in: "query"
+        description: "Only return form instances submitted by like the given value."
+        required: false
+        type: "string"
+      - name: "tenantId"
+        in: "query"
+        description: "Only return form instances with the given tenantId."
+        required: false
+        type: "string"
+      - name: "tenantIdLike"
+        in: "query"
+        description: "Only return form instances with a tenantId like the given value."
+        required: false
+        type: "string"
+      - name: "withoutTenantId"
+        in: "query"
+        description: "If true, only returns form instances without a tenantId set.\
+          \ If false, the withoutTenantId parameter is ignored."
+        required: false
+        type: "boolean"
+      - name: "sort"
+        in: "query"
+        description: "Property to sort on, to be used together with the order."
+        required: false
+        type: "string"
+        enum:
+        - "submittedDate"
+        - "tenantId"
+      responses:
+        200:
+          description: "Indicates request was successful and the form instances are\
+            \ returned"
+          schema:
+            $ref: "#/definitions/DataResponseFormInstanceResponse"
+        400:
+          description: "Indicates a parameter was passed in the wrong format . The\
+            \ status-message contains additional information."
+      security:
+      - basicAuth: []
+    post:
+      tags:
+      - "Form Instances"
+      summary: "Store a form instance"
+      description: "Provide either a FormDefinitionKey or a FormDefinitionId together\
+        \ with the other properties."
+      operationId: "storeFormInstance"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/FormRequest"
+      responses:
+        201:
+          description: "Indicates the form instance was stored."
+        404:
+          description: "Indicates the related form model was not found."
+      security:
+      - basicAuth: []
+  /form/model:
+    post:
+      tags:
+      - "Form Models"
+      summary: "Get a populated form model"
+      description: "Provide variables needed to pre populated form fields and to render\
+        \ expression based form fields"
+      operationId: "getFormModel"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/FormRequest"
+      responses:
+        200:
+          description: "Indicates the form model was found and returned."
+          schema:
+            $ref: "#/definitions/FormModelResponse"
+        404:
+          description: "Indicates the requested form model was not found."
+      security:
+      - basicAuth: []
+  /query/form-instances:
+    post:
+      tags:
+      - "Form Instances"
+      - "Query"
+      summary: "Query form instances"
+      description: "The request body can contain all possible filters that can be\
+        \ used in the List form instances URL query. On top of these, it?s possible\
+        \ to provide an array of variables to include in the query, with their format\
+        \ described here.\n\nThe general paging and sorting query-parameters can be\
+        \ used for this URL."
+      operationId: "queryFormInstances"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/FormInstanceQueryRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the form instances are\
+            \ returned"
+          schema:
+            $ref: "#/definitions/DataResponseFormInstanceResponse"
+        400:
+          description: "Indicates a parameter was passed in the wrong format . The\
+            \ status-message contains additional information."
+      security:
+      - basicAuth: []
+securityDefinitions:
+  basicAuth:
+    type: "basic"
+definitions:
+  DataResponse:
+    type: "object"
+    properties:
+      data:
+        type: "array"
+        items:
+          type: "object"
+      total:
+        type: "integer"
+        format: "int64"
+      start:
+        type: "integer"
+        format: "int32"
+      sort:
+        type: "string"
+      order:
+        type: "string"
+      size:
+        type: "integer"
+        format: "int32"
+  DataResponseFormDefinitionResponse:
+    type: "object"
+    properties:
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/FormDefinitionResponse"
+      total:
+        type: "integer"
+        format: "int64"
+      start:
+        type: "integer"
+        format: "int32"
+      sort:
+        type: "string"
+      order:
+        type: "string"
+      size:
+        type: "integer"
+        format: "int32"
+  DataResponseFormDeployment:
+    type: "object"
+    properties:
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/FormDeployment"
+      total:
+        type: "integer"
+        format: "int64"
+      start:
+        type: "integer"
+        format: "int32"
+      sort:
+        type: "string"
+      order:
+        type: "string"
+      size:
+        type: "integer"
+        format: "int32"
+  DataResponseFormInstanceResponse:
+    type: "object"
+    properties:
+      data:
+        type: "array"
+        items:
+          $ref: "#/definitions/FormInstanceResponse"
+      total:
+        type: "integer"
+        format: "int64"
+      start:
+        type: "integer"
+        format: "int32"
+      sort:
+        type: "string"
+      order:
+        type: "string"
+      size:
+        type: "integer"
+        format: "int32"
+  ExpressionFormField:
+    allOf:
+    - $ref: "#/definitions/FormField"
+    - type: "object"
+      properties:
+        expression:
+          type: "string"
+  FormContainer:
+    allOf:
+    - $ref: "#/definitions/FormField"
+    - type: "object"
+      properties:
+        fields:
+          type: "array"
+          items:
+            type: "array"
+            items:
+              $ref: "#/definitions/FormField"
+  FormDefinitionResponse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        example: "10"
+      url:
+        type: "string"
+        example: "http://localhost:8182/form-repository/form-definitions/simpleForm"
+      category:
+        type: "string"
+        example: "Examples"
+      name:
+        type: "string"
+        example: "The Simple Form"
+      key:
+        type: "string"
+        example: "simpleForm"
+      description:
+        type: "string"
+        example: "This is a form for testing purposes"
+      version:
+        type: "integer"
+        format: "int32"
+        example: 1
+      resourceName:
+        type: "string"
+        example: "SimpleSourceName"
+      deploymentId:
+        type: "string"
+        example: "818e4703-f1d2-11e6-8549-acde48001121"
+      parentDeploymentId:
+        type: "string"
+        example: "2"
+      tenantId:
+        type: "string"
+        example: "null"
+  FormDeployment:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        example: "10"
+      name:
+        type: "string"
+        example: "flowable-form-examples"
+      deploymentTime:
+        type: "string"
+        format: "date-time"
+        example: "2010-10-13T14:54:26.750+02:00"
+      category:
+        type: "string"
+        example: "examples"
+      url:
+        type: "string"
+        example: "http://localhost:8081/form-api/form-repository/deployments/10"
+      parentDeploymentId:
+        type: "string"
+        example: "5"
+      tenantId:
+        type: "string"
+        example: "null"
+  FormEngineInfoResponse:
+    type: "object"
+    properties:
+      name:
+        type: "string"
+        example: "default"
+      resourceUrl:
+        type: "string"
+        example: "file://flowable/flowable.form.cfg.xml"
+      exception:
+        type: "string"
+        example: "null"
+      version:
+        type: "string"
+        example: "6.2.0"
+  FormField:
+    type: "object"
+    discriminator: "fieldType"
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+      type:
+        type: "string"
+      value:
+        type: "object"
+      required:
+        type: "boolean"
+      readOnly:
+        type: "boolean"
+      overrideId:
+        type: "boolean"
+      placeholder:
+        type: "string"
+      params:
+        type: "object"
+        additionalProperties:
+          type: "object"
+      layout:
+        $ref: "#/definitions/LayoutDefinition"
+  FormInstanceModelResponse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+      description:
+        type: "string"
+      key:
+        type: "string"
+      version:
+        type: "integer"
+        format: "int32"
+      fields:
+        type: "array"
+        items:
+          $ref: "#/definitions/FormField"
+      outcomes:
+        type: "array"
+        items:
+          $ref: "#/definitions/FormOutcome"
+      outcomeVariableName:
+        type: "string"
+      formInstanceId:
+        type: "string"
+      submittedBy:
+        type: "string"
+      submittedDate:
+        type: "string"
+        format: "date-time"
+      selectedOutcome:
+        type: "string"
+      taskId:
+        type: "string"
+      processInstanceId:
+        type: "string"
+      processDefinitionId:
+        type: "string"
+      tenantId:
+        type: "string"
+      url:
+        type: "string"
+  FormInstanceQueryRequest:
+    type: "object"
+    properties:
+      start:
+        type: "integer"
+        format: "int32"
+      size:
+        type: "integer"
+        format: "int32"
+      sort:
+        type: "string"
+      order:
+        type: "string"
+      id:
+        type: "string"
+      formDefinitionId:
+        type: "string"
+      formDefinitionIdLike:
+        type: "string"
+      taskId:
+        type: "string"
+      taskIdLike:
+        type: "string"
+      processInstanceId:
+        type: "string"
+      processInstanceIdLike:
+        type: "string"
+      processDefinitionId:
+        type: "string"
+      processDefinitionIdLike:
+        type: "string"
+      submittedBy:
+        type: "string"
+      submittedByLike:
+        type: "string"
+      tenantId:
+        type: "string"
+      tenantIdLike:
+        type: "string"
+      withoutTenantId:
+        type: "boolean"
+  FormInstanceResponse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+        example: "48b9ac82-f1d3-11e6-8549-acde48001122"
+      formDefinitionId:
+        type: "string"
+        example: "818e4703-f1d2-11e6-8549-acde48001122"
+      taskId:
+        type: "string"
+        example: "88"
+      processInstanceId:
+        type: "string"
+        example: "66"
+      processDefinitionId:
+        type: "string"
+        example: "oneTaskProcess:1:158"
+      submittedDate:
+        type: "string"
+        format: "date-time"
+        example: "2013-04-17T10:17:43.902+0000"
+      submittedBy:
+        type: "string"
+        example: "testUser"
+      formValuesId:
+        type: "string"
+        example: "818e4703-f1d2-11e6-8549-acde48001110"
+      tenantId:
+        type: "string"
+        example: "null"
+      url:
+        type: "string"
+        example: "http://localhost:8182/form/form-instances/48b9ac82-f1d3-11e6-8549-acde48001122"
+  FormModel:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+      description:
+        type: "string"
+      key:
+        type: "string"
+      version:
+        type: "integer"
+        format: "int32"
+      fields:
+        type: "array"
+        items:
+          $ref: "#/definitions/FormField"
+      outcomes:
+        type: "array"
+        items:
+          $ref: "#/definitions/FormOutcome"
+      outcomeVariableName:
+        type: "string"
+  FormModelResponse:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+      description:
+        type: "string"
+      key:
+        type: "string"
+      version:
+        type: "integer"
+        format: "int32"
+      fields:
+        type: "array"
+        items:
+          $ref: "#/definitions/FormField"
+      outcomes:
+        type: "array"
+        items:
+          $ref: "#/definitions/FormOutcome"
+      outcomeVariableName:
+        type: "string"
+      url:
+        type: "string"
+  FormOutcome:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+  FormRequest:
+    type: "object"
+    properties:
+      formInstanceId:
+        type: "string"
+      formDefinitionId:
+        type: "string"
+      formDefinitionKey:
+        type: "string"
+      taskId:
+        type: "string"
+      processInstanceId:
+        type: "string"
+      processDefinitionId:
+        type: "string"
+      scopeId:
+        type: "string"
+      scopeType:
+        type: "string"
+      scopeDefinitionId:
+        type: "string"
+      tenantId:
+        type: "string"
+      parentDeploymentId:
+        type: "string"
+      variables:
+        type: "object"
+        additionalProperties:
+          type: "object"
+  LayoutDefinition:
+    type: "object"
+    properties:
+      row:
+        type: "integer"
+        format: "int32"
+  Option:
+    type: "object"
+    properties:
+      id:
+        type: "string"
+      name:
+        type: "string"
+  OptionFormField:
+    allOf:
+    - $ref: "#/definitions/FormField"
+    - type: "object"
+      properties:
+        optionType:
+          type: "string"
+        hasEmptyValue:
+          type: "boolean"
+        options:
+          type: "array"
+          items:
+            $ref: "#/definitions/Option"
