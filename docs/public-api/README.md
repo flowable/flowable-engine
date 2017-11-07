@@ -39,10 +39,10 @@ You can retrieve the Swagger Specification for Flowable API by following links b
 
 | API Name | Syntax Validation  | 
 |:---:|:---:|
-| [Process API](/references/swagger/process/flowable.yaml) | <img src="http://online.swagger.io/validator?url=https://raw.githubusercontent.com/flowable/flowable-engine/master/docs/public-api/references/swagger/process/flowable-swagger-process.yaml">  |  
-| [Form API](/references/swagger/form/flowable.yaml) |  <img src="http://online.swagger.io/validator?url=https://raw.githubusercontent.com/flowable/flowable-engine/master/docs/public-api/references/swagger/form/flowable-swagger-form.yaml"> |  
-| [Decision API](/references/swagger/decision/flowable.yaml) |  <img src="http://online.swagger.io/validator?url=https://raw.githubusercontent.com/flowable/flowable-engine/master/docs/public-api/references/swagger/decision/flowable-swagger-decision.yaml"> | 
-| [Content API](/references/swagger/content/flowable.yaml) | <img src="http://online.swagger.io/validator?url=https://raw.githubusercontent.com/flowable/flowable-engine/master/docs/public-api/references/swagger/content/flowable-swagger-content.yaml">  | 
+| [Process API](references/swagger/process/flowable-swagger-process.yaml) | <img src="http://online.swagger.io/validator?url=https://raw.githubusercontent.com/flowable/flowable-engine/master/docs/public-api/references/swagger/process/flowable-swagger-process.yaml"/>  |  
+| [Form API](references/swagger/form/flowable-swagger-form.yaml) |  <img src="http://online.swagger.io/validator?url=https://raw.githubusercontent.com/flowable/flowable-engine/master/docs/public-api/references/swagger/form/flowable-swagger-form.yaml"/> |  
+| [Decision API](references/swagger/decision/flowable-swagger-decision.yaml) |  <img src="http://online.swagger.io/validator?url=https://raw.githubusercontent.com/flowable/flowable-engine/master/docs/public-api/references/swagger/decision/flowable-swagger-decision.yaml"/> | 
+| [Content API](references/swagger/content/flowable-swagger-content.yaml) | <img src="http://online.swagger.io/validator?url=https://raw.githubusercontent.com/flowable/flowable-engine/master/docs/public-api/references/swagger/content/flowable-swagger-content.yaml"/>  | 
 
 
 ## Open API Specification V3
@@ -52,27 +52,32 @@ You can retrieve the OpenApi Specification (V3) for Flowable API by following li
 
 | API Name |
 |:---:|
-| [Process API](/references/oas/process/flowable-swagger-process.yaml) |    
-| [Form API](/references/oas/form/flowable-swagger-form.yaml) | 
-| [Decision API](/references/oas/decision/flowable-swagger-decision.yaml) |  
-| [Content API](/references/oas/content/flowable-swagger-content.yaml) |   
+| [Process API](references/openapi/process/flowable-oas-process.yaml) |    
+| [Form API](references/openapi/form/flowable-oas-form.yaml) | 
+| [Decision API](references/openapi/decision/flowable-oas-decision.yaml) |  
+| [Content API](references/openapi/content/flowable-oas-content.yaml) |   
 
 # Tools
 
 To help developers discovering & using Flowable API, we provide a set of tools ready to use.
 
-## [Flowable OpenAPI Specification Generator](/tools/flowable-oas-generator)
+## [Flowable OpenAPI Specification Generator](tools/flowable-oas-generator)
 
 Utility project to generate automatically the swagger definition from the source code.
 
-## [Flowable Rest Asciidoc](/tools/flowable-rest-asciidoc)
+## [Flowable Rest Asciidoc](tools/flowable-rest-asciidoc)
 
 Utility project to generate asciidoc based on OAS files.
 
-## [Flowable Swagger UI](/tools/flowable-swagger-ui)
+## [Flowable Swagger UI](tools/flowable-swagger-ui)
 
 Utility project to build a WAR file for Swagger UI.
 
-## [Flowable Slate](/tools/flowable-slate)
+## [Flowable Slate](tools/flowable-slate)
 
 Utility project to create a beautiful static web site for REST API docs.
+
+## [Flowable Swagger Codegen](tools/flowable-swagger-codegen)
+
+Utility project to generate client sdk to interact with Flowable Rest API.
+
