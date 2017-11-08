@@ -10,9 +10,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.app.idm.service;
+package org.flowable.app.idm.service.impl;
 
+import org.flowable.app.idm.service.impl.AbstractIdmService;
 import java.util.List;
+import org.flowable.app.idm.service.PrivilegeService;
 
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.Privilege;

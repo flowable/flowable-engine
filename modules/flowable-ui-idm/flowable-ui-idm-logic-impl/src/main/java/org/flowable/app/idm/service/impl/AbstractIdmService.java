@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.app.idm.service;
+package org.flowable.app.idm.service.impl;
 
 import org.flowable.idm.api.IdmIdentityService;
 import org.springframework.beans.factory.annotation.Autowired;

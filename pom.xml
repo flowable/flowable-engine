@@ -967,6 +967,7 @@
         <module>modules/flowable-job-service-api</module>
         <module>modules/flowable-job-service</module>
 		<module>modules/flowable-engine</module>
+	 <module>modules/flowable-ui-idm-logic-impl</module>
 	</modules>
 
 	<build>

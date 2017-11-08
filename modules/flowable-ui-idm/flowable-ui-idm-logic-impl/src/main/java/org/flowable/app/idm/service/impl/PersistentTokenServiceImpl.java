@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.app.idm.service;
+package org.flowable.app.idm.service.impl;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -23,6 +23,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
+import org.flowable.app.idm.service.PersistentTokenService;
 
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Token;
