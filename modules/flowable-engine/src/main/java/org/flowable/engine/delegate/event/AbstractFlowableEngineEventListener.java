@@ -103,6 +103,15 @@ public abstract class AbstractFlowableEngineEventListener implements FlowableEve
                     case ACTIVITY_CANCELLED:
                         activityCancelled((FlowableActivityCancelledEvent) flowableEngineEvent);
                         break;
+                    case MULTI_INSTANCE_ACTIVITY_STARTED:
+                        multiInstanceActivityStarted((FlowableMultiInstanceActivityEvent) flowableEngineEvent);
+                        break;
+                    case MULTI_INSTANCE_ACTIVITY_COMPLETED:
+                        multiInstanceActivityCompleted((FlowableMultiInstanceActivityEvent) flowableEngineEvent);
+                        break;
+                    case MULTI_INSTANCE_ACTIVITY_CANCELLED:
+                        multiInstanceActivityCancelled((FlowableMultiInstanceActivityCancelledEvent) flowableEngineEvent);
+                        break;
                     case ACTIVITY_SIGNAL_WAITING:
                         activitySignalWaiting((FlowableSignalEvent) flowableEngineEvent);
                         break;
@@ -222,6 +231,12 @@ public abstract class AbstractFlowableEngineEventListener implements FlowableEve
     protected void activityCompleted(FlowableActivityEvent event) {}
 
     protected void activityCancelled(FlowableActivityCancelledEvent event) {}
+
+    protected void multiInstanceActivityStarted(FlowableMultiInstanceActivityEvent event) {}
+
+    protected void multiInstanceActivityCompleted(FlowableMultiInstanceActivityEvent event) {}
+
+    protected void multiInstanceActivityCancelled(FlowableMultiInstanceActivityCancelledEvent event) {}
 
     protected void activitySignalWaiting(FlowableSignalEvent event) {}
 
