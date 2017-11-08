@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>flowable-ui-idm-logic-impl</artifactId>
+    <artifactId>flowable-ui-idm-security</artifactId>
     <parent>
         <groupId>org.flowable</groupId>
         <artifactId>flowable-ui-idm</artifactId>
@@ -23,6 +23,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+        </dependency>
+        
+        
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
         </dependency>
         
         <!-- JSON -->
@@ -104,4 +110,5 @@
             </build>
         </profile>
     </profiles>
+    <name>flowable-ui-idm-security</name>
 </project>

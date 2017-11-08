@@ -12,17 +12,22 @@
  */
 package org.flowable.app.conf;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.flowable.app.idm.service.impl.CustomPersistentRememberMeServices;
 import org.flowable.app.security.AjaxAuthenticationFailureHandler;
 import org.flowable.app.security.AjaxAuthenticationSuccessHandler;
 import org.flowable.app.security.AjaxLogoutSuccessHandler;
 import org.flowable.app.security.ClearFlowableCookieLogoutHandler;
 import org.flowable.app.security.CustomDaoAuthenticationProvider;
 import org.flowable.app.security.CustomLdapAuthenticationProvider;
-import org.flowable.app.security.CustomPersistentRememberMeServices;
 import org.flowable.app.security.DefaultPrivileges;
+import org.flowable.app.security.FlowableAppUser;
 import org.flowable.app.security.Http401UnauthorizedEntryPoint;
 import org.flowable.app.web.CustomFormLoginConfig;
 import org.flowable.idm.api.IdmIdentityService;
+import org.flowable.idm.api.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,12 +37,16 @@ import org.springframework.core.annotation.Order;
 import org.springframework.core.env.Environment;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.RememberMeAuthenticationProvider;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.RememberMeServices;
@@ -89,7 +98,7 @@ public class SecurityConfiguration {
             }
         }
     }
-
+    
     @Bean
     public UserDetailsService userDetailsService() {
         org.flowable.app.security.UserDetailsService userDetailsService = new org.flowable.app.security.UserDetailsService();

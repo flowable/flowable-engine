@@ -12,6 +12,7 @@
  */
 package org.flowable.app.security;
 
+import org.flowable.app.security.FlowableAppUser;
 import org.flowable.idm.api.IdmIdentityService;
 import org.springframework.context.support.MessageSourceAccessor;
 import org.springframework.security.authentication.AuthenticationProvider;

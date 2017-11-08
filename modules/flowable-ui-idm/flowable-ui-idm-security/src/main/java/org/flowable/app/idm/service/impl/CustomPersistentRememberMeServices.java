@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.app.security;
+package org.flowable.app.idm.service.impl;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
@@ -21,6 +21,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.app.idm.service.PersistentTokenService;
+import org.flowable.app.idm.service.PersistentTokenService;
+import org.flowable.app.security.CookieConstants;
+import org.flowable.app.security.CustomRememberMeService;
+import org.flowable.app.security.CustomUserDetailService;
+import org.flowable.app.security.FlowableAppUser;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.Token;
 import org.flowable.idm.api.User;
