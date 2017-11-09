@@ -46,13 +46,13 @@ import javax.servlet.http.HttpServletResponse;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Tasks Variables" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Task Variables" }, description = "Manage Tasks", authorizations = { @Authorization(value = "basicAuth") })
 public class TaskVariableResource extends TaskVariableBaseResource {
 
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @ApiOperation(value = "Get a variable from a task", tags = { "Tasks Variables" }, nickname = "getTaskInstanceVariable")
+    @ApiOperation(value = "Get a variable from a task", tags = { "Task Variables" }, nickname = "getTaskInstanceVariable")
     @ApiImplicitParams(@ApiImplicitParam(name = "scope", dataType = "string", value = "Scope of variable to be returned. When local, only task-local variable value is returned. When global, only variable value from the task’s parent execution-hierarchy are returned. When the parameter is omitted, a local variable will be returned if it exists, otherwise a global variable.", paramType = "query"))
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task was found and the requested variables are returned."),
@@ -67,7 +67,7 @@ public class TaskVariableResource extends TaskVariableBaseResource {
     }
 
     // FIXME OASv3 to solve Multiple Endpoint issue
-    @ApiOperation(value = "Update an existing variable on a task", tags = { "Tasks Variables" }, nickname = "updateTaskInstanceVariable",
+    @ApiOperation(value = "Update an existing variable on a task", tags = { "Task Variables" }, nickname = "updateTaskInstanceVariable",
             notes = "This endpoint can be used in 2 ways: By passing a JSON Body (RestVariable) or by passing a multipart/form-data Object.\n"
                     + "It's possible to update simple (non-binary) variable or  binary variable \n"
                     + "Any number of variables can be passed into the request body array.\n"
@@ -126,7 +126,7 @@ public class TaskVariableResource extends TaskVariableBaseResource {
         return result;
     }
 
-    @ApiOperation(value = "Delete a variable on a task", tags = { "Tasks Variables" }, nickname = "deleteTaskInstanceVariable")
+    @ApiOperation(value = "Delete a variable on a task", tags = { "Task Variables" }, nickname = "deleteTaskInstanceVariable")
     @ApiImplicitParams(@ApiImplicitParam(name = "scope", dataType = "string", value = "Scope of variable to be returned. When local, only task-local variable value is returned. When global, only variable value from the task’s parent execution-hierarchy are returned. When the parameter is omitted, a local variable will be returned if it exists, otherwise a global variable.", paramType = "query"))
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the task variable was found and has been deleted. Response-body is intentionally empty."),

@@ -58,7 +58,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
     @Autowired
     protected HistoryService historyService;
 
-    @ApiOperation(value = "List of process instances", nickname ="listProcessInstances", tags = { "Process Instances" })
+    @ApiOperation(value = "List process instances", nickname ="listProcessInstances", tags = { "Process Instances" })
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionKey", dataType = "string", value = "Only return process instances with the given process definition key.", paramType = "query"),
@@ -141,25 +141,12 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
         return getQueryResponse(queryRequest, allRequestParams);
     }
 
-    @ApiOperation(value = "Start a process instance", tags = { "Process Instances" }, notes = "## Request body (start by process definition id)\n\n"
-            + "```JSON\n {\n" + "   \"processDefinitionId\":\"oneTaskProcess:1:158\",\n" + "   \"businessKey\":\"myBusinessKey\",\n" + "   \"variables\": [\n"
-            + "      {\n" + "        \"name\":\"myVar\",\n" + "        \"value\":\"This is a variable\",\n" + "      }\n" + "   ]\n" + "}```"
-            + "\n\n"
-            + "## Request body (start by process definition key)\n\n"
-            + "```JSON\n {\n" + "   \"processDefinitionKey\":\"oneTaskProcess\",\n" + "   \"businessKey\":\"myBusinessKey\",\n" + "   \"tenantId\": \"tenant1\",\n"
-            + "   \"variables\": [\n" + "      {\n" + "        \"name\":\"myVar\",\n" + "        \"value\":\"This is a variable\",\n" + "      }\n"
-            + "   ]\n" + "}```"
-            + "\n\n"
-            + "## Request body (start by message)\n\n"
-            + "```JSON\n{\n" + "   \"message\":\"newOrderMessage\",\n" + "   \"businessKey\":\"myBusinessKey\",\n" + "   \"tenantId\": \"tenant1\",\n"
-            + "   \"variables\": [\n" + "      {\n" + "        \"name\":\"myVar\",\n" + "        \"value\":\"This is a variable\",\n" + "      }\n"
-            + "   ]\n" + "}```"
-            + "\n\n"
-            + "Note that also a *transientVariables* property is accepted as part of this json, that follows the same structure as the *variables* property.\n\n"
-            + "Only one of *processDefinitionId*, *processDefinitionKey* or *message* can be used in the request body. "
-            + "Parameters *businessKey*, *variables* and *tenantId* are optional. "
-            + "If tenantId is omitted, the default tenant will be used. More information about the variable format can be found in the REST variables section. "
-            + "Note that the variable-scope that is supplied is ignored, process-variables are always local.")
+    @ApiOperation(value = "Start a process instance", tags = { "Process Instances" },
+            notes = "Note that also a *transientVariables* property is accepted as part of this json, that follows the same structure as the *variables* property.\n\n"
+            + "Only one of *processDefinitionId*, *processDefinitionKey* or *message* can be used in the request body. \n\n"
+            + "Parameters *businessKey*, *variables* and *tenantId* are optional.\n\n "
+            + "If tenantId is omitted, the default tenant will be used. More information about the variable format can be found in the REST variables section.\n\n "
+            + "Note that the variable-scope that is supplied is ignored, process-variables are always local.\n\n")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the process instance was created."),
             @ApiResponse(code = 400, message = "Indicates either the process-definition was not found (based on id or key), no process is started by sending the given message or an invalid variable has been passed. Status description contains additional information about the error.")

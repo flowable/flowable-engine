@@ -12,6 +12,8 @@
  */
 package org.flowable.rest.content.service.api.content;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author Tijs Rademakers
  */
@@ -28,6 +30,7 @@ public class ContentItemRequest {
     protected String createdBy;
     protected String lastModifiedBy;
 
+    @ApiModelProperty(value = "Name of the content item", example = "Simple content item")
     public String getName() {
         return name;
     }
@@ -36,6 +39,7 @@ public class ContentItemRequest {
         this.name = name;
     }
 
+    @ApiModelProperty(value = "Mime type of the content item, optional", example = "application/pdf")
     public String getMimeType() {
         return mimeType;
     }
@@ -44,6 +48,7 @@ public class ContentItemRequest {
         this.mimeType = mimeType;
     }
 
+    @ApiModelProperty(value = "Task identifier for the content item, optional", example = "12345")
     public String getTaskId() {
         return taskId;
     }
@@ -52,6 +57,7 @@ public class ContentItemRequest {
         this.taskId = taskId;
     }
 
+    @ApiModelProperty(value = "Process instance identifier for the content item, optional", example = "1234")
     public String getProcessInstanceId() {
         return processInstanceId;
     }
@@ -60,6 +66,7 @@ public class ContentItemRequest {
         this.processInstanceId = processInstanceId;
     }
 
+    @ApiModelProperty(value = "The identifier of the content item in an external content store, optional.", example = "5678")
     public String getContentStoreId() {
         return contentStoreId;
     }
@@ -68,6 +75,7 @@ public class ContentItemRequest {
         this.contentStoreId = contentStoreId;
     }
 
+    @ApiModelProperty(value = "The name of an external content store, optional", example = "myFileStore")
     public String getContentStoreName() {
         return contentStoreName;
     }
@@ -76,6 +84,7 @@ public class ContentItemRequest {
         this.contentStoreName = contentStoreName;
     }
 
+    @ApiModelProperty(value = "The form field for the content item, optional", example = "uploadField")
     public String getField() {
         return field;
     }
@@ -84,6 +93,7 @@ public class ContentItemRequest {
         this.field = field;
     }
 
+    @ApiModelProperty(value = "The tenant identifier of the content item, optional.", example = "myTenantId")
     public String getTenantId() {
         return tenantId;
     }
@@ -92,6 +102,7 @@ public class ContentItemRequest {
         this.tenantId = tenantId;
     }
 
+    @ApiModelProperty(value = "The user identifier that created the content item, optional", example = "johndoe")
     public String getCreatedBy() {
         return createdBy;
     }
@@ -100,6 +111,7 @@ public class ContentItemRequest {
         this.createdBy = createdBy;
     }
 
+    @ApiModelProperty(value = "The user identifier that last modified the content item, optional", example = "johndoe")
     public String getLastModifiedBy() {
         return lastModifiedBy;
     }

@@ -39,10 +39,10 @@ import java.io.InputStream;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Tasks Attachments" }, description = "Manage Tasks Attachments", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Task Attachments" }, description = "Manage Tasks Attachments", authorizations = { @Authorization(value = "basicAuth") })
 public class TaskAttachmentContentResource extends TaskBaseResource {
 
-    @ApiOperation(value = "Get the content for an attachment", tags = { "Tasks Attachments" },
+    @ApiOperation(value = "Get the content for an attachment", tags = { "Task Attachments" },
             notes = "The response body contains the binary content. By default, the content-type of the response is set to application/octet-stream unless the attachment type contains a valid Content-type.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the task and attachment was found and the requested content is returned."),

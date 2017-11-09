@@ -48,7 +48,7 @@ public class DeadLetterJobCollectionResource {
     @Autowired
     protected ManagementService managementService;
 
-    @ApiOperation(value = "Get a list of deadletter jobs", tags = { "Jobs" }, nickname = "listDeadLetterJobs")
+    @ApiOperation(value = "List deadletter jobs", tags = { "Jobs" }, nickname = "listDeadLetterJobs")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return job with the given id", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "Only return jobs part of a process with the given id", paramType = "query"),

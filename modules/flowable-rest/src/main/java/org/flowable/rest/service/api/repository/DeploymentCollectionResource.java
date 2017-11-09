@@ -75,7 +75,7 @@ public class DeploymentCollectionResource {
     @Autowired
     protected RepositoryService repositoryService;
 
-    @ApiOperation(value = "List of Deployments", tags = { "Deployment" }, nickname="listDeployments")
+    @ApiOperation(value = "List Deployments", tags = { "Deployment" }, nickname="listDeployments")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return deployments with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return deployments with a name like the given name.", paramType = "query"),

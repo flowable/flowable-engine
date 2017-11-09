@@ -37,10 +37,10 @@ import java.util.List;
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "Process Instances Identity Links" }, description = "Manage Process Instances Identity Links", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "Process Instance Identity Links" }, description = "Manage Process Instances Identity Links", authorizations = { @Authorization(value = "basicAuth") })
 public class ProcessInstanceIdentityLinkCollectionResource extends BaseProcessInstanceResource {
 
-    @ApiOperation(value = "Get involved people for process instance", tags = {"Process Instances Identity Links" }, nickname = "listProcessInstanceIdentityLinks",
+    @ApiOperation(value = "Get involved people for process instance", tags = {"Process Instance Identity Links" }, nickname = "listProcessInstanceIdentityLinks",
             notes = "Note that the groupId in Response Body will always be null, as it’s only possible to involve users with a process-instance.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the process instance was found and links are returned."),
@@ -52,7 +52,7 @@ public class ProcessInstanceIdentityLinkCollectionResource extends BaseProcessIn
         return restResponseFactory.createRestIdentityLinks(runtimeService.getIdentityLinksForProcessInstance(processInstance.getId()));
     }
 
-    @ApiOperation(value = "Add an involved user to a process instance", tags = {"Process Instances Identity Links" }, nickname = "createProcessInstanceIdentityLinks",
+    @ApiOperation(value = "Add an involved user to a process instance", tags = {"Process Instance Identity Links" }, nickname = "createProcessInstanceIdentityLinks",
             notes = "Note that the groupId in Response Body will always be null, as it’s only possible to involve users with a process-instance.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the process instance was found and the link is created."),

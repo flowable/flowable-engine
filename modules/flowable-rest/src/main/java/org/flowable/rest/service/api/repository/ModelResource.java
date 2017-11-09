@@ -13,9 +13,12 @@
 
 package org.flowable.rest.service.api.repository;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.repository.Model;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,12 +28,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Frederik Heremans
@@ -53,8 +52,7 @@ public class ModelResource extends BaseModelResource {
 
     @ApiOperation(value = "Update a model", tags = { "Models" }, notes = "All request values are optional. "
             + "For example, you can only include the name attribute in the request body JSON-object, only updating the name of the model, leaving all other fields unaffected. "
-            + "When an attribute is explicitly included and is set to null, the model-value will be updated to null. "
-            + "Example: ```JSON \n{\"metaInfo\" : null}``` will clear the metaInfo of the model).")
+            + "When an attribute is explicitly included and is set to null, the model-value will be updated to null. ")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the model was found and updated."),
             @ApiResponse(code = 404, message = "Indicates the requested model was not found.")

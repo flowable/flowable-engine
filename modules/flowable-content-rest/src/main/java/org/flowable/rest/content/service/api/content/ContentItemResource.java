@@ -55,23 +55,8 @@ public class ContentItemResource extends ContentItemBaseResource {
         return contentRestResponseFactory.createContentItemResponse(getContentItemFromRequest(contentItemId));
     }
 
-    @ApiOperation(value = "Updates a content item, with the provided content item information", tags = { "Content item" }, notes = "## Updates a content item, with the provided content item information\n\n"
-            + " ```JSON\n" + "{\n" + "  \"name\":\"Simple content item\",\n" + "  \"mimeType\":\"application/pdf\",\n"
-            + "  \"taskId\":\"12345\",\n" + "  \"processInstanceId\":\"1234\"\n"
-            + "  \"contentStoreId\":\"5678\",\n" + "  \"contentStoreName\":\"myFileStore\"\n"
-            + "  \"field\":\"uploadField\",\n" + "  \"createdBy\":\"johndoe\"\n"
-            + "  \"lastModifiedBy\":\"johndoe\",\n" + "  \"tenantId\":\"myTenantId\"\n" + "} ```"
-            + "\n\n"
-            + "- *name*: Name of the content item.\n\n"
-            + "- *mimeType*: Mime type of the content item, optional.\n\n"
-            + "- *taskId*: Task identifier for the content item, optional.\n\n"
-            + "- *processInstanceId*: Process instance identifier for the content item, optional.\n\n"
-            + "- *contentStoreId*: The identifier of the content item in an external content store, optional.\n\n"
-            + "- *contentStoreName*: The name of an external content store, optional.\n\n"
-            + "- *field*: The form field for the content item, optional.\n\n"
-            + "- *createdBy*: The user identifier that created the content item, optional.\n\n"
-            + "- *lastModifiedBy*: The user identifier that last modified the content item, optional.\n\n"
-            + "- *tenantId*: The tenant identifier of the content item, optional.")
+    @ApiOperation(value = "Updates a content item, with the provided content item information", tags = { "Content item" },
+            notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the content item was updated and the result is returned."),
             @ApiResponse(code = 404, message = "Indicates content item could not be found.")

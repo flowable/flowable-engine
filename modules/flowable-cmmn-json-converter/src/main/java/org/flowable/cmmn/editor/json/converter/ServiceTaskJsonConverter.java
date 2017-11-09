@@ -17,7 +17,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
-import org.flowable.cmmn.editor.json.model.ModelInfo;
+import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnModel;
@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  */
 public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements DecisionTableKeyAwareConverter {
     
-    protected Map<String, ModelInfo> decisionTableKeyMap;
+    protected Map<String, CmmnModelInfo> decisionTableKeyMap;
 
     public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap,
             Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
@@ -68,7 +68,7 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
                     ObjectNode decisionReferenceNode = objectMapper.createObjectNode();
                     propertiesNode.set(PROPERTY_DECISIONTABLE_REFERENCE, decisionReferenceNode);
 
-                    ModelInfo modelInfo = decisionTableKeyMap.get(fieldExtension.getStringValue());
+                    CmmnModelInfo modelInfo = decisionTableKeyMap.get(fieldExtension.getStringValue());
                     decisionReferenceNode.put("id", modelInfo.getId());
                     decisionReferenceNode.put("name", modelInfo.getName());
                     decisionReferenceNode.put("key", modelInfo.getKey());
@@ -180,7 +180,7 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
     }
 
     @Override
-    public void setDecisionTableKeyMap(Map<String, ModelInfo> decisionTableKeyMap) {
+    public void setDecisionTableKeyMap(Map<String, CmmnModelInfo> decisionTableKeyMap) {
         this.decisionTableKeyMap = decisionTableKeyMap;
     }
 }

@@ -18,7 +18,7 @@ package org.flowable.cmmn.editor.constants;
 public interface CmmnStencilConstants {
 
     // stencil items
-    String STENCIL_PLANMODEL = "PlanModel";
+    String STENCIL_PLANMODEL = "CasePlanModel";
     String STENCIL_STAGE = "Stage";
     String STENCIL_TASK = "Task";
     String STENCIL_TASK_HUMAN = "HumanTask";

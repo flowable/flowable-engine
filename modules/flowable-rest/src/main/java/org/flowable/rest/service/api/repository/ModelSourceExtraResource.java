@@ -43,14 +43,14 @@ import javax.servlet.http.HttpServletResponse;
 @Api(tags = { "Models" }, description = "Manage Models", authorizations = { @Authorization(value = "basicAuth") })
 public class ModelSourceExtraResource extends BaseModelSourceResource {
 
-    @GetMapping("/repository/models/{modelId}/source-extra")
+    @ApiOperation(value = "Get the extra editor source for a model", tags = { "Models" }, nickname = "getExtraEditorSource",
+            notes = "Response body contains the model’s raw editor source. The response’s content-type is set to application/octet-stream, regardless of the content of the source.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the model was found and source is returned."),
             @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
     })
-    @ApiOperation(value = "Get the extra editor source for a model", tags = {
-            "Models" }, notes = "Response body contains the model’s raw editor source. The response’s content-type is set to application/octet-stream, regardless of the content of the source.")
-    protected byte[] getModelBytes(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletResponse response) {
+    @GetMapping("/repository/models/{modelId}/source-extra")
+    public byte[] getModelBytes(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletResponse response) {
         byte[] editorSource = repositoryService.getModelEditorSourceExtra(modelId);
         if (editorSource == null) {
             throw new FlowableObjectNotFoundException("Model with id '" + modelId + "' does not have extra source available.", String.class);
@@ -59,8 +59,8 @@ public class ModelSourceExtraResource extends BaseModelSourceResource {
         return editorSource;
     }
 
-    @ApiOperation(value = "Set the extra editor source for a model", tags = {
-            "Models" }, consumes = "multipart/form-data", notes = "Response body contains the model’s raw editor source. The response’s content-type is set to application/octet-stream, regardless of the content of the source.")
+    @ApiOperation(value = "Set the extra editor source for a model", tags = { "Models" }, nickname = "setExtraEditorSource", consumes = "multipart/form-data",
+            notes = "Response body contains the model’s raw editor source. The response’s content-type is set to application/octet-stream, regardless of the content of the source.")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "file", dataType = "file", paramType = "form", required = true)
     })
@@ -69,7 +69,7 @@ public class ModelSourceExtraResource extends BaseModelSourceResource {
             @ApiResponse(code = 404, message = "Indicates the requested model was not found.")
     })
     @PutMapping(value = "/repository/models/{modelId}/source-extra", consumes = "multipart/form-data")
-    protected void setModelSource(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletRequest request, HttpServletResponse response) {
+    public void setModelSource(@ApiParam(name = "modelId") @PathVariable String modelId, HttpServletRequest request, HttpServletResponse response) {
         Model model = getModelFromRequest(modelId);
         if (model != null) {
             try {

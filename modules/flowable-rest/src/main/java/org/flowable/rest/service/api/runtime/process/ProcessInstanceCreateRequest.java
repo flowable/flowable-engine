@@ -13,14 +13,15 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-import org.flowable.rest.service.api.engine.variable.RestVariable;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+import org.apache.commons.lang3.StringUtils;
+import org.flowable.rest.service.api.engine.variable.RestVariable;
+
+import java.util.List;
 
 /**
  * Modified to add a "returnVariables" flag, which determines whether the variables that exist within the process instance when the first wait state is encountered (or when the process instance
@@ -30,6 +31,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
  * @author Ryan Johnston (@rjfsu)
  * @author Joram Barrez
  */
+@ApiModel(description = "Only one of processDefinitionId, processDefinitionKey or message can be used in the request body")
 public class ProcessInstanceCreateRequest {
 
     private String processDefinitionId;
@@ -43,6 +45,7 @@ public class ProcessInstanceCreateRequest {
     // Added by Ryan Johnston
     private boolean returnVariables;
 
+    @ApiModelProperty(example = "oneTaskProcess:1:158")
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
@@ -51,6 +54,7 @@ public class ProcessInstanceCreateRequest {
         this.processDefinitionId = processDefinitionId;
     }
 
+    @ApiModelProperty(example = "oneTaskProcess")
     public String getProcessDefinitionKey() {
         return processDefinitionKey;
     }
@@ -59,6 +63,7 @@ public class ProcessInstanceCreateRequest {
         this.processDefinitionKey = processDefinitionKey;
     }
 
+    @ApiModelProperty(example = "myBusinessKey")
     public String getBusinessKey() {
         return businessKey;
     }
@@ -67,6 +72,7 @@ public class ProcessInstanceCreateRequest {
         this.businessKey = businessKey;
     }
 
+    @ApiModelProperty(example = "newOrderMessage")
     public String getMessage() {
         return message;
     }
@@ -79,6 +85,7 @@ public class ProcessInstanceCreateRequest {
         this.tenantId = tenantId;
     }
 
+    @ApiModelProperty(example = "tenant1")
     public String getTenantId() {
         return tenantId;
     }

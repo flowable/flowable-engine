@@ -22,7 +22,6 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.PlanItem;
-import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryIfPart;
 
@@ -62,17 +61,18 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
 
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel) {
         Criterion criterion = (Criterion) baseElement;
+        ArrayNode outgoingArrayNode = objectMapper.createArrayNode();
         ArrayNode dockersArrayNode = objectMapper.createArrayNode();
         ObjectNode dockNode = objectMapper.createObjectNode();
         GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(criterion.getId());
         
-        PlanItemDefinition parentPlanItemDefinition = cmmnModel.findPlanItemDefinition(criterion.getAttachedToRefId());
-        PlanItem parentPlanItem = cmmnModel.findPlanItem(parentPlanItemDefinition.getPlanItemRef());
+        PlanItem parentPlanItem = cmmnModel.findPlanItem(criterion.getAttachedToRefId());
         GraphicInfo parentGraphicInfo = cmmnModel.getGraphicInfo(parentPlanItem.getId());
         dockNode.put(EDITOR_BOUNDS_X, graphicInfo.getX() - parentGraphicInfo.getX());
         dockNode.put(EDITOR_BOUNDS_Y, graphicInfo.getY() - parentGraphicInfo.getY());
         dockersArrayNode.add(dockNode);
         elementNode.set("dockers", dockersArrayNode);
+        elementNode.set("outgoing", outgoingArrayNode);
     }
 
     @Override
