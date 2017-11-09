@@ -129,8 +129,9 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-ldap</artifactId>
         </dependency>
-	</dependencies>
         
+	</dependencies>
+
 	<!-- BUILD -->
 	<build>
 	
