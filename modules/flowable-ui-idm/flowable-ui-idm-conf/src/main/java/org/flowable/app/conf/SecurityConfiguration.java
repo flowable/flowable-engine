@@ -84,7 +84,7 @@ public class SecurityConfiguration {
         } else {
             // Default auth (database backed)
             try {
-                auth.authenticationProvider(new SealAuthenticationProvider());
+                auth.authenticationProvider(new SealAuthenticationProvider(env));
             } catch (Exception e) {
                 LOGGER.error("Could not configure authentication mechanism:", e);
             }

@@ -73,9 +73,9 @@ public class SealUserQueryImpl extends UserQueryImpl {
 
     private List<User> createMirrorSealUsers() {
         List<User> all = new ArrayList<>();
-        all.add(createMirrorSealUser("aghonim"));
-        all.add(createMirrorSealUser("admin"));
-        all.add(createMirrorSealUser("root"));
+//        all.add(createMirrorSealUser("aghonim"));
+//        all.add(createMirrorSealUser("admin"));
+//        all.add(createMirrorSealUser("root"));
         return all;
     }
 

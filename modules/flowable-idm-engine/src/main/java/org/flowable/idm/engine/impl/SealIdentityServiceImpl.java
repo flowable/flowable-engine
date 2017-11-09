@@ -12,8 +12,6 @@
  */
 package org.flowable.idm.engine.impl;
 
-import org.flowable.idm.engine.impl.SealGroupQueryImpl;
-import org.flowable.idm.engine.impl.SealUserQueryImpl;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.idm.api.GroupQuery;
 import org.flowable.idm.api.UserQuery;
@@ -36,42 +34,6 @@ public class SealIdentityServiceImpl extends IdmIdentityServiceImpl {
 
     @Override
     public boolean checkPassword(String userId, String password) {
-        return executeCheckPassword(userId, password);
-    }
-
-//    @Override
-//    public List<Group> getGroupsWithPrivilege(String name) {
-//        List<Group> groups = new ArrayList<>();
-//        List<PrivilegeMapping> privilegeMappings = getPrivilegeMappingsByPrivilegeId(name);
-//        for (PrivilegeMapping privilegeMapping : privilegeMappings) {
-//            if (privilegeMapping.getGroupId() != null) {
-//                Group group = new GroupEntityImpl();
-//                group.setId(privilegeMapping.getGroupId());
-//                group.setName(privilegeMapping.getGroupId());
-//                groups.add(group);
-//            }
-//        }
-//        
-//        return groups;
-//    }
-//
-//    @Override
-//    public List<User> getUsersWithPrivilege(String name) {
-//        List<User> users = new ArrayList<>();
-//        List<PrivilegeMapping> privilegeMappings = getPrivilegeMappingsByPrivilegeId(name);
-//        for (PrivilegeMapping privilegeMapping : privilegeMappings) {
-//            if (privilegeMapping.getUserId() != null) {
-//                User user = new UserEntityImpl();
-//                user.setId(privilegeMapping.getUserId());
-//                user.setLastName(privilegeMapping.getUserId());
-//                users.add(user);
-//            }
-//        }
-//        
-//        return users;
-//    }
-    protected boolean executeCheckPassword(final String userId, final String password) {
-        // Extra password check, see http://forums.activiti.org/comment/22312
         if (password == null || password.length() == 0) {
             throw new FlowableException("Null or empty passwords are not allowed!");
         }

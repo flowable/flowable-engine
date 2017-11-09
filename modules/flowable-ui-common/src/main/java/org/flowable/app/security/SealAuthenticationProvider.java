@@ -12,6 +12,7 @@ import org.flowable.idm.api.User;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -23,6 +24,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 /**
@@ -32,9 +34,15 @@ import org.springframework.web.client.RestTemplate;
 public class SealAuthenticationProvider implements AuthenticationProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SealAuthenticationProvider.class);
+
+    private final Environment environment;
+
+    public SealAuthenticationProvider(Environment environment) {
+        this.environment = environment;
+    }
+
     @Override
     public Authentication authenticate(final Authentication a) throws AuthenticationException {
-        LOGGER.error("YYYYYYY Authenticating");
         User u = new User() {
             @Override
             public String getId() {
@@ -93,35 +101,39 @@ public class SealAuthenticationProvider implements AuthenticationProvider {
         };
         Collection<GrantedAuthority> auth = new HashSet<>();
 
-        String sealBase = "http://scdweb:8080/seal-ws";
-        String nonce = "http://scdweb:8080/seal-ws/v5/security/nonce";
+        String sealBase = environment.getProperty("seal.ws.url");
+        String nonce = sealBase + "/security/nonce";
 
-        if (!a.getPrincipal().toString().equals("admin")) {
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
+        ResponseEntity<String> result = restTemplate.exchange(nonce, HttpMethod.GET, entity, String.class);
+        if (!result.getStatusCode().toString().equals("200")) {
+            return null;
+        }
+        String actualNonce = result.getBody();
+        JSONObject request = new JSONObject();
+        try {
+            request.put("principal", a.getPrincipal().toString());
+            request.put("password", a.getCredentials().toString());
+            request.put("nonce", actualNonce);
+        } catch (Exception e) {
+            LOGGER.error("Cannot request.put???", e);
+        }
 
-            RestTemplate restTemplate = new RestTemplate();
-            HttpHeaders headers = new HttpHeaders();
-            HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
-            ResponseEntity<String> result = restTemplate.exchange(nonce, HttpMethod.GET, entity, String.class);
-            if (!result.getStatusCode().toString().equals("200")) {
-                throw new BadCredentialsException("Authentication failed for this request with nonce");
-            }
-            String actualNonce = result.getBody();
-            JSONObject request = new JSONObject();
-            try {
-                request.put("principal", a.getPrincipal().toString());
-                request.put("password", a.getCredentials().toString());
-                request.put("nonce", actualNonce);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-
-            HttpHeaders headers2 = new HttpHeaders();
-            headers2.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<String> entity2 = new HttpEntity<String>(request.toString(), headers2);
-            ResponseEntity<String> loginResponse = restTemplate.exchange(sealBase + "/v5/auths", HttpMethod.POST, entity2, String.class);
+        HttpHeaders headers2 = new HttpHeaders();
+        headers2.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> entity2 = new HttpEntity<String>(request.toString(), headers2);
+        try {
+            ResponseEntity<String> loginResponse = restTemplate.exchange(sealBase + "/auths", HttpMethod.POST, entity2, String.class);
             if (!loginResponse.getStatusCode().toString().equals("201")) {
-                throw new BadCredentialsException("Authentication failed for this request with auths");
+                return null;
             }
+        } catch (HttpClientErrorException e) {
+            if (e.getMessage().contains("401")) {
+                return null;
+            }
+            throw e;
         }
 
         FlowableAppUser user = new FlowableAppUser(u, a.getPrincipal().toString(), auth);
