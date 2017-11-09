@@ -649,7 +649,13 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         // activity with message/signal boundary events
         FlowElement currentFlowElement = execution.getCurrentFlowElement();
         if (currentFlowElement instanceof FlowNode) {
-            dispatchActivityCancelled(execution, cancelActivity);
+
+            if (execution.isMultiInstanceRoot()) {
+                dispatchMultiInstanceActivityCancelled(execution, cancelActivity);
+            }
+            else {
+                dispatchActivityCancelled(execution, cancelActivity);
+            }
         }
     }
 
@@ -658,6 +664,15 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
                 .getEventDispatcher()
                 .dispatchEvent(
                         FlowableEventBuilder.createActivityCancelledEvent(execution.getCurrentFlowElement().getId(),
+                                execution.getCurrentFlowElement().getName(), execution.getId(), execution.getProcessInstanceId(),
+                                execution.getProcessDefinitionId(), getActivityType((FlowNode) execution.getCurrentFlowElement()), cancelActivity));
+    }
+
+    protected void dispatchMultiInstanceActivityCancelled(ExecutionEntity execution, FlowElement cancelActivity) {
+        CommandContextUtil.getProcessEngineConfiguration()
+                .getEventDispatcher()
+                .dispatchEvent(
+                        FlowableEventBuilder.createMultiInstanceActivityCancelledEvent(execution.getCurrentFlowElement().getId(),
                                 execution.getCurrentFlowElement().getName(), execution.getId(), execution.getProcessInstanceId(),
                                 execution.getProcessDefinitionId(), getActivityType((FlowNode) execution.getCurrentFlowElement()), cancelActivity));
     }

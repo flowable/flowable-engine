@@ -29,7 +29,6 @@ public class LogInterceptor extends AbstractCommandInterceptor {
             // do nothing here if we cannot log
             return next.execute(config, command);
         }
-        LOGGER.debug("\n");
         LOGGER.debug("--- starting {} --------------------------------------------------------", command.getClass().getSimpleName());
         try {
 
@@ -37,7 +36,6 @@ public class LogInterceptor extends AbstractCommandInterceptor {
 
         } finally {
             LOGGER.debug("--- {} finished --------------------------------------------------------", command.getClass().getSimpleName());
-            LOGGER.debug("\n");
         }
     }
 }
