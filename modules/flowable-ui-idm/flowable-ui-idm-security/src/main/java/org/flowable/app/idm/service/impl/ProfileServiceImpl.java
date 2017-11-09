@@ -10,8 +10,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.app.idm.service;
+package org.flowable.app.idm.service.impl;
 
+import org.flowable.app.idm.service.impl.AbstractIdmService;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.flowable.app.security.SecurityUtils;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import org.flowable.app.idm.service.ProfileService;
 
 /**
  * @author Joram Barrez

@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.app.idm.service;
+package org.flowable.app.idm.service.impl;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.idm.model.UserInformation;
+import org.flowable.app.idm.service.UserService;
 import org.flowable.app.service.exception.BadRequestException;
 import org.flowable.app.service.exception.ConflictingRequestException;
 import org.flowable.app.service.exception.NotFoundException;

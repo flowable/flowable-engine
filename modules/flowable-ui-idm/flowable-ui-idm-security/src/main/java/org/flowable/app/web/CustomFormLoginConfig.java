@@ -12,6 +12,7 @@
  */
 package org.flowable.app.web;
 
+import org.flowable.app.web.CustomAntPathMatcher;
 import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;

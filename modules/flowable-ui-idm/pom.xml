@@ -28,6 +28,7 @@
 	
 	<modules>
 		<module>flowable-ui-idm-logic</module>
+                <module>flowable-ui-idm-security</module>
 		<module>flowable-ui-idm-rest</module>
 		<module>flowable-ui-idm-conf</module>
 		<module>flowable-ui-idm-app</module>
@@ -38,6 +39,16 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-ui-idm-logic</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-ui-idm-security</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.seal.process</groupId>
+            <artifactId>seal-flowable-ui-idm-logic-impl</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>

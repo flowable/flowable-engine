@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.app.idm.service;
+package org.flowable.app.idm.service.impl;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
@@ -26,6 +26,7 @@ import javax.annotation.PostConstruct;
 
 import org.flowable.app.idm.cache.UserCache;
 import org.flowable.app.idm.model.UserInformation;
+import org.flowable.app.idm.service.UserService;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.User;
 import org.springframework.beans.factory.annotation.Autowired;
