@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -65,7 +65,7 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
         ArrayNode dockersArrayNode = objectMapper.createArrayNode();
         ObjectNode dockNode = objectMapper.createObjectNode();
         GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(criterion.getId());
-        
+
         PlanItem parentPlanItem = cmmnModel.findPlanItem(criterion.getAttachedToRefId());
         GraphicInfo parentGraphicInfo = cmmnModel.getGraphicInfo(parentPlanItem.getId());
         dockNode.put(EDITOR_BOUNDS_X, graphicInfo.getX() - parentGraphicInfo.getX());
@@ -73,12 +73,15 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
         dockersArrayNode.add(dockNode);
         elementNode.set("dockers", dockersArrayNode);
         elementNode.set("outgoing", outgoingArrayNode);
+        if (criterion.getSentry() != null && criterion.getSentry().getSentryIfPart() != null) {
+            propertiesNode.put("ifpartcondition", criterion.getSentry().getSentryIfPart().getCondition());
+        }
     }
 
     @Override
-    protected CaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, 
+    protected CaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor,
                     BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
-        
+
         Criterion criterion = new Criterion();
         String id = CmmnJsonConverterUtil.getElementId(elementNode);
         if (StringUtils.isBlank(id)) {
@@ -92,34 +95,34 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
 
         } else if (STENCIL_EXIT_CRITERION.equals(stencilId)) {
             criterion.setExitCriterion(true);
-        } 
-        
+        }
+
         criterion.setAttachedToRefId(lookForAttachedRef(elementNode.get(EDITOR_SHAPE_ID).asText(), modelNode.get(EDITOR_CHILD_SHAPES)));
-        
+
         if (criterion.getAttachedToRefId() != null) {
             String criterionId = CmmnJsonConverterUtil.getElementId(elementNode);
             cmmnModel.addCriterion(criterionId, criterion);
             cmmnModel.addCriterionTechnicalId(criterion.getTechnicalId(), criterionId);
         }
-        
+
         createSentry(elementNode, criterion, cmmnModelIdHelper);
-        
+
         return criterion;
     }
 
     protected void createSentry(JsonNode elementNode, Criterion criterion, CmmnModelIdHelper cmmnModelIdHelper) {
-        // Associate a sentry with the criterion. 
+        // Associate a sentry with the criterion.
         // The onparts will be added later, in the postprocessing.
         Sentry sentry = new Sentry();
         sentry.setId("sentry" + cmmnModelIdHelper.nextSentryId());
-        
+
         String ifPartCondition = getPropertyValueAsString(PROPERTY_IF_PART_CONDITION, elementNode);
         if (StringUtils.isNotBlank(ifPartCondition)) {
             SentryIfPart sentryIfPart = new SentryIfPart();
             sentryIfPart.setCondition(ifPartCondition);
             sentry.setSentryIfPart(sentryIfPart);
         }
-        
+
         criterion.setSentryRef(sentry.getId());
         criterion.setSentry(sentry);
     }
