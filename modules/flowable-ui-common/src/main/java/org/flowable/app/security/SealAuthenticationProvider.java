@@ -10,6 +10,8 @@ import java.util.HashSet;
 
 import org.flowable.idm.api.User;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -29,8 +31,10 @@ import org.springframework.web.client.RestTemplate;
  */
 public class SealAuthenticationProvider implements AuthenticationProvider {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(SealAuthenticationProvider.class);
     @Override
     public Authentication authenticate(final Authentication a) throws AuthenticationException {
+        LOGGER.error("YYYYYYY Authenticating");
         User u = new User() {
             @Override
             public String getId() {
@@ -88,77 +92,43 @@ public class SealAuthenticationProvider implements AuthenticationProvider {
             }
         };
         Collection<GrantedAuthority> auth = new HashSet<>();
-        
-        //Tiger
+
         String sealBase = "http://scdweb:8080/seal-ws";
         String nonce = "http://scdweb:8080/seal-ws/v5/security/nonce";
-        
-        
-        if(!a.getPrincipal().toString().equals("admin"))
-        {
-        
-        RestTemplate restTemplate = new RestTemplate();
-        
-		HttpHeaders headers = new HttpHeaders();
-		
-		HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
-		
-		ResponseEntity<String> result = restTemplate.exchange(nonce,HttpMethod.GET, entity, String.class);
 
-		if (!result.getStatusCode().toString().equals("200"))
-			throw new BadCredentialsException("Authentication failed for this request with nonce");
-		
-		String actualNonce = result.getBody();
-		
-		// GOT NONCE!!!!!!!!!!
-		
-		Credentials credentials = new Credentials(a.getPrincipal().toString(), a.getCredentials().toString(), actualNonce);
-		
-		
-		JSONObject request = new JSONObject();
-		try {
-			request.put("principal", credentials.principal);
-			request.put("password", credentials.password);
-			request.put("nonce", credentials.nonce);
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		
-		HttpHeaders headers2 = new HttpHeaders();
-		headers2.setContentType(MediaType.APPLICATION_JSON);
+        if (!a.getPrincipal().toString().equals("admin")) {
 
-		HttpEntity<String> entity2 = new HttpEntity<String>(request.toString(), headers2);
-		
-		
-		ResponseEntity<String> loginResponse = restTemplate.exchange(sealBase + "/v5/auths", HttpMethod.POST, entity2, String.class);
-		
-				if (!loginResponse.getStatusCode().toString().equals("201"))		
-					throw new BadCredentialsException("Authentication failed for this request with auths");
-		
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            HttpEntity<String> entity = new HttpEntity<String>("parameters", headers);
+            ResponseEntity<String> result = restTemplate.exchange(nonce, HttpMethod.GET, entity, String.class);
+            if (!result.getStatusCode().toString().equals("200")) {
+                throw new BadCredentialsException("Authentication failed for this request with nonce");
+            }
+            String actualNonce = result.getBody();
+            JSONObject request = new JSONObject();
+            try {
+                request.put("principal", a.getPrincipal().toString());
+                request.put("password", a.getCredentials().toString());
+                request.put("nonce", actualNonce);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            HttpHeaders headers2 = new HttpHeaders();
+            headers2.setContentType(MediaType.APPLICATION_JSON);
+            HttpEntity<String> entity2 = new HttpEntity<String>(request.toString(), headers2);
+            ResponseEntity<String> loginResponse = restTemplate.exchange(sealBase + "/v5/auths", HttpMethod.POST, entity2, String.class);
+            if (!loginResponse.getStatusCode().toString().equals("201")) {
+                throw new BadCredentialsException("Authentication failed for this request with auths");
+            }
         }
-				
-        //Tiger
-        
+
         FlowableAppUser user = new FlowableAppUser(u, a.getPrincipal().toString(), auth);
-        
+
         return new UsernamePasswordAuthenticationToken(user, a.getCredentials().toString(), auth);
     }
 
-    //Tiger
-    static private class Credentials {
-        public final String principal;
-        public final String password;
-        public final String nonce;
-
-        private Credentials(String principal, String password, String nonce) {
-            this.principal = principal;
-            this.password = password;
-            this.nonce = nonce;
-        }
-    }
-    //Tiger
-    
-    
     @Override
     public boolean supports(Class<?> type) {
         return true;
