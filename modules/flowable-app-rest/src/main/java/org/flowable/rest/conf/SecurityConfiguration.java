@@ -27,11 +27,11 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         HttpSecurity httpSecurity = http.authenticationProvider(authenticationProvider())
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                //.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
                 .csrf().disable();
 
-        boolean swaggerDocsEnable = environment.getProperty("rest.docs.swagger.enabled", Boolean.class, true);
+     /*   boolean swaggerDocsEnable = environment.getProperty("rest.docs.swagger.enabled", Boolean.class, true);
         if (swaggerDocsEnable) {
             httpSecurity
                     .authorizeRequests()
@@ -44,6 +44,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                     .antMatchers("/docs/**").denyAll()
                     .anyRequest()
                     .authenticated().and().httpBasic();
-        }
+        }*/
     }
 }
