@@ -614,7 +614,7 @@
     "view" : "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\" ?><svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"14\"  height=\"22\" version=\"1.0\"> <oryx:magnets><oryx:magnet oryx:cx=\"8\" oryx:cy=\"10\" oryx:default=\"yes\" /></oryx:magnets><oryx:docker oryx:cx=\"16\" oryx:cy=\"16\" /><g pointer-events=\"fill\"><defs><radialGradient id=\"background\" cx=\"10%\" cy=\"10%\" r=\"100%\" fx=\"10%\" fy=\"10%\"><stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/><stop id=\"fill_el\" offset=\"100%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/></radialGradient></defs><polygon id=\"bg_frame\" points=\"7 0  14 11  7 22 0 11\" fill=\"url(#background) #ffffff\" stroke=\"#000000\"/></g></svg>",
     "icon" : "sentry/entry.png",
     "groups" : [ "Sentries" ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "ifpartconditionpackage" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "ifpartconditionpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "association_start", "SentriesMorph", "EntryCriterionOnItemBoundary" ]
   }, {
@@ -625,7 +625,7 @@
     "view" : "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\" ?><svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"14\"  height=\"22\" version=\"1.0\"> <oryx:magnets><oryx:magnet oryx:cx=\"8\" oryx:cy=\"10\" oryx:default=\"yes\" /></oryx:magnets><oryx:docker oryx:cx=\"16\" oryx:cy=\"16\" /><g pointer-events=\"fill\"><defs><radialGradient id=\"background\" cx=\"10%\" cy=\"10%\" r=\"100%\" fx=\"10%\" fy=\"10%\"><stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/><stop id=\"fill_el\" offset=\"100%\" stop-color=\"#000000\" stop-opacity=\"1\"/></radialGradient></defs><polygon id=\"bg_frame\" points=\"7 0  14 11  7 22 0 11\" fill=\"url(#background) #000000\" /></g></svg>",
     "icon" : "sentry/exit.png",
     "groups" : [ "Sentries" ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "ifpartconditionpackage" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "ifpartconditionpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "association_start", "SentriesMorph", "ExitCriterionOnItemBoundary" ]
   }, {

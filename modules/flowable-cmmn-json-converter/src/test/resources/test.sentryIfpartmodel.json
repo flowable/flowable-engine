@@ -70,8 +70,7 @@
           "resourceId": "sid-FB0DD4A6-0EC0-46F9-9A22-72A76CCECA9D",
           "properties": {
             "overrideid": "sid-FB0DD4A6-0EC0-46F9-9A22-72A76CCECA9D",
-            "name": "",
-            "documentation": "",
+            "name": "sentry name",
             "ifpartcondition": "${true}"
           },
           "stencil": {

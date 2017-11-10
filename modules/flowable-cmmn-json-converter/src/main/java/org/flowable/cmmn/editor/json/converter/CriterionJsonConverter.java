@@ -73,8 +73,17 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
         dockersArrayNode.add(dockNode);
         elementNode.set("dockers", dockersArrayNode);
         elementNode.set("outgoing", outgoingArrayNode);
+
+        // set properties
+        putProperty(propertiesNode, "name", criterion.getSentry().getName());
         if (criterion.getSentry() != null && criterion.getSentry().getSentryIfPart() != null) {
-            propertiesNode.put("ifpartcondition", criterion.getSentry().getSentryIfPart().getCondition());
+            putProperty(propertiesNode,"ifpartcondition", criterion.getSentry().getSentryIfPart().getCondition());
+        }
+    }
+
+    protected void putProperty(ObjectNode propertiesNode, String propertyName, String propertyValue) {
+        if (StringUtils.isNotEmpty(propertyValue)) {
+            propertiesNode.put(propertyName, propertyValue);
         }
     }
 
@@ -115,6 +124,7 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
         // The onparts will be added later, in the postprocessing.
         Sentry sentry = new Sentry();
         sentry.setId("sentry" + cmmnModelIdHelper.nextSentryId());
+        sentry.setName(getPropertyValueAsString(PROPERTY_NAME, elementNode));
 
         String ifPartCondition = getPropertyValueAsString(PROPERTY_IF_PART_CONDITION, elementNode);
         if (StringUtils.isNotBlank(ifPartCondition)) {

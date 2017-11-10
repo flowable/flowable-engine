@@ -47,7 +47,7 @@ public class SentryIfPartConverterTest extends AbstractConverterTest {
         return "test.sentryIfpartmodel.json";
     }
 
-    private void validateModel(CmmnModel model) {
+    protected void validateModel(CmmnModel model) {
         Case caseModel = model.getPrimaryCase();
         Stage planModelStage = caseModel.getPlanModel();
         PlanItem planItem = planModelStage.findPlanItemInPlanFragmentOrUpwards("planItem1");
@@ -63,5 +63,7 @@ public class SentryIfPartConverterTest extends AbstractConverterTest {
         SentryIfPart ifPart = sentry.getSentryIfPart();
         assertNotNull(ifPart);
         assertThat(ifPart.getCondition(), is("${true}"));
+
+        assertThat(sentry.getName(), is("sentry name"));
     }
 }

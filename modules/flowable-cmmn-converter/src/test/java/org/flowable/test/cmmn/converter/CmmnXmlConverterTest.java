@@ -88,6 +88,7 @@ public class CmmnXmlConverterTest {
                 assertNotNull(onParts.get(0).getStandardEvent());
             } else {
                 assertThat(sentry.getSentryIfPart().getCondition(), is("${true}"));
+                assertThat(sentry.getName(), is("criterion name"));
             }
         }
 
