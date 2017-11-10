@@ -1,0 +1,365 @@
+version: '2'
+services:
+    flowable-rest-app:
+        image: flowable/flowable-rest
+        depends_on:
+            - flowable-db
+        environment:
+            - datasource.driver=org.postgresql.Driver
+            - datasource.url=jdbc:postgresql://flowable-db:5432/flowable
+            - datasource.username=flowable
+            - datasource.password=flowable
+        ports:
+            - 9977:9977
+        depends_on:
+            - flowable-db
+        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-rest.jar", "-httpPort=9977", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
+    flowable-modeler-app:
+          image: flowable/flowable-modeler
+          container_name: flowable-modeler
+          depends_on:
+              - flowable-db
+              - flowable-idm-app
+              - flowable-task-app
+          environment:
+              - datasource.driver=org.postgresql.Driver
+              - datasource.url=jdbc:postgresql://flowable-db:5432/flowable
+              - datasource.username=flowable
+              - datasource.password=flowable
+              - idm.app.url=http://flowable-idm-app:8384/flowable-idm
+              - idm.app.redirect.url=http://localhost:8384/flowable-idm
+              - idm.admin.user=admin
+              - idm.admin.password=test
+              - deployment.api.url=http://flowable-task-app:9999/flowable-task/process-api
+          ports:
+              - 8586:8586
+          entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-modeler.jar", "-httpPort=8586", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
+    flowable-task-app:
+        image: flowable/flowable-task
+        container_name: flowable-task
+        depends_on:
+            - flowable-db
+            - flowable-idm-app
+        environment:
+            - datasource.driver=org.postgresql.Driver
+            - datasource.url=jdbc:postgresql://flowable-db:5432/flowable
+            - datasource.username=flowable
+            - datasource.password=flowable
+            - idm.app.url=http://flowable-idm-app:8384/flowable-idm
+            - idm.app.redirect.url=http://localhost:8384/flowable-idm
+            - idm.admin.user=admin
+            - idm.admin.password=test
+        ports:
+            - 9999:9999
+        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-task.jar", "-httpPort=9999", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
+    flowable-idm-app:
+        image: flowable/flowable-idm
+        container_name: flowable-idm
+        depends_on:
+            - flowable-db
+        environment:
+            - datasource.driver=org.postgresql.Driver
+            - datasource.url=jdbc:postgresql://flowable-db:5432/flowable
+            - datasource.username=flowable
+            - datasource.password=flowable
+        ports:
+            - 8384:8384
+        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-idm.jar", "-httpPort=8384", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
+    flowable-admin-app:
+        image: flowable/flowable-admin
+        container_name: flowable-admin
+        depends_on:
+            - flowable-db
+            - flowable-idm-app
+            - flowable-task-app
+        environment:
+            - datasource.driver=org.postgresql.Driver
+            - datasource.url=jdbc:postgresql://flowable-db:5432/flowable
+            - datasource.username=flowable
+            - datasource.password=flowable
+            - idm.app.url=http://flowable-idm-app:8384/flowable-idm
+            - idm.app.redirect.url=http://localhost:8384/flowable-idm
+            - idm.admin.user=admin
+            - idm.admin.password=test
+            - rest.process.app.host=http://flowable-task-app
+            - rest.process.app.port=9999
+            - rest.process.app.contextroot=flowable-task
+            - rest.process.app.restroot=process-api
+            - rest.dmn.app.host=http://flowable-task-app
+            - rest.dmn.app.port=9999
+            - rest.dmn.app.contextroot=flowable-task
+            - rest.dmn.app.restroot=dmn-api
+            - rest.form.app.host=http://flowable-task-app
+            - rest.form.app.port=9999
+            - rest.form.app.contextroot=flowable-task
+            - rest.form.app.restroot=form-api
+            - rest.content.app.host=http://flowable-task-app
+            - rest.content.app.port=9999
+            - rest.content.app.contextroot=flowable-task
+            - rest.content.app.restroot=content-api
+        ports:
+            - 9988:9988
+        entrypoint: ["./wait-for-something.sh", "flowable-db", "5432", "PostgreSQL", "java", "-jar", "flowable-admin.jar", "-httpPort=9988", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]
+    flowable-db:
+        extends:
+            file: postgres.yml
+            service: flowable-postgres
+    zookeeper:
+      image: docker.seal-software.net/seal-zookeeper:3.4.9.11
+      hostname: zookeeper
+
+      ports:
+        - "2181:2181"
+
+    sealconfiguration:
+      image: docker.seal-software.net/seal-configuration:2017.3.0-STABLE
+      links:
+        - zookeeper
+
+    sealstate:
+      image: docker.seal-software.net/seal-state:refset327-imported-master
+
+    contracts:
+      image: docker.seal-software.net/seal-contracts:refset-327
+
+    sealgate:
+      image: docker.seal-software.net/seal-gate:2017.3.0-STABLE
+
+
+    #-- ScD -------------------------------------------------
+
+    sealws:
+      image: docker.seal-software.net/seal-ws:2017.3.0-STABLE
+
+    sealgui:
+      image: docker.seal-software.net/seal-gui:2017.3.0-STABLE
+
+    walrusserviceapi:
+      image: docker.seal-software.net/walrus-service-api:2017.3.0-STABLE
+
+    walrusmodels:
+      image: docker.seal-software.net/walrus-models:2017.3.0-STABLE
+
+    walrusmodelscore:
+      image: docker.seal-software.net/walrus-models-core:2017.3.0-STABLE
+
+    scdweb:
+      image: docker.seal-software.net/tomcat:8.0.9
+      hostname: scdweb
+
+      ports:
+        - 8080:8080 ## http
+        - 5010:5005 ## debug
+
+      volumes_from:
+        - sealws
+        - sealgui
+        - walrusserviceapi
+        - walrusmodels
+        - walrusmodelscore
+        - sealconfiguration
+        - sealstate
+        - zookeeper
+
+      links:
+        - logstash
+        - broker
+        - postgres
+        - solr
+        - zookeeper
+
+      environment:
+        - JAVA_HOME=/opt/jdk1.8.0_60
+        - CATALINA_OPTS=-Dseal.sqldb.maxPoolSize=10 -Dseal.config.url=zookeeper:2181 -Dseal.walrus.baseDirectory=/seal/walrus-models
+
+    sealcrawler:
+      image: docker.seal-software.net/seal-crawler:2017.3.0-STABLE
+      hostname: sealcrawler
+
+      ports:
+        - 5020:5005 ## debug
+
+      volumes_from:
+        - contracts
+
+      links:
+        - logstash
+        - broker
+        - scdweb
+        - zookeeper
+
+      environment:
+        - JAVA_HOME=/opt/jdk1.8.0_60
+
+    sealimporter:
+      image: docker.seal-software.net/seal-importer:2017.3.0-STABLE
+      hostname: sealimporter
+
+      ports:
+        - 5030:5005 ## debug
+
+      volumes_from:
+        - sealconfiguration
+        - sealstate
+        - contracts
+
+      links:
+        - logstash
+        - broker
+        - scdweb
+        - zookeeper
+
+    sealjobrunner:
+      image: docker.seal-software.net/seal-jobrunner:2017.3.0-STABLE
+      hostname: jobrunner
+
+      ports:
+        - 9527:9527 ## telnet
+        - 5040:5005 ## debug
+
+      volumes_from:
+        - sealconfiguration
+        - sealgate
+        - sealstate
+        - walrusmodels
+        - walrusmodelscore
+
+      links:
+        - logstash
+        - postgres
+        - broker
+        - scdweb
+        - solr
+        - zookeeper
+
+    sealbatch:
+      image: docker.seal-software.net/seal-batch:2017.3.0-STABLE
+      hostname: sealbatch
+
+      ports:
+        - 5050:5005 ## debug
+
+      volumes_from:
+        - sealconfiguration
+
+      links:
+        - logstash
+        - postgres
+        - zookeeper
+
+      environment:
+        - JAVA_HOME=/opt/jdk1.8.0_60
+        - BATCH_OPTS=-Dseal.warehouse.jdbcUrl=jdbc:postgresql://postgres:5432/sealwarehouse
+
+    sealrebase:
+      image: docker.seal-software.net/seal-rebase:2017.3.0-STABLE
+      hostname: sealrebase
+
+      volumes_from:
+        - sealconfiguration
+
+      links:
+        - broker
+        - scdweb
+        - solr
+
+      environment:
+        - JAVA_HOME=/opt/jdk1.8.0_60
+
+    #-- ScA -------------------------------------------------
+
+    scabackend:
+      image: docker.seal-software.net/sca-backend:2017.3.0-STABLE
+
+    scafrontend:
+      image: docker.seal-software.net/sca-web:2017.3.0-STABLE
+
+    scaweb:
+      image: docker.seal-software.net/tomcat:8.0.9
+      hostname: scaweb
+
+      ports:
+        - 8888:8080 ## http
+        - 5060:5005 ## debug
+
+      volumes_from:
+        - scabackend
+        - scafrontend
+        - sealconfiguration
+        - sealgate
+
+      links:
+        - logstash
+        - broker
+        - postgres
+        - caat
+        - scdweb
+        - solr
+        - zookeeper
+
+      environment:
+        - JAVA_HOME=/opt/jdk1.8.0_60
+        - SEAL_COMPONENT=sca
+
+
+    #-- Third-party -----------------------------------------
+
+    postgres:
+      image: docker.seal-software.net/postgres:9.6.1
+      hostname: postgres
+
+      ports:
+        - 5432:5432
+
+      volumes_from:
+        - sealstate
+
+    solr:
+      image: docker.seal-software.net/seal-solr:1.0-SNAPSHOT
+      hostname: solr
+
+      ports:
+        - 8983:8983
+
+      environment:
+        - SOLR_JAVA_OPTS=-Dsolr.solr.home=/seal/seal-configuration/solr -Dsolr.data.dir=/seal/data/solr -Djava.util.logging.manager=org.apache.juli.ClassLoaderLogManager
+
+      volumes_from:
+        - sealconfiguration
+        - sealstate
+
+    couchdb:
+      image: docker.seal-software.net/couchdb:1.5.1
+      hostname: couchdb
+
+      ports:
+        - 5984:5984
+
+      volumes_from:
+        - sealstate
+
+    broker:
+      image: docker.seal-software.net/seal-activemq:5.13.2.1
+      hostname: broker
+
+      ports:
+        - 8161:8161
+        - 61616:61616
+
+    caat:
+      image: docker.seal-software.net/caat:3.18.1
+      hostname: caat
+
+      ports:
+        - 8443:8443
+
+      volumes_from:
+        - sealstate
+
+    logstash:
+      image: docker.seal-software.net/logstash:latest
+      hostname: logstash
+
+      ports:
+        - 9292:9292
+        - 9200:9200

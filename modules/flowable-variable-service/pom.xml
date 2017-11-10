@@ -75,7 +75,12 @@
             <artifactId>openjpa</artifactId>
             <scope>test</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-all</artifactId>
+            <version>2.4.8</version>
+            <type>jar</type>
+        </dependency>
     </dependencies>
 
     <properties>
