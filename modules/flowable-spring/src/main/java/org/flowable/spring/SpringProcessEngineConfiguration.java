@@ -53,7 +53,7 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
     protected String deploymentMode = "default";
     protected ApplicationContext applicationContext;
     protected Integer transactionSynchronizationAdapterOrder;
-    private Collection<AutoDeploymentStrategy> deploymentStrategies = new ArrayList<>();
+    protected Collection<AutoDeploymentStrategy> deploymentStrategies = new ArrayList<>();
 
     public SpringProcessEngineConfiguration() {
         this.transactionsExternallyManaged = true;
