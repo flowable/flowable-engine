@@ -150,7 +150,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
     }
 
     @Deployment(resources = IDENTITY_LINKS_PROCESS_BPMN20_XML)
-    public void testClaimingIdentityLinkHistory() {
+    public void testClaimingIdentityLinkHistory() throws Exception {
         if (!HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             return;
         }
@@ -165,6 +165,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
 
         assertTaskEvent(taskId, 1, Event.ACTION_ADD_USER_LINK, "kermit", IdentityLinkType.ASSIGNEE);
 
+        Thread.sleep(1000);
         taskService.unclaim(taskId);
 
         assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
@@ -194,7 +195,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
     }
 
     @Deployment(resources = IDENTITY_LINKS_PROCESS_BPMN20_XML)
-    public void testOwnerIdentityLinkHistory() {
+    public void testOwnerIdentityLinkHistory() throws Exception {
         if (!HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             return;
         }
@@ -209,6 +210,7 @@ public class TaskIdentityLinksTest extends PluggableFlowableTestCase {
 
         assertTaskEvent(taskId, 1, Event.ACTION_ADD_USER_LINK, "kermit", IdentityLinkType.OWNER);
 
+        Thread.sleep(1000);
         taskService.setOwner(taskId, null);
 
         assertEquals(0, taskService.getIdentityLinksForTask(taskId).size());
