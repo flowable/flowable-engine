@@ -100,12 +100,6 @@ public class GetDecisionTablesForProcessDefinitionCmd implements Command<List<Dm
 
         if (decisionTable != null) {
             decisionTables.add(decisionTable);
-        } else {
-            decisionTable = decisionTableQuery.decisionTableKey(decisionTableKey).parentDeploymentId(null).latestVersion().singleResult();
-
-            if (decisionTable != null) {
-                decisionTables.add(decisionTable);
-            }
         }
     }
 }
