@@ -12,11 +12,13 @@
  */
 package org.flowable.engine.impl.bpmn.behavior;
 
-import java.util.List;
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.Task;
+import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.common.api.FlowableException;
@@ -30,10 +32,8 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.List;
+import java.util.Map;
 
 public class DmnActivityBehavior extends TaskActivityBehavior {
 
@@ -90,17 +90,20 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 
         DmnRuleService ruleService = CommandContextUtil.getDmnRuleService();
 
-        List<Map<String, Object>> executionResult = ruleService.createExecuteDecisionBuilder()
-                        .decisionKey(finaldecisionTableKeyValue)
-                        .parentDeploymentId(processDefinition.getDeploymentId())
-                        .instanceId(execution.getProcessInstanceId())
-                        .executionId(execution.getId())
-                        .activityId(task.getId())
-                        .variables(execution.getVariables())
-                        .tenantId(execution.getTenantId())
-                        .execute();
-                
-        setVariablesOnExecution(executionResult, finaldecisionTableKeyValue, execution, processEngineConfiguration.getObjectMapper());
+        DecisionExecutionAuditContainer decisionExecutionAuditContainer = ruleService.createExecuteDecisionBuilder()
+                .decisionKey(finaldecisionTableKeyValue)
+                .parentDeploymentId(processDefinition.getDeploymentId())
+                .instanceId(execution.getProcessInstanceId())
+                .executionId(execution.getId())
+                .activityId(task.getId())
+                .variables(execution.getVariables())
+                .tenantId(execution.getTenantId())
+                .executeWithAuditTrail();
+        if (decisionExecutionAuditContainer.isFailed()) {
+            throw new FlowableException("DMN decision table with key " + finaldecisionTableKeyValue + " could not be executed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage());
+        }
+
+        setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue, execution, processEngineConfiguration.getObjectMapper());
 
         leave(execution);
     }
