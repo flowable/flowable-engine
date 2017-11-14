@@ -16,6 +16,7 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
+import org.flowable.cmmn.model.Association;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnModel;
@@ -61,7 +62,6 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
 
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel) {
         Criterion criterion = (Criterion) baseElement;
-        ArrayNode outgoingArrayNode = objectMapper.createArrayNode();
         ArrayNode dockersArrayNode = objectMapper.createArrayNode();
         ObjectNode dockNode = objectMapper.createObjectNode();
         GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(criterion.getId());
@@ -72,13 +72,24 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
         dockNode.put(EDITOR_BOUNDS_Y, graphicInfo.getY() - parentGraphicInfo.getY());
         dockersArrayNode.add(dockNode);
         elementNode.set("dockers", dockersArrayNode);
-        elementNode.set("outgoing", outgoingArrayNode);
+        elementNode.set("outgoing", getOutgoingArrayNodes(criterion.getId(), cmmnModel));
 
         // set properties
         putProperty(propertiesNode, "name", criterion.getSentry().getName());
+        putProperty(propertiesNode, "documentation", criterion.getSentry().getDocumentation());
         if (criterion.getSentry() != null && criterion.getSentry().getSentryIfPart() != null) {
             putProperty(propertiesNode,"ifpartcondition", criterion.getSentry().getSentryIfPart().getCondition());
         }
+    }
+
+    protected JsonNode getOutgoingArrayNodes(String id, CmmnModel cmmnModel) {
+        ArrayNode outgoingArrayNode = objectMapper.createArrayNode();
+        for (Association association : cmmnModel.getAssociations()) {
+            if (id.equals(association.getSourceRef())) {
+                outgoingArrayNode.add(CmmnJsonConverterUtil.createResourceNode(association.getId()));
+            }
+        }
+        return outgoingArrayNode;
     }
 
     protected void putProperty(ObjectNode propertiesNode, String propertyName, String propertyValue) {
@@ -125,6 +136,7 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
         Sentry sentry = new Sentry();
         sentry.setId("sentry" + cmmnModelIdHelper.nextSentryId());
         sentry.setName(getPropertyValueAsString(PROPERTY_NAME, elementNode));
+        sentry.setDocumentation(getPropertyValueAsString(PROPERTY_DOCUMENTATION, elementNode));
 
         String ifPartCondition = getPropertyValueAsString(PROPERTY_IF_PART_CONDITION, elementNode);
         if (StringUtils.isNotBlank(ifPartCondition)) {

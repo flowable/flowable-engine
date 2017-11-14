@@ -15,6 +15,7 @@ package org.flowable.cmmn.editor;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
+import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryIfPart;
@@ -28,7 +29,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 
-public class SentryIfPartConverterTest extends AbstractConverterTest {
+public class SentryConverterTest extends AbstractConverterTest {
 
     @Test
     public void convertJsonToModel() throws Exception {
@@ -65,5 +66,10 @@ public class SentryIfPartConverterTest extends AbstractConverterTest {
         assertThat(ifPart.getCondition(), is("${true}"));
 
         assertThat(sentry.getName(), is("sentry name"));
+        assertThat(sentry.getDocumentation(), is("sentry doc"));
+
+        GraphicInfo sentryGraphicInfo = model.getGraphicInfo(criterion.getId());
+        assertThat(sentryGraphicInfo.getX(), is(400.73441809224767) );
+        assertThat(sentryGraphicInfo.getY(), is(110.88085470555188) );
     }
 }

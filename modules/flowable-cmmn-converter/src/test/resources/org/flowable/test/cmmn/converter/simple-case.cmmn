@@ -36,6 +36,7 @@
                 </planItemOnPart>
             </sentry>
             <sentry id="ifPart" name="criterion name">
+                <documentation>sentry doc</documentation>
                 <ifPart>
                     <condition><![CDATA[${true}]]></condition>
                 </ifPart>
