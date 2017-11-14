@@ -31,6 +31,7 @@ import org.flowable.engine.delegate.event.FlowableErrorEvent;
 import org.flowable.engine.delegate.event.FlowableJobRescheduledEvent;
 import org.flowable.engine.delegate.event.FlowableMessageEvent;
 import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityCancelledEvent;
+import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityCompletedEvent;
 import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityEvent;
 import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
 import org.flowable.engine.delegate.event.FlowableProcessTerminatedEvent;
@@ -246,6 +247,34 @@ public class FlowableEventBuilder {
             String executionId, String processInstanceId, String processDefinitionId, FlowElement flowElement) {
 
         FlowableMultiInstanceActivityEventImpl newEvent = new FlowableMultiInstanceActivityEventImpl(type);
+        newEvent.setActivityId(activityId);
+        newEvent.setActivityName(activityName);
+        newEvent.setExecutionId(executionId);
+        newEvent.setProcessDefinitionId(processDefinitionId);
+        newEvent.setProcessInstanceId(processInstanceId);
+
+        if (flowElement instanceof FlowNode) {
+            FlowNode flowNode = (FlowNode) flowElement;
+            newEvent.setActivityType(parseActivityType(flowNode));
+            Object behaviour = flowNode.getBehavior();
+            if (behaviour != null) {
+                newEvent.setBehaviorClass(behaviour.getClass().getCanonicalName());
+            }
+
+            newEvent.setSequential(((Activity) flowNode).getLoopCharacteristics().isSequential());
+        }
+
+        return newEvent;
+    }
+
+    public static FlowableMultiInstanceActivityCompletedEvent createMultiInstanceActivityCompletedEvent(FlowableEngineEventType type, int numberOfInstances,
+            int numberOfActiveInstances, int numberOfCompletedInstances, String activityId, String activityName, String executionId, String processInstanceId,
+            String processDefinitionId, FlowElement flowElement) {
+
+        FlowableMultiInstanceActivityCompletedEventImpl newEvent = new FlowableMultiInstanceActivityCompletedEventImpl(type);
+        newEvent.setNumberOfInstances(numberOfInstances);
+        newEvent.setNumberOfActiveInstances(numberOfActiveInstances);
+        newEvent.setNumberOfCompletedInstances(numberOfCompletedInstances);
         newEvent.setActivityId(activityId);
         newEvent.setActivityName(activityName);
         newEvent.setExecutionId(executionId);
