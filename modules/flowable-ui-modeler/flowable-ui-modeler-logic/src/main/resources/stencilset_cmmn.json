@@ -463,6 +463,16 @@
       "popular" : true
     } ]
   }, {
+    "name" : "decisiontaskThrowErrorOnNoHitspackage",
+    "properties" : [ {
+      "id" : "decisiontaskThrowErrorOnNoHits",
+      "type" : "Boolean",
+      "title" : "Throw error if no rules were hit",
+      "value" : "false",
+      "description" : "Should an error be thrown if no rules of the decision table were hit and consequently no result was found.",
+      "popular" : true
+    } ]
+  }{
     "name" : "casetaskcasereferencepackage",
     "properties" : [ {
       "id" : "casetaskcasereference",

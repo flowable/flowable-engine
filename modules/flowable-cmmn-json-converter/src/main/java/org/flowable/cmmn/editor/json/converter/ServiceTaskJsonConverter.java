@@ -14,6 +14,7 @@ package org.flowable.cmmn.editor.json.converter;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.node.BooleanNode;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
@@ -32,7 +33,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Tijs Rademakers
  */
 public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements DecisionTableKeyAwareConverter {
-    
+
     protected Map<String, CmmnModelInfo> decisionTableKeyMap;
 
     public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap,
@@ -48,7 +49,7 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
     public static void fillCmmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
         convertersToJsonMap.put(CaseTask.class, ServiceTaskJsonConverter.class);
     }
-    
+
     @Override
     protected String getStencilId(BaseElement baseElement) {
         return CmmnStencilConstants.STENCIL_TASK_SERVICE;
@@ -57,7 +58,7 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
     @Override
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor,
                     BaseElement baseElement, CmmnModel cmmnModel) {
-        
+
         ServiceTask serviceTask = (ServiceTask) baseElement;
 
         if ("dmn".equalsIgnoreCase(serviceTask.getType())) {
@@ -72,6 +73,9 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
                     decisionReferenceNode.put("id", modelInfo.getId());
                     decisionReferenceNode.put("name", modelInfo.getName());
                     decisionReferenceNode.put("key", modelInfo.getKey());
+                } else if (PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY.equals(fieldExtension.getFieldName())) {
+                    propertiesNode.set(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS,
+                            BooleanNode.valueOf(Boolean.parseBoolean(fieldExtension.getStringValue())));
                 }
             }
 
@@ -110,7 +114,7 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
     @Override
     protected BaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor,
                     BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
-        
+
         ServiceTask task = new ServiceTask();
         if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_SERVICETASK_CLASS, elementNode))) {
             task.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
