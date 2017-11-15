@@ -31,6 +31,7 @@ import org.flowable.engine.impl.context.BpmnOverrideContext;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Map;
@@ -40,6 +41,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
     private static final long serialVersionUID = 1L;
 
     protected static final String EXPRESSION_DECISION_TABLE_REFERENCE_KEY = "decisionTableReferenceKey";
+    protected static final String EXPRESSION_DECISION_TABLE_THROW_ERROR_FLAG = "decisiontaskThrowErrorOnNoHits";
 
     protected Task task;
 
@@ -102,6 +104,16 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
         if (decisionExecutionAuditContainer.isFailed()) {
             throw new FlowableException("DMN decision table with key " + finaldecisionTableKeyValue + " could not be executed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage());
         }
+
+        /*Throw error if there were no rules hit when the flag indicates to do this.*/
+        FieldExtension throwErrorFieldExtension = DelegateHelper.getFlowElementField(execution, EXPRESSION_DECISION_TABLE_THROW_ERROR_FLAG);
+        if (throwErrorFieldExtension != null &&
+                throwErrorFieldExtension.getStringValue() != null &&
+                Boolean.parseBoolean(throwErrorFieldExtension.getStringValue()) &&
+                decisionExecutionAuditContainer.getDecisionResult().isEmpty()) {
+            throw new FlowableException("DMN decision table with key " + finaldecisionTableKeyValue + " Did not hit any rules for the provided input.");
+        }
+
 
         setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue, execution, processEngineConfiguration.getObjectMapper());
 
