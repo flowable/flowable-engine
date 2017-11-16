@@ -20,4 +20,13 @@
     <listener>
         <listener-class>org.flowable.rest.servlet.WebConfigurer</listener-class>
     </listener>
+    <filter>
+  	<filter-name>XSessionTokenSecuirtyFilter</filter-name>
+  	<filter-class>org.flowable.rest.conf.XSessionTokenSecuirtyFilter</filter-class>
+  	<async-supported>true</async-supported>
+  </filter>
+  <filter-mapping>
+  	<filter-name>XSessionTokenSecuirtyFilter</filter-name>
+  	<url-pattern>/*</url-pattern>
+  </filter-mapping>
 </web-app>
