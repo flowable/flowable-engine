@@ -107,7 +107,7 @@ public enum FlowableEngineEventType implements FlowableEventType {
     ENGINE_CLOSED,
 
     /**
-     * An activity is starting to execute. This event is dispatch right before an activity is executed.
+     * An activity is starting to execute. This event is dispatched right before an activity is executed.
      */
     ACTIVITY_STARTED,
 
@@ -120,6 +120,21 @@ public enum FlowableEngineEventType implements FlowableEventType {
      * An activity has been cancelled because of boundary event.
      */
     ACTIVITY_CANCELLED,
+
+    /**
+     * A multi-instance activity is starting to execute. This event is dispatched right before an activity is executed.
+     */
+    MULTI_INSTANCE_ACTIVITY_STARTED,
+
+    /**
+     * A multi-instance activity has been completed successfully.
+     */
+    MULTI_INSTANCE_ACTIVITY_COMPLETED,
+
+    /**
+     * A multi-instance activity has been cancelled.
+     */
+    MULTI_INSTANCE_ACTIVITY_CANCELLED,
 
     /**
      * A boundary, intermediate, or subprocess start signal catching event has started.

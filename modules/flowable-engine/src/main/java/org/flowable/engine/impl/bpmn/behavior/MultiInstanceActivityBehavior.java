@@ -144,7 +144,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         executionEntityManager.deleteChildExecutions(multiInstanceRootExecution, "MI_END", false);
         executionEntityManager.deleteRelatedDataForExecution(multiInstanceRootExecution, null);
         executionEntityManager.delete(multiInstanceRootExecution);
-        
+
         ExecutionEntity newExecution = executionEntityManager.createChildExecution(parentExecution);
         newExecution.setCurrentFlowElement(flowElement);
         super.leave(newExecution);
