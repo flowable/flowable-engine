@@ -51,7 +51,7 @@ public class Bootstrapper implements ApplicationListener<ContextRefreshedEvent> 
 
             if (!env.getProperty("ldap.enabled", Boolean.class, false)) {
                 // First create the default IDM entities
-                createDefaultAdmin();
+//                createDefaultAdmin();
             
             } else {
                 if (identityService.createPrivilegeQuery().count() == 0) {
