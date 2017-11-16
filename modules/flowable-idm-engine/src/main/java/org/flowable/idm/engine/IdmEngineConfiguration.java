@@ -12,6 +12,7 @@
  */
 package org.flowable.idm.engine;
 
+import org.flowable.idm.engine.impl.SealIdentityServiceImpl;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -105,7 +106,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
     // SERVICES
     // /////////////////////////////////////////////////////////////////
 
-    protected IdmIdentityService idmIdentityService = new IdmIdentityServiceImpl();
+    protected IdmIdentityService idmIdentityService = new SealIdentityServiceImpl();
     protected IdmManagementService idmManagementService = new IdmManagementServiceImpl();
 
     // DATA MANAGERS ///////////////////////////////////////////////////
