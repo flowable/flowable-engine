@@ -25,6 +25,7 @@ import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryIfPart;
+import org.flowable.cmmn.model.Stage;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -66,8 +67,16 @@ public class CriterionJsonConverter extends BaseCmmnJsonConverter {
         ObjectNode dockNode = objectMapper.createObjectNode();
         GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(criterion.getId());
 
-        PlanItem parentPlanItem = cmmnModel.findPlanItem(criterion.getAttachedToRefId());
-        GraphicInfo parentGraphicInfo = cmmnModel.getGraphicInfo(parentPlanItem.getId());
+        GraphicInfo parentGraphicInfo = null;
+        Stage planModel = cmmnModel.getPrimaryCase().getPlanModel();
+        if (criterion.getAttachedToRefId().equals(planModel.getId())) {
+            parentGraphicInfo = cmmnModel.getGraphicInfo(planModel.getId());
+            
+        } else {
+            PlanItem parentPlanItem = cmmnModel.findPlanItem(criterion.getAttachedToRefId());
+            parentGraphicInfo = cmmnModel.getGraphicInfo(parentPlanItem.getId());
+        }
+        
         dockNode.put(EDITOR_BOUNDS_X, graphicInfo.getX() - parentGraphicInfo.getX());
         dockNode.put(EDITOR_BOUNDS_Y, graphicInfo.getY() - parentGraphicInfo.getY());
         dockersArrayNode.add(dockNode);

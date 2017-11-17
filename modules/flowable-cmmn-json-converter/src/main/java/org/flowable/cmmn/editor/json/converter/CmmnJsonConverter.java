@@ -175,6 +175,32 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
                         planModelGraphicInfo.getY() + planModelGraphicInfo.getHeight(), planModelGraphicInfo.getX(), planModelGraphicInfo.getY());
         planModelNode.putArray(EDITOR_OUTGOING);
         shapesArrayNode.add(planModelNode);
+        
+        ArrayNode outgoingArrayNode = objectMapper.createArrayNode();
+        for (Criterion criterion : planModelStage.getExitCriteria()) {
+            GraphicInfo criterionGraphicInfo = model.getGraphicInfo(criterion.getId());
+            ObjectNode criterionNode = CmmnJsonConverterUtil.createChildShape(criterion.getId(), STENCIL_EXIT_CRITERION, 
+                    criterionGraphicInfo.getX() + criterionGraphicInfo.getWidth(), criterionGraphicInfo.getY() + criterionGraphicInfo.getHeight(), 
+                    criterionGraphicInfo.getX(), criterionGraphicInfo.getY());
+            
+            shapesArrayNode.add(criterionNode);
+            ObjectNode criterionPropertiesNode = objectMapper.createObjectNode();
+            criterionPropertiesNode.put(PROPERTY_OVERRIDE_ID, criterion.getId());
+            new CriterionJsonConverter().convertElementToJson(criterionNode, criterionPropertiesNode, this, criterion, model);
+            criterionNode.set(EDITOR_SHAPE_PROPERTIES, criterionPropertiesNode);
+            
+            if (CollectionUtils.isNotEmpty(criterion.getOutgoingAssociations())) {
+                ArrayNode criterionOutgoingArrayNode = objectMapper.createArrayNode();
+                for (Association association : criterion.getOutgoingAssociations()) {
+                    criterionOutgoingArrayNode.add(CmmnJsonConverterUtil.createResourceNode(association.getId()));
+                }
+                
+                criterionNode.set("outgoing", criterionOutgoingArrayNode);
+            }
+            
+            outgoingArrayNode.add(CmmnJsonConverterUtil.createResourceNode(criterion.getId()));
+        }
+        planModelNode.set("outgoing", outgoingArrayNode);
 
         ArrayNode planModelShapesArrayNode = objectMapper.createArrayNode();
         planModelNode.set(EDITOR_CHILD_SHAPES, planModelShapesArrayNode);
@@ -443,7 +469,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             if (associationsFound) {
                 List<Association> associations = associationMap.get(criterion.getId());
                 for (Association association : associations) {
-                    PlanItem criterionPlanItem;
+                    PlanItem criterionPlanItem = null;
                     if (association.getSourceRef().equals(criterion.getId())) {
                         criterionPlanItem = (PlanItem) association.getTargetElement();
                     } else {
@@ -590,7 +616,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             double sourceDockersY = dockersNode.get(0).get(EDITOR_BOUNDS_Y).asDouble();
 
             String stencilId = CmmnJsonConverterUtil.getStencilId(sourceRefNode);
-            String sourceId;
+            String sourceId = null;
             if (STENCIL_ENTRY_CRITERION.equals(stencilId) || STENCIL_EXIT_CRITERION.equals(stencilId)) {
                 sourceId = CmmnJsonConverterUtil.getElementId(sourceRefNode);
             } else {
@@ -602,7 +628,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             GraphicInfo sourceInfo = cmmnModel.getGraphicInfo(sourceId);
 
             stencilId = CmmnJsonConverterUtil.getStencilId(targetRefNode);
-            String targetId;
+            String targetId = null;
             if (STENCIL_ENTRY_CRITERION.equals(stencilId) || STENCIL_EXIT_CRITERION.equals(stencilId)) {
                 targetId = CmmnJsonConverterUtil.getElementId(targetRefNode);
             } else {
@@ -651,7 +677,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
                 }
             }
 
-            Line2D lastLine;
+            Line2D lastLine = null;
 
             if (dockersNode.size() > 2) {
                 for (int i = 1; i < dockersNode.size() - 1; i++) {
