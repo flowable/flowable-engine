@@ -68,8 +68,7 @@ public class DeploymentManager {
         if (decisionTable == null) {
             decisionTable = engineConfig.getDecisionTableEntityManager().findById(decisionId);
             if (decisionTable == null) {
-                return null;
-//                throw new FlowableObjectNotFoundException("no deployed decision found with id '" + decisionId + "'");
+                throw new FlowableObjectNotFoundException("no deployed decision found with id '" + decisionId + "'");
             }
             decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
         }
@@ -80,8 +79,7 @@ public class DeploymentManager {
         DecisionTableEntity decisionTable = decisionTableEntityManager.findLatestDecisionTableByKey(decisionKey);
 
         if (decisionTable == null) {
-            return null;
-//            throw new FlowableObjectNotFoundException("no decisions deployed with key '" + decisionKey + "'");
+            throw new FlowableObjectNotFoundException("no decisions deployed with key '" + decisionKey + "'");
         }
         decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
         return decisionTable;
@@ -91,8 +89,7 @@ public class DeploymentManager {
         DecisionTableEntity decisionTable = decisionTableEntityManager.findLatestDecisionTableByKeyAndTenantId(decisionKey, tenantId);
 
         if (decisionTable == null) {
-            return null;
-//            throw new FlowableObjectNotFoundException("no decisions deployed with key '" + decisionKey + "' for tenant identifier '" + tenantId + "'");
+            throw new FlowableObjectNotFoundException("no decisions deployed with key '" + decisionKey + "' for tenant identifier '" + tenantId + "'");
         }
         decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
         return decisionTable;
@@ -102,9 +99,8 @@ public class DeploymentManager {
         DecisionTableEntity decisionTable = decisionTableEntityManager.findLatestDecisionTableByKeyAndParentDeploymentId(decisionTableKey, parentDeploymentId);
 
         if (decisionTable == null) {
-            return null;
-//            throw new FlowableObjectNotFoundException("no decisions deployed with key '" + decisionTableKey +
-//                    "' for parent deployment id '" + parentDeploymentId + "'");
+            throw new FlowableObjectNotFoundException("no decisions deployed with key '" + decisionTableKey +
+                            "' for parent deployment id '" + parentDeploymentId + "'");
         }
         decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
         return decisionTable;
@@ -117,9 +113,8 @@ public class DeploymentManager {
                 decisionTableKey, parentDeploymentId, tenantId);
 
         if (decisionTable == null) {
-            return null;
-//            throw new FlowableObjectNotFoundException("no decisions deployed with key '" + decisionTableKey +
-//                    "' for parent deployment id '" + parentDeploymentId + "' and tenant identifier " + tenantId);
+            throw new FlowableObjectNotFoundException("no decisions deployed with key '" + decisionTableKey +
+                            "' for parent deployment id '" + parentDeploymentId + "' and tenant identifier " + tenantId);
         }
         decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
         return decisionTable;
@@ -129,8 +124,7 @@ public class DeploymentManager {
         DecisionTableEntity decisionTable = decisionTableEntityManager.findDecisionTableByKeyAndVersionAndTenantId(decisionKey, decisionVersion, tenantId);
 
         if (decisionTable == null) {
-            return null;
-//            throw new FlowableObjectNotFoundException("no decisions deployed with key = '" + decisionKey + "' and version = '" + decisionVersion + "'");
+            throw new FlowableObjectNotFoundException("no decisions deployed with key = '" + decisionKey + "' and version = '" + decisionVersion + "'");
         }
 
         decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();

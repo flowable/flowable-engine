@@ -52,19 +52,20 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
         DmnDecisionTable decisionTable = null;
 
         if (StringUtils.isNotEmpty(getDecisionKey()) && StringUtils.isNotEmpty(getParentDeploymentId()) && StringUtils.isNotEmpty(getTenantId())) {
+            
             decisionTable = deploymentManager.findDeployedLatestDecisionByKeyParentDeploymentIdAndTenantId(
                             getDecisionKey(), getParentDeploymentId(), getTenantId());
 
             // Fall back
             // If there is no decision table found linked to the deployment id, try to find one without a specific deployment id.
-            if(decisionTable == null){
+            if (decisionTable == null) {
                 decisionTable = deploymentManager.findDeployedLatestDecisionByKeyAndTenantId(getDecisionKey(), getTenantId());
             }
 
             if (decisionTable == null) {
                 throw new FlowableObjectNotFoundException("No decision found for key: " + getDecisionKey() +
                     ", parent deployment id " + getParentDeploymentId() + " and tenant id: " + getTenantId() +
-                    ". There was also no fall back decision table found without specifying the deployment id.");
+                    ". There was also no fall back decision table found without parent deployment id.");
             }
 
         } else if (StringUtils.isNotEmpty(getDecisionKey()) && StringUtils.isNotEmpty(getParentDeploymentId())) {
@@ -72,14 +73,14 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
 
             // Fall back
             // If there is no decision table found linked to the deployment id, try to find one without a specific deployment id.
-            if(decisionTable == null){
+            if (decisionTable == null){
                 decisionTable = deploymentManager.findDeployedLatestDecisionByKey(getDecisionKey());
             }
 
             if (decisionTable == null) {
                 throw new FlowableObjectNotFoundException("No decision found for key: " + getDecisionKey() +
                     " and parent deployment id " + getParentDeploymentId() +
-                    ". There was also no fall back decision table found without specifying the deployment id.");
+                    ". There was also no fall back decision table found without parent deployment id.");
             }
 
         } else if (StringUtils.isNotEmpty(getDecisionKey()) && StringUtils.isNotEmpty(getTenantId())) {
