@@ -463,9 +463,9 @@
       "popular" : true
     } ]
   }, {
-    "name" : "decisiontaskThrowErrorOnNoHitspackage",
+    "name" : "decisiontaskthrowerroronnohitspackage",
     "properties" : [ {
-      "id" : "decisiontaskThrowErrorOnNoHits",
+      "id" : "decisiontaskthrowerroronnohits",
       "type" : "Boolean",
       "title" : "Throw error if no rules were hit",
       "value" : "false",

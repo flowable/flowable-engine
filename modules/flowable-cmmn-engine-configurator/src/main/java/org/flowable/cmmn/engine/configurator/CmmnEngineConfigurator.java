@@ -24,7 +24,6 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.configurator.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.configurator.impl.process.DefaultProcessInstanceService;
 import org.flowable.cmmn.engine.impl.callback.ChildProcessInstanceStateChangeCallback;
-import org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.db.EntityDependencyOrder;
 import org.flowable.engine.cfg.AbstractEngineConfigurator;
 import org.flowable.engine.common.api.FlowableException;
@@ -59,7 +58,7 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
     @Override
     public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
         if (cmmnEngineConfiguration == null) {
-            cmmnEngineConfiguration = new StandaloneInMemCmmnEngineConfiguration();
+            cmmnEngineConfiguration = new CmmnEngineConfiguration();
         }
 
         initialiseCommonProperties(processEngineConfiguration, cmmnEngineConfiguration);

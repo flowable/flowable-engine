@@ -254,7 +254,7 @@ public interface StencilConstants {
     final String PROPERTY_DECISIONTABLE_REFERENCE_NAME = "decisiontablereferencename";
     final String PROPERTY_DECISIONTABLE_REFERENCE_KEY = "decisionTableReferenceKey";
     final String PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS = "decisiontaskthrowerroronnohits";
-    final String PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY = "decisiontaskThrowErrorOnNoHits";
+    final String PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY = "decisionTaskThrowErrorOnNoHits";
 
     final String PROPERTY_HTTPTASK_REQ_METHOD = "httptaskrequestmethod";
     final String PROPERTY_HTTPTASK_REQ_URL = "httptaskrequesturl";

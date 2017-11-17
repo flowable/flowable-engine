@@ -85,7 +85,7 @@ public interface CmmnStencilConstants {
     String PROPERTY_DECISIONTABLE_REFERENCE_NAME = "decisiontablereferencename";
     String PROPERTY_DECISIONTABLE_REFERENCE_KEY = "decisionTableReferenceKey";
     String PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS = "decisiontaskthrowerroronnohits";
-    String PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY = "decisiontaskThrowErrorOnNoHits";
+    String PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY = "decisionTaskThrowErrorOnNoHits";
     
     String PROPERTY_CASE_REFERENCE = "casetaskcasereference";
     
