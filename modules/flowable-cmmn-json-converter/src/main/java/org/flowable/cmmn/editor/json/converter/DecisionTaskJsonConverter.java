@@ -71,6 +71,12 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements 
             }
         }
 
+        boolean decisionTableThrowErrorOnNoHitsNode = getPropertyValueAsBoolean(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS, elementNode);
+        FieldExtension decisionTableThrowErrorOnNoHitsField = new FieldExtension();
+        decisionTableThrowErrorOnNoHitsField.setFieldName(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY);
+        decisionTableThrowErrorOnNoHitsField.setStringValue(decisionTableThrowErrorOnNoHitsNode ? "true" : "false");
+        serviceTask.getFieldExtensions().add(decisionTableThrowErrorOnNoHitsField);
+
         return serviceTask;
     }
 
