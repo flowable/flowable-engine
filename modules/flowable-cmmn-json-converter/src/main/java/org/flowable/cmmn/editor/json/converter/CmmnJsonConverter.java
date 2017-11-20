@@ -37,6 +37,7 @@ import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.SentryOnPart;
 import org.flowable.cmmn.model.Stage;
+import org.flowable.cmmn.model.TimerEventListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,6 +79,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         DecisionTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         CaseTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         ProcessTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
+        TimerEventListenerJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         
         // milestone
         MilestoneJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
@@ -401,11 +403,23 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             if (planItemDefinition instanceof Stage) {
                 Stage stage = (Stage) planItemDefinition;
                 postProcessElements(stage, stage.getPlanItems(), edgeMap, associationMap, cmmnModel, cmmnModelIdHelper);
+                
+            } else if (planItemDefinition instanceof TimerEventListener) {
+                TimerEventListener timerEventListener = (TimerEventListener) planItemDefinition;
+                
+                // The modeler json has referenced the plan item definition. Swapping it with the plan item id when found.
+                String startTriggerSourceRef = timerEventListener.getTimerStartTriggerSourceRef();
+                if (StringUtils.isNotEmpty(startTriggerSourceRef)) {
+                    PlanItemDefinition referencedPlanItemDefinition = parentStage.findPlanItemDefinition(startTriggerSourceRef);
+                    timerEventListener.setTimerStartTriggerSourceRef(referencedPlanItemDefinition.getPlanItemRef());
+                }
+                
             }
             
              if (CollectionUtils.isNotEmpty(planItem.getCriteriaRefs())) {
                  createSentryParts(planItem.getCriteriaRefs(), parentStage, associationMap, cmmnModel, cmmnModelIdHelper, planItem, planItem);
             }
+             
         }
     }
 

@@ -485,7 +485,7 @@
   }, {
     "name" : "timerexpressionpackage",
     "properties" : [ {
-      "id" : "timerexpressionpackage",
+      "id" : "timerexpression",
       "type" : "String",
       "title" : "Timer Expression",
       "value" : "",

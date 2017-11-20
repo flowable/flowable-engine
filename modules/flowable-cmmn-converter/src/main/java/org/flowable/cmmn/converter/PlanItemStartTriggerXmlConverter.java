@@ -14,17 +14,17 @@ package org.flowable.cmmn.converter;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.flowable.cmmn.model.BaseElement;
+import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.TimerEventListener;
 
 /**
  * @author Joram Barrez
  */
-public class StandardEventXmlConverter extends CaseElementXmlConverter {
+public class PlanItemStartTriggerXmlConverter extends CaseElementXmlConverter {
     
     @Override
     public String getXMLElementName() {
-        return CmmnXmlConstants.ELEMENT_STANDARD_EVENT;
+        return CmmnXmlConstants.ELEMENT_PLAN_ITEM_START_TRIGGER;
     }
     
     @Override
@@ -33,13 +33,10 @@ public class StandardEventXmlConverter extends CaseElementXmlConverter {
     }
 
     @Override
-    protected BaseElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        String event = xtr.getText();
+    protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         if (conversionHelper.getCurrentCmmnElement() instanceof TimerEventListener) {
             TimerEventListener timerEventListener = (TimerEventListener) conversionHelper.getCurrentCmmnElement();
-            timerEventListener.setTimerStartTriggerStandardEvent(event);
-        } else {
-            conversionHelper.getCurrentSentryOnPart().setStandardEvent(xtr.getText());
+            timerEventListener.setTimerStartTriggerSourceRef(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_PLAN_ITEM_START_TRIGGER_SRC_REF));
         }
         return null;
     }

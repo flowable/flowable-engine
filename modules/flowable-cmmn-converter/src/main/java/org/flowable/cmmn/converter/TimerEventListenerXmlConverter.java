@@ -20,28 +20,23 @@ import org.flowable.cmmn.model.TimerEventListener;
 /**
  * @author Joram Barrez
  */
-public class StandardEventXmlConverter extends CaseElementXmlConverter {
-    
+public class TimerEventListenerXmlConverter extends PlanItemDefinitiomXmlConverter {
+
     @Override
-    public String getXMLElementName() {
-        return CmmnXmlConstants.ELEMENT_STANDARD_EVENT;
+    public boolean isCmmnElement() {
+        return true;
     }
     
     @Override
-    public boolean isCmmnElement() {
-        return false;
+    public String getXMLElementName() {
+        return CmmnXmlConstants.ELEMENT_TIMER_EVENT_LISTENER;
     }
 
     @Override
     protected BaseElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        String event = xtr.getText();
-        if (conversionHelper.getCurrentCmmnElement() instanceof TimerEventListener) {
-            TimerEventListener timerEventListener = (TimerEventListener) conversionHelper.getCurrentCmmnElement();
-            timerEventListener.setTimerStartTriggerStandardEvent(event);
-        } else {
-            conversionHelper.getCurrentSentryOnPart().setStandardEvent(xtr.getText());
-        }
-        return null;
+        TimerEventListener timerEventListener = new TimerEventListener();
+        // Timer expression / start trigger will be handled by dedicated converters
+        return timerEventListener;
     }
-    
+
 }

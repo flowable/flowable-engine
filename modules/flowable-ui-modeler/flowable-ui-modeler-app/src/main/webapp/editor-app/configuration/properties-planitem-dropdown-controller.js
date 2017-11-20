@@ -54,7 +54,7 @@ angular.module('flowableModeler').controller('FlowablePlanItemDropdownCtrl', [ '
         
         var simplifiedPlanItems = [];
         for (var i=0; i<planItems.length; i++) {
-            simplifiedPlanItems.push({ id: planItems[i].id, name: planItems[i].properties.get('oryx-name') });
+            simplifiedPlanItems.push({ id: planItems[i].resourceId, name: planItems[i].properties.get('oryx-name') });
         }
         
         if (simplifiedPlanItems.length > 0) {
