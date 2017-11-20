@@ -22,6 +22,7 @@ import java.util.Map;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.api.repository.EngineResource;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
@@ -30,7 +31,6 @@ import org.flowable.engine.impl.DeploymentQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
-import org.flowable.engine.impl.persistence.entity.ResourceEntity;
 import org.flowable.engine.impl.repository.DeploymentBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.Deployment;
@@ -100,7 +100,7 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
                 existingDeployment = (DeploymentEntity) existingDeployments.get(0);
             }
 
-            if ((existingDeployment != null) && !deploymentsDiffer(deployment, existingDeployment)) {
+            if (existingDeployment != null && !deploymentsDiffer(deployment, existingDeployment)) {
                 return existingDeployment;
             }
         }
@@ -148,17 +148,17 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
             return true;
         }
 
-        Map<String, ResourceEntity> resources = deployment.getResources();
-        Map<String, ResourceEntity> savedResources = saved.getResources();
+        Map<String, EngineResource> resources = deployment.getResources();
+        Map<String, EngineResource> savedResources = saved.getResources();
 
         for (String resourceName : resources.keySet()) {
-            ResourceEntity savedResource = savedResources.get(resourceName);
+            EngineResource savedResource = savedResources.get(resourceName);
 
             if (savedResource == null)
                 return true;
 
             if (!savedResource.isGenerated()) {
-                ResourceEntity resource = resources.get(resourceName);
+                EngineResource resource = resources.get(resourceName);
 
                 byte[] bytes = resource.getBytes();
                 byte[] savedBytes = savedResource.getBytes();

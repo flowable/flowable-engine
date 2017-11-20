@@ -23,8 +23,8 @@ import org.flowable.dmn.engine.impl.parser.DmnParse;
 import org.flowable.dmn.engine.impl.parser.DmnParseFactory;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
-import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntity;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.common.api.repository.EngineResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,9 +45,9 @@ public class ParsedDeploymentBuilder {
     public ParsedDeployment build() {
         List<DecisionTableEntity> decisionTables = new ArrayList<>();
         Map<DecisionTableEntity, DmnParse> decisionTablesToDmnParseMap = new LinkedHashMap<>();
-        Map<DecisionTableEntity, DmnResourceEntity> decisionTablesToResourceMap = new LinkedHashMap<>();
+        Map<DecisionTableEntity, EngineResource> decisionTablesToResourceMap = new LinkedHashMap<>();
 
-        for (DmnResourceEntity resource : deployment.getResources().values()) {
+        for (EngineResource resource : deployment.getResources().values()) {
             if (DmnResourceUtil.isDmnResource(resource.getName())) {
                 LOGGER.debug("Processing DMN resource {}", resource.getName());
                 DmnParse parse = createDmnParseFromResource(resource);
@@ -62,7 +62,7 @@ public class ParsedDeploymentBuilder {
         return new ParsedDeployment(deployment, decisionTables, decisionTablesToDmnParseMap, decisionTablesToResourceMap);
     }
 
-    protected DmnParse createDmnParseFromResource(DmnResourceEntity resource) {
+    protected DmnParse createDmnParseFromResource(EngineResource resource) {
         String resourceName = resource.getName();
         ByteArrayInputStream inputStream = new ByteArrayInputStream(resource.getBytes());
 

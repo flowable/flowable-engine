@@ -10,18 +10,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.impl.deployer;
+package org.flowable.engine.common.api.repository;
 
-import java.util.Map;
+public interface EngineResource {
 
-import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
+    String getName();
 
-/**
- * @author Tijs Rademakers
- * @author Joram Barrez
- */
-public interface Deployer {
+    void setName(String name);
 
-    void deploy(CmmnDeploymentEntity deployment, Map<String, Object> deploymentSettings);
+    byte[] getBytes();
+
+    void setBytes(byte[] bytes);
+
+    String getDeploymentId();
+
+    void setDeploymentId(String deploymentId);
+    
+    boolean isGenerated();
     
 }

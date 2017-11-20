@@ -226,6 +226,10 @@ public abstract class AbstractEngineConfiguration {
     protected boolean tablePrefixIsSchema;
 
     protected Properties databaseTypeMappings = getDefaultDatabaseTypeMappings();
+    
+    protected List<EngineDeployer> customPreDeployers;
+    protected List<EngineDeployer> customPostDeployers;
+    protected List<EngineDeployer> deployers;
 
     public static final String DATABASE_TYPE_H2 = "h2";
     public static final String DATABASE_TYPE_HSQL = "hsql";
@@ -1288,6 +1292,33 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setMaxLengthStringVariableType(int maxLengthStringVariableType) {
         this.maxLengthStringVariableType = maxLengthStringVariableType;
+        return this;
+    }
+    
+    public List<EngineDeployer> getDeployers() {
+        return deployers;
+    }
+
+    public AbstractEngineConfiguration setDeployers(List<EngineDeployer> deployers) {
+        this.deployers = deployers;
+        return this;
+    }
+    
+    public List<EngineDeployer> getCustomPreDeployers() {
+        return customPreDeployers;
+    }
+
+    public AbstractEngineConfiguration setCustomPreDeployers(List<EngineDeployer> customPreDeployers) {
+        this.customPreDeployers = customPreDeployers;
+        return this;
+    }
+
+    public List<EngineDeployer> getCustomPostDeployers() {
+        return customPostDeployers;
+    }
+
+    public AbstractEngineConfiguration setCustomPostDeployers(List<EngineDeployer> customPostDeployers) {
+        this.customPostDeployers = customPostDeployers;
         return this;
     }
     

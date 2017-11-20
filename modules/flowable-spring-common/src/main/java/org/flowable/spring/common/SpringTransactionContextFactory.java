@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.spring;
+package org.flowable.spring.common;
 
 import org.flowable.engine.common.impl.cfg.TransactionContext;
 import org.flowable.engine.common.impl.cfg.TransactionContextFactory;

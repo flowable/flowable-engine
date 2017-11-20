@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.spring.autodeployment;
+package org.flowable.spring.configurator;
 
 import java.io.IOException;
 import java.util.HashMap;

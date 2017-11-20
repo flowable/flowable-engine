@@ -20,10 +20,10 @@ import java.util.Map;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntity;
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentBuilderImpl;
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.common.api.repository.EngineResource;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
@@ -86,16 +86,17 @@ public class DeployCmd implements Command<CmmnDeployment> {
             return true;
         }
 
-        Map<String, CmmnResourceEntity> resources = deployment.getResources();
-        Map<String, CmmnResourceEntity> savedResources = saved.getResources();
+        Map<String, EngineResource> resources = deployment.getResources();
+        Map<String, EngineResource> savedResources = saved.getResources();
 
         for (String resourceName : resources.keySet()) {
-            CmmnResourceEntity savedResource = savedResources.get(resourceName);
+            EngineResource savedResource = savedResources.get(resourceName);
 
-            if (savedResource == null)
+            if (savedResource == null) {
                 return true;
+            }
 
-            CmmnResourceEntity resource = resources.get(resourceName);
+            EngineResource resource = resources.get(resourceName);
 
             byte[] bytes = resource.getBytes();
             byte[] savedBytes = savedResource.getBytes();
