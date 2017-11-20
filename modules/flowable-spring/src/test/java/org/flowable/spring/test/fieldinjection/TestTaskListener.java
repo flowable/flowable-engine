@@ -14,10 +14,10 @@ package org.flowable.spring.test.fieldinjection;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.delegate.DelegateHelper;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.task.service.delegate.DelegateTask;
-import org.flowable.engine.common.api.delegate.Expression;
 import org.springframework.stereotype.Component;
 
 /**

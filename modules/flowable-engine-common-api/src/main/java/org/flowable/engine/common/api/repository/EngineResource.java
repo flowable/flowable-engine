@@ -10,17 +10,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.persistence.deploy;
+package org.flowable.engine.common.api.repository;
 
-import java.util.Map;
+public interface EngineResource {
 
-import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
+    String getName();
 
-/**
- * @author Tom Baeyens
- * @author Joram Barrez
- */
-public interface Deployer {
+    void setName(String name);
 
-    void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings);
+    byte[] getBytes();
+
+    void setBytes(byte[] bytes);
+
+    String getDeploymentId();
+
+    void setDeploymentId(String deploymentId);
+    
+    boolean isGenerated();
+    
 }

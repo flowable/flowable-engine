@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.dmn.api.DmnDeployment;
+import org.flowable.engine.common.api.repository.EngineResource;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 
 /**
@@ -27,8 +28,6 @@ import org.flowable.engine.common.impl.persistence.entity.Entity;
 public interface DmnDeploymentEntity extends DmnDeployment, Entity {
 
     void addResource(DmnResourceEntity resource);
-
-    Map<String, DmnResourceEntity> getResources();
 
     void addDeployedArtifact(Object deployedArtifact);
 
@@ -42,7 +41,7 @@ public interface DmnDeploymentEntity extends DmnDeployment, Entity {
 
     void setParentDeploymentId(String parentDeploymentId);
 
-    void setResources(Map<String, DmnResourceEntity> resources);
+    void setResources(Map<String, EngineResource> resources);
 
     void setDeploymentTime(Date deploymentTime);
 

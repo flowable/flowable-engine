@@ -26,12 +26,14 @@ import org.flowable.cmmn.engine.impl.parser.CmmnParser;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.engine.common.EngineDeployer;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.repository.EngineDeployment;
+import org.flowable.engine.common.api.repository.EngineResource;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 import org.slf4j.Logger;
@@ -42,7 +44,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Joram Barrez
  */
-public class CmmnDeployer implements Deployer {
+public class CmmnDeployer implements EngineDeployer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CmmnDeployer.class);
 
@@ -52,11 +54,11 @@ public class CmmnDeployer implements Deployer {
     protected CmmnParser cmmnParser;
 
     @Override
-    public void deploy(CmmnDeploymentEntity deployment, Map<String, Object> deploymentSettings) {
+    public void deploy(EngineDeployment deployment, Map<String, Object> deploymentSettings) {
         LOGGER.debug("Processing deployment {}", deployment.getName());
 
         CmmnParseResult parseResult = new CmmnParseResult(deployment);
-        for (CmmnResourceEntity resource : deployment.getResources().values()) {
+        for (EngineResource resource : deployment.getResources().values()) {
             if (isCmmnResource(resource.getName())) {
                 LOGGER.debug("Processing CMMN resource {}", resource.getName());
                 parseResult.merge(cmmnParser.parse(resource));
@@ -137,7 +139,7 @@ public class CmmnDeployer implements Deployer {
         }
     }
 
-    protected void copyDeploymentValuesToCaseDefinitions(CmmnDeploymentEntity deployment, List<CaseDefinitionEntity> caseDefinitionEntities) {
+    protected void copyDeploymentValuesToCaseDefinitions(EngineDeployment deployment, List<CaseDefinitionEntity> caseDefinitionEntities) {
         String tenantId = deployment.getTenantId();
         String deploymentId = deployment.getId();
 
@@ -189,7 +191,7 @@ public class CmmnDeployer implements Deployer {
     protected void updateCachingAndArtifacts(CmmnParseResult parseResult) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
         DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache = cmmnEngineConfiguration.getCaseDefinitionCache();
-        CmmnDeploymentEntity deployment = parseResult.getDeployment();
+        CmmnDeploymentEntity deployment = (CmmnDeploymentEntity) parseResult.getDeployment();
 
         for (CaseDefinitionEntity caseDefinitionEntity : parseResult.getAllCaseDefinitions()) {
             CmmnModel model = parseResult.getCmmnModelForCaseDefinition(caseDefinitionEntity);

@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.flowable.spring.autodeployment;
+package org.flowable.spring.configurator;
 
 import org.flowable.engine.RepositoryService;
 import org.springframework.core.io.Resource;

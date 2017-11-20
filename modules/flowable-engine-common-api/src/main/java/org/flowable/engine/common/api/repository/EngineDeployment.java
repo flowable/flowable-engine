@@ -10,18 +10,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.engine.impl.deployer;
+package org.flowable.engine.common.api.repository;
 
+import java.util.Date;
 import java.util.Map;
 
-import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
-
 /**
+ * Represents a deployment that is already present in the engine repository.
+ * 
+ * A deployment is a container for resources such as process definitions, case definitions, images, forms, etc.
+ * 
  * @author Tijs Rademakers
- * @author Joram Barrez
  */
-public interface Deployer {
+public interface EngineDeployment {
 
-    void deploy(CmmnDeploymentEntity deployment, Map<String, Object> deploymentSettings);
+    String getId();
+
+    String getName();
+
+    Date getDeploymentTime();
+
+    String getCategory();
+
+    String getKey();
+
+    String getTenantId();
     
+    String getEngineVersion();
+    
+    boolean isNew();
+
+    Map<String, EngineResource> getResources();
 }

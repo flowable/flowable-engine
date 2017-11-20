@@ -18,32 +18,32 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntity;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.repository.EngineDeployment;
+import org.flowable.engine.common.api.repository.EngineResource;
 
 /**
  * @author Joram Barrez
  */
 public class CmmnParseResult {
 
-    protected CmmnDeploymentEntity deploymentEntity;
+    protected EngineDeployment deployment;
     protected List<CaseDefinitionEntity> definitions = new ArrayList<>();
     protected Map<CaseDefinitionEntity, CmmnModel> mapDefinitionsToCmmnModel = new HashMap<>();
-    protected Map<CaseDefinitionEntity, CmmnResourceEntity> mapDefinitionsToResources = new HashMap<>();
+    protected Map<CaseDefinitionEntity, EngineResource> mapDefinitionsToResources = new HashMap<>();
     
     public CmmnParseResult() {
         
     }
 
-    public CmmnParseResult(CmmnDeploymentEntity entity) {
-        this.deploymentEntity = entity;
+    public CmmnParseResult(EngineDeployment deployment) {
+        this.deployment = deployment;
     }
 
-    public CmmnDeploymentEntity getDeployment() {
-        return deploymentEntity;
+    public EngineDeployment getDeployment() {
+        return deployment;
     }
     
     public void addCaseDefinition(CaseDefinitionEntity caseDefinitionEntity) {
@@ -54,13 +54,13 @@ public class CmmnParseResult {
         return definitions;
     }
     
-    public void addCaseDefinition(CaseDefinitionEntity caseDefinitionEntity, CmmnResourceEntity resourceEntity, CmmnModel cmmnModel) {
+    public void addCaseDefinition(CaseDefinitionEntity caseDefinitionEntity, EngineResource resourceEntity, CmmnModel cmmnModel) {
         definitions.add(caseDefinitionEntity);
         mapDefinitionsToResources.put(caseDefinitionEntity, resourceEntity);
         mapDefinitionsToCmmnModel.put(caseDefinitionEntity, cmmnModel);
     }
     
-    public CmmnResourceEntity getResourceForCaseDefinition(CaseDefinitionEntity caseDefinition) {
+    public EngineResource getResourceForCaseDefinition(CaseDefinitionEntity caseDefinition) {
         return mapDefinitionsToResources.get(caseDefinition);
     }
 
@@ -74,10 +74,10 @@ public class CmmnParseResult {
     }
     
     public void merge(CmmnParseResult cmmnParseResult) {
-        if (deploymentEntity == null) {
+        if (deployment == null) {
             throw new FlowableException("Cannot merge from a parse result without a deployment entity");
         }
-        if (cmmnParseResult.getDeployment() != null && !deploymentEntity.equals(cmmnParseResult.getDeployment())) {
+        if (cmmnParseResult.getDeployment() != null && !deployment.equals(cmmnParseResult.getDeployment())) {
             throw new FlowableException("Cannot merge parse results with different deployment entities");
         }
         for (CaseDefinitionEntity caseDefinitionEntity : cmmnParseResult.getAllCaseDefinitions()) {

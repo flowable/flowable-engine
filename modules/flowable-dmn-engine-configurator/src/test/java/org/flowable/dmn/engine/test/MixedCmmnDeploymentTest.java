@@ -32,7 +32,7 @@ import org.junit.Test;
 /**
  * @author Yvo Swillens
  */
-public class MixedDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTest {
+public class MixedCmmnDeploymentTest extends AbstractFlowableDmnEngineConfiguratorTest {
 
     @Test
     @Deployment(resources = { "org/flowable/dmn/engine/test/deployment/oneDecisionTaskProcess.bpmn20.xml",
