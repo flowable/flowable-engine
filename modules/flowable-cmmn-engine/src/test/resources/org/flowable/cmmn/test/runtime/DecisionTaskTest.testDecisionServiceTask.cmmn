@@ -6,7 +6,7 @@
     <case id="myCase">
         <casePlanModel id="myPlanModel" name="My CasePlanModel">
 
-            <planItem id="planItem1" name="Task One" definitionRef="serviceTask" />
+            <planItem id="planItem1" name="Task One" definitionRef="decisionTask" />
             <planItem id="planItem2" name="The Case" definitionRef="task">
                 <entryCriterion sentryRef="sentry1" />
             </planItem>
@@ -17,7 +17,14 @@
                 </planItemOnPart>
             </sentry>
 
-            <task id="serviceTask" flowable:type="java" flowable:class="org.flowable.cmmn.test.delegate.TestJavaDelegate" />
+            <task id="decisionTask" name="dmn" isBlocking="false" flowable:type="dmn">
+                <extensionElements>
+                    <flowable:field name="decisionTableReferenceKey">
+                        <flowable:string><![CDATA[decisionTable]]></flowable:string>
+                    </flowable:field>
+                </extensionElements>
+            </task>
+
             <task id="task" name="The Task" isBlocking="true" />
 
         </casePlanModel>

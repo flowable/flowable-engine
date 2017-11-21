@@ -73,14 +73,14 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         AssociationJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
 
         // task types
-        TaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         HumanTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         ServiceTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
-        DecisionTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
+        DecisionTaskJsonConverter.fillTypes(convertersToCmmnMap);
         CaseTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         ProcessTaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
         TimerEventListenerJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
-        
+        TaskJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
+
         // milestone
         MilestoneJsonConverter.fillTypes(convertersToCmmnMap, convertersToJsonMap);
 
@@ -177,29 +177,29 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
                         planModelGraphicInfo.getY() + planModelGraphicInfo.getHeight(), planModelGraphicInfo.getX(), planModelGraphicInfo.getY());
         planModelNode.putArray(EDITOR_OUTGOING);
         shapesArrayNode.add(planModelNode);
-        
+
         ArrayNode outgoingArrayNode = objectMapper.createArrayNode();
         for (Criterion criterion : planModelStage.getExitCriteria()) {
             GraphicInfo criterionGraphicInfo = model.getGraphicInfo(criterion.getId());
-            ObjectNode criterionNode = CmmnJsonConverterUtil.createChildShape(criterion.getId(), STENCIL_EXIT_CRITERION, 
-                    criterionGraphicInfo.getX() + criterionGraphicInfo.getWidth(), criterionGraphicInfo.getY() + criterionGraphicInfo.getHeight(), 
+            ObjectNode criterionNode = CmmnJsonConverterUtil.createChildShape(criterion.getId(), STENCIL_EXIT_CRITERION,
+                    criterionGraphicInfo.getX() + criterionGraphicInfo.getWidth(), criterionGraphicInfo.getY() + criterionGraphicInfo.getHeight(),
                     criterionGraphicInfo.getX(), criterionGraphicInfo.getY());
-            
+
             shapesArrayNode.add(criterionNode);
             ObjectNode criterionPropertiesNode = objectMapper.createObjectNode();
             criterionPropertiesNode.put(PROPERTY_OVERRIDE_ID, criterion.getId());
             new CriterionJsonConverter().convertElementToJson(criterionNode, criterionPropertiesNode, this, criterion, model);
             criterionNode.set(EDITOR_SHAPE_PROPERTIES, criterionPropertiesNode);
-            
+
             if (CollectionUtils.isNotEmpty(criterion.getOutgoingAssociations())) {
                 ArrayNode criterionOutgoingArrayNode = objectMapper.createArrayNode();
                 for (Association association : criterion.getOutgoingAssociations()) {
                     criterionOutgoingArrayNode.add(CmmnJsonConverterUtil.createResourceNode(association.getId()));
                 }
-                
+
                 criterionNode.set("outgoing", criterionOutgoingArrayNode);
             }
-            
+
             outgoingArrayNode.add(CmmnJsonConverterUtil.createResourceNode(criterion.getId()));
         }
         planModelNode.set("outgoing", outgoingArrayNode);
@@ -429,23 +429,23 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             if (planItemDefinition instanceof Stage) {
                 Stage stage = (Stage) planItemDefinition;
                 postProcessElements(stage, stage.getPlanItems(), edgeMap, associationMap, cmmnModel, cmmnModelIdHelper);
-                
+
             } else if (planItemDefinition instanceof TimerEventListener) {
                 TimerEventListener timerEventListener = (TimerEventListener) planItemDefinition;
-                
+
                 // The modeler json has referenced the plan item definition. Swapping it with the plan item id when found.
                 String startTriggerSourceRef = timerEventListener.getTimerStartTriggerSourceRef();
                 if (StringUtils.isNotEmpty(startTriggerSourceRef)) {
                     PlanItemDefinition referencedPlanItemDefinition = parentStage.findPlanItemDefinition(startTriggerSourceRef);
                     timerEventListener.setTimerStartTriggerSourceRef(referencedPlanItemDefinition.getPlanItemRef());
                 }
-                
+
             }
 
              if (CollectionUtils.isNotEmpty(planItem.getCriteriaRefs())) {
                  createSentryParts(planItem.getCriteriaRefs(), parentStage, associationMap, cmmnModel, cmmnModelIdHelper, planItem, planItem);
             }
-             
+
         }
     }
 

@@ -23,6 +23,8 @@ import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.ImplementationType;
+import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ServiceTask;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -47,10 +49,21 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
 
     public static void fillCmmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
         convertersToJsonMap.put(CaseTask.class, ServiceTaskJsonConverter.class);
+        convertersToJsonMap.put(ServiceTask.class, ServiceTaskJsonConverter.class);
     }
 
     @Override
     protected String getStencilId(BaseElement baseElement) {
+        if (baseElement instanceof PlanItem) {
+            PlanItem planItem = (PlanItem) baseElement;
+            PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
+            if (planItemDefinition != null && planItemDefinition instanceof ServiceTask) {
+                ServiceTask serviceTask = (ServiceTask) planItemDefinition;
+                if (ServiceTask.DMN_TASK.equals(serviceTask.getType())) {
+                    return STENCIL_TASK_DECISION;
+                }
+            }
+        }
         return CmmnStencilConstants.STENCIL_TASK_SERVICE;
     }
 
@@ -58,21 +71,24 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor,
                     BaseElement baseElement, CmmnModel cmmnModel) {
 
-        ServiceTask serviceTask = (ServiceTask) baseElement;
+        ServiceTask serviceTask = (ServiceTask) ((PlanItem) baseElement).getPlanItemDefinition();
 
         if (ServiceTask.DMN_TASK.equalsIgnoreCase(serviceTask.getType())) {
             for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
-                if (PROPERTY_DECISIONTABLE_REFERENCE_KEY.equals(fieldExtension.getFieldName()) &&
-                                decisionTableKeyMap != null && decisionTableKeyMap.containsKey(fieldExtension.getStringValue())) {
+                if (PROPERTY_DECISIONTABLE_REFERENCE_KEY.equals(fieldExtension.getFieldName())) {
 
                     ObjectNode decisionReferenceNode = objectMapper.createObjectNode();
                     propertiesNode.set(PROPERTY_DECISIONTABLE_REFERENCE, decisionReferenceNode);
 
-                    CmmnModelInfo modelInfo = decisionTableKeyMap.get(fieldExtension.getStringValue());
-                    decisionReferenceNode.put("id", modelInfo.getId());
-                    decisionReferenceNode.put("name", modelInfo.getName());
-                    decisionReferenceNode.put("key", modelInfo.getKey());
-                    
+                    CmmnModelInfo modelInfo = decisionTableKeyMap != null ? decisionTableKeyMap.get(fieldExtension.getStringValue()) : null;
+                    if (modelInfo != null) {
+                        decisionReferenceNode.put("id", modelInfo.getId());
+                        decisionReferenceNode.put("name", modelInfo.getName());
+                        decisionReferenceNode.put("key", modelInfo.getKey());
+                    } else {
+                        decisionReferenceNode.put("id", fieldExtension.getStringValue());
+                    }
+
                 } else if (PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY.equals(fieldExtension.getFieldName())) {
                     propertiesNode.put(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS, Boolean.parseBoolean(fieldExtension.getStringValue()));
                 }

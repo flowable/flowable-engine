@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,51 +57,51 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
         if (!(baseElement instanceof PlanItem)) {
             return;
         }
-        
+
         PlanItem planItem = (PlanItem) baseElement;
         PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
-        
+
         GraphicInfo graphicInfo = model.getGraphicInfo(planItem.getId());
 
         String stencilId = getStencilId(baseElement);
-        
+
         ObjectNode planItemNode = CmmnJsonConverterUtil.createChildShape(baseElement.getId(), stencilId, graphicInfo.getX() - subProcessX + graphicInfo.getWidth(),
                 graphicInfo.getY() - subProcessY + graphicInfo.getHeight(), graphicInfo.getX() - subProcessX, graphicInfo.getY() - subProcessY);
         shapesArrayNode.add(planItemNode);
         ObjectNode propertiesNode = objectMapper.createObjectNode();
         propertiesNode.put(PROPERTY_OVERRIDE_ID, planItemDefinition.getId());
-    
-        if (StringUtils.isNotEmpty(planItem.getName())) {
+
+        if (StringUtils.isNotEmpty(planItemDefinition.getName())) {
             propertiesNode.put(PROPERTY_NAME, planItemDefinition.getName());
         }
 
-        if (StringUtils.isNotEmpty(planItem.getDocumentation())) {
+        if (StringUtils.isNotEmpty(planItemDefinition.getDocumentation())) {
             propertiesNode.put(PROPERTY_DOCUMENTATION, planItemDefinition.getDocumentation());
         }
-        
+
         convertElementToJson(planItemNode, propertiesNode, processor, baseElement, model);
 
         planItemNode.set(EDITOR_SHAPE_PROPERTIES, propertiesNode);
         ArrayNode outgoingArrayNode = objectMapper.createArrayNode();
-        
+
         if (CollectionUtils.isNotEmpty(planItem.getEntryCriteria())) {
             convertCriteria(planItem.getEntryCriteria(), model, processor, shapesArrayNode, outgoingArrayNode, subProcessX, subProcessY);
         }
-        
+
         if (CollectionUtils.isNotEmpty(planItem.getExitCriteria())) {
             convertCriteria(planItem.getExitCriteria(), model, processor, shapesArrayNode, outgoingArrayNode, subProcessX, subProcessY);
         }
-        
+
         if (CollectionUtils.isNotEmpty(planItem.getOutgoingAssociations())) {
             for (Association association : planItem.getOutgoingAssociations()) {
                 outgoingArrayNode.add(CmmnJsonConverterUtil.createResourceNode(association.getId()));
-            } 
+            }
         }
 
         planItemNode.set("outgoing", outgoingArrayNode);
     }
 
-    public void convertToCmmnModel(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, BaseElement parentElement, 
+    public void convertToCmmnModel(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, BaseElement parentElement,
             Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
 
         BaseElement baseElement = convertJsonToElement(elementNode, modelNode, processor, parentElement, shapeMap, cmmnModel, cmmnModelIdHelper);
@@ -111,22 +111,22 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             PlanItemDefinition planItemDefinition = (PlanItemDefinition) baseElement;
             planItemDefinition.setName(getPropertyValueAsString(PROPERTY_NAME, elementNode));
             planItemDefinition.setDocumentation(getPropertyValueAsString(PROPERTY_DOCUMENTATION, elementNode));
-            
+
             if (planItemDefinition instanceof Task) {
                 Task task = (Task) planItemDefinition;
                 task.setBlocking(getPropertyValueAsBoolean(PROPERTY_IS_BLOCKING, elementNode));
                 task.setBlockingExpression(getPropertyValueAsString(PROPERTY_IS_BLOCKING_EXPRESSION, elementNode));
             }
-        
+
             Stage stage = (Stage) parentElement;
             stage.addPlanItemDefinition(planItemDefinition);
-            
+
             PlanItem planItem = new PlanItem();
             planItem.setId("planItem" + cmmnModelIdHelper.nextPlanItemId());
             planItem.setName(planItemDefinition.getName());
             planItem.setPlanItemDefinition(planItemDefinition);
             planItem.setDefinitionRef(planItemDefinition.getId());
-            
+
             ArrayNode outgoingNode = (ArrayNode) elementNode.get("outgoing");
             if (outgoingNode != null && outgoingNode.size() > 0) {
                 for (JsonNode outgoingChildNode : outgoingNode) {
@@ -137,9 +137,9 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
                     }
                 }
             }
-            
+
             planItemDefinition.setPlanItemRef(planItem.getId());
-            
+
             stage.addPlanItem(planItem);
             planItem.setParent(stage);
         }
@@ -147,37 +147,37 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
 
     protected abstract void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor, BaseElement baseElement, CmmnModel cmmnModel);
 
-    protected abstract BaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, 
+    protected abstract BaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor,
                     BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper);
 
     protected abstract String getStencilId(BaseElement baseElement);
-    
+
     protected void convertCriteria(List<Criterion> criteria, CmmnModel model, ActivityProcessor processor, ArrayNode shapesArrayNode, ArrayNode outgoingArrayNode, double subProcessX, double subProcessY) {
         for (Criterion criterion : criteria) {
             GraphicInfo criterionGraphicInfo = model.getGraphicInfo(criterion.getId());
-            ObjectNode criterionNode = CmmnJsonConverterUtil.createChildShape(criterion.getId(), criterion.isEntryCriterion() ? STENCIL_ENTRY_CRITERION : STENCIL_EXIT_CRITERION, 
-                    criterionGraphicInfo.getX() - subProcessX + criterionGraphicInfo.getWidth(), criterionGraphicInfo.getY() - subProcessY + criterionGraphicInfo.getHeight(), 
+            ObjectNode criterionNode = CmmnJsonConverterUtil.createChildShape(criterion.getId(), criterion.isEntryCriterion() ? STENCIL_ENTRY_CRITERION : STENCIL_EXIT_CRITERION,
+                    criterionGraphicInfo.getX() - subProcessX + criterionGraphicInfo.getWidth(), criterionGraphicInfo.getY() - subProcessY + criterionGraphicInfo.getHeight(),
                     criterionGraphicInfo.getX() - subProcessX, criterionGraphicInfo.getY() - subProcessY);
-            
+
             shapesArrayNode.add(criterionNode);
             ObjectNode criterionPropertiesNode = objectMapper.createObjectNode();
             criterionPropertiesNode.put(PROPERTY_OVERRIDE_ID, criterion.getId());
             new CriterionJsonConverter().convertElementToJson(criterionNode, criterionPropertiesNode, processor, criterion, model);
             criterionNode.set(EDITOR_SHAPE_PROPERTIES, criterionPropertiesNode);
-            
+
             if (CollectionUtils.isNotEmpty(criterion.getOutgoingAssociations())) {
                 ArrayNode criterionOutgoingArrayNode = objectMapper.createArrayNode();
                 for (Association association : criterion.getOutgoingAssociations()) {
                     criterionOutgoingArrayNode.add(CmmnJsonConverterUtil.createResourceNode(association.getId()));
                 }
-                
+
                 criterionNode.set("outgoing", criterionOutgoingArrayNode);
             }
-            
+
             outgoingArrayNode.add(CmmnJsonConverterUtil.createResourceNode(criterion.getId()));
         }
     }
-    
+
     protected void addFieldExtensions(List<FieldExtension> extensions, ObjectNode propertiesNode) {
         ObjectNode fieldExtensionsNode = objectMapper.createObjectNode();
         ArrayNode itemsNode = objectMapper.createArrayNode();

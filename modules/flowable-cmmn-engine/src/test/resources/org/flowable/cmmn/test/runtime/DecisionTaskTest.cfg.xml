@@ -10,6 +10,12 @@
         <property name="jdbcUsername" value="sa" />
         <property name="jdbcPassword" value="" />
         <property name="databaseSchemaUpdate" value="true" />
+        <property name="configurators">
+            <list>
+                <bean class="org.flowable.dmn.engine.configurator.DmnEngineConfigurator">
+                </bean>
+            </list>
+        </property>
     </bean>
 
     <bean id="testBean" class="org.flowable.cmmn.test.delegate.TestBean" />

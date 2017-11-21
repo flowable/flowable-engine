@@ -19,7 +19,7 @@
 			org.flowable.dmn.engine.configurator
 		</flowable.artifact>
 	</properties>
-	
+
 	<dependencies>
         <dependency>
             <groupId>org.flowable</groupId>
@@ -28,11 +28,6 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-engine</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.flowable</groupId>
-            <artifactId>flowable-cmmn-engine</artifactId>
             <scope>test</scope>
         </dependency>
 		<dependency>
@@ -84,7 +79,7 @@
 		</plugins>
 		<pluginManagement>
 			<plugins>
-				<!--This plugin's configuration is used to store Eclipse m2e settings 
+				<!--This plugin's configuration is used to store Eclipse m2e settings
 					only. It has no influence on the Maven build itself. -->
 				<plugin>
 					<groupId>org.eclipse.m2e</groupId>
