@@ -21,6 +21,7 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.flowable.engine.repository.Model;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.HttpMultipartHelper;
@@ -187,13 +188,13 @@ public class ModelResourceSourceTest extends BaseSpringRestTestCase {
 
     public void testSetModelSourceUnexistingModel() throws Exception {
         HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL_SOURCE, "unexisting"));
-        httpPut.setEntity(new StringEntity(""));
+        httpPut.setEntity(MultipartEntityBuilder.create().build());
         closeResponse(executeBinaryRequest(httpPut, HttpStatus.SC_NOT_FOUND));
     }
 
     public void testSetModelSourceExtraUnexistingModel() throws Exception {
         HttpPut httpPut = new HttpPut(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_MODEL_SOURCE_EXTRA, "unexisting"));
-        httpPut.setEntity(new StringEntity(""));
+        httpPut.setEntity(MultipartEntityBuilder.create().build());
         closeResponse(executeBinaryRequest(httpPut, HttpStatus.SC_NOT_FOUND));
     }
 }

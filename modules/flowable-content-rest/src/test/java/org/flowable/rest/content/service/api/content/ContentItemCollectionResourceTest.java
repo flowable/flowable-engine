@@ -144,7 +144,7 @@ public class ContentItemCollectionResourceTest extends BaseSpringContentRestTest
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + ContentRestUrls.createRelativeResourceUrl(
                 ContentRestUrls.URL_CONTENT_ITEM_COLLECTION));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
-        closeResponse(executeBinaryRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
+        closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
     }
 
     public void testGetContentItems() throws Exception {

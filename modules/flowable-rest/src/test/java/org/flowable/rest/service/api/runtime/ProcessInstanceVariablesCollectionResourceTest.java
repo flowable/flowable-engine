@@ -95,7 +95,7 @@ public class ProcessInstanceVariablesCollectionResourceTest extends BaseSpringRe
         // Create a new local variable
         HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_PROCESS_INSTANCE_VARIABLE_COLLECTION, processInstance.getId()));
         httpPost.setEntity(new StringEntity(requestNode.toString()));
-        CloseableHttpResponse response = executeBinaryRequest(httpPost, HttpStatus.SC_CREATED);
+        CloseableHttpResponse response = executeRequest(httpPost, HttpStatus.SC_CREATED);
         JsonNode responseNode = objectMapper.readTree(response.getEntity().getContent()).get(0);
         closeResponse(response);
         assertNotNull(responseNode);
