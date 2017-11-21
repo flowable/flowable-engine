@@ -93,6 +93,8 @@ public class HistoricProcessInstanceEntityImpl extends HistoricScopeInstanceEnti
         persistentState.put("processDefinitionName", processDefinitionName);
         persistentState.put("processDefinitionVersion", processDefinitionVersion);
         persistentState.put("deploymentId", deploymentId);
+        persistentState.put("callbackId", callbackId);
+        persistentState.put("callbackType", callbackType);
         return persistentState;
     }
 

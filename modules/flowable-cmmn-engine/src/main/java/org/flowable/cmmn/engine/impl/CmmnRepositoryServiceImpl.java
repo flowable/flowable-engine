@@ -15,17 +15,19 @@ package org.flowable.cmmn.engine.impl;
 import java.io.InputStream;
 import java.util.List;
 
-import org.flowable.cmmn.engine.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
+import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
+import org.flowable.cmmn.api.repository.CmmnDeploymentQuery;
 import org.flowable.cmmn.engine.impl.cmd.DeleteDeploymentCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeployCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetCmmnModelCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetDeploymentCaseDefinitionCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetDeploymentResourceNamesCmd;
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentBuilderImpl;
-import org.flowable.cmmn.engine.repository.CaseDefinitionQuery;
-import org.flowable.cmmn.engine.repository.CmmnDeployment;
-import org.flowable.cmmn.engine.repository.CmmnDeploymentBuilder;
-import org.flowable.cmmn.engine.repository.CmmnDeploymentQuery;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -57,6 +59,11 @@ public class CmmnRepositoryServiceImpl extends ServiceImpl implements CmmnReposi
     
     public CmmnDeployment deploy(CmmnDeploymentBuilderImpl deploymentBuilder) {
         return commandExecutor.execute(new DeployCmd(deploymentBuilder));
+    }
+    
+    @Override
+    public CaseDefinition getCaseDefinition(String caseDefinitionId) {
+        return commandExecutor.execute(new GetDeploymentCaseDefinitionCmd(caseDefinitionId));
     }
     
     @Override

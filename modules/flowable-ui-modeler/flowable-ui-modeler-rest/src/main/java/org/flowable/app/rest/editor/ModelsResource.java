@@ -68,6 +68,11 @@ public class ModelsResource {
     public ResultListDataRepresentation getModelsToIncludeInAppDefinition() {
         return modelQueryService.getModelsToIncludeInAppDefinition();
     }
+    
+    @RequestMapping(value = "/rest/cmmn-models-for-app-definition", method = RequestMethod.GET, produces = "application/json")
+    public ResultListDataRepresentation getCmmnModelsToIncludeInAppDefinition() {
+        return modelQueryService.getCmmnModelsToIncludeInAppDefinition();
+    }
 
     @RequestMapping(value = "/rest/import-process-model", method = RequestMethod.POST, produces = "application/json")
     public ModelRepresentation importProcessModel(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
@@ -81,6 +86,29 @@ public class ModelsResource {
     public String importProcessModelText(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
 
         ModelRepresentation modelRepresentation = modelQueryService.importProcessModel(request, file);
+        String modelRepresentationJson = null;
+        try {
+            modelRepresentationJson = objectMapper.writeValueAsString(modelRepresentation);
+        } catch (Exception e) {
+            LOGGER.error("Error while processing Model representation json", e);
+            throw new InternalServerErrorException("Model Representation could not be saved");
+        }
+
+        return modelRepresentationJson;
+    }
+    
+    @RequestMapping(value = "/rest/import-case-model", method = RequestMethod.POST, produces = "application/json")
+    public ModelRepresentation importCaseModel(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
+        return modelQueryService.importCaseModel(request, file);
+    }
+
+    /*
+     * specific endpoint for IE9 flash upload component
+     */
+    @RequestMapping(value = "/rest/import-case-model/text", method = RequestMethod.POST)
+    public String importCaseModelText(HttpServletRequest request, @RequestParam("file") MultipartFile file) {
+
+        ModelRepresentation modelRepresentation = modelQueryService.importCaseModel(request, file);
         String modelRepresentationJson = null;
         try {
             modelRepresentationJson = objectMapper.writeValueAsString(modelRepresentation);

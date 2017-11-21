@@ -19,7 +19,7 @@ import java.util.HashMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
-import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * @author Christian Lipphardt (camunda)
@@ -36,6 +36,7 @@ public class HistoricVariableInstanceEntityImpl extends AbstractEntity implement
     protected String executionId;
     protected String taskId;
     protected String scopeId;
+    protected String subScopeId;
     protected String scopeType;
 
     protected Date createTime;
@@ -59,6 +60,7 @@ public class HistoricVariableInstanceEntityImpl extends AbstractEntity implement
 
         persistentState.put("name", name);
         persistentState.put("scopeId", scopeId);
+        persistentState.put("subScopeId", subScopeId);
         persistentState.put("scopeType", scopeType);
         persistentState.put("textValue", textValue);
         persistentState.put("textValue2", textValue2);
@@ -250,6 +252,16 @@ public class HistoricVariableInstanceEntityImpl extends AbstractEntity implement
     @Override
     public void setScopeId(String scopeId) {
         this.scopeId = scopeId;
+    }
+    
+    @Override
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+    
+    @Override
+    public void setSubScopeId(String subScopeId) {
+        this.subScopeId = subScopeId;
     }
 
     @Override

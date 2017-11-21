@@ -196,8 +196,28 @@ public class EndExecutionOperation extends AbstractOperation {
 
         // If there are no more active child executions, the process can be continued
         // If not (eg an embedded subprocess still has active elements, we cannot continue)
-        if (getNumberOfActiveChildExecutionsForExecution(executionEntityManager, parentExecution.getId()) == 0
-                || isAllEventScopeExecutions(executionEntityManager, parentExecution)) {
+        List<ExecutionEntity> eventScopeExecutions = getEventScopeExecutions(executionEntityManager, parentExecution);
+        
+        // Event scoped executions need to be deleted when there are no active siblings anymore, 
+        // unless instances of the event subprocess itself. If there are no active siblings anymore,
+        // the current scope had ended and the event subprocess start event should stop listening to any trigger.
+        if (!eventScopeExecutions.isEmpty()) {
+            List<? extends ExecutionEntity> childExecutions = parentExecution.getExecutions();
+            boolean activeSiblings = false;
+            for (ExecutionEntity childExecutionEntity : childExecutions) {
+                if (!isInEventSubProcess(childExecutionEntity) && childExecutionEntity.isActive() && !childExecutionEntity.isEnded()) {
+                    activeSiblings = true;
+                }
+            }
+            
+            if (!activeSiblings) {
+                for (ExecutionEntity eventScopeExecution : eventScopeExecutions) {
+                    executionEntityManager.deleteExecutionAndRelatedData(eventScopeExecution, null);                    
+                }
+            }
+        }
+        
+        if (getNumberOfActiveChildExecutionsForExecution(executionEntityManager, parentExecution.getId()) == 0) {
 
             ExecutionEntity executionToContinue = null;
 
@@ -386,18 +406,16 @@ public class EndExecutionOperation extends AbstractOperation {
         return activeChildExecutions;
     }
 
-    protected boolean isAllEventScopeExecutions(ExecutionEntityManager executionEntityManager, ExecutionEntity parentExecution) {
-        boolean allEventScopeExecutions = true;
+    protected List<ExecutionEntity> getEventScopeExecutions(ExecutionEntityManager executionEntityManager, ExecutionEntity parentExecution) {
+        List<ExecutionEntity> eventScopeExecutions = new ArrayList<>(1);
         List<ExecutionEntity> executions = executionEntityManager.findChildExecutionsByParentExecutionId(parentExecution.getId());
         for (ExecutionEntity childExecution : executions) {
             if (childExecution.isEventScope()) {
-                executionEntityManager.deleteExecutionAndRelatedData(childExecution, null);
+                eventScopeExecutions.add(childExecution);
                 
-            } else {
-                allEventScopeExecutions = false;
-            }
+            } 
         }
-        return allEventScopeExecutions;
+        return eventScopeExecutions;
     }
 
     protected boolean allChildExecutionsEnded(ExecutionEntity parentExecutionEntity, ExecutionEntity executionEntityToIgnore) {
@@ -415,4 +433,16 @@ public class EndExecutionOperation extends AbstractOperation {
         }
         return true;
     }
+    
+    protected boolean isInEventSubProcess(ExecutionEntity executionEntity) {
+        ExecutionEntity currentExecutionEntity = executionEntity;
+        while (currentExecutionEntity != null) {
+            if (currentExecutionEntity.getCurrentFlowElement() instanceof EventSubProcess) {
+                return true;
+            }
+            currentExecutionEntity = currentExecutionEntity.getParent();
+        }
+        return false;
+    }
+    
 }

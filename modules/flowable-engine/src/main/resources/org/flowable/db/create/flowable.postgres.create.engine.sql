@@ -63,105 +63,6 @@ create table ACT_RU_EXECUTION (
     primary key (ID_)
 );
 
-create table ACT_RU_JOB (
-    ID_ varchar(64) NOT NULL,
-    REV_ integer,
-    TYPE_ varchar(255) NOT NULL,
-    LOCK_EXP_TIME_ timestamp,
-    LOCK_OWNER_ varchar(255),
-    EXCLUSIVE_ boolean,
-    EXECUTION_ID_ varchar(64),
-    PROCESS_INSTANCE_ID_ varchar(64),
-    PROC_DEF_ID_ varchar(64),
-    RETRIES_ integer,
-    EXCEPTION_STACK_ID_ varchar(64),
-    EXCEPTION_MSG_ varchar(4000),
-    DUEDATE_ timestamp,
-    REPEAT_ varchar(255),
-    HANDLER_TYPE_ varchar(255),
-    HANDLER_CFG_ varchar(4000),
-    CREATE_TIME_ timestamp,
-    TENANT_ID_ varchar(255) default '',
-    primary key (ID_)
-);
-
-create table ACT_RU_TIMER_JOB (
-    ID_ varchar(64) NOT NULL,
-    REV_ integer,
-    TYPE_ varchar(255) NOT NULL,
-    LOCK_EXP_TIME_ timestamp,
-    LOCK_OWNER_ varchar(255),
-    EXCLUSIVE_ boolean,
-    EXECUTION_ID_ varchar(64),
-    PROCESS_INSTANCE_ID_ varchar(64),
-    PROC_DEF_ID_ varchar(64),
-    RETRIES_ integer,
-    EXCEPTION_STACK_ID_ varchar(64),
-    EXCEPTION_MSG_ varchar(4000),
-    DUEDATE_ timestamp,
-    REPEAT_ varchar(255),
-    HANDLER_TYPE_ varchar(255),
-    HANDLER_CFG_ varchar(4000),
-    CREATE_TIME_ timestamp,
-    TENANT_ID_ varchar(255) default '',
-    primary key (ID_)
-);
-
-create table ACT_RU_SUSPENDED_JOB (
-    ID_ varchar(64) NOT NULL,
-    REV_ integer,
-    TYPE_ varchar(255) NOT NULL,
-    EXCLUSIVE_ boolean,
-    EXECUTION_ID_ varchar(64),
-    PROCESS_INSTANCE_ID_ varchar(64),
-    PROC_DEF_ID_ varchar(64),
-    RETRIES_ integer,
-    EXCEPTION_STACK_ID_ varchar(64),
-    EXCEPTION_MSG_ varchar(4000),
-    DUEDATE_ timestamp,
-    REPEAT_ varchar(255),
-    HANDLER_TYPE_ varchar(255),
-    HANDLER_CFG_ varchar(4000),
-    CREATE_TIME_ timestamp,
-    TENANT_ID_ varchar(255) default '',
-    primary key (ID_)
-);
-
-create table ACT_RU_DEADLETTER_JOB (
-    ID_ varchar(64) NOT NULL,
-    REV_ integer,
-    TYPE_ varchar(255) NOT NULL,
-    EXCLUSIVE_ boolean,
-    EXECUTION_ID_ varchar(64),
-    PROCESS_INSTANCE_ID_ varchar(64),
-    PROC_DEF_ID_ varchar(64),
-    EXCEPTION_STACK_ID_ varchar(64),
-    EXCEPTION_MSG_ varchar(4000),
-    DUEDATE_ timestamp,
-    REPEAT_ varchar(255),
-    HANDLER_TYPE_ varchar(255),
-    HANDLER_CFG_ varchar(4000),
-    CREATE_TIME_ timestamp,
-    TENANT_ID_ varchar(255) default '',
-    primary key (ID_)
-);
-
-create table ACT_RU_HISTORY_JOB (
-    ID_ varchar(64) NOT NULL,
-    REV_ integer,
-    LOCK_EXP_TIME_ timestamp,
-    LOCK_OWNER_ varchar(255),
-    RETRIES_ integer,
-    EXCEPTION_STACK_ID_ varchar(64),
-    EXCEPTION_MSG_ varchar(4000),
-    HANDLER_TYPE_ varchar(255),
-    HANDLER_CFG_ varchar(4000),
-    ADV_HANDLER_CFG_ID_ varchar(64),
-    CREATE_TIME_ timestamp,
-    TENANT_ID_ varchar(255) default '',
-    primary key (ID_)
-);
-
 create table ACT_RE_PROCDEF (
     ID_ varchar(64) NOT NULL,
     REV_ integer,
@@ -178,45 +79,6 @@ create table ACT_RE_PROCDEF (
     SUSPENSION_STATE_ integer,
     TENANT_ID_ varchar(255) default '',
     ENGINE_VERSION_ varchar(255),
-    primary key (ID_)
-);
-
-create table ACT_RU_TASK (
-    ID_ varchar(64),
-    REV_ integer,
-    EXECUTION_ID_ varchar(64),
-    PROC_INST_ID_ varchar(64),
-    PROC_DEF_ID_ varchar(64),
-    NAME_ varchar(255),
-    PARENT_TASK_ID_ varchar(64),
-    DESCRIPTION_ varchar(4000),
-    TASK_DEF_KEY_ varchar(255),
-    OWNER_ varchar(255),
-    ASSIGNEE_ varchar(255),
-    DELEGATION_ varchar(64),
-    PRIORITY_ integer,
-    CREATE_TIME_ timestamp,
-    DUE_DATE_ timestamp,
-    CATEGORY_ varchar(255),
-    SUSPENSION_STATE_ integer,
-    TENANT_ID_ varchar(255) default '',
-    FORM_KEY_ varchar(255),
-    CLAIM_TIME_ timestamp,
-    IS_COUNT_ENABLED_ boolean,
-	VAR_COUNT_ integer, 
-	ID_LINK_COUNT_ integer,
-    primary key (ID_)
-);
-
-create table ACT_RU_IDENTITYLINK (
-    ID_ varchar(64),
-    REV_ integer,
-    GROUP_ID_ varchar(255),
-    TYPE_ varchar(255),
-    USER_ID_ varchar(255),
-    TASK_ID_ varchar(64),
-    PROC_INST_ID_ varchar(64),
-    PROC_DEF_ID_ varchar (64),
     primary key (ID_)
 );
 
@@ -260,9 +122,6 @@ create table ACT_PROCDEF_INFO (
 
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDX_EXE_ROOT on ACT_RU_EXECUTION(ROOT_PROC_INST_ID_);
-create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
-create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);
-create index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK(GROUP_ID_);
 create index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR(CONFIGURATION_);
 create index ACT_IDX_VARIABLE_TASK_ID on ACT_RU_VARIABLE(TASK_ID_);
 
@@ -368,12 +227,6 @@ alter table ACT_RU_JOB
     foreign key (PROC_DEF_ID_) 
     references ACT_RE_PROCDEF (ID_);
 
-create index ACT_IDX_JOB_EXCEPTION on ACT_RU_JOB(EXCEPTION_STACK_ID_);
-alter table ACT_RU_JOB 
-    add constraint ACT_FK_JOB_EXCEPTION 
-    foreign key (EXCEPTION_STACK_ID_) 
-    references ACT_GE_BYTEARRAY (ID_);
-
 create index ACT_IDX_TIMER_JOB_EXECUTION_ID on ACT_RU_TIMER_JOB(EXECUTION_ID_);
 alter table ACT_RU_TIMER_JOB 
     add constraint ACT_FK_TIMER_JOB_EXECUTION 
@@ -391,12 +244,6 @@ alter table ACT_RU_TIMER_JOB
     add constraint ACT_FK_TIMER_JOB_PROC_DEF
     foreign key (PROC_DEF_ID_) 
     references ACT_RE_PROCDEF (ID_);
-
-create index ACT_IDX_TIMER_JOB_EXCEPTION on ACT_RU_TIMER_JOB(EXCEPTION_STACK_ID_);    
-alter table ACT_RU_TIMER_JOB 
-    add constraint ACT_FK_TIMER_JOB_EXCEPTION 
-    foreign key (EXCEPTION_STACK_ID_) 
-    references ACT_GE_BYTEARRAY (ID_);
 
 create index ACT_IDX_SUSPENDED_JOB_EXECUTION_ID on ACT_RU_SUSPENDED_JOB(EXECUTION_ID_);    
 alter table ACT_RU_SUSPENDED_JOB 
@@ -416,12 +263,6 @@ alter table ACT_RU_SUSPENDED_JOB
     foreign key (PROC_DEF_ID_) 
     references ACT_RE_PROCDEF (ID_);
 
-create index ACT_IDX_SUSPENDED_JOB_EXCEPTION on ACT_RU_SUSPENDED_JOB(EXCEPTION_STACK_ID_);    
-alter table ACT_RU_SUSPENDED_JOB 
-    add constraint ACT_FK_SUSPENDED_JOB_EXCEPTION 
-    foreign key (EXCEPTION_STACK_ID_) 
-    references ACT_GE_BYTEARRAY (ID_);
-
 create index ACT_IDX_DEADLETTER_JOB_EXECUTION_ID on ACT_RU_DEADLETTER_JOB(EXECUTION_ID_);      
 alter table ACT_RU_DEADLETTER_JOB 
     add constraint ACT_FK_DEADLETTER_JOB_EXECUTION 
@@ -440,12 +281,6 @@ alter table ACT_RU_DEADLETTER_JOB
     foreign key (PROC_DEF_ID_) 
     references ACT_RE_PROCDEF (ID_);
     
-create index ACT_IDX_DEADLETTER_JOB_EXCEPTION on ACT_RU_DEADLETTER_JOB(EXCEPTION_STACK_ID_);    
-alter table ACT_RU_DEADLETTER_JOB 
-    add constraint ACT_FK_DEADLETTER_JOB_EXCEPTION 
-    foreign key (EXCEPTION_STACK_ID_) 
-    references ACT_GE_BYTEARRAY (ID_);
-
 create index ACT_IDX_EVENT_SUBSCR on ACT_RU_EVENT_SUBSCR(EXECUTION_ID_);
 alter table ACT_RU_EVENT_SUBSCR
     add constraint ACT_FK_EVENT_EXEC
@@ -487,7 +322,7 @@ alter table ACT_PROCDEF_INFO
     unique (PROC_DEF_ID_);
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.2.0.0', 1);
+values ('schema.version', '6.2.1.0', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.2.0.0)', 1); 
+values ('schema.history', 'create(6.2.1.0)', 1); 

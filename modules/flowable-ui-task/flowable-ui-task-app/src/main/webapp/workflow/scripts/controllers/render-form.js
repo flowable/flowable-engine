@@ -305,7 +305,7 @@ angular.module('flowableApp')
                     } else if (field.type == 'date' && field.value && !field.readOnly) {
                         var dateArray = field.value.split('-');
                         if (dateArray && dateArray.length == 3) {
-                            field.value = new Date(dateArray[0],dateArray[1],dateArray[2]);
+                            field.value = new Date(dateArray[0],dateArray[1]-1,dateArray[2]);
                         }
                         
                     } else if (field.type == 'people' && field.value) {

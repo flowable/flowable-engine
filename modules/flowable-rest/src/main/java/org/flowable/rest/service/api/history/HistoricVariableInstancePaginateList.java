@@ -17,11 +17,12 @@ import java.util.List;
 
 import org.flowable.rest.api.AbstractPaginateList;
 import org.flowable.rest.service.api.RestResponseFactory;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 
 /**
  * @author Tijs Rademakers
  */
-public class HistoricVariableInstancePaginateList extends AbstractPaginateList {
+public class HistoricVariableInstancePaginateList extends AbstractPaginateList<HistoricVariableInstanceResponse, HistoricVariableInstance> {
 
     protected RestResponseFactory restResponseFactory;
 
@@ -29,9 +30,8 @@ public class HistoricVariableInstancePaginateList extends AbstractPaginateList {
         this.restResponseFactory = restResponseFactory;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    protected List processList(List list) {
+    protected List<HistoricVariableInstanceResponse> processList(List<HistoricVariableInstance> list) {
         return restResponseFactory.createHistoricVariableInstanceResponseList(list);
     }
 }

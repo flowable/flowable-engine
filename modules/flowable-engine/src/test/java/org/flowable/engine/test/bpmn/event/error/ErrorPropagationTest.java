@@ -29,7 +29,7 @@ public class ErrorPropagationTest {
         ProcessInstance processInstance = flowableRule.getRuntimeService().startProcessInstanceByKey("catchError4");
         assertNotNull(processInstance);
 
-        final org.flowable.task.service.Task task = flowableRule.getTaskService().createTaskQuery().singleResult();
+        final org.flowable.task.api.Task task = flowableRule.getTaskService().createTaskQuery().singleResult();
 
         assertEquals("MyErrorTaskNested", task.getName());
     }

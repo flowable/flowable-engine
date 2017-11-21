@@ -39,6 +39,10 @@ public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements Hi
     protected String executionId;
     protected String processInstanceId;
     protected String processDefinitionId;
+    protected String scopeId;
+    protected String subScopeId;
+    protected String scopeType;
+    protected String scopeDefinitionId;
     protected Date startTime;
     protected Date endTime;
     protected Long durationInMillis;
@@ -72,6 +76,10 @@ public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements Hi
         this.processDefinitionId = task.getProcessDefinitionId();
         this.processInstanceId = task.getProcessInstanceId();
         this.executionId = task.getExecutionId();
+        this.scopeId = task.getScopeId();
+        this.subScopeId = task.getSubScopeId();
+        this.scopeType = task.getScopeType();
+        this.scopeDefinitionId = task.getScopeDefinitionId();
         this.name = task.getName();
         this.parentTaskId = task.getParentTaskId();
         this.description = task.getDescription();
@@ -109,6 +117,10 @@ public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements Hi
         persistentState.put("category", category);
         persistentState.put("executionId", executionId);
         persistentState.put("processDefinitionId", processDefinitionId);
+        persistentState.put("scopeId", scopeId);
+        persistentState.put("subScopeId", subScopeId);
+        persistentState.put("scopeType", scopeType);
+        persistentState.put("scopeDefinitionId", scopeDefinitionId);
         persistentState.put("parentTaskId", parentTaskId);
         persistentState.put("dueDate", dueDate);
         persistentState.put("claimTime", claimTime);
@@ -147,6 +159,46 @@ public class HistoricTaskInstanceEntityImpl extends AbstractEntity implements Hi
     @Override
     public String getProcessDefinitionId() {
         return processDefinitionId;
+    }
+    
+    @Override
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    @Override
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    @Override
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+
+    @Override
+    public void setSubScopeId(String subScopeId) {
+        this.subScopeId = subScopeId;
+    }
+
+    @Override
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    @Override
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
+    @Override
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
+    }
+
+    @Override
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
     }
 
     @Override

@@ -14,9 +14,9 @@ package org.flowable.cmmn.engine.impl.persistence.entity.data;
 
 import java.util.List;
 
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
-import org.flowable.cmmn.engine.runtime.PlanItemInstance;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 
 /**

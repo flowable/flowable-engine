@@ -16,6 +16,7 @@
         "NAVIGATION": {
             "TASKS": "Tasks",
             "PROCESSES": "Processes",
+            "CASES": "Cases",
             "DESIGN": "Design",
             "CREATE": "+ Create",
             "LOGIN": "Sign in"
@@ -153,6 +154,7 @@
             "ASSIGNEE": "Assignee",
             "DUE": "Due",
             "PROCESS-INSTANCE": "Part of process",
+            "CASE-INSTANCE": "Part of case",
             "ENDED": "Ended",
             "DURATION": "Duration"
         },
@@ -264,6 +266,71 @@
             "CANCEL-DESCRIPTION": "Are you sure you want to cancel process {{name}}?",
             "DELETE-TITLE": "Delete the process?",
             "DELETE-DESCRIPTION": "Are you sure you want to delete process {{name}}? All tasks, content and comments related to this process will be deleted permanently."
+        }
+    },
+    "CASE": {
+        "ALERT": {
+            "STARTED": "A new  \"{{caseDefinitionName}}\" case was started",
+            "START-CASE-CONTENT-ADD-FAILED": "Failed to add {{noOfFiles}} file(s) to the case"
+        },
+        "TITLE": {
+            "DIAGRAM": "Case diagram"
+        },
+        "FILTER": {
+            "CREATED-DESC": "Newest first",
+            "CREATED-ASC": "Oldest first",
+            "ENDED-DESC": "Completed most recently",
+            "ENDED-ASC": "Completed least recently",
+            "STATE-SUMMARY": "Showing {{state.title | translate}} cases",
+            "STATE": "Case State",
+            "STATE-RUNNING": "running",
+            "STATE-COMPLETED": "completed",
+            "STATE-ALL": "all"
+        },
+        "MESSAGE": {
+            "NO-DESCRIPTION": "This case instance has no description",
+            "NO-FILTER": "Showing all case instances, not filtered",
+            "NO-INSTANCES": "No matching case instances found...",
+            "NO-INSTANCES-HELP": "There are no cases that are running now. If your cases have completed, you can find them using the filter for the case list. To get going with something new you can:",
+            "NO-INSTANCES-HELP-START": "Start a new case and track its progress",
+            "NO-TASKS": "No tasks are currently active ...",
+            "NO-COMPLETED-TASKS": "No tasks have been completed yet...",
+            "NO-BUSINESS-KEY": "No business key set",
+            "CATEGORY": "Category: {{processDefinitionCategory}}",
+            "SELECT-DEFINITION": "Select a case to start from the list below",
+            "NO-CASE-DEFINITIONS": "You cannot start a case since there are no case definitions available",
+            "START-CASE": "Start Case",
+            "STARTED-BY": "Started by",
+            "NO-CASE-DEFINITION-SELECTED-HELP": "Please select a case definition"
+        },
+        "ACTION" : {
+            "CREATE": "+ Start a case",
+            "BACK-TO-LIST": "Back to case instances",
+            "SHOW-DIAGRAM": "Show diagram",
+            "CANCEL": "Cancel case",
+            "DELETE": "Delete case",
+            "AUDIT-LOG": "Audit Log"
+        },
+        "FIELD": {
+            "BUSINESS-KEY": "Business key",
+            "CATEGORY": "Category",
+            "CASE-DEFINITION": "Case definition",
+            "STARTED": "Started",
+            "STARTED-BY": "Started by",
+            "ENDED": "Ended",
+            "NAME": "Case instance name",
+            "NAME-PLACEHOLDER" : "Enter an optional name for the case being started"
+        },
+        "SECTION": {
+            "ACTIVE-TASKS": "Active tasks",
+            "COMPLETED-TASKS": "Completed tasks",
+            "CONTENT" : "Content"
+        },
+        "POPUP": {
+            "CANCEL-TITLE": "Cancel the case?",
+            "CANCEL-DESCRIPTION": "Are you sure you want to cancel case {{name}}?",
+            "DELETE-TITLE": "Delete the case?",
+            "DELETE-DESCRIPTION": "Are you sure you want to delete case {{name}}? All tasks and content related to this case will be deleted permanently."
         }
     },
     "INVOLVE-PEOPLE": {

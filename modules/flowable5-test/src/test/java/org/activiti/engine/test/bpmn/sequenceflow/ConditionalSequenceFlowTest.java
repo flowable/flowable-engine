@@ -34,7 +34,7 @@ public class ConditionalSequenceFlowTest extends PluggableFlowableTestCase {
         Map<String, Object> variables = CollectionUtil.singletonMap("input", "right");
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("condSeqFlowUelExpr", variables);
 
-        org.flowable.task.service.Task task = taskService
+        org.flowable.task.api.Task task = taskService
                 .createTaskQuery()
                 .processInstanceId(pi.getId())
                 .singleResult();
@@ -51,7 +51,7 @@ public class ConditionalSequenceFlowTest extends PluggableFlowableTestCase {
         variables.put("skipRight", false);
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("testSkipExpression", variables);
 
-        org.flowable.task.service.Task task = taskService
+        org.flowable.task.api.Task task = taskService
                 .createTaskQuery()
                 .processInstanceId(pi.getId())
                 .singleResult();
@@ -64,7 +64,7 @@ public class ConditionalSequenceFlowTest extends PluggableFlowableTestCase {
         Map<String, Object> variables = CollectionUtil.singletonMap("input", "right");
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("condSeqFlowUelExpr", variables);
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
 
         assertEquals("task not left", task.getName());
         taskService.complete(task.getId());

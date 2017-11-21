@@ -19,7 +19,7 @@ import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.job.service.TimerJobQuery;
+import org.flowable.job.api.TimerJobQuery;
 import org.junit.Assert;
 
 /**

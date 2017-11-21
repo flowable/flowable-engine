@@ -17,6 +17,12 @@ import java.util.ArrayList;
 import javax.sql.DataSource;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.api.CmmnEngineConfigurationApi;
+import org.flowable.cmmn.api.CmmnHistoryService;
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.CmmnTaskService;
+import org.flowable.cmmn.spring.configurator.SpringCmmnEngineConfigurator;
 import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentService;
 import org.flowable.content.spring.SpringContentEngineConfiguration;
@@ -90,7 +96,7 @@ public class FlowableEngineConfiguration {
         factoryBean.setProcessEngineConfiguration(processEngineConfiguration());
         return factoryBean;
     }
-
+    
     public ProcessEngine processEngine() {
         // Safe to call the getObject() on the @Bean annotated processEngineFactoryBean(), will be
         // the fully initialized object instanced from the factory and will NOT be created more than once
@@ -99,6 +105,12 @@ public class FlowableEngineConfiguration {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+    
+    @Bean(name = "cmmnEngineConfiguration")
+    public CmmnEngineConfigurationApi cmmnEngineConfiguration() {
+        ProcessEngineConfiguration processEngineConfiguration = processEngine().getProcessEngineConfiguration();
+        return EngineServiceUtil.getCmmnEngineConfiguration(processEngineConfiguration);
     }
     
     @Bean(name = "dmnEngineConfiguration")
@@ -165,6 +177,9 @@ public class FlowableEngineConfiguration {
 
         processEngineConfiguration.setDisableIdmEngine(true);
         processEngineConfiguration.addConfigurator(new SpringFormEngineConfigurator());
+        
+        SpringCmmnEngineConfigurator cmmnEngineConfigurator = new SpringCmmnEngineConfigurator();
+        processEngineConfiguration.addConfigurator(cmmnEngineConfigurator);
         
         SpringDmnEngineConfiguration dmnEngineConfiguration = new SpringDmnEngineConfiguration();
         dmnEngineConfiguration.setHistoryEnabled(true);
@@ -265,6 +280,26 @@ public class FlowableEngineConfiguration {
     @Bean
     public DmnHistoryService dmnHistoryService() {
         return dmnEngineConfiguration().getDmnHistoryService();
+    }
+    
+    @Bean
+    public CmmnRepositoryService cmmnRepositoryService() {
+        return cmmnEngineConfiguration().getCmmnRepositoryService();
+    }
+
+    @Bean
+    public CmmnRuntimeService cmmnRuntimeService() {
+        return cmmnEngineConfiguration().getCmmnRuntimeService();
+    }
+    
+    @Bean
+    public CmmnTaskService cmmnTaskService() {
+        return cmmnEngineConfiguration().getCmmnTaskService();
+    }
+    
+    @Bean
+    public CmmnHistoryService cmmnHistoryService() {
+        return cmmnEngineConfiguration().getCmmnHistoryService();
     }
 
     @Bean

@@ -39,7 +39,7 @@ public class TaskPriorityExtensionsTest extends PluggableFlowableTestCase {
         // priority
         final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskPriorityExtension", variables);
 
-        final org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        final org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         assertEquals(priority, task.getPriority());
     }
@@ -47,7 +47,7 @@ public class TaskPriorityExtensionsTest extends PluggableFlowableTestCase {
     @Deployment
     public void testPriorityExtensionString() throws Exception {
         final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskPriorityExtensionString");
-        final org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        final org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals(42, task.getPriority());
     }
 }

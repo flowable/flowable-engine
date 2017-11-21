@@ -27,11 +27,11 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.db.SuspensionState;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityManager;
-import org.flowable.task.service.DelegationState;
+import org.flowable.task.api.DelegationState;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.util.CommandContextUtil;
@@ -75,10 +75,13 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     protected List<IdentityLinkEntity> taskIdentityLinkEntities = new ArrayList<>();
 
     protected String executionId;
-    
     protected String processInstanceId;
-    
     protected String processDefinitionId;
+    
+    protected String scopeId;
+    protected String subScopeId;
+    protected String scopeType;
+    protected String scopeDefinitionId;
 
     protected String taskDefinitionKey;
     protected String formKey;
@@ -119,8 +122,23 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         if (executionId != null) {
             persistentState.put("executionId", this.executionId);
         }
+        if (processInstanceId != null) {
+            persistentState.put("processInstanceId", this.processInstanceId);
+        }
         if (processDefinitionId != null) {
             persistentState.put("processDefinitionId", this.processDefinitionId);
+        }
+        if (scopeId != null) {
+            persistentState.put("scopeId", this.scopeId);
+        }
+        if (subScopeId != null) {
+            persistentState.put("subScopeId", this.subScopeId);
+        }
+        if (scopeType != null) {
+            persistentState.put("scopeType", this.scopeType);
+        }
+        if (scopeDefinitionId != null) {
+            persistentState.put("scopeDefinitionId", this.scopeDefinitionId);
         }
         if (createTime != null) {
             persistentState.put("createTime", this.createTime);
@@ -415,6 +433,46 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     @Override
     public void setProcessDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
+    }
+    
+    @Override
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    @Override
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    @Override
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+
+    @Override
+    public void setSubScopeId(String subScopeId) {
+        this.subScopeId = subScopeId;
+    }
+
+    @Override
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    @Override
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
+    @Override
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
+    }
+
+    @Override
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
     }
 
     @Override

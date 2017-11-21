@@ -12,12 +12,12 @@
  */
 package org.flowable.form.spring.configurator;
 
+import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.configurator.FormEngineConfigurator;
 import org.flowable.form.spring.SpringFormEngineConfiguration;
-import org.flowable.spring.SpringProcessEngineConfiguration;
+import org.flowable.spring.common.SpringEngineConfiguration;
 
 /**
  * @author Tijs Rademakers
@@ -28,14 +28,17 @@ public class SpringFormEngineConfigurator extends FormEngineConfigurator {
     protected SpringFormEngineConfiguration formEngineConfiguration;
 
     @Override
-    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public void configure(AbstractEngineConfiguration engineConfiguration) {
         if (formEngineConfiguration == null) {
             formEngineConfiguration = new SpringFormEngineConfiguration();
         }
-        initialiseCommonProperties(processEngineConfiguration, formEngineConfiguration);
-        formEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
+        initialiseCommonProperties(engineConfiguration, formEngineConfiguration);
+        SpringEngineConfiguration springEngineConfiguration = (SpringEngineConfiguration) engineConfiguration;
+        formEngineConfiguration.setTransactionManager(springEngineConfiguration.getTransactionManager());
 
         initFormEngine();
+        
+        initServiceConfigurations(engineConfiguration, formEngineConfiguration);
     }
 
     @Override

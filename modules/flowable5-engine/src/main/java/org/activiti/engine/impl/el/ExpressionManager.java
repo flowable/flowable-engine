@@ -27,8 +27,8 @@ import org.activiti.engine.impl.javax.el.ValueExpression;
 import org.activiti.engine.impl.juel.ExpressionFactoryImpl;
 import org.activiti.engine.impl.persistence.entity.VariableScopeImpl;
 import org.flowable.engine.impl.bpmn.data.ItemInstance;
+import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.variable.service.delegate.VariableScope;
 
 /**
  * <p>

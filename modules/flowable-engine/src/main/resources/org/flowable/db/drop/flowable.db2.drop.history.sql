@@ -11,15 +11,12 @@ drop index ACT_IDX_HI_PROCVAR_PROC_INST;
 drop index ACT_IDX_HI_PROCVAR_TASK_ID;
 drop index ACT_IDX_HI_PROCVAR_EXE;
 drop index ACT_IDX_HI_ACT_INST_PROCINST;
-drop index ACT_IDX_HI_IDENT_LNK_USER;
 drop index ACT_IDX_HI_IDENT_LNK_TASK;
 drop index ACT_IDX_HI_IDENT_LNK_PROCINST;
 drop index ACT_IDX_HI_TASK_INST_PROCINST;
 
 drop table ACT_HI_PROCINST;
 drop table ACT_HI_ACTINST;
-drop table ACT_HI_TASKINST;
 drop table ACT_HI_DETAIL;
 drop table ACT_HI_COMMENT;
 drop table ACT_HI_ATTACHMENT;
-drop table ACT_HI_IDENTITYLINK;

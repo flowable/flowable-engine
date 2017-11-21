@@ -14,8 +14,6 @@ package org.flowable.http.cfg;
 
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.http.HttpServiceTaskTestServer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Http Server and API to test HTTP Service Task config
@@ -23,8 +21,6 @@ import org.slf4j.LoggerFactory;
  * @author Harsha Teja Kanna
  */
 public abstract class HttpServiceTaskCfgTestCase extends ResourceFlowableTestCase {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(HttpServiceTaskCfgTestCase.class);
 
     public HttpServiceTaskCfgTestCase(String configPath) {
         super(configPath);

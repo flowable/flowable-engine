@@ -52,7 +52,8 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.app.AppResourceConverter;
-import org.flowable.engine.cfg.ProcessEngineConfigurator;
+import org.flowable.engine.common.EngineConfigurator;
+import org.flowable.engine.common.EngineDeployer;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
@@ -61,6 +62,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
+import org.flowable.engine.common.impl.db.DbSchemaManager;
 import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.event.FlowableEventDispatcherImpl;
 import org.flowable.engine.common.impl.history.HistoryLevel;
@@ -76,7 +78,6 @@ import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.compatibility.DefaultFlowable5CompatibilityHandlerFactory;
@@ -196,7 +197,6 @@ import org.flowable.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandle
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
-import org.flowable.engine.impl.persistence.deploy.Deployer;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionInfoCache;
@@ -271,6 +271,7 @@ import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.parse.BpmnParseHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
+import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.flowable.job.service.HistoryJobHandler;
@@ -281,15 +282,20 @@ import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.AsyncRunnableExecutionExceptionHandler;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncHistoryJobExecutor;
 import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
+import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncRunnableExecutionExceptionHandler;
 import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
+import org.flowable.job.service.impl.db.JobDbSchemaManager;
 import org.flowable.task.service.InternalTaskLocalizationManager;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
+import org.flowable.task.service.impl.db.TaskDbSchemaManager;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
+import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.db.IbatisVariableTypeHandler;
@@ -316,8 +322,6 @@ import org.flowable.variable.service.impl.types.SerializableType;
 import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
-import org.flowable.variable.service.impl.types.VariableType;
-import org.flowable.variable.service.impl.types.VariableTypes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -407,14 +411,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // CONFIGURATORS ////////////////////////////////////////////////////////////
 
     protected boolean enableConfiguratorServiceLoader = true; // Enabled by default. In certain environments this should be set to false (eg osgi)
-    protected List<ProcessEngineConfigurator> configurators; // The injected configurators
-    protected List<ProcessEngineConfigurator> allConfigurators; // Including auto-discovered configurators
+    protected List<EngineConfigurator> configurators; // The injected configurators
+    protected List<EngineConfigurator> allConfigurators; // Including auto-discovered configurators
 
     protected VariableServiceConfiguration variableServiceConfiguration;
     protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
     protected TaskServiceConfiguration taskServiceConfiguration;
     protected JobServiceConfiguration jobServiceConfiguration;
-    protected ProcessEngineConfigurator idmProcessEngineConfigurator;
+    protected EngineConfigurator idmEngineConfigurator;
 
     // DEPLOYERS //////////////////////////////////////////////////////////////////
 
@@ -427,9 +431,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected BpmnDeploymentHelper bpmnDeploymentHelper;
     protected CachingAndArtifactsManager cachingAndArtifactsManager;
     protected ProcessDefinitionDiagramHelper processDefinitionDiagramHelper;
-    protected List<Deployer> customPreDeployers;
-    protected List<Deployer> customPostDeployers;
-    protected List<Deployer> deployers;
     protected DeploymentManager deploymentManager;
 
     protected int processDefinitionCacheLimit = -1; // By default, no limit
@@ -450,7 +451,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected List<JobHandler> customJobHandlers;
     protected Map<String, JobHandler> jobHandlers;
-    protected AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler;
+    protected List<AsyncRunnableExecutionExceptionHandler> customAsyncRunnableExecutionExceptionHandlers;
+    protected boolean addDefaultExceptionHandler = true;
 
     protected List<HistoryJobHandler> customHistoryJobHandlers;
     protected Map<String, HistoryJobHandler> historyJobHandlers;
@@ -720,11 +722,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      */
     protected DelegateExpressionFieldInjectionMode delegateExpressionFieldInjectionMode = DelegateExpressionFieldInjectionMode.MIXED;
 
-    /**
-     * If set to true, enables bulk insert (grouping sql inserts together). Default true. For some databases (eg DB2 on Zos: https://activiti.atlassian.net/browse/ACT-4042) needs to be set to false
-     */
-    protected boolean isBulkInsertEnabled = true;
-
     protected ObjectMapper objectMapper = new ObjectMapper();
 
     /**
@@ -737,7 +734,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // agenda factory
     protected FlowableEngineAgendaFactory agendaFactory;
     
-    protected VariableDbSchemaManager variableDbSchemaManager;
+    protected DbSchemaManager identityLinkDbSchemaManager;
+    protected DbSchemaManager variableDbSchemaManager;
+    protected DbSchemaManager taskDbSchemaManager;
+    protected DbSchemaManager jobDbSchemaManager;
 
     // Backwards compatibility //////////////////////////////////////////////////////////////
 
@@ -912,23 +912,42 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
-    @Override
-    public void initDatabaseType() {
-        super.initDatabaseType();
-        // Special care for MSSQL, as it has a hard limit of 2000 params per statement (incl bulk statement).
-        // Especially with executions, with 100 as default, this limit is passed.
-        if (DATABASE_TYPE_MSSQL.equals(databaseType)) {
-            maxNrOfStatementsInBulkInsert = DEFAULT_MAX_NR_OF_STATEMENTS_BULK_INSERT_SQL_SERVER;
-        }
-    }
-
     public void initDbSchemaManagers() {
         super.initDbSchemaManager();
+        initProcessDbSchemaManager();
+        initIdentityLinkDbSchemaManager();
+        initVariableDbSchemaManager();
+        initTaskDbSchemaManager();
+        initJobDbSchemaManager();
+    }
+
+    protected void initProcessDbSchemaManager() {
         if (this.dbSchemaManager == null) {
             this.dbSchemaManager = new ProcessDbSchemaManager();
         }
+    }
+
+    protected void initVariableDbSchemaManager() {
         if (this.variableDbSchemaManager == null) {
             this.variableDbSchemaManager = new VariableDbSchemaManager();
+        }
+    }
+
+    protected void initTaskDbSchemaManager() {
+        if (this.taskDbSchemaManager == null) {
+            this.taskDbSchemaManager = new TaskDbSchemaManager();
+        }
+    }
+    
+    protected void initIdentityLinkDbSchemaManager() {
+        if (this.identityLinkDbSchemaManager == null) {
+            this.identityLinkDbSchemaManager = new IdentityLinkDbSchemaManager();
+        }
+    }
+    
+    protected void initJobDbSchemaManager() {
+        if (this.jobDbSchemaManager == null) {
+            this.jobDbSchemaManager = new JobDbSchemaManager();
         }
     }
 
@@ -1109,22 +1128,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     @Override
     protected void initDbSqlSessionFactoryEntitySettings() {
-        for (Class<? extends Entity> clazz : EntityDependencyOrder.INSERT_ORDER) {
-            // All entities except one of the bpmn engine are bulk inserteable
-            dbSqlSessionFactory.getInsertionOrder().add(clazz);
-
-            if (isBulkInsertEnabled) {
-                dbSqlSessionFactory.getBulkInserteableEntityClasses().add(clazz);
-            }
-        }
+        defaultInitDbSqlSessionFactoryEntitySettings(EntityDependencyOrder.INSERT_ORDER, EntityDependencyOrder.DELETE_ORDER);
 
         // Oracle doesn't support bulk inserting for event log entries
         if (isBulkInsertEnabled && "oracle".equals(databaseType)) {
             dbSqlSessionFactory.getBulkInserteableEntityClasses().remove(EventLogEntryEntityImpl.class);
-        }
-
-        for (Class<? extends Entity> clazz : EntityDependencyOrder.DELETE_ORDER) {
-            dbSqlSessionFactory.getDeletionOrder().add(clazz);
         }
     }
 
@@ -1149,8 +1157,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         allConfigurators = new ArrayList<>();
 
         if (!disableIdmEngine) {
-            if (idmProcessEngineConfigurator != null) {
-                allConfigurators.add(idmProcessEngineConfigurator);
+            if (idmEngineConfigurator != null) {
+                allConfigurators.add(idmEngineConfigurator);
             } else {
                 allConfigurators.add(new IdmEngineConfigurator());
             }
@@ -1168,9 +1176,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 classLoader = ReflectUtil.getClassLoader();
             }
 
-            ServiceLoader<ProcessEngineConfigurator> configuratorServiceLoader = ServiceLoader.load(ProcessEngineConfigurator.class, classLoader);
+            ServiceLoader<EngineConfigurator> configuratorServiceLoader = ServiceLoader.load(EngineConfigurator.class, classLoader);
             int nrOfServiceLoadedConfigurators = 0;
-            for (ProcessEngineConfigurator configurator : configuratorServiceLoader) {
+            for (EngineConfigurator configurator : configuratorServiceLoader) {
                 allConfigurators.add(configurator);
                 nrOfServiceLoadedConfigurators++;
             }
@@ -1183,9 +1191,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
                 // Order them according to the priorities (useful for dependent
                 // configurator)
-                Collections.sort(allConfigurators, new Comparator<ProcessEngineConfigurator>() {
+                Collections.sort(allConfigurators, new Comparator<EngineConfigurator>() {
                     @Override
-                    public int compare(ProcessEngineConfigurator configurator1, ProcessEngineConfigurator configurator2) {
+                    public int compare(EngineConfigurator configurator1, EngineConfigurator configurator2) {
                         int priority1 = configurator1.getPriority();
                         int priority2 = configurator2.getPriority();
 
@@ -1199,8 +1207,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 });
 
                 // Execute the configurators
-                LOGGER.info("Found {} Process Engine Configurators in total:", allConfigurators.size());
-                for (ProcessEngineConfigurator configurator : allConfigurators) {
+                LOGGER.info("Found {} Engine Configurators in total:", allConfigurators.size());
+                for (EngineConfigurator configurator : allConfigurators) {
                     LOGGER.info("{} (priority:{})", configurator.getClass(), configurator.getPriority());
                 }
 
@@ -1210,7 +1218,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     public void configuratorsBeforeInit() {
-        for (ProcessEngineConfigurator configurator : allConfigurators) {
+        for (EngineConfigurator configurator : allConfigurators) {
             LOGGER.info("Executing beforeInit() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
             configurator.beforeInit(this);
         }
@@ -1299,7 +1307,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.jobServiceConfiguration.setJobHandlers(this.jobHandlers);
         this.jobServiceConfiguration.setHistoryJobHandlers(this.historyJobHandlers);
         this.jobServiceConfiguration.setFailedJobCommandFactory(this.failedJobCommandFactory);
-        this.jobServiceConfiguration.setAsyncRunnableExecutionExceptionHandler(this.asyncRunnableExecutionExceptionHandler);
+        
+        List<AsyncRunnableExecutionExceptionHandler> exceptionHandlers = new ArrayList<>();
+        if (customAsyncRunnableExecutionExceptionHandlers != null) {
+            exceptionHandlers.addAll(customAsyncRunnableExecutionExceptionHandlers);
+        }
+        
+        if (addDefaultExceptionHandler) {
+            exceptionHandlers.add(new DefaultAsyncRunnableExecutionExceptionHandler());
+        }
+        
+        this.jobServiceConfiguration.setAsyncRunnableExecutionExceptionHandlers(exceptionHandlers);
         this.jobServiceConfiguration.setAsyncExecutorNumberOfRetries(this.asyncExecutorNumberOfRetries);
         this.jobServiceConfiguration.setAsyncExecutorResetExpiredJobsMaxTimeout(this.asyncExecutorResetExpiredJobsMaxTimeout);
 
@@ -1319,7 +1337,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     public void configuratorsAfterInit() {
-        for (ProcessEngineConfigurator configurator : allConfigurators) {
+        for (EngineConfigurator configurator : allConfigurators) {
             LOGGER.info("Executing configure() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
             configurator.configure(this);
         }
@@ -1441,8 +1459,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
-    public Collection<? extends Deployer> getDefaultDeployers() {
-        List<Deployer> defaultDeployers = new ArrayList<>();
+    public Collection<? extends EngineDeployer> getDefaultDeployers() {
+        List<EngineDeployer> defaultDeployers = new ArrayList<>();
 
         if (bpmnDeployer == null) {
             bpmnDeployer = new BpmnDeployer();
@@ -2217,11 +2235,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public List<ProcessEngineConfigurator> getConfigurators() {
+    public List<EngineConfigurator> getConfigurators() {
         return configurators;
     }
 
-    public ProcessEngineConfigurationImpl addConfigurator(ProcessEngineConfigurator configurator) {
+    public ProcessEngineConfigurationImpl addConfigurator(EngineConfigurator configurator) {
         if (this.configurators == null) {
             this.configurators = new ArrayList<>();
         }
@@ -2229,7 +2247,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public ProcessEngineConfigurationImpl setConfigurators(List<ProcessEngineConfigurator> configurators) {
+    public ProcessEngineConfigurationImpl setConfigurators(List<EngineConfigurator> configurators) {
         this.configurators = configurators;
         return this;
     }
@@ -2238,16 +2256,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.enableConfiguratorServiceLoader = enableConfiguratorServiceLoader;
     }
 
-    public List<ProcessEngineConfigurator> getAllConfigurators() {
+    public List<EngineConfigurator> getAllConfigurators() {
         return allConfigurators;
     }
 
-    public ProcessEngineConfigurator getIdmProcessEngineConfigurator() {
-        return idmProcessEngineConfigurator;
+    public EngineConfigurator getIdmEngineConfigurator() {
+        return idmEngineConfigurator;
     }
 
-    public ProcessEngineConfigurationImpl setIdmProcessEngineConfigurator(ProcessEngineConfigurator idmProcessEngineConfigurator) {
-        this.idmProcessEngineConfigurator = idmProcessEngineConfigurator;
+    public ProcessEngineConfigurationImpl setIdmEngineConfigurator(EngineConfigurator idmEngineConfigurator) {
+        this.idmEngineConfigurator = idmEngineConfigurator;
         return this;
     }
 
@@ -2317,15 +2335,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setProcessDefinitionDiagramHelper(ProcessDefinitionDiagramHelper processDefinitionDiagramHelper) {
         this.processDefinitionDiagramHelper = processDefinitionDiagramHelper;
-        return this;
-    }
-
-    public List<Deployer> getDeployers() {
-        return deployers;
-    }
-
-    public ProcessEngineConfigurationImpl setDeployers(List<Deployer> deployers) {
-        this.deployers = deployers;
         return this;
     }
 
@@ -2523,24 +2532,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setAgendaFactory(FlowableEngineAgendaFactory agendaFactory) {
         this.agendaFactory = agendaFactory;
-        return this;
-    }
-
-    public List<Deployer> getCustomPreDeployers() {
-        return customPreDeployers;
-    }
-
-    public ProcessEngineConfigurationImpl setCustomPreDeployers(List<Deployer> customPreDeployers) {
-        this.customPreDeployers = customPreDeployers;
-        return this;
-    }
-
-    public List<Deployer> getCustomPostDeployers() {
-        return customPostDeployers;
-    }
-
-    public ProcessEngineConfigurationImpl setCustomPostDeployers(List<Deployer> customPostDeployers) {
-        this.customPostDeployers = customPostDeployers;
         return this;
     }
 
@@ -2929,15 +2920,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public boolean isBulkInsertEnabled() {
-        return isBulkInsertEnabled;
-    }
-
-    public ProcessEngineConfigurationImpl setBulkInsertEnabled(boolean isBulkInsertEnabled) {
-        this.isBulkInsertEnabled = isBulkInsertEnabled;
-        return this;
-    }
-
     @Override
     public ProcessEngineConfigurationImpl setUsingRelationalDatabase(boolean usingRelationalDatabase) {
         this.usingRelationalDatabase = usingRelationalDatabase;
@@ -3272,14 +3254,23 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.candidateManager = candidateManager;
     }
 
-    public AsyncRunnableExecutionExceptionHandler getAsyncRunnableExecutionExceptionHandler() {
-        return asyncRunnableExecutionExceptionHandler;
+    public List<AsyncRunnableExecutionExceptionHandler> getCustomAsyncRunnableExecutionExceptionHandlers() {
+        return customAsyncRunnableExecutionExceptionHandlers;
     }
 
-    public ProcessEngineConfigurationImpl setAsyncRunnableExecutionExceptionHandler(
-            AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler) {
+    public ProcessEngineConfigurationImpl setCustomAsyncRunnableExecutionExceptionHandlers(
+            List<AsyncRunnableExecutionExceptionHandler> customAsyncRunnableExecutionExceptionHandlers) {
 
-        this.asyncRunnableExecutionExceptionHandler = asyncRunnableExecutionExceptionHandler;
+        this.customAsyncRunnableExecutionExceptionHandlers = customAsyncRunnableExecutionExceptionHandlers;
+        return this;
+    }
+
+    public boolean isAddDefaultExceptionHandler() {
+        return addDefaultExceptionHandler;
+    }
+
+    public ProcessEngineConfigurationImpl setAddDefaultExceptionHandler(boolean addDefaultExceptionHandler) {
+        this.addDefaultExceptionHandler = addDefaultExceptionHandler;
         return this;
     }
 
@@ -3394,13 +3385,40 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.processInstanceStateChangedCallbacks = processInstanceStateChangedCallbacks;
         return this;
     }
-    
-    public VariableDbSchemaManager getVariableDbSchemaManager() {
+
+    public DbSchemaManager getVariableDbSchemaManager() {
         return variableDbSchemaManager;
     }
 
-    public ProcessEngineConfigurationImpl setVariableDbSchemaManager(VariableDbSchemaManager variableDbSchemaManager) {
+    public ProcessEngineConfigurationImpl setVariableDbSchemaManager(DbSchemaManager variableDbSchemaManager) {
         this.variableDbSchemaManager = variableDbSchemaManager;
+        return this;
+    }
+
+    public DbSchemaManager getTaskDbSchemaManager() {
+        return taskDbSchemaManager;
+    }
+
+    public ProcessEngineConfigurationImpl setTaskDbSchemaManager(DbSchemaManager taskDbSchemaManager) {
+        this.taskDbSchemaManager = taskDbSchemaManager;
+        return this;
+    }
+    
+    public DbSchemaManager getIdentityLinkDbSchemaManager() {
+        return identityLinkDbSchemaManager;
+    }
+
+    public ProcessEngineConfigurationImpl setIdentityLinkDbSchemaManager(DbSchemaManager identityLinkDbSchemaManager) {
+        this.identityLinkDbSchemaManager = identityLinkDbSchemaManager;
+        return this;
+    }
+    
+    public DbSchemaManager getJobDbSchemaManager() {
+        return jobDbSchemaManager;
+    }
+
+    public ProcessEngineConfigurationImpl setJobDbSchemaManager(DbSchemaManager jobDbSchemaManager) {
+        this.jobDbSchemaManager = jobDbSchemaManager;
         return this;
     }
 

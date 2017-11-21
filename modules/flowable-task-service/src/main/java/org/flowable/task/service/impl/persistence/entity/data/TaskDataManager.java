@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.TaskQueryImpl;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
@@ -28,6 +28,10 @@ public interface TaskDataManager extends DataManager<TaskEntity> {
     List<TaskEntity> findTasksByExecutionId(final String executionId);
 
     List<TaskEntity> findTasksByProcessInstanceId(String processInstanceId);
+    
+    List<TaskEntity> findTasksByScopeIdAndScopeType(String scopeId, String scopeType);
+    
+    List<TaskEntity> findTasksBySubScopeIdAndScopeType(String subScopeId, String scopeType);
 
     List<Task> findTasksByQueryCriteria(TaskQueryImpl taskQuery);
 

@@ -67,9 +67,9 @@
                 </div>
             </div>
 			<div class="item fadein" ng-repeat="caseModel in model.caseModels.data track by $index">
-				<div class="item-box" ng-style="{'background-image': 'url(\'' + config.contextRoot + '/app/rest/models/' + caseModel.id + '/thumbnail?version=' + imageVersion + '\')'}" ng-click="showCaseModelDetails(caseModel);">
+				<div class="item-box" ng-style="{'background-image': 'url(\'' + getModelThumbnailUrl(caseModel.id, imageVersion) + '\')'}" ng-click="showCaseModelDetails(caseModel);">
 					<div class="actions">
-						<span class="badge">v{{process.version}}</span>
+						<span class="badge">v{{caseModel.version}}</span>
 						<div class="btn-group pull-right">
 							<button id="detailsButton" type="button" ng-click="showCaseModelDetails(caseModel); $event.stopPropagation();" class="btn btn-default" title="{{'CASE.ACTION.DETAILS' | translate}}">
 								<i class="glyphicon glyphicon-search"></i>

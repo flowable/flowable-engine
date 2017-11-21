@@ -17,15 +17,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.constants.EditorJsonConstants;
-import org.flowable.cmmn.editor.constants.StencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
+import org.flowable.cmmn.editor.json.converter.util.CmmnModelJsonConverterUtil;
 import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
-import org.flowable.cmmn.editor.json.converter.util.JsonConverterUtil;
 import org.flowable.cmmn.model.Association;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
+import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
@@ -43,7 +44,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Tijs Rademakers
  */
-public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, StencilConstants {
+public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, CmmnStencilConstants {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(BaseCmmnJsonConverter.class);
 
@@ -176,6 +177,25 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Sten
             outgoingArrayNode.add(CmmnJsonConverterUtil.createResourceNode(criterion.getId()));
         }
     }
+    
+    protected void addFieldExtensions(List<FieldExtension> extensions, ObjectNode propertiesNode) {
+        ObjectNode fieldExtensionsNode = objectMapper.createObjectNode();
+        ArrayNode itemsNode = objectMapper.createArrayNode();
+        for (FieldExtension extension : extensions) {
+            ObjectNode propertyItemNode = objectMapper.createObjectNode();
+            propertyItemNode.put(PROPERTY_SERVICETASK_FIELD_NAME, extension.getFieldName());
+            if (StringUtils.isNotEmpty(extension.getStringValue())) {
+                propertyItemNode.put(PROPERTY_SERVICETASK_FIELD_STRING_VALUE, extension.getStringValue());
+            }
+            if (StringUtils.isNotEmpty(extension.getExpression())) {
+                propertyItemNode.put(PROPERTY_SERVICETASK_FIELD_EXPRESSION, extension.getExpression());
+            }
+            itemsNode.add(propertyItemNode);
+        }
+
+        fieldExtensionsNode.set("fields", itemsNode);
+        propertiesNode.set(PROPERTY_SERVICETASK_FIELDS, fieldExtensionsNode);
+    }
 
     protected void setPropertyValue(String name, String value, ObjectNode propertiesNode) {
         if (StringUtils.isNotEmpty(value)) {
@@ -215,19 +235,19 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Sten
     }
 
     protected String getPropertyValueAsString(String name, JsonNode objectNode) {
-        return JsonConverterUtil.getPropertyValueAsString(name, objectNode);
+        return CmmnModelJsonConverterUtil.getPropertyValueAsString(name, objectNode);
     }
 
     protected boolean getPropertyValueAsBoolean(String name, JsonNode objectNode) {
-        return JsonConverterUtil.getPropertyValueAsBoolean(name, objectNode);
+        return CmmnModelJsonConverterUtil.getPropertyValueAsBoolean(name, objectNode);
     }
 
     protected List<String> getPropertyValueAsList(String name, JsonNode objectNode) {
-        return JsonConverterUtil.getPropertyValueAsList(name, objectNode);
+        return CmmnModelJsonConverterUtil.getPropertyValueAsList(name, objectNode);
     }
 
     protected JsonNode getProperty(String name, JsonNode objectNode) {
-        return JsonConverterUtil.getProperty(name, objectNode);
+        return CmmnModelJsonConverterUtil.getProperty(name, objectNode);
     }
 
     protected String convertListToCommaSeparatedString(List<String> stringList) {

@@ -18,8 +18,8 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.db.HasRevision;
 import org.activiti.engine.impl.db.PersistentObject;
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.variable.service.impl.types.ValueFields;
-import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * @author Tom Baeyens
@@ -226,6 +226,11 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricDetailEn
 
     @Override
     public String getScopeId() {
+        return null;
+    }
+    
+    @Override
+    public String getSubScopeId() {
         return null;
     }
 

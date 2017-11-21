@@ -13,12 +13,18 @@
 package org.flowable.task.service.impl;
 
 import java.util.List;
+import java.util.Objects;
 
+import org.flowable.identitylink.service.HistoricIdentityLinkService;
+import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.HistoricTaskService;
 import org.flowable.task.service.TaskServiceConfiguration;
-import org.flowable.task.service.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntityManager;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.task.service.impl.util.CommandContextUtil;
 
 /**
  * @author Tom Baeyens
@@ -72,6 +78,62 @@ public class HistoricTaskServiceImpl extends ServiceImpl implements HistoricTask
     @Override
     public void deleteHistoricTask(HistoricTaskInstanceEntity HistoricTaskInstance) {
         getHistoricTaskInstanceEntityManager().delete(HistoricTaskInstance);
+    }
+    
+    @Override
+    public HistoricTaskInstanceEntity recordTaskCreated(TaskEntity task) {
+        HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager = getHistoricTaskInstanceEntityManager();
+        HistoricTaskInstanceEntity historicTaskInstanceEntity = historicTaskInstanceEntityManager.create(task); 
+        historicTaskInstanceEntityManager.insert(historicTaskInstanceEntity, false);
+        return historicTaskInstanceEntity;
+    }
+    
+    @Override
+    public HistoricTaskInstanceEntity recordTaskEnd(TaskEntity task, String deleteReason) {
+        HistoricTaskInstanceEntity historicTaskInstanceEntity = getHistoricTaskInstanceEntityManager().findById(task.getId());
+        if (historicTaskInstanceEntity != null) {
+            historicTaskInstanceEntity.markEnded(deleteReason);
+        }
+        return historicTaskInstanceEntity;
+    }
+    
+    @Override
+    public HistoricTaskInstanceEntity recordTaskInfoChange(TaskEntity taskEntity) {
+        HistoricTaskInstanceEntity historicTaskInstance = getHistoricTaskInstanceEntityManager().findById(taskEntity.getId());
+        if (historicTaskInstance != null) {
+            historicTaskInstance.setName(taskEntity.getName());
+            historicTaskInstance.setDescription(taskEntity.getDescription());
+            historicTaskInstance.setDueDate(taskEntity.getDueDate());
+            historicTaskInstance.setPriority(taskEntity.getPriority());
+            historicTaskInstance.setCategory(taskEntity.getCategory());
+            historicTaskInstance.setFormKey(taskEntity.getFormKey());
+            historicTaskInstance.setParentTaskId(taskEntity.getParentTaskId());
+            historicTaskInstance.setTaskDefinitionKey(taskEntity.getTaskDefinitionKey());
+            historicTaskInstance.setProcessDefinitionId(taskEntity.getProcessDefinitionId());
+            historicTaskInstance.setClaimTime(taskEntity.getClaimTime());
+            historicTaskInstance.setLastUpdateTime(taskServiceConfiguration.getClock().getCurrentTime());
+            
+            if (!Objects.equals(historicTaskInstance.getAssignee(), taskEntity.getAssignee())) {
+                historicTaskInstance.setAssignee(taskEntity.getAssignee());
+                createHistoricIdentityLink(historicTaskInstance.getId(), IdentityLinkType.ASSIGNEE, historicTaskInstance.getAssignee());
+            }
+            
+            if (!Objects.equals(historicTaskInstance.getOwner(), taskEntity.getOwner())) {
+                historicTaskInstance.setOwner(taskEntity.getOwner());
+                createHistoricIdentityLink(historicTaskInstance.getId(), IdentityLinkType.OWNER, historicTaskInstance.getOwner());
+            }
+        }
+        return historicTaskInstance;
+    }
+    
+    protected void createHistoricIdentityLink(String taskId, String type, String userId) {
+        HistoricIdentityLinkService historicIdentityLinkService =  CommandContextUtil.getHistoricIdentityLinkService();
+        HistoricIdentityLinkEntity historicIdentityLinkEntity = historicIdentityLinkService.createHistoricIdentityLink();
+        historicIdentityLinkEntity.setTaskId(taskId);
+        historicIdentityLinkEntity.setType(type);
+        historicIdentityLinkEntity.setUserId(userId);
+        historicIdentityLinkEntity.setCreateTime(taskServiceConfiguration.getClock().getCurrentTime());
+        historicIdentityLinkService.insertHistoricIdentityLink(historicIdentityLinkEntity, false);
     }
 
 }

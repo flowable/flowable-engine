@@ -221,18 +221,18 @@ var modelUrl;
 
 if (modelType == 'runtime') {
 	if (historyModelId) {
-    	modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-instances/history/' + historyModelId + '/model-json';
+    	modelUrl = FLOWABLE.APP_URL.getProcessInstanceModelJsonHistoryUrl(historyModelId);
 	} else {
-    	modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-instances/' + modelId + '/model-json';
+    	modelUrl = FLOWABLE.APP_URL.getProcessInstanceModelJsonUrl(modelId);
 	}
 } else if (modelType == 'design') {
 	if (historyModelId) {
-    	modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + modelId + '/history/' + historyModelId + '/model-json';
+    	modelUrl = FLOWABLE.APP_URL.getModelHistoryModelJsonUrl(modelId, historyModelId);
 	} else {
-    	modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + modelId + '/model-json';
+    	modelUrl = FLOWABLE.APP_URL.getModelModelJsonUrl(modelId);
 	}
 } else if (modelType == 'process-definition') {
-    modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-definitions/' + processDefinitionId + '/model-json';
+    modelUrl = FLOWABLE.APP_URL.getProcessDefinitionModelJsonUrl(processDefinitionId);
 }
 
 var request = jQuery.ajax({
@@ -245,19 +245,19 @@ request.success(function(data, textStatus, jqXHR) {
     if ((!data.elements || data.elements.length == 0) && (!data.pools || data.pools.length == 0)) return;
 
     INITIAL_CANVAS_WIDTH = data.diagramWidth;
-    
+
     if (modelType == 'design') {
     	INITIAL_CANVAS_WIDTH += 20;
     } else {
         INITIAL_CANVAS_WIDTH += 30;
     }
-    
+
     INITIAL_CANVAS_HEIGHT = data.diagramHeight + 50;
     canvasWidth = INITIAL_CANVAS_WIDTH;
     canvasHeight = INITIAL_CANVAS_HEIGHT;
     viewBoxWidth = INITIAL_CANVAS_WIDTH;
     viewBoxHeight = INITIAL_CANVAS_HEIGHT;
-    
+
     if (modelType == 'design') {
     	var headerBarHeight = 170;
     	var offsetY = 0;

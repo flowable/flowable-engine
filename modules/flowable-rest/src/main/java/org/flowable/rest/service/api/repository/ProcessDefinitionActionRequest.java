@@ -13,18 +13,16 @@
 
 package org.flowable.rest.service.api.repository;
 
-import java.util.Date;
-
+import io.swagger.annotations.ApiModelProperty;
 import org.flowable.rest.service.api.RestActionRequest;
 
-import io.swagger.annotations.ApiModelProperty;
+import java.util.Date;
 
 /**
  * @author Frederik Heremans
  */
 public class ProcessDefinitionActionRequest extends RestActionRequest {
 
-    @ApiModelProperty(value = "Action to perform: Either activate or suspend")
     public static final String ACTION_SUSPEND = "suspend";
     public static final String ACTION_ACTIVATE = "activate";
 
@@ -56,5 +54,11 @@ public class ProcessDefinitionActionRequest extends RestActionRequest {
 
     public String getCategory() {
         return category;
+    }
+
+    @Override
+    @ApiModelProperty(value = "Action to perform: Either activate or suspend", example = "activate", required = true)
+    public String getAction() {
+        return super.getAction();
     }
 }

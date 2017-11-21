@@ -100,7 +100,7 @@ public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
         em.close();
     }
 
-    private org.flowable.task.service.Task getTask(ProcessInstance instance) {
+    private org.flowable.task.api.Task getTask(ProcessInstance instance) {
         return processEngine.getTaskService().createTaskQuery().processInstanceId(instance.getProcessInstanceId()).includeProcessVariables().singleResult();
     }
 
@@ -118,7 +118,7 @@ public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
         params.put("propertyEntity", propertyEntity);
         ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey("JPAVariableProcess", params);
 
-        org.flowable.task.service.Task task = getTask(instance);
+        org.flowable.task.api.Task task = getTask(instance);
         for (Map.Entry<String, Object> entry : task.getProcessVariables().entrySet()) {
             String name = entry.getKey();
             Object value = entry.getValue();
@@ -146,7 +146,7 @@ public class JPAEnhancedVariableTest extends AbstractFlowableTestCase {
         params.put("list2", Arrays.asList(propertyEntity, propertyEntity));
         ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceByKey("JPAVariableProcess", params);
 
-        org.flowable.task.service.Task task = getTask(instance);
+        org.flowable.task.api.Task task = getTask(instance);
         List list = (List) task.getProcessVariables().get("list1");
         assertEquals(2, list.size());
         assertTrue(list.get(0) instanceof FieldAccessJPAEntity);

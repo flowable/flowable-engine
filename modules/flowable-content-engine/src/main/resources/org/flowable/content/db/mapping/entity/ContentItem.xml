@@ -59,6 +59,86 @@
           )
     </insert>
     
+    <insert id="bulkInsertContentItem" parameterType="java.util.List">
+        insert into ${prefix}ACT_CO_CONTENT_ITEM (
+            ID_,
+            NAME_,
+            MIME_TYPE_,
+            TASK_ID_,
+            PROC_INST_ID_,
+            CONTENT_STORE_ID_,
+            CONTENT_STORE_NAME_,
+            FIELD_,
+            CONTENT_AVAILABLE_,
+            CONTENT_SIZE_,
+            TENANT_ID_,
+            CREATED_,
+            CREATED_BY_,
+            LAST_MODIFIED_,
+            LAST_MODIFIED_BY_)
+         values 
+         <foreach collection="list" item="contentItem" index="index" separator=",">
+         (
+            #{contentItem.id, jdbcType=VARCHAR},
+            #{contentItem.name, jdbcType=VARCHAR},
+            #{contentItem.mimeType, jdbcType=VARCHAR},
+            #{contentItem.taskId, jdbcType=VARCHAR},
+            #{contentItem.processInstanceId, jdbcType=VARCHAR},
+            #{contentItem.contentStoreId, jdbcType=VARCHAR},
+            #{contentItem.contentStoreName, jdbcType=VARCHAR},
+            #{contentItem.field, jdbcType=VARCHAR},
+            #{contentItem.contentAvailable, jdbcType=BOOLEAN},
+            #{contentItem.contentSize, jdbcType=BIGINT},
+            #{contentItem.tenantId, jdbcType=VARCHAR},
+            #{contentItem.created, jdbcType=TIMESTAMP},
+            #{contentItem.createdBy, jdbcType=VARCHAR},
+            #{contentItem.lastModified, jdbcType=TIMESTAMP},
+            #{contentItem.lastModifiedBy, jdbcType=VARCHAR}
+          )
+          </foreach>
+    </insert>
+    
+     <insert id="bulkInsertContentItem" databaseId="oracle" parameterType="java.util.List">
+        INSERT ALL
+        <foreach collection="list" item="contentItem" index="index">
+            INTO ${prefix}ACT_CO_CONTENT_ITEM (
+                ID_,
+                NAME_,
+                MIME_TYPE_,
+                TASK_ID_,
+                PROC_INST_ID_,
+                CONTENT_STORE_ID_,
+                CONTENT_STORE_NAME_,
+                FIELD_,
+                CONTENT_AVAILABLE_,
+                CONTENT_SIZE_,
+                TENANT_ID_,
+                CREATED_,
+                CREATED_BY_,
+                LAST_MODIFIED_,
+                LAST_MODIFIED_BY_)
+         values 
+         (
+            #{contentItem.id, jdbcType=VARCHAR},
+            #{contentItem.name, jdbcType=VARCHAR},
+            #{contentItem.mimeType, jdbcType=VARCHAR},
+            #{contentItem.taskId, jdbcType=VARCHAR},
+            #{contentItem.processInstanceId, jdbcType=VARCHAR},
+            #{contentItem.contentStoreId, jdbcType=VARCHAR},
+            #{contentItem.contentStoreName, jdbcType=VARCHAR},
+            #{contentItem.field, jdbcType=VARCHAR},
+            #{contentItem.contentAvailable, jdbcType=BOOLEAN},
+            #{contentItem.contentSize, jdbcType=BIGINT},
+            #{contentItem.tenantId, jdbcType=VARCHAR},
+            #{contentItem.created, jdbcType=TIMESTAMP},
+            #{contentItem.createdBy, jdbcType=VARCHAR},
+            #{contentItem.lastModified, jdbcType=TIMESTAMP},
+            #{contentItem.lastModifiedBy, jdbcType=VARCHAR}
+          )
+        </foreach>
+        SELECT * FROM dual
+    </insert>
+    
     <update id="updateContentItem" parameterType="org.flowable.content.engine.impl.persistence.entity.ContentItemEntityImpl">
         update ${prefix}ACT_CO_CONTENT_ITEM
         <set>

@@ -17,7 +17,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.cmmn.engine.repository.CmmnDeployment;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
+import org.flowable.engine.common.api.repository.EngineResource;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 
 /**
@@ -28,8 +29,6 @@ public interface CmmnDeploymentEntity extends CmmnDeployment, Entity {
 
     void addResource(CmmnResourceEntity resource);
 
-    Map<String, CmmnResourceEntity> getResources();
-
     void addDeployedArtifact(Object deployedArtifact);
 
     <T> List<T> getDeployedArtifacts(Class<T> clazz);
@@ -37,12 +36,14 @@ public interface CmmnDeploymentEntity extends CmmnDeployment, Entity {
     void setName(String name);
 
     void setCategory(String category);
+    
+    void setKey(String key);
 
     void setTenantId(String tenantId);
 
     void setParentDeploymentId(String parentDeploymentId);
 
-    void setResources(Map<String, CmmnResourceEntity> resources);
+    void setResources(Map<String, EngineResource> resources);
 
     void setDeploymentTime(Date deploymentTime);
 

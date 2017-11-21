@@ -15,7 +15,7 @@ package org.flowable.cmmn.editor.json.converter;
 import java.util.Map;
 
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
-import org.flowable.cmmn.editor.json.model.ModelInfo;
+import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnModel;
@@ -31,12 +31,14 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Tijs Rademakers
  */
 public class StageJsonConverter extends BaseCmmnJsonConverter implements FormAwareConverter, FormKeyAwareConverter,
-        DecisionTableAwareConverter, DecisionTableKeyAwareConverter {
+        DecisionTableAwareConverter, DecisionTableKeyAwareConverter, CaseModelAwareConverter, ProcessModelAwareConverter {
 
     protected Map<String, String> formMap;
-    protected Map<String, ModelInfo> formKeyMap;
+    protected Map<String, CmmnModelInfo> formKeyMap;
     protected Map<String, String> decisionTableMap;
-    protected Map<String, ModelInfo> decisionTableKeyMap;
+    protected Map<String, CmmnModelInfo> decisionTableKeyMap;
+    protected Map<String, String> caseModelMap;
+    protected Map<String, String> processModelMap;
 
     public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap,
             Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
@@ -76,7 +78,8 @@ public class StageJsonConverter extends BaseCmmnJsonConverter implements FormAwa
         Stage stage = new Stage();
 
         JsonNode childShapesArray = elementNode.get(EDITOR_CHILD_SHAPES);
-        processor.processJsonElements(childShapesArray, modelNode, stage, shapeMap, formMap, decisionTableMap, cmmnModel, cmmnModelIdHelper);
+        processor.processJsonElements(childShapesArray, modelNode, stage, shapeMap, formMap, decisionTableMap, 
+                        caseModelMap, processModelMap, cmmnModel, cmmnModelIdHelper);
         
         Stage parentStage = (Stage) parentElement;
         stage.setParent(parentStage);
@@ -90,7 +93,7 @@ public class StageJsonConverter extends BaseCmmnJsonConverter implements FormAwa
     }
 
     @Override
-    public void setFormKeyMap(Map<String, ModelInfo> formKeyMap) {
+    public void setFormKeyMap(Map<String, CmmnModelInfo> formKeyMap) {
         this.formKeyMap = formKeyMap;
     }
 
@@ -100,7 +103,17 @@ public class StageJsonConverter extends BaseCmmnJsonConverter implements FormAwa
     }
 
     @Override
-    public void setDecisionTableKeyMap(Map<String, ModelInfo> decisionTableKeyMap) {
+    public void setDecisionTableKeyMap(Map<String, CmmnModelInfo> decisionTableKeyMap) {
         this.decisionTableKeyMap = decisionTableKeyMap;
+    }
+    
+    @Override
+    public void setCaseModelMap(Map<String, String> caseModelMap) {
+        this.caseModelMap = caseModelMap;
+    }
+
+    @Override
+    public void setProcessModelMap(Map<String, String> processModelMap) {
+        this.processModelMap = processModelMap;
     }
 }

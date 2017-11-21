@@ -19,9 +19,9 @@ import java.util.Map;
 import org.flowable.engine.common.impl.db.HasRevision;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.Task;
 import org.flowable.task.service.delegate.DelegateTask;
-import org.flowable.variable.service.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -44,6 +44,14 @@ public interface TaskEntity extends VariableScope, Task, DelegateTask, Entity, H
     void setEventHandlerId(String eventHandlerId);
 
     void setProcessInstanceId(String processInstanceId);
+    
+    void setScopeId(String scopeId);
+    
+    void setSubScopeId(String subScopeId);
+    
+    void setScopeType(String scopeType);
+    
+    void setScopeDefinitionId(String scopeDefinitionId);
 
     int getSuspensionState();
 

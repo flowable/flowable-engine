@@ -14,12 +14,12 @@ package org.flowable.cmmn.editor.json.converter;
 
 import java.util.Map;
 
-import org.flowable.cmmn.editor.json.model.ModelInfo;
+import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 
 /**
  * @author Tijs Rademakers
  */
 public interface FormKeyAwareConverter {
 
-    public void setFormKeyMap(Map<String, ModelInfo> formKeyMap);
+    public void setFormKeyMap(Map<String, CmmnModelInfo> formKeyMap);
 }

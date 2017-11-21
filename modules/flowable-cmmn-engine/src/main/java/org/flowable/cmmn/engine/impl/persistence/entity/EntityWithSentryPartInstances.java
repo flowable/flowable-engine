@@ -15,7 +15,7 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 import java.util.List;
 
 import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.variable.service.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Joram Barrez

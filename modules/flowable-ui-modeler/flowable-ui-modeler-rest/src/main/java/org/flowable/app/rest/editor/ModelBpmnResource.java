@@ -28,7 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ModelBpmnResource extends AbstractModelBpmnResource {
 
     /**
-     * GET /rest/models/{modelId}/bpmn -> Get BPMN 2.0 xml
+     * GET /rest/models/{modelId}/bpmn20 -> Get BPMN 2.0 xml
      */
     @RequestMapping(value = "/rest/models/{processModelId}/bpmn20", method = RequestMethod.GET)
     public void getProcessModelBpmn20Xml(HttpServletResponse response, @PathVariable String processModelId) throws IOException {

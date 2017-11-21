@@ -13,7 +13,8 @@
 
 package org.flowable.task.service;
 
-import org.flowable.task.service.history.HistoricTaskInstance;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 /**
  * @author Tijs Rademakers

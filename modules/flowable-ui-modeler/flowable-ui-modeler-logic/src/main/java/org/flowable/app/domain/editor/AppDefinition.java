@@ -26,6 +26,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
 public class AppDefinition {
 
     protected List<AppModelDefinition> models;
+    protected List<AppModelDefinition> cmmnModels;
     protected String theme;
     protected String icon;
     protected String groupsAccess;
@@ -53,6 +54,14 @@ public class AppDefinition {
 
     public void setModels(List<AppModelDefinition> models) {
         this.models = models;
+    }
+    
+    public List<AppModelDefinition> getCmmnModels() {
+        return cmmnModels;
+    }
+
+    public void setCmmnModels(List<AppModelDefinition> cmmnModels) {
+        this.cmmnModels = cmmnModels;
     }
 
     public String getGroupsAccess() {

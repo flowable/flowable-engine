@@ -12,22 +12,19 @@
  */
 package org.flowable.cmmn.test;
 
-import java.util.List;
-
-import org.flowable.cmmn.engine.CmmnEngine;
-import org.flowable.cmmn.engine.CmmnHistoryService;
-import org.flowable.cmmn.engine.CmmnManagementService;
-import org.flowable.cmmn.engine.CmmnRepositoryService;
-import org.flowable.cmmn.engine.CmmnRuntimeService;
-import org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator;
+import org.flowable.cmmn.api.CmmnHistoryService;
+import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.CmmnTaskService;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.cfg.ProcessEngineConfigurator;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.repository.Deployment;
 import org.junit.After;
 import org.junit.Before;
@@ -40,11 +37,12 @@ import org.junit.runner.RunWith;
 @RunWith(CmmnTestRunner.class)
 public abstract class AbstractProcessEngineIntegrationTest {
 
-    protected static CmmnEngine cmmnEngine;
+    protected static CmmnEngineConfiguration cmmnEngineConfiguration;
     protected static ProcessEngine processEngine;
 
     protected CmmnRepositoryService cmmnRepositoryService;
     protected CmmnRuntimeService cmmnRuntimeService;
+    protected CmmnTaskService cmmnTaskService;
     protected CmmnHistoryService cmmnHistoryService;
     protected CmmnManagementService cmmnManagementService;
 
@@ -56,22 +54,19 @@ public abstract class AbstractProcessEngineIntegrationTest {
     public static void bootProcessEngine() {
         if (processEngine == null) {
             processEngine = ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("flowable.cfg.xml").buildProcessEngine();
-            List<ProcessEngineConfigurator> configurators = ((ProcessEngineConfigurationImpl) processEngine.getProcessEngineConfiguration()).getAllConfigurators();
-            for (ProcessEngineConfigurator configurator : configurators) {
-                if (configurator instanceof CmmnEngineConfigurator) {
-                    cmmnEngine = ((CmmnEngineConfigurator) configurator).getCmmnEngine();
-                    CmmnTestRunner.setCmmnEngine(cmmnEngine); // TODO: better solution
-                }
-            }
+            cmmnEngineConfiguration = (CmmnEngineConfiguration) processEngine.getProcessEngineConfiguration()
+                    .getEngineConfigurations().get(EngineConfigurationConstants.KEY_CMMN_ENGINE_CONFIG);
+            CmmnTestRunner.setCmmnEngineConfiguration(cmmnEngineConfiguration);
         }
     }
 
     @Before
     public void setupServices() {
-        this.cmmnRepositoryService = cmmnEngine.getCmmnRepositoryService();
-        this.cmmnRuntimeService = cmmnEngine.getCmmnRuntimeService();
-        this.cmmnHistoryService = cmmnEngine.getCmmnHistoryService();
-        this.cmmnManagementService = cmmnEngine.getCmmnManagementService();
+        this.cmmnRepositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
+        this.cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
+        this.cmmnTaskService = cmmnEngineConfiguration.getCmmnTaskService();
+        this.cmmnHistoryService = cmmnEngineConfiguration.getCmmnHistoryService();
+        this.cmmnManagementService = cmmnEngineConfiguration.getCmmnManagementService();
 
         this.processEngineRepositoryService = processEngine.getRepositoryService();
         this.processEngineRuntimeService = processEngine.getRuntimeService();

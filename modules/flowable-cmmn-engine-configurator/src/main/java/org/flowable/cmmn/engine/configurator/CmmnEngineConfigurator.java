@@ -18,21 +18,21 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.cmmn.api.PlanItemInstanceCallbackType;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.PlanItemInstanceCallbackType;
 import org.flowable.cmmn.engine.configurator.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.configurator.impl.process.DefaultProcessInstanceService;
 import org.flowable.cmmn.engine.impl.callback.ChildProcessInstanceStateChangeCallback;
-import org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.db.EntityDependencyOrder;
-import org.flowable.engine.cfg.AbstractEngineConfigurator;
+import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.AbstractEngineConfigurator;
+import org.flowable.engine.common.EngineDeployer;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.deploy.Deployer;
 
 /**
  * @author Joram Barrez
@@ -40,7 +40,6 @@ import org.flowable.engine.impl.persistence.deploy.Deployer;
 public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
 
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
-    protected CmmnEngine cmmnEngine;
 
     @Override
     public int getPriority() {
@@ -48,8 +47,8 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
     }
 
     @Override
-    protected List<Deployer> getCustomDeployers() {
-        return Collections.<Deployer>singletonList(new CmmnDeployer(this));
+    protected List<EngineDeployer> getCustomDeployers() {
+        return Collections.<EngineDeployer>singletonList(new CmmnDeployer());
     }
 
     @Override
@@ -58,16 +57,24 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
     }
 
     @Override
-    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public void configure(AbstractEngineConfiguration engineConfiguration) {
         if (cmmnEngineConfiguration == null) {
-            cmmnEngineConfiguration = new StandaloneInMemCmmnEngineConfiguration();
+            cmmnEngineConfiguration = new CmmnEngineConfiguration();
         }
 
-        initialiseCommonProperties(processEngineConfiguration, cmmnEngineConfiguration);
+        initialiseCommonProperties(engineConfiguration, cmmnEngineConfiguration);
+        
+        ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) engineConfiguration;
         initProcessInstanceService(processEngineConfiguration);
         initProcessInstanceStateChangedCallbacks(processEngineConfiguration);
+        
+        cmmnEngineConfiguration.setEnableTaskRelationshipCounts(processEngineConfiguration.getPerformanceSettings().isEnableTaskRelationshipCounts());
+        cmmnEngineConfiguration.setTaskQueryLimit(processEngineConfiguration.getTaskQueryLimit());
+        cmmnEngineConfiguration.setHistoricTaskQueryLimit(processEngineConfiguration.getHistoricTaskQueryLimit());
 
-        this.cmmnEngine = initCmmnEngine();
+        initCmmnEngine();
+        
+        initServiceConfigurations(engineConfiguration, cmmnEngineConfiguration);
     }
 
     protected void initProcessInstanceService(ProcessEngineConfigurationImpl processEngineConfiguration) {
@@ -111,13 +118,4 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
         return this;
     }
-
-    public CmmnEngine getCmmnEngine() {
-        return cmmnEngine;
-    }
-
-    public void setCmmnEngine(CmmnEngine cmmnEngine) {
-        this.cmmnEngine = cmmnEngine;
-    }
-
 }

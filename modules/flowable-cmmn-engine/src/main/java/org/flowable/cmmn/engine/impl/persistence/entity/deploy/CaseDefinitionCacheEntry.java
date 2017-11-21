@@ -12,7 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity.deploy;
 
-import org.flowable.cmmn.engine.repository.CaseDefinition;
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 

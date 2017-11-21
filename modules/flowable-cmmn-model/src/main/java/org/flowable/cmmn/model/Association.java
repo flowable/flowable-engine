@@ -21,6 +21,7 @@ public class Association extends BaseElement {
     protected BaseElement sourceElement;
     protected String targetRef;
     protected BaseElement targetElement;
+    protected String transitionEvent;
 
     public String getSourceRef() {
         return sourceRef;
@@ -52,6 +53,14 @@ public class Association extends BaseElement {
 
     public void setTargetElement(BaseElement targetElement) {
         this.targetElement = targetElement;
+    }
+    
+    public String getTransitionEvent() {
+        return transitionEvent;
+    }
+
+    public void setTransitionEvent(String transitionEvent) {
+        this.transitionEvent = transitionEvent;
     }
 
     public Association clone() {

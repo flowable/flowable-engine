@@ -75,7 +75,7 @@ public class ExclusiveGatewayActivityBehavior extends GatewayActivityBehavior {
                 boolean conditionEvaluatesToTrue = ConditionUtil.hasTrueCondition(sequenceFlow, execution);
                 if (conditionEvaluatesToTrue && (defaultSequenceFlowId == null || !defaultSequenceFlowId.equals(sequenceFlow.getId()))) {
                     if (LOGGER.isDebugEnabled()) {
-                        LOGGER.debug("Sequence flow '{}'selected as outgoing sequence flow.", sequenceFlow.getId());
+                        LOGGER.debug("Sequence flow '{}' selected as outgoing sequence flow.", sequenceFlow.getId());
                     }
                     outgoingSequenceFlow = sequenceFlow;
                 }

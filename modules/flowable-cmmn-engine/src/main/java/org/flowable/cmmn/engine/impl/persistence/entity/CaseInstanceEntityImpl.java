@@ -18,8 +18,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.impl.variable.VariableScopeType;
+import org.flowable.variable.api.type.VariableScopeType;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
@@ -37,7 +38,7 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
     protected String startUserId;
     protected String callbackId;
     protected String callbackType;
-    protected String tenantId;
+    protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     
     // non persisted
     protected List<PlanItemInstanceEntity> childPlanItemInstances;
@@ -151,7 +152,7 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
 
     @Override
     protected Collection<VariableInstanceEntity> loadVariableInstances() {
-        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeType(id, VariableScopeType.CASE_INSTANCE);
+        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeType(id, VariableScopeType.CMMN);
     }
 
     @Override
@@ -165,17 +166,17 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
     @Override
     protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
         variableInstance.setScopeId(id);
-        variableInstance.setScopeType(VariableScopeType.CASE_INSTANCE);
+        variableInstance.setScopeType(VariableScopeType.CMMN);
     }
 
     @Override
     protected VariableInstanceEntity getSpecificVariable(String variableName) {
-        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeTypeAndName(id, VariableScopeType.CASE_INSTANCE, variableName);
+        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeTypeAndName(id, VariableScopeType.CMMN, variableName);
     }
 
     @Override
     protected List<VariableInstanceEntity> getSpecificVariables(Collection<String> variableNames) {
-        return CommandContextUtil.getVariableService().findVariableInstancesByScopeIdAndScopeTypeAndNames(id, VariableScopeType.CASE_INSTANCE, variableNames);
+        return CommandContextUtil.getVariableService().findVariableInstancesByScopeIdAndScopeTypeAndNames(id, VariableScopeType.CMMN, variableNames);
     }
 
     @Override

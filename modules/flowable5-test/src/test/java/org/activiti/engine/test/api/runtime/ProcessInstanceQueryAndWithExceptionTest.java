@@ -8,8 +8,8 @@ import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
-import org.flowable.job.service.Job;
-import org.flowable.job.service.TimerJobQuery;
+import org.flowable.job.api.Job;
+import org.flowable.job.api.TimerJobQuery;
 
 public class ProcessInstanceQueryAndWithExceptionTest extends PluggableFlowableTestCase {
 

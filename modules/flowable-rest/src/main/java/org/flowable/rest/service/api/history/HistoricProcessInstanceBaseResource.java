@@ -52,7 +52,7 @@ public class HistoricProcessInstanceBaseResource {
     @Autowired
     protected HistoryService historyService;
 
-    protected DataResponse getQueryResponse(HistoricProcessInstanceQueryRequest queryRequest, Map<String, String> allRequestParams) {
+    protected DataResponse<HistoricProcessInstanceResponse> getQueryResponse(HistoricProcessInstanceQueryRequest queryRequest, Map<String, String> allRequestParams) {
         HistoricProcessInstanceQuery query = historyService.createHistoricProcessInstanceQuery();
 
         // Populate query based on request

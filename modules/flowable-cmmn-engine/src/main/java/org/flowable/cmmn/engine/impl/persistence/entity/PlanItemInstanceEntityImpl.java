@@ -18,11 +18,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.impl.variable.VariableScopeType;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.variable.api.type.VariableScopeType;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 
@@ -42,7 +43,7 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
     protected String startUserId;
     protected String referenceId;
     protected String referenceType;
-    protected String tenantId;
+    protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     
     // Non-persisted
     protected PlanItem planItem;
@@ -177,7 +178,7 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
 
     @Override
     protected Collection<VariableInstanceEntity> loadVariableInstances() {
-        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeType(id, VariableScopeType.PLAN_ITEM_INSTANCE);
+        return CommandContextUtil.getVariableService().findVariableInstanceBySubScopeIdAndScopeType(id, VariableScopeType.CMMN);
     }
 
     @Override
@@ -190,18 +191,19 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
 
     @Override
     protected void initializeVariableInstanceBackPointer(VariableInstanceEntity variableInstance) {
-        variableInstance.setScopeId(id);
-        variableInstance.setScopeType(VariableScopeType.PLAN_ITEM_INSTANCE);
+        variableInstance.setScopeId(caseInstanceId);
+        variableInstance.setSubScopeId(id);
+        variableInstance.setScopeType(VariableScopeType.CMMN);
     }
 
     @Override
     protected VariableInstanceEntity getSpecificVariable(String variableName) {
-        return CommandContextUtil.getVariableService().findVariableInstanceByScopeIdAndScopeTypeAndName(id, VariableScopeType.PLAN_ITEM_INSTANCE, variableName);
+        return CommandContextUtil.getVariableService().findVariableInstanceBySubScopeIdAndScopeTypeAndName(id, VariableScopeType.CMMN, variableName);
     }
 
     @Override
     protected List<VariableInstanceEntity> getSpecificVariables(Collection<String> variableNames) {
-        return CommandContextUtil.getVariableService().findVariableInstancesByScopeIdAndScopeTypeAndNames(id, VariableScopeType.PLAN_ITEM_INSTANCE, variableNames);
+        return CommandContextUtil.getVariableService().findVariableInstancesBySubScopeIdAndScopeTypeAndNames(id, VariableScopeType.CMMN, variableNames);
     }
 
     @Override

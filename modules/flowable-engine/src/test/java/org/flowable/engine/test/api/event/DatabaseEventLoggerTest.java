@@ -19,11 +19,11 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.impl.identity.Authentication;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.event.logger.EventLogger;
 import org.flowable.engine.impl.event.logger.handler.Fields;
-import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -289,7 +289,7 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
         }
 
         // Completing two tasks
-        for (org.flowable.task.service.Task task : taskService.createTaskQuery().list()) {
+        for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
             Authentication.setAuthenticatedUserId(task.getAssignee());
             Map<String, Object> varMap = new HashMap<>();
             varMap.put("test", "test");
@@ -537,7 +537,7 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
 
     public void testStandaloneTaskEvents() throws JsonParseException, JsonMappingException, IOException {
 
-        org.flowable.task.service.Task task = taskService.newTask();
+        org.flowable.task.api.Task task = taskService.newTask();
         task.setAssignee("kermit");
         task.setTenantId("myTenant");
         taskService.saveTask(task);

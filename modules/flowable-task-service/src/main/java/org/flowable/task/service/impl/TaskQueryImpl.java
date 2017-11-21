@@ -23,14 +23,15 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.IdmIdentityService;
-import org.flowable.task.service.DelegationState;
-import org.flowable.task.service.Task;
-import org.flowable.task.service.TaskQuery;
+import org.flowable.task.api.DelegationState;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.util.CommandContextUtil;
+import org.flowable.variable.api.type.VariableScopeType;
+import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 import org.flowable.variable.service.impl.QueryVariableValue;
-import org.flowable.variable.service.impl.types.VariableTypes;
 
 /**
  * @author Joram Barrez
@@ -68,12 +69,17 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected String candidateUser;
     protected String candidateGroup;
     protected List<String> candidateGroups;
+    protected boolean ignoreAssigneeValue;
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
     protected String processInstanceId;
     protected List<String> processInstanceIds;
     protected String executionId;
+    protected String scopeId;
+    protected String subScopeId;
+    protected String scopeType;
+    protected String scopeDefinitionId;
     protected Date createTime;
     protected Date createTimeBefore;
     protected Date createTimeAfter;
@@ -91,6 +97,8 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
     protected List<String> processCategoryNotInList;
     protected String deploymentId;
     protected List<String> deploymentIds;
+    protected String cmmnDeploymentId;
+    protected List<String> cmmnDeploymentIds;
     protected String processInstanceBusinessKey;
     protected String processInstanceBusinessKeyLike;
     protected String processInstanceBusinessKeyLikeIgnoreCase;
@@ -560,6 +568,16 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
         return this;
     }
+    
+    @Override
+    public TaskQuery ignoreAssigneeValue() {
+        if (orActive) {
+            currentOrQueryObject.ignoreAssigneeValue = true;
+        } else {
+            this.ignoreAssigneeValue = true;
+        }
+        return this;
+    }
 
     @Override
     public TaskQuery taskTenantId(String tenantId) {
@@ -665,6 +683,82 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.executionId = executionId;
         } else {
             this.executionId = executionId;
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQuery caseInstanceId(String caseInstanceId) {
+        if (orActive) {
+            currentOrQueryObject.scopeId(caseInstanceId);
+            currentOrQueryObject.scopeType(VariableScopeType.CMMN);
+        } else {
+            this.scopeId(caseInstanceId);
+            this.scopeType(VariableScopeType.CMMN);
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQuery caseDefinitionId(String caseDefinitionId) {
+        if (orActive) {
+            currentOrQueryObject.scopeDefinitionId(caseDefinitionId);
+            currentOrQueryObject.scopeType(VariableScopeType.CMMN);
+        } else {
+            this.scopeDefinitionId(caseDefinitionId);
+            this.scopeType(VariableScopeType.CMMN);
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQuery planItemInstanceId(String planItemInstanceId) {
+        if (orActive) {
+            currentOrQueryObject.subScopeId(planItemInstanceId);
+            currentOrQueryObject.scopeType(VariableScopeType.CMMN);
+        } else {
+            this.subScopeId(planItemInstanceId);
+            this.scopeType(VariableScopeType.CMMN);
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQueryImpl scopeId(String scopeId) {
+        if (orActive) {
+            currentOrQueryObject.scopeId = scopeId;
+        } else {
+            this.scopeId = scopeId;
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQueryImpl subScopeId(String subScopeId) {
+        if (orActive) {
+            currentOrQueryObject.subScopeId = subScopeId;
+        } else {
+            this.subScopeId = subScopeId;
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQueryImpl scopeType(String scopeType) {
+        if (orActive) {
+            currentOrQueryObject.scopeType = scopeType;
+        } else {
+            this.scopeType = scopeType;
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQueryImpl scopeDefinitionId(String scopeDefinitionId) {
+        if (orActive) {
+            currentOrQueryObject.scopeDefinitionId = scopeDefinitionId;
+        } else {
+            this.scopeDefinitionId = scopeDefinitionId;
         }
         return this;
     }
@@ -1082,6 +1176,26 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
         return this;
     }
+    
+    @Override
+    public TaskQuery cmmnDeploymentId(String cmmnDeploymentId) {
+        if (orActive) {
+            currentOrQueryObject.cmmnDeploymentId = cmmnDeploymentId;
+        } else {
+            this.cmmnDeploymentId = cmmnDeploymentId;
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQuery cmmnDeploymentIdIn(List<String> cmmnDeploymentIds) {
+        if (orActive) {
+            currentOrQueryObject.cmmnDeploymentIds = cmmnDeploymentIds;
+        } else {
+            this.cmmnDeploymentIds = cmmnDeploymentIds;
+        }
+        return this;
+    }
 
     public TaskQuery dueDate(Date dueDate) {
         if (orActive) {
@@ -1391,7 +1505,7 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
 
         TaskServiceConfiguration taskServiceConfiguration = CommandContextUtil.getTaskServiceConfiguration();
-        if (tasks != null && taskServiceConfiguration.isEnableLocalization()) {
+        if (tasks != null && taskServiceConfiguration.getInternalTaskLocalizationManager() != null && taskServiceConfiguration.isEnableLocalization()) {
             for (Task task : tasks) {
                 taskServiceConfiguration.getInternalTaskLocalizationManager().localize(task, locale, withLocalizationFallback);
             }
@@ -1453,6 +1567,10 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         return candidateGroup;
     }
 
+    public boolean isIgnoreAssigneeValue() {
+        return ignoreAssigneeValue;
+    }
+
     public String getProcessInstanceId() {
         return processInstanceId;
     }
@@ -1463,6 +1581,22 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public String getExecutionId() {
         return executionId;
+    }
+    
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
     }
 
     public String getTaskId() {
@@ -1603,6 +1737,14 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
 
     public List<String> getDeploymentIds() {
         return deploymentIds;
+    }
+    
+    public String getCmmnDeploymentId() {
+        return cmmnDeploymentId;
+    }
+
+    public List<String> getCmmnDeploymentIds() {
+        return cmmnDeploymentIds;
     }
 
     public String getProcessInstanceBusinessKeyLike() {

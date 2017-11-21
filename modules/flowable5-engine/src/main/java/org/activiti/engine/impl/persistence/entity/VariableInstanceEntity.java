@@ -22,9 +22,9 @@ import org.activiti.engine.impl.db.HasRevision;
 import org.activiti.engine.impl.db.PersistentObject;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
-import org.flowable.variable.service.impl.types.ValueFields;
-import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * @author Tom Baeyens
@@ -327,6 +327,11 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
     public String getScopeId() {
         return null;
     }
+    
+    @Override
+    public String getSubScopeId() {
+        return null;
+    }
 
     @Override
     public String getScopeType() {
@@ -335,6 +340,11 @@ public class VariableInstanceEntity extends AbstractEntity implements VariableIn
 
     @Override
     public void setScopeId(String scopeId) {
+        
+    }
+    
+    @Override
+    public void setSubScopeId(String subScopeId) {
         
     }
 

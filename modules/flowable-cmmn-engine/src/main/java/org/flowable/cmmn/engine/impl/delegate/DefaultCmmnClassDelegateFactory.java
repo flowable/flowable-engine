@@ -12,14 +12,18 @@
  */
 package org.flowable.cmmn.engine.impl.delegate;
 
+import java.util.List;
+
+import org.flowable.cmmn.model.FieldExtension;
+
 /**
  * @author Joram Barrez
  */
 public class DefaultCmmnClassDelegateFactory implements CmmnClassDelegateFactory {
 
     @Override
-    public CmmnClassDelegate create(String className) {
-        return new CmmnClassDelegate(className);
+    public CmmnClassDelegate create(String className, List<FieldExtension> fieldExtensions) {
+        return new CmmnClassDelegate(className, fieldExtensions);
     }
 
 }

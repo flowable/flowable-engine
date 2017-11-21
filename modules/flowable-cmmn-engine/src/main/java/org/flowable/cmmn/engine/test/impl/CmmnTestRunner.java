@@ -15,10 +15,10 @@ package org.flowable.cmmn.engine.test.impl;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.engine.CmmnEngine;
-import org.flowable.cmmn.engine.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
-import org.flowable.cmmn.engine.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.engine.common.api.FlowableException;
 import org.junit.Assert;
@@ -37,18 +37,18 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(CmmnTestRunner.class);
     
-    protected static CmmnEngine cmmnEngine;
+    protected static CmmnEngineConfiguration cmmnEngineConfiguration;
 
     public CmmnTestRunner(Class<?> klass) throws InitializationError {
         super(klass);
     }
     
-    public static CmmnEngine getCmmnEngine() {
-        return CmmnTestRunner.cmmnEngine;
+    public static CmmnEngineConfiguration getCmmnEngineConfiguration() {
+        return CmmnTestRunner.cmmnEngineConfiguration;
     }
 
-    public static void setCmmnEngine(CmmnEngine cmmnEngine) {
-        CmmnTestRunner.cmmnEngine = cmmnEngine;
+    public static void setCmmnEngineConfiguration(CmmnEngineConfiguration cmmnEngineConfiguration) {
+        CmmnTestRunner.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
     
     @Override
@@ -70,10 +70,10 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
         try {
             LOGGER.debug("annotation @CmmnDeployment creates deployment for {}.{}", method.getMethod().getDeclaringClass().getSimpleName(), method.getName());
     
-            if (cmmnEngine == null) {
+            if (cmmnEngineConfiguration == null) {
                 throw new FlowableException("No cached CMMN engine found.");
             }
-            CmmnRepositoryService repositoryService = cmmnEngine.getCmmnRepositoryService();
+            CmmnRepositoryService repositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
             CmmnDeploymentBuilder deploymentBuilder = repositoryService
                     .createDeployment()
                     .name(method.getMethod().getDeclaringClass().getSimpleName() + "." + method.getName());
@@ -115,11 +115,11 @@ public class CmmnTestRunner extends BlockJUnit4ClassRunner {
     }
     
     protected void deleteDeployment(String deploymentId) {
-        cmmnEngine.getCmmnRepositoryService().deleteDeployment(deploymentId, true);
+        cmmnEngineConfiguration.getCmmnRepositoryService().deleteDeployment(deploymentId, true);
     }
     
     protected void assertDatabaseEmpty(FrameworkMethod method) {
-        Map<String, Long> tableCounts = cmmnEngine.getCmmnManagementService().getTableCounts();
+        Map<String, Long> tableCounts = cmmnEngineConfiguration.getCmmnManagementService().getTableCounts();
         
         StringBuilder outputMessage = new StringBuilder();
         for (String table : tableCounts.keySet()) {

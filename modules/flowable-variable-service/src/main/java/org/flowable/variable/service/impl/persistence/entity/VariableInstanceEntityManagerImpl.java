@@ -19,9 +19,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.data.VariableInstanceDataManager;
-import org.flowable.variable.service.impl.types.VariableType;
 
 /**
  * @author Tom Baeyens
@@ -105,6 +105,21 @@ public class VariableInstanceEntityManagerImpl extends AbstractEntityManager<Var
     @Override
     public List<VariableInstanceEntity> findVariableInstancesByScopeIdAndScopeTypeAndNames(String scopeId, String scopeType, Collection<String> variableNames) {
         return variableInstanceDataManager.findVariableInstancesByScopeIdAndScopeTypeAndNames(scopeId, scopeType, variableNames);
+    }
+    
+    @Override
+    public List<VariableInstanceEntity> findVariableInstanceBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
+        return variableInstanceDataManager.findVariableInstanceBySubScopeIdAndScopeType(subScopeId, scopeType);
+    }
+
+    @Override
+    public VariableInstanceEntity findVariableInstanceBySubScopeIdAndScopeTypeAndName(String subScopeId, String scopeType, String variableName) {
+        return variableInstanceDataManager.findVariableInstanceBySubScopeIdAndScopeTypeAndName(subScopeId, scopeType, variableName);
+    }
+
+    @Override
+    public List<VariableInstanceEntity> findVariableInstancesBySubScopeIdAndScopeTypeAndNames(String subScopeId, String scopeType, Collection<String> variableNames) {
+        return variableInstanceDataManager.findVariableInstancesBySubScopeIdAndScopeTypeAndNames(subScopeId, scopeType, variableNames);
     }
 
     @Override

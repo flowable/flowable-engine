@@ -12,11 +12,11 @@
  */
 package org.flowable.spring.configurator;
 
+import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.impl.cfg.IdmEngineConfigurator;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.spring.SpringIdmEngineConfiguration;
-import org.flowable.spring.SpringProcessEngineConfiguration;
+import org.flowable.spring.common.SpringEngineConfiguration;
 
 /**
  * @author Tijs Rademakers
@@ -26,14 +26,17 @@ public class SpringIdmEngineConfigurator extends IdmEngineConfigurator {
     protected SpringIdmEngineConfiguration idmEngineConfiguration;
 
     @Override
-    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public void configure(AbstractEngineConfiguration engineConfiguration) {
         if (idmEngineConfiguration == null) {
             idmEngineConfiguration = new SpringIdmEngineConfiguration();
         }
-        initialiseCommonProperties(processEngineConfiguration, idmEngineConfiguration);
-        idmEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
+        initialiseCommonProperties(engineConfiguration, idmEngineConfiguration);
+        SpringEngineConfiguration springEngineConfiguration = (SpringEngineConfiguration) engineConfiguration;
+        idmEngineConfiguration.setTransactionManager(springEngineConfiguration.getTransactionManager());
 
         idmEngineConfiguration.buildIdmEngine();
+        
+        initServiceConfigurations(engineConfiguration, idmEngineConfiguration);
     }
 
     @Override

@@ -27,7 +27,7 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.impl.util.ReflectUtil;
-import org.flowable.variable.service.impl.types.ValueFields;
+import org.flowable.variable.api.types.ValueFields;
 
 /**
  * @author Tom Baeyens

@@ -1,0 +1,9 @@
+{
+  "groupId":"org.flowable.rest.client.java",
+  "artifactId":"flowable-java-client-sdk",
+  "artifactVersion":"0.0.1",
+  "invokerPackage":"org.flowable.rest.client.java",
+  "library":"retrofit2",
+  "dateLibrary":"legacy",
+  "useRxJava2":"true"
+}

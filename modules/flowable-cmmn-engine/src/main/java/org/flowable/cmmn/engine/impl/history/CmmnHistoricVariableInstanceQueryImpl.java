@@ -15,11 +15,11 @@ package org.flowable.cmmn.engine.impl.history;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.cmmn.engine.history.HistoricVariableInstanceQuery;
-import org.flowable.cmmn.engine.impl.variable.VariableScopeType;
+import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
 import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.type.VariableScopeType;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
 
 /**
@@ -45,7 +45,14 @@ public class CmmnHistoricVariableInstanceQueryImpl implements HistoricVariableIn
     @Override
     public HistoricVariableInstanceQuery caseInstanceId(String caseInstanceId) {
         wrappedHistoricVariableInstanceQuery.scopeId(caseInstanceId);
-        wrappedHistoricVariableInstanceQuery.scopeType(VariableScopeType.CASE_INSTANCE);
+        wrappedHistoricVariableInstanceQuery.scopeType(VariableScopeType.CMMN);
+        return this;
+    }
+    
+    @Override
+    public HistoricVariableInstanceQuery planItemInstanceId(String planItemInstanceId) {
+        wrappedHistoricVariableInstanceQuery.subScopeId(planItemInstanceId);
+        wrappedHistoricVariableInstanceQuery.scopeType(VariableScopeType.CMMN);
         return this;
     }
 

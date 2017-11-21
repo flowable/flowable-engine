@@ -17,8 +17,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.cmmn.engine.runtime.PlanItemInstance;
-import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.PlanItemTransition;
 
 /**

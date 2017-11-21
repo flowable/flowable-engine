@@ -13,7 +13,7 @@
 package org.flowable.identitylink.service.impl.persistence.entity;
 
 import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.api.IdentityLink;
 
 /**
  * @author Joram Barrez

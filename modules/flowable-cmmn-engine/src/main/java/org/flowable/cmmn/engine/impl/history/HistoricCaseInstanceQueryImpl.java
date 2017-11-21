@@ -16,8 +16,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.cmmn.engine.history.HistoricCaseInstance;
-import org.flowable.cmmn.engine.history.HistoricCaseInstanceQuery;
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
+import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.AbstractQuery;
@@ -37,8 +37,11 @@ public class HistoricCaseInstanceQueryImpl extends AbstractQuery<HistoricCaseIns
     protected String caseDefinitionCategory;
     protected Integer caseDefinitionVersion;
     protected String caseInstanceId;
+    protected Set<String> caseInstanceIds;
     protected String businessKey;
     protected String caseInstanceParentId;
+    protected String deploymentId;
+    protected List<String> deploymentIds;
     protected boolean finished;
     protected boolean unfinished;
     protected Date startedBefore;
@@ -115,6 +118,15 @@ public class HistoricCaseInstanceQueryImpl extends AbstractQuery<HistoricCaseIns
         this.caseInstanceId = caseInstanceId;
         return this;
     }
+    
+    @Override
+    public HistoricCaseInstanceQueryImpl caseInstanceIds(Set<String> caseInstanceIds) {
+        if (caseInstanceIds == null) {
+            throw new FlowableIllegalArgumentException("Case instance ids is null");
+        }
+        this.caseInstanceIds = caseInstanceIds;
+        return this;
+    }
 
     @Override
     public HistoricCaseInstanceQueryImpl caseInstanceBusinessKey(String businessKey) {
@@ -140,6 +152,24 @@ public class HistoricCaseInstanceQueryImpl extends AbstractQuery<HistoricCaseIns
             throw new FlowableIllegalArgumentException("Parent id is null");
         }
         this.caseInstanceParentId = parentId;
+        return this;
+    }
+    
+    @Override
+    public HistoricCaseInstanceQueryImpl deploymentId(String deploymentId) {
+        if (deploymentId == null) {
+            throw new FlowableIllegalArgumentException("Deployment id is null");
+        }
+        this.deploymentId = deploymentId;
+        return this;
+    }
+    
+    @Override
+    public HistoricCaseInstanceQueryImpl deploymentIds(List<String> deploymentIds) {
+        if (deploymentIds == null) {
+            throw new FlowableIllegalArgumentException("Deployment ids is null");
+        }
+        this.deploymentIds = deploymentIds;
         return this;
     }
     

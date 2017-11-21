@@ -45,7 +45,7 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
         assertEquals(1, runtimeService.createProcessInstanceQuery().count());
         assertEquals(0, managementService.createTimerJobQuery().count());
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery()
+        org.flowable.task.api.Task task = taskService.createTaskQuery()
                 .taskName("afterSignal")
                 .singleResult();
 
@@ -78,7 +78,7 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
             assertEquals(1, runtimeService.createProcessInstanceQuery().count());
             assertEquals(0, managementService.createTimerJobQuery().count());
 
-            org.flowable.task.service.Task task = taskService.createTaskQuery()
+            org.flowable.task.api.Task task = taskService.createTaskQuery()
                     .taskName("afterTimer")
                     .singleResult();
 
@@ -122,7 +122,7 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
             assertEquals(1, runtimeService.createProcessInstanceQuery().count());
             assertEquals(0, managementService.createTimerJobQuery().count());
 
-            org.flowable.task.service.Task task = taskService.createTaskQuery()
+            org.flowable.task.api.Task task = taskService.createTaskQuery()
                     .taskName("afterMessage")
                     .singleResult();
 

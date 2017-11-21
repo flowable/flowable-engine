@@ -47,6 +47,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_HUMAN_TASK = "humanTask";
     String ELEMENT_CASE_TASK = "caseTask";
     String ELEMENT_PROCESS_TASK = "processTask";
+    String ELEMENT_TIMER_EVENT_LISTENER = "timerEventListener";
     String ELEMENT_PLAN_ITEM = "planItem";
     String ELEMENT_SENTRY = "sentry";
     String ELEMENT_PLAN_ITEM_ON_PART = "planItemOnPart";
@@ -62,6 +63,7 @@ public interface CmmnXmlConstants {
     
     String ATTRIBUTE_ID = "id";
     String ATTRIBUTE_NAME = "name";
+    String ATTRIBUTE_INITIATOR_VARIABLE_NAME = "initiatorVariableName";
     String ATTRIBUTE_TEXT_FORMAT = "textFormat";
     String ATTRIBUTE_DEFINITION_REF = "definitionRef";
     String ATTRIBUTE_SOURCE_REF = "sourceRef";
@@ -75,7 +77,32 @@ public interface CmmnXmlConstants {
     String ELEMENT_PROCESS_REF_EXPRESSION = "processRefExpression";
     String ELEMENT_CONDITION = "condition";
     
+    String ELEMENT_TIMER_EXPRESSION = "timerExpression";
+    String ELEMENT_PLAN_ITEM_START_TRIGGER = "planItemStartTrigger";
+    String ATTRIBUTE_PLAN_ITEM_START_TRIGGER_SRC_REF = "sourceRef";
+    
+    String ATTRIBUTE_TYPE = "type";
+    
     String ATTRIBUTE_CLASS = "class";
+    String ATTRIBUTE_EXPRESSION = "expression";
+    String ATTRIBUTE_DELEGATE_EXPRESSION = "delegateExpression";
+    
+    String ATTRIBUTE_RESULT_VARIABLE_NAME = "resultVariableName";
+    
+    String ELEMENT_FIELD = "field";
+    String ATTRIBUTE_FIELD_STRING = "stringValue";
+    String ATTRIBUTE_FIELD_EXPRESSION = "expression";
+    String ELEMENT_FIELD_STRING = "string";
+    String ELEMENT_FIELD_EXPRESSION = "expression";
+    
+    String ATTRIBUTE_ASSIGNEE = "assignee";
+    String ATTRIBUTE_OWNER = "owner";
+    String ATTRIBUTE_CANDIDATE_USERS = "candidateUsers";
+    String ATTRIBUTE_CANDIDATE_GROUPS = "candidateGroups";
+    String ATTRIBUTE_PRIORITY = "priority";
+    String ATTRIBUTE_FORM_KEY = "formKey";
+    String ATTRIBUTE_DUE_DATE = "dueDate";
+    String ATTRIBUTE_CATEGORY = "category";
     
     String ELEMENT_DI_CMMN = "CMMNDI";
     String ELEMENT_DI_DIAGRAM = "CMMNDiagram";

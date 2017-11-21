@@ -12,12 +12,18 @@
  */
 package org.flowable.cmmn.engine.impl.delegate;
 
-import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
-import org.flowable.cmmn.engine.delegate.PlanItemJavaDelegate;
+import java.util.List;
+
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemJavaDelegateActivityBehavior;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Joram Barrez
@@ -25,22 +31,25 @@ import org.flowable.engine.common.impl.util.ReflectUtil;
 public class CmmnClassDelegate implements CmmnActivityBehavior {
 
     protected String className;
+    protected List<FieldExtension> fieldExtensions;
     protected CmmnActivityBehavior activityBehaviorInstance;
 
-    public CmmnClassDelegate(String className) {
+    public CmmnClassDelegate(String className, List<FieldExtension> fieldExtensions) {
         this.className = className;
+        this.fieldExtensions = fieldExtensions;
     }
 
     @Override
     public void execute(DelegatePlanItemInstance planItemInstance) {
         if (activityBehaviorInstance == null) {
-            activityBehaviorInstance = getCmmnActivityBehavior(className);
+            activityBehaviorInstance = getCmmnActivityBehavior(className, planItemInstance);
         }
         activityBehaviorInstance.execute(planItemInstance);
     }
 
-    protected CmmnActivityBehavior getCmmnActivityBehavior(String className) {
+    protected CmmnActivityBehavior getCmmnActivityBehavior(String className, VariableScope variableScope) {
         Object instance = instantiate(className);
+        applyFieldExtensions(fieldExtensions, instance, variableScope);
 
         if (instance instanceof PlanItemJavaDelegate) {
             return new PlanItemJavaDelegateActivityBehavior((PlanItemJavaDelegate) instance);
@@ -57,6 +66,26 @@ public class CmmnClassDelegate implements CmmnActivityBehavior {
 
     protected Object instantiate(String className) {
         return ReflectUtil.instantiate(className);
+    }
+    
+    protected static void applyFieldExtensions(List<FieldExtension> fieldExtensions, Object target, VariableScope variableScope) {
+        if (fieldExtensions != null) {
+            for (FieldExtension fieldExtension : fieldExtensions) {
+                applyFieldExtension(fieldExtension, target, variableScope);
+            }
+        }
+    }
+
+    protected static void applyFieldExtension(FieldExtension fieldExtension, Object target, VariableScope variableScope) {
+        Object value = null;
+        if (fieldExtension.getStringValue() != null) {
+            value = fieldExtension.getStringValue();
+        } else if (fieldExtension.getExpression() != null) {
+            ExpressionManager expressionManager = CommandContextUtil.getCmmnEngineConfiguration().getExpressionManager();
+            value = expressionManager.createExpression(fieldExtension.getExpression());
+        }
+        
+        ReflectUtil.invokeSetterOrField(target, fieldExtension.getFieldName(), value, false);
     }
 
 }

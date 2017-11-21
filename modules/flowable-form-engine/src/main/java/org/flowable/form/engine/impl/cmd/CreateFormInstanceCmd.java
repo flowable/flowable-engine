@@ -26,12 +26,20 @@ public class CreateFormInstanceCmd extends AbstractSaveFormInstanceCmd implement
 
     private static final long serialVersionUID = 1L;
 
-    public CreateFormInstanceCmd(FormModel formModel, Map<String, Object> variables, String taskId, String processInstanceId) {
-        super(formModel, variables, taskId, processInstanceId);
+    public CreateFormInstanceCmd(FormModel formModel, Map<String, Object> variables, String taskId, String processInstanceId, String processDefinitionId) {
+        super(formModel, variables, taskId, processInstanceId, processDefinitionId);
     }
     
-    public CreateFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String processInstanceId) {
-        super(formModelId, variables, taskId, processInstanceId);
+    public CreateFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String processInstanceId, String processDefinitionId) {
+        super(formModelId, variables, taskId, processInstanceId, processDefinitionId);
+    }
+    
+    public CreateFormInstanceCmd(FormModel formModel, Map<String, Object> variables, String taskId, String scopeId, String scopeType, String scopeDefinitionId) {
+        super(formModel, variables, taskId, scopeId, scopeType, scopeDefinitionId);
+    }
+    
+    public CreateFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String scopeId, String scopeType, String scopeDefinitionId) {
+        super(formModelId, variables, taskId, scopeId, scopeType, scopeDefinitionId);
     }
 
     @Override

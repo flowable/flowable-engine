@@ -25,7 +25,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.task.Comment;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.Task;
 
 /**
  * @author Joram Barrez

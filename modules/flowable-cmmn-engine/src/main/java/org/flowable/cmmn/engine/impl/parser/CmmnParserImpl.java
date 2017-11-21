@@ -24,19 +24,23 @@ import org.flowable.cmmn.converter.CmmnXMLException;
 import org.flowable.cmmn.converter.CmmnXmlConverter;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.HumanTask;
+import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ProcessTask;
+import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
+import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.repository.EngineResource;
 import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.util.io.InputStreamSource;
 import org.flowable.engine.common.impl.util.io.StreamSource;
@@ -53,7 +57,7 @@ public class CmmnParserImpl implements CmmnParser {
     protected CmmnActivityBehaviorFactory activityBehaviorFactory;
     protected ExpressionManager expressionManager;
     
-    public CmmnParseResult parse(CmmnResourceEntity resourceEntity) {
+    public CmmnParseResult parse(EngineResource resourceEntity) {
         CmmnParseResult parseResult = new CmmnParseResult();
         try(ByteArrayInputStream inputStream = new ByteArrayInputStream(resourceEntity.getBytes())) {
             Pair<CmmnModel, List<CaseDefinitionEntity>> pair = parse(resourceEntity, parseResult, new InputStreamSource(inputStream));
@@ -66,7 +70,7 @@ public class CmmnParserImpl implements CmmnParser {
         return parseResult;
     }
     
-    public Pair<CmmnModel, List<CaseDefinitionEntity>> parse(CmmnResourceEntity resourceEntity, CmmnParseResult parseResult, StreamSource cmmnSource) {
+    public Pair<CmmnModel, List<CaseDefinitionEntity>> parse(EngineResource resourceEntity, CmmnParseResult parseResult, StreamSource cmmnSource) {
         try {
             boolean enableSafeBpmnXml = false;
             String encoding = null;
@@ -90,7 +94,7 @@ public class CmmnParserImpl implements CmmnParser {
         }
     }
     
-    protected List<CaseDefinitionEntity> processCmmnElements(CmmnResourceEntity resourceEntity, CmmnModel cmmnModel) {
+    protected List<CaseDefinitionEntity> processCmmnElements(EngineResource resourceEntity, CmmnModel cmmnModel) {
         List<CaseDefinitionEntity> caseDefinitionEntities = new ArrayList<>();
         for (Case caze : cmmnModel.getCases()) {
             
@@ -117,6 +121,10 @@ public class CmmnParserImpl implements CmmnParser {
                 Stage stage = (Stage) planItemDefinition;
                 planItem.setBehavior(activityBehaviorFactory.createStageActivityBehavoir(planItem, stage));
                 
+            } else if (planItemDefinition instanceof HumanTask) { 
+                HumanTask humanTask = (HumanTask) planItemDefinition;
+                planItem.setBehavior(activityBehaviorFactory.createHumanTaskActivityBehavior(planItem, humanTask));
+                
             } else if (planItemDefinition instanceof CaseTask) {
                 CaseTask caseTask = (CaseTask) planItemDefinition;
                 planItem.setBehavior(activityBehaviorFactory.createCaseTaskActivityBehavior(planItem, caseTask));
@@ -129,15 +137,30 @@ public class CmmnParserImpl implements CmmnParser {
                 Milestone milestone = (Milestone) planItemDefinition;
                 planItem.setBehavior(activityBehaviorFactory.createMilestoneActivityBehavior(planItem, milestone));
                 
+            } else if (planItemDefinition instanceof TimerEventListener) { 
+                TimerEventListener timerEventListener = (TimerEventListener) planItemDefinition;
+                planItem.setBehavior(activityBehaviorFactory.createTimerEventListenerActivityBehavior(planItem, timerEventListener));
+                
             } else if (planItemDefinition instanceof Task) {
                 Task task = (Task) planItemDefinition;
                 
-                if (StringUtils.isEmpty(task.getClassName())) {
-                    planItem.setBehavior(activityBehaviorFactory.createTaskActivityBehavior(planItem, task));
+                if (task instanceof ServiceTask) {
+                    ServiceTask serviceTask = (ServiceTask) task;
+                    if (StringUtils.isNotEmpty(serviceTask.getImplementation())) {
+                        if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(serviceTask.getImplementationType())) {
+                            planItem.setBehavior(activityBehaviorFactory.createCmmnClassDelegate(planItem, serviceTask));
+                            
+                        } else if (ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equals(serviceTask.getImplementationType())) {
+                            planItem.setBehavior(activityBehaviorFactory.createPlanItemExpressionActivityBehavior(planItem, serviceTask));
+                            
+                        } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(serviceTask.getImplementationType())) {
+                            planItem.setBehavior(activityBehaviorFactory.createPlanItemDelegateExpressionActivityBehavior(planItem, serviceTask));
+                        }
+                    }
+                    
                 } else {
-                    planItem.setBehavior(activityBehaviorFactory.createCmmnClassDelegate(planItem, task));
+                    planItem.setBehavior(activityBehaviorFactory.createTaskActivityBehavior(planItem, task));
                 }
-            
             }
             
             if (planItemDefinition instanceof PlanFragment) {

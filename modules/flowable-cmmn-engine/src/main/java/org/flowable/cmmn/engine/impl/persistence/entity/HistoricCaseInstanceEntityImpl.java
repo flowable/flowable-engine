@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
 
 /**
@@ -33,7 +34,7 @@ public class HistoricCaseInstanceEntityImpl extends AbstractEntity implements Hi
     protected String startUserId;
     protected String callbackId;
     protected String callbackType;
-    protected String tenantId;
+    protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     
     public Object getPersistentState() {
         Map<String, Object> persistentState = new HashMap<>();

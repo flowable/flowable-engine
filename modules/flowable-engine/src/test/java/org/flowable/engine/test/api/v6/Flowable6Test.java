@@ -25,7 +25,7 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 
 /**
  * These are the first tests ever written for Flowable 6. Keeping them here for nostalgic reasons.
@@ -53,7 +53,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
         assertFalse(processInstance.isEnded());
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("The famous task", task.getName());
         assertEquals("kermit", task.getAssignee());
 
@@ -66,7 +66,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
         assertFalse(processInstance.isEnded());
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("The famous task", task.getName());
         assertEquals("kermit", task.getAssignee());
     }
@@ -77,12 +77,12 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
         assertFalse(processInstance.isEnded());
 
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().processDefinitionKey("simpleParallelGateway").orderByTaskName().asc().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processDefinitionKey("simpleParallelGateway").orderByTaskName().asc().list();
         assertEquals(2, tasks.size());
         assertEquals("Task a", tasks.get(0).getName());
         assertEquals("Task b", tasks.get(1).getName());
 
-        for (org.flowable.task.service.Task task : tasks) {
+        for (org.flowable.task.api.Task task : tasks) {
             taskService.complete(task.getId());
         }
 
@@ -95,14 +95,14 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
         assertFalse(processInstance.isEnded());
 
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().processDefinitionKey("simpleParallelGateway").orderByTaskName().asc().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processDefinitionKey("simpleParallelGateway").orderByTaskName().asc().list();
         assertEquals(4, tasks.size());
         assertEquals("Task a", tasks.get(0).getName());
         assertEquals("Task b1", tasks.get(1).getName());
         assertEquals("Task b2", tasks.get(2).getName());
         assertEquals("Task c", tasks.get(3).getName());
 
-        for (org.flowable.task.service.Task task : tasks) {
+        for (org.flowable.task.api.Task task : tasks) {
             taskService.complete(task.getId());
         }
 
@@ -162,7 +162,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         managementService.moveTimerToExecutableJob(job.getId());
         managementService.executeJob(job.getId());
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Task after timer", task.getName());
 
         taskService.complete(task.getId());
@@ -177,7 +177,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
 
         assertEquals(1, managementService.createTimerJobQuery().count());
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("The famous task", task.getName());
         taskService.complete(task.getId());
 
@@ -200,11 +200,11 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         managementService.moveTimerToExecutableJob(job.getId());
         managementService.executeJob(job.getId());
 
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
         assertEquals(2, tasks.size());
 
         // Completing them both should complete the process instance
-        for (org.flowable.task.service.Task task : tasks) {
+        for (org.flowable.task.api.Task task : tasks) {
             taskService.complete(task.getId());
         }
 
@@ -219,7 +219,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         managementService.executeJob(job.getId());
 
         tasks = taskService.createTaskQuery().orderByTaskName().desc().list(); // Not the desc() here: org.flowable.task.service.Task B, org.flowable.task.service.Task A will be the result (task b being associated with the child execution)
-        for (org.flowable.task.service.Task task : tasks) {
+        for (org.flowable.task.api.Task task : tasks) {
             taskService.complete(task.getId());
         }
         assertEquals(0, runtimeService.createExecutionQuery().count());
@@ -233,16 +233,16 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
         assertFalse(processInstance.isEnded());
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
         assertEquals(3, tasks.size());
         assertEquals("A", tasks.get(0).getName());
         assertEquals("B", tasks.get(1).getName());
         assertEquals("C", tasks.get(2).getName());
 
-        for (org.flowable.task.service.Task t : tasks) {
+        for (org.flowable.task.api.Task t : tasks) {
             taskService.complete(t.getId());
         }
 
@@ -256,7 +256,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertEquals("B", tasks.get(0).getName());
         assertEquals("C", tasks.get(1).getName());
 
-        for (org.flowable.task.service.Task t : tasks) {
+        for (org.flowable.task.api.Task t : tasks) {
             taskService.complete(t.getId());
         }
 
@@ -269,7 +269,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertEquals(1, tasks.size());
         assertEquals("C", tasks.get(0).getName());
 
-        for (org.flowable.task.service.Task t : tasks) {
+        for (org.flowable.task.api.Task t : tasks) {
             taskService.complete(t.getId());
         }
     }
@@ -280,7 +280,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
         assertFalse(processInstance.isEnded());
 
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
         assertEquals(2, tasks.size());
         assertEquals("A", tasks.get(0).getName());
         assertEquals("B", tasks.get(1).getName());
@@ -318,7 +318,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
 
         // Completing all tasks in this order should give the engine a bit
         // exercise (parent executions first)
-        for (org.flowable.task.service.Task task : tasks) {
+        for (org.flowable.task.api.Task task : tasks) {
             taskService.complete(task.getId());
         }
 
@@ -333,7 +333,7 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
         assertFalse(processInstance.isEnded());
 
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
         assertEquals(2, tasks.size());
         assertEquals("A", tasks.get(0).getName());
         assertEquals("B", tasks.get(1).getName());
@@ -425,9 +425,9 @@ public class Flowable6Test extends PluggableFlowableTestCase {
         assertFalse(processInstance.isEnded());
         assertEquals(3, taskService.createTaskQuery().count());
 
-        org.flowable.task.service.Task taskC = taskService.createTaskQuery().taskName("C").singleResult();
+        org.flowable.task.api.Task taskC = taskService.createTaskQuery().taskName("C").singleResult();
         taskService.complete(taskC.getId());
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
         assertEquals(3, tasks.size());
         assertEquals("A", tasks.get(0).getName());
         assertEquals("B", tasks.get(1).getName());

@@ -19,7 +19,6 @@ public class Task extends PlanItemDefinition {
     
     protected boolean blocking = true;
     protected String blockingExpression;
-    protected String className;
 
     public boolean isBlocking() {
         return blocking;
@@ -37,18 +36,9 @@ public class Task extends PlanItemDefinition {
         this.blockingExpression = blockingExpression;
     }
 
-    public String getClassName() {
-        return className;
-    }
-
-    public void setClassName(String className) {
-        this.className = className;
-    }
-    
     public void setValues(Task otherElement) {
         super.setValues(otherElement);
         setBlocking(otherElement.isBlocking());
         setBlockingExpression(otherElement.getBlockingExpression());
-        setClassName(otherElement.getClassName());
     }
 }

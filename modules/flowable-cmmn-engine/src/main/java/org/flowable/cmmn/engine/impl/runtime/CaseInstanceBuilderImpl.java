@@ -15,8 +15,8 @@ package org.flowable.cmmn.engine.impl.runtime;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.cmmn.engine.runtime.CaseInstance;
-import org.flowable.cmmn.engine.runtime.CaseInstanceBuilder;
+import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 
 /**
  * @author Joram Barrez

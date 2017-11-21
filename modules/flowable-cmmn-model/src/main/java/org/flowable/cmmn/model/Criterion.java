@@ -21,11 +21,9 @@ import java.util.List;
 public class Criterion extends CaseElement implements HasAssociations {
     
     protected String technicalId;
-    protected String name;
     protected String sentryRef;
     protected Sentry sentry;
     protected String attachedToRefId;
-    protected BaseElement attachedToRef;
     protected boolean isEntryCriterion;
     protected boolean isExitCriterion;
     protected List<Association> incomingAssociations = new ArrayList<>();
@@ -36,12 +34,6 @@ public class Criterion extends CaseElement implements HasAssociations {
     }
     public void setTechnicalId(String technicalId) {
         this.technicalId = technicalId;
-    }
-    public String getName() {
-        return name;
-    }
-    public void setName(String name) {
-        this.name = name;
     }
     public String getSentryRef() {
         return sentryRef;
@@ -60,12 +52,6 @@ public class Criterion extends CaseElement implements HasAssociations {
     }
     public void setAttachedToRefId(String attachedToRefId) {
         this.attachedToRefId = attachedToRefId;
-    }
-    public BaseElement getAttachedToRef() {
-        return attachedToRef;
-    }
-    public void setAttachedToRef(BaseElement attachedToRef) {
-        this.attachedToRef = attachedToRef;
     }
     public boolean isEntryCriterion() {
         return isEntryCriterion;

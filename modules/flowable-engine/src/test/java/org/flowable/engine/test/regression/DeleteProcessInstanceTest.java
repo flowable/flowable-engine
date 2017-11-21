@@ -22,7 +22,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 //SLF4J
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +55,7 @@ public class DeleteProcessInstanceTest extends PluggableFlowableTestCase {
         assertFalse(executionUser.isEnded());
 
         // Assert that a user task is available for claiming.
-        org.flowable.task.service.Task taskUser = taskService.createTaskQuery().processInstanceId(instanceUser.getProcessInstanceId()).singleResult();
+        org.flowable.task.api.Task taskUser = taskService.createTaskQuery().processInstanceId(instanceUser.getProcessInstanceId()).singleResult();
         assertNotNull(taskUser);
 
         // Delete the process instance.

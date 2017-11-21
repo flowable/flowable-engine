@@ -51,7 +51,7 @@ public class MessageEventSubprocessTest extends PluggableFlowableTestCase {
         assertEquals(1, runtimeService.createExecutionQuery().count());
 
         // if we trigger the usertask, the process terminates and the event subscription is removed:
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("task", task.getTaskDefinitionKey());
         taskService.complete(task.getId());
         assertProcessEnded(processInstance.getId());
@@ -85,7 +85,7 @@ public class MessageEventSubprocessTest extends PluggableFlowableTestCase {
         assertEquals(1, runtimeService.createExecutionQuery().count());
 
         // if we trigger the usertask, the process terminates and the event subscription is removed:
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("task", task.getTaskDefinitionKey());
         taskService.complete(task.getId());
         assertEquals(0, createEventSubscriptionQuery().count());

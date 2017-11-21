@@ -11,8 +11,8 @@ import org.activiti.engine.impl.event.logger.handler.Fields;
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.impl.identity.Authentication;
 import org.flowable.engine.event.EventLogEntry;
-import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.ProcessInstance;
 
@@ -284,7 +284,7 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
         }
 
         // Completing two tasks
-        for (org.flowable.task.service.Task task : taskService.createTaskQuery().list()) {
+        for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
             Authentication.setAuthenticatedUserId(task.getAssignee());
             Map<String, Object> varMap = new HashMap<String, Object>();
             varMap.put("test", "test");

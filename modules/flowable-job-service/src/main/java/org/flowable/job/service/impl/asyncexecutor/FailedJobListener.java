@@ -20,7 +20,7 @@ import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandContextCloseListener;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.util.CommandContextUtil;
 import org.slf4j.Logger;

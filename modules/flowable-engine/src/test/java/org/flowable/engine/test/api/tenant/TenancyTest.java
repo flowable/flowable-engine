@@ -26,7 +26,7 @@ import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 import org.junit.Assert;
 
 /**
@@ -439,7 +439,7 @@ public class TenancyTest extends PluggableFlowableTestCase {
             }
 
             // Complete all tasks
-            for (org.flowable.task.service.Task task : taskService.createTaskQuery().list()) {
+            for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
                 taskService.complete(task.getId());
             }
             

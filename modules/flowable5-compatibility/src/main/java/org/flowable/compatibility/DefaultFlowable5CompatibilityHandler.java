@@ -13,8 +13,6 @@
 
 package org.flowable.compatibility;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.io.InputStream;
 import java.util.Collection;
 import java.util.Date;
@@ -50,6 +48,8 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
+import org.flowable.engine.common.api.repository.EngineResource;
+import org.flowable.engine.common.impl.identity.Authentication;
 import org.flowable.engine.common.impl.javax.el.PropertyNotFoundException;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
@@ -57,10 +57,8 @@ import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.form.StartFormData;
 import org.flowable.engine.impl.cmd.AddIdentityLinkCmd;
-import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
-import org.flowable.engine.impl.persistence.entity.ResourceEntity;
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.engine.impl.repository.DeploymentBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -69,11 +67,13 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityImpl;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -279,7 +279,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
             DeploymentEntity activiti6DeploymentEntity = activiti6DeploymentBuilder.getDeployment();
             Map<String, org.activiti.engine.impl.persistence.entity.ResourceEntity> activiti5Resources = new HashMap<>();
             for (String resourceKey : activiti6DeploymentEntity.getResources().keySet()) {
-                ResourceEntity activiti6ResourceEntity = activiti6DeploymentEntity.getResources().get(resourceKey);
+                EngineResource activiti6ResourceEntity = activiti6DeploymentEntity.getResources().get(resourceKey);
 
                 org.activiti.engine.impl.persistence.entity.ResourceEntity activiti5ResourceEntity = new org.activiti.engine.impl.persistence.entity.ResourceEntity();
                 activiti5ResourceEntity.setName(activiti6ResourceEntity.getName());

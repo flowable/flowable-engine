@@ -136,12 +136,14 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
     }
     
     public String getProperty(String propertyName) {
+        String tableName = getPropertyTable();
+        if (!getDbSqlSession().getDbSqlSessionFactory().isTablePrefixIsSchema()) {
+            tableName = prependDatabaseTablePrefix(tableName);
+        }
+        
         PreparedStatement statement = null;
         try {
-            String tableName = PROPERTY_TABLE;
-            if (!getDbSqlSession().getDbSqlSessionFactory().isTablePrefixIsSchema()) {
-                tableName = prependDatabaseTablePrefix(tableName);
-            }
+            
             statement = getDbSqlSession().getSqlSession().getConnection()
                     .prepareStatement("select VALUE_ from " + tableName + " where NAME_ = ?");
             statement.setString(1, propertyName);
@@ -152,7 +154,7 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
                 return null;
             }
         } catch (SQLException e) {
-            throw new FlowableException("Could not read property " + propertyName + " from ACT_GE_PROPERTY", e);
+            return null;
         } finally {
             if (statement != null) {
                 try {
@@ -163,43 +165,8 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
         }
     }
     
-    public void setProperty(String propertyName, String value) {
-        PreparedStatement statement = null;
-        PreparedStatement statement2 = null;
-        try {
-            String tableName = PROPERTY_TABLE;
-            if (!getDbSqlSession().getDbSqlSessionFactory().isTablePrefixIsSchema()) {
-                tableName = prependDatabaseTablePrefix(tableName);
-            }
-            statement = getDbSqlSession().getSqlSession().getConnection()
-                    .prepareStatement("update " + tableName + " set VALUE_ = ? where NAME_ = ?");
-            statement.setString(1, propertyName);
-            statement.setString(2, value);
-            int result = statement.executeUpdate();
-            
-            // Property does not exist yet, insert the property
-            if (result == 0) {
-                statement2 = getDbSqlSession().getSqlSession().getConnection()
-                        .prepareStatement("insert into " + tableName + " values(?, ?, ?)");
-                statement2.setString(1, propertyName);
-                statement2.setString(2, value);
-                statement2.setInt(3, 1);
-                statement2.executeUpdate();
-            }
-        } catch (SQLException e) {
-            throw new FlowableException("Could not read property " + propertyName + " from ACT_GE_PROPERTY", e);
-        } finally {
-            if (statement != null) {
-                try {
-                    statement.close();
-                } catch (SQLException e) { }
-            }
-            if (statement2 != null) {
-                try {
-                    statement2.close();
-                } catch (SQLException e) { }
-            }
-        }
+    protected String getPropertyTable() {
+        return PROPERTY_TABLE;
     }
     
     public String getResourceForDbOperation(String directory, String operation, String component, String databaseType) {
@@ -218,9 +185,7 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
         try {
             inputStream = ReflectUtil.getResourceAsStream(resourceName);
             if (inputStream == null) {
-                if (isOptional) {
-                    LOGGER.info("no schema resource {} for {}", resourceName, operation);
-                } else {
+                if (!isOptional) {
                     throw new FlowableException("resource '" + resourceName + "' is not available");
                 }
             } else {

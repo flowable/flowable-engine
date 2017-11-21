@@ -12,12 +12,13 @@
  */
 package org.flowable.cmmn.engine.impl;
 
+import org.flowable.cmmn.api.CmmnHistoryService;
+import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.CmmnHistoryService;
-import org.flowable.cmmn.engine.CmmnManagementService;
-import org.flowable.cmmn.engine.CmmnRepositoryService;
-import org.flowable.cmmn.engine.CmmnRuntimeService;
 import org.flowable.cmmn.engine.impl.cmd.SchemaOperationsCmmnEngineBuild;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.slf4j.Logger;
@@ -33,6 +34,7 @@ public class CmmnEngineImpl implements CmmnEngine {
     protected String name;
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
     protected CmmnRuntimeService cmmnRuntimeService;
+    protected CmmnTaskService cmmnTaskService;
     protected CmmnManagementService cmmnManagementService;
     protected CmmnRepositoryService cmmnRepositoryService;
     protected CmmnHistoryService cmmnHistoryService;
@@ -41,6 +43,7 @@ public class CmmnEngineImpl implements CmmnEngine {
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
         this.name = cmmnEngineConfiguration.getEngineName();
         this.cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
+        this.cmmnTaskService = cmmnEngineConfiguration.getCmmnTaskService();
         this.cmmnManagementService = cmmnEngineConfiguration.getCmmnManagementService();
         this.cmmnRepositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
         this.cmmnHistoryService = cmmnEngineConfiguration.getCmmnHistoryService();
@@ -53,6 +56,7 @@ public class CmmnEngineImpl implements CmmnEngine {
         LOGGER.info("CmmnEngine {} created", name);
     }
     
+    @Override
     public String getName() {
         return name;
     }
@@ -74,6 +78,7 @@ public class CmmnEngineImpl implements CmmnEngine {
         this.cmmnEngineConfiguration = cmmnEngineConfiguration;
     }
     
+    @Override
     public CmmnRuntimeService getCmmnRuntimeService() {
         return cmmnRuntimeService;
     }
@@ -81,7 +86,17 @@ public class CmmnEngineImpl implements CmmnEngine {
     public void setCmmnRuntimeService(CmmnRuntimeService cmmnRuntimeService) {
         this.cmmnRuntimeService = cmmnRuntimeService;
     }
+    
+    @Override
+    public CmmnTaskService getCmmnTaskService() {
+        return cmmnTaskService;
+    }
 
+    public void setCmmnTaskService(CmmnTaskService cmmnTaskService) {
+        this.cmmnTaskService = cmmnTaskService;
+    }
+
+    @Override
     public CmmnManagementService getCmmnManagementService() {
         return cmmnManagementService;
     }
@@ -90,6 +105,7 @@ public class CmmnEngineImpl implements CmmnEngine {
         this.cmmnManagementService = cmmnManagementService;
     }
 
+    @Override
     public CmmnRepositoryService getCmmnRepositoryService() {
         return cmmnRepositoryService;
     }
@@ -98,6 +114,7 @@ public class CmmnEngineImpl implements CmmnEngine {
         this.cmmnRepositoryService = cmmnRepositoryService;
     }
 
+    @Override
     public CmmnHistoryService getCmmnHistoryService() {
         return cmmnHistoryService;
     }

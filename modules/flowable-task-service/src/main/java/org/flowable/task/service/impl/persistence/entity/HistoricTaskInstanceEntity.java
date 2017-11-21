@@ -18,7 +18,7 @@ import java.util.List;
 
 import org.flowable.engine.common.impl.db.HasRevision;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.task.service.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 /**
@@ -69,33 +69,23 @@ public interface HistoricTaskInstanceEntity extends Entity, HistoricTaskInstance
     
     void markEnded(String deleteReason);
 
-    @Override
-    String getProcessInstanceId();
-
-    @Override
-    String getProcessDefinitionId();
-
-    @Override
-    Date getStartTime();
-
-    @Override
-    Date getEndTime();
-
-    @Override
-    Long getDurationInMillis();
-
     void setProcessInstanceId(String processInstanceId);
 
     void setProcessDefinitionId(String processDefinitionId);
+
+    void setScopeId(String scopeId);
+
+    void setSubScopeId(String subScopeId);
+
+    void setScopeType(String scopeType);
+
+    void setScopeDefinitionId(String scopeDefinitionId);
 
     void setStartTime(Date startTime);
 
     void setEndTime(Date endTime);
 
     void setDurationInMillis(Long durationInMillis);
-
-    @Override
-    String getDeleteReason();
 
     void setDeleteReason(String deleteReason);
 

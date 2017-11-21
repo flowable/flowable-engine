@@ -17,13 +17,14 @@ import static org.junit.Assert.assertEquals;
 import java.io.IOException;
 import java.io.InputStream;
 
+import org.flowable.cmmn.api.CmmnHistoryService;
+import org.flowable.cmmn.api.CmmnManagementService;
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.CmmnTaskService;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.CmmnHistoryService;
-import org.flowable.cmmn.engine.CmmnManagementService;
-import org.flowable.cmmn.engine.CmmnRepositoryService;
-import org.flowable.cmmn.engine.CmmnRuntimeService;
-import org.flowable.cmmn.engine.runtime.CaseInstance;
 import org.flowable.cmmn.engine.test.impl.CmmnTestRunner;
 import org.junit.After;
 import org.junit.Before;
@@ -40,17 +41,18 @@ public class FlowableCmmnTestCase {
     
     private static final Logger logger = LoggerFactory.getLogger(FlowableCmmnTestCase.class);
     
-    protected CmmnEngine cmmnEngine;
+    protected CmmnEngineConfiguration cmmnEngineConfiguration;
     protected CmmnManagementService cmmnManagementService;
     protected CmmnRepositoryService cmmnRepositoryService;
     protected CmmnRuntimeService cmmnRuntimeService;
+    protected CmmnTaskService cmmnTaskService;
     protected CmmnHistoryService cmmnHistoryService;
     
     protected String deploymentId;
     
     @BeforeClass
     public static void setupEngine() {
-        if (CmmnTestRunner.getCmmnEngine() == null) {
+        if (CmmnTestRunner.getCmmnEngineConfiguration() == null) {
             initCmmnEngine();
         }
     }
@@ -58,7 +60,7 @@ public class FlowableCmmnTestCase {
     protected static void initCmmnEngine() {
         try (InputStream inputStream = FlowableCmmnTestCase.class.getClassLoader().getResourceAsStream("flowable.cmmn.cfg.xml")) {
             CmmnEngine cmmnEngine = CmmnEngineConfiguration.createCmmnEngineConfigurationFromInputStream(inputStream).buildCmmnEngine();
-            CmmnTestRunner.setCmmnEngine(cmmnEngine);
+            CmmnTestRunner.setCmmnEngineConfiguration(cmmnEngine.getCmmnEngineConfiguration());
         } catch (IOException e) {
             logger.error("Could not create CMMN engine", e);
         }
@@ -66,12 +68,13 @@ public class FlowableCmmnTestCase {
     
     @Before
     public void setupServices() {
-        CmmnEngine cmmnEngine = CmmnTestRunner.getCmmnEngine();
-        this.cmmnEngine = cmmnEngine;
-        this.cmmnRepositoryService = cmmnEngine.getCmmnRepositoryService();
-        this.cmmnManagementService = cmmnEngine.getCmmnManagementService();
-        this.cmmnRuntimeService = cmmnEngine.getCmmnRuntimeService();
-        this.cmmnHistoryService = cmmnEngine.getCmmnHistoryService();
+        CmmnEngineConfiguration cmmnEngineConfiguration = CmmnTestRunner.getCmmnEngineConfiguration();
+        this.cmmnEngineConfiguration = cmmnEngineConfiguration;
+        this.cmmnRepositoryService = cmmnEngineConfiguration.getCmmnRepositoryService();
+        this.cmmnManagementService = cmmnEngineConfiguration.getCmmnManagementService();
+        this.cmmnRuntimeService = cmmnEngineConfiguration.getCmmnRuntimeService();
+        this.cmmnTaskService = cmmnEngineConfiguration.getCmmnTaskService();
+        this.cmmnHistoryService = cmmnEngineConfiguration.getCmmnHistoryService();
     }
     
     @After
@@ -79,6 +82,13 @@ public class FlowableCmmnTestCase {
         if (deploymentId != null) {
            cmmnRepositoryService.deleteDeployment(deploymentId, true);
         }
+    }
+    
+    protected void deployOneHumanTaskCaseModel() {
+        deploymentId = cmmnRepositoryService.createDeployment()
+                .addClasspathResource("org/flowable/cmmn/test/one-human-task-model.cmmn")
+                .deploy()
+                .getId();
     }
     
     protected void deployOneTaskCaseModel() {

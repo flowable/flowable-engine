@@ -19,6 +19,7 @@ import java.util.ArrayList;
  */
 public class ServiceTask extends TaskWithFieldExtensions {
 
+    public static final String JAVA_TASK = "java";
     public static final String DMN_TASK = "dmn";
     public static final String MAIL_TASK = "mail";
     public static final String HTTP_TASK = "http";
@@ -27,9 +28,6 @@ public class ServiceTask extends TaskWithFieldExtensions {
     protected String implementationType;
     protected String resultVariableName;
     protected String type;
-    protected String operationRef;
-    protected String extensionId;
-    protected String skipExpression;
 
     public String getImplementation() {
         return implementation;
@@ -63,34 +61,6 @@ public class ServiceTask extends TaskWithFieldExtensions {
         this.type = type;
     }
 
-    public String getOperationRef() {
-        return operationRef;
-    }
-
-    public void setOperationRef(String operationRef) {
-        this.operationRef = operationRef;
-    }
-
-    public String getExtensionId() {
-        return extensionId;
-    }
-
-    public void setExtensionId(String extensionId) {
-        this.extensionId = extensionId;
-    }
-
-    public boolean isExtended() {
-        return extensionId != null && !extensionId.isEmpty();
-    }
-
-    public String getSkipExpression() {
-        return skipExpression;
-    }
-
-    public void setSkipExpression(String skipExpression) {
-        this.skipExpression = skipExpression;
-    }
-
     public ServiceTask clone() {
         ServiceTask clone = new ServiceTask();
         clone.setValues(this);
@@ -103,9 +73,6 @@ public class ServiceTask extends TaskWithFieldExtensions {
         setImplementationType(otherElement.getImplementationType());
         setResultVariableName(otherElement.getResultVariableName());
         setType(otherElement.getType());
-        setOperationRef(otherElement.getOperationRef());
-        setExtensionId(otherElement.getExtensionId());
-        setSkipExpression(otherElement.getSkipExpression());
 
         fieldExtensions = new ArrayList<>();
         if (otherElement.getFieldExtensions() != null && !otherElement.getFieldExtensions().isEmpty()) {

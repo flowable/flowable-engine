@@ -173,7 +173,7 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
         listener.reset();
 
         // Test typed entity-listener
-        listener = new TestBaseEntityEventListener(org.flowable.task.service.Task.class);
+        listener = new TestBaseEntityEventListener(org.flowable.task.api.Task.class);
 
         // Dispatch event for a task, should be received
         dispatcher.addEventListener(listener);

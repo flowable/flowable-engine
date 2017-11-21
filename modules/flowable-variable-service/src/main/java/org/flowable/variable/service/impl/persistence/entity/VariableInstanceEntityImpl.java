@@ -18,8 +18,8 @@ import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
-import org.flowable.variable.service.impl.types.ValueFields;
-import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * @author Tom Baeyens
@@ -39,6 +39,7 @@ public class VariableInstanceEntityImpl extends AbstractEntity implements Variab
     protected String processDefinitionId;
     protected String taskId;
     protected String scopeId;
+    protected String subScopeId;
     protected String scopeType;
 
     protected Long longValue;
@@ -64,6 +65,7 @@ public class VariableInstanceEntityImpl extends AbstractEntity implements Variab
         }
         persistentState.put("executionId", executionId);
         persistentState.put("scopeId", scopeId);
+        persistentState.put("subScopeId", subScopeId);
         persistentState.put("scopeType", scopeType);
         persistentState.put("longValue", longValue);
         persistentState.put("doubleValue", doubleValue);
@@ -211,6 +213,16 @@ public class VariableInstanceEntityImpl extends AbstractEntity implements Variab
     @Override
     public void setScopeId(String scopeId) {
         this.scopeId = scopeId;
+    }
+    
+    @Override
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+    
+    @Override
+    public void setSubScopeId(String subScopeId) {
+        this.subScopeId = subScopeId;
     }
 
     @Override

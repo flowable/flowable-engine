@@ -14,7 +14,7 @@ package org.flowable.task.service;
 
 import java.util.List;
 
-import org.flowable.task.service.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
 import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
@@ -23,6 +23,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
  * Service which provides access to {@link HistoricTaskInstanceEntity}.
  * 
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public interface HistoricTaskService {
 
@@ -41,4 +42,11 @@ public interface HistoricTaskService {
     void insertHistoricTask(HistoricTaskInstanceEntity historicTaskInstanceEntity, boolean fireCreateEvent);
     
     void deleteHistoricTask(HistoricTaskInstanceEntity HistoricTaskInstance);
+    
+    HistoricTaskInstanceEntity recordTaskCreated(TaskEntity task);
+    
+    HistoricTaskInstanceEntity recordTaskEnd(TaskEntity task, String deleteReason);
+    
+    HistoricTaskInstanceEntity recordTaskInfoChange(TaskEntity taskEntity);
+    
 }

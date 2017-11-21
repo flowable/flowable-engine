@@ -167,12 +167,17 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
                             toVerify.addAll(childExecutions);
                         }
                     }
+                    sendCompletedWithConditionEvent(leavingExecution);
+                }
+                else {
+                    sendCompletedEvent(leavingExecution);
                 }
                 
                 super.leave(leavingExecution);
             }
 
         } else {
+            sendCompletedEvent(execution);
             super.leave(execution);
         }
     }

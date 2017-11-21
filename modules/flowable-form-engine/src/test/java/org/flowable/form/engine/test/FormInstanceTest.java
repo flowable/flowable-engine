@@ -38,7 +38,7 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formModel, valuesMap, "default");
         assertEquals("test", formValues.get("input1"));
 
-        FormInstance formInstance = formService.createFormInstance(formValues, formModel, null, null);
+        FormInstance formInstance = formService.createFormInstance(formValues, formModel, null, null, null);
         assertEquals(formModel.getId(), formInstance.getFormDefinitionId());
         JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
         assertEquals("test", formNode.get("values").get("input1").asText());
@@ -66,7 +66,7 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         assertEquals(new LocalDate(2016, 1, 1), formValues.get("date1"));
         assertEquals(new LocalDate(2017, 1, 1), formValues.get("date2"));
 
-        FormInstance formInstance = formService.createFormInstance(formValues, formDefinition, null, null);
+        FormInstance formInstance = formService.createFormInstance(formValues, formDefinition, null, null, null);
         assertEquals(formDefinition.getId(), formInstance.getFormDefinitionId());
         JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
         JsonNode valuesNode = formNode.get("values");
@@ -87,7 +87,7 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         valuesMap.put("input1", "test");
         Map<String, Object> formValues = formService.getVariablesFromFormSubmission(formModel, valuesMap, "default");
 
-        FormInstance formInstance = formService.saveFormInstance(formValues, formModel, taskId, null);
+        FormInstance formInstance = formService.saveFormInstance(formValues, formModel, taskId, null, null);
         assertEquals(formModel.getId(), formInstance.getFormDefinitionId());
         JsonNode formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
         assertEquals("test", formNode.get("values").get("input1").asText());
@@ -104,7 +104,7 @@ public class FormInstanceTest extends AbstractFlowableFormTest {
         valuesMap.put("input1", "updatedValue");
         formValues = formService.getVariablesFromFormSubmission(formModel, valuesMap, "updatedOutcome");
 
-        formInstance = formService.saveFormInstance(formValues, formModel, taskId, null);
+        formInstance = formService.saveFormInstance(formValues, formModel, taskId, null, null);
         assertEquals(formModel.getId(), formInstance.getFormDefinitionId());
         formNode = formEngineConfiguration.getObjectMapper().readTree(formInstance.getFormValueBytes());
         assertEquals("updatedValue", formNode.get("values").get("input1").asText());

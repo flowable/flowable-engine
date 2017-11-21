@@ -12,7 +12,7 @@
  */
 package org.flowable.standalone.escapeclause;
 
-import org.flowable.job.service.TimerJobQuery;
+import org.flowable.job.api.TimerJobQuery;
 
 public class JobQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
 

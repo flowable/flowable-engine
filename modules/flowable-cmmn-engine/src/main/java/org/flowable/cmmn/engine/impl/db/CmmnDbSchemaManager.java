@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.db;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +20,9 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.db.DbSchemaManager;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import liquibase.Liquibase;
 import liquibase.database.Database;
@@ -30,6 +34,8 @@ import liquibase.exception.LiquibaseException;
 import liquibase.resource.ClassLoaderResourceAccessor;
 
 public class CmmnDbSchemaManager implements DbSchemaManager {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(CmmnDbSchemaManager.class);
 
     public static final String LIQUIBASE_CHANGELOG = "org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog.xml";
     
@@ -65,7 +71,26 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
 
     protected Liquibase createLiquibaseInstance(CmmnEngineConfiguration cmmnEngineConfiguration)
             throws SQLException, DatabaseException, LiquibaseException {
-        DatabaseConnection connection = new JdbcConnection(cmmnEngineConfiguration.getDataSource().getConnection());
+        
+        // If a command context is currently active, the current connection needs to be reused.
+        Connection jdbcConnection = null;
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+        if (commandContext == null) {
+            jdbcConnection = cmmnEngineConfiguration.getDataSource().getConnection();
+        } else {
+            jdbcConnection = CommandContextUtil.getDbSqlSession(commandContext).getSqlSession().getConnection();
+        }
+        
+        // A commit is needed here, because one of the things that Liquibase does when acquiring its lock
+        // is doing a rollback, which removes all changes done so far. 
+        // For most databases, this is not a problem as DDL statements are not transactional.
+        // However for some (e.g. sql server), this would remove all previous statements, which is not wanted,
+        // hence the extra commit here.
+        if (!jdbcConnection.getAutoCommit()) {
+            jdbcConnection.commit();
+        }
+        
+        DatabaseConnection connection = new JdbcConnection(jdbcConnection);
         Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
         database.setDatabaseChangeLogTableName(CmmnEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogTableName());
         database.setDatabaseChangeLogLockTableName(CmmnEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogLockTableName());
@@ -94,6 +119,8 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
         try {
             
             getCommonDbSchemaManager().dbSchemaCreate();
+            getIdentityLinkDbSchemaManager().dbSchemaCreate();
+            getTaskDbSchemaManager().dbSchemaCreate();
             getVariableDbSchemaManager().dbSchemaCreate();
             
             Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getCmmnEngineConfiguration());
@@ -108,11 +135,33 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
         try {
             Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getCmmnEngineConfiguration());
             liquibase.dropAll();
-            
+        } catch (Exception e) {
+            LOGGER.info("Error dropping CMMN engine tables", e);
+        }
+          
+        try {
             getVariableDbSchemaManager().dbSchemaDrop();
+        } catch (Exception e) {
+            LOGGER.info("Error dropping variable tables", e);
+        }
+        
+        try {
+            getTaskDbSchemaManager().dbSchemaDrop();
+        } catch (Exception e) {
+            LOGGER.info("Error dropping task tables", e);
+        }
+        
+        try {
+            getIdentityLinkDbSchemaManager().dbSchemaDrop();
+        } catch (Exception e) {
+            LOGGER.info("Error dropping identity link tables", e);
+        }
+        
+        
+        try {
             getCommonDbSchemaManager().dbSchemaDrop();
         } catch (Exception e) {
-            throw new FlowableException("Error dropping CMMN engine tables", e);
+            LOGGER.info("Error dropping common tables", e);
         }
     }
 
@@ -121,10 +170,13 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
         try {
             
             getCommonDbSchemaManager().dbSchemaUpdate();
+            getIdentityLinkDbSchemaManager().dbSchemaUpdate();
+            getTaskDbSchemaManager().dbSchemaUpdate();
             getVariableDbSchemaManager().dbSchemaUpdate();
             
             Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getCmmnEngineConfiguration());
             liquibase.update("cmmn");
+
         } catch (Exception e) {
             throw new FlowableException("Error updating CMMN engine tables", e);
         }
@@ -135,9 +187,16 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
         return CommandContextUtil.getCmmnEngineConfiguration().getCommonDbSchemaManager();
     }
     
+    protected DbSchemaManager getIdentityLinkDbSchemaManager() {
+        return CommandContextUtil.getCmmnEngineConfiguration().getIdentityLinkDbSchemaManager();
+    }
+    
     protected DbSchemaManager getVariableDbSchemaManager() {
         return CommandContextUtil.getCmmnEngineConfiguration().getVariableDbSchemaManager();
     }
     
+    protected DbSchemaManager getTaskDbSchemaManager() {
+        return CommandContextUtil.getCmmnEngineConfiguration().getTaskDbSchemaManager();
+    }
     
 }

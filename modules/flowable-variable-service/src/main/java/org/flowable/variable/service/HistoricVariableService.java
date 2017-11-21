@@ -14,7 +14,7 @@ package org.flowable.variable.service;
 
 import java.util.List;
 
-import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -23,6 +23,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  * Service which provides access to historic variables.
  * 
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public interface HistoricVariableService {
     
@@ -36,13 +37,14 @@ public interface HistoricVariableService {
     
     HistoricVariableInstanceEntity createAndInsert(VariableInstanceEntity variable);
     
-    void copyVariableValue(HistoricVariableInstanceEntity historicVariable, VariableInstanceEntity variable);
+    void recordVariableUpdate(VariableInstanceEntity variableInstanceEntity);
     
-    void deleteHistoricVariableInstance(String id);
+    void recordVariableRemoved(VariableInstanceEntity variableInstanceEntity);
     
     void deleteHistoricVariableInstance(HistoricVariableInstanceEntity historicVariable);
     
     void deleteHistoricVariableInstancesByProcessInstanceId(String processInstanceId);
     
     void deleteHistoricVariableInstancesByTaskId(String taskId);
+    
 }

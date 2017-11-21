@@ -13,6 +13,7 @@
 package org.flowable.engine.test.cfg.executioncount;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -22,6 +23,7 @@ import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.history.HistoricActivityInstance;
+import org.flowable.engine.impl.db.EntityDependencyOrder;
 import org.flowable.engine.impl.history.AbstractHistoryManager;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
@@ -31,7 +33,7 @@ import org.flowable.engine.test.profiler.FlowableProfiler;
 import org.flowable.engine.test.profiler.ProfileSession;
 import org.flowable.engine.test.profiler.ProfilingDbSqlSessionFactory;
 import org.flowable.engine.test.profiler.TotalExecutionTimeCommandInterceptor;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.junit.Assert;
 
@@ -40,6 +42,7 @@ import org.junit.Assert;
  */
 public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
 
+    protected boolean oldIsBulkInsertableValue;
     protected boolean oldExecutionTreeFetchValue;
     protected boolean oldExecutionRelationshipCountValue;
     protected boolean oldTaskRelationshipCountValue;
@@ -53,12 +56,15 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         super.setUp();
 
         // Enable flags
+        this.oldIsBulkInsertableValue = processEngineConfiguration.isBulkInsertEnabled();
         this.oldExecutionTreeFetchValue = processEngineConfiguration.getPerformanceSettings().isEnableEagerExecutionTreeFetching();
         this.oldExecutionRelationshipCountValue = processEngineConfiguration.getPerformanceSettings().isEnableExecutionRelationshipCounts();
         this.oldTaskRelationshipCountValue = processEngineConfiguration.getPerformanceSettings().isEnableTaskRelationshipCounts();
         this.oldenableProcessDefinitionInfoCacheValue = processEngineConfiguration.isEnableProcessDefinitionInfoCache();
         oldHistoryLevel = ((AbstractHistoryManager) processEngineConfiguration.getHistoryManager()).getHistoryLevel();
 
+        processEngineConfiguration.setBulkInsertEnabled(true);
+        
         processEngineConfiguration.getPerformanceSettings().setEnableEagerExecutionTreeFetching(true);
         processEngineConfiguration.getPerformanceSettings().setEnableExecutionRelationshipCounts(true);
         processEngineConfiguration.getPerformanceSettings().setEnableTaskRelationshipCounts(true);
@@ -80,7 +86,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         // Add dbsqlSession factory that captures CRUD operations
         this.oldDbSqlSessionFactory = processEngineConfiguration.getDbSqlSessionFactory();
         DbSqlSessionFactory newDbSqlSessionFactory = new ProfilingDbSqlSessionFactory();
-        newDbSqlSessionFactory.setBulkInserteableEntityClasses(oldDbSqlSessionFactory.getBulkInserteableEntityClasses());
+        newDbSqlSessionFactory.setBulkInserteableEntityClasses(new HashSet<>(EntityDependencyOrder.INSERT_ORDER));
         newDbSqlSessionFactory.setInsertionOrder(oldDbSqlSessionFactory.getInsertionOrder());
         newDbSqlSessionFactory.setDeletionOrder(oldDbSqlSessionFactory.getDeletionOrder());
         newDbSqlSessionFactory.setDatabaseType(oldDbSqlSessionFactory.getDatabaseType());
@@ -92,13 +98,13 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         newDbSqlSessionFactory.setIdGenerator(oldDbSqlSessionFactory.getIdGenerator());
         newDbSqlSessionFactory.setDbHistoryUsed(oldDbSqlSessionFactory.isDbHistoryUsed());
         newDbSqlSessionFactory.setDatabaseSpecificStatements(oldDbSqlSessionFactory.getDatabaseSpecificStatements());
-        newDbSqlSessionFactory.setBulkInserteableEntityClasses(oldDbSqlSessionFactory.getBulkInserteableEntityClasses());
         processEngineConfiguration.addSessionFactory(newDbSqlSessionFactory);
     }
 
     @Override
     protected void tearDown() throws Exception {
 
+        processEngineConfiguration.setBulkInsertEnabled(oldIsBulkInsertableValue);
         processEngineConfiguration.getPerformanceSettings().setEnableEagerExecutionTreeFetching(oldExecutionTreeFetchValue);
         processEngineConfiguration.getPerformanceSettings().setEnableExecutionRelationshipCounts(oldExecutionRelationshipCountValue);
         processEngineConfiguration.getPerformanceSettings().setEnableTaskRelationshipCounts(oldTaskRelationshipCountValue);
@@ -280,7 +286,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     public void testOneTaskProcess() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             deployStartProcessInstanceAndProfile("process-usertask-01.bpmn20.xml", "process-usertask-01", false);
-            org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
             taskService.complete(task.getId());
             stopProfiling();
     
@@ -327,7 +333,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     public void testOneTaskWithBoundaryTimerProcess() {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             deployStartProcessInstanceAndProfile("process-usertask-02.bpmn20.xml", "process-usertask-02", false);
-            org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
             taskService.complete(task.getId());
             stopProfiling();
     
@@ -357,7 +363,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             // TODO: move to separate class
             deployStartProcessInstanceAndProfile("process-usertask-01.bpmn20.xml", "process-usertask-01", false);
-            org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
     
             long variableCount = 3;
     
@@ -390,7 +396,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             // TODO: move to separate class
             deployStartProcessInstanceAndProfile("process-usertask-01.bpmn20.xml", "process-usertask-01", false);
-            org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
     
             taskService.claim(task.getId(), "firstUser");
             taskService.unclaim(task.getId());
@@ -409,7 +415,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             // TODO: move to separate class
             deployStartProcessInstanceAndProfile("process-usertask-01.bpmn20.xml", "process-usertask-01", false);
-            org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
     
             taskService.addCandidateUser(task.getId(), "user01");
             taskService.addCandidateUser(task.getId(), "user02");
@@ -453,7 +459,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
         if (!processEngineConfiguration.isAsyncHistoryEnabled()) {
             // TODO: move to separate class
             deployStartProcessInstanceAndProfile("process-usertask-01.bpmn20.xml", "process-usertask-01", false);
-            org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
     
             taskService.addCandidateGroup(task.getId(), "group01");
             taskService.addCandidateGroup(task.getId(), "group02");

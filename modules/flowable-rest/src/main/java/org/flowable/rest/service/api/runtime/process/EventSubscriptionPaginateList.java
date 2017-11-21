@@ -15,13 +15,14 @@ package org.flowable.rest.service.api.runtime.process;
 
 import java.util.List;
 
+import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.rest.api.AbstractPaginateList;
 import org.flowable.rest.service.api.RestResponseFactory;
 
 /**
  * @author Tijs Rademakers
  */
-public class EventSubscriptionPaginateList extends AbstractPaginateList {
+public class EventSubscriptionPaginateList extends AbstractPaginateList<EventSubscriptionResponse, EventSubscription> {
 
     protected RestResponseFactory restResponseFactory;
 
@@ -29,9 +30,8 @@ public class EventSubscriptionPaginateList extends AbstractPaginateList {
         this.restResponseFactory = restResponseFactory;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    protected List processList(List list) {
+    protected List<EventSubscriptionResponse> processList(List<EventSubscription> list) {
         return restResponseFactory.createEventSubscriptionResponseList(list);
     }
 }

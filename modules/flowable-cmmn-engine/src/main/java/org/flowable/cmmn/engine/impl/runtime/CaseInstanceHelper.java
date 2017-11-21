@@ -12,9 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.runtime;
 
+import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
-import org.flowable.cmmn.engine.runtime.CaseInstance;
-import org.flowable.cmmn.engine.runtime.CaseInstanceBuilder;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**

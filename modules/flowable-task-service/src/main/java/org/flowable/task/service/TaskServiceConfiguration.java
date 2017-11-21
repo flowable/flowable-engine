@@ -37,7 +37,7 @@ public class TaskServiceConfiguration extends AbstractServiceConfiguration {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(TaskServiceConfiguration.class);
 
-    public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/task/db/mapping/mappings.xml";
+    public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/task/service/db/mapping/mappings.xml";
 
     // SERVICES
     // /////////////////////////////////////////////////////////////////

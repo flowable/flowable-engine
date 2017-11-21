@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.Task;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.impl.TaskQueryImpl;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
@@ -88,6 +88,16 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     @Override
     public List<TaskEntity> findTasksByProcessInstanceId(String processInstanceId) {
         return taskDataManager.findTasksByProcessInstanceId(processInstanceId);
+    }
+    
+    @Override
+    public List<TaskEntity> findTasksByScopeIdAndScopeType(String scopeId, String scopeType) {
+        return taskDataManager.findTasksByScopeIdAndScopeType(scopeId, scopeType);
+    }
+    
+    @Override
+    public List<TaskEntity> findTasksBySubScopeIdAndScopeType(String subScopeId, String scopeType) {
+        return taskDataManager.findTasksBySubScopeIdAndScopeType(subScopeId, scopeType);
     }
 
     @Override

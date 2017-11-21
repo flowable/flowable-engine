@@ -15,14 +15,14 @@ package org.flowable.cmmn.engine.impl.repository;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 
+import org.flowable.cmmn.api.repository.CmmnDeployment;
+import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.CmmnRepositoryServiceImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.repository.CmmnDeployment;
-import org.flowable.cmmn.engine.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.util.IoUtil;
@@ -36,6 +36,7 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
 
     protected CmmnDeploymentEntity deployment;
     protected boolean isCmmn20XsdValidationEnabled = true;
+    protected boolean isDuplicateFilterEnabled;
 
     public CmmnDeploymentBuilderImpl() {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration();
@@ -130,6 +131,11 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
         deployment.setCategory(category);
         return this;
     }
+    
+    public CmmnDeploymentBuilder key(String key) {
+        deployment.setKey(key);
+        return this;
+    }
 
     public CmmnDeploymentBuilder disableSchemaValidation() {
         this.isCmmn20XsdValidationEnabled = false;
@@ -145,6 +151,12 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
         deployment.setParentDeploymentId(parentDeploymentId);
         return this;
     }
+    
+    @Override
+    public CmmnDeploymentBuilder enableDuplicateFiltering() {
+        this.isDuplicateFilterEnabled = true;
+        return this;
+    }
 
     public CmmnDeployment deploy() {
         return repositoryService.deploy(this);
@@ -156,6 +168,10 @@ public class CmmnDeploymentBuilderImpl implements CmmnDeploymentBuilder {
 
     public boolean isCmmnXsdValidationEnabled() {
         return isCmmn20XsdValidationEnabled;
+    }
+    
+    public boolean isDuplicateFilterEnabled() {
+        return isDuplicateFilterEnabled;
     }
 
 }

@@ -13,11 +13,11 @@
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.Task;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.Expression;
@@ -38,12 +38,12 @@ public class TaskActivityBehavior extends CoreCmmnTriggerableActivityBehavior {
     
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        if (!determineIsBlocking(planItemInstanceEntity)) {
+        if (!evaluateIsBlocking(planItemInstanceEntity)) {
             CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance((PlanItemInstanceEntity) planItemInstanceEntity);
         }
     }
 
-    protected boolean determineIsBlocking(DelegatePlanItemInstance planItemInstance) {
+    protected boolean evaluateIsBlocking(DelegatePlanItemInstance planItemInstance) {
         boolean blocking = isBlocking;
         if (StringUtils.isNotEmpty(isBlockingExpression)) {
             Expression expression = CommandContextUtil.getExpressionManager().createExpression(isBlockingExpression);

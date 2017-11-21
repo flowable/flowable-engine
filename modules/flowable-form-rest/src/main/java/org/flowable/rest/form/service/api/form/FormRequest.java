@@ -22,8 +22,12 @@ public class FormRequest {
     private String formInstanceId;
     private String formDefinitionId;
     private String formDefinitionKey;
-    private String processInstanceId;
     private String taskId;
+    private String processInstanceId;
+    private String processDefinitionId;
+    private String scopeId;
+    private String scopeType;
+    private String scopeDefinitionId;
     private String tenantId;
     private String parentDeploymentId;
     private Map<String, Object> variables;
@@ -51,6 +55,14 @@ public class FormRequest {
     public void setFormDefinitionKey(String formDefinitionKey) {
         this.formDefinitionKey = formDefinitionKey;
     }
+    
+    public String getTaskId() {
+        return taskId;
+    }
+
+    public void setTaskId(String taskId) {
+        this.taskId = taskId;
+    }
 
     public String getProcessInstanceId() {
         return processInstanceId;
@@ -60,12 +72,36 @@ public class FormRequest {
         this.processInstanceId = processInstanceId;
     }
 
-    public String getTaskId() {
-        return taskId;
+    public String getProcessDefinitionId() {
+        return processDefinitionId;
     }
 
-    public void setTaskId(String taskId) {
-        this.taskId = taskId;
+    public void setProcessDefinitionId(String processDefinitionId) {
+        this.processDefinitionId = processDefinitionId;
+    }
+
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
+    }
+
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
     }
 
     public String getTenantId() {

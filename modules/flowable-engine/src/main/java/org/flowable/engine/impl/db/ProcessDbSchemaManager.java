@@ -89,7 +89,10 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     public void dbSchemaCreate() {
         
         getCommonDbSchemaManager().dbSchemaCreate();
+        getIdentityLinkDbSchemaManager().dbSchemaCreate();
+        getTaskDbSchemaManager().dbSchemaCreate();
         getVariableDbSchemaManager().dbSchemaCreate();
+        getJobDbSchemaManager().dbSchemaCreate();
         
         if (isEngineTablePresent()) {
             String dbVersion = getDbVersion();
@@ -116,13 +119,45 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     @Override
     public void dbSchemaDrop() {
         
-        executeMandatorySchemaResource("drop", "engine");
-        if (CommandContextUtil.getDbSqlSession().getDbSqlSessionFactory().isDbHistoryUsed()) {
-            executeMandatorySchemaResource("drop", "history");
+        try {
+            executeMandatorySchemaResource("drop", "engine");
+            if (CommandContextUtil.getDbSqlSession().getDbSqlSessionFactory().isDbHistoryUsed()) {
+                executeMandatorySchemaResource("drop", "history");
+            }
+            
+        } catch (Exception e) {
+            LOGGER.info("Error dropping engine tables", e);
+        }
+        
+        try {
+            getJobDbSchemaManager().dbSchemaDrop();
+        } catch (Exception e) {
+            LOGGER.info("Error dropping job tables", e);
         }
      
-        getVariableDbSchemaManager().dbSchemaDrop();
-        getCommonDbSchemaManager().dbSchemaDrop();
+        try {
+            getVariableDbSchemaManager().dbSchemaDrop();
+        } catch (Exception e) {
+            LOGGER.info("Error dropping variable tables", e);
+        }
+        
+        try {
+            getTaskDbSchemaManager().dbSchemaDrop();
+        } catch (Exception e) {
+            LOGGER.info("Error dropping task tables", e);
+        }
+        
+        try {
+            getIdentityLinkDbSchemaManager().dbSchemaDrop();
+        } catch (Exception e) {
+            LOGGER.info("Error dropping identity link tables", e);
+        }
+        
+        try {
+            getCommonDbSchemaManager().dbSchemaDrop();
+        } catch (Exception e) {
+            LOGGER.info("Error dropping common tables", e);
+        }
     }
 
     public void dbSchemaPrune() {
@@ -135,7 +170,10 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     public String dbSchemaUpdate() {
         
         getCommonDbSchemaManager().dbSchemaUpdate();
+        getIdentityLinkDbSchemaManager().dbSchemaUpdate();
+        getTaskDbSchemaManager().dbSchemaUpdate();
         getVariableDbSchemaManager().dbSchemaUpdate();
+        getJobDbSchemaManager().dbSchemaUpdate();
 
         String feedback = null;
         boolean isUpgradeNeeded = false;
@@ -289,8 +327,20 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         return CommandContextUtil.getProcessEngineConfiguration().getCommonDbSchemaManager();
     }
     
+    protected DbSchemaManager getIdentityLinkDbSchemaManager() {
+        return CommandContextUtil.getProcessEngineConfiguration().getIdentityLinkDbSchemaManager();
+    }
+    
     protected DbSchemaManager getVariableDbSchemaManager() {
         return CommandContextUtil.getProcessEngineConfiguration().getVariableDbSchemaManager();
+    }
+    
+    protected DbSchemaManager getTaskDbSchemaManager() {
+        return CommandContextUtil.getProcessEngineConfiguration().getTaskDbSchemaManager();
+    }
+    
+    protected DbSchemaManager getJobDbSchemaManager() {
+        return CommandContextUtil.getProcessEngineConfiguration().getJobDbSchemaManager();
     }
     
     @Override
