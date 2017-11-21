@@ -85,9 +85,16 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
 
         // executeCompensationBoundaryEvents(execution.getCurrentFlowElement(), execution);
 
-        if (loopCounter >= nrOfInstances || completionConditionSatisfied(multiInstanceRootExecution)) {
-            super.leave(execution);
+        boolean completeConditionSatisfied = completionConditionSatisfied(multiInstanceRootExecution);
+        if (loopCounter >= nrOfInstances || completeConditionSatisfied) {
+            if(completeConditionSatisfied) {
+                sendCompletedWithConditionEvent(multiInstanceRootExecution);
+            }
+            else {
+                sendCompletedEvent(multiInstanceRootExecution);
+            }
 
+            super.leave(execution);
         } else {
             continueSequentialMultiInstance(execution, loopCounter, (ExecutionEntity) multiInstanceRootExecution);
         }

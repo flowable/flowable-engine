@@ -56,6 +56,10 @@ public class CmmnResourceEntityImpl extends AbstractEntityNoRevision implements 
         return CmmnResourceEntityImpl.class;
     }
 
+    public boolean isGenerated() {
+        return false;
+    }
+
     @Override
     public String toString() {
         return "CmmnResourceEntity[id=" + id + ", name=" + name + "]";

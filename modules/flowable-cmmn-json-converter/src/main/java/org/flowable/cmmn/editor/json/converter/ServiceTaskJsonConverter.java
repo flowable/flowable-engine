@@ -72,6 +72,9 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
                     decisionReferenceNode.put("id", modelInfo.getId());
                     decisionReferenceNode.put("name", modelInfo.getName());
                     decisionReferenceNode.put("key", modelInfo.getKey());
+                    
+                } else if (PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY.equals(fieldExtension.getFieldName())) {
+                    propertiesNode.put(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS, Boolean.parseBoolean(fieldExtension.getStringValue()));
                 }
             }
 

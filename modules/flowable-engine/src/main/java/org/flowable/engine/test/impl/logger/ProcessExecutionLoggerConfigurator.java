@@ -13,7 +13,7 @@
 package org.flowable.engine.test.impl.logger;
 
 import org.flowable.engine.cfg.AbstractProcessEngineConfigurator;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.common.AbstractEngineConfiguration;
 
 /**
  * @author jbarrez
@@ -23,14 +23,14 @@ public class ProcessExecutionLoggerConfigurator extends AbstractProcessEngineCon
     protected ProcessExecutionLogger processExecutionLogger;
 
     @Override
-    public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public void beforeInit(AbstractEngineConfiguration engineConfiguration) {
         processExecutionLogger = new ProcessExecutionLogger();
-        processEngineConfiguration.setCommandInvoker(new LoggingCommandInvoker(processExecutionLogger));
+        engineConfiguration.setCommandInvoker(new LoggingCommandInvoker(processExecutionLogger));
     }
 
     @Override
-    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        processEngineConfiguration.getEventDispatcher().addEventListener(new DebugInfoEntityEventListener(processExecutionLogger));
+    public void configure(AbstractEngineConfiguration engineConfiguration) {
+        engineConfiguration.getEventDispatcher().addEventListener(new DebugInfoEntityEventListener(processExecutionLogger));
     }
 
     public ProcessExecutionLogger getProcessExecutionLogger() {
