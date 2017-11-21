@@ -20,19 +20,25 @@ under the License.
 ////////////////////////////////////////////////////////////////////////////////
 // Use these settings to help adjust the appearance of Slate
 
+// Flowable Color :
+// Background nav selected :  #0c4359
+// Background nav : #187ca3
+//
+//
+
 
 // BACKGROUND COLORS
 ////////////////////
-$nav-bg: #2E3336 !default;
-$examples-bg: #2E3336 !default;
+$nav-bg: #187ca3 !default;
+$examples-bg: #187ca3 !default;
 $code-bg: #1E2224 !default;
-$code-annotation-bg: #191D1F !default;
-$nav-subitem-bg: #1E2224 !default;
-$nav-active-bg: #0F75D4 !default;
-$nav-active-parent-bg: #1E2224 !default; // parent links of the current section
-$lang-select-border: #000 !default;
-$lang-select-bg: #1E2224 !default;
-$lang-select-active-bg: $examples-bg !default; // feel free to change this to blue or something
+$code-annotation-bg: #0d4359 !default;
+$nav-subitem-bg: #007387 !default;
+$nav-active-bg: #0d4359 !default;
+$nav-active-parent-bg: #0c4359 !default; // parent links of the current section
+$lang-select-border: #0d4359 !default;
+$lang-select-bg: #187ca3 !default;
+$lang-select-active-bg: #0c4359 !default; // feel free to change this to blue or something
 $lang-select-pressed-bg: #111 !default; // color of language tab bg when mouse is pressed
 $main-bg: #F3F7F9 !default;
 $aside-notice-bg: #8fbcd4 !default;
@@ -89,7 +95,7 @@ $phone-width: $tablet-width - $nav-width !default; // min width before reverting
 // OTHER
 ////////////////////
 $nav-footer-border-color: #666 !default;
-$search-box-border-color: #666 !default;
+$search-box-border-color: #fff !default;
 
 
 ////////////////////////////////////////////////////////////////////////////////
