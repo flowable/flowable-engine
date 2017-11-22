@@ -21,13 +21,15 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.flowable.engine.common.impl.javax.el.ELException;
 
 public class BooleanOperations {
 	private static final Set<Class<? extends Number>> SIMPLE_INTEGER_TYPES = new HashSet<>();
 	private static final Set<Class<? extends Number>> SIMPLE_FLOAT_TYPES = new HashSet<>();
-	
+
 	static {
 		SIMPLE_INTEGER_TYPES.add(Byte.class);
 		SIMPLE_INTEGER_TYPES.add(Short.class);
@@ -57,16 +59,16 @@ public class BooleanOperations {
 			return converter.convert(o1, String.class).compareTo(converter.convert(o2, String.class)) < 0;
 		}
 		if (o1 instanceof Comparable) {
-			return ((Comparable)o1).compareTo(o2) < 0;
+			return ((Comparable) o1).compareTo(o2) < 0;
 		}
 		if (o2 instanceof Comparable) {
-			return ((Comparable)o2).compareTo(o1) > 0;
+			return ((Comparable) o2).compareTo(o1) > 0;
 		}
 		throw new ELException(LocalMessages.get("error.compare.types", o1.getClass(), o2.getClass()));
 	}
 
 	@SuppressWarnings("unchecked")
-	private static final boolean gt0(TypeConverter converter, Object o1, Object o2) {		
+	private static final boolean gt0(TypeConverter converter, Object o1, Object o2) {
 		Class<?> t1 = o1.getClass();
 		Class<?> t2 = o2.getClass();
 		if (BigDecimal.class.isAssignableFrom(t1) || BigDecimal.class.isAssignableFrom(t2)) {
@@ -85,10 +87,10 @@ public class BooleanOperations {
 			return converter.convert(o1, String.class).compareTo(converter.convert(o2, String.class)) > 0;
 		}
 		if (o1 instanceof Comparable) {
-			return ((Comparable)o1).compareTo(o2) > 0;
+			return ((Comparable) o1).compareTo(o2) > 0;
 		}
 		if (o2 instanceof Comparable) {
-			return ((Comparable)o2).compareTo(o1) < 0;
+			return ((Comparable) o2).compareTo(o1) < 0;
 		}
 		throw new ELException(LocalMessages.get("error.compare.types", o1.getClass(), o2.getClass()));
 	}
@@ -178,14 +180,30 @@ public class BooleanOperations {
 			return true;
 		}
 		if (o instanceof Object[]) {
-			return ((Object[])o).length == 0;
+			return ((Object[]) o).length == 0;
 		}
-		if (o instanceof Map<?,?>) {
-			return ((Map<?,?>)o).isEmpty();
+		if (o instanceof Map<?, ?>) {
+			return ((Map<?, ?>) o).isEmpty();
 		}
 		if (o instanceof Collection<?>) {
-			return ((Collection<?>)o).isEmpty();
+			return ((Collection<?>) o).isEmpty();
 		}
 		return false;
 	}
+
+	public static final boolean regex(TypeConverter converter, Object o1, Object o2) {
+		if (o1 == o2) {
+			return true;
+		}
+		if (o1 == null || o2 == null) {
+			return false;
+		}
+		String s1 = converter.convert(o1, String.class);
+		String s2 = converter.convert(o2, String.class);
+		Pattern pattern = Pattern.compile(s2);
+
+        Matcher matcher = pattern.matcher(s1);
+		return matcher.matches();
+	}
+
 }
