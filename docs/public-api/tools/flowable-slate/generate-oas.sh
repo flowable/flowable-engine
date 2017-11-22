@@ -7,12 +7,12 @@ mkdir -p target/specfile
 # COPY SPEC FILES Automatically Generated
 # cp -r ../flowable-oas-generator/target/oas/v2/ target/specfile
 # COPY SPEC FILES based on References
- cp -r ../../references/swagger/ target/specfile
+ cp -r ../../references/openapi/ target/specfile
 
 
 for apiName in {"content","decision","form","process"}; do
   # EXECUTE WINDERSHIN
-  widdershins --summary --noschema  --user_templates templates/ -y target/specfile/$apiName/flowable-swagger-$apiName.yaml target/specfile/$apiName/_rest-body.md
+  widdershins --summary --noschema  --user_templates templates/ -y target/specfile/$apiName/flowable-oas-$apiName.yaml target/specfile/$apiName/_rest-body.md
 
   # COPY TO SLATE
   # Remove header from the body (roughly the first 40 lines)

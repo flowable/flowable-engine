@@ -1,0 +1,11 @@
+{
+  "groupId":"org.flowable.client.java",
+  "artifactId":"flowable-java-client-form",
+  "artifactVersion":"0.0.1",
+  "invokerPackage":"org.flowable.client.java.form",
+  "modelPackage":"org.flowable.client.java.form.model",
+  "apiPackage":"org.flowable.client.java.form.api",
+  "library":"retrofit2",
+  "dateLibrary":"legacy",
+  "useRxJava2":"true"
+}

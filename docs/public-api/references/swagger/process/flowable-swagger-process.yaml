@@ -2624,259 +2624,6 @@ paths:
             \ information about the error."
       security:
       - basicAuth: []
-  /query/executions:
-    post:
-      tags:
-      - "Executions"
-      - "Query"
-      summary: "Query executions"
-      description: "The request body can contain all possible filters that can be\
-        \ used in the List executions URL query. On top of these, it?s possible to\
-        \ provide an array of variables and processInstanceVariables to include in\
-        \ the query, with their format described here.\n\nThe general paging and sorting\
-        \ query-parameters can be used for this URL."
-      operationId: "queryExecutions"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/ExecutionQueryRequest"
-      responses:
-        200:
-          description: "Indicates request was successful and the executions are returned."
-          schema:
-            $ref: "#/definitions/DataResponseExecutionResponse"
-        404:
-          description: "Indicates a parameter was passed in the wrong format . The\
-            \ status-message contains additional information."
-      security:
-      - basicAuth: []
-  /query/historic-activity-instances:
-    post:
-      tags:
-      - "History"
-      - "Query"
-      summary: "Query for historic activity instances"
-      description: "All supported JSON parameter fields allowed are exactly the same\
-        \ as the parameters found for getting a collection of historic task instances,\
-        \ but passed in as JSON-body arguments rather than URL-parameters to allow\
-        \ for more advanced querying and preventing errors with request-uri?s that\
-        \ are too long."
-      operationId: "queryActivityInstances"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/HistoricActivityInstanceQueryRequest"
-      responses:
-        200:
-          description: "Indicates request was successful and the activities are returned"
-          schema:
-            $ref: "#/definitions/DataResponseHistoricActivityInstanceResponse"
-        400:
-          description: "Indicates an parameter was passed in the wrong format. The\
-            \ status-message contains additional information"
-      security:
-      - basicAuth: []
-  /query/historic-detail:
-    post:
-      tags:
-      - "History"
-      - "Query"
-      summary: "Query for historic details"
-      description: "All supported JSON parameter fields allowed are exactly the same\
-        \ as the parameters found for getting a collection of historic process instances,\
-        \ but passed in as JSON-body arguments rather than URL-parameters to allow\
-        \ for more advanced querying and preventing errors with request-uri?s that\
-        \ are too long."
-      operationId: "queryHistoricDetail"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/HistoricDetailQueryRequest"
-      responses:
-        200:
-          description: "Indicates request was successful and the historic details\
-            \ are returned"
-          schema:
-            $ref: "#/definitions/DataResponseHistoricDetailResponse"
-        400:
-          description: "Indicates an parameter was passed in the wrong format. The\
-            \ status-message contains additional information."
-      security:
-      - basicAuth: []
-  /query/historic-process-instances:
-    post:
-      tags:
-      - "History Process"
-      - "Query"
-      summary: "Query for historic process instances"
-      description: "All supported JSON parameter fields allowed are exactly the same\
-        \ as the parameters found for getting a collection of historic process instances,\
-        \ but passed in as JSON-body arguments rather than URL-parameters to allow\
-        \ for more advanced querying and preventing errors with request-uri?s that\
-        \ are too long. On top of that, the query allows for filtering based on process\
-        \ variables. The variables property is a JSON-array containing objects with\
-        \ the format as described here."
-      operationId: "queryHistoricProcessInstance"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/HistoricProcessInstanceQueryRequest"
-      responses:
-        200:
-          description: "Indicates request was successful and the process instances\
-            \ are returned"
-          schema:
-            $ref: "#/definitions/DataResponseHistoricProcessInstanceResponse"
-        400:
-          description: "Indicates an parameter was passed in the wrong format. The\
-            \ status-message contains additional information."
-      security:
-      - basicAuth: []
-  /query/historic-task-instances:
-    post:
-      tags:
-      - "History Task"
-      - "Query"
-      summary: "Query for historic task instances"
-      description: "All supported JSON parameter fields allowed are exactly the same\
-        \ as the parameters found for getting a collection of historic task instances,\
-        \ but passed in as JSON-body arguments rather than URL-parameters to allow\
-        \ for more advanced querying and preventing errors with request-uri?s that\
-        \ are too long. On top of that, the query allows for filtering based on process\
-        \ variables. The taskVariables and processVariables properties are JSON-arrays\
-        \ containing objects with the format as described here."
-      operationId: "queryHistoricTaskInstance"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/HistoricTaskInstanceQueryRequest"
-      responses:
-        200:
-          description: "Indicates request was successful and the tasks are returned"
-          schema:
-            $ref: "#/definitions/DataResponseHistoricTaskInstanceResponse"
-        404:
-          description: "Indicates an parameter was passed in the wrong format. The\
-            \ status-message contains additional information."
-      security:
-      - basicAuth: []
-  /query/historic-variable-instances:
-    post:
-      tags:
-      - "History"
-      - "Query"
-      summary: "Query for historic variable instances"
-      description: "All supported JSON parameter fields allowed are exactly the same\
-        \ as the parameters found for getting a collection of historic process instances,\
-        \ but passed in as JSON-body arguments rather than URL-parameters to allow\
-        \ for more advanced querying and preventing errors with request-uri?s that\
-        \ are too long. On top of that, the query allows for filtering based on process\
-        \ variables. The variables property is a JSON-array containing objects with\
-        \ the format as described here."
-      operationId: "queryVariableInstances"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/HistoricVariableInstanceQueryRequest"
-      responses:
-        200:
-          description: "Indicates request was successful and the tasks are returned"
-          schema:
-            $ref: "#/definitions/DataResponseHistoricVariableInstanceResponse"
-        400:
-          description: "Indicates an parameter was passed in the wrong format. The\
-            \ status-message contains additional information."
-      security:
-      - basicAuth: []
-  /query/process-instances:
-    post:
-      tags:
-      - "Process Instances"
-      - "Query"
-      summary: "Query process instances"
-      description: "The request body can contain all possible filters that can be\
-        \ used in the List process instances URL query. On top of these, it?s possible\
-        \ to provide an array of variables to include in the query, with their format\
-        \ described here.\n\nThe general paging and sorting query-parameters can be\
-        \ used for this URL."
-      operationId: "queryProcessInstances"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/ProcessInstanceQueryRequest"
-      responses:
-        200:
-          description: "Indicates request was successful and the process-instances\
-            \ are returned"
-          schema:
-            $ref: "#/definitions/DataResponseProcessInstanceResponse"
-        400:
-          description: "Indicates a parameter was passed in the wrong format . The\
-            \ status-message contains additional information."
-      security:
-      - basicAuth: []
-  /query/tasks:
-    post:
-      tags:
-      - "Tasks"
-      - "Query"
-      summary: "Query for tasks"
-      description: "All supported JSON parameter fields allowed are exactly the same\
-        \ as the parameters found for getting a collection of tasks (except for candidateGroupIn\
-        \ which is only available in this POST task query REST service), but passed\
-        \ in as JSON-body arguments rather than URL-parameters to allow for more advanced\
-        \ querying and preventing errors with request-uri?s that are too long. On\
-        \ top of that, the query allows for filtering based on task and process variables.\
-        \ The taskVariables and processInstanceVariables are both JSON-arrays containing\
-        \ objects with the format as described here."
-      operationId: "queryTasks"
-      produces:
-      - "application/json"
-      parameters:
-      - in: "body"
-        name: "body"
-        required: false
-        schema:
-          $ref: "#/definitions/TaskQueryRequest"
-      responses:
-        200:
-          description: "Indicates request was successful and the tasks are returned."
-          schema:
-            $ref: "#/definitions/DataResponseTaskResponse"
-        400:
-          description: "Indicates a parameter was passed in the wrong format or that\
-            \ delegationState has an invalid value (other than pending and resolved).\
-            \ The status-message contains additional information."
-      security:
-      - basicAuth: []
   /repository/deployments:
     get:
       tags:
@@ -3628,7 +3375,7 @@ paths:
           schema:
             type: "array"
             items:
-              $ref: "#/definitions/DmnDecisionTable"
+              $ref: "#/definitions/DecisionTableResponse"
         404:
           description: "Indicates the requested process definition was not found."
       security:
@@ -4350,7 +4097,7 @@ paths:
         description: "Update a variable on an execution"
         required: false
         schema:
-          $ref: "#/definitions/ExecutionVariableResource"
+          $ref: "#/definitions/RestVariable"
       responses:
         200:
           description: "Indicates both the process instance and variable were found\
@@ -5413,6 +5160,40 @@ paths:
             \ The status-message contains additional information."
       security:
       - basicAuth: []
+  /query/tasks:
+    post:
+      tags:
+      - "Query"
+      - "Tasks"
+      summary: "Query for tasks"
+      description: "All supported JSON parameter fields allowed are exactly the same\
+        \ as the parameters found for getting a collection of tasks (except for candidateGroupIn\
+        \ which is only available in this POST task query REST service), but passed\
+        \ in as JSON-body arguments rather than URL-parameters to allow for more advanced\
+        \ querying and preventing errors with request-uri?s that are too long. On\
+        \ top of that, the query allows for filtering based on task and process variables.\
+        \ The taskVariables and processInstanceVariables are both JSON-arrays containing\
+        \ objects with the format as described here."
+      operationId: "queryTasks"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/TaskQueryRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the tasks are returned."
+          schema:
+            $ref: "#/definitions/DataResponseTaskResponse"
+        400:
+          description: "Indicates a parameter was passed in the wrong format or that\
+            \ delegationState has an invalid value (other than pending and resolved).\
+            \ The status-message contains additional information."
+      security:
+      - basicAuth: []
   /runtime/tasks/{taskId}:
     get:
       tags:
@@ -6232,7 +6013,7 @@ paths:
         description: "Update a task variable"
         required: false
         schema:
-          $ref: "#/definitions/TaskVariableResource"
+          $ref: "#/definitions/RestVariable"
       responses:
         200:
           description: "Indicates the variables was updated and the result is returned."
@@ -6331,6 +6112,225 @@ paths:
           description: "Indicates the requested task was not found or the task doesn?\
             t have a variable with the given name (in the given scope). Status message\
             \ provides additional information."
+      security:
+      - basicAuth: []
+  /query/executions:
+    post:
+      tags:
+      - "Executions"
+      - "Query"
+      summary: "Query executions"
+      description: "The request body can contain all possible filters that can be\
+        \ used in the List executions URL query. On top of these, it?s possible to\
+        \ provide an array of variables and processInstanceVariables to include in\
+        \ the query, with their format described here.\n\nThe general paging and sorting\
+        \ query-parameters can be used for this URL."
+      operationId: "queryExecutions"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/ExecutionQueryRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the executions are returned."
+          schema:
+            $ref: "#/definitions/DataResponseExecutionResponse"
+        404:
+          description: "Indicates a parameter was passed in the wrong format . The\
+            \ status-message contains additional information."
+      security:
+      - basicAuth: []
+  /query/historic-activity-instances:
+    post:
+      tags:
+      - "Query"
+      - "History"
+      summary: "Query for historic activity instances"
+      description: "All supported JSON parameter fields allowed are exactly the same\
+        \ as the parameters found for getting a collection of historic task instances,\
+        \ but passed in as JSON-body arguments rather than URL-parameters to allow\
+        \ for more advanced querying and preventing errors with request-uri?s that\
+        \ are too long."
+      operationId: "queryActivityInstances"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/HistoricActivityInstanceQueryRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the activities are returned"
+          schema:
+            $ref: "#/definitions/DataResponseHistoricActivityInstanceResponse"
+        400:
+          description: "Indicates an parameter was passed in the wrong format. The\
+            \ status-message contains additional information"
+      security:
+      - basicAuth: []
+  /query/historic-detail:
+    post:
+      tags:
+      - "Query"
+      - "History"
+      summary: "Query for historic details"
+      description: "All supported JSON parameter fields allowed are exactly the same\
+        \ as the parameters found for getting a collection of historic process instances,\
+        \ but passed in as JSON-body arguments rather than URL-parameters to allow\
+        \ for more advanced querying and preventing errors with request-uri?s that\
+        \ are too long."
+      operationId: "queryHistoricDetail"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/HistoricDetailQueryRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the historic details\
+            \ are returned"
+          schema:
+            $ref: "#/definitions/DataResponseHistoricDetailResponse"
+        400:
+          description: "Indicates an parameter was passed in the wrong format. The\
+            \ status-message contains additional information."
+      security:
+      - basicAuth: []
+  /query/historic-process-instances:
+    post:
+      tags:
+      - "Query"
+      - "History Process"
+      summary: "Query for historic process instances"
+      description: "All supported JSON parameter fields allowed are exactly the same\
+        \ as the parameters found for getting a collection of historic process instances,\
+        \ but passed in as JSON-body arguments rather than URL-parameters to allow\
+        \ for more advanced querying and preventing errors with request-uri?s that\
+        \ are too long. On top of that, the query allows for filtering based on process\
+        \ variables. The variables property is a JSON-array containing objects with\
+        \ the format as described here."
+      operationId: "queryHistoricProcessInstance"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/HistoricProcessInstanceQueryRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the process instances\
+            \ are returned"
+          schema:
+            $ref: "#/definitions/DataResponseHistoricProcessInstanceResponse"
+        400:
+          description: "Indicates an parameter was passed in the wrong format. The\
+            \ status-message contains additional information."
+      security:
+      - basicAuth: []
+  /query/historic-task-instances:
+    post:
+      tags:
+      - "Query"
+      - "History Task"
+      summary: "Query for historic task instances"
+      description: "All supported JSON parameter fields allowed are exactly the same\
+        \ as the parameters found for getting a collection of historic task instances,\
+        \ but passed in as JSON-body arguments rather than URL-parameters to allow\
+        \ for more advanced querying and preventing errors with request-uri?s that\
+        \ are too long. On top of that, the query allows for filtering based on process\
+        \ variables. The taskVariables and processVariables properties are JSON-arrays\
+        \ containing objects with the format as described here."
+      operationId: "queryHistoricTaskInstance"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/HistoricTaskInstanceQueryRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the tasks are returned"
+          schema:
+            $ref: "#/definitions/DataResponseHistoricTaskInstanceResponse"
+        404:
+          description: "Indicates an parameter was passed in the wrong format. The\
+            \ status-message contains additional information."
+      security:
+      - basicAuth: []
+  /query/historic-variable-instances:
+    post:
+      tags:
+      - "Query"
+      - "History"
+      summary: "Query for historic variable instances"
+      description: "All supported JSON parameter fields allowed are exactly the same\
+        \ as the parameters found for getting a collection of historic process instances,\
+        \ but passed in as JSON-body arguments rather than URL-parameters to allow\
+        \ for more advanced querying and preventing errors with request-uri?s that\
+        \ are too long. On top of that, the query allows for filtering based on process\
+        \ variables. The variables property is a JSON-array containing objects with\
+        \ the format as described here."
+      operationId: "queryVariableInstances"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/HistoricVariableInstanceQueryRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the tasks are returned"
+          schema:
+            $ref: "#/definitions/DataResponseHistoricVariableInstanceResponse"
+        400:
+          description: "Indicates an parameter was passed in the wrong format. The\
+            \ status-message contains additional information."
+      security:
+      - basicAuth: []
+  /query/process-instances:
+    post:
+      tags:
+      - "Query"
+      - "Process Instances"
+      summary: "Query process instances"
+      description: "The request body can contain all possible filters that can be\
+        \ used in the List process instances URL query. On top of these, it?s possible\
+        \ to provide an array of variables to include in the query, with their format\
+        \ described here.\n\nThe general paging and sorting query-parameters can be\
+        \ used for this URL."
+      operationId: "queryProcessInstances"
+      produces:
+      - "application/json"
+      parameters:
+      - in: "body"
+        name: "body"
+        required: false
+        schema:
+          $ref: "#/definitions/ProcessInstanceQueryRequest"
+      responses:
+        200:
+          description: "Indicates request was successful and the process-instances\
+            \ are returned"
+          schema:
+            $ref: "#/definitions/DataResponseProcessInstanceResponse"
+        400:
+          description: "Indicates a parameter was passed in the wrong format . The\
+            \ status-message contains additional information."
       security:
       - basicAuth: []
 securityDefinitions:
@@ -6967,16 +6967,16 @@ definitions:
         example: "http://localhost:8081/flowable-rest/service/repository/deployments/10"
       tenantId:
         type: "string"
-  DmnDecisionTable:
+  DecisionTableResponse:
     type: "object"
     properties:
+      id:
+        type: "string"
+      category:
+        type: "string"
       name:
         type: "string"
       key:
-        type: "string"
-      id:
-        type: "string"
-      parentDeploymentId:
         type: "string"
       description:
         type: "string"
@@ -6985,11 +6985,13 @@ definitions:
         format: "int32"
       resourceName:
         type: "string"
-      category:
+      deploymentId:
+        type: "string"
+      parentDeploymentId:
         type: "string"
       tenantId:
         type: "string"
-      deploymentId:
+      url:
         type: "string"
   EventListener:
     type: "object"
@@ -7182,10 +7184,6 @@ definitions:
       tenantId:
         type: "string"
         example: "null"
-  ExecutionVariableCollectionResource:
-    type: "object"
-  ExecutionVariableResource:
-    type: "object"
   ExtensionAttribute:
     type: "object"
     properties:
@@ -8650,10 +8648,6 @@ definitions:
         example: "null"
       completed:
         type: "boolean"
-  ProcessInstanceVariableCollectionResource:
-    type: "object"
-  ProcessInstanceVariableResource:
-    type: "object"
   QueryVariable:
     type: "object"
     properties:
@@ -8763,20 +8757,27 @@ definitions:
       name:
         type: "string"
         example: "myVariable"
-        description: "Name of the variable"
+        title: "Name of the variable"
       type:
         type: "string"
         example: "string"
-        description: "Type of the variable."
+        title: "Type of the variable."
+        description: "When writing a variable and this value is omitted, the type will be deducted from the raw JSON-attribute request type and is limited to either string, double, integer and boolean. It’s advised to always include a type to make sure no wrong assumption about the type can be done."
       value:
         type: "object"
         example: "test"
-        description: "Value of the variable."
+        title: "Value of the variable."
+        description: "When writing a variable and value is omitted, null will be used as value."
       valueUrl:
         type: "string"
         example: "http://...."
+        title: "Url value to the binary"
+        description: "When reading a variable of type binary or serializable, this attribute will point to the URL where the raw binary data can be fetched from."
       scope:
+        title: "scope of the variable."
         type: "string"
+        example: "global"
+        description: "If local, the variable is explicitly defined on the resource it’s requested from. When global, the variable is defined on the parent (or any parent in the parent-tree) of the resource it’s requested from. When writing a variable and the scope is omitted, global is assumed."
   Signal:
     type: "object"
     properties:
@@ -8893,8 +8894,6 @@ definitions:
           \ variables "
         items:
           $ref: "#/definitions/RestVariable"
-  TaskAttachmentCollectionResource:
-    type: "object"
   TaskQueryRequest:
     type: "object"
     properties:
@@ -9143,10 +9142,6 @@ definitions:
         type: "array"
         items:
           $ref: "#/definitions/RestVariable"
-  TaskVariableCollectionResource:
-    type: "object"
-  TaskVariableResource:
-    type: "object"
   UserInfoRequest:
     type: "object"
     properties:
@@ -9251,3 +9246,22 @@ definitions:
         type: "object"
       type:
         type: "string"
+  AttachmentRequest:
+    type: "object"
+    properties:
+      name:
+        description: "Name of the attachment"
+        type: "string"
+        example: "SimpleAttachment.doc"
+      description:
+        description: "Description of the attachment"
+        type: "string"
+        example: "This a simple attachment description"
+      type:
+        description: "Type of the attachment"
+        type: "string"
+        example: "mySimpleType"
+      externalUrl:
+        description: "External url pointing to the binary"
+        type: "string"
+        example: "http://www.flowable.org"
