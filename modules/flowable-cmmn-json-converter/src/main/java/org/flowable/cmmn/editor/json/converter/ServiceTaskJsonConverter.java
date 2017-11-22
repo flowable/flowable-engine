@@ -12,8 +12,8 @@
  */
 package org.flowable.cmmn.editor.json.converter;
 
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
@@ -27,13 +27,23 @@ import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ServiceTask;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Tijs Rademakers
  */
 public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements DecisionTableKeyAwareConverter {
+
+    private static final Map<String, String> type_to_stencilset = new HashMap<>();
+    static {
+        type_to_stencilset.put(ServiceTask.DMN_TASK, STENCIL_TASK_DECISION);
+        type_to_stencilset.put(ServiceTask.HTTP_TASK, STENCIL_TASK_HTTP);
+    }
+    protected static final Map<String, String> TYPE_TO_STENCILSET = Collections.unmodifiableMap(
+            type_to_stencilset
+        );
 
     protected Map<String, CmmnModelInfo> decisionTableKeyMap;
 
@@ -59,8 +69,9 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
             PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
             if (planItemDefinition != null && planItemDefinition instanceof ServiceTask) {
                 ServiceTask serviceTask = (ServiceTask) planItemDefinition;
-                if (ServiceTask.DMN_TASK.equals(serviceTask.getType())) {
-                    return STENCIL_TASK_DECISION;
+                String stencilId = TYPE_TO_STENCILSET.get(serviceTask.getType());
+                if (stencilId != null) {
+                    return stencilId;
                 }
             }
         }
@@ -93,6 +104,9 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
             }
 
         } else if (ServiceTask.HTTP_TASK.equalsIgnoreCase(serviceTask.getType())) {
+            if (StringUtils.isNotEmpty(serviceTask.getImplementation())) {
+                propertiesNode.put(PROPERTY_SERVICETASK_CLASS, serviceTask.getImplementation());
+            }
             setPropertyFieldValue(PROPERTY_HTTPTASK_REQ_METHOD, "requestMethod", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_HTTPTASK_REQ_URL, "requestUrl", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_HTTPTASK_REQ_HEADERS, "requestHeaders", serviceTask, propertiesNode);

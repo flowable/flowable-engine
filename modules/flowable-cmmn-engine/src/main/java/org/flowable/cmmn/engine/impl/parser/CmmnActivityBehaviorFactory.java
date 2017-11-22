@@ -13,10 +13,10 @@
 package org.flowable.cmmn.engine.impl.parser;
 
 import org.flowable.cmmn.engine.impl.behavior.impl.CaseTaskActivityBehavior;
-import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemDmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.HumanTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.MilestoneActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemDelegateExpressionActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemDmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemExpressionActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.ProcessTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.StageActivityBehavior;
@@ -57,6 +57,8 @@ public interface CmmnActivityBehaviorFactory {
     PlanItemDelegateExpressionActivityBehavior createPlanItemDelegateExpressionActivityBehavior(PlanItem planItem, ServiceTask task);
 
     PlanItemDmnActivityBehavior createDmnActivityBehavior(PlanItem planItem, ServiceTask task);
+
+    CmmnClassDelegate createHttpActivityBehavior(PlanItem planItem, ServiceTask task);
 
     TimerEventListenerActivityBehaviour createTimerEventListenerActivityBehavior(PlanItem planItem, TimerEventListener timerEventListener);
 

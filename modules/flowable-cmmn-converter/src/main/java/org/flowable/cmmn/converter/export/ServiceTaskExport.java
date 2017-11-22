@@ -51,6 +51,11 @@ public class ServiceTaskExport extends AbstractPlanItemDefinitionExport {
 
             }
         }
+        if (ServiceTask.HTTP_TASK.equals(task.getType())) {
+            if (StringUtils.isNotEmpty(task.getImplementation())) {
+                xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_CLASS, task.getImplementation());
+            }
+        }
 
         if (task.getFieldExtensions().size() > 0) {
             xtw.writeStartElement(ELEMENT_EXTENSIONS);

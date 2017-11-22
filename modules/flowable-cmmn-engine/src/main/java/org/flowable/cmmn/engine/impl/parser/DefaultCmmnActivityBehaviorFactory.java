@@ -14,10 +14,10 @@ package org.flowable.cmmn.engine.impl.parser;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.behavior.impl.CaseTaskActivityBehavior;
-import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemDmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.HumanTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.MilestoneActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemDelegateExpressionActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemDmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemExpressionActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.ProcessTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.StageActivityBehavior;
@@ -26,6 +26,7 @@ import org.flowable.cmmn.engine.impl.behavior.impl.TimerEventListenerActivityBeh
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegate;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegateFactory;
 import org.flowable.cmmn.model.CaseTask;
+import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.Milestone;
 import org.flowable.cmmn.model.PlanItem;
@@ -34,6 +35,7 @@ import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
 import org.flowable.cmmn.model.TimerEventListener;
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.common.impl.el.ExpressionManager;
 
@@ -108,6 +110,33 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     @Override
     public PlanItemDmnActivityBehavior createDmnActivityBehavior(PlanItem planItem, ServiceTask task) {
         return new PlanItemDmnActivityBehavior(task);
+    }
+
+    @Override
+    public CmmnClassDelegate createHttpActivityBehavior(PlanItem planItem, ServiceTask task) {
+        try {
+            Class<?> theClass = null;
+            FieldExtension behaviorExtension = null;
+            for (FieldExtension fieldExtension : task.getFieldExtensions()) {
+                if ("httpActivityBehaviorClass".equals(fieldExtension.getFieldName()) && StringUtils.isNotEmpty(fieldExtension.getStringValue())) {
+                    theClass = Class.forName(fieldExtension.getStringValue());
+                    behaviorExtension = fieldExtension;
+                    break;
+                }
+            }
+
+            if (behaviorExtension != null) {
+                task.getFieldExtensions().remove(behaviorExtension);
+            }
+
+            // Default Http behavior class
+            if (theClass == null) theClass = Class.forName("org.flowable.http.impl.CmmnHttpActivityBehaviorImpl");
+
+            return classDelegateFactory.create(task.getImplementation(), task.getFieldExtensions());
+
+        } catch (ClassNotFoundException e) {
+            throw new FlowableException("Could not find org.flowable.http.HttpActivityBehavior: ", e);
+        }
     }
 
     public CmmnClassDelegateFactory getClassDelegateFactory() {

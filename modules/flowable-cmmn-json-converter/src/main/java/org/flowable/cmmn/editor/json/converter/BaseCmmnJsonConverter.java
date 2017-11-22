@@ -31,6 +31,7 @@ import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
 import org.slf4j.Logger;
@@ -195,6 +196,16 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
 
         fieldExtensionsNode.set("fields", itemsNode);
         propertiesNode.set(PROPERTY_SERVICETASK_FIELDS, fieldExtensionsNode);
+    }
+
+    protected void addField(String name, String propertyName, JsonNode elementNode, ServiceTask task) {
+        FieldExtension field = new FieldExtension();
+        field.setFieldName(name);
+        String value = getPropertyValueAsString(propertyName, elementNode);
+        if (StringUtils.isNotEmpty(value)) {
+            field.setStringValue(value);
+            task.getFieldExtensions().add(field);
+        }
     }
 
     protected void setPropertyValue(String name, String value, ObjectNode propertiesNode) {
