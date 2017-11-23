@@ -33,21 +33,17 @@ public class ListType implements VariableType {
 	@Override
 	public void setValue(Object o, ValueFields valueFields) {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		ObjectOutputStream out;
 		byte[] data;
 		try {
-			ObjectOutputStream out = new ObjectOutputStream(bos);
+			out = new ObjectOutputStream(bos);
 			out.writeObject(o);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
 			data = bos.toString().getBytes("UTF-8");
 			String encodedData = DatatypeConverter.printBase64Binary(data);
 			valueFields.setTextValue(encodedData);
-		} catch (UnsupportedEncodingException e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-
 	}
 
 	@Override
@@ -57,17 +53,16 @@ public class ListType implements VariableType {
 			return null;
 		} else {
 			byte[] decodedData = DatatypeConverter.parseBase64Binary(str);
-			ArrayList<Object> list = new ArrayList<Object>();
 			ByteArrayInputStream bis = new ByteArrayInputStream(decodedData);
+			ObjectInputStream ois;
 			try {
-				ObjectInputStream ois = new ObjectInputStream(bis);
-				list = (ArrayList) ois.readObject();
-			} catch (IOException e) {
+				ois = new ObjectInputStream(bis);
+				return (ArrayList<?>) ois.readObject();
+			} catch (Exception e) {
 				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+				return null;
 			}
-			return list;
+			
 		}
 
 	}
