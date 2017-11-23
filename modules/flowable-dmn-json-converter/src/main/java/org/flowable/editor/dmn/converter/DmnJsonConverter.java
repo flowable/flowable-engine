@@ -434,16 +434,60 @@ public class DmnJsonConverter {
 						if (complexExpressionIds.contains(id)) {
 							outputEntry.setText(expressionValue);
 						} else {
-							if ("string".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())) { // add
-																												// quotes
-																												// for
-																												// string
-								outputEntry.setText("\"" + expressionValue + "\"");
-							} else if ("date".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())
-									&& StringUtils.isNotEmpty(expressionValue)) { // wrap in built in toDate function
-								outputEntry.setText("date:toDate('" + expressionValue + "')");
+							if ("string".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())) {
+								String name = ruleOutputContainerMap.get(id).getName();
+								StringBuilder stringBuilder = new StringBuilder(name);
+								if (expressionValue.toLowerCase().startsWith("appendstring")) {
+									String expression = expressionValue.substring(12);
+									stringBuilder.append(".append(");
+									stringBuilder.append("\"");
+									stringBuilder.append(expression);
+									stringBuilder.append("\")");
+								} else if (expressionValue.toLowerCase().startsWith("appendnumber")){
+									String expression = expressionValue.substring(12);
+									stringBuilder.append(".append(");
+									stringBuilder.append(expression);
+									stringBuilder.append(")");
+								} else if (expressionValue.toLowerCase().startsWith("appenddate")){
+									String expression = expressionValue.substring(10);
+									stringBuilder.append(".append(");
+									stringBuilder.append("date:toDate('");
+									stringBuilder.append(expression);
+									stringBuilder.append("')");
+								} else if (expressionValue.toLowerCase().startsWith("removestring")) {
+									String expression = expressionValue.substring(12);
+									stringBuilder.append(".remove(");
+									stringBuilder.append("\"");
+									stringBuilder.append(expression);
+									stringBuilder.append("\")");
+								}else if (expressionValue.toLowerCase().startsWith("removenumber")){
+									String expression = expressionValue.substring(12);
+									stringBuilder.append(".remove(");
+									stringBuilder.append(expression);
+									stringBuilder.append(")");
+								}else if (expressionValue.toLowerCase().startsWith("removedate")){
+									String expression = expressionValue.substring(10);
+									stringBuilder.append(".remove(");
+									stringBuilder.append("date:toDate('");
+									stringBuilder.append(expression);
+									stringBuilder.append("')");
+								}else if (expressionValue.toLowerCase().startsWith("clear")){
+									stringBuilder.append(".clear()");
+								}
+								outputEntry.setText(stringBuilder.toString());
 							} else {
-								outputEntry.setText(expressionValue);
+								if ("string".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())) { // add
+																													// quotes
+																													// for
+																													// string
+									outputEntry.setText("\"" + expressionValue + "\"");
+								} else if ("date".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())
+										&& StringUtils.isNotEmpty(expressionValue)) { // wrap in built in toDate
+																						// function
+									outputEntry.setText("date:toDate('" + expressionValue + "')");
+								} else {
+									outputEntry.setText(expressionValue);
+								}
 							}
 						}
 
@@ -458,5 +502,5 @@ public class DmnJsonConverter {
 				decisionTable.addRule(rule);
 			}
 		}
-	}
+}
 }
