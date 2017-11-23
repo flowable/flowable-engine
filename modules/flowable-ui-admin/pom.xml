@@ -10,7 +10,7 @@
       <groupId>org.flowable</groupId>
       <artifactId>flowable-root</artifactId>
       <relativePath>../..</relativePath>
-      <version>6.2.0-SNAPSHOT</version>
+      <version>6.2.1-SNAPSHOT</version>
     </parent>
 
     <properties>
@@ -19,7 +19,7 @@
   		<java.version>1.7</java.version>
 
   		<!-- Libraries versions -->
-  		<flowable.version>6.2.0-SNAPSHOT</flowable.version>
+  		<flowable.version>6.2.1-SNAPSHOT</flowable.version>
   		<jetty.version>9.1.3.v20140225</jetty.version>
 
   		<!-- Web container version -->
@@ -50,6 +50,37 @@
                             <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
                             <systemProperties>
                                 <com.sun.management.jmxremote.port>4002</com.sun.management.jmxremote.port>
+                            </systemProperties>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+
+        <profile>
+            <id>postgresql</id>
+            <dependencies>
+                <dependency>
+                    <groupId>org.postgresql</groupId>
+                    <artifactId>postgresql</artifactId>
+                    <scope>runtime</scope>
+                </dependency>
+            </dependencies>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.apache.tomcat.maven</groupId>
+                        <artifactId>tomcat7-maven-plugin</artifactId>
+                        <configuration>
+                            <path>/flowable-admin</path>
+                            <port>9988</port>
+                            <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
+                            <systemProperties>
+                                <datasource.driver>org.postgresql.Driver</datasource.driver>
+                                <datasource.url>jdbc:postgresql://localhost:5432/flowable</datasource.url>
+                                <datasource.username>flowable</datasource.username>
+                                <datasource.password>flowable</datasource.password>
+                                <com.sun.management.jmxremote.port>4000</com.sun.management.jmxremote.port>
                             </systemProperties>
                         </configuration>
                     </plugin>
@@ -401,7 +432,6 @@
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpmime</artifactId>
-			<version>4.3.2</version>
 		</dependency>
 
 	    <!-- LOGGING -->

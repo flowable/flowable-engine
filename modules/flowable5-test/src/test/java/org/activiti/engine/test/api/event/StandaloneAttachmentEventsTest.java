@@ -35,7 +35,7 @@ public class StandaloneAttachmentEventsTest extends PluggableFlowableTestCase {
      */
     public void testAttachmentEntityEventsStandaloneTask() throws Exception {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-            org.flowable.task.service.Task task = null;
+            org.flowable.task.api.Task task = null;
             try {
                 task = taskService.newTask();
                 taskService.saveTask(task);
@@ -108,7 +108,7 @@ public class StandaloneAttachmentEventsTest extends PluggableFlowableTestCase {
 
     public void testAttachmentEntityEventsOnHistoricTaskDelete() throws Exception {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
-            org.flowable.task.service.Task task = null;
+            org.flowable.task.api.Task task = null;
             try {
                 task = taskService.newTask();
                 taskService.saveTask(task);

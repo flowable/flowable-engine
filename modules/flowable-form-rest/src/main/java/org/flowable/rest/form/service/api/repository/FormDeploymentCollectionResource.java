@@ -12,12 +12,14 @@
  */
 package org.flowable.rest.form.service.api.repository;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -31,21 +33,17 @@ import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.form.FormRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.multipart.MultipartHttpServletRequest;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Yvo Swillens
@@ -69,7 +67,7 @@ public class FormDeploymentCollectionResource {
     @Autowired
     protected FormRepositoryService formRepositoryService;
 
-    @ApiOperation(value = "List of Form Deployments", tags = { "Form Deployments" })
+    @ApiOperation(value = "List of Form Deployments", nickname = "listFormDeployments", tags = { "Form Deployments" })
     @ApiImplicitParams({
             @ApiImplicitParam(name = "name", dataType = "string", value = "Only return form deployments with the given name.", paramType = "query"),
             @ApiImplicitParam(name = "nameLike", dataType = "string", value = "Only return form deployments with a name like the given name.", paramType = "query"),
@@ -77,14 +75,14 @@ public class FormDeploymentCollectionResource {
             @ApiImplicitParam(name = "categoryNotEquals", dataType = "string", value = "Only return form deployments which don’t have the given category.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return form deployments with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return form deployments with a tenantId like the given value.", paramType = "query"),
-            @ApiImplicitParam(name = "withoutTenantId", dataType = "string", value = "If true, only returns form deployments without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
+            @ApiImplicitParam(name = "withoutTenantId", dataType = "boolean", value = "If true, only returns form deployments without a tenantId set. If false, the withoutTenantId parameter is ignored.", paramType = "query"),
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,name,deployTime,tenantId", paramType = "query"),
     })
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the request was successful."),
     })
-    @RequestMapping(value = "/form-repository/deployments", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getDeployments(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
+    @GetMapping(value = "/form-repository/deployments", produces = "application/json")
+    public DataResponse<FormDeploymentResponse> getDeployments(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         FormDeploymentQuery deploymentQuery = formRepositoryService.createDeploymentQuery();
 
         // Apply filters
@@ -113,20 +111,19 @@ public class FormDeploymentCollectionResource {
             }
         }
 
-        DataResponse response = new FormDeploymentsPaginateList(formRestResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
-        return response;
+        return new FormDeploymentsPaginateList(formRestResponseFactory).paginateList(allRequestParams, deploymentQuery, "id", allowedSortProperties);
     }
 
     @ApiOperation(value = "Create a new form deployment", tags = {
             "Form Deployments" }, consumes = "multipart/form-data", produces = "application/json", notes = "The request body should contain data of type multipart/form-data. There should be exactly one file in the request, any additional files will be ignored. The deployment name is the name of the file-field passed in. Make sure the file-name ends with .form or .xml.")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates the form deployment was created."),
+            @ApiResponse(code = 201, message = "Indicates the form deployment was created."),
             @ApiResponse(code = 400, message = "Indicates there was no content present in the request body or the content mime-type is not supported for form deployment. The status-description contains additional information.")
     })
     @ApiImplicitParams({
         @ApiImplicitParam(name="file", paramType = "form", dataType = "java.io.File")
     })
-    @RequestMapping(value = "/form-repository/deployments", method = RequestMethod.POST, produces = "application/json", consumes = "multipart/form-data")
+    @PostMapping(value = "/form-repository/deployments", produces = "application/json", consumes = "multipart/form-data")
     public FormDeploymentResponse uploadDeployment(@ApiParam(name = "tenantId") @RequestParam(value = "tenantId", required = false) String tenantId, HttpServletRequest request, HttpServletResponse response) {
 
         if (!(request instanceof MultipartHttpServletRequest)) {

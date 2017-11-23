@@ -16,9 +16,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
+import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.runtime.CaseInstance;
-import org.flowable.cmmn.engine.runtime.CaseInstanceQuery;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.AbstractQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -38,6 +38,7 @@ public class CaseInstanceQueryImpl extends AbstractQuery<CaseInstanceQuery, Case
     protected Integer caseDefinitionVersion;
     protected String businessKey;
     protected String caseInstanceId;
+    protected Set<String> caseInstanceIds;
     protected String caseInstanceParentId;
     protected String caseInstanceParentPlanItemInstanceId;
     protected Date startedBefore;
@@ -110,6 +111,15 @@ public class CaseInstanceQueryImpl extends AbstractQuery<CaseInstanceQuery, Case
             throw new FlowableIllegalArgumentException("Case instance id is null");
         }
         this.caseInstanceId = caseInstanceId;
+        return this;
+    }
+    
+    @Override
+    public CaseInstanceQueryImpl caseInstanceIds(Set<String> caseInstanceIds) {
+        if (caseInstanceIds == null) {
+            throw new FlowableIllegalArgumentException("Case instance ids is null");
+        }
+        this.caseInstanceIds = caseInstanceIds;
         return this;
     }
 

@@ -45,7 +45,7 @@ public class HistoricDetailBaseResource {
     @Autowired
     protected HistoryService historyService;
 
-    protected DataResponse getQueryResponse(HistoricDetailQueryRequest queryRequest, Map<String, String> allRequestParams) {
+    protected DataResponse<HistoricDetailResponse> getQueryResponse(HistoricDetailQueryRequest queryRequest, Map<String, String> allRequestParams) {
         HistoricDetailQuery query = historyService.createHistoricDetailQuery();
 
         // Populate query based on request

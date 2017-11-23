@@ -13,7 +13,7 @@
 
 package org.activiti.engine.impl.scripting;
 
-import org.flowable.variable.service.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Tom Baeyens

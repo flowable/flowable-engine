@@ -55,7 +55,7 @@
             </div>
             
             <div class="item fadein" ng-repeat="form in model.forms.data track by $index">
-                <div class="item-box" ng-style="{'background-image': 'url(\'' + config.contextRoot + '/app/rest/models/' + form.id + '/thumbnail?version=' + imageVersion + '\')'}" ng-click="showFormDetails(form);">
+                <div class="item-box" ng-style="{'background-image': 'url(\'' + getModelThumbnailUrl(form.id, imageVersion) + '\')'}" ng-click="showFormDetails(form);">
                     <div class="actions">
                         <span class="badge">v{{form.version}}</span>
                         <div class="btn-group pull-right">

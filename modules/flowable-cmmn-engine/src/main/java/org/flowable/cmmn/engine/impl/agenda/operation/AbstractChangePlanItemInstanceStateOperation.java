@@ -36,7 +36,7 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
             Object behavior = planItemInstanceEntity.getPlanItem().getBehavior();
             if (behavior instanceof PlanItemActivityBehavior
                     && StateTransition.isPossible(planItemInstanceEntity, getLifeCycleTransition())) {
-                ((PlanItemActivityBehavior) behavior).onStateTransition(planItemInstanceEntity, getLifeCycleTransition());
+                ((PlanItemActivityBehavior) behavior).onStateTransition(commandContext, planItemInstanceEntity, getLifeCycleTransition());
             }
         }
 

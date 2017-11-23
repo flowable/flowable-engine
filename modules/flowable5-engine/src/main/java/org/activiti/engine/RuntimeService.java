@@ -31,9 +31,9 @@ import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.identitylink.service.IdentityLink;
-import org.flowable.variable.service.delegate.VariableScope;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
  * 

@@ -14,7 +14,7 @@ package org.flowable.cmmn.editor.json.converter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.EditorJsonConstants;
-import org.flowable.cmmn.editor.constants.StencilConstants;
+import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 import org.slf4j.Logger;
@@ -28,7 +28,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 /**
  * @author Tijs Rademakers
  */
-public class CmmnJsonConverterUtil implements EditorJsonConstants, StencilConstants {
+public class CmmnJsonConverterUtil implements EditorJsonConstants, CmmnStencilConstants {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CmmnJsonConverterUtil.class);
 

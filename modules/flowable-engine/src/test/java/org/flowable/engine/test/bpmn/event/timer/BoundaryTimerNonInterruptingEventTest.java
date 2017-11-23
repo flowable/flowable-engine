@@ -22,9 +22,9 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.job.service.Job;
-import org.flowable.job.service.TimerJobQuery;
-import org.flowable.task.service.TaskQuery;
+import org.flowable.job.api.Job;
+import org.flowable.job.api.TimerJobQuery;
+import org.flowable.task.api.TaskQuery;
 
 /**
  * @author Joram Barrez
@@ -38,7 +38,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
 
         // After process start, there should be 3 timers created
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("nonInterruptingTimersOnUserTask");
-        org.flowable.task.service.Task task1 = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task1 = taskService.createTaskQuery().singleResult();
         assertEquals("First Task", task1.getName());
 
         TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
@@ -57,7 +57,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
 
         // and we are still in the first state, but in the second state as well!
         assertEquals(2L, taskService.createTaskQuery().count());
-        List<org.flowable.task.service.Task> taskList = taskService.createTaskQuery().orderByTaskName().desc().list();
+        List<org.flowable.task.api.Task> taskList = taskService.createTaskQuery().orderByTaskName().desc().list();
         assertEquals("First Task", taskList.get(0).getName());
         assertEquals("Escalation Task 1", taskList.get(1).getName());
 
@@ -86,7 +86,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
 
         // but we still have the escalation task
         assertEquals(1L, taskService.createTaskQuery().count());
-        org.flowable.task.service.Task escalationTask = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task escalationTask = taskService.createTaskQuery().singleResult();
         assertEquals("Escalation Task 2", escalationTask.getName());
 
         taskService.complete(escalationTask.getId());
@@ -102,7 +102,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
 
         // After process start, there should be 3 timers created
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("testJoin");
-        org.flowable.task.service.Task task1 = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task1 = taskService.createTaskQuery().singleResult();
         assertEquals("Main Task", task1.getName());
 
         TimerJobQuery jobQuery = managementService.createTimerJobQuery().processInstanceId(pi.getId());
@@ -124,7 +124,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
 
         // we now have one task left
         assertEquals(1L, taskService.createTaskQuery().count());
-        org.flowable.task.service.Task task2 = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task2 = taskService.createTaskQuery().singleResult();
         assertEquals("Escalation Task", task2.getName());
 
         // complete the task, the parallel gateway should fire
@@ -145,12 +145,12 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
         assertEquals(3, taskService.createTaskQuery().count());
 
         // Complete task that was reached by non interrupting timer
-        org.flowable.task.service.Task task = taskService.createTaskQuery().taskDefinitionKey("timerFiredTask").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("timerFiredTask").singleResult();
         taskService.complete(task.getId());
         assertEquals(2, taskService.createTaskQuery().count());
 
         // Complete other tasks
-        for (org.flowable.task.service.Task t : taskService.createTaskQuery().list()) {
+        for (org.flowable.task.api.Task t : taskService.createTaskQuery().list()) {
             taskService.complete(t.getId());
         }
         assertProcessEnded(procId);
@@ -168,7 +168,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
         assertEquals(3, taskService.createTaskQuery().count());
 
         // Complete 2 tasks that will trigger the join
-        org.flowable.task.service.Task task = taskService.createTaskQuery().taskDefinitionKey("firstTask").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("firstTask").singleResult();
         taskService.complete(task.getId());
         task = taskService.createTaskQuery().taskDefinitionKey("secondTask").singleResult();
         taskService.complete(task.getId());
@@ -200,7 +200,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
         // a new job must be prepared because there are indefinite number of repeats 1 hour interval");
         assertEquals(1, managementService.createTimerJobQuery().processInstanceId(processInstanceId).count());
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
         taskService.complete(task.getId());
 
         moveByMinutes(60);
@@ -231,7 +231,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
 
         assertEquals(2, tq.count());
 
-        List<org.flowable.task.service.Task> tasks = tq.list();
+        List<org.flowable.task.api.Task> tasks = tq.list();
 
         taskService.complete(tasks.get(0).getId());
         taskService.complete(tasks.get(1).getId());
@@ -288,7 +288,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
         assertEquals(5, taskService.createTaskQuery().count());
 
         // Complete 4 tasks that will trigger the join
-        org.flowable.task.service.Task task = taskService.createTaskQuery().taskDefinitionKey("sub1task1").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("sub1task1").singleResult();
         taskService.complete(task.getId());
         task = taskService.createTaskQuery().taskDefinitionKey("sub1task2").singleResult();
         taskService.complete(task.getId());
@@ -315,7 +315,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableFlowableTest
         managementService.executeJob(timer.getId());
         assertEquals(5, taskService.createTaskQuery().count());
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().taskDefinitionKey("sub1task1").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("sub1task1").singleResult();
         taskService.complete(task.getId());
         task = taskService.createTaskQuery().taskDefinitionKey("sub1task2").singleResult();
         taskService.complete(task.getId());

@@ -14,7 +14,7 @@ package org.flowable.cmmn.engine.impl.persistence.entity.data;
 
 import java.util.List;
 
-import org.flowable.cmmn.engine.history.HistoricMilestoneInstance;
+import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.engine.impl.history.HistoricMilestoneInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.HistoricMilestoneInstanceEntity;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;

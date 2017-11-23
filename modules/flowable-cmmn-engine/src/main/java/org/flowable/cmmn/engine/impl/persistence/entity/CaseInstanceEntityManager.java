@@ -14,8 +14,8 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.cmmn.engine.runtime.CaseInstance;
-import org.flowable.cmmn.engine.runtime.CaseInstanceQuery;
+import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
 
 /**
@@ -33,6 +33,6 @@ public interface CaseInstanceEntityManager extends EntityManager<CaseInstanceEnt
     
     void deleteByCaseDefinitionId(String caseDefinitionId);
     
-    void deleteCaseInstanceAndRelatedData(String caseInstanceId);
+    void deleteCaseInstanceAndRelatedData(String caseInstanceId, String deleteReason);
     
 }

@@ -19,7 +19,7 @@ flowableApp.controller('AboutFlowablePopupCtrl', ['$rootScope', '$scope', '$http
         licenseHolder: ''
     };
 
-    $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/about-info'}).
+    $http({method: 'GET', url: FLOWABLE.APP_URL.getAboutInfoUrl()}).
         success(function(response, status, headers, config) {
             $scope.popup.licenseHolder = response.holder;
             $scope.popup.activitiVersion = response.versionInfo.edition + ' v' + response.versionInfo.majorVersion + '.' + response.versionInfo.minorVersion + '.' + response.versionInfo.revisionVersion;

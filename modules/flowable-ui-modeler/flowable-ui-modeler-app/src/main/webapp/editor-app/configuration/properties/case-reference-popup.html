@@ -1,0 +1,45 @@
+
+<div class="modal" ng-controller="FlowableCaseReferencePopupCtrl">
+    <div class="modal-dialog modal-wide">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true" ng-click="close()">&times;</button>
+                <h2>
+                    {{'PROPERTY.CASEREFERENCE.TITLE' | translate}}
+                    <span ng-show="selectedCase != null"> - {{selectedCase.name}}</span>
+                    <span ng-show="selectedCase == null"> - {{'PROPERTY.CASEREFERENCE.EMPTY' | translate}}</span>
+
+                </h2>
+            </div>
+            <div class="modal-body-with-overflow">
+                <div class="detail-group clearfix">
+                    <div class="col-xs-12">
+                        <div class="alert alert-error" ng-show="!state.loadingCases && state.caseError" translate>PROPERTY.CASEREFERENCE.ERROR.FORM</div>
+                    </div>
+                </div>
+                <div class="detail-group clearfix">
+                    <div class="col-xs-12 editor-item-picker">
+                        <div ng-if="!state.loadingCases && !state.caseError" class="col-xs-4 editor-item-picker-component" ng-repeat="caseModel in caseModels" ng-class="{'selected' : caseModel.id == selectedCase.id}" ng-click="selectCase(caseModel, $event)">
+                           <div class="controls">
+                               <input type="checkbox" value="option1" ng-click="selectCase(caseModel, $event)" ng-checked="caseModel.id == selectedCase.id" />
+                           </div>
+                           <h4>{{caseModel.name}}</h4>
+                           <img ng-src="{{getModelThumbnailUrl(caseModel.id)}}" />
+                         </div>
+                         <div ng-show="state.loadingCases">
+                            <p class="loading" translate>PROPERTY.CASEREFERENCE.CASE.LOADING</p>
+                         </div>
+                         <div ng-show="!state.loadingCases && caseModels.length == 0">
+                            <p translate>PROPERTY.CASEREFERENCE.CASE.EMPTY</p>
+                         </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button ng-click="close()" class="btn btn-primary" translate>GENERAL.ACTION.CANCEL</button>
+            	<button ng-disabled="!selectedCase || state.caseError" ng-click="open()" class="btn btn-primary" translate>GENERAL.ACTION.OPEN</button>
+                <button ng-disabled="state.caseError" ng-click="save()" class="btn btn-primary" translate>GENERAL.ACTION.SAVE</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -12,13 +12,13 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
-import org.flowable.cmmn.engine.PlanItemInstanceCallbackType;
-import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.PlanItemInstanceCallbackType;
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.process.ProcessInstanceService;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.Process;
 import org.flowable.cmmn.model.ProcessTask;
@@ -93,18 +93,18 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
         
         // Triggering the plan item (as opposed to a regular complete) terminates the process instance
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance(planItemInstance);
-        deleteProcessInstance(planItemInstance, commandContext);
+        deleteProcessInstance(commandContext, planItemInstance);
     }
 
     @Override
-    public void onStateTransition(DelegatePlanItemInstance planItemInstance, String transition) {
+    public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
         // The process task plan item will be deleted by the regular TerminatePlanItemOperation
         if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
-            deleteProcessInstance(planItemInstance, CommandContextUtil.getCommandContext());
+            deleteProcessInstance(commandContext, planItemInstance);
         }
     }
     
-    protected void deleteProcessInstance(DelegatePlanItemInstance planItemInstance, CommandContext commandContext) {
+    protected void deleteProcessInstance(CommandContext commandContext, DelegatePlanItemInstance planItemInstance) {
         ProcessInstanceService processInstanceService = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getProcessInstanceService();
         processInstanceService.deleteProcessInstance(planItemInstance.getReferenceId());
     }

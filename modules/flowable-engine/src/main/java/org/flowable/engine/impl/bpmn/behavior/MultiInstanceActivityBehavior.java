@@ -29,11 +29,14 @@ import org.flowable.bpmn.model.Process;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
+import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityCompletedEvent;
+import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.bpmn.helper.ClassDelegateCollectionHandler;
 import org.flowable.engine.impl.bpmn.helper.DelegateExpressionCollectionHandler;
 import org.flowable.engine.impl.bpmn.helper.DelegateExpressionUtil;
@@ -144,7 +147,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         executionEntityManager.deleteChildExecutions(multiInstanceRootExecution, "MI_END", false);
         executionEntityManager.deleteRelatedDataForExecution(multiInstanceRootExecution, null);
         executionEntityManager.delete(multiInstanceRootExecution);
-        
+
         ExecutionEntity newExecution = executionEntityManager.createChildExecution(parentExecution);
         newExecution.setCurrentFlowElement(flowElement);
         super.leave(newExecution);
@@ -261,6 +264,27 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
 
     // Helpers
     // //////////////////////////////////////////////////////////////////////
+
+    protected void sendCompletedWithConditionEvent(DelegateExecution execution) {
+        CommandContextUtil.getEventDispatcher(CommandContextUtil.getCommandContext()).dispatchEvent(
+                buildCompletedEvent(execution, FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_COMPLETED_WITH_CONDITION));
+    }
+
+    protected void sendCompletedEvent(DelegateExecution execution) {
+        CommandContextUtil.getEventDispatcher(CommandContextUtil.getCommandContext()).dispatchEvent(
+                buildCompletedEvent(execution, FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_COMPLETED));
+    }
+
+    protected FlowableMultiInstanceActivityCompletedEvent buildCompletedEvent(DelegateExecution execution, FlowableEngineEventType eventType) {
+        FlowElement flowNode = execution.getCurrentFlowElement();
+
+        return FlowableEventBuilder.createMultiInstanceActivityCompletedEvent(eventType,
+                (int) execution.getVariable(NUMBER_OF_INSTANCES),
+                (int) execution.getVariable(NUMBER_OF_ACTIVE_INSTANCES),
+                (int) execution.getVariable(NUMBER_OF_COMPLETED_INSTANCES),
+                flowNode.getId(),
+                flowNode.getName(), execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode);
+    }
 
     @SuppressWarnings("rawtypes")
     protected int resolveNrOfInstances(DelegateExecution execution) {

@@ -53,7 +53,7 @@ import org.activiti.engine.impl.variable.DeserializedObject;
 import org.apache.ibatis.session.SqlSession;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.variable.service.event.FlowableVariableEvent;
+import org.flowable.variable.api.event.FlowableVariableEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

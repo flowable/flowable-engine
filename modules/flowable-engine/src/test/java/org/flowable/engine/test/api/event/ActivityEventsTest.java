@@ -37,7 +37,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 
 /**
  * Test case for all {@link FlowableEvent}s related to activities.
@@ -127,7 +127,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
 
         // Complete usertask
         listener.clearEventsReceived();
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
         taskService.complete(task.getId());
 
@@ -172,7 +172,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         listener.clearEventsReceived();
 
         // Check gateway and intermediate throw event
-        org.flowable.task.service.Task subTask = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).singleResult();
+        org.flowable.task.api.Task subTask = taskService.createTaskQuery().processInstanceId(processInstance.getProcessInstanceId()).singleResult();
         assertNotNull(subTask);
 
         taskService.complete(subTask.getId());
@@ -286,7 +286,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("signalProcess");
         assertNotNull(processInstance);
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         Execution executionWithSignalEvent = runtimeService.createExecutionQuery().activityId("shipOrder").singleResult();
@@ -408,7 +408,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         Execution executionWithMessage = runtimeService.createExecutionQuery().messageEventSubscriptionName("messageName").singleResult();
         assertNotNull(executionWithMessage);
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("Wait", task.getName());
 
         taskService.complete(task.getId());
@@ -450,7 +450,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensationProcess");
         assertNotNull(processInstance);
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         // Complete task, next a compensation event will be thrown
@@ -687,7 +687,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         Execution executionWithMessage = runtimeService.createExecutionQuery().messageEventSubscriptionName("message_1").singleResult();
         assertNotNull(executionWithMessage);
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("User Task", task.getName());
         taskService.complete(task.getId());
 
@@ -793,7 +793,7 @@ public class ActivityEventsTest extends PluggableFlowableTestCase {
         Execution executionWithMessage = runtimeService.createExecutionQuery().activityId("boundaryMessageEventCatching").singleResult();
         assertNotNull(executionWithMessage);
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         assertEquals(2, listener.getEventsReceived().size());

@@ -17,10 +17,10 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.List;
 
-import org.flowable.cmmn.engine.repository.CaseDefinition;
-import org.flowable.cmmn.engine.repository.CmmnDeployment;
-import org.flowable.cmmn.engine.runtime.CaseInstance;
-import org.flowable.cmmn.engine.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
+import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.junit.Before;
 import org.junit.Test;
@@ -75,7 +75,7 @@ public class CmmnTaskQueryTest extends FlowableCmmnTestCase {
     }
     
     @Test
-    public void testQuertByCaseDefinitionId() {
+    public void testQueryByCaseDefinitionId() {
         CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().singleResult();
         assertNotNull(caseDefinition);
         assertEquals(NR_CASE_INSTANCES, cmmnTaskService.createTaskQuery().caseDefinitionId(caseDefinition.getId()).list().size());

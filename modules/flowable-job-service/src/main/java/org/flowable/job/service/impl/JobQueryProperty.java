@@ -17,7 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.common.api.query.QueryProperty;
-import org.flowable.job.service.JobQuery;
+import org.flowable.job.api.JobQuery;
 
 /**
  * Contains the possible properties that can be used in a {@link JobQuery}.

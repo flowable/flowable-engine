@@ -44,7 +44,7 @@ angular.module('flowableModeler')
     ];
 
     $scope.loadApp = function() {
-    	$http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/' + $routeParams.modelId}).
+    	$http({method: 'GET', url: FLOWABLE.APP_URL.getAppDefinitionUrl($routeParams.modelId)}).
         	success(function(data, status, headers, config) {
         	    $rootScope.currentAppDefinition = data;
         	    if (!$rootScope.currentAppDefinition.definition.theme) {
@@ -235,7 +235,7 @@ angular.module('flowableModeler')
     $scope.loadModels = function() {
         $scope.popup.loading = true;
 
-        $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models-for-app-definition'}).
+        $http({method: 'GET', url: FLOWABLE.APP_URL.getModelsForAppDefinitionUrl()}).
           success(function(data, status, headers, config) {
               $scope.popup.models = data;
               $scope.popup.loading = false;
@@ -244,7 +244,7 @@ angular.module('flowableModeler')
              $scope.popup.loading = false;
           });
 
-        $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/cmmn-models-for-app-definition'}).
+        $http({method: 'GET', url: FLOWABLE.APP_URL.getCmmnModelsForAppDefinitionUrl()}).
           success(function(data, status, headers, config) {
               $scope.popup.cmmnModels = data;
               $scope.popup.loading = false;

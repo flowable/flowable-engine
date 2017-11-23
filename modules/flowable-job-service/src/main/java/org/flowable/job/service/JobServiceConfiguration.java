@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,6 +12,7 @@
  */
 package org.flowable.job.service;
 
+import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.AbstractServiceConfiguration;
@@ -62,16 +63,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public class JobServiceConfiguration extends AbstractServiceConfiguration {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(JobServiceConfiguration.class);
-    
+
     // SERVICES
     // /////////////////////////////////////////////////////////////////
 
     protected JobService jobService = new JobServiceImpl(this);
     protected TimerJobService timerJobService = new TimerJobServiceImpl(this);
     protected HistoryJobService historyJobService = new HistoryJobServiceImpl(this);
-    
+
     protected JobManager jobManager;
-    
+
     // DATA MANAGERS ///////////////////////////////////////////////////
 
     protected JobDataManager jobDataManager;
@@ -82,34 +83,34 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     protected JobByteArrayDataManager jobByteArrayDataManager;
 
     // ENTITY MANAGERS /////////////////////////////////////////////////
-    
+
     protected JobEntityManager jobEntityManager;
     protected DeadLetterJobEntityManager deadLetterJobEntityManager;
     protected SuspendedJobEntityManager suspendedJobEntityManager;
     protected TimerJobEntityManager timerJobEntityManager;
     protected HistoryJobEntityManager historyJobEntityManager;
     protected JobByteArrayEntityManager jobByteArrayEntityManager;
-    
+
     protected CommandExecutor commandExecutor;
-    
+
     protected ExpressionManager expressionManager;
     protected BusinessCalendarManager businessCalendarManager;
-    
+
     protected HistoryLevel historyLevel;
-    
+
     protected InternalJobManager internalJobManager;
-    
+
     protected AsyncExecutor asyncExecutor;
-    
+
     protected Map<String, JobHandler> jobHandlers;
     protected FailedJobCommandFactory failedJobCommandFactory;
-    protected AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler;
+    protected List<AsyncRunnableExecutionExceptionHandler> asyncRunnableExecutionExceptionHandlers;
 
     protected Map<String, HistoryJobHandler> historyJobHandlers;
-    
+
     protected int asyncExecutorNumberOfRetries;
     protected int asyncExecutorResetExpiredJobsMaxTimeout;
-    
+
     protected ObjectMapper objectMapper;
 
     // init
@@ -120,7 +121,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         initDataManagers();
         initEntityManagers();
     }
-    
+
     @Override
     public boolean isHistoryLevelAtLeast(HistoryLevel level) {
         if (LOGGER.isDebugEnabled()) {
@@ -137,7 +138,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         }
         return historyLevel != HistoryLevel.NONE;
     }
-    
+
     // Job manager ///////////////////////////////////////////////////////////
 
     public void initJobManager() {
@@ -199,7 +200,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     public JobServiceConfiguration getIdentityLinkServiceConfiguration() {
         return this;
     }
-    
+
     public JobService getJobService() {
         return jobService;
     }
@@ -208,7 +209,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         this.jobService = jobService;
         return this;
     }
-    
+
     public TimerJobService getTimerJobService() {
         return timerJobService;
     }
@@ -217,7 +218,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         this.timerJobService = timerJobService;
         return this;
     }
-    
+
     public HistoryJobService getHistoryJobService() {
         return historyJobService;
     }
@@ -234,7 +235,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     public void setJobManager(JobManager jobManager) {
         this.jobManager = jobManager;
     }
-    
+
     public JobDataManager getJobDataManager() {
         return jobDataManager;
     }
@@ -331,7 +332,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
 
     public JobServiceConfiguration setHistoryJobEntityManager(HistoryJobEntityManager historyJobEntityManager) {
         this.historyJobEntityManager = historyJobEntityManager;
-        return this; 
+        return this;
     }
 
     public JobByteArrayEntityManager getJobByteArrayEntityManager() {
@@ -355,13 +356,13 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     public HistoryLevel getHistoryLevel() {
         return historyLevel;
     }
-    
+
     @Override
     public JobServiceConfiguration setHistoryLevel(HistoryLevel historyLevel) {
         this.historyLevel = historyLevel;
         return this;
     }
-    
+
     public InternalJobManager getInternalJobManager() {
         return internalJobManager;
     }
@@ -415,12 +416,12 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         return this;
     }
 
-    public AsyncRunnableExecutionExceptionHandler getAsyncRunnableExecutionExceptionHandler() {
-        return asyncRunnableExecutionExceptionHandler;
+    public List<AsyncRunnableExecutionExceptionHandler> getAsyncRunnableExecutionExceptionHandlers() {
+        return asyncRunnableExecutionExceptionHandlers;
     }
 
-    public JobServiceConfiguration setAsyncRunnableExecutionExceptionHandler(AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler) {
-        this.asyncRunnableExecutionExceptionHandler = asyncRunnableExecutionExceptionHandler;
+    public JobServiceConfiguration setAsyncRunnableExecutionExceptionHandlers(List<AsyncRunnableExecutionExceptionHandler> asyncRunnableExecutionExceptionHandlers) {
+        this.asyncRunnableExecutionExceptionHandlers = asyncRunnableExecutionExceptionHandlers;
         return this;
     }
 

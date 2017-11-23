@@ -15,7 +15,7 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.cmmn.engine.history.HistoricCaseInstance;
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;

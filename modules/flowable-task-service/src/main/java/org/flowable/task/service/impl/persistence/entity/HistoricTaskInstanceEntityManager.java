@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.impl.persistence.entity.EntityManager;
-import org.flowable.task.service.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
 
 /**

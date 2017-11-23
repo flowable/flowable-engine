@@ -38,6 +38,8 @@ public class DmnDbSchemaManager implements DbSchemaManager {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(DmnDbSchemaManager.class);
     
+    public static String LIQUIBASE_CHANGELOG = "org/flowable/dmn/db/liquibase/flowable-dmn-db-changelog.xml";
+    
     public void initSchema() {
         initSchema(CommandContextUtil.getDmnEngineConfiguration());
     }
@@ -65,7 +67,7 @@ public class DmnDbSchemaManager implements DbSchemaManager {
         }
     }
 
-    protected Liquibase createLiquibaseInstance(DmnEngineConfiguration dmnEngineConfiguration)
+    public Liquibase createLiquibaseInstance(DmnEngineConfiguration dmnEngineConfiguration)
             throws SQLException, DatabaseException, LiquibaseException {
         
         Connection jdbcConnection = null;
@@ -97,10 +99,10 @@ public class DmnDbSchemaManager implements DbSchemaManager {
             database.setLiquibaseCatalogName(databaseCatalog);
         }
 
-        Liquibase liquibase = new Liquibase("org/flowable/dmn/db/liquibase/flowable-dmn-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
+        Liquibase liquibase = new Liquibase(LIQUIBASE_CHANGELOG, new ClassLoaderResourceAccessor(), database);
         return liquibase;
     }
-
+    
     @Override
     public void dbSchemaCreate() {
         try {

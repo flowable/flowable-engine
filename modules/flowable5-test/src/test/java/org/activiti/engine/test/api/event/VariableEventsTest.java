@@ -21,7 +21,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.variable.service.event.FlowableVariableEvent;
+import org.flowable.variable.api.event.FlowableVariableEvent;
 
 /**
  * Test case for all {@link FlowableEvent}s related to variables.
@@ -112,7 +112,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertEquals(1, listener.getEventsReceived().size());
         assertEquals(FlowableEngineEventType.VARIABLE_CREATED, listener.getEventsReceived().get(0).getType());
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         assertEquals(2, listener.getEventsReceived().size());
@@ -215,7 +215,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertNotNull(processInstance);
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         taskService.setVariableLocal(task.getId(), "testVariable", "The value");
@@ -262,7 +262,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variableProcess");
         assertNotNull(processInstance);
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                 .singleResult();
         assertNotNull(task);
 

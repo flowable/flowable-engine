@@ -15,9 +15,9 @@ package org.flowable.cmmn.engine.impl.util;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
-import org.flowable.cmmn.engine.CmmnRepositoryService;
-import org.flowable.cmmn.engine.CmmnRuntimeService;
 import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgenda;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManager;
@@ -31,12 +31,18 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityMa
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.TableDataManager;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
+import org.flowable.content.api.ContentEngineConfigurationApi;
+import org.flowable.content.api.ContentService;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
+import org.flowable.form.api.FormEngineConfigurationApi;
+import org.flowable.form.api.FormManagementService;
+import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.api.FormService;
 import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.task.service.HistoricTaskService;
@@ -190,6 +196,66 @@ public class CommandContextUtil {
             historicVariableService = variableServiceConfiguration.getHistoricVariableService();
         }
         return historicVariableService;
+    }
+    
+// FORM ENGINE
+    
+    public static FormEngineConfigurationApi getFormEngineConfiguration() {
+        return getFormEngineConfiguration(getCommandContext());
+    }
+    
+    public static FormEngineConfigurationApi getFormEngineConfiguration(CommandContext commandContext) {
+        return (FormEngineConfigurationApi) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
+    }
+    
+    public static FormRepositoryService getFormRepositoryService() {
+        FormRepositoryService formRepositoryService = null;
+        FormEngineConfigurationApi formEngineConfiguration = getFormEngineConfiguration();
+        if (formEngineConfiguration != null) {
+            formRepositoryService = formEngineConfiguration.getFormRepositoryService();
+        }
+        
+        return formRepositoryService;
+    }
+    
+    public static FormService getFormService() {
+        FormService formService = null;
+        FormEngineConfigurationApi formEngineConfiguration = getFormEngineConfiguration();
+        if (formEngineConfiguration != null) {
+            formService = formEngineConfiguration.getFormService();
+        }
+        
+        return formService;
+    }
+    
+    public static FormManagementService getFormManagementService() {
+        FormManagementService formManagementService = null;
+        FormEngineConfigurationApi formEngineConfiguration = getFormEngineConfiguration();
+        if (formEngineConfiguration != null) {
+            formManagementService = formEngineConfiguration.getFormManagementService();
+        }
+        
+        return formManagementService;
+    }
+    
+    // CONTENT ENGINE
+    
+    public static ContentEngineConfigurationApi getContentEngineConfiguration() {
+        return getContentEngineConfiguration(getCommandContext());
+    }
+    
+    public static ContentEngineConfigurationApi getContentEngineConfiguration(CommandContext commandContext) {
+        return (ContentEngineConfigurationApi) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_CONTENT_ENGINE_CONFIG);
+    }
+    
+    public static ContentService getContentService() {
+        ContentService contentService = null;
+        ContentEngineConfigurationApi contentEngineConfiguration = getContentEngineConfiguration();
+        if (contentEngineConfiguration != null) {
+            contentService = contentEngineConfiguration.getContentService();
+        }
+        
+        return contentService;
     }
     
     public static IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration() { 

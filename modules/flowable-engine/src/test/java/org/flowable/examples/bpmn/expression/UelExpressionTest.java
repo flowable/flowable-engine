@@ -29,7 +29,7 @@ public class UelExpressionTest extends PluggableFlowableTestCase {
         // expression)
         UelExpressionTestOrder order = new UelExpressionTestOrder(150);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("uelExpressions", CollectionUtil.singletonMap("order", order));
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("Standard service", task.getName());
 
         // While an order of 300, gives us a premium service (goes through an

@@ -4,7 +4,7 @@
   
 <mapper namespace="org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityImpl">
   
-  <!-- PROCESSDEFINITION INSERT -->
+  <!-- DECISION DEFINITION INSERT -->
 
   <insert id="insertDecisionTable" parameterType="org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityImpl">
     insert into ${prefix}ACT_DMN_DECISION_TABLE(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, 
@@ -19,6 +19,43 @@
             #{resourceName, jdbcType=VARCHAR},
             #{description, jdbcType=VARCHAR},
             #{tenantId, jdbcType=VARCHAR})
+  </insert>
+  
+  <insert id="bulkInsertDecisionTable" parameterType="java.util.List">
+    insert into ${prefix}ACT_DMN_DECISION_TABLE(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, 
+        PARENT_DEPLOYMENT_ID_, RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_)
+    values 
+    <foreach collection="list" item="decisionTable" index="index" separator=",">
+        (#{decisionTable.id, jdbcType=VARCHAR},
+         #{decisionTable.category, jdbcType=VARCHAR},
+         #{decisionTable.name, jdbcType=VARCHAR},
+         #{decisionTable.key, jdbcType=VARCHAR}, 
+         #{decisionTable.version, jdbcType=INTEGER},
+         #{decisionTable.deploymentId, jdbcType=VARCHAR},
+         #{decisionTable.parentDeploymentId, jdbcType=VARCHAR},
+         #{decisionTable.resourceName, jdbcType=VARCHAR},
+         #{decisionTable.description, jdbcType=VARCHAR},
+         #{decisionTable.tenantId, jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+  
+  <insert id="bulkInsertDecisionTable" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL 
+    <foreach collection="list" item="decisionTable" index="index">
+        INTO ${prefix}ACT_DMN_DECISION_TABLE(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, 
+            PARENT_DEPLOYMENT_ID_, RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_) VALUES 
+            (#{decisionTable.id, jdbcType=VARCHAR},
+             #{decisionTable.category, jdbcType=VARCHAR},
+             #{decisionTable.name, jdbcType=VARCHAR},
+             #{decisionTable.key, jdbcType=VARCHAR}, 
+             #{decisionTable.version, jdbcType=INTEGER},
+             #{decisionTable.deploymentId, jdbcType=VARCHAR},
+             #{decisionTable.parentDeploymentId, jdbcType=VARCHAR},
+             #{decisionTable.resourceName, jdbcType=VARCHAR},
+             #{decisionTable.description, jdbcType=VARCHAR},
+             #{decisionTable.tenantId, jdbcType=VARCHAR})
+    </foreach>
+    SELECT * FROM dual
   </insert>
   
   <!-- DECISION TABLE UPDATE -->

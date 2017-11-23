@@ -29,7 +29,7 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 
 /**
  * @author Daniel Meyer

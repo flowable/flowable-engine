@@ -20,7 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
-import org.flowable.cmmn.editor.json.model.ModelInfo;
+import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnModel;
@@ -38,7 +38,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements FormAwareConverter, FormKeyAwareConverter {
 
     protected Map<String, String> formMap;
-    protected Map<String, ModelInfo> formKeyMap;
+    protected Map<String, CmmnModelInfo> formKeyMap;
 
     public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap, 
             Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
@@ -201,7 +201,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
         if (StringUtils.isNotEmpty(humanTask.getFormKey())) {
             if (formKeyMap != null && formKeyMap.containsKey(humanTask.getFormKey())) {
                 ObjectNode formRefNode = objectMapper.createObjectNode();
-                ModelInfo modelInfo = formKeyMap.get(humanTask.getFormKey());
+                CmmnModelInfo modelInfo = formKeyMap.get(humanTask.getFormKey());
                 formRefNode.put("id", modelInfo.getId());
                 formRefNode.put("name", modelInfo.getName());
                 formRefNode.put("key", modelInfo.getKey());
@@ -273,7 +273,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
                     task.setCandidateUsers(getValueAsList(PROPERTY_USERTASK_CANDIDATE_USERS, assignmentDefNode));
                     task.setCandidateGroups(getValueAsList(PROPERTY_USERTASK_CANDIDATE_GROUPS, assignmentDefNode));
 
-                    if (StringUtils.isNotEmpty(task.getAssignee()) && !"$INITIATOR".equalsIgnoreCase(task.getAssignee())) {
+                    if (StringUtils.isNotEmpty(task.getAssignee())) {
 
                         if (canCompleteTaskNode != null && !canCompleteTaskNode.isNull()) {
                             addInitiatorCanCompleteExtensionElement(Boolean.valueOf(canCompleteTaskNode.asText()), task);
@@ -281,7 +281,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
                             addInitiatorCanCompleteExtensionElement(false, task);
                         }
 
-                    } else if (StringUtils.isNotEmpty(task.getAssignee()) && "$INITIATOR".equalsIgnoreCase(task.getAssignee())) {
+                    } else if (StringUtils.isNotEmpty(task.getAssignee())) {
                         addInitiatorCanCompleteExtensionElement(true, task);
                     }
 
@@ -302,7 +302,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
                             fillCandidateGroups(idmDefNode, canCompleteTaskNode, task);
 
                         } else {
-                            task.setAssignee("$INITIATOR");
+                            task.setAssignee("${" + cmmnModel.getPrimaryCase().getInitiatorVariableName() + "}");
                             addExtensionElement("flowable-idm-initiator", String.valueOf(true), task);
                         }
                     }
@@ -441,7 +441,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
     }
 
     @Override
-    public void setFormKeyMap(Map<String, ModelInfo> formKeyMap) {
+    public void setFormKeyMap(Map<String, CmmnModelInfo> formKeyMap) {
         this.formKeyMap = formKeyMap;
     }
 }

@@ -22,7 +22,6 @@ import java.util.Set;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.flowable.content.api.ContentEngineConfigurationApi;
@@ -45,7 +44,6 @@ import org.flowable.content.engine.impl.persistence.entity.TableDataManagerImpl;
 import org.flowable.content.engine.impl.persistence.entity.data.ContentItemDataManager;
 import org.flowable.content.engine.impl.persistence.entity.data.impl.MybatisContentItemDataManager;
 import org.flowable.engine.common.AbstractEngineConfiguration;
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
@@ -58,13 +56,6 @@ import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.common.runtime.Clock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import liquibase.Liquibase;
-import liquibase.database.Database;
-import liquibase.database.DatabaseConnection;
-import liquibase.database.DatabaseFactory;
-import liquibase.database.jvm.JdbcConnection;
-import liquibase.resource.ClassLoaderResourceAccessor;
 
 public class ContentEngineConfiguration extends AbstractEngineConfiguration implements ContentEngineConfigurationApi {
 
@@ -222,37 +213,8 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
     }
 
     public void initDbSchema() {
-        try {
-            DatabaseConnection connection = new JdbcConnection(dataSource.getConnection());
-            Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
-            database.setDatabaseChangeLogTableName(LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogTableName());
-            database.setDatabaseChangeLogLockTableName(LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogLockTableName());
-
-            if (StringUtils.isNotEmpty(databaseSchema)) {
-                database.setDefaultSchemaName(databaseSchema);
-                database.setLiquibaseSchemaName(databaseSchema);
-            }
-
-            if (StringUtils.isNotEmpty(databaseCatalog)) {
-                database.setDefaultCatalogName(databaseCatalog);
-                database.setLiquibaseCatalogName(databaseCatalog);
-            }
-
-            Liquibase liquibase = new Liquibase("org/flowable/content/db/liquibase/flowable-content-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
-
-            if (DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
-                LOGGER.debug("Dropping and creating schema CONTENT");
-                liquibase.dropAll();
-                liquibase.update("content");
-            } else if (DB_SCHEMA_UPDATE_TRUE.equals(databaseSchemaUpdate)) {
-                LOGGER.debug("Updating schema CONTENT");
-                liquibase.update("content");
-            } else if (DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
-                LOGGER.debug("Validating schema CONTENT");
-                liquibase.validate();
-            }
-        } catch (Exception e) {
-            throw new FlowableException("Error initialising content data schema", e);
+        if (dbSchemaManager != null) {
+            ((ContentDbSchemaManager) dbSchemaManager).initSchema(this, databaseSchemaUpdate);
         }
     }
 
@@ -301,13 +263,7 @@ public class ContentEngineConfiguration extends AbstractEngineConfiguration impl
     
     @Override
     protected void initDbSqlSessionFactoryEntitySettings() {
-        for (Class<? extends Entity> clazz : EntityDependencyOrder.INSERT_ORDER) {
-            dbSqlSessionFactory.getInsertionOrder().add(clazz);
-        }
-        
-        for (Class<? extends Entity> clazz : EntityDependencyOrder.DELETE_ORDER) {
-            dbSqlSessionFactory.getDeletionOrder().add(clazz);
-        }
+        defaultInitDbSqlSessionFactoryEntitySettings(EntityDependencyOrder.INSERT_ORDER, EntityDependencyOrder.DELETE_ORDER);
     }
 
     // command executors

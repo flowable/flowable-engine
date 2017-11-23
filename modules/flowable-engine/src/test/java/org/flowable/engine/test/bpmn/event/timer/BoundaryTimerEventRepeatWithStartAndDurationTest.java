@@ -24,7 +24,7 @@ import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.joda.time.DateTime;
 import org.joda.time.format.ISODateTimeFormat;
@@ -48,10 +48,10 @@ public class BoundaryTimerEventRepeatWithStartAndDurationTest extends PluggableF
         variables.put("StartDate", baseTime);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("repeatWithStartAndDuration", variables);
 
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertEquals(1, tasks.size());
 
-        org.flowable.task.service.Task task = tasks.get(0);
+        org.flowable.task.api.Task task = tasks.get(0);
         assertEquals("Task A", task.getName());
 
         // Test Boundary Events

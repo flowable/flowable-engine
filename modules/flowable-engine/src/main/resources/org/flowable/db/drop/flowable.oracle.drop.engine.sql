@@ -11,19 +11,15 @@ drop index ACT_IDX_VAR_PROCINST;
 drop index ACT_IDX_JOB_EXECUTION_ID;
 drop index ACT_IDX_JOB_PROC_INST_ID;
 drop index ACT_IDX_JOB_PROC_DEF_ID;
-drop index ACT_IDX_JOB_EXCEPTION;
 drop index ACT_IDX_TJOB_EXECUTION_ID;
 drop index ACT_IDX_TJOB_PROC_INST_ID;
 drop index ACT_IDX_TJOB_PROC_DEF_ID;
-drop index ACT_IDX_TJOB_EXCEPTION;    
 drop index ACT_IDX_SJOB_EXECUTION_ID;    
 drop index ACT_IDX_SJOB_PROC_INST_ID;    
 drop index ACT_IDX_SJOB_PROC_DEF_ID;    
-drop index ACT_IDX_SJOB_EXCEPTION;    
 drop index ACT_IDX_DJOB_EXECUTION_ID;      
 drop index ACT_IDX_DJOB_PROC_INST_ID;        
 drop index ACT_IDX_DJOB_PROC_DEF_ID;    
-drop index ACT_IDX_DJOB_EXCEPTION;
 drop index ACT_IDX_MODEL_SOURCE;
 drop index ACT_IDX_MODEL_SOURCE_EXTRA;
 drop index ACT_IDX_MODEL_DEPLOYMENT;
@@ -80,9 +76,6 @@ alter table ACT_RU_JOB
 alter table ACT_RU_JOB 
     drop CONSTRAINT ACT_FK_JOB_PROC_DEF;
 
-alter table ACT_RU_JOB 
-    drop CONSTRAINT ACT_FK_JOB_EXCEPTION;
-    
 alter table ACT_RU_TIMER_JOB 
     drop CONSTRAINT ACT_FK_TJOB_EXECUTION;
     
@@ -91,9 +84,6 @@ alter table ACT_RU_TIMER_JOB
     
 alter table ACT_RU_TIMER_JOB 
     drop CONSTRAINT ACT_FK_TJOB_PROC_DEF;
-    
-alter table ACT_RU_TIMER_JOB 
-    drop CONSTRAINT ACT_FK_TJOB_EXCEPTION;
     
 alter table ACT_RU_SUSPENDED_JOB 
     drop CONSTRAINT ACT_FK_SJOB_EXECUTION;
@@ -104,9 +94,6 @@ alter table ACT_RU_SUSPENDED_JOB
 alter table ACT_RU_SUSPENDED_JOB 
     drop CONSTRAINT ACT_FK_SJOB_PROC_DEF;
     
-alter table ACT_RU_SUSPENDED_JOB 
-    drop CONSTRAINT ACT_FK_SJOB_EXCEPTION;
-    
 alter table ACT_RU_DEADLETTER_JOB 
     drop CONSTRAINT ACT_FK_DJOB_EXECUTION;
     
@@ -115,9 +102,6 @@ alter table ACT_RU_DEADLETTER_JOB
     
 alter table ACT_RU_DEADLETTER_JOB 
     drop CONSTRAINT ACT_FK_DJOB_PROC_DEF;
-    
-alter table ACT_RU_DEADLETTER_JOB 
-    drop CONSTRAINT ACT_FK_DJOB_EXCEPTION;
     
 alter table ACT_RU_EVENT_SUBSCR
     drop CONSTRAINT ACT_FK_EVENT_EXEC;
@@ -152,11 +136,6 @@ drop table ACT_RE_DEPLOYMENT;
 drop table ACT_RE_MODEL;
 drop table ACT_RE_PROCDEF;
 drop table ACT_RU_EXECUTION;
-drop table ACT_RU_JOB;
-drop table ACT_RU_TIMER_JOB;
-drop table ACT_RU_SUSPENDED_JOB;
-drop table ACT_RU_DEADLETTER_JOB;
-drop table ACT_RU_HISTORY_JOB;
 drop table ACT_RU_EVENT_SUBSCR;
 
 drop sequence act_evt_log_seq;

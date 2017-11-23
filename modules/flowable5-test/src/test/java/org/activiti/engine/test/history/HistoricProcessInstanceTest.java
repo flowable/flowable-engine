@@ -33,7 +33,7 @@ import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.test.Deployment;
-import org.flowable.identitylink.service.history.HistoricIdentityLink;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
 
 /**
  * @author Tom Baeyens
@@ -71,7 +71,7 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         assertNull(historicProcessInstance.getEndTime());
         assertNull(historicProcessInstance.getDurationInMillis());
 
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
 
         assertEquals(1, tasks.size());
 
@@ -317,12 +317,12 @@ public class HistoricProcessInstanceTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
         // First complete process instance 2
-        for (org.flowable.task.service.Task task : taskService.createTaskQuery().processInstanceId(processInstance2.getId()).list()) {
+        for (org.flowable.task.api.Task task : taskService.createTaskQuery().processInstanceId(processInstance2.getId()).list()) {
             taskService.complete(task.getId());
         }
 
         // Then process instance 1
-        for (org.flowable.task.service.Task task : taskService.createTaskQuery().processInstanceId(processInstance1.getId()).list()) {
+        for (org.flowable.task.api.Task task : taskService.createTaskQuery().processInstanceId(processInstance1.getId()).list()) {
             taskService.complete(task.getId());
         }
 

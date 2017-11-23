@@ -24,6 +24,8 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.cmmn.api.CmmnHistoryService;
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.content.api.ContentItem;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.HistoryService;
@@ -33,12 +35,12 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
-import org.flowable.task.service.Task;
-import org.flowable.task.service.history.HistoricTaskInstance;
-import org.flowable.task.service.history.HistoricTaskInstanceQuery;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -63,6 +65,9 @@ public class PermissionService {
 
     @Autowired
     protected HistoryService historyService;
+    
+    @Autowired
+    protected CmmnHistoryService cmmnHistoryService;
 
     @Autowired
     protected RemoteIdmService remoteIdmService;
@@ -144,6 +149,15 @@ public class PermissionService {
                             }
                         }
                     }
+                }
+            }
+            
+        } else if (task.getScopeId() != null) {
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(task.getScopeId()).singleResult();
+            if (historicCaseInstance != null && StringUtils.isNotEmpty(historicCaseInstance.getStartUserId())) {
+                String caseInstanceStartUserId = historicCaseInstance.getStartUserId();
+                if (String.valueOf(user.getId()).equals(caseInstanceStartUserId)) {
+                    canCompleteTask = true;
                 }
             }
         }

@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
-import org.flowable.cmmn.engine.repository.CmmnDeployment;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.junit.After;
 import org.junit.Before;

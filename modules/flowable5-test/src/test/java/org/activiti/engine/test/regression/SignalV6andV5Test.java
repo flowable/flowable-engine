@@ -44,14 +44,14 @@ public class SignalV6andV5Test extends PluggableFlowableTestCase {
         assertNotNull(v6Definition);
         assertTrue(StringUtils.isEmpty(v6Definition.getEngineVersion()));
         
-        org.flowable.task.service.Task signalTask = taskService.createTaskQuery().processDefinitionKey("signalBoundaryCatch").singleResult();
+        org.flowable.task.api.Task signalTask = taskService.createTaskQuery().processDefinitionKey("signalBoundaryCatch").singleResult();
         assertNotNull(signalTask);
         assertEquals("task", signalTask.getTaskDefinitionKey());
         
-        org.flowable.task.service.Task beforeTask = taskService.createTaskQuery().processDefinitionKey("signalThrow").singleResult();
+        org.flowable.task.api.Task beforeTask = taskService.createTaskQuery().processDefinitionKey("signalThrow").singleResult();
         taskService.complete(beforeTask.getId());
         
-        org.flowable.task.service.Task afterTask = taskService.createTaskQuery().processDefinitionKey("signalBoundaryCatch").singleResult();
+        org.flowable.task.api.Task afterTask = taskService.createTaskQuery().processDefinitionKey("signalBoundaryCatch").singleResult();
         assertNotNull(afterTask);
         assertEquals("afterTask", afterTask.getTaskDefinitionKey());
         
@@ -85,15 +85,15 @@ public class SignalV6andV5Test extends PluggableFlowableTestCase {
         assertNotNull(v6Definition);
         assertTrue(StringUtils.isEmpty(v6Definition.getEngineVersion()));
         
-        org.flowable.task.service.Task signalTask = taskService.createTaskQuery().processDefinitionKey("signalIntermediateCatch").singleResult();
+        org.flowable.task.api.Task signalTask = taskService.createTaskQuery().processDefinitionKey("signalIntermediateCatch").singleResult();
         assertNotNull(signalTask);
         assertEquals("task", signalTask.getTaskDefinitionKey());
         taskService.complete(signalTask.getId());
         
-        org.flowable.task.service.Task beforeTask = taskService.createTaskQuery().processDefinitionKey("signalThrow").singleResult();
+        org.flowable.task.api.Task beforeTask = taskService.createTaskQuery().processDefinitionKey("signalThrow").singleResult();
         taskService.complete(beforeTask.getId());
         
-        org.flowable.task.service.Task afterTask = taskService.createTaskQuery().processDefinitionKey("signalIntermediateCatch").singleResult();
+        org.flowable.task.api.Task afterTask = taskService.createTaskQuery().processDefinitionKey("signalIntermediateCatch").singleResult();
         assertNotNull(afterTask);
         assertEquals("afterTask", afterTask.getTaskDefinitionKey());
         
@@ -127,14 +127,14 @@ public class SignalV6andV5Test extends PluggableFlowableTestCase {
         assertNotNull(v6Definition);
         assertTrue(StringUtils.isEmpty(v6Definition.getEngineVersion()));
         
-        org.flowable.task.service.Task signalTask = taskService.createTaskQuery().processDefinitionKey("signalBoundaryCatch").singleResult();
+        org.flowable.task.api.Task signalTask = taskService.createTaskQuery().processDefinitionKey("signalBoundaryCatch").singleResult();
         assertNotNull(signalTask);
         assertEquals("task", signalTask.getTaskDefinitionKey());
         
-        org.flowable.task.service.Task beforeTask = taskService.createTaskQuery().processDefinitionKey("signalThrow").singleResult();
+        org.flowable.task.api.Task beforeTask = taskService.createTaskQuery().processDefinitionKey("signalThrow").singleResult();
         taskService.complete(beforeTask.getId());
         
-        org.flowable.task.service.Task afterTask = taskService.createTaskQuery().processDefinitionKey("signalBoundaryCatch").singleResult();
+        org.flowable.task.api.Task afterTask = taskService.createTaskQuery().processDefinitionKey("signalBoundaryCatch").singleResult();
         assertNotNull(afterTask);
         assertEquals("afterTask", afterTask.getTaskDefinitionKey());
         
@@ -168,15 +168,15 @@ public class SignalV6andV5Test extends PluggableFlowableTestCase {
         assertNotNull(v6Definition);
         assertTrue(StringUtils.isEmpty(v6Definition.getEngineVersion()));
         
-        org.flowable.task.service.Task signalTask = taskService.createTaskQuery().processDefinitionKey("signalIntermediateCatch").singleResult();
+        org.flowable.task.api.Task signalTask = taskService.createTaskQuery().processDefinitionKey("signalIntermediateCatch").singleResult();
         assertNotNull(signalTask);
         assertEquals("task", signalTask.getTaskDefinitionKey());
         taskService.complete(signalTask.getId());
         
-        org.flowable.task.service.Task beforeTask = taskService.createTaskQuery().processDefinitionKey("signalThrow").singleResult();
+        org.flowable.task.api.Task beforeTask = taskService.createTaskQuery().processDefinitionKey("signalThrow").singleResult();
         taskService.complete(beforeTask.getId());
         
-        org.flowable.task.service.Task afterTask = taskService.createTaskQuery().processDefinitionKey("signalIntermediateCatch").singleResult();
+        org.flowable.task.api.Task afterTask = taskService.createTaskQuery().processDefinitionKey("signalIntermediateCatch").singleResult();
         assertNotNull(afterTask);
         assertEquals("afterTask", afterTask.getTaskDefinitionKey());
         

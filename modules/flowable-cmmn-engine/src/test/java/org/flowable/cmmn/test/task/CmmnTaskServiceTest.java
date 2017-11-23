@@ -16,14 +16,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
-import org.flowable.cmmn.engine.runtime.CaseInstance;
-import org.flowable.cmmn.engine.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.engine.common.impl.history.HistoryLevel;
-import org.flowable.task.service.Task;
-import org.flowable.task.service.history.HistoricTaskInstance;
-import org.flowable.variable.service.type.VariableScopeType;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.variable.api.type.VariableScopeType;
 import org.junit.Test;
 
 /**
@@ -37,6 +37,8 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("oneHumanTaskCase").start();
         Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
         assertNotNull(task);
+        assertEquals("The Task", task.getName());
+        assertEquals("This is a test documentation", task.getDescription());
         assertEquals("johnDoe", task.getAssignee());
         
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
@@ -51,6 +53,34 @@ public class CmmnTaskServiceTest extends FlowableCmmnTestCase {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
             assertNotNull(historicTaskInstance);
+            assertEquals("The Task", historicTaskInstance.getName());
+            assertEquals("This is a test documentation", historicTaskInstance.getDescription());
+            assertNotNull(historicTaskInstance.getEndTime());
+        }
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testOneHumanTaskExpressionCase() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                        .caseDefinitionKey("oneHumanTaskCase")
+                        .variable("var1", "A")
+                        .variable("var2", "YES")
+                        .start();
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertNotNull(task);
+        assertEquals("The Task A", task.getName());
+        assertEquals("This is a test YES", task.getDescription());
+        assertEquals("johnDoe", task.getAssignee());
+        
+        cmmnTaskService.complete(task.getId());
+        assertCaseInstanceEnded(caseInstance);
+        
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricTaskInstance historicTaskInstance = cmmnHistoryService.createHistoricTaskInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertNotNull(historicTaskInstance);
+            assertEquals("The Task A", historicTaskInstance.getName());
+            assertEquals("This is a test YES", historicTaskInstance.getDescription());
             assertNotNull(historicTaskInstance.getEndTime());
         }
     }

@@ -30,7 +30,7 @@ public class StandaloneCommentEventsTest extends PluggableFlowableTestCase {
 
     public void testCommentEntityEventsStandaloneTask() throws Exception {
         if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.AUDIT)) {
-            org.flowable.task.service.Task task = null;
+            org.flowable.task.api.Task task = null;
             try {
                 task = taskService.newTask();
                 taskService.saveTask(task);

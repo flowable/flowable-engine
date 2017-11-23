@@ -89,5 +89,14 @@
 
     </changeSet>
 
+    <changeSet id="2" author="flowable">
+    
+        <addColumn tableName="ACT_FO_FORM_INSTANCE">
+            <column name="SCOPE_ID_" type="varchar(255)" />
+            <column name="SCOPE_TYPE_" type="varchar(255)" />
+            <column name="SCOPE_DEFINITION_ID_" type="varchar(255)" />
+        </addColumn>
+    
+    </changeSet>
 
 </databaseChangeLog>

@@ -1,11 +1,6 @@
 drop table if exists ACT_RE_DEPLOYMENT cascade constraints;
 drop table if exists ACT_RE_MODEL cascade constraints;
 drop table if exists ACT_RU_EXECUTION cascade constraints;
-drop table if exists ACT_RU_JOB cascade constraints;
-drop table if exists ACT_RU_TIMER_JOB cascade constraints;
-drop table if exists ACT_RU_SUSPENDED_JOB cascade constraints;
-drop table if exists ACT_RU_DEADLETTER_JOB cascade constraints;
-drop table if exists ACT_RU_HISTORY_JOB cascade constraints;
 drop table if exists ACT_RE_PROCDEF cascade constraints;
 drop table if exists ACT_RU_EVENT_SUBSCR cascade constraints;
 drop table if exists ACT_EVT_LOG cascade constraints;

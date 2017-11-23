@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.common.api.repository.EngineResource;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
 
 /**
@@ -37,7 +38,7 @@ public class CmmnDeploymentEntityImpl extends AbstractEntityNoRevision implement
     protected String key;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     protected String parentDeploymentId;
-    protected Map<String, CmmnResourceEntity> resources;
+    protected Map<String, EngineResource> resources;
     protected Date deploymentTime;
     protected boolean isNew;
 
@@ -57,7 +58,7 @@ public class CmmnDeploymentEntityImpl extends AbstractEntityNoRevision implement
         resources.put(resource.getName(), resource);
     }
 
-    public Map<String, CmmnResourceEntity> getResources() {
+    public Map<String, EngineResource> getResources() {
         if (resources == null && id != null) {
             List<CmmnResourceEntity> resourcesList = CommandContextUtil.getCmmnResourceEntityManager().findResourcesByDeploymentId(id);
             resources = new HashMap<>();
@@ -144,7 +145,7 @@ public class CmmnDeploymentEntityImpl extends AbstractEntityNoRevision implement
         this.parentDeploymentId = parentDeploymentId;
     }
 
-    public void setResources(Map<String, CmmnResourceEntity> resources) {
+    public void setResources(Map<String, EngineResource> resources) {
         this.resources = resources;
     }
 
@@ -162,6 +163,10 @@ public class CmmnDeploymentEntityImpl extends AbstractEntityNoRevision implement
 
     public void setNew(boolean isNew) {
         this.isNew = isNew;
+    }
+    
+    public String getEngineVersion() {
+        return null;
     }
 
     // common methods //////////////////////////////////////////////////////////

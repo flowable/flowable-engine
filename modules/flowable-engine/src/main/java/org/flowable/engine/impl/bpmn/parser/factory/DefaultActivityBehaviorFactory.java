@@ -15,6 +15,7 @@ package org.flowable.engine.impl.bpmn.parser.factory;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
+import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.BusinessRuleTask;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.CancelEventDefinition;
@@ -47,6 +48,7 @@ import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.bpmn.model.Transaction;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.delegate.BusinessRuleTaskDelegate;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.behavior.AdhocSubProcessActivityBehavior;
@@ -102,7 +104,6 @@ import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.scripting.ScriptingEngines;
-import org.flowable.engine.common.api.delegate.Expression;
 
 import java.util.List;
 
@@ -185,13 +186,13 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     }
 
     @Override
-    public WebServiceActivityBehavior createWebServiceActivityBehavior(ServiceTask serviceTask) {
-        return new WebServiceActivityBehavior();
+    public WebServiceActivityBehavior createWebServiceActivityBehavior(ServiceTask serviceTask, BpmnModel bpmnModel) {
+        return new WebServiceActivityBehavior(bpmnModel);
     }
 
     @Override
-    public WebServiceActivityBehavior createWebServiceActivityBehavior(SendTask sendTask) {
-        return new WebServiceActivityBehavior();
+    public WebServiceActivityBehavior createWebServiceActivityBehavior(SendTask sendTask, BpmnModel bpmnModel) {
+        return new WebServiceActivityBehavior(bpmnModel);
     }
 
     @Override

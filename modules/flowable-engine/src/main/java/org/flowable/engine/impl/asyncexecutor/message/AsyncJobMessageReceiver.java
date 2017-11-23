@@ -17,7 +17,7 @@ import java.util.List;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;

@@ -19,9 +19,9 @@ import static org.mockito.Mockito.when;
 import java.io.File;
 import java.io.InputStream;
 
-import org.flowable.cmmn.engine.CmmnRepositoryService;
-import org.flowable.cmmn.engine.repository.CmmnDeployment;
-import org.flowable.cmmn.engine.repository.CmmnDeploymentBuilder;
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
+import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.junit.Before;
 import org.mockito.Mock;
 import org.springframework.core.io.ByteArrayResource;

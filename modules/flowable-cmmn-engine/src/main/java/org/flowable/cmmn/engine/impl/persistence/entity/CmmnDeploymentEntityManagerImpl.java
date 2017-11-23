@@ -15,12 +15,13 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
+import org.flowable.cmmn.api.repository.CmmnDeploymentQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CmmnDeploymentDataManager;
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentQueryImpl;
-import org.flowable.cmmn.engine.repository.CaseDefinition;
-import org.flowable.cmmn.engine.repository.CmmnDeployment;
-import org.flowable.cmmn.engine.repository.CmmnDeploymentQuery;
+import org.flowable.engine.common.api.repository.EngineResource;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 
 /**
@@ -44,9 +45,9 @@ public class CmmnDeploymentEntityManagerImpl extends AbstractCmmnEntityManager<C
     public void insert(CmmnDeploymentEntity deployment) {
         super.insert(deployment, true);
 
-        for (CmmnResourceEntity resource : deployment.getResources().values()) {
+        for (EngineResource resource : deployment.getResources().values()) {
             resource.setDeploymentId(deployment.getId());
-            getCmmnResourceEntityManager().insert(resource);
+            getCmmnResourceEntityManager().insert((CmmnResourceEntity) resource);
         }
     }
 

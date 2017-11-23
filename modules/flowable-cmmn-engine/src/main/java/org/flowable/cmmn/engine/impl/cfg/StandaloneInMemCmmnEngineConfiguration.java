@@ -18,6 +18,7 @@ public class StandaloneInMemCmmnEngineConfiguration extends CmmnEngineConfigurat
     
     public StandaloneInMemCmmnEngineConfiguration() {
         this.jdbcUrl = "jdbc:h2:mem:flowable";
+        this.databaseSchemaUpdate = CmmnEngineConfiguration.DB_SCHEMA_UPDATE_TRUE;
     }
 
 }

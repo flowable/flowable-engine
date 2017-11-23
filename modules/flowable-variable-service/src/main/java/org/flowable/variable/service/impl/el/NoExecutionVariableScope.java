@@ -18,8 +18,8 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
-import org.flowable.variable.service.delegate.VariableScope;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstance;
+import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 /**
  * Variable-scope only used to resolve variables when NO execution is active but expression-resolving is needed. This occurs eg. when start-form properties have default's defined. Even though

@@ -25,8 +25,8 @@ import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.job.service.Job;
-import org.flowable.job.service.JobNotFoundException;
+import org.flowable.job.api.Job;
+import org.flowable.job.api.JobNotFoundException;
 import org.flowable.job.service.impl.cmd.AcquireTimerJobsCmd;
 
 /**

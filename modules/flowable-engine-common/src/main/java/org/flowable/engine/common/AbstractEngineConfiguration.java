@@ -62,6 +62,7 @@ import org.flowable.engine.common.impl.interceptor.LogInterceptor;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.common.impl.interceptor.TransactionContextInterceptor;
 import org.flowable.engine.common.impl.persistence.StrongUuidGenerator;
+import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.common.impl.util.DefaultClockImpl;
 import org.flowable.engine.common.impl.util.IoUtil;
 import org.flowable.engine.common.runtime.Clock;
@@ -145,6 +146,12 @@ public abstract class AbstractEngineConfiguration {
     protected TransactionContextFactory transactionContextFactory;
     
     /**
+     * If set to true, enables bulk insert (grouping sql inserts together). Default true. 
+     * For some databases (eg DB2+z/OS) needs to be set to false.
+     */
+    protected boolean isBulkInsertEnabled = true;
+    
+    /**
      * Some databases have a limit of how many parameters one sql insert can have (eg SQL Server, 2000 params (!= insert statements) ). Tweak this parameter in case of exceptions indicating too much
      * is being put into one bulk insert, or make it higher if your database can cope with it and there are inserts with a huge amount of data.
      * <p>
@@ -219,6 +226,10 @@ public abstract class AbstractEngineConfiguration {
     protected boolean tablePrefixIsSchema;
 
     protected Properties databaseTypeMappings = getDefaultDatabaseTypeMappings();
+    
+    protected List<EngineDeployer> customPreDeployers;
+    protected List<EngineDeployer> customPostDeployers;
+    protected List<EngineDeployer> deployers;
 
     public static final String DATABASE_TYPE_H2 = "h2";
     public static final String DATABASE_TYPE_HSQL = "hsql";
@@ -414,7 +425,7 @@ public abstract class AbstractEngineConfiguration {
 
     public void initSchemaCommandConfig() {
         if (schemaCommandConfig == null) {
-            schemaCommandConfig = new CommandConfig().transactionNotSupported();
+            schemaCommandConfig = new CommandConfig();
         }
     }
     
@@ -546,6 +557,20 @@ public abstract class AbstractEngineConfiguration {
     }
     
     protected abstract void initDbSqlSessionFactoryEntitySettings();
+    
+    protected void defaultInitDbSqlSessionFactoryEntitySettings(List<Class<? extends Entity>> insertOrder, List<Class<? extends Entity>> deleteOrder) {
+        for (Class<? extends Entity> clazz : insertOrder) {
+            dbSqlSessionFactory.getInsertionOrder().add(clazz);
+
+            if (isBulkInsertEnabled) {
+                dbSqlSessionFactory.getBulkInserteableEntityClasses().add(clazz);
+            }
+        }
+
+        for (Class<? extends Entity> clazz : deleteOrder) {
+            dbSqlSessionFactory.getDeletionOrder().add(clazz);
+        }
+    }
 
     public void initTransactionFactory() {
         if (transactionFactory == null) {
@@ -1059,6 +1084,15 @@ public abstract class AbstractEngineConfiguration {
         this.maxNrOfStatementsInBulkInsert = maxNrOfStatementsInBulkInsert;
         return this;
     }
+    
+    public boolean isBulkInsertEnabled() {
+        return isBulkInsertEnabled;
+    }
+
+    public AbstractEngineConfiguration setBulkInsertEnabled(boolean isBulkInsertEnabled) {
+        this.isBulkInsertEnabled = isBulkInsertEnabled;
+        return this;
+    }
 
     public Set<Class<?>> getCustomMybatisMappers() {
         return customMybatisMappers;
@@ -1258,6 +1292,33 @@ public abstract class AbstractEngineConfiguration {
 
     public AbstractEngineConfiguration setMaxLengthStringVariableType(int maxLengthStringVariableType) {
         this.maxLengthStringVariableType = maxLengthStringVariableType;
+        return this;
+    }
+    
+    public List<EngineDeployer> getDeployers() {
+        return deployers;
+    }
+
+    public AbstractEngineConfiguration setDeployers(List<EngineDeployer> deployers) {
+        this.deployers = deployers;
+        return this;
+    }
+    
+    public List<EngineDeployer> getCustomPreDeployers() {
+        return customPreDeployers;
+    }
+
+    public AbstractEngineConfiguration setCustomPreDeployers(List<EngineDeployer> customPreDeployers) {
+        this.customPreDeployers = customPreDeployers;
+        return this;
+    }
+
+    public List<EngineDeployer> getCustomPostDeployers() {
+        return customPostDeployers;
+    }
+
+    public AbstractEngineConfiguration setCustomPostDeployers(List<EngineDeployer> customPostDeployers) {
+        this.customPostDeployers = customPostDeployers;
         return this;
     }
     

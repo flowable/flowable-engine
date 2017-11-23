@@ -14,7 +14,7 @@
 package org.flowable.engine.impl.form;
 
 import org.flowable.engine.form.TaskFormData;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.Task;
 
 /**
  * @author Tom Baeyens

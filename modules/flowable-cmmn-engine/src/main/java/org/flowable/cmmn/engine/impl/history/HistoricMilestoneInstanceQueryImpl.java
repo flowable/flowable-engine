@@ -15,8 +15,8 @@ package org.flowable.cmmn.engine.impl.history;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.cmmn.engine.history.HistoricMilestoneInstance;
-import org.flowable.cmmn.engine.history.HistoricMilestoneInstanceQuery;
+import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
+import org.flowable.cmmn.api.history.HistoricMilestoneInstanceQuery;
 import org.flowable.cmmn.engine.impl.runtime.MilestoneInstanceQueryProperty;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.impl.AbstractQuery;

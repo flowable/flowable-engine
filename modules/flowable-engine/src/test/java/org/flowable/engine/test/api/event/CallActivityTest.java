@@ -75,7 +75,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
 
         // no task should be active in parent process
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(task);
 
         // only active task should be the one defined in the external subprocess
@@ -258,7 +258,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
 
         // no task should be active in parent process
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(task);
 
         // only active task should be the one defined in the external subprocess
@@ -380,7 +380,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
 
         // no task should be active in parent process
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(task);
 
         // only active task should be the one defined in the external subprocess

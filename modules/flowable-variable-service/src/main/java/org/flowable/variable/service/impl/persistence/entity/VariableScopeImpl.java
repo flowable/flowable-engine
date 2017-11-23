@@ -28,11 +28,12 @@ import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.javax.el.ELContext;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntity;
+import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.api.types.VariableTypes;
 import org.flowable.variable.service.VariableServiceConfiguration;
-import org.flowable.variable.service.delegate.VariableScope;
 import org.flowable.variable.service.event.impl.FlowableVariableEventBuilder;
-import org.flowable.variable.service.impl.types.VariableType;
-import org.flowable.variable.service.impl.types.VariableTypes;
 import org.flowable.variable.service.impl.util.CommandContextUtil;
 
 /**

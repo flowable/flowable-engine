@@ -19,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.api.types.VariableTypes;
 
 /**
  * @author Tom Baeyens

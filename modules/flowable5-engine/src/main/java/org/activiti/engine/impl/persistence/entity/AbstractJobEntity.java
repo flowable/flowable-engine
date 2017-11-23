@@ -24,7 +24,7 @@ import org.activiti.engine.impl.db.HasRevision;
 import org.activiti.engine.impl.db.PersistentObject;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.ProcessEngineConfiguration;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 
 /**
  * Abstract job entity class.

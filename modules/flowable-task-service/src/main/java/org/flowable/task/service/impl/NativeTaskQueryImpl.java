@@ -17,8 +17,8 @@ import java.util.Map;
 
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.task.service.NativeTaskQuery;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.NativeTaskQuery;
+import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.util.CommandContextUtil;
 
 public class NativeTaskQueryImpl extends AbstractNativeQuery<NativeTaskQuery, Task> implements NativeTaskQuery {

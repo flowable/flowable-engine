@@ -17,10 +17,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.flowable.variable.api.types.VariableType;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
-import org.flowable.variable.service.impl.types.VariableType;
 
 /**
  * @author Tom Baeyens

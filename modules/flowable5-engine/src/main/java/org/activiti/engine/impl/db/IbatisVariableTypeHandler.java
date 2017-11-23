@@ -22,8 +22,8 @@ import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.context.Context;
 import org.apache.ibatis.type.JdbcType;
 import org.apache.ibatis.type.TypeHandler;
-import org.flowable.variable.service.impl.types.VariableType;
-import org.flowable.variable.service.impl.types.VariableTypes;
+import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.api.types.VariableTypes;
 
 /**
  * @author Dave Syer

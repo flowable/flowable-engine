@@ -12,21 +12,19 @@
  */
 package org.flowable.rest.dmn.service.api.repository;
 
-import javax.servlet.http.HttpServletResponse;
-
-import org.flowable.dmn.api.DmnDecisionTable;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import org.flowable.dmn.api.DmnDecisionTable;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Yvo Swillens
@@ -40,7 +38,7 @@ public class DecisionTableResourceDataResource extends BaseDecisionTableResource
             @ApiResponse(code = 200, message = "Indicates both decision table and resource have been found and the resource data has been returned."),
             @ApiResponse(code = 404, message = "Indicates the requested decision table was not found or there is no resource with the given id present in the decision table. The status-description contains additional information.")
     })
-    @RequestMapping(value = "/dmn-repository/decision-tables/{decisionTableId}/resourcedata", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/dmn-repository/decision-tables/{decisionTableId}/resourcedata", produces = "application/json")
     @ResponseBody
     public byte[] getDecisionTableResource(@ApiParam(name = "decisionTableId") @PathVariable String decisionTableId, HttpServletResponse response) {
         DmnDecisionTable decisionTable = getDecisionTableFromRequest(decisionTableId);

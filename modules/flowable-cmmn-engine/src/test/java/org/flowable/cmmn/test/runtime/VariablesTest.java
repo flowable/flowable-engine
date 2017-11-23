@@ -22,15 +22,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
-import org.flowable.cmmn.engine.delegate.PlanItemJavaDelegate;
-import org.flowable.cmmn.engine.history.HistoricMilestoneInstance;
-import org.flowable.cmmn.engine.runtime.CaseInstance;
-import org.flowable.cmmn.engine.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
+import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
+import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
-import org.flowable.variable.service.history.HistoricVariableInstance;
-import org.flowable.variable.service.type.VariableScopeType;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.type.VariableScopeType;
 import org.junit.Test;
 
 /**
@@ -126,18 +126,21 @@ public class VariablesTest extends FlowableCmmnTestCase {
         assertEquals(caseInstance.getId(), historicVariableInstance.getScopeId());
         assertEquals(VariableScopeType.CMMN, historicVariableInstance.getScopeType());
         assertEquals("test", historicVariableInstance.getValue());
+        assertNull(historicVariableInstance.getSubScopeId());
         
         assertEquals(123, cmmnRuntimeService.getVariable(caseInstance.getId(), "intVar"));
         historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("intVar").singleResult();
         assertEquals(caseInstance.getId(), historicVariableInstance.getScopeId());
         assertEquals(VariableScopeType.CMMN, historicVariableInstance.getScopeType());
         assertEquals(123, historicVariableInstance.getValue());
+        assertNull(historicVariableInstance.getSubScopeId());
         
         assertEquals(123.123, cmmnRuntimeService.getVariable(caseInstance.getId(), "doubleVar"));
         historicVariableInstance = cmmnHistoryService.createHistoricVariableInstanceQuery().variableName("doubleVar").singleResult();
         assertEquals(caseInstance.getId(), historicVariableInstance.getScopeId());
         assertEquals(VariableScopeType.CMMN, historicVariableInstance.getScopeType());
         assertEquals(123.123, historicVariableInstance.getValue());
+        assertNull(historicVariableInstance.getSubScopeId());
         
         // Update variables
         Map<String, Object> newVariables = new HashMap<>();

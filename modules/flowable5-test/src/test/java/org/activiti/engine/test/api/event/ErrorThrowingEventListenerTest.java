@@ -40,7 +40,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
             assertNotNull(processInstance);
 
             // Fetch the task and assign it. Should cause error-event to be dispatched
-            org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                     .taskDefinitionKey("userTask")
                     .singleResult();
             assertNotNull(task);
@@ -63,7 +63,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
 
         // Fetch the task and assign it. Should cause error-event to be dispatched
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                 .taskDefinitionKey("userTask")
                 .singleResult();
         assertNotNull(task);
@@ -90,7 +90,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
             assertNotNull(processInstance);
 
             // Fetch the task and assign it. Should cause error-event to be dispatched
-            org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                     .taskDefinitionKey("userTask")
                     .singleResult();
             assertNotNull(task);
@@ -130,7 +130,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
 
         // Fetch the task and assign it. Should cause error-event to be dispatched
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                 .taskDefinitionKey("userTask")
                 .singleResult();
         assertNotNull(task);

@@ -12,20 +12,18 @@
  */
 package org.flowable.rest.dmn.service.api.history;
 
-import javax.servlet.http.HttpServletResponse;
-
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Tijs Rademakers
@@ -39,7 +37,7 @@ public class HistoricDecisionExecutionResourceDataResource extends BaseHistoricD
             @ApiResponse(code = 200, message = "Indicates the historic decision execution has been found and the audit data has been returned."),
             @ApiResponse(code = 404, message = "Indicates the requested historic decision execution was not found. The status-description contains additional information.")
     })
-    @RequestMapping(value = "/dmn-history/historic-decision-executions/{historicDecisionExecutionId}/auditdata", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/dmn-history/historic-decision-executions/{historicDecisionExecutionId}/auditdata", produces = "application/json")
     @ResponseBody
     public String getHistoricDecisionExecutionAuditData(@ApiParam(name = "historicDecisionExecutionId") @PathVariable String historicDecisionExecutionId, HttpServletResponse response) {
         return getExecutionAuditData(historicDecisionExecutionId, response);

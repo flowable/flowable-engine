@@ -23,8 +23,8 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.test.Deployment;
-import org.flowable.task.service.Task;
-import org.flowable.task.service.history.HistoricTaskInstance;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 /**
  * @author martin.grofcik

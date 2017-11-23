@@ -15,11 +15,11 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.flowable.cmmn.api.runtime.MilestoneInstance;
+import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.MilestoneInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.MilestoneInstanceQueryImpl;
-import org.flowable.cmmn.engine.runtime.MilestoneInstance;
-import org.flowable.cmmn.engine.runtime.MilestoneInstanceQuery;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 
 /**

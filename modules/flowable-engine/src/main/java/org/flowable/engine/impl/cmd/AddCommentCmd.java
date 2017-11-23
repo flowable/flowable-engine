@@ -26,7 +26,7 @@ import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**

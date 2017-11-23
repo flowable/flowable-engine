@@ -28,7 +28,7 @@ import org.flowable.rest.exception.FlowableContentNotSupportedException;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.service.api.engine.variable.RestVariable.RestVariableScope;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.Task;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;

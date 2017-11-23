@@ -14,24 +14,24 @@ package org.flowable.cmmn.engine.configurator.impl.deployer;
 
 import java.util.Map;
 
-import org.flowable.cmmn.engine.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.repository.CmmnDeploymentBuilder;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.cmmn.engine.repository.CmmnDeploymentBuilder;
-import org.flowable.engine.impl.persistence.deploy.Deployer;
-import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
-import org.flowable.engine.impl.persistence.entity.ResourceEntity;
+import org.flowable.engine.common.EngineDeployer;
+import org.flowable.engine.common.api.repository.EngineDeployment;
+import org.flowable.engine.common.api.repository.EngineResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * @author Joram Barrez
  */
-public class CmmnDeployer implements Deployer {
+public class CmmnDeployer implements EngineDeployer {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(CmmnDeployer.class);
     
     @Override
-    public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
+    public void deploy(EngineDeployment deployment, Map<String, Object> deploymentSettings) {
         if (!deployment.isNew()) {
             return;
         }
@@ -39,7 +39,7 @@ public class CmmnDeployer implements Deployer {
         LOGGER.debug("CmmnDeployer: processing deployment {}", deployment.getName());
 
         CmmnDeploymentBuilder cmmnDeploymentBuilder = null;
-        Map<String, ResourceEntity> resources = deployment.getResources();
+        Map<String, EngineResource> resources = deployment.getResources();
         for (String resourceName : resources.keySet()) {
             if (org.flowable.cmmn.engine.impl.deployer.CmmnDeployer.isCmmnResource(resourceName)) {
                 LOGGER.info("CmmnDeployer: processing resource {}", resourceName);

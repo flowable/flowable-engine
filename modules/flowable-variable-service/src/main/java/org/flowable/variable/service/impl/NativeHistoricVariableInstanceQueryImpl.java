@@ -18,8 +18,8 @@ import java.util.Map;
 import org.flowable.engine.common.impl.AbstractNativeQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
-import org.flowable.variable.service.history.HistoricVariableInstance;
-import org.flowable.variable.service.history.NativeHistoricVariableInstanceQuery;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.history.NativeHistoricVariableInstanceQuery;
 import org.flowable.variable.service.impl.util.CommandContextUtil;
 
 public class NativeHistoricVariableInstanceQueryImpl extends AbstractNativeQuery<NativeHistoricVariableInstanceQuery, HistoricVariableInstance> implements NativeHistoricVariableInstanceQuery {

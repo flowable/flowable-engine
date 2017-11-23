@@ -56,7 +56,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         assertNotNull(rootProcessInstance);
         assertNotNull(childExecution);
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals(childExecution.getId(), task.getExecutionId());
 
         taskService.complete(task.getId());
@@ -108,7 +108,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         assertNotNull(rootProcessInstance);
         assertNotNull(childExecution);
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals(childExecution.getId(), task.getExecutionId());
 
         taskService.complete(task.getId());
@@ -214,7 +214,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         assertNotNull(rootProcessInstance);
         assertNotNull(childExecution);
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals(childExecution.getId(), task.getExecutionId());
 
         taskService.complete(task.getId());
@@ -300,7 +300,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessEvents");
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         Execution subProcessExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("subProcess").singleResult();

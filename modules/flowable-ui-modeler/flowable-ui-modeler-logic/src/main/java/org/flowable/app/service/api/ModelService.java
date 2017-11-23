@@ -54,7 +54,8 @@ public interface ModelService {
 
     byte[] getCmmnXML(AbstractModel model);
 
-    CmmnModel getCmmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap);
+    CmmnModel getCmmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap,
+    Map<String, Model> caseModelMap, Map<String, Model> processModelMap);
 
     String createModelJson(ModelRepresentation model, String skeletonId);
 

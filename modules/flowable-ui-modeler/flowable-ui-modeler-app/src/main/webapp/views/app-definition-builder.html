@@ -112,7 +112,7 @@
 
                 <div class="col-xs-12 item-wrapper" ng-show="appBuilder.activeTab == 'bpmn'">
                     <div class="item fadein" ng-repeat="model in currentAppDefinition.definition.models">
-                        <div class="item-box" ng-style="{'background-image': 'url(\'' + config.contextRoot + '/app/rest/models/' + model.id + '/thumbnail\')'}">
+                        <div class="item-box" ng-style="{'background-image': 'url(\'' + getModelThumbnailUrl(model.id) + '\')'}">
                             <div class="actions">
                                 <span class="badge">v{{model.version}}</span>
                             </div>
@@ -128,7 +128,7 @@
 
                 <div class="col-xs-12 item-wrapper" ng-show="appBuilder.activeTab == 'cmmn'">
                     <div class="item fadein" ng-repeat="model in currentAppDefinition.definition.cmmnModels">
-                        <div class="item-box" ng-style="{'background-image': 'url(\'' + config.contextRoot + '/app/rest/models/' + model.id + '/thumbnail\')'}">
+                        <div class="item-box" ng-style="{'background-image': 'url(\'' + getModelThumbnailUrl(model.id) + '\')'}">
                             <div class="actions">
                                 <span class="badge">v{{model.version}}</span>
                             </div>

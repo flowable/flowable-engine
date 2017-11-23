@@ -12,8 +12,8 @@
  */
 package org.activiti.engine.impl.variable;
 
-import org.flowable.variable.service.impl.types.ValueFields;
-import org.flowable.variable.service.impl.types.VariableType;
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * @author Joram Barrez

@@ -12,20 +12,6 @@
  */
 package org.flowable.rest.form.service.api.form;
 
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.form.model.FormModel;
-import org.flowable.rest.api.DataResponse;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -34,6 +20,18 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.form.model.FormModel;
+import org.flowable.rest.api.DataResponse;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 /**
  * @author Yvo Swillens
@@ -42,7 +40,7 @@ import io.swagger.annotations.Authorization;
 @Api(tags = { "Form Instances" }, description = "Manage Form Instances", authorizations = { @Authorization(value = "basicAuth") })
 public class FormInstanceCollectionResource extends BaseFormInstanceResource {
 
-    @ApiOperation(value = "List of form instances", tags = { "Form Instances" })
+    @ApiOperation(value = "List of form instances", nickname = "listFormInstances", tags = { "Form Instances" })
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return form instances with the given id.", paramType = "query"),
             @ApiImplicitParam(name = "formDefinitionId", dataType = "string", value = "Only return form instances with the given form definition id.", paramType = "query"),
@@ -61,11 +59,11 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "submittedDate,tenantId", paramType = "query"),
     })
     @ApiResponses(value = {
-            @ApiResponse(code = 204, message = "Indicates request was successful and the form instances are returned"),
-            @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
+            @ApiResponse(code = 200, message = "Indicates request was successful and the form instances are returned"),
+            @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
-    @RequestMapping(value = "/form/form-instances", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getFormInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    @GetMapping(value = "/form/form-instances", produces = "application/json")
+    public DataResponse<FormInstanceResponse> getFormInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         // Populate query based on request
         FormInstanceQueryRequest queryRequest = new FormInstanceQueryRequest();
 
@@ -117,12 +115,13 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
         return getQueryResponse(queryRequest, allRequestParams);
     }
 
-    @ApiOperation(value = "Store a form instance", tags = { "Form Instances" }, nickname = "storeFormInstance", notes = "Provide either a FormDefinitionKey or a FormDefinitionId together with the other properties.")
+    @ApiOperation(value = "Store a form instance", tags = { "Form Instances" }, nickname = "storeFormInstance",
+            notes = "Provide either a FormDefinitionKey or a FormDefinitionId together with the other properties.")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the form instance was stored."),
             @ApiResponse(code = 404, message = "Indicates the related form model was not found.")
     })
-    @RequestMapping(value = "/form/form-instances", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/form/form-instances", produces = "application/json")
     public void storeFormInstance(@RequestBody FormRequest formRequest, HttpServletRequest request) {
 
         FormModel formModel;
@@ -130,7 +129,6 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
         if (formRequest.getFormDefinitionKey() != null) {
             formModel = formService.getFormModelWithVariablesByKey(
                     formRequest.getFormDefinitionKey(),
-                    formRequest.getProcessInstanceId(),
                     formRequest.getTaskId(),
                     formRequest.getVariables(),
                     formRequest.getTenantId());
@@ -138,7 +136,6 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
         } else if (formRequest.getFormDefinitionId() != null) {
             formModel = formService.getFormModelWithVariablesById(
                     formRequest.getFormDefinitionId(),
-                    formRequest.getProcessInstanceId(),
                     formRequest.getTaskId(),
                     formRequest.getVariables(),
                     formRequest.getTenantId());
@@ -151,7 +148,13 @@ public class FormInstanceCollectionResource extends BaseFormInstanceResource {
             throw new FlowableObjectNotFoundException("Could not find a form definition");
         }
 
-        formService.createFormInstance(formRequest.getVariables(), formModel, formRequest.getTaskId(),
-                formRequest.getProcessInstanceId());
+        if (formRequest.getScopeId() != null) {
+            formService.createFormInstanceWithScopeId(formRequest.getVariables(), formModel, formRequest.getTaskId(),
+                            formRequest.getScopeId(), formRequest.getScopeType(), formRequest.getScopeDefinitionId());
+            
+        } else {
+            formService.createFormInstance(formRequest.getVariables(), formModel, formRequest.getTaskId(),
+                            formRequest.getProcessInstanceId(), formRequest.getProcessDefinitionId());
+        }
     }
 }

@@ -31,7 +31,7 @@ import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.parse.BpmnParseHandler;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.Task;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 import org.junit.Test;
 

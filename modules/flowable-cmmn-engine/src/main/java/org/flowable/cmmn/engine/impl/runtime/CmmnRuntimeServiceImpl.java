@@ -14,7 +14,12 @@ package org.flowable.cmmn.engine.impl.runtime;
 
 import java.util.Map;
 
-import org.flowable.cmmn.engine.CmmnRuntimeService;
+import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.CaseInstanceBuilder;
+import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
+import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.engine.impl.ServiceImpl;
 import org.flowable.cmmn.engine.impl.cmd.EvaluateCriteriaCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetVariableCmd;
@@ -24,11 +29,6 @@ import org.flowable.cmmn.engine.impl.cmd.SetVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TerminateCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TriggerPlanItemInstanceCmd;
-import org.flowable.cmmn.engine.runtime.CaseInstance;
-import org.flowable.cmmn.engine.runtime.CaseInstanceBuilder;
-import org.flowable.cmmn.engine.runtime.CaseInstanceQuery;
-import org.flowable.cmmn.engine.runtime.MilestoneInstanceQuery;
-import org.flowable.cmmn.engine.runtime.PlanItemInstanceQuery;
 
 /**
  * @author Joram Barrez

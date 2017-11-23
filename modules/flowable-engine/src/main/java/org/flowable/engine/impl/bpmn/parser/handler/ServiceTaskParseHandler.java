@@ -79,7 +79,7 @@ public class ServiceTaskParseHandler extends AbstractActivityBpmnParseHandler<Se
             // Webservice
         } else if (ImplementationType.IMPLEMENTATION_TYPE_WEBSERVICE.equalsIgnoreCase(serviceTask.getImplementationType()) && StringUtils.isNotEmpty(serviceTask.getOperationRef())) {
 
-            WebServiceActivityBehavior webServiceActivityBehavior = bpmnParse.getActivityBehaviorFactory().createWebServiceActivityBehavior(serviceTask);
+            WebServiceActivityBehavior webServiceActivityBehavior = bpmnParse.getActivityBehaviorFactory().createWebServiceActivityBehavior(serviceTask, bpmnParse.getBpmnModel());
             serviceTask.setBehavior(webServiceActivityBehavior);
 
         } else {

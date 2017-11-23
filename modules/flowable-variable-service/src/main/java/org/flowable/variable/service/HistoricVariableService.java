@@ -14,7 +14,7 @@ package org.flowable.variable.service;
 
 import java.util.List;
 
-import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;

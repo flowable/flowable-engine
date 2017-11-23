@@ -42,8 +42,8 @@
 
     <div class="header" ng-if="!newCaseInstance && model.caseInstance">
         <div class="btn-group pull-right" ng-show="model.caseInstance.startedBy.id == ('' + account.id)">
-            <button ng-if="!model.caseInstance.ended" class="btn" ng-click="cancelCase()" translate="PROCESS.ACTION.CANCEL"></button>
-            <button ng-if="model.caseInstance.ended" class="btn" ng-click="deleteCase()" translate="PROCESS.ACTION.DELETE"></button>
+            <button ng-if="!model.caseInstance.ended" class="btn" ng-click="cancelCase()" translate="CASE.ACTION.CANCEL"></button>
+            <button ng-if="model.caseInstance.ended" class="btn" ng-click="deleteCase()" translate="CASE.ACTION.DELETE"></button>
         </div>
         <h2> {{model.caseInstance.name && model.caseInstance.name || model.caseInstance.caseDefinitionName}}</h2>
 

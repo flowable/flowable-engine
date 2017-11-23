@@ -39,7 +39,7 @@ import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-import org.flowable.variable.service.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;

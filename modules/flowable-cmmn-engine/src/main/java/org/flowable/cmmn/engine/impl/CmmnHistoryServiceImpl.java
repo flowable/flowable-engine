@@ -12,13 +12,13 @@
  */
 package org.flowable.cmmn.engine.impl;
 
-import org.flowable.cmmn.engine.CmmnHistoryService;
-import org.flowable.cmmn.engine.history.HistoricCaseInstanceQuery;
-import org.flowable.cmmn.engine.history.HistoricMilestoneInstanceQuery;
-import org.flowable.cmmn.engine.history.HistoricVariableInstanceQuery;
+import org.flowable.cmmn.api.CmmnHistoryService;
+import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
+import org.flowable.cmmn.api.history.HistoricMilestoneInstanceQuery;
+import org.flowable.cmmn.api.history.HistoricVariableInstanceQuery;
 import org.flowable.cmmn.engine.impl.cmd.DeleteHistoricCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoricVariableInstanceQueryImpl;
-import org.flowable.task.service.history.HistoricTaskInstanceQuery;
+import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
 
 /**

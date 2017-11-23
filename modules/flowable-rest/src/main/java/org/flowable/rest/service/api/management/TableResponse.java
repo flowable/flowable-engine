@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.management;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author Frederik Heremans
  */
@@ -22,6 +24,7 @@ public class TableResponse {
     protected String url;
     protected Long count;
 
+    @ApiModelProperty(example = "ACT_RU_VARIABLE")
     public String getName() {
         return name;
     }
@@ -30,6 +33,7 @@ public class TableResponse {
         this.name = name;
     }
 
+    @ApiModelProperty(example = "http://localhost:8080/flowable-rest/service/management/tables/ACT_RU_VARIABLE")
     public String getUrl() {
         return url;
     }
@@ -38,6 +42,7 @@ public class TableResponse {
         this.url = url;
     }
 
+    @ApiModelProperty(example = "4528")
     public Long getCount() {
         return count;
     }

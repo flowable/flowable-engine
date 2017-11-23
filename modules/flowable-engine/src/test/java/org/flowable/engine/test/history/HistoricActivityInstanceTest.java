@@ -195,7 +195,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         // Get task list
         HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("theTask").singleResult();
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals(task.getId(), historicActivityInstance.getTaskId());
         assertEquals("kermit", historicActivityInstance.getAssignee());
     }
@@ -287,7 +287,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
     public void testBoundaryEvent() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("boundaryEventProcess");
         // Complete the task with the boundary-event on it
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
         taskService.complete(task.getId());
 
@@ -344,7 +344,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
     public void testParallelJoinEndTime() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("forkJoin");
 
-        List<org.flowable.task.service.Task> tasksToComplete = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        List<org.flowable.task.api.Task> tasksToComplete = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(2, tasksToComplete.size());
 
         // Complete both tasks, second task-complete should end the fork-gateway and set time
@@ -372,7 +372,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         // 15 service tasks should have passed
 
         for (int i = 0; i < 10; i++) {
-            org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             Number inputNumber = (Number) taskService.getVariable(task.getId(), "input");
             int input = inputNumber.intValue();
             assertEquals(i, input);

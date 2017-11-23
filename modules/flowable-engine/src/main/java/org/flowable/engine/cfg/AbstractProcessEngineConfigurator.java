@@ -12,12 +12,13 @@
  */
 package org.flowable.engine.cfg;
 
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.EngineConfigurator;
 
 /**
  * @author jbarrez
  */
-public abstract class AbstractProcessEngineConfigurator implements ProcessEngineConfigurator {
+public abstract class AbstractProcessEngineConfigurator implements EngineConfigurator {
 
     public static int DEFAULT_CONFIGURATOR_PRIORITY = 10000;
 
@@ -27,12 +28,12 @@ public abstract class AbstractProcessEngineConfigurator implements ProcessEngine
     }
 
     @Override
-    public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public void beforeInit(AbstractEngineConfiguration engineConfiguration) {
 
     }
 
     @Override
-    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public void configure(AbstractEngineConfiguration engineConfiguration) {
 
     }
 

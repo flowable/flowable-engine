@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.flowable.engine.delegate.TaskListener;
-import org.flowable.identitylink.service.IdentityLink;
+import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.task.service.delegate.DelegateTask;
 
 public class DelegateTaskTestTaskListener implements TaskListener {

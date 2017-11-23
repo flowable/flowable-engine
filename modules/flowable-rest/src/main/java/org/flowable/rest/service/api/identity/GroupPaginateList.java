@@ -15,13 +15,14 @@ package org.flowable.rest.service.api.identity;
 
 import java.util.List;
 
+import org.flowable.idm.api.Group;
 import org.flowable.rest.api.AbstractPaginateList;
 import org.flowable.rest.service.api.RestResponseFactory;
 
 /**
  * @author Frederik Heremans
  */
-public class GroupPaginateList extends AbstractPaginateList {
+public class GroupPaginateList extends AbstractPaginateList<GroupResponse, Group> {
 
     protected RestResponseFactory restResponseFactory;
 
@@ -29,9 +30,8 @@ public class GroupPaginateList extends AbstractPaginateList {
         this.restResponseFactory = restResponseFactory;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    protected List processList(List list) {
+    protected List<GroupResponse> processList(List<Group> list) {
         return restResponseFactory.createGroupResponseList(list);
     }
 }

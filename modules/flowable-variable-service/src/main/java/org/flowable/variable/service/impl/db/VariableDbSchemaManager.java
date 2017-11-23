@@ -30,7 +30,7 @@ public class VariableDbSchemaManager extends ServiceSqlScriptBasedDbSchemaManage
 
     @Override
     protected String getResourcesRootDirectory() {
-        return "org/flowable/variable/db/";
+        return "org/flowable/variable/service/db/";
     }
     
 }

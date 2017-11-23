@@ -20,7 +20,7 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.common.runtime.Clock;
-import org.flowable.variable.service.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * Context in which simulation is run. It contains references to process engine, event calendar.

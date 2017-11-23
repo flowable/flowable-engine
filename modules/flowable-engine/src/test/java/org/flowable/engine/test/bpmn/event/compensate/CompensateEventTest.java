@@ -62,7 +62,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("Manually undo book hotel", task.getName());
         taskService.complete(task.getId());
 
@@ -81,7 +81,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
         Execution execution = runtimeService.createExecutionQuery().activityId("beforeEnd").singleResult();
         runtimeService.trigger(execution.getId());
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("Manually undo book hotel", task.getName());
         taskService.complete(task.getId());
 
@@ -127,7 +127,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
 
         // get task from first subprocess
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
         Map<String, String> taskFormVariables = new HashMap<>();
         taskFormVariables.put("test", "begin");
@@ -218,22 +218,22 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
         }
 
         // Triggering the task will trigger the compensation subprocess
-        org.flowable.task.service.Task afterBookHotelTask = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        org.flowable.task.api.Task afterBookHotelTask = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                 .taskDefinitionKey("afterBookHotel").singleResult();
         taskService.complete(afterBookHotelTask.getId());
 
-        org.flowable.task.service.Task compensationTask1 = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        org.flowable.task.api.Task compensationTask1 = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                 .taskDefinitionKey("compensateTask1").singleResult();
         assertNotNull(compensationTask1);
 
-        org.flowable.task.service.Task compensationTask2 = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        org.flowable.task.api.Task compensationTask2 = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                 .taskDefinitionKey("compensateTask2").singleResult();
         assertNotNull(compensationTask2);
 
         taskService.complete(compensationTask1.getId());
         taskService.complete(compensationTask2.getId());
 
-        org.flowable.task.service.Task compensationTask3 = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        org.flowable.task.api.Task compensationTask3 = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                 .taskDefinitionKey("compensateTask3").singleResult();
         assertNotNull(compensationTask3);
         taskService.complete(compensationTask3.getId());
@@ -250,7 +250,7 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess",
                 CollectionUtil.singletonMap("doCompensation", false));
 
-        org.flowable.task.service.Task afterBookHotelTask = taskService.createTaskQuery().processInstanceId(processInstance.getId())
+        org.flowable.task.api.Task afterBookHotelTask = taskService.createTaskQuery().processInstanceId(processInstance.getId())
                 .taskDefinitionKey("afterBookHotel").singleResult();
         taskService.complete(afterBookHotelTask.getId());
 
@@ -262,11 +262,11 @@ public class CompensateEventTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
 
         // Completing should trigger the compensations
-        org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("afterNestedSubProcess").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("afterNestedSubProcess").singleResult();
         assertNotNull(task);
         taskService.complete(task.getId());
 
-        org.flowable.task.service.Task compensationTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("undoBookHotel").singleResult();
+        org.flowable.task.api.Task compensationTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("undoBookHotel").singleResult();
         assertNotNull(compensationTask);
         taskService.complete(compensationTask.getId());
 

@@ -30,8 +30,8 @@ import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.task.service.TaskQuery;
-import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.task.api.TaskQuery;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 /**
@@ -49,7 +49,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             // After the process has started, the 'verify credit history' task should be active
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("orderProcess");
             TaskQuery taskQuery = taskService.createTaskQuery();
-            org.flowable.task.service.Task verifyCreditTask = taskQuery.singleResult();
+            org.flowable.task.api.Task verifyCreditTask = taskQuery.singleResult();
             assertEquals("Verify credit history", verifyCreditTask.getName());
 
             // Verify with Query API
@@ -59,7 +59,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
 
             // Completing the task with approval, will end the subprocess and continue the original process
             taskService.complete(verifyCreditTask.getId(), CollectionUtil.singletonMap("creditApproved", true));
-            org.flowable.task.service.Task prepareAndShipTask = taskQuery.singleResult();
+            org.flowable.task.api.Task prepareAndShipTask = taskQuery.singleResult();
             assertEquals("Prepare and Ship", prepareAndShipTask.getName());
         }
     }
@@ -69,7 +69,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProc");
             TaskQuery taskQuery = taskService.createTaskQuery();
-            org.flowable.task.service.Task userTask = taskQuery.singleResult();
+            org.flowable.task.api.Task userTask = taskQuery.singleResult();
             assertEquals("userTask1", userTask.getName());
 
             taskService.complete(userTask.getId(), CollectionUtil.singletonMap("myVar", "test789"));
@@ -109,7 +109,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProc");
             TaskQuery taskQuery = taskService.createTaskQuery();
-            org.flowable.task.service.Task userTask = taskQuery.singleResult();
+            org.flowable.task.api.Task userTask = taskQuery.singleResult();
             assertEquals("userTask1", userTask.getName());
 
             taskService.complete(userTask.getId(), CollectionUtil.singletonMap("myVar", "test789"));
@@ -218,7 +218,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         Map<String, Object> startVars = new HashMap<String, Object>();
         startVars.put("startVar", "hello");
         String processInstanceId = runtimeService.startProcessInstanceByKey("twoTasksProcess", startVars).getId();
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstanceId).list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstanceId).list();
         for (int i = 0; i < tasks.size(); i++) {
             runtimeService.setVariableLocal(tasks.get(i).getExecutionId(), "executionVar" + i, i);
             taskService.setVariableLocal(tasks.get(i).getId(), "taskVar" + i, i);
@@ -333,8 +333,8 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             }
         }
 
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        for (org.flowable.task.service.Task task : tasks) {
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        for (org.flowable.task.api.Task task : tasks) {
             taskService.setVariableLocal(task.getId(), "taskVar", "taskVar");
         }
 
@@ -357,7 +357,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         deployTwoTasksTestProcess();
         // Generate data
         String processInstanceId = runtimeService.startProcessInstanceByKey("twoTasksProcess").getId();
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstanceId).list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstanceId).list();
         taskService.setVariableLocal(tasks.get(0).getId(), "taskVar1", "hello1");
         taskService.setVariableLocal(tasks.get(1).getId(), "taskVar2", "hello2");
 
@@ -396,9 +396,9 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             }
         }
 
-        List<org.flowable.task.service.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         Set<String> taskIds = new HashSet<String>();
-        for (org.flowable.task.service.Task task : tasks) {
+        for (org.flowable.task.api.Task task : tasks) {
             taskService.setVariableLocal(task.getId(), "taskVar", "taskVar");
             taskIds.add(task.getId());
         }
@@ -432,7 +432,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstance pi = runtimeService.startProcessInstanceByKey("ProcessWithSubProcess");
 
-            org.flowable.task.service.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
             Map<String, Object> variables = new HashMap<String, Object>();
             variables.put("test", "1");
             taskService.complete(task.getId(), variables);
@@ -577,7 +577,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
             assertEquals(2, historyService.createNativeHistoricDetailQuery().sql(sqlWithConditions)
                     .parameter("name", "var%").list().size());
 
-            org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
             Map<String, String> formDatas = new HashMap<String, String>();
             formDatas.put("field1", "field value 1");
             formDatas.put("field2", "field value 2");
@@ -603,7 +603,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
             TaskQuery taskQuery = taskService.createTaskQuery();
-            org.flowable.task.service.Task task = taskQuery.singleResult();
+            org.flowable.task.api.Task task = taskQuery.singleResult();
             assertEquals("my task", task.getName());
 
             // no type change
@@ -639,7 +639,7 @@ public class HistoricVariableInstanceTest extends PluggableFlowableTestCase {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.FULL, processEngineConfiguration)) {
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("myProc");
             TaskQuery taskQuery = taskService.createTaskQuery();
-            org.flowable.task.service.Task userTask = taskQuery.singleResult();
+            org.flowable.task.api.Task userTask = taskQuery.singleResult();
             assertEquals("userTask1", userTask.getName());
 
             taskService.complete(userTask.getId(), CollectionUtil.singletonMap("myVar", "test789"));

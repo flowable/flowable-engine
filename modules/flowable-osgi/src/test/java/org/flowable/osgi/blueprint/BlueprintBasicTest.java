@@ -37,7 +37,7 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.osgi.blueprint.bean.ActivityBehaviourBean;
 import org.flowable.osgi.blueprint.bean.SimpleBean;
-import org.flowable.variable.service.history.HistoricVariableInstance;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.ops4j.pax.exam.Configuration;
@@ -94,10 +94,16 @@ public class BlueprintBasicTest {
                 mavenBundle().groupId("org.flowable").artifactId("flowable-idm-api").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-idm-engine").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-content-api").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-variable-service-api").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-variable-service").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-identitylink-service-api").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-identitylink-service").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-task-service-api").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-task-service").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-job-service-api").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-job-service").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-cmmn-model").version(FLOWABLE_VERSION),
+                mavenBundle().groupId("org.flowable").artifactId("flowable-cmmn-api").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.flowable").artifactId("flowable-engine").version(FLOWABLE_VERSION),
                 mavenBundle().groupId("org.apache.commons").artifactId("commons-lang3").version("3.3.2"),
                 mavenBundle().groupId("com.fasterxml.uuid").artifactId("java-uuid-generator").version("3.1.3"),

@@ -140,7 +140,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(10, nrOfSerializable);
 
         // Trying the same after moving the process
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().taskName("Task 3").singleResult();
@@ -224,7 +224,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(10, nrOfSerializable);
 
         // Trying the same after moving the process
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().taskName("Task 3").singleResult();
@@ -249,7 +249,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
     public void testGetVariablesLocal2() {
 
         // Trying the same after moving the process
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().taskName("Task 3").singleResult();
@@ -356,7 +356,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
         assertEquals(4, runtimeService.getVariablesLocal(processInstanceId, Arrays.asList("intVar1", "intVar3", "intVar5", "intVar9")).size());
 
         // Trying the same after moving the process
-        org.flowable.task.service.Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         task = taskService.createTaskQuery().taskName("Task 3").singleResult();
@@ -448,7 +448,7 @@ public class VariablesTest extends PluggableFlowableTestCase {
 
     public void testTaskGetVariables() {
 
-        org.flowable.task.service.Task task = taskService.createTaskQuery().taskName("Task 1").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskName("Task 1").singleResult();
         Map<String, Object> vars = taskService.getVariables(task.getId());
         assertEquals(70, vars.size());
         int nrOfStrings = 0;

@@ -35,7 +35,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.logging.LogMDC;
-import org.flowable.job.service.Job;
+import org.flowable.job.api.Job;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.slf4j.Logger;
@@ -239,9 +239,17 @@ public class ContinueProcessOperation extends AbstractOperation {
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         if (processEngineConfiguration != null && processEngineConfiguration.getEventDispatcher().isEnabled()) {
-            processEngineConfiguration.getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, flowNode.getId(), flowNode.getName(), execution.getId(),
-                            execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
+
+            if (flowNode instanceof Activity && ((Activity) flowNode).hasMultiInstanceLoopCharacteristics()) {
+                processEngineConfiguration.getEventDispatcher().dispatchEvent(
+                        FlowableEventBuilder.createMultiInstanceActivityEvent(FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_STARTED, flowNode.getId(),
+                                flowNode.getName(), execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
+            }
+            else {
+                processEngineConfiguration.getEventDispatcher().dispatchEvent(
+                        FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, flowNode.getId(), flowNode.getName(), execution.getId(),
+                                execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
+            }
         }
 
         try {

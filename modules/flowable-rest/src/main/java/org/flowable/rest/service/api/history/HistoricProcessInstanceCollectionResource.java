@@ -13,17 +13,6 @@
 
 package org.flowable.rest.service.api.history;
 
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.flowable.rest.api.DataResponse;
-import org.flowable.rest.api.RequestUtil;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -32,15 +21,23 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import org.flowable.rest.api.DataResponse;
+import org.flowable.rest.api.RequestUtil;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 /**
  * @author Tijs Rademakers
  */
 @RestController
-@Api(tags = { "History" }, description = "Manage History", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Process" }, description = "Manage History Process Instances", authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricProcessInstanceCollectionResource extends HistoricProcessInstanceBaseResource {
 
-    @ApiOperation(value = "List of historic process instances", tags = { "History" }, nickname = "listHistoricProcessInstances")
+    @ApiOperation(value = "List of historic process instances", tags = { "History Process" }, nickname = "listHistoricProcessInstances")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "An id of the historic process instance.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionKey", dataType = "string", value = "The process definition key of the historic process instance.", paramType = "query"),
@@ -50,10 +47,10 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
             @ApiImplicitParam(name = "finished", dataType = "boolean", value = "Indication if the historic process instance is finished.", paramType = "query"),
             @ApiImplicitParam(name = "superProcessInstanceId", dataType = "string", value = "An optional parent process id of the historic process instance.", paramType = "query"),
             @ApiImplicitParam(name = "excludeSubprocesses", dataType = "boolean", value = "Return only historic process instances which aren’t sub processes.", paramType = "query"),
-            @ApiImplicitParam(name = "finishedAfter", dataType = "string", value = "Return only historic process instances that were finished after this date.", paramType = "query"),
-            @ApiImplicitParam(name = "finishedBefore", dataType = "string", value = "Return only historic process instances that were finished before this date.", paramType = "query"),
-            @ApiImplicitParam(name = "startedAfter", dataType = "string", value = "Return only historic process instances that were started after this date.", paramType = "query"),
-            @ApiImplicitParam(name = "startedBefore", dataType = "string", value = "Return only historic process instances that were started before this date.", paramType = "query"),
+            @ApiImplicitParam(name = "finishedAfter", dataType = "string", format="date-time",  value = "Return only historic process instances that were finished after this date.", paramType = "query"),
+            @ApiImplicitParam(name = "finishedBefore", dataType = "string", format="date-time", value = "Return only historic process instances that were finished before this date.", paramType = "query"),
+            @ApiImplicitParam(name = "startedAfter", dataType = "string", format="date-time", value = "Return only historic process instances that were started after this date.", paramType = "query"),
+            @ApiImplicitParam(name = "startedBefore", dataType = "string", format="date-time", value = "Return only historic process instances that were started before this date.", paramType = "query"),
             @ApiImplicitParam(name = "startedBy", dataType = "string", value = "Return only historic process instances that were started by this user.", paramType = "query"),
             @ApiImplicitParam(name = "includeProcessVariables", dataType = "boolean", value = "An indication if the historic process instance variables should be returned as well.", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return instances with the given tenantId.", paramType = "query"),
@@ -63,8 +60,8 @@ public class HistoricProcessInstanceCollectionResource extends HistoricProcessIn
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates that historic process instances could be queried."),
             @ApiResponse(code = 400, message = "Indicates an parameter was passed in the wrong format. The status-message contains additional information.") })
-    @RequestMapping(value = "/history/historic-process-instances", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getHistoricProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    @GetMapping(value = "/history/historic-process-instances", produces = "application/json")
+    public DataResponse<HistoricProcessInstanceResponse> getHistoricProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         // Populate query based on request
         HistoricProcessInstanceQueryRequest queryRequest = new HistoricProcessInstanceQueryRequest();
 

@@ -1,0 +1,121 @@
+{
+  "modelId": "eeb6b3b2-c561-11e7-bf99-d0bf9c184429",
+  "bounds": {
+    "lowerRight": {
+      "x": 1200,
+      "y": 1050
+    },
+    "upperLeft": {
+      "x": 0,
+      "y": 0
+    }
+  },
+  "properties": {
+    "case_id": "sentiresCaseModel",
+    "name": "sentries case model",
+    "documentation": "",
+    "case_initiatorvariablename": "initiator",
+    "case_author": "",
+    "case_version": "",
+    "case_namespace": "http://www.flowable.org/casedef"
+  },
+  "childShapes": [
+    {
+      "resourceId": "casePlanModel",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": ""
+      },
+      "stencil": {
+        "id": "CasePlanModel"
+      },
+      "childShapes": [
+        {
+          "resourceId": "planItem1",
+          "properties": {
+            "overrideid": "sid-38BA12A6-86B2-42D8-A306-E2EA03FD17B0",
+            "name": "HumanTask",
+            "documentation": "",
+            "isblocking": "true",
+            "isblockingexpression": "",
+            "usertaskassignment": "",
+            "formkeydefinition": "",
+            "formreference": "",
+            "duedatedefinition": "",
+            "prioritydefinition": ""
+          },
+          "stencil": {
+            "id": "HumanTask"
+          },
+          "childShapes": [],
+          "outgoing": [
+            {
+              "resourceId": "sid-FB0DD4A6-0EC0-46F9-9A22-72A76CCECA9D"
+            }
+          ],
+          "bounds": {
+            "lowerRight": {
+              "x": 358.72728155467115,
+              "y": 128.00000216744158
+            },
+            "upperLeft": {
+              "x": 258.72728155467115,
+              "y": 48.00000216744158
+            }
+          },
+          "dockers": []
+        },
+        {
+          "resourceId": "sid-FB0DD4A6-0EC0-46F9-9A22-72A76CCECA9D",
+          "properties": {
+            "overrideid": "sid-FB0DD4A6-0EC0-46F9-9A22-72A76CCECA9D",
+            "name": "sentry name",
+            "documentation": "sentry doc",
+            "ifpartcondition": "${true}"
+          },
+          "stencil": {
+            "id": "EntryCriterion"
+          },
+          "childShapes": [],
+          "outgoing": [],
+          "bounds": {
+            "lowerRight": {
+              "x": 264.73441809224767,
+              "y": 92.88085470555188
+            },
+            "upperLeft": {
+              "x": 250.73441809224767,
+              "y": 70.88085470555188
+            }
+          },
+          "dockers": [
+            {
+              "x": 0.000013367203848702047,
+              "y": 33.99999783255842
+            }
+          ]
+        }
+      ],
+      "outgoing": [],
+      "bounds": {
+        "lowerRight": {
+          "x": 868,
+          "y": 754
+        },
+        "upperLeft": {
+          "x": 150,
+          "y": 40
+        }
+      },
+      "dockers": []
+    }
+  ],
+  "stencil": {
+    "id": "CMMNDiagram"
+  },
+  "stencilset": {
+    "namespace": "http://b3mn.org/stencilset/cmmn1.1#",
+    "url": "../editor/stencilsets/cmmn1.1/cmmn1.1.json"
+  }
+}

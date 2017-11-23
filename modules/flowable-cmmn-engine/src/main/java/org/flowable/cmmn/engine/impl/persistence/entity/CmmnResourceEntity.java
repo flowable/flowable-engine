@@ -12,20 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
+import org.flowable.engine.common.api.repository.EngineResource;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 
-public interface CmmnResourceEntity extends Entity {
-
-    String getName();
-
-    void setName(String name);
-
-    byte[] getBytes();
-
-    void setBytes(byte[] bytes);
-
-    String getDeploymentId();
-
-    void setDeploymentId(String deploymentId);
+public interface CmmnResourceEntity extends Entity, EngineResource {
     
 }

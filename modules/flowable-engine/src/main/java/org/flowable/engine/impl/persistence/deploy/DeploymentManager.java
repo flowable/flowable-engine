@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.app.AppModel;
+import org.flowable.engine.common.EngineDeployer;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
@@ -46,7 +47,7 @@ public class DeploymentManager {
     protected ProcessDefinitionInfoCache processDefinitionInfoCache;
     protected DeploymentCache<Object> appResourceCache;
     protected DeploymentCache<Object> knowledgeBaseCache; // Needs to be object to avoid an import to Drools in this core class
-    protected List<Deployer> deployers;
+    protected List<EngineDeployer> deployers;
 
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
     protected ProcessDefinitionEntityManager processDefinitionEntityManager;
@@ -57,7 +58,7 @@ public class DeploymentManager {
     }
 
     public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
-        for (Deployer deployer : deployers) {
+        for (EngineDeployer deployer : deployers) {
             deployer.deploy(deployment, deploymentSettings);
         }
     }
@@ -220,11 +221,11 @@ public class DeploymentManager {
     // getters and setters
     // //////////////////////////////////////////////////////
 
-    public List<Deployer> getDeployers() {
+    public List<EngineDeployer> getDeployers() {
         return deployers;
     }
 
-    public void setDeployers(List<Deployer> deployers) {
+    public void setDeployers(List<EngineDeployer> deployers) {
         this.deployers = deployers;
     }
 

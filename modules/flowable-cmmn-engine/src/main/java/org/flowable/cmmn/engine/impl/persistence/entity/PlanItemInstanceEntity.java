@@ -14,7 +14,7 @@ package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.List;
 
-import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 
 /**
