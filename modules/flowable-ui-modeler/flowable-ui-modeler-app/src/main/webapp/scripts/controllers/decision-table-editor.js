@@ -31,7 +31,7 @@ angular.module('flowableModeler')
             var operators = ['==', '!=', '<', '>', '>=', '<=', 'regex'];
             var listInputOperators = ['containsString', 'containsNumber', 'containsDate'];
             var listOutputOperators = ['append', 'remove', 'clear'];
-            var listDefaultOutputOperators = ['string', 'number', 'date'];
+            var listDefaultOutputOperators = ['string', 'number', 'date', 'expression'];
             var columnIdCounter = 0;
             var hitPolicyHeaderElement;
             var dateFormat = 'YYYY-MM-DD';
@@ -199,14 +199,16 @@ angular.module('flowableModeler')
             };
 
             $scope.doAfterGetColHeader = function (col, TH) {
-                if ($scope.model.columnDefs[col] && $scope.model.columnDefs[col].expressionType === 'input-operator') {
+                if ($scope.model.columnDefs[col] && $scope.model.columnDefs[col].expressionType === 'input-operator' 
+                	|| $scope.model.columnDefs[col] && $scope.model.columnDefs[col].expressionType === 'input-list-operator') {
                     TH.className += "input-operator-header";
                 } else if ($scope.model.columnDefs[col] && $scope.model.columnDefs[col].expressionType === 'input-expression') {
                     TH.className += "input-expression-header";
                     if ($scope.model.startOutputExpression - 1 === col) {
                         TH.className += " last";
                     }
-                } else if($scope.model.columnDefs[col] && $scope.model.columnDefs[col].expressionType === 'output-operator'){
+                } else if($scope.model.columnDefs[col] && $scope.model.columnDefs[col].expressionType === 'output-list-operator'
+                	|| $scope.model.columnDefs[col] && $scope.model.columnDefs[col].expressionType === 'output-operator'){
 				TH.className += "output-operator-header";
                 }else if ($scope.model.columnDefs[col] && $scope.model.columnDefs[col].expressionType === 'output') {
                     TH.className += "output-header";
@@ -402,7 +404,6 @@ angular.module('flowableModeler')
             };
 
             $scope.openOutputExpressionEditor = function (expressionPos, newExpression) {
-			console.log(expressionPos);
                 var editTemplate = 'views/popup/decision-table-edit-output-expression.html';
 
                 $scope.model.newExpression = !!newExpression;
@@ -456,7 +457,6 @@ angular.module('flowableModeler')
                     hitPolicyHeaderElement = angular.element('<div class="hit-policy-header"><a onclick="triggerHitPolicyEditor()">' + $rootScope.currentDecisionTable.hitIndicator.substring(0, 1) + '</a></div>');
 
                     evaluateDecisionTableGrid($rootScope.currentDecisionTable);
-
                     $timeout(function () {
                         // Flip switch in timeout to start watching all decision-related models
                         // after next digest cycle, to prevent first false-positive
@@ -801,7 +801,6 @@ angular.module('flowableModeler')
 
             var setGridValues = function (key, type) {
                 if ($scope.model.rulesData) {
-                		console.log($scope.model.rulesData);
                     $scope.model.rulesData.forEach(function (rowData) {
                     		switch(type){
                     			case 'output-list-operator':
@@ -889,7 +888,6 @@ angular.module('flowableModeler')
             };
 
             var evaluateDecisionTableGrid = function (decisionTable) {
-			console.log(decisionTable);
                 $scope.evaluateDecisionHeaders(decisionTable);
                 evaluateDecisionGrid(decisionTable);
             };
@@ -1137,7 +1135,6 @@ angular.module('flowableModeler')
 
         // Saving the edited input
         $scope.save = function () {
-			console.log($scope.model.newExpression);
             if ($scope.model.newExpression) {
                 var newOutputExpression = {
                     variableId: $scope.popup.selectedExpressionNewVariableId,
