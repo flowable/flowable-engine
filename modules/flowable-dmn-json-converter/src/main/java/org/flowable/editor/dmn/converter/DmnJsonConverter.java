@@ -306,6 +306,7 @@ public class DmnJsonConverter {
 
 					String operatorId = id + "_operator";
 					String expressionId = id + "_expression";
+					String listOperatorId = id + "_list_operator";
 
 					RuleInputClauseContainer ruleInputClauseContainer = new RuleInputClauseContainer();
 					ruleInputClauseContainer.setInputClause(ruleInputContainerMap.get(id));
@@ -326,28 +327,31 @@ public class DmnJsonConverter {
 					} else {
 						expressionValue = expressionValueNode.asText();
 					}
+					
+					JsonNode listOperatorValueNode = ruleNode.get(listOperatorId);
+					String listOperatorValue = null;
+					if (listOperatorValueNode != null && !listOperatorValueNode.isNull()) {
+						listOperatorValue = listOperatorValueNode.asText();
+					}
 
 					StringBuilder stringBuilder = new StringBuilder();
 					if ("list".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())) {
 						String formattedExpressionValue = "";
-						if (operatorValue.startsWith("containsString")) {
-							if (operatorValue.substring(14).equals("==")) {
+						if (listOperatorValue.toLowerCase().equals("containsString")) {
+							if (operatorValue.toLowerCase().equals("==")) {
 								stringBuilder = new StringBuilder(".containsString(");
-							} else if (operatorValue.substring(14).equals("regex")) {
+							} else if (operatorValue.toLowerCase().equals("regex")) {
 								stringBuilder = new StringBuilder(".containsRegex(");
 							}
 							stringBuilder.append("\"");
 							stringBuilder.append(expressionValue);
 							stringBuilder.append("\")");
-						} else if (operatorValue.startsWith("containsNumber")
-								|| operatorValue.startsWith("containsDate")) {
-							String subOperation = "";
-							if (operatorValue.startsWith("containsNumber")) {
-								subOperation = operatorValue.substring(14);
+						} else if (listOperatorValue.toLowerCase().equals("containsNumber")
+								|| listOperatorValue.toLowerCase().equals("containsDate")) {
+							if (listOperatorValue.toLowerCase().equals("containsNumber")) {
 								formattedExpressionValue = expressionValue;
 								stringBuilder = new StringBuilder(".containsNumber");
-							} else if (operatorValue.startsWith("containsDate")) {
-								subOperation = operatorValue.substring(12);
+							} else if (listOperatorValue.toLowerCase().equals("containsDate")) {
 								StringBuilder stringBuilder2 = new StringBuilder(formattedExpressionValue);
 								stringBuilder2.append("date:toDate('");
 								stringBuilder2.append(expressionValue);
@@ -356,7 +360,7 @@ public class DmnJsonConverter {
 								stringBuilder = new StringBuilder(".containsDate");
 							}
 							String methodName = "";
-							switch (subOperation) {
+							switch (operatorValue) {
 							case "==":
 								methodName = "Equals(";
 								break;
@@ -422,13 +426,27 @@ public class DmnJsonConverter {
 					LiteralExpression outputEntry = new LiteralExpression();
 					outputEntry.setId("outputEntry_" + id + "_" + ruleCounter);
 
-					if (ruleNode.has(id)) {
-						JsonNode expressionValueNode = ruleNode.get(id);
+					String operatorId = id + "_operator";
+					String expressionId = id ;
+					String listOperatorId = id + "_list_operator";
+					
+					if (ruleNode.has(expressionId)) {
+						JsonNode expressionValueNode = ruleNode.get(expressionId);
 						String expressionValue;
 						if (expressionValueNode == null || expressionValueNode.isNull()) {
 							expressionValue = "";
 						} else {
 							expressionValue = expressionValueNode.asText();
+						}
+						JsonNode listOperatorValueNode = ruleNode.get(listOperatorId);
+						String listOperatorValue = null;
+						if (listOperatorValueNode != null && !listOperatorValueNode.isNull()) {
+							listOperatorValue = listOperatorValueNode.asText();
+						}
+						JsonNode operatorValueNode = ruleNode.get(operatorId);
+						String operatorValue = null;
+						if (operatorValueNode != null && !operatorValueNode.isNull()) {
+							operatorValue = operatorValueNode.asText();
 						}
 
 						if (complexExpressionIds.contains(id)) {
@@ -436,41 +454,27 @@ public class DmnJsonConverter {
 						} else {
 							if ("list".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())) {
 								String name = ruleOutputContainerMap.get(id).getName();
-								StringBuilder stringBuilder = new StringBuilder(name);
-								if (expressionValue.toLowerCase().startsWith("appendstring")) {
-									String expression = expressionValue.substring(12);
-									stringBuilder.append(".append(");
+								StringBuilder stringBuilder = new StringBuilder(expressionValue);
+								if(operatorValue.toLowerCase().equals("string")) {
+									stringBuilder = new StringBuilder("\"");
+									stringBuilder.append(expressionValue);
 									stringBuilder.append("\"");
-									stringBuilder.append(expression);
-									stringBuilder.append("\")");
-								} else if (expressionValue.toLowerCase().startsWith("appendnumber")){
-									String expression = expressionValue.substring(12);
+								}else if(operatorValue.toLowerCase().equals("date")) {
+									stringBuilder.append(".append(");
+									stringBuilder.append("date:toDate('");
+									stringBuilder.append(expressionValue);
+									stringBuilder.append("')");
+								}
+								String expression = stringBuilder.toString();
+								stringBuilder = new StringBuilder(name);
+								if (listOperatorValue.toLowerCase().equals("append")) {
 									stringBuilder.append(".append(");
 									stringBuilder.append(expression);
 									stringBuilder.append(")");
-								} else if (expressionValue.toLowerCase().startsWith("appenddate")){
-									String expression = expressionValue.substring(10);
-									stringBuilder.append(".append(");
-									stringBuilder.append("date:toDate('");
-									stringBuilder.append(expression);
-									stringBuilder.append("')");
-								} else if (expressionValue.toLowerCase().startsWith("removestring")) {
-									String expression = expressionValue.substring(12);
-									stringBuilder.append(".remove(");
-									stringBuilder.append("\"");
-									stringBuilder.append(expression);
-									stringBuilder.append("\")");
-								}else if (expressionValue.toLowerCase().startsWith("removenumber")){
-									String expression = expressionValue.substring(12);
+								}else if (listOperatorValue.toLowerCase().equals("remove")) {
 									stringBuilder.append(".remove(");
 									stringBuilder.append(expression);
 									stringBuilder.append(")");
-								}else if (expressionValue.toLowerCase().startsWith("removedate")){
-									String expression = expressionValue.substring(10);
-									stringBuilder.append(".remove(");
-									stringBuilder.append("date:toDate('");
-									stringBuilder.append(expression);
-									stringBuilder.append("')");
 								}else if (expressionValue.toLowerCase().startsWith("clear")){
 									stringBuilder.append(".clear()");
 								}
