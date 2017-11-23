@@ -28,9 +28,10 @@ angular.module('flowableModeler')
 
             var hotDecisionTableEditorInstance;
             var hitPolicies = ['FIRST', 'ANY', 'UNIQUE', 'PRIORITY', 'RULE ORDER', 'OUTPUT ORDER', 'COLLECT'];
-            var operators = ['==', '!=', '<', '>', '>=', '<='];
+            var operators = ['==', '!=', '<', '>', '>=', '<=', 'regex'];
             var listInputOperators = ['containsString', 'containsNumber', 'containsDate'];
             var listOutputOperators = ['append', 'remove', 'clear'];
+            var listDefaultOutputOperators = ['string', 'number', 'date'];
             var columnIdCounter = 0;
             var hitPolicyHeaderElement;
             var dateFormat = 'YYYY-MM-DD';
@@ -493,7 +494,7 @@ angular.module('flowableModeler')
 
                 var columnDefinition = {
                     data: inputExpression.id + '_list_operator',
-                    expressionType: 'input-operator',
+                    expressionType: 'input-list-operator',
                     expression: inputExpression,
                     width: '60',
                     className: 'input-operator-cell',
@@ -672,12 +673,34 @@ angular.module('flowableModeler')
 
                 var columnDefinition = {
                     data: outputExpression.id + '_list_operator',
-                    expressionType: 'output-operator',
+                    expressionType: 'output-list-operator',
                     expression: outputExpression,
                     width: '60',
                     className: 'output-operator-cell',
                     type: 'dropdown',
                     source: listOutputOperators
+                };
+
+                if ($scope.currentDecisionTable.inputExpressions.length !== 1) {
+                    columnDefinition.title = '<div class="header-remove-expression">' +
+                        '<a onclick="triggerRemoveExpression(\'output\',' + expressionPosition + ',true)"><span class="glyphicon glyphicon-minus-sign"></span></a>' +
+                        '</div>';
+                }
+
+                return columnDefinition;
+            };
+            
+            var composeDefaultOutputOperatorColumnDefinition = function (outputExpression) {
+                var expressionPosition = $scope.currentDecisionTable.outputExpressions.indexOf(outputExpression);
+
+                var columnDefinition = {
+                    data: outputExpression.id + '_operator',
+                    expressionType: 'output-operator',
+                    expression: outputExpression,
+                    width: '60',
+                    className: 'output-operator-cell',
+                    type: 'dropdown',
+                    source: listDefaultOutputOperators
                 };
 
                 if ($scope.currentDecisionTable.inputExpressions.length !== 1) {
@@ -731,7 +754,7 @@ angular.module('flowableModeler')
                     decisionTable.inputExpressions = [];
                     var inputExpression = createNewInputExpression();
                     decisionTable.inputExpressions.push(inputExpression);
-                    columnDefinitions.push(composeInputOperatorColumnDefinition(inputExpression));
+                    columnDefinitions.push(composeInputDefaultOperatorColumnDefinition(inputExpression));
                     columnDefinitions.push(composeInputExpressionColumnDefinition(inputExpression));
                     inputExpressionCounter += 2;
                 }
@@ -745,11 +768,15 @@ angular.module('flowableModeler')
 				}else{
                              var outputOperatorColumnDefinition = composeOutputOperatorColumnDefinition(outputExpression);
                              columnDefinitions.push(outputOperatorColumnDefinition);
-//                             setGridValues(outputOperatorColumnDefinition.data, outputOperatorColumnDefinition.expressionType);
+                             setGridValues(outputOperatorColumnDefinition.data, outputOperatorColumnDefinition.expressionType);
+                             
+                             var outputDefaultOperatorColumnDefinition = composeDefaultOutputOperatorColumnDefinition(outputExpression);
+                             columnDefinitions.push(outputDefaultOperatorColumnDefinition);
+                             setGridValues(outputDefaultOperatorColumnDefinition.data, outputDefaultOperatorColumnDefinition.expressionType);
 
                              var outputExpressionColumnDefinition = composeOutputColumnDefinition(outputExpression);
                              columnDefinitions.push(outputExpressionColumnDefinition);
-//                             setGridValues(outputExpressionColumnDefinition.data, outputExpressionColumnDefinition.expressionType);
+                             setGridValues(outputExpressionColumnDefinition.data, outputExpressionColumnDefinition.expressionType);
 				}
                     });
                     
@@ -774,21 +801,33 @@ angular.module('flowableModeler')
 
             var setGridValues = function (key, type) {
                 if ($scope.model.rulesData) {
+                		console.log($scope.model.rulesData);
                     $scope.model.rulesData.forEach(function (rowData) {
-                        if (type === 'input-operator') {
-                            if (!(key in rowData) || rowData[key] === '') {
-                                rowData[key] = '==';
-                            }
-                        } else if (type === 'output-operator') {
-                            if (!(key in rowData) || rowData[key] === '') {
-                                rowData[key] = 'append';
-                             }
-                        }
-                        // else if (type === 'input-expression') {
-                        //     if (!(key in rowData) || rowData[key] === '') {
-                        //         rowData[key] = '-';
-                        //     }
-                        // }
+                    		switch(type){
+                    			case 'output-list-operator':
+                    				if (!(key in rowData) || rowData[key] === '')
+                    					rowData[key] = 'append';
+                    				break;
+                    			case 'input-list-operator':
+                    				if (!(key in rowData) || rowData[key] === '')
+                    					rowData[key] = 'containsString';
+                    				break;
+                    			case 'output':
+                    				if (!(key in rowData) || rowData[key] === '')
+                    					rowData[key] = '-';
+                    				break;
+                    			case 'input-expression':
+                    				if (!(key in rowData) || rowData[key] === '')
+                    					rowData[key] = '-';
+                    				break;
+                    			case 'output-operator':
+                    				if (!(key in rowData) || rowData[key] === '')
+                    					rowData[key] = 'string';
+                    				break;
+                    			default:
+                    				if (!(key in rowData) || rowData[key] === '')
+                    					rowData[key] = '==';
+                    		}
                     });
                 }
             };
