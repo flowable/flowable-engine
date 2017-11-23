@@ -327,6 +327,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flowable.variable.service.impl.types.GroovyLazyMapType;
+import org.flowable.variable.service.impl.types.ListType;
 
 /**
  * @author Tom Baeyens
@@ -1834,6 +1835,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             variableTypes.addType(new CustomObjectType("item", ItemInstance.class));
             variableTypes.addType(new CustomObjectType("message", MessageInstance.class));
             variableTypes.addType(new GroovyLazyMapType());
+            variableTypes.addType(new ListType());
             if (customPostVariableTypes != null) {
                 for (VariableType customVariableType : customPostVariableTypes) {
                     variableTypes.addType(customVariableType);

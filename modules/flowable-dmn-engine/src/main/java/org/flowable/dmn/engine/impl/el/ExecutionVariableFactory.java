@@ -27,64 +27,71 @@ import org.slf4j.LoggerFactory;
  */
 public class ExecutionVariableFactory {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionVariableFactory.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionVariableFactory.class);
 
-    public static Object getExecutionVariable(String type, Object expressionResult) {
+	public static Object getExecutionVariable(String type, Object expressionResult) {
 
-        if (type == null || expressionResult == null) {
-            LOGGER.error("could not create result variable: type {} expression result {}", type, expressionResult);
-            throw new FlowableException("could not create result variable");
-        }
+		if (type == null || expressionResult == null) {
+			LOGGER.error("could not create result variable: type {} expression result {}", type, expressionResult);
+			throw new FlowableException("could not create result variable");
+		}
 
-        Object executionVariable = null;
+		Object executionVariable = null;
 
-        try {
-            if (StringUtils.equals("boolean", type)) {
-                if (expressionResult instanceof Boolean) {
-                    executionVariable = expressionResult;
-                } else {
-                    executionVariable = new Boolean(expressionResult.toString());
-                }
-            } else if (StringUtils.equals("string", type)) {
-                if (expressionResult instanceof String) {
-                    executionVariable = expressionResult;
-                } else {
-                    executionVariable = expressionResult.toString();
-                }
-            } else if (StringUtils.equals("number", type)) {
-                if (expressionResult instanceof Double) {
-                    executionVariable = expressionResult;
-                } else {
-                    executionVariable = Double.valueOf(expressionResult.toString());
-                }
-            } else if (StringUtils.equals("date", type)) {
-                if (expressionResult instanceof Date) {
-                    executionVariable = expressionResult;
-                } else {
-                    executionVariable = new DateTime(expressionResult.toString()).toDate();
-                }
-            } else {
-                LOGGER.error("could not create result variable: unrecognized mapping type");
-                throw new FlowableException("could not create result variable: unrecognized mapping type");
-            }
-        } catch (Exception e) {
-            LOGGER.error("could not create result variable", e);
-            throw new FlowableException("Could not create execution variable", e);
-        }
+		try {
+			if (StringUtils.equals("boolean", type)) {
+				if (expressionResult instanceof Boolean) {
+					executionVariable = expressionResult;
+				} else {
+					executionVariable = new Boolean(expressionResult.toString());
+				}
+			} else if (StringUtils.equals("string", type)) {
+				if (expressionResult instanceof String) {
+					executionVariable = expressionResult;
+				} else {
+					executionVariable = expressionResult.toString();
+				}
+			} else if (StringUtils.equals("listString", type)) {
+				if (expressionResult instanceof String) {
+					executionVariable = expressionResult;
+				} else {
+					executionVariable = expressionResult.toString();
+				}
+			} else if (StringUtils.equals("number", type)) {
+				if (expressionResult instanceof Double) {
+					executionVariable = expressionResult;
+				} else {
+					executionVariable = Double.valueOf(expressionResult.toString());
+				}
+			} else if (StringUtils.equals("date", type)) {
+				if (expressionResult instanceof Date) {
+					executionVariable = expressionResult;
+				} else {
+					executionVariable = new DateTime(expressionResult.toString()).toDate();
+				}
 
-        return executionVariable;
-    }
+			} else {
+				LOGGER.error("could not create result variable: unrecognized mapping type");
+				throw new FlowableException("could not create result variable: unrecognized mapping type");
+			}
+		} catch (Exception e) {
+			LOGGER.error("could not create result variable", e);
+			throw new FlowableException("Could not create execution variable", e);
+		}
 
-    public static List<Object> getExecutionVariables(String type, List<Object> expressionResults) {
-        if (type == null || expressionResults == null) {
-            return null;
-        }
+		return executionVariable;
+	}
 
-        List<Object> executionVariables = new ArrayList<>();
-        for (Object expressionResult : expressionResults) {
-            executionVariables.add(getExecutionVariable(type, expressionResult));
-        }
+	public static List<Object> getExecutionVariables(String type, List<Object> expressionResults) {
+		if (type == null || expressionResults == null) {
+			return null;
+		}
 
-        return executionVariables;
-    }
+		List<Object> executionVariables = new ArrayList<>();
+		for (Object expressionResult : expressionResults) {
+			executionVariables.add(getExecutionVariable(type, expressionResult));
+		}
+
+		return executionVariables;
+	}
 }
