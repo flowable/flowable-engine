@@ -36,6 +36,18 @@ public interface TimerJobQuery extends Query<TimerJobQuery, Job> {
 
     /** Only select jobs which exist for the given process definition id */
     TimerJobQuery processDefinitionId(String processDefinitionid);
+    
+    /** Only select tasks for the given scope identifier. */
+    TimerJobQuery scopeId(String scopeId);
+
+    /** Only select tasks for the given sub scope identifier. */
+    TimerJobQuery subScopeId(String subScopeId);
+    
+    /** Only select tasks for the given scope type. */
+    TimerJobQuery scopeType(String scopeType);
+    
+    /** Only select tasks for the given scope definition identifier. */
+    TimerJobQuery scopeDefinitionId(String scopeDefinitionId);
 
     /**
      * Only select jobs which are executable, ie. duedate is null or duedate is in the past

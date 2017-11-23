@@ -47,6 +47,26 @@ public interface Job extends JobInfo {
      * Returns the specific process definition on which the job was created
      */
     String getProcessDefinitionId();
+    
+    /**
+     * Reference to a scope identifier or null if none is set.
+     */
+    String getScopeId();
+    
+    /**
+     * Reference to a sub scope identifier or null if none is set.
+     */
+    String getSubScopeId();
+    
+    /**
+     * Reference to a scope type or null if none is set.
+     */
+    String getScopeType();
+    
+    /**
+     * Reference to a scope definition identifier or null if none is set.
+     */
+    String getScopeDefinitionId();
 
     /**
      * Is the job exclusive?

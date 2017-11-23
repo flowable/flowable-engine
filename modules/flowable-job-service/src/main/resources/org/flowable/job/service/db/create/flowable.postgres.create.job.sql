@@ -8,6 +8,10 @@ create table ACT_RU_JOB (
     EXECUTION_ID_ varchar(64),
     PROCESS_INSTANCE_ID_ varchar(64),
     PROC_DEF_ID_ varchar(64),
+    SCOPE_ID_ varchar(255),
+    SUB_SCOPE_ID_ varchar(255),
+    SCOPE_TYPE_ varchar(255),
+    SCOPE_DEFINITION_ID_ varchar(255),
     RETRIES_ integer,
     EXCEPTION_STACK_ID_ varchar(64),
     EXCEPTION_MSG_ varchar(4000),
@@ -30,6 +34,10 @@ create table ACT_RU_TIMER_JOB (
     EXECUTION_ID_ varchar(64),
     PROCESS_INSTANCE_ID_ varchar(64),
     PROC_DEF_ID_ varchar(64),
+    SCOPE_ID_ varchar(255),
+    SUB_SCOPE_ID_ varchar(255),
+    SCOPE_TYPE_ varchar(255),
+    SCOPE_DEFINITION_ID_ varchar(255),
     RETRIES_ integer,
     EXCEPTION_STACK_ID_ varchar(64),
     EXCEPTION_MSG_ varchar(4000),
@@ -50,6 +58,10 @@ create table ACT_RU_SUSPENDED_JOB (
     EXECUTION_ID_ varchar(64),
     PROCESS_INSTANCE_ID_ varchar(64),
     PROC_DEF_ID_ varchar(64),
+    SCOPE_ID_ varchar(255),
+    SUB_SCOPE_ID_ varchar(255),
+    SCOPE_TYPE_ varchar(255),
+    SCOPE_DEFINITION_ID_ varchar(255),
     RETRIES_ integer,
     EXCEPTION_STACK_ID_ varchar(64),
     EXCEPTION_MSG_ varchar(4000),
@@ -70,6 +82,10 @@ create table ACT_RU_DEADLETTER_JOB (
     EXECUTION_ID_ varchar(64),
     PROCESS_INSTANCE_ID_ varchar(64),
     PROC_DEF_ID_ varchar(64),
+    SCOPE_ID_ varchar(255),
+    SUB_SCOPE_ID_ varchar(255),
+    SCOPE_TYPE_ varchar(255),
+    SCOPE_DEFINITION_ID_ varchar(255),
     EXCEPTION_STACK_ID_ varchar(64),
     EXCEPTION_MSG_ varchar(4000),
     DUEDATE_ timestamp,
@@ -119,6 +135,22 @@ create index ACT_IDX_DEADLETTER_JOB_EXCEPTION on ACT_RU_DEADLETTER_JOB(EXCEPTION
 alter table ACT_RU_DEADLETTER_JOB 
     add constraint ACT_FK_DEADLETTER_JOB_EXCEPTION 
     foreign key (EXCEPTION_STACK_ID_) 
-    references ACT_GE_BYTEARRAY (ID_);            
+    references ACT_GE_BYTEARRAY (ID_);     
+    
+create index ACT_IDX_JOB_SCOPE on ACT_RU_JOB(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_JOB_SUB_SCOPE on ACT_RU_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_JOB_SCOPE_DEF on ACT_RU_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
+
+create index ACT_IDX_TJOB_SCOPE on ACT_RU_TIMER_JOB(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_TJOB_SUB_SCOPE on ACT_RU_TIMER_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_TJOB_SCOPE_DEF on ACT_RU_TIMER_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_); 
+
+create index ACT_IDX_SJOB_SCOPE on ACT_RU_DEADLETTER_JOB(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_SJOB_SUB_SCOPE on ACT_RU_DEADLETTER_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_SJOB_SCOPE_DEF on ACT_RU_DEADLETTER_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);   
+
+create index ACT_IDX_DJOB_SCOPE on ACT_RU_DEADLETTER_JOB(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_DJOB_SUB_SCOPE on ACT_RU_DEADLETTER_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_DJOB_SCOPE_DEF on ACT_RU_DEADLETTER_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_); 
 
 insert into ACT_GE_PROPERTY values ('job.schema.version', '6.2.1.0', 1);

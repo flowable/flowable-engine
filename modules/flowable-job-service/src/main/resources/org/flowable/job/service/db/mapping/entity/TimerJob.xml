@@ -16,6 +16,10 @@
         <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
         <result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
         <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+        <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
+        <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
+        <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
+        <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
         <result property="retries" column="RETRIES_" jdbcType="INTEGER" />
         <result property="exceptionByteArrayRef" column="EXCEPTION_STACK_ID_" typeHandler="JobByteArrayRefTypeHandler" />
         <result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
@@ -66,6 +70,18 @@
             </if>
             <if test="processDefinitionId != null">
                 and RES.PROC_DEF_ID_ = #{processDefinitionId}
+            </if>
+            <if test="scopeId != null">
+                and RES.SCOPE_ID_ = #{scopeId}
+            </if>
+            <if test="subScopeId != null">
+                and RES.SUB_SCOPE_ID_ = #{subScopeId}
+            </if>
+            <if test="scopeType != null">
+                and RES.SCOPE_TYPE_ = #{scopeType}
+            </if>
+            <if test="scopeDefinitionId != null">
+                and RES.SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
             </if>
             <if test="onlyTimers">
                 and RES.TYPE_ = 'timer'
@@ -127,6 +143,10 @@
         EXECUTION_ID_,
         PROCESS_INSTANCE_ID_,
         PROC_DEF_ID_,
+        SCOPE_ID_, 
+        SUB_SCOPE_ID_, 
+        SCOPE_TYPE_, 
+        SCOPE_DEFINITION_ID_,
         RETRIES_,
         EXCEPTION_STACK_ID_,
         EXCEPTION_MSG_,
@@ -143,6 +163,10 @@
         #{executionId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
+        #{scopeId, jdbcType=VARCHAR},
+        #{subScopeId, jdbcType=VARCHAR},
+        #{scopeType, jdbcType=VARCHAR},
+        #{scopeDefinitionId, jdbcType=VARCHAR},
         #{retries, jdbcType=INTEGER},
         #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
         #{exceptionMessage, jdbcType=VARCHAR},
@@ -164,6 +188,10 @@
         EXECUTION_ID_,
         PROCESS_INSTANCE_ID_,
         PROC_DEF_ID_,
+        SCOPE_ID_, 
+        SUB_SCOPE_ID_, 
+        SCOPE_TYPE_, 
+        SCOPE_DEFINITION_ID_,
         RETRIES_,
         EXCEPTION_STACK_ID_,
         EXCEPTION_MSG_,
@@ -181,6 +209,10 @@
             #{job.executionId, jdbcType=VARCHAR},
             #{job.processInstanceId, jdbcType=VARCHAR},
             #{job.processDefinitionId, jdbcType=VARCHAR},
+            #{job.scopeId, jdbcType=VARCHAR},
+            #{job.subScopeId, jdbcType=VARCHAR},
+            #{job.scopeType, jdbcType=VARCHAR},
+            #{job.scopeDefinitionId, jdbcType=VARCHAR},
             #{job.retries, jdbcType=INTEGER},
             #{job.exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{job.exceptionMessage, jdbcType=VARCHAR},
@@ -204,6 +236,10 @@
             EXECUTION_ID_,
             PROCESS_INSTANCE_ID_,
             PROC_DEF_ID_,
+            SCOPE_ID_, 
+            SUB_SCOPE_ID_, 
+            SCOPE_TYPE_, 
+            SCOPE_DEFINITION_ID_,
             RETRIES_,
             EXCEPTION_STACK_ID_,
             EXCEPTION_MSG_,
@@ -220,6 +256,10 @@
             #{job.executionId, jdbcType=VARCHAR},
             #{job.processInstanceId, jdbcType=VARCHAR},
             #{job.processDefinitionId, jdbcType=VARCHAR},
+            #{job.scopeId, jdbcType=VARCHAR},
+            #{job.subScopeId, jdbcType=VARCHAR},
+            #{job.scopeType, jdbcType=VARCHAR},
+            #{job.scopeDefinitionId, jdbcType=VARCHAR},
             #{job.retries, jdbcType=INTEGER},
             #{job.exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{job.exceptionMessage, jdbcType=VARCHAR},
