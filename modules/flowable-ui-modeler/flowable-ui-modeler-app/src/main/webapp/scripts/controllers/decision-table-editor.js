@@ -29,8 +29,8 @@ angular.module('flowableModeler')
             var hotDecisionTableEditorInstance;
             var hitPolicies = ['FIRST', 'ANY', 'UNIQUE', 'PRIORITY', 'RULE ORDER', 'OUTPUT ORDER', 'COLLECT'];
             var operators = ['==', '!=', '<', '>', '>=', '<='];
-            var listInputOperators = ['contains string', 'contains number', 'contains date'];
-            var listOutputOperators = ['append', 'overwrite'];
+            var listInputOperators = ['containsString', 'containsNumber', 'containsDate'];
+            var listOutputOperators = ['append', 'remove', 'clear'];
             var columnIdCounter = 0;
             var hitPolicyHeaderElement;
             var dateFormat = 'YYYY-MM-DD';
