@@ -434,7 +434,7 @@ public class DmnJsonConverter {
 						if (complexExpressionIds.contains(id)) {
 							outputEntry.setText(expressionValue);
 						} else {
-							if ("string".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())) {
+							if ("list".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())) {
 								String name = ruleOutputContainerMap.get(id).getName();
 								StringBuilder stringBuilder = new StringBuilder(name);
 								if (expressionValue.toLowerCase().startsWith("appendstring")) {
