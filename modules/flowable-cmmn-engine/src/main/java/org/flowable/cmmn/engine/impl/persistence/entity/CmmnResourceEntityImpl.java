@@ -23,6 +23,7 @@ public class CmmnResourceEntityImpl extends AbstractEntityNoRevision implements 
     protected String name;
     protected byte[] bytes;
     protected String deploymentId;
+    protected boolean generated;
 
     public CmmnResourceEntityImpl() {
 
@@ -58,6 +59,10 @@ public class CmmnResourceEntityImpl extends AbstractEntityNoRevision implements 
 
     public boolean isGenerated() {
         return false;
+    }
+
+    public void setGenerated(boolean generated) {
+        this.generated = generated;
     }
 
     @Override

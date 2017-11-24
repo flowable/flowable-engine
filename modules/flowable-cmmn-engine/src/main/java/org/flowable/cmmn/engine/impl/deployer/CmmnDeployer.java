@@ -26,6 +26,7 @@ import org.flowable.cmmn.engine.impl.parser.CmmnParser;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseDefinitionEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
@@ -52,6 +53,7 @@ public class CmmnDeployer implements EngineDeployer {
 
     protected IdGenerator idGenerator;
     protected CmmnParser cmmnParser;
+    protected CaseDefinitionDiagramHelper caseDefinitionDiagramHelper;
 
     @Override
     public void deploy(EngineDeployment deployment, Map<String, Object> deploymentSettings) {
@@ -68,6 +70,9 @@ public class CmmnDeployer implements EngineDeployer {
         verifyCaseDefinitionsDoNotShareKeys(parseResult.getAllCaseDefinitions());
         copyDeploymentValuesToCaseDefinitions(parseResult.getDeployment(), parseResult.getAllCaseDefinitions());
         setResourceNamesOnCaseDefinitions(parseResult);
+        
+        createAndPersistNewDiagramsIfNeeded(parseResult);
+        setCaseDefinitionDiagramNames(parseResult);
 
         if (deployment.isNew()) {
             Map<CaseDefinitionEntity, CaseDefinitionEntity> mapOfNewCaseDefinitionToPreviousVersion = getPreviousVersionsOfCaseDefinitions(parseResult);
@@ -87,6 +92,37 @@ public class CmmnDeployer implements EngineDeployer {
             }
         }
         return false;
+    }
+    
+    /**
+     * Creates new diagrams for case definitions if the deployment is new, the case definition in question supports it, and the engine is configured to make new diagrams.
+     *
+     * When this method creates a new diagram, it also persists it via the ResourceEntityManager and adds it to the resources of the deployment.
+     */
+    protected void createAndPersistNewDiagramsIfNeeded(CmmnParseResult parseResult) {
+        for (CaseDefinitionEntity caseDefinition : parseResult.getAllCaseDefinitions()) {
+            if (caseDefinitionDiagramHelper.shouldCreateDiagram(caseDefinition, parseResult.getDeployment())) {
+                CmmnResourceEntity resource = caseDefinitionDiagramHelper.createDiagramForCaseDefinition(
+                                caseDefinition, parseResult.getCmmnModelForCaseDefinition(caseDefinition));
+                if (resource != null) {
+                    CommandContextUtil.getCmmnResourceEntityManager().insert(resource, false);
+                    ((CmmnDeploymentEntity) parseResult.getDeployment()).addResource(resource); // now we'll find it if we look for the diagram name later.
+                }
+            }
+        }
+    }
+    
+    /**
+     * Updates all the case definition entities to have the correct diagram resource name. Must be called after createAndPersistNewDiagramsAsNeeded to ensure that any newly-created diagrams already
+     * have their resources attached to the deployment.
+     */
+    protected void setCaseDefinitionDiagramNames(CmmnParseResult parseResult) {
+        Map<String, EngineResource> resources = parseResult.getDeployment().getResources();
+
+        for (CaseDefinitionEntity caseDefinition : parseResult.getAllCaseDefinitions()) {
+            String diagramResourceName = ResourceNameUtil.getCaseDiagramResourceNameFromDeployment(caseDefinition, resources);
+            caseDefinition.setDiagramResourceName(diagramResourceName);
+        }
     }
 
     protected Map<CaseDefinitionEntity, CaseDefinitionEntity> getPreviousVersionsOfCaseDefinitions(CmmnParseResult parseResult) {
@@ -109,6 +145,11 @@ public class CmmnDeployer implements EngineDeployer {
             }
             caseDefinition.setVersion(version);
             caseDefinition.setId(idGenerator.getNextId());
+            
+            Case caseObject = parseResult.getCmmnCaseForCaseDefinition(caseDefinition);
+            if (caseObject.getFormKey() != null) {
+                caseDefinition.setHasStartFormKey(true);
+            }
         }
     }
 
@@ -125,6 +166,8 @@ public class CmmnDeployer implements EngineDeployer {
             if (persistedCaseDefinition != null) {
                 caseDefinition.setId(persistedCaseDefinition.getId());
                 caseDefinition.setVersion(persistedCaseDefinition.getVersion());
+                caseDefinition.setHasStartFormKey(persistedCaseDefinition.hasStartFormKey());
+                caseDefinition.setHasGraphicalNotation(persistedCaseDefinition.hasGraphicalNotation());
             }
         }
     }
@@ -219,4 +262,11 @@ public class CmmnDeployer implements EngineDeployer {
         this.cmmnParser = cmmnParser;
     }
 
+    public CaseDefinitionDiagramHelper getCaseDefinitionDiagramHelper() {
+        return caseDefinitionDiagramHelper;
+    }
+
+    public void setCaseDefinitionDiagramHelper(CaseDefinitionDiagramHelper caseDefinitionDiagramHelper) {
+        this.caseDefinitionDiagramHelper = caseDefinitionDiagramHelper;
+    }
 }

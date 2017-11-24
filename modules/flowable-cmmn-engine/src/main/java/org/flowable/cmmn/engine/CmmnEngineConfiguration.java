@@ -50,6 +50,7 @@ import org.flowable.cmmn.engine.impl.db.CmmnDbSchemaManager;
 import org.flowable.cmmn.engine.impl.db.EntityDependencyOrder;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegateFactory;
 import org.flowable.cmmn.engine.impl.delegate.DefaultCmmnClassDelegateFactory;
+import org.flowable.cmmn.engine.impl.deployer.CaseDefinitionDiagramHelper;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
@@ -106,6 +107,8 @@ import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelperImpl;
 import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
 import org.flowable.cmmn.engine.impl.task.DefaultCmmnTaskVariableScopeResolver;
+import org.flowable.cmmn.image.CaseDiagramGenerator;
+import org.flowable.cmmn.image.impl.DefaultCaseDiagramGenerator;
 import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.EngineConfigurator;
 import org.flowable.engine.common.EngineDeployer;
@@ -209,6 +212,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CmmnParser cmmnParser;
     protected CmmnDeployer cmmnDeployer;
     protected CmmnDeploymentManager deploymentManager;
+    protected CaseDefinitionDiagramHelper caseDefinitionDiagramHelper;
 
     protected int caseDefinitionCacheLimit = -1;
     protected DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache;
@@ -230,6 +234,17 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected DbSchemaManager identityLinkDbSchemaManager;
     protected DbSchemaManager variableDbSchemaManager;
     protected DbSchemaManager taskDbSchemaManager;
+    
+    /**
+     * Case diagram generator. Default value is DefaultCaseDiagramGenerator
+     */
+    protected CaseDiagramGenerator caseDiagramGenerator;
+    
+    protected boolean isCreateDiagramOnDeploy = true;
+    
+    protected String activityFontName = "Arial";
+    protected String labelFontName = "Arial";
+    protected String annotationFontName = "Arial";
     
     // CONFIGURATORS ////////////////////////////////////////////////////////////
 
@@ -294,6 +309,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected void init() {
         initConfigurators();
         configuratorsBeforeInit();
+        initCaseDiagramGenerator();
         initCommandContextFactory();
         initTransactionContextFactory();
         initCommandExecutors();
@@ -332,8 +348,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initTaskServiceConfiguration();
     }
 
+    public void initCaseDiagramGenerator() {
+        if (caseDiagramGenerator == null) {
+            caseDiagramGenerator = new DefaultCaseDiagramGenerator();
+        }
+    }
+    
     @Override
-
     public void initDbSchemaManager() {
         super.initDbSchemaManager();
         initCmmnDbSchemaManager();
@@ -532,9 +553,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
 
         initCmmnParser();
+        initCaseDefinitionDiagramHelper();
 
         cmmnDeployer.setIdGenerator(idGenerator);
         cmmnDeployer.setCmmnParser(cmmnParser);
+        cmmnDeployer.setCaseDefinitionDiagramHelper(caseDefinitionDiagramHelper);
 
         defaultDeployers.add(cmmnDeployer);
         return defaultDeployers;
@@ -567,6 +590,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             cmmnParserImpl.setActivityBehaviorFactory(activityBehaviorFactory);
             cmmnParserImpl.setExpressionManager(expressionManager);
             cmmnParser = cmmnParserImpl;
+        }
+    }
+    
+    public void initCaseDefinitionDiagramHelper() {
+        if (caseDefinitionDiagramHelper == null) {
+            caseDefinitionDiagramHelper = new CaseDefinitionDiagramHelper();
         }
     }
 
@@ -1079,6 +1108,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
+    public CaseDefinitionDiagramHelper getCaseDefinitionDiagramHelper() {
+        return caseDefinitionDiagramHelper;
+    }
+
+    public CmmnEngineConfiguration setCaseDefinitionDiagramHelper(CaseDefinitionDiagramHelper caseDefinitionDiagramHelper) {
+        this.caseDefinitionDiagramHelper = caseDefinitionDiagramHelper;
+        return this;
+    }
+
     public CmmnActivityBehaviorFactory getActivityBehaviorFactory() {
         return activityBehaviorFactory;
     }
@@ -1325,6 +1363,51 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setSerializableVariableTypeTrackDeserializedObjects(boolean serializableVariableTypeTrackDeserializedObjects) {
         this.serializableVariableTypeTrackDeserializedObjects = serializableVariableTypeTrackDeserializedObjects;
+        return this;
+    }
+
+    public CaseDiagramGenerator getCaseDiagramGenerator() {
+        return caseDiagramGenerator;
+    }
+
+    public CmmnEngineConfiguration setCaseDiagramGenerator(CaseDiagramGenerator caseDiagramGenerator) {
+        this.caseDiagramGenerator = caseDiagramGenerator;
+        return this;
+    }
+    
+    public boolean isCreateDiagramOnDeploy() {
+        return isCreateDiagramOnDeploy;
+    }
+
+    public CmmnEngineConfiguration setCreateDiagramOnDeploy(boolean isCreateDiagramOnDeploy) {
+        this.isCreateDiagramOnDeploy = isCreateDiagramOnDeploy;
+        return this;
+    }
+
+    public String getActivityFontName() {
+        return activityFontName;
+    }
+
+    public CmmnEngineConfiguration setActivityFontName(String activityFontName) {
+        this.activityFontName = activityFontName;
+        return this;
+    }
+
+    public String getLabelFontName() {
+        return labelFontName;
+    }
+
+    public CmmnEngineConfiguration setLabelFontName(String labelFontName) {
+        this.labelFontName = labelFontName;
+        return this;
+    }
+
+    public String getAnnotationFontName() {
+        return annotationFontName;
+    }
+
+    public CmmnEngineConfiguration setAnnotationFontName(String annotationFontName) {
+        this.annotationFontName = annotationFontName;
         return this;
     }
 

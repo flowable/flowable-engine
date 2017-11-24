@@ -7,28 +7,30 @@
   <!-- RESOURCE INSERT -->
 
   <insert id="insertCmmnResource" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CmmnResourceEntityImpl">
-    insert into ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_)
-    values (#{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR}, #{bytes, jdbcType=${blobType}}, #{deploymentId, jdbcType=VARCHAR})  
+    insert into ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_, GENERATED_)
+    values (#{id, jdbcType=VARCHAR}, #{name, jdbcType=VARCHAR}, #{bytes, jdbcType=${blobType}}, #{deploymentId, jdbcType=VARCHAR}, #{generated, jdbcType=BOOLEAN})  
   </insert>
 
   <insert id="bulkInsertCmmnResource" parameterType="java.util.List">
-    INSERT INTO ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_) VALUES 
+    INSERT INTO ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_, GENERATED_) VALUES 
       <foreach collection="list" item="resource" index="index" separator=","> 
         (#{resource.id, jdbcType=VARCHAR},
          #{resource.name, jdbcType=VARCHAR},
          #{resource.bytes, jdbcType=${blobType}},
-         #{resource.deploymentId, jdbcType=VARCHAR})
+         #{resource.deploymentId, jdbcType=VARCHAR},
+         #{resource.generated, jdbcType=BOOLEAN})
       </foreach>
   </insert>
 
   <insert id="bulkInsertCmmnResource" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL
       <foreach collection="list" item="resource" index="index"> 
-        INTO ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_) VALUES 
+        INTO ${prefix}ACT_CMMN_DEPLOYMENT_RESOURCE(ID_, NAME_, RESOURCE_BYTES_, DEPLOYMENT_ID_, GENERATED_) VALUES 
         (#{resource.id, jdbcType=VARCHAR},
          #{resource.name, jdbcType=VARCHAR},
          #{resource.bytes, jdbcType=${blobType}},
-         #{resource.deploymentId, jdbcType=VARCHAR})
+         #{resource.deploymentId, jdbcType=VARCHAR},
+         #{resource.generated, jdbcType=BOOLEAN})
       </foreach>
     SELECT * FROM dual
   </insert>
@@ -45,6 +47,7 @@
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR"/>
     <result property="bytes" column="RESOURCE_BYTES_" jdbcType="${blobType}"/>
+    <result property="generated" column="GENERATED_" jdbcType="BOOLEAN"/>
   </resultMap>
   
   <!-- RESOURCE SELECT -->
