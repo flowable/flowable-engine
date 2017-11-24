@@ -26,15 +26,17 @@ import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import org.flowable.spring.autodeployment.AutoDeploymentStrategy;
-import org.flowable.spring.autodeployment.DefaultAutoDeploymentStrategy;
-import org.flowable.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
-import org.flowable.spring.autodeployment.SingleResourceAutoDeploymentStrategy;
+import org.flowable.idm.spring.SpringTransactionContextFactory;
+import org.flowable.idm.spring.SpringTransactionInterceptor;
+import org.flowable.spring.common.SpringEngineConfiguration;
+import org.flowable.spring.configurator.AutoDeploymentStrategy;
+import org.flowable.spring.configurator.DefaultAutoDeploymentStrategy;
+import org.flowable.spring.configurator.ResourceParentFolderAutoDeploymentStrategy;
+import org.flowable.spring.configurator.SingleResourceAutoDeploymentStrategy;
 import org.flowable.spring.configurator.SpringIdmEngineConfigurator;
 import org.flowable.variable.service.impl.types.EntityManagerSession;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.datasource.TransactionAwareDataSourceProxy;
 import org.springframework.transaction.PlatformTransactionManager;
@@ -45,7 +47,7 @@ import org.springframework.transaction.PlatformTransactionManager;
  * @author Joram Barrez
  * @author Tiese Barrell
  */
-public class SpringProcessEngineConfiguration extends ProcessEngineConfigurationImpl implements ApplicationContextAware {
+public class SpringProcessEngineConfiguration extends ProcessEngineConfigurationImpl implements SpringEngineConfiguration {
 
     protected PlatformTransactionManager transactionManager;
     protected String deploymentName = "SpringAutoDeployment";
@@ -60,7 +62,7 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
         deploymentStrategies.add(new DefaultAutoDeploymentStrategy());
         deploymentStrategies.add(new SingleResourceAutoDeploymentStrategy());
         deploymentStrategies.add(new ResourceParentFolderAutoDeploymentStrategy());
-        setIdmProcessEngineConfigurator(new SpringIdmEngineConfigurator());
+        setIdmEngineConfigurator(new SpringIdmEngineConfigurator());
     }
 
     @Override

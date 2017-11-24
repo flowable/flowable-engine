@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -59,6 +60,7 @@ import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryOnPart;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
+import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.io.InputStreamProvider;
 import org.slf4j.Logger;
@@ -97,6 +99,8 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new CaseTaskXmlConverter());
         addElementConverter(new ProcessXmlConverter());
         addElementConverter(new ProcessTaskXmlConverter());
+        addElementConverter(new TimerEventListenerXmlConverter());
+        addElementConverter(new PlanItemStartTriggerXmlConverter());
         addElementConverter(new CmmnDiShapeXmlConverter());
         addElementConverter(new CmmnDiEdgeXmlConverter());
         addElementConverter(new CmmnDiBoundsXmlConverter());
@@ -107,6 +111,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addTextConverter(new StandardEventXmlConverter());
         addTextConverter(new ProcessRefExpressionXmlConverter());
         addTextConverter(new ConditionXmlConverter());
+        addTextConverter(new TimerExpressionXmlConverter());
     }
 
     public static void addElementConverter(BaseCmmnXmlConverter converter) {
@@ -426,9 +431,17 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     }
                 }
 
+            } else if (planItemDefinition instanceof TimerEventListener) {
+                TimerEventListener timerEventListener = (TimerEventListener) planItemDefinition;
+                String sourceRef = timerEventListener.getTimerStartTriggerSourceRef();
+                PlanItem startTriggerPlanItem = timerEventListener.getParentStage().findPlanItemInPlanFragmentOrUpwards(sourceRef);
+                if (startTriggerPlanItem != null) {
+                    timerEventListener.setTimerStartTriggerPlanItem(startTriggerPlanItem);
+                }
             }
 
         }
+        
     }
 
     protected void resolveEntryCriteria(HasEntryCriteria hasEntryCriteria) {

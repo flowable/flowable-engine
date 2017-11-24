@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.dmn.engine.DmnEngineConfiguration;
+import org.flowable.engine.common.api.repository.EngineResource;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
 
 /**
@@ -35,7 +36,7 @@ public class DmnDeploymentEntityImpl extends AbstractEntityNoRevision implements
     protected String category;
     protected String tenantId = DmnEngineConfiguration.NO_TENANT_ID;
     protected String parentDeploymentId;
-    protected Map<String, DmnResourceEntity> resources;
+    protected Map<String, EngineResource> resources;
     protected Date deploymentTime;
     protected boolean isNew;
 
@@ -57,7 +58,7 @@ public class DmnDeploymentEntityImpl extends AbstractEntityNoRevision implements
     }
 
     @Override
-    public Map<String, DmnResourceEntity> getResources() {
+    public Map<String, EngineResource> getResources() {
         return resources;
     }
 
@@ -141,7 +142,7 @@ public class DmnDeploymentEntityImpl extends AbstractEntityNoRevision implements
     }
 
     @Override
-    public void setResources(Map<String, DmnResourceEntity> resources) {
+    public void setResources(Map<String, EngineResource> resources) {
         this.resources = resources;
     }
 
@@ -163,6 +164,16 @@ public class DmnDeploymentEntityImpl extends AbstractEntityNoRevision implements
     @Override
     public void setNew(boolean isNew) {
         this.isNew = isNew;
+    }
+    
+    @Override
+    public String getKey() {
+        return null;
+    }
+
+    @Override
+    public String getEngineVersion() {
+        return null;
     }
 
     // common methods //////////////////////////////////////////////////////////

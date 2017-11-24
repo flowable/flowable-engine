@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.common.api.repository.EngineResource;
 import org.flowable.engine.common.impl.persistence.entity.AbstractEntityNoRevision;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
@@ -36,7 +37,7 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
     protected String category;
     protected String key;
     protected String tenantId = ProcessEngineConfiguration.NO_TENANT_ID;
-    protected Map<String, ResourceEntity> resources;
+    protected Map<String, EngineResource> resources;
     protected Date deploymentTime;
     protected boolean isNew;
 
@@ -63,7 +64,7 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
     // lazy loading ///////////////////////////////////////////////////////////////
 
     @Override
-    public Map<String, ResourceEntity> getResources() {
+    public Map<String, EngineResource> getResources() {
         if (resources == null && id != null) {
             List<ResourceEntity> resourcesList = CommandContextUtil.getResourceEntityManager().findResourcesByDeploymentId(id);
             resources = new HashMap<>();
@@ -155,7 +156,7 @@ public class DeploymentEntityImpl extends AbstractEntityNoRevision implements De
     }
 
     @Override
-    public void setResources(Map<String, ResourceEntity> resources) {
+    public void setResources(Map<String, EngineResource> resources) {
         this.resources = resources;
     }
 

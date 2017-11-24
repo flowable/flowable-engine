@@ -35,7 +35,7 @@ public class ProcessDefinitionDecisionTableCollectionResource extends BaseProces
 
     @ApiOperation(value = "List decision tables for a process-definition", nickname = "listProcessDefinitionDecisionTables", tags = { "Process Definitions" })
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Indicates the process definition was found and the decision tables are returned.", response = DmnDecisionTable.class, responseContainer = "List"),
+            @ApiResponse(code = 200, message = "Indicates the process definition was found and the decision tables are returned.", response = DecisionTableResponse.class, responseContainer = "List"),
             @ApiResponse(code = 404, message = "Indicates the requested process definition was not found.")
     })
     @GetMapping(value = "/repository/process-definitions/{processDefinitionId}/decision-tables", produces = "application/json")

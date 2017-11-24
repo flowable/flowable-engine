@@ -19,6 +19,7 @@ public class Case extends CmmnElement {
     
     protected String name;
     protected String initiatorVariableName;
+    protected String formKey;
     protected Stage planModel;
     protected Map<String, CaseElement> allCaseElements = new HashMap<>();
     
@@ -43,6 +44,14 @@ public class Case extends CmmnElement {
 
     public void setInitiatorVariableName(String initiatorVariableName) {
         this.initiatorVariableName = initiatorVariableName;
+    }
+
+    public String getFormKey() {
+        return formKey;
+    }
+
+    public void setFormKey(String formKey) {
+        this.formKey = formKey;
     }
 
     public Stage getPlanModel() {

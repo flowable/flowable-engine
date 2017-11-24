@@ -16,8 +16,8 @@ import org.flowable.cmmn.engine.CmmnEngine;
 import org.flowable.cmmn.engine.configurator.CmmnEngineConfigurator;
 import org.flowable.cmmn.spring.SpringCmmnEngineConfiguration;
 import org.flowable.cmmn.spring.SpringCmmnExpressionManager;
+import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 
 /**
@@ -29,20 +29,20 @@ public class SpringCmmnEngineConfigurator extends CmmnEngineConfigurator {
     protected SpringCmmnEngineConfiguration cmmnEngineConfiguration;
 
     @Override
-    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public void configure(AbstractEngineConfiguration engineConfiguration) {
         if (cmmnEngineConfiguration == null) {
             cmmnEngineConfiguration = new SpringCmmnEngineConfiguration();
         }
-        initialiseCommonProperties(processEngineConfiguration, cmmnEngineConfiguration);
+        initialiseCommonProperties(engineConfiguration, cmmnEngineConfiguration);
         
-        SpringProcessEngineConfiguration springProcessEngineConfiguration = (SpringProcessEngineConfiguration) processEngineConfiguration;
+        SpringProcessEngineConfiguration springProcessEngineConfiguration = (SpringProcessEngineConfiguration) engineConfiguration;
         cmmnEngineConfiguration.setTransactionManager(springProcessEngineConfiguration.getTransactionManager());
         cmmnEngineConfiguration.setExpressionManager(new SpringCmmnExpressionManager(
                         springProcessEngineConfiguration.getApplicationContext(), springProcessEngineConfiguration.getBeans()));
 
         initCmmnEngine();
         
-        initServiceConfigurations(processEngineConfiguration, cmmnEngineConfiguration);
+        initServiceConfigurations(engineConfiguration, cmmnEngineConfiguration);
     }
 
     @Override

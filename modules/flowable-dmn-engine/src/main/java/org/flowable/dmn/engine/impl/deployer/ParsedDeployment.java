@@ -18,9 +18,9 @@ import java.util.Map;
 import org.flowable.dmn.engine.impl.parser.DmnParse;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntity;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntity;
-import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntity;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DmnDefinition;
+import org.flowable.engine.common.api.repository.EngineResource;
 
 /**
  * An intermediate representation of a DeploymentEntity which keeps track of all of the entity's DecisionTableEntities and resources, and BPMN parses, models, and processes associated with each
@@ -35,12 +35,12 @@ public class ParsedDeployment {
 
     protected List<DecisionTableEntity> decisionTables;
     protected Map<DecisionTableEntity, DmnParse> mapDecisionTablesToParses;
-    protected Map<DecisionTableEntity, DmnResourceEntity> mapDecisionTablesToResources;
+    protected Map<DecisionTableEntity, EngineResource> mapDecisionTablesToResources;
 
     public ParsedDeployment(
             DmnDeploymentEntity entity, List<DecisionTableEntity> decisionTables,
             Map<DecisionTableEntity, DmnParse> mapDecisionTablesToParses,
-            Map<DecisionTableEntity, DmnResourceEntity> mapDecisionTablesToResources) {
+            Map<DecisionTableEntity, EngineResource> mapDecisionTablesToResources) {
 
         this.deploymentEntity = entity;
         this.decisionTables = decisionTables;
@@ -56,7 +56,7 @@ public class ParsedDeployment {
         return decisionTables;
     }
 
-    public DmnResourceEntity getResourceForDecisionTable(DecisionTableEntity decisionTable) {
+    public EngineResource getResourceForDecisionTable(DecisionTableEntity decisionTable) {
         return mapDecisionTablesToResources.get(decisionTable);
     }
 

@@ -76,7 +76,7 @@ public class ModelImageService {
         }
         return null;
     }
-    
+
     public byte[] generateCmmnThumbnailImage(Model model, ObjectNode editorJsonNode) {
         try {
 
@@ -121,7 +121,7 @@ public class ModelImageService {
         }
         return diagramInfo;
     }
-    
+
     protected GraphicInfo calculateDiagramSize(CmmnModel cmmnModel) {
         GraphicInfo diagramInfo = new GraphicInfo();
 
@@ -155,20 +155,20 @@ public class ModelImageService {
             }
         }
     }
-    
+
     protected void scaleDiagram(CmmnModel cmmnModel, double scaleFactor) {
         for (Case caseModel : cmmnModel.getCases()) {
             org.flowable.cmmn.model.GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(caseModel.getPlanModel().getId());
             scaleCmmnGraphicInfo(graphicInfo, scaleFactor);
-            
+
             for (Criterion criterion : caseModel.getPlanModel().getExitCriteria()) {
                 org.flowable.cmmn.model.GraphicInfo criterionGraphicInfo = cmmnModel.getGraphicInfo(criterion.getId());
                 scaleCmmnGraphicInfo(criterionGraphicInfo, scaleFactor);
             }
-            
+
             scalePlanItems(caseModel.getPlanModel().getPlanItems(), cmmnModel, scaleFactor);
         }
-        
+
         scaleAssociations(cmmnModel.getAssociations(), cmmnModel, scaleFactor);
     }
 
@@ -226,8 +226,8 @@ public class ModelImageService {
                 if (flowList != null) {
                     graphicInfoList.addAll(flowList);
                 }
-                
-            // no graphic info for Data Objects    
+
+            // no graphic info for Data Objects
             } else if (!DataObject.class.isInstance(flowElement)) {
                 graphicInfoList.add(bpmnModel.getGraphicInfo(flowElement.getId()));
             }
@@ -256,7 +256,7 @@ public class ModelImageService {
             scaleGraphicInfoList(graphicInfoList, scaleFactor);
         }
     }
-    
+
     protected void scalePlanItems(Collection<PlanItem> itemList, CmmnModel cmmnModel, double scaleFactor) {
         for (PlanItem planItem : itemList) {
             org.flowable.cmmn.model.GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(planItem.getId());
@@ -266,12 +266,12 @@ public class ModelImageService {
                 Stage stage = (Stage) planItem.getPlanItemDefinition();
                 scalePlanItems(stage.getPlanItems(), cmmnModel, scaleFactor);
             }
-            
+
             for (Criterion criterion : planItem.getEntryCriteria()) {
                 org.flowable.cmmn.model.GraphicInfo criterionGraphicInfo = cmmnModel.getGraphicInfo(criterion.getId());
                 scaleCmmnGraphicInfo(criterionGraphicInfo, scaleFactor);
             }
-            
+
             for (Criterion criterion : planItem.getExitCriteria()) {
                 org.flowable.cmmn.model.GraphicInfo criterionGraphicInfo = cmmnModel.getGraphicInfo(criterion.getId());
                 scaleCmmnGraphicInfo(criterionGraphicInfo, scaleFactor);
@@ -298,13 +298,15 @@ public class ModelImageService {
         graphicInfo.setWidth(graphicInfo.getWidth() / scaleFactor);
         graphicInfo.setHeight(graphicInfo.getHeight() / scaleFactor);
     }
-    
+
     protected void scaleCmmnGraphicInfoList(List<org.flowable.cmmn.model.GraphicInfo> graphicInfoList, double scaleFactor) {
-        for (org.flowable.cmmn.model.GraphicInfo graphicInfo : graphicInfoList) {
-            scaleCmmnGraphicInfo(graphicInfo, scaleFactor);
+        if (graphicInfoList != null) {
+            for (org.flowable.cmmn.model.GraphicInfo graphicInfo : graphicInfoList) {
+                scaleCmmnGraphicInfo(graphicInfo, scaleFactor);
+            }
         }
     }
-    
+
     protected void scaleCmmnGraphicInfo(org.flowable.cmmn.model.GraphicInfo graphicInfo, double scaleFactor) {
         graphicInfo.setX(graphicInfo.getX() / scaleFactor);
         graphicInfo.setY(graphicInfo.getY() / scaleFactor);
