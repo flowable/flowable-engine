@@ -111,21 +111,11 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         return processInstance;
     }
 
-    protected ProcessInstance createAndStartProcessInstance(ProcessDefinition processDefinition, 
-                                                            String businessKey, 
-                                                            String processInstanceName,
-                                                            Map<String, Object> variables, 
-                                                            Map<String, Object> transientVariables,
-                                                            String callbackId,
-                                                            String callbackType) {
-        return processInstanceHelper.createProcessInstance(processDefinition, 
-                                                                   businessKey, 
-                                                                   processInstanceName, 
-                                                                   variables, 
-                                                                   transientVariables,
-                                                                   callbackId,
-                                                                   callbackType,
-                                                                   true);
+    protected ProcessInstance createAndStartProcessInstance(ProcessDefinition processDefinition, String businessKey, String processInstanceName, 
+                    Map<String, Object> variables, Map<String, Object> transientVariables, String callbackId, String callbackType) {
+        
+        return processInstanceHelper.createProcessInstance(processDefinition, businessKey, processInstanceName, variables, 
+                        transientVariables, callbackId, callbackType, true);
     }
 
     protected Map<String, Object> processDataObjects(Collection<ValuedDataObject> dataObjects) {

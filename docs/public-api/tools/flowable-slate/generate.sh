@@ -12,10 +12,14 @@ mkdir -p target/specfile
 
 for apiName in {"content","decision","form","process"}; do
   # EXECUTE WINDERSHIN
-  widdershins --summary -y target/specfile/$apiName/flowable-swagger-$apiName.yaml target/specfile/$apiName/index.html.md
+  widdershins --summary --noschema  --user_templates templates/ -y target/specfile/$apiName/flowable-swagger-$apiName.yaml target/specfile/$apiName/_rest-body.md
 
   # COPY TO SLATE
-  cp target/specfile/$apiName/index.html.md slate/source
+  # Remove header from the body (roughly the first 40 lines)
+  sed -e '1,40d' target/specfile/$apiName/_rest-body.md > slate/source/includes/_rest-body.md
+  # Add Header API Name Title.
+  title="$(tr '[:lower:]' '[:upper:]' <<< ${apiName:0:1})${apiName:1}"
+  sed -e "s/API_NAME/$title/g" templates/_rest-title.md > slate/source/includes/_rest-title.md
 
   # BUILD SLATE
   cd slate

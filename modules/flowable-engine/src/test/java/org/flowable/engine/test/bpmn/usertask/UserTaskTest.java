@@ -22,6 +22,8 @@ import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 
 /**
@@ -141,6 +143,35 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         assertEquals(vars.size(), task.getProcessVariables().size());
 
         assertEquals("test123", task.getFormKey());
+    }
+    
+    @Deployment
+    public void testEmptyAssignmentExpression() {
+        Map<String, Object> variableMap = new HashMap<>();
+        variableMap.put("assignee", null);
+        variableMap.put("candidateUsers", null);
+        variableMap.put("candidateGroups", null);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variableMap);
+        assertNotNull(processInstance);
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        assertNull(task.getAssignee());
+        List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(task.getId());
+        assertEquals(0, identityLinks.size());
+        
+        variableMap = new HashMap<>();
+        variableMap.put("assignee", "");
+        variableMap.put("candidateUsers", "");
+        variableMap.put("candidateGroups", "");
+        processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variableMap);
+        assertNotNull(processInstance);
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        assertNull(task.getAssignee());
+        identityLinks = taskService.getIdentityLinksForTask(task.getId());
+        assertEquals(0, identityLinks.size());
     }
 
 }

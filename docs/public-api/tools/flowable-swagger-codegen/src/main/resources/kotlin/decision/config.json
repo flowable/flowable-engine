@@ -1,0 +1,9 @@
+{
+  "groupId":"org.flowable.client.kotlin",
+  "artifactId":"flowable-kotlin-client-decision",
+  "artifactVersion":"0.0.1",
+  "packageName":"org.flowable.client.kotlin.decision",
+  "invokerPackage":"org.flowable.client.kotlin.decision",
+  "modelPackage":"org.flowable.client.kotlin.decision.model",
+  "apiPackage":"org.flowable.client.kotlin.decision.api"
+}
