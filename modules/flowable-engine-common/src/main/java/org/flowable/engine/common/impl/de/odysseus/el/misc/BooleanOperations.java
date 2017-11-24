@@ -68,7 +68,7 @@ public class BooleanOperations {
 	}
 
 	@SuppressWarnings("unchecked")
-	private static final boolean gt0(TypeConverter converter, Object o1, Object o2) {               
+	private static final boolean gt0(TypeConverter converter, Object o1, Object o2) {              
 		Class<?> t1 = o1.getClass();
 		Class<?> t2 = o2.getClass();
 		if (BigDecimal.class.isAssignableFrom(t1) || BigDecimal.class.isAssignableFrom(t2)) {
