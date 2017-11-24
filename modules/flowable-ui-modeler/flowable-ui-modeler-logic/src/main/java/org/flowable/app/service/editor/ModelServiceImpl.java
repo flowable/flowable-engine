@@ -417,6 +417,37 @@ public class ModelServiceImpl implements ModelService {
     protected Model internalSave(String name, String key, String description, String editorJson, boolean newVersion,
             String newVersionComment, byte[] imageBytes, User updatedBy, Model modelObject) {
 
+        ObjectNode jsonNode;
+        try
+        {
+            jsonNode = objectMapper.readValue(editorJson, ObjectNode.class);
+        }
+        catch (Exception e)
+        {
+            throw new InternalServerErrorException("Could not deserialize model definition");
+        }
+
+        if (AbstractModel.MODEL_TYPE_BPMN == modelObject.getModelType())
+        {
+            ObjectNode metaNode = jsonNode.with("properties");
+            ArrayNode historyNode = metaNode.withArray("rds_provenances");
+            ObjectNode newHistory = historyNode.addObject();
+            newHistory.put("user", updatedBy.getId());
+            newHistory.put("time", new Date().getTime());
+            newHistory.put("designerVersion", this.getVersionFromJar());
+        }
+        else if (AbstractModel.MODEL_TYPE_FORM_RDS == modelObject.getModelType())
+        {
+
+            ObjectNode metaNode = jsonNode.with("metadata");
+            ArrayNode historyNode = metaNode.withArray("provenance");
+            ObjectNode newHistory = historyNode.addObject();
+            newHistory.put("user", updatedBy.getId());
+            newHistory.put("time", new Date().getTime());
+            newHistory.put("designerVersion", this.getVersionFromJar());
+        }
+        editorJson = jsonNode.toString();
+
         if (!newVersion) {
 
             modelObject.setLastUpdated(new Date());
@@ -855,5 +886,10 @@ public class ModelServiceImpl implements ModelService {
         LOGGER.error("Error addFormToProcess ", e);
         throw new FlowableException("Error addFormToProcess", e);
       }
+    }
+
+    private String getVersionFromJar()
+    {
+        return FormDesignJsonService.class.getPackage().getImplementationVersion();
     }
 }
