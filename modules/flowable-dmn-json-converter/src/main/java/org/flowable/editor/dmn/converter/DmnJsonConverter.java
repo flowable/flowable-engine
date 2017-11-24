@@ -194,8 +194,7 @@ public class DmnJsonConverter {
         }
     }
 
-    protected void processInputExpressions(JsonNode modelNode, Map<String, InputClause> ruleInputContainerMap,
-            DecisionTable decisionTable) {
+    protected void processInputExpressions(JsonNode modelNode, Map<String, InputClause> ruleInputContainerMap, DecisionTable decisionTable) {
         // input expressions
         JsonNode inputExpressions = modelNode.get("inputExpressions");
 
@@ -218,8 +217,7 @@ public class DmnJsonConverter {
                 inputClause.setInputExpression(inputExpression);
 
                 if (inputExpressionNode.get("entries") != null && !inputExpressionNode.get("entries").isNull()
-                        && inputExpressionNode.get("entries").isArray()
-                        && inputExpressionNode.get("entries").size() > 0) {
+                    && inputExpressionNode.get("entries").isArray() && inputExpressionNode.get("entries").size() > 0) {
                     UnaryTests inputValues = new UnaryTests();
                     List<Object> inputEntries = new ArrayList<>();
                     for (JsonNode entriesNode : inputExpressionNode.get("entries")) {
@@ -238,10 +236,10 @@ public class DmnJsonConverter {
             }
         }
     }
-
-    protected void processOutputExpressions(JsonNode modelNode, Map<String, OutputClause> ruleOutputContainerMap,
-            List<String> complexExpressionIds, DecisionTable decisionTable) {
-
+    
+    protected void processOutputExpressions(JsonNode modelNode, Map<String, OutputClause> ruleOutputContainerMap, 
+                    List<String> complexExpressionIds, DecisionTable decisionTable) {
+        
         // output expressions
         JsonNode outputExpressions = modelNode.get("outputExpressions");
 
@@ -260,8 +258,7 @@ public class DmnJsonConverter {
                 outputClause.setTypeRef(DmnJsonConverterUtil.getValueAsString("type", outputExpressionNode));
 
                 if (outputExpressionNode.get("entries") != null && !outputExpressionNode.get("entries").isNull()
-                        && outputExpressionNode.get("entries").isArray()
-                        && outputExpressionNode.get("entries").size() > 0) {
+                    && outputExpressionNode.get("entries").isArray() && outputExpressionNode.get("entries").size() > 0) {
                     UnaryTests outputValues = new UnaryTests();
                     List<Object> outputEntries = new ArrayList<>();
                     for (JsonNode entriesNode : outputExpressionNode.get("entries")) {
@@ -273,8 +270,7 @@ public class DmnJsonConverter {
                     outputClause.setOutputValues(outputValues);
                 }
 
-                if (outputExpressionNode.get("complexExpression") != null
-                        && !outputExpressionNode.get("complexExpression").isNull()) {
+                if (outputExpressionNode.get("complexExpression") != null && !outputExpressionNode.get("complexExpression").isNull()) {
                     if (outputExpressionNode.get("complexExpression").asBoolean()) {
                         complexExpressionIds.add(outputExpressionId);
                     }
@@ -288,9 +284,8 @@ public class DmnJsonConverter {
         }
     }
 
-    protected void processRules(JsonNode modelNode, Map<String, InputClause> ruleInputContainerMap,
-            Map<String, OutputClause> ruleOutputContainerMap, List<String> complexExpressionIds,
-            DecisionTable decisionTable) {
+    protected void processRules(JsonNode modelNode, Map<String, InputClause> ruleInputContainerMap, Map<String, OutputClause> ruleOutputContainerMap, 
+                    List<String> complexExpressionIds, DecisionTable decisionTable) {
         // rules
         JsonNode rules = modelNode.get("rules");
 
@@ -480,14 +475,10 @@ public class DmnJsonConverter {
                             if (complexExpressionIds.contains(id)) {
                                 outputEntry.setText(expressionValue);
                             } else {
-                                if ("string".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())) { // add
-                                    // quotes
-                                    // for
-                                    // string
+                                if ("string".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())) { // add quotes for string
                                     outputEntry.setText("\"" + expressionValue + "\"");
                                 } else if ("date".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())
-                                        && StringUtils.isNotEmpty(expressionValue)) { // wrap in built in toDate
-                                    // function
+                                    && StringUtils.isNotEmpty(expressionValue)) { // wrap in built in toDate function
                                     outputEntry.setText("date:toDate('" + expressionValue + "')");
                                 } else {
                                     outputEntry.setText(expressionValue);
