@@ -14,10 +14,12 @@ package org.flowable.cmmn.editor.constants;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public interface CmmnStencilConstants {
 
     // stencil items
+    
     String STENCIL_PLANMODEL = "CasePlanModel";
     String STENCIL_STAGE = "Stage";
     String STENCIL_TASK = "Task";
@@ -27,6 +29,7 @@ public interface CmmnStencilConstants {
     String STENCIL_TASK_CASE = "CaseTask";
     String STENCIL_TASK_PROCESS = "ProcessTask";
     String STENCIL_MILESTONE = "Milestone";
+    String STENCIL_TIMER_EVENT_LISTENER ="TimerEventListener";
 
     String STENCIL_ENTRY_CRITERION = "EntryCriterion";
     String STENCIL_EXIT_CRITERION = "ExitCriterion";
@@ -37,6 +40,7 @@ public interface CmmnStencilConstants {
     String PROPERTY_VALUE_NO = "No";
     
     // stencil properties
+    
     String PROPERTY_OVERRIDE_ID = "overrideid";
     String PROPERTY_NAME = "name";
     String PROPERTY_DOCUMENTATION = "documentation";
@@ -108,5 +112,9 @@ public interface CmmnStencilConstants {
     String PROPERTY_HTTPTASK_SAVE_REQUEST_VARIABLES = "httptasksaverequestvariables";
     String PROPERTY_HTTPTASK_SAVE_RESPONSE_PARAMETERS = "httptasksaveresponseparameters";
     String PROPERTY_HTTPTASK_RESULT_VARIABLE_PREFIX = "httptaskresultvariableprefix";
+    
+    String PROPERTY_TIMER_EXPRESSION = "timerexpression";
+    String PROPERTY_TIMER_START_TRIGGER_SOURCE_REF = "timerstarttriggersourceref";
+    String PROPERTY_TIMER_START_TRIGGER_STANDARD_EVENT = "transitionevent";
     
 }

@@ -38,6 +38,7 @@ import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
+import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.repository.EngineResource;
 import org.flowable.engine.common.impl.el.ExpressionManager;
@@ -138,6 +139,10 @@ public class CmmnParserImpl implements CmmnParser {
             } else if (planItemDefinition instanceof Milestone) {
                 Milestone milestone = (Milestone) planItemDefinition;
                 planItem.setBehavior(activityBehaviorFactory.createMilestoneActivityBehavior(planItem, milestone));
+                
+            } else if (planItemDefinition instanceof TimerEventListener) { 
+                TimerEventListener timerEventListener = (TimerEventListener) planItemDefinition;
+                planItem.setBehavior(activityBehaviorFactory.createTimerEventListenerActivityBehavior(planItem, timerEventListener));
                 
             } else if (planItemDefinition instanceof Task) {
                 Task task = (Task) planItemDefinition;

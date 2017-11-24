@@ -47,6 +47,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_HUMAN_TASK = "humanTask";
     String ELEMENT_CASE_TASK = "caseTask";
     String ELEMENT_PROCESS_TASK = "processTask";
+    String ELEMENT_TIMER_EVENT_LISTENER = "timerEventListener";
     String ELEMENT_PLAN_ITEM = "planItem";
     String ELEMENT_SENTRY = "sentry";
     String ELEMENT_PLAN_ITEM_ON_PART = "planItemOnPart";
@@ -75,6 +76,10 @@ public interface CmmnXmlConstants {
     
     String ELEMENT_PROCESS_REF_EXPRESSION = "processRefExpression";
     String ELEMENT_CONDITION = "condition";
+    
+    String ELEMENT_TIMER_EXPRESSION = "timerExpression";
+    String ELEMENT_PLAN_ITEM_START_TRIGGER = "planItemStartTrigger";
+    String ATTRIBUTE_PLAN_ITEM_START_TRIGGER_SRC_REF = "sourceRef";
     
     String ATTRIBUTE_TYPE = "type";
     

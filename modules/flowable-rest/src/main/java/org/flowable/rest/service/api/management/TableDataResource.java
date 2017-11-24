@@ -13,8 +13,14 @@
 
 package org.flowable.rest.service.api.management;
 
-import java.util.Map;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
@@ -28,14 +34,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Frederik Heremans
@@ -64,7 +64,7 @@ public class TableDataResource {
             @ApiResponse(code = 404, message = "Indicates the requested table does not exist.")
     })
     @GetMapping(value = "/management/tables/{tableName}/data", produces = "application/json")
-    public DataResponse getTableData(@ApiParam(name = "tableName") @PathVariable String tableName, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
+    public DataResponse<List<Map<String, Object>>> getTableData(@ApiParam(name = "tableName") @PathVariable String tableName, @ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams) {
         // Check if table exists before continuing
         if (managementService.getTableMetaData(tableName) == null) {
             throw new FlowableObjectNotFoundException("Could not find a table with name '" + tableName + "'.", String.class);
