@@ -16,7 +16,6 @@ import java.util.Map;
 
 import org.flowable.engine.common.api.repository.EngineDeployment;
 import org.flowable.engine.impl.bpmn.parser.BpmnParser;
-import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 
 public class ParsedDeploymentBuilderFactory {
 

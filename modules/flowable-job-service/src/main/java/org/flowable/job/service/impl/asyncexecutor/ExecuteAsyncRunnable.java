@@ -22,6 +22,7 @@ import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobInfo;
+import org.flowable.job.service.InternalJobCompatibilityManager;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.cmd.ExecuteAsyncJobCmd;
 import org.flowable.job.service.impl.cmd.LockExclusiveJobCmd;
@@ -96,10 +97,9 @@ public class ExecuteAsyncRunnable implements Runnable {
 
         if (job instanceof Job) {
             Job jobObject = (Job) job;
-            if (jobServiceConfiguration.getInternalJobManager() != null &&
-                            jobServiceConfiguration.getInternalJobManager().isFlowable5ProcessDefinitionId(jobObject.getProcessDefinitionId())) {
-
-                jobServiceConfiguration.getInternalJobManager().executeV5JobWithLockAndRetry(jobObject);
+            InternalJobCompatibilityManager internalJobCompatibilityManager = jobServiceConfiguration.getInternalJobCompatibilityManager();
+            if (internalJobCompatibilityManager != null && internalJobCompatibilityManager.isFlowable5Job(jobObject)) {
+                internalJobCompatibilityManager.executeV5JobWithLockAndRetry(jobObject);
                 return;
             }
         }

@@ -12,7 +12,7 @@
  * limitations under the License.
  */
 
-package org.flowable.engine.impl.calendar;
+package org.flowable.engine.common.impl.calendar;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

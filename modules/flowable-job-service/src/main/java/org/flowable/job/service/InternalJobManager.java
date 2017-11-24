@@ -14,7 +14,6 @@
 package org.flowable.job.service;
 
 import org.flowable.job.api.Job;
-import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
 
@@ -25,23 +24,14 @@ public interface InternalJobManager {
 
     VariableScope resolveVariableScope(Job job);
     
-    boolean isFlowable5ProcessDefinitionId(String processDefinitionId);
-    
-    void executeV5Job(Job job);
-    
-    void executeV5JobWithLockAndRetry(Job job);
-    
     boolean handleJobInsert(Job job);
     
     void handleJobDelete(Job job);
     
-    void handleFailedJob(AbstractRuntimeJobEntity job, Throwable exception);
+    void lockJobScope(Job job);
     
-    void updateJobScopeLockTime(Job job);
+    void clearJobScopeLock(Job job);
     
-    void clearJobScopeLockTime(Job job);
+    void preTimerJobDelete(JobEntity jobEntity, VariableScope variableScope);
     
-    void deleteV5Job(String jobId);
-    
-    void restoreJobExtraData(JobEntity jobEntity, VariableScope variableScope);
 }

@@ -14,7 +14,6 @@ package org.flowable.engine.delegate.event.impl;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityEvent;
-import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityEvent;
 
 /**
  * Implementation of an {@link FlowableMultiInstanceActivityEvent}.

@@ -18,6 +18,7 @@ import java.util.List;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.variable.api.delegate.VariableScope;
 import org.junit.Assert;
 
 public class TweetHandler implements JobHandler {
@@ -30,7 +31,7 @@ public class TweetHandler implements JobHandler {
     }
 
     @Override
-    public void execute(JobEntity job, String configuration, Object execution, CommandContext commandContext) {
+    public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
         messages.add(configuration);
         Assert.assertNotNull(commandContext);
     }

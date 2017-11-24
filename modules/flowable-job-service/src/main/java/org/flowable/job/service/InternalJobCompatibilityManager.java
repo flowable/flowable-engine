@@ -10,18 +10,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package org.flowable.job.service;
 
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.job.service.impl.persistence.entity.JobEntity;
-import org.flowable.variable.api.delegate.VariableScope;
+import org.flowable.job.api.Job;
+import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 
 /**
- * @author Tom Baeyens
+ * @author Tijs Rademakers
+ * @author Joram Barrez
  */
-public interface JobHandler {
+public interface InternalJobCompatibilityManager {
+    
+    boolean isFlowable5Job(Job job);
 
-    String getType();
-
-    void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext);
+    void executeV5Job(Job job);
+    
+    void executeV5JobWithLockAndRetry(Job job);
+    
+    void deleteV5Job(String jobId);
+    
+    void handleFailedV5Job(AbstractRuntimeJobEntity job, Throwable exception);
+    
 }

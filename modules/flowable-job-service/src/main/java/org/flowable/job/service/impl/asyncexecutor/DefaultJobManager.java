@@ -336,8 +336,7 @@ public class DefaultJobManager implements JobManager {
             variableScope = NoExecutionVariableScope.getSharedInstance();
         }
 
-        // set endDate if it was set to the definition
-        jobServiceConfiguration.getInternalJobManager().restoreJobExtraData(timerEntity, variableScope);
+        jobServiceConfiguration.getInternalJobManager().preTimerJobDelete(timerEntity, variableScope);
 
         if (timerEntity.getDuedate() != null && !isValidTime(timerEntity, timerEntity.getDuedate(), variableScope)) {
             if (LOGGER.isDebugEnabled()) {
@@ -361,7 +360,7 @@ public class DefaultJobManager implements JobManager {
             }
         }
     }
-
+    
     protected void executeJobHandler(JobEntity jobEntity) {
         VariableScope variableScope = null;
         if (jobEntity.getExecutionId() != null) {

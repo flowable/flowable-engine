@@ -38,7 +38,7 @@ import org.activiti.engine.impl.persistence.entity.TimerJobEntity;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
-import org.flowable.engine.impl.calendar.DurationHelper;
+import org.flowable.engine.common.impl.calendar.DurationHelper;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.job.api.Job;
 import org.slf4j.Logger;
