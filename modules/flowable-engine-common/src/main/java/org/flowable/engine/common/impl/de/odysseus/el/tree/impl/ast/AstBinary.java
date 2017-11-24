@@ -95,7 +95,7 @@ public class AstBinary extends AstRightValue {
 	};
 	public static final Operator REGEX = new SimpleOperator() {
 		@Override public Object apply(TypeConverter converter, Object o1, Object o2) { return BooleanOperations.regex(converter, o1, o2); }
-		@Override public String toString() { return "r"; }
+		@Override public String toString() { return "regex"; }
 	};
 
 	private final Operator operator;

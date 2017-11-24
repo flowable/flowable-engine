@@ -29,7 +29,7 @@ import org.flowable.engine.common.impl.javax.el.ELException;
 public class BooleanOperations {
 	private static final Set<Class<? extends Number>> SIMPLE_INTEGER_TYPES = new HashSet<>();
 	private static final Set<Class<? extends Number>> SIMPLE_FLOAT_TYPES = new HashSet<>();
-        
+       
 	static {
 		SIMPLE_INTEGER_TYPES.add(Byte.class);
 		SIMPLE_INTEGER_TYPES.add(Short.class);
