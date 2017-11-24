@@ -193,7 +193,7 @@ public class DmnJsonConverter {
             }
         }
     }
-
+    
     protected void processInputExpressions(JsonNode modelNode, Map<String, InputClause> ruleInputContainerMap, DecisionTable decisionTable) {
         // input expressions
         JsonNode inputExpressions = modelNode.get("inputExpressions");
@@ -283,7 +283,7 @@ public class DmnJsonConverter {
             }
         }
     }
-
+    
     protected void processRules(JsonNode modelNode, Map<String, InputClause> ruleInputContainerMap, Map<String, OutputClause> ruleOutputContainerMap, 
                     List<String> complexExpressionIds, DecisionTable decisionTable) {
         // rules
