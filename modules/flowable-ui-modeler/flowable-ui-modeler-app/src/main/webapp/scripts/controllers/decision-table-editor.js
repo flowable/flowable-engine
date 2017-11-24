@@ -29,7 +29,7 @@ angular.module('flowableModeler')
             var hotDecisionTableEditorInstance;
             var hitPolicies = ['FIRST', 'ANY', 'UNIQUE', 'PRIORITY', 'RULE ORDER', 'OUTPUT ORDER', 'COLLECT'];
             var operators = ['==', '!=', '<', '>', '>=', '<=', 'regex'];
-            var listInputOperators = ['containsString', 'containsNumber', 'containsDate'];
+            var listInputOperators = ['containsString', 'containsNumber', 'containsDate', 'containsExpression'];
             var listOutputOperators = ['append', 'remove', 'clear'];
             var listDefaultOutputOperators = ['string', 'number', 'date', 'expression'];
             var columnIdCounter = 0;
@@ -432,11 +432,13 @@ angular.module('flowableModeler')
 
             var _loadDecisionTableDefinition = function (modelId) {
                 DecisionTableService.fetchDecisionTableDetails(modelId).then(function (decisionTable) {
+
                     $rootScope.currentDecisionTable = decisionTable.decisionTableDefinition;
                     $rootScope.currentDecisionTable.id = decisionTable.id;
                     $rootScope.currentDecisionTable.key = decisionTable.decisionTableDefinition.key;
                     $rootScope.currentDecisionTable.name = decisionTable.name;
                     $rootScope.currentDecisionTable.description = decisionTable.description;
+
                     $scope.model.lastUpdatedBy = decisionTable.lastUpdatedBy;
                     $scope.model.createdBy = decisionTable.createdBy;
 
@@ -455,6 +457,7 @@ angular.module('flowableModeler')
                     hitPolicyHeaderElement = angular.element('<div class="hit-policy-header"><a onclick="triggerHitPolicyEditor()">' + $rootScope.currentDecisionTable.hitIndicator.substring(0, 1) + '</a></div>');
 
                     evaluateDecisionTableGrid($rootScope.currentDecisionTable);
+
                     $timeout(function () {
                         // Flip switch in timeout to start watching all decision-related models
                         // after next digest cycle, to prevent first false-positive
@@ -605,7 +608,7 @@ angular.module('flowableModeler')
                         type = 'list';
                         break;
                     default:
-				type = 'text';
+                        type = 'text';
                 }
 
                 if (outputExpression.complexExpression) {
@@ -759,6 +762,7 @@ angular.module('flowableModeler')
 
                 columnDefinitions[inputExpressionCounter - 1].className += ' last';
                 $scope.model.startOutputExpression = inputExpressionCounter;
+
                 if (decisionTable.outputExpressions && decisionTable.outputExpressions.length > 0) {
                     decisionTable.outputExpressions.forEach(function (outputExpression) {
 				if(outputExpression.type != "list"){
@@ -789,7 +793,6 @@ angular.module('flowableModeler')
 
                 // timeout needed for trigger hot update when removing column defs
                 $scope.model.columnDefs = columnDefinitions;
-
                 $timeout(function () {
                     if (hotDecisionTableEditorInstance) {
                         hotDecisionTableEditorInstance.render();

@@ -46,7 +46,7 @@ angular.module('flowableModeler')
             var hotReadOnlyDecisionTableEditorInstance;
             var hitPolicies = ['FIRST', 'ANY', 'UNIQUE', 'PRIORITY', 'RULE ORDER', 'OUTPUT ORDER', 'COLLECT'];
             var operators = ['==', '!=', '<', '>', '>=', '<=', 'regex'];
-            var listInputOperators = ['containsString', 'containsNumber', 'containsDate'];
+            var listInputOperators = ['containsString', 'containsNumber', 'containsDate', 'containsExpression'];
             var listOutputOperators = ['append', 'remove', 'clear'];
             var listDefaultOutputOperators = ['string', 'number', 'date', 'expression'];
             var columnIdCounter = 0;
@@ -478,7 +478,7 @@ angular.module('flowableModeler')
 
                 return defaultRow;
             };
-            
+
             var composeInputDefaultOperatorColumnDefinition = function (inputExpression) {
                 var expressionPosition = $scope.currentDecisionTable.inputExpressions.indexOf(inputExpression);
 
@@ -601,7 +601,7 @@ angular.module('flowableModeler')
                         type = 'list';
                         break;
                     default:
-				type = 'text';
+                        type = 'text';
                 }
 
                 if (outputExpression.complexExpression) {
@@ -636,7 +636,6 @@ angular.module('flowableModeler')
                         '<br/><span class="header-variable-type">' + (outputExpression.type ? outputExpression.type : "") + '</span>' +
                         '<br><span class="header-entries">[' + outputExpression.entries.join() + ']</span>' +
                         '</div>';
-                        
                 } else {
                     title += '<div class="output-header">' +
                         '<a onclick="triggerExpressionEditor(\'output\',' + expressionPosition + ',false)"><span class="header-label">' + (outputExpression.label ? outputExpression.label : "New Output") + '</span></a>' +
@@ -725,7 +724,6 @@ angular.module('flowableModeler')
 		                     inputExpressionCounter += 3;
 					}
                     });
-                    
                 } else { // create default input expression
                     decisionTable.inputExpressions = [];
                     var inputExpression = createNewInputExpression();
@@ -737,6 +735,7 @@ angular.module('flowableModeler')
 
                 columnDefinitions[inputExpressionCounter - 1].className += ' last';
                 $scope.model.startOutputExpression = inputExpressionCounter;
+
                 if (decisionTable.outputExpressions && decisionTable.outputExpressions.length > 0) {
                     decisionTable.outputExpressions.forEach(function (outputExpression) {
 				if(outputExpression.type != "list"){
@@ -755,7 +754,6 @@ angular.module('flowableModeler')
                              setGridValues(outputExpressionColumnDefinition.data, outputExpressionColumnDefinition.expressionType);
 				}
                     });
-                    
                 } else { // create default output expression
                     decisionTable.outputExpressions = [];
                     var outputExpression = createNewOutputExpression();
@@ -767,14 +765,12 @@ angular.module('flowableModeler')
 
                 // timeout needed for trigger hot update when removing column defs
                 $scope.model.columnDefs = columnDefinitions;
-
                 $timeout(function () {
                     if (hotReadOnlyDecisionTableEditorInstance) {
-                    	hotReadOnlyDecisionTableEditorInstance.render();
+                        hotReadOnlyDecisionTableEditorInstance.render();
                     }
                 });
             };
-
 
             // fetch table from service and populate model
             _loadDecisionTableDefinition($routeParams.modelId);

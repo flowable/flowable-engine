@@ -157,6 +157,7 @@ angular.module('flowableModeler')
                 };
 
                 $rootScope.currentDecisionTableRules = $scope.model.rulesData;
+
                 var saveCallback = function() {
                     $scope.$hide();
                     
