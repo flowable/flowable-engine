@@ -342,7 +342,8 @@ public class DmnJsonConverter {
                             stringBuilder.append(expressionValue);
                             stringBuilder.append("\")");
                         } else if (listOperatorValue.toLowerCase().equals("containsNumber")
-                                || listOperatorValue.toLowerCase().equals("containsDate")) {
+                                || listOperatorValue.toLowerCase().equals("containsDate") 
+                                || listOperatorValue.toLowerCase().equals("containsExpression")) {
                             if (listOperatorValue.toLowerCase().equals("containsNumber")) {
                                 formattedExpressionValue = expressionValue;
                                 stringBuilder = new StringBuilder(".containsNumber");
@@ -353,6 +354,9 @@ public class DmnJsonConverter {
                                 stringBuilder2.append("')");
                                 formattedExpressionValue = stringBuilder2.toString();
                                 stringBuilder = new StringBuilder(".containsDate");
+                            }else if(listOperatorValue.toLowerCase().equals("containsExpression")) {
+                                formattedExpressionValue = expressionValue;
+                                stringBuilder = new StringBuilder(".containsExpression");
                             }
                             String methodName = "";
                             switch (operatorValue) {
@@ -378,7 +382,7 @@ public class DmnJsonConverter {
                             stringBuilder.append(methodName);
                             stringBuilder.append(formattedExpressionValue);
                             stringBuilder.append(")");
-                        }
+                        } 
                     } else {
                         // don't add operator if it's ==
                         if (StringUtils.isNotEmpty(operatorValue)) {
