@@ -1,0 +1,25 @@
+{
+  "sfFormProperties": {
+    "items": [
+      {
+        "key": "textarea",
+        "editorId": "sfb-editor-text-area",
+        "$builder-settings": {
+          "componentName": "Textarea"
+        },
+        "sfFormProperties": {
+          "title": "Textarea",
+          "type": "textarea",
+          "tooltip": "",
+          "placeholder": ""
+        },
+        "sfSchemaProperties": {
+          "required": false,
+          "type": "string"
+        }
+      }
+    ],
+    "type": "root"
+  },
+  "sfSchemaProperties": {}
+}
