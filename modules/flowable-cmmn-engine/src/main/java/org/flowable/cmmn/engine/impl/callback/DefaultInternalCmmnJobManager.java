@@ -13,9 +13,9 @@
 package org.flowable.cmmn.engine.impl.callback;
 
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.InternalJobManager;
-import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
 
@@ -48,13 +48,14 @@ public class DefaultInternalCmmnJobManager implements InternalJobManager {
 
     @Override
     public void lockJobScope(Job job) {
-        // TODO Auto-generated method stub
+        CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
+        caseInstanceEntityManager.updateLockTime(job.getScopeId());
     }
 
     @Override
     public void clearJobScopeLock(Job job) {
-        // TODO Auto-generated method stub
-        
+        CaseInstanceEntityManager caseInstanceEntityManager = cmmnEngineConfiguration.getCaseInstanceEntityManager();
+        caseInstanceEntityManager.clearLockTime(job.getScopeId());
     }
 
     @Override

@@ -13,6 +13,9 @@
 
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -111,6 +114,24 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         }
 
         delete(caseInstanceEntity);
+    }
+    
+    @Override
+    public void updateLockTime(String caseInstanceId) {
+        Date expirationTime = getCmmnEngineConfiguration().getClock().getCurrentTime();
+        int lockMillis = getCmmnEngineConfiguration().getAsyncExecutor().getAsyncJobLockTimeInMillis();
+
+        GregorianCalendar lockCal = new GregorianCalendar();
+        lockCal.setTime(expirationTime);
+        lockCal.add(Calendar.MILLISECOND, lockMillis);
+        Date lockDate = lockCal.getTime();
+        
+        caseInstanceDataManager.updateLockTime(caseInstanceId, lockDate, expirationTime);
+    }
+    
+    @Override
+    public void clearLockTime(String caseInstanceId) {
+        caseInstanceDataManager.clearLockTime(caseInstanceId);
     }
 
 }

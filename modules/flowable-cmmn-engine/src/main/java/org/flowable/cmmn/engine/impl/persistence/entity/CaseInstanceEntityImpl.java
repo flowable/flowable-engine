@@ -40,6 +40,8 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
     protected String callbackType;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     
+    protected Date lockTime;
+    
     // non persisted
     protected List<PlanItemInstanceEntity> childPlanItemInstances;
     protected List<SentryPartInstanceEntity> satisfiedSentryPartInstances;
@@ -56,6 +58,7 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
         persistentState.put("callbackId", callbackId);
         persistentState.put("callbackType", callbackType);
         persistentState.put("tenantId", tenantId);
+        persistentState.put("lockTime", lockTime);
         return persistentState;
     }
     
@@ -119,7 +122,13 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
-    
+    public Date getLockTime() {
+        return lockTime;
+    }
+    public void setLockTime(Date lockTime) {
+        this.lockTime = lockTime;
+    }
+
     @Override
     public List<PlanItemInstanceEntity> getChildPlanItemInstances() {
         if (childPlanItemInstances == null) {
