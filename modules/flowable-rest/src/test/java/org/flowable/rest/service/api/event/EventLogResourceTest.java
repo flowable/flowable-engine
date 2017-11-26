@@ -14,7 +14,7 @@ import org.flowable.engine.test.Deployment;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
 import org.flowable.rest.service.api.management.EventLogResource;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.Task;
 import org.hamcrest.CoreMatchers;
 
 import java.io.IOException;

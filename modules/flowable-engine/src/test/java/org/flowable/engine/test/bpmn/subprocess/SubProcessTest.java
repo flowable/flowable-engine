@@ -27,6 +27,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
+import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.api.history.HistoricTaskInstance;
 
@@ -450,7 +451,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         // After staring the process, the task in the subprocess should be active
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSimulationSubProcess",
                 CollectionUtil.singletonMap("virtualEngineCfg", "org/flowable/engine/test/bpmn/subprocess/SubProcessTest.virtualProcessEngine.cfg.xml"));
-        org.flowable.task.service.Task userTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        Task userTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals("wait state to check process instance state", userTask.getName());
 
         assertThat(ProcessEngines.getProcessEngine("virtual-flowable"), is(nullValue()));
@@ -465,7 +466,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     public void testSimulationSubProcessWithRealProcessEngine() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSimulationSubProcess",
                 CollectionUtil.singletonMap("virtualEngineCfg", ""));
-        org.flowable.task.service.Task userTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        Task userTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals("wait state to check process instance state", userTask.getName());
 
         assertThat(

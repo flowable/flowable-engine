@@ -17,6 +17,7 @@ import org.flowable.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessDebugger;
 import org.flowable.job.api.Job;
+import org.flowable.variable.api.delegate.VariableScope;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;

@@ -7,7 +7,7 @@ import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.Task;
 
 import java.util.Date;
 import java.util.List;

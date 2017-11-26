@@ -21,7 +21,7 @@ public class EscalationProbabilitySimulationTest extends ResourceFlowableTestCas
     @Deployment(resources = {"org/flowable/crystalball/examples/EscalationProbability-simulationRun.bpmn20.xml"})
     public void testSimulationRun() {
         ProcessEngines.setInitialized(true);
-        this.runtimeService.createProcessInstanceBuilder().processDefinitionKey("oneTaskProcessSimulationTest").start();
+        this.runtimeService.createProcessInstanceBuilder().processDefinitionKey("simulationRun").start();
         JobTestHelper.waitForJobExecutorToProcessAllJobs(this.processEngineConfiguration, this.managementService, 30000, 500);
     }
 

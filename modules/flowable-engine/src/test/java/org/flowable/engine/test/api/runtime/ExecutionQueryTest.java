@@ -35,7 +35,7 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ExecutionQuery;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.task.service.Task;
+import org.flowable.task.api.Task;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
