@@ -16,5 +16,6 @@ import org.flowable.engine.common.api.repository.EngineResource;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 
 public interface CmmnResourceEntity extends Entity, EngineResource {
-    
+ 
+    void setGenerated(boolean generated);
 }
