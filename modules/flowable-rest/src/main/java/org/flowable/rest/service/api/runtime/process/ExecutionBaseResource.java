@@ -51,7 +51,7 @@ public class ExecutionBaseResource {
     @Autowired
     protected RuntimeService runtimeService;
 
-    protected DataResponse getQueryResponse(ExecutionQueryRequest queryRequest, Map<String, String> requestParams, String serverRootUrl) {
+    protected DataResponse<ExecutionResponse> getQueryResponse(ExecutionQueryRequest queryRequest, Map<String, String> requestParams, String serverRootUrl) {
 
         ExecutionQuery query = runtimeService.createExecutionQuery();
 

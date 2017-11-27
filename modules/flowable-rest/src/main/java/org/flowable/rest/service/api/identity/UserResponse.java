@@ -14,6 +14,7 @@
 package org.flowable.rest.service.api.identity;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @author Frederik Hermans
@@ -28,6 +29,7 @@ public class UserResponse {
     protected String email;
     protected String pictureUrl;
 
+    @ApiModelProperty(example = "no-reply@flowable.org")
     public String getEmail() {
         return email;
     }
@@ -36,6 +38,7 @@ public class UserResponse {
         this.email = email;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/identity/users/testuser")
     public String getUrl() {
         return url;
     }
@@ -44,6 +47,7 @@ public class UserResponse {
         this.url = url;
     }
 
+    @ApiModelProperty(example = "testuser")
     public String getId() {
         return id;
     }
@@ -52,6 +56,7 @@ public class UserResponse {
         this.id = id;
     }
 
+    @ApiModelProperty(example = "Fred")
     public String getFirstName() {
         return firstName;
     }
@@ -60,6 +65,7 @@ public class UserResponse {
         this.firstName = firstName;
     }
 
+    @ApiModelProperty(example = "Smith")
     public String getLastName() {
         return lastName;
     }
@@ -77,6 +83,7 @@ public class UserResponse {
         this.passWord = passWord;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/identity/users/testuser/picture")
     public String getPictureUrl() {
         return pictureUrl;
     }

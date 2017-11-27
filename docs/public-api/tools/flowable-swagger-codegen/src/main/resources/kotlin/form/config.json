@@ -1,0 +1,9 @@
+{
+  "groupId":"org.flowable.client.kotlin",
+  "artifactId":"flowable-kotlin-client-form",
+  "artifactVersion":"0.0.1",
+  "packageName":"org.flowable.client.kotlin.form",
+  "invokerPackage":"org.flowable.client.kotlin.form",
+  "modelPackage":"org.flowable.client.kotlin.form.model",
+  "apiPackage":"org.flowable.client.kotlin.form.api"
+}

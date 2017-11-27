@@ -12,21 +12,9 @@
  */
 package org.flowable.cmmn.api.repository;
 
-import java.util.Date;
+import org.flowable.engine.common.api.repository.EngineDeployment;
 
-public interface CmmnDeployment {
-
-    String getId();
-
-    String getName();
-
-    Date getDeploymentTime();
-
-    String getCategory();
-    
-    String getKey();
-
-    String getTenantId();
+public interface CmmnDeployment extends EngineDeployment{
 
     String getParentDeploymentId();
     

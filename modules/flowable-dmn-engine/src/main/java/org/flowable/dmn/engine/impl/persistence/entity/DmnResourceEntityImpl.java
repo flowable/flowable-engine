@@ -66,6 +66,11 @@ public class DmnResourceEntityImpl extends AbstractEntityNoRevision implements D
     public Object getPersistentState() {
         return DmnResourceEntityImpl.class;
     }
+    
+    @Override
+    public boolean isGenerated() {
+        return false;
+    }
 
     // common methods //////////////////////////////////////////////////////////
 

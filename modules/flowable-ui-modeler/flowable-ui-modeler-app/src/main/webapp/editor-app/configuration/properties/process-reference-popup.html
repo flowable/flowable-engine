@@ -24,7 +24,7 @@
 			                   <input type="checkbox" value="option1" ng-click="selectProcess(processModel, $event)" ng-checked="processModel.id == selectedProcess.id" />
 			               </div>
 			               <h4>{{processModel.name}}</h4>
-			               <img src="{{config.contextRoot}}/app/rest/models/{{processModel.id}}/thumbnail" />
+			               <img src="{{getModelThumbnailUrl(processModel.id)}}" />
 			             </div>
 			             <div ng-show="state.loadingProcesses">
 			               <p class="loading" translate>PROPERTY.PROCESSREFERENCE.PROCESS.LOADING</p>

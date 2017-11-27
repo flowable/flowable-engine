@@ -77,8 +77,9 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
     protected Map<String, ItemDefinition> itemDefinitionMap = new HashMap<>();
     protected Map<String, MessageDefinition> messageDefinitionMap = new HashMap<>();
 
-    public WebServiceActivityBehavior() {
+    public WebServiceActivityBehavior(BpmnModel bpmnModel) {
         itemDefinitionMap.put("http://www.w3.org/2001/XMLSchema:string", new ItemDefinition("http://www.w3.org/2001/XMLSchema:string", new ClassStructureDefinition(String.class)));
+        fillDefinitionMaps(bpmnModel);
     }
 
     @Override
@@ -110,8 +111,6 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
         }
 
         MessageInstance message = null;
-
-        fillDefinitionMaps(bpmnModel);
 
         Operation operation = operationMap.get(operationRef);
 

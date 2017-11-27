@@ -12,13 +12,12 @@
  */
 package org.flowable.rest.dmn.service.api.decision;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.api.ExecuteDecisionBuilder;
@@ -28,17 +27,15 @@ import org.flowable.rest.dmn.service.api.DmnRestResponseFactory;
 import org.flowable.rest.variable.EngineRestVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Yvo Swillens
@@ -58,7 +55,7 @@ public class DmnRuleServiceResource {
     @ApiResponses(value = {
         @ApiResponse(code = 201, message = "Indicates the Decision has been executed")
     })
-    @RequestMapping(value = "/dmn-rule/execute", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/dmn-rule/execute", produces = "application/json")
     public DmnRuleServiceResponse executeDecision(@ApiParam("request") @RequestBody DmnRuleServiceRequest request, HttpServletRequest httpRequest, HttpServletResponse response) {
         if (request.getDecisionKey() == null) {
             throw new FlowableIllegalArgumentException("Decision key is required.");
@@ -96,7 +93,7 @@ public class DmnRuleServiceResource {
         @ApiResponse(code = 201, message = "Indicates the Decision has been executed"),
         @ApiResponse(code = 500, message = "Indicates the Decision returned multiple results")
     })
-    @RequestMapping(value = "/dmn-rule/execute/single-result", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/dmn-rule/execute/single-result", produces = "application/json")
     public DmnRuleServiceSingleResponse executeDecisionByKeySingleResult(@ApiParam("request") @RequestBody DmnRuleServiceRequest request, HttpServletRequest httpRequest, HttpServletResponse response) {
         if (request.getDecisionKey() == null) {
             throw new FlowableIllegalArgumentException("Decision key is required.");

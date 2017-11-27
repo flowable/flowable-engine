@@ -72,7 +72,7 @@ angular.module('flowableModeler')
 		    params.filterText = $scope.model.filterText;
 		  }
 
-		  $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models', params: params}).
+		  $http({method: 'GET', url: FLOWABLE.APP_URL.getModelsUrl(), params: params}).
 		  	success(function(data, status, headers, config) {
 	    		$scope.model.apps = data;
 	    		$scope.model.loading = false;
@@ -159,7 +159,7 @@ angular.module('flowableModeler')
 
             $scope.model.loading = true;
 
-            $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models', data: $scope.model.app}).
+            $http({method: 'POST', url: FLOWABLE.APP_URL.getModelsUrl(), data: $scope.model.app}).
                 success(function (data, status, headers, config) {
                     $scope.$hide();
 
@@ -214,7 +214,7 @@ angular.module('flowableModeler')
 
             $scope.model.loading = true;
 
-            $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/'+$scope.model.app.id+'/clone', data: $scope.model.app}).
+            $http({method: 'POST', url: FLOWABLE.APP_URL.getCloneModelsUrl($scope.model.app.id), data: $scope.model.app}).
                 success(function (data, status, headers, config) {
                     $scope.$hide();
 
@@ -252,9 +252,9 @@ angular.module('flowableModeler')
 
           var url;
           if (isIE) {
-             url = FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/text/import?renewIdmEntries=' + $scope.model.renewIdmIds;
+             url = FLOWABLE.APP_URL.getAppDefinitionTextImportUrl($scope.model.renewIdmIds);
           } else {
-              url = FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/import?renewIdmEntries=' + $scope.model.renewIdmIds;
+              url = FLOWABLE.APP_URL.getAppDefinitionImportUrl($scope.model.renewIdmIds);
           }
           Upload.upload({
               url: url,

@@ -12,25 +12,23 @@
  */
 package org.flowable.rest.form.service.api.form;
 
-import javax.servlet.http.HttpServletRequest;
-
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.form.api.FormService;
-import org.flowable.form.model.FormInstanceModel;
-import org.flowable.rest.form.FormRestResponseFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.form.api.FormService;
+import org.flowable.form.model.FormInstanceModel;
+import org.flowable.rest.form.FormRestResponseFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author Yvo Swillens
@@ -50,7 +48,7 @@ public class FormInstanceModelResource {
             @ApiResponse(code = 200, message = "Indicates the form instance was found and the model is returned."),
             @ApiResponse(code = 404, message = "Indicates the form instance was not found.")
     })
-    @RequestMapping(value = "/form/form-instance-model", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/form/form-instance-model", produces = "application/json")
     public FormInstanceModelResponse getFormInstanceModel(@ApiParam(name = "formInstanceModelRequest") @RequestBody FormRequest formRequest, HttpServletRequest request) {
 
         FormInstanceModel formInstanceModel;

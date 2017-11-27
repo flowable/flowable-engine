@@ -121,5 +121,9 @@ FLOWABLE.PROPERTY_CONFIG =
     "flowable-transitionevent" : {
         "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/transition-event-write-template.html"
+    },
+    "flowable-planitem-dropdown" : {
+        "readModeTemplateUrl": "editor-app/configuration/properties/planitem-dropdown-read-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/planitem-dropdown-write-template.html"
     }
 };

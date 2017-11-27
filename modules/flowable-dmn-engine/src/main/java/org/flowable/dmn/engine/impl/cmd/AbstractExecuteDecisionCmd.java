@@ -32,7 +32,7 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
     private static final long serialVersionUID = 1L;
 
     protected ExecuteDecisionInfo executeDecisionInfo = new ExecuteDecisionInfo();
-    
+
     public AbstractExecuteDecisionCmd(ExecuteDecisionBuilderImpl decisionBuilder) {
         executeDecisionInfo.setDecisionKey(decisionBuilder.getDecisionKey());
         executeDecisionInfo.setParentDeploymentId(decisionBuilder.getParentDeploymentId());
@@ -42,7 +42,7 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
         executeDecisionInfo.setVariables(decisionBuilder.getVariables());
         executeDecisionInfo.setTenantId(decisionBuilder.getTenantId());
     }
-    
+
     public AbstractExecuteDecisionCmd(String decisionKey, Map<String, Object> variables) {
         executeDecisionInfo.setDecisionKey(decisionKey);
         executeDecisionInfo.setVariables(variables);
@@ -52,18 +52,35 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
         DmnDecisionTable decisionTable = null;
 
         if (StringUtils.isNotEmpty(getDecisionKey()) && StringUtils.isNotEmpty(getParentDeploymentId()) && StringUtils.isNotEmpty(getTenantId())) {
+            
             decisionTable = deploymentManager.findDeployedLatestDecisionByKeyParentDeploymentIdAndTenantId(
                             getDecisionKey(), getParentDeploymentId(), getTenantId());
+
+            // Fall back
+            // If there is no decision table found linked to the deployment id, try to find one without a specific deployment id.
+            if (decisionTable == null) {
+                decisionTable = deploymentManager.findDeployedLatestDecisionByKeyAndTenantId(getDecisionKey(), getTenantId());
+            }
+
             if (decisionTable == null) {
                 throw new FlowableObjectNotFoundException("No decision found for key: " + getDecisionKey() +
-                    ", parent deployment id " + getParentDeploymentId() + " and tenant id: " + getTenantId());
+                    ", parent deployment id " + getParentDeploymentId() + " and tenant id: " + getTenantId() +
+                    ". There was also no fall back decision table found without parent deployment id.");
             }
 
         } else if (StringUtils.isNotEmpty(getDecisionKey()) && StringUtils.isNotEmpty(getParentDeploymentId())) {
             decisionTable = deploymentManager.findDeployedLatestDecisionByKeyAndParentDeploymentId(getDecisionKey(), getParentDeploymentId());
+
+            // Fall back
+            // If there is no decision table found linked to the deployment id, try to find one without a specific deployment id.
+            if (decisionTable == null){
+                decisionTable = deploymentManager.findDeployedLatestDecisionByKey(getDecisionKey());
+            }
+
             if (decisionTable == null) {
                 throw new FlowableObjectNotFoundException("No decision found for key: " + getDecisionKey() +
-                    " and parent deployment id " + getParentDeploymentId());
+                    " and parent deployment id " + getParentDeploymentId() +
+                    ". There was also no fall back decision table found without parent deployment id.");
             }
 
         } else if (StringUtils.isNotEmpty(getDecisionKey()) && StringUtils.isNotEmpty(getTenantId())) {
@@ -82,7 +99,7 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
         } else {
             throw new IllegalArgumentException("decisionKey is null");
         }
-        
+
         executeDecisionInfo.setDecisionDefinitionId(decisionTable.getId());
         executeDecisionInfo.setDeploymentId(decisionTable.getDeploymentId());
 
@@ -99,15 +116,15 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
 
         return decision;
     }
-    
+
     protected String getDecisionKey() {
         return executeDecisionInfo.getDecisionKey();
     }
-    
+
     protected String getParentDeploymentId() {
         return executeDecisionInfo.getParentDeploymentId();
     }
-    
+
     protected String getTenantId() {
         return executeDecisionInfo.getTenantId();
     }

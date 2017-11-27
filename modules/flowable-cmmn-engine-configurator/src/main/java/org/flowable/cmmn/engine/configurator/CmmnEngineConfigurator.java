@@ -24,15 +24,15 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.configurator.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.configurator.impl.process.DefaultProcessInstanceService;
 import org.flowable.cmmn.engine.impl.callback.ChildProcessInstanceStateChangeCallback;
-import org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.db.EntityDependencyOrder;
-import org.flowable.engine.cfg.AbstractEngineConfigurator;
+import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.AbstractEngineConfigurator;
+import org.flowable.engine.common.EngineDeployer;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.deploy.Deployer;
 
 /**
  * @author Joram Barrez
@@ -47,8 +47,8 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
     }
 
     @Override
-    protected List<Deployer> getCustomDeployers() {
-        return Collections.<Deployer>singletonList(new CmmnDeployer());
+    protected List<EngineDeployer> getCustomDeployers() {
+        return Collections.<EngineDeployer>singletonList(new CmmnDeployer());
     }
 
     @Override
@@ -57,12 +57,14 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
     }
 
     @Override
-    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public void configure(AbstractEngineConfiguration engineConfiguration) {
         if (cmmnEngineConfiguration == null) {
-            cmmnEngineConfiguration = new StandaloneInMemCmmnEngineConfiguration();
+            cmmnEngineConfiguration = new CmmnEngineConfiguration();
         }
 
-        initialiseCommonProperties(processEngineConfiguration, cmmnEngineConfiguration);
+        initialiseCommonProperties(engineConfiguration, cmmnEngineConfiguration);
+        
+        ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) engineConfiguration;
         initProcessInstanceService(processEngineConfiguration);
         initProcessInstanceStateChangedCallbacks(processEngineConfiguration);
         
@@ -72,7 +74,7 @@ public class CmmnEngineConfigurator extends AbstractEngineConfigurator {
 
         initCmmnEngine();
         
-        initServiceConfigurations(processEngineConfiguration, cmmnEngineConfiguration);
+        initServiceConfigurations(engineConfiguration, cmmnEngineConfiguration);
     }
 
     protected void initProcessInstanceService(ProcessEngineConfigurationImpl processEngineConfiguration) {

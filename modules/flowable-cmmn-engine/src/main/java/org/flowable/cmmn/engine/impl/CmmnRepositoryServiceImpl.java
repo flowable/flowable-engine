@@ -25,8 +25,10 @@ import org.flowable.cmmn.engine.impl.cmd.DeleteDeploymentCmd;
 import org.flowable.cmmn.engine.impl.cmd.DeployCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetCmmnModelCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetDeploymentCaseDefinitionCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetDeploymentCaseDiagramCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetDeploymentResourceCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetDeploymentResourceNamesCmd;
+import org.flowable.cmmn.engine.impl.cmd.SetCaseDefinitionCategoryCmd;
 import org.flowable.cmmn.engine.impl.repository.CmmnDeploymentBuilderImpl;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.engine.common.impl.interceptor.Command;
@@ -34,6 +36,7 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
+ * @author Tijs Rademakers
  */
 public class CmmnRepositoryServiceImpl extends ServiceImpl implements CmmnRepositoryService {
 
@@ -72,6 +75,11 @@ public class CmmnRepositoryServiceImpl extends ServiceImpl implements CmmnReposi
     }
     
     @Override
+    public InputStream getCaseDiagram(String caseDefinitionId) {
+        return commandExecutor.execute(new GetDeploymentCaseDiagramCmd(caseDefinitionId));
+    }
+    
+    @Override
     public void deleteDeployment(String deploymentId, boolean cascade) {
         commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, cascade));
     }
@@ -85,5 +93,9 @@ public class CmmnRepositoryServiceImpl extends ServiceImpl implements CmmnReposi
     public CaseDefinitionQuery createCaseDefinitionQuery() {
         return cmmnEngineConfiguration.getCaseDefinitionEntityManager().createCaseDefinitionQuery();
     }
-    
+
+    @Override
+    public void setCaseDefinitionCategory(String caseDefinitionId, String category) {
+        commandExecutor.execute(new SetCaseDefinitionCategoryCmd(caseDefinitionId, category));
+    }
 }

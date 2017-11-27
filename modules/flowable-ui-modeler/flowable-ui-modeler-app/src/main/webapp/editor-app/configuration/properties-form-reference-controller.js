@@ -15,7 +15,7 @@ angular.module('flowableModeler').controller('FlowableFormReferenceDisplayCtrl',
     [ '$scope', '$modal', '$http', function($scope, $modal, $http) {
     
     if ($scope.property && $scope.property.value && $scope.property.value.id) {
-   		$http.get(FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.property.value.id)
+   		$http.get(FLOWABLE.APP_URL.getModelUrl($scope.property.value.id))
             .success(
                 function(response) {
                     $scope.form = {
@@ -167,7 +167,7 @@ angular.module('flowableModeler').controller('FlowableFormReferencePopupCtrl',
 
         $scope.model.loading = true;
 
-        $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models', data: $scope.model.form}).
+        $http({method: 'POST', url: FLOWABLE.APP_URL.getModelsUrl(), data: $scope.model.form}).
             success(function(data, status, headers, config) {
                 
                 var newFormId = data.id;
@@ -239,7 +239,7 @@ angular.module('flowableModeler').controller('FlowableFormReferencePopupCtrl',
 
     $scope.loadForms = function() {
         var modelMetaData = editorManager.getBaseModelData();
-        $http.get(FLOWABLE.CONFIG.contextRoot + '/app/rest/form-models')
+        $http.get(FLOWABLE.APP_URL.getFormModelsUrl())
             .success(
                 function(response) {
                     $scope.state.loadingForms = false;

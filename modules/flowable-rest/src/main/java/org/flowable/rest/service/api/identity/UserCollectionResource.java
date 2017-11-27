@@ -13,12 +13,14 @@
 
 package org.flowable.rest.service.api.identity;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiImplicitParams;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.query.QueryProperty;
@@ -30,20 +32,16 @@ import org.flowable.rest.exception.FlowableConflictException;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
-import io.swagger.annotations.ApiImplicitParams;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Frederik Heremans
@@ -67,7 +65,7 @@ public class UserCollectionResource {
     @Autowired
     protected IdentityService identityService;
 
-    @ApiOperation(value = "Get a list of users", tags = { "Users" })
+    @ApiOperation(value = "List users", nickname = "listUsers", tags = { "Users" })
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return group with the given id", paramType = "query"),
             @ApiImplicitParam(name = "firstName", dataType = "string", value = "Only return users with the given firstname", paramType = "query"),
@@ -83,8 +81,8 @@ public class UserCollectionResource {
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the group exists and is returned.")
     })
-    @RequestMapping(value = "/identity/users", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getUsers(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    @GetMapping(value = "/identity/users", produces = "application/json")
+    public DataResponse<UserResponse> getUsers(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         UserQuery query = identityService.createUserQuery();
 
         if (allRequestParams.containsKey("id")) {
@@ -121,7 +119,7 @@ public class UserCollectionResource {
             @ApiResponse(code = 400, message = "Indicates the id of the user was missing.")
 
     })
-    @RequestMapping(value = "/identity/users", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/identity/users", produces = "application/json")
     public UserResponse createUser(@RequestBody UserRequest userRequest, HttpServletRequest request, HttpServletResponse response) {
         if (userRequest.getId() == null) {
             throw new FlowableIllegalArgumentException("Id cannot be null.");

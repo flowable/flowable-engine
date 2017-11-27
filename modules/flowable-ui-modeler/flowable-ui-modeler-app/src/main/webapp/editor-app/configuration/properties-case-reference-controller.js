@@ -58,7 +58,7 @@ angular.module('flowableModeler').controller('FlowableCaseReferencePopupCtrl', [
     
     $scope.loadCases = function() {
    	    var modelMetaData = editorManager.getBaseModelData();
-    	$http.get(FLOWABLE.CONFIG.contextRoot + '/app/rest/case-models?excludeId=' + modelMetaData.modelId)
+    	$http.get(FLOWABLE.APP_URL.getCaseModelsUrl('?excludeId=' + modelMetaData.modelId))
     		.success(
     			function(response) {
     				$scope.state.loadingCases = false;

@@ -11,30 +11,29 @@
  * limitations under the License.
  */
 angular.module('flowableModeler')
-  .controller('FormCtrl', ['$rootScope', '$scope', '$translate', '$http', '$location', '$routeParams','$modal', '$timeout', '$popover', 
+  .controller('FormCtrl', ['$rootScope', '$scope', '$translate', '$http', '$location', '$routeParams','$modal', '$timeout', '$popover',
                               function ($rootScope, $scope, $translate, $http, $location, $routeParams, $modal, $timeout, $popover) {
 
     // Main page (needed for visual indicator of current page)
     $rootScope.setMainPageById('forms');
-    
+
     $scope.formMode = 'read';
-    
+
     // Initialize model
     $scope.model = {
         // Store the main model id, this points to the current version of a model,
         // even when we're showing history
         latestModelId: $routeParams.modelId
     };
-    
+
     $scope.loadForm = function() {
       var url;
       if ($routeParams.modelHistoryId) {
-        url = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $routeParams.modelId
-          + '/history/' + $routeParams.modelHistoryId;
+        url = FLOWABLE.APP_URL.getModelHistoryUrl($routeParams.modelId, $routeParams.modelHistoryId);
       } else {
-        url = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $routeParams.modelId;
+        url = FLOWABLE.APP_URL.getModelUrl($routeParams.modelId);
       }
-      
+
       $http({method: 'GET', url: url}).
         success(function(data, status, headers, config) {
           $scope.model.form = data;
@@ -44,21 +43,21 @@ angular.module('flowableModeler')
           $scope.returnToList();
         });
     };
-    
+
     $scope.useAsNewVersion = function() {
         _internalCreateModal({
     		template: 'views/popup/model-use-as-new-version.html',
     		scope: $scope
     	}, $modal, $scope);
     };
-    
+
     $scope.loadVersions = function() {
-      
+
       var params = {
-        includeLatestVersion: !$scope.model.form.latestVersion  
+        includeLatestVersion: !$scope.model.form.latestVersion
       };
-      
-      $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.model.latestModelId + '/history', params: params}).
+
+      $http({method: 'GET', url: FLOWABLE.APP_URL.getModelHistoriesUrl($scope.model.latestModelId), params: params}).
 	      success(function(data, status, headers, config) {
 	        if ($scope.model.form.latestVersion) {
 	          if (!data.data) {
@@ -66,11 +65,11 @@ angular.module('flowableModeler')
 	          }
 	          data.data.unshift($scope.model.form);
 	        }
-	        
+
 	        $scope.model.versions = data;
 	      });
     };
-    
+
     $scope.showVersion = function(version) {
       if (version) {
         if (version.latestVersion) {
@@ -81,11 +80,11 @@ angular.module('flowableModeler')
         }
       }
     };
-    
+
     $scope.returnToList = function() {
         $location.path("/forms/");
     };
-    
+
     $scope.editForm = function() {
         _internalCreateModal({
     		template: 'views/popup/model-edit.html',
@@ -113,7 +112,7 @@ angular.module('flowableModeler')
     		scope: $scope
     	}, $modal, $scope);
     };
-    
+
     $scope.openEditor = function() {
       if ($scope.model.form) {
     	  $location.path("/form-editor/" + $scope.model.form.id);
@@ -124,7 +123,7 @@ angular.module('flowableModeler')
       if (!$scope.historyState) {
         var state = {};
         $scope.historyState = state;
-        
+
         // Create popover
         state.popover = $popover(angular.element($event.target), {
           template: 'views/popover/history.html',
@@ -133,18 +132,18 @@ angular.module('flowableModeler')
           scope: $scope,
           container: 'body'
         });
-        
+
         var destroy = function() {
           state.popover.destroy();
           delete $scope.historyState;
         };
-        
+
         // When popup is hidden or scope is destroyed, hide popup
         state.popover.$scope.$on('tooltip.hide', destroy);
         $scope.$on('$destroy', destroy);
       }
     };
-    
+
     $scope.loadForm();
-    
+
 }]);

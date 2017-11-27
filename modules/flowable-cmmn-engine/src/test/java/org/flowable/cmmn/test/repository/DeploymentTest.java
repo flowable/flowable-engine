@@ -27,6 +27,7 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
+import org.h2.util.IOUtils;
 import org.junit.Test;
 
 /**
@@ -86,5 +87,33 @@ public class DeploymentTest extends FlowableCmmnTestCase {
             assertNotNull(planItem.getBehavior());
         }
     }
-
+    
+    @Test
+    @CmmnDeployment
+    public void testCaseDefinitionDI() throws Exception {
+        org.flowable.cmmn.api.repository.CmmnDeployment cmmnDeployment = cmmnRepositoryService.createDeploymentQuery().singleResult();
+        assertNotNull(cmmnDeployment);
+        
+        List<String> resourceNames = cmmnRepositoryService.getDeploymentResourceNames(cmmnDeployment.getId());
+        assertEquals(2, resourceNames.size());
+        
+        String resourceName = "org/flowable/cmmn/test/repository/DeploymentTest.testCaseDefinitionDI.cmmn";
+        String diagramResourceName = "org/flowable/cmmn/test/repository/DeploymentTest.testCaseDefinitionDI.caseB.png";
+        assertTrue(resourceNames.contains(resourceName));
+        assertTrue(resourceNames.contains(diagramResourceName));
+        
+        InputStream inputStream = cmmnRepositoryService.getResourceAsStream(cmmnDeployment.getId(), resourceName);
+        assertNotNull(inputStream);
+        IOUtils.closeSilently(inputStream);
+        
+        InputStream diagramInputStream = cmmnRepositoryService.getResourceAsStream(cmmnDeployment.getId(), diagramResourceName);
+        assertNotNull(diagramInputStream);
+        IOUtils.closeSilently(diagramInputStream);
+        
+        CaseDefinition caseDefinition = cmmnRepositoryService.createCaseDefinitionQuery().deploymentId(cmmnDeployment.getId()).singleResult();
+        
+        InputStream caseDiagramInputStream = cmmnRepositoryService.getCaseDiagram(caseDefinition.getId());
+        assertNotNull(caseDiagramInputStream);
+        IOUtils.closeSilently(caseDiagramInputStream);
+    }
 }

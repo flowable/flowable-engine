@@ -91,7 +91,8 @@ public interface StencilConstants {
     final String PROPERTY_PROCESS_VERSION = "process_version";
     final String PROPERTY_PROCESS_AUTHOR = "process_author";
     final String PROPERTY_PROCESS_NAMESPACE = "process_namespace";
-    final String PROPERTY_PROCESS_EXECUTABLE = "process_executable";
+    
+    final String PROPERTY_IS_EXECUTABLE = "isexecutable";
     
     final String PROPERTY_PROCESS_POTENTIALSTARTERUSER = "process_potentialstarteruser";
     final String PROPERTY_PROCESS_POTENTIALSTARTERGROUP = "process_potentialstartergroup";
@@ -252,6 +253,8 @@ public interface StencilConstants {
     final String PROPERTY_DECISIONTABLE_REFERENCE_ID = "decisiontablereferenceid";
     final String PROPERTY_DECISIONTABLE_REFERENCE_NAME = "decisiontablereferencename";
     final String PROPERTY_DECISIONTABLE_REFERENCE_KEY = "decisionTableReferenceKey";
+    final String PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS = "decisiontaskthrowerroronnohits";
+    final String PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY = "decisionTaskThrowErrorOnNoHits";
 
     final String PROPERTY_HTTPTASK_REQ_METHOD = "httptaskrequestmethod";
     final String PROPERTY_HTTPTASK_REQ_URL = "httptaskrequesturl";

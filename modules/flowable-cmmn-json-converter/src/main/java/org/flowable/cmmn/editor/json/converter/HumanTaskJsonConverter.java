@@ -20,7 +20,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
-import org.flowable.cmmn.editor.json.model.ModelInfo;
+import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnModel;
@@ -38,7 +38,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements FormAwareConverter, FormKeyAwareConverter {
 
     protected Map<String, String> formMap;
-    protected Map<String, ModelInfo> formKeyMap;
+    protected Map<String, CmmnModelInfo> formKeyMap;
 
     public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap, 
             Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
@@ -201,7 +201,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
         if (StringUtils.isNotEmpty(humanTask.getFormKey())) {
             if (formKeyMap != null && formKeyMap.containsKey(humanTask.getFormKey())) {
                 ObjectNode formRefNode = objectMapper.createObjectNode();
-                ModelInfo modelInfo = formKeyMap.get(humanTask.getFormKey());
+                CmmnModelInfo modelInfo = formKeyMap.get(humanTask.getFormKey());
                 formRefNode.put("id", modelInfo.getId());
                 formRefNode.put("name", modelInfo.getName());
                 formRefNode.put("key", modelInfo.getKey());
@@ -441,7 +441,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
     }
 
     @Override
-    public void setFormKeyMap(Map<String, ModelInfo> formKeyMap) {
+    public void setFormKeyMap(Map<String, CmmnModelInfo> formKeyMap) {
         this.formKeyMap = formKeyMap;
     }
 }

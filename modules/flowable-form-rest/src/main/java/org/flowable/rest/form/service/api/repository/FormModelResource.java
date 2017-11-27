@@ -12,20 +12,20 @@
  */
 package org.flowable.rest.form.service.api.repository;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.form.model.FormModel;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.Authorization;
 
 /**
  * @author Yvo Swillens
@@ -40,8 +40,12 @@ public class FormModelResource {
     @Autowired
     protected FormRepositoryService formRepositoryService;
 
-    @ApiOperation(value = "Get a process definition form model", tags = { "Form Definitions" }, nickname = "getModelResource")
-    @RequestMapping(value = "/form-repository/form-definitions/{formDefinitionId}/model", method = RequestMethod.GET, produces = "application/json")
+    @ApiOperation(value = "Get a form definition Form model", tags = { "Form Definitions" }, nickname = "getFormDefinitionFormModel")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the form definition Form model was found returned."),
+            @ApiResponse(code = 404, message = "Indicates the form definition Form model was not found.")
+    })
+    @GetMapping(value = "/form-repository/form-definitions/{formDefinitionId}/model", produces = "application/json")
     public FormModel getModelResource(@ApiParam(name = "formDefinitionId") @PathVariable String formDefinitionId) {
         FormModel formDefinition = formRepositoryService.getFormModelById(formDefinitionId);
 

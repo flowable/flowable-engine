@@ -13,24 +13,23 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.runtime.Execution;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.runtime.Execution;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Frederik Heremans
@@ -44,32 +43,19 @@ public class ExecutionResource extends ExecutionBaseResource {
             @ApiResponse(code = 200, message = "Indicates the execution was found and returned."),
             @ApiResponse(code = 404, message = "Indicates the execution was not found.")
     })
-    @RequestMapping(value = "/runtime/executions/{executionId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/runtime/executions/{executionId}", produces = "application/json")
     public ExecutionResponse getExecution(@ApiParam(name = "executionId") @PathVariable String executionId, HttpServletRequest request) {
         return restResponseFactory.createExecutionResponse(getExecutionFromRequest(executionId));
     }
 
-    @ApiOperation(value = "Execute an action on an execution", tags = { "Executions" }, notes = "## Request body (signal an execution):\n\n"
-            + " ```JSON\n" + "{\n" + "  \"action\":\"signal\"\n" + "} ```"
-            + "\n\n\n"
-            + "Both a variables and transientVariables property is accepted with following structure"
-            + " ```JSON\n" + "{\n" + "  \"action\":\"signal\",\n" + "  \"variables\" : [\n" + "    {\n" + "      \"name\": \"myVar\",\n"
-            + "      \"value\": \"someValue\"\n" + "    }\n" + "  ]\n" + "}```"
-            + "\n\n\n"
-            + "## Request body (signal event received for execution)\n\n"
-            + " ```JSON\n" + "{\n" + "  \"action\":\"signal\"\n" + "} ```"
-            + "\n\n\n"
-            + "Notifies the execution that a signal event has been received, requires a signalName parameter. Optional variables can be passed that are set on the execution before the action is executed."
-            + "## Request body (signal event received for execution)\n\n"
-            + " ```JSON\n" + "{\n" + "  \"action\":\"messageEventReceived\",\n" + "  \"messageName\":\"myMessage\"\n" + "  \"variables\": [  ]\n" + "} ```"
-            + "\n\n\n")
+    @ApiOperation(value = "Execute an action on an execution", tags = { "Executions" }, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the execution was found and the action is performed."),
             @ApiResponse(code = 204, message = "Indicates the execution was found, the action was performed and the action caused the execution to end."),
             @ApiResponse(code = 400, message = "Indicates an illegal action was requested, required parameters are missing in the request body or illegal variables are passed in. Status description contains additional information about the error."),
             @ApiResponse(code = 404, message = "Indicates the execution was not found.")
     })
-    @RequestMapping(value = "/runtime/executions/{executionId}", method = RequestMethod.PUT, produces = "application/json")
+    @PutMapping(value = "/runtime/executions/{executionId}", produces = "application/json")
     public ExecutionResponse performExecutionAction(@ApiParam(name = "executionId") @PathVariable String executionId, @RequestBody ExecutionActionRequest actionRequest, HttpServletRequest request, HttpServletResponse response) {
 
         Execution execution = getExecutionFromRequest(executionId);

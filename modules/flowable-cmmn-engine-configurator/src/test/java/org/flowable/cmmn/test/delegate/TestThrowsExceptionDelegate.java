@@ -12,8 +12,8 @@
  */
 package org.flowable.cmmn.test.delegate;
 
-import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
-import org.flowable.cmmn.engine.delegate.PlanItemJavaDelegate;
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.delegate.PlanItemJavaDelegate;
 
 /**
  * @author Joram Barrez

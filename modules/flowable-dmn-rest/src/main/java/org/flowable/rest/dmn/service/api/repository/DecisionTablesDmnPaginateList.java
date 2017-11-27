@@ -14,13 +14,14 @@ package org.flowable.rest.dmn.service.api.repository;
 
 import java.util.List;
 
+import org.flowable.dmn.api.DmnDecisionTable;
 import org.flowable.rest.api.AbstractPaginateList;
 import org.flowable.rest.dmn.service.api.DmnRestResponseFactory;
 
 /**
  * @author Yvo Swillens
  */
-public class DecisionTablesDmnPaginateList extends AbstractPaginateList {
+public class DecisionTablesDmnPaginateList extends AbstractPaginateList<DecisionTableResponse, DmnDecisionTable> {
 
     protected DmnRestResponseFactory dmnRestResponseFactory;
 
@@ -28,9 +29,8 @@ public class DecisionTablesDmnPaginateList extends AbstractPaginateList {
         this.dmnRestResponseFactory = dmnRestResponseFactory;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    protected List processList(List list) {
+    protected List<DecisionTableResponse> processList(List<DmnDecisionTable> list) {
         return dmnRestResponseFactory.createDecisionTableResponseList(list);
     }
 }

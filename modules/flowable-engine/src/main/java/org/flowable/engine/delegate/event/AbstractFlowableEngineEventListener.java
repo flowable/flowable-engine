@@ -103,6 +103,18 @@ public abstract class AbstractFlowableEngineEventListener implements FlowableEve
                     case ACTIVITY_CANCELLED:
                         activityCancelled((FlowableActivityCancelledEvent) flowableEngineEvent);
                         break;
+                    case MULTI_INSTANCE_ACTIVITY_STARTED:
+                        multiInstanceActivityStarted((FlowableMultiInstanceActivityEvent) flowableEngineEvent);
+                        break;
+                    case MULTI_INSTANCE_ACTIVITY_COMPLETED:
+                        multiInstanceActivityCompleted((FlowableMultiInstanceActivityCompletedEvent) flowableEngineEvent);
+                        break;
+                    case MULTI_INSTANCE_ACTIVITY_COMPLETED_WITH_CONDITION:
+                        multiInstanceActivityCompletedWithCondition((FlowableMultiInstanceActivityCompletedEvent) flowableEngineEvent);
+                        break;
+                    case MULTI_INSTANCE_ACTIVITY_CANCELLED:
+                        multiInstanceActivityCancelled((FlowableMultiInstanceActivityCancelledEvent) flowableEngineEvent);
+                        break;
                     case ACTIVITY_SIGNAL_WAITING:
                         activitySignalWaiting((FlowableSignalEvent) flowableEngineEvent);
                         break;
@@ -222,6 +234,14 @@ public abstract class AbstractFlowableEngineEventListener implements FlowableEve
     protected void activityCompleted(FlowableActivityEvent event) {}
 
     protected void activityCancelled(FlowableActivityCancelledEvent event) {}
+
+    protected void multiInstanceActivityStarted(FlowableMultiInstanceActivityEvent event) {}
+
+    protected void multiInstanceActivityCompleted(FlowableMultiInstanceActivityCompletedEvent event) {}
+
+    protected void multiInstanceActivityCompletedWithCondition(FlowableMultiInstanceActivityCompletedEvent event) {}
+
+    protected void multiInstanceActivityCancelled(FlowableMultiInstanceActivityCancelledEvent event) {}
 
     protected void activitySignalWaiting(FlowableSignalEvent event) {}
 
