@@ -68,6 +68,23 @@ public class DmnJsonConverterUtil {
                     }
                 }
             }
+            
+            JsonNode outputExpressionNodes = decisionTableNode.get("outputExpressions");
+            Map<String, String> outputExpressionIds = new HashMap<>();
+            if (outputExpressionNodes != null && !outputExpressionNodes.isNull()) {
+                for (JsonNode outputExpressionNode : outputExpressionNodes) {
+                    if (outputExpressionNode.get("id") != null && !outputExpressionNode.get("id").isNull()) {
+                        String outputId = outputExpressionNode.get("id").asText();
+
+                        String outputType = null;
+                        if (outputExpressionNode.get("type") != null && !outputExpressionNode.get("type").isNull()) {
+                            outputType = outputExpressionNode.get("type").asText();
+                        }
+
+                        outputExpressionIds.put(outputId, outputType);
+                    }
+                }
+            }
             // split input rule nodes
             JsonNode ruleNodes = decisionTableNode.get("rules");
             ArrayNode newRuleNodes = objectMapper.createArrayNode();
@@ -80,38 +97,84 @@ public class DmnJsonConverterUtil {
                         if (ruleNode.has(inputExpressionId)) {
                             String operatorId = inputExpressionId + "_operator";
                             String expressionId = inputExpressionId + "_expression";
+                            String listOperatorId = inputExpressionId + "_list_operator";
                             String operatorValue = null;
                             String expressionValue = null;
+                            String listOperatorValue = null;
 
                             if (ruleNode.get(inputExpressionId) != null && !ruleNode.get(inputExpressionId).isNull()) {
                                 String oldExpression = ruleNode.get(inputExpressionId).asText();
-
-                                if (StringUtils.isNotEmpty(oldExpression)) {
-                                    if (oldExpression.indexOf(' ') != -1) {
-                                        operatorValue = oldExpression.substring(0, oldExpression.indexOf(' '));
-                                        expressionValue = oldExpression.substring(oldExpression.indexOf(' ') + 1);
-                                    } else { // no prefixed operator
-                                        expressionValue = oldExpression;
+                                if(inputExpressionIds.get(inputExpressionId).equals("list")) {
+                                    if(oldExpression.startsWith(".containsString")) {
+                                        listOperatorValue = "containsString";
+                                        operatorValue = "==";
+                                        expressionValue = oldExpression.substring(16, oldExpression.length() - 1);
+                                    }else if(oldExpression.startsWith(".containsRegex")) {
+                                        listOperatorValue = "containsString";
+                                        operatorValue = "regex";
+                                        expressionValue = oldExpression.substring(15, oldExpression.length() - 1);
+                                    }else if(oldExpression.startsWith(".containsNumber") || oldExpression.startsWith(".containsDate")) {
+                                        String methodName = "";
+                                        if (oldExpression.startsWith("containsNumber")) {
+                                            listOperatorValue = "containsNumber";
+                                            methodName = oldExpression.substring(16, oldExpression.indexOf('('));
+                                            expressionValue = oldExpression.substring(oldExpression.indexOf('(') + 1, oldExpression.length() - 1);
+                                        }else if (oldExpression.startsWith("containsDate")) {
+                                            listOperatorValue = "containsDate";
+                                            methodName = oldExpression.substring(14, oldExpression.indexOf('('));
+                                            expressionValue = oldExpression.substring(oldExpression.indexOf('(') + 1, oldExpression.length() - 1);
+                                        }
+                                        switch (methodName) {
+                                        case "Equals":
+                                            operatorValue = "==";
+                                            break;
+                                        case "NotEquals":
+                                            operatorValue = "!=";
+                                            break;
+                                        case "LessThan":
+                                            operatorValue = ">";
+                                            break;
+                                        case "GreaterThan":
+                                            operatorValue = "<";
+                                            break;
+                                        case "LessThanOrEquals":
+                                            operatorValue = ">=";
+                                            break;
+                                        case "GreaterThanOrEquals":
+                                            operatorValue = "<=";
+                                            break;
+                                        }
+                                    }else if(oldExpression.startsWith(".containsExpression")) {
+                                        listOperatorValue = "containsExpression";
+                                        operatorValue = "==";
+                                        expressionValue = oldExpression.substring(19, oldExpression.length() - 1);
                                     }
-
-                                    // remove outer escape quotes
-                                    if (expressionValue.startsWith("\"") && expressionValue.endsWith("\"")) {
-                                        expressionValue = expressionValue.substring(1, expressionValue.length() - 1);
+                                }else if (StringUtils.isNotEmpty(oldExpression)) {
+                                        if (oldExpression.indexOf(' ') != -1) {
+                                            //set list operator value
+                                            operatorValue = oldExpression.substring(0, oldExpression.indexOf(' '));
+                                            expressionValue = oldExpression.substring(oldExpression.indexOf(' ') + 1);
+                                        } else { // no prefixed operator
+                                            expressionValue = oldExpression;
+                                        }
+    
+                                        // determine type is null
+                                        if (StringUtils.isEmpty(inputExpressionIds.get(inputExpressionId))) {
+                                            String expressionType = determineExpressionType(expressionValue);
+                                            inputExpressionIds.put(inputExpressionId, expressionType);
+                                        }
                                     }
+                                // remove outer escape quotes
+                                if (expressionValue.startsWith("\"") && expressionValue.endsWith("\"")) {
+                                    expressionValue = expressionValue.substring(1, expressionValue.length() - 1);
+                                }
 
-                                    // if build in date function
-                                    if (expressionValue.startsWith("fn_date(")) {
-                                        expressionValue = expressionValue.substring(9, expressionValue.lastIndexOf('\''));
-                                        
-                                    } else if (expressionValue.startsWith("date:toDate(")) {
-                                        expressionValue = expressionValue.substring(13, expressionValue.lastIndexOf('\''));
-                                    }
-
-                                    // determine type is null
-                                    if (StringUtils.isEmpty(inputExpressionIds.get(inputExpressionId))) {
-                                        String expressionType = determineExpressionType(expressionValue);
-                                        inputExpressionIds.put(inputExpressionId, expressionType);
-                                    }
+                                // if build in date function
+                                if (expressionValue.startsWith("fn_date(")) {
+                                    expressionValue = expressionValue.substring(9, expressionValue.lastIndexOf('\''));
+                                    
+                                } else if (expressionValue.startsWith("date:toDate(")) {
+                                    expressionValue = expressionValue.substring(13, expressionValue.lastIndexOf('\''));
                                 }
                             }
 
@@ -128,6 +191,12 @@ public class DmnJsonConverterUtil {
                             } else { // default value
                                 newRuleNode.put(expressionId, "-");
                             }
+                            
+                            if (StringUtils.isNotEmpty(listOperatorValue)) {
+                                newRuleNode.put(listOperatorId, listOperatorValue);
+                            } else { // default value
+                                newRuleNode.put(listOperatorId, "containsString");
+                            }
                         }
                     }
 
@@ -136,21 +205,64 @@ public class DmnJsonConverterUtil {
                         String outputExpressionId = ruleProperty.next();
                         if (!inputExpressionIds.containsKey(outputExpressionId)) { // is output expression
                             String outputExpressionValue = ruleNode.get(outputExpressionId).asText();
+                            
+                            String operatorId = outputExpressionId + "_operator";
+                            String expressionId = outputExpressionId + "_expression";
+                            String listOperatorId = outputExpressionId + "_list_operator";
+                            String operatorValue = null;
+                            String expressionValue = null;
+                            String listOperatorValue = null;
 
+                            if(outputExpressionIds.get(outputExpressionId).equals("list")) {
+                                outputExpressionValue = outputExpressionValue.substring(outputExpressionValue.indexOf('.'));
+                                if(outputExpressionValue.startsWith(".append")) {
+                                    listOperatorValue = "append";
+                                    expressionValue = outputExpressionValue.substring(8, outputExpressionValue.length() - 1);
+                                }else if(outputExpressionValue.startsWith(".remove")) {
+                                    listOperatorValue = "remove";
+                                    expressionValue = outputExpressionValue.substring(8, outputExpressionValue.length() - 1);
+                                }else if(outputExpressionValue.startsWith(".clear")) {
+                                    listOperatorValue = "clear";
+                                    expressionValue = outputExpressionValue.substring(7, outputExpressionValue.length() - 1);
+                                }
+                            
+                                operatorValue = determineExpressionType(expressionValue);
+
+                            }else {
+                                expressionValue = outputExpressionValue;
+                            }
                             // remove outer escape quotes
-                            if (StringUtils.isNotEmpty(outputExpressionValue) && outputExpressionValue.startsWith("\"") && outputExpressionValue.endsWith("\"")) {
-                                outputExpressionValue = outputExpressionValue.substring(1, outputExpressionValue.length() - 1);
+                            if (StringUtils.isNotEmpty(expressionValue) && expressionValue.startsWith("\"") && expressionValue.endsWith("\"")) {
+                                expressionValue = expressionValue.substring(1, expressionValue.length() - 1);
                             }
 
                             // if build in date function
-                            if (outputExpressionValue.startsWith("fn_date(")) {
-                                outputExpressionValue = outputExpressionValue.substring(9, outputExpressionValue.lastIndexOf('\''));
+                            if (expressionValue.startsWith("fn_date(")) {
+                                expressionValue = expressionValue.substring(9, expressionValue.lastIndexOf('\''));
                                 
-                            } else if (outputExpressionValue.startsWith("date:toDate(")) {
-                                outputExpressionValue = outputExpressionValue.substring(13, outputExpressionValue.lastIndexOf('\''));
+                            } else if (expressionValue.startsWith("date:toDate(")) {
+                                expressionValue = expressionValue.substring(13, expressionValue.lastIndexOf('\''));
+                            }
+                            
+                            // add new operator kv
+                            if (StringUtils.isNotEmpty(operatorValue)) {
+                                newRuleNode.put(operatorId, operatorValue);
+                            } else { // default value
+                                newRuleNode.put(operatorId, "string");
                             }
 
-                            newRuleNode.put(outputExpressionId, outputExpressionValue);
+                            // add new expression kv
+                            if (StringUtils.isNotEmpty(expressionValue)) {
+                                newRuleNode.put(expressionId, expressionValue);
+                            } else { // default value
+                                newRuleNode.put(expressionId, "-");
+                            }
+                            
+                            if (StringUtils.isNotEmpty(listOperatorValue)) {
+                                newRuleNode.put(listOperatorId, listOperatorValue);
+                            } else { // default value
+                                newRuleNode.put(listOperatorId, "append");
+                            }
                         }
                     }
 
@@ -179,7 +291,7 @@ public class DmnJsonConverterUtil {
     public static String determineExpressionType(String expressionValue) {
         String expressionType = null;
         if (!"-".equals(expressionValue)) {
-            expressionType = "string";
+            expressionType = "expression";
             if (NumberUtils.isNumber(expressionValue)) {
                 expressionType = "number";
             } else {
@@ -189,6 +301,9 @@ public class DmnJsonConverterUtil {
                 } catch (ParseException pe) {
                     if ("true".equalsIgnoreCase(expressionValue) || "false".equalsIgnoreCase(expressionType)) {
                         expressionType = "boolean";
+                    }
+                    if(expressionValue.startsWith("\"")) {
+                        expressionType = "string";
                     }
                 }
             }
