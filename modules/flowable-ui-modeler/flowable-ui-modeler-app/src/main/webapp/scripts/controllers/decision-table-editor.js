@@ -835,17 +835,25 @@ angular.module('flowableModeler')
             var createDefaultRow = function () {
                 var defaultRow = {};
                 $scope.model.columnDefs.forEach(function (columnDefinition) {
-                    if (columnDefinition.expressionType === 'input-operator') {
-                        defaultRow[columnDefinition.data] = '==';
-                    }
-                    else if (columnDefinition.expressionType === 'input-expression') {
-                        defaultRow[columnDefinition.data] = '-';
-                    }
-                    else if (columnDefinition.expressionType === 'output') {
-                        defaultRow[columnDefinition.data] = '';
-                    } else if (columnDefinition.expressionType === 'output-operator') {
-                        defaultRow[columnDefinition.data] = 'append';
-                    }
+                	switch(columnDefinition.expressionType){
+                	case 'output-list-operator':
+                		defaultRow[columnDefinition.data] = 'append';
+                		break;
+                	case 'input-list-operator':
+                		defaultRow[columnDefinition.data] = 'containsString';
+                		break;
+                	case 'output':
+                		defaultRow[columnDefinition.data] = '-';
+                		break;
+                	case 'input-expression':
+                		defaultRow[columnDefinition.data] = '-';
+                		break;
+                	case 'output-operator':
+                		defaultRow[columnDefinition.data] = 'string';
+                		break;
+                	default:
+                		defaultRow[columnDefinition.data] = '==';
+                	}
                 });
 
                 return defaultRow;
