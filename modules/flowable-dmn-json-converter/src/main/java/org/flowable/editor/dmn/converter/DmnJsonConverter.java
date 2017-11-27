@@ -456,8 +456,7 @@ public class DmnJsonConverter {
                                 stringBuilder.append(expressionValue);
                                 stringBuilder.append("\"");
                             } else if (operatorValue.toLowerCase().equals("date")) {
-                                stringBuilder.append(".append(");
-                                stringBuilder.append("date:toDate('");
+                                stringBuilder = new StringBuilder("date:toDate('");
                                 stringBuilder.append(expressionValue);
                                 stringBuilder.append("')");
                             }
