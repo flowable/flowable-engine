@@ -115,11 +115,11 @@ public class DmnJsonConverterUtil {
                                         expressionValue = oldExpression.substring(15, oldExpression.length() - 1);
                                     }else if(oldExpression.startsWith(".containsNumber") || oldExpression.startsWith(".containsDate")) {
                                         String methodName = "";
-                                        if (oldExpression.startsWith("containsNumber")) {
+                                        if (oldExpression.startsWith(".containsNumber")) {
                                             listOperatorValue = "containsNumber";
                                             methodName = oldExpression.substring(16, oldExpression.indexOf('('));
                                             expressionValue = oldExpression.substring(oldExpression.indexOf('(') + 1, oldExpression.length() - 1);
-                                        }else if (oldExpression.startsWith("containsDate")) {
+                                        }else if (oldExpression.startsWith(".containsDate")) {
                                             listOperatorValue = "containsDate";
                                             methodName = oldExpression.substring(14, oldExpression.indexOf('('));
                                             expressionValue = oldExpression.substring(oldExpression.indexOf('(') + 1, oldExpression.length() - 1);
@@ -207,7 +207,7 @@ public class DmnJsonConverterUtil {
                             String outputExpressionValue = ruleNode.get(outputExpressionId).asText();
                             
                             String operatorId = outputExpressionId + "_operator";
-                            String expressionId = outputExpressionId + "_expression";
+                            String expressionId = outputExpressionId;
                             String listOperatorId = outputExpressionId + "_list_operator";
                             String operatorValue = null;
                             String expressionValue = null;
@@ -307,6 +307,8 @@ public class DmnJsonConverterUtil {
                     }
                 }
             }
+        }else {
+            expressionType = "string";
         }
         return expressionType;
     }

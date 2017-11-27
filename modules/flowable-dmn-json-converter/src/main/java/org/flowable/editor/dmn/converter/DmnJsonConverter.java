@@ -332,7 +332,7 @@ public class DmnJsonConverter {
                     StringBuilder stringBuilder = new StringBuilder();
                     if ("list".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())) {
                         String formattedExpressionValue = "";
-                        if (listOperatorValue.toLowerCase().equals("containsString")) {
+                        if (listOperatorValue.toLowerCase().equals("containsstring")) {
                             if (operatorValue.toLowerCase().equals("==")) {
                                 stringBuilder = new StringBuilder(".containsString(");
                             } else if (operatorValue.toLowerCase().equals("regex")) {
@@ -341,12 +341,12 @@ public class DmnJsonConverter {
                             stringBuilder.append("\"");
                             stringBuilder.append(expressionValue);
                             stringBuilder.append("\")");
-                        } else if (listOperatorValue.toLowerCase().equals("containsNumber")
-                                || listOperatorValue.toLowerCase().equals("containsDate")) {
-                            if (listOperatorValue.toLowerCase().equals("containsNumber")) {
+                        } else if (listOperatorValue.toLowerCase().equals("containsnumber")
+                                || listOperatorValue.toLowerCase().equals("containsdate")) {
+                            if (listOperatorValue.toLowerCase().equals("containsnumber")) {
                                 formattedExpressionValue = expressionValue;
                                 stringBuilder = new StringBuilder(".containsNumber");
-                            } else if (listOperatorValue.toLowerCase().equals("containsDate")) {
+                            } else if (listOperatorValue.toLowerCase().equals("containsdate")) {
                                 StringBuilder stringBuilder2 = new StringBuilder(formattedExpressionValue);
                                 stringBuilder2.append("date:toDate('");
                                 stringBuilder2.append(expressionValue);
@@ -378,7 +378,7 @@ public class DmnJsonConverter {
                             stringBuilder.append(methodName);
                             stringBuilder.append(formattedExpressionValue);
                             stringBuilder.append(")");
-                        } else if(listOperatorValue.toLowerCase().equals("containsExpression")) {
+                        } else if(listOperatorValue.toLowerCase().equals("containsexpression")) {
                             stringBuilder = new StringBuilder(".containsExpression");
                             stringBuilder.append(expressionValue);
                             stringBuilder.append(")");
@@ -471,7 +471,7 @@ public class DmnJsonConverter {
                                 stringBuilder.append(".remove(");
                                 stringBuilder.append(expression);
                                 stringBuilder.append(")");
-                            } else if (expressionValue.toLowerCase().startsWith("clear")) {
+                            } else if (listOperatorValue.toLowerCase().startsWith("clear")) {
                                 stringBuilder.append(".clear()");
                             }
                             outputEntry.setText(stringBuilder.toString());
