@@ -16,14 +16,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.flowable.engine.cfg.ProcessEngineConfigurator;
+import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.EngineConfigurator;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 /**
  * @author Joram Barrez
  */
-public class FlowableProfiler implements ProcessEngineConfigurator {
+public class FlowableProfiler implements EngineConfigurator {
 
     protected static FlowableProfiler INSTANCE = new FlowableProfiler();
 
@@ -35,19 +35,19 @@ public class FlowableProfiler implements ProcessEngineConfigurator {
     }
 
     @Override
-    public void beforeInit(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public void beforeInit(AbstractEngineConfiguration engineConfiguration) {
 
         // Command interceptor
         List<CommandInterceptor> interceptors = new ArrayList<>();
         interceptors.add(new TotalExecutionTimeCommandInterceptor());
-        processEngineConfiguration.setCustomPreCommandInterceptors(interceptors);
+        engineConfiguration.setCustomPreCommandInterceptors(interceptors);
 
         // DbsqlSession
-        processEngineConfiguration.setDbSqlSessionFactory(new ProfilingDbSqlSessionFactory());
+        engineConfiguration.setDbSqlSessionFactory(new ProfilingDbSqlSessionFactory());
     }
 
     @Override
-    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public void configure(AbstractEngineConfiguration engineConfiguration) {
 
     }
 

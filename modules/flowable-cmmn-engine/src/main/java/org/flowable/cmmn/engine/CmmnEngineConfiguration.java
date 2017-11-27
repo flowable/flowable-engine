@@ -16,9 +16,11 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 
 import javax.sql.DataSource;
 
@@ -42,14 +44,15 @@ import org.flowable.cmmn.engine.impl.agenda.CmmnEngineAgendaSessionFactory;
 import org.flowable.cmmn.engine.impl.agenda.DefaultCmmnEngineAgendaFactory;
 import org.flowable.cmmn.engine.impl.callback.ChildCaseInstanceStateChangeCallback;
 import org.flowable.cmmn.engine.impl.cfg.DelegateExpressionFieldInjectionMode;
+import org.flowable.cmmn.engine.impl.cfg.IdmEngineConfigurator;
 import org.flowable.cmmn.engine.impl.cfg.StandaloneInMemCmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.db.CmmnDbSchemaManager;
 import org.flowable.cmmn.engine.impl.db.EntityDependencyOrder;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegateFactory;
 import org.flowable.cmmn.engine.impl.delegate.DefaultCmmnClassDelegateFactory;
+import org.flowable.cmmn.engine.impl.deployer.CaseDefinitionDiagramHelper;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
-import org.flowable.cmmn.engine.impl.deployer.Deployer;
 import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryTaskManager;
@@ -104,7 +107,11 @@ import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelper;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceHelperImpl;
 import org.flowable.cmmn.engine.impl.runtime.CmmnRuntimeServiceImpl;
 import org.flowable.cmmn.engine.impl.task.DefaultCmmnTaskVariableScopeResolver;
+import org.flowable.cmmn.image.CaseDiagramGenerator;
+import org.flowable.cmmn.image.impl.DefaultCaseDiagramGenerator;
 import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.EngineConfigurator;
+import org.flowable.engine.common.EngineDeployer;
 import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
@@ -119,7 +126,7 @@ import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
@@ -190,6 +197,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected MilestoneInstanceEntityManager milestoneInstanceEntityManager;
     protected HistoricCaseInstanceDataManager historicCaseInstanceDataManager;
     protected HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager;
+    
+    // IDM ENGINE /////////////////////////////////////////////////////
+    protected boolean disableIdmEngine;
 
     protected CaseInstanceHelper caseInstanceHelper;
     protected CmmnHistoryManager cmmnHistoryManager;
@@ -201,10 +211,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CmmnClassDelegateFactory classDelegateFactory;
     protected CmmnParser cmmnParser;
     protected CmmnDeployer cmmnDeployer;
-    protected List<Deployer> customPreDeployers;
-    protected List<Deployer> customPostDeployers;
-    protected List<Deployer> deployers;
     protected CmmnDeploymentManager deploymentManager;
+    protected CaseDefinitionDiagramHelper caseDefinitionDiagramHelper;
 
     protected int caseDefinitionCacheLimit = -1;
     protected DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache;
@@ -226,6 +234,24 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected DbSchemaManager identityLinkDbSchemaManager;
     protected DbSchemaManager variableDbSchemaManager;
     protected DbSchemaManager taskDbSchemaManager;
+    
+    /**
+     * Case diagram generator. Default value is DefaultCaseDiagramGenerator
+     */
+    protected CaseDiagramGenerator caseDiagramGenerator;
+    
+    protected boolean isCreateDiagramOnDeploy = true;
+    
+    protected String activityFontName = "Arial";
+    protected String labelFontName = "Arial";
+    protected String annotationFontName = "Arial";
+    
+    // CONFIGURATORS ////////////////////////////////////////////////////////////
+
+    protected boolean enableConfiguratorServiceLoader = true; // Enabled by default. In certain environments this should be set to false (eg osgi)
+    protected List<EngineConfigurator> configurators; // The injected configurators
+    protected List<EngineConfigurator> allConfigurators; // Including auto-discovered configurators
+    protected EngineConfigurator idmEngineConfigurator;
     
     // Identitylink support
     protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
@@ -281,6 +307,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     }
 
     protected void init() {
+        initConfigurators();
+        configuratorsBeforeInit();
+        initCaseDiagramGenerator();
         initCommandContextFactory();
         initTransactionContextFactory();
         initCommandExecutors();
@@ -319,8 +348,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initTaskServiceConfiguration();
     }
 
+    public void initCaseDiagramGenerator() {
+        if (caseDiagramGenerator == null) {
+            caseDiagramGenerator = new DefaultCaseDiagramGenerator();
+        }
+    }
+    
     @Override
-
     public void initDbSchemaManager() {
         super.initDbSchemaManager();
         initCmmnDbSchemaManager();
@@ -511,17 +545,19 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         }
     }
 
-    public Collection<? extends Deployer> getDefaultDeployers() {
-        List<Deployer> defaultDeployers = new ArrayList<>();
+    public Collection<? extends EngineDeployer> getDefaultDeployers() {
+        List<EngineDeployer> defaultDeployers = new ArrayList<>();
 
         if (cmmnDeployer == null) {
             cmmnDeployer = new CmmnDeployer();
         }
 
         initCmmnParser();
+        initCaseDefinitionDiagramHelper();
 
         cmmnDeployer.setIdGenerator(idGenerator);
         cmmnDeployer.setCmmnParser(cmmnParser);
+        cmmnDeployer.setCaseDefinitionDiagramHelper(caseDefinitionDiagramHelper);
 
         defaultDeployers.add(cmmnDeployer);
         return defaultDeployers;
@@ -554,6 +590,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             cmmnParserImpl.setActivityBehaviorFactory(activityBehaviorFactory);
             cmmnParserImpl.setExpressionManager(expressionManager);
             cmmnParser = cmmnParserImpl;
+        }
+    }
+    
+    public void initCaseDefinitionDiagramHelper() {
+        if (caseDefinitionDiagramHelper == null) {
+            caseDefinitionDiagramHelper = new CaseDefinitionDiagramHelper();
         }
     }
 
@@ -599,6 +641,78 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     @Override
     protected void initDbSqlSessionFactoryEntitySettings() {
         defaultInitDbSqlSessionFactoryEntitySettings(EntityDependencyOrder.INSERT_ORDER, EntityDependencyOrder.DELETE_ORDER);
+    }
+    
+    public void initConfigurators() {
+
+        allConfigurators = new ArrayList<>();
+
+        if (!disableIdmEngine) {
+            if (idmEngineConfigurator != null) {
+                allConfigurators.add(idmEngineConfigurator);
+            } else {
+                allConfigurators.add(new IdmEngineConfigurator());
+            }
+        }
+
+        // Configurators that are explicitly added to the config
+        if (configurators != null) {
+            allConfigurators.addAll(configurators);
+        }
+
+        // Auto discovery through ServiceLoader
+        if (enableConfiguratorServiceLoader) {
+            ClassLoader classLoader = getClassLoader();
+            if (classLoader == null) {
+                classLoader = ReflectUtil.getClassLoader();
+            }
+
+            ServiceLoader<EngineConfigurator> configuratorServiceLoader = ServiceLoader.load(EngineConfigurator.class, classLoader);
+            int nrOfServiceLoadedConfigurators = 0;
+            for (EngineConfigurator configurator : configuratorServiceLoader) {
+                allConfigurators.add(configurator);
+                nrOfServiceLoadedConfigurators++;
+            }
+
+            if (nrOfServiceLoadedConfigurators > 0) {
+                LOGGER.info("Found {} auto-discoverable Process Engine Configurator{}", nrOfServiceLoadedConfigurators++, nrOfServiceLoadedConfigurators > 1 ? "s" : "");
+            }
+
+            if (!allConfigurators.isEmpty()) {
+
+                // Order them according to the priorities (useful for dependent
+                // configurator)
+                Collections.sort(allConfigurators, new Comparator<EngineConfigurator>() {
+                    @Override
+                    public int compare(EngineConfigurator configurator1, EngineConfigurator configurator2) {
+                        int priority1 = configurator1.getPriority();
+                        int priority2 = configurator2.getPriority();
+
+                        if (priority1 < priority2) {
+                            return -1;
+                        } else if (priority1 > priority2) {
+                            return 1;
+                        }
+                        return 0;
+                    }
+                });
+
+                // Execute the configurators
+                LOGGER.info("Found {} Engine Configurators in total:", allConfigurators.size());
+                for (EngineConfigurator configurator : allConfigurators) {
+                    LOGGER.info("{} (priority:{})", configurator.getClass(), configurator.getPriority());
+                }
+
+            }
+
+        }
+    }
+
+    public void configuratorsBeforeInit() {
+        for (EngineConfigurator configurator : allConfigurators) {
+            LOGGER.info("Executing beforeInit() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
+            configurator.beforeInit(this);
+        }
     }
     
     public void initVariableTypes() {
@@ -985,39 +1099,21 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
 
-    public List<Deployer> getCustomPreDeployers() {
-        return customPreDeployers;
-    }
-
-    public CmmnEngineConfiguration setCustomPreDeployers(List<Deployer> customPreDeployers) {
-        this.customPreDeployers = customPreDeployers;
-        return this;
-    }
-
-    public List<Deployer> getCustomPostDeployers() {
-        return customPostDeployers;
-    }
-
-    public CmmnEngineConfiguration setCustomPostDeployers(List<Deployer> customPostDeployers) {
-        this.customPostDeployers = customPostDeployers;
-        return this;
-    }
-
-    public List<Deployer> getDeployers() {
-        return deployers;
-    }
-
-    public CmmnEngineConfiguration setDeployers(List<Deployer> deployers) {
-        this.deployers = deployers;
-        return this;
-    }
-
     public CmmnDeploymentManager getDeploymentManager() {
         return deploymentManager;
     }
 
     public CmmnEngineConfiguration setDeploymentManager(CmmnDeploymentManager deploymentManager) {
         this.deploymentManager = deploymentManager;
+        return this;
+    }
+
+    public CaseDefinitionDiagramHelper getCaseDefinitionDiagramHelper() {
+        return caseDefinitionDiagramHelper;
+    }
+
+    public CmmnEngineConfiguration setCaseDefinitionDiagramHelper(CaseDefinitionDiagramHelper caseDefinitionDiagramHelper) {
+        this.caseDefinitionDiagramHelper = caseDefinitionDiagramHelper;
         return this;
     }
 
@@ -1267,6 +1363,51 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setSerializableVariableTypeTrackDeserializedObjects(boolean serializableVariableTypeTrackDeserializedObjects) {
         this.serializableVariableTypeTrackDeserializedObjects = serializableVariableTypeTrackDeserializedObjects;
+        return this;
+    }
+
+    public CaseDiagramGenerator getCaseDiagramGenerator() {
+        return caseDiagramGenerator;
+    }
+
+    public CmmnEngineConfiguration setCaseDiagramGenerator(CaseDiagramGenerator caseDiagramGenerator) {
+        this.caseDiagramGenerator = caseDiagramGenerator;
+        return this;
+    }
+    
+    public boolean isCreateDiagramOnDeploy() {
+        return isCreateDiagramOnDeploy;
+    }
+
+    public CmmnEngineConfiguration setCreateDiagramOnDeploy(boolean isCreateDiagramOnDeploy) {
+        this.isCreateDiagramOnDeploy = isCreateDiagramOnDeploy;
+        return this;
+    }
+
+    public String getActivityFontName() {
+        return activityFontName;
+    }
+
+    public CmmnEngineConfiguration setActivityFontName(String activityFontName) {
+        this.activityFontName = activityFontName;
+        return this;
+    }
+
+    public String getLabelFontName() {
+        return labelFontName;
+    }
+
+    public CmmnEngineConfiguration setLabelFontName(String labelFontName) {
+        this.labelFontName = labelFontName;
+        return this;
+    }
+
+    public String getAnnotationFontName() {
+        return annotationFontName;
+    }
+
+    public CmmnEngineConfiguration setAnnotationFontName(String annotationFontName) {
+        this.annotationFontName = annotationFontName;
         return this;
     }
 
