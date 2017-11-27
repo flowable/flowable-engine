@@ -604,6 +604,8 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
             Map<String, Object> varMap = Collections.singletonMap("processVar", (Object) "test");
             ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", varMap);
             
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 250);
+            
             tasks = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).processVariableExists("processVar").list();
             assertEquals(1, tasks.size());
             
@@ -619,6 +621,8 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
             assertEquals(1, tasks.size());
             
             runtimeService.setVariable(processInstance.getId(), "processVar2", "test2");
+            
+            waitForHistoryJobExecutorToProcessAllJobs(5000, 250);
             
             tasks = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId())
                             .processVariableExists("processVar").processVariableValueEquals("processVar2", "test2").list();
