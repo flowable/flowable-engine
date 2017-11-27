@@ -62,7 +62,7 @@ public class SimpleEventCalendar implements EventCalendar {
         SimulationEvent minEvent = eventList.remove(minIndex);
 
         if (minEvent.hasSimulationTime() && minEvent.getSimulationTime() < this.clockReader.getCurrentTime().getTime()) {
-            throw new FlowableException("Unable to execute event from the past");
+            LOGGER.warn("Executing an event from the past " + minEvent);
         }
 
         if (eventList.isEmpty()) {
