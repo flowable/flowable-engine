@@ -132,6 +132,11 @@ public enum FlowableEngineEventType implements FlowableEventType {
     MULTI_INSTANCE_ACTIVITY_COMPLETED,
 
     /**
+     * A multi-instance activity has met its condition and completed successfully.
+     */
+    MULTI_INSTANCE_ACTIVITY_COMPLETED_WITH_CONDITION,
+
+    /**
      * A multi-instance activity has been cancelled.
      */
     MULTI_INSTANCE_ACTIVITY_CANCELLED,

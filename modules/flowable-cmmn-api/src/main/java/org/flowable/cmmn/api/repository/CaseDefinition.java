@@ -12,26 +12,52 @@
  */
 package org.flowable.cmmn.api.repository;
 
+import org.flowable.cmmn.api.CmmnRepositoryService;
+
 public interface CaseDefinition {
 
+    /** unique identifier */
     String getId();
 
+    /**
+     * category name which is derived from the targetNamespace attribute in the definitions element
+     */
     String getCategory();
 
+    /** label used for display purposes */
     String getName();
 
+    /** unique name for all versions of this case definition */
     String getKey();
 
+    /** description of this case definition **/
     String getDescription();
 
+    /** version of this case definition */
     int getVersion();
 
+    /**
+     * name of {@link CmmnRepositoryService#getResourceAsStream(String, String) the resource} of this case definition.
+     */
     String getResourceName();
 
+    /** The deployment in which this case definition is contained. */
     String getDeploymentId();
+    
+    /** The resource name in the deployment of the diagram image (if any). */
+    String getDiagramResourceName();
 
+    /**
+     * Does this case definition have a start form key}.
+     */
+    boolean hasStartFormKey();
+
+    /**
+     * Does this case definition have a graphical notation defined (such that a diagram can be generated)?
+     */
     boolean hasGraphicalNotation();
 
+    /** The tenant identifier of this case definition */
     String getTenantId();
 
 }

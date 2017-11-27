@@ -73,6 +73,8 @@ html, body {
   // This is the logo at the top of the ToC
   &>img {
     display: block;
+    margin-left:auto;
+    margin-right:auto;
     max-width: 100%;
   }
 
@@ -355,7 +357,8 @@ html, body {
     margin-top: 2em;
     border-top: 1px solid #ccc;
     border-bottom: 1px solid #ccc;
-    background-color: #fdfdfd;
+    background-color: #0c4359;
+    color: #fff;
   }
 
   h1:first-child, div:first-child + h1 {
@@ -384,7 +387,7 @@ html, body {
   h3, h4, h5, h6 {
     @extend %header-font;
     font-size: 15px;
-    margin-top: 2.5em;
+    margin-top: 1.0em;
     margin-bottom: 0.8em;
   }
 
@@ -428,6 +431,12 @@ html, body {
     tr:nth-child(even)>td {
       background-color: lighten($main-bg,2.4%);
     }
+
+    thead, tfoot {
+      background: -webkit-linear-gradient(top, #90b66a, #90b66a);
+      color: #fff;
+      font-weight: bold;
+    }
   }
 
   dt {
@@ -453,6 +462,15 @@ html, body {
     border-radius: 3px;
     @extend %break-words;
     @extend %code-font;
+  }
+
+  p>code{
+    border: 1px dashed #666666;
+    width:100%;
+    display: block;
+    font-weight: bold;
+    padding-top: 10px;
+    padding-bottom: 10px;
   }
 
   pre>code {
@@ -611,4 +629,17 @@ html, body {
 
 .highlight, .highlight .w {
   background-color: $code-bg;
+}
+
+::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+  color: white;
+}
+::-moz-placeholder { /* Firefox 19+ */
+  color: white;
+}
+:-ms-input-placeholder { /* IE 10+ */
+  color: white;
+}
+:-moz-placeholder { /* Firefox 18- */
+  color: white;
 }

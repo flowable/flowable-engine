@@ -24,25 +24,27 @@ import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.CmmnDeploymentEntityManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.deploy.CaseDefinitionCacheEntry;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionQueryImpl;
+import org.flowable.engine.common.EngineDeployer;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.api.repository.EngineDeployment;
 import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 
 public class CmmnDeploymentManager {
 
     protected DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache;
-    protected List<Deployer> deployers;
+    protected List<EngineDeployer> deployers;
     protected CmmnEngineConfiguration cmmnEngineConfiguration;
     protected CmmnDeploymentEntityManager deploymentEntityManager;
     protected CaseDefinitionEntityManager caseDefinitionEntityManager;
 
-    public void deploy(CmmnDeploymentEntity deployment) {
+    public void deploy(EngineDeployment deployment) {
         deploy(deployment, null);
     }
 
-    public void deploy(CmmnDeploymentEntity deployment, Map<String, Object> deploymentSettings) {
-        for (Deployer deployer : deployers) {
+    public void deploy(EngineDeployment deployment, Map<String, Object> deploymentSettings) {
+        for (EngineDeployer deployer : deployers) {
             deployer.deploy(deployment, deploymentSettings);
         }
     }
@@ -130,11 +132,11 @@ public class CmmnDeploymentManager {
         deploymentEntityManager.deleteDeploymentAndRelatedData(deploymentId, cascade);
     }
 
-    public List<Deployer> getDeployers() {
+    public List<EngineDeployer> getDeployers() {
         return deployers;
     }
 
-    public void setDeployers(List<Deployer> deployers) {
+    public void setDeployers(List<EngineDeployer> deployers) {
         this.deployers = deployers;
     }
 

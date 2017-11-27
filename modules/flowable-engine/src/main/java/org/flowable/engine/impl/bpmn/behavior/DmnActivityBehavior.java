@@ -17,6 +17,7 @@ import java.util.Map;
 
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.Task;
+import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.common.api.FlowableException;
@@ -40,6 +41,7 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
     private static final long serialVersionUID = 1L;
 
     protected static final String EXPRESSION_DECISION_TABLE_REFERENCE_KEY = "decisionTableReferenceKey";
+    protected static final String EXPRESSION_DECISION_TABLE_THROW_ERROR_FLAG = "decisionTaskThrowErrorOnNoHits";
 
     protected Task task;
 
@@ -90,17 +92,30 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 
         DmnRuleService ruleService = CommandContextUtil.getDmnRuleService();
 
-        List<Map<String, Object>> executionResult = ruleService.createExecuteDecisionBuilder()
-                        .decisionKey(finaldecisionTableKeyValue)
-                        .parentDeploymentId(processDefinition.getDeploymentId())
-                        .instanceId(execution.getProcessInstanceId())
-                        .executionId(execution.getId())
-                        .activityId(task.getId())
-                        .variables(execution.getVariables())
-                        .tenantId(execution.getTenantId())
-                        .execute();
-                
-        setVariablesOnExecution(executionResult, finaldecisionTableKeyValue, execution, processEngineConfiguration.getObjectMapper());
+        DecisionExecutionAuditContainer decisionExecutionAuditContainer = ruleService.createExecuteDecisionBuilder()
+                .decisionKey(finaldecisionTableKeyValue)
+                .parentDeploymentId(processDefinition.getDeploymentId())
+                .instanceId(execution.getProcessInstanceId())
+                .executionId(execution.getId())
+                .activityId(task.getId())
+                .variables(execution.getVariables())
+                .tenantId(execution.getTenantId())
+                .executeWithAuditTrail();
+        
+        if (decisionExecutionAuditContainer.isFailed()) {
+            throw new FlowableException("DMN decision table with key " + finaldecisionTableKeyValue + " execution failed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage());
+        }
+
+        /*Throw error if there were no rules hit when the flag indicates to do this.*/
+        FieldExtension throwErrorFieldExtension = DelegateHelper.getFlowElementField(execution, EXPRESSION_DECISION_TABLE_THROW_ERROR_FLAG);
+        if (decisionExecutionAuditContainer.getDecisionResult().isEmpty() && 
+                        throwErrorFieldExtension != null && "true".equalsIgnoreCase(throwErrorFieldExtension.getStringValue())) {
+            
+            throw new FlowableException("DMN decision table with key " + finaldecisionTableKeyValue + " did not hit any rules for the provided input.");
+        }
+
+
+        setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue, execution, processEngineConfiguration.getObjectMapper());
 
         leave(execution);
     }

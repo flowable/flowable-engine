@@ -21,6 +21,7 @@ import org.flowable.dmn.api.DmnDeployment;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.DmnDeploymentQueryImpl;
 import org.flowable.dmn.engine.impl.persistence.entity.data.DmnDeploymentDataManager;
+import org.flowable.engine.common.api.repository.EngineResource;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 
 /**
@@ -45,9 +46,9 @@ public class DmnDeploymentEntityManagerImpl extends AbstractEntityManager<DmnDep
     public void insert(DmnDeploymentEntity deployment) {
         super.insert(deployment, true);
 
-        for (DmnResourceEntity resource : deployment.getResources().values()) {
+        for (EngineResource resource : deployment.getResources().values()) {
             resource.setDeploymentId(deployment.getId());
-            getResourceEntityManager().insert(resource);
+            getResourceEntityManager().insert((DmnResourceEntity) resource);
         }
     }
 

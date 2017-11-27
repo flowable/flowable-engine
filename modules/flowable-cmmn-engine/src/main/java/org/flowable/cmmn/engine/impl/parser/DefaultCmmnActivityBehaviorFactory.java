@@ -21,6 +21,7 @@ import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemExpressionActivityBeh
 import org.flowable.cmmn.engine.impl.behavior.impl.ProcessTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.StageActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.TaskActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.TimerEventListenerActivityBehaviour;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegate;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegateFactory;
 import org.flowable.cmmn.model.CaseTask;
@@ -31,6 +32,7 @@ import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
+import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.common.impl.el.ExpressionManager;
 
@@ -95,6 +97,11 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     @Override
     public PlanItemDelegateExpressionActivityBehavior createPlanItemDelegateExpressionActivityBehavior(PlanItem planItem, ServiceTask task) {
         return new PlanItemDelegateExpressionActivityBehavior(task.getImplementation(), task.getFieldExtensions());
+    }
+    
+    @Override
+    public TimerEventListenerActivityBehaviour createTimerEventListenerActivityBehavior(PlanItem planItem, TimerEventListener timerEventListener) {
+        return new TimerEventListenerActivityBehaviour(timerEventListener);
     }
 
     public CmmnClassDelegateFactory getClassDelegateFactory() {

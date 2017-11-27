@@ -56,44 +56,20 @@ import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
  */
 public class ProcessInstanceHelper {
 
-    public ProcessInstance createProcessInstance(ProcessDefinition processDefinition,
-                                                 String businessKey, 
-                                                 String processInstanceName, 
-                                                 Map<String, Object> variables, 
-                                                 Map<String, Object> transientVariables) {
-        return createProcessInstance(processDefinition, 
-                                             businessKey, 
-                                             processInstanceName, 
-                                             variables, 
-                                             transientVariables, 
-                                             null,
-                                             null,
-                                             false);
+    public ProcessInstance createProcessInstance(ProcessDefinition processDefinition, String businessKey, String processInstanceName, 
+                    Map<String, Object> variables, Map<String, Object> transientVariables) {
+        
+        return createProcessInstance(processDefinition, businessKey, processInstanceName, variables, transientVariables, null, null, false);
     }
 
-    public ProcessInstance createAndStartProcessInstance(ProcessDefinition processDefinition,
-                                                         String businessKey, 
-                                                         String processInstanceName, 
-                                                         Map<String, Object> variables, 
-                                                         Map<String, Object> transientVariables) {
-        return createProcessInstance(processDefinition, 
-                                             businessKey, 
-                                             processInstanceName, 
-                                             variables, 
-                                             transientVariables, 
-                                             null,
-                                             null,
-                                             true);
+    public ProcessInstance createAndStartProcessInstance(ProcessDefinition processDefinition, String businessKey, String processInstanceName, 
+                    Map<String, Object> variables, Map<String, Object> transientVariables) {
+        
+        return createProcessInstance(processDefinition, businessKey, processInstanceName, variables, transientVariables, null, null, true);
     }
 
-    public ProcessInstance createProcessInstance(ProcessDefinition processDefinition,
-                                                            String businessKey, 
-                                                            String processInstanceName,
-                                                            Map<String, Object> variables, 
-                                                            Map<String, Object> transientVariables, 
-                                                            String callbackId,
-                                                            String callbackType,
-                                                            boolean startProcessInstance) {
+    public ProcessInstance createProcessInstance(ProcessDefinition processDefinition, String businessKey, String processInstanceName, Map<String, Object> variables, 
+                    Map<String, Object> transientVariables, String callbackId,String callbackType, boolean startProcessInstance) {
 
         CommandContext commandContext = Context.getCommandContext();
         if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
@@ -118,25 +94,12 @@ public class ProcessInstanceHelper {
             throw new FlowableException("No start element found for process definition " + processDefinition.getId());
         }
 
-        return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, 
-                                                                   businessKey,
-                                                                   processInstanceName, 
-                                                                   initialFlowElement, 
-                                                                   process, 
-                                                                   variables, 
-                                                                   transientVariables,
-                                                                   callbackId,
-                                                                   callbackType,
-                                                                   startProcessInstance);
+        return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, businessKey, processInstanceName, initialFlowElement, process, 
+                        variables, transientVariables, callbackId, callbackType, startProcessInstance);
     }
 
-    public ProcessInstance createAndStartProcessInstanceByMessage(ProcessDefinition processDefinition, 
-                                                                  String messageName, 
-                                                                  String businessKey,
-                                                                  Map<String, Object> variables, 
-                                                                  Map<String, Object> transientVariables,
-                                                                  String callbackId,
-                                                                  String callbackType) {
+    public ProcessInstance createAndStartProcessInstanceByMessage(ProcessDefinition processDefinition, String messageName, String businessKey, 
+                    Map<String, Object> variables, Map<String, Object> transientVariables, String callbackId, String callbackType) {
 
         CommandContext commandContext = Context.getCommandContext();
         if (Flowable5Util.isFlowable5ProcessDefinition(processDefinition, commandContext)) {
@@ -173,48 +136,21 @@ public class ProcessInstanceHelper {
             throw new FlowableException("No message start event found for process definition " + processDefinition.getId() + " and message name " + messageName);
         }
 
-        return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, 
-                                                                   businessKey, 
-                                                                   null, 
-                                                                   initialFlowElement, 
-                                                                   process, 
-                                                                   variables, 
-                                                                   transientVariables,
-                                                                   callbackId,
-                                                                   callbackType,
-                                                                   true);
+        return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, businessKey, null, initialFlowElement, process, variables, 
+                        transientVariables, callbackId, callbackType, true);
     }
     
     public ProcessInstance createAndStartProcessInstanceWithInitialFlowElement(ProcessDefinition processDefinition,
-            String businessKey, 
-            String processInstanceName, 
-            FlowElement initialFlowElement,
-            Process process, 
-            Map<String, Object> variables, 
-            Map<String, Object> transientVariables, 
-            boolean startProcessInstance) {
-        return createAndStartProcessInstanceWithInitialFlowElement(processDefinition,
-                                                                   businessKey,
-                                                                   processInstanceName,
-                                                                   initialFlowElement,
-                                                                   process,
-                                                                   variables,
-                                                                   transientVariables,
-                                                                   null,
-                                                                   null,
-                                                                   startProcessInstance);
+            String businessKey, String processInstanceName, FlowElement initialFlowElement, Process process, Map<String, Object> variables, 
+            Map<String, Object> transientVariables, boolean startProcessInstance) {
+        
+        return createAndStartProcessInstanceWithInitialFlowElement(processDefinition, businessKey, processInstanceName, initialFlowElement, 
+                        process, variables, transientVariables, null, null, startProcessInstance);
     }
 
-    public ProcessInstance createAndStartProcessInstanceWithInitialFlowElement(ProcessDefinition processDefinition,
-                                                                               String businessKey, 
-                                                                               String processInstanceName, 
-                                                                               FlowElement initialFlowElement,
-                                                                               Process process, 
-                                                                               Map<String, Object> variables, 
-                                                                               Map<String, Object> transientVariables,
-                                                                               String callbackId,
-                                                                               String callbackType,
-                                                                               boolean startProcessInstance) {
+    public ProcessInstance createAndStartProcessInstanceWithInitialFlowElement(ProcessDefinition processDefinition, String businessKey, String processInstanceName, 
+                    FlowElement initialFlowElement, Process process, Map<String, Object> variables, Map<String, Object> transientVariables, 
+                    String callbackId, String callbackType, boolean startProcessInstance) {
 
         CommandContext commandContext = Context.getCommandContext();
 
@@ -237,7 +173,6 @@ public class ProcessInstanceHelper {
         if (callbackType != null) {
             processInstance.setCallbackType(callbackType);
         }
-
 
         CommandContextUtil.getHistoryManager(commandContext).recordProcessInstanceStart(processInstance);
 

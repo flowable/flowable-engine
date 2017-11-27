@@ -155,6 +155,28 @@ function _drawTask(element)
 	}
 }
 
+function _drawTimerEventListener(element)
+{
+    _drawEventListener(element);
+    _drawTimerEventListenerIcon(paper, element);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+}
+
+function _drawEventListener(element)
+{
+    var x = element.x + (element.width / 2);
+	var y = element.y + (element.height / 2);
+
+	var circle = paper.circle(x, y, 15);
+
+    circle.attr({"stroke-width": 1,
+        "stroke": "black",
+        "fill": "white"
+    });
+
+	circle.id = element.id;
+}
+
 function _drawMilestone(element)
 {
     var rectAttrs = {};
@@ -376,9 +398,8 @@ function _drawMultilineText(text, x, y, boxWidth, boxHeight, horizontalAnchor, v
 }
 
 function _drawAssociation(flow){
-	
+
 	var polyline = new Polyline(flow.id, flow.waypoints, ASSOCIATION_STROKE, paper);
-	
 	polyline.element = paper.path(polyline.path);
 	polyline.element.attr({"stroke-width": ASSOCIATION_STROKE});
 	polyline.element.attr({"stroke-dasharray": ". "});
