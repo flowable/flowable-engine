@@ -1,0 +1,141 @@
+{
+  "modelId": "4d8f1a75-d004-11e7-af0a-00dbdfd9e96a",
+  "bounds": {
+    "lowerRight": {
+      "x": 1200,
+      "y": 1050
+    },
+    "upperLeft": {
+      "x": 0,
+      "y": 0
+    }
+  },
+  "properties": {
+    "process_id": "test",
+    "name": "test",
+    "documentation": "",
+    "process_author": "",
+    "process_version": "",
+    "process_namespace": "http://www.flowable.org/processdef",
+    "executionlisteners": "",
+    "eventlisteners": "",
+    "signaldefinitions": "",
+    "messagedefinitions": "",
+    "rds_processformkey": "",
+    "rds_viewprocessuser": "",
+    "rds_viewprocessgroup": "",
+    "rds_editprocessformkey": "",
+    "rds_editprocessuser": "",
+    "rds_editprocessgroup": "",
+    "process_potentialstarteruser": "",
+    "process_potentialstartergroup": ""
+  },
+  "childShapes": [{
+    "resourceId": "startEvent1",
+    "properties": {
+      "overrideid": "",
+      "name": "",
+      "documentation": "",
+      "executionlisteners": "",
+      "initiator": "",
+      "formkeydefinition": "",
+      "formreference": {
+        "id": "74b365c6-d004-11e7-af0a-00dbdfd9e96a",
+        "name": "testForm",
+        "key": "testForm"
+      },
+      "formproperties": ""
+    },
+    "stencil": {
+      "id": "StartNoneEvent"
+    },
+    "childShapes": [],
+    "outgoing": [{
+      "resourceId": "sid-A312BABD-E5B1-4A69-88FB-9763F56DAF71"
+    }],
+    "bounds": {
+      "lowerRight": {
+        "x": 130,
+        "y": 193
+      },
+      "upperLeft": {
+        "x": 100,
+        "y": 163
+      }
+    },
+    "dockers": []
+  },
+    {
+      "resourceId": "sid-7BC4DB85-5927-4E7F-B9FE-4CC5A0150A27",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "executionlisteners": ""
+      },
+      "stencil": {
+        "id": "EndNoneEvent"
+      },
+      "childShapes": [],
+      "outgoing": [],
+      "bounds": {
+        "lowerRight": {
+          "x": 569.777761691882,
+          "y": 199.99999735090464
+        },
+        "upperLeft": {
+          "x": 541.777761691882,
+          "y": 171.99999735090464
+        }
+      },
+      "dockers": []
+    },
+    {
+      "resourceId": "sid-A312BABD-E5B1-4A69-88FB-9763F56DAF71",
+      "properties": {
+        "overrideid": "",
+        "name": "",
+        "documentation": "",
+        "conditionsequenceflow": "",
+        "executionlisteners": "",
+        "defaultflow": "false",
+        "rds_conditionsequenceflowformkey": "",
+        "rds_confirmmessage": ""
+      },
+      "stencil": {
+        "id": "SequenceFlow"
+      },
+      "childShapes": [],
+      "outgoing": [{
+        "resourceId": "sid-7BC4DB85-5927-4E7F-B9FE-4CC5A0150A27"
+      }],
+      "bounds": {
+        "lowerRight": {
+          "x": 541.0036213046785,
+          "y": 185.7318506923576
+        },
+        "upperLeft": {
+          "x": 130.6350344530079,
+          "y": 178.28377165337304
+        }
+      },
+      "dockers": [{
+        "x": 15,
+        "y": 15
+      },
+        {
+          "x": 14,
+          "y": 14
+        }],
+      "target": {
+        "resourceId": "sid-7BC4DB85-5927-4E7F-B9FE-4CC5A0150A27"
+      }
+    }],
+  "stencil": {
+    "id": "BPMNDiagram"
+  },
+  "stencilset": {
+    "namespace": "http://b3mn.org/stencilset/bpmn2.0#",
+    "url": "../editor/stencilsets/bpmn2.0/bpmn2.0.json"
+  }
+}
