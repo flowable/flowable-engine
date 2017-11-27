@@ -14,6 +14,7 @@ package org.flowable.engine.test.api.history;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -526,7 +527,6 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
         }
     }
 
-
     public void testQueryWithPagingVariablesAndIdentityLinks() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
             
@@ -577,6 +577,64 @@ public class HistoricTaskAndVariablesQueryTest extends PluggableFlowableTestCase
 
             tasks = historyService.createHistoricTaskInstanceQuery().includeProcessVariables().includeTaskLocalVariables().includeIdentityLinks().orderByTaskPriority().asc().listPage(4, 2);
             assertEquals(0, tasks.size());
+        }
+    }
+    
+    @Deployment(resources = { "org/flowable/engine/test/api/history/HistoricTaskAndVariablesQueryTest.testCandidate.bpmn20.xml" })
+    public void testQueryVariableExists() {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+            HistoricTaskInstance task = historyService.createHistoricTaskInstanceQuery().taskVariableExists("testVar").singleResult();
+            assertNotNull(task);
+            
+            List<HistoricTaskInstance> tasks = historyService.createHistoricTaskInstanceQuery().taskVariableNotExists("testVar").list();
+            assertEquals(2, tasks.size());
+            
+            tasks = historyService.createHistoricTaskInstanceQuery().or().taskVariableNotExists("testVar").processDefinitionId("unexisting").list();
+            assertEquals(2, tasks.size());
+            
+            tasks = historyService.createHistoricTaskInstanceQuery().or().taskVariableExists("testVar").processDefinitionId("unexisting").list();
+            assertEquals(1, tasks.size());
+            
+            tasks = historyService.createHistoricTaskInstanceQuery().or().taskVariableNotExists("testVar").endOr().or().processDefinitionId("unexisting").list();
+            assertEquals(0, tasks.size());
+            
+            tasks = historyService.createHistoricTaskInstanceQuery().or().taskVariableExists("testVar").endOr().or().processDefinitionId("unexisting").list();
+            assertEquals(0, tasks.size());
+            
+            Map<String, Object> varMap = Collections.singletonMap("processVar", (Object) "test");
+            ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", varMap);
+            
+            tasks = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).processVariableExists("processVar").list();
+            assertEquals(1, tasks.size());
+            
+            tasks = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).processVariableNotExists("processVar").list();
+            assertEquals(0, tasks.size());
+            
+            tasks = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId())
+                            .or().processVariableExists("processVar").processDefinitionId("undexisting").endOr().list();
+            assertEquals(1, tasks.size());
+            
+            tasks = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId())
+                            .or().processVariableNotExists("processVar").processInstanceId(processInstance.getId()).endOr().list();
+            assertEquals(1, tasks.size());
+            
+            runtimeService.setVariable(processInstance.getId(), "processVar2", "test2");
+            
+            tasks = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId())
+                            .processVariableExists("processVar").processVariableValueEquals("processVar2", "test2").list();
+            assertEquals(1, tasks.size());
+            
+            tasks = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId())
+                            .processVariableNotExists("processVar").processVariableValueEquals("processVar2", "test2").list();
+            assertEquals(0, tasks.size());
+            
+            tasks = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId())
+                            .or().processVariableExists("processVar").processVariableValueEquals("processVar2", "test2").endOr().list();
+            assertEquals(1, tasks.size());
+            
+            tasks = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId())
+                            .or().processVariableNotExists("processVar").processVariableValueEquals("processVar2", "test2").endOr().list();
+            assertEquals(1, tasks.size());
         }
     }
 

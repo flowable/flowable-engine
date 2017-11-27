@@ -202,6 +202,22 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
      *            cannot be null. The string can include the wildcard character '%' to express like-strategy: starts with (string%), ends with (%string) or contains (%string%).
      */
     HistoricProcessInstanceQuery variableValueLikeIgnoreCase(String name, String value);
+    
+    /**
+     * Only select process instances which have a variable with the given name.
+     * 
+     * @param name
+     *            cannot be null.
+     */
+    HistoricProcessInstanceQuery variableExists(String name);
+    
+    /**
+     * Only select process instances which does not have a variable with the given name.
+     * 
+     * @param name
+     *            cannot be null.
+     */
+    HistoricProcessInstanceQuery variableNotExists(String name);
 
     /**
      * Only select historic process instances that were started before the given date.
