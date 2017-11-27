@@ -12,12 +12,15 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
+import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
+ * {@link CmmnActivityBehavior} implementation for the CMMN Timer Event Listener.
+ * 
  * @author Joram Barrez
  */
 public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavior {
