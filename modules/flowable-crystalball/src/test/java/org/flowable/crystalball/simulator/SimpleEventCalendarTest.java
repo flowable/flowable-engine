@@ -63,7 +63,7 @@ public class SimpleEventCalendarTest {
         assertNull(calendar.removeFirstEvent());
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testRunEventFromPast() throws Exception {
         SimulationEvent event1 = new SimulationEvent.Builder("any type").simulationTime(1).build();
         EventCalendar calendar = new SimpleEventCalendar(clock, comparator);
@@ -71,6 +71,6 @@ public class SimpleEventCalendarTest {
         calendar.addEvent(event1);
         this.clock.setCurrentTime(new Date(2));
         calendar.removeFirstEvent();
-        // the test should pass (severity is warning)
+        fail("RuntimeException expected");
     }
 }

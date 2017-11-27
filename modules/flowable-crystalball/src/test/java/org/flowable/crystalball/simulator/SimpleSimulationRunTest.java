@@ -156,15 +156,15 @@ public class SimpleSimulationRunTest {
         ProcessEngines.destroy();
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testRunToTimeInThePast() throws Exception {
 
         recordEvents();
         SimulationDebugger simDebugger = createDebugger();
         simDebugger.init(new NoExecutionVariableScope());
         try {
-            // severity decreased from Error to Warning
             simDebugger.runTo(-1);
+            fail("RuntimeException expected - unable to execute event from the past");
         } finally {
             simDebugger.close();
             ProcessEngines.destroy();
