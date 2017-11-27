@@ -29,9 +29,9 @@ angular.module('flowableModeler')
             var hotDecisionTableEditorInstance;
             var hitPolicies = ['FIRST', 'ANY', 'UNIQUE', 'PRIORITY', 'RULE ORDER', 'OUTPUT ORDER', 'COLLECT'];
             var operators = ['==', '!=', '<', '>', '>=', '<=', 'regex'];
-            var listInputOperators = ['containsString', 'containsNumber', 'containsDate'];
+            var listInputOperators = ['containsString', 'containsNumber', 'containsDate', 'containsExpression'];
             var listOutputOperators = ['append', 'remove', 'clear'];
-            var listDefaultOutputOperators = ['string', 'number', 'date'];
+            var listDefaultOutputOperators = ['string', 'number', 'date', 'expression'];
             var columnIdCounter = 0;
             var hitPolicyHeaderElement;
             var dateFormat = 'YYYY-MM-DD';
@@ -47,9 +47,7 @@ angular.module('flowableModeler')
                 columnVariableIdMap: {},
                 startOutputExpression: 0,
                 selectedRow: undefined,
-                availableVariableTypes: ['string', 'number', 'boolean', 'date', 'list'],
-                isOutputList: false,
-                isInputList: false
+                availableVariableTypes: ['string', 'number', 'boolean', 'date', 'list']
             };
 
             // Hot Model init
@@ -199,14 +197,16 @@ angular.module('flowableModeler')
             };
 
             $scope.doAfterGetColHeader = function (col, TH) {
-                if ($scope.model.columnDefs[col] && $scope.model.columnDefs[col].expressionType === 'input-operator') {
+                if ($scope.model.columnDefs[col] && $scope.model.columnDefs[col].expressionType === 'input-operator' 
+                	|| $scope.model.columnDefs[col] && $scope.model.columnDefs[col].expressionType === 'input-list-operator') {
                     TH.className += "input-operator-header";
                 } else if ($scope.model.columnDefs[col] && $scope.model.columnDefs[col].expressionType === 'input-expression') {
                     TH.className += "input-expression-header";
                     if ($scope.model.startOutputExpression - 1 === col) {
                         TH.className += " last";
                     }
-                } else if($scope.model.columnDefs[col] && $scope.model.columnDefs[col].expressionType === 'output-operator'){
+                } else if($scope.model.columnDefs[col] && $scope.model.columnDefs[col].expressionType === 'output-list-operator'
+                	|| $scope.model.columnDefs[col] && $scope.model.columnDefs[col].expressionType === 'output-operator'){
 				TH.className += "output-operator-header";
                 }else if ($scope.model.columnDefs[col] && $scope.model.columnDefs[col].expressionType === 'output') {
                     TH.className += "output-header";
@@ -402,7 +402,6 @@ angular.module('flowableModeler')
             };
 
             $scope.openOutputExpressionEditor = function (expressionPos, newExpression) {
-			console.log(expressionPos);
                 var editTemplate = 'views/popup/decision-table-edit-output-expression.html';
 
                 $scope.model.newExpression = !!newExpression;
@@ -433,11 +432,13 @@ angular.module('flowableModeler')
 
             var _loadDecisionTableDefinition = function (modelId) {
                 DecisionTableService.fetchDecisionTableDetails(modelId).then(function (decisionTable) {
+
                     $rootScope.currentDecisionTable = decisionTable.decisionTableDefinition;
                     $rootScope.currentDecisionTable.id = decisionTable.id;
                     $rootScope.currentDecisionTable.key = decisionTable.decisionTableDefinition.key;
                     $rootScope.currentDecisionTable.name = decisionTable.name;
                     $rootScope.currentDecisionTable.description = decisionTable.description;
+
                     $scope.model.lastUpdatedBy = decisionTable.lastUpdatedBy;
                     $scope.model.createdBy = decisionTable.createdBy;
 
@@ -607,7 +608,7 @@ angular.module('flowableModeler')
                         type = 'list';
                         break;
                     default:
-				type = 'text';
+                        type = 'text';
                 }
 
                 if (outputExpression.complexExpression) {
@@ -761,6 +762,7 @@ angular.module('flowableModeler')
 
                 columnDefinitions[inputExpressionCounter - 1].className += ' last';
                 $scope.model.startOutputExpression = inputExpressionCounter;
+
                 if (decisionTable.outputExpressions && decisionTable.outputExpressions.length > 0) {
                     decisionTable.outputExpressions.forEach(function (outputExpression) {
 				if(outputExpression.type != "list"){
@@ -791,7 +793,6 @@ angular.module('flowableModeler')
 
                 // timeout needed for trigger hot update when removing column defs
                 $scope.model.columnDefs = columnDefinitions;
-
                 $timeout(function () {
                     if (hotDecisionTableEditorInstance) {
                         hotDecisionTableEditorInstance.render();
@@ -801,7 +802,6 @@ angular.module('flowableModeler')
 
             var setGridValues = function (key, type) {
                 if ($scope.model.rulesData) {
-                		console.log($scope.model.rulesData);
                     $scope.model.rulesData.forEach(function (rowData) {
                     		switch(type){
                     			case 'output-list-operator':
@@ -889,7 +889,6 @@ angular.module('flowableModeler')
             };
 
             var evaluateDecisionTableGrid = function (decisionTable) {
-			console.log(decisionTable);
                 $scope.evaluateDecisionHeaders(decisionTable);
                 evaluateDecisionGrid(decisionTable);
             };
@@ -1137,7 +1136,6 @@ angular.module('flowableModeler')
 
         // Saving the edited input
         $scope.save = function () {
-			console.log($scope.model.newExpression);
             if ($scope.model.newExpression) {
                 var newOutputExpression = {
                     variableId: $scope.popup.selectedExpressionNewVariableId,
