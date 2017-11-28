@@ -880,7 +880,7 @@ hot-table .column-header.label {
     padding-left: 15px;
 }
 
-#decisionTableGrid tr .input-operator-cell {
+#decisionTableGrid tr .input-operator-cell, #decisionTableGrid tr .output-operator-cell {
     text-align: center;
     min-width: 50px; !important;
 }
@@ -971,12 +971,12 @@ hot-table .column-header.label {
     border-left: 4px double rgba(51, 51, 51, 0.7);
 }
 
-#decisionTableGrid th.output-header {
+#decisionTableGrid th.output-header , #decisionTableGrid th.output-operator-header{
     background-color: rgba(243, 243, 243, 1);
     border-bottom: 4px double rgba(51, 51, 51, 0.7);
 }
 
-#decisionTableGrid th.input-operator-header {
+#decisionTableGrid th.input-operator-header , #decisionTableGrid th.output-operator-header {
     border-right-style: hidden;
 }
 

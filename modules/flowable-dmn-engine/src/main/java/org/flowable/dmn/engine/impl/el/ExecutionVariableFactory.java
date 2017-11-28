@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.variable.service.impl.persistence.entity.SealMetadataList;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,6 +63,13 @@ public class ExecutionVariableFactory {
                     executionVariable = expressionResult;
                 } else {
                     executionVariable = new DateTime(expressionResult.toString()).toDate();
+                }
+            } else if (StringUtils.equals("list", type)) {
+                if (expressionResult instanceof SealMetadataList) {
+                    executionVariable = expressionResult;
+                } else {
+                    executionVariable = new SealMetadataList();
+                    ((SealMetadataList) executionVariable).append(expressionResult.toString());
                 }
             } else {
                 LOGGER.error("could not create result variable: unrecognized mapping type");
