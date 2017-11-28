@@ -92,7 +92,7 @@ public class Scanner {
 		TEXT,
 		DOT("'.'"), LBRACK("'['"), RBRACK("']'"),
 		COMMA("','"),
-		START_EVAL_DEFERRED("'#{'"), START_EVAL_DYNAMIC("'${'"), END_EVAL("'}'"),
+		START_EVAL_DEFERRED("'#{'"), START_EVAL_DYNAMIC("'${'"), END_EVAL("'}'"), REGEX("'regex'"),
 		EXTENSION; // used in syntax extensions
 		private final String string;
 		private Symbol() {
@@ -145,6 +145,7 @@ public class Scanner {
 		addFixToken(new Token(Symbol.START_EVAL_DYNAMIC, "${"));
 		addFixToken(new Token(Symbol.END_EVAL, "}"));
 		addFixToken(new Token(Symbol.EOF, null, 0));
+		addFixToken(new Token(Symbol.REGEX, "regex"));
 		
 		addKeyToken(new Token(Symbol.NULL, "null"));
 		addKeyToken(new Token(Symbol.TRUE, "true"));
@@ -161,6 +162,7 @@ public class Scanner {
 		addKeyToken(new Token(Symbol.NE, "ne"));
 		addKeyToken(new Token(Symbol.GE, "ge"));
 		addKeyToken(new Token(Symbol.GT, "gt"));
+		addKeyToken(new Token(Symbol.REGEX, "regex"));
 		addKeyToken(new Token(Symbol.INSTANCEOF, "instanceof"));
 	}
 
@@ -362,6 +364,11 @@ public class Scanner {
 			case '(': return fixed(Symbol.LPAREN);
 			case ')': return fixed(Symbol.RPAREN);
 			case ',': return fixed(Symbol.COMMA);
+			case 'r': 
+			    if(position < input.length() - 4 && input.substring(position, position + 4) == "regex") {
+			        return fixed(Symbol.REGEX);
+			    }
+			    break;
 			case '.':
 				if (!isDigit(c2)) {
 					return fixed(Symbol.DOT);

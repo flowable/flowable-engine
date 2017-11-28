@@ -19,7 +19,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class ELConditionExpressionPreParser {
 
-    protected static String[] OPERATORS = new String[]{"==", "!=", "<", ">", ">=", "<="};
+    protected static String[] OPERATORS = new String[]{"==", "!=", "<", ">", ">=", "<=", "regex"};
 
     public static String parse(String expression, String inputVariable, String inputVariableType) {
         
