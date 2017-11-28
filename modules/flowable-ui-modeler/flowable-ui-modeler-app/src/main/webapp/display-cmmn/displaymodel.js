@@ -189,18 +189,18 @@ var modelUrl;
 
 if (modelType == 'runtime') {
 	if (historyModelId) {
-    	modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/case-instances/history/' + historyModelId + '/model-json';
+    	modelUrl = FLOWABLE.APP_URL.getCaseInstancesHistoryModelJsonUrl(historyModelId);
 	} else {
-    	modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/case-instances/' + modelId + '/model-json';
+    	modelUrl = FLOWABLE.APP_URL.getCaseInstancesModelJsonUrl(modelId);
 	}
 } else if (modelType == 'design') {
 	if (historyModelId) {
-    	modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + modelId + '/history/' + historyModelId + '/model-json';
+    	modelUrl = FLOWABLE.APP_URL.getModelHistoryModelJsonUrl(modelId, historyModelId);
 	} else {
-    	modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + modelId + '/model-json';
+    	modelUrl = FLOWABLE.APP_URL.getModelModelJsonUrl(modelId);
 	}
 } else if (modelType == 'case-definition') {
-    modelUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/case-definitions/' + caseDefinitionId + '/model-json';
+    modelUrl = FLOWABLE.APP_URL.getCaseDefinitionModelJsonUrl(caseDefinitionId);
 }
 
 var request = jQuery.ajax({

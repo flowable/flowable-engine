@@ -1,6 +1,6 @@
 {
   "GENERAL":{
-    "MAIN-TITLE":"Activiti",
+    "MAIN-TITLE":"Flowable",
     "ERROR":{
       "GENERIC":"Desculpe, ocorreu um erro...",
       "UNKNOWN":"Desculpe, um erro ocorreu durante a execução da operação solicitada.",

@@ -14,12 +14,12 @@ package org.flowable.cmmn.editor.json.converter;
 
 import java.util.Map;
 
-import org.flowable.cmmn.editor.json.model.ModelInfo;
+import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 
 /**
  * @author Tijs Rademakers
  */
 public interface DecisionTableKeyAwareConverter {
 
-    public void setDecisionTableKeyMap(Map<String, ModelInfo> decisionTableMap);
+    public void setDecisionTableKeyMap(Map<String, CmmnModelInfo> decisionTableMap);
 }

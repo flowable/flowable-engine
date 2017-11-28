@@ -128,12 +128,12 @@ flowableModeler
             templateUrl: appResourceRoot + 'views/app-definition-builder.html',
             controller: 'AppDefinitionBuilderController'
         });
-            
+
         if (FLOWABLE.CONFIG.appDefaultRoute) {
             $routeProvider.when('/', {
                 redirectTo: FLOWABLE.CONFIG.appDefaultRoute
             });
-            
+
         } else {
             $routeProvider.when('/', {
                 redirectTo: '/processes'
@@ -229,6 +229,10 @@ flowableModeler
 
             $rootScope.mainPage = $rootScope.mainNavigation[0];
 
+            // Add url helpers to root scope:
+            $rootScope.getModelThumbnailUrl = FLOWABLE.APP_URL.getModelThumbnailUrl;
+            $rootScope.getImageUrl = FLOWABLE.APP_URL.getImageUrl;
+
             /*
              * History of process and form pages accessed by the editor.
              * This is needed because you can navigate to sub processes and forms
@@ -321,18 +325,18 @@ flowableModeler
                     });
                 }
             };
-            
-            $http.get(FLOWABLE.CONFIG.contextRoot + '/app/rest/account')
+
+            $http.get(FLOWABLE.APP_URL.getAccountUrl())
 	        	.success(function (data, status, headers, config) {
 	              	$rootScope.account = data;
 	               	$rootScope.invalidCredentials = false;
 	 				$rootScope.authenticated = true;
 	          	});
-	          	
+
 	        $rootScope.logout = function () {
                 $rootScope.authenticated = false;
                 $rootScope.authenticationError = false;
-                $http.get(FLOWABLE.CONFIG.contextRoot + '/app/logout')
+                $http.get(FLOWABLE.APP_URL.getLogoutUrl())
                     .success(function (data, status, headers, config) {
                         $rootScope.login = null;
                         $rootScope.authenticated = false;

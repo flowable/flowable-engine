@@ -15,7 +15,7 @@ package org.flowable.cmmn.editor.json.converter;
 import java.util.Map;
 
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
-import org.flowable.cmmn.editor.json.model.ModelInfo;
+import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnModel;
@@ -34,9 +34,9 @@ public class StageJsonConverter extends BaseCmmnJsonConverter implements FormAwa
         DecisionTableAwareConverter, DecisionTableKeyAwareConverter, CaseModelAwareConverter, ProcessModelAwareConverter {
 
     protected Map<String, String> formMap;
-    protected Map<String, ModelInfo> formKeyMap;
+    protected Map<String, CmmnModelInfo> formKeyMap;
     protected Map<String, String> decisionTableMap;
-    protected Map<String, ModelInfo> decisionTableKeyMap;
+    protected Map<String, CmmnModelInfo> decisionTableKeyMap;
     protected Map<String, String> caseModelMap;
     protected Map<String, String> processModelMap;
 
@@ -93,7 +93,7 @@ public class StageJsonConverter extends BaseCmmnJsonConverter implements FormAwa
     }
 
     @Override
-    public void setFormKeyMap(Map<String, ModelInfo> formKeyMap) {
+    public void setFormKeyMap(Map<String, CmmnModelInfo> formKeyMap) {
         this.formKeyMap = formKeyMap;
     }
 
@@ -103,7 +103,7 @@ public class StageJsonConverter extends BaseCmmnJsonConverter implements FormAwa
     }
 
     @Override
-    public void setDecisionTableKeyMap(Map<String, ModelInfo> decisionTableKeyMap) {
+    public void setDecisionTableKeyMap(Map<String, CmmnModelInfo> decisionTableKeyMap) {
         this.decisionTableKeyMap = decisionTableKeyMap;
     }
     

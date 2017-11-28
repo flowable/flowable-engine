@@ -29,6 +29,7 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.impl.identity.Authentication;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
@@ -335,8 +336,9 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
             IdentityLinkUtil.createProcessInstanceIdentityLink(subProcessInstance, authenticatedUserId, null, IdentityLinkType.STARTER);
         }
 
-        if (CommandContextUtil.getProcessEngineConfiguration() != null && CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().isEnabled()) {
-            CommandContextUtil.getProcessEngineConfiguration().getEventDispatcher().dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, subProcessInstance));
+        FlowableEventDispatcher flowableEventDispatcher = processEngineConfiguration.getEventDispatcher();
+        if (flowableEventDispatcher != null && flowableEventDispatcher.isEnabled()) {
+            flowableEventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_CREATED, subProcessInstance));
         }
 
         return subProcessInstance;
@@ -647,7 +649,13 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         // activity with message/signal boundary events
         FlowElement currentFlowElement = execution.getCurrentFlowElement();
         if (currentFlowElement instanceof FlowNode) {
-            dispatchActivityCancelled(execution, cancelActivity);
+
+            if (execution.isMultiInstanceRoot()) {
+                dispatchMultiInstanceActivityCancelled(execution, cancelActivity);
+            }
+            else {
+                dispatchActivityCancelled(execution, cancelActivity);
+            }
         }
     }
 
@@ -656,6 +664,15 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
                 .getEventDispatcher()
                 .dispatchEvent(
                         FlowableEventBuilder.createActivityCancelledEvent(execution.getCurrentFlowElement().getId(),
+                                execution.getCurrentFlowElement().getName(), execution.getId(), execution.getProcessInstanceId(),
+                                execution.getProcessDefinitionId(), getActivityType((FlowNode) execution.getCurrentFlowElement()), cancelActivity));
+    }
+
+    protected void dispatchMultiInstanceActivityCancelled(ExecutionEntity execution, FlowElement cancelActivity) {
+        CommandContextUtil.getProcessEngineConfiguration()
+                .getEventDispatcher()
+                .dispatchEvent(
+                        FlowableEventBuilder.createMultiInstanceActivityCancelledEvent(execution.getCurrentFlowElement().getId(),
                                 execution.getCurrentFlowElement().getName(), execution.getId(), execution.getProcessInstanceId(),
                                 execution.getProcessDefinitionId(), getActivityType((FlowNode) execution.getCurrentFlowElement()), cancelActivity));
     }

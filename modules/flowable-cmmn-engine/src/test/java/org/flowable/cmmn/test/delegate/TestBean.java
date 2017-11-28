@@ -12,7 +12,7 @@
  */
 package org.flowable.cmmn.test.delegate;
 
-import org.flowable.cmmn.engine.delegate.DelegatePlanItemInstance;
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 
 /**
  * @author Tijs Rademakers

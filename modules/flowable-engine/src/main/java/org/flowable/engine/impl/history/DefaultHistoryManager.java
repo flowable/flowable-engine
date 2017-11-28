@@ -263,15 +263,15 @@ public class DefaultHistoryManager extends AbstractHistoryManager {
     @Override
     public void recordTaskInfoChange(TaskEntity taskEntity) {
         
-        HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
-        HistoricTaskInstanceEntity originalHistoricTaskInstanceEntity = historicTaskService.getHistoricTask(taskEntity.getId());
-        String originalAssignee = null;
-        if (originalHistoricTaskInstanceEntity != null) {
-            originalAssignee = originalHistoricTaskInstanceEntity.getAssignee();
-        }
-        
         boolean assigneeChanged = false;
         if (isHistoryLevelAtLeast(HistoryLevel.AUDIT)) {
+            HistoricTaskService historicTaskService = CommandContextUtil.getHistoricTaskService();
+            HistoricTaskInstanceEntity originalHistoricTaskInstanceEntity = historicTaskService.getHistoricTask(taskEntity.getId());
+            String originalAssignee = null;
+            if (originalHistoricTaskInstanceEntity != null) {
+                originalAssignee = originalHistoricTaskInstanceEntity.getAssignee();
+            }
+
             HistoricTaskInstanceEntity historicTaskInstance = historicTaskService.recordTaskInfoChange(taskEntity);
             if (historicTaskInstance != null) {
                 if (!Objects.equals(originalAssignee, taskEntity.getAssignee())) {

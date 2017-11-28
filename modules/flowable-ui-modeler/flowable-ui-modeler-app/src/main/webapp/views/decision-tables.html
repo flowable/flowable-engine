@@ -55,7 +55,7 @@
             </div>
             
             <div class="item fadein" ng-repeat="decisionTable in model.decisionTables.data track by $index">
-                <div class="item-box" ng-style="{'background-image': 'url(\'' + config.contextRoot + '/app/rest/models/' + decisionTable.id + '/thumbnail?version=' + imageVersion + '\')'}" ng-click="showDecisionTableDetails(decisionTable);">
+                <div class="item-box" ng-style="{'background-image': 'url(\'' + getModelThumbnailUrl(decisionTable.id, imageVersion) + '\')'}" ng-click="showDecisionTableDetails(decisionTable);">
                     <div class="actions">
                         <span class="badge">v{{decisionTable.version}}</span>
                         <div class="btn-group pull-right">

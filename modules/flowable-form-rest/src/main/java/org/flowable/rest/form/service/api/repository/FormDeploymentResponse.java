@@ -12,12 +12,12 @@
  */
 package org.flowable.rest.form.service.api.repository;
 
-import java.util.Date;
-
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.swagger.annotations.ApiModelProperty;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.rest.util.DateToStringSerializer;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.util.Date;
 
 /**
  * @author Yvo Swillens
@@ -43,6 +43,7 @@ public class FormDeploymentResponse {
         setUrl(url);
     }
 
+    @ApiModelProperty(example = "10")
     public String getId() {
         return id;
     }
@@ -51,6 +52,7 @@ public class FormDeploymentResponse {
         this.id = id;
     }
 
+    @ApiModelProperty(example = "flowable-form-examples")
     public String getName() {
         return name;
     }
@@ -59,6 +61,7 @@ public class FormDeploymentResponse {
         this.name = name;
     }
 
+    @ApiModelProperty(example = "2010-10-13T14:54:26.750+02:00")
     public Date getDeploymentTime() {
         return deploymentTime;
     }
@@ -67,6 +70,7 @@ public class FormDeploymentResponse {
         this.deploymentTime = deploymentTime;
     }
 
+    @ApiModelProperty(example = "examples")
     public String getCategory() {
         return category;
     }
@@ -75,6 +79,7 @@ public class FormDeploymentResponse {
         this.category = category;
     }
 
+    @ApiModelProperty(example = "http://localhost:8081/form-api/form-repository/deployments/10")
     public String getUrl() {
         return url;
     }
@@ -83,6 +88,7 @@ public class FormDeploymentResponse {
         this.url = url;
     }
 
+    @ApiModelProperty(example = "5")
     public String getParentDeploymentId() {
         return parentDeploymentId;
     }
@@ -91,6 +97,7 @@ public class FormDeploymentResponse {
         this.parentDeploymentId = parentDeploymentId;
     }
 
+    @ApiModelProperty(example = "null")
     public String getTenantId() {
         return tenantId;
     }

@@ -23,7 +23,7 @@ import org.flowable.engine.common.api.query.QueryProperty;
 /**
  * @author Tijs Rademakers
  */
-public abstract class AbstractPaginateList {
+public abstract class AbstractPaginateList<RES, REQ> {
 
     /**
      * Uses the pagination parameters form the request and makes sure to order the result and set all pagination attributes for the response to render.
@@ -37,8 +37,7 @@ public abstract class AbstractPaginateList {
      *            The default sort column (the rest attribute) that later will be mapped to an internal engine name
      * @param properties
      */
-    @SuppressWarnings("rawtypes")
-    public DataResponse paginateList(Map<String, String> requestParams, PaginateRequest paginateRequest, Object query, String defaultSort, Map properties) {
+    public DataResponse<RES> paginateList(Map<String, String> requestParams, PaginateRequest paginateRequest, Query<?, REQ> query, String defaultSort, Map<String, QueryProperty> properties) {
 
         if (paginateRequest == null) {
             paginateRequest = new PaginateRequest();
@@ -83,38 +82,33 @@ public abstract class AbstractPaginateList {
 
         // Sort order
         if (sort != null && !properties.isEmpty()) {
-            Object qp = properties.get(sort);
-            if (qp == null) {
+            QueryProperty queryProperty = properties.get(sort);
+            if (queryProperty == null) {
                 throw new FlowableIllegalArgumentException("Value for param 'sort' is not valid, '" + sort + "' is not a valid property");
             }
 
-            if (query instanceof Query) {
-                Query queryObject = (Query) query;
-                QueryProperty queryProperty = (QueryProperty) qp;
-                queryObject.orderBy(queryProperty);
-                if (order.equals("asc")) {
-                    queryObject.asc();
-                } else if (order.equals("desc")) {
-                    queryObject.desc();
-                } else {
-                    throw new FlowableIllegalArgumentException("Value for param 'order' is not valid : '" + order + "', must be 'asc' or 'desc'");
-                }
+            query.orderBy(queryProperty);
+            if (order.equals("asc")) {
+                query.asc();
+            } else if (order.equals("desc")) {
+                query.desc();
+            } else {
+                throw new FlowableIllegalArgumentException("Value for param 'order' is not valid : '" + order + "', must be 'asc' or 'desc'");
             }
         }
 
-        DataResponse response = new DataResponse();
+        DataResponse<RES> response = new DataResponse<>();
         response.setStart(start);
         response.setSort(sort);
         response.setOrder(order);
 
-        Query queryObject = (Query) query;
 
         // Get result and set pagination parameters
-        List list = processList(queryObject.listPage(start, size));
+        List<RES> list = processList(query.listPage(start, size));
         if (start == 0 && list.size() < size) {
             response.setTotal(list.size());
         } else {
-            response.setTotal(queryObject.count());
+            response.setTotal(query.count());
         }
 
         response.setSize(list.size());
@@ -135,11 +129,9 @@ public abstract class AbstractPaginateList {
      * @param properties
      *
      */
-    @SuppressWarnings("rawtypes")
-    public DataResponse paginateList(Map<String, String> requestParams, Object query, String defaultSort, Map properties) {
+    public DataResponse<RES> paginateList(Map<String, String> requestParams, Query<?, REQ> query, String defaultSort, Map<String, QueryProperty> properties) {
         return paginateList(requestParams, null, query, defaultSort, properties);
     }
 
-    @SuppressWarnings("rawtypes")
-    protected abstract List processList(List list);
+    protected abstract List<RES> processList(List<REQ> list);
 }

@@ -13,12 +13,12 @@ package org.flowable.rest.service.api.repository;
  * limitations under the License.
  */
 
-import java.util.Date;
-
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.swagger.annotations.ApiModelProperty;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.rest.util.DateToStringSerializer;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.util.Date;
 
 /**
  * @author Tijs Rademakers
@@ -43,6 +43,7 @@ public class DeploymentResponse {
         setUrl(url);
     }
 
+    @ApiModelProperty(example = "10")
     public String getId() {
         return id;
     }
@@ -51,6 +52,7 @@ public class DeploymentResponse {
         this.id = id;
     }
 
+    @ApiModelProperty(example = "flowable-examples.bar")
     public String getName() {
         return name;
     }
@@ -59,6 +61,7 @@ public class DeploymentResponse {
         this.name = name;
     }
 
+    @ApiModelProperty(example = "2010-10-13T14:54:26.750+02:00")
     public Date getDeploymentTime() {
         return deploymentTime;
     }
@@ -67,6 +70,7 @@ public class DeploymentResponse {
         this.deploymentTime = deploymentTime;
     }
 
+    @ApiModelProperty(example = "examples")
     public String getCategory() {
         return category;
     }
@@ -79,6 +83,7 @@ public class DeploymentResponse {
         this.url = url;
     }
 
+    @ApiModelProperty(example = "http://localhost:8081/flowable-rest/service/repository/deployments/10")
     public String getUrl() {
         return url;
     }
@@ -87,6 +92,7 @@ public class DeploymentResponse {
         this.tenantId = tenantId;
     }
 
+    @ApiModelProperty(example = "")
     public String getTenantId() {
         return tenantId;
     }

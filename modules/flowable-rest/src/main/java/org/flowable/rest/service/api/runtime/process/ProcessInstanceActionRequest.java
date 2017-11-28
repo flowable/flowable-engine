@@ -13,6 +13,7 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
+import io.swagger.annotations.ApiModelProperty;
 import org.flowable.rest.service.api.RestActionRequest;
 
 /**
@@ -22,4 +23,10 @@ public class ProcessInstanceActionRequest extends RestActionRequest {
 
     public static final String ACTION_SUSPEND = "suspend";
     public static final String ACTION_ACTIVATE = "activate";
+
+    @Override
+    @ApiModelProperty(value = "Action to perform: Either activate or suspend", example = "activate", required = true)
+    public String getAction() {
+        return super.getAction();
+    }
 }

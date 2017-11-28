@@ -1315,6 +1315,60 @@ public class ExecutionQueryTest extends PluggableFlowableTestCase {
         runtimeService.deleteProcessInstance(processInstance.getId(), "test");
         runtimeService.deleteProcessInstance(processInstance2.getId(), "test");
     }
+    
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testVariableExistsQuery() {
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("mixed", "AbCdEfG");
+        vars.put("upper", "ABCDEFG");
+        vars.put("lower", "abcdefg");
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+
+        Execution execution = runtimeService.createExecutionQuery().variableExists("mixed").singleResult();
+        assertNotNull(execution);
+        assertEquals(processInstance1.getId(), execution.getProcessInstanceId());
+        
+        runtimeService.setVariableLocal(execution.getId(), "localvar", "test");
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance1.getId()).processVariableNotExists("lower").list();
+        assertEquals(0, executions.size());
+        
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance1.getId()).processVariableExists("lower")
+                        .processVariableValueEquals("upper", "ABCDEFG").list();
+        assertEquals(2, executions.size());
+        
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance1.getId()).or().processVariableExists("mixed")
+                        .processVariableValueEquals("upper", "ABCDEFG").endOr().list();
+        assertEquals(2, executions.size());
+        
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance1.getId()).or().processVariableNotExists("mixed")
+                        .processVariableValueEquals("upper", "ABCDEFG").endOr().list();
+        assertEquals(2, executions.size());
+        
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance1.getId()).or().processVariableNotExists("mixed").endOr().or()
+                        .processVariableValueEquals("upper", "ABCDEFG").endOr().list();
+        assertEquals(0, executions.size());
+        
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance1.getId()).variableExists("localvar")
+                        .processVariableValueEquals("upper", "ABCDEFG").list();
+        assertEquals(1, executions.size());
+        
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance1.getId()).or().variableExists("mixed")
+                        .processVariableValueEquals("upper", "ABCDEFG").endOr().list();
+        assertEquals(2, executions.size());
+        
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance1.getId()).or().variableNotExists("mixed")
+                        .processVariableValueEquals("upper", "ABCDEFG").endOr().list();
+        assertEquals(2, executions.size());
+        
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance1.getId()).or().variableNotExists("mixed").endOr().or()
+                        .variableValueEquals("upper", "ABCDEFG").endOr().list();
+        assertEquals(2, executions.size());
+        
+        executions = runtimeService.createExecutionQuery().processInstanceId(processInstance1.getId()).or().variableExists("mixed").endOr().or()
+                        .variableValueEquals("upper", "ABCDEFG").endOr().list();
+        assertEquals(0, executions.size());
+    }
 
     @Deployment
     public void testQueryBySignalSubscriptionName() {

@@ -27,6 +27,58 @@
         #{tokenData, jdbcType=VARCHAR}
       )
   </insert>
+  
+  <insert id="bulkInsertToken" parameterType="java.util.List">
+      insert into ${prefix}ACT_ID_TOKEN (
+        ID_,
+        REV_, 
+        TOKEN_VALUE_,
+        TOKEN_DATE_,
+        IP_ADDRESS_,
+        USER_AGENT_,
+        USER_ID_,
+        TOKEN_DATA_
+      ) values 
+      <foreach collection="list" item="token" index="index" separator=",">
+      (
+        #{token.id ,jdbcType=VARCHAR},
+        1,
+        #{token.tokenValue, jdbcType=VARCHAR},
+        #{token.tokenDate, jdbcType=TIMESTAMP},
+        #{token.ipAddress, jdbcType=VARCHAR},
+        #{token.userAgent, jdbcType=VARCHAR},
+        #{token.userId, jdbcType=VARCHAR},
+        #{token.tokenData, jdbcType=VARCHAR}
+      )
+      </foreach>
+  </insert>
+  
+  <insert id="bulkInsertToken" databaseId="oracle" parameterType="java.util.List">
+      INSERT ALL
+      <foreach collection="list" item="token" index="index">
+        INTO ${prefix}ACT_ID_TOKEN (
+            ID_,
+            REV_, 
+            TOKEN_VALUE_,
+            TOKEN_DATE_,
+            IP_ADDRESS_,
+            USER_AGENT_,
+            USER_ID_,
+            TOKEN_DATA_
+      ) VALUES (
+        #{token.id ,jdbcType=VARCHAR},
+        1,
+        #{token.tokenValue, jdbcType=VARCHAR},
+        #{token.tokenDate, jdbcType=TIMESTAMP},
+        #{token.ipAddress, jdbcType=VARCHAR},
+        #{token.userAgent, jdbcType=VARCHAR},
+        #{token.userId, jdbcType=VARCHAR},
+        #{token.tokenData, jdbcType=VARCHAR}
+      )
+      </foreach>
+      SELECT * FROM dual
+  </insert>
+  
 
   <!-- TOKEN UPDATE -->
   

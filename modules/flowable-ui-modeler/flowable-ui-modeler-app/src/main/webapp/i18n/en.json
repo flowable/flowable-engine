@@ -351,6 +351,7 @@
             "EDIT": "Modify model properties",
             "DELETE": "Delete this form",
             "CREATE-CONFIRM": "Create new form",
+            "DUPLICATE": "Duplicate this form",
             "DUPLICATE-CONFIRM": "Duplicate the form",
             "OPEN-IN-EDITOR": "Form Editor",
             "EDIT-CONFIRM": "Save",

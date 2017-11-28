@@ -13,12 +13,12 @@
 
 package org.flowable.rest.service.api.history;
 
-import java.util.Date;
-
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.swagger.annotations.ApiModelProperty;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.util.DateToStringSerializer;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.util.Date;
 
 /**
  * @author Tijs Rademakers
@@ -47,6 +47,8 @@ public class HistoricDetailResponse {
     protected String propertyId;
     protected String propertyValue;
 
+
+    @ApiModelProperty(example = "26")
     public String getId() {
         return id;
     }
@@ -55,6 +57,7 @@ public class HistoricDetailResponse {
         this.id = id;
     }
 
+    @ApiModelProperty(example = "5")
     public String getProcessInstanceId() {
         return processInstanceId;
     }
@@ -63,6 +66,7 @@ public class HistoricDetailResponse {
         this.processInstanceId = processInstanceId;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/history/historic-process-instances/5")
     public String getProcessInstanceUrl() {
         return processInstanceUrl;
     }
@@ -71,6 +75,7 @@ public class HistoricDetailResponse {
         this.processInstanceUrl = processInstanceUrl;
     }
 
+    @ApiModelProperty(example = "6")
     public String getExecutionId() {
         return executionId;
     }
@@ -79,6 +84,7 @@ public class HistoricDetailResponse {
         this.executionId = executionId;
     }
 
+    @ApiModelProperty(example = "10")
     public String getActivityInstanceId() {
         return activityInstanceId;
     }
@@ -87,6 +93,7 @@ public class HistoricDetailResponse {
         this.activityInstanceId = activityInstanceId;
     }
 
+    @ApiModelProperty(example = "6")
     public String getTaskId() {
         return taskId;
     }
@@ -95,6 +102,7 @@ public class HistoricDetailResponse {
         this.taskId = taskId;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/history/historic-task-instances/6")
     public String getTaskUrl() {
         return taskUrl;
     }
@@ -103,6 +111,7 @@ public class HistoricDetailResponse {
         this.taskUrl = taskUrl;
     }
 
+    @ApiModelProperty(example = "2013-04-17T10:17:43.902+0000")
     public Date getTime() {
         return time;
     }
@@ -111,6 +120,7 @@ public class HistoricDetailResponse {
         this.time = time;
     }
 
+    @ApiModelProperty(example = "variableUpdate")
     public String getDetailType() {
         return detailType;
     }
@@ -119,6 +129,7 @@ public class HistoricDetailResponse {
         this.detailType = detailType;
     }
 
+    @ApiModelProperty(example = "2")
     public Integer getRevision() {
         return revision;
     }
@@ -135,6 +146,7 @@ public class HistoricDetailResponse {
         this.variable = variable;
     }
 
+    @ApiModelProperty(example = "null")
     public String getPropertyId() {
         return propertyId;
     }
@@ -143,6 +155,7 @@ public class HistoricDetailResponse {
         this.propertyId = propertyId;
     }
 
+    @ApiModelProperty(example = "null")
     public String getPropertyValue() {
         return propertyValue;
     }

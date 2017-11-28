@@ -13,7 +13,7 @@
 
 angular.module('flowableModeler').controller('FlowableDecisionTableReferenceCtrl',
     [ '$scope', '$modal', '$http', function($scope, $modal, $http) {
-	
+
      // Config for the modal window
      var opts = {
          template:  'editor-app/configuration/properties/decisiontable-reference-popup.html?version=' + Date.now(),
@@ -23,7 +23,7 @@ angular.module('flowableModeler').controller('FlowableDecisionTableReferenceCtrl
      // Open the dialog
      _internalCreateModal(opts, $modal, $scope);
 }]);
- 
+
 angular.module('flowableModeler').controller('FlowableDecisionTableReferencePopupCtrl', ['$rootScope', '$scope', '$http', '$location', 'editorManager',
     function($rootScope, $scope, $http, $location, editorManager) {
 
@@ -77,7 +77,7 @@ angular.module('flowableModeler').controller('FlowableDecisionTableReferencePopu
                     'name': $scope.selectedDecisionTable.name,
                     'key': $scope.selectedDecisionTable.key
                 };
-                
+
             } else {
                 $scope.property.value = null;
             }
@@ -139,7 +139,7 @@ angular.module('flowableModeler').controller('FlowableDecisionTableReferencePopu
                     .error(function(data, status, headers, config) {
 
                     });
-                
+
                 $scope.close();
             }
         };
@@ -168,7 +168,7 @@ angular.module('flowableModeler').controller('FlowableDecisionTableReferencePopu
 
             if (!$scope.model.decisionTable.name || $scope.model.decisionTable.name.length == 0 ||
             	!$scope.model.decisionTable.key || $scope.model.decisionTable.key.length == 0) {
-            	
+
                 return;
             }
 
@@ -177,7 +177,7 @@ angular.module('flowableModeler').controller('FlowableDecisionTableReferencePopu
 
             $http({
                 method: 'POST',
-                url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models',
+                url: FLOWABLE.APP_URL.getModelsUrl(),
                 data: $scope.model.decisionTable
             }).
             success(function(data, status, headers, config) {
@@ -231,7 +231,7 @@ angular.module('flowableModeler').controller('FlowableDecisionTableReferencePopu
 
                         $scope.model.loading = false;
                         $scope.$hide();
-                        
+
                         $rootScope.addHistoryItem($scope.selectedShape.resourceId);
                         $location.path('decision-table-editor/' + newDecisionTableId);
                     })
@@ -263,7 +263,7 @@ angular.module('flowableModeler').controller('FlowableDecisionTableReferencePopu
 
         $scope.loadDecisionTables = function() {
             var modelMetaData = editorManager.getBaseModelData();
-            $http.get(FLOWABLE.CONFIG.contextRoot + '/app/rest/decision-table-models')
+            $http.get(FLOWABLE.APP_URL.getDecisionTableModelsUrl())
                 .success(
                     function(response) {
                         $scope.state.loadingDecisionTables = false;

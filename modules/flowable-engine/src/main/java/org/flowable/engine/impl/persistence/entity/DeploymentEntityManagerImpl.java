@@ -26,6 +26,7 @@ import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.api.repository.EngineResource;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
@@ -67,9 +68,9 @@ public class DeploymentEntityManagerImpl extends AbstractEntityManager<Deploymen
     public void insert(DeploymentEntity deployment) {
         insert(deployment, false);
 
-        for (ResourceEntity resource : deployment.getResources().values()) {
+        for (EngineResource resource : deployment.getResources().values()) {
             resource.setDeploymentId(deployment.getId());
-            getResourceEntityManager().insert(resource);
+            getResourceEntityManager().insert((ResourceEntity) resource);
         }
     }
 

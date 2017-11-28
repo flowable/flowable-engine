@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -207,13 +208,15 @@ public class ExclusiveGatewayTest extends PluggableFlowableTestCase {
     // From https://github.com/Activiti/Activiti/issues/796
     @Deployment
     public void testExclusiveDirectlyToEnd() {
-        Map<String, Object> variables = new HashMap<>();
-        variables.put("input", 1);
-        ProcessInstance startProcessInstanceByKey = runtimeService.startProcessInstanceByKey("exclusiveGateway", variables);
-        long count = historyService.createHistoricActivityInstanceQuery()
-                .processInstanceId(startProcessInstanceByKey.getId()).unfinished()
-                .count();
-        assertEquals(0, count);
+        if (processEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            Map<String, Object> variables = new HashMap<>();
+            variables.put("input", 1);
+            ProcessInstance startProcessInstanceByKey = runtimeService.startProcessInstanceByKey("exclusiveGateway", variables);
+            long count = historyService.createHistoricActivityInstanceQuery()
+                    .processInstanceId(startProcessInstanceByKey.getId()).unfinished()
+                    .count();
+            assertEquals(0, count);
+        }
     }
 
 }

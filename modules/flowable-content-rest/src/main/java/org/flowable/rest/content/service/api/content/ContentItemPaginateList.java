@@ -15,13 +15,14 @@ package org.flowable.rest.content.service.api.content;
 
 import java.util.List;
 
+import org.flowable.content.api.ContentItem;
 import org.flowable.rest.api.AbstractPaginateList;
 import org.flowable.rest.content.ContentRestResponseFactory;
 
 /**
  * @author Tijs Rademakers
  */
-public class ContentItemPaginateList extends AbstractPaginateList {
+public class ContentItemPaginateList extends AbstractPaginateList<ContentItemResponse, ContentItem> {
 
     protected ContentRestResponseFactory restResponseFactory;
 
@@ -29,9 +30,8 @@ public class ContentItemPaginateList extends AbstractPaginateList {
         this.restResponseFactory = restResponseFactory;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    protected List processList(List list) {
+    protected List<ContentItemResponse> processList(List<ContentItem> list) {
         return restResponseFactory.createContentItemResponseList(list);
     }
 }

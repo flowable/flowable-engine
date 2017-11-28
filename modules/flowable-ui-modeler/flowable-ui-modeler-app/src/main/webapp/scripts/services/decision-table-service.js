@@ -35,7 +35,7 @@ angular.module('flowableModeler').service('DecisionTableService', [ '$rootScope'
             return httpAsPromise(
                 {
                     method: 'GET',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/decision-table-models',
+                    url: FLOWABLE.APP_URL.getDecisionTableModelsUrl(),
                     params: {filter: filter}
                 }
             );
@@ -45,13 +45,9 @@ angular.module('flowableModeler').service('DecisionTableService', [ '$rootScope'
          * Fetches the details of a decision table.
          */
         this.fetchDecisionTableDetails = function(modelId, historyModelId) {
-            var url = FLOWABLE.CONFIG.contextRoot + '/app/rest/decision-table-models/';
-            if (historyModelId) {
-                url += 'history/' + encodeURIComponent(historyModelId);
-            }
-            else {
-                url += encodeURIComponent(modelId);
-            }
+            var url = historyModelId ?
+                FLOWABLE.APP_URL.getDecisionTableModelHistoryUrl(encodeURIComponent(modelId), encodeURIComponent(historyModelId)) :
+                FLOWABLE.APP_URL.getDecisionTableModelUrl(encodeURIComponent(modelId));
             return httpAsPromise({ method: 'GET', url: url });
         };
 
@@ -118,7 +114,7 @@ angular.module('flowableModeler').service('DecisionTableService', [ '$rootScope'
 
                     $http({
 	                    method: 'PUT',
-	                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/decision-table-models/' + $rootScope.currentDecisionTable.id,
+	                    url: FLOWABLE.APP_URL.getDecisionTableModelUrl($rootScope.currentDecisionTable.id),
 	                    data: data}).
 	                
 	                	success(function (response, status, headers, config) {
@@ -152,7 +148,7 @@ angular.module('flowableModeler').service('DecisionTableService', [ '$rootScope'
                 }
                 decisionTableIdParams += 'version=' + Date.now();
 
-                $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/decision-table-models/values?' + decisionTableIdParams}).
+                $http({method: 'GET', url: FLOWABLE.APP_URL.getDecisionTableModelValuesUrl(decisionTableIdParams)}).
                     success(function (data) {
                         if (callback) {
                             callback(data);

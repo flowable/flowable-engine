@@ -25,7 +25,7 @@
                                <input type="checkbox" value="option1" ng-click="selectForm(form, $event)" ng-checked="form.id == selectedForm.id" />
                            </div>
                            <h4>{{form.name}}</h4>
-                           <img ng-src="{{config.contextRoot}}/app/rest/models/{{form.id}}/thumbnail" />
+                           <img ng-src="{{getModelThumbnailUrl(form.id)}}" />
                          </div>
                          <div ng-show="state.loadingForms">
                             <p class="loading" translate>PROPERTY.FORMREFERENCE.FORM.LOADING</p>

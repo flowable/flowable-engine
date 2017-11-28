@@ -223,6 +223,36 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
             assertNull(processInstance);
         }
     }
+    
+    public void testQueryByVariableExist() {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            // DeploymentId
+            String deploymentId = repositoryService.createDeploymentQuery().list().get(0).getId();
+            HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().variableExists("anothertest")
+                            .deploymentId(deploymentId).singleResult();
+            assertNotNull(processInstance);
+
+            List<HistoricProcessInstance> processInstanceList = historyService.createHistoricProcessInstanceQuery()
+                            .variableNotExists("anothertest").deploymentId(deploymentId).list();
+            assertEquals(5, processInstanceList.size());
+            
+            processInstance = historyService.createHistoricProcessInstanceQuery().or().variableExists("anothertest")
+                            .processInstanceId("notexisting").endOr().deploymentId(deploymentId).singleResult();
+            assertNotNull(processInstance);
+            
+            processInstanceList = historyService.createHistoricProcessInstanceQuery().or().variableNotExists("anothertest")
+                            .processInstanceId("nonexisting").endOr().deploymentId(deploymentId).list();
+            assertEquals(5, processInstanceList.size());
+            
+            processInstanceList = historyService.createHistoricProcessInstanceQuery().or().variableNotExists("anothertest")
+                            .variableValueEquals("test", "test").endOr().deploymentId(deploymentId).list();
+            assertEquals(5, processInstanceList.size());
+            
+            processInstanceList = historyService.createHistoricProcessInstanceQuery().or().variableNotExists("anothertest").endOr().or()
+                            .variableValueEquals("test", "test").endOr().deploymentId(deploymentId).list();
+            assertEquals(4, processInstanceList.size());
+        }
+    }
 
     public void testOrQuery() {
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {

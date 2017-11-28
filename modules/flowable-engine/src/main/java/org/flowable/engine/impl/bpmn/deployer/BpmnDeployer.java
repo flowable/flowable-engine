@@ -29,13 +29,15 @@ import org.flowable.bpmn.model.UserTask;
 import org.flowable.bpmn.model.ValuedDataObject;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.DynamicBpmnService;
+import org.flowable.engine.common.EngineDeployer;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.api.repository.EngineDeployment;
+import org.flowable.engine.common.api.repository.EngineResource;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.deploy.Deployer;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
@@ -52,7 +54,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
-public class BpmnDeployer implements Deployer {
+public class BpmnDeployer implements EngineDeployer {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BpmnDeployer.class);
 
@@ -63,7 +65,7 @@ public class BpmnDeployer implements Deployer {
     protected ProcessDefinitionDiagramHelper processDefinitionDiagramHelper;
 
     @Override
-    public void deploy(DeploymentEntity deployment, Map<String, Object> deploymentSettings) {
+    public void deploy(EngineDeployment deployment, Map<String, Object> deploymentSettings) {
         LOGGER.debug("Processing deployment {}", deployment.getName());
 
         // The ParsedDeployment represents the deployment, the process definitions, and the BPMN
@@ -131,7 +133,7 @@ public class BpmnDeployer implements Deployer {
      * have their resources attached to the deployment.
      */
     protected void setProcessDefinitionDiagramNames(ParsedDeployment parsedDeployment) {
-        Map<String, ResourceEntity> resources = parsedDeployment.getDeployment().getResources();
+        Map<String, EngineResource> resources = parsedDeployment.getDeployment().getResources();
 
         for (ProcessDefinitionEntity processDefinition : parsedDeployment.getAllProcessDefinitions()) {
             String diagramResourceName = ResourceNameUtil.getProcessDiagramResourceNameFromDeployment(processDefinition, resources);

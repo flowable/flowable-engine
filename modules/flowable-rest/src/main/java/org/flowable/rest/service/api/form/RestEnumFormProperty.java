@@ -12,6 +12,8 @@
  */
 package org.flowable.rest.service.api.form;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author Tijs Rademakers
  */
@@ -20,6 +22,7 @@ public class RestEnumFormProperty {
     protected String id;
     protected String name;
 
+    @ApiModelProperty(example = "normal")
     public String getId() {
         return id;
     }
@@ -28,6 +31,7 @@ public class RestEnumFormProperty {
         this.id = id;
     }
 
+    @ApiModelProperty(example = "Normal bed")
     public String getName() {
         return name;
     }

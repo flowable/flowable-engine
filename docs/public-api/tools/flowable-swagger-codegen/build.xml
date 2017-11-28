@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="flowable-codegen">
+
+    <property name="project.name" value="content"/>
+    <property name="language" value="java"/>
+    <property name="language.extra" value=""/>
+    <property name="language.extra.2" value=""/>
+
+
+    <target name="install-macos" description="Install codegen on macOs">
+        <exec executable="brew" >
+            <arg value="install"/>
+            <arg value="swagger-codegen"/>
+        </exec>
+    </target>
+
+    <target name="clean" description="Clean target">
+        <delete dir="target/"/>
+    </target>
+
+
+    <target name="build.content">
+        <antcall target="codegen">
+            <param name="project.name" value="content"/>
+       </antcall>
+    </target>
+
+    <target name="build.form">
+        <antcall target="codegen">
+            <param name="project.name" value="form"/>
+        </antcall>
+    </target>
+
+    <target name="build.decision">
+        <antcall target="codegen">
+            <param name="project.name" value="decision"/>
+        </antcall>
+    </target>
+
+    <target name="build.process">
+        <antcall target="codegen">
+            <param name="project.name" value="process"/>
+        </antcall>
+    </target>
+
+
+    <target name="codegen" description="">
+        <exec executable="swagger-codegen" >
+            <arg value="generate"/>
+            <arg value="-i"/>
+            <arg value="../../references/swagger/${project.name}/flowable-swagger-${project.name}.yaml"/>
+            <arg value="-o"/>
+            <arg value="target/${language}/${project.name}"/>
+            <arg value="-l"/>
+            <arg value="${language}"/>
+            <arg value="-c"/>
+            <arg value="src/main/resources/${language}/${project.name}/config.json"/>
+        </exec>
+    </target>
+
+
+    <target name="build.all">
+        <antcall target="build.content"/>
+        <antcall target="build.form"/>
+        <antcall target="build.decision"/>
+        <antcall target="build.process"/>
+    </target>
+
+    <target name="java.all" description="">
+        <antcall target="build.all">
+            <param name="language" value="java"/>
+        </antcall>
+    </target>
+
+    <target name="swift.all" description="">
+        <antcall target="build.all">
+            <param name="language" value="swift4"/>
+        </antcall>
+    </target>
+
+    <target name="js.all" description="">
+        <antcall target="build.all">
+            <param name="language" value="javascript"/>
+        </antcall>
+    </target>
+
+    <target name="typescript.all" description="">
+        <antcall target="build.all">
+            <param name="language" value="typescript-fetch"/>
+        </antcall>
+    </target>
+
+    <target name="kotlin.all" description="">
+        <antcall target="build.all">
+            <param name="language" value="kotlin"/>
+        </antcall>
+    </target>
+
+</project>
