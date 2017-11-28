@@ -32,7 +32,10 @@ public class DefaultInternalCmmnJobManager implements InternalJobManager {
 
     @Override
     public VariableScope resolveVariableScope(Job job) {
-        return cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(job.getSubScopeId());
+        if (job.getSubScopeId() != null) {
+            return cmmnEngineConfiguration.getPlanItemInstanceEntityManager().findById(job.getSubScopeId());
+        }
+        return null;
     }
 
     @Override

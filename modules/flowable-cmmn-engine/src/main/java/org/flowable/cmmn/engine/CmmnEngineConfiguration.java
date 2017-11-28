@@ -63,6 +63,7 @@ import org.flowable.cmmn.engine.impl.history.CmmnHistoryTaskManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryVariableManager;
 import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.interceptor.CmmnCommandInvoker;
+import org.flowable.cmmn.engine.impl.job.TriggerTimerEventJobHandler;
 import org.flowable.cmmn.engine.impl.parser.CmmnActivityBehaviorFactory;
 import org.flowable.cmmn.engine.impl.parser.CmmnParser;
 import org.flowable.cmmn.engine.impl.parser.CmmnParserImpl;
@@ -149,6 +150,7 @@ import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncRunnableExecution
 import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
 import org.flowable.job.service.impl.asyncexecutor.JobManager;
+import org.flowable.job.service.impl.db.JobDbSchemaManager;
 import org.flowable.task.service.InternalTaskVariableScopeResolver;
 import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.task.service.history.InternalHistoryTaskManager;
@@ -254,6 +256,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected DbSchemaManager identityLinkDbSchemaManager;
     protected DbSchemaManager variableDbSchemaManager;
     protected DbSchemaManager taskDbSchemaManager;
+    protected DbSchemaManager jobDbSchemaManager;
     
     /**
      * Case diagram generator. Default value is DefaultCaseDiagramGenerator
@@ -602,6 +605,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initIdentityLinkDbSchemaManager();
         initVariableDbSchemaManager();
         initTaskDbSchemaManager();
+        initJobDbSchemaManager();
     }
 
     protected void initCmmnDbSchemaManager() {
@@ -625,6 +629,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected void initIdentityLinkDbSchemaManager() {
         if (this.identityLinkDbSchemaManager == null) {
             this.identityLinkDbSchemaManager = new IdentityLinkDbSchemaManager();
+        }
+    }
+    
+    protected void initJobDbSchemaManager() {
+        if (this.jobDbSchemaManager == null) {
+            this.jobDbSchemaManager = new JobDbSchemaManager();
         }
     }
 
@@ -1065,6 +1075,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     
     public void initJobHandlers() {
         jobHandlers = new HashMap<>();
+        jobHandlers.put(TriggerTimerEventJobHandler.TYPE, new TriggerTimerEventJobHandler());
 
         // if we have custom job handlers, register them
         if (customJobHandlers != null) {
@@ -1611,6 +1622,15 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     public CmmnEngineConfiguration setTaskDbSchemaManager(DbSchemaManager taskDbSchemaManager) {
         this.taskDbSchemaManager = taskDbSchemaManager;
+        return this;
+    }
+    
+    public DbSchemaManager getJobDbSchemaManager() {
+        return jobDbSchemaManager;
+    }
+
+    public CmmnEngineConfiguration setJobDbSchemaManager(DbSchemaManager jobDbSchemaManager) {
+        this.jobDbSchemaManager = jobDbSchemaManager;
         return this;
     }
 

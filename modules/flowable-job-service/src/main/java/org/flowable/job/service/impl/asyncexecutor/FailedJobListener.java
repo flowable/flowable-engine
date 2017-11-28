@@ -54,7 +54,7 @@ public class FailedJobListener implements CommandContextCloseListener {
     @Override
     public void closed(CommandContext context) {
         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
-        if (eventDispatcher.isEnabled()) {
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(
                     FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_EXECUTION_SUCCESS, job));
         }
@@ -62,8 +62,9 @@ public class FailedJobListener implements CommandContextCloseListener {
 
     @Override
     public void closeFailure(CommandContext commandContext) {
-        if (CommandContextUtil.getEventDispatcher().isEnabled()) {
-            CommandContextUtil.getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityExceptionEvent(
+        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityExceptionEvent(
                     FlowableEngineEventType.JOB_EXECUTION_FAILURE, job, commandContext.getException()));
         }
 

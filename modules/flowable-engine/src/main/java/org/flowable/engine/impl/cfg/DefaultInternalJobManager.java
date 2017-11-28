@@ -57,7 +57,10 @@ public class DefaultInternalJobManager implements InternalJobManager {
     
     @Override
     public VariableScope resolveVariableScope(Job job) {
-        return getExecutionEntityManager().findById(job.getExecutionId());
+        if (job.getExecutionId() != null) {
+            return getExecutionEntityManager().findById(job.getExecutionId());
+        }
+        return null;
     }
 
     @Override
