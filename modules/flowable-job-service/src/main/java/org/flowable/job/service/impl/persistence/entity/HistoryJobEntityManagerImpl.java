@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -44,7 +44,7 @@ public class HistoryJobEntityManagerImpl extends JobInfoEntityManagerImpl<Histor
     protected DataManager<HistoryJobEntity> getDataManager() {
         return historyJobDataManager;
     }
-    
+
     @Override
     public List<HistoryJob> findHistoryJobsByQueryCriteria(HistoryJobQueryImpl jobQuery) {
         return historyJobDataManager.findHistoryJobsByQueryCriteria(jobQuery);
@@ -54,13 +54,14 @@ public class HistoryJobEntityManagerImpl extends JobInfoEntityManagerImpl<Histor
     public long findHistoryJobCountByQueryCriteria(HistoryJobQueryImpl jobQuery) {
         return historyJobDataManager.findHistoryJobCountByQueryCriteria(jobQuery);
     }
-    
+
     @Override
     public void delete(HistoryJobEntity jobEntity) {
         super.delete(jobEntity);
 
-        deleteExceptionByteArrayRef(jobEntity);
-        deleteAdvancedJobHandlerConfigurationByteArrayRef(jobEntity);
+        deleteByteArrayRef(jobEntity.getExceptionByteArrayRef());
+        deleteByteArrayRef(jobEntity.getAdvancedJobHandlerConfigurationByteArrayRef());
+        deleteByteArrayRef(jobEntity.getCustomValuesByteArrayRef());
 
         // Send event
         if (getEventDispatcher().isEnabled()) {
@@ -68,23 +69,6 @@ public class HistoryJobEntityManagerImpl extends JobInfoEntityManagerImpl<Histor
         }
     }
 
-    /**
-     * Deletes a the byte array used to store the exception information. Subclasses may override to provide custom implementations.
-     */
-    protected void deleteExceptionByteArrayRef(HistoryJobEntity jobEntity) {
-        JobByteArrayRef exceptionByteArrayRef = jobEntity.getExceptionByteArrayRef();
-        if (exceptionByteArrayRef != null) {
-            exceptionByteArrayRef.delete();
-        }
-    }
-    
-    protected void deleteAdvancedJobHandlerConfigurationByteArrayRef(HistoryJobEntity jobEntity) {
-        JobByteArrayRef configurationByteArrayRef = jobEntity.getAdvancedJobHandlerConfigurationByteArrayRef();
-        if (configurationByteArrayRef != null) {
-            configurationByteArrayRef.delete();
-        }
-    }
-    
     @Override
     public void deleteNoCascade(HistoryJobEntity historyJobEntity) {
         super.delete(historyJobEntity);

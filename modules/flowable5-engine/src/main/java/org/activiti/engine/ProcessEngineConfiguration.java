@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,7 +14,9 @@
 package org.activiti.engine;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.sql.DataSource;
@@ -22,6 +24,7 @@ import javax.sql.DataSource;
 import org.activiti.engine.impl.cfg.BeansConfigurationHelper;
 import org.activiti.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
+import org.activiti.engine.runtime.JobProcessor;
 import org.flowable.engine.cfg.MailServerInfo;
 import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.runtime.Clock;
@@ -224,6 +227,8 @@ public abstract class ProcessEngineConfiguration {
     protected ProcessEngineLifecycleListener processEngineLifecycleListener;
 
     protected boolean enableProcessDefinitionInfoCache;
+
+    protected List<JobProcessor> jobProcessors = Collections.emptyList();
 
     /**
      * use one of the static createXxxx methods instead
@@ -813,4 +818,14 @@ public abstract class ProcessEngineConfiguration {
         this.enableProcessDefinitionInfoCache = enableProcessDefinitionInfoCache;
         return this;
     }
+
+    public List<JobProcessor> getJobProcessors() {
+        return jobProcessors;
+    }
+
+    public ProcessEngineConfiguration setJobProcessors(List<JobProcessor> jobProcessors) {
+        this.jobProcessors = jobProcessors;
+        return this;
+    }
+
 }
