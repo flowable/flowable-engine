@@ -218,10 +218,10 @@ public class DmnJsonConverterUtil {
                                 if(outputExpressionValue.startsWith(".append")) {
                                     listOperatorValue = "append";
                                     expressionValue = outputExpressionValue.substring(8, outputExpressionValue.length() - 1);
-                                }else if(outputExpressionValue.startsWith(".remove")) {
+                                }else if(outputExpressionValue.startsWith(".removeObject")) {
                                     listOperatorValue = "remove";
                                     expressionValue = outputExpressionValue.substring(8, outputExpressionValue.length() - 1);
-                                }else if(outputExpressionValue.startsWith(".clear")) {
+                                }else if(outputExpressionValue.startsWith(".clearMetadata")) {
                                     listOperatorValue = "clear";
                                     expressionValue = outputExpressionValue.substring(7, outputExpressionValue.length() - 1);
                                 }

@@ -467,11 +467,11 @@ public class DmnJsonConverter {
                                 stringBuilder.append(expression);
                                 stringBuilder.append(")");
                             } else if (listOperatorValue.toLowerCase().equals("remove")) {
-                                stringBuilder.append(".remove(");
+                                stringBuilder.append(".removeObject(");
                                 stringBuilder.append(expression);
                                 stringBuilder.append(")");
                             } else if (listOperatorValue.toLowerCase().startsWith("clear")) {
-                                stringBuilder.append(".clear()");
+                                stringBuilder.append(".clearMetadata()");
                             }
                             outputEntry.setText(stringBuilder.toString());
                         } else {
