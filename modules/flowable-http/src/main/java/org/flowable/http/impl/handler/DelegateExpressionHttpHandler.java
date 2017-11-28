@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,12 +12,10 @@
  */
 package org.flowable.http.impl.handler;
 
-import java.util.List;
-
 import org.apache.http.client.HttpClient;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.engine.common.api.variable.VariableContainer;
 import org.flowable.engine.impl.bpmn.helper.DelegateExpressionUtil;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -28,13 +26,15 @@ import org.flowable.http.delegate.HttpResponseHandler;
 import org.flowable.http.impl.delegate.HttpRequestHandlerInvocation;
 import org.flowable.http.impl.delegate.HttpResponseHandlerInvocation;
 
+import java.util.List;
+
 /**
  * @author Tijs Rademakers
  */
 public class DelegateExpressionHttpHandler implements HttpRequestHandler, HttpResponseHandler {
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     protected Expression expression;
     protected final List<FieldDeclaration> fieldDeclarations;
 
@@ -44,7 +44,7 @@ public class DelegateExpressionHttpHandler implements HttpRequestHandler, HttpRe
     }
 
     @Override
-    public void handleHttpRequest(DelegateExecution execution, HttpRequest httpRequest, HttpClient client) {
+    public void handleHttpRequest(VariableContainer execution, HttpRequest httpRequest, HttpClient client) {
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, execution, fieldDeclarations);
         if (delegate instanceof HttpRequestHandler) {
             CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(
@@ -53,9 +53,9 @@ public class DelegateExpressionHttpHandler implements HttpRequestHandler, HttpRe
             throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did not resolve to an implementation of " + HttpRequestHandler.class);
         }
     }
-    
+
     @Override
-    public void handleHttpResponse(DelegateExecution execution, HttpResponse httpResponse) {
+    public void handleHttpResponse(VariableContainer execution, HttpResponse httpResponse) {
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, execution, fieldDeclarations);
         if (delegate instanceof HttpResponseHandler) {
             CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor().handleInvocation(

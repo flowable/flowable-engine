@@ -13,21 +13,19 @@
 package org.flowable.http.custom;
 
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.http.HttpActivityBehavior;
-import org.flowable.http.HttpRequest;
-import org.flowable.http.HttpResponse;
+import org.flowable.http.impl.HttpActivityBehaviorImpl;
 
 /**
  * Implementation of HttpActivityBehavior to test custom behavior class
  *
  * @author Harsha Teja Kanna.
  */
-public class HttpActivityBehaviorCustomTestImpl extends HttpActivityBehavior {
+public class HttpActivityBehaviorCustomTestImpl extends HttpActivityBehaviorImpl {
 
     private static final long serialVersionUID = 1L;
 
     @Override
-    protected HttpResponse perform(DelegateExecution execution, HttpRequest request) {
-        return null;
+    public void execute(DelegateExecution execution) {
+        leave(execution);
     }
 }

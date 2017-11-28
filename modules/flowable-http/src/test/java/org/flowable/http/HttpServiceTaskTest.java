@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -41,7 +41,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
         assertProcessEnded(procId);
     }
-    
+
     @Deployment
     public void testGetWithVariableName() {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
@@ -52,7 +52,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         assertTrue(variableValue.contains("firstName") && variableValue.contains("John"));
         assertProcessEnded(procId);
     }
-    
+
     @Deployment
     public void testGetWithoutVariableName() {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
@@ -63,7 +63,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         assertTrue(variableValue.contains("firstName") && variableValue.contains("John"));
         assertProcessEnded(procId);
     }
-    
+
     @Deployment
     public void testGetWithResponseHandler() {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
@@ -71,7 +71,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         assertEquals(2, variables.size());
         String firstName = null;
         String lastName = null;
-        
+
         for (HistoricVariableInstance historicVariableInstance : variables) {
             if ("firstName".equals(historicVariableInstance.getVariableName())) {
                 firstName = (String) historicVariableInstance.getValue();
@@ -79,12 +79,12 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
                 lastName = (String) historicVariableInstance.getValue();
             }
         }
-        
+
         assertEquals("John", firstName);
         assertEquals("Doe", lastName);
         assertProcessEnded(procId);
     }
-    
+
     @Deployment
     public void testGetWithRequestHandler() {
         String procId = runtimeService.startProcessInstanceByKey("simpleGetOnly").getId();
@@ -145,7 +145,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
             assertTrue(e instanceof FlowableException);
             assertEquals("HTTP400", e.getMessage());
         }
-        assertProcessEnded(process.getId());
+        assertNull("Process instance was not started.", process);
     }
 
     @Deployment
@@ -302,7 +302,7 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
 
         ProcessInstance process = runtimeService.startProcessInstanceByKey("testHttpPut5XX", variables);
         assertFalse(process.isEnded());
-        
+
         Map<String, String> headerMap = HttpServiceTaskTestServlet.headerMap;
         assertEquals("text/plain", headerMap.get("Content-Type"));
         assertEquals("623b94fc-14b8-4ee6-aed7-b16b9321e29f", headerMap.get("X-Request-ID"));
