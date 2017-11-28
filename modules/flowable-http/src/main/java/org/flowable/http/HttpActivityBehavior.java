@@ -12,22 +12,22 @@
  */
 package org.flowable.http;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.bpmn.helper.ErrorPropagation;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * An activity behavior for HTTP requests.
@@ -37,9 +37,9 @@ import org.slf4j.LoggerFactory;
 public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpActivityBehavior.class);
-    
+
     private static final long serialVersionUID = 1L;
-    
+
     // Validation constants
     public static final String HTTP_TASK_REQUEST_METHOD_REQUIRED = "requestMethod is required";
     public static final String HTTP_TASK_REQUEST_METHOD_INVALID = "requestMethod is invalid";
@@ -144,7 +144,7 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
                     execution.setVariable(request.getPrefix() + ".responseReason", response.getReason());
                     execution.setVariable(request.getPrefix() + ".responseHeaders", response.getHeaders());
                 }
-                
+
                 if (!response.isBodyResponseHandled()) {
                     String responseVariableValue = getStringFromField(responseVariableName, execution);
                     if (StringUtils.isNotEmpty(responseVariableValue)) {
@@ -165,7 +165,7 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
                                 || (code.startsWith("5") && handleCodes.contains("5XX"))
                                 || (code.startsWith("4") && handleCodes.contains("4XX"))
                                 || (code.startsWith("3") && handleCodes.contains("3XX"))) {
-                            
+
                             ErrorPropagation.propagateError("HTTP" + code, execution);
                             return;
                         }
@@ -177,22 +177,22 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
                                 || (code.startsWith("5") && failCodes.contains("5XX"))
                                 || (code.startsWith("4") && failCodes.contains("4XX"))
                                 || (code.startsWith("3") && failCodes.contains("3XX"))) {
-                            
+
                             throw new FlowableException("HTTP" + code);
                         }
                     }
                 }
             }
-            
+
         } catch (Exception e) {
             if (request.isIgnoreErrors()) {
                 LOGGER.info("Error ignored while processing http task in execution {}", execution.getId(), e);
                 execution.setVariable(request.getPrefix() + ".errorMessage", e.getMessage());
-                
+
             } else {
                 if (ErrorPropagation.mapException(e, (ExecutionEntity) execution, mapExceptions)) {
                     return;
-                    
+
                 } else {
                     if (e instanceof FlowableException) {
                         throw (FlowableException) e;
@@ -214,7 +214,7 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
      * @return
      */
     protected abstract HttpResponse perform(final DelegateExecution execution, final HttpRequest request);
-    
+
     protected int getIntFromField(Expression expression, DelegateExecution execution) {
         if (expression != null) {
             Object value = expression.getValue(execution);
@@ -229,7 +229,17 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
         if (expression != null) {
             Object value = expression.getValue(execution);
             if (value != null) {
-                return Boolean.parseBoolean(value.toString());
+                if (value instanceof String) {
+                    String stringValue = (String) value;
+                    if (stringValue.equalsIgnoreCase("true") || stringValue.equalsIgnoreCase("false")) {
+                        return Boolean.parseBoolean(value.toString());
+                    }
+                    throw new RuntimeException("String value \"" + value + "\" is not alloved in boolean expression");
+                }
+                if (value instanceof Boolean) {
+                    return (Boolean) value;
+                }
+                throw new RuntimeException("Value \"" + value + "\" can not be converted into boolean");
             }
         }
         return false;
