@@ -234,12 +234,12 @@ public abstract class HttpActivityBehavior extends AbstractBpmnActivityBehavior 
                     if (stringValue.equalsIgnoreCase("true") || stringValue.equalsIgnoreCase("false")) {
                         return Boolean.parseBoolean(value.toString());
                     }
-                    throw new RuntimeException("String value \"" + value + "\" is not alloved in boolean expression");
+                    throw new FlowableException("String value \"" + value + "\" is not alloved in boolean expression");
                 }
                 if (value instanceof Boolean) {
                     return (Boolean) value;
                 }
-                throw new RuntimeException("Value \"" + value + "\" can not be converted into boolean");
+                throw new FlowableException("Value \"" + value + "\" can not be converted into boolean");
             }
         }
         return false;

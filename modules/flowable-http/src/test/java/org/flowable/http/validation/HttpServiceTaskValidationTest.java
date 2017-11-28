@@ -23,6 +23,7 @@ import static org.flowable.http.HttpActivityBehavior.HTTP_TASK_REQUEST_FIELD_INV
 import static org.flowable.http.HttpActivityBehavior.HTTP_TASK_REQUEST_HEADERS_INVALID;
 import static org.flowable.http.HttpActivityBehavior.HTTP_TASK_REQUEST_METHOD_INVALID;
 import static org.hamcrest.CoreMatchers.containsString;
+import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 /**
@@ -58,7 +59,7 @@ public class HttpServiceTaskValidationTest extends HttpServiceTaskTestCase {
             fail("FlowableException expected");
         } catch (Exception e) {
             assertTrue(e instanceof FlowableException);
-            assertThat(e.getMessage(), containsString(HTTP_TASK_REQUEST_FIELD_INVALID));
+            assertThat(e.getMessage(), is("String value \"Accept application/json\" is not alloved in boolean expression"));
         }
     }
 
