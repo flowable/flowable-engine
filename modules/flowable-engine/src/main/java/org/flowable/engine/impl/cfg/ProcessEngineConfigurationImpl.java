@@ -315,6 +315,7 @@ import org.flowable.variable.service.impl.types.JPAEntityVariableType;
 import org.flowable.variable.service.impl.types.JodaDateTimeType;
 import org.flowable.variable.service.impl.types.JodaDateType;
 import org.flowable.variable.service.impl.types.JsonType;
+import org.flowable.variable.service.impl.types.ListType;
 import org.flowable.variable.service.impl.types.LongJsonType;
 import org.flowable.variable.service.impl.types.LongStringType;
 import org.flowable.variable.service.impl.types.LongType;
@@ -329,7 +330,6 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flowable.variable.service.impl.types.GroovyLazyMapType;
-import org.flowable.variable.service.impl.types.ListType;
 
 /**
  * @author Tom Baeyens

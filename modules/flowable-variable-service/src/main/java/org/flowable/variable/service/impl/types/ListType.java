@@ -2,10 +2,8 @@ package org.flowable.variable.service.impl.types;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 import javax.xml.bind.DatatypeConverter;
@@ -31,23 +29,22 @@ public class ListType implements VariableType {
 	}
 
 	@Override
-	public void setValue(Object o, ValueFields valueFields) {
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+	public void setValue(Object value, ValueFields valueFields) {
+		ByteArrayOutputStream byteArrayOutputStream;
+		ObjectOutputStream objectOutputStream;
 		byte[] data;
+		String encodedData;
 		try {
-			ObjectOutputStream out = new ObjectOutputStream(bos);
-			out.writeObject(o);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		try {
-			data = bos.toString().getBytes("UTF-8");
-			String encodedData = DatatypeConverter.printBase64Binary(data);
-			valueFields.setTextValue(encodedData);
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
+			byteArrayOutputStream = new ByteArrayOutputStream();
+			objectOutputStream = new ObjectOutputStream(byteArrayOutputStream);
+			objectOutputStream.writeObject(value);
 
+			data = byteArrayOutputStream.toString().getBytes("UTF-8");
+			encodedData = DatatypeConverter.printBase64Binary(data);
+			valueFields.setTextValue(encodedData);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
@@ -57,19 +54,15 @@ public class ListType implements VariableType {
 			return null;
 		} else {
 			byte[] decodedData = DatatypeConverter.parseBase64Binary(str);
-			ArrayList<Object> list = new ArrayList<Object>();
-			ByteArrayInputStream bis = new ByteArrayInputStream(decodedData);
+			ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(decodedData);
+			ObjectInputStream objectInputStream = null;
 			try {
-				ObjectInputStream ois = new ObjectInputStream(bis);
-				list = (ArrayList) ois.readObject();
-			} catch (IOException e) {
+				objectInputStream = new ObjectInputStream(byteArrayInputStream);
+				return (ArrayList<?>) objectInputStream.readObject();
+			} catch (Exception e) {
 				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
-				e.printStackTrace();
+				return null;
 			}
-			return list;
 		}
-
 	}
-
 }
