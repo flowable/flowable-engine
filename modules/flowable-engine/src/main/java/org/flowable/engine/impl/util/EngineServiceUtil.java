@@ -24,6 +24,7 @@ import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
@@ -36,13 +37,13 @@ public class EngineServiceUtil {
     
     // IDM ENGINE
     
-    public static IdmEngineConfiguration getIdmEngineConfiguration(ProcessEngineConfiguration processEngineConfiguration) {
-        return (IdmEngineConfiguration) processEngineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
+    public static IdmEngineConfiguration getIdmEngineConfiguration(AbstractEngineConfiguration engineConfiguration) {
+        return (IdmEngineConfiguration) engineConfiguration.getEngineConfigurations().get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
     }
     
-    public static IdmIdentityService getIdmIdentityService(ProcessEngineConfiguration processEngineConfiguration) {
+    public static IdmIdentityService getIdmIdentityService(AbstractEngineConfiguration engineConfiguration) {
         IdmIdentityService idmIdentityService = null;
-        IdmEngineConfiguration idmEngineConfiguration = getIdmEngineConfiguration(processEngineConfiguration);
+        IdmEngineConfiguration idmEngineConfiguration = getIdmEngineConfiguration(engineConfiguration);
         if (idmEngineConfiguration != null) {
             idmIdentityService = idmEngineConfiguration.getIdmIdentityService();
         }

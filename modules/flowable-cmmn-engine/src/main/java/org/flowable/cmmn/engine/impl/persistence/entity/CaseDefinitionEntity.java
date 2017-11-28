@@ -34,6 +34,10 @@ public interface CaseDefinitionEntity extends Entity, CaseDefinition {
     
     void setHasGraphicalNotation(boolean hasGraphicalNotation);
     
+    void setDiagramResourceName(String diagramResourceName);
+    
+    void setHasStartFormKey(boolean hasStartFormKey);
+    
     void setTenantId(String tenantId);
 
 }

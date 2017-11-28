@@ -52,7 +52,8 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.app.AppResourceConverter;
-import org.flowable.engine.cfg.ProcessEngineConfigurator;
+import org.flowable.engine.common.EngineConfigurator;
+import org.flowable.engine.common.EngineDeployer;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
@@ -196,7 +197,6 @@ import org.flowable.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandle
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
-import org.flowable.engine.impl.persistence.deploy.Deployer;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionInfoCache;
@@ -300,6 +300,7 @@ import org.flowable.variable.service.VariableServiceConfiguration;
 import org.flowable.variable.service.history.InternalHistoryVariableManager;
 import org.flowable.variable.service.impl.db.IbatisVariableTypeHandler;
 import org.flowable.variable.service.impl.db.VariableDbSchemaManager;
+import org.flowable.variable.service.impl.persistence.entity.SealMetadataList;
 import org.flowable.variable.service.impl.types.BooleanType;
 import org.flowable.variable.service.impl.types.ByteArrayType;
 import org.flowable.variable.service.impl.types.CustomObjectType;
@@ -314,10 +315,12 @@ import org.flowable.variable.service.impl.types.JPAEntityVariableType;
 import org.flowable.variable.service.impl.types.JodaDateTimeType;
 import org.flowable.variable.service.impl.types.JodaDateType;
 import org.flowable.variable.service.impl.types.JsonType;
+import org.flowable.variable.service.impl.types.ListType;
 import org.flowable.variable.service.impl.types.LongJsonType;
 import org.flowable.variable.service.impl.types.LongStringType;
 import org.flowable.variable.service.impl.types.LongType;
 import org.flowable.variable.service.impl.types.NullType;
+import org.flowable.variable.service.impl.types.SealMetadataListType;
 import org.flowable.variable.service.impl.types.SerializableType;
 import org.flowable.variable.service.impl.types.ShortType;
 import org.flowable.variable.service.impl.types.StringType;
@@ -412,14 +415,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // CONFIGURATORS ////////////////////////////////////////////////////////////
 
     protected boolean enableConfiguratorServiceLoader = true; // Enabled by default. In certain environments this should be set to false (eg osgi)
-    protected List<ProcessEngineConfigurator> configurators; // The injected configurators
-    protected List<ProcessEngineConfigurator> allConfigurators; // Including auto-discovered configurators
+    protected List<EngineConfigurator> configurators; // The injected configurators
+    protected List<EngineConfigurator> allConfigurators; // Including auto-discovered configurators
 
     protected VariableServiceConfiguration variableServiceConfiguration;
     protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
     protected TaskServiceConfiguration taskServiceConfiguration;
     protected JobServiceConfiguration jobServiceConfiguration;
-    protected ProcessEngineConfigurator idmProcessEngineConfigurator;
+    protected EngineConfigurator idmEngineConfigurator;
 
     // DEPLOYERS //////////////////////////////////////////////////////////////////
 
@@ -432,9 +435,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected BpmnDeploymentHelper bpmnDeploymentHelper;
     protected CachingAndArtifactsManager cachingAndArtifactsManager;
     protected ProcessDefinitionDiagramHelper processDefinitionDiagramHelper;
-    protected List<Deployer> customPreDeployers;
-    protected List<Deployer> customPostDeployers;
-    protected List<Deployer> deployers;
     protected DeploymentManager deploymentManager;
 
     protected int processDefinitionCacheLimit = -1; // By default, no limit
@@ -1161,8 +1161,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         allConfigurators = new ArrayList<>();
 
         if (!disableIdmEngine) {
-            if (idmProcessEngineConfigurator != null) {
-                allConfigurators.add(idmProcessEngineConfigurator);
+            if (idmEngineConfigurator != null) {
+                allConfigurators.add(idmEngineConfigurator);
             } else {
                 allConfigurators.add(new IdmEngineConfigurator());
             }
@@ -1180,9 +1180,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 classLoader = ReflectUtil.getClassLoader();
             }
 
-            ServiceLoader<ProcessEngineConfigurator> configuratorServiceLoader = ServiceLoader.load(ProcessEngineConfigurator.class, classLoader);
+            ServiceLoader<EngineConfigurator> configuratorServiceLoader = ServiceLoader.load(EngineConfigurator.class, classLoader);
             int nrOfServiceLoadedConfigurators = 0;
-            for (ProcessEngineConfigurator configurator : configuratorServiceLoader) {
+            for (EngineConfigurator configurator : configuratorServiceLoader) {
                 allConfigurators.add(configurator);
                 nrOfServiceLoadedConfigurators++;
             }
@@ -1195,9 +1195,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
                 // Order them according to the priorities (useful for dependent
                 // configurator)
-                Collections.sort(allConfigurators, new Comparator<ProcessEngineConfigurator>() {
+                Collections.sort(allConfigurators, new Comparator<EngineConfigurator>() {
                     @Override
-                    public int compare(ProcessEngineConfigurator configurator1, ProcessEngineConfigurator configurator2) {
+                    public int compare(EngineConfigurator configurator1, EngineConfigurator configurator2) {
                         int priority1 = configurator1.getPriority();
                         int priority2 = configurator2.getPriority();
 
@@ -1211,8 +1211,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 });
 
                 // Execute the configurators
-                LOGGER.info("Found {} Process Engine Configurators in total:", allConfigurators.size());
-                for (ProcessEngineConfigurator configurator : allConfigurators) {
+                LOGGER.info("Found {} Engine Configurators in total:", allConfigurators.size());
+                for (EngineConfigurator configurator : allConfigurators) {
                     LOGGER.info("{} (priority:{})", configurator.getClass(), configurator.getPriority());
                 }
 
@@ -1222,7 +1222,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     public void configuratorsBeforeInit() {
-        for (ProcessEngineConfigurator configurator : allConfigurators) {
+        for (EngineConfigurator configurator : allConfigurators) {
             LOGGER.info("Executing beforeInit() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
             configurator.beforeInit(this);
         }
@@ -1341,7 +1341,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     public void configuratorsAfterInit() {
-        for (ProcessEngineConfigurator configurator : allConfigurators) {
+        for (EngineConfigurator configurator : allConfigurators) {
             LOGGER.info("Executing configure() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
             configurator.configure(this);
         }
@@ -1463,8 +1463,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
-    public Collection<? extends Deployer> getDefaultDeployers() {
-        List<Deployer> defaultDeployers = new ArrayList<>();
+    public Collection<? extends EngineDeployer> getDefaultDeployers() {
+        List<EngineDeployer> defaultDeployers = new ArrayList<>();
 
         if (bpmnDeployer == null) {
             bpmnDeployer = new BpmnDeployer();
@@ -1834,6 +1834,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             variableTypes.addType(new CustomObjectType("item", ItemInstance.class));
             variableTypes.addType(new CustomObjectType("message", MessageInstance.class));
             variableTypes.addType(new GroovyLazyMapType());
+            variableTypes.addType(new ListType());
+            variableTypes.addType(new SealMetadataListType());
             if (customPostVariableTypes != null) {
                 for (VariableType customVariableType : customPostVariableTypes) {
                     variableTypes.addType(customVariableType);
@@ -2240,11 +2242,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public List<ProcessEngineConfigurator> getConfigurators() {
+    public List<EngineConfigurator> getConfigurators() {
         return configurators;
     }
 
-    public ProcessEngineConfigurationImpl addConfigurator(ProcessEngineConfigurator configurator) {
+    public ProcessEngineConfigurationImpl addConfigurator(EngineConfigurator configurator) {
         if (this.configurators == null) {
             this.configurators = new ArrayList<>();
         }
@@ -2252,7 +2254,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public ProcessEngineConfigurationImpl setConfigurators(List<ProcessEngineConfigurator> configurators) {
+    public ProcessEngineConfigurationImpl setConfigurators(List<EngineConfigurator> configurators) {
         this.configurators = configurators;
         return this;
     }
@@ -2261,16 +2263,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.enableConfiguratorServiceLoader = enableConfiguratorServiceLoader;
     }
 
-    public List<ProcessEngineConfigurator> getAllConfigurators() {
+    public List<EngineConfigurator> getAllConfigurators() {
         return allConfigurators;
     }
 
-    public ProcessEngineConfigurator getIdmProcessEngineConfigurator() {
-        return idmProcessEngineConfigurator;
+    public EngineConfigurator getIdmEngineConfigurator() {
+        return idmEngineConfigurator;
     }
 
-    public ProcessEngineConfigurationImpl setIdmProcessEngineConfigurator(ProcessEngineConfigurator idmProcessEngineConfigurator) {
-        this.idmProcessEngineConfigurator = idmProcessEngineConfigurator;
+    public ProcessEngineConfigurationImpl setIdmEngineConfigurator(EngineConfigurator idmEngineConfigurator) {
+        this.idmEngineConfigurator = idmEngineConfigurator;
         return this;
     }
 
@@ -2340,15 +2342,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setProcessDefinitionDiagramHelper(ProcessDefinitionDiagramHelper processDefinitionDiagramHelper) {
         this.processDefinitionDiagramHelper = processDefinitionDiagramHelper;
-        return this;
-    }
-
-    public List<Deployer> getDeployers() {
-        return deployers;
-    }
-
-    public ProcessEngineConfigurationImpl setDeployers(List<Deployer> deployers) {
-        this.deployers = deployers;
         return this;
     }
 
@@ -2546,24 +2539,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setAgendaFactory(FlowableEngineAgendaFactory agendaFactory) {
         this.agendaFactory = agendaFactory;
-        return this;
-    }
-
-    public List<Deployer> getCustomPreDeployers() {
-        return customPreDeployers;
-    }
-
-    public ProcessEngineConfigurationImpl setCustomPreDeployers(List<Deployer> customPreDeployers) {
-        this.customPreDeployers = customPreDeployers;
-        return this;
-    }
-
-    public List<Deployer> getCustomPostDeployers() {
-        return customPostDeployers;
-    }
-
-    public ProcessEngineConfigurationImpl setCustomPostDeployers(List<Deployer> customPostDeployers) {
-        this.customPostDeployers = customPostDeployers;
         return this;
     }
 

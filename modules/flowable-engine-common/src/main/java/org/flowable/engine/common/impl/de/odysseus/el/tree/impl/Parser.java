@@ -488,6 +488,10 @@ public class Parser {
 						v = getExtensionHandler(consumeToken()).createAstNode(v, cmp(true));
 						break;
 					}
+				case REGEX:
+					consumeToken();
+					v = createAstBinary(v, cmp(true), AstBinary.REGEX);
+					break;
 				default:
 					return v;
 			}

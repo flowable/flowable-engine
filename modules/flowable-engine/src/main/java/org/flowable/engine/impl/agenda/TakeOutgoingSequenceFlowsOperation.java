@@ -117,17 +117,11 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
                 CommandContextUtil.getHistoryManager(commandContext).recordActivityEnd(execution, null);
             }
 
-            if (!(execution.getCurrentFlowElement() instanceof SubProcess)) {
-                if(flowNode instanceof Activity && ((Activity) flowNode).hasMultiInstanceLoopCharacteristics()) {
-                    CommandContextUtil.getEventDispatcher(commandContext).dispatchEvent(
-                            FlowableEventBuilder.createMultiInstanceActivityEvent(FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_COMPLETED, flowNode.getId(),
-                                    flowNode.getName(), execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
-                }
-                else {
+            if (!(execution.getCurrentFlowElement() instanceof SubProcess) &&
+                !(flowNode instanceof Activity && ((Activity) flowNode).hasMultiInstanceLoopCharacteristics())) {
                     CommandContextUtil.getEventDispatcher(commandContext).dispatchEvent(
                             FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, flowNode.getId(), flowNode.getName(),
                                     execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
-                }
             }
         }
     }

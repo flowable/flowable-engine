@@ -14,6 +14,8 @@ package org.flowable.dmn.api;
 
 import java.util.Date;
 
+import org.flowable.engine.common.api.repository.EngineDeployment;
+
 /**
  * Represents a deployment that is already present in the process repository.
  * 
@@ -28,7 +30,7 @@ import java.util.Date;
  * @author Tijs Rademakers
  * @author Joram Barrez
  */
-public interface DmnDeployment {
+public interface DmnDeployment extends EngineDeployment {
 
     String getId();
 

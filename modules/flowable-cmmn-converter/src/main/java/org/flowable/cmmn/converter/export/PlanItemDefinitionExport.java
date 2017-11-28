@@ -23,6 +23,7 @@ import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
+import org.flowable.cmmn.model.TimerEventListener;
 
 public class PlanItemDefinitionExport implements CmmnXmlConstants {
     
@@ -47,6 +48,8 @@ public class PlanItemDefinitionExport implements CmmnXmlConstants {
         
         } else if (planItemDefinition instanceof Milestone) {
             MilestoneExport.writeMilestone((Milestone) planItemDefinition, xtw);
+        } else if (planItemDefinition instanceof TimerEventListener) {
+            TimerEventListenerExport.writeTimerEventListener((TimerEventListener) planItemDefinition, xtw);
         }
     }
 }

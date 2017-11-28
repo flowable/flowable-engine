@@ -21,6 +21,8 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.flowable.engine.common.impl.javax.el.ELException;
 
@@ -188,4 +190,20 @@ public class BooleanOperations {
 		}
 		return false;
 	}
+
+	public static final boolean regex(TypeConverter converter, Object o1, Object o2) {
+		if (o1 == o2) {
+			return true;
+		}
+		if (o1 == null || o2 == null) {
+			return false;
+		}
+		String s1 = converter.convert(o1, String.class);
+		String s2 = converter.convert(o2, String.class);
+		Pattern pattern = Pattern.compile(s2);
+
+        Matcher matcher = pattern.matcher(s1);
+		return matcher.matches();
+	}
+
 }

@@ -26,6 +26,7 @@ import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
 import org.flowable.engine.delegate.event.FlowableCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityCancelledEvent;
+import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityCompletedEvent;
 import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityEvent;
 import org.flowable.engine.delegate.event.FlowableProcessStartedEvent;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -297,9 +298,12 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         assertEquals(task0.getId(), taskEntity.getId());
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
-        assertEquals(FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_COMPLETED, activityEvent.getType());
-        //assertEquals(FlowableEngineEventType.ACTIVITY_COMPLETED, activityEvent.getType());
+        assertEquals(FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_COMPLETED_WITH_CONDITION, activityEvent.getType());
         assertEquals("task", activityEvent.getActivityId());
+        assertEquals(2, ((FlowableMultiInstanceActivityCompletedEvent)activityEvent).getNumberOfInstances());
+        assertEquals(1, ((FlowableMultiInstanceActivityCompletedEvent)activityEvent).getNumberOfActiveInstances());
+        assertEquals(1, ((FlowableMultiInstanceActivityCompletedEvent)activityEvent).getNumberOfCompletedInstances());
+        assertEquals(false, ((FlowableMultiInstanceActivityCompletedEvent)activityEvent).isSequential());
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.ACTIVITY_STARTED, activityEvent.getType());
@@ -937,6 +941,7 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
                 FlowableEngineEventType.ACTIVITY_CANCELLED,
                 FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_STARTED,
                 FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_COMPLETED,
+                    FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_COMPLETED_WITH_CONDITION,
                 FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_CANCELLED,
                 FlowableEngineEventType.TASK_CREATED,
                 FlowableEngineEventType.TASK_COMPLETED,
@@ -1007,7 +1012,12 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         }
 
         @Override
-        protected void multiInstanceActivityCompleted(FlowableMultiInstanceActivityEvent event) {
+        protected void multiInstanceActivityCompleted(FlowableMultiInstanceActivityCompletedEvent event) {
+            eventsReceived.add(event);
+        }
+
+        @Override
+        protected void multiInstanceActivityCompletedWithCondition(FlowableMultiInstanceActivityCompletedEvent event) {
             eventsReceived.add(event);
         }
 

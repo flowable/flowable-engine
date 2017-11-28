@@ -13,7 +13,6 @@
 package org.flowable.rest.form.service.api.repository;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.rest.util.DateToStringSerializer;
@@ -23,7 +22,6 @@ import java.util.Date;
 /**
  * @author Yvo Swillens
  */
-@ApiModel(value = "FormDeployment")
 public class FormDeploymentResponse {
 
     protected String id;
