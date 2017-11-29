@@ -404,12 +404,12 @@ function _showProcessDiagram() {
             //try {
             var drawFunction = eval("_draw" + element.type);
             drawFunction(element);
-            _drawBreakpoint(element);
-            if (element.brokenExecutions) {
+            //_drawBreakpoint(element);
+            /*if (element.brokenExecutions) {
                 for (var j = 0; j < element.brokenExecutions.length; j++) {
                     _drawContinueExecution(element.x +25 + j * 10, element.y - 15, element.brokenExecutions[j], element.id);
                 }
-            }
+            }*/
             //} catch(err) {console.log(err);}
         }
 

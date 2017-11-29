@@ -2968,8 +2968,8 @@ paths:
   /query/executions:
     post:
       tags:
-        - Executions
         - Query
+        - Executions
       summary: Query executions
       description: >-
         The request body can contain all possible filters that can be used in
@@ -3002,8 +3002,8 @@ paths:
   /query/historic-activity-instances:
     post:
       tags:
-        - History
         - Query
+        - History
       summary: Query for historic activity instances
       description: >-
         All supported JSON parameter fields allowed are exactly the same as the
@@ -3034,8 +3034,8 @@ paths:
   /query/historic-detail:
     post:
       tags:
-        - History
         - Query
+        - History
       summary: Query for historic details
       description: >-
         All supported JSON parameter fields allowed are exactly the same as the
@@ -3067,8 +3067,8 @@ paths:
   /query/historic-process-instances:
     post:
       tags:
-        - History Process
         - Query
+        - History Process
       summary: Query for historic process instances
       description: >-
         All supported JSON parameter fields allowed are exactly the same as the
@@ -3103,8 +3103,8 @@ paths:
   /query/historic-task-instances:
     post:
       tags:
-        - History Task
         - Query
+        - History Task
       summary: Query for historic task instances
       description: >-
         All supported JSON parameter fields allowed are exactly the same as the
@@ -3136,8 +3136,8 @@ paths:
   /query/historic-variable-instances:
     post:
       tags:
-        - History
         - Query
+        - History
       summary: Query for historic variable instances
       description: >-
         All supported JSON parameter fields allowed are exactly the same as the
@@ -3170,8 +3170,8 @@ paths:
   /query/process-instances:
     post:
       tags:
-        - Process Instances
         - Query
+        - Process Instances
       summary: Query process instances
       description: >-
         The request body can contain all possible filters that can be used in
@@ -3206,8 +3206,8 @@ paths:
   /query/tasks:
     post:
       tags:
-        - Tasks
         - Query
+        - Tasks
       summary: Query for tasks
       description: >-
         All supported JSON parameter fields allowed are exactly the same as the
@@ -4070,7 +4070,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/DmnDecisionTable'
+                  $ref: '#/components/schemas/DecisionTableResponse'
         '404':
           description: Indicates the requested process definition was not found.
       security:
@@ -4873,7 +4873,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ExecutionVariableResource'
+              $ref: '#/components/schemas/RestVariable'
           multipart/form-data:
             schema:
               $ref: '#/components/schemas/BinaryVariable'
@@ -7767,30 +7767,32 @@ components:
             http://localhost:8081/flowable-rest/service/repository/deployments/10
         tenantId:
           type: string
-    DmnDecisionTable:
-      type: object
+    DecisionTableResponse:
+      type: "object"
       properties:
-        name:
-          type: string
-        key:
-          type: string
         id:
-          type: string
-        parentDeploymentId:
-          type: string
-        description:
-          type: string
-        version:
-          type: integer
-          format: int32
-        resourceName:
-          type: string
+          type: "string"
         category:
-          type: string
-        tenantId:
-          type: string
+          type: "string"
+        name:
+          type: "string"
+        key:
+          type: "string"
+        description:
+          type: "string"
+        version:
+          type: "integer"
+          format: "int32"
+        resourceName:
+          type: "string"
         deploymentId:
-          type: string
+          type: "string"
+        parentDeploymentId:
+          type: "string"
+        tenantId:
+          type: "string"
+        url:
+          type: "string"
     EventListener:
       type: object
       properties:
@@ -7983,10 +7985,6 @@ components:
         tenantId:
           type: string
           example: 'null'
-    ExecutionVariableCollectionResource:
-      type: object
-    ExecutionVariableResource:
-      type: object
     ExtensionAttribute:
       type: object
       properties:
@@ -9464,10 +9462,6 @@ components:
           example: 'null'
         completed:
           type: boolean
-    ProcessInstanceVariableCollectionResource:
-      type: object
-    ProcessInstanceVariableResource:
-      type: object
     QueryVariable:
       type: object
       properties:
@@ -9711,8 +9705,6 @@ components:
             variables
           items:
             $ref: '#/components/schemas/RestVariable'
-    TaskAttachmentCollectionResource:
-      type: object
     TaskQueryRequest:
       type: object
       properties:
@@ -9961,10 +9953,6 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/RestVariable'
-    TaskVariableCollectionResource:
-      type: object
-    TaskVariableResource:
-      type: object
     UserInfoRequest:
       type: object
       properties:

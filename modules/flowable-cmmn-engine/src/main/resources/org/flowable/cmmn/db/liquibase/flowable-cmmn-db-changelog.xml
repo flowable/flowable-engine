@@ -287,5 +287,18 @@
         </createTable>
 
     </changeSet>
+    
+    <changeSet id="2" author="flowable">
+    
+        <addColumn tableName="ACT_CMMN_CASEDEF">
+            <column name="DGRM_RESOURCE_NAME_" type="varchar(4000)"/>
+            <column name="HAS_START_FORM_KEY_" type="boolean"/>
+        </addColumn>
+        
+        <addColumn tableName="ACT_CMMN_DEPLOYMENT_RESOURCE">
+            <column name="GENERATED_" type="boolean"/>
+        </addColumn>
+    
+    </changeSet>
 
 </databaseChangeLog>

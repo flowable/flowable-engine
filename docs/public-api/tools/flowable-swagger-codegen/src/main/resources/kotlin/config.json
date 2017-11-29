@@ -1,6 +1,0 @@
-{
-  "groupId":"org.flowable.rest.client.kotlin",
-  "artifactId":"flowable-kotlin-client-sdk",
-  "artifactVersion":"0.0.1",
-  "packageName":"org.flowable.rest.client.kotlin"
-}

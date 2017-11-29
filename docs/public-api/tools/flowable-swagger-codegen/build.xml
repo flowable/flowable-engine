@@ -54,7 +54,7 @@
             <arg value="-l"/>
             <arg value="${language}"/>
             <arg value="-c"/>
-            <arg value="src/main/resources/${language}/config.json"/>
+            <arg value="src/main/resources/${language}/${project.name}/config.json"/>
         </exec>
     </target>
 
@@ -81,6 +81,12 @@
     <target name="js.all" description="">
         <antcall target="build.all">
             <param name="language" value="javascript"/>
+        </antcall>
+    </target>
+
+    <target name="typescript.all" description="">
+        <antcall target="build.all">
+            <param name="language" value="typescript-fetch"/>
         </antcall>
     </target>
 

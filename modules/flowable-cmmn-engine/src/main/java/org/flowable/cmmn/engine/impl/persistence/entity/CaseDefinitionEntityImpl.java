@@ -28,7 +28,9 @@ public class CaseDefinitionEntityImpl extends AbstractEntity implements CaseDefi
     protected int version;
     protected String resourceName;
     protected boolean isGraphicalNotationDefined;
+    protected String diagramResourceName;
     protected String deploymentId;
+    protected boolean hasStartFormKey;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     
     @Override
@@ -86,6 +88,16 @@ public class CaseDefinitionEntityImpl extends AbstractEntity implements CaseDefi
     public boolean isGraphicalNotationDefined() {
         return hasGraphicalNotation();
     }
+    
+    @Override
+    public String getDiagramResourceName() {
+        return diagramResourceName;
+    }
+
+    @Override
+    public boolean hasStartFormKey() {
+        return hasStartFormKey;
+    }
 
     @Override
     public String getTenantId() {
@@ -125,6 +137,16 @@ public class CaseDefinitionEntityImpl extends AbstractEntity implements CaseDefi
     @Override
     public void setHasGraphicalNotation(boolean hasGraphicalNotation) {
         this.isGraphicalNotationDefined = hasGraphicalNotation;
+    }
+    
+    @Override
+    public void setDiagramResourceName(String diagramResourceName) {
+        this.diagramResourceName = diagramResourceName;
+    }
+
+    @Override
+    public void setHasStartFormKey(boolean hasStartFormKey) {
+        this.hasStartFormKey = hasStartFormKey;
     }
 
     @Override

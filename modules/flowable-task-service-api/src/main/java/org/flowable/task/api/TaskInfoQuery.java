@@ -460,6 +460,22 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      *            cannot be null. The string can include the wildcard character '%' to express like-strategy: starts with (string%), ends with (%string) or contains (%string%).
      */
     T taskVariableValueLikeIgnoreCase(String name, String value);
+    
+    /**
+     * Only select tasks which have a local variable with the given name.
+     * 
+     * @param name
+     *            cannot be null.
+     */
+    T taskVariableExists(String name);
+    
+    /**
+     * Only select tasks which does not have a local variable with the given name.
+     * 
+     * @param name
+     *            cannot be null.
+     */
+    T taskVariableNotExists(String name);
 
     /**
      * Only select tasks which are part of a process that has a variable with the given name set to the given value.
@@ -558,6 +574,22 @@ public interface TaskInfoQuery<T extends TaskInfoQuery<?, ?>, V extends TaskInfo
      *            cannot be null. The string can include the wildcard character '%' to express like-strategy: starts with (string%), ends with (%string) or contains (%string%).
      */
     T processVariableValueLikeIgnoreCase(String name, String value);
+    
+    /**
+     * Only select tasks which have a global variable with the given name.
+     * 
+     * @param name
+     *            cannot be null.
+     */
+    T processVariableExists(String name);
+    
+    /**
+     * Only select tasks which does not have a global variable with the given name.
+     * 
+     * @param name
+     *            cannot be null.
+     */
+    T processVariableNotExists(String name);
 
     /**
      * Include local task variables in the task query result

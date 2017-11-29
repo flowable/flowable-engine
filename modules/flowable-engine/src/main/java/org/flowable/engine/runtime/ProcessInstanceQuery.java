@@ -243,6 +243,22 @@ public interface ProcessInstanceQuery extends Query<ProcessInstanceQuery, Proces
      *            variable value, cannot be null. The string can include the wildcard character '%' to express like-strategy: starts with (string%), ends with (%string) or contains (%string%).
      */
     ProcessInstanceQuery variableValueLikeIgnoreCase(String name, String value);
+    
+    /**
+     * Only select process instances which have a variable with the given name.
+     * 
+     * @param name
+     *            cannot be null.
+     */
+    ProcessInstanceQuery variableExists(String name);
+    
+    /**
+     * Only select process instances which does not have a variable with the given name.
+     * 
+     * @param name
+     *            cannot be null.
+     */
+    ProcessInstanceQuery variableNotExists(String name);
 
     /**
      * Only select process instances which are suspended, either because the process instance itself is suspended or because the corresponding process definition is suspended

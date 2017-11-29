@@ -17,9 +17,11 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnElement;
+import org.flowable.cmmn.model.Criterion;
 
 /**
  * @author Joram Barrez
+ * @author Tijs Rademakers
  */
 public abstract class BaseCmmnXmlConverter {
 
@@ -39,6 +41,11 @@ public abstract class BaseCmmnXmlConverter {
             if (baseElement instanceof CmmnElement) {
                 CmmnElement cmmnElement = (CmmnElement) baseElement;
                 conversionHelper.setCurrentCmmnElement(cmmnElement);
+            }
+
+            if (baseElement instanceof Criterion) {
+                Criterion criterion = (Criterion) baseElement;
+                conversionHelper.getCmmnModel().addCriterion(criterion.getId(), criterion);
             }
 
         }

@@ -60,11 +60,14 @@ public class CmmnParserImpl implements CmmnParser {
 
     public CmmnParseResult parse(EngineResource resourceEntity) {
         CmmnParseResult parseResult = new CmmnParseResult();
-        try(ByteArrayInputStream inputStream = new ByteArrayInputStream(resourceEntity.getBytes())) {
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(resourceEntity.getBytes())) {
             Pair<CmmnModel, List<CaseDefinitionEntity>> pair = parse(resourceEntity, parseResult, new InputStreamSource(inputStream));
             for (CaseDefinitionEntity caseDefinitionEntity : pair.getRight()) {
                 parseResult.addCaseDefinition(caseDefinitionEntity, resourceEntity, pair.getLeft());
             }
+
+            processDI(pair.getLeft(), pair.getRight());
+
         } catch (IOException e) {
             logger.error("Could not read bytes from CMMN resource", e);
         }
@@ -180,7 +183,48 @@ public class CmmnParserImpl implements CmmnParser {
             }
         }
     }
+    public void processDI(CmmnModel cmmnModel, List<CaseDefinitionEntity> caseDefinitions) {
 
+        if (caseDefinitions.isEmpty()) {
+            return;
+        }
+
+        if (!cmmnModel.getLocationMap().isEmpty()) {
+
+            List<String> planModelIds = new ArrayList<>();
+            for (Case caseObject : cmmnModel.getCases()) {
+                planModelIds.add(caseObject.getPlanModel().getId());
+            }
+
+            // Verify if all referenced elements exist
+            for (String cmmnReference : cmmnModel.getLocationMap().keySet()) {
+
+                if (planModelIds.contains(cmmnReference)) {
+                    continue;
+                }
+
+                if (cmmnModel.findPlanItem(cmmnReference) == null && cmmnModel.getCriterion(cmmnReference) == null) {
+                    logger.warn("Invalid reference in diagram interchange definition: could not find {}", cmmnReference);
+                }
+            }
+
+            for (Case caseObject : cmmnModel.getCases()) {
+                CaseDefinitionEntity caseDefinition = getCaseDefinition(caseObject.getId(), caseDefinitions);
+                if (caseDefinition != null) {
+                    caseDefinition.setHasGraphicalNotation(true);
+                }
+            }
+        }
+    }
+
+    public CaseDefinitionEntity getCaseDefinition(String caseDefinitionKey, List<CaseDefinitionEntity> caseDefinitions) {
+        for (CaseDefinitionEntity caseDefinition : caseDefinitions) {
+            if (caseDefinition.getKey().equals(caseDefinitionKey)) {
+                return caseDefinition;
+            }
+        }
+        return null;
+    }
     public CmmnActivityBehaviorFactory getActivityBehaviorFactory() {
         return activityBehaviorFactory;
     }
