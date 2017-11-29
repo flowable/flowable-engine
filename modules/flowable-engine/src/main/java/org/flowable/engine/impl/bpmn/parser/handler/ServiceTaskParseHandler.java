@@ -58,7 +58,7 @@ public class ServiceTaskParseHandler extends AbstractActivityBpmnParseHandler<Se
                 serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createHttpActivityBehavior(serviceTask));
 
             } else {
-                LOGGER.warn("Invalid service task type: '{}'  for service task {}", serviceTask.getType(), serviceTask.getId());
+                LOGGER.warn("Invalid type: '{}' for service task {}", serviceTask.getType(), serviceTask.getId());
             }
 
             // activiti:class
@@ -83,7 +83,7 @@ public class ServiceTaskParseHandler extends AbstractActivityBpmnParseHandler<Se
             serviceTask.setBehavior(webServiceActivityBehavior);
 
         } else {
-            LOGGER.warn("One of the attributes 'class', 'delegateExpression', 'type', 'operation', or 'expression' is mandatory on serviceTask {}", serviceTask.getId());
+            LOGGER.warn("One of the attributes 'class', 'delegateExpression', 'type', 'operation', or 'expression' is mandatory on service task {}", serviceTask.getId());
         }
 
     }
