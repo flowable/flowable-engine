@@ -344,7 +344,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             association.setSourceRef(diEdge.getCmmnElementRef());
             association.setTargetRef(diEdge.getTargetCmmnElementRef());
 
-            String planItemSourceRef;
+            String planItemSourceRef = null;
             PlanItem planItem = cmmnModel.findPlanItem(association.getSourceRef());
             if (planItem == null) {
                 planItem = cmmnModel.findPlanItem(association.getTargetRef());
