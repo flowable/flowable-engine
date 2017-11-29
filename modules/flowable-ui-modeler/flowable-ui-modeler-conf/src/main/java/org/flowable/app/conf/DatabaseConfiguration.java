@@ -164,10 +164,10 @@ public class DatabaseConfiguration {
 
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("Configuring Datasource with following properties (omitted password for security)");
-                LOGGER.info("datasource driver : {}", dataSourceDriver);
-                LOGGER.info("datasource url : {}", dataSourceUrl);
-                LOGGER.info("datasource user name : {}", dataSourceUsername);
-                LOGGER.info("Min pool size | Max pool size | acquire increment : {} | {} | {}", minPoolSize, maxPoolSize, acquireIncrement);
+                LOGGER.info("Datasource driver: {}", dataSourceDriver);
+                LOGGER.info("Datasource url: {}", dataSourceUrl);
+                LOGGER.info("Datasource user name: {}", dataSourceUsername);
+                LOGGER.info("Min pool size | Max pool size | Acquire increment: {} | {} | {}", minPoolSize, maxPoolSize, acquireIncrement);
             }
 
             ComboPooledDataSource ds = new ComboPooledDataSource();
