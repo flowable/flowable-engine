@@ -185,6 +185,7 @@ public class DatabaseConfiguration {
 
             // Pool config: see http://www.mchange.com/projects/c3p0/#configuration
             ds.setMinPoolSize(minPoolSize);
+            ds.setInitialPoolSize(minPoolSize);
             ds.setMaxPoolSize(maxPoolSize);
             ds.setAcquireIncrement(acquireIncrement);
             if (preferredTestQuery != null) {
