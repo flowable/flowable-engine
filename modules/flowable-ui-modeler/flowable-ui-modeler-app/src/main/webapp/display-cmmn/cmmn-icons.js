@@ -1,16 +1,16 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 function _drawHumanTaskIcon(paper, startX, startY)
 {
 	var path1 = paper.path("m 1,17 16,0 0,-1.7778 -5.333332,-3.5555 0,-1.7778 c 1.244444,0 1.244444,-2.3111 1.244444,-2.3111 l 0,-3.0222 C 12.555557,0.8221 9.0000001,1.0001 9.0000001,1.0001 c 0,0 -3.5555556,-0.178 -3.9111111,3.5555 l 0,3.0222 c 0,0 0,2.3111 1.2444443,2.3111 l 0,1.7778 L 1,15.2222 1,17 17,17");
@@ -19,7 +19,7 @@ function _drawHumanTaskIcon(paper, startX, startY)
 		"stroke": "none",
 		"fill": "#d1b575"
  	});
-	
+
 	var userTaskIcon = paper.set();
 	userTaskIcon.push(path1);
 
@@ -34,7 +34,7 @@ function _drawServiceTaskIcon(paper, startX, startY)
 		"stroke": "none",
 		"fill": "#72a7d0"
  	});
-	
+
 	var serviceTaskIcon = paper.set();
 	serviceTaskIcon.push(path1);
 
@@ -49,14 +49,14 @@ function _drawCaseTaskIcon(paper, startX, startY)
         "stroke": "#000000",
         "fill": "#000000"
     });
-    
+
     var path2 = paper.path("M1 23 L1 4 L30 4 L30 23z");
     path2.attr({
         "opacity": 1,
         "stroke": "#000000",
         "fill": "#F4F6F7"
     });
-    
+
     var caseTaskIcon = paper.set();
     caseTaskIcon.push(path1);
     caseTaskIcon.push(path2);
@@ -73,7 +73,7 @@ function _drawProcessTaskIcon(paper, startX, startY)
         "stroke": "#000000",
         "fill": "#F4F6F7"
     });
-    
+
     var processTaskIcon = paper.set();
     processTaskIcon.push(path1);
 
@@ -95,6 +95,19 @@ function _drawHttpTaskIcon(paper, startX, startY)
 
     path.transform("T" + startX + "," + startY);
 
+}
+
+function _drawBusinessRuleTaskIcon(paper, startX, startY) {
+    var path1 = paper.path("m 1,2 0,14 16,0 0,-14 z m 1.45458,5.6000386 2.90906,0 0,2.7999224 -2.90906,0 z m 4.36364,0 8.72718,0 0,2.7999224 -8.72718,0 z m -4.36364,4.1998844 2.90906,0 0,2.800116 -2.90906,0 z m 4.36364,0 8.72718,0 0,2.800116 -8.72718,0 z");
+    path1.attr({
+        "stroke": "none",
+        "fill": "#72a7d0"
+    });
+
+    var businessRuleTaskIcon = paper.set();
+    businessRuleTaskIcon.push(path1);
+
+    businessRuleTaskIcon.transform("T" + startX + "," + startY);
 }
 
 function _drawTimerEventListenerIcon(paper, element)

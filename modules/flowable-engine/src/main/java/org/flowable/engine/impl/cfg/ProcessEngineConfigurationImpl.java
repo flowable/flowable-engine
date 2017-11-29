@@ -276,8 +276,10 @@ import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.flowable.job.service.HistoryJobHandler;
 import org.flowable.job.service.InternalJobCompatibilityManager;
+import org.flowable.job.service.HistoryJobProcessor;
 import org.flowable.job.service.InternalJobManager;
 import org.flowable.job.service.JobHandler;
+import org.flowable.job.service.JobProcessor;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.AsyncRunnableExecutionExceptionHandler;
@@ -726,6 +728,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
+    protected List<Object> flowable5JobProcessors = Collections.emptyList();
+    protected List<JobProcessor> jobProcessors = Collections.emptyList();
+    protected List<HistoryJobProcessor> historyJobProcessors = Collections.emptyList();
+
     /**
      * Enabled a very verbose debug output of the execution tree whilst executing operations. Most useful for core engine developers or people fiddling around with the execution tree.
      */
@@ -735,7 +741,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // agenda factory
     protected FlowableEngineAgendaFactory agendaFactory;
-    
+
     protected DbSchemaManager identityLinkDbSchemaManager;
     protected DbSchemaManager variableDbSchemaManager;
     protected DbSchemaManager taskDbSchemaManager;
@@ -940,13 +946,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             this.taskDbSchemaManager = new TaskDbSchemaManager();
         }
     }
-    
+
     protected void initIdentityLinkDbSchemaManager() {
         if (this.identityLinkDbSchemaManager == null) {
             this.identityLinkDbSchemaManager = new IdentityLinkDbSchemaManager();
         }
     }
-    
+
     protected void initJobDbSchemaManager() {
         if (this.jobDbSchemaManager == null) {
             this.jobDbSchemaManager = new JobDbSchemaManager();
@@ -1309,16 +1315,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.jobServiceConfiguration.setJobHandlers(this.jobHandlers);
         this.jobServiceConfiguration.setHistoryJobHandlers(this.historyJobHandlers);
         this.jobServiceConfiguration.setFailedJobCommandFactory(this.failedJobCommandFactory);
-        
+
         List<AsyncRunnableExecutionExceptionHandler> exceptionHandlers = new ArrayList<>();
         if (customAsyncRunnableExecutionExceptionHandlers != null) {
             exceptionHandlers.addAll(customAsyncRunnableExecutionExceptionHandlers);
         }
-        
+
         if (addDefaultExceptionHandler) {
             exceptionHandlers.add(new DefaultAsyncRunnableExecutionExceptionHandler());
         }
-        
+
         this.jobServiceConfiguration.setAsyncRunnableExecutionExceptionHandlers(exceptionHandlers);
         this.jobServiceConfiguration.setAsyncExecutorNumberOfRetries(this.asyncExecutorNumberOfRetries);
         this.jobServiceConfiguration.setAsyncExecutorResetExpiredJobsMaxTimeout(this.asyncExecutorResetExpiredJobsMaxTimeout);
@@ -1338,6 +1344,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         } else {
             this.jobServiceConfiguration.setInternalJobCompatibilityManager(new DefaultInternalJobCompatibilityManager(this));
         }
+
+        // set the job processors
+        this.jobServiceConfiguration.setJobProcessors(this.jobProcessors);
+        this.jobServiceConfiguration.setHistoryJobProcessors(this.historyJobProcessors);
 
         this.jobServiceConfiguration.init();
 
@@ -2066,6 +2076,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         if (performanceSettings.isValidateTaskRelationshipCountConfigOnBoot()) {
             commandExecutor.execute(new ValidateTaskRelatedEntityCountCfgCmd());
+        }
+
+        // if Flowable 5 support is needed configure the Flowable 5 job processors via the compatibility handler
+        if (flowable5CompatibilityEnabled) {
+            flowable5CompatibilityHandler.setJobProcessor(this.flowable5JobProcessors);
         }
     }
 
@@ -3394,6 +3409,33 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    public List<Object> getFlowable5JobProcessors() {
+        return flowable5JobProcessors;
+    }
+
+    public ProcessEngineConfigurationImpl setFlowable5JobProcessors(List<Object> jobProcessors) {
+        this.flowable5JobProcessors = jobProcessors;
+        return this;
+    }
+
+    public List<JobProcessor> getJobProcessors() {
+        return jobProcessors;
+    }
+
+    public ProcessEngineConfigurationImpl setJobProcessors(List<JobProcessor> jobProcessors) {
+        this.jobProcessors = jobProcessors;
+        return this;
+    }
+
+    public List<HistoryJobProcessor> getHistoryJobProcessors() {
+        return historyJobProcessors;
+    }
+
+    public ProcessEngineConfigurationImpl setHistoryJobProcessors(List<HistoryJobProcessor> historyJobProcessors) {
+        this.historyJobProcessors = historyJobProcessors;
+        return this;
+    }
+
     public Map<String, List<RuntimeInstanceStateChangeCallback>> getProcessInstanceStateChangedCallbacks() {
         return processInstanceStateChangedCallbacks;
     }
@@ -3420,7 +3462,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.taskDbSchemaManager = taskDbSchemaManager;
         return this;
     }
-    
+
     public DbSchemaManager getIdentityLinkDbSchemaManager() {
         return identityLinkDbSchemaManager;
     }
@@ -3429,7 +3471,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.identityLinkDbSchemaManager = identityLinkDbSchemaManager;
         return this;
     }
-    
+
     public DbSchemaManager getJobDbSchemaManager() {
         return jobDbSchemaManager;
     }

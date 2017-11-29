@@ -55,6 +55,7 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
 
     protected String jobHandlerType;
     protected String jobHandlerConfiguration;
+    protected JobByteArrayRef customValuesByteArrayRef;
 
     protected JobByteArrayRef exceptionByteArrayRef;
     protected String exceptionMessage;
@@ -71,15 +72,19 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
         persistentState.put("exceptionMessage", exceptionMessage);
         persistentState.put("jobHandlerType", jobHandlerType);
 
+        if (customValuesByteArrayRef != null) {
+            persistentState.put("customValuesByteArrayRef", customValuesByteArrayRef);
+        }
+
         if (exceptionByteArrayRef != null) {
             persistentState.put("exceptionByteArrayRef", exceptionByteArrayRef);
         }
-        
+
         return persistentState;
     }
 
     // getters and setters ////////////////////////////////////////////////////////
-    
+
     @Override
     public Date getCreateTime() {
         return createTime;
@@ -233,6 +238,24 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
     }
 
     @Override
+    public JobByteArrayRef getCustomValuesByteArrayRef() {
+        return customValuesByteArrayRef;
+    }
+
+    @Override
+    public String getCustomValues() {
+        return getJobByteArrayRefAsString(customValuesByteArrayRef);
+    }
+
+    @Override
+    public void setCustomValues(String customValues) {
+        if(customValuesByteArrayRef == null) {
+            customValuesByteArrayRef = new JobByteArrayRef();
+        }
+        customValuesByteArrayRef.setValue("jobCustomValues", customValues);
+    }
+
+    @Override
     public String getJobType() {
         return jobType;
     }
@@ -254,20 +277,7 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
 
     @Override
     public String getExceptionStacktrace() {
-        if (exceptionByteArrayRef == null) {
-            return null;
-        }
-
-        byte[] bytes = exceptionByteArrayRef.getBytes();
-        if (bytes == null) {
-            return null;
-        }
-
-        try {
-            return new String(bytes, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new FlowableException("UTF-8 is not a supported encoding");
-        }
+        return getJobByteArrayRefAsString(exceptionByteArrayRef);
     }
 
     @Override
@@ -275,7 +285,7 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
         if (exceptionByteArrayRef == null) {
             exceptionByteArrayRef = new JobByteArrayRef();
         }
-        exceptionByteArrayRef.setValue("stacktrace", getUtf8Bytes(exception));
+        exceptionByteArrayRef.setValue("stacktrace", exception);
     }
 
     @Override
@@ -293,15 +303,11 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
         return exceptionByteArrayRef;
     }
 
-    protected byte[] getUtf8Bytes(String str) {
-        if (str == null) {
+    private String getJobByteArrayRefAsString(JobByteArrayRef jobByteArrayRef) {
+        if (jobByteArrayRef == null) {
             return null;
         }
-        try {
-            return str.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new FlowableException("UTF-8 is not a supported encoding");
-        }
+        return jobByteArrayRef.asString();
     }
 
     @Override

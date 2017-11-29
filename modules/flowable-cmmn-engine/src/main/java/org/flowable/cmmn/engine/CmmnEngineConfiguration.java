@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -219,7 +219,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected MilestoneInstanceEntityManager milestoneInstanceEntityManager;
     protected HistoricCaseInstanceDataManager historicCaseInstanceDataManager;
     protected HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager;
-    
+
     // IDM ENGINE /////////////////////////////////////////////////////
     protected boolean disableIdmEngine;
 
@@ -238,13 +238,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected int caseDefinitionCacheLimit = -1;
     protected DeploymentCache<CaseDefinitionCacheEntry> caseDefinitionCache;
-    
+
     protected HistoryLevel historyLevel = HistoryLevel.AUDIT;
-    
+
     protected ExpressionManager expressionManager;
     protected List<FlowableFunctionDelegate> flowableFunctionDelegates;
     protected List<FlowableFunctionDelegate> customFlowableFunctionDelegates;
-    
+
     /**
      * Using field injection together with a delegate expression for a service task / execution listener / task listener is not thread-sade , see user guide section 'Field Injection' for more
      * information.
@@ -262,23 +262,23 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      * Case diagram generator. Default value is DefaultCaseDiagramGenerator
      */
     protected CaseDiagramGenerator caseDiagramGenerator;
-    
+
     protected boolean isCreateDiagramOnDeploy = true;
-    
+
     protected String activityFontName = "Arial";
     protected String labelFontName = "Arial";
     protected String annotationFontName = "Arial";
-    
+
     // CONFIGURATORS ////////////////////////////////////////////////////////////
 
     protected boolean enableConfiguratorServiceLoader = true; // Enabled by default. In certain environments this should be set to false (eg osgi)
     protected List<EngineConfigurator> configurators; // The injected configurators
     protected List<EngineConfigurator> allConfigurators; // Including auto-discovered configurators
     protected EngineConfigurator idmEngineConfigurator;
-    
+
     // Identitylink support
     protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
-    
+
     // Task support
     protected TaskServiceConfiguration taskServiceConfiguration;
     protected InternalHistoryTaskManager internalHistoryTaskManager;
@@ -286,7 +286,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected boolean isEnableTaskRelationshipCounts;
     protected int taskQueryLimit;
     protected int historicTaskQueryLimit;
-    
+
     // Variable support
     protected VariableTypes variableTypes;
     protected List<VariableType> customPreVariableTypes;
@@ -295,6 +295,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected InternalHistoryVariableManager internalHistoryVariableManager;
     protected boolean serializableVariableTypeTrackDeserializedObjects = true;
     protected ObjectMapper objectMapper = new ObjectMapper();
+
+    // Set Http Client config defaults
+    protected HttpClientConfig httpClientConfig = new HttpClientConfig();
     
     // Async executor
     protected JobServiceConfiguration jobServiceConfiguration;
@@ -584,6 +587,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initClock();
         initIdentityLinkServiceConfiguration();
         initVariableServiceConfiguration();
+        configuratorsAfterInit();
         initTaskServiceConfiguration();
         initBusinessCalendarManager();
         initJobHandlers();
@@ -597,7 +601,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             caseDiagramGenerator = new DefaultCaseDiagramGenerator();
         }
     }
-    
+
     @Override
     public void initDbSchemaManager() {
         super.initDbSchemaManager();
@@ -625,7 +629,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             this.taskDbSchemaManager = new TaskDbSchemaManager();
         }
     }
-    
+
     protected void initIdentityLinkDbSchemaManager() {
         if (this.identityLinkDbSchemaManager == null) {
             this.identityLinkDbSchemaManager = new IdentityLinkDbSchemaManager();
@@ -642,7 +646,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void initMybatisTypeHandlers(Configuration configuration) {
         configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler(variableTypes));
     }
-    
+
     public void initExpressionManager() {
         if (expressionManager == null) {
             expressionManager = new CmmnExpressionManager(beans);
@@ -692,7 +696,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected void initServices() {
         initService(cmmnRuntimeService);
-        initService(cmmnTaskService);;
+        initService(cmmnTaskService);
         initService(cmmnManagementService);
         initService(cmmnRepositoryService);
         initService(cmmnHistoryService);
@@ -843,7 +847,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             cmmnParser = cmmnParserImpl;
         }
     }
-    
+
     public void initCaseDefinitionDiagramHelper() {
         if (caseDefinitionDiagramHelper == null) {
             caseDefinitionDiagramHelper = new CaseDefinitionDiagramHelper();
@@ -893,7 +897,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected void initDbSqlSessionFactoryEntitySettings() {
         defaultInitDbSqlSessionFactoryEntitySettings(EntityDependencyOrder.INSERT_ORDER, EntityDependencyOrder.DELETE_ORDER);
     }
-    
+
     public void initConfigurators() {
 
         allConfigurators = new ArrayList<>();
@@ -965,7 +969,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             configurator.beforeInit(this);
         }
     }
-    
+
+    public void configuratorsAfterInit() {
+        for (EngineConfigurator configurator : allConfigurators) {
+            LOGGER.info("Executing configure() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
+            configurator.configure(this);
+        }
+    }
+
     public void initVariableTypes() {
         if (variableTypes == null) {
             variableTypes = new DefaultVariableTypes();
@@ -997,17 +1008,17 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             }
         }
     }
-    
+
     public void initVariableServiceConfiguration() {
         this.variableServiceConfiguration = new VariableServiceConfiguration();
-        
+
         this.variableServiceConfiguration.setHistoryLevel(this.historyLevel);
         this.variableServiceConfiguration.setClock(this.clock);
         this.variableServiceConfiguration.setObjectMapper(this.objectMapper);
         this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
 
         this.variableServiceConfiguration.setVariableTypes(this.variableTypes);
-        
+
         if (this.internalHistoryVariableManager != null) {
             this.variableServiceConfiguration.setInternalHistoryVariableManager(this.internalHistoryVariableManager);
         } else {
@@ -1021,7 +1032,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
         addServiceConfiguration(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG, this.variableServiceConfiguration);
     }
-    
+
     public void initTaskServiceConfiguration() {
         this.taskServiceConfiguration = new TaskServiceConfiguration();
         this.taskServiceConfiguration.setHistoryLevel(this.historyLevel);
@@ -1049,7 +1060,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
         addServiceConfiguration(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG, this.taskServiceConfiguration);
     }
-    
+
     public void initIdentityLinkServiceConfiguration() {
         this.identityLinkServiceConfiguration = new IdentityLinkServiceConfiguration();
         this.identityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
@@ -1210,7 +1221,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.cmmnRuntimeService = cmmnRuntimeService;
         return this;
     }
-    
+
     public CmmnTaskService getCmmnTaskService() {
         return cmmnTaskService;
     }
@@ -1546,7 +1557,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.caseInstanceStateChangeCallbacks = caseInstanceStateChangeCallbacks;
         return this;
     }
-    
+
     @Override
     public CmmnEngineConfiguration setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -1561,7 +1572,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.historyLevel = historyLevel;
         return this;
     }
-    
+
     public ExpressionManager getExpressionManager() {
         return expressionManager;
     }
@@ -1597,7 +1608,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.customFlowableFunctionDelegates = customFlowableFunctionDelegates;
         return this;
     }
-    
+
     public DbSchemaManager getIdentityLinkDbSchemaManager() {
         return identityLinkDbSchemaManager;
     }
@@ -1615,7 +1626,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.variableDbSchemaManager = variableDbSchemaManager;
         return this;
     }
-    
+
     public DbSchemaManager getTaskDbSchemaManager() {
         return taskDbSchemaManager;
     }
@@ -1642,7 +1653,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.variableTypes = variableTypes;
         return this;
     }
-    
+
     public List<VariableType> getCustomPreVariableTypes() {
         return customPreVariableTypes;
     }
@@ -1660,7 +1671,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.customPostVariableTypes = customPostVariableTypes;
         return this;
     }
-    
+
     public IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration() {
         return identityLinkServiceConfiguration;
     }
@@ -1678,7 +1689,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.variableServiceConfiguration = variableServiceConfiguration;
         return this;
     }
-    
+
     public TaskServiceConfiguration getTaskServiceConfiguration() {
         return taskServiceConfiguration;
     }
@@ -1687,7 +1698,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.taskServiceConfiguration = taskServiceConfiguration;
         return this;
     }
-    
+
     public InternalHistoryTaskManager getInternalHistoryTaskManager() {
         return internalHistoryTaskManager;
     }
@@ -1696,7 +1707,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.internalHistoryTaskManager = internalHistoryTaskManager;
         return this;
     }
-    
+
     public InternalTaskVariableScopeResolver getInternalTaskVariableScopeResolver() {
         return internalTaskVariableScopeResolver;
     }
@@ -1759,7 +1770,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.caseDiagramGenerator = caseDiagramGenerator;
         return this;
     }
-    
+
     public boolean isCreateDiagramOnDeploy() {
         return isCreateDiagramOnDeploy;
     }
@@ -2149,4 +2160,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         return this;
     }
     
+    public HttpClientConfig getHttpClientConfig() {
+        return httpClientConfig;
+    }
+
+    public void setHttpClientConfig(HttpClientConfig httpClientConfig) {
+        this.httpClientConfig.merge(httpClientConfig);
+    }
+
 }

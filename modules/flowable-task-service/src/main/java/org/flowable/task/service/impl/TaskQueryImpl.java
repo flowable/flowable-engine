@@ -932,6 +932,27 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
         }
         return this;
     }
+    
+    
+    @Override
+    public TaskQuery taskVariableExists(String name) {
+        if (orActive) {
+            currentOrQueryObject.variableExists(name);
+        } else {
+            this.variableExists(name);
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQuery taskVariableNotExists(String name) {
+        if (orActive) {
+            currentOrQueryObject.variableNotExists(name);
+        } else {
+            this.variableNotExists(name);
+        }
+        return this;
+    }
 
     @Override
     public TaskQuery processVariableValueEquals(String variableName, Object variableValue) {
@@ -1039,6 +1060,26 @@ public class TaskQueryImpl extends AbstractVariableQueryImpl<TaskQuery, Task> im
             currentOrQueryObject.variableValueLikeIgnoreCase(name, value, false);
         } else {
             this.variableValueLikeIgnoreCase(name, value, false);
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQuery processVariableExists(String name) {
+        if (orActive) {
+            currentOrQueryObject.variableExists(name, false);
+        } else {
+            this.variableExists(name, false);
+        }
+        return this;
+    }
+    
+    @Override
+    public TaskQuery processVariableNotExists(String name) {
+        if (orActive) {
+            currentOrQueryObject.variableNotExists(name, false);
+        } else {
+            this.variableNotExists(name, false);
         }
         return this;
     }

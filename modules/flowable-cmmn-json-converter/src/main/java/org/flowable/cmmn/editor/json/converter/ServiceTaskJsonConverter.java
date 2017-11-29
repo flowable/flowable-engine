@@ -12,8 +12,8 @@
  */
 package org.flowable.cmmn.editor.json.converter;
 
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
@@ -22,16 +22,29 @@ import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.FieldExtension;
+import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.ImplementationType;
+import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ServiceTask;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Tijs Rademakers
  */
 public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements DecisionTableKeyAwareConverter {
+
+    private static final Map<String, String> type_to_stencilset = new HashMap<>();
+    static {
+        type_to_stencilset.put(ServiceTask.DMN_TASK, STENCIL_TASK_DECISION);
+        type_to_stencilset.put(HttpServiceTask.HTTP_TASK, STENCIL_TASK_HTTP);
+    }
+    protected static final Map<String, String> TYPE_TO_STENCILSET = Collections.unmodifiableMap(
+            type_to_stencilset
+        );
 
     protected Map<String, CmmnModelInfo> decisionTableKeyMap;
 
@@ -47,10 +60,22 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
 
     public static void fillCmmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
         convertersToJsonMap.put(CaseTask.class, ServiceTaskJsonConverter.class);
+        convertersToJsonMap.put(ServiceTask.class, ServiceTaskJsonConverter.class);
     }
 
     @Override
     protected String getStencilId(BaseElement baseElement) {
+        if (baseElement instanceof PlanItem) {
+            PlanItem planItem = (PlanItem) baseElement;
+            PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
+            if (planItemDefinition != null && planItemDefinition instanceof ServiceTask) {
+                ServiceTask serviceTask = (ServiceTask) planItemDefinition;
+                String stencilId = TYPE_TO_STENCILSET.get(serviceTask.getType());
+                if (stencilId != null) {
+                    return stencilId;
+                }
+            }
+        }
         return CmmnStencilConstants.STENCIL_TASK_SERVICE;
     }
 
@@ -58,27 +83,31 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
     protected void convertElementToJson(ObjectNode elementNode, ObjectNode propertiesNode, ActivityProcessor processor,
                     BaseElement baseElement, CmmnModel cmmnModel) {
 
-        ServiceTask serviceTask = (ServiceTask) baseElement;
+        ServiceTask serviceTask = (ServiceTask) ((PlanItem) baseElement).getPlanItemDefinition();
 
         if (ServiceTask.DMN_TASK.equalsIgnoreCase(serviceTask.getType())) {
             for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
-                if (PROPERTY_DECISIONTABLE_REFERENCE_KEY.equals(fieldExtension.getFieldName()) &&
-                                decisionTableKeyMap != null && decisionTableKeyMap.containsKey(fieldExtension.getStringValue())) {
+                if (PROPERTY_DECISIONTABLE_REFERENCE_KEY.equals(fieldExtension.getFieldName())) {
 
                     ObjectNode decisionReferenceNode = objectMapper.createObjectNode();
                     propertiesNode.set(PROPERTY_DECISIONTABLE_REFERENCE, decisionReferenceNode);
 
-                    CmmnModelInfo modelInfo = decisionTableKeyMap.get(fieldExtension.getStringValue());
-                    decisionReferenceNode.put("id", modelInfo.getId());
-                    decisionReferenceNode.put("name", modelInfo.getName());
-                    decisionReferenceNode.put("key", modelInfo.getKey());
-                    
+                    CmmnModelInfo modelInfo = decisionTableKeyMap != null ? decisionTableKeyMap.get(fieldExtension.getStringValue()) : null;
+                    if (modelInfo != null) {
+                        decisionReferenceNode.put("id", modelInfo.getId());
+                        decisionReferenceNode.put("name", modelInfo.getName());
+                        decisionReferenceNode.put("key", modelInfo.getKey());
+                    }
+
                 } else if (PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY.equals(fieldExtension.getFieldName())) {
                     propertiesNode.put(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS, Boolean.parseBoolean(fieldExtension.getStringValue()));
                 }
             }
 
-        } else if (ServiceTask.HTTP_TASK.equalsIgnoreCase(serviceTask.getType())) {
+        } else if (HttpServiceTask.HTTP_TASK.equalsIgnoreCase(serviceTask.getType())) {
+            if (StringUtils.isNotEmpty(serviceTask.getImplementation())) {
+                propertiesNode.put(PROPERTY_SERVICETASK_CLASS, serviceTask.getImplementation());
+            }
             setPropertyFieldValue(PROPERTY_HTTPTASK_REQ_METHOD, "requestMethod", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_HTTPTASK_REQ_URL, "requestUrl", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_HTTPTASK_REQ_HEADERS, "requestHeaders", serviceTask, propertiesNode);

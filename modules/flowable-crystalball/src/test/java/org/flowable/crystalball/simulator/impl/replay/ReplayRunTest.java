@@ -107,7 +107,7 @@ public class ReplayRunTest {
 
     private ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
         ProcessEngineConfigurationImpl configuration = new org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration();
-        configuration.setHistory("full").setDatabaseSchemaUpdate("drop-create");
+        configuration.setHistory("full").setDatabaseSchemaUpdate("true");
         configuration.setCustomDefaultBpmnParseHandlers(
                 Collections.<BpmnParseHandler>singletonList(
                         new AddListenerUserTaskParseHandler(TaskListener.EVENTNAME_CREATE,

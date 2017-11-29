@@ -20,6 +20,7 @@
         <result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
         <result property="jobHandlerType" column="HANDLER_TYPE_" jdbcType="VARCHAR" />
         <result property="jobHandlerConfiguration" column="HANDLER_CFG_" jdbcType="VARCHAR" />
+        <result property="customValuesByteArrayRef" column="CUSTOM_VALUES_ID_" typeHandler="JobByteArrayRefTypeHandler" />
         <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
         <result property="duedate" column="DUEDATE_" jdbcType="TIMESTAMP" />
@@ -67,6 +68,7 @@
             REPEAT_,
             HANDLER_TYPE_,
             HANDLER_CFG_,
+            CUSTOM_VALUES_ID_,
             CREATE_TIME_,
             TENANT_ID_)
     values (#{id, jdbcType=VARCHAR},
@@ -86,6 +88,7 @@
             #{repeat, jdbcType=VARCHAR},
             #{jobHandlerType, jdbcType=VARCHAR},
             #{jobHandlerConfiguration, jdbcType=VARCHAR},
+            #{customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{createTime, jdbcType=TIMESTAMP},
             #{tenantId, jdbcType=VARCHAR}
     )
@@ -110,9 +113,10 @@
             REPEAT_,
             HANDLER_TYPE_,
             HANDLER_CFG_,
+            CUSTOM_VALUES_ID_,
             CREATE_TIME_,
-            TENANT_ID_) VALUES 
-	    <foreach collection="list" item="job" index="index" separator=","> 
+            TENANT_ID_) VALUES
+	    <foreach collection="list" item="job" index="index" separator=",">
 	        (#{job.id, jdbcType=VARCHAR},
 	         #{job.revision, jdbcType=INTEGER},
 	         #{job.jobType, jdbcType=VARCHAR},
@@ -130,6 +134,7 @@
 	         #{job.repeat, jdbcType=VARCHAR},
 	         #{job.jobHandlerType, jdbcType=VARCHAR},
 	         #{job.jobHandlerConfiguration, jdbcType=VARCHAR},
+	         #{job.customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
              #{job.createTime, jdbcType=TIMESTAMP},
 	         #{job.tenantId, jdbcType=VARCHAR})
 	    </foreach>
@@ -156,8 +161,9 @@
       		REPEAT_,
       		HANDLER_TYPE_,
       		HANDLER_CFG_,
+            CUSTOM_VALUES_ID_,
             CREATE_TIME_,
-      		TENANT_ID_) VALUES 
+      		TENANT_ID_) VALUES
       		(#{job.id, jdbcType=VARCHAR},
        		#{job.revision, jdbcType=INTEGER},
        		#{job.jobType, jdbcType=VARCHAR},
@@ -175,6 +181,7 @@
        		#{job.repeat, jdbcType=VARCHAR},
        		#{job.jobHandlerType, jdbcType=VARCHAR},
        		#{job.jobHandlerConfiguration, jdbcType=VARCHAR},
+       		#{job.customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{job.createTime, jdbcType=TIMESTAMP},
        		#{job.tenantId, jdbcType=VARCHAR})
     	</foreach>

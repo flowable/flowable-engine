@@ -21,6 +21,7 @@ import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemJavaDelegateActivityB
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.variable.VariableContainer;
 import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.variable.api.delegate.VariableScope;
@@ -49,7 +50,7 @@ public class CmmnClassDelegate implements CmmnActivityBehavior {
 
     protected CmmnActivityBehavior getCmmnActivityBehavior(String className, VariableScope variableScope) {
         Object instance = instantiate(className);
-        applyFieldExtensions(fieldExtensions, instance, variableScope);
+        applyFieldExtensions(fieldExtensions, instance, variableScope, false);
 
         if (instance instanceof PlanItemJavaDelegate) {
             return new PlanItemJavaDelegateActivityBehavior((PlanItemJavaDelegate) instance);
@@ -67,16 +68,16 @@ public class CmmnClassDelegate implements CmmnActivityBehavior {
     protected Object instantiate(String className) {
         return ReflectUtil.instantiate(className);
     }
-    
-    protected static void applyFieldExtensions(List<FieldExtension> fieldExtensions, Object target, VariableScope variableScope) {
+
+    public static void applyFieldExtensions(List<FieldExtension> fieldExtensions, Object target, VariableContainer variableContainer, boolean throwExceptionOnMissingField) {
         if (fieldExtensions != null) {
             for (FieldExtension fieldExtension : fieldExtensions) {
-                applyFieldExtension(fieldExtension, target, variableScope);
+                applyFieldExtension(fieldExtension, target, variableContainer, throwExceptionOnMissingField);
             }
         }
     }
 
-    protected static void applyFieldExtension(FieldExtension fieldExtension, Object target, VariableScope variableScope) {
+    protected static void applyFieldExtension(FieldExtension fieldExtension, Object target, VariableContainer variableContainer, boolean throwExceptionOnMissingField) {
         Object value = null;
         if (fieldExtension.getStringValue() != null) {
             value = fieldExtension.getStringValue();
@@ -84,8 +85,8 @@ public class CmmnClassDelegate implements CmmnActivityBehavior {
             ExpressionManager expressionManager = CommandContextUtil.getCmmnEngineConfiguration().getExpressionManager();
             value = expressionManager.createExpression(fieldExtension.getExpression());
         }
-        
-        ReflectUtil.invokeSetterOrField(target, fieldExtension.getFieldName(), value, false);
+
+        ReflectUtil.invokeSetterOrField(target, fieldExtension.getFieldName(), value, throwExceptionOnMissingField);
     }
 
 }

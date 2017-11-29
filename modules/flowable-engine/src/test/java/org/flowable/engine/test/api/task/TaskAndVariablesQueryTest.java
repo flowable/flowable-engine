@@ -19,7 +19,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
+import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
 import org.flowable.task.api.TaskQuery;
 
 /**
@@ -132,6 +134,54 @@ public class TaskAndVariablesQueryTest extends PluggableFlowableTestCase {
         assertEquals(true, task.getProcessVariables().get("processVar"));
         assertEquals(123, task.getProcessVariables().get("anotherProcessVar"));
         assertEquals("This is a binary process variable", new String((byte[]) task.getProcessVariables().get("binaryVariable")));
+    }
+    
+    @Deployment
+    public void testVariableExistsQuery() {
+        Map<String, Object> startMap = new HashMap<>();
+        startMap.put("processVar", true);
+        startMap.put("binaryVariable", "This is a binary process variable".getBytes());
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", startMap);
+
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).processVariableExists("processVar").singleResult();
+        assertNotNull(task);
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).processVariableNotExists("processVar").singleResult();
+        assertNull(task);
+        
+        task = taskService.createTaskQuery().or().processVariableExists("processVar").processVariableExists("test").endOr().singleResult();
+        assertNotNull(task);
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskVariableExists("processVar").singleResult();
+        assertNull(task);
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskVariableNotExists("processVar").singleResult();
+        assertNotNull(task);
+
+        taskService.setVariable(task.getId(), "anotherProcessVar", 123);
+        taskService.setVariableLocal(task.getId(), "localVar", "test");
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskVariableExists("localVar").singleResult();
+        assertNotNull(task);
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskVariableNotExists("localVar").singleResult();
+        assertNull(task);
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).or().processVariableExists("processVar")
+                        .processVariableValueEquals("anotherProcessVar", 123).endOr().singleResult();
+        assertNotNull(task);
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).or().processVariableNotExists("processVar")
+                        .processVariableValueEquals("anotherProcessVar", 123).endOr().singleResult();
+        assertNotNull(task);
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).or().processVariableExists("processVar").endOr().or()
+                        .processVariableValueEquals("anotherProcessVar", 123).endOr().singleResult();
+        assertNotNull(task);
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).or().processVariableNotExists("processVar").endOr().or()
+                        .processVariableValueEquals("anotherProcessVar", 123).endOr().singleResult();
+        assertNull(task);
     }
 
     public void testQueryWithPagingAndVariables() {

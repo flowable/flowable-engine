@@ -172,7 +172,12 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
                 else {
                     sendCompletedEvent(leavingExecution);
                 }
-                
+
+                // Clean up execution that resulted in the mult-instance finishing so that cancelled events aren't sent for it.
+                ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
+                executionEntityManager.deleteChildExecutions(executionEntity, DELETE_REASON_END, false);
+                executionEntityManager.deleteExecutionAndRelatedData(executionEntity, DELETE_REASON_END);
+
                 super.leave(leavingExecution);
             }
 
@@ -260,21 +265,4 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
 
         parentScopeExecution.forceUpdate();
     }
-
-    // TODO: can the ExecutionManager.deleteChildExecution not be used?
-    protected void deleteChildExecutions(ExecutionEntity parentExecution, boolean deleteExecution, CommandContext commandContext) {
-        // Delete all child executions
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-        Collection<ExecutionEntity> childExecutions = executionEntityManager.findChildExecutionsByParentExecutionId(parentExecution.getId());
-        if (CollectionUtil.isNotEmpty(childExecutions)) {
-            for (ExecutionEntity childExecution : childExecutions) {
-                deleteChildExecutions(childExecution, true, commandContext);
-            }
-        }
-
-        if (deleteExecution) {
-            executionEntityManager.deleteExecutionAndRelatedData(parentExecution, null);
-        }
-    }
-
 }

@@ -1734,6 +1734,34 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         runtimeService.deleteProcessInstance(processInstance.getId(), "test");
         runtimeService.deleteProcessInstance(processInstance2.getId(), "test");
     }
+    
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testVariableExistsQuery() {
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("mixed", "AbCdEfG");
+        vars.put("upper", "ABCDEFG");
+        vars.put("lower", "abcdefg");
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+
+        ProcessInstance instance = runtimeService.createProcessInstanceQuery().variableExists("mixed").singleResult();
+        assertNotNull(instance);
+        assertEquals(processInstance1.getId(), instance.getId());
+
+        List<ProcessInstance> instances = runtimeService.createProcessInstanceQuery().variableNotExists("lower").list();
+        assertEquals(5, instances.size());
+        
+        instances = runtimeService.createProcessInstanceQuery().variableExists("lower").variableValueEquals("upper", "ABCDEFG").list();
+        assertEquals(1, instances.size());
+        
+        instances = runtimeService.createProcessInstanceQuery().or().variableExists("mixed").variableValueEquals("upper", "ABCDEFG").endOr().list();
+        assertEquals(1, instances.size());
+        
+        instances = runtimeService.createProcessInstanceQuery().or().variableNotExists("mixed").variableValueEquals("upper", "ABCDEFG").endOr().list();
+        assertEquals(6, instances.size());
+        
+        instances = runtimeService.createProcessInstanceQuery().or().variableNotExists("mixed").endOr().or().variableValueEquals("upper", "ABCDEFG").endOr().list();
+        assertEquals(0, instances.size());
+    }
 
     public void testQueryByProcessInstanceIds() {
         Set<String> processInstanceIds = new HashSet<>(this.processInstanceIds);

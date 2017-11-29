@@ -602,6 +602,26 @@ public class ProcessInstanceQueryImpl extends AbstractVariableQueryImpl<ProcessI
             return variableValueLikeIgnoreCase(name, value, false);
         }
     }
+    
+    @Override
+    public ProcessInstanceQuery variableExists(String name) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableExists(name, false);
+            return this;
+        } else {
+            return variableExists(name, false);
+        }
+    }
+    
+    @Override
+    public ProcessInstanceQuery variableNotExists(String name) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableNotExists(name, false);
+            return this;
+        } else {
+            return variableNotExists(name, false);
+        }
+    }
 
     @Override
     public ProcessInstanceQuery locale(String locale) {

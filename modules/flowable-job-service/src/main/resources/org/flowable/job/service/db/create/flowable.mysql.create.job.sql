@@ -19,6 +19,7 @@ create table ACT_RU_JOB (
     REPEAT_ varchar(255),
     HANDLER_TYPE_ varchar(255),
     HANDLER_CFG_ varchar(4000),
+    CUSTOM_VALUES_ID_ varchar(64),
     CREATE_TIME_ timestamp(3) NULL,
     TENANT_ID_ varchar(255) default '',
     primary key (ID_)
@@ -45,6 +46,7 @@ create table ACT_RU_TIMER_JOB (
     REPEAT_ varchar(255),
     HANDLER_TYPE_ varchar(255),
     HANDLER_CFG_ varchar(4000),
+    CUSTOM_VALUES_ID_ varchar(64),
     CREATE_TIME_ timestamp(3) NULL,
     TENANT_ID_ varchar(255) default '',
     primary key (ID_)
@@ -69,6 +71,7 @@ create table ACT_RU_SUSPENDED_JOB (
     REPEAT_ varchar(255),
     HANDLER_TYPE_ varchar(255),
     HANDLER_CFG_ varchar(4000),
+    CUSTOM_VALUES_ID_ varchar(64),
     CREATE_TIME_ timestamp(3) NULL,
     TENANT_ID_ varchar(255) default '',
     primary key (ID_)
@@ -92,6 +95,7 @@ create table ACT_RU_DEADLETTER_JOB (
     REPEAT_ varchar(255),
     HANDLER_TYPE_ varchar(255),
     HANDLER_CFG_ varchar(4000),
+    CUSTOM_VALUES_ID_ varchar(64),
     CREATE_TIME_ timestamp(3) NULL,
     TENANT_ID_ varchar(255) default '',
     primary key (ID_)
@@ -107,31 +111,64 @@ create table ACT_RU_HISTORY_JOB (
     EXCEPTION_MSG_ varchar(4000),
     HANDLER_TYPE_ varchar(255),
     HANDLER_CFG_ varchar(4000),
+    CUSTOM_VALUES_ID_ varchar(64),
     ADV_HANDLER_CFG_ID_ varchar(64),
     CREATE_TIME_ timestamp(3) NULL,
     TENANT_ID_ varchar(255) default '',
     primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
-alter table ACT_RU_JOB 
-    add constraint ACT_FK_JOB_EXCEPTION 
-    foreign key (EXCEPTION_STACK_ID_) 
+create index ACT_IDX_JOB_EXCEPTION_STACK_ID on ACT_RU_JOB(EXCEPTION_STACK_ID_);
+create index ACT_IDX_JOB_CUSTOM_VALUES_ID on ACT_RU_JOB(CUSTOM_VALUES_ID_);
+
+create index ACT_IDX_TIMER_JOB_EXCEPTION_STACK_ID on ACT_RU_TIMER_JOB(EXCEPTION_STACK_ID_);
+create index ACT_IDX_TIMER_JOB_CUSTOM_VALUES_ID on ACT_RU_TIMER_JOB(CUSTOM_VALUES_ID_);
+
+create index ACT_IDX_SUSPENDED_JOB_EXCEPTION_STACK_ID on ACT_RU_SUSPENDED_JOB(EXCEPTION_STACK_ID_);
+create index ACT_IDX_SUSPENDED_JOB_CUSTOM_VALUES_ID on ACT_RU_SUSPENDED_JOB(CUSTOM_VALUES_ID_);
+
+create index ACT_IDX_DEADLETTER_JOB_EXCEPTION_STACK_ID on ACT_RU_DEADLETTER_JOB(EXCEPTION_STACK_ID_);
+create index ACT_IDX_DEADLETTER_JOB_CUSTOM_VALUES_ID on ACT_RU_DEADLETTER_JOB(CUSTOM_VALUES_ID_);
+
+alter table ACT_RU_JOB
+    add constraint ACT_FK_JOB_EXCEPTION
+    foreign key (EXCEPTION_STACK_ID_)
     references ACT_GE_BYTEARRAY (ID_);
-    
-alter table ACT_RU_TIMER_JOB 
-    add constraint ACT_FK_TIMER_JOB_EXCEPTION 
-    foreign key (EXCEPTION_STACK_ID_) 
+
+alter table ACT_RU_JOB
+    add constraint ACT_FK_JOB_CUSTOM_VALUES
+    foreign key (CUSTOM_VALUES_ID_)
     references ACT_GE_BYTEARRAY (ID_);
-    
-alter table ACT_RU_SUSPENDED_JOB 
-    add constraint ACT_FK_SUSPENDED_JOB_EXCEPTION 
-    foreign key (EXCEPTION_STACK_ID_) 
+
+alter table ACT_RU_TIMER_JOB
+    add constraint ACT_FK_TIMER_JOB_EXCEPTION
+    foreign key (EXCEPTION_STACK_ID_)
     references ACT_GE_BYTEARRAY (ID_);
-    
-alter table ACT_RU_DEADLETTER_JOB 
-    add constraint ACT_FK_DEADLETTER_JOB_EXCEPTION 
-    foreign key (EXCEPTION_STACK_ID_) 
-    references ACT_GE_BYTEARRAY (ID_);            
+
+alter table ACT_RU_TIMER_JOB
+    add constraint ACT_FK_TIMER_JOB_CUSTOM_VALUES
+    foreign key (CUSTOM_VALUES_ID_)
+    references ACT_GE_BYTEARRAY (ID_);
+
+alter table ACT_RU_SUSPENDED_JOB
+    add constraint ACT_FK_SUSPENDED_JOB_EXCEPTION
+    foreign key (EXCEPTION_STACK_ID_)
+    references ACT_GE_BYTEARRAY (ID_);
+
+alter table ACT_RU_SUSPENDED_JOB
+    add constraint ACT_FK_SUSPENDED_JOB_CUSTOM_VALUES
+    foreign key (CUSTOM_VALUES_ID_)
+    references ACT_GE_BYTEARRAY (ID_);
+
+alter table ACT_RU_DEADLETTER_JOB
+    add constraint ACT_FK_DEADLETTER_JOB_EXCEPTION
+    foreign key (EXCEPTION_STACK_ID_)
+    references ACT_GE_BYTEARRAY (ID_);
+
+alter table ACT_RU_DEADLETTER_JOB
+    add constraint ACT_FK_DEADLETTER_JOB_CUSTOM_VALUES
+    foreign key (CUSTOM_VALUES_ID_)
+    references ACT_GE_BYTEARRAY (ID_);
 
 create index ACT_IDX_JOB_SCOPE on ACT_RU_JOB(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_JOB_SUB_SCOPE on ACT_RU_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);

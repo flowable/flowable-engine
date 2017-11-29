@@ -23,14 +23,16 @@ public interface HistoryJobEntity extends JobInfoEntity, HistoryJob, Entity, Has
     String getAdvancedJobHandlerConfiguration();
 
     void setAdvancedJobHandlerConfiguration(String jobHandlerConfiguration);
-  
+
     void setAdvancedJobHandlerConfigurationBytes(byte[] bytes);
-  
+
     JobByteArrayRef getAdvancedJobHandlerConfigurationByteArrayRef();
 
     void setCreateTime(Date createTime);
 
     void setAdvancedJobHandlerConfigurationByteArrayRef(JobByteArrayRef configurationByteArrayRef);
+
+    void setCustomValuesByteArrayRef(JobByteArrayRef customValuesByteArrayRef);
 
     void setExceptionByteArrayRef(JobByteArrayRef exceptionByteArrayRef);
 

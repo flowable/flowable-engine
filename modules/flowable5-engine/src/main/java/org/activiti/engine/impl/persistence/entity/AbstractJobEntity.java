@@ -65,6 +65,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
     protected Date endDate;
 
     protected final ByteArrayRef exceptionByteArrayRef = new ByteArrayRef();
+    protected final ByteArrayRef customValuesByteArrayRef = new ByteArrayRef();
 
     protected String exceptionMessage;
 
@@ -93,6 +94,23 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         exceptionByteArrayRef.setValue("stacktrace", getUtf8Bytes(exception));
     }
 
+    @Override
+    public String getCustomValues() {
+        byte[] bytes = customValuesByteArrayRef.getBytes();
+        if (bytes == null) {
+            return null;
+        }
+        try {
+            return new String(bytes, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new ActivitiException("UTF-8 is not a supported encoding");
+        }
+    }
+
+    public void setCustomValues(String customValues) {
+        customValuesByteArrayRef.setValue("jobCustomValues", getUtf8Bytes(customValues));
+    }
+
     private byte[] getUtf8Bytes(String str) {
         if (str == null) {
             return null;
@@ -110,7 +128,8 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         persistentState.put("retries", retries);
         persistentState.put("duedate", duedate);
         persistentState.put("exceptionMessage", exceptionMessage);
-        persistentState.put("exceptionByteArrayId", exceptionByteArrayRef.getId());
+        persistentState.put("exceptionByteArrayRef", exceptionByteArrayRef.getId());
+        persistentState.put("customValuesByteArrayRef", customValuesByteArrayRef.getId());
         return persistentState;
     }
 
