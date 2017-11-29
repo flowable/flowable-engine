@@ -1,5 +1,6 @@
 package org.flowable.http.cmmn.impl;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
@@ -15,6 +16,7 @@ import org.flowable.cmmn.model.FlowableHttpResponseHandler;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.http.ExpressionUtils;
 import org.flowable.http.HttpActivityExecutor;
@@ -29,10 +31,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLSession;
-import java.util.List;
+import java.util.Collections;
 
 import static org.flowable.http.ExpressionUtils.getStringSetFromField;
-import static org.flowable.http.ExpressionUtils.parseBoolean;
 import static org.flowable.http.HttpActivityExecutor.HTTP_TASK_REQUEST_FIELD_INVALID;
 
 /**
@@ -70,8 +71,6 @@ public class CmmnHttpActivityBehaviorImpl extends CoreCmmnActivityBehavior {
     protected String responseVariableName;
     // Prefix for the execution variable names (Optional)
     protected String resultVariablePrefix;
-    // Exception mapping
-    protected List<MapExceptionEntry> mapExceptions;
 
     protected HttpServiceTask serviceTask;
     protected HttpActivityExecutor httpActivityExecutor;
@@ -114,19 +113,19 @@ public class CmmnHttpActivityBehaviorImpl extends CoreCmmnActivityBehavior {
         HttpRequest request = new HttpRequest();
 
         try {
-            request.setMethod(requestMethod);
-            request.setUrl(requestUrl);
-            request.setHeaders(requestHeaders);
-            request.setBody(requestBody);
-            request.setTimeout(ExpressionUtils.parseInt(requestTimeout));
-            request.setNoRedirects(parseBoolean(disallowRedirects));
-            request.setIgnoreErrors(parseBoolean(ignoreException));
-            request.setSaveRequest(parseBoolean(saveRequestVariables));
-            request.setSaveResponse(parseBoolean(saveResponseParameters));
-            request.setPrefix(resultVariablePrefix);
+            request.setMethod(ExpressionUtils.getStringFromField(createExpression(requestMethod), planItemInstanceEntity));
+            request.setUrl(ExpressionUtils.getStringFromField(createExpression(requestUrl), planItemInstanceEntity));
+            request.setHeaders(ExpressionUtils.getStringFromField(createExpression(requestHeaders), planItemInstanceEntity));
+            request.setBody(ExpressionUtils.getStringFromField(createExpression(requestBody), planItemInstanceEntity));
+            request.setTimeout(ExpressionUtils.getIntFromField(createExpression(requestTimeout), planItemInstanceEntity));
+            request.setNoRedirects(ExpressionUtils.getBooleanFromField(createExpression(disallowRedirects), planItemInstanceEntity));
+            request.setIgnoreErrors(ExpressionUtils.getBooleanFromField(createExpression(ignoreException), planItemInstanceEntity));
+            request.setSaveRequest(ExpressionUtils.getBooleanFromField(createExpression(saveRequestVariables), planItemInstanceEntity));
+            request.setSaveResponse(ExpressionUtils.getBooleanFromField(createExpression(saveResponseParameters), planItemInstanceEntity));
+            request.setPrefix(ExpressionUtils.getStringFromField(createExpression(resultVariablePrefix), planItemInstanceEntity));
 
-            String failCodes = failStatusCodes;
-            String handleCodes = handleStatusCodes;
+            String failCodes = ExpressionUtils.getStringFromField(createExpression(failStatusCodes), planItemInstanceEntity);
+            String handleCodes = ExpressionUtils.getStringFromField(createExpression(handleStatusCodes), planItemInstanceEntity);
 
             if (failCodes != null) {
                 request.setFailCodes(getStringSetFromField(failCodes));
@@ -170,7 +169,7 @@ public class CmmnHttpActivityBehaviorImpl extends CoreCmmnActivityBehavior {
                 createHttpRequestHandler(serviceTask.getHttpRequestHandler(), CommandContextUtil.getCmmnEngineConfiguration()),
                 createHttpResponseHandler(serviceTask.getHttpResponseHandler(), CommandContextUtil.getCmmnEngineConfiguration()),
                 responseVariableName,
-                mapExceptions,
+                Collections.<MapExceptionEntry>emptyList(),
                 CommandContextUtil.getCmmnEngineConfiguration().getHttpClientConfig().getSocketTimeout(),
                 CommandContextUtil.getCmmnEngineConfiguration().getHttpClientConfig().getConnectTimeout(),
                 CommandContextUtil.getCmmnEngineConfiguration().getHttpClientConfig().getConnectionRequestTimeout()
@@ -178,6 +177,13 @@ public class CmmnHttpActivityBehaviorImpl extends CoreCmmnActivityBehavior {
 
         CommandContextUtil.getAgenda().planCompletePlanItemInstance(planItemInstanceEntity);
 
+    }
+
+    protected Expression createExpression(String expressionString) {
+        if (StringUtils.isEmpty(expressionString)) {
+            return null;
+        }
+        return CommandContextUtil.getCmmnEngineConfiguration().getExpressionManager().createExpression(expressionString);
     }
 
     protected HttpRequestHandler createHttpRequestHandler(FlowableHttpRequestHandler flowableHandler, CmmnEngineConfiguration cmmnEngineConfiguration) {

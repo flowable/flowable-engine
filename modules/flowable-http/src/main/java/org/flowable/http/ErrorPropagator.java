@@ -2,7 +2,6 @@ package org.flowable.http;
 
 import org.flowable.bpmn.model.MapExceptionEntry;
 import org.flowable.engine.common.api.variable.VariableContainer;
-import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 import java.util.List;
 

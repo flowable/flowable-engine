@@ -20,14 +20,9 @@ public abstract class ExpressionUtils {
     public static int getIntFromField(Expression expression, VariableContainer execution) {
         if (expression != null) {
             Object value = expression.getValue(execution);
-            return parseInt(value);
-        }
-        return 0;
-    }
-
-    public static int parseInt(Object value) {
-        if (value != null) {
-            return Integer.parseInt(value.toString());
+            if (value != null) {
+                return Integer.parseInt(value.toString());
+            }
         }
         return 0;
     }
@@ -40,7 +35,7 @@ public abstract class ExpressionUtils {
         return false;
     }
 
-    public static boolean parseBoolean(Object value) {
+    protected static boolean parseBoolean(Object value) {
         if (value != null) {
             if (value instanceof String) {
                 String stringValue = (String) value;

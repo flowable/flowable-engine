@@ -14,21 +14,21 @@ package org.flowable.cmmn.converter;
 
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CmmnElement;
-import org.flowable.cmmn.model.FlowableHttpResponseHandler;
+import org.flowable.cmmn.model.FlowableHttpRequestHandler;
 import org.flowable.cmmn.model.HttpServiceTask;
 
 import javax.xml.stream.XMLStreamReader;
 
-import static org.flowable.cmmn.converter.CmmnXmlConstants.ELEMENT_HTTP_RESPONSE_HANDLER;
+import static org.flowable.cmmn.converter.CmmnXmlConstants.ELEMENT_HTTP_REQUEST_HANDLER;
 
 /**
  * @author Tijs Rademakers
  */
-public class FlowableHttpResponseHandlerXmlConverter extends AbstractFlowableHttpHandlerXmlConverter {
+public class FlowableHttpRequestHandlerXmlConverter extends AbstractFlowableHttpHandlerXmlConverter {
 
     @Override
     public String getXMLElementName() {
-        return ELEMENT_HTTP_RESPONSE_HANDLER;
+        return ELEMENT_HTTP_REQUEST_HANDLER;
     }
 
     @Override
@@ -43,10 +43,10 @@ public class FlowableHttpResponseHandlerXmlConverter extends AbstractFlowableHtt
             return null;
         }
 
-        FlowableHttpResponseHandler responseHandler = new FlowableHttpResponseHandler();
-        setImplementation(xtr, responseHandler);
+        FlowableHttpRequestHandler requestHandler = new FlowableHttpRequestHandler();
+        setImplementation(xtr, requestHandler);
 
-        ((HttpServiceTask) cmmnElement).setHttpResponseHandler(responseHandler);
+        ((HttpServiceTask) cmmnElement).setHttpRequestHandler(requestHandler);
 
         return null;
     }

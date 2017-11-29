@@ -140,10 +140,6 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
         }
     }
 
-    public CmmnClassDelegateFactory getClassDelegateFactory() {
-        return classDelegateFactory;
-    }
-
     public void setClassDelegateFactory(CmmnClassDelegateFactory classDelegateFactory) {
         this.classDelegateFactory = classDelegateFactory;
     }

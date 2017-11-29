@@ -36,10 +36,10 @@ import org.flowable.engine.impl.el.FixedValue;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.http.HttpActivityExecutor;
 import org.flowable.http.HttpRequest;
-import org.flowable.http.delegate.HttpRequestHandler;
-import org.flowable.http.delegate.HttpResponseHandler;
 import org.flowable.http.bpmn.impl.handler.ClassDelegateHttpHandler;
 import org.flowable.http.bpmn.impl.handler.DelegateExpressionHttpHandler;
+import org.flowable.http.delegate.HttpRequestHandler;
+import org.flowable.http.delegate.HttpResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -193,7 +193,10 @@ public class HttpActivityBehaviorImpl extends AbstractBpmnActivityBehavior {
                 createHttpRequestHandler(httpServiceTask.getHttpRequestHandler(), CommandContextUtil.getProcessEngineConfiguration()),
                 createHttpResponseHandler(httpServiceTask.getHttpResponseHandler(), CommandContextUtil.getProcessEngineConfiguration()),
                 getStringFromField(responseVariableName, execution),
-                mapExceptions, CommandContextUtil.getProcessEngineConfiguration().getHttpClientConfig().getSocketTimeout(), CommandContextUtil.getProcessEngineConfiguration().getHttpClientConfig().getConnectTimeout(), CommandContextUtil.getProcessEngineConfiguration().getHttpClientConfig().getConnectionRequestTimeout());
+                mapExceptions,
+                CommandContextUtil.getProcessEngineConfiguration().getHttpClientConfig().getSocketTimeout(),
+                CommandContextUtil.getProcessEngineConfiguration().getHttpClientConfig().getConnectTimeout(),
+                CommandContextUtil.getProcessEngineConfiguration().getHttpClientConfig().getConnectionRequestTimeout());
 
         leave(execution);
     }

@@ -23,7 +23,10 @@
                         <flowable:string><![CDATA[GET]]></flowable:string>
                     </flowable:field>
                     <flowable:field name="requestUrl">
-                        <flowable:string><![CDATA[http://localhost:9798/test]]></flowable:string>
+                        <flowable:string><![CDATA[http://localhost:9798/api/fail?code=400]]></flowable:string>
+                    </flowable:field>
+                    <flowable:field name="failStatusCodes">
+                        <flowable:string><![CDATA[4XX]]></flowable:string>
                     </flowable:field>
                 </extensionElements>
             </task>

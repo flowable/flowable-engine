@@ -12,11 +12,12 @@
  */
 package org.flowable.cmmn.engine.impl.delegate;
 
-import java.util.List;
-
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.engine.common.impl.util.ReflectUtil;
+
+import java.util.List;
 
 /**
  * @author Joram Barrez
@@ -36,7 +37,13 @@ public class DefaultCmmnClassDelegateFactory implements CmmnClassDelegateFactory
     protected static Object defaultInstantiateDelegate(String className, ServiceTask serviceTask) {
         Object object = ReflectUtil.instantiate(className);
         for (FieldExtension extension : serviceTask.getFieldExtensions()) {
-            ReflectUtil.invokeSetterOrField(object, extension.getFieldName(), extension.getStringValue(), false);
+            String value;
+            if (StringUtils.isEmpty(extension.getStringValue())) {
+                value = extension.getExpression();
+            } else {
+                value = extension.getStringValue();
+            }
+            ReflectUtil.invokeSetterOrField(object, extension.getFieldName(), value, false);
         }
 
         if (serviceTask != null) {

@@ -10,6 +10,17 @@
         <property name="jdbcUsername" value="sa" />
         <property name="jdbcPassword" value="" />
         <property name="databaseSchemaUpdate" value="true" />
+
+		<property name="httpClientConfig" ref="httpClientConfig"/>
     </bean>
+
+	<bean id="httpClientConfig" class="org.flowable.cmmn.engine.HttpClientConfig">
+		<property name="connectTimeout" value="5000"/>
+		<property name="socketTimeout" value="5000"/>
+		<property name="connectionRequestTimeout" value="5000"/>
+		<property name="requestRetryLimit" value="5"/>
+		<!-- https configuration -->
+		<property name="disableCertVerify" value="true"/>
+	</bean>
 
 </beans>
