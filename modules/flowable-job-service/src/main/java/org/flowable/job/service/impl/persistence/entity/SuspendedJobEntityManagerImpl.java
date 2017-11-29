@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -80,7 +80,8 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
     public void delete(SuspendedJobEntity jobEntity) {
         super.delete(jobEntity);
 
-        deleteExceptionByteArrayRef(jobEntity);
+        deleteByteArrayRef(jobEntity.getExceptionByteArrayRef());
+        deleteByteArrayRef(jobEntity.getCustomValuesByteArrayRef());
 
         getJobServiceConfiguration().getInternalJobManager().handleJobDelete(jobEntity);
 
@@ -90,19 +91,10 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
         }
     }
 
-    /**
-     * Deletes a the byte array used to store the exception information. Subclasses may override to provide custom implementations.
-     */
-    protected void deleteExceptionByteArrayRef(SuspendedJobEntity jobEntity) {
-        JobByteArrayRef exceptionByteArrayRef = jobEntity.getExceptionByteArrayRef();
-        if (exceptionByteArrayRef != null) {
-            exceptionByteArrayRef.delete();
-        }
-    }
-
     protected SuspendedJobEntity createSuspendedJob(AbstractRuntimeJobEntity job) {
         SuspendedJobEntity newSuspendedJobEntity = create();
         newSuspendedJobEntity.setJobHandlerConfiguration(job.getJobHandlerConfiguration());
+        newSuspendedJobEntity.setCustomValues(job.getCustomValues());
         newSuspendedJobEntity.setJobHandlerType(job.getJobHandlerType());
         newSuspendedJobEntity.setExclusive(job.isExclusive());
         newSuspendedJobEntity.setRepeat(job.getRepeat());

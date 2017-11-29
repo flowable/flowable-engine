@@ -21,6 +21,7 @@
         <result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
         <result property="jobHandlerType" column="HANDLER_TYPE_" jdbcType="VARCHAR" />
         <result property="jobHandlerConfiguration" column="HANDLER_CFG_" jdbcType="VARCHAR" />
+        <result property="customValuesByteArrayRef" column="CUSTOM_VALUES_ID_" typeHandler="JobByteArrayRefTypeHandler" />
         <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
         <result property="duedate" column="DUEDATE_" jdbcType="TIMESTAMP" />
@@ -178,7 +179,7 @@
         )
     </update>
 
-    <!-- See http://stackoverflow.com/questions/4429319/you-cant-specify-target-table-for-update-in-from-clause Tested this on MySQL 5.6: does NOT use a temporary 
+    <!-- See http://stackoverflow.com/questions/4429319/you-cant-specify-target-table-for-update-in-from-clause Tested this on MySQL 5.6: does NOT use a temporary
         table (so good, performance) -->
     <update id="updateJobTenantIdForDeployment" databaseId="mysql" parameterType="java.util.Map">
         update ${prefix}ACT_RU_JOB set
@@ -219,6 +220,7 @@
         REPEAT_,
         HANDLER_TYPE_,
         HANDLER_CFG_,
+        CUSTOM_VALUES_ID_,
         CREATE_TIME_,
         TENANT_ID_)
         values (#{id, jdbcType=VARCHAR},
@@ -237,6 +239,7 @@
         #{repeat, jdbcType=VARCHAR},
         #{jobHandlerType, jdbcType=VARCHAR},
         #{jobHandlerConfiguration, jdbcType=VARCHAR},
+        #{customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
         #{createTime, jdbcType=TIMESTAMP},
         #{tenantId, jdbcType=VARCHAR}
         )
@@ -260,6 +263,7 @@
         REPEAT_,
         HANDLER_TYPE_,
         HANDLER_CFG_,
+        CUSTOM_VALUES_ID_,
         CREATE_TIME_,
         TENANT_ID_) VALUES
         <foreach collection="list" item="job" index="index" separator=",">
@@ -279,6 +283,7 @@
             #{job.repeat, jdbcType=VARCHAR},
             #{job.jobHandlerType, jdbcType=VARCHAR},
             #{job.jobHandlerConfiguration, jdbcType=VARCHAR},
+            #{job.customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{job.createTime, jdbcType=TIMESTAMP},
             #{job.tenantId, jdbcType=VARCHAR})
         </foreach>
@@ -303,6 +308,7 @@
             EXCEPTION_MSG_,
             HANDLER_TYPE_,
             HANDLER_CFG_,
+            CUSTOM_VALUES_ID_,
             CREATE_TIME_,
             TENANT_ID_) VALUES
             (#{job.id, jdbcType=VARCHAR},
@@ -320,6 +326,7 @@
             #{job.exceptionMessage, jdbcType=VARCHAR},
             #{job.jobHandlerType, jdbcType=VARCHAR},
             #{job.jobHandlerConfiguration, jdbcType=VARCHAR},
+            #{job.customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{job.createTime, jdbcType=TIMESTAMP},
             #{job.tenantId, jdbcType=VARCHAR})
         </foreach>

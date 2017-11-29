@@ -29,6 +29,12 @@ public interface AbstractJobEntity extends Entity, HasRevision {
 
     void setJobHandlerConfiguration(String jobHandlerConfiguration);
 
+    String getCustomValues();
+
+    void setCustomValues(String customValues);
+
+    JobByteArrayRef getCustomValuesByteArrayRef();
+
     String getExceptionStacktrace();
 
     void setExceptionStacktrace(String exception);
@@ -36,9 +42,9 @@ public interface AbstractJobEntity extends Entity, HasRevision {
     void setExceptionMessage(String exceptionMessage);
 
     JobByteArrayRef getExceptionByteArrayRef();
-    
+
     void setTenantId(String tenantId);
-    
+
     Date getCreateTime();
 
 }

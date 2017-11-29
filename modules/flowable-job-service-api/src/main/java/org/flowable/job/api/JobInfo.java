@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -26,14 +26,14 @@ public interface JobInfo {
     String getId();
 
     /**
-     * Returns the number of retries this job has left. Whenever the jobexecutor fails to execute the job, this value is decremented. 
+     * Returns the number of retries this job has left. Whenever the jobexecutor fails to execute the job, this value is decremented.
      * When it hits zero, the job is supposed to be dead and not retried again (ie a manual retry is required then).
      */
     int getRetries();
 
     /**
      * Returns the message of the exception that occurred, the last time the job was executed. Returns null when no exception occurred.
-     * 
+     *
      * To get the full exception stacktrace, use ManagementService#getJobExceptionStacktrace(String)
      */
     String getExceptionMessage();
@@ -49,8 +49,13 @@ public interface JobInfo {
     String getJobHandlerType();
 
     /**
-     * Get the job configuration.
+     * Get the job handler configuration.
      */
     String getJobHandlerConfiguration();
-    
+
+    /**
+     * Get the custom values.
+     */
+    String getCustomValues();
+
 }

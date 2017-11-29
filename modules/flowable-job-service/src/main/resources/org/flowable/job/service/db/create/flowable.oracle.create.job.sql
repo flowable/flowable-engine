@@ -15,6 +15,7 @@ create table ACT_RU_JOB (
     REPEAT_ NVARCHAR2(255),
     HANDLER_TYPE_ NVARCHAR2(255),
     HANDLER_CFG_ NVARCHAR2(2000),
+    CUSTOM_VALUES_ID_ NVARCHAR2(64),
     CREATE_TIME_ TIMESTAMP(6),
     TENANT_ID_ NVARCHAR2(255) DEFAULT '',
     primary key (ID_)
@@ -37,6 +38,7 @@ create table ACT_RU_TIMER_JOB (
     REPEAT_ NVARCHAR2(255),
     HANDLER_TYPE_ NVARCHAR2(255),
     HANDLER_CFG_ NVARCHAR2(2000),
+    CUSTOM_VALUES_ID_ NVARCHAR2(64),
     CREATE_TIME_ TIMESTAMP(6),
     TENANT_ID_ NVARCHAR2(255) DEFAULT '',
     primary key (ID_)
@@ -57,6 +59,7 @@ create table ACT_RU_SUSPENDED_JOB (
     REPEAT_ NVARCHAR2(255),
     HANDLER_TYPE_ NVARCHAR2(255),
     HANDLER_CFG_ NVARCHAR2(2000),
+    CUSTOM_VALUES_ID_ NVARCHAR2(64),
     CREATE_TIME_ TIMESTAMP(6),
     TENANT_ID_ NVARCHAR2(255) DEFAULT '',
     primary key (ID_)
@@ -76,6 +79,7 @@ create table ACT_RU_DEADLETTER_JOB (
     REPEAT_ NVARCHAR2(255),
     HANDLER_TYPE_ NVARCHAR2(255),
     HANDLER_CFG_ NVARCHAR2(2000),
+    CUSTOM_VALUES_ID_ NVARCHAR2(64),
     CREATE_TIME_ TIMESTAMP(6),
     TENANT_ID_ NVARCHAR2(255) DEFAULT '',
     primary key (ID_)
@@ -91,6 +95,7 @@ create table ACT_RU_HISTORY_JOB (
     EXCEPTION_MSG_ NVARCHAR2(2000),
     HANDLER_TYPE_ NVARCHAR2(255),
     HANDLER_CFG_ NVARCHAR2(2000),
+    CUSTOM_VALUES_ID_ NVARCHAR2(64),
     ADV_HANDLER_CFG_ID_ NVARCHAR2(64),
     CREATE_TIME_ TIMESTAMP(6),
     TENANT_ID_ NVARCHAR2(255) DEFAULT '',
@@ -98,27 +103,55 @@ create table ACT_RU_HISTORY_JOB (
 );
 
 create index ACT_IDX_JOB_EXCEPTION on ACT_RU_JOB(EXCEPTION_STACK_ID_);
-alter table ACT_RU_JOB 
-    add constraint ACT_FK_JOB_EXCEPTION 
-    foreign key (EXCEPTION_STACK_ID_) 
+create index ACT_IDX_JOB_CUSTOM_VAL_ID on ACT_RU_JOB(CUSTOM_VALUES_ID_);
+
+create index ACT_IDX_TJOB_EXCEPTION on ACT_RU_TIMER_JOB(EXCEPTION_STACK_ID_);
+create index ACT_IDX_TJOB_CUSTOM_VAL_ID on ACT_RU_TIMER_JOB(CUSTOM_VALUES_ID_);
+
+create index ACT_IDX_SJOB_EXCEPTION on ACT_RU_SUSPENDED_JOB(EXCEPTION_STACK_ID_);
+create index ACT_IDX_SJOB_CUSTOM_VAL_ID on ACT_RU_SUSPENDED_JOB(CUSTOM_VALUES_ID_);
+
+create index ACT_IDX_DJOB_EXCEPTION on ACT_RU_DEADLETTER_JOB(EXCEPTION_STACK_ID_);
+create index ACT_IDX_DJOB_CUSTOM_VAL_ID on ACT_RU_DEADLETTER_JOB(CUSTOM_VALUES_ID_);
+
+alter table ACT_RU_JOB
+    add constraint ACT_FK_JOB_EXCEPTION
+    foreign key (EXCEPTION_STACK_ID_)
     references ACT_GE_BYTEARRAY (ID_);
-    
-create index ACT_IDX_TJOB_EXCEPTION on ACT_RU_TIMER_JOB(EXCEPTION_STACK_ID_);    
-alter table ACT_RU_TIMER_JOB 
-    add constraint ACT_FK_TJOB_EXCEPTION 
-    foreign key (EXCEPTION_STACK_ID_) 
+
+alter table ACT_RU_JOB
+    add constraint ACT_FK_JOB_CUSTOM_VAL
+    foreign key (CUSTOM_VALUES_ID_)
     references ACT_GE_BYTEARRAY (ID_);
-    
-create index ACT_IDX_SJOB_EXCEPTION on ACT_RU_SUSPENDED_JOB(EXCEPTION_STACK_ID_);    
-alter table ACT_RU_SUSPENDED_JOB 
-    add constraint ACT_FK_SJOB_EXCEPTION 
-    foreign key (EXCEPTION_STACK_ID_) 
+
+alter table ACT_RU_TIMER_JOB
+    add constraint ACT_FK_TJOB_EXCEPTION
+    foreign key (EXCEPTION_STACK_ID_)
     references ACT_GE_BYTEARRAY (ID_);
-    
-create index ACT_IDX_DJOB_EXCEPTION on ACT_RU_DEADLETTER_JOB(EXCEPTION_STACK_ID_);    
-alter table ACT_RU_DEADLETTER_JOB 
-    add constraint ACT_FK_DJOB_EXCEPTION 
-    foreign key (EXCEPTION_STACK_ID_) 
-    references ACT_GE_BYTEARRAY (ID_);            
+
+alter table ACT_RU_TIMER_JOB
+    add constraint ACT_FK_TJOB_CUSTOM_VAL
+    foreign key (CUSTOM_VALUES_ID_)
+    references ACT_GE_BYTEARRAY (ID_);
+
+alter table ACT_RU_SUSPENDED_JOB
+    add constraint ACT_FK_SJOB_EXCEPTION
+    foreign key (EXCEPTION_STACK_ID_)
+    references ACT_GE_BYTEARRAY (ID_);
+
+alter table ACT_RU_SUSPENDED_JOB
+    add constraint ACT_FK_SJOB_CUSTOM_VAL
+    foreign key (CUSTOM_VALUES_ID_)
+    references ACT_GE_BYTEARRAY (ID_);
+
+alter table ACT_RU_DEADLETTER_JOB
+    add constraint ACT_FK_DJOB_EXCEPTION
+    foreign key (EXCEPTION_STACK_ID_)
+    references ACT_GE_BYTEARRAY (ID_);
+
+alter table ACT_RU_DEADLETTER_JOB
+    add constraint ACT_FK_DJOB_CUSTOM_VAL
+    foreign key (CUSTOM_VALUES_ID_)
+    references ACT_GE_BYTEARRAY (ID_);
 
 insert into ACT_GE_PROPERTY values ('job.schema.version', '6.2.1.0', 1);
