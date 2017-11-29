@@ -19,8 +19,7 @@ import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelp
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.CmmnModel;
-import org.flowable.cmmn.model.ImplementationType;
-import org.flowable.cmmn.model.ServiceTask;
+import org.flowable.cmmn.model.HttpServiceTask;
 
 import java.util.Map;
 
@@ -50,8 +49,7 @@ public class HttpTaskJsonConverter extends BaseCmmnJsonConverter implements Deci
     protected CaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor,
                     BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
 
-        ServiceTask task = new ServiceTask();
-        task.setType(ServiceTask.HTTP_TASK);
+        HttpServiceTask task = new HttpServiceTask();
 
         if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_SERVICETASK_CLASS, elementNode))) {
             task.setImplementation(getPropertyValueAsString(PROPERTY_SERVICETASK_CLASS, elementNode));

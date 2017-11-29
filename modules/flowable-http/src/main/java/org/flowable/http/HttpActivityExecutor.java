@@ -26,14 +26,11 @@ import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 import org.flowable.bpmn.model.MapExceptionEntry;
-import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.common.api.variable.VariableContainer;
-import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.http.delegate.HttpRequestHandler;
 import org.flowable.http.delegate.HttpResponseHandler;
 import org.slf4j.Logger;
@@ -47,8 +44,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import static org.flowable.http.ExpressionUtils.getStringFromField;
 
 /**
  * An executor behavior for HTTP requests.
@@ -70,23 +65,29 @@ public class HttpActivityExecutor {
     public static final String HTTP_TASK_REQUEST_FIELD_INVALID = "request fields are invalid";
 
     protected final Timer timer = new Timer(true);
-    protected final CloseableHttpClient client;
+    protected final HttpClientBuilder clientBuilder;
     protected final ErrorPropagator errorPropagator;
 
-    public HttpActivityExecutor(CloseableHttpClient client, ErrorPropagator errorPropagator) {
-        this.client = client;
+    public HttpActivityExecutor(HttpClientBuilder clientBuilder, ErrorPropagator errorPropagator) {
+        this.clientBuilder = clientBuilder;
         this.errorPropagator = errorPropagator;
     }
 
     public void execute(HttpRequest request, VariableContainer execution, String executionId,
                         HttpRequestHandler flowableHttpRequestHandler, HttpResponseHandler flowableHttpResponseHandler,
-                        Expression responseVariableName,
-                        List<MapExceptionEntry> mapExceptions) {
-
+                        String responseVariableName,
+                        List<MapExceptionEntry> mapExceptions, int socketTimeout, int connectTimeout, int connectionRequestTimeout) {
         validate(request);
 
+        CloseableHttpClient client = null;
         try {
-            HttpResponse response = perform(execution, request, flowableHttpRequestHandler, flowableHttpResponseHandler);
+            client = clientBuilder.build();
+            LOGGER.debug("HTTP client is initialized");
+
+            HttpResponse response = perform(client, execution, request, flowableHttpRequestHandler, flowableHttpResponseHandler,
+                    socketTimeout,
+                    connectTimeout,
+                    connectionRequestTimeout);
             // Save response fields
             if (response != null) {
                 // Save response body only by default
@@ -98,9 +99,8 @@ public class HttpActivityExecutor {
                 }
 
                 if (!response.isBodyResponseHandled()) {
-                    String responseVariableValue = getStringFromField(responseVariableName, execution);
-                    if (StringUtils.isNotEmpty(responseVariableValue)) {
-                        execution.setVariable(responseVariableValue, response.getBody());
+                    if (StringUtils.isNotEmpty(responseVariableName)) {
+                        execution.setVariable(responseVariableName, response.getBody());
                     } else {
                         execution.setVariable(request.getPrefix() + ".responseBody", response.getBody());
                     }
@@ -140,15 +140,21 @@ public class HttpActivityExecutor {
             if (request.isIgnoreErrors()) {
                 LOGGER.info("Error ignored while processing http task in execution {}", executionId, e);
                 execution.setVariable(request.getPrefix() + ".errorMessage", e.getMessage());
-
             } else {
-                if (!errorPropagator.mapException(e, (ExecutionEntity) execution, mapExceptions)) {
+                if (!errorPropagator.mapException(e, execution, mapExceptions)) {
                     if (e instanceof FlowableException) {
                         throw (FlowableException) e;
                     } else {
                         throw new FlowableException("Error occurred while processing http task in execution " + executionId, e);
                     }
                 }
+            }
+        } finally {
+            try {
+                client.close();
+                LOGGER.debug("HTTP client is closed");
+            } catch (Throwable e) {
+                LOGGER.error("Could not close http client", e);
             }
         }
 
@@ -176,9 +182,10 @@ public class HttpActivityExecutor {
         }
     }
 
-    public HttpResponse perform(VariableContainer execution, final HttpRequest requestInfo,
+    public HttpResponse perform(CloseableHttpClient client, VariableContainer execution, final HttpRequest requestInfo,
                                 HttpRequestHandler httpRequestHandler,
-                                HttpResponseHandler httpResponseHandler) {
+                                HttpResponseHandler httpResponseHandler,
+                                int socketTimeout, int connectTimeout, int connectionRequestTimeout) {
 
         HttpRequestBase request;
         CloseableHttpResponse response = null;
@@ -225,7 +232,10 @@ public class HttpActivityExecutor {
                 setHeaders(request, requestInfo.getHeaders());
             }
 
-            setConfig(request, requestInfo, CommandContextUtil.getProcessEngineConfiguration().getHttpClientConfig());
+            setConfig(request, requestInfo,
+                    socketTimeout,
+                    connectTimeout,
+                    connectionRequestTimeout);
 
             if (requestInfo.getTimeout() > 0) {
                 timer.schedule(new TimeoutTask(request), requestInfo.getTimeout());
@@ -276,12 +286,12 @@ public class HttpActivityExecutor {
         }
     }
 
-    protected void setConfig(final HttpRequestBase base, final HttpRequest requestInfo, final HttpClientConfig config) {
+    protected void setConfig(final HttpRequestBase base, final HttpRequest requestInfo, int socketTimeout, int connectTimeout, int connectionRequestTimeout) {
         base.setConfig(RequestConfig.custom()
                 .setRedirectsEnabled(!requestInfo.isNoRedirects())
-                .setSocketTimeout(config.getSocketTimeout())
-                .setConnectTimeout(config.getConnectTimeout())
-                .setConnectionRequestTimeout(config.getConnectionRequestTimeout())
+                .setSocketTimeout(socketTimeout)
+                .setConnectTimeout(connectTimeout)
+                .setConnectionRequestTimeout(connectionRequestTimeout)
                 .build());
     }
 

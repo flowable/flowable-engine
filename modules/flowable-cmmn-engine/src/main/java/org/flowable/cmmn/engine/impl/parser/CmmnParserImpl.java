@@ -28,6 +28,7 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.Milestone;
@@ -150,7 +151,7 @@ public class CmmnParserImpl implements CmmnParser {
                         case ServiceTask.DMN_TASK:
                             planItem.setBehavior(activityBehaviorFactory.createDmnActivityBehavior(planItem, serviceTask));
                             break;
-                        case ServiceTask.HTTP_TASK:
+                        case HttpServiceTask.HTTP_TASK:
                             planItem.setBehavior(activityBehaviorFactory.createHttpActivityBehavior(planItem, serviceTask));
                             break;
                         default:

@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.parser;
 
+import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.CaseTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.HumanTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.MilestoneActivityBehavior;
@@ -58,7 +59,7 @@ public interface CmmnActivityBehaviorFactory {
 
     PlanItemDmnActivityBehavior createDmnActivityBehavior(PlanItem planItem, ServiceTask task);
 
-    CmmnClassDelegate createHttpActivityBehavior(PlanItem planItem, ServiceTask task);
+    CmmnActivityBehavior createHttpActivityBehavior(PlanItem planItem, ServiceTask task);
 
     TimerEventListenerActivityBehaviour createTimerEventListenerActivityBehavior(PlanItem planItem, TimerEventListener timerEventListener);
 

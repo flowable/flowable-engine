@@ -13,5 +13,5 @@ public interface ErrorPropagator {
 
     void propagateError(VariableContainer execution, String code);
 
-    boolean mapException(Exception e, ExecutionEntity execution, List<MapExceptionEntry> exceptionMap);
+    boolean mapException(Exception e, VariableContainer execution, List<MapExceptionEntry> exceptionMap);
 }

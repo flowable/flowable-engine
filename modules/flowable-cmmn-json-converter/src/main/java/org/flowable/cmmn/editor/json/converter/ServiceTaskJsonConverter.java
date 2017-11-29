@@ -22,6 +22,7 @@ import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.FieldExtension;
+import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
@@ -39,7 +40,7 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
     private static final Map<String, String> type_to_stencilset = new HashMap<>();
     static {
         type_to_stencilset.put(ServiceTask.DMN_TASK, STENCIL_TASK_DECISION);
-        type_to_stencilset.put(ServiceTask.HTTP_TASK, STENCIL_TASK_HTTP);
+        type_to_stencilset.put(HttpServiceTask.HTTP_TASK, STENCIL_TASK_HTTP);
     }
     protected static final Map<String, String> TYPE_TO_STENCILSET = Collections.unmodifiableMap(
             type_to_stencilset
@@ -103,7 +104,7 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
                 }
             }
 
-        } else if (ServiceTask.HTTP_TASK.equalsIgnoreCase(serviceTask.getType())) {
+        } else if (HttpServiceTask.HTTP_TASK.equalsIgnoreCase(serviceTask.getType())) {
             if (StringUtils.isNotEmpty(serviceTask.getImplementation())) {
                 propertiesNode.put(PROPERTY_SERVICETASK_CLASS, serviceTask.getImplementation());
             }

@@ -258,6 +258,9 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected boolean serializableVariableTypeTrackDeserializedObjects = true;
     protected ObjectMapper objectMapper = new ObjectMapper();
 
+    // Set Http Client config defaults
+    protected HttpClientConfig httpClientConfig = new HttpClientConfig();
+
     public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResourceDefault() {
         return createCmmnEngineConfigurationFromResource("flowable.cmmn.cfg.xml", "cmmnEngineConfiguration");
     }
@@ -421,7 +424,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
 
     protected void initServices() {
         initService(cmmnRuntimeService);
-        initService(cmmnTaskService);;
+        initService(cmmnTaskService);
         initService(cmmnManagementService);
         initService(cmmnRepositoryService);
         initService(cmmnHistoryService);
@@ -1348,4 +1351,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void setConfigurators(List<EngineConfigurator> configurators) {
         this.configurators = configurators;
     }
+
+    public HttpClientConfig getHttpClientConfig() {
+        return httpClientConfig;
+    }
+
+    public void setHttpClientConfig(HttpClientConfig httpClientConfig) {
+        this.httpClientConfig.merge(httpClientConfig);
+    }
+
 }

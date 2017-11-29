@@ -56,6 +56,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_EXIT_CRITERION = "exitCriterion";
     String ELEMENT_IF_PART = "ifPart";
     String ELEMENT_EXTENSIONS = "extensionElements";
+    String ELEMENT_HTTP_RESPONSE_HANDLER = "httpResponseHandler";
 
     String ELEMENT_PROCESS = "process";
     String ATTRIBUTE_IMPLEMENTATION_TYPE = "implementationType";

@@ -16,6 +16,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.FieldExtension;
+import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.ServiceTask;
 
@@ -51,7 +52,7 @@ public class ServiceTaskExport extends AbstractPlanItemDefinitionExport {
 
             }
         }
-        if (ServiceTask.HTTP_TASK.equals(task.getType())) {
+        if (HttpServiceTask.HTTP_TASK.equals(task.getType())) {
             if (StringUtils.isNotEmpty(task.getImplementation())) {
                 xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_CLASS, task.getImplementation());
             }

@@ -14,6 +14,7 @@ package org.flowable.cmmn.converter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CmmnElement;
+import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Task;
@@ -29,10 +30,6 @@ import java.util.Set;
  * @author Joram Barrez
  */
 public class TaskXmlConverter extends PlanItemDefinitiomXmlConverter {
-
-    private static final Collection<String> SERVICE_LIKE_TASK_TYPES = Collections.unmodifiableList(
-            Arrays.asList(ServiceTask.DMN_TASK, ServiceTask.HTTP_TASK)
-    );
 
     @Override
     public String getXMLElementName() {
@@ -73,10 +70,12 @@ public class TaskXmlConverter extends PlanItemDefinitiomXmlConverter {
             serviceTask.setResultVariableName(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_RESULT_VARIABLE_NAME));
             task = serviceTask;
 
-        } else if (SERVICE_LIKE_TASK_TYPES.contains(type)) {
+        } else if (ServiceTask.DMN_TASK.equals(type)) {
             ServiceTask serviceLikeTask = new ServiceTask();
             serviceLikeTask.setType(type);
             task = serviceLikeTask;
+        } else if (HttpServiceTask.HTTP_TASK.equals(type)) {
+            task = new HttpServiceTask();
         } else {
             task = new Task();
         }

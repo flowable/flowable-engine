@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.flowable.org/processdef">
+  <process id="asyncFailedJobRetryTimeCycle" name="Simple HTTP Get process" isExecutable="true">
+    <serviceTask id="failGet" name="Fail test" flowable:async="true" flowable:type="http">
+      <extensionElements>
+        <flowable:field name="requestMethod">
+          <flowable:string><![CDATA[GET]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="requestUrl">
+          <flowable:string><![CDATA[http://localhost:9798/api/fail]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="failStatusCodes">
+          <flowable:string><![CDATA[400, 5XX]]></flowable:string>
+        </flowable:field>
+        <flowable:failedJobRetryTimeCycle>R3/PT2S</flowable:failedJobRetryTimeCycle>
+        <flowable:executionListener event="start" class="org.flowable.http.bpmn.HttpExecutionListener">
+        </flowable:executionListener>
+      </extensionElements>
+    </serviceTask>
+    <startEvent id="theStart" name="Start"></startEvent>
+    <endEvent id="theEnd" name="End"></endEvent>
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="failGet"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="failGet" targetRef="theEnd"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_asyncSimpleGetOnly">
+    <bpmndi:BPMNPlane bpmnElement="asyncSimpleGetOnly" id="BPMNPlane_asyncSimpleGetOnly">
+      <bpmndi:BPMNShape bpmnElement="failGet" id="BPMNShape_failGet">
+        <omgdc:Bounds height="55.0" width="105.0" x="220.0" y="170.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="theStart" id="BPMNShape_theStart">
+        <omgdc:Bounds height="35.0" width="35.0" x="100.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="theEnd" id="BPMNShape_theEnd">
+        <omgdc:Bounds height="35.0" width="35.0" x="400.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="135.0" y="197.0"></omgdi:waypoint>
+        <omgdi:waypoint x="220.0" y="197.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="325.0" y="197.0"></omgdi:waypoint>
+        <omgdi:waypoint x="400.0" y="197.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

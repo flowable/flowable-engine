@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.parser;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.CaseTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.HumanTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.MilestoneActivityBehavior;
@@ -113,7 +114,7 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     }
 
     @Override
-    public CmmnClassDelegate createHttpActivityBehavior(PlanItem planItem, ServiceTask task) {
+    public CmmnActivityBehavior createHttpActivityBehavior(PlanItem planItem, ServiceTask task) {
         try {
             Class<?> theClass = null;
             FieldExtension behaviorExtension = null;
@@ -130,9 +131,9 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
             }
 
             // Default Http behavior class
-            if (theClass == null) theClass = Class.forName("org.flowable.http.impl.CmmnHttpActivityBehaviorImpl");
+            if (theClass == null) theClass = Class.forName("org.flowable.http.cmmn.impl.CmmnHttpActivityBehaviorImpl");
 
-            return classDelegateFactory.create(task.getImplementation(), task.getFieldExtensions());
+            return (CmmnActivityBehavior) classDelegateFactory.defaultInstantiateDelegate(theClass, task);
 
         } catch (ClassNotFoundException e) {
             throw new FlowableException("Could not find org.flowable.http.HttpActivityBehavior: ", e);

@@ -26,6 +26,7 @@ import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.GraphicInfo;
+import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ServiceTask;
@@ -140,7 +141,7 @@ public class CmmnDisplayJsonConverter {
 
             if (planItemDefinition instanceof ServiceTask) {
                 ServiceTask serviceTask = (ServiceTask) planItemDefinition;
-                if (ServiceTask.HTTP_TASK.equals(serviceTask.getType())) {
+                if (HttpServiceTask.HTTP_TASK.equals(serviceTask.getType())) {
                     elementNode.put("taskType", "http");
                 } else if (ServiceTask.DMN_TASK.equals(serviceTask.getType())) {
                     elementNode.put("taskType", "dmn");

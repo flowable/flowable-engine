@@ -20,9 +20,14 @@ public abstract class ExpressionUtils {
     public static int getIntFromField(Expression expression, VariableContainer execution) {
         if (expression != null) {
             Object value = expression.getValue(execution);
-            if (value != null) {
-                return Integer.parseInt(value.toString());
-            }
+            return parseInt(value);
+        }
+        return 0;
+    }
+
+    public static int parseInt(Object value) {
+        if (value != null) {
+            return Integer.parseInt(value.toString());
         }
         return 0;
     }
@@ -30,19 +35,24 @@ public abstract class ExpressionUtils {
     public static boolean getBooleanFromField(final Expression expression, final VariableContainer execution) {
         if (expression != null) {
             Object value = expression.getValue(execution);
-            if (value != null) {
-                if (value instanceof String) {
-                    String stringValue = (String) value;
-                    if (stringValue.equalsIgnoreCase("true") || stringValue.equalsIgnoreCase("false")) {
-                        return Boolean.parseBoolean(value.toString());
-                    }
-                    throw new FlowableException("String value \"" + value + "\" is not alloved in boolean expression");
+            return parseBoolean(value);
+        }
+        return false;
+    }
+
+    public static boolean parseBoolean(Object value) {
+        if (value != null) {
+            if (value instanceof String) {
+                String stringValue = (String) value;
+                if (stringValue.equalsIgnoreCase("true") || stringValue.equalsIgnoreCase("false")) {
+                    return Boolean.parseBoolean(value.toString());
                 }
-                if (value instanceof Boolean) {
-                    return (Boolean) value;
-                }
-                throw new FlowableException("Value \"" + value + "\" can not be converted into boolean");
+                throw new FlowableException("String value \"" + value + "\" is not alloved in boolean expression");
             }
+            if (value instanceof Boolean) {
+                return (Boolean) value;
+            }
+            throw new FlowableException("Value \"" + value + "\" can not be converted into boolean");
         }
         return false;
     }
