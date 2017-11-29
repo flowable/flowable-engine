@@ -260,7 +260,7 @@ alter table ACT_RU_DEADLETTER_JOB
     foreign key (CUSTOM_VALUES_ID_)
     references ACT_GE_BYTEARRAY (ID_);
 
-insert into ACT_GE_PROPERTY values ('job.schema.version', '6.2.0.0', 1);
+insert into ACT_GE_PROPERTY values ('job.schema.version', '6.2.1.0', 1);
 create table ACT_RE_DEPLOYMENT (
     ID_ varchar(64),
     NAME_ varchar(255),

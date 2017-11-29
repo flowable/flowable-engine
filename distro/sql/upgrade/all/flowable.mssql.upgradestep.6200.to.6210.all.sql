@@ -1,3 +1,5 @@
+update ACT_GE_PROPERTY set VALUE_ = '6.2.1.0' where NAME_ = 'job.schema.version';
+
 alter table ACT_RU_JOB add CUSTOM_VALUES_ID_ nvarchar(64);
 alter table ACT_RU_TIMER_JOB add CUSTOM_VALUES_ID_ nvarchar(64);
 alter table ACT_RU_SUSPENDED_JOB add CUSTOM_VALUES_ID_ nvarchar(64);
