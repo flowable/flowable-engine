@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -53,6 +53,7 @@ public class JobEntity extends AbstractJobEntity {
         this.exceptionMessage = te.getExceptionMessage();
         this.createTime = te.getCreateTime();
         setExceptionStacktrace(te.getExceptionStacktrace());
+        setCustomValues(te.getCustomValues());
 
         // Inherit tenant
         this.tenantId = te.getTenantId();
@@ -106,8 +107,9 @@ public class JobEntity extends AbstractJobEntity {
                 .getDbSqlSession()
                 .delete(this);
 
-        // Also delete the job's exception byte array
+        // Also delete the job's exception and the custom values byte array
         exceptionByteArrayRef.delete();
+        customValuesByteArrayRef.delete();
 
         // remove link to execution
         if (executionId != null) {

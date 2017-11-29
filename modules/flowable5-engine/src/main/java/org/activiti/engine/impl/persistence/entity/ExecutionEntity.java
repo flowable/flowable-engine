@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -25,10 +25,12 @@ import java.util.Map;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.delegate.event.impl.ActivitiEventBuilder;
+import org.activiti.engine.impl.JobProcessorContextImpl;
 import org.activiti.engine.impl.bpmn.behavior.MultiInstanceActivityBehavior;
 import org.activiti.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.activiti.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
+import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.db.HasRevision;
@@ -56,6 +58,8 @@ import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
 import org.activiti.engine.impl.pvm.runtime.OutgoingExecution;
 import org.activiti.engine.impl.pvm.runtime.StartingExecution;
 import org.activiti.engine.runtime.Execution;
+import org.activiti.engine.runtime.JobProcessor;
+import org.activiti.engine.runtime.JobProcessorContext;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.FlowableListener;
@@ -380,10 +384,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
             for (TimerDeclarationImpl timerDeclaration : timerDeclarations) {
                 TimerJobEntity timer = timerDeclaration.prepareTimerEntity(this);
                 if (timer != null) {
-                    Context
-                            .getCommandContext()
-                            .getJobEntityManager()
-                            .schedule(timer);
+                    callJobProcessors(JobProcessorContext.Phase.BEFORE_CREATE, timer, Context.getProcessEngineConfiguration());
+                    Context.getCommandContext().getJobEntityManager().schedule(timer);
                 }
             }
         }
@@ -702,10 +704,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
             message.setTenantId(getTenantId());
         }
 
-        Context
-                .getCommandContext()
-                .getJobEntityManager()
-                .send(message);
+        callJobProcessors(JobProcessorContext.Phase.BEFORE_CREATE, message, Context.getProcessEngineConfiguration());
+        Context.getCommandContext().getJobEntityManager().send(message);
     }
 
     public boolean isActive(String activityId) {
@@ -1922,6 +1922,13 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     @Override
     public void setMultiInstanceRoot(boolean isMultiInstanceRoot) {
 
+    }
+
+    protected void callJobProcessors(JobProcessorContext.Phase processorType, AbstractJobEntity abstractJobEntity, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        JobProcessorContextImpl jobProcessorContext = new JobProcessorContextImpl(processorType, abstractJobEntity);
+        for (JobProcessor jobProcessor : processEngineConfiguration.getJobProcessors()) {
+            jobProcessor.process(jobProcessorContext);
+        }
     }
 
 }
