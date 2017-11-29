@@ -72,6 +72,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     private static final long serialVersionUID = 1L;
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(MultiInstanceActivityBehavior.class);
+    protected static final String DELETE_REASON_END = "MI_END";
 
     // Variable names for outer instance(as described in spec)
     protected final String NUMBER_OF_INSTANCES = "nrOfInstances";
@@ -144,7 +145,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         ExecutionEntity parentExecution = multiInstanceRootExecution.getParent();
         
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
-        executionEntityManager.deleteChildExecutions(multiInstanceRootExecution, "MI_END", false);
+        executionEntityManager.deleteChildExecutions(multiInstanceRootExecution, DELETE_REASON_END, true);
         executionEntityManager.deleteRelatedDataForExecution(multiInstanceRootExecution, null);
         executionEntityManager.delete(multiInstanceRootExecution);
 
