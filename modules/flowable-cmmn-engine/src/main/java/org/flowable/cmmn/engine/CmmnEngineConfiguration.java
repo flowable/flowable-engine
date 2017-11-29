@@ -234,6 +234,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected DbSchemaManager identityLinkDbSchemaManager;
     protected DbSchemaManager variableDbSchemaManager;
     protected DbSchemaManager taskDbSchemaManager;
+
     /**
      * Case diagram generator. Default value is DefaultCaseDiagramGenerator
      */
@@ -244,6 +245,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected String activityFontName = "Arial";
     protected String labelFontName = "Arial";
     protected String annotationFontName = "Arial";
+
     // CONFIGURATORS ////////////////////////////////////////////////////////////
 
     protected boolean enableConfiguratorServiceLoader = true; // Enabled by default. In certain environments this should be set to false (eg osgi)

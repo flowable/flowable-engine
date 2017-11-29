@@ -38,16 +38,16 @@ public class TaskXmlConverter extends PlanItemDefinitiomXmlConverter {
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        Task task;
-        ServiceTask serviceTask = new ServiceTask();
+        Task task = null;
         String type = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_TYPE);
         String className = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_CLASS);
-        if (StringUtils.isNotEmpty(className)) {
-            serviceTask.setImplementation(className);
-        }
 
         if (ServiceTask.JAVA_TASK.equals(type)) {
+            ServiceTask serviceTask = new ServiceTask();
             serviceTask.setType(ServiceTask.JAVA_TASK);
+            if (StringUtils.isNotEmpty(className)) {
+                serviceTask.setImplementation(className);
+            }
             String expression = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_EXPRESSION);
             String delegateExpression = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_DELEGATE_EXPRESSION);
 
@@ -67,11 +67,15 @@ public class TaskXmlConverter extends PlanItemDefinitiomXmlConverter {
             task = serviceTask;
 
         } else if (ServiceTask.DMN_TASK.equals(type)) {
-            ServiceTask serviceLikeTask = new ServiceTask();
-            serviceLikeTask.setType(type);
-            task = serviceLikeTask;
+            ServiceTask serviceTask = new ServiceTask();
+            serviceTask.setType(type);
+            task = serviceTask;
         } else if (HttpServiceTask.HTTP_TASK.equals(type)) {
-            task = new HttpServiceTask();
+            HttpServiceTask httpServiceTask = new HttpServiceTask();
+            if (StringUtils.isNotEmpty(className)) {
+                httpServiceTask.setImplementation(className);
+            }
+            task = httpServiceTask;
         } else {
             task = new Task();
         }

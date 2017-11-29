@@ -692,7 +692,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
                 }
             }
 
-            Line2D lastLine;
+            Line2D lastLine = null;
 
             if (dockersNode.size() > 2) {
                 for (int i = 1; i < dockersNode.size() - 1; i++) {

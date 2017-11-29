@@ -334,7 +334,7 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
 
     @Override
     public ActivityBehavior createBusinessRuleTaskActivityBehavior(BusinessRuleTask businessRuleTask) {
-        BusinessRuleTaskDelegate ruleActivity;
+        BusinessRuleTaskDelegate ruleActivity = null;
         if (StringUtils.isNotEmpty(businessRuleTask.getClassName())) {
             try {
                 Class<?> clazz = Class.forName(businessRuleTask.getClassName());
@@ -454,7 +454,7 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     public CallActivityBehavior createCallActivityBehavior(CallActivity callActivity) {
         String expressionRegex = "\\$+\\{+.+\\}";
 
-        CallActivityBehavior callActivityBehaviour;
+        CallActivityBehavior callActivityBehaviour = null;
         if (StringUtils.isNotEmpty(callActivity.getCalledElement()) && callActivity.getCalledElement().matches(expressionRegex)) {
             callActivityBehaviour = new CallActivityBehavior(expressionManager.createExpression(callActivity.getCalledElement()), callActivity.getMapExceptions());
         } else {
