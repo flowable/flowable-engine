@@ -83,7 +83,7 @@ public class CmmnClassDelegate implements CmmnActivityBehavior {
             value = fieldExtension.getStringValue();
         } else if (fieldExtension.getExpression() != null) {
             ExpressionManager expressionManager = CommandContextUtil.getCmmnEngineConfiguration().getExpressionManager();
-            value = expressionManager.createExpression(fieldExtension.getExpression()).getValue(variableContainer);
+            value = expressionManager.createExpression(fieldExtension.getExpression());
         }
 
         ReflectUtil.invokeSetterOrField(target, fieldExtension.getFieldName(), value, throwExceptionOnMissingField);

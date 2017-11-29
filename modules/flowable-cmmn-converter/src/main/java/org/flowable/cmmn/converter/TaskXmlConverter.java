@@ -52,6 +52,7 @@ public class TaskXmlConverter extends PlanItemDefinitiomXmlConverter {
         }
 
         if (ServiceTask.JAVA_TASK.equals(type)) {
+            serviceTask.setType(ServiceTask.JAVA_TASK);
             String expression = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_EXPRESSION);
             String delegateExpression = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_DELEGATE_EXPRESSION);
 

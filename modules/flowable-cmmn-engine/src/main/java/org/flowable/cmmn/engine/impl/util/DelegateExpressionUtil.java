@@ -51,18 +51,18 @@ public class DelegateExpressionUtil {
     protected static void applyFieldExtensions(List<FieldExtension> fieldExtensions, Object target, VariableContainer variableContainer, boolean throwExceptionOnMissingField) {
         if (fieldExtensions != null) {
             for (FieldExtension fieldExtension : fieldExtensions) {
-                applyFieldExtension(fieldExtension, target, variableContainer, throwExceptionOnMissingField);
+                applyFieldExtension(fieldExtension, target, throwExceptionOnMissingField);
             }
         }
     }
 
-    protected static void applyFieldExtension(FieldExtension fieldExtension, Object target, VariableContainer variableContainer, boolean throwExceptionOnMissingField) {
+    protected static void applyFieldExtension(FieldExtension fieldExtension, Object target, boolean throwExceptionOnMissingField) {
         Object value = null;
         if (fieldExtension.getStringValue() != null) {
             value = fieldExtension.getStringValue();
         } else if (fieldExtension.getExpression() != null) {
             ExpressionManager expressionManager = CommandContextUtil.getCmmnEngineConfiguration().getExpressionManager();
-            value = expressionManager.createExpression(fieldExtension.getExpression()).getValue(variableContainer);
+            value = expressionManager.createExpression(fieldExtension.getExpression());
         }
 
         ReflectUtil.invokeSetterOrField(target, fieldExtension.getFieldName(), value, throwExceptionOnMissingField);
