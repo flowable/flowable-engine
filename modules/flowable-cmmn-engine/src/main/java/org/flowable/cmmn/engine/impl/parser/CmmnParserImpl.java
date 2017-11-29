@@ -225,6 +225,7 @@ public class CmmnParserImpl implements CmmnParser {
         }
         return null;
     }
+
     public CmmnActivityBehaviorFactory getActivityBehaviorFactory() {
         return activityBehaviorFactory;
     }
