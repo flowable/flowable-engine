@@ -484,7 +484,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             if (associationsFound) {
                 List<Association> associations = associationMap.get(criterion.getId());
                 for (Association association : associations) {
-                    PlanItem criterionPlanItem;
+                    PlanItem criterionPlanItem = null;
                     if (association.getSourceRef().equals(criterion.getId())) {
                         criterionPlanItem = (PlanItem) association.getTargetElement();
                     } else {
@@ -631,7 +631,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             double sourceDockersY = dockersNode.get(0).get(EDITOR_BOUNDS_Y).asDouble();
 
             String stencilId = CmmnJsonConverterUtil.getStencilId(sourceRefNode);
-            String sourceId;
+            String sourceId = null;
             if (STENCIL_ENTRY_CRITERION.equals(stencilId) || STENCIL_EXIT_CRITERION.equals(stencilId)) {
                 sourceId = CmmnJsonConverterUtil.getElementId(sourceRefNode);
             } else {
@@ -643,7 +643,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             GraphicInfo sourceInfo = cmmnModel.getGraphicInfo(sourceId);
 
             stencilId = CmmnJsonConverterUtil.getStencilId(targetRefNode);
-            String targetId;
+            String targetId = null;
             if (STENCIL_ENTRY_CRITERION.equals(stencilId) || STENCIL_EXIT_CRITERION.equals(stencilId)) {
                 targetId = CmmnJsonConverterUtil.getElementId(targetRefNode);
             } else {
