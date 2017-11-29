@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -17,7 +17,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -105,8 +104,10 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new CmmnDiEdgeXmlConverter());
         addElementConverter(new CmmnDiBoundsXmlConverter());
         addElementConverter(new CmmnDiWaypointXmlConverter());
-        
+
         addElementConverter(new FieldExtensionXmlConverter());
+        addElementConverter(new FlowableHttpResponseHandlerXmlConverter());
+        addElementConverter(new FlowableHttpRequestHandlerXmlConverter());
 
         addTextConverter(new StandardEventXmlConverter());
         addTextConverter(new ProcessRefExpressionXmlConverter());
@@ -313,7 +314,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             processPlanFragment(cmmnModel, caze.getPlanModel());
         }
 
-        // CMMN doesn't mandate ids on many elements ... adding generated ids 
+        // CMMN doesn't mandate ids on many elements ... adding generated ids
         // to those elements as this makes the logic much easier
         ensureIds(conversionHelper.getPlanFragments(), "planFragment_");
         ensureIds(conversionHelper.getStages(), "stage_");
@@ -342,7 +343,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             association.setId(diEdge.getId());
             association.setSourceRef(diEdge.getCmmnElementRef());
             association.setTargetRef(diEdge.getTargetCmmnElementRef());
-            
+
             String planItemSourceRef = null;
             PlanItem planItem = cmmnModel.findPlanItem(association.getSourceRef());
             if (planItem == null) {
@@ -351,7 +352,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             } else {
                 planItemSourceRef = association.getSourceRef();
             }
-            
+
             if (planItem != null) {
                 for (Criterion criterion : planItem.getEntryCriteria()) {
                     Sentry sentry = criterion.getSentry();
@@ -363,7 +364,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     }
                 }
             }
-            
+
             cmmnModel.addAssociation(association);
 
             cmmnModel.addFlowGraphicInfoList(association.getId(), diEdge.getWaypoints());
@@ -413,7 +414,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 }
 
                 if (exitCriteriaAllowed) {
-                    resolveExitCriteriaSentry((HasExitCriteria) planItem);
+                    resolveExitCriteriaSentry(planItem);
                 } else {
                     LOGGER.warn("Ignoring exit criteria on plan item {}", planItem.getId());
                 }
@@ -441,7 +442,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             }
 
         }
-        
+
     }
 
     protected void resolveEntryCriteria(HasEntryCriteria hasEntryCriteria) {

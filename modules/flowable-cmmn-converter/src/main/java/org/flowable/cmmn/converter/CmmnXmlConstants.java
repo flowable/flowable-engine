@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,7 +16,7 @@ package org.flowable.cmmn.converter;
  * @author Joram Barrez
  */
 public interface CmmnXmlConstants {
-    
+
     String CMMN_NAMESPACE = "http://www.omg.org/spec/CMMN/20151109/MODEL";
     String FLOWABLE_EXTENSIONS_NAMESPACE = "http://flowable.org/cmmn";
     String FLOWABLE_EXTENSIONS_PREFIX = "flowable";
@@ -29,7 +29,7 @@ public interface CmmnXmlConstants {
     String OMGDI_NAMESPACE = "http://www.omg.org/spec/CMMN/20151109/DI";
     String OMGDI_PREFIX = "di";
     String CASE_NAMESPACE = "http://www.flowable.org/test";
-    
+
     String ATTRIBUTE_TARGET_NAMESPACE = "targetNamespace";
     String ATTRIBUTE_EXPRESSION_LANGUAGE = "expressionLanguage";
     String ATTRIBUTE_EXPORTER = "exporter";
@@ -41,7 +41,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_DOCUMENTATION = "documentation";
     String ELEMENT_CASE = "case";
     String ELEMENT_PLAN_MODEL = "casePlanModel";
-    String ELEMENT_STAGE = "stage";    
+    String ELEMENT_STAGE = "stage";
     String ELEMENT_MILESTONE = "milestone";
     String ELEMENT_TASK = "task";
     String ELEMENT_HUMAN_TASK = "humanTask";
@@ -55,12 +55,14 @@ public interface CmmnXmlConstants {
     String ELEMENT_ENTRY_CRITERION = "entryCriterion";
     String ELEMENT_EXIT_CRITERION = "exitCriterion";
     String ELEMENT_IF_PART = "ifPart";
-    String ELEMENT_EXTENSIONS = "extensions";
-    
+    String ELEMENT_EXTENSIONS = "extensionElements";
+    String ELEMENT_HTTP_RESPONSE_HANDLER = "httpResponseHandler";
+    String ELEMENT_HTTP_REQUEST_HANDLER = "httpRequestHandler";
+
     String ELEMENT_PROCESS = "process";
     String ATTRIBUTE_IMPLEMENTATION_TYPE = "implementationType";
     String ATTRIBUTE_EXTERNAL_REF = "externalRef";
-    
+
     String ATTRIBUTE_ID = "id";
     String ATTRIBUTE_NAME = "name";
     String ATTRIBUTE_INITIATOR_VARIABLE_NAME = "initiatorVariableName";
@@ -70,31 +72,31 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_SENTRY_REF = "sentryRef";
     String ATTRIBUTE_IS_BLOCKING = "isBlocking";
     String ATTRIBUTE_IS_BLOCKING_EXPRESSION = "isBlockingExpression";
-    
+
     String ATTRIBUTE_CASE_REF = "caseRef";
     String ATTRIBUTE_PROCESS_REF = "processRef";
-    
+
     String ELEMENT_PROCESS_REF_EXPRESSION = "processRefExpression";
     String ELEMENT_CONDITION = "condition";
-    
+
     String ELEMENT_TIMER_EXPRESSION = "timerExpression";
     String ELEMENT_PLAN_ITEM_START_TRIGGER = "planItemStartTrigger";
     String ATTRIBUTE_PLAN_ITEM_START_TRIGGER_SRC_REF = "sourceRef";
-    
+
     String ATTRIBUTE_TYPE = "type";
-    
+
     String ATTRIBUTE_CLASS = "class";
     String ATTRIBUTE_EXPRESSION = "expression";
     String ATTRIBUTE_DELEGATE_EXPRESSION = "delegateExpression";
-    
+
     String ATTRIBUTE_RESULT_VARIABLE_NAME = "resultVariableName";
-    
+
     String ELEMENT_FIELD = "field";
     String ATTRIBUTE_FIELD_STRING = "stringValue";
     String ATTRIBUTE_FIELD_EXPRESSION = "expression";
     String ELEMENT_FIELD_STRING = "string";
     String ELEMENT_FIELD_EXPRESSION = "expression";
-    
+
     String ATTRIBUTE_ASSIGNEE = "assignee";
     String ATTRIBUTE_OWNER = "owner";
     String ATTRIBUTE_CANDIDATE_USERS = "candidateUsers";
@@ -103,7 +105,7 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_FORM_KEY = "formKey";
     String ATTRIBUTE_DUE_DATE = "dueDate";
     String ATTRIBUTE_CATEGORY = "category";
-    
+
     String ELEMENT_DI_CMMN = "CMMNDI";
     String ELEMENT_DI_DIAGRAM = "CMMNDiagram";
     String ELEMENT_DI_SHAPE = "CMMNShape";
@@ -117,5 +119,5 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_DI_HEIGHT = "height";
     String ATTRIBUTE_DI_X = "x";
     String ATTRIBUTE_DI_Y = "y";
-    
+
 }

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,6 +14,7 @@ package org.flowable.cmmn.editor.json.converter;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
@@ -32,18 +33,13 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements 
 
     protected Map<String, String> decisionTableMap;
 
-    public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToBpmnMap,
-            Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
+    public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap) {
 
-        fillJsonTypes(convertersToBpmnMap);
-        fillBpmnTypes(convertersToJsonMap);
+        fillJsonTypes(convertersToCmmnMap);
     }
 
     public static void fillJsonTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToBpmnMap) {
         convertersToBpmnMap.put(STENCIL_TASK_DECISION, DecisionTaskJsonConverter.class);
-    }
-
-    public static void fillBpmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
     }
 
     protected String getStencilId(BaseElement baseElement) {
@@ -51,7 +47,7 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements 
     }
 
     @Override
-    protected CaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, 
+    protected CaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor,
                     BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
 
         ServiceTask serviceTask = new ServiceTask();
@@ -60,10 +56,8 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements 
         JsonNode decisionTableReferenceNode = getProperty(PROPERTY_DECISIONTABLE_REFERENCE, elementNode);
         if (decisionTableReferenceNode != null && decisionTableReferenceNode.has("id") && !decisionTableReferenceNode.get("id").isNull()) {
 
-            String decisionTableId = decisionTableReferenceNode.get("id").asText();
-            if (decisionTableMap != null) {
-                String decisionTableKey = decisionTableMap.get(decisionTableId);
-
+            String decisionTableKey = decisionTableReferenceNode.get("key").asText();;
+            if (StringUtils.isNotEmpty(decisionTableKey)) {
                 FieldExtension decisionTableKeyField = new FieldExtension();
                 decisionTableKeyField.setFieldName(PROPERTY_DECISIONTABLE_REFERENCE_KEY);
                 decisionTableKeyField.setStringValue(decisionTableKey);
