@@ -568,16 +568,20 @@ public class DefaultJobManager implements JobManager {
     }
 
     protected void callJobProcessors(JobProcessorContext.Phase processorType, AbstractJobEntity abstractJobEntity) {
-        JobProcessorContextImpl jobProcessorContext = new JobProcessorContextImpl(processorType, abstractJobEntity);
-        for (JobProcessor jobProcessor : jobServiceConfiguration.getJobProcessors()) {
-            jobProcessor.process(jobProcessorContext);
+        if (jobServiceConfiguration.getJobProcessors() != null) {
+            JobProcessorContextImpl jobProcessorContext = new JobProcessorContextImpl(processorType, abstractJobEntity);
+            for (JobProcessor jobProcessor : jobServiceConfiguration.getJobProcessors()) {
+                jobProcessor.process(jobProcessorContext);
+            }
         }
     }
 
     protected void callHistoryJobProcessors(HistoryJobProcessorContext.Phase processorType, HistoryJobEntity historyJobEntity) {
-        HistoryJobProcessorContextImpl historyJobProcessorContext = new HistoryJobProcessorContextImpl(processorType, historyJobEntity);
-        for (HistoryJobProcessor historyJobProcessor : jobServiceConfiguration.getHistoryJobProcessors()) {
-            historyJobProcessor.process(historyJobProcessorContext);
+        if (jobServiceConfiguration.getHistoryJobProcessors() != null) {
+            HistoryJobProcessorContextImpl historyJobProcessorContext = new HistoryJobProcessorContextImpl(processorType, historyJobEntity);
+            for (HistoryJobProcessor historyJobProcessor : jobServiceConfiguration.getHistoryJobProcessors()) {
+                historyJobProcessor.process(historyJobProcessorContext);
+            }
         }
     }
 
