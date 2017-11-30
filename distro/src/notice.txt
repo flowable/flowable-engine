@@ -149,7 +149,7 @@ io.swagger                      swagger-models              1.5.10          Apac
 javax.activation                activation                  1.1.1           COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
 javax.annotation                jsr250-api                  1.0             COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
 javax.mail                      mail                        1.4.1           CDDL-GPLv2+CE
-joda-time                       joda-time                   2.6             Apache 2
+joda-time                       joda-time                   2.9.9           Apache 2
 log4j                           log4j                       1.2.17          The Apache Software License, Version 2.0
 math.geom2d                     javaGeom                    0.11.1          Lesser General Public License version 2.0 (LGPLv2)
 org.apache.commons              commons-email               1.5             Apache License, Version 2.0
