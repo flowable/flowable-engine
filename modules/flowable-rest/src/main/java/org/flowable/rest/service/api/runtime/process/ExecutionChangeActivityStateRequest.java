@@ -18,7 +18,7 @@ import io.swagger.annotations.ApiModelProperty;
 /**
  * @author Tijs Rademakers
  */
-public class ProcessInstanceChangeActivityStateRequest {
+public class ExecutionChangeActivityStateRequest {
 
     protected String cancelActivityId;
     protected String startActivityId;

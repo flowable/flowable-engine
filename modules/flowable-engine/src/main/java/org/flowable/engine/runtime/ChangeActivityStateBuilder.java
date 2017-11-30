@@ -28,6 +28,11 @@ public interface ChangeActivityStateBuilder {
      * Set the id of the process instance
      **/
     ChangeActivityStateBuilder processInstanceId(String processInstanceId);
+    
+    /**
+     * Set the id of the execution for which the activity should be changed
+     **/
+    ChangeActivityStateBuilder executionId(String executionId);
 
     /**
      * Set the activity that should be cancelled.

@@ -1070,6 +1070,8 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("secondTask", task.getTaskDefinitionKey());
         taskService.complete(task.getId());
+        
+        assertProcessEnded(processInstance.getId());
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcess.bpmn20.xml" })
@@ -1098,5 +1100,136 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("subtask", task.getTaskDefinitionKey());
         taskService.complete(task.getId());
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+        
+        assertProcessEnded(processInstance.getId());
+    }
+    
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskSubProcess.bpmn20.xml" })
+    public void testSetCurrentActivityForSubProcessExecution() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startSimpleSubProcess");
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subtask", task.getTaskDefinitionKey());
+
+        runtimeService.createChangeActivityStateBuilder()
+                .executionId(task.getExecutionId())
+                .startActivityId("taskBefore")
+                .changeState();
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskBefore", task.getTaskDefinitionKey());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, executions.size());
+
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subtask", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+        
+        assertProcessEnded(processInstance.getId());
+    }
+    
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskNestedSubProcess.bpmn20.xml" })
+    public void testSetCurrentActivityForNestedSubProcessExecution() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startNestedSubProcess");
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subtask", task.getTaskDefinitionKey());
+        
+        taskService.complete(task.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("nestedSubtask", task.getTaskDefinitionKey());
+
+        runtimeService.createChangeActivityStateBuilder()
+                .executionId(task.getExecutionId())
+                .startActivityId("subtaskAfter")
+                .changeState();
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subtaskAfter", task.getTaskDefinitionKey());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(3, executions.size());
+
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        taskService.complete(task.getId());
+        
+        assertProcessEnded(processInstance.getId());
+    }
+    
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskNestedSubProcess.bpmn20.xml" })
+    public void testSetCurrentActivityForNestedSubProcessExecution2() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("startNestedSubProcess");
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subtask", task.getTaskDefinitionKey());
+        
+        taskService.complete(task.getId());
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("nestedSubtask", task.getTaskDefinitionKey());
+
+        runtimeService.createChangeActivityStateBuilder()
+                .executionId(task.getExecutionId())
+                .startActivityId("taskAfter")
+                .changeState();
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(2, executions.size());
+
+        taskService.complete(task.getId());
+        
+        assertProcessEnded(processInstance.getId());
+    }
+    
+    @Deployment(resources = { "org/flowable/engine/test/api/taskTwoSubProcesses.bpmn20.xml" })
+    public void testSetCurrentActivityForTwoSubProcesses() {
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoSubProcesses");
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        taskService.complete(task.getId());
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subtask", task.getTaskDefinitionKey());
+
+        runtimeService.createChangeActivityStateBuilder()
+                .executionId(task.getExecutionId())
+                .startActivityId("subtask2")
+                .changeState();
+
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("subtask2", task.getTaskDefinitionKey());
+
+        List<Execution> executions = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).list();
+        assertEquals(3, executions.size());
+
+        taskService.complete(task.getId());
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("taskAfter", task.getTaskDefinitionKey());
+        
+        taskService.complete(task.getId());
+        
+        assertProcessEnded(processInstance.getId());
     }
 }

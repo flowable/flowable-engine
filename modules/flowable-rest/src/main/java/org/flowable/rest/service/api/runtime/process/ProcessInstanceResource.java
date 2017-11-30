@@ -96,7 +96,7 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
     })
     @PostMapping(value = "/runtime/process-instances/{processInstanceId}/change-state", produces = "application/json")
     public void changeActivityState(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId,
-            @RequestBody ProcessInstanceChangeActivityStateRequest activityStateRequest, HttpServletRequest request) {
+            @RequestBody ExecutionChangeActivityStateRequest activityStateRequest, HttpServletRequest request) {
 
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(processInstanceId)

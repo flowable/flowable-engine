@@ -88,6 +88,7 @@ import org.flowable.engine.compatibility.DefaultFlowable5CompatibilityHandlerFac
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandlerFactory;
 import org.flowable.engine.delegate.event.impl.BpmnModelEventDispatchAction;
+import org.flowable.engine.dynamic.DynamicStateManager;
 import org.flowable.engine.form.AbstractFormType;
 import org.flowable.engine.impl.DynamicBpmnServiceImpl;
 import org.flowable.engine.impl.FormServiceImpl;
@@ -160,6 +161,7 @@ import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.impl.db.EntityDependencyOrder;
 import org.flowable.engine.impl.db.ProcessDbSchemaManager;
 import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
+import org.flowable.engine.impl.dynamic.DefaultDynamicStateManager;
 import org.flowable.engine.impl.el.FlowableDateFunctionDelegate;
 import org.flowable.engine.impl.el.ProcessExpressionManager;
 import org.flowable.engine.impl.event.CompensationEventHandler;
@@ -410,6 +412,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // Job Manager
 
     protected JobManager jobManager;
+    
+    // Dynamic state manager
+    
+    protected DynamicStateManager dynamicStateManager;
 
     // CONFIGURATORS ////////////////////////////////////////////////////////////
 
@@ -841,6 +847,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initEntityManagers();
         initCandidateManager();
         initHistoryManager();
+        initDynamicStateManager();
         initJpa();
         initDeployers();
         initEventHandlers();
@@ -1100,6 +1107,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             } else {
                 historyManager = new DefaultHistoryManager(this, historyLevel);
             }
+        }
+    }
+    
+    // Dynamic state manager ////////////////////////////////////////////////////
+    
+    public void initDynamicStateManager() {
+        if (dynamicStateManager == null) {
+            dynamicStateManager = new DefaultDynamicStateManager();
         }
     }
 
@@ -3365,6 +3380,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setJobManager(JobManager jobManager) {
         this.jobManager = jobManager;
+        return this;
+    }
+
+    public DynamicStateManager getDynamicStateManager() {
+        return dynamicStateManager;
+    }
+
+    public ProcessEngineConfigurationImpl setDynamicStateManager(DynamicStateManager dynamicStateManager) {
+        this.dynamicStateManager = dynamicStateManager;
         return this;
     }
 

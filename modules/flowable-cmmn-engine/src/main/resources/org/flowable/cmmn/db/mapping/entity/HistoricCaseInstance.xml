@@ -151,10 +151,10 @@
 
     <sql id="selectHistoricCaseInstancesByQueryCriteriaSql">
         from ${prefix}ACT_CMMN_HI_CASE_INST RES
+        <if test="caseDefinitionKey != null or caseDefinitionKeys != null or caseDefinitionCategory != null or caseDefinitionName != null or deploymentId != null or deploymentIds != null">
+            inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
+        </if>
         <where>
-            <if test="caseDefinitionKey != null or caseDefinitionKeys != null or caseDefinitionCategory != null or caseDefinitionName != null or deploymentId != null or deploymentIds != null">
-                inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF
-            </if>
             <if test="caseInstanceId != null">
                 RES.ID_ = #{caseInstanceId}
             </if>
