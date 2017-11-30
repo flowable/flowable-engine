@@ -9,13 +9,13 @@ import javax.xml.bind.DatatypeConverter;
 
 import org.flowable.variable.api.types.ValueFields;
 import org.flowable.variable.api.types.VariableType;
-import org.flowable.variable.service.impl.persistence.entity.SealMetadataList;
+import org.flowable.variable.service.impl.persistence.entity.AdvancedList;
 
-public class SealMetadataListType implements VariableType{
+public class AdvancedListType implements VariableType{
 
 	@Override
 	public String getTypeName() {
-		return "SealMetadataList";
+		return "AdvancedList<T>";
 	}
 
 	@Override
@@ -25,7 +25,7 @@ public class SealMetadataListType implements VariableType{
 
 	@Override
 	public boolean isAbleToStore(Object value) {
-		return value == null || value instanceof SealMetadataList;
+		return value == null || value instanceof AdvancedList<?>;
 	}
 
 	@Override
@@ -57,14 +57,14 @@ public class SealMetadataListType implements VariableType{
 			byte[] decodedData = DatatypeConverter.parseBase64Binary(str);
 			ByteArrayInputStream byteArrayInputStream= new ByteArrayInputStream(decodedData);
 			ObjectInputStream objectInputStream = null;
-			SealMetadataList sealList = null;
+			AdvancedList<?> advancedList = null;
 			try {
 				objectInputStream = new ObjectInputStream(byteArrayInputStream);
-				sealList = (SealMetadataList)objectInputStream.readObject();
+				advancedList = (AdvancedList<?>)objectInputStream.readObject();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-			return sealList;
+			return advancedList;
 		}
 	}
 
