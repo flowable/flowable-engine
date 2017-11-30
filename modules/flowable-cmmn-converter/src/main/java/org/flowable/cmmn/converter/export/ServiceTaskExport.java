@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.converter.export;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
@@ -19,6 +20,7 @@ import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.ImplementationType;
 import org.flowable.cmmn.model.ServiceTask;
+import org.flowable.cmmn.model.TaskWithFieldExtensions;
 
 public class ServiceTaskExport extends AbstractPlanItemDefinitionExport {
 
@@ -58,6 +60,13 @@ public class ServiceTaskExport extends AbstractPlanItemDefinitionExport {
             }
         }
 
+        writeExtensions(task, xtw);
+
+        // end task element
+        xtw.writeEndElement();
+    }
+
+    public static void writeExtensions(TaskWithFieldExtensions task, XMLStreamWriter xtw) throws XMLStreamException {
         if (task.getFieldExtensions().size() > 0) {
             xtw.writeStartElement(ELEMENT_EXTENSIONS);
 
@@ -78,8 +87,6 @@ public class ServiceTaskExport extends AbstractPlanItemDefinitionExport {
 
             xtw.writeEndElement();
         }
-
-        // end task element
-        xtw.writeEndElement();
     }
+
 }

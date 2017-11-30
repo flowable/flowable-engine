@@ -14,23 +14,32 @@ package org.flowable.cmmn.converter.export;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.DecisionTask;
-import org.flowable.cmmn.model.ProcessTask;
 
 import javax.xml.stream.XMLStreamWriter;
+
+import static org.flowable.cmmn.converter.export.ServiceTaskExport.writeExtensions;
 
 public class DecisionTaskExport extends AbstractPlanItemDefinitionExport {
 
     public static void writeDecisionTask(DecisionTask decisionTask, XMLStreamWriter xtw) throws Exception {
-        // start process task element
+        // start decision task element
         xtw.writeStartElement(ELEMENT_DECISION_TASK);
         writeCommonPlanItemDefinitionAttributes(decisionTask, xtw);
         writeBlockingAttribute(xtw, decisionTask);
 
-        if (StringUtils.isNotEmpty(decisionTask.getDecisionRef())) {
-            xtw.writeAttribute(ATTRIBUTE_DECISION_REF, decisionTask.getDecisionRef());
+        writeExtensions(decisionTask, xtw);
+
+        if (StringUtils.isNotEmpty(decisionTask.getDecisionRef()) || StringUtils.isNotEmpty(decisionTask.getDecisionRefExpression())) {
+            xtw.writeStartElement(ELEMENT_DECISION_REF_EXPRESSION);
+                xtw.writeCData(
+                        StringUtils.isNotEmpty(decisionTask.getDecisionRef()) ?
+                            decisionTask.getDecisionRef():
+                            decisionTask.getDecisionRefExpression()
+                );
+            xtw.writeEndElement();
         }
 
-        // end process task element
+        // end decision task element
         xtw.writeEndElement();
     }
 }

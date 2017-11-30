@@ -13,6 +13,7 @@
 package org.flowable.cmmn.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -91,6 +92,10 @@ public class CmmnModel {
             }
         }
         return null;
+    }
+
+    public Collection<Decision> getDecisions() {
+        return decisions;
     }
 
     public PlanItemDefinition findPlanItemDefinition(String id) {

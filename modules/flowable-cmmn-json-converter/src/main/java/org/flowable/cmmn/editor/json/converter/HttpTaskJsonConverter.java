@@ -28,9 +28,7 @@ import java.util.Map;
  * @author Yvo Swillens
  * @author martin.grofcik
  */
-public class HttpTaskJsonConverter extends BaseCmmnJsonConverter implements DecisionTableAwareConverter {
-
-    protected Map<String, String> decisionTableMap;
+public class HttpTaskJsonConverter extends BaseCmmnJsonConverter {
 
     public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap) {
 
@@ -77,8 +75,4 @@ public class HttpTaskJsonConverter extends BaseCmmnJsonConverter implements Deci
 
     }
 
-    @Override
-    public void setDecisionTableMap(Map<String, String> decisionTableMap) {
-        this.decisionTableMap = decisionTableMap;
-    }
 }

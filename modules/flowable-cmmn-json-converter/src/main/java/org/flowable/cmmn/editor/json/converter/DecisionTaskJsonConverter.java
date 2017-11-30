@@ -30,10 +30,8 @@ import java.util.Map;
  * @author Tijs Rademakers
  * @author Yvo Swillens
  */
-public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements DecisionTableAwareConverter,
-        DecisionTableKeyAwareConverter {
+public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements DecisionTableKeyAwareConverter {
 
-    protected Map<String, String> decisionTableMap;
     protected Map<String, CmmnModelInfo> decisionTableKeyMap;
 
     public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap, Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
@@ -62,7 +60,7 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements 
         JsonNode decisionTableReferenceNode = getProperty(PROPERTY_DECISIONTABLE_REFERENCE, elementNode);
         if (decisionTableReferenceNode != null && decisionTableReferenceNode.has("id") && !decisionTableReferenceNode.get("id").isNull()) {
 
-            String decisionTableKey = decisionTableReferenceNode.get("key").asText();;
+            String decisionTableKey = decisionTableReferenceNode.get("key").asText();
             if (StringUtils.isNotEmpty(decisionTableKey)) {
                 decisionTask.setDecisionRef(decisionTableKey);
             }
@@ -96,11 +94,6 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements 
                 propertiesNode.put(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS, Boolean.parseBoolean(fieldExtension.getStringValue()));
             }
         }
-    }
-
-    @Override
-    public void setDecisionTableMap(Map<String, String> decisionTableMap) {
-        decisionTableMap = decisionTableMap;
     }
 
     @Override
