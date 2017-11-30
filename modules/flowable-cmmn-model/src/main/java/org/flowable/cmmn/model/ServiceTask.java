@@ -20,7 +20,6 @@ import java.util.ArrayList;
 public class ServiceTask extends TaskWithFieldExtensions {
 
     public static final String JAVA_TASK = "java";
-    public static final String DMN_TASK = "dmn";
     public static final String MAIL_TASK = "mail";
 
     protected String implementation;

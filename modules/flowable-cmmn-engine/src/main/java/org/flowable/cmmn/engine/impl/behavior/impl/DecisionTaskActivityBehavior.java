@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,13 +16,15 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import liquibase.util.StringUtils;
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.api.repository.CaseDefinition;
-import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.DecisionTask;
 import org.flowable.cmmn.model.FieldExtension;
-import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.engine.common.api.FlowableException;
@@ -37,57 +39,80 @@ import java.util.Map;
 /**
  * @author martin.grofcik
  */
-public class ServiceTaskDmnActivityBehavior extends CoreCmmnActivityBehavior {
+public class DecisionTaskActivityBehavior extends TaskActivityBehavior implements PlanItemActivityBehavior {
 
-    protected static final String EXPRESSION_DECISION_TABLE_REFERENCE_KEY = "decisionTableReferenceKey";
     protected static final String EXPRESSION_DECISION_TABLE_THROW_ERROR_FLAG = "decisionTaskThrowErrorOnNoHits";
 
-    protected ServiceTask task;
+    protected DecisionTask decisionTask;
+    protected Expression decisionRefExpression;
 
-    public ServiceTaskDmnActivityBehavior(ServiceTask task) {
-        this.task = task;
+    public DecisionTaskActivityBehavior(Expression decisionRefExpression, DecisionTask decisionTask) {
+        super(decisionTask.isBlocking(), decisionTask.getBlockingExpression());
+        this.decisionTask = decisionTask;
+        this.decisionRefExpression = decisionRefExpression;
     }
 
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        String referenceKeyValue = getExpressionValue(EXPRESSION_DECISION_TABLE_REFERENCE_KEY, String.class, null, commandContext, planItemInstanceEntity);
-
-        if (referenceKeyValue == null) {
-            throw new FlowableIllegalArgumentException("ReferenceKey must not be null");
+        DmnRuleService dmnRuleService = CommandContextUtil.getDmnRuleService(commandContext);
+        if (dmnRuleService == null) {
+            throw new FlowableException("Could not execute decision instance: no dmn service found.");
         }
 
-        DmnRuleService dmnRuleService = CommandContextUtil.getDmnRuleService(commandContext);
-        CaseDefinition caseDefinition = CaseDefinitionUtil.getCaseDefinition(planItemInstanceEntity.getCaseDefinitionId());
-        DecisionExecutionAuditContainer decisionExecutionAuditContainer = dmnRuleService.createExecuteDecisionBuilder().
-                decisionKey(referenceKeyValue).
-                parentDeploymentId(caseDefinition.getDeploymentId()).
-                instanceId(planItemInstanceEntity.getCaseInstanceId()).
-                executionId(planItemInstanceEntity.getId()).
-                activityId(task.getId()).
-                variables(planItemInstanceEntity.getVariables()).
-                tenantId(planItemInstanceEntity.getTenantId()).
-                executeWithAuditTrail();
+        String externalRef = null;
+        if (decisionTask != null && decisionTask.getDecision() != null &&
+                StringUtils.isNotEmpty(decisionTask.getDecision().getExternalRef())) {
+            externalRef = decisionTask.getDecision().getExternalRef();
+        } else if (decisionRefExpression != null) {
+            Object externalRefValue = decisionRefExpression.getValue(planItemInstanceEntity);
+            if (externalRefValue != null) {
+                externalRef = externalRefValue.toString();
+            }
+            if (StringUtils.isEmpty(externalRef)) {
+                throw new FlowableException("Could not execute decision: no externalRef defined");
+            }
+        }
 
+        DecisionExecutionAuditContainer decisionExecutionAuditContainer;
+        boolean blocking = evaluateIsBlocking(planItemInstanceEntity);
+        if (blocking) {
+            throw new FlowableException("Blocking decision task execution is not supported.");
+        } else {
+            CaseDefinition caseDefinition = CaseDefinitionUtil.getCaseDefinition(planItemInstanceEntity.getCaseDefinitionId());
+            decisionExecutionAuditContainer = dmnRuleService.createExecuteDecisionBuilder().
+                    decisionKey(externalRef).
+                    parentDeploymentId(caseDefinition.getDeploymentId()).
+                    instanceId(planItemInstanceEntity.getCaseInstanceId()).
+                    executionId(planItemInstanceEntity.getId()).
+                    activityId(decisionTask.getId()).
+                    variables(planItemInstanceEntity.getVariables()).
+                    tenantId(planItemInstanceEntity.getTenantId()).
+                    executeWithAuditTrail();
+        }
+
+        if (decisionExecutionAuditContainer == null) {
+            throw new FlowableException("DMN decision table with key " + externalRef + " was not executed.");
+        }
         if (decisionExecutionAuditContainer.isFailed()) {
-            throw new FlowableException("DMN decision table with key " + referenceKeyValue + " execution failed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage());
+            throw new FlowableException("DMN decision table with key " + externalRef + " execution failed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage());
         }
 
         /*Throw error if there were no rules hit when the flag indicates to do this.*/
         Boolean throwErrorFieldValue = getExpressionValue(EXPRESSION_DECISION_TABLE_THROW_ERROR_FLAG, Boolean.class, false, commandContext, planItemInstanceEntity);
         if (decisionExecutionAuditContainer.getDecisionResult().isEmpty() && throwErrorFieldValue) {
-
-            throw new FlowableException("DMN decision table with key " + referenceKeyValue + " did not hit any rules for the provided input.");
+            throw new FlowableException("DMN decision table with key " + externalRef + " did not hit any rules for the provided input.");
         }
 
         setVariables(
                 decisionExecutionAuditContainer.getDecisionResult(),
-                referenceKeyValue,
+                externalRef,
                 planItemInstanceEntity,
                 CommandContextUtil.getCmmnEngineConfiguration(commandContext).getObjectMapper()
         );
 
         CommandContextUtil.getAgenda().planCompletePlanItemInstance(planItemInstanceEntity);
     }
+
 
     protected void setVariables(List<Map<String, Object>> executionResult,
                                 String decisionKey,
@@ -140,13 +165,13 @@ public class ServiceTaskDmnActivityBehavior extends CoreCmmnActivityBehavior {
             throw new FlowableException(exc.getMessage(), exc);
         }
         if (expressionValue != null && !expressionValue.getClass().isAssignableFrom(expectedType)) {
-            throw new FlowableIllegalArgumentException("Expression '"+ expressionString +"' must be resolved to " + expectedType.getName() + " was " + expressionValue);
+            throw new FlowableIllegalArgumentException("Expression '" + expressionString + "' must be resolved to " + expectedType.getName() + " was " + expressionValue);
         }
         return (T) expressionValue;
     }
 
     private String getFieldString(String fieldName) {
-        Iterator<FieldExtension> iterator = this.task.getFieldExtensions().iterator();
+        Iterator<FieldExtension> iterator = this.decisionTask.getFieldExtensions().iterator();
         while (iterator.hasNext()) {
             FieldExtension fieldExtension = iterator.next();
             if (fieldName.equals(fieldExtension.getFieldName())) {
@@ -154,5 +179,10 @@ public class ServiceTaskDmnActivityBehavior extends CoreCmmnActivityBehavior {
             }
         }
         return null;
+    }
+
+    @Override
+    public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
+
     }
 }

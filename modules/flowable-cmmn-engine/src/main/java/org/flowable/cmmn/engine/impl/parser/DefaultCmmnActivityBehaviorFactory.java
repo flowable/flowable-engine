@@ -15,10 +15,10 @@ package org.flowable.cmmn.engine.impl.parser;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.CaseTaskActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.DecisionTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.HumanTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.MilestoneActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemDelegateExpressionActivityBehavior;
-import org.flowable.cmmn.engine.impl.behavior.impl.ServiceTaskDmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemExpressionActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.ProcessTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.StageActivityBehavior;
@@ -27,6 +27,7 @@ import org.flowable.cmmn.engine.impl.behavior.impl.TimerEventListenerActivityBeh
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegate;
 import org.flowable.cmmn.engine.impl.delegate.CmmnClassDelegateFactory;
 import org.flowable.cmmn.model.CaseTask;
+import org.flowable.cmmn.model.DecisionTask;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.Milestone;
@@ -66,7 +67,7 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
 
     @Override
     public TaskActivityBehavior createTaskActivityBehavior(PlanItem planItem, Task task) {
-        return new TaskActivityBehavior(task);
+        return new TaskActivityBehavior(task.isBlocking(), task.getBlockingExpression());
     }
 
     @Override
@@ -81,10 +82,7 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
 
     @Override
     public ProcessTaskActivityBehavior createProcessTaskActivityBehavior(PlanItem planItem, ProcessTask processTask) {
-        Expression processRefExpression = null;
-        if (StringUtils.isNotEmpty(processTask.getProcessRefExpression())) {
-            processRefExpression = expressionManager.createExpression(processTask.getProcessRefExpression());
-        }
+        Expression processRefExpression = createExpression(processTask.getProcessRefExpression());
         return new ProcessTaskActivityBehavior(processTask.getProcess(), processRefExpression, processTask);
     }
 
@@ -109,8 +107,8 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     }
 
     @Override
-    public ServiceTaskDmnActivityBehavior createServiceTaskDmnActivityBehavior(PlanItem planItem, ServiceTask task) {
-        return new ServiceTaskDmnActivityBehavior(task);
+    public DecisionTaskActivityBehavior createDecisionTaskActivityBehavior(PlanItem planItem, DecisionTask decisionTask) {
+        return new DecisionTaskActivityBehavior(createExpression(decisionTask.getDecisionRefExpression()), decisionTask);
     }
 
     @Override
@@ -150,6 +148,14 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
 
     public void setExpressionManager(ExpressionManager expressionManager) {
         this.expressionManager = expressionManager;
+    }
+
+    protected Expression createExpression(String refExpressionString) {
+        Expression processRefExpression = null;
+        if (StringUtils.isNotEmpty(refExpressionString)) {
+            processRefExpression = expressionManager.createExpression(refExpressionString);
+        }
+        return processRefExpression;
     }
 
 }

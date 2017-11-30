@@ -39,7 +39,6 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
 
     private static final Map<String, String> type_to_stencilset = new HashMap<>();
     static {
-        type_to_stencilset.put(ServiceTask.DMN_TASK, STENCIL_TASK_DECISION);
         type_to_stencilset.put(HttpServiceTask.HTTP_TASK, STENCIL_TASK_HTTP);
     }
     protected static final Map<String, String> TYPE_TO_STENCILSET = Collections.unmodifiableMap(
@@ -85,26 +84,7 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
 
         ServiceTask serviceTask = (ServiceTask) ((PlanItem) baseElement).getPlanItemDefinition();
 
-        if (ServiceTask.DMN_TASK.equalsIgnoreCase(serviceTask.getType())) {
-            for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
-                if (PROPERTY_DECISIONTABLE_REFERENCE_KEY.equals(fieldExtension.getFieldName())) {
-
-                    ObjectNode decisionReferenceNode = objectMapper.createObjectNode();
-                    propertiesNode.set(PROPERTY_DECISIONTABLE_REFERENCE, decisionReferenceNode);
-
-                    CmmnModelInfo modelInfo = decisionTableKeyMap != null ? decisionTableKeyMap.get(fieldExtension.getStringValue()) : null;
-                    if (modelInfo != null) {
-                        decisionReferenceNode.put("id", modelInfo.getId());
-                        decisionReferenceNode.put("name", modelInfo.getName());
-                        decisionReferenceNode.put("key", modelInfo.getKey());
-                    }
-
-                } else if (PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY.equals(fieldExtension.getFieldName())) {
-                    propertiesNode.put(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS, Boolean.parseBoolean(fieldExtension.getStringValue()));
-                }
-            }
-
-        } else if (HttpServiceTask.HTTP_TASK.equalsIgnoreCase(serviceTask.getType())) {
+        if (HttpServiceTask.HTTP_TASK.equalsIgnoreCase(serviceTask.getType())) {
             if (StringUtils.isNotEmpty(serviceTask.getImplementation())) {
                 propertiesNode.put(PROPERTY_SERVICETASK_CLASS, serviceTask.getImplementation());
             }

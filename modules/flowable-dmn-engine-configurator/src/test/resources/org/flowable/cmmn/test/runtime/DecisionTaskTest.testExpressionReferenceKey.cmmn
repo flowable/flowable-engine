@@ -17,13 +17,9 @@
                 </planItemOnPart>
             </sentry>
 
-            <task id="decisionTask" name="dmn" isBlocking="false" flowable:type="dmn">
-                <extensionElements>
-                    <flowable:field name="decisionTableReferenceKey">
-                        <flowable:string><![CDATA[${referenceKey}]]></flowable:string>
-                    </flowable:field>
-                </extensionElements>
-            </task>
+            <decisionTask id="decisionTask" name="dmn" isBlocking="false">
+                <decisionRefExpression><![CDATA[${referenceKey}]]></decisionRefExpression>
+            </decisionTask>
 
             <task id="task" name="The Task" isBlocking="true" />
 

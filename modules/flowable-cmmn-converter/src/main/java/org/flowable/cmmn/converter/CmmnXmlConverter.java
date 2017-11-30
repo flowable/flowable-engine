@@ -49,6 +49,7 @@ import org.flowable.cmmn.model.CmmnDiEdge;
 import org.flowable.cmmn.model.CmmnDiShape;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
+import org.flowable.cmmn.model.DecisionTask;
 import org.flowable.cmmn.model.HasEntryCriteria;
 import org.flowable.cmmn.model.HasExitCriteria;
 import org.flowable.cmmn.model.PlanFragment;
@@ -98,6 +99,8 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new CaseTaskXmlConverter());
         addElementConverter(new ProcessXmlConverter());
         addElementConverter(new ProcessTaskXmlConverter());
+        addElementConverter(new DecisionXmlConverter());
+        addElementConverter(new DecisionTaskXmlConverter());
         addElementConverter(new TimerEventListenerXmlConverter());
         addElementConverter(new PlanItemStartTriggerXmlConverter());
         addElementConverter(new CmmnDiShapeXmlConverter());
@@ -111,6 +114,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
 
         addTextConverter(new StandardEventXmlConverter());
         addTextConverter(new ProcessRefExpressionXmlConverter());
+        addTextConverter(new DecisionRefExpressionXmlConverter());
         addTextConverter(new ConditionXmlConverter());
         addTextConverter(new TimerExpressionXmlConverter());
     }
@@ -429,6 +433,15 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     org.flowable.cmmn.model.Process process = cmmnModel.getProcessById(processTask.getProcessRef());
                     if (process != null) {
                         processTask.setProcess(process);
+                    }
+                }
+
+            } else if (planItemDefinition instanceof DecisionTask) {
+                DecisionTask decisionTask = (DecisionTask) planItemDefinition;
+                if (decisionTask.getDecisionRef() != null) {
+                    org.flowable.cmmn.model.Decision decision = cmmnModel.getDecisionById(decisionTask.getDecisionRef());
+                    if (decision != null) {
+                        decisionTask.setDecision(decision);
                     }
                 }
 

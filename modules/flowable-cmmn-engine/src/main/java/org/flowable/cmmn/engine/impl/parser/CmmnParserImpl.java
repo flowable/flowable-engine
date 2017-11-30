@@ -28,6 +28,7 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnModel;
+import org.flowable.cmmn.model.DecisionTask;
 import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.ImplementationType;
@@ -137,6 +138,10 @@ public class CmmnParserImpl implements CmmnParser {
                 ProcessTask processTask = (ProcessTask) planItemDefinition;
                 planItem.setBehavior(activityBehaviorFactory.createProcessTaskActivityBehavior(planItem, processTask));
 
+            } else if (planItemDefinition instanceof DecisionTask) {
+                DecisionTask decisionTask = (DecisionTask) planItemDefinition;
+                planItem.setBehavior(activityBehaviorFactory.createDecisionTaskActivityBehavior(planItem, decisionTask));
+
             } else if (planItemDefinition instanceof Milestone) {
                 Milestone milestone = (Milestone) planItemDefinition;
                 planItem.setBehavior(activityBehaviorFactory.createMilestoneActivityBehavior(planItem, milestone));
@@ -151,9 +156,6 @@ public class CmmnParserImpl implements CmmnParser {
                 if (task instanceof ServiceTask) {
                     ServiceTask serviceTask = (ServiceTask) task;
                     switch (serviceTask.getType()) {
-                        case ServiceTask.DMN_TASK:
-                            planItem.setBehavior(activityBehaviorFactory.createServiceTaskDmnActivityBehavior(planItem, serviceTask));
-                            break;
                         case HttpServiceTask.HTTP_TASK:
                             planItem.setBehavior(activityBehaviorFactory.createHttpActivityBehavior(planItem, serviceTask));
                             break;

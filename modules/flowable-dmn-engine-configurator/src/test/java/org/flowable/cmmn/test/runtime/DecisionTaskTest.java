@@ -202,8 +202,8 @@ public class DecisionTaskTest {
             resources = { "org/flowable/cmmn/test/runtime/DecisionTaskTest.testExpressionReferenceKey.cmmn"}
     )
     public void testNullReferenceKey() {
-        this.expectedException.expect(FlowableIllegalArgumentException.class);
-        this.expectedException.expectMessage("ReferenceKey must not be null");
+        this.expectedException.expect(FlowableException.class);
+        this.expectedException.expectMessage("Could not execute decision: no externalRef defined");
 
         cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
                         .caseDefinitionKey("myCase")
@@ -217,8 +217,8 @@ public class DecisionTaskTest {
             resources = { "org/flowable/cmmn/test/runtime/DecisionTaskTest.testExpressionReferenceKey.cmmn"}
     )
     public void testNonStringReferenceKey() {
-        this.expectedException.expect(FlowableIllegalArgumentException.class);
-        this.expectedException.expectMessage("Expression 'decisionTableReferenceKey' must be resolved to java.lang.String was 1");
+        this.expectedException.expect(FlowableObjectNotFoundException.class);
+        this.expectedException.expectMessage("no decisions deployed with key '1' ");
 
         cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
                         .caseDefinitionKey("myCase")
@@ -238,6 +238,19 @@ public class DecisionTaskTest {
         cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
                         .caseDefinitionKey("myCase")
                         .start();
+    }
+
+    @Test
+    @CmmnDeployment(
+            resources = {"org/flowable/cmmn/test/runtime/DecisionTaskTest.testBlocking.cmmn"}
+    )
+    public void testBlocking() {
+        this.expectedException.expect(FlowableException.class);
+        this.expectedException.expectMessage("Blocking decision task execution is not supported.");
+
+        cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .start();
     }
 
     protected void assertResultVariable(CaseInstance caseInstance) {
