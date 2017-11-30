@@ -17,6 +17,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * 
@@ -32,8 +33,8 @@ public class AsyncContinuationJobHandler implements JobHandler {
     }
 
     @Override
-    public void execute(JobEntity job, String configuration, Object execution, CommandContext commandContext) {
-        ExecutionEntity executionEntity = (ExecutionEntity) execution;
+    public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
+        ExecutionEntity executionEntity = (ExecutionEntity) variableScope;
         CommandContextUtil.getAgenda(commandContext).planContinueProcessSynchronousOperation(executionEntity);
     }
 

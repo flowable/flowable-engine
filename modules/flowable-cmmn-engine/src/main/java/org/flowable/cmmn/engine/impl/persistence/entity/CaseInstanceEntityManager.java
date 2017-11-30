@@ -35,4 +35,8 @@ public interface CaseInstanceEntityManager extends EntityManager<CaseInstanceEnt
     
     void deleteCaseInstanceAndRelatedData(String caseInstanceId, String deleteReason);
     
+    void updateLockTime(String caseInstanceId);
+
+    void clearLockTime(String caseInstanceId);
+    
 }

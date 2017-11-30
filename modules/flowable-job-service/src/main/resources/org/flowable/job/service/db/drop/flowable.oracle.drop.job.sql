@@ -1,3 +1,16 @@
+drop index ACT_IDX_JOB_SCOPE;
+drop index ACT_IDX_JOB_SUB_SCOPE;
+drop index ACT_IDX_JOB_SCOPE_DEF;
+drop index ACT_IDX_TJOB_SCOPE;
+drop index ACT_IDX_TJOB_SUB_SCOPE;
+drop index ACT_IDX_TJOB_SCOPE_DEF;
+drop index ACT_IDX_SJOB_SCOPE;
+drop index ACT_IDX_SJOB_SUB_SCOPE;
+drop index ACT_IDX_SJOB_SCOPE_DEF;
+drop index ACT_IDX_DJOB_SCOPE;
+drop index ACT_IDX_DJOB_SUB_SCOPE;
+drop index ACT_IDX_DJOB_SCOPE_DEF; 
+
 drop index ACT_IDX_JOB_EXCEPTION;
 drop index ACT_IDX_JOB_CUSTOM_VAL_ID;
 

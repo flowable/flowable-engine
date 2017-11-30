@@ -5,6 +5,7 @@ import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.job.api.JobInfo;
+import org.flowable.job.service.InternalJobCompatibilityManager;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
@@ -32,10 +33,9 @@ public class DefaultAsyncRunnableExecutionExceptionHandler implements AsyncRunna
 
                 if (job instanceof AbstractRuntimeJobEntity) {
                     AbstractRuntimeJobEntity runtimeJob = (AbstractRuntimeJobEntity) job;
-                    if (runtimeJob.getProcessDefinitionId() != null && jobServiceConfiguration.getInternalJobManager() != null &&
-                            jobServiceConfiguration.getInternalJobManager().isFlowable5ProcessDefinitionId(runtimeJob.getProcessDefinitionId())) {
-
-                        jobServiceConfiguration.getInternalJobManager().handleFailedJob(runtimeJob, exception);
+                    InternalJobCompatibilityManager internalJobCompatibilityManager = jobServiceConfiguration.getInternalJobCompatibilityManager();
+                    if (internalJobCompatibilityManager != null && internalJobCompatibilityManager.isFlowable5Job(runtimeJob)) {
+                        internalJobCompatibilityManager.handleFailedV5Job(runtimeJob, exception);
                         return null;
                     }
                 }

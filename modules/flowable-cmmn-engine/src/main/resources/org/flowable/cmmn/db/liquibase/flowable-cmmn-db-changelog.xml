@@ -298,6 +298,10 @@
         <addColumn tableName="ACT_CMMN_DEPLOYMENT_RESOURCE">
             <column name="GENERATED_" type="boolean"/>
         </addColumn>
+        
+        <addColumn tableName="ACT_CMMN_RU_CASE_INST">
+            <column name="LOCK_TIME_" type="datetime" />
+        </addColumn>
     
     </changeSet>
 

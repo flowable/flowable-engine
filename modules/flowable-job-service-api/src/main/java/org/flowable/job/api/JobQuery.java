@@ -39,6 +39,18 @@ public interface JobQuery extends Query<JobQuery, Job> {
 
     /** Only select jobs which exist for the given process definition id */
     JobQuery processDefinitionId(String processDefinitionId);
+    
+    /** Only select tasks for the given scope identifier. */
+    JobQuery scopeId(String scopeId);
+
+    /** Only select tasks for the given sub scope identifier. */
+    JobQuery subScopeId(String subScopeId);
+    
+    /** Only select tasks for the given scope type. */
+    JobQuery scopeType(String scopeType);
+    
+    /** Only select tasks for the given scope definition identifier. */
+    JobQuery scopeDefinitionId(String scopeDefinitionId);
 
     /**
      * Only select jobs that are timers. Cannot be used together with {@link #messages()}

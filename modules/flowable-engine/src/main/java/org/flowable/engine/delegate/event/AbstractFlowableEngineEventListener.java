@@ -13,6 +13,8 @@
  */
 package org.flowable.engine.delegate.event;
 
+import java.util.Set;
+
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
@@ -22,8 +24,6 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.variable.api.event.FlowableVariableEvent;
-
-import java.util.Set;
 
 /**
  *  @author Robert Hafner

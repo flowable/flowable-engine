@@ -13,6 +13,7 @@
 package org.flowable.cmmn.engine.impl.persistence.entity.data.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -26,6 +27,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataMan
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.matcher.CaseInstanceByCaseDefinitionIdMatcher;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
+import org.flowable.engine.common.api.FlowableOptimisticLockingException;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -72,6 +74,26 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
     @Override
     public void deleteByCaseDefinitionId(String caseDefinitionId) {
         getDbSqlSession().delete("deleteCaseInstanceByCaseDefinitionId", caseDefinitionId, getManagedEntityClass());
+    }
+    
+    @Override
+    public void updateLockTime(String caseInstanceId, Date lockDate, Date expirationTime) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("id", caseInstanceId);
+        params.put("lockTime", lockDate);
+        params.put("expirationTime", expirationTime);
+
+        int result = getDbSqlSession().update("updateCaseInstanceLockTime", params);
+        if (result == 0) {
+            throw new FlowableOptimisticLockingException("Could not lock case instance");
+        }
+    }
+    
+    @Override
+    public void clearLockTime(String caseInstanceId) {
+        HashMap<String, Object> params = new HashMap<>();
+        params.put("id", caseInstanceId);
+        getDbSqlSession().update("clearCaseInstanceLockTime", params);
     }
 
 }

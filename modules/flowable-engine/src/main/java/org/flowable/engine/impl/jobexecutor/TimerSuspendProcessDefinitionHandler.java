@@ -16,6 +16,7 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cmd.SuspendProcessDefinitionCmd;
 import org.flowable.engine.impl.util.json.JSONObject;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Joram Barrez
@@ -30,7 +31,7 @@ public class TimerSuspendProcessDefinitionHandler extends TimerChangeProcessDefi
     }
 
     @Override
-    public void execute(JobEntity job, String configuration, Object execution, CommandContext commandContext) {
+    public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
         JSONObject cfgJson = new JSONObject(configuration);
         String processDefinitionId = job.getProcessDefinitionId();
         boolean suspendProcessInstances = getIncludeProcessInstances(cfgJson);

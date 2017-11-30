@@ -21,6 +21,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
+import org.flowable.job.service.InternalJobCompatibilityManager;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
@@ -49,10 +50,9 @@ public class DeleteJobCmd implements Command<Object>, Serializable {
         JobEntity jobToDelete = getJobToDelete(commandContext);
 
         JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
-        if (jobServiceConfiguration.getInternalJobManager() != null && 
-                        jobServiceConfiguration.getInternalJobManager().isFlowable5ProcessDefinitionId(jobToDelete.getProcessDefinitionId())) {
-            
-            jobServiceConfiguration.getInternalJobManager().deleteV5Job(jobToDelete.getId());
+        InternalJobCompatibilityManager internalJobCompatibilityManager = jobServiceConfiguration.getInternalJobCompatibilityManager(); 
+        if (internalJobCompatibilityManager != null && internalJobCompatibilityManager.isFlowable5Job(jobToDelete)) {
+            internalJobCompatibilityManager.deleteV5Job(jobToDelete.getId());
             return null;
         }
 

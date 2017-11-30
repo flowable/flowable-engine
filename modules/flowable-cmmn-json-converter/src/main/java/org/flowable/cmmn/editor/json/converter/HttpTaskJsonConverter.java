@@ -42,7 +42,7 @@ public class HttpTaskJsonConverter extends BaseCmmnJsonConverter implements Deci
     }
 
     protected String getStencilId(BaseElement baseElement) {
-        return STENCIL_TASK_DECISION;
+        return STENCIL_TASK_HTTP;
     }
 
     @Override

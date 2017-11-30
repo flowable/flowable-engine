@@ -113,7 +113,7 @@ public class DefaultJobManager implements JobManager {
 
     private void sendTimerScheduledEvent(TimerJobEntity timerJob) {
         FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher();
-        if (eventDispatcher.isEnabled()) {
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(
                     FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.TIMER_SCHEDULED, timerJob));
         }
@@ -347,8 +347,7 @@ public class DefaultJobManager implements JobManager {
             variableScope = NoExecutionVariableScope.getSharedInstance();
         }
 
-        // set endDate if it was set to the definition
-        jobServiceConfiguration.getInternalJobManager().restoreJobExtraData(timerEntity, variableScope);
+        jobServiceConfiguration.getInternalJobManager().preTimerJobDelete(timerEntity, variableScope);
 
         if (timerEntity.getDuedate() != null && !isValidTime(timerEntity, timerEntity.getDuedate(), variableScope)) {
             if (LOGGER.isDebugEnabled()) {
@@ -372,12 +371,9 @@ public class DefaultJobManager implements JobManager {
             }
         }
     }
-
+    
     protected void executeJobHandler(JobEntity jobEntity) {
-        VariableScope variableScope = null;
-        if (jobEntity.getExecutionId() != null) {
-            variableScope = jobServiceConfiguration.getInternalJobManager().resolveVariableScope(jobEntity);
-        }
+        VariableScope variableScope = jobServiceConfiguration.getInternalJobManager().resolveVariableScope(jobEntity);
 
         Map<String, JobHandler> jobHandlers = jobServiceConfiguration.getJobHandlers();
         JobHandler jobHandler = jobHandlers.get(jobEntity.getJobHandlerType());
@@ -511,6 +507,10 @@ public class DefaultJobManager implements JobManager {
         copyToJob.setMaxIterations(copyFromJob.getMaxIterations());
         copyToJob.setProcessDefinitionId(copyFromJob.getProcessDefinitionId());
         copyToJob.setProcessInstanceId(copyFromJob.getProcessInstanceId());
+        copyToJob.setScopeId(copyFromJob.getScopeId());
+        copyToJob.setSubScopeId(copyFromJob.getSubScopeId());
+        copyToJob.setScopeType(copyFromJob.getScopeType());
+        copyToJob.setScopeDefinitionId(copyFromJob.getScopeDefinitionId());
         copyToJob.setRepeat(copyFromJob.getRepeat());
         copyToJob.setRetries(copyFromJob.getRetries());
         copyToJob.setRevision(copyFromJob.getRevision());
@@ -568,16 +568,20 @@ public class DefaultJobManager implements JobManager {
     }
 
     protected void callJobProcessors(JobProcessorContext.Phase processorType, AbstractJobEntity abstractJobEntity) {
-        JobProcessorContextImpl jobProcessorContext = new JobProcessorContextImpl(processorType, abstractJobEntity);
-        for (JobProcessor jobProcessor : jobServiceConfiguration.getJobProcessors()) {
-            jobProcessor.process(jobProcessorContext);
+        if (jobServiceConfiguration.getJobProcessors() != null) {
+            JobProcessorContextImpl jobProcessorContext = new JobProcessorContextImpl(processorType, abstractJobEntity);
+            for (JobProcessor jobProcessor : jobServiceConfiguration.getJobProcessors()) {
+                jobProcessor.process(jobProcessorContext);
+            }
         }
     }
 
     protected void callHistoryJobProcessors(HistoryJobProcessorContext.Phase processorType, HistoryJobEntity historyJobEntity) {
-        HistoryJobProcessorContextImpl historyJobProcessorContext = new HistoryJobProcessorContextImpl(processorType, historyJobEntity);
-        for (HistoryJobProcessor historyJobProcessor : jobServiceConfiguration.getHistoryJobProcessors()) {
-            historyJobProcessor.process(historyJobProcessorContext);
+        if (jobServiceConfiguration.getHistoryJobProcessors() != null) {
+            HistoryJobProcessorContextImpl historyJobProcessorContext = new HistoryJobProcessorContextImpl(processorType, historyJobEntity);
+            for (HistoryJobProcessor historyJobProcessor : jobServiceConfiguration.getHistoryJobProcessors()) {
+                historyJobProcessor.process(historyJobProcessorContext);
+            }
         }
     }
 
