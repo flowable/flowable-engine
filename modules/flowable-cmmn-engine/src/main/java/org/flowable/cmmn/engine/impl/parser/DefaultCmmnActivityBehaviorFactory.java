@@ -18,7 +18,7 @@ import org.flowable.cmmn.engine.impl.behavior.impl.CaseTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.HumanTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.MilestoneActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemDelegateExpressionActivityBehavior;
-import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemDmnActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.impl.ServiceTaskDmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.PlanItemExpressionActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.ProcessTaskActivityBehavior;
 import org.flowable.cmmn.engine.impl.behavior.impl.StageActivityBehavior;
@@ -109,8 +109,8 @@ public class DefaultCmmnActivityBehaviorFactory implements CmmnActivityBehaviorF
     }
 
     @Override
-    public PlanItemDmnActivityBehavior createDmnActivityBehavior(PlanItem planItem, ServiceTask task) {
-        return new PlanItemDmnActivityBehavior(task);
+    public ServiceTaskDmnActivityBehavior createServiceTaskDmnActivityBehavior(PlanItem planItem, ServiceTask task) {
+        return new ServiceTaskDmnActivityBehavior(task);
     }
 
     @Override

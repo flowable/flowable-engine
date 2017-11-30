@@ -16,8 +16,7 @@
             #{startTime ,jdbcType=TIMESTAMP},
             #{startUserId ,jdbcType=VARCHAR},
             #{callbackId, jdbcType=VARCHAR},
-            #{callbackType,
-            jdbcType=VARCHAR},
+            #{callbackType,jdbcType=VARCHAR},
             #{tenantId ,jdbcType=VARCHAR}
         )
     </insert>
@@ -101,6 +100,20 @@
             </if>
         </set>    
         where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
+    </update>
+    
+    <update id="updateCaseInstanceLockTime" parameterType="java.util.Map">
+        update ${prefix}ACT_CMMN_RU_CASE_INST 
+        set
+          LOCK_TIME_ = #{lockTime, jdbcType=TIMESTAMP}
+        where ID_ = #{id}
+          and (LOCK_TIME_ is null OR LOCK_TIME_ &lt; #{expirationTime, jdbcType=TIMESTAMP})
+    </update>
+  
+    <update id="clearCaseInstanceLockTime" parameterType="java.util.Map">
+        update ${prefix}ACT_CMMN_RU_CASE_INST 
+        set LOCK_TIME_ = null
+        where ID_ = #{id}
     </update>
 
     <delete id="deleteCaseInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl">

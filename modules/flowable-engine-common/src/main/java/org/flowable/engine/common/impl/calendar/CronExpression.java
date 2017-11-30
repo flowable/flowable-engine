@@ -1,4 +1,4 @@
-package org.flowable.engine.impl.calendar;
+package org.flowable.engine.common.impl.calendar;
 
 /*
  * Included from Quartz 2.3.0 (https://github.com/quartz-scheduler/quartz/tree/quartz-2.3.0)

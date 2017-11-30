@@ -18,6 +18,29 @@ import java.util.Map;
 import org.flowable.cmmn.api.CmmnManagementService;
 import org.flowable.cmmn.engine.impl.cmd.GetTableCountsCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetTableNamesCmd;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.job.api.DeadLetterJobQuery;
+import org.flowable.job.api.Job;
+import org.flowable.job.api.JobQuery;
+import org.flowable.job.api.SuspendedJobQuery;
+import org.flowable.job.api.TimerJobQuery;
+import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
+import org.flowable.job.service.impl.JobQueryImpl;
+import org.flowable.job.service.impl.SuspendedJobQueryImpl;
+import org.flowable.job.service.impl.TimerJobQueryImpl;
+import org.flowable.job.service.impl.cmd.DeleteDeadLetterJobCmd;
+import org.flowable.job.service.impl.cmd.DeleteJobCmd;
+import org.flowable.job.service.impl.cmd.DeleteSuspendedJobCmd;
+import org.flowable.job.service.impl.cmd.DeleteTimerJobCmd;
+import org.flowable.job.service.impl.cmd.ExecuteJobCmd;
+import org.flowable.job.service.impl.cmd.GetJobExceptionStacktraceCmd;
+import org.flowable.job.service.impl.cmd.JobType;
+import org.flowable.job.service.impl.cmd.MoveDeadLetterJobToExecutableJobCmd;
+import org.flowable.job.service.impl.cmd.MoveJobToDeadLetterJobCmd;
+import org.flowable.job.service.impl.cmd.MoveTimerToExecutableJobCmd;
+import org.flowable.job.service.impl.cmd.SetJobRetriesCmd;
+import org.flowable.job.service.impl.cmd.SetTimerJobRetriesCmd;
 
 /**
  * @author Joram Barrez
@@ -32,6 +55,108 @@ public class CmmnManagementServiceImpl extends ServiceImpl implements CmmnManage
     @Override
     public Collection<String> getTableNames() {
         return commandExecutor.execute(new GetTableNamesCmd());
+    }
+    
+    @Override
+    public void executeJob(String jobId) {
+        if (jobId == null) {
+            throw new FlowableIllegalArgumentException("Job id is null");
+        }
+
+        try {
+            commandExecutor.execute(new ExecuteJobCmd(jobId));
+        } catch (RuntimeException e) {
+            if (e instanceof FlowableException) {
+                throw e;
+            } else {
+                throw new FlowableException("Job " + jobId + " failed", e);
+            }
+        }
+    }
+
+    @Override
+    public Job moveTimerToExecutableJob(String jobId) {
+        return commandExecutor.execute(new MoveTimerToExecutableJobCmd(jobId));
+    }
+
+    @Override
+    public Job moveJobToDeadLetterJob(String jobId) {
+        return commandExecutor.execute(new MoveJobToDeadLetterJobCmd(jobId));
+    }
+
+    @Override
+    public Job moveDeadLetterJobToExecutableJob(String jobId, int retries) {
+        return commandExecutor.execute(new MoveDeadLetterJobToExecutableJobCmd(jobId, retries));
+    }
+
+    @Override
+    public void deleteJob(String jobId) {
+        commandExecutor.execute(new DeleteJobCmd(jobId));
+    }
+
+    @Override
+    public void deleteTimerJob(String jobId) {
+        commandExecutor.execute(new DeleteTimerJobCmd(jobId));
+    }
+    
+    @Override
+    public void deleteSuspendedJob(String jobId) {
+        commandExecutor.execute(new DeleteSuspendedJobCmd(jobId));
+    }
+
+    @Override
+    public void deleteDeadLetterJob(String jobId) {
+        commandExecutor.execute(new DeleteDeadLetterJobCmd(jobId));
+    }
+    
+    @Override
+    public void setJobRetries(String jobId, int retries) {
+        commandExecutor.execute(new SetJobRetriesCmd(jobId, retries));
+    }
+
+    @Override
+    public void setTimerJobRetries(String jobId, int retries) {
+        commandExecutor.execute(new SetTimerJobRetriesCmd(jobId, retries));
+    }
+
+    @Override
+    public JobQuery createJobQuery() {
+        return new JobQueryImpl(commandExecutor);
+    }
+
+    @Override
+    public TimerJobQuery createTimerJobQuery() {
+        return new TimerJobQueryImpl(commandExecutor);
+    }
+
+    @Override
+    public SuspendedJobQuery createSuspendedJobQuery() {
+        return new SuspendedJobQueryImpl(commandExecutor);
+    }
+
+    @Override
+    public DeadLetterJobQuery createDeadLetterJobQuery() {
+        return new DeadLetterJobQueryImpl(commandExecutor);
+    }
+    
+    @Override
+    public String getJobExceptionStacktrace(String jobId) {
+        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.ASYNC));
+    }
+
+    @Override
+    public String getTimerJobExceptionStacktrace(String jobId) {
+        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.TIMER));
+    }
+
+    @Override
+    public String getSuspendedJobExceptionStacktrace(String jobId) {
+        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.SUSPENDED));
+    }
+
+    @Override
+    public String getDeadLetterJobExceptionStacktrace(String jobId) {
+        return commandExecutor.execute(new GetJobExceptionStacktraceCmd(jobId, JobType.DEADLETTER));
     }
 
 }

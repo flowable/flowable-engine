@@ -152,13 +152,13 @@ public class CmmnParserImpl implements CmmnParser {
                     ServiceTask serviceTask = (ServiceTask) task;
                     switch (serviceTask.getType()) {
                         case ServiceTask.DMN_TASK:
-                            planItem.setBehavior(activityBehaviorFactory.createDmnActivityBehavior(planItem, serviceTask));
+                            planItem.setBehavior(activityBehaviorFactory.createServiceTaskDmnActivityBehavior(planItem, serviceTask));
                             break;
                         case HttpServiceTask.HTTP_TASK:
                             planItem.setBehavior(activityBehaviorFactory.createHttpActivityBehavior(planItem, serviceTask));
                             break;
                         default:
-                            // java task type was not set in the version 6.2.0 that's why we have to assume that default
+                            // java task type was not set in the version <= 6.2.0 that's why we have to assume that default
                             // service task type is java
                             if (StringUtils.isNotEmpty(serviceTask.getImplementation())) {
                                 if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(serviceTask.getImplementationType())) {

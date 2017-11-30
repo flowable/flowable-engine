@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.calendar.BusinessCalendar;
 import org.flowable.job.api.Job;
@@ -141,8 +142,9 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
         getJobServiceConfiguration().getInternalJobManager().handleJobDelete(jobEntity);
 
         // Send event
-        if (getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
+        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
         }
     }
 

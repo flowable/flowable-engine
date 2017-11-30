@@ -37,6 +37,10 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
     protected String executionId;
     protected String handlerType;
     protected String processDefinitionId;
+    protected String scopeId;
+    protected String subScopeId;
+    protected String scopeType;
+    protected String scopeDefinitionId;
     protected boolean executable;
     protected boolean onlyTimers;
     protected boolean onlyMessages;
@@ -85,6 +89,42 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
             throw new FlowableIllegalArgumentException("Provided process definition id is null");
         }
         this.processDefinitionId = processDefinitionId;
+        return this;
+    }
+    
+    @Override
+    public TimerJobQueryImpl scopeId(String scopeId) {
+        if (scopeId == null) {
+            throw new FlowableIllegalArgumentException("Provided scope id is null");
+        }
+        this.scopeId = scopeId;
+        return this;
+    }
+    
+    @Override
+    public TimerJobQueryImpl subScopeId(String subScopeId) {
+        if (scopeId == null) {
+            throw new FlowableIllegalArgumentException("Provided sub scope id is null");
+        }
+        this.subScopeId = subScopeId;
+        return this;
+    }
+    
+    @Override
+    public TimerJobQueryImpl scopeType(String scopeType) {
+        if (scopeType == null) {
+            throw new FlowableIllegalArgumentException("Provided scope type is null");
+        }
+        this.scopeType = scopeType;
+        return this;
+    }
+    
+    @Override
+    public TimerJobQueryImpl scopeDefinitionId(String scopeDefinitionId) {
+        if (scopeDefinitionId == null) {
+            throw new FlowableIllegalArgumentException("Provided scope definitionid is null");
+        }
+        this.scopeDefinitionId = scopeDefinitionId;
         return this;
     }
 
@@ -285,6 +325,22 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
 
     public String getProcessDefinitionId() {
         return processDefinitionId;
+    }
+    
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
     }
 
     public boolean isOnlyTimers() {

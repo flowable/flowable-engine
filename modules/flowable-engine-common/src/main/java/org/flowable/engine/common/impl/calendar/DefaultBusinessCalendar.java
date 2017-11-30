@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.calendar;
+package org.flowable.engine.common.impl.calendar;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -19,8 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.calendar.BusinessCalendar;
-import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.common.impl.context.Context;
 
 /**
  * @author Tom Baeyens
@@ -53,7 +52,7 @@ public class DefaultBusinessCalendar implements BusinessCalendar {
 
     @Override
     public Date resolveDuedate(String duedate) {
-        Date resolvedDuedate = CommandContextUtil.getProcessEngineConfiguration().getClock().getCurrentTime();
+        Date resolvedDuedate = Context.getCommandContext().getCurrentEngineConfiguration().getClock().getCurrentTime(); 
 
         String[] tokens = duedate.split(" and ");
         for (String token : tokens) {

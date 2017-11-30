@@ -122,6 +122,7 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
             getIdentityLinkDbSchemaManager().dbSchemaCreate();
             getTaskDbSchemaManager().dbSchemaCreate();
             getVariableDbSchemaManager().dbSchemaCreate();
+            getJobDbSchemaManager().dbSchemaCreate();
             
             Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getCmmnEngineConfiguration());
             liquibase.update("cmmn");
@@ -137,6 +138,12 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
             liquibase.dropAll();
         } catch (Exception e) {
             LOGGER.info("Error dropping CMMN engine tables", e);
+        }
+        
+        try {
+            getJobDbSchemaManager().dbSchemaDrop();
+        } catch (Exception e) {
+            LOGGER.info("Error dropping job tables", e);
         }
           
         try {
@@ -157,7 +164,6 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
             LOGGER.info("Error dropping identity link tables", e);
         }
         
-        
         try {
             getCommonDbSchemaManager().dbSchemaDrop();
         } catch (Exception e) {
@@ -173,6 +179,7 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
             getIdentityLinkDbSchemaManager().dbSchemaUpdate();
             getTaskDbSchemaManager().dbSchemaUpdate();
             getVariableDbSchemaManager().dbSchemaUpdate();
+            getJobDbSchemaManager().dbSchemaUpdate();
             
             Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getCmmnEngineConfiguration());
             liquibase.update("cmmn");
@@ -197,6 +204,10 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
     
     protected DbSchemaManager getTaskDbSchemaManager() {
         return CommandContextUtil.getCmmnEngineConfiguration().getTaskDbSchemaManager();
+    }
+    
+    protected DbSchemaManager getJobDbSchemaManager() {
+        return CommandContextUtil.getCmmnEngineConfiguration().getJobDbSchemaManager();
     }
     
 }

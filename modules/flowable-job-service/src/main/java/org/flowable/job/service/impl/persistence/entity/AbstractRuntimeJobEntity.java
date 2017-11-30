@@ -27,11 +27,19 @@ public interface AbstractRuntimeJobEntity extends Job, AbstractJobEntity {
     void setProcessInstanceId(String processInstanceId);
 
     void setProcessDefinitionId(String processDefinitionId);
-    
+
+    void setScopeId(String scopeId);
+
+    void setSubScopeId(String subScopeId);
+
+    void setScopeType(String scopeType);
+
+    void setScopeDefinitionId(String scopeDefinitionId);
+
     void setDuedate(Date duedate);
-    
+
     void setExclusive(boolean isExclusive);
-    
+
     String getRepeat();
 
     void setRepeat(String repeat);

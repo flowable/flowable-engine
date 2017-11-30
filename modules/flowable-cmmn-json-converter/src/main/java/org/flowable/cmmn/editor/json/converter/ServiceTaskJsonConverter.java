@@ -12,14 +12,14 @@
  */
 package org.flowable.cmmn.editor.json.converter;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.BaseElement;
-import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.HttpServiceTask;
@@ -28,23 +28,19 @@ import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ServiceTask;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
  */
 public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements DecisionTableKeyAwareConverter {
 
-    private static final Map<String, String> type_to_stencilset = new HashMap<>();
+    private static final Map<String, String> TYPE_TO_STENCILSET = new HashMap<>();
     static {
-        type_to_stencilset.put(ServiceTask.DMN_TASK, STENCIL_TASK_DECISION);
-        type_to_stencilset.put(HttpServiceTask.HTTP_TASK, STENCIL_TASK_HTTP);
+        TYPE_TO_STENCILSET.put(ServiceTask.DMN_TASK, STENCIL_TASK_DECISION);
+        TYPE_TO_STENCILSET.put(HttpServiceTask.HTTP_TASK, STENCIL_TASK_HTTP);
     }
-    protected static final Map<String, String> TYPE_TO_STENCILSET = Collections.unmodifiableMap(
-            type_to_stencilset
-        );
 
     protected Map<String, CmmnModelInfo> decisionTableKeyMap;
 
@@ -59,8 +55,8 @@ public class ServiceTaskJsonConverter extends BaseCmmnJsonConverter implements D
     }
 
     public static void fillCmmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
-        convertersToJsonMap.put(CaseTask.class, ServiceTaskJsonConverter.class);
         convertersToJsonMap.put(ServiceTask.class, ServiceTaskJsonConverter.class);
+        convertersToJsonMap.put(HttpServiceTask.class, ServiceTaskJsonConverter.class);
     }
 
     @Override

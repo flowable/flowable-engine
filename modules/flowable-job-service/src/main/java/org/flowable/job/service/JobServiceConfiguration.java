@@ -99,6 +99,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     protected HistoryLevel historyLevel;
 
     protected InternalJobManager internalJobManager;
+    protected InternalJobCompatibilityManager internalJobCompatibilityManager;
 
     protected AsyncExecutor asyncExecutor;
 
@@ -372,6 +373,14 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
 
     public void setInternalJobManager(InternalJobManager internalJobManager) {
         this.internalJobManager = internalJobManager;
+    }
+    
+    public InternalJobCompatibilityManager getInternalJobCompatibilityManager() {
+        return internalJobCompatibilityManager;
+    }
+
+    public void setInternalJobCompatibilityManager(InternalJobCompatibilityManager internalJobCompatibilityManager) {
+        this.internalJobCompatibilityManager = internalJobCompatibilityManager;
     }
 
     public AsyncExecutor getAsyncExecutor() {

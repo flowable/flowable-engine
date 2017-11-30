@@ -20,6 +20,7 @@ import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobNotFoundException;
+import org.flowable.job.service.InternalJobCompatibilityManager;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.FailedJobListener;
 import org.flowable.job.service.impl.util.CommandContextUtil;
@@ -60,10 +61,9 @@ public class ExecuteJobCmd implements Command<Object>, Serializable {
         }
 
         JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getJobServiceConfiguration(commandContext);
-        if (job.getProcessDefinitionId() != null && jobServiceConfiguration.getInternalJobManager() != null && 
-                        jobServiceConfiguration.getInternalJobManager().isFlowable5ProcessDefinitionId(job.getProcessDefinitionId())) {
-        
-            jobServiceConfiguration.getInternalJobManager().executeV5Job(job);
+        InternalJobCompatibilityManager internalJobCompatibilityManager = jobServiceConfiguration.getInternalJobCompatibilityManager();
+        if (internalJobCompatibilityManager != null && internalJobCompatibilityManager.isFlowable5Job(job)) {
+            internalJobCompatibilityManager.executeV5Job(job);
             return null;
         }
 

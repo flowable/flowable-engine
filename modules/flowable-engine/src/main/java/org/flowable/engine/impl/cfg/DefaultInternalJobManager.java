@@ -25,10 +25,7 @@ import org.flowable.bpmn.model.TimerEventDefinition;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.common.impl.calendar.BusinessCalendar;
-import org.flowable.engine.common.impl.interceptor.Command;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
-import org.flowable.engine.impl.calendar.CycleBusinessCalendar;
+import org.flowable.engine.common.impl.calendar.CycleBusinessCalendar;
 import org.flowable.engine.impl.jobexecutor.TimerEventHandler;
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
@@ -37,7 +34,6 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.CountingEntityUtil;
-import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.InternalJobManager;
@@ -51,41 +47,22 @@ import org.flowable.variable.api.delegate.VariableScope;
 /**
  * @author Tijs Rademakers
  */
-public class DefaultJobScopeManager implements InternalJobManager {
+public class DefaultInternalJobManager implements InternalJobManager {
     
     protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
-    public DefaultJobScopeManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public DefaultInternalJobManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
         this.processEngineConfiguration = processEngineConfiguration;
     }
     
     @Override
     public VariableScope resolveVariableScope(Job job) {
-        return getExecutionEntityManager().findById(job.getExecutionId());
+        if (job.getExecutionId() != null) {
+            return getExecutionEntityManager().findById(job.getExecutionId());
+        }
+        return null;
     }
 
-    @Override
-    public boolean isFlowable5ProcessDefinitionId(String processDefinitionId) {
-        return Flowable5Util.isFlowable5ProcessDefinitionId(processEngineConfiguration, processDefinitionId);
-    }
-
-    @Override
-    public void executeV5Job(Job job) {
-        Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
-        compatibilityHandler.executeJob(job);
-    }
-
-    @Override
-    public void executeV5JobWithLockAndRetry(final Job job) {
-        processEngineConfiguration.getCommandExecutor().execute(new Command<Void>() {
-            @Override
-            public Void execute(CommandContext commandContext) {
-                CommandContextUtil.getProcessEngineConfiguration(commandContext).getFlowable5CompatibilityHandler().executeJobWithLockAndRetry(job);
-                return null;
-            }
-        });
-    }
-    
     @Override
     public boolean handleJobInsert(Job job) {
         // add link to execution
@@ -162,13 +139,7 @@ public class DefaultJobScopeManager implements InternalJobManager {
     }
 
     @Override
-    public void handleFailedJob(AbstractRuntimeJobEntity job, Throwable exception) {
-        Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
-        compatibilityHandler.handleFailedJob(job, exception);
-    }
-
-    @Override
-    public void updateJobScopeLockTime(Job job) {
+    public void lockJobScope(Job job) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
         ExecutionEntity execution = executionEntityManager.findById(job.getExecutionId());
         if (execution != null) {
@@ -177,7 +148,7 @@ public class DefaultJobScopeManager implements InternalJobManager {
     }
 
     @Override
-    public void clearJobScopeLockTime(Job job) {
+    public void clearJobScopeLock(Job job) {
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
         ExecutionEntity execution = executionEntityManager.findById(job.getProcessInstanceId());
         if (execution != null) {
@@ -186,13 +157,7 @@ public class DefaultJobScopeManager implements InternalJobManager {
     }
 
     @Override
-    public void deleteV5Job(String jobId) {
-        Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
-        compatibilityHandler.deleteJob(jobId);
-    }
-    
-    @Override
-    public void restoreJobExtraData(JobEntity jobEntity, VariableScope variableScope) {
+    public void preTimerJobDelete(JobEntity jobEntity, VariableScope variableScope) {
         String activityId = jobEntity.getJobHandlerConfiguration();
 
         if (jobEntity.getJobHandlerType().equalsIgnoreCase(TimerStartEventJobHandler.TYPE) ||
