@@ -12,8 +12,8 @@
  */
 package org.flowable.cmmn.editor.json.converter;
 
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
@@ -23,10 +23,8 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.DecisionTask;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.PlanItem;
-import org.flowable.cmmn.model.ServiceTask;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -38,13 +36,17 @@ public class DecisionTaskJsonConverter extends BaseCmmnJsonConverter implements 
     protected Map<String, String> decisionTableMap;
     protected Map<String, CmmnModelInfo> decisionTableKeyMap;
 
-    public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap) {
-
+    public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap, Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
         fillJsonTypes(convertersToCmmnMap);
+        fillCmmnTypes(convertersToJsonMap);
     }
 
     public static void fillJsonTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToBpmnMap) {
         convertersToBpmnMap.put(STENCIL_TASK_DECISION, DecisionTaskJsonConverter.class);
+    }
+
+    public static void fillCmmnTypes(Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
+        convertersToJsonMap.put(DecisionTask.class, DecisionTaskJsonConverter.class);
     }
 
     protected String getStencilId(BaseElement baseElement) {

@@ -32,7 +32,7 @@ import static org.junit.Assert.assertTrue;
 /**
  * @author martin.grofcik
  */
-public class DmnTaskJsonConverterTest extends AbstractConverterTest {
+public class DecisionTaskJsonConverterTest extends AbstractConverterTest {
     @Override
     protected String getResource() {
         return "test.dmnTaskModel.json";
