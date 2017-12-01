@@ -26,13 +26,16 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
  */
 public class SpringCmmnEngineConfigurator extends CmmnEngineConfigurator {
 
-    protected SpringCmmnEngineConfiguration cmmnEngineConfiguration;
-
     @Override
     public void configure(AbstractEngineConfiguration engineConfiguration) {
         if (cmmnEngineConfiguration == null) {
             cmmnEngineConfiguration = new SpringCmmnEngineConfiguration();
         }
+
+        if (!(cmmnEngineConfiguration instanceof SpringCmmnEngineConfiguration)) {
+            throw new FlowableException("SpringCmmnEngineConfigurator accepts only SpringCmmnEngineConfiguration. " + cmmnEngineConfiguration.getClass().getName());
+        }
+
         initialiseCommonProperties(engineConfiguration, cmmnEngineConfiguration);
 
         SpringProcessEngineConfiguration springProcessEngineConfiguration = (SpringProcessEngineConfiguration) engineConfiguration;
@@ -43,7 +46,7 @@ public class SpringCmmnEngineConfigurator extends CmmnEngineConfigurator {
         cmmnEngineConfiguration.setTaskQueryLimit(springProcessEngineConfiguration.getTaskQueryLimit());
         cmmnEngineConfiguration.setHistoricTaskQueryLimit(springProcessEngineConfiguration.getHistoricTaskQueryLimit());
 
-        cmmnEngineConfiguration.setTransactionManager(springProcessEngineConfiguration.getTransactionManager());
+        ((SpringCmmnEngineConfiguration) cmmnEngineConfiguration).setTransactionManager(springProcessEngineConfiguration.getTransactionManager());
         cmmnEngineConfiguration.setExpressionManager(new SpringCmmnExpressionManager(
                         springProcessEngineConfiguration.getApplicationContext(), springProcessEngineConfiguration.getBeans()));
 
@@ -63,7 +66,7 @@ public class SpringCmmnEngineConfigurator extends CmmnEngineConfigurator {
 
     @Override
     public SpringCmmnEngineConfiguration getCmmnEngineConfiguration() {
-        return cmmnEngineConfiguration;
+        return (SpringCmmnEngineConfiguration) cmmnEngineConfiguration;
     }
 
     public SpringCmmnEngineConfigurator setCmmnEngineConfiguration(SpringCmmnEngineConfiguration cmmnEngineConfiguration) {
