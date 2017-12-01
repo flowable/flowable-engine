@@ -58,9 +58,7 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
     protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
         ServiceTask serviceTask = (ServiceTask) baseElement;
 
-        if (serviceTask.getSkipExpression() != null) {
-            propertiesNode.put(PROPERTY_SKIP_EXPRESSION, serviceTask.getSkipExpression());
-        }
+        setPropertyValue(PROPERTY_SKIP_EXPRESSION, serviceTask.getSkipExpression(), propertiesNode);
 
         if ("mail".equalsIgnoreCase(serviceTask.getType())) {
             setPropertyFieldValue(PROPERTY_MAILTASK_TO, serviceTask, propertiesNode);
@@ -150,6 +148,8 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
         if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_SERVICETASK_RESULT_VARIABLE, elementNode))) {
             task.setResultVariableName(getPropertyValueAsString(PROPERTY_SERVICETASK_RESULT_VARIABLE, elementNode));
         }
+
+        task.setSkipExpression(getPropertyValueAsString(PROPERTY_SKIP_EXPRESSION, elementNode));
 
         JsonNode fieldsNode = getProperty(PROPERTY_SERVICETASK_FIELDS, elementNode);
         if (fieldsNode != null) {
