@@ -78,10 +78,8 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
         if (blocking) {
             throw new FlowableException("Blocking decision task execution is not supported.");
         } else {
-            CaseDefinition caseDefinition = CaseDefinitionUtil.getCaseDefinition(planItemInstanceEntity.getCaseDefinitionId());
             decisionExecutionAuditContainer = dmnRuleService.createExecuteDecisionBuilder().
                     decisionKey(externalRef).
-                    parentDeploymentId(caseDefinition.getDeploymentId()).
                     instanceId(planItemInstanceEntity.getCaseInstanceId()).
                     executionId(planItemInstanceEntity.getId()).
                     activityId(decisionTask.getId()).

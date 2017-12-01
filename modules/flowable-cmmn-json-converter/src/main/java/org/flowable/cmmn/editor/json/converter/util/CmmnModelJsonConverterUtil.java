@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -79,7 +79,7 @@ public class CmmnModelJsonConverterUtil implements EditorJsonConstants, CmmnSten
     /**
      * Usable for BPMN 2.0 editor json: traverses all child shapes (also nested), goes into the properties and sees if there is a matching property in the 'properties' of the childshape and returns
      * those in a list.
-     * 
+     *
      * Returns a map with said json nodes, with the key the name of the childshape.
      */
 
@@ -133,17 +133,23 @@ public class CmmnModelJsonConverterUtil implements EditorJsonConstants, CmmnSten
         allowedStencilTypes.add(STENCIL_TASK_DECISION);
         return getCmmnModelChildShapesPropertyValues(editorJsonNode, "decisiontaskdecisiontablereference", allowedStencilTypes);
     }
-    
+
     public static List<JsonLookupResult> getCmmnModelCaseReferences(JsonNode editorJsonNode) {
         List<String> allowedStencilTypes = new ArrayList<>();
         allowedStencilTypes.add(STENCIL_TASK_CASE);
         return getCmmnModelChildShapesPropertyValues(editorJsonNode, PROPERTY_CASE_REFERENCE, allowedStencilTypes);
     }
-    
+
     public static List<JsonLookupResult> getCmmnModelProcessReferences(JsonNode editorJsonNode) {
         List<String> allowedStencilTypes = new ArrayList<>();
         allowedStencilTypes.add(STENCIL_TASK_PROCESS);
         return getCmmnModelChildShapesPropertyValues(editorJsonNode, PROPERTY_PROCESS_REFERENCE, allowedStencilTypes);
+    }
+
+    public static List<JsonLookupResult> getCmmnModelDecisionReferences(JsonNode editorJsonNode) {
+        List<String> allowedStencilTypes = new ArrayList<>();
+        allowedStencilTypes.add(STENCIL_TASK_DECISION);
+        return getCmmnModelChildShapesPropertyValues(editorJsonNode, PROPERTY_DECISIONTABLE_REFERENCE, allowedStencilTypes);
     }
 
     // APP MODEL
@@ -171,7 +177,7 @@ public class CmmnModelJsonConverterUtil implements EditorJsonConstants, CmmnSten
 
     /**
      * Loops through a list of {@link JsonNode} instances, and stores the given property with given type in the returned list.
-     * 
+     *
      * In Java 8, this probably could be done a lot cooler.
      */
     public static Set<Long> gatherLongPropertyFromJsonNodes(Iterable<JsonNode> jsonNodes, String propertyName) {
