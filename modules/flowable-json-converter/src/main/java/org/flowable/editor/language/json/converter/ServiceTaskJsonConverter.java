@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -57,6 +57,10 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
     @Override
     protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
         ServiceTask serviceTask = (ServiceTask) baseElement;
+
+        if (serviceTask.getSkipExpression() != null) {
+            propertiesNode.put(PROPERTY_SKIP_EXPRESSION, serviceTask.getSkipExpression());
+        }
 
         if ("mail".equalsIgnoreCase(serviceTask.getType())) {
             setPropertyFieldValue(PROPERTY_MAILTASK_TO, serviceTask, propertiesNode);
