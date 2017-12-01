@@ -12,9 +12,9 @@
  */
 package org.flowable.engine.test.api.event;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,18 +26,11 @@ public class TestTransactionFlowableEventListener implements TransactionFlowable
     private static final Logger LOGGER = LoggerFactory.getLogger(TestTransactionFlowableEventListener.class);
     private List<FlowableEvent> eventsReceived;
     private String onTransaction = "";
-//    private boolean ignoreRawActivityEvents = false;
 
 
     public TestTransactionFlowableEventListener() {
         eventsReceived = new ArrayList<>();
     }
-
-//    public TestTransactionFlowableEventListener(boolean ignoreRawActivityEvents) {
-//        eventsReceived = new ArrayList<>();
-//        this.ignoreRawActivityEvents = ignoreRawActivityEvents;
-//    }
-
 
     public List<FlowableEvent> getEventsReceived() {
         return eventsReceived;
@@ -47,12 +40,12 @@ public class TestTransactionFlowableEventListener implements TransactionFlowable
         eventsReceived.clear();
     }
 
-    //    @Override
+    @Override
     public String getOnTransaction() {
         return onTransaction;
     }
 
-    //    @Override
+    @Override
     public void setOnTransaction(String onTransaction) {
 
         this.onTransaction = onTransaction;
@@ -60,13 +53,8 @@ public class TestTransactionFlowableEventListener implements TransactionFlowable
 
     @Override
     public void onEvent(FlowableEvent event) {
-//        LOGGER.debug("ELEMENT TRIGGERED");
-//        if (event instanceof FlowableActivityEvent) {
-//            if (!ignoreRawActivityEvents || (event.getType() != FlowableEngineEventType.ACTIVITY_STARTED && event.getType() != FlowableEngineEventType.ACTIVITY_COMPLETED)) {
                 eventsReceived.add(event);
                 LOGGER.debug("{} {} event triggered ... {}", onTransaction, event.getType(), eventsReceived.size());
-//            }
-//        }
     }
 
     public boolean isEventTriggered(FlowableEngineEventType flowableEvent) {
@@ -75,10 +63,6 @@ public class TestTransactionFlowableEventListener implements TransactionFlowable
         }
         return false;
     }
-
-//    public void setIgnoreRawActivityEvents(boolean ignoreRawActivityEvents) {
-//        this.ignoreRawActivityEvents = ignoreRawActivityEvents;
-//    }
 
     @Override
     public boolean isFailOnException() {

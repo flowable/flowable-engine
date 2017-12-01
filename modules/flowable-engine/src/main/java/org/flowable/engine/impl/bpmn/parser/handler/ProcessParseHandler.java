@@ -25,7 +25,6 @@ import org.flowable.engine.common.impl.event.TransactionDependentFlowableEventSu
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.impl.event.FlowableEventSupport;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
