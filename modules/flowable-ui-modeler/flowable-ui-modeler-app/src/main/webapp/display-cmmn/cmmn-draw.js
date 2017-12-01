@@ -77,10 +77,6 @@ function _drawVariableServiceTaskIcon(element)
     {
         _drawHttpTaskIcon(paper, element.x + 4, element.y + 4);
     }
-    else if (element.taskType === "dmn")
-    {
-        _drawBusinessRuleTaskIcon(paper, element.x + 4, element.y + 4);
-    }
 	else if (element.stencilIconId)
 	{
 		paper.image("../service/stencilitem/" + element.stencilIconId + "/icon", element.x + 4, element.y + 4, 16, 16);
@@ -117,6 +113,13 @@ function _drawProcessTask(element)
 {
     _drawTask(element);
     _drawProcessTaskIcon(paper, element.x + 1, element.y + 1);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+}
+
+function _drawDecisionTask(element)
+{
+    _drawTask(element);
+    _drawDecisionTaskIcon(paper, element.x + 1, element.y + 1);
     _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
 }
 

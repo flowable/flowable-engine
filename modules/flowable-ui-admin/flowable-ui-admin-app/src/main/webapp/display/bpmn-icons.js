@@ -10,10 +10,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 function _drawUserTaskIcon(paper, startX, startY, element)
 {
-  
+
   var color = _bpmnGetColor(element, "#d1b575");
 	var path1 = paper.path("m 1,17 16,0 0,-1.7778 -5.333332,-3.5555 0,-1.7778 c 1.244444,0 1.244444,-2.3111 1.244444,-2.3111 l 0,-3.0222 C 12.555557,0.8221 9.0000001,1.0001 9.0000001,1.0001 c 0,0 -3.5555556,-0.178 -3.9111111,3.5555 l 0,3.0222 c 0,0 0,2.3111 1.2444443,2.3111 l 0,1.7778 L 1,15.2222 1,17 17,17");
 	path1.attr({
@@ -21,7 +21,7 @@ function _drawUserTaskIcon(paper, startX, startY, element)
 		"stroke": "none",
 		"fill": color
  	});
-	
+
 	var userTaskIcon = paper.set();
 	userTaskIcon.push(path1);
 
@@ -37,7 +37,7 @@ function _drawServiceTaskIcon(paper, startX, startY, element)
 		"stroke": "none",
 		"fill": color
  	});
-	
+
 	var serviceTaskIcon = paper.set();
 	serviceTaskIcon.push(path1);
 
@@ -53,7 +53,7 @@ function _drawScriptTaskIcon(paper, startX, startY, element)
 		"stroke": "none",
 		"fill": color
  	});
-	
+
 	var scriptTaskIcon = paper.set();
 	scriptTaskIcon.push(path1);
 
@@ -68,25 +68,25 @@ function _drawBusinessRuleTaskIcon(paper, startX, startY, element)
 		"stroke": "#000000",
 		"fill": color
  	});
-	
+
 	var rect2 = paper.rect(0, 4, 22, 12);
 	rect2.attr({
 		"stroke": "#000000",
 		"fill": "none"
  	});
-	
+
 	var path1 = paper.path("M 0 10 L 22 10");
 	path1.attr({
 		"stroke": "#000000",
 		"fill": "none"
  	});
-	
+
 	var path2 = paper.path("M 7 4 L 7 16");
 	path2.attr({
 		"stroke": "#000000",
 		"fill": "none"
  	});
-	
+
 	var businessRuleTaskIcon = paper.set();
 	businessRuleTaskIcon.push(rect1, rect2, path1, path2);
 
@@ -101,13 +101,13 @@ function _drawSendTaskIcon(paper, startX, startY, element)
 		"stroke": "white",
 		"fill": color
  	});
-	
+
 	var path2 = paper.path("M7,10 L16,17 L25 10z6");
 	path2.attr({
 		"stroke": "white",
 		"fill": color
  	});
-	
+
 	var sendTaskIcon = paper.set();
 	sendTaskIcon.push(path1, path2);
 
@@ -123,7 +123,7 @@ function _drawManualTaskIcon(paper, startX, startY, element)
 		"stroke": "none",
 		"fill": color
  	});
-	
+
 	var manualTaskIcon = paper.set();
 	manualTaskIcon.push(path1);
 
@@ -139,12 +139,12 @@ function _drawReceiveTaskIcon(paper, startX, startY, element)
 		"stroke": "none",
 		"fill": color
  	});
-	
+
 	startX += 4;
 	startY += 2;
-	
+
 	path.transform("T" + startX + "," + startY);
-	
+
 }
 
 function _drawCamelTaskIcon(paper, startX, startY)
@@ -155,17 +155,33 @@ function _drawCamelTaskIcon(paper, startX, startY)
         "stroke": "none",
         "fill": "#bd4848"
     });
-    
+
     startX += 4;
     startY += 2;
-    
+
     path.transform("T" + startX + "," + startY);
-    
+
 }
 
 function _drawHttpTaskIcon(paper, startX, startY)
 {
     var path = paper.path("m 16.704699,5.9229055 q 0.358098,0 0.608767,0.2506681 0.250669,0.250668 0.250669,0.6087677 0,0.3580997 -0.250669,0.6087677 -0.250669,0.2506679 -0.608767,0.2506679 -0.358098,0 -0.608767,-0.2506679 -0.250669,-0.250668 -0.250669,-0.6087677 0,-0.3580997 0.250669,-0.6087677 0.250669,-0.2506681 0.608767,-0.2506681 z m 2.578308,-2.0053502 q -2.229162,0 -3.854034,0.6759125 -1.624871,0.6759067 -3.227361,2.2694472 -0.716197,0.725146 -1.575633,1.7457293 L 7.2329969,8.7876913 Q 7.0897576,8.8055849 7.000233,8.9309334 L 4.9948821,12.368677 q -0.035811,0.06267 -0.035811,0.143242 0,0.107426 0.080572,0.205905 l 0.5729577,0.572957 q 0.125334,0.116384 0.2864786,0.07162 l 2.4708789,-0.760963 2.5156417,2.515645 -0.76096,2.470876 q -0.009,0.02687 -0.009,0.08057 0,0.125338 0.08058,0.205905 l 0.572957,0.572958 q 0.170096,0.152194 0.349146,0.04476 l 3.437744,-2.005351 q 0.125335,-0.08953 0.143239,-0.232763 l 0.17905,-3.392986 q 1.02058,-0.859435 1.745729,-1.575629 1.67411,-1.6830612 2.309735,-3.2049805 0.635625,-1.5219191 0.635625,-3.8585111 0,-0.1253369 -0.08505,-0.2148575 -0.08505,-0.089526 -0.201431,-0.089526 z");
+    path.attr({
+        "opacity": 1,
+        "stroke": "none",
+        "fill": "#16964d"
+    });
+
+    startX += -2;
+    startY += -2;
+
+    path.transform("T" + startX + "," + startY);
+
+}
+
+function _drawDecisionTaskIcon(paper, startX, startY)
+{
+    var path = paper.path("m 1,2 0,14 16,0 0,-14 z m 1.9,2.4000386 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m -8.67364,3.9 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m -8.67364,3.9 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z");
     path.attr({
         "opacity": 1,
         "stroke": "none",
@@ -187,12 +203,12 @@ function _drawMuleTaskIcon(paper, startX, startY)
         "stroke": "none",
         "fill": "#bd4848"
     });
-    
+
     startX += 4;
     startY += 2;
 
     path.transform("T" + startX + "," + startY);
-    
+
 }
 
 function _drawEventIcon(paper, element)
@@ -222,16 +238,16 @@ function _drawTimerIcon(paper, element)
 {
 	var x = element.x + (element.width / 2);
 	var y = element.y + (element.height / 2);
-	
+
 	var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
-  
+
 	var circle = paper.circle(x, y, 10);
 
 	circle.attr({"stroke-width": 1,
 		"stroke": strokeColor,
 		"fill": "none"
  	});
-	
+
 	var path = paper.path("M 16 6 L 16 9 M 21 7 L 19.5 10 M 25 11 L 22 12.5 M 26 16 L 23 16 " +
 		"M 25 21 L 22 19.5 M 21 25 L 19.5 22 M 16 26 L 16 23 M 11 25 L 12.5 22 M 7 21 L 10 19.5 " +
 		"M 6 16 L 9 16 M 7 11 L 10 12.5 M 11 7 L 12.5 10 M 18 9 L 16 16 L 20 16");
@@ -247,9 +263,9 @@ function _drawTimerIcon(paper, element)
 function _drawErrorIcon(paper, element)
 {
 	var path = paper.path("M 22.820839,11.171502 L 19.36734,24.58992 L 13.54138,14.281819 L 9.3386512,20.071607 L 13.048949,6.8323057 L 18.996148,16.132659 L 22.820839,11.171502 z");
-	
+
 	var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
-	
+
 	var fill = "none";
 	var x = element.x - 1;
 	var y = element.y - 1;
@@ -259,14 +275,14 @@ function _drawErrorIcon(paper, element)
 		x -= 1;
 		y -= 1;
 	}
-	
-	
+
+
 	path.attr({
 		"stroke": strokeColor,
 		"stroke-width": 1,
 		"fill": fill
  	});
-	
+
 	path.transform("T" + x + "," + y);
 	return path;
 }
@@ -274,13 +290,13 @@ function _drawErrorIcon(paper, element)
 function _drawSignalIcon(paper, element)
 {
   var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
-  
+
 	var fill = "none";
 	if (element.type === "ThrowEvent")
 	{
 		fill = strokeColor;
 	}
-	
+
 	var path = paper.path("M 8.7124971,21.247342 L 23.333334,21.247342 L 16.022915,8.5759512 L 8.7124971,21.247342 z");
 	path.attr({
 		"stroke": strokeColor,
@@ -294,7 +310,7 @@ function _drawSignalIcon(paper, element)
 function _drawMessageIcon(paper, element)
 {
   var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
-  
+
 	var path = paper.path("M8,11 L8,21 L24,21 L24,11z M8,11 L16,17 L24,11");
 	path.attr({
 		"stroke": strokeColor,
