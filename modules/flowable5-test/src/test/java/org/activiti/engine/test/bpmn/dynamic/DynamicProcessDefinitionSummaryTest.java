@@ -25,7 +25,6 @@ import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.dynamic.DynamicProcessDefinitionSummary;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -109,10 +108,10 @@ public class DynamicProcessDefinitionSummaryTest extends PluggableFlowableTestCa
         // verify if runtime is up to date
         runtimeService.startProcessInstanceById(processDefinitionId);
         // bob and david both should have a single task.
-        Task bobTask = taskService.createTaskQuery().taskCandidateUser("bob").singleResult();
+        org.flowable.task.api.Task bobTask = taskService.createTaskQuery().taskCandidateUser("bob").singleResult();
         assertThat("Bob must have one task", bobTask, is(notNullValue()));
 
-        Task davidTask = taskService.createTaskQuery().taskCandidateUser("david").singleResult();
+        org.flowable.task.api.Task davidTask = taskService.createTaskQuery().taskCandidateUser("david").singleResult();
         assertThat("David must have one task", davidTask, is(not(nullValue())));
     }
 
@@ -141,10 +140,10 @@ public class DynamicProcessDefinitionSummaryTest extends PluggableFlowableTestCa
         // verify if runtime is up to date
         runtimeService.startProcessInstanceById(processDefinitionId);
 
-        Task bobTask = taskService.createTaskQuery().taskCandidateUser("bob").singleResult();
+        org.flowable.task.api.Task bobTask = taskService.createTaskQuery().taskCandidateUser("bob").singleResult();
         assertThat("Bob must have one task", bobTask, is(notNullValue()));
 
-        List<Task> davidTasks = taskService.createTaskQuery().taskCandidateUser("david").list();
+        List<org.flowable.task.api.Task> davidTasks = taskService.createTaskQuery().taskCandidateUser("david").list();
         assertThat("David must have two task", davidTasks.size(), is(2));
     }
 

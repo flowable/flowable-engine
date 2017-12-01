@@ -15,9 +15,9 @@ package org.flowable.engine.impl.cmd;
 
 import java.util.Map;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -44,6 +44,7 @@ public class TriggerCmd extends NeedsActiveExecutionCmd<Object> {
         this.transientVariables = transientVariables;
     }
 
+    @Override
     protected Object execute(CommandContext commandContext, ExecutionEntity execution) {
         if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
             Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();

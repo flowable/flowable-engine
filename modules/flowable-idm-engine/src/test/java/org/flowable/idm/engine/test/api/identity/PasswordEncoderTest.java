@@ -56,7 +56,7 @@ public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
 
         idmEngineConfiguration.setPasswordEncoder(new ApacheDigester(ApacheDigester.Digester.SHA512));
         validatePassword();
-        
+
         idmEngineConfiguration.setPasswordEncoder(passwordEncoder);
     }
 
@@ -98,10 +98,9 @@ public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
 
         assertFalse(noSalt.equals(salt));
         idmIdentityService.deleteUser("johndoe1");
-        
+
         idmEngineConfiguration.setPasswordEncoder(passwordEncoder);
     }
-
 
 
     public void testValidatePasswordEncoderInstance() {
@@ -109,17 +108,19 @@ public class PasswordEncoderTest extends PluggableFlowableIdmTestCase {
         idmEngineConfiguration.setPasswordEncoder(new CustomPasswordEncoder());
         PasswordEncoder customPasswordEncoder = idmEngineConfiguration.getPasswordEncoder();
         assertTrue(customPasswordEncoder instanceof CustomPasswordEncoder);
-        
+
         idmEngineConfiguration.setPasswordEncoder(passwordEncoder);
     }
 
 
     class CustomPasswordEncoder implements PasswordEncoder {
 
+        @Override
         public String encode(CharSequence rawPassword, PasswordSalt passwordSalt) {
             return null;
         }
 
+        @Override
         public boolean isMatches(CharSequence rawPassword, String encodedPassword, PasswordSalt salt) {
             return false;
         }

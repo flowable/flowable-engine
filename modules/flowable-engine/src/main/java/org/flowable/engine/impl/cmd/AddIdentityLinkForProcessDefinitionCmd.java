@@ -23,6 +23,7 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 
 /**
  * @author Tijs Rademakers
@@ -54,6 +55,7 @@ public class AddIdentityLinkForProcessDefinitionCmd implements Command<Void>, Se
         }
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         ProcessDefinitionEntity processDefinition = CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findById(processDefinitionId);
 
@@ -67,7 +69,8 @@ public class AddIdentityLinkForProcessDefinitionCmd implements Command<Void>, Se
             return null;
         }
 
-        CommandContextUtil.getIdentityLinkEntityManager(commandContext).addIdentityLink(processDefinition, userId, groupId);
+        IdentityLinkEntity identityLinkEntity = CommandContextUtil.getIdentityLinkService().createProcessDefinitionIdentityLink(processDefinition.getId(), userId, groupId);
+        processDefinition.getIdentityLinks().add(identityLinkEntity);
 
         return null;
     }

@@ -19,18 +19,17 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventType;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.delegate.event.FlowableVariableEvent;
-import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.variable.api.event.FlowableVariableEvent;
 import org.hamcrest.CoreMatchers;
 
 /**
@@ -122,7 +121,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertEquals(1, listener.getEventsReceived().size());
         assertEquals(FlowableEngineEventType.VARIABLE_CREATED, listener.getEventsReceived().get(0).getType());
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         assertEquals(2, listener.getEventsReceived().size());
@@ -183,24 +182,58 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
 
         assertEquals(6, listener.getEventsReceived().size());
-        FlowableVariableEvent event = (FlowableVariableEvent) listener.getEventsReceived().get(0);
-        assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_CREATED));
-        assertThat(event.getVariableName(), is("parentVar1"));
-        event = (FlowableVariableEvent) listener.getEventsReceived().get(1);
-        assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_CREATED));
-        assertThat(event.getVariableName(), is("subVar1"));
-        event = (FlowableVariableEvent) listener.getEventsReceived().get(2);
-        assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_CREATED));
-        assertThat(event.getVariableName(), is("parentVar2"));
-        event = (FlowableVariableEvent) listener.getEventsReceived().get(3);
-        assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_DELETED));
-        assertThat(event.getVariableName(), is("subVar1"));
-        event = (FlowableVariableEvent) listener.getEventsReceived().get(4);
-        assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_DELETED));
-        assertThat(event.getVariableName(), is("parentVar2"));
-        event = (FlowableVariableEvent) listener.getEventsReceived().get(5);
-        assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_DELETED));
-        assertThat(event.getVariableName(), is("parentVar1"));
+        int nrOfCreated = 0;
+        int nrOfDeleted = 0;
+        for (int i = 0; i < listener.getEventsReceived().size(); i++) {
+            FlowableVariableEvent event = (FlowableVariableEvent) listener.getEventsReceived().get(i);
+            if (event.getType() == FlowableEngineEventType.VARIABLE_CREATED) {
+                
+                nrOfCreated++;
+                
+                if (event.getVariableName().equals("parentVar1")) {
+                    assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_CREATED));
+                    assertThat(event.getVariableName(), is("parentVar1"));
+                    
+                } else if (event.getVariableName().equals("subVar1")) {
+                    assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_CREATED));
+                    assertThat(event.getVariableName(), is("subVar1"));
+                    
+                } else if (event.getVariableName().equals("parentVar2")) {
+                    assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_CREATED));
+                    assertThat(event.getVariableName(), is("parentVar2"));
+                    
+                } else {
+                    fail("Unknown variable name " + event.getVariableName());
+                }
+                
+            } else if (event.getType() == FlowableEngineEventType.VARIABLE_DELETED) {
+                
+                nrOfDeleted++;
+                
+                if (event.getVariableName().equals("parentVar1")) {
+                    assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_DELETED));
+                    assertThat(event.getVariableName(), is("parentVar1"));
+                    
+                } else if (event.getVariableName().equals("subVar1")) {
+                    assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_DELETED));
+                    assertThat(event.getVariableName(), is("subVar1"));
+                    
+                } else if (event.getVariableName().equals("parentVar2")) {
+                    assertThat(event.getType(), CoreMatchers.<FlowableEventType>is(FlowableEngineEventType.VARIABLE_DELETED));
+                    assertThat(event.getVariableName(), is("parentVar2"));
+                    
+                } else {
+                    fail("Unknown variable name " + event.getVariableName());
+                }
+                
+            } else {
+                fail("Unknown event type " + event.getType());
+            }
+            
+        }
+        
+        assertEquals(3, nrOfCreated);
+        assertEquals(3, nrOfDeleted);
     }
 
     /**
@@ -252,7 +285,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
         assertNotNull(processInstance);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         taskService.setVariableLocal(task.getId(), "testVariable", "The value");
@@ -297,7 +330,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("variableProcess");
         assertNotNull(processInstance);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         assertEquals(3, listener.getEventsReceived().size());
@@ -336,7 +369,7 @@ public class VariableEventsTest extends PluggableFlowableTestCase {
      * Test to check create, update an delete behavior for variables on a task not related to a process.
      */
     public void testTaskVariableStandalone() throws Exception {
-        Task newTask = taskService.newTask();
+        org.flowable.task.api.Task newTask = taskService.newTask();
         try {
             taskService.saveTask(newTask);
 

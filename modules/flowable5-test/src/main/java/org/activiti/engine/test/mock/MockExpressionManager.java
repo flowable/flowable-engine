@@ -21,7 +21,7 @@ import org.activiti.engine.impl.javax.el.CompositeELResolver;
 import org.activiti.engine.impl.javax.el.ELResolver;
 import org.activiti.engine.impl.javax.el.ListELResolver;
 import org.activiti.engine.impl.javax.el.MapELResolver;
-import org.flowable.engine.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 
 public class MockExpressionManager extends ExpressionManager {
 

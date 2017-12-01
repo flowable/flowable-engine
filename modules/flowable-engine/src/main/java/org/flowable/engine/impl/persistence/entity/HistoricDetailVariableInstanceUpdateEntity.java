@@ -16,8 +16,8 @@ package org.flowable.engine.impl.persistence.entity;
 import org.flowable.engine.common.impl.db.HasRevision;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.history.HistoricVariableUpdate;
-import org.flowable.engine.impl.variable.ValueFields;
-import org.flowable.engine.impl.variable.VariableType;
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * @author Tom Baeyens

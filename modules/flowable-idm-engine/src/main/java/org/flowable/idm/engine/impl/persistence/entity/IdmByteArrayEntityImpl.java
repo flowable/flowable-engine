@@ -34,24 +34,29 @@ public class IdmByteArrayEntityImpl extends AbstractEntity implements IdmByteArr
 
     }
 
+    @Override
     public byte[] getBytes() {
         return bytes;
     }
 
+    @Override
     public Object getPersistentState() {
         return new PersistentState(name, bytes);
     }
 
     // getters and setters ////////////////////////////////////////////////////////
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public void setBytes(byte[] bytes) {
         this.bytes = bytes;
     }
@@ -73,6 +78,7 @@ public class IdmByteArrayEntityImpl extends AbstractEntity implements IdmByteArr
             this.bytes = bytes;
         }
 
+        @Override
         public boolean equals(Object obj) {
             if (obj instanceof PersistentState) {
                 PersistentState other = (PersistentState) obj;

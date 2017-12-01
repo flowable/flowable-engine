@@ -3,6 +3,7 @@
         "MAIN-TITLE": "Flowable Editor",
         "NAVIGATION" : {
             "PROCESSES": "Processes",
+            "CASEMODELS": "Case models",
             "FORMS": "Forms",
             "DECISION-TABLES": "Decision Tables",
             "APPS": "Apps"
@@ -70,6 +71,37 @@
             "PROCESSES-BPMN-IMPORT-HINT": "You can also import existing BPMN models.",
             "FILTER-TEXT": ", matching \"{{filterText}}\"",
             "FILTER-TEXT-EMPTY": "There are no process models matching \"{{filterText}}\"",
+            "RECENT": "Recent",
+            "RECENT-COUNT": "{{total}} recently used models",
+            "RECENT-ONE": "One recently used models",
+            "RECENT-EMPTY": "No recently used models"
+        },
+
+        "SORT": {
+            "MODIFIED-ASC": "Oldest",
+            "MODIFIED-DESC": "Last modified",
+            "NAME-ASC": "Name, A-Z",
+            "NAME-DESC": "Name, Z-A"
+        }
+    },
+    
+    "CASE-LIST" : {
+        "TITLE" : "Case Models",
+        "SEARCH-PLACEHOLDER": "Search",
+        "ACTION" : {
+            "CREATE": "Create Case",
+            "IMPORT": "Import Case"
+        },
+
+        "FILTER" : {
+            "CASES": "Case models",
+            "CASES-COUNT": "There are {{total}} case models",
+            "CASES-ONE": "There is one case model",
+            "CASES-EMPTY": "There is no case model created yet. You can design case models, user forms and then bundle them up into an app definition. The first step is to create a case model:",
+            "CASES-CMMN-HINT": "Create a CMMN model using the CMMN Visual Editor.",
+            "CASES-CMMN-IMPORT-HINT": "You can also import existing CMMN models.",
+            "FILTER-TEXT": ", matching \"{{filterText}}\"",
+            "FILTER-TEXT-EMPTY": "There are no case models matching \"{{filterText}}\"",
             "RECENT": "Recent",
             "RECENT-COUNT": "{{total}} recently used models",
             "RECENT-ONE": "One recently used models",
@@ -243,6 +275,72 @@
             "CREATE-DESCRIPTION": "You need to give a name for the new sub process and you may want to add a description at the same time."
         }
     },
+    
+    "CASE": {
+      "NAME": "Model name",
+      "KEY": "Model key",
+      "DESCRIPTION": "Description",
+      "VERSION-COMMENT": "Version comment",
+      "ACTION": {
+            "DETAILS": "Show details",
+            "EDIT": "Modify model properties",
+            "DUPLICATE": "Duplicate this model",
+            "EXPORT_CMMN": "Export to CMMN 1.1",
+            "DELETE": "Delete this model",
+            "CREATE-CONFIRM": "Create new model",
+            "DUPLICATE-CONFIRM": "Duplicate the model",
+            "OPEN-IN-EDITOR": "Visual Editor",
+            "EDIT-CONFIRM": "Save",
+            "DELETE-CONFIRM": "Delete case model",
+            "USE-AS-NEW-VERSION": "Use as new version",
+            "FAVORITE": "Favorite this model"
+
+        },
+        "DETAILS": {
+          "HISTORY-TITLE": "History",
+          "LAST-UPDATED-BY": "Last updated by {{lastUpdatedBy}} - {{lastUpdated | dateformat}}",
+          "CREATED-BY": "Created by {{createdBy}}",
+          "NO-DESCRIPTION": "This model has no description. Modify the model properties to add one"
+        },
+
+        "POPUP": {
+          "CREATE-TITLE": "Create a new case model",
+          "DUPLICATE-TITLE": "Duplicate the case model",
+          "CREATE-DESCRIPTION": "You need to give a name for the new model and you may want to add a description at the same time.",
+          "DUPLICATE-DESCRIPTION": "You can change the name for the new model and you may want to change the description at the same time.",
+          "EDIT-DESCRIPTION": "Change any of the model properties below and then press Save to update the model.",
+          "DELETE-DESCRIPTION": "Are you sure you want to delete the process model \"{{name}}\"?",
+          "EDIT-TITLE":"Edit model details",
+          "DELETE-TITLE": "Delete model",
+          "DELETE-LOADING-RELATIONS": "Checking model usage...",
+          "DELETE-RELATIONS-DESCRIPTION-SINGLE": "This model cannot be deleted, because another model is using it:",
+          "DELETE-RELATIONS-DESCRIPTION": "This model cannot be deleted, because it is used by other models:",
+          "DELETE-PROCESS-RELATION": "Case model",
+          "DELETE-FORM-RELATION": "Form model",
+          "DELETE-APP-RELATION": "App model",
+          "IMPORT-DESCRIPTION": "Please browse for or drop a CMMN XML definition with an .cmmn or .cmmn.xml extension",
+          "IMPORT-TITLE": "Import a case model",
+          "USE-AS-NEW-TITLE": "Use as new version",
+          "USE-AS-NEW-DESCRIPTION": "Are you sure you want to use version {{version}} to create a new version of \"{{name}}\"?",
+          "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "Could not fully restore the app model to the chosen version: some referenced models are missing due to being deleted in the past. Please update the app model accordingly. Missing models:",
+          "USE-AS-NEW-UNRESOLVED-MODEL": "Model '{{name}}' with internal id {{id}}, created by {{createdBy}}",
+          "SHARED-WITH": "Shared with",
+          "PERMISSION": "Permission",
+          "ACTIONS": "Actions",
+          "IMPORT": {
+              "DROPZONE": "Drop a .cmmn or .cmmn.xml CMMN XML file",
+              "CANCEL-UPLOAD": "Cancel the upload",
+              "ERROR": "Error while processing the CMMN XML file",
+              "NO-DROP": "Drag and drop not supported"
+          }
+        },
+        "ALERT": {
+          "EDIT-CONFIRM": "Model updated"
+        },
+        "ERROR": {
+          "NOT-FOUND": "The requested model does not exist"
+        }
+    },
 
     "FORM": {
       "NAME": "Form name",
@@ -253,6 +351,7 @@
             "EDIT": "Modify model properties",
             "DELETE": "Delete this form",
             "CREATE-CONFIRM": "Create new form",
+            "DUPLICATE": "Duplicate this form",
             "DUPLICATE-CONFIRM": "Duplicate the form",
             "OPEN-IN-EDITOR": "Form Editor",
             "EDIT-CONFIRM": "Save",
@@ -323,6 +422,8 @@
             "CREATE-TITLE": "Create a new decision table",
             "CREATE-DESCRIPTION": "You need to give a name for the new decision table and you may want to add a description at the same time.",
             "SAVE-DESCRIPTION": "You need to give a name and a unique key for the new decision table and you may want to add a description at the same time.",
+            "DUPLICATE-TITLE": "Duplicate decision table",
+            "DUPLICATE-DESCRIPTION": "You need to give a name for the new decision table and you may want to add a description at the same time.",
             "DELETE-TITLE": "Delete decision table",
             "DELETE-DESCRIPTION": "Are you sure you want to delete the decision table \"{{name}}\"?",
             "SAVE-DECISION-TABLE-TITLE": "Save decision table",
@@ -687,6 +788,16 @@
     "PROPERTY.FIELDS.STRING.PLACEHOLDER" : "Enter a string",
     "PROPERTY.FIELDS.IMPLEMENTATION" : "Implementation",
 
+    "PROPERTY.DATAPROPERTIES.VALUES" : "{{length}} data objects",
+    "PROPERTY.DATAPROPERTIES.EMPTY" : "No data objects configured",
+    "PROPERTY.DATAPROPERTIES.ID" : "Id",
+    "PROPERTY.DATAPROPERTIES.ID.PLACEHOLDER" : "Enter an id",
+    "PROPERTY.DATAPROPERTIES.NAME" : "Name",
+    "PROPERTY.DATAPROPERTIES.NAME.PLACEHOLDER" : "Enter a name",
+    "PROPERTY.DATAPROPERTIES.TYPE" : "Type",
+    "PROPERTY.DATAPROPERTIES.VALUE.PLACEHOLDER" : "Enter a value (optional)",
+    "PROPERTY.DATAPROPERTIES.VALUE" : "Default Value",
+
     "PROPERTY.FORMPROPERTIES.VALUE" : "{{length}} form properties",
     "PROPERTY.FORMPROPERTIES.EMPTY" : "No form properties selected",
     "PROPERTY.FORMPROPERTIES.ID" : "Id",
@@ -724,11 +835,11 @@
     "PROPERTY.PARAMETER.TARGET.PLACEHOLDER" : "Enter a target",
     "PROPERTY.PARAMETER.EMPTY" : "No parameter selected",
 
-    "PROPERTY.SUBPROCESSREFERENCE.EMPTY" : "No reference selected",
-    "PROPERTY.SUBPROCESSREFERENCE.TITLE" : "Collapsed subprocess reference",
-    "PROPERTY.SUBPROCESSREFERENCE.ERROR.SUBPROCESS" : "There was an error loading the subprocesses. Try again later",
-    "PROPERTY.SUBPROCESSREFERENCE.SUBPROCESS.LOADING" : "Loading subprocesses...",
-    "PROPERTY.SUBPROCESSREFERENCE.SUBPROCESS.EMPTY" : "This folder contains no subprocesses",
+    "PROPERTY.PROCESSREFERENCE.EMPTY" : "No reference selected",
+    "PROPERTY.PROCESSREFERENCE.TITLE" : "Process reference",
+    "PROPERTY.PROCESSREFERENCE.ERROR.PROCESS" : "There was an error loading the processes. Try again later",
+    "PROPERTY.PROCESSREFERENCE.PROCESS.LOADING" : "Loading processes...",
+    "PROPERTY.PROCESSREFERENCE.PROCESS.EMPTY" : "This folder contains no processes",
 
     "PROPERTY.FORMREFERENCE.EMPTY" : "No reference selected",
     "PROPERTY.FORMREFERENCE.TITLE" : "Form reference",
@@ -845,5 +956,11 @@
     "PROPERTY.DECISIONTABLEREFERENCE.TITLE" : "Decision table reference",
     "PROPERTY.DECISIONTABLEREFERENCE.ERROR.FORM" : "There was an error loading the decision tables. Try again later",
     "PROPERTY.DECISIONTABLEREFERENCE.DECISIONTABLE.LOADING" : "Loading decision tables...",
-    "PROPERTY.DECISIONTABLEREFERENCE.DECISIONTABLE.EMPTY" : "This folder contains no decision tables"
+    "PROPERTY.DECISIONTABLEREFERENCE.DECISIONTABLE.EMPTY" : "This folder contains no decision tables",
+    
+    "PROPERTY.CASEREFERENCE.EMPTY" : "No reference selected",
+    "PROPERTY.CASEREFERENCE.TITLE" : "Case model reference",
+    "PROPERTY.CASEREFERENCE.ERROR.FORM" : "There was an error loading the case models. Try again later",
+    "PROPERTY.CASEREFERENCE.CASE.LOADING" : "Loading case models...",
+    "PROPERTY.CASEREFERENCE.CASE.EMPTY" : "This folder contains no case models"
 }

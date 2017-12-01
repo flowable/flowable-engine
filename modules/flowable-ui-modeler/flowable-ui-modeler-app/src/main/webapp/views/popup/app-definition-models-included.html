@@ -11,9 +11,14 @@
 
 
             <div class="modal-body modal-body-with-overflow">
-                <div class="item-wrapper clearfix">
+                <div class="tabs-wrapper">
+
+                <div tab-control="tabs" active-tab="popup.activeTab">
+                </div>
+                
+                <div class="item-wrapper clearfix" ng-show="popup.activeTab == 'bpmn'">
                     <div class="item fadein" ng-repeat="model in popup.models.data">
-                        <div class="item-box" ng-style="{'background-image': 'url(\'' + config.contextRoot + '/app/rest/models/' + model.id + '/thumbnail\')'}" ng-click="selectModel(model); $event.stopPropagation();">
+                        <div class="item-box" ng-style="{'background-image': 'url(\'' + getModelThumbnailUrl(model.id) + '\')'}" ng-click="selectModel(model); $event.stopPropagation();">
                             <span class="badge">v{{model.version}}</span>
                             <div class="btn-group pull-right">
                                 <button type="button" ng-show="isModelSelected(model)" class="btn btn-default" title="{{'PROCESS.ACTION.DETAILS' | translate}}">
@@ -28,6 +33,28 @@
                                     <span><i class="glyphicon glyphicon-user"></i> {{model.createdBy}}</span> <span title="{{model.lastUpdated | dateformat:'LLLL'}}"><i class="glyphicon glyphicon-pencil"></i> {{model.lastUpdated | dateformat}}</span>
                                 </div>
                                 <p>{{model.description}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="item-wrapper clearfix" ng-show="popup.activeTab == 'cmmn'">
+                    <div class="item fadein" ng-repeat="cmmnModel in popup.cmmnModels.data">
+                        <div class="item-box" ng-style="{'background-image': 'url(\'' + getModelThumbnailUrl(cmmnModel.id) + '\')'}" ng-click="selectCmmnModel(cmmnModel); $event.stopPropagation();">
+                            <span class="badge">v{{cmmnModel.version}}</span>
+                            <div class="btn-group pull-right">
+                                <button type="button" ng-show="isCmmnModelSelected(cmmnModel)" class="btn btn-default" title="{{'PROCESS.ACTION.DETAILS' | translate}}">
+                                    <i class="glyphicon glyphicon-plus-sign"></i>
+                                </button>
+                            </div>
+                            <div class="details">
+                                <h3 class="truncate" title="{{cmmnModel.name}}">
+                                    {{cmmnModel.name}}
+                                </h3>
+                                <div class="basic-details truncate">
+                                    <span><i class="glyphicon glyphicon-user"></i> {{cmmnModel.createdBy}}</span> <span title="{{cmmnModel.lastUpdated | dateformat:'LLLL'}}"><i class="glyphicon glyphicon-pencil"></i> {{cmmnModel.lastUpdated | dateformat}}</span>
+                                </div>
+                                <p>{{cmmnModel.description}}</p>
                             </div>
                         </div>
                     </div>

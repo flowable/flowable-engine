@@ -25,10 +25,12 @@ public class ProcessHistoryParseHandler extends AbstractBpmnParseHandler<Process
 
     protected static final ProcessInstanceEndHandler PROCESS_INSTANCE_END_HANDLER = new ProcessInstanceEndHandler();
 
+    @Override
     protected Class<? extends BaseElement> getHandledType() {
         return Process.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, Process element) {
         bpmnParse.getCurrentProcessDefinition().addExecutionListener(org.activiti.engine.impl.pvm.PvmEvent.EVENTNAME_END, PROCESS_INSTANCE_END_HANDLER);
     }

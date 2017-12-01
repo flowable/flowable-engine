@@ -25,7 +25,7 @@ import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
+import org.flowable.task.api.Task;
 import org.springframework.util.StringUtils;
 
 class ProcessScopeTestEngine {

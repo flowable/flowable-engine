@@ -13,33 +13,30 @@
 
 package org.flowable.rest.service.api.history;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.flowable.engine.HistoryService;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.history.HistoricVariableInstance;
-import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
-import org.flowable.rest.service.api.RestResponseFactory;
-import org.flowable.rest.service.api.engine.variable.RestVariable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.rest.service.api.RestResponseFactory;
+import org.flowable.rest.service.api.engine.variable.RestVariable;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 
 /**
  * @author Tijs Rademakers
@@ -54,7 +51,7 @@ public class HistoricVariableInstanceDataResource {
     @Autowired
     protected HistoryService historyService;
 
-    @RequestMapping(value = "/history/historic-variable-instances/{varInstanceId}/data", method = RequestMethod.GET)
+    @GetMapping(value = "/history/historic-variable-instances/{varInstanceId}/data")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the variable instance was found and the requested variable data is returned."),
             @ApiResponse(code = 404, message = "Indicates the requested variable instance was not found or the variable instance doesn’t have a variable with the given name or the variable doesn’t have a binary stream available. Status message provides additional information.") })

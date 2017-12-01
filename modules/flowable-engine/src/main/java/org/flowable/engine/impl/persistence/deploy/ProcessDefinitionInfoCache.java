@@ -58,6 +58,7 @@ public class ProcessDefinitionInfoCache {
             // true will keep the 'access-order', which is needed to have a real LRU cache
             private static final long serialVersionUID = 1L;
 
+            @Override
             protected boolean removeEldestEntry(Map.Entry<String, ProcessDefinitionInfoCacheObject> eldest) {
                 boolean removeEldest = size() > limit;
                 if (removeEldest) {

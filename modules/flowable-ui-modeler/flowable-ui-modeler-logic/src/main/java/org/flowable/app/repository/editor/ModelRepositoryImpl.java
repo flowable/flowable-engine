@@ -40,7 +40,7 @@ public class ModelRepositoryImpl implements ModelRepository {
 
     @Override
     public List<Model> findByModelType(Integer modelType, String sort) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("modelType", modelType);
         params.put("sort", sort);
         return findModelsByParameters(params);
@@ -48,7 +48,7 @@ public class ModelRepositoryImpl implements ModelRepository {
 
     @Override
     public List<Model> findByModelTypeAndFilter(Integer modelType, String filter, String sort) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("modelType", modelType);
         params.put("filter", filter);
         params.put("sort", sort);
@@ -57,7 +57,7 @@ public class ModelRepositoryImpl implements ModelRepository {
 
     @Override
     public List<Model> findByKeyAndType(String key, Integer modelType) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("key", key);
         params.put("modelType", modelType);
         return findModelsByParameters(params);
@@ -70,7 +70,7 @@ public class ModelRepositoryImpl implements ModelRepository {
 
     @Override
     public Long countByModelTypeAndCreatedBy(int modelType, String createdBy) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("createdBy", createdBy);
         params.put("modelType", modelType);
         return sqlSessionTemplate.selectOne(NAMESPACE + "countByModelTypeAndCreatedBy", params);

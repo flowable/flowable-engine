@@ -14,10 +14,10 @@ package org.flowable.cdi;
 
 import java.util.Date;
 
-import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * Signifies an event that is happening / has happened during the execution of a business process.

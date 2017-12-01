@@ -317,6 +317,8 @@
         "POPUP": {
             "CREATE-TITLE": "Crear nueva tabla de decision",
             "CREATE-DESCRIPTION": "Es necesario dar un nombre par a la tabla de decision, es recomendable proporcionar una descripcion al mismo tiempo.",
+            "DUPLICATE-TITLE": "Duplicar tabla de decision",
+            "DUPLICATE-DESCRIPTION": "Puedes dar un nombre para la nueba tabla de decision es recomendable proporcionar una descripcion al mismo tiempo.",
             "SAVE-DESCRIPTION": "Es necesario proporcionar un nombre y un identificador unico para la tabla de decision, es recomendable proporcionar una descripcion al mismo tiempo",
             "DELETE-TITLE": "Borrar tabla de decision",
             "DELETE-DESCRIPTION": "Estas Seguro que deseas borrar esta tabla de decision \"{{name}}\"?",
@@ -558,7 +560,7 @@
     "FEATURE-TOUR" : {
         "BENDPOINT" : {
             "TITLE": "Tutorial punto de curva",
-            "DESCRIPTION" : "Cuando estas conectando un elemento con otro usando un flujo de secuencia (Esas felechas entre los pasos del proceso), encontraras que esos flujos de secuencia se crean de manera automatica, si deseas modificar la direccione de las flechas, puedes agregar o eliminar un punto de curva de un flujo de secuencia.<br/><br/> Como se muestra debajo en la figura, primero das click en el boton 'Agregar punto curva'y despues das click en el flujo de secuencia al que deseas agregarlo. El fluo de secuencia te indicará con un punto en verde que el punto curva puede ser agregado.<br/><br/> Para remover un punto curva, click  en 'eliminar punto curva' y da click en el flujo de secuencia del cual deseas remover."
+            "DESCRIPTION" : "Cuando estas conectando un elemento con otro usando un flujo de secuencia (Esas flechas entre los pasos del proceso), encontraras que esos flujos de secuencia se crean de manera automatica, si deseas modificar la direccione de las flechas, puedes agregar o eliminar un punto de curva de un flujo de secuencia.<br/> Como se muestra debajo en la figura, primero das click en el boton 'Agregar punto curva'y despues das click en el flujo de secuencia al que deseas agregarlo. El fluo de secuencia te indicará con un punto en verde que el punto curva puede ser agregado.<br/> Para eliminar un punto curva, click en 'eliminar punto curva' y da click en el flujo de secuencia del cual deseas eliminar."
         }
     },
 

@@ -16,7 +16,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -102,7 +101,7 @@ public class CustomTaskAssignmentTest extends PluggableFlowableTestCase {
     public void testReleaseTask() throws Exception {
         runtimeService.startProcessInstanceByKey("releaseTaskProcess");
 
-        Task task = taskService.createTaskQuery().taskAssignee("fozzie").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskAssignee("fozzie").singleResult();
         assertNotNull(task);
         String taskId = task.getId();
 

@@ -21,7 +21,6 @@ import org.flowable.engine.form.StartFormData;
 import org.flowable.engine.form.TaskFormData;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 public class FormPropertyDefaultValueTest extends PluggableFlowableTestCase {
@@ -29,7 +28,7 @@ public class FormPropertyDefaultValueTest extends PluggableFlowableTestCase {
     @Deployment
     public void testDefaultValue() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("FormPropertyDefaultValueTest.testDefaultValue");
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         TaskFormData formData = formService.getTaskFormData(task.getId());
         List<FormProperty> formProperties = formData.getFormProperties();

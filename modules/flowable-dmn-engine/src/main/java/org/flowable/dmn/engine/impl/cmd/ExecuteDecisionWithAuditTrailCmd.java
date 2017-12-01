@@ -49,6 +49,7 @@ public class ExecuteDecisionWithAuditTrailCmd extends AbstractExecuteDecisionCmd
         executeDecisionInfo.setTenantId(tenantId);
     }
 
+    @Override
     public DecisionExecutionAuditContainer execute(CommandContext commandContext) {
         if (getDecisionKey() == null) {
             throw new FlowableIllegalArgumentException("decisionKey is null");

@@ -26,6 +26,49 @@
 
 <h1>Flowable Release Notes</h1>
 
+<h3>Release Notes - Flowable - 6.2.0</h3>
+
+<h4>Highlights</h4>
+
+<ul>
+    <li>Introduction of a new CMMN 1.1 Engine. This provides an implementation of the <a href="http://www.omg.org/spec/CMMN/1.1/">CMMN 1.1 OMG standard</a>. A lot of effort has been put in this
+    new Engine, and it uses a new set of database tables optimized for CMMN execution. We've added a new CMMN user guide to help you getting started. Note that since this is a first release, the
+    CMMN Engine is marked as an experimental feature and missing features like timers and HTTP and Decision tasks will be added in next releases.</li>
+    <li>Added a CMMN editor to the Flowable Modeler app.</li>
+    <li>Added support for CMMN cases ot the Flowable Task app.</li>
+    <li>The BPMN and CMMN engine share a number of common services like Tasks, Variables, Identity links and Jobs. Therefore these services are extracted from the core BPMN engine module and
+    new modules have been created for each one of these services. The BPMN and CMMN engines make use of these services to provide for example Task and Variable support. With this approach Flowable is very
+    flexible in the deployment model. You can run only the BPMN Engine, only the CMMN Engine or run them both together without any issues.</li>
+    <li>Various small bugfixes all around.</li>
+</ul>
+
+<h4>Community contributors</h4>
+
+<ul>
+    <li>David Malkovsky (dbmalkovsky)</li>
+    <li>Filip Hrisafov (filiphr)</li>
+    <li>Robert Hafner (roberthafner)</li>
+    <li>Marco van Zwetselaar (zwets)</li>
+    <li>Lori Small (lsmall)</li>
+    <li>Michael Lippens (mlippens)</li>
+</ul>
+
+<h4>Upgrade notes</h4>
+
+<p>Because of the extraction of the Task, Variable, Identity Link and Job services, we had to change the package names of the classes used in these modules.
+This means that for example TaskQuery and Job Query have been moved to a new package. This was done to adhere to OSGi standards and to be ready for the new Java 9 version.
+This however does mean that you run into some compilation issues while migration to version 6.2.0. We always try to prevent this as much as we can, but due to the new modules this wasn't possible in this release.
+The common naming pattern of these new service is org.flowable.{servicename}.api for the API module and org.flowable.{servicename}.service for the service implementation module.
+So org.flowable.task.api and org.flowable.task.service for example.</p>
+
+<h3>Release Notes - Flowable - 6.1.2</h3>
+
+<h4>Bug fix release</h4>
+
+<p>Thanks to whee we found out that there's an issue with the release 6.1.1 when running it without an Internet connection <a href="https://forum.flowable.org/t/upgrading-6-1-0-to-6-1-1-could-not-read-idm-mybatis-configuration-file/753">https://forum.flowable.org/t/upgrading-6-1-0-to-6-1-1-could-not-read-idm-mybatis-configuration-file/753</a>.
+This was fixed with the following commit <a href="https://github.com/flowable/flowable-engine/commit/7338015dc8aadc984ff9dd4ad3385b6a7b4ace6f">https://github.com/flowable/flowable-engine/commit/7338015dc8aadc984ff9dd4ad3385b6a7b4ace6f</a>.
+Although an Internet connection is often available, we decided to do a bug fix release to prevent people from running into this issue.</p>
+
 <h3>Release Notes - Flowable - 6.1.1</h3>
 
 <h4>Highlights</h4>

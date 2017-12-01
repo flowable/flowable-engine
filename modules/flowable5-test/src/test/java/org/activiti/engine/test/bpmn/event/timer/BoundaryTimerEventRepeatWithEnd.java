@@ -18,10 +18,9 @@ import java.util.Date;
 import java.util.List;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
 import org.joda.time.DateTime;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
@@ -52,10 +51,10 @@ public class BoundaryTimerEventRepeatWithEnd extends PluggableFlowableTestCase {
 
         runtimeService.setVariable(processInstance.getId(), "EndDateForBoundary", dateStr);
 
-        List<Task> tasks = taskService.createTaskQuery().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertEquals(1, tasks.size());
 
-        Task task = tasks.get(0);
+        org.flowable.task.api.Task task = tasks.get(0);
         assertEquals("Task A", task.getName());
 
         // Test Boundary Events

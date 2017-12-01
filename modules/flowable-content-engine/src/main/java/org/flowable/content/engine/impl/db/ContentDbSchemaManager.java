@@ -12,11 +12,15 @@
  */
 package org.flowable.content.engine.impl.db;
 
+import java.sql.Connection;
+
 import org.flowable.content.engine.ContentEngineConfiguration;
 import org.flowable.content.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.db.DbSchemaManager;
-import org.flowable.engine.common.impl.db.DbSqlSession;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import liquibase.Liquibase;
 import liquibase.database.Database;
@@ -27,21 +31,27 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 
 public class ContentDbSchemaManager implements DbSchemaManager {
     
+    private static final Logger LOGGER = LoggerFactory.getLogger(ContentDbSchemaManager.class);
+    
+    public static String LIQUIBASE_CHANGELOG = "org/flowable/content/db/liquibase/flowable-content-db-changelog.xml";
+    
+    @Override
     public void dbSchemaCreate() {
-        Liquibase liquibase = createLiquibaseInstance();
+        Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getContentEngineConfiguration());
         try {
-            liquibase.update("form");
+            liquibase.update("content");
         } catch (Exception e) {
-            throw new FlowableException("Error creating form engine tables", e);
+            throw new FlowableException("Error creating content engine tables", e);
         }
     }
 
+    @Override
     public void dbSchemaDrop() {
-        Liquibase liquibase = createLiquibaseInstance();
+        Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getContentEngineConfiguration());
         try {
             liquibase.dropAll();
         } catch (Exception e) {
-            throw new FlowableException("Error dropping form engine tables", e);
+            throw new FlowableException("Error dropping content engine tables", e);
         }
     }
     
@@ -51,20 +61,51 @@ public class ContentDbSchemaManager implements DbSchemaManager {
         return null;
     }
 
-    protected static Liquibase createLiquibaseInstance() {
+    protected static Liquibase createLiquibaseInstance(ContentEngineConfiguration configuration) {
         try {
-            DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
-            DatabaseConnection connection = new JdbcConnection(dbSqlSession.getSqlSession().getConnection());
+            
+            Connection jdbcConnection = null;
+            CommandContext commandContext = CommandContextUtil.getCommandContext();
+            if (commandContext == null) {
+                jdbcConnection = configuration.getDataSource().getConnection();
+            } else {
+                jdbcConnection = CommandContextUtil.getDbSqlSession(commandContext).getSqlSession().getConnection();
+            }
+            if (!jdbcConnection.getAutoCommit()) {
+                jdbcConnection.commit();
+            }
+            
+            DatabaseConnection connection = new JdbcConnection(jdbcConnection);
             Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
             database.setDatabaseChangeLogTableName(ContentEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogTableName());
             database.setDatabaseChangeLogLockTableName(ContentEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogLockTableName());
 
-            Liquibase liquibase = new Liquibase("org/flowable/form/db/liquibase/flowable-form-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
+            Liquibase liquibase = new Liquibase(LIQUIBASE_CHANGELOG, new ClassLoaderResourceAccessor(), database);
             return liquibase;
 
         } catch (Exception e) {
             throw new FlowableException("Error creating liquibase instance", e);
         }
     }
+    
+    public void initSchema(ContentEngineConfiguration configuration, String databaseSchemaUpdate) {
+        try {
+            Liquibase liquibase = createLiquibaseInstance(configuration);
+            if (ContentEngineConfiguration.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)) {
+                LOGGER.debug("Dropping and creating schema Content");
+                liquibase.dropAll();
+                liquibase.update("content");
+            } else if (ContentEngineConfiguration.DB_SCHEMA_UPDATE_TRUE.equals(databaseSchemaUpdate)) {
+                LOGGER.debug("Updating schema Content");
+                liquibase.update("content");
+            } else if (ContentEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
+                LOGGER.debug("Validating schema Content");
+                liquibase.validate();
+            }
+        } catch (Exception e) {
+            throw new FlowableException("Error initialising Content schema", e);
+        }
+    }
+
 
 }

@@ -20,9 +20,9 @@ import java.util.Set;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.VariableInstance;
-import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Daisuke Yoshimoto
@@ -47,7 +47,7 @@ public class GetExecutionsVariablesCmd implements Command<List<VariableInstance>
         }
 
         List<VariableInstance> instances = new ArrayList<>();
-        List<VariableInstanceEntity> entities = CommandContextUtil.getVariableInstanceEntityManager(commandContext).findVariableInstancesByExecutionIds(executionIds);
+        List<VariableInstanceEntity> entities = CommandContextUtil.getVariableService().findVariableInstancesByExecutionIds(executionIds);
         for (VariableInstanceEntity entity : entities) {
             entity.getValue();
             instances.add(entity);

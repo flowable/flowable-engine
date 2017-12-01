@@ -17,14 +17,14 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.ibatis.type.JdbcType;
-import org.flowable.engine.cfg.AbstractEngineConfigurator;
+import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.AbstractEngineConfigurator;
+import org.flowable.engine.common.EngineDeployer;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.db.CustomMyBatisTypeHandlerConfig;
 import org.flowable.engine.common.impl.db.CustomMybatisTypeAliasConfig;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.deploy.Deployer;
 import org.flowable.form.engine.FormEngine;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.deployer.FormDeployer;
@@ -47,8 +47,8 @@ public class FormEngineConfigurator extends AbstractEngineConfigurator {
     }
     
     @Override
-    protected List<Deployer> getCustomDeployers() {
-        List<Deployer> deployers = new ArrayList<>();
+    protected List<EngineDeployer> getCustomDeployers() {
+        List<EngineDeployer> deployers = new ArrayList<>();
         deployers.add(new FormDeployer());
         return deployers;
     }
@@ -71,14 +71,16 @@ public class FormEngineConfigurator extends AbstractEngineConfigurator {
     }
 
     @Override
-    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public void configure(AbstractEngineConfiguration engineConfiguration) {
         if (formEngineConfiguration == null) {
             formEngineConfiguration = new StandaloneFormEngineConfiguration();
         }
         
-        initialiseCommonProperties(processEngineConfiguration, formEngineConfiguration, EngineConfigurationConstants.KEY_FORM_ENGINE_CONFIG);
+        initialiseCommonProperties(engineConfiguration, formEngineConfiguration);
 
         initFormEngine();
+        
+        initServiceConfigurations(engineConfiguration, formEngineConfiguration);
     }
     
     @Override

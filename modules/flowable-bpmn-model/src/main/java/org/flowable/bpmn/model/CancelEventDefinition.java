@@ -17,6 +17,7 @@ package org.flowable.bpmn.model;
  */
 public class CancelEventDefinition extends EventDefinition {
 
+    @Override
     public CancelEventDefinition clone() {
         CancelEventDefinition clone = new CancelEventDefinition();
         clone.setValues(this);

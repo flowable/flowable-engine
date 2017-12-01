@@ -43,6 +43,7 @@ public class AdditionalConverterTest extends AbstractConverterTest {
         validateModel(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "full.dmn";
     }
@@ -59,13 +60,22 @@ public class AdditionalConverterTest extends AbstractConverterTest {
 
         List<InputClause> inputClauses = decisionTable.getInputs();
         assertEquals(2, inputClauses.size());
+        assertNotNull(inputClauses.get(0).getId());
+        assertNotNull(inputClauses.get(0).getLabel());
+        assertNotNull(inputClauses.get(0).getInputExpression().getTypeRef());
+        assertNotNull(inputClauses.get(0).getInputExpression().getId());
+        assertNotNull(inputClauses.get(0).getInputExpression().getText());
 
         List<OutputClause> outputClauses = decisionTable.getOutputs();
         assertEquals(2, outputClauses.size());
+        assertNotNull(outputClauses.get(0).getName());
+        assertNotNull(outputClauses.get(0).getTypeRef());
+        assertNotNull(outputClauses.get(0).getId());
+        assertNotNull(outputClauses.get(0).getLabel());
 
         assertEquals("\"result2\",\"result1\"", decisionTable.getOutputs().get(0).getOutputValues().getText());
         assertEquals("\"2\",\"1\"", decisionTable.getOutputs().get(1).getOutputValues().getText());
-        
+
         List<DecisionRule> rules = decisionTable.getRules();
         assertEquals(2, rules.size());
 

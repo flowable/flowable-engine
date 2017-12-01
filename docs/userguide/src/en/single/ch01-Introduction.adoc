@@ -1,0 +1,22 @@
+== Introduction
+
+include::../bpmn/ch02-GettingStarted.adoc[tags=getting.started.flowable]
+
+include::../base/header-Introduction.adoc[]
+
+
+=== Architecture Overview
+
+*TBD*
+
+=== Supported Platform
+
+*TBD*
+
+=== History
+
+*TBD*
+
+=== What's new
+
+*TBD*

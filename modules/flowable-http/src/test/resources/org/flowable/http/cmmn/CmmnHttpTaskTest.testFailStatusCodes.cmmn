@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL"
+             xmlns:flowable="http://flowable.org/cmmn"
+             targetNamespace="http://flowable.org/cmmn">
+
+    <case id="myCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+
+            <planItem id="httpGet" name="Task One" definitionRef="httpCmmnTask" />
+            <planItem id="planItem2" name="The Case" definitionRef="task">
+                <entryCriterion sentryRef="sentry1" />
+            </planItem>
+
+            <sentry id="sentry1">
+                <planItemOnPart sourceRef="httpGet">
+                    <standardEvent>complete</standardEvent>
+                </planItemOnPart>
+            </sentry>
+
+            <task id="httpCmmnTask" name="http" isBlocking="false" flowable:type="http">
+                <extensionElements>
+                    <flowable:field name="requestMethod">
+                        <flowable:string><![CDATA[GET]]></flowable:string>
+                    </flowable:field>
+                    <flowable:field name="requestUrl">
+                        <flowable:string><![CDATA[http://localhost:9798/api/fail?code=400]]></flowable:string>
+                    </flowable:field>
+                    <flowable:field name="failStatusCodes">
+                        <flowable:string><![CDATA[4XX]]></flowable:string>
+                    </flowable:field>
+                </extensionElements>
+            </task>
+
+            <task id="task" name="The Task" isBlocking="true" />
+
+        </casePlanModel>
+    </case>
+
+</definitions>

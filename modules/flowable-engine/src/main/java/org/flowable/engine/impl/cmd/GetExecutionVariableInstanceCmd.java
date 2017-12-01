@@ -20,10 +20,10 @@ import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.VariableInstance;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.Execution;
+import org.flowable.variable.api.persistence.entity.VariableInstance;
 
 public class GetExecutionVariableInstanceCmd implements Command<VariableInstance>, Serializable {
 
@@ -38,6 +38,7 @@ public class GetExecutionVariableInstanceCmd implements Command<VariableInstance
         this.isLocal = isLocal;
     }
 
+    @Override
     public VariableInstance execute(CommandContext commandContext) {
         if (executionId == null) {
             throw new FlowableIllegalArgumentException("executionId is null");

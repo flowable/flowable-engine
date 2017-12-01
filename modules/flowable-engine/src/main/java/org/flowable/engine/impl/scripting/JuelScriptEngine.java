@@ -71,25 +71,30 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
         this(null);
     }
 
+    @Override
     public CompiledScript compile(String script) throws ScriptException {
         ValueExpression expr = parse(script, context);
         return new JuelCompiledScript(expr);
     }
 
+    @Override
     public CompiledScript compile(Reader reader) throws ScriptException {
         // Create a String based on the reader and compile it
         return compile(readFully(reader));
     }
 
+    @Override
     public Object eval(String script, ScriptContext scriptContext) throws ScriptException {
         ValueExpression expr = parse(script, scriptContext);
         return evaluateExpression(expr, scriptContext);
     }
 
+    @Override
     public Object eval(Reader reader, ScriptContext scriptContext) throws ScriptException {
         return eval(readFully(reader), scriptContext);
     }
 
+    @Override
     public ScriptEngineFactory getFactory() {
         synchronized (this) {
             if (scriptEngineFactory == null) {
@@ -99,6 +104,7 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
         return scriptEngineFactory;
     }
 
+    @Override
     public Bindings createBindings() {
         return new SimpleBindings();
     }
@@ -246,11 +252,13 @@ public class JuelScriptEngine extends AbstractScriptEngine implements Compilable
             this.valueExpression = valueExpression;
         }
 
+        @Override
         public ScriptEngine getEngine() {
             // Return outer class instance
             return JuelScriptEngine.this;
         }
 
+        @Override
         public Object eval(ScriptContext ctx) throws ScriptException {
             return evaluateExpression(valueExpression, ctx);
         }

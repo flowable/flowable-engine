@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.examples.bpmn.executionlistener.CurrentActivityExecutionListener.CurrentActivity;
 import org.flowable.examples.bpmn.executionlistener.RecorderExecutionListener.RecordedEvent;
@@ -47,7 +46,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
         assertEquals("businessKey123", businessKey);
 
         // Transition take executionListener will set 2 variables
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
         taskService.complete(task.getId());
 
@@ -162,7 +161,7 @@ public class ExecutionListenerTest extends PluggableFlowableTestCase {
 
         RecorderExecutionListener.clear();
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         assertProcessEnded(processInstance.getId());

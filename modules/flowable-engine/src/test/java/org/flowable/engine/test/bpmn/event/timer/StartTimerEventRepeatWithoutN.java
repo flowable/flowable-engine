@@ -14,11 +14,14 @@
 package org.flowable.engine.test.bpmn.event.timer;
 
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEntityEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.test.Deployment;
+
+import java.util.Arrays;
+import java.util.HashSet;
 
 /**
  * @author Saeid Mirzaei Test case for ACT-4066
@@ -29,13 +32,15 @@ public class StartTimerEventRepeatWithoutN extends PluggableFlowableTestCase {
     protected long counter;
     protected StartEventListener startEventListener;
 
-    class StartEventListener implements FlowableEventListener {
+    class StartEventListener extends AbstractFlowableEngineEventListener {
+
+        public StartEventListener() {
+            super(new HashSet<>(Arrays.asList(FlowableEngineEventType.TIMER_FIRED)));
+        }
 
         @Override
-        public void onEvent(FlowableEvent event) {
-            if (event.getType().equals(FlowableEngineEventType.TIMER_FIRED)) {
-                counter++;
-            }
+        protected void timerFired(FlowableEngineEntityEvent event) {
+            counter++;
         }
 
         @Override

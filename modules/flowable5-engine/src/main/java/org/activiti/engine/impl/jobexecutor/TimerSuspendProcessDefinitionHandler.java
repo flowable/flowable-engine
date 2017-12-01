@@ -16,7 +16,7 @@ import org.activiti.engine.impl.cmd.SuspendProcessDefinitionCmd;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.util.json.JSONObject;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.api.Job;
 
 /**
  * @author Joram Barrez
@@ -25,10 +25,12 @@ public class TimerSuspendProcessDefinitionHandler extends TimerChangeProcessDefi
 
     public static final String TYPE = "suspend-processdefinition";
 
+    @Override
     public String getType() {
         return TYPE;
     }
 
+    @Override
     public void execute(Job job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
         JSONObject cfgJson = new JSONObject(configuration);
         String processDefinitionId = job.getProcessDefinitionId();

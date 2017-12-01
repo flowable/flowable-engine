@@ -12,10 +12,10 @@
  */
 package org.flowable.engine.test.mock;
 
-import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.scripting.Resolver;
 import org.flowable.engine.impl.scripting.ResolverFactory;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * This is a bridge resolver, making available any objects registered through {@link org.flowable.engine.test.mock.Mocks#register} inside scripts supported by process execution. <br>
@@ -30,7 +30,6 @@ import org.flowable.engine.impl.scripting.ResolverFactory;
  * <br>
  * &lt;bean id=&quot;processEngineConfiguration&quot;<br>
  * class=&quot;org.flowable.engine.impl.cfg. StandaloneInMemProcessEngineConfiguration&quot;&gt;<br>
- * &lt;property name=&quot;jobExecutorActivate&quot; value=&quot;false&quot; /&gt;<br>
  * &lt;property name=&quot;expressionManager&quot;&gt;<br>
  * &lt;bean class=&quot;org.flowable.engine.test.mock.MockExpressionManager&quot; /&gt;<br>
  * &lt;/property&gt;<br>

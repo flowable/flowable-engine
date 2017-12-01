@@ -24,11 +24,11 @@ import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.activiti.engine.impl.util.IoUtil;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
-import org.flowable.engine.runtime.TimerJobQuery;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
+import org.flowable.job.api.TimerJobQuery;
 
 /**
  * @author Joram Barrez

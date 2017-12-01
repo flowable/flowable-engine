@@ -23,21 +23,24 @@ import org.activiti.engine.impl.interceptor.CommandContext;
  */
 public abstract class AbstractEventFlusher implements EventFlusher {
 
-    protected List<EventLoggerEventHandler> eventHandlers = new ArrayList<EventLoggerEventHandler>();
+    protected List<EventLoggerEventHandler> eventHandlers = new ArrayList<>();
 
     @Override
     public void closed(CommandContext commandContext) {
         // Not interested in closed
     }
 
+    @Override
     public List<EventLoggerEventHandler> getEventHandlers() {
         return eventHandlers;
     }
 
+    @Override
     public void setEventHandlers(List<EventLoggerEventHandler> eventHandlers) {
         this.eventHandlers = eventHandlers;
     }
 
+    @Override
     public void addEventHandler(EventLoggerEventHandler databaseEventLoggerEventHandler) {
         eventHandlers.add(databaseEventLoggerEventHandler);
     }

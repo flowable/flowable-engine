@@ -15,6 +15,7 @@ package org.flowable.engine.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.AbstractNativeQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.history.HistoricProcessInstance;
@@ -35,10 +36,12 @@ public class NativeHistoricProcessInstanceQueryImpl extends AbstractNativeQuery<
 
     // results ////////////////////////////////////////////////////////////////
 
+    @Override
     public List<HistoricProcessInstance> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext).findHistoricProcessInstancesByNativeQuery(parameterMap);
     }
 
+    @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getHistoricProcessInstanceEntityManager(commandContext).findHistoricProcessInstanceCountByNativeQuery(parameterMap);
     }

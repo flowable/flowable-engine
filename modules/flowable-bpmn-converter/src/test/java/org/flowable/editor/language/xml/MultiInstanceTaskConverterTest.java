@@ -16,11 +16,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.List;
-import java.util.Map;
-
 import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.flowable.bpmn.model.Process;
@@ -34,19 +30,19 @@ import org.junit.Test;
  */
 public class MultiInstanceTaskConverterTest extends AbstractConverterTest {
 	private static final String PARTICIPANT_VALUE = "[\n" +
-"                {\n" +
-"                  \"principalType\" : \"User\",\n" +
-"                  \"role\" : \"PotentialOwner\",\n" +
-"                  \"principal\" : \"wfuser1\",\n" +
-"                  \"version\" : 1\n" +
-"                },\n" +
-"                {\n" +
-"                  \"principalType\" : \"User\",\n" +
-"                  \"role\" : \"PotentialOwner\",\n" +
-"                  \"principal\" : \"wfuser2\",\n" +
-"                  \"version\" : 1\n" +
-"                }\n" +
-"              ]";
+"                   {\n" +
+"                     \"principalType\" : \"User\",\n" +
+"                     \"role\" : \"PotentialOwner\",\n" +
+"                     \"principal\" : \"wfuser1\",\n" +
+"                     \"version\" : 1\n" +
+"                   },\n" +
+"                   {\n" +
+"                     \"principalType\" : \"User\",\n" +
+"                     \"role\" : \"PotentialOwner\",\n" +
+"                     \"principal\" : \"wfuser2\",\n" +
+"                     \"version\" : 1\n" +
+"                   }\n" +
+"                 ]";
 
     @Test
     public void convertXMLToModel() throws Exception {
@@ -62,6 +58,7 @@ public class MultiInstanceTaskConverterTest extends AbstractConverterTest {
         deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "multiinstancemodel.bpmn";
     }
@@ -82,15 +79,10 @@ public class MultiInstanceTaskConverterTest extends AbstractConverterTest {
 
         UserTask task = (UserTask) flowElement;
         MultiInstanceLoopCharacteristics loopCharacteristics = task.getLoopCharacteristics();
-        assertTrue(!loopCharacteristics.isSequential());
-        assertEquals("${numTasks}", loopCharacteristics.getLoopCardinality());
         assertEquals("participant", loopCharacteristics.getElementVariable());
-
-        // verify collection extension element
-        Map<String, List<ExtensionElement>> extensions = loopCharacteristics.getExtensionElements();
-        assertEquals(1, extensions.size());
-        ExtensionElement extElement = extensions.get("collection").get(0);
-        assertEquals(PARTICIPANT_VALUE, extElement.getElementText());
+        assertEquals(PARTICIPANT_VALUE, loopCharacteristics.getCollectionString().trim());
+        assertEquals("class", loopCharacteristics.getHandler().getImplementationType());
+        assertEquals("org.flowable.engine.test.bpmn.multiinstance.JSONCollectionHandler", loopCharacteristics.getHandler().getImplementation());
 
         // verify subprocess
         flowElement = main.getFlowElement("subprocess1");

@@ -24,6 +24,7 @@ public class MonthFormType extends AbstractFormType {
 
     public static final String TYPE_NAME = "month";
 
+    @Override
     public String getName() {
         return TYPE_NAME;
     }

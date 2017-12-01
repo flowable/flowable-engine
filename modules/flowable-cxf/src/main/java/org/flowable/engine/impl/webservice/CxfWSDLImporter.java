@@ -78,6 +78,7 @@ public class CxfWSDLImporter implements XMLImporter {
         this.namespace = "";
     }
 
+    @Override
     public void importFrom(Import theImport, String sourceSystemId) {
         this.namespace = theImport.getNamespace() == null ? "" : theImport.getNamespace() + ":";
         try {
@@ -230,14 +231,17 @@ public class CxfWSDLImporter implements XMLImporter {
         return intermediateModel;
     }
 
+    @Override
     public Map<String, StructureDefinition> getStructures() {
         return this.structures;
     }
 
+    @Override
     public Map<String, WSService> getServices() {
         return this.wsServices;
     }
 
+    @Override
     public Map<String, WSOperation> getOperations() {
         return this.wsOperations;
     }

@@ -17,10 +17,11 @@ import java.util.List;
 
 import org.flowable.app.model.common.AbstractRepresentation;
 import org.flowable.app.model.common.UserRepresentation;
-import org.flowable.engine.history.HistoricTaskInstance;
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskInfo;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -45,6 +46,7 @@ public class TaskRepresentation extends AbstractRepresentation {
     protected Integer priority;
     protected String processInstanceId;
     protected String processInstanceName;
+    
     protected String processDefinitionId;
     protected String processDefinitionName;
     protected String processDefinitionDescription;
@@ -52,6 +54,19 @@ public class TaskRepresentation extends AbstractRepresentation {
     protected String processDefinitionCategory;
     protected int processDefinitionVersion;
     protected String processDefinitionDeploymentId;
+    
+    protected String scopeId;
+    protected String scopeType;
+    protected String caseInstanceName;
+    
+    protected String scopeDefinitionId;
+    protected String caseDefinitionName;
+    protected String caseDefinitionDescription;
+    protected String caseDefinitionKey;
+    protected String caseDefinitionCategory;
+    protected int caseDefinitionVersion;
+    protected String caseDefinitionDeploymentId;
+    
     protected String formKey;
     protected String processInstanceStartUserId;
     protected boolean initiatorCanCompleteTask;
@@ -67,32 +82,15 @@ public class TaskRepresentation extends AbstractRepresentation {
     }
 
     public TaskRepresentation(Task task) {
-        this(task, null);
+        initializeTaskDetails(task);
     }
 
     public TaskRepresentation(HistoricTaskInstance task) {
-        this(task, null);
+        initializeTaskDetails(task);
     }
 
     public TaskRepresentation(TaskInfo taskInfo, ProcessDefinition processDefinition) {
-        this.id = taskInfo.getId();
-        this.name = taskInfo.getName();
-        this.description = taskInfo.getDescription();
-        this.category = taskInfo.getCategory();
-        this.created = taskInfo.getCreateTime();
-        this.dueDate = taskInfo.getDueDate();
-        this.priority = taskInfo.getPriority();
-        this.processInstanceId = taskInfo.getProcessInstanceId();
-        this.processDefinitionId = taskInfo.getProcessDefinitionId();
-
-        if (taskInfo instanceof HistoricTaskInstance) {
-            this.endDate = ((HistoricTaskInstance) taskInfo).getEndTime();
-            this.formKey = taskInfo.getFormKey();
-            this.duration = ((HistoricTaskInstance) taskInfo).getDurationInMillis();
-        } else {
-            // Rendering of forms for historic tasks not supported currently
-            this.formKey = taskInfo.getFormKey();
-        }
+        initializeTaskDetails(taskInfo);
 
         if (processDefinition != null) {
             this.processDefinitionName = processDefinition.getName();
@@ -103,11 +101,52 @@ public class TaskRepresentation extends AbstractRepresentation {
             this.processDefinitionDeploymentId = processDefinition.getDeploymentId();
         }
     }
+    
+    public TaskRepresentation(TaskInfo taskInfo, CaseDefinition caseDefinition) {
+        initializeTaskDetails(taskInfo);
+
+        if (caseDefinition != null) {
+            this.caseDefinitionName = caseDefinition.getName();
+            this.caseDefinitionDescription = caseDefinition.getDescription();
+            this.caseDefinitionKey = caseDefinition.getKey();
+            this.caseDefinitionCategory = caseDefinition.getCategory();
+            this.caseDefinitionVersion = caseDefinition.getVersion();
+            this.caseDefinitionDeploymentId = caseDefinition.getDeploymentId();
+        }
+    }
 
     public TaskRepresentation(TaskInfo taskInfo, ProcessDefinition processDefinition, String processInstanceName) {
-        // todo Once a ProcessInstanceInfo class is implemented, lets send in that as the 3rd parameter instead
         this(taskInfo, processDefinition);
         this.processInstanceName = processInstanceName;
+    }
+    
+    public TaskRepresentation(TaskInfo taskInfo, CaseDefinition caseDefinition, String caseInstanceName) {
+        this(taskInfo, caseDefinition);
+        this.caseInstanceName = caseInstanceName;
+    }
+    
+    public void initializeTaskDetails(TaskInfo taskInfo) {
+        this.id = taskInfo.getId();
+        this.name = taskInfo.getName();
+        this.description = taskInfo.getDescription();
+        this.category = taskInfo.getCategory();
+        this.created = taskInfo.getCreateTime();
+        this.dueDate = taskInfo.getDueDate();
+        this.priority = taskInfo.getPriority();
+        this.processInstanceId = taskInfo.getProcessInstanceId();
+        this.processDefinitionId = taskInfo.getProcessDefinitionId();
+        this.scopeId = taskInfo.getScopeId();
+        this.scopeType = taskInfo.getScopeType();
+        this.scopeDefinitionId = taskInfo.getScopeDefinitionId();
+
+        if (taskInfo instanceof HistoricTaskInstance) {
+            this.endDate = ((HistoricTaskInstance) taskInfo).getEndTime();
+            this.formKey = taskInfo.getFormKey();
+            this.duration = ((HistoricTaskInstance) taskInfo).getDurationInMillis();
+        } else {
+            // Rendering of forms for historic tasks not supported currently
+            this.formKey = taskInfo.getFormKey();
+        }
     }
 
     public void fillTask(Task task) {
@@ -257,6 +296,86 @@ public class TaskRepresentation extends AbstractRepresentation {
 
     public void setProcessDefinitionDeploymentId(String processDefinitionDeploymentId) {
         this.processDefinitionDeploymentId = processDefinitionDeploymentId;
+    }
+    
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
+    public String getCaseInstanceName() {
+        return caseInstanceName;
+    }
+
+    public void setCaseInstanceName(String caseInstanceName) {
+        this.caseInstanceName = caseInstanceName;
+    }
+
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
+    }
+
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
+    }
+
+    public String getCaseDefinitionName() {
+        return caseDefinitionName;
+    }
+
+    public void setCaseDefinitionName(String caseDefinitionName) {
+        this.caseDefinitionName = caseDefinitionName;
+    }
+
+    public String getCaseDefinitionDescription() {
+        return caseDefinitionDescription;
+    }
+
+    public void setCaseDefinitionDescription(String caseDefinitionDescription) {
+        this.caseDefinitionDescription = caseDefinitionDescription;
+    }
+
+    public String getCaseDefinitionKey() {
+        return caseDefinitionKey;
+    }
+
+    public void setCaseDefinitionKey(String caseDefinitionKey) {
+        this.caseDefinitionKey = caseDefinitionKey;
+    }
+
+    public String getCaseDefinitionCategory() {
+        return caseDefinitionCategory;
+    }
+
+    public void setCaseDefinitionCategory(String caseDefinitionCategory) {
+        this.caseDefinitionCategory = caseDefinitionCategory;
+    }
+
+    public int getCaseDefinitionVersion() {
+        return caseDefinitionVersion;
+    }
+
+    public void setCaseDefinitionVersion(int caseDefinitionVersion) {
+        this.caseDefinitionVersion = caseDefinitionVersion;
+    }
+
+    public String getCaseDefinitionDeploymentId() {
+        return caseDefinitionDeploymentId;
+    }
+
+    public void setCaseDefinitionDeploymentId(String caseDefinitionDeploymentId) {
+        this.caseDefinitionDeploymentId = caseDefinitionDeploymentId;
     }
 
     public String getFormKey() {

@@ -23,7 +23,7 @@ import org.flowable.dmn.api.DmnDeploymentBuilder;
 import org.flowable.dmn.api.DmnManagementService;
 import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
-import org.flowable.dmn.engine.impl.deployer.ParsedDeploymentBuilder;
+import org.flowable.dmn.engine.impl.deployer.DmnResourceUtil;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.db.DbSchemaManager;
@@ -65,25 +65,36 @@ public abstract class DmnTestHelper {
             LOGGER.warn("Could not get method by reflection. This could happen if you are using @Parameters in combination with annotations.", e);
             return null;
         }
-        DmnDeploymentAnnotation deploymentAnnotation = method.getAnnotation(DmnDeploymentAnnotation.class);
+        
+        DmnDeployment deploymentAnnotation = method.getAnnotation(DmnDeployment.class);
         if (deploymentAnnotation != null) {
-            LOGGER.debug("annotation @Deployment creates deployment for {}.{}", testClass.getSimpleName(), methodName);
-            String[] resources = deploymentAnnotation.resources();
-            if (resources.length == 0) {
-                String name = method.getName();
-                String resource = getDmnDecisionResource(testClass, name);
-                resources = new String[] { resource };
-            }
-
-            DmnDeploymentBuilder deploymentBuilder = dmnEngine.getDmnRepositoryService().createDeployment().name(testClass.getSimpleName() + "." + methodName);
-
-            for (String resource : resources) {
-                deploymentBuilder.addClasspathResource(resource);
-            }
-
-            deploymentId = deploymentBuilder.deploy().getId();
+            deploymentId = deployResourceFromAnnotation(dmnEngine, testClass, methodName, method, deploymentAnnotation.resources());
+        }
+        DmnDeploymentAnnotation deploymentAnnotation2 = method.getAnnotation(DmnDeploymentAnnotation.class);
+        if (deploymentAnnotation2 != null) {
+            deploymentId = deployResourceFromAnnotation(dmnEngine, testClass, methodName, method, deploymentAnnotation2.resources());
         }
 
+        return deploymentId;
+    }
+
+    protected static String deployResourceFromAnnotation(DmnEngine dmnEngine, Class<?> testClass, String methodName,
+            Method method, String[] resources) {
+        String deploymentId;
+        LOGGER.debug("annotation @Deployment creates deployment for {}.{}", testClass.getSimpleName(), methodName);
+        if (resources.length == 0) {
+            String name = method.getName();
+            String resource = getDmnDecisionResource(testClass, name);
+            resources = new String[] { resource };
+        }
+
+        DmnDeploymentBuilder deploymentBuilder = dmnEngine.getDmnRepositoryService().createDeployment().name(testClass.getSimpleName() + "." + methodName);
+
+        for (String resource : resources) {
+            deploymentBuilder.addClasspathResource(resource);
+        }
+
+        deploymentId = deploymentBuilder.deploy().getId();
         return deploymentId;
     }
 
@@ -103,7 +114,7 @@ public abstract class DmnTestHelper {
      * parameter: <code>DmnDeployer.DMN_RESOURCE_SUFFIXES</code>. The first resource matching a suffix will be returned.
      */
     public static String getDmnDecisionResource(Class<?> type, String name) {
-        for (String suffix : ParsedDeploymentBuilder.DMN_RESOURCE_SUFFIXES) {
+        for (String suffix : DmnResourceUtil.DMN_RESOURCE_SUFFIXES) {
             String resource = type.getName().replace('.', '/') + "." + name + "." + suffix;
             InputStream inputStream = DmnTestHelper.class.getClassLoader().getResourceAsStream(resource);
             if (inputStream == null) {
@@ -112,7 +123,7 @@ public abstract class DmnTestHelper {
                 return resource;
             }
         }
-        return type.getName().replace('.', '/') + "." + name + "." + ParsedDeploymentBuilder.DMN_RESOURCE_SUFFIXES[0];
+        return type.getName().replace('.', '/') + "." + name + "." + DmnResourceUtil.DMN_RESOURCE_SUFFIXES[0];
     }
 
     // Engine startup and shutdown helpers
@@ -166,6 +177,7 @@ public abstract class DmnTestHelper {
             CommandExecutor commandExecutor = dmnEngine.getDmnEngineConfiguration().getCommandExecutor();
             CommandConfig config = new CommandConfig().transactionNotSupported();
             commandExecutor.execute(config, new Command<Object>() {
+                @Override
                 public Object execute(CommandContext commandContext) {
                     DbSchemaManager dbSchemaManager = CommandContextUtil.getDmnEngineConfiguration().getDbSchemaManager();
                     dbSchemaManager.dbSchemaDrop();

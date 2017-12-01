@@ -14,9 +14,8 @@ package org.activiti.examples.bpmn.tasklistener;
 
 import java.util.Map;
 
-import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * @author Falko Menge <falko.menge@camunda.com>
@@ -26,8 +25,7 @@ public class AssigneeOverwriteFromVariable implements TaskListener {
     @SuppressWarnings("unchecked")
     public void notify(DelegateTask delegateTask) {
         // get mapping table from variable
-        DelegateExecution execution = delegateTask.getExecution();
-        Map<String, String> assigneeMappingTable = (Map<String, String>) execution.getVariable("assigneeMappingTable");
+        Map<String, String> assigneeMappingTable = (Map<String, String>) delegateTask.getVariable("assigneeMappingTable");
 
         // get assignee from process
         String assigneeFromProcessDefinition = delegateTask.getAssignee();

@@ -12,8 +12,8 @@
  */
 package org.flowable.engine.impl.delegate.invocation;
 
-import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * Class handling invocations of {@link TaskListener TaskListeners}
@@ -30,10 +30,12 @@ public class TaskListenerInvocation extends DelegateInvocation {
         this.delegateTask = delegateTask;
     }
 
+    @Override
     protected void invoke() {
         executionListenerInstance.notify(delegateTask);
     }
 
+    @Override
     public Object getTarget() {
         return executionListenerInstance;
     }

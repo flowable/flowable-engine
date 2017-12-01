@@ -15,7 +15,7 @@ package org.flowable.engine.impl.bpmn.data;
 import java.io.Serializable;
 
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * A data association (Input or Output) between a source and a target

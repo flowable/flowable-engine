@@ -23,7 +23,7 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.task.IdentityLink;
+import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.idm.api.User;
 
 /**
@@ -40,6 +40,7 @@ public class GetPotentialStarterUsersCmd implements Command<List<User>>, Seriali
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
+    @Override
     public List<User> execute(CommandContext commandContext) {
         ProcessDefinitionEntity processDefinition = CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findById(processDefinitionId);
 

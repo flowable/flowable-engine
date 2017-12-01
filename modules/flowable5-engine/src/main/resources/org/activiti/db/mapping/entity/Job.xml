@@ -20,6 +20,7 @@
     <result property="duedate" column="DUEDATE_" jdbcType="TIMESTAMP" />
     <result property="repeat" column="REPEAT_" jdbcType="VARCHAR" />
     <result property="exceptionByteArrayRef" column="EXCEPTION_STACK_ID_" typeHandler="ByteArrayRefTypeHandler" />
+    <result property="customValuesByteArrayRef" column="CUSTOM_VALUES_ID_" typeHandler="ByteArrayRefTypeHandler" />
     <result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
     <result property="jobHandlerType" column="HANDLER_TYPE_" jdbcType="VARCHAR" />
     <result property="jobHandlerConfiguration" column="HANDLER_CFG_" jdbcType="VARCHAR" />
@@ -209,6 +210,7 @@
             PROC_DEF_ID_,
             RETRIES_,
             EXCEPTION_STACK_ID_,
+            CUSTOM_VALUES_ID_,
             EXCEPTION_MSG_,
             DUEDATE_,
             REPEAT_,
@@ -226,6 +228,7 @@
             #{processDefinitionId, jdbcType=VARCHAR},
             #{retries, jdbcType=INTEGER},
             #{exceptionByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
+            #{customValuesByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
             #{exceptionMessage, jdbcType=VARCHAR},
             #{duedate, jdbcType=TIMESTAMP},
             #{repeat, jdbcType=VARCHAR},
@@ -248,6 +251,7 @@
             PROC_DEF_ID_,
             RETRIES_,
             EXCEPTION_STACK_ID_,
+            CUSTOM_VALUES_ID_,
             EXCEPTION_MSG_,
             DUEDATE_,
             REPEAT_,
@@ -266,6 +270,7 @@
          #{job.processDefinitionId, jdbcType=VARCHAR},
          #{job.retries, jdbcType=INTEGER},
          #{job.exceptionByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
+         #{job.customValuesByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
          #{job.exceptionMessage, jdbcType=VARCHAR},
          #{job.duedate, jdbcType=TIMESTAMP},
          #{job.repeat, jdbcType=VARCHAR},
@@ -290,6 +295,7 @@
               PROC_DEF_ID_,
               RETRIES_,
               EXCEPTION_STACK_ID_,
+              CUSTOM_VALUES_ID_,
               EXCEPTION_MSG_,
               DUEDATE_,
               REPEAT_,
@@ -307,6 +313,7 @@
            #{job.processDefinitionId, jdbcType=VARCHAR},
            #{job.retries, jdbcType=INTEGER},
            #{job.exceptionByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
+           #{job.customValuesByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
            #{job.exceptionMessage, jdbcType=VARCHAR},
            #{job.duedate, jdbcType=TIMESTAMP},
            #{job.repeat, jdbcType=VARCHAR},
@@ -327,6 +334,7 @@
        LOCK_OWNER_ = #{lockOwner, jdbcType=VARCHAR},
        RETRIES_ = #{retries, jdbcType=INTEGER},
        EXCEPTION_STACK_ID_ = #{exceptionByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
+       CUSTOM_VALUES_ID_ = #{customValuesByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
        EXCEPTION_MSG_ = #{exceptionMessage, jdbcType=VARCHAR},
        DUEDATE_ = #{duedate, jdbcType=TIMESTAMP}
     </set>

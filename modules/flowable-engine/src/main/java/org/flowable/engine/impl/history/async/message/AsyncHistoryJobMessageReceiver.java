@@ -18,13 +18,13 @@ import java.util.List;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.HistoryJobQueryImpl;
 import org.flowable.engine.impl.asyncexecutor.message.AsyncJobMessageReceiver;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.runtime.HistoryJob;
+import org.flowable.job.api.HistoryJob;
+import org.flowable.job.service.HistoryJobService;
+import org.flowable.job.service.impl.HistoryJobQueryImpl;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -64,12 +64,12 @@ public class AsyncHistoryJobMessageReceiver {
             
             @Override
             public Void execute(CommandContext commandContext) {
-                HistoryJobEntityManager historyJobEntityManager = CommandContextUtil.getHistoryJobEntityManager(commandContext);
+                HistoryJobService historyJobService = CommandContextUtil.getHistoryJobService(commandContext);
                 
                 HistoryJobQueryImpl query = new HistoryJobQueryImpl();
                 query.jobId(jobId);
                 
-                List<HistoryJob> jobs = historyJobEntityManager.findHistoryJobsByQueryCriteria(query);
+                List<HistoryJob> jobs = historyJobService.findHistoryJobsByQueryCriteria(query);
                 if (jobs == null || jobs.isEmpty()) {
                     throw new FlowableException("No history job found for id " + jobId);
                 }
@@ -82,7 +82,7 @@ public class AsyncHistoryJobMessageReceiver {
                 
                 HistoryJobEntity historyJobEntity = (HistoryJobEntity) jobs.get(0);
                 if (asyncHistoryJobMessageHandler.handleJob(historyJobEntity, getHistoryJobData(historyJobEntity))) {
-                    historyJobEntityManager.delete(historyJobEntity);
+                    historyJobService.deleteHistoryJob(historyJobEntity);
                 }
                 
                 return null;

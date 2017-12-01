@@ -20,9 +20,9 @@ import java.util.Set;
 
 import org.drools.KnowledgeBase;
 import org.drools.runtime.StatefulKnowledgeSession;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.delegate.BusinessRuleTaskDelegate;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.impl.rules.RulesAgendaFilter;
 import org.flowable.engine.impl.rules.RulesHelper;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
@@ -46,6 +46,7 @@ public class BusinessRuleTaskActivityBehavior extends TaskActivityBehavior imple
     public BusinessRuleTaskActivityBehavior() {
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
         ProcessDefinition processDefinition = ProcessDefinitionUtil.getProcessDefinition(execution.getProcessDefinitionId());
         String deploymentId = processDefinition.getDeploymentId();
@@ -85,18 +86,22 @@ public class BusinessRuleTaskActivityBehavior extends TaskActivityBehavior imple
         leave(execution);
     }
 
+    @Override
     public void addRuleVariableInputIdExpression(Expression inputId) {
         this.variablesInputExpressions.add(inputId);
     }
 
+    @Override
     public void addRuleIdExpression(Expression inputId) {
         this.rulesExpressions.add(inputId);
     }
 
+    @Override
     public void setExclude(boolean exclude) {
         this.exclude = exclude;
     }
 
+    @Override
     public void setResultVariable(String resultVariableName) {
         this.resultVariable = resultVariableName;
     }

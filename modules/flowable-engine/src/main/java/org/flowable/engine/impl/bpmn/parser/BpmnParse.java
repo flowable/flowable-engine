@@ -26,6 +26,7 @@ import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.repository.EngineDeployment;
 import org.flowable.engine.common.impl.event.FlowableEventSupport;
 import org.flowable.engine.common.impl.event.TransactionDependentFlowableEventSupport;
 import org.flowable.engine.common.impl.util.io.InputStreamSource;
@@ -35,7 +36,6 @@ import org.flowable.engine.common.impl.util.io.UrlStreamSource;
 import org.flowable.engine.impl.bpmn.parser.factory.ActivityBehaviorFactory;
 import org.flowable.engine.impl.bpmn.parser.factory.ListenerFactory;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.io.ResourceStreamSource;
@@ -89,7 +89,7 @@ public class BpmnParse implements BpmnXMLConstants {
     protected String targetNamespace;
 
     /** The deployment to which the parsed process definitions will be added. */
-    protected DeploymentEntity deployment;
+    protected EngineDeployment deployment;
 
     /** The end result of the parsing: a list of process definition. */
     protected List<ProcessDefinitionEntity> processDefinitions = new ArrayList<>();
@@ -127,7 +127,7 @@ public class BpmnParse implements BpmnXMLConstants {
         this.bpmnParserHandlers = parser.getBpmnParserHandlers();
     }
 
-    public BpmnParse deployment(DeploymentEntity deployment) {
+    public BpmnParse deployment(EngineDeployment deployment) {
         this.deployment = deployment;
         return this;
     }
@@ -452,11 +452,11 @@ public class BpmnParse implements BpmnXMLConstants {
         this.bpmnParserHandlers = bpmnParserHandlers;
     }
 
-    public DeploymentEntity getDeployment() {
+    public EngineDeployment getDeployment() {
         return deployment;
     }
 
-    public void setDeployment(DeploymentEntity deployment) {
+    public void setDeployment(EngineDeployment deployment) {
         this.deployment = deployment;
     }
 

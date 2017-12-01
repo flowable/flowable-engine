@@ -12,12 +12,13 @@
  */
 package org.flowable.compatibility.test;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 import java.util.List;
 
-import org.flowable.engine.task.Task;
+import org.flowable.task.api.Task;
 import org.junit.Test;
-
-import static org.junit.Assert.*;
 
 public class ParseHandlerTest extends AbstractFlowable6CompatibilityTest {
 

@@ -20,15 +20,15 @@ import java.util.concurrent.Callable;
 
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.common.impl.util.IoUtil;
-import org.flowable.engine.impl.cmd.CancelJobsCmd;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
-import org.flowable.engine.runtime.TimerJobQuery;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
+import org.flowable.job.api.TimerJobQuery;
+import org.flowable.job.service.impl.cmd.CancelJobsCmd;
 
 /**
  * @author Joram Barrez
@@ -85,6 +85,7 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
 
         moveByMinutes(5);
         waitForJobExecutorOnCondition(10000, 500, new Callable<Boolean>() {
+            @Override
             public Boolean call() throws Exception {
                 return 1 == piq.count();
             }
@@ -94,6 +95,7 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
 
         moveByMinutes(5);
         waitForJobExecutorOnCondition(10000, 500, new Callable<Boolean>() {
+            @Override
             public Boolean call() throws Exception {
                 return 2 == piq.count();
             }
@@ -160,6 +162,7 @@ public class StartTimerEventTest extends PluggableFlowableTestCase {
 
         moveByMinutes(5);
         waitForJobExecutorOnCondition(10000, 500, new Callable<Boolean>() {
+            @Override
             public Boolean call() throws Exception {
                 // we check that correct version was started
                 ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample").singleResult();

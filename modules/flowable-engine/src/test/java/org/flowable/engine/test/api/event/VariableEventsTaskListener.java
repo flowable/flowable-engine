@@ -12,8 +12,8 @@
  */
 package org.flowable.engine.test.api.event;
 
-import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.TaskListener;
+import org.flowable.task.service.delegate.DelegateTask;
 
 public class VariableEventsTaskListener implements TaskListener {
 

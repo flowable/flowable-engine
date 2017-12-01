@@ -53,6 +53,7 @@ public class DmnEngineImpl implements DmnEngine {
         DmnEngines.registerDmnEngine(this);
     }
 
+    @Override
     public void close() {
         DmnEngines.unregister(this);
     }
@@ -60,26 +61,32 @@ public class DmnEngineImpl implements DmnEngine {
     // getters and setters
     // //////////////////////////////////////////////////////
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public DmnManagementService getDmnManagementService() {
         return dmnManagementService;
     }
 
+    @Override
     public DmnRepositoryService getDmnRepositoryService() {
         return dmnRepositoryService;
     }
 
+    @Override
     public DmnRuleService getDmnRuleService() {
         return dmnRuleService;
     }
     
+    @Override
     public DmnHistoryService getDmnHistoryService() {
         return dmnHistoryService;
     }
 
+    @Override
     public DmnEngineConfiguration getDmnEngineConfiguration() {
         return dmnEngineConfiguration;
     }

@@ -17,6 +17,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHeaders;
@@ -24,13 +27,13 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.flowable.app.domain.editor.AppDefinition;
 import org.flowable.app.domain.editor.Model;
 import org.flowable.app.service.api.AppDefinitionService;
@@ -104,12 +107,18 @@ public class AppDefinitionPublishService extends BaseAppDefinitionService {
         httpPost.setEntity(entity);
 
         HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-        SSLConnectionSocketFactory sslsf = null;
         try {
             SSLContextBuilder builder = new SSLContextBuilder();
             builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-            sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-            clientBuilder.setSSLSocketFactory(sslsf);
+            clientBuilder.setSSLSocketFactory(
+                    new SSLConnectionSocketFactory(builder.build(), new HostnameVerifier() {
+                        @Override
+                        public boolean verify(String s, SSLSession sslSession) {
+                            return true;
+                        }
+                    })
+            );
+            
         } catch (Exception e) {
             LOGGER.error("Could not configure SSL for http client", e);
             throw new InternalServerErrorException("Could not configure SSL for http client", e);
@@ -125,6 +134,7 @@ public class AppDefinitionPublishService extends BaseAppDefinitionService {
                 LOGGER.error("Invalid deploy result code: {}", response.getStatusLine());
                 throw new InternalServerErrorException("Invalid deploy result code: " + response.getStatusLine());
             }
+            
         } catch (IOException ioe) {
             LOGGER.error("Error calling deploy endpoint", ioe);
             throw new InternalServerErrorException("Error calling deploy endpoint: " + ioe.getMessage());

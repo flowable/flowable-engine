@@ -28,10 +28,12 @@ public class ServiceTaskParseHandler extends AbstractActivityBpmnParseHandler<Se
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ServiceTaskParseHandler.class);
 
+    @Override
     public Class<? extends BaseElement> getHandledType() {
         return ServiceTask.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, ServiceTask serviceTask) {
 
         // Email, Mule, Http and Shell service tasks
@@ -56,7 +58,7 @@ public class ServiceTaskParseHandler extends AbstractActivityBpmnParseHandler<Se
                 serviceTask.setBehavior(bpmnParse.getActivityBehaviorFactory().createHttpActivityBehavior(serviceTask));
 
             } else {
-                LOGGER.warn("Invalid service task type: '{}'  for service task {}", serviceTask.getType(), serviceTask.getId());
+                LOGGER.warn("Invalid type: '{}' for service task {}", serviceTask.getType(), serviceTask.getId());
             }
 
             // activiti:class
@@ -77,11 +79,11 @@ public class ServiceTaskParseHandler extends AbstractActivityBpmnParseHandler<Se
             // Webservice
         } else if (ImplementationType.IMPLEMENTATION_TYPE_WEBSERVICE.equalsIgnoreCase(serviceTask.getImplementationType()) && StringUtils.isNotEmpty(serviceTask.getOperationRef())) {
 
-            WebServiceActivityBehavior webServiceActivityBehavior = bpmnParse.getActivityBehaviorFactory().createWebServiceActivityBehavior(serviceTask);
+            WebServiceActivityBehavior webServiceActivityBehavior = bpmnParse.getActivityBehaviorFactory().createWebServiceActivityBehavior(serviceTask, bpmnParse.getBpmnModel());
             serviceTask.setBehavior(webServiceActivityBehavior);
 
         } else {
-            LOGGER.warn("One of the attributes 'class', 'delegateExpression', 'type', 'operation', or 'expression' is mandatory on serviceTask {}", serviceTask.getId());
+            LOGGER.warn("One of the attributes 'class', 'delegateExpression', 'type', 'operation', or 'expression' is mandatory on service task {}", serviceTask.getId());
         }
 
     }

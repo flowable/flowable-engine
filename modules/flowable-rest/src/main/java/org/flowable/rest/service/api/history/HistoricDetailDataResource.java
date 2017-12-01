@@ -13,34 +13,31 @@
 
 package org.flowable.rest.service.api.history;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.flowable.engine.HistoryService;
-import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.history.HistoricDetail;
-import org.flowable.engine.history.HistoricVariableUpdate;
-import org.flowable.engine.impl.persistence.entity.VariableInstanceEntity;
-import org.flowable.rest.service.api.RestResponseFactory;
-import org.flowable.rest.service.api.engine.variable.RestVariable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.history.HistoricDetail;
+import org.flowable.engine.history.HistoricVariableUpdate;
+import org.flowable.rest.service.api.RestResponseFactory;
+import org.flowable.rest.service.api.engine.variable.RestVariable;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
 
 /**
  * @author Tijs Rademakers
@@ -55,12 +52,12 @@ public class HistoricDetailDataResource {
     @Autowired
     protected HistoryService historyService;
 
-    @RequestMapping(value = "/history/historic-detail/{detailId}/data", method = RequestMethod.GET)
+    @ApiOperation(value = "Get the binary data for a historic detail variable", tags = {"History" }, nickname = "getHistoricDetailVariableData",
+            notes = "The response body contains the binary value of the variable. When the variable is of type binary, the content-type of the response is set to application/octet-stream, regardless of the content of the variable or the request accept-type header. In case of serializable, application/x-java-serialized-object is used as content-type.")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the historic detail instance was found and the requested variable data is returned."),
             @ApiResponse(code = 404, message = "Indicates the requested historic detail instance was not found or the historic detail instance doesn’t have a variable with the given name or the variable doesn’t have a binary stream available. Status message provides additional information.") })
-    @ApiOperation(value = "Get the binary data for a historic detail variable", tags = {
-            "History" }, nickname = "getHistoricDetailVariableData", notes = "The response body contains the binary value of the variable. When the variable is of type binary, the content-type of the response is set to application/octet-stream, regardless of the content of the variable or the request accept-type header. In case of serializable, application/x-java-serialized-object is used as content-type.")
+    @GetMapping(value = "/history/historic-detail/{detailId}/data")
     @ResponseBody
     public byte[] getVariableData(@ApiParam(name = "detailId") @PathVariable("detailId") String detailId, HttpServletRequest request, HttpServletResponse response) {
         try {

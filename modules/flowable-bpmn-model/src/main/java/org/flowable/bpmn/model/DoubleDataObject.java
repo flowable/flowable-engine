@@ -12,15 +12,23 @@
  */
 package org.flowable.bpmn.model;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * @author Lori Small
  */
 public class DoubleDataObject extends ValuedDataObject {
 
+    @Override
     public void setValue(Object value) {
-        this.value = Double.valueOf(value.toString());
+    	if (value instanceof String && !StringUtils.isEmpty(((String) value).trim())) {
+    		this.value = Double.valueOf(value.toString());
+    	} else if (value instanceof Number) {
+    		this.value = (Double) value;
+    	}
     }
 
+    @Override
     public DoubleDataObject clone() {
         DoubleDataObject clone = new DoubleDataObject();
         clone.setValues(this);

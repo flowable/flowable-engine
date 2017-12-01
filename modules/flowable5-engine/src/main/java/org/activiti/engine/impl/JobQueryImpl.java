@@ -22,7 +22,7 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.runtime.JobQuery;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.api.Job;
 
 /**
  * @author Joram Barrez
@@ -63,6 +63,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         super(commandExecutor);
     }
 
+    @Override
     public JobQuery jobId(String jobId) {
         if (jobId == null) {
             throw new ActivitiIllegalArgumentException("Provided job id is null");
@@ -71,6 +72,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return this;
     }
 
+    @Override
     public JobQueryImpl processInstanceId(String processInstanceId) {
         if (processInstanceId == null) {
             throw new ActivitiIllegalArgumentException("Provided process instance id is null");
@@ -79,6 +81,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return this;
     }
 
+    @Override
     public JobQueryImpl processDefinitionId(String processDefinitionId) {
         if (processDefinitionId == null) {
             throw new ActivitiIllegalArgumentException("Provided process definition id is null");
@@ -87,6 +90,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return this;
     }
 
+    @Override
     public JobQueryImpl executionId(String executionId) {
         if (executionId == null) {
             throw new ActivitiIllegalArgumentException("Provided execution id is null");
@@ -95,6 +99,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return this;
     }
 
+    @Override
     public JobQueryImpl handlerType(String handlerType) {
         if (handlerType == null) {
             throw new ActivitiIllegalArgumentException("Provided handlerType is null");
@@ -103,16 +108,19 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return this;
     }
 
+    @Override
     public JobQuery withRetriesLeft() {
         retriesLeft = true;
         return this;
     }
 
+    @Override
     public JobQuery executable() {
         executable = true;
         return this;
     }
 
+    @Override
     public JobQuery timers() {
         if (onlyMessages) {
             throw new ActivitiIllegalArgumentException("Cannot combine onlyTimers() with onlyMessages() in the same query");
@@ -121,6 +129,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return this;
     }
 
+    @Override
     public JobQuery messages() {
         if (onlyTimers) {
             throw new ActivitiIllegalArgumentException("Cannot combine onlyTimers() with onlyMessages() in the same query");
@@ -129,6 +138,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return this;
     }
 
+    @Override
     public JobQuery duedateHigherThan(Date date) {
         if (date == null) {
             throw new ActivitiIllegalArgumentException("Provided date is null");
@@ -137,6 +147,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return this;
     }
 
+    @Override
     public JobQuery duedateLowerThan(Date date) {
         if (date == null) {
             throw new ActivitiIllegalArgumentException("Provided date is null");
@@ -145,10 +156,12 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return this;
     }
 
+    @Override
     public JobQuery duedateHigherThen(Date date) {
         return duedateHigherThan(date);
     }
 
+    @Override
     public JobQuery duedateHigherThenOrEquals(Date date) {
         if (date == null) {
             throw new ActivitiIllegalArgumentException("Provided date is null");
@@ -157,10 +170,12 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return this;
     }
 
+    @Override
     public JobQuery duedateLowerThen(Date date) {
         return duedateLowerThan(date);
     }
 
+    @Override
     public JobQuery duedateLowerThenOrEquals(Date date) {
         if (date == null) {
             throw new ActivitiIllegalArgumentException("Provided date is null");
@@ -169,16 +184,19 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return this;
     }
 
+    @Override
     public JobQuery noRetriesLeft() {
         noRetriesLeft = true;
         return this;
     }
 
+    @Override
     public JobQuery withException() {
         this.withException = true;
         return this;
     }
 
+    @Override
     public JobQuery exceptionMessage(String exceptionMessage) {
         if (exceptionMessage == null) {
             throw new ActivitiIllegalArgumentException("Provided exception message is null");
@@ -187,6 +205,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return this;
     }
 
+    @Override
     public JobQuery jobTenantId(String tenantId) {
         if (tenantId == null) {
             throw new ActivitiIllegalArgumentException("Provided tentant id is null");
@@ -195,6 +214,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return this;
     }
 
+    @Override
     public JobQuery jobTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
             throw new ActivitiIllegalArgumentException("Provided tentant id is null");
@@ -203,6 +223,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
         return this;
     }
 
+    @Override
     public JobQuery jobWithoutTenantId() {
         this.withoutTenantId = true;
         return this;
@@ -210,32 +231,39 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
 
     // sorting //////////////////////////////////////////
 
+    @Override
     public JobQuery orderByJobDuedate() {
         return orderBy(JobQueryProperty.DUEDATE);
     }
 
+    @Override
     public JobQuery orderByExecutionId() {
         return orderBy(JobQueryProperty.EXECUTION_ID);
     }
 
+    @Override
     public JobQuery orderByJobId() {
         return orderBy(JobQueryProperty.JOB_ID);
     }
 
+    @Override
     public JobQuery orderByProcessInstanceId() {
         return orderBy(JobQueryProperty.PROCESS_INSTANCE_ID);
     }
 
+    @Override
     public JobQuery orderByJobRetries() {
         return orderBy(JobQueryProperty.RETRIES);
     }
 
+    @Override
     public JobQuery orderByTenantId() {
         return orderBy(JobQueryProperty.TENANT_ID);
     }
 
     // results //////////////////////////////////////////
 
+    @Override
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
         return commandContext
@@ -243,6 +271,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
                 .findJobCountByQueryCriteria(this);
     }
 
+    @Override
     public List<Job> executeList(CommandContext commandContext, Page page) {
         checkQueryOk();
         return commandContext

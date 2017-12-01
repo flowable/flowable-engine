@@ -66,6 +66,7 @@ public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Ser
         this.transientVariables = processInstanceBuilder.getTransientVariables();
     }
 
+    @Override
     public ProcessInstance execute(CommandContext commandContext) {
         DeploymentManager deploymentManager = commandContext
                 .getProcessEngineConfiguration()

@@ -25,7 +25,7 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.task.Comment;
-import org.flowable.engine.task.Task;
+import org.flowable.task.api.Task;
 
 /**
  * @author Joram Barrez
@@ -43,6 +43,7 @@ public class DeleteCommentCmd implements Command<Void>, Serializable {
         this.commentId = commentId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         CommentEntityManager commentManager = CommandContextUtil.getCommentEntityManager(commandContext);
 
@@ -62,7 +63,7 @@ public class DeleteCommentCmd implements Command<Void>, Serializable {
                 }
 
             } else if (comment.getTaskId() != null) {
-                Task task = CommandContextUtil.getTaskEntityManager(commandContext).findById(comment.getTaskId());
+                Task task = CommandContextUtil.getTaskService().getTask(comment.getTaskId());
                 if (task != null && task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
                     Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
                     compatibilityHandler.deleteComment(commentId, taskId, processInstanceId);
@@ -88,7 +89,7 @@ public class DeleteCommentCmd implements Command<Void>, Serializable {
             }
             if (taskId != null) {
 
-                Task task = CommandContextUtil.getTaskEntityManager(commandContext).findById(taskId);
+                Task task = CommandContextUtil.getTaskService().getTask(taskId);
                 if (task != null && task.getProcessDefinitionId() != null && Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, task.getProcessDefinitionId())) {
                     Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
                     compatibilityHandler.deleteComment(commentId, taskId, processInstanceId);

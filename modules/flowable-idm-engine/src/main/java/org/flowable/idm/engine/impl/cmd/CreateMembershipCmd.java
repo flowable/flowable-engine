@@ -34,6 +34,7 @@ public class CreateMembershipCmd implements Command<Object>, Serializable {
         this.groupId = groupId;
     }
 
+    @Override
     public Object execute(CommandContext commandContext) {
         if (userId == null) {
             throw new FlowableIllegalArgumentException("userId is null");

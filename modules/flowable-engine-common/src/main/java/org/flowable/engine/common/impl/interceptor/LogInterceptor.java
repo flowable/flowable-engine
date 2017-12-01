@@ -23,12 +23,12 @@ public class LogInterceptor extends AbstractCommandInterceptor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(LogInterceptor.class);
 
+    @Override
     public <T> T execute(CommandConfig config, Command<T> command) {
         if (!LOGGER.isDebugEnabled()) {
             // do nothing here if we cannot log
             return next.execute(config, command);
         }
-        LOGGER.debug("\n");
         LOGGER.debug("--- starting {} --------------------------------------------------------", command.getClass().getSimpleName());
         try {
 
@@ -36,7 +36,6 @@ public class LogInterceptor extends AbstractCommandInterceptor {
 
         } finally {
             LOGGER.debug("--- {} finished --------------------------------------------------------", command.getClass().getSimpleName());
-            LOGGER.debug("\n");
         }
     }
 }

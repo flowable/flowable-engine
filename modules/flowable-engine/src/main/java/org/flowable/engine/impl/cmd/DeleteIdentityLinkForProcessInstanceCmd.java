@@ -23,6 +23,7 @@ import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
+import org.flowable.engine.impl.util.IdentityLinkUtil;
 
 /**
  * @author Tijs Rademakers
@@ -62,6 +63,7 @@ public class DeleteIdentityLinkForProcessInstanceCmd implements Command<Object>,
         }
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         ExecutionEntity processInstance = CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstanceId);
 
@@ -75,7 +77,7 @@ public class DeleteIdentityLinkForProcessInstanceCmd implements Command<Object>,
             return null;
         }
 
-        CommandContextUtil.getIdentityLinkEntityManager(commandContext).deleteIdentityLink(processInstance, userId, groupId, type);
+        IdentityLinkUtil.deleteProcessInstanceIdentityLinks(processInstance, userId, groupId, type);
         CommandContextUtil.getHistoryManager(commandContext).createProcessInstanceIdentityLinkComment(processInstanceId, userId, groupId, type, false);
 
         return null;

@@ -12,11 +12,6 @@
  */
 package org.flowable.editor.language.json.converter;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -59,6 +54,11 @@ import org.flowable.editor.language.json.converter.util.JsonConverterUtil;
 import org.flowable.editor.language.json.model.ModelInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import math.geom2d.Point2D;
 import math.geom2d.conic.Circle2D;
@@ -248,10 +248,16 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
             propertiesNode.put(PROPERTY_DOCUMENTATION, mainProcess.getDocumentation());
         }
         if (!mainProcess.isExecutable()) {
-            propertiesNode.put(PROPERTY_PROCESS_EXECUTABLE, "No");
+            propertiesNode.put(PROPERTY_IS_EXECUTABLE, "false");
         }
         if (StringUtils.isNoneEmpty(model.getTargetNamespace())) {
             propertiesNode.put(PROPERTY_PROCESS_NAMESPACE, model.getTargetNamespace());
+        }
+        if (CollectionUtils.isNotEmpty(mainProcess.getCandidateStarterGroups())) {
+            propertiesNode.put(PROPERTY_PROCESS_POTENTIALSTARTERGROUP, StringUtils.join(mainProcess.getCandidateStarterGroups(), ","));
+        }
+        if (CollectionUtils.isNotEmpty(mainProcess.getCandidateStarterUsers())) {
+            propertiesNode.put(PROPERTY_PROCESS_POTENTIALSTARTERUSER, StringUtils.join(mainProcess.getCandidateStarterUsers(), ","));
         }
 
         BpmnJsonConverterUtil.convertMessagesToJson(model.getMessages(), propertiesNode);
@@ -290,7 +296,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                 poolPropertiesNode.put(PROPERTY_OVERRIDE_ID, pool.getId());
                 poolPropertiesNode.put(PROPERTY_PROCESS_ID, pool.getProcessRef());
                 if (!pool.isExecutable()) {
-                    poolPropertiesNode.put(PROPERTY_PROCESS_EXECUTABLE, PROPERTY_VALUE_NO);
+                    poolPropertiesNode.put(PROPERTY_IS_EXECUTABLE, "false");
                 }
                 if (StringUtils.isNotEmpty(pool.getName())) {
                     poolPropertiesNode.put(PROPERTY_NAME, pool.getName());
@@ -378,6 +384,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         return modelNode;
     }
 
+    @Override
     public void processFlowElements(FlowElementsContainer container, BpmnModel model, ArrayNode shapesArrayNode,
             Map<String, ModelInfo> formKeyMap, Map<String, ModelInfo> decisionTableKeyMap, double subProcessX, double subProcessY) {
 
@@ -439,7 +446,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
 
         BpmnModel bpmnModel = new BpmnModel();
 
-        bpmnModel.setTargetNamespace("http://activiti.org/test");
+        bpmnModel.setTargetNamespace("http://flowable.org/test");
         Map<String, JsonNode> shapeMap = new HashMap<>();
         Map<String, JsonNode> sourceRefMap = new HashMap<>();
         Map<String, JsonNode> edgeMap = new HashMap<>();
@@ -465,7 +472,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                 pool.setId(BpmnJsonConverterUtil.getElementId(shapeNode));
                 pool.setName(JsonConverterUtil.getPropertyValueAsString(PROPERTY_NAME, shapeNode));
                 pool.setProcessRef(JsonConverterUtil.getPropertyValueAsString(PROPERTY_PROCESS_ID, shapeNode));
-                pool.setExecutable(JsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_PROCESS_EXECUTABLE, shapeNode, true));
+                pool.setExecutable(JsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_IS_EXECUTABLE, shapeNode, true));
                 bpmnModel.getPools().add(pool);
 
                 Process process = new Process();
@@ -532,9 +539,9 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                 bpmnModel.setTargetNamespace(namespace);
             }
             process.setDocumentation(BpmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_DOCUMENTATION, modelNode));
-            JsonNode processExecutableNode = JsonConverterUtil.getProperty(PROPERTY_PROCESS_EXECUTABLE, modelNode);
+            JsonNode processExecutableNode = JsonConverterUtil.getProperty(PROPERTY_IS_EXECUTABLE, modelNode);
             if (processExecutableNode != null && StringUtils.isNotEmpty(processExecutableNode.asText())) {
-                process.setExecutable(JsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_PROCESS_EXECUTABLE, modelNode));
+                process.setExecutable(JsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_IS_EXECUTABLE, modelNode));
             }
 
             BpmnJsonConverterUtil.convertJsonToMessages(modelNode, bpmnModel);
@@ -666,6 +673,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         return bpmnModel;
     }
 
+    @Override
     public void processJsonElements(JsonNode shapesArrayNode, JsonNode modelNode, BaseElement parentElement, Map<String, JsonNode> shapeMap,
             Map<String, String> formMap, Map<String, String> decisionTableMap, BpmnModel bpmnModel) {
 

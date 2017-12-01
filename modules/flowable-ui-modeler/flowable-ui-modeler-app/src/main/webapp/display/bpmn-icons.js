@@ -292,11 +292,17 @@ function _drawSignalIcon(paper, element)
 
 function _drawMessageIcon(paper, element)
 {
+    var fill = "none";
+    if (element.type === "ThrowEvent")
+    {
+        fill = "black";
+    }
+    
 	var path = paper.path("M 1 3 L 9 11 L 17 3 L 1 3 z M 1 5 L 1 13 L 5 9 L 1 5 z M 17 5 L 13 9 L 17 13 L 17 5 z M 6 10 L 1 15 L 17 15 L 12 10 L 9 13 L 6 10 z");
 	path.attr({
-		"stroke": "none",
+		"stroke": "black",
 		"stroke-width": 1,
-		"fill": "#585858"
+		"fill": fill
  	});
 	path.transform("T" + (element.x + 6) + "," + (element.y + 6));
 	return path;

@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.AbstractServiceConfiguration;
 import org.flowable.engine.common.impl.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,7 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
     protected CommandContextFactory commandContextFactory;
     protected String currentEngineConfigurationKey;
     protected Map<String, AbstractEngineConfiguration> engineConfigurations = new HashMap<>();
+    protected Map<String, AbstractServiceConfiguration> serviceConfigurations = new HashMap<>();
 
     public CommandContextInterceptor() {
     }
@@ -40,47 +42,49 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
         this.commandContextFactory = commandContextFactory;
     }
 
+    @Override
     public <T> T execute(CommandConfig config, Command<T> command) {
-        CommandContext context = Context.getCommandContext();
+        CommandContext commandContext = Context.getCommandContext();
 
         boolean contextReused = false;
         AbstractEngineConfiguration previousEngineConfiguration = null;
         
         // We need to check the exception, because the transaction can be in a
         // rollback state, and some other command is being fired to compensate (eg. decrementing job retries)
-        if (!config.isContextReusePossible() || context == null || context.getException() != null) {
-            context = commandContextFactory.createCommandContext(command);
-            context.setEngineConfigurations(engineConfigurations);
+        if (!config.isContextReusePossible() || commandContext == null || commandContext.getException() != null) {
+            commandContext = commandContextFactory.createCommandContext(command);
+            commandContext.setEngineConfigurations(engineConfigurations);
+            commandContext.setServiceConfigurations(serviceConfigurations);
             
         } else {
             LOGGER.debug("Valid context found. Reusing it for the current command '{}'", command.getClass().getCanonicalName());
             contextReused = true;
-            context.setReused(true);
-            previousEngineConfiguration = context.getCurrentEngineConfiguration();
+            commandContext.setReused(true);
+            previousEngineConfiguration = commandContext.getCurrentEngineConfiguration();
         }
 
         try {
 
-            context.setCurrentEngineConfiguration(engineConfigurations.get(currentEngineConfigurationKey));
+            commandContext.setCurrentEngineConfiguration(engineConfigurations.get(currentEngineConfigurationKey));
             // Push on stack
-            Context.setCommandContext(context);
+            Context.setCommandContext(commandContext);
 
             return next.execute(config, command);
 
         } catch (Exception e) {
 
-            context.exception(e);
+            commandContext.exception(e);
 
         } finally {
             try {
                 if (!contextReused) {
-                    context.close();
+                    commandContext.close();
                 }
             } finally {
 
                 // Pop from stack
                 Context.removeCommandContext();
-                context.setCurrentEngineConfiguration(previousEngineConfiguration);
+                commandContext.setCurrentEngineConfiguration(previousEngineConfiguration);
             }
         }
 
@@ -109,6 +113,14 @@ public class CommandContextInterceptor extends AbstractCommandInterceptor {
 
     public void setEngineConfigurations(Map<String, AbstractEngineConfiguration> engineConfigurations) {
         this.engineConfigurations = engineConfigurations;
+    }
+    
+    public Map<String, AbstractServiceConfiguration> getServiceConfigurations() {
+        return serviceConfigurations;
+    }
+
+    public void setServiceConfigurations(Map<String, AbstractServiceConfiguration> serviceConfigurations) {
+        this.serviceConfigurations = serviceConfigurations;
     }
     
 }

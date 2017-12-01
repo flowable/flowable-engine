@@ -18,7 +18,7 @@ import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.persistence.entity.JobEntity;
 import org.activiti.engine.impl.persistence.entity.TimerJobEntity;
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.api.Job;
 
 /**
  * @author Tom Baeyens

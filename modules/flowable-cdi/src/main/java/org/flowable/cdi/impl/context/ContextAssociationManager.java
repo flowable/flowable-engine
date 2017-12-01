@@ -16,7 +16,7 @@ import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.task.Task;
+import org.flowable.task.api.Task;
 
 /**
  * Represents a means for associating an execution with a context.

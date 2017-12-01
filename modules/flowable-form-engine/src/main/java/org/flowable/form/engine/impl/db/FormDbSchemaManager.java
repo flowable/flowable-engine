@@ -12,11 +12,12 @@
  */
 package org.flowable.form.engine.impl.db;
 
+import java.sql.Connection;
+
 import org.apache.commons.lang3.StringUtils;
-import org.apache.ibatis.session.SqlSession;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.db.DbSchemaManager;
-import org.flowable.engine.common.impl.db.DbSqlSession;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.util.CommandContextUtil;
 
@@ -29,6 +30,9 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 
 public class FormDbSchemaManager implements DbSchemaManager {
     
+    public static String LIQUIBASE_CHANGELOG = "org/flowable/form/db/liquibase/flowable-form-db-changelog.xml";
+    
+    @Override
     public void dbSchemaCreate() {
         Liquibase liquibase = createLiquibaseInstance();
         try {
@@ -38,6 +42,7 @@ public class FormDbSchemaManager implements DbSchemaManager {
         }
     }
 
+    @Override
     public void dbSchemaDrop() {
         Liquibase liquibase = createLiquibaseInstance();
         try {
@@ -55,24 +60,34 @@ public class FormDbSchemaManager implements DbSchemaManager {
 
     protected static Liquibase createLiquibaseInstance() {
         try {
-            DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
-            SqlSession sqlSession = dbSqlSession.getSqlSession();
-            DatabaseConnection connection = new JdbcConnection(sqlSession.getConnection());
+            Connection jdbcConnection = null;
+            CommandContext commandContext = CommandContextUtil.getCommandContext();
+            FormEngineConfiguration formEngineConfiguration = CommandContextUtil.getFormEngineConfiguration(commandContext);
+            if (commandContext == null) {
+                jdbcConnection = CommandContextUtil.getFormEngineConfiguration(commandContext).getDataSource().getConnection();
+            } else {
+                jdbcConnection = CommandContextUtil.getDbSqlSession(commandContext).getSqlSession().getConnection();
+            }
+            if (!jdbcConnection.getAutoCommit()) {
+                jdbcConnection.commit();
+            }
+            
+            DatabaseConnection connection = new JdbcConnection(jdbcConnection);
             Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
             database.setDatabaseChangeLogTableName(FormEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogTableName());
             database.setDatabaseChangeLogLockTableName(FormEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogLockTableName());
 
-            if (StringUtils.isNotEmpty(sqlSession.getConnection().getSchema())) {
-                database.setDefaultSchemaName(sqlSession.getConnection().getSchema());
-                database.setLiquibaseSchemaName(sqlSession.getConnection().getSchema());
+            if (StringUtils.isNotEmpty(formEngineConfiguration.getDatabaseSchema())) {
+                database.setDefaultSchemaName(formEngineConfiguration.getDatabaseSchema());
+                database.setLiquibaseSchemaName(formEngineConfiguration.getDatabaseSchema());
             }
 
-            if (StringUtils.isNotEmpty(sqlSession.getConnection().getCatalog())) {
-                database.setDefaultCatalogName(sqlSession.getConnection().getCatalog());
-                database.setLiquibaseCatalogName(sqlSession.getConnection().getCatalog());
+            if (StringUtils.isNotEmpty(formEngineConfiguration.getDatabaseCatalog())) {
+                database.setDefaultCatalogName(formEngineConfiguration.getDatabaseCatalog());
+                database.setLiquibaseCatalogName(formEngineConfiguration.getDatabaseCatalog());
             }
 
-            Liquibase liquibase = new Liquibase("org/flowable/form/db/liquibase/flowable-form-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
+            Liquibase liquibase = new Liquibase(LIQUIBASE_CHANGELOG, new ClassLoaderResourceAccessor(), database);
             return liquibase;
 
         } catch (Exception e) {

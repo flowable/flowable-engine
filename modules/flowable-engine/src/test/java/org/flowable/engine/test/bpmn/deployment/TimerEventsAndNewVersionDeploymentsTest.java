@@ -14,7 +14,7 @@
 package org.flowable.engine.test.bpmn.deployment;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.api.Job;
 
 /**
  * A test specifically written to test how events (start/boundary) are handled when deploying a new version of a process definition.

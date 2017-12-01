@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.app.filter.FlowableCookieFilterCallback;
 import org.flowable.app.model.common.RemoteToken;
-import org.flowable.engine.impl.identity.Authentication;
+import org.flowable.engine.common.impl.identity.Authentication;
 
 public class EngineAuthenticationCookieFilterCallback implements FlowableCookieFilterCallback {
 

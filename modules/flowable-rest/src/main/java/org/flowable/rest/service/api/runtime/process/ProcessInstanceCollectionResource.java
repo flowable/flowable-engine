@@ -13,29 +13,6 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.flowable.engine.HistoryService;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.history.HistoricVariableInstance;
-import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.runtime.ProcessInstanceBuilder;
-import org.flowable.rest.api.DataResponse;
-import org.flowable.rest.service.api.engine.variable.RestVariable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -44,6 +21,27 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import org.flowable.engine.HistoryService;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.engine.runtime.ProcessInstanceBuilder;
+import org.flowable.rest.api.DataResponse;
+import org.flowable.rest.service.api.engine.variable.RestVariable;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Modified the "createProcessInstance" method to conditionally call a "createProcessInstanceResponse" method with a different signature, which will conditionally return the process variables that
@@ -60,7 +58,7 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
     @Autowired
     protected HistoryService historyService;
 
-    @ApiOperation(value = "List of process instances", tags = { "Process Instances" })
+    @ApiOperation(value = "List process instances", nickname ="listProcessInstances", tags = { "Process Instances" })
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return models with the given version.", paramType = "query"),
             @ApiImplicitParam(name = "processDefinitionKey", dataType = "string", value = "Only return process instances with the given process definition key.", paramType = "query"),
@@ -78,11 +76,11 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
             @ApiImplicitParam(name = "sort", dataType = "string", value = "Property to sort on, to be used together with the order.", allowableValues = "id,processDefinitionId,tenantId,processDefinitionKey", paramType = "query"),
     })
     @ApiResponses(value = {
-            @ApiResponse(code = 204, message = "Indicates request was successful and the process-instances are returned"),
-            @ApiResponse(code = 404, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
+            @ApiResponse(code = 200, message = "Indicates request was successful and the process-instances are returned"),
+            @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format . The status-message contains additional information.")
     })
-    @RequestMapping(value = "/runtime/process-instances", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    @GetMapping(value = "/runtime/process-instances", produces = "application/json")
+    public DataResponse<ProcessInstanceResponse> getProcessInstances(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         // Populate query based on request
         ProcessInstanceQueryRequest queryRequest = new ProcessInstanceQueryRequest();
 
@@ -143,30 +141,17 @@ public class ProcessInstanceCollectionResource extends BaseProcessInstanceResour
         return getQueryResponse(queryRequest, allRequestParams);
     }
 
-    @ApiOperation(value = "Start a process instance", tags = { "Process Instances" }, notes = "## Request body (start by process definition id)\n\n"
-            + "```JSON\n {\n" + "   \"processDefinitionId\":\"oneTaskProcess:1:158\",\n" + "   \"businessKey\":\"myBusinessKey\",\n" + "   \"variables\": [\n"
-            + "      {\n" + "        \"name\":\"myVar\",\n" + "        \"value\":\"This is a variable\",\n" + "      }\n" + "   ]\n" + "}```"
-            + "\n\n"
-            + "## Request body (start by process definition key)\n\n"
-            + "```JSON\n {\n" + "   \"processDefinitionKey\":\"oneTaskProcess\",\n" + "   \"businessKey\":\"myBusinessKey\",\n" + "   \"tenantId\": \"tenant1\",\n"
-            + "   \"variables\": [\n" + "      {\n" + "        \"name\":\"myVar\",\n" + "        \"value\":\"This is a variable\",\n" + "      }\n"
-            + "   ]\n" + "}```"
-            + "\n\n"
-            + "## Request body (start by message)\n\n"
-            + "```JSON\n{\n" + "   \"message\":\"newOrderMessage\",\n" + "   \"businessKey\":\"myBusinessKey\",\n" + "   \"tenantId\": \"tenant1\",\n"
-            + "   \"variables\": [\n" + "      {\n" + "        \"name\":\"myVar\",\n" + "        \"value\":\"This is a variable\",\n" + "      }\n"
-            + "   ]\n" + "}```"
-            + "\n\n"
-            + "Note that also a *transientVariables* property is accepted as part of this json, that follows the same structure as the *variables* property.\n\n"
-            + "Only one of *processDefinitionId*, *processDefinitionKey* or *message* can be used in the request body. "
-            + "Parameters *businessKey*, *variables* and *tenantId* are optional. "
-            + "If tenantId is omitted, the default tenant will be used. More information about the variable format can be found in the REST variables section. "
-            + "Note that the variable-scope that is supplied is ignored, process-variables are always local.")
+    @ApiOperation(value = "Start a process instance", tags = { "Process Instances" },
+            notes = "Note that also a *transientVariables* property is accepted as part of this json, that follows the same structure as the *variables* property.\n\n"
+            + "Only one of *processDefinitionId*, *processDefinitionKey* or *message* can be used in the request body. \n\n"
+            + "Parameters *businessKey*, *variables* and *tenantId* are optional.\n\n "
+            + "If tenantId is omitted, the default tenant will be used. More information about the variable format can be found in the REST variables section.\n\n "
+            + "Note that the variable-scope that is supplied is ignored, process-variables are always local.\n\n")
     @ApiResponses(value = {
             @ApiResponse(code = 201, message = "Indicates the process instance was created."),
             @ApiResponse(code = 400, message = "Indicates either the process-definition was not found (based on id or key), no process is started by sending the given message or an invalid variable has been passed. Status description contains additional information about the error.")
     })
-    @RequestMapping(value = "/runtime/process-instances", method = RequestMethod.POST, produces = "application/json")
+    @PostMapping(value = "/runtime/process-instances", produces = "application/json")
     public ProcessInstanceResponse createProcessInstance(@RequestBody ProcessInstanceCreateRequest request, HttpServletRequest httpRequest, HttpServletResponse response) {
 
         if (request.getProcessDefinitionId() == null && request.getProcessDefinitionKey() == null && request.getMessage() == null) {

@@ -15,9 +15,9 @@ package org.activiti.camel;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
 import org.activiti.camel.util.Routing;
 import org.activiti.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.test.context.ContextConfiguration;

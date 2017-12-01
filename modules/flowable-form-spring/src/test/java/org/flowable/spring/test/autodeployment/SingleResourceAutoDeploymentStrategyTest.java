@@ -43,6 +43,7 @@ public class SingleResourceAutoDeploymentStrategyTest extends AbstractAutoDeploy
     private SingleResourceAutoDeploymentStrategy classUnderTest;
 
     @Before
+    @Override
     public void before() throws Exception {
         super.before();
         classUnderTest = new SingleResourceAutoDeploymentStrategy();

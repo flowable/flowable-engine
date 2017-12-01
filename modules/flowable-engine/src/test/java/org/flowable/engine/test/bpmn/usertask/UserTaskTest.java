@@ -17,13 +17,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 /**
  * @author Joram Barrez
@@ -34,7 +35,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
     public void testTaskPropertiesNotNull() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task.getId());
         assertEquals("my task", task.getName());
         assertEquals("Very important", task.getDescription());
@@ -63,12 +64,12 @@ public class UserTaskTest extends PluggableFlowableTestCase {
 
         // start the process
         runtimeService.startProcessInstanceByKey("ForkProcess");
-        List<Task> taskList = taskService.createTaskQuery().list();
+        List<org.flowable.task.api.Task> taskList = taskService.createTaskQuery().list();
         assertNotNull(taskList);
         assertEquals(2, taskList.size());
 
         // make sure user task exists
-        Task task = taskService.createTaskQuery().taskDefinitionKey("SimpleUser").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("SimpleUser").singleResult();
         assertNotNull(task);
 
         // attempt to complete the task and get PersistenceException pointing to
@@ -79,7 +80,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
     @Deployment
     public void testTaskCategory() {
         runtimeService.startProcessInstanceByKey("testTaskCategory");
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
         // Test if the property set in the model is shown in the task
         String testCategory = "My Category";
@@ -124,7 +125,7 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
         // Set variables
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
         Map<String, Object> vars = new HashMap<>();
         for (int i = 0; i < 20; i++) {
@@ -142,6 +143,35 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         assertEquals(vars.size(), task.getProcessVariables().size());
 
         assertEquals("test123", task.getFormKey());
+    }
+    
+    @Deployment
+    public void testEmptyAssignmentExpression() {
+        Map<String, Object> variableMap = new HashMap<>();
+        variableMap.put("assignee", null);
+        variableMap.put("candidateUsers", null);
+        variableMap.put("candidateGroups", null);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variableMap);
+        assertNotNull(processInstance);
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        assertNull(task.getAssignee());
+        List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(task.getId());
+        assertEquals(0, identityLinks.size());
+        
+        variableMap = new HashMap<>();
+        variableMap.put("assignee", "");
+        variableMap.put("candidateUsers", "");
+        variableMap.put("candidateGroups", "");
+        processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variableMap);
+        assertNotNull(processInstance);
+        
+        task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertNotNull(task);
+        assertNull(task.getAssignee());
+        identityLinks = taskService.getIdentityLinksForTask(task.getId());
+        assertEquals(0, identityLinks.size());
     }
 
 }

@@ -12,8 +12,8 @@
  */
 package org.activiti.engine.impl.variable;
 
-import org.flowable.engine.impl.variable.ValueFields;
-import org.flowable.engine.impl.variable.VariableType;
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * @author Tom Baeyens
@@ -26,22 +26,27 @@ public class StringType implements VariableType {
         this.maxLength = maxLength;
     }
 
+    @Override
     public String getTypeName() {
         return "string";
     }
 
+    @Override
     public boolean isCachable() {
         return true;
     }
 
+    @Override
     public Object getValue(ValueFields valueFields) {
         return valueFields.getTextValue();
     }
 
+    @Override
     public void setValue(Object value, ValueFields valueFields) {
         valueFields.setTextValue((String) value);
     }
 
+    @Override
     public boolean isAbleToStore(Object value) {
         if (value == null) {
             return true;

@@ -12,34 +12,28 @@
  */
 package org.flowable.app.service.runtime;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import org.flowable.app.model.runtime.CompleteFormRepresentation;
-import org.flowable.app.model.runtime.ProcessInstanceVariableRepresentation;
 import org.flowable.app.model.runtime.SaveFormRepresentation;
 import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.exception.NotFoundException;
 import org.flowable.app.service.exception.NotPermittedException;
+import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.history.HistoricVariableInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.form.model.FormModel;
 import org.flowable.idm.api.User;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers
@@ -52,6 +46,9 @@ public class FlowableTaskFormService {
 
     @Autowired
     protected TaskService taskService;
+    
+    @Autowired
+    protected CmmnTaskService cmmnTaskService;
 
     @Autowired
     protected RepositoryService repositoryService;
@@ -73,7 +70,11 @@ public class FlowableTaskFormService {
 
     public FormModel getTaskForm(String taskId) {
         HistoricTaskInstance task = permissionService.validateReadPermissionOnTask(SecurityUtils.getCurrentUserObject(), taskId);
-        return taskService.getTaskFormModel(task.getId());
+        if (task.getProcessInstanceId() != null) {
+            return taskService.getTaskFormModel(task.getId());
+        } else {
+            return cmmnTaskService.getTaskFormModel(task.getId());
+        }
     }
 
     public void saveTaskForm(String taskId, SaveFormRepresentation saveFormRepresentation) {
@@ -87,7 +88,14 @@ public class FlowableTaskFormService {
 
         checkCurrentUserCanModifyTask(task);
 
-        formService.saveFormInstanceByFormModelId(saveFormRepresentation.getValues(), saveFormRepresentation.getFormId(), taskId, task.getProcessInstanceId());
+        if (task.getProcessInstanceId() != null) {
+            formService.saveFormInstanceByFormModelId(saveFormRepresentation.getValues(), saveFormRepresentation.getFormId(), taskId, 
+                            task.getProcessInstanceId(), task.getProcessDefinitionId());
+            
+        } else {
+            formService.saveFormInstanceWithScopeId(saveFormRepresentation.getValues(), saveFormRepresentation.getFormId(), taskId, 
+                            task.getScopeId(), task.getScopeType(), task.getScopeDefinitionId());
+        }
 
     }
 
@@ -102,28 +110,16 @@ public class FlowableTaskFormService {
 
         checkCurrentUserCanModifyTask(task);
 
-        taskService.completeTaskWithForm(taskId, completeTaskFormRepresentation.getFormId(),
-                completeTaskFormRepresentation.getOutcome(), completeTaskFormRepresentation.getValues());
-    }
-
-    public List<ProcessInstanceVariableRepresentation> getProcessInstanceVariables(String taskId) {
-        HistoricTaskInstance task = permissionService.validateReadPermissionOnTask(SecurityUtils.getCurrentUserObject(), taskId);
-        List<HistoricVariableInstance> historicVariables = historyService.createHistoricVariableInstanceQuery().processInstanceId(task.getProcessInstanceId()).list();
-
-        // Get all process-variables to extract values from
-        Map<String, ProcessInstanceVariableRepresentation> processInstanceVariables = new HashMap<String, ProcessInstanceVariableRepresentation>();
-
-        for (HistoricVariableInstance historicVariableInstance : historicVariables) {
-            ProcessInstanceVariableRepresentation processInstanceVariableRepresentation = new ProcessInstanceVariableRepresentation(
-                    historicVariableInstance.getVariableName(), historicVariableInstance.getVariableTypeName(), historicVariableInstance.getValue());
-            processInstanceVariables.put(historicVariableInstance.getId(), processInstanceVariableRepresentation);
+        if (task.getProcessInstanceId() != null) {
+            taskService.completeTaskWithForm(taskId, completeTaskFormRepresentation.getFormId(),
+                    completeTaskFormRepresentation.getOutcome(), completeTaskFormRepresentation.getValues());
+        } else {
+            cmmnTaskService.completeTaskWithForm(taskId, completeTaskFormRepresentation.getFormId(), completeTaskFormRepresentation.getOutcome(), 
+                            completeTaskFormRepresentation.getValues());
         }
-
-        List<ProcessInstanceVariableRepresentation> processInstanceVariableRepresenations = new ArrayList<ProcessInstanceVariableRepresentation>(processInstanceVariables.values());
-        return processInstanceVariableRepresenations;
     }
 
-    private void checkCurrentUserCanModifyTask(Task task) {
+    protected void checkCurrentUserCanModifyTask(Task task) {
         User currentUser = SecurityUtils.getCurrentUserObject();
         if (!permissionService.isTaskOwnerOrAssignee(currentUser, task.getId())) {
             if (!permissionService.validateIfUserIsInitiatorAndCanCompleteTask(currentUser, task)) {

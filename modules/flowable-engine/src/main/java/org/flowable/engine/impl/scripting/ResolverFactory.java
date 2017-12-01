@@ -13,8 +13,8 @@
 
 package org.flowable.engine.impl.scripting;
 
-import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Tom Baeyens

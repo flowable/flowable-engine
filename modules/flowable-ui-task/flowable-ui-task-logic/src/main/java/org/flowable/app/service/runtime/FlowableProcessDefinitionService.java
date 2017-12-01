@@ -12,8 +12,6 @@
  */
 package org.flowable.app.service.runtime;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.model.common.ResultListDataRepresentation;
 import org.flowable.app.model.runtime.ProcessDefinitionRepresentation;
+import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.exception.BadRequestException;
 import org.flowable.app.service.exception.InternalServerErrorException;
 import org.flowable.app.service.exception.NotFoundException;
@@ -45,6 +44,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author Tijs Rademakers
  */
@@ -59,6 +60,9 @@ public class FlowableProcessDefinitionService {
 
     @Autowired
     protected FormRepositoryService formRepositoryService;
+
+    @Autowired
+    protected PermissionService permissionService;
 
     @Autowired
     protected ObjectMapper objectMapper;
@@ -100,7 +104,15 @@ public class FlowableProcessDefinitionService {
         }
 
         List<ProcessDefinition> definitions = definitionQuery.list();
-        ResultListDataRepresentation result = new ResultListDataRepresentation(convertDefinitionList(definitions));
+
+        List<ProcessDefinition> startableDefinitions = new ArrayList<>();
+        for (ProcessDefinition definition : definitions) {
+            if (SecurityUtils.getCurrentUserObject() == null || permissionService.canStartProcess(SecurityUtils.getCurrentUserObject(), definition)) {
+                startableDefinitions.add(definition);
+            }
+        }
+
+        ResultListDataRepresentation result = new ResultListDataRepresentation(convertDefinitionList(startableDefinitions));
         return result;
     }
 
@@ -163,7 +175,7 @@ public class FlowableProcessDefinitionService {
     }
 
     protected List<ProcessDefinitionRepresentation> convertDefinitionList(List<ProcessDefinition> definitions) {
-        List<ProcessDefinitionRepresentation> result = new ArrayList<ProcessDefinitionRepresentation>();
+        List<ProcessDefinitionRepresentation> result = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(definitions)) {
             for (ProcessDefinition processDefinition : definitions) {
                 ProcessDefinitionRepresentation rep = new ProcessDefinitionRepresentation(processDefinition);

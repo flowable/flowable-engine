@@ -12,7 +12,7 @@
  */
 package org.flowable.crystalball.simulator;
 
-import org.flowable.engine.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * This is basic interface for SimRun implementation it allows to execute simulation without any break

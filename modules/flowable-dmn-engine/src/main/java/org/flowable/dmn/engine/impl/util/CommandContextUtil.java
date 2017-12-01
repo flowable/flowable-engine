@@ -12,6 +12,7 @@
  */
 package org.flowable.dmn.engine.impl.util;
 
+import org.flowable.dmn.api.DmnRepositoryService;
 import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DmnDeploymentEntityManager;
@@ -81,7 +82,15 @@ public class CommandContextUtil {
     }
     
     public static HistoricDecisionExecutionEntityManager getHistoricDecisionExecutionEntityManager(CommandContext commandContext) {
-        return getDmnEngineConfiguration().getHistoricDecisionExecutionEntityManager();
+        return getDmnEngineConfiguration(commandContext).getHistoricDecisionExecutionEntityManager();
+    }
+    
+    public static DmnRepositoryService getDmnRepositoryService() {
+        return getDmnRepositoryService(getCommandContext());
+    }
+    
+    public static DmnRepositoryService getDmnRepositoryService(CommandContext commandContext) {
+        return getDmnEngineConfiguration(commandContext).getDmnRepositoryService();
     }
     
     public static CommandContext getCommandContext() {

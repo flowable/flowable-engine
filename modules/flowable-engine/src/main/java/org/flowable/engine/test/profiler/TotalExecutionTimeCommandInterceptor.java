@@ -27,6 +27,7 @@ public class TotalExecutionTimeCommandInterceptor extends AbstractCommandInterce
         this.profiler = FlowableProfiler.getInstance();
     }
 
+    @Override
     public <T> T execute(CommandConfig config, Command<T> command) {
         ProfileSession currentProfileSession = profiler.getCurrentProfileSession();
 

@@ -13,22 +13,6 @@
 
 package org.flowable.rest.service.api.management;
 
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.flowable.engine.ManagementService;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.runtime.SuspendedJobQuery;
-import org.flowable.rest.api.DataResponse;
-import org.flowable.rest.api.RequestUtil;
-import org.flowable.rest.service.api.RestResponseFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -37,6 +21,19 @@ import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
+import org.flowable.engine.ManagementService;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.job.api.SuspendedJobQuery;
+import org.flowable.rest.api.DataResponse;
+import org.flowable.rest.api.RequestUtil;
+import org.flowable.rest.service.api.RestResponseFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 /**
  * @author Joram Barrez
@@ -52,7 +49,7 @@ public class SuspendedJobCollectionResource {
     protected ManagementService managementService;
 
     // Fixme documentation & real parameters
-    @ApiOperation(value = "Get a list of suspended jobs", tags = { "Jobs" }, nickname = "listSuspendedJobs")
+    @ApiOperation(value = "List suspended jobs", tags = { "Jobs" }, nickname = "listSuspendedJobs")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "id", dataType = "string", value = "Only return job with the given id", paramType = "query"),
             @ApiImplicitParam(name = "processInstanceId", dataType = "string", value = "Only return jobs part of a process with the given id", paramType = "query"),
@@ -63,8 +60,8 @@ public class SuspendedJobCollectionResource {
             @ApiImplicitParam(name = "timersOnly", dataType = "boolean", value = "If true, only return jobs which are timers. If false, this parameter is ignored. Cannot be used together with 'messagesOnly'.", paramType = "query"),
             @ApiImplicitParam(name = "messagesOnly", dataType = "boolean", value = "If true, only return jobs which are messages. If false, this parameter is ignored. Cannot be used together with 'timersOnly'", paramType = "query"),
             @ApiImplicitParam(name = "withException", dataType = "boolean", value = "If true, only return jobs for which an exception occurred while executing it. If false, this parameter is ignored.", paramType = "query"),
-            @ApiImplicitParam(name = "dueBefore", dataType = "string", value = "Only return jobs which are due to be executed before the given date. Jobs without duedate are never returned using this parameter.", paramType = "query"),
-            @ApiImplicitParam(name = "dueAfter", dataType = "string", value = "Only return jobs which are due to be executed after the given date. Jobs without duedate are never returned using this parameter.", paramType = "query"),
+            @ApiImplicitParam(name = "dueBefore", dataType = "string", format="date-time", value = "Only return jobs which are due to be executed before the given date. Jobs without duedate are never returned using this parameter.", paramType = "query"),
+            @ApiImplicitParam(name = "dueAfter", dataType = "string", format="date-time", value = "Only return jobs which are due to be executed after the given date. Jobs without duedate are never returned using this parameter.", paramType = "query"),
             @ApiImplicitParam(name = "exceptionMessage", dataType = "string", value = "Only return jobs with the given exception message", paramType = "query"),
             @ApiImplicitParam(name = "tenantId", dataType = "string", value = "Only return jobs with the given tenantId.", paramType = "query"),
             @ApiImplicitParam(name = "tenantIdLike", dataType = "string", value = "Only return jobs with a tenantId like the given value.", paramType = "query"),
@@ -77,8 +74,8 @@ public class SuspendedJobCollectionResource {
             @ApiResponse(code = 200, message = "Indicates the requested jobs were returned."),
             @ApiResponse(code = 400, message = "Indicates an illegal value has been used in a url query parameter or the both 'messagesOnly' and 'timersOnly' are used as parameters. Status description contains additional details about the error.")
     })
-    @RequestMapping(value = "/management/suspended-jobs", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getJobs(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    @GetMapping(value = "/management/suspended-jobs", produces = "application/json")
+    public DataResponse<JobResponse> getJobs(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         SuspendedJobQuery query = managementService.createSuspendedJobQuery();
 
         if (allRequestParams.containsKey("id")) {

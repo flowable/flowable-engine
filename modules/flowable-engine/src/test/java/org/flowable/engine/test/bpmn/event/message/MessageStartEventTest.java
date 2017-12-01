@@ -22,7 +22,6 @@ import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.EventSubscriptionQuery;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -109,7 +108,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
 
         assertFalse(processInstance.isEnded());
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
 
         taskService.complete(task.getId());
@@ -156,7 +155,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
 
         assertFalse(processInstance.isEnded());
 
-        Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterNoneStart").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterNoneStart").singleResult();
         assertNotNull(task);
 
         taskService.complete(task.getId());
@@ -187,7 +186,7 @@ public class MessageStartEventTest extends PluggableFlowableTestCase {
 
         assertFalse(processInstance.isEnded());
 
-        Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterMessageStart").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskDefinitionKey("taskAfterMessageStart").singleResult();
         assertNotNull(task);
 
         taskService.complete(task.getId());

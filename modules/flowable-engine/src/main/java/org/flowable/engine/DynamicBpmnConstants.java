@@ -35,6 +35,8 @@ public interface DynamicBpmnConstants {
     String USER_TASK_OWNER = "userTaskOwner";
     String USER_TASK_CANDIDATE_USERS = "userTaskCandidateUsers";
     String USER_TASK_CANDIDATE_GROUPS = "userTaskCandidateGroups";
+    
+    String MULTI_INSTANCE_COMPLETION_CONDITION = "multiInstanceCompletionCondition";
 
     String DMN_TASK_DECISION_TABLE_KEY = "dmnTaskDecisionTableKey";
 

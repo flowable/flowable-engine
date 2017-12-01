@@ -15,6 +15,7 @@ package org.flowable.engine.impl;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.AbstractNativeQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -35,10 +36,12 @@ public class NativeExecutionQueryImpl extends AbstractNativeQuery<NativeExecutio
 
     // results ////////////////////////////////////////////////////////////////
 
+    @Override
     public List<Execution> executeList(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getExecutionEntityManager(commandContext).findExecutionsByNativeQuery(parameterMap);
     }
 
+    @Override
     public long executeCount(CommandContext commandContext, Map<String, Object> parameterMap) {
         return CommandContextUtil.getExecutionEntityManager(commandContext).findExecutionCountByNativeQuery(parameterMap);
     }

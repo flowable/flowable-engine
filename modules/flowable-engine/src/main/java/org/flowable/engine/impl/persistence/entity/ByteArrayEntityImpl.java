@@ -35,32 +35,39 @@ public class ByteArrayEntityImpl extends AbstractEntity implements ByteArrayEnti
 
     }
 
+    @Override
     public byte[] getBytes() {
         return bytes;
     }
 
+    @Override
     public Object getPersistentState() {
         return new PersistentState(name, bytes);
     }
 
     // getters and setters ////////////////////////////////////////////////////////
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public String getDeploymentId() {
         return deploymentId;
     }
 
+    @Override
     public void setDeploymentId(String deploymentId) {
         this.deploymentId = deploymentId;
     }
 
+    @Override
     public void setBytes(byte[] bytes) {
         this.bytes = bytes;
     }
@@ -82,6 +89,7 @@ public class ByteArrayEntityImpl extends AbstractEntity implements ByteArrayEnti
             this.bytes = bytes;
         }
 
+        @Override
         public boolean equals(Object obj) {
             if (obj instanceof PersistentState) {
                 PersistentState other = (PersistentState) obj;

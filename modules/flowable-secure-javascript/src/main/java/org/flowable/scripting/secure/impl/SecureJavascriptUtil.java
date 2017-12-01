@@ -12,7 +12,7 @@
  */
 package org.flowable.scripting.secure.impl;
 
-import org.flowable.engine.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 

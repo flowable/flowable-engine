@@ -13,18 +13,16 @@
 
 package org.flowable.rest.service.api.runtime.task;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.swagger.annotations.ApiModelProperty;
+import org.flowable.rest.service.api.engine.variable.RestVariable;
+import org.flowable.rest.util.DateToStringSerializer;
+import org.flowable.task.api.DelegationState;
+import org.flowable.task.api.Task;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import org.flowable.engine.task.DelegationState;
-import org.flowable.engine.task.Task;
-import org.flowable.rest.service.api.engine.variable.RestVariable;
-import org.flowable.rest.util.DateToStringSerializer;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-
-import io.swagger.annotations.ApiModelProperty;
 
 /**
  * @author Frederik Heremans
@@ -90,6 +88,7 @@ public class TaskResponse {
         return result;
     }
 
+    @ApiModelProperty(example = "8")
     public String getId() {
         return id;
     }
@@ -98,6 +97,7 @@ public class TaskResponse {
         this.id = id;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/runtime/tasks/8")
     public String getUrl() {
         return url;
     }
@@ -106,6 +106,7 @@ public class TaskResponse {
         this.url = url;
     }
 
+    @ApiModelProperty(example = "owner")
     public String getOwner() {
         return owner;
     }
@@ -114,6 +115,7 @@ public class TaskResponse {
         this.owner = owner;
     }
 
+    @ApiModelProperty(example = "kermit")
     public String getAssignee() {
         return assignee;
     }
@@ -122,7 +124,7 @@ public class TaskResponse {
         this.assignee = assignee;
     }
 
-    @ApiModelProperty(value = "Delegation-state of the task, can be null, \"pending\" or \"resolved\".")
+    @ApiModelProperty(example = "pending", value = "Delegation-state of the task, can be null, \"pending\" or \"resolved\".")
     public String getDelegationState() {
         return delegationState;
     }
@@ -131,6 +133,7 @@ public class TaskResponse {
         this.delegationState = delegationState;
     }
 
+    @ApiModelProperty(example = "My task")
     public String getName() {
         return name;
     }
@@ -139,6 +142,7 @@ public class TaskResponse {
         this.name = name;
     }
 
+    @ApiModelProperty(example = "Task description")
     public String getDescription() {
         return description;
     }
@@ -147,6 +151,7 @@ public class TaskResponse {
         this.description = description;
     }
 
+    @ApiModelProperty(example = "2013-04-17T10:17:43.902+0000")
     public Date getCreateTime() {
         return createTime;
     }
@@ -155,6 +160,7 @@ public class TaskResponse {
         this.createTime = createTime;
     }
 
+    @ApiModelProperty(example = "2013-04-17T10:17:43.902+0000")
     public Date getDueDate() {
         return dueDate;
     }
@@ -163,6 +169,7 @@ public class TaskResponse {
         this.dueDate = dueDate;
     }
 
+    @ApiModelProperty(example = "50")
     public int getPriority() {
         return priority;
     }
@@ -179,6 +186,7 @@ public class TaskResponse {
         this.suspended = suspended;
     }
 
+    @ApiModelProperty(example = "theTask")
     public String getTaskDefinitionKey() {
         return taskDefinitionKey;
     }
@@ -187,6 +195,7 @@ public class TaskResponse {
         this.taskDefinitionKey = taskDefinitionKey;
     }
 
+    @ApiModelProperty(example = "null")
     public String getParentTaskId() {
         return parentTaskId;
     }
@@ -195,6 +204,7 @@ public class TaskResponse {
         this.parentTaskId = parentTaskId;
     }
 
+    @ApiModelProperty(example = "null")
     public String getParentTaskUrl() {
         return parentTaskUrl;
     }
@@ -203,6 +213,7 @@ public class TaskResponse {
         this.parentTaskUrl = parentTaskUrl;
     }
 
+    @ApiModelProperty(example = "5")
     public String getExecutionId() {
         return executionId;
     }
@@ -211,6 +222,7 @@ public class TaskResponse {
         this.executionId = executionId;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/runtime/executions/5")
     public String getExecutionUrl() {
         return executionUrl;
     }
@@ -219,6 +231,7 @@ public class TaskResponse {
         this.category = category;
     }
 
+    @ApiModelProperty(example = "ExampleCategory")
     public String getCategory() {
         return category;
     }
@@ -227,6 +240,7 @@ public class TaskResponse {
         this.executionUrl = executionUrl;
     }
 
+    @ApiModelProperty(example = "5")
     public String getProcessInstanceId() {
         return processInstanceId;
     }
@@ -235,6 +249,7 @@ public class TaskResponse {
         this.processInstanceId = processInstanceId;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/runtime/process-instances/5")
     public String getProcessInstanceUrl() {
         return processInstanceUrl;
     }
@@ -243,6 +258,7 @@ public class TaskResponse {
         this.processInstanceUrl = processInstanceUrl;
     }
 
+    @ApiModelProperty(example = "oneTaskProcess%3A1%3A4")
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
@@ -251,6 +267,7 @@ public class TaskResponse {
         this.processDefinitionId = processDefinitionId;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/runtime/process-definitions/oneTaskProcess%3A1%3A4")
     public String getProcessDefinitionUrl() {
         return processDefinitionUrl;
     }
@@ -271,6 +288,7 @@ public class TaskResponse {
         variables.add(variable);
     }
 
+    @ApiModelProperty(example = "null")
     public String getTenantId() {
         return tenantId;
     }

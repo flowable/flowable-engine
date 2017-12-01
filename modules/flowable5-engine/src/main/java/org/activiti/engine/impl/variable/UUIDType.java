@@ -14,8 +14,8 @@ package org.activiti.engine.impl.variable;
 
 import java.util.UUID;
 
-import org.flowable.engine.impl.variable.ValueFields;
-import org.flowable.engine.impl.variable.VariableType;
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * @author Birger Zimmermann
@@ -24,14 +24,17 @@ public class UUIDType implements VariableType {
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public String getTypeName() {
         return "uuid";
     }
 
+    @Override
     public boolean isCachable() {
         return true;
     }
 
+    @Override
     public Object getValue(ValueFields valueFields) {
         String textValue = valueFields.getTextValue();
         if (textValue == null)
@@ -39,6 +42,7 @@ public class UUIDType implements VariableType {
         return UUID.fromString(textValue);
     }
 
+    @Override
     public void setValue(Object value, ValueFields valueFields) {
         if (value != null) {
             valueFields.setTextValue(value.toString());
@@ -47,6 +51,7 @@ public class UUIDType implements VariableType {
         }
     }
 
+    @Override
     public boolean isAbleToStore(Object value) {
         if (value == null) {
             return true;

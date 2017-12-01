@@ -15,7 +15,7 @@ package org.activiti.engine.impl.bpmn.listener;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * An {@link ExecutionListener} that evaluates a {@link Expression} when notified.
@@ -30,6 +30,7 @@ public class ExpressionExecutionListener implements ExecutionListener {
         this.expression = expression;
     }
 
+    @Override
     public void notify(DelegateExecution execution) {
         // Return value of expression is ignored
         expression.getValue(execution);

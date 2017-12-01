@@ -12,13 +12,13 @@
  */
 package org.activiti.engine.impl.variable;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.flowable.engine.impl.variable.ValueFields;
-import org.flowable.engine.impl.variable.VariableType;
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.api.types.VariableType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers
@@ -35,14 +35,17 @@ public class JsonType implements VariableType {
         this.objectMapper = objectMapper;
     }
 
+    @Override
     public String getTypeName() {
         return "json";
     }
 
+    @Override
     public boolean isCachable() {
         return true;
     }
 
+    @Override
     public Object getValue(ValueFields valueFields) {
         JsonNode jsonValue = null;
         if (valueFields.getTextValue() != null && valueFields.getTextValue().length() > 0) {
@@ -55,10 +58,12 @@ public class JsonType implements VariableType {
         return jsonValue;
     }
 
+    @Override
     public void setValue(Object value, ValueFields valueFields) {
         valueFields.setTextValue(value != null ? value.toString() : null);
     }
 
+    @Override
     public boolean isAbleToStore(Object value) {
         if (value == null) {
             return true;

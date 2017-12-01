@@ -12,10 +12,10 @@
  */
 package org.flowable.engine.test.bpmn.exclusive;
 
-import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
 /**
  * 

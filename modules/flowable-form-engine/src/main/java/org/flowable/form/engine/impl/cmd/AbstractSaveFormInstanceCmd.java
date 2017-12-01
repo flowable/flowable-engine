@@ -41,21 +41,46 @@ public abstract class AbstractSaveFormInstanceCmd implements Command<FormInstanc
     protected Map<String, Object> variables;
     protected String taskId;
     protected String processInstanceId;
+    protected String processDefinitionId;
+    protected String scopeId;
+    protected String scopeType;
+    protected String scopeDefinitionId;
 
-    public AbstractSaveFormInstanceCmd(FormModel formModel, Map<String, Object> variables, String taskId, String processInstanceId) {
+    public AbstractSaveFormInstanceCmd(FormModel formModel, Map<String, Object> variables, String taskId, String processInstanceId, String processDefinitionId) {
         this.formModel = formModel;
         this.variables = variables;
         this.taskId = taskId;
         this.processInstanceId = processInstanceId;
+        this.processDefinitionId = processDefinitionId;
     }
 
-    public AbstractSaveFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String processInstanceId) {
+    public AbstractSaveFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String processInstanceId, String processDefinitionId) {
         this.formModelId = formModelId;
         this.variables = variables;
         this.taskId = taskId;
         this.processInstanceId = processInstanceId;
+        this.processDefinitionId = processDefinitionId;
+    }
+    
+    public AbstractSaveFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String scopeId, String scopeType, String scopeDefinitionId) {
+        this.formModelId = formModelId;
+        this.variables = variables;
+        this.taskId = taskId;
+        this.scopeId = scopeId;
+        this.scopeType = scopeType;
+        this.scopeDefinitionId = scopeDefinitionId;
+    }
+    
+    public AbstractSaveFormInstanceCmd(FormModel formModel, Map<String, Object> variables, String taskId, String scopeId, String scopeType, String scopeDefinitionId) {
+        this.formModel = formModel;
+        this.variables = variables;
+        this.taskId = taskId;
+        this.scopeId = scopeId;
+        this.scopeType = scopeType;
+        this.scopeDefinitionId = scopeDefinitionId;
     }
 
+    @Override
     public FormInstance execute(CommandContext commandContext) {
 
         if (formModel == null) {
@@ -123,7 +148,17 @@ public abstract class AbstractSaveFormInstanceCmd implements Command<FormInstanc
 
         formInstanceEntity.setFormDefinitionId(formModel.getId());
         formInstanceEntity.setTaskId(taskId);
-        formInstanceEntity.setProcessInstanceId(processInstanceId);
+        
+        if (processInstanceId != null) {
+            formInstanceEntity.setProcessInstanceId(processInstanceId);
+            formInstanceEntity.setProcessDefinitionId(processDefinitionId);
+            
+        } else {
+            formInstanceEntity.setScopeId(scopeId);
+            formInstanceEntity.setScopeType(scopeType);
+            formInstanceEntity.setScopeDefinitionId(scopeDefinitionId);
+        }
+        
         formInstanceEntity.setSubmittedDate(new Date());
         try {
             formInstanceEntity.setFormValueBytes(objectMapper.writeValueAsBytes(submittedFormValuesJson));

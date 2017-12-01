@@ -27,10 +27,12 @@ import org.activiti.engine.impl.pvm.process.TransitionImpl;
  */
 public interface InterpretableExecution extends ActivityExecution, ExecutionListenerExecution, PvmProcessInstance {
 
+    @Override
     void take(PvmTransition transition);
 
     void take(PvmTransition transition, boolean fireActivityCompletedEvent);
 
+    @Override
     void setEventName(String eventName);
 
     void setEventSource(PvmProcessElement element);
@@ -45,6 +47,7 @@ public interface InterpretableExecution extends ActivityExecution, ExecutionList
 
     void performOperation(AtomicOperation atomicOperation);
 
+    @Override
     boolean isScope();
 
     void destroy();
@@ -61,6 +64,7 @@ public interface InterpretableExecution extends ActivityExecution, ExecutionList
 
     InterpretableExecution getSuperExecution();
 
+    @Override
     void deleteCascade(String deleteReason);
 
     boolean isDeleteRoot();

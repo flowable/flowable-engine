@@ -23,6 +23,7 @@ import org.flowable.idm.engine.impl.util.CommandContextUtil;
  */
 public final class SchemaOperationsIdmEngineBuild implements Command<Object> {
 
+    @Override
     public Object execute(CommandContext commandContext) {
         IdmDbSchemaManager idmDbSchemaManager = (IdmDbSchemaManager) CommandContextUtil.getIdmEngineConfiguration(commandContext).getDbSchemaManager();
         idmDbSchemaManager.performSchemaOperationsIdmEngineBuild();

@@ -20,20 +20,21 @@ import org.flowable.bpmn.model.FlowNode;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.logging.LogMDC;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.api.Job;
+import org.flowable.job.service.JobService;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,8 +160,22 @@ public class ContinueProcessOperation extends AbstractOperation {
     }
 
     protected void executeAsynchronous(FlowNode flowNode) {
-        JobEntity job = CommandContextUtil.getJobManager(commandContext).createAsyncJob(execution, flowNode.isExclusive());
-        CommandContextUtil.getJobManager(commandContext).scheduleAsyncJob(job);
+        JobService jobService = CommandContextUtil.getJobService(commandContext);
+        
+        JobEntity job = jobService.createJob();
+        job.setExecutionId(execution.getId());
+        job.setProcessInstanceId(execution.getProcessInstanceId());
+        job.setProcessDefinitionId(execution.getProcessDefinitionId());
+
+        // Inherit tenant id (if applicable)
+        if (execution.getTenantId() != null) {
+            job.setTenantId(execution.getTenantId());
+        }
+        
+        execution.getJobs().add(job);
+        
+        jobService.createAsyncJob(job, flowNode.isExclusive());
+        jobService.scheduleAsyncJob(job);
     }
 
     protected void executeMultiInstanceSynchronous(FlowNode flowNode) {
@@ -224,9 +239,17 @@ public class ContinueProcessOperation extends AbstractOperation {
 
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
         if (processEngineConfiguration != null && processEngineConfiguration.getEventDispatcher().isEnabled()) {
-            processEngineConfiguration.getEventDispatcher().dispatchEvent(
-                    FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, flowNode.getId(), flowNode.getName(), execution.getId(),
-                            execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
+
+            if (flowNode instanceof Activity && ((Activity) flowNode).hasMultiInstanceLoopCharacteristics()) {
+                processEngineConfiguration.getEventDispatcher().dispatchEvent(
+                        FlowableEventBuilder.createMultiInstanceActivityEvent(FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_STARTED, flowNode.getId(),
+                                flowNode.getName(), execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
+            }
+            else {
+                processEngineConfiguration.getEventDispatcher().dispatchEvent(
+                        FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_STARTED, flowNode.getId(), flowNode.getName(), execution.getId(),
+                                execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
+            }
         }
 
         try {

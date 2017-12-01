@@ -13,11 +13,10 @@
 
 package org.flowable.engine.test.history;
 
-import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 /**
  * @author Frederik Heremans
@@ -28,7 +27,7 @@ public class HistoricTaskInstanceUpdateTest extends PluggableFlowableTestCase {
     public void testHistoricTaskInstanceUpdate() {
         runtimeService.startProcessInstanceByKey("HistoricTaskInstanceTest").getId();
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
         // Update and save the task's fields before it is finished
         task.setPriority(12345);

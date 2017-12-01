@@ -15,9 +15,9 @@ package org.flowable.spring.test.expression;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
+import org.flowable.task.api.Task;
 import org.springframework.test.context.ContextConfiguration;
 
 /**

@@ -297,6 +297,8 @@
       "CREATE-TITLE":"Criar uma nova tabela de decisão",
       "CREATE-DESCRIPTION":"Você precisa dar um nome para a nova tabela de decisão, e você pode querer adicionar uma descrição ao mesmo tempo.",
       "SAVE-DESCRIPTION":"Você precisa dar um nome e uma chave exclusiva para a nova tabela de decisão, e você pode querer adicionar uma descrição ao mesmo tempo.",
+      "DUPLICATE-TITLE":"Duplicar uma tabela de decisão",
+      "DUPLICATE-DESCRIPTION":"Você pode dar um nome para a tabela de decisão, e pode querer alterar a descrição ao mesmo tempo.",
       "DELETE-TITLE":"Excluir a tabela de decisão",
       "DELETE-DESCRIPTION":"Tem certeza que deseja excluir a tabela de decisão \"{{name}}\"?",
       "SAVE-DECISION-TABLE-TITLE":"Salvar a tabela de decisão",

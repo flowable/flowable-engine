@@ -14,7 +14,7 @@ package org.activiti.engine.task;
 
 import java.util.Date;
 
-import org.flowable.engine.task.DelegationState;
+import org.flowable.task.api.DelegationState;
 
 /**
  * Represents one task for a human user.

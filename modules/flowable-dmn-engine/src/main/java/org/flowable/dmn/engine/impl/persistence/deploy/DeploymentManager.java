@@ -26,6 +26,7 @@ import org.flowable.dmn.engine.impl.persistence.entity.DmnResourceEntity;
 import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 
 /**
  * @author Tijs Rademakers
@@ -99,7 +100,7 @@ public class DeploymentManager {
 
         if (decisionTable == null) {
             throw new FlowableObjectNotFoundException("no decisions deployed with key '" + decisionTableKey +
-                    "' for parent deployment id '" + parentDeploymentId + "'");
+                            "' for parent deployment id '" + parentDeploymentId + "'");
         }
         decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
         return decisionTable;
@@ -113,7 +114,7 @@ public class DeploymentManager {
 
         if (decisionTable == null) {
             throw new FlowableObjectNotFoundException("no decisions deployed with key '" + decisionTableKey +
-                    "' for parent deployment id '" + parentDeploymentId + "' and tenant identifier " + tenantId);
+                            "' for parent deployment id '" + parentDeploymentId + "' and tenant identifier " + tenantId);
         }
         decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
         return decisionTable;

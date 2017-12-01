@@ -19,7 +19,6 @@ import java.util.Map;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -35,7 +34,7 @@ public class ConditionalSequenceFlowTest extends PluggableFlowableTestCase {
         Map<String, Object> variables = CollectionUtil.singletonMap("input", "right");
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("condSeqFlowUelExpr", variables);
 
-        Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
 
         assertEquals("task right", task.getName());
     }
@@ -49,7 +48,7 @@ public class ConditionalSequenceFlowTest extends PluggableFlowableTestCase {
         variables.put("skipRight", false);
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("testSkipExpression", variables);
 
-        Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
 
         assertEquals("task left", task.getName());
     }
@@ -59,7 +58,7 @@ public class ConditionalSequenceFlowTest extends PluggableFlowableTestCase {
         Map<String, Object> variables = CollectionUtil.singletonMap("input", "right");
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("condSeqFlowUelExpr", variables);
 
-        Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
 
         assertEquals("task not left", task.getName());
         taskService.complete(task.getId());

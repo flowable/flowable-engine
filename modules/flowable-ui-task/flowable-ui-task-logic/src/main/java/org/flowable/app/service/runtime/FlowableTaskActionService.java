@@ -12,11 +12,10 @@
  */
 package org.flowable.app.service.runtime;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.model.common.UserRepresentation;
 import org.flowable.app.model.runtime.TaskRepresentation;
 import org.flowable.app.security.SecurityUtils;
@@ -25,16 +24,18 @@ import org.flowable.app.service.exception.BadRequestException;
 import org.flowable.app.service.exception.NotFoundException;
 import org.flowable.app.service.exception.NotPermittedException;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.history.HistoricIdentityLink;
-import org.flowable.engine.task.IdentityLink;
-import org.flowable.engine.task.IdentityLinkType;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskInfo;
+import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.idm.api.User;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
@@ -54,13 +55,18 @@ public class FlowableTaskActionService extends FlowableAbstractTaskService {
         }
 
         if (!permissionService.isTaskOwnerOrAssignee(currentUser, task)) {
-            if (!permissionService.validateIfUserIsInitiatorAndCanCompleteTask(currentUser, task)) {
+            if (StringUtils.isEmpty(task.getScopeType()) && !permissionService.validateIfUserIsInitiatorAndCanCompleteTask(currentUser, task)) {
                 throw new NotPermittedException();
             }
         }
 
         try {
-            taskService.complete(task.getId());
+            if (StringUtils.isEmpty(task.getScopeType())) {
+                taskService.complete(task.getId());
+            } else {
+                cmmnTaskService.complete(task.getId());
+            }
+            
         } catch (FlowableException e) {
             LOGGER.error("Error completing task {}", taskId, e);
             throw new BadRequestException("Task " + taskId + " can't be completed", e);
@@ -225,7 +231,7 @@ public class FlowableTaskActionService extends FlowableAbstractTaskService {
 
     protected List<UserRepresentation> getInvolvedUsers(String taskId) {
         List<HistoricIdentityLink> idLinks = historyService.getHistoricIdentityLinksForTask(taskId);
-        List<UserRepresentation> result = new ArrayList<UserRepresentation>(idLinks.size());
+        List<UserRepresentation> result = new ArrayList<>(idLinks.size());
 
         for (HistoricIdentityLink link : idLinks) {
             // Only include users and non-assignee links

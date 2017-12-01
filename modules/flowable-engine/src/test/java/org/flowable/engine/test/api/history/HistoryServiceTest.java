@@ -28,15 +28,14 @@ import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.history.HistoricTaskInstanceQuery;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskQuery;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.api.runtime.ProcessInstanceQueryTest;
+import org.flowable.task.api.TaskQuery;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -57,7 +56,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertEquals(1, historyService.createHistoricProcessInstanceQuery().count());
 
         // Complete the task and check if the size is count 1
-        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(1, tasks.size());
         taskService.complete(tasks.get(0).getId());
         
@@ -72,7 +71,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertEquals(0, historyService.createHistoricProcessInstanceQuery().count());
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 
-        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(1, tasks.size());
         taskService.complete(tasks.get(0).getId());
 
@@ -106,7 +105,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertEquals("johndoe", historicProcessInstance.getStartUserId());
         assertEquals("theStart", historicProcessInstance.getStartActivityId());
 
-        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(1, tasks.size());
         taskService.complete(tasks.get(0).getId());
         
@@ -121,11 +120,11 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         // After the process has started, the 'verify credit history' task should be active
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("orderProcess");
         TaskQuery taskQuery = taskService.createTaskQuery();
-        Task verifyCreditTask = taskQuery.singleResult();
+        org.flowable.task.api.Task verifyCreditTask = taskQuery.singleResult();
 
         // Completing the task with approval, will end the subprocess and continue the original process
         taskService.complete(verifyCreditTask.getId(), CollectionUtil.singletonMap("creditApproved", true));
-        Task prepareAndShipTask = taskQuery.singleResult();
+        org.flowable.task.api.Task prepareAndShipTask = taskQuery.singleResult();
         assertEquals("Prepare and Ship", prepareAndShipTask.getName());
         
         HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, managementService, 5000, 200);
@@ -166,7 +165,7 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         assertEquals("theStart", historicProcessInstance.getStartActivityId());
 
         // now complete the task to end the process instance
-        Task task = taskService.createTaskQuery().processDefinitionKey("checkCreditProcess").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processDefinitionKey("checkCreditProcess").singleResult();
         Map<String, Object> map = new HashMap<>();
         map.put("creditApproved", true);
         taskService.complete(task.getId(), map);
@@ -544,8 +543,8 @@ public class HistoryServiceTest extends PluggableFlowableTestCase {
         vars.put("rootValue", "test");
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("concurrent", vars);
 
-        List<Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
-        for (Task task : tasks) {
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(pi.getId()).list();
+        for (org.flowable.task.api.Task task : tasks) {
             Map<String, Object> variables = new HashMap<>();
             // set token local variable
             LOGGER.debug("setting variables on task {}, execution {}", task.getId(), task.getExecutionId());

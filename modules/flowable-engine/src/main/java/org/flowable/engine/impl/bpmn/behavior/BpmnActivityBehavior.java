@@ -14,12 +14,12 @@
 package org.flowable.engine.impl.bpmn.behavior;
 
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

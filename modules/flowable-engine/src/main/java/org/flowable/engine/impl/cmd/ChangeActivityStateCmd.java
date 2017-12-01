@@ -13,20 +13,13 @@
 
 package org.flowable.engine.impl.cmd;
 
-import java.util.List;
-
-import org.flowable.bpmn.model.BpmnModel;
-import org.flowable.bpmn.model.FlowElement;
-import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.dynamic.DynamicStateManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.impl.util.Flowable5Util;
-import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 
 /**
  * @author Tijs Rademakers
@@ -34,74 +27,37 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 public class ChangeActivityStateCmd implements Command<Void> {
 
     protected final String processInstanceId;
+    protected final String executionId;
     protected final String cancelActivityId;
     protected final String startActivityId;
 
     public ChangeActivityStateCmd(ChangeActivityStateBuilderImpl changeActivityStateBuilder) {
         this.processInstanceId = changeActivityStateBuilder.getProcessInstanceId();
+        this.executionId = changeActivityStateBuilder.getExecutionId();
         this.cancelActivityId = changeActivityStateBuilder.getCancelActivityId();
         this.startActivityId = changeActivityStateBuilder.getStartActivityId();
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
-        if (processInstanceId == null) {
-            throw new FlowableIllegalArgumentException("Process instance id is required");
+        if (processInstanceId == null && executionId == null) {
+            throw new FlowableIllegalArgumentException("Process instance id or execution id is required");
+        }
+        
+        DynamicStateManager dynamicStateManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDynamicStateManager();
+
+        String fromActivityId = null;
+        ExecutionEntity execution = null;
+        if (executionId != null) {
+            execution = dynamicStateManager.resolveActiveExecution(executionId, commandContext);
+            fromActivityId = execution.getCurrentFlowElement().getId();
+            
+        } else {
+            execution = dynamicStateManager.resolveActiveExecution(processInstanceId, cancelActivityId, commandContext);
+            fromActivityId = cancelActivityId;
         }
 
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-        ExecutionEntity execution = executionEntityManager.findById(processInstanceId);
-
-        if (execution == null) {
-            throw new FlowableException("Execution could not be found with id " + processInstanceId);
-        }
-
-        if (!execution.isProcessInstanceType()) {
-            throw new FlowableException("Execution is not a process instance type execution for id " + processInstanceId);
-        }
-
-        if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, execution.getProcessDefinitionId())) {
-            throw new FlowableException("Flowable 5 process definitions are not supported");
-        }
-
-        ExecutionEntity activeExecutionEntity = null;
-        List<ExecutionEntity> childExecutions = executionEntityManager.findChildExecutionsByProcessInstanceId(execution.getId());
-        for (ExecutionEntity childExecution : childExecutions) {
-            if (childExecution.getCurrentActivityId().equals(cancelActivityId)) {
-                activeExecutionEntity = childExecution;
-            }
-        }
-
-        if (activeExecutionEntity == null) {
-            throw new FlowableException("Active execution could not be found with activity id " + cancelActivityId);
-        }
-
-        BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(execution.getProcessDefinitionId());
-        FlowElement cancelActivityElement = bpmnModel.getFlowElement(cancelActivityId);
-        FlowElement startActivityElement = bpmnModel.getFlowElement(startActivityId);
-
-        if (startActivityElement == null) {
-            throw new FlowableException("Activity could not be found in process definition for id " + startActivityId);
-        }
-
-        boolean deleteParentExecution = false;
-        ExecutionEntity parentExecution = activeExecutionEntity.getParent();
-        if (cancelActivityElement.getSubProcess() != null) {
-            if (startActivityElement.getSubProcess() == null ||
-                    !startActivityElement.getSubProcess().getId().equals(parentExecution.getActivityId())) {
-
-                deleteParentExecution = true;
-            }
-        }
-
-        executionEntityManager.deleteExecutionAndRelatedData(activeExecutionEntity, "Change activity to " + startActivityId);
-
-        if (deleteParentExecution) {
-            executionEntityManager.deleteExecutionAndRelatedData(parentExecution, "Change activity to " + startActivityId);
-        }
-
-        ExecutionEntity newChildExecution = executionEntityManager.createChildExecution(execution);
-        newChildExecution.setCurrentFlowElement(startActivityElement);
-        CommandContextUtil.getAgenda().planContinueProcessOperation(newChildExecution);
+        dynamicStateManager.moveExecutionState(execution, fromActivityId, startActivityId, commandContext);
 
         return null;
     }

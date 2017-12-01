@@ -12,8 +12,6 @@
  */
 package org.flowable.app.conf;
 
-import com.mchange.v2.c3p0.ComboPooledDataSource;
-
 import java.beans.PropertyVetoException;
 
 import javax.sql.DataSource;
@@ -30,6 +28,8 @@ import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import com.mchange.v2.c3p0.ComboPooledDataSource;
 
 @Configuration
 @EnableTransactionManagement
@@ -64,49 +64,28 @@ public class DatabaseConfiguration {
             String dataSourceUsername = env.getProperty("datasource.username", "sa");
             String dataSourcePassword = env.getProperty("datasource.password", "");
 
-            Integer minPoolSize = env.getProperty("datasource.min-pool-size", Integer.class);
-            if (minPoolSize == null) {
-                minPoolSize = 10;
-            }
+            Integer minPoolSize = env.getProperty("datasource.min-pool-size", Integer.class, 10);
 
-            Integer maxPoolSize = env.getProperty("datasource.max-pool-size", Integer.class);
-            if (maxPoolSize == null) {
-                maxPoolSize = 100;
-            }
+            Integer maxPoolSize = env.getProperty("datasource.max-pool-size", Integer.class, 100);
 
-            Integer acquireIncrement = env.getProperty("datasource.acquire-increment", Integer.class);
-            if (acquireIncrement == null) {
-                acquireIncrement = 5;
-            }
+            Integer acquireIncrement = env.getProperty("datasource.acquire-increment", Integer.class, 5);
 
             String preferredTestQuery = env.getProperty("datasource.preferred-test-query");
 
-            Boolean testConnectionOnCheckin = env.getProperty("datasource.test-connection-on-checkin", Boolean.class);
-            if (testConnectionOnCheckin == null) {
-                testConnectionOnCheckin = true;
-            }
+            Boolean testConnectionOnCheckin = env.getProperty("datasource.test-connection-on-checkin", Boolean.class, true);
 
-            Boolean testConnectionOnCheckOut = env.getProperty("datasource.test-connection-on-checkout", Boolean.class);
-            if (testConnectionOnCheckOut == null) {
-                testConnectionOnCheckOut = true;
-            }
+            Boolean testConnectionOnCheckOut = env.getProperty("datasource.test-connection-on-checkout", Boolean.class, true);
 
-            Integer maxIdleTime = env.getProperty("datasource.max-idle-time", Integer.class);
-            if (maxIdleTime == null) {
-                maxIdleTime = 1800;
-            }
+            Integer maxIdleTime = env.getProperty("datasource.max-idle-time", Integer.class, 1800);
 
-            Integer maxIdleTimeExcessConnections = env.getProperty("datasource.max-idle-time-excess-connections", Integer.class);
-            if (maxIdleTimeExcessConnections == null) {
-                maxIdleTimeExcessConnections = 1800;
-            }
+            Integer maxIdleTimeExcessConnections = env.getProperty("datasource.max-idle-time-excess-connections", Integer.class, 1800);
 
             if (LOGGER.isInfoEnabled()) {
                 LOGGER.info("Configuring Datasource with following properties (omitted password for security)");
-                LOGGER.info("datasource driver : {}", dataSourceDriver);
-                LOGGER.info("datasource url : {}", dataSourceUrl);
-                LOGGER.info("datasource user name : {}", dataSourceUsername);
-                LOGGER.info("Min pool size | Max pool size | acquire increment : {} | {} | {}", minPoolSize, maxPoolSize, acquireIncrement);
+                LOGGER.info("Datasource driver: {}", dataSourceDriver);
+                LOGGER.info("Datasource url: {}", dataSourceUrl);
+                LOGGER.info("Datasource user name: {}", dataSourceUsername);
+                LOGGER.info("Min pool size | Max pool size | Acquire increment: {} | {} | {}", minPoolSize, maxPoolSize, acquireIncrement);
             }
 
             ComboPooledDataSource ds = new ComboPooledDataSource();
@@ -124,6 +103,7 @@ public class DatabaseConfiguration {
 
             // Pool config: see http://www.mchange.com/projects/c3p0/#configuration
             ds.setMinPoolSize(minPoolSize);
+            ds.setInitialPoolSize(minPoolSize);
             ds.setMaxPoolSize(maxPoolSize);
             ds.setAcquireIncrement(acquireIncrement);
             if (preferredTestQuery != null) {

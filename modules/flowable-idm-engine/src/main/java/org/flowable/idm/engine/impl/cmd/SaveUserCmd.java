@@ -12,6 +12,8 @@
  */
 package org.flowable.idm.engine.impl.cmd;
 
+import java.io.Serializable;
+
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -21,8 +23,6 @@ import org.flowable.idm.api.PasswordSalt;
 import org.flowable.idm.api.User;
 import org.flowable.idm.engine.impl.persistence.entity.UserEntity;
 import org.flowable.idm.engine.impl.util.CommandContextUtil;
-
-import java.io.Serializable;
 
 /**
  * @author Joram Barrez
@@ -37,6 +37,7 @@ public class SaveUserCmd implements Command<Void>, Serializable {
         this.user = user;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (user == null) {
             throw new FlowableIllegalArgumentException("user is null");

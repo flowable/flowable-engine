@@ -18,7 +18,7 @@ import java.util.List;
 import org.flowable.engine.delegate.BusinessRuleTaskDelegate;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.DelegateHelper;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 
 public class CustomBusinessRuleTask implements BusinessRuleTaskDelegate {
 

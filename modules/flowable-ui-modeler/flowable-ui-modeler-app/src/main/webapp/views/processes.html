@@ -67,7 +67,7 @@
                 </div>
             </div>
 			<div class="item fadein" ng-repeat="process in model.processes.data track by $index">
-				<div class="item-box" ng-style="{'background-image': 'url(\'' + config.contextRoot + '/app/rest/models/' + process.id + '/thumbnail?version=' + imageVersion + '\')'}" ng-click="showProcessDetails(process);">
+				<div class="item-box" ng-style="{'background-image': 'url(\'' + getModelThumbnailUrl(process.id, imageVersion) + '\')'}" ng-click="showProcessDetails(process);">
 					<div class="actions">
 						<span class="badge">v{{process.version}}</span>
 						<div class="btn-group pull-right">

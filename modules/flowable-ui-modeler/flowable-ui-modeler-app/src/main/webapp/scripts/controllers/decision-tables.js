@@ -84,7 +84,7 @@ angular.module('flowableModeler')
 		    params.filterText = $scope.model.filterText;
 		  }
 
-		  $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models', params: params}).
+		  $http({method: 'GET', url: FLOWABLE.APP_URL.getModelsUrl(), params: params}).
 		  	success(function(data, status, headers, config) {
 	    		$scope.model.decisionTables = data;
 	    		$scope.model.loading = false;
@@ -174,7 +174,7 @@ angular.module('flowableModeler')
 
         $scope.model.loading = true;
 
-        $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models', data: $scope.model.decisionTable}).
+        $http({method: 'POST', url: FLOWABLE.APP_URL.getModelsUrl(), data: $scope.model.decisionTable}).
             success(function(data, status, headers, config) {
                 $scope.$hide();
                 $scope.model.loading = false;
@@ -199,8 +199,8 @@ angular.module('flowableModeler')
 }]);
 
 angular.module('flowableModeler')
-	.controller('DuplicateDecisionTableCtrl', ['$rootScope', '$scope', '$http', 'EventTrackingService',
-		function ($rootScope, $scope, $http, EventTrackingService) {
+	.controller('DuplicateDecisionTableCtrl', ['$rootScope', '$scope', '$http',
+		function ($rootScope, $scope, $http) {
 
 			$scope.model = {
 				loading: false,
@@ -215,6 +215,7 @@ angular.module('flowableModeler')
 			if ($scope.originalModel) {
 				//clone the model
 				$scope.model.decisionTable.name = $scope.originalModel.decisionTable.name;
+				$scope.model.decisionTable.key = $scope.originalModel.decisionTable.key;
 				$scope.model.decisionTable.description = $scope.originalModel.decisionTable.description;
 				$scope.model.decisionTable.modelType = $scope.originalModel.decisionTable.modelType;
 				$scope.model.decisionTable.id = $scope.originalModel.decisionTable.id;
@@ -228,12 +229,10 @@ angular.module('flowableModeler')
 
 				$scope.model.loading = true;
 
-				$http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/'+$scope.model.decisionTable.id+'/clone', data: $scope.model.decisionTable}).
+				$http({method: 'POST', url: FLOWABLE.APP_URL.getCloneModelsUrl($scope.model.decisionTable.id), data: $scope.model.decisionTable}).
 					success(function(data, status, headers, config) {
 						$scope.$hide();
 						$scope.model.loading = false;
-
-                        EventTrackingService.trackEvent('editor', 'decision-table-model-created');
 
 						if ($scope.duplicateDecisionTableCallback) {
 							$scope.duplicateDecisionTableCallback(data);
@@ -243,7 +242,7 @@ angular.module('flowableModeler')
 					}).
 					error(function(data, status, headers, config) {
 						$scope.model.loading = false;
-						$scope.$hide();
+						$scope.model.errorMessage = data.message;
 					});
 			};
 
@@ -268,9 +267,9 @@ angular.module('flowableModeler')
 
           var url;
           if (isIE) {
-              url = FLOWABLE.CONFIG.contextRoot + '/app/rest/decision-table-models/import-decision-table-text';
+              url = FLOWABLE.APP_URL.getDecisionTableTextImportUrl();
           } else {
-              url = FLOWABLE.CONFIG.contextRoot + '/app/rest/decision-table-models/import-decision-table';
+              url = FLOWABLE.APP_URL.getDecisionTableImportUrl();
           }
 
           Upload.upload({

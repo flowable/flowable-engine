@@ -23,10 +23,10 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.form.TaskFormData;
 import org.flowable.engine.impl.form.FormEngine;
 import org.flowable.engine.impl.form.TaskFormHandler;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.FormHandlerUtil;
-import org.flowable.engine.task.Task;
+import org.flowable.task.api.Task;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Tom Baeyens
@@ -43,13 +43,14 @@ public class GetRenderedTaskFormCmd implements Command<Object>, Serializable {
         this.formEngineName = formEngineName;
     }
 
+    @Override
     public Object execute(CommandContext commandContext) {
 
         if (taskId == null) {
             throw new FlowableIllegalArgumentException("Task id should not be null");
         }
 
-        TaskEntity task = CommandContextUtil.getTaskEntityManager(commandContext).findById(taskId);
+        TaskEntity task = CommandContextUtil.getTaskService().getTask(taskId);
         if (task == null) {
             throw new FlowableObjectNotFoundException("Task '" + taskId + "' not found", Task.class);
         }

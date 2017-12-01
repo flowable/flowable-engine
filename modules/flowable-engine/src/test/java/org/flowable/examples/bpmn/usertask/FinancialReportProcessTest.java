@@ -16,11 +16,11 @@ import java.util.List;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 public class FinancialReportProcessTest extends PluggableFlowableTestCase {
 
+    @Override
     public void setUp() throws Exception {
         identityService.saveUser(identityService.newUser("fozzie"));
         identityService.saveUser(identityService.newUser("kermit"));
@@ -32,6 +32,7 @@ public class FinancialReportProcessTest extends PluggableFlowableTestCase {
         identityService.createMembership("kermit", "management");
     }
 
+    @Override
     public void tearDown() throws Exception {
         identityService.deleteUser("fozzie");
         identityService.deleteUser("kermit");
@@ -44,9 +45,9 @@ public class FinancialReportProcessTest extends PluggableFlowableTestCase {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("financialReport");
 
-        List<Task> tasks = taskService.createTaskQuery().taskCandidateUser("fozzie").list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskCandidateUser("fozzie").list();
         assertEquals(1, tasks.size());
-        Task task = tasks.get(0);
+        org.flowable.task.api.Task task = tasks.get(0);
         assertEquals("Write monthly financial report", task.getName());
 
         taskService.claim(task.getId(), "fozzie");

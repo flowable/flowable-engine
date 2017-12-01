@@ -14,11 +14,11 @@ package org.flowable.engine.impl.history.async.json.transformer;
 
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
-import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.task.IdentityLinkType;
+import org.flowable.identitylink.service.HistoricIdentityLinkService;
+import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -34,13 +34,13 @@ public class TaskOwnerChangedHistoryJsonTransformer extends AbstractNeedsTaskHis
         String owner = getStringFromJson(historicalData, HistoryJsonConstants.OWNER);
         String taskId = getStringFromJson(historicalData, HistoryJsonConstants.ID);
         
-        HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getHistoricIdentityLinkEntityManager();
-        HistoricIdentityLinkEntity historicIdentityLinkEntity = historicIdentityLinkEntityManager.create();
+        HistoricIdentityLinkService historicIdentityLinkService = CommandContextUtil.getHistoricIdentityLinkService();
+        HistoricIdentityLinkEntity historicIdentityLinkEntity = historicIdentityLinkService.createHistoricIdentityLink();
         historicIdentityLinkEntity.setTaskId(taskId);
         historicIdentityLinkEntity.setType(IdentityLinkType.OWNER);
         historicIdentityLinkEntity.setUserId(owner);
         historicIdentityLinkEntity.setCreateTime(getDateFromJson(historicalData, HistoryJsonConstants.CREATE_TIME)); 
-        historicIdentityLinkEntityManager.insert(historicIdentityLinkEntity, false);
+        historicIdentityLinkService.insertHistoricIdentityLink(historicIdentityLinkEntity, false);
     }
 
 }

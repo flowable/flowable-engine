@@ -35,6 +35,7 @@ public class SpringTransactionContextFactory implements TransactionContextFactor
         this.transactionSynchronizationAdapterOrder = transactionSynchronizationAdapterOrder;
     }
 
+    @Override
     public TransactionContext openTransactionContext(CommandContext commandContext) {
         return new SpringTransactionContext(transactionManager, commandContext, transactionSynchronizationAdapterOrder);
     }

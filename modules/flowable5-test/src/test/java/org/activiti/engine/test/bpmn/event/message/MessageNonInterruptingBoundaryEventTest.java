@@ -15,7 +15,6 @@ package org.activiti.engine.test.bpmn.event.message;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -30,7 +29,7 @@ public class MessageNonInterruptingBoundaryEventTest extends PluggableFlowableTe
 
         assertEquals(2, runtimeService.createExecutionQuery().count());
 
-        Task userTask = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
+        org.flowable.task.api.Task userTask = taskService.createTaskQuery().taskDefinitionKey("task").singleResult();
         assertNotNull(userTask);
 
         Execution execution = runtimeService.createExecutionQuery()

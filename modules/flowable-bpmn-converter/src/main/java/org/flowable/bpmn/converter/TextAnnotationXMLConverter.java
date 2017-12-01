@@ -38,6 +38,7 @@ public class TextAnnotationXMLConverter extends BaseBpmnXMLConverter {
         childParserMap.put(annotationTextParser.getElementName(), annotationTextParser);
     }
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return TextAnnotation.class;
     }

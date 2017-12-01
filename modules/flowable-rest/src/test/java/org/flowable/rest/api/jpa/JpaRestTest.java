@@ -19,10 +19,10 @@ import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.rest.api.jpa.model.Message;
 import org.flowable.rest.service.api.RestUrls;
+import org.flowable.task.api.Task;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

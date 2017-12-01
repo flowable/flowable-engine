@@ -101,18 +101,22 @@ public class LdapGroupCacheTest extends LDAPTestCase {
         protected String lastCacheEviction;
         protected String lastCacheExpiration;
 
+        @Override
         public void cacheMiss(String userId) {
             this.lastCacheMiss = userId;
         }
 
+        @Override
         public void cacheHit(String userId) {
             this.lastCacheHit = userId;
         }
 
+        @Override
         public void cacheExpired(String userId) {
             this.lastCacheExpiration = userId;
         }
 
+        @Override
         public void cacheEviction(String userId) {
             this.lastCacheEviction = userId;
         }

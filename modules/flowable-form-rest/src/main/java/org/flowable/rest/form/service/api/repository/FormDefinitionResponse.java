@@ -12,6 +12,7 @@
  */
 package org.flowable.rest.form.service.api.repository;
 
+import io.swagger.annotations.ApiModelProperty;
 import org.flowable.form.api.FormDefinition;
 
 /**
@@ -44,6 +45,7 @@ public class FormDefinitionResponse {
         setTenantId(formDefinition.getTenantId());
     }
 
+    @ApiModelProperty(example = "10")
     public String getId() {
         return id;
     }
@@ -52,6 +54,7 @@ public class FormDefinitionResponse {
         this.id = id;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/form-repository/form-definitions/simpleForm")
     public String getUrl() {
         return url;
     }
@@ -60,6 +63,7 @@ public class FormDefinitionResponse {
         this.url = url;
     }
 
+    @ApiModelProperty(example = "Examples")
     public String getCategory() {
         return category;
     }
@@ -68,6 +72,7 @@ public class FormDefinitionResponse {
         this.category = category;
     }
 
+    @ApiModelProperty(example = "The Simple Form")
     public String getName() {
         return name;
     }
@@ -76,6 +81,7 @@ public class FormDefinitionResponse {
         this.name = name;
     }
 
+    @ApiModelProperty(example = "simpleForm")
     public String getKey() {
         return key;
     }
@@ -84,6 +90,7 @@ public class FormDefinitionResponse {
         this.key = key;
     }
 
+    @ApiModelProperty(example = "This is a form for testing purposes")
     public String getDescription() {
         return description;
     }
@@ -92,6 +99,7 @@ public class FormDefinitionResponse {
         this.description = description;
     }
 
+    @ApiModelProperty(example = "1")
     public int getVersion() {
         return version;
     }
@@ -100,6 +108,7 @@ public class FormDefinitionResponse {
         this.version = version;
     }
 
+    @ApiModelProperty(example = "SimpleSourceName")
     public String getResourceName() {
         return resourceName;
     }
@@ -108,6 +117,7 @@ public class FormDefinitionResponse {
         this.resourceName = resourceName;
     }
 
+    @ApiModelProperty(example = "818e4703-f1d2-11e6-8549-acde48001121")
     public String getDeploymentId() {
         return deploymentId;
     }
@@ -116,6 +126,7 @@ public class FormDefinitionResponse {
         this.deploymentId = deploymentId;
     }
 
+    @ApiModelProperty(example = "2")
     public String getParentDeploymentId() {
         return parentDeploymentId;
     }
@@ -124,6 +135,7 @@ public class FormDefinitionResponse {
         this.parentDeploymentId = parentDeploymentId;
     }
 
+    @ApiModelProperty(example = "null")
     public String getTenantId() {
         return tenantId;
     }

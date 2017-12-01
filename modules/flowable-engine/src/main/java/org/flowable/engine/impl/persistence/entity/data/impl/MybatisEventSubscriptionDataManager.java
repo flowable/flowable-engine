@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.common.impl.db.CachedEntityMatcher;
 import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.CachedEntityMatcher;
 import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
@@ -29,7 +29,7 @@ import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntit
 import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntityImpl;
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntityImpl;
-import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.EventSubscriptionDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByExecutionAndTypeMatcher;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.EventSubscriptionsByExecutionIdMatcher;
@@ -44,7 +44,7 @@ import org.flowable.engine.runtime.EventSubscription;
 /**
  * @author Joram Barrez
  */
-public class MybatisEventSubscriptionDataManager extends AbstractDataManager<EventSubscriptionEntity> implements EventSubscriptionDataManager {
+public class MybatisEventSubscriptionDataManager extends AbstractProcessDataManager<EventSubscriptionEntity> implements EventSubscriptionDataManager {
 
     private static List<Class<? extends EventSubscriptionEntity>> ENTITY_SUBCLASSES = new ArrayList<>();
 

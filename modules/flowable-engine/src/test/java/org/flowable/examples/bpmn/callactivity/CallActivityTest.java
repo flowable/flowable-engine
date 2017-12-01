@@ -19,9 +19,8 @@ import java.util.Map;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskQuery;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.TaskQuery;
 
 /**
  * @author Joram Barrez
@@ -34,7 +33,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         // should be active
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("orderProcess");
         TaskQuery taskQuery = taskService.createTaskQuery();
-        Task verifyCreditTask = taskQuery.singleResult();
+        org.flowable.task.api.Task verifyCreditTask = taskQuery.singleResult();
         assertEquals("Verify credit history", verifyCreditTask.getName());
 
         // Verify with Query API
@@ -45,7 +44,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         // Completing the task with approval, will end the subprocess and
         // continue the original process
         taskService.complete(verifyCreditTask.getId(), CollectionUtil.singletonMap("creditApproved", true));
-        Task prepareAndShipTask = taskQuery.singleResult();
+        org.flowable.task.api.Task prepareAndShipTask = taskQuery.singleResult();
         assertEquals("Prepare and Ship", prepareAndShipTask.getName());
     }
 
@@ -54,7 +53,7 @@ public class CallActivityTest extends PluggableFlowableTestCase {
         // After the process has started, the 'verify credit history' task should be active
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("mainProcess");
         TaskQuery taskQuery = taskService.createTaskQuery();
-        Task verifyCreditTask = taskQuery.singleResult();
+        org.flowable.task.api.Task verifyCreditTask = taskQuery.singleResult();
         assertEquals("User Task 1", verifyCreditTask.getName());
 
         // Verify with Query API

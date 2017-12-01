@@ -15,7 +15,7 @@ package org.flowable.engine.impl.bpmn.behavior;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
@@ -40,6 +40,7 @@ public class ServiceTaskJavaDelegateActivityBehavior extends TaskActivityBehavio
         this.skipExpression = skipExpression;
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
         boolean isSkipExpressionEnabled = SkipExpressionUtil.isSkipExpressionEnabled(execution, skipExpression);
         if (!isSkipExpressionEnabled || (isSkipExpressionEnabled && !SkipExpressionUtil.shouldSkipFlowElement(execution, skipExpression))) {
@@ -49,6 +50,7 @@ public class ServiceTaskJavaDelegateActivityBehavior extends TaskActivityBehavio
         leave(execution);
     }
 
+    @Override
     public void notify(DelegateExecution execution) {
         execute(execution);
     }

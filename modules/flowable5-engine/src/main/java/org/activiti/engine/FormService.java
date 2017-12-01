@@ -49,12 +49,10 @@ public interface FormService {
      * id. This business key can then be used to easily look up that process instance , see {@link ProcessInstanceQuery#processInstanceBusinessKey(String)}. Providing such a business key is definitely
      * a best practice.
      * 
-     * Note that a business key MUST be unique for the given process definition. Process instance from different process definition are allowed to have the same business key.
-     * 
      * @param processDefinitionId
      *            the id of the process definition, cannot be null.
      * @param businessKey
-     *            a key that uniquely identifies the process instance in the context or the given process definition.
+     *            a key that identifies the process instance and can be used to retrieve the process instance later via the query API.
      * @param properties
      *            the properties to pass, can be null.
      */

@@ -14,7 +14,7 @@ package org.activiti.engine.task;
 
 import java.util.List;
 
-import org.flowable.engine.task.DelegationState;
+import org.flowable.task.api.DelegationState;
 
 /**
  * Allows programmatic querying of {@link Task}s;

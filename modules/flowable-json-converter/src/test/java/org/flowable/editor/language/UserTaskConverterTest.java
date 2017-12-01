@@ -44,6 +44,7 @@ public class UserTaskConverterTest extends AbstractConverterTest {
         validateModel(bpmnModel);
     }
 
+    @Override
     protected String getResource() {
         return "test.usertaskmodel.json";
     }

@@ -24,11 +24,11 @@ import org.flowable.bpmn.model.ParallelGateway;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.Expression;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.Condition;
 import org.flowable.engine.impl.bpmn.helper.SkipExpressionUtil;
@@ -117,12 +117,12 @@ public class TakeOutgoingSequenceFlowsOperation extends AbstractOperation {
                 CommandContextUtil.getHistoryManager(commandContext).recordActivityEnd(execution, null);
             }
 
-            if (!(execution.getCurrentFlowElement() instanceof SubProcess)) {
-                CommandContextUtil.getEventDispatcher(commandContext).dispatchEvent(
-                        FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, flowNode.getId(), flowNode.getName(),
-                                execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
+            if (!(execution.getCurrentFlowElement() instanceof SubProcess) &&
+                !(flowNode instanceof Activity && ((Activity) flowNode).hasMultiInstanceLoopCharacteristics())) {
+                    CommandContextUtil.getEventDispatcher(commandContext).dispatchEvent(
+                            FlowableEventBuilder.createActivityEvent(FlowableEngineEventType.ACTIVITY_COMPLETED, flowNode.getId(), flowNode.getName(),
+                                    execution.getId(), execution.getProcessInstanceId(), execution.getProcessDefinitionId(), flowNode));
             }
-
         }
     }
     

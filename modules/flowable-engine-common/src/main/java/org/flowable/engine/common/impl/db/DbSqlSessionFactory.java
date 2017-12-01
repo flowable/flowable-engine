@@ -65,10 +65,12 @@ public class DbSqlSessionFactory implements SessionFactory {
     
     protected int maxNrOfStatementsInBulkInsert = 100;
 
+    @Override
     public Class<?> getSessionType() {
         return DbSqlSession.class;
     }
     
+    @Override
     public Session openSession(CommandContext commandContext) {
         DbSqlSession dbSqlSession = createDbSqlSession();
         if (getDatabaseSchema() != null && getDatabaseSchema().length() > 0) {

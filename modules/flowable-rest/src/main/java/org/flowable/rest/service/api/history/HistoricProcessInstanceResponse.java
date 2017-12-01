@@ -13,14 +13,14 @@
 
 package org.flowable.rest.service.api.history;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import io.swagger.annotations.ApiModelProperty;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 import org.flowable.rest.util.DateToStringSerializer;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @author Tijs Rademakers
@@ -45,6 +45,7 @@ public class HistoricProcessInstanceResponse {
     protected List<RestVariable> variables = new ArrayList<>();
     protected String tenantId;
 
+    @ApiModelProperty(example = "5")
     public String getId() {
         return id;
     }
@@ -53,6 +54,7 @@ public class HistoricProcessInstanceResponse {
         this.id = id;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/history/historic-process-instances/5")
     public String getUrl() {
         return url;
     }
@@ -61,6 +63,7 @@ public class HistoricProcessInstanceResponse {
         this.url = url;
     }
 
+    @ApiModelProperty(example = "myKey")
     public String getBusinessKey() {
         return businessKey;
     }
@@ -69,6 +72,7 @@ public class HistoricProcessInstanceResponse {
         this.businessKey = businessKey;
     }
 
+    @ApiModelProperty(example = "oneTaskProcess%3A1%3A4")
     public String getProcessDefinitionId() {
         return processDefinitionId;
     }
@@ -77,6 +81,7 @@ public class HistoricProcessInstanceResponse {
         this.processDefinitionId = processDefinitionId;
     }
 
+    @ApiModelProperty(example = "http://localhost:8182/repository/process-definitions/oneTaskProcess%3A1%3A4")
     public String getProcessDefinitionUrl() {
         return processDefinitionUrl;
     }
@@ -85,6 +90,7 @@ public class HistoricProcessInstanceResponse {
         this.processDefinitionUrl = processDefinitionUrl;
     }
 
+    @ApiModelProperty(example = "2013-04-17T10:17:43.902+0000")
     public Date getStartTime() {
         return startTime;
     }
@@ -93,6 +99,7 @@ public class HistoricProcessInstanceResponse {
         this.startTime = startTime;
     }
 
+    @ApiModelProperty(example = "2013-04-18T14:06:32.715+0000")
     public Date getEndTime() {
         return endTime;
     }
@@ -101,6 +108,7 @@ public class HistoricProcessInstanceResponse {
         this.endTime = endTime;
     }
 
+    @ApiModelProperty(example = "86400056")
     public Long getDurationInMillis() {
         return durationInMillis;
     }
@@ -109,6 +117,7 @@ public class HistoricProcessInstanceResponse {
         this.durationInMillis = durationInMillis;
     }
 
+    @ApiModelProperty(example = "kermit")
     public String getStartUserId() {
         return startUserId;
     }
@@ -117,6 +126,7 @@ public class HistoricProcessInstanceResponse {
         this.startUserId = startUserId;
     }
 
+    @ApiModelProperty(example = "startEvent")
     public String getStartActivityId() {
         return startActivityId;
     }
@@ -125,6 +135,7 @@ public class HistoricProcessInstanceResponse {
         this.startActivityId = startActivityId;
     }
 
+    @ApiModelProperty(example = "endEvent")
     public String getEndActivityId() {
         return endActivityId;
     }
@@ -133,6 +144,7 @@ public class HistoricProcessInstanceResponse {
         this.endActivityId = endActivityId;
     }
 
+    @ApiModelProperty(example = "null")
     public String getDeleteReason() {
         return deleteReason;
     }
@@ -141,6 +153,7 @@ public class HistoricProcessInstanceResponse {
         this.deleteReason = deleteReason;
     }
 
+    @ApiModelProperty(example = "3")
     public String getSuperProcessInstanceId() {
         return superProcessInstanceId;
     }
@@ -161,6 +174,7 @@ public class HistoricProcessInstanceResponse {
         variables.add(variable);
     }
 
+    @ApiModelProperty(example = "null")
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }

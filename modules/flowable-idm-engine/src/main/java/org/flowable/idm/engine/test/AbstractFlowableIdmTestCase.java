@@ -112,6 +112,7 @@ public abstract class AbstractFlowableIdmTestCase extends AbstractTestCase {
             CommandExecutor commandExecutor = idmEngine.getIdmEngineConfiguration().getCommandExecutor();
             CommandConfig config = new CommandConfig().transactionNotSupported();
             commandExecutor.execute(config, new Command<Object>() {
+                @Override
                 public Object execute(CommandContext commandContext) {
                     DbSchemaManager dbSchemaManager = CommandContextUtil.getIdmEngineConfiguration(commandContext).getDbSchemaManager();
                     dbSchemaManager.dbSchemaCreate();

@@ -13,6 +13,7 @@
 
 package org.flowable.dmn.engine.impl.db;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 
 import org.apache.commons.lang3.StringUtils;
@@ -20,6 +21,7 @@ import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.db.DbSchemaManager;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -35,6 +37,8 @@ import liquibase.resource.ClassLoaderResourceAccessor;
 public class DmnDbSchemaManager implements DbSchemaManager {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(DmnDbSchemaManager.class);
+    
+    public static String LIQUIBASE_CHANGELOG = "org/flowable/dmn/db/liquibase/flowable-dmn-db-changelog.xml";
     
     public void initSchema() {
         initSchema(CommandContextUtil.getDmnEngineConfiguration());
@@ -59,13 +63,26 @@ public class DmnDbSchemaManager implements DbSchemaManager {
                 liquibase.validate();
             }
         } catch (Exception e) {
-            throw new FlowableException("Error initialising dmn data model");
+            throw new FlowableException("Error initialising dmn data model", e);
         }
     }
 
-    protected Liquibase createLiquibaseInstance(DmnEngineConfiguration dmnEngineConfiguration)
+    public Liquibase createLiquibaseInstance(DmnEngineConfiguration dmnEngineConfiguration)
             throws SQLException, DatabaseException, LiquibaseException {
-        DatabaseConnection connection = new JdbcConnection(dmnEngineConfiguration.getDataSource().getConnection());
+        
+        Connection jdbcConnection = null;
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+        if (commandContext == null) {
+            jdbcConnection = dmnEngineConfiguration.getDataSource().getConnection();
+        } else {
+            jdbcConnection = CommandContextUtil.getDbSqlSession(commandContext).getSqlSession().getConnection();
+        }
+        
+        if (!jdbcConnection.getAutoCommit()) {
+            jdbcConnection.commit();
+        }
+        
+        DatabaseConnection connection = new JdbcConnection(jdbcConnection);
         Database database = DatabaseFactory.getInstance().findCorrectDatabaseImplementation(connection);
         database.setDatabaseChangeLogTableName(DmnEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogTableName());
         database.setDatabaseChangeLogLockTableName(DmnEngineConfiguration.LIQUIBASE_CHANGELOG_PREFIX + database.getDatabaseChangeLogLockTableName());
@@ -82,10 +99,10 @@ public class DmnDbSchemaManager implements DbSchemaManager {
             database.setLiquibaseCatalogName(databaseCatalog);
         }
 
-        Liquibase liquibase = new Liquibase("org/flowable/dmn/db/liquibase/flowable-dmn-db-changelog.xml", new ClassLoaderResourceAccessor(), database);
+        Liquibase liquibase = new Liquibase(LIQUIBASE_CHANGELOG, new ClassLoaderResourceAccessor(), database);
         return liquibase;
     }
-
+    
     @Override
     public void dbSchemaCreate() {
         try {
@@ -111,7 +128,5 @@ public class DmnDbSchemaManager implements DbSchemaManager {
         dbSchemaCreate();
         return null;
     }
-    
-    
 
 }

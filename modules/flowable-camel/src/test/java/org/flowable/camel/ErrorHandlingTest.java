@@ -16,17 +16,16 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.flowable.camel.util.Routing;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.test.context.ContextConfiguration;
 
 /**
  * Demonstrates an issue in Activiti 5.12. Exception on Camel routes will be lost, if default error handling is used.
- * 
+ *
  * @author stefan.schulze@accelsis.biz
- * 
  */
 @ContextConfiguration("classpath:error-camel-flowable-context.xml")
 public class ErrorHandlingTest extends SpringFlowableTestCase {
@@ -38,12 +37,12 @@ public class ErrorHandlingTest extends SpringFlowableTestCase {
 
     /**
      * Process instance should be removed after completion. Works as intended, if no exception interrupts the Camel route.
-     * 
+     *
      * @throws Exception
      */
-    @Deployment(resources = { "process/errorHandling.bpmn20.xml" })
+    @Deployment(resources = {"process/errorHandling.bpmn20.xml"})
     public void testCamelRouteWorksAsIntended() throws Exception {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("routing", Routing.DEFAULT);
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("ErrorHandling", variables);
@@ -59,12 +58,12 @@ public class ErrorHandlingTest extends SpringFlowableTestCase {
 
     /**
      * Expected behavior, with default error handling in Camel: Roll-back to previous wait state. Fails with Activiti 5.12.
-     * 
+     *
      * @throws Exception
      */
-    @Deployment(resources = { "process/errorHandling.bpmn20.xml" })
+    @Deployment(resources = {"process/errorHandling.bpmn20.xml"})
     public void testRollbackOnException() throws Exception {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("routing", Routing.PROVOKE_ERROR);
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("ErrorHandling", variables);
@@ -76,12 +75,12 @@ public class ErrorHandlingTest extends SpringFlowableTestCase {
 
     /**
      * Exception caught and processed by Camel dead letter queue handler. Process instance proceeds to ReceiveTask as expected.
-     * 
+     *
      * @throws Exception
      */
-    @Deployment(resources = { "process/errorHandling.bpmn20.xml" })
+    @Deployment(resources = {"process/errorHandling.bpmn20.xml"})
     public void testErrorHandledByCamel() throws Exception {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put("routing", Routing.HANDLE_ERROR);
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("ErrorHandling", variables);

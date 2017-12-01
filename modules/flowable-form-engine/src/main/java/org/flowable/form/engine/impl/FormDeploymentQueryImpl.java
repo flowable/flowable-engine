@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.AbstractQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.form.api.FormDeployment;
@@ -54,6 +55,7 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
         super(commandExecutor);
     }
 
+    @Override
     public FormDeploymentQueryImpl deploymentId(String deploymentId) {
         if (deploymentId == null) {
             throw new FlowableIllegalArgumentException("Deployment id is null");
@@ -62,6 +64,7 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
         return this;
     }
 
+    @Override
     public FormDeploymentQueryImpl deploymentName(String deploymentName) {
         if (deploymentName == null) {
             throw new FlowableIllegalArgumentException("deploymentName is null");
@@ -70,6 +73,7 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
         return this;
     }
 
+    @Override
     public FormDeploymentQueryImpl deploymentNameLike(String nameLike) {
         if (nameLike == null) {
             throw new FlowableIllegalArgumentException("deploymentNameLike is null");
@@ -78,6 +82,7 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
         return this;
     }
 
+    @Override
     public FormDeploymentQueryImpl deploymentCategory(String deploymentCategory) {
         if (deploymentCategory == null) {
             throw new FlowableIllegalArgumentException("deploymentCategory is null");
@@ -86,6 +91,7 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
         return this;
     }
 
+    @Override
     public FormDeploymentQueryImpl deploymentCategoryNotEquals(String deploymentCategoryNotEquals) {
         if (deploymentCategoryNotEquals == null) {
             throw new FlowableIllegalArgumentException("deploymentCategoryExclude is null");
@@ -94,6 +100,7 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
         return this;
     }
 
+    @Override
     public FormDeploymentQueryImpl parentDeploymentId(String parentDeploymentId) {
         if (parentDeploymentId == null) {
             throw new FlowableIllegalArgumentException("parentDeploymentId is null");
@@ -102,6 +109,7 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
         return this;
     }
 
+    @Override
     public FormDeploymentQueryImpl parentDeploymentIdLike(String parentDeploymentIdLike) {
         if (parentDeploymentIdLike == null) {
             throw new FlowableIllegalArgumentException("parentDeploymentIdLike is null");
@@ -110,11 +118,13 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
         return this;
     }
 
+    @Override
     public FormDeploymentQueryImpl deploymentWithoutTenantId() {
         this.withoutTenantId = true;
         return this;
     }
 
+    @Override
     public FormDeploymentQueryImpl deploymentTenantId(String tenantId) {
         if (tenantId == null) {
             throw new FlowableIllegalArgumentException("deploymentTenantId is null");
@@ -123,6 +133,7 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
         return this;
     }
 
+    @Override
     public FormDeploymentQueryImpl deploymentTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
             throw new FlowableIllegalArgumentException("deploymentTenantIdLike is null");
@@ -131,6 +142,7 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
         return this;
     }
 
+    @Override
     public FormDeploymentQueryImpl formDefinitionKey(String key) {
         if (key == null) {
             throw new FlowableIllegalArgumentException("key is null");
@@ -139,6 +151,7 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
         return this;
     }
 
+    @Override
     public FormDeploymentQueryImpl formDefinitionKeyLike(String keyLike) {
         if (keyLike == null) {
             throw new FlowableIllegalArgumentException("keyLike is null");
@@ -149,18 +162,22 @@ public class FormDeploymentQueryImpl extends AbstractQuery<FormDeploymentQuery, 
 
     // sorting ////////////////////////////////////////////////////////
 
+    @Override
     public FormDeploymentQuery orderByDeploymentId() {
         return orderBy(DeploymentQueryProperty.DEPLOYMENT_ID);
     }
 
+    @Override
     public FormDeploymentQuery orderByDeploymentTime() {
         return orderBy(DeploymentQueryProperty.DEPLOY_TIME);
     }
 
+    @Override
     public FormDeploymentQuery orderByDeploymentName() {
         return orderBy(DeploymentQueryProperty.DEPLOYMENT_NAME);
     }
 
+    @Override
     public FormDeploymentQuery orderByTenantId() {
         return orderBy(DeploymentQueryProperty.DEPLOYMENT_TENANT_ID);
     }

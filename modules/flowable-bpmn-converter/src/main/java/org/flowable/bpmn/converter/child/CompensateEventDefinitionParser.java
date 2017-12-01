@@ -26,10 +26,12 @@ import org.flowable.bpmn.model.Event;
  */
 public class CompensateEventDefinitionParser extends BaseChildElementParser {
 
+    @Override
     public String getElementName() {
         return ELEMENT_EVENT_COMPENSATEDEFINITION;
     }
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
         if (!(parentElement instanceof Event))
             return;

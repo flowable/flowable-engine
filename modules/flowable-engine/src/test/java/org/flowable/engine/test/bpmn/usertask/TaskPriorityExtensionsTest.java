@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -40,7 +39,7 @@ public class TaskPriorityExtensionsTest extends PluggableFlowableTestCase {
         // priority
         final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskPriorityExtension", variables);
 
-        final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        final org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
 
         assertEquals(priority, task.getPriority());
     }
@@ -48,7 +47,7 @@ public class TaskPriorityExtensionsTest extends PluggableFlowableTestCase {
     @Deployment
     public void testPriorityExtensionString() throws Exception {
         final ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskPriorityExtensionString");
-        final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        final org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals(42, task.getPriority());
     }
 }

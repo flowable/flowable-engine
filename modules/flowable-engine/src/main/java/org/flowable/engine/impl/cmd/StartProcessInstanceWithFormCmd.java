@@ -65,6 +65,7 @@ public class StartProcessInstanceWithFormCmd implements Command<ProcessInstance>
         this.processInstanceName = processInstanceName;
     }
 
+    @Override
     public ProcessInstance execute(CommandContext commandContext) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         DeploymentManager deploymentCache = processEngineConfiguration.getDeploymentManager();
@@ -99,7 +100,7 @@ public class StartProcessInstanceWithFormCmd implements Command<ProcessInstance>
                 formVariables, commandContext);
 
         if (formModel != null) {
-            formService.createFormInstance(formVariables, formModel, null, processInstance.getId());
+            formService.createFormInstance(formVariables, formModel, null, processInstance.getId(), processInstance.getProcessDefinitionId());
 
             processUploadFieldsIfNeeded(formModel, processInstance.getId());
         }

@@ -27,7 +27,7 @@ import java.util.Set;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -62,6 +62,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
     /**
      * Setup starts 4 process instances of oneTaskProcess and 1 instance of oneTaskProcess2
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml")
@@ -74,6 +75,7 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_2, "1").getId());
     }
 
+    @Override
     protected void tearDown() throws Exception {
         deleteDeployments();
         super.tearDown();
@@ -1732,6 +1734,34 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         runtimeService.deleteProcessInstance(processInstance.getId(), "test");
         runtimeService.deleteProcessInstance(processInstance2.getId(), "test");
     }
+    
+    @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })
+    public void testVariableExistsQuery() {
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("mixed", "AbCdEfG");
+        vars.put("upper", "ABCDEFG");
+        vars.put("lower", "abcdefg");
+        ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("oneTaskProcess", vars);
+
+        ProcessInstance instance = runtimeService.createProcessInstanceQuery().variableExists("mixed").singleResult();
+        assertNotNull(instance);
+        assertEquals(processInstance1.getId(), instance.getId());
+
+        List<ProcessInstance> instances = runtimeService.createProcessInstanceQuery().variableNotExists("lower").list();
+        assertEquals(5, instances.size());
+        
+        instances = runtimeService.createProcessInstanceQuery().variableExists("lower").variableValueEquals("upper", "ABCDEFG").list();
+        assertEquals(1, instances.size());
+        
+        instances = runtimeService.createProcessInstanceQuery().or().variableExists("mixed").variableValueEquals("upper", "ABCDEFG").endOr().list();
+        assertEquals(1, instances.size());
+        
+        instances = runtimeService.createProcessInstanceQuery().or().variableNotExists("mixed").variableValueEquals("upper", "ABCDEFG").endOr().list();
+        assertEquals(6, instances.size());
+        
+        instances = runtimeService.createProcessInstanceQuery().or().variableNotExists("mixed").endOr().or().variableValueEquals("upper", "ABCDEFG").endOr().list();
+        assertEquals(0, instances.size());
+    }
 
     public void testQueryByProcessInstanceIds() {
         Set<String> processInstanceIds = new HashSet<>(this.processInstanceIds);
@@ -1809,12 +1839,12 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertNull(processes.get(0).getDescription());
 
         ObjectNode infoNode = dynamicBpmnService.getProcessDefinitionInfo(processInstance.getProcessDefinitionId());
-        dynamicBpmnService.changeLocalizationName("en-GB", "oneTaskProcess", "The One Task Process 'en-GB' localized name", infoNode);
-        dynamicBpmnService.changeLocalizationDescription("en-GB", "oneTaskProcess", "The One Task Process 'en-GB' localized description", infoNode);
+        dynamicBpmnService.changeLocalizationName("en-GB", "oneTaskProcess", "The One org.flowable.task.service.Task Process 'en-GB' localized name", infoNode);
+        dynamicBpmnService.changeLocalizationDescription("en-GB", "oneTaskProcess", "The One org.flowable.task.service.Task Process 'en-GB' localized description", infoNode);
         dynamicBpmnService.saveProcessDefinitionInfo(processInstance.getProcessDefinitionId(), infoNode);
 
-        dynamicBpmnService.changeLocalizationName("en", "oneTaskProcess", "The One Task Process 'en' localized name", infoNode);
-        dynamicBpmnService.changeLocalizationDescription("en", "oneTaskProcess", "The One Task Process 'en' localized description", infoNode);
+        dynamicBpmnService.changeLocalizationName("en", "oneTaskProcess", "The One org.flowable.task.service.Task Process 'en' localized name", infoNode);
+        dynamicBpmnService.changeLocalizationDescription("en", "oneTaskProcess", "The One org.flowable.task.service.Task Process 'en' localized description", infoNode);
         dynamicBpmnService.saveProcessDefinitionInfo(processInstance.getProcessDefinitionId(), infoNode);
 
         processes = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).list();
@@ -1829,8 +1859,8 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
 
         processes = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).locale("en-GB").list();
         assertEquals(1, processes.size());
-        assertEquals("The One Task Process 'en-GB' localized name", processes.get(0).getName());
-        assertEquals("The One Task Process 'en-GB' localized description", processes.get(0).getDescription());
+        assertEquals("The One org.flowable.task.service.Task Process 'en-GB' localized name", processes.get(0).getName());
+        assertEquals("The One org.flowable.task.service.Task Process 'en-GB' localized description", processes.get(0).getDescription());
 
         processes = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).listPage(0, 10);
         assertEquals(1, processes.size());
@@ -1844,8 +1874,8 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
 
         processes = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).locale("en-GB").listPage(0, 10);
         assertEquals(1, processes.size());
-        assertEquals("The One Task Process 'en-GB' localized name", processes.get(0).getName());
-        assertEquals("The One Task Process 'en-GB' localized description", processes.get(0).getDescription());
+        assertEquals("The One org.flowable.task.service.Task Process 'en-GB' localized name", processes.get(0).getName());
+        assertEquals("The One org.flowable.task.service.Task Process 'en-GB' localized description", processes.get(0).getDescription());
 
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(processInstance.getName());
@@ -1856,20 +1886,20 @@ public class ProcessInstanceQueryTest extends PluggableFlowableTestCase {
         assertEquals("Descripción del proceso", processInstance.getDescription());
 
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).locale("en-GB").singleResult();
-        assertEquals("The One Task Process 'en-GB' localized name", processInstance.getName());
-        assertEquals("The One Task Process 'en-GB' localized description", processInstance.getDescription());
+        assertEquals("The One org.flowable.task.service.Task Process 'en-GB' localized name", processInstance.getName());
+        assertEquals("The One org.flowable.task.service.Task Process 'en-GB' localized description", processInstance.getDescription());
 
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(processInstance.getName());
         assertNull(processInstance.getDescription());
 
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).locale("en").singleResult();
-        assertEquals("The One Task Process 'en' localized name", processInstance.getName());
-        assertEquals("The One Task Process 'en' localized description", processInstance.getDescription());
+        assertEquals("The One org.flowable.task.service.Task Process 'en' localized name", processInstance.getName());
+        assertEquals("The One org.flowable.task.service.Task Process 'en' localized description", processInstance.getDescription());
 
         processInstance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).locale("en-AU").withLocalizationFallback().singleResult();
-        assertEquals("The One Task Process 'en' localized name", processInstance.getName());
-        assertEquals("The One Task Process 'en' localized description", processInstance.getDescription());
+        assertEquals("The One org.flowable.task.service.Task Process 'en' localized name", processInstance.getName());
+        assertEquals("The One org.flowable.task.service.Task Process 'en' localized description", processInstance.getDescription());
     }
 
     @Deployment(resources = { "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml" })

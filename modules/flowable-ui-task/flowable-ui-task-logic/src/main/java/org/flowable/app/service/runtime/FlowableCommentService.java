@@ -26,9 +26,9 @@ import org.flowable.engine.HistoryService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.task.Comment;
 import org.flowable.idm.api.User;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,7 +59,7 @@ public class FlowableCommentService {
         List<Comment> comments = getCommentsForTask(taskId);
 
         // Create representation for all comments
-        List<CommentRepresentation> commentList = new ArrayList<CommentRepresentation>();
+        List<CommentRepresentation> commentList = new ArrayList<>();
         for (Comment comment : comments) {
             commentList.add(new CommentRepresentation(comment));
         }
@@ -94,7 +94,7 @@ public class FlowableCommentService {
         List<Comment> comments = getCommentsForProcessInstance(processInstanceId);
 
         // Create representation for all comments
-        List<CommentRepresentation> commentList = new ArrayList<CommentRepresentation>();
+        List<CommentRepresentation> commentList = new ArrayList<>();
         for (Comment comment : comments) {
             commentList.add(new CommentRepresentation(comment));
         }

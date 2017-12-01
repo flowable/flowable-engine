@@ -50,10 +50,13 @@
     <property name="asyncHistoryEnabled" value="false" />
     
     <property name="enableProcessDefinitionInfoCache" value="true" />
-    
+
+    <property name="clock">
+        <bean class="org.flowable.engine.common.impl.util.TestClockImpl" />
+    </property>
   </bean>
   
-  <bean id="asyncExecutor" class="org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor">
+  <bean id="asyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">
     <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
     <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
   </bean>

@@ -23,6 +23,7 @@ import org.activiti.engine.impl.util.json.JSONObject;
  */
 public class JsonProcessEngineInfoConverter extends JsonObjectConverter<ProcessEngineInfo> {
 
+    @Override
     public JSONObject toJsonObject(ProcessEngineInfo processEngineInfo) {
         ProcessEngineInfoImpl processEngineInfoImpl = (ProcessEngineInfoImpl) processEngineInfo;
         JSONObject jsonObject = new JSONObject();
@@ -32,6 +33,7 @@ public class JsonProcessEngineInfoConverter extends JsonObjectConverter<ProcessE
         return jsonObject;
     }
 
+    @Override
     public ProcessEngineInfo toObject(Reader reader) {
         return null;
     }

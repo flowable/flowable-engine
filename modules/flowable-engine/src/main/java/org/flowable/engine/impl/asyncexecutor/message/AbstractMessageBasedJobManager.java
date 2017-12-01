@@ -19,14 +19,14 @@ import org.flowable.engine.common.impl.cfg.TransactionListener;
 import org.flowable.engine.common.impl.cfg.TransactionState;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.asyncexecutor.DefaultJobManager;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.async.AsyncHistorySession;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.impl.persistence.entity.JobInfoEntity;
-import org.flowable.engine.runtime.HistoryJob;
-import org.flowable.engine.runtime.JobInfo;
+import org.flowable.job.api.HistoryJob;
+import org.flowable.job.api.JobInfo;
+import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.impl.asyncexecutor.DefaultJobManager;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobInfoEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,8 +44,8 @@ public abstract class AbstractMessageBasedJobManager extends DefaultJobManager {
         super(null);
     }
 
-    public AbstractMessageBasedJobManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        super(processEngineConfiguration);
+    public AbstractMessageBasedJobManager(JobServiceConfiguration jobServiceConfiguration) {
+        super(jobServiceConfiguration);
     }
 
     @Override
@@ -67,8 +67,8 @@ public abstract class AbstractMessageBasedJobManager extends DefaultJobManager {
             JobInfoEntity jobInfoEntity = (JobInfoEntity) job;
 
             // When unacquiring, we up the lock time again., so that it isn't cleared by the reset expired thread.
-            jobInfoEntity.setLockExpirationTime(new Date(processEngineConfiguration.getClock().getCurrentTime().getTime()
-                    + processEngineConfiguration.getAsyncExecutor().getAsyncJobLockTimeInMillis()));
+            jobInfoEntity.setLockExpirationTime(new Date(jobServiceConfiguration.getClock().getCurrentTime().getTime()
+                    + jobServiceConfiguration.getAsyncExecutor().getAsyncJobLockTimeInMillis()));
         }
 
         prepareAndSendMessage(job);
@@ -82,7 +82,7 @@ public abstract class AbstractMessageBasedJobManager extends DefaultJobManager {
                 historyJobEntity.setRetries(historyJobEntity.getRetries() - 1);
                 unacquire(historyJobEntity);
             } else {
-                processEngineConfiguration.getHistoryJobEntityManager().deleteNoCascade(historyJobEntity);
+                jobServiceConfiguration.getHistoryJobEntityManager().deleteNoCascade(historyJobEntity);
             }
         } else {
             unacquire(job);
@@ -93,6 +93,7 @@ public abstract class AbstractMessageBasedJobManager extends DefaultJobManager {
         TransactionContext transactionContext = Context.getTransactionContext();
         if (transactionContext != null) {
             Context.getTransactionContext().addTransactionListener(TransactionState.COMMITTED, new TransactionListener() {
+                @Override
                 public void execute(CommandContext commandContext) {
                     sendMessage(job);
                 }
@@ -102,6 +103,7 @@ public abstract class AbstractMessageBasedJobManager extends DefaultJobManager {
             CommandContext commandContext = Context.getCommandContext();
             AsyncHistorySession asyncHistorySession = commandContext.getSession(AsyncHistorySession.class);
             asyncHistorySession.addAsyncHistoryRunnableAfterCommit(new Runnable() {
+                @Override
                 public void run() {
                     sendMessage(job);
                 }

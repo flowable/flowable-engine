@@ -34,16 +34,19 @@ public class IdmEngineFactoryBean implements FactoryBean<IdmEngine>, DisposableB
     protected ApplicationContext applicationContext;
     protected IdmEngine idmEngine;
 
+    @Override
     public void destroy() throws Exception {
         if (idmEngine != null) {
             idmEngine.close();
         }
     }
 
+    @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
 
+    @Override
     public IdmEngine getObject() throws Exception {
         configureExternallyManagedTransactions();
 
@@ -60,10 +63,12 @@ public class IdmEngineFactoryBean implements FactoryBean<IdmEngine>, DisposableB
         }
     }
 
+    @Override
     public Class<IdmEngine> getObjectType() {
         return IdmEngine.class;
     }
 
+    @Override
     public boolean isSingleton() {
         return true;
     }

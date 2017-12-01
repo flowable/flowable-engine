@@ -23,12 +23,12 @@ import org.flowable.engine.cfg.HttpClientConfig;
 import org.flowable.engine.cfg.MailServerInfo;
 import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.runtime.Clock;
-import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.image.ProcessDiagramGenerator;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 
 /**
  * Configuration information from which a process engine can be build.
@@ -99,7 +99,6 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     // Set Http Client config defaults
     protected HttpClientConfig httpClientConfig = new HttpClientConfig();
 
-    protected boolean isDbHistoryUsed = true;
     protected HistoryLevel historyLevel;
 
     protected String jpaPersistenceUnitName;
@@ -195,6 +194,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
     // getters and setters
     // //////////////////////////////////////////////////////
 
+    @Override
     public String getEngineName() {
         return processEngineName;
     }
@@ -328,41 +328,49 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         this.httpClientConfig.merge(httpClientConfig);
     }
 
+    @Override
     public ProcessEngineConfiguration setDatabaseType(String databaseType) {
         this.databaseType = databaseType;
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setDatabaseSchemaUpdate(String databaseSchemaUpdate) {
         this.databaseSchemaUpdate = databaseSchemaUpdate;
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setJdbcDriver(String jdbcDriver) {
         this.jdbcDriver = jdbcDriver;
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setJdbcUrl(String jdbcUrl) {
         this.jdbcUrl = jdbcUrl;
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setJdbcUsername(String jdbcUsername) {
         this.jdbcUsername = jdbcUsername;
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setJdbcPassword(String jdbcPassword) {
         this.jdbcPassword = jdbcPassword;
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setTransactionsExternallyManaged(boolean transactionsExternallyManaged) {
         this.transactionsExternallyManaged = transactionsExternallyManaged;
         return this;
@@ -377,50 +385,49 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         return this;
     }
 
-    public boolean isDbHistoryUsed() {
-        return isDbHistoryUsed;
-    }
-
-    public ProcessEngineConfiguration setDbHistoryUsed(boolean isDbHistoryUsed) {
-        this.isDbHistoryUsed = isDbHistoryUsed;
-        return this;
-    }
-
+    @Override
     public ProcessEngineConfiguration setJdbcMaxActiveConnections(int jdbcMaxActiveConnections) {
         this.jdbcMaxActiveConnections = jdbcMaxActiveConnections;
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setJdbcMaxIdleConnections(int jdbcMaxIdleConnections) {
         this.jdbcMaxIdleConnections = jdbcMaxIdleConnections;
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setJdbcMaxCheckoutTime(int jdbcMaxCheckoutTime) {
         this.jdbcMaxCheckoutTime = jdbcMaxCheckoutTime;
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setJdbcMaxWaitTime(int jdbcMaxWaitTime) {
         this.jdbcMaxWaitTime = jdbcMaxWaitTime;
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setJdbcPingEnabled(boolean jdbcPingEnabled) {
         this.jdbcPingEnabled = jdbcPingEnabled;
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setJdbcPingQuery(String jdbcPingQuery) {
         this.jdbcPingQuery = jdbcPingQuery;
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setJdbcPingConnectionNotUsedFor(int jdbcPingNotUsedFor) {
         this.jdbcPingConnectionNotUsedFor = jdbcPingNotUsedFor;
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setJdbcDefaultTransactionIsolationLevel(int jdbcDefaultTransactionIsolationLevel) {
         this.jdbcDefaultTransactionIsolationLevel = jdbcDefaultTransactionIsolationLevel;
         return this;
@@ -444,11 +451,13 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setClassLoader(ClassLoader classLoader) {
         this.classLoader = classLoader;
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setUseClassForNameClassLoading(boolean useClassForNameClassLoading) {
         this.useClassForNameClassLoading = useClassForNameClassLoading;
         return this;
@@ -490,6 +499,7 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setDataSourceJndiName(String dataSourceJndiName) {
         this.dataSourceJndiName = dataSourceJndiName;
         return this;
@@ -549,36 +559,43 @@ public abstract class ProcessEngineConfiguration extends AbstractEngineConfigura
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setDatabaseTablePrefix(String databaseTablePrefix) {
         this.databaseTablePrefix = databaseTablePrefix;
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setTablePrefixIsSchema(boolean tablePrefixIsSchema) {
         this.tablePrefixIsSchema = tablePrefixIsSchema;
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setDatabaseWildcardEscapeCharacter(String databaseWildcardEscapeCharacter) {
         this.databaseWildcardEscapeCharacter = databaseWildcardEscapeCharacter;
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setDatabaseCatalog(String databaseCatalog) {
         this.databaseCatalog = databaseCatalog;
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setDatabaseSchema(String databaseSchema) {
         this.databaseSchema = databaseSchema;
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setXmlEncoding(String xmlEncoding) {
         this.xmlEncoding = xmlEncoding;
         return this;
     }
 
+    @Override
     public ProcessEngineConfiguration setClock(Clock clock) {
         this.clock = clock;
         return this;

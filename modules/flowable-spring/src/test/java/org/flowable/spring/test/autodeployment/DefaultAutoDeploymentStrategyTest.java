@@ -29,7 +29,7 @@ import java.io.InputStream;
 import java.util.zip.ZipInputStream;
 
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.spring.autodeployment.DefaultAutoDeploymentStrategy;
+import org.flowable.spring.configurator.DefaultAutoDeploymentStrategy;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,6 +44,7 @@ public class DefaultAutoDeploymentStrategyTest extends AbstractAutoDeploymentStr
 
     private DefaultAutoDeploymentStrategy classUnderTest;
 
+    @Override
     @Before
     public void before() throws Exception {
         super.before();

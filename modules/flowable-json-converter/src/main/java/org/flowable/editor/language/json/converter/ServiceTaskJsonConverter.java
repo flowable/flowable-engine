@@ -14,6 +14,7 @@ package org.flowable.editor.language.json.converter;
 
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.node.BooleanNode;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.FieldExtension;
@@ -48,10 +49,12 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
         convertersToJsonMap.put(HttpServiceTask.class, ServiceTaskJsonConverter.class);
     }
 
+    @Override
     protected String getStencilId(BaseElement baseElement) {
         return STENCIL_TASK_SERVICE;
     }
 
+    @Override
     protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
         ServiceTask serviceTask = (ServiceTask) baseElement;
 
@@ -86,6 +89,9 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
                     decisionReferenceNode.put("id", modelInfo.getId());
                     decisionReferenceNode.put("name", modelInfo.getName());
                     decisionReferenceNode.put("key", modelInfo.getKey());
+                } else if (PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY.equals(fieldExtension.getFieldName())) {
+                    propertiesNode.set(PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS,
+                            BooleanNode.valueOf(Boolean.parseBoolean(fieldExtension.getStringValue())));
                 }
             }
 
@@ -121,6 +127,7 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
         }
     }
 
+    @Override
     protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
         ServiceTask task = new ServiceTask();
         if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_SERVICETASK_CLASS, elementNode))) {

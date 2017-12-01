@@ -12,17 +12,31 @@
  */
 package org.flowable.bpmn.model;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.Date;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Lori Small
  */
 public class DateDataObject extends ValuedDataObject {
 
+    @Override
     public void setValue(Object value) {
-        this.value = (Date) value;
+    	if (value instanceof String && !StringUtils.isEmpty(((String) value).trim())) {
+    		try {
+				this.value = DateFormat.getDateTimeInstance().parse((String) value);
+			} catch (ParseException e) {
+				System.out.println("Error parsing Date string: " + value);
+			}
+    	} else if (value instanceof Date) {
+    		this.value = value;
+    	}
     }
 
+    @Override
     public DateDataObject clone() {
         DateDataObject clone = new DateDataObject();
         clone.setValues(this);

@@ -25,14 +25,11 @@ import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
-import org.flowable.engine.impl.asyncexecutor.JobManager;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.history.HistoryManager;
-import org.flowable.engine.impl.jobexecutor.FailedJobCommandFactory;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntityManager;
 import org.flowable.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.flowable.engine.impl.persistence.entity.CommentEntityManager;
-import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntityManager;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityManager;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntityManager;
 import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManager;
@@ -40,37 +37,41 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntityManager;
-import org.flowable.engine.impl.persistence.entity.IdentityLinkEntityManager;
-import org.flowable.engine.impl.persistence.entity.JobEntityManager;
 import org.flowable.engine.impl.persistence.entity.ModelEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionInfoEntityManager;
 import org.flowable.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManager;
-import org.flowable.engine.impl.persistence.entity.SuspendedJobEntityManager;
 import org.flowable.engine.impl.persistence.entity.TableDataManager;
-import org.flowable.engine.impl.persistence.entity.TaskEntityManager;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntityManager;
-import org.flowable.engine.impl.persistence.entity.VariableInstanceEntityManager;
 import org.flowable.form.api.FormEngineConfigurationApi;
 import org.flowable.form.api.FormManagementService;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
+import org.flowable.identitylink.service.HistoricIdentityLinkService;
+import org.flowable.identitylink.service.IdentityLinkService;
+import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntityManager;
+import org.flowable.job.service.HistoryJobService;
+import org.flowable.job.service.JobService;
+import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.TimerJobService;
+import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
+import org.flowable.task.service.HistoricTaskService;
+import org.flowable.task.service.TaskService;
+import org.flowable.task.service.TaskServiceConfiguration;
+import org.flowable.variable.service.HistoricVariableService;
+import org.flowable.variable.service.VariableService;
+import org.flowable.variable.service.VariableServiceConfiguration;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class CommandContextUtil {
     
-    public static final String ATTRIBUTE_INVOLVED_EXECUTIONS = "ctx.attribue.involvedExecutions";
+    public static final String ATTRIBUTE_INVOLVED_EXECUTIONS = "ctx.attribute.involvedExecutions";
     
     public static ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
         return getProcessEngineConfiguration(getCommandContext());
@@ -81,6 +82,147 @@ public class CommandContextUtil {
             return (ProcessEngineConfigurationImpl) commandContext.getEngineConfigurations().get(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
         }
         return null;
+    }
+    
+    // VARIABLE SERVICE
+    public static VariableServiceConfiguration getVariableServiceConfiguration() {
+        return getVariableServiceConfiguration(getCommandContext());
+    }
+    
+    public static VariableServiceConfiguration getVariableServiceConfiguration(CommandContext commandContext) {
+        return (VariableServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG);
+    }
+    
+    public static VariableService getVariableService() {
+        VariableService variableService = null;
+        VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration();
+        if (variableServiceConfiguration != null) {
+            variableService = variableServiceConfiguration.getVariableService();
+        }
+        
+        return variableService;
+    }
+    
+    public static HistoricVariableService getHistoricVariableService() {
+        HistoricVariableService historicVariableService = null;
+        VariableServiceConfiguration variableServiceConfiguration = getVariableServiceConfiguration();
+        if (variableServiceConfiguration != null) {
+            historicVariableService = variableServiceConfiguration.getHistoricVariableService();
+        }
+        
+        return historicVariableService;
+    }
+    
+    // IDENTITY LINK SERVICE
+    public static IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration() {
+        return getIdentityLinkServiceConfiguration(getCommandContext());
+    }
+    
+    public static IdentityLinkServiceConfiguration getIdentityLinkServiceConfiguration(CommandContext commandContext) {
+        return (IdentityLinkServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG);
+    }
+    
+    public static IdentityLinkService getIdentityLinkService() {
+        IdentityLinkService identityLinkService = null;
+        IdentityLinkServiceConfiguration identityLinkServiceConfiguration = getIdentityLinkServiceConfiguration();
+        if (identityLinkServiceConfiguration != null) {
+            identityLinkService = identityLinkServiceConfiguration.getIdentityLinkService();
+        }
+        
+        return identityLinkService;
+    }
+    
+    public static HistoricIdentityLinkService getHistoricIdentityLinkService() {
+        HistoricIdentityLinkService historicIdentityLinkService = null;
+        IdentityLinkServiceConfiguration identityLinkServiceConfiguration = getIdentityLinkServiceConfiguration();
+        if (identityLinkServiceConfiguration != null) {
+            historicIdentityLinkService = identityLinkServiceConfiguration.getHistoricIdentityLinkService();
+        }
+        
+        return historicIdentityLinkService;
+    }
+    
+    // TASK SERVICE
+    public static TaskServiceConfiguration getTaskServiceConfiguration() {
+        return getTaskServiceConfiguration(getCommandContext());
+    }
+    
+    public static TaskServiceConfiguration getTaskServiceConfiguration(CommandContext commandContext) {
+        return (TaskServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
+    }
+    
+    public static TaskService getTaskService() {
+        return getTaskService(getCommandContext());
+    }
+    
+    public static TaskService getTaskService(CommandContext commandContext) {
+        TaskService taskService = null;
+        TaskServiceConfiguration taskServiceConfiguration = getTaskServiceConfiguration(commandContext);
+        if (taskServiceConfiguration != null) {
+            taskService = taskServiceConfiguration.getTaskService();
+        }
+        return taskService;
+    }
+    
+    public static HistoricTaskService getHistoricTaskService() {
+        HistoricTaskService historicTaskService = null;
+        TaskServiceConfiguration taskServiceConfiguration = getTaskServiceConfiguration();
+        if (taskServiceConfiguration != null) {
+            historicTaskService = taskServiceConfiguration.getHistoricTaskService();
+        }
+        
+        return historicTaskService;
+    }
+    
+    // JOB SERVICE
+    public static JobServiceConfiguration getJobServiceConfiguration() {
+        return getJobServiceConfiguration(getCommandContext());
+    }
+    
+    public static JobServiceConfiguration getJobServiceConfiguration(CommandContext commandContext) {
+        return (JobServiceConfiguration) commandContext.getServiceConfigurations().get(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG);
+    }
+    
+    public static JobService getJobService() {
+        return getJobService(getCommandContext());
+    }
+    
+    public static JobService getJobService(CommandContext commandContext) {
+        JobService jobService = null;
+        JobServiceConfiguration jobServiceConfiguration = getJobServiceConfiguration(commandContext);
+        if (jobServiceConfiguration != null) {
+            jobService = jobServiceConfiguration.getJobService();
+        }
+        
+        return jobService;
+    }
+    
+    public static TimerJobService getTimerJobService() {
+        return getTimerJobService(getCommandContext());
+    }
+    
+    public static TimerJobService getTimerJobService(CommandContext commandContext) {
+        TimerJobService timerJobService = null;
+        JobServiceConfiguration jobServiceConfiguration = getJobServiceConfiguration(commandContext);
+        if (jobServiceConfiguration != null) {
+            timerJobService = jobServiceConfiguration.getTimerJobService();
+        }
+        
+        return timerJobService;
+    }
+    
+    public static HistoryJobService getHistoryJobService() {
+        return getHistoryJobService(getCommandContext());
+    }
+    
+    public static HistoryJobService getHistoryJobService(CommandContext commandContext) {
+        HistoryJobService historyJobService = null;
+        JobServiceConfiguration jobServiceConfiguration = getJobServiceConfiguration(commandContext);
+        if (jobServiceConfiguration != null) {
+            historyJobService = jobServiceConfiguration.getHistoryJobService();
+        }
+        
+        return historyJobService;
     }
     
     // IDM ENGINE
@@ -319,76 +461,12 @@ public class CommandContextUtil {
         return getProcessEngineConfiguration(commandContext).getExecutionEntityManager();
     }
     
-    public static TaskEntityManager getTaskEntityManager() {
-        return getTaskEntityManager(getCommandContext());
-    }
-    
-    public static TaskEntityManager getTaskEntityManager(CommandContext commandContext) {
-        return getProcessEngineConfiguration(commandContext).getTaskEntityManager();
-    }
-    
-    public static VariableInstanceEntityManager getVariableInstanceEntityManager() {
-        return getVariableInstanceEntityManager(getCommandContext());
-    }
-    
-    public static VariableInstanceEntityManager getVariableInstanceEntityManager(CommandContext commandContext) {
-        return getProcessEngineConfiguration(commandContext).getVariableInstanceEntityManager();
-    }
-    
-    public static JobEntityManager getJobEntityManager() {
-        return getJobEntityManager(getCommandContext());
-    }
-    
-    public static JobEntityManager getJobEntityManager(CommandContext commandContext) {
-        return getProcessEngineConfiguration(commandContext).getJobEntityManager();
-    }
-    
-    public static TimerJobEntityManager getTimerJobEntityManager() {
-        return getTimerJobEntityManager(getCommandContext());
-    }
-    
-    public static TimerJobEntityManager getTimerJobEntityManager(CommandContext commandContext) {
-        return getProcessEngineConfiguration(commandContext).getTimerJobEntityManager();
-    }
-    
-    public static SuspendedJobEntityManager getSuspendedJobEntityManager() {
-        return getSuspendedJobEntityManager(getCommandContext());
-    }
-    
-    public static SuspendedJobEntityManager getSuspendedJobEntityManager(CommandContext commandContext) {
-        return getProcessEngineConfiguration(commandContext).getSuspendedJobEntityManager();
-    }
-    
-    public static DeadLetterJobEntityManager getDeadLetterJobEntityManager() {
-        return getDeadLetterJobEntityManager(getCommandContext());
-    }
-    
-    public static DeadLetterJobEntityManager getDeadLetterJobEntityManager(CommandContext commandContext) {
-        return getProcessEngineConfiguration(commandContext).getDeadLetterJobEntityManager();
-    }
-    
-    public static JobManager getJobManager() {
-        return getJobManager(getCommandContext());
-    }
-    
-    public static JobManager getJobManager(CommandContext commandContext) {
-        return getProcessEngineConfiguration(commandContext).getJobManager();
-    }
-    
     public static EventSubscriptionEntityManager getEventSubscriptionEntityManager() {
         return getEventSubscriptionEntityManager(getCommandContext());
     }
     
     public static EventSubscriptionEntityManager getEventSubscriptionEntityManager(CommandContext commandContext) {
         return getProcessEngineConfiguration(commandContext).getEventSubscriptionEntityManager();
-    }
-    
-    public static IdentityLinkEntityManager getIdentityLinkEntityManager() {
-        return getIdentityLinkEntityManager(getCommandContext());
-    }
-    
-    public static IdentityLinkEntityManager getIdentityLinkEntityManager(CommandContext commandContext) {
-        return getProcessEngineConfiguration(commandContext).getIdentityLinkEntityManager();
     }
     
     public static PrivilegeEntityManager getPrivilegeEntityManager() {
@@ -427,28 +505,12 @@ public class CommandContextUtil {
         return getProcessEngineConfiguration(commandContext).getHistoricProcessInstanceEntityManager();
     }
     
-    public static HistoricTaskInstanceEntityManager getHistoricTaskInstanceEntityManager() {
-        return getHistoricTaskInstanceEntityManager(getCommandContext());
-    }
-    
-    public static HistoricTaskInstanceEntityManager getHistoricTaskInstanceEntityManager(CommandContext commandContext) {
-        return getProcessEngineConfiguration(commandContext).getHistoricTaskInstanceEntityManager();
-    }
-    
     public static HistoricActivityInstanceEntityManager getHistoricActivityInstanceEntityManager() {
         return getHistoricActivityInstanceEntityManager(getCommandContext());
     }
     
     public static HistoricActivityInstanceEntityManager getHistoricActivityInstanceEntityManager(CommandContext commandContext) {
         return getProcessEngineConfiguration(commandContext).getHistoricActivityInstanceEntityManager();
-    }
-    
-    public static HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager() {
-        return getHistoricVariableInstanceEntityManager(getCommandContext());
-    }
-    
-    public static HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager(CommandContext commandContext) {
-        return getProcessEngineConfiguration(commandContext).getHistoricVariableInstanceEntityManager();
     }
     
     public static HistoryManager getHistoryManager(CommandContext commandContext) {
@@ -461,22 +523,6 @@ public class CommandContextUtil {
     
     public static HistoricDetailEntityManager getHistoricDetailEntityManager(CommandContext commandContext) {
         return getProcessEngineConfiguration(commandContext).getHistoricDetailEntityManager();
-    }
-    
-    public static HistoricIdentityLinkEntityManager getHistoricIdentityLinkEntityManager() {
-        return getHistoricIdentityLinkEntityManager(getCommandContext());
-    }
-    
-    public static HistoricIdentityLinkEntityManager getHistoricIdentityLinkEntityManager(CommandContext commandContext) {
-        return getProcessEngineConfiguration(commandContext).getHistoricIdentityLinkEntityManager();
-    }
-    
-    public static HistoryJobEntityManager getHistoryJobEntityManager() {
-        return getHistoryJobEntityManager(getCommandContext());
-    }
-    
-    public static HistoryJobEntityManager getHistoryJobEntityManager(CommandContext commandContext) {
-        return getProcessEngineConfiguration(commandContext).getHistoryJobEntityManager();
     }
     
     public static AttachmentEntityManager getAttachmentEntityManager() {
@@ -509,6 +555,14 @@ public class CommandContextUtil {
     
     public static FailedJobCommandFactory getFailedJobCommandFactory(CommandContext commandContext) {
         return getProcessEngineConfiguration(commandContext).getFailedJobCommandFactory();
+    }
+    
+    public static ProcessInstanceHelper getProcessInstanceHelper() {
+        return getProcessInstanceHelper(getCommandContext());
+    }
+    
+    public static ProcessInstanceHelper getProcessInstanceHelper(CommandContext commandContext) {
+        return getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
     }
     
     public static CommandContext getCommandContext() {

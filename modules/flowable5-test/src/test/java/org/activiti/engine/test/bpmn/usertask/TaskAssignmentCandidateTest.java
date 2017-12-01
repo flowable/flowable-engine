@@ -15,7 +15,6 @@ package org.activiti.engine.test.bpmn.usertask;
 import java.util.List;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -38,7 +37,7 @@ public class TaskAssignmentCandidateTest extends PluggableFlowableTestCase {
     @Deployment
     public void testCandidateGroups() {
         runtimeService.startProcessInstanceByKey("taskCandidateExample");
-        List<Task> tasks = taskService
+        List<org.flowable.task.api.Task> tasks = taskService
                 .createTaskQuery()
                 .taskCandidateGroup("management")
                 .list();

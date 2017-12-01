@@ -24,8 +24,23 @@ angular.module('flowableModeler')
         latestModelId: $routeParams.modelId
     };
     
+    $scope.appBuilder = {
+        activeTab: 'bpmn'
+    };
+    
+    $scope.tabs = [
+        {
+            id: 'bpmn',
+            title: 'BPMN models'
+        },
+        {
+            id: 'cmmn',
+            title: 'CMMN models'
+        }
+    ];
+    
     $scope.loadApp = function() {
-    	$http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/' + $routeParams.modelId}).
+    	$http({method: 'GET', url: FLOWABLE.APP_URL.getAppDefinitionUrl($routeParams.modelId)}).
         	success(function(data, status, headers, config) {
         	    $rootScope.currentAppDefinition = data;
         	    if (!$rootScope.currentAppDefinition.definition.theme) {
@@ -174,7 +189,9 @@ angular.module('flowableModeler')
 
     $scope.popup = {
         loading: false,
-        selectedModels: []
+        selectedModels: [],
+        selectedCmmnModels: [],
+        activeTab: 'bpmn'
     };
     
     if ($rootScope.currentAppDefinition.definition.models) {
@@ -183,12 +200,38 @@ angular.module('flowableModeler')
         }
     }
     
+    if ($rootScope.currentAppDefinition.definition.cmmnModels) {
+        for (var i = 0; i < $rootScope.currentAppDefinition.definition.cmmnModels.length; i++) {
+            $scope.popup.selectedCmmnModels.push($rootScope.currentAppDefinition.definition.cmmnModels[i].id);
+        }
+    }
+    
+    $scope.tabs = [
+        {
+            id: 'bpmn',
+            title: 'BPMN models'
+        },
+        {
+            id: 'cmmn',
+            title: 'CMMN models'
+        }
+    ];
+    
     $scope.loadModels = function() {
         $scope.popup.loading = true;
         
-        $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models-for-app-definition'}).
+        $http({method: 'GET', url: FLOWABLE.APP_URL.getModelsForAppDefinitionUrl()}).
           success(function(data, status, headers, config) {
               $scope.popup.models = data;
+              $scope.popup.loading = false;
+          }).
+          error(function(data, status, headers, config) {
+             $scope.popup.loading = false;
+          });
+          
+        $http({method: 'GET', url: FLOWABLE.APP_URL.getCmmnModelsForAppDefinitionUrl()}).
+          success(function(data, status, headers, config) {
+              $scope.popup.cmmnModels = data;
               $scope.popup.loading = false;
           }).
           error(function(data, status, headers, config) {
@@ -227,8 +270,47 @@ angular.module('flowableModeler')
         $rootScope.currentAppDefinition.definition.models = modelArray;
     };
     
+    $scope.selectCmmnModel = function(model) {
+        var index = $scope.popup.selectedCmmnModels.indexOf(model.id);
+        if (index >= 0) {
+            $scope.popup.selectedCmmnModels.splice(index, 1);
+        } else {
+            $scope.popup.selectedCmmnModels.push(model.id);
+        }
+        
+        var modelArray = [];
+        for (var i = 0; i < $scope.popup.cmmnModels.data.length; i++) {
+            if ($scope.popup.selectedCmmnModels.indexOf($scope.popup.cmmnModels.data[i].id) >= 0) {
+                var selectedModel = $scope.popup.cmmnModels.data[i];
+                var summaryModel = {
+                    id: selectedModel.id,
+                    name: selectedModel.name,
+                    version: selectedModel.version,
+                    modelType: selectedModel.modelType,
+                    description: selectedModel.description,
+                    stencilSetId: selectedModel.stencilSet,
+                    createdByFullName: selectedModel.createdByFullName,
+                    createdBy: selectedModel.createdBy,
+                    lastUpdatedByFullName: selectedModel.lastUpdatedByFullName,
+                    lastUpdatedBy: selectedModel.lastUpdatedBy,
+                    lastUpdated: selectedModel.lastUpdated
+                };
+                modelArray.push(summaryModel);
+            }
+        }
+        $rootScope.currentAppDefinition.definition.cmmnModels = modelArray;
+    };
+    
     $scope.isModelSelected = function(model) {
         if ($scope.popup.selectedModels.indexOf(model.id) >= 0) {
+            return true;
+        } else {
+            return false;
+        }
+    };
+    
+    $scope.isCmmnModelSelected = function(model) {
+        if ($scope.popup.selectedCmmnModels.indexOf(model.id) >= 0) {
             return true;
         } else {
             return false;

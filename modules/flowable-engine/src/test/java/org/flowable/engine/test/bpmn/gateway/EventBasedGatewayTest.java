@@ -20,10 +20,9 @@ import org.flowable.engine.impl.EventSubscriptionQueryImpl;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
 
 /**
  * @author Daniel Meyer
@@ -48,7 +47,7 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
         assertEquals(0, managementService.createJobQuery().count());
         assertEquals(0, managementService.createTimerJobQuery().count());
 
-        Task task = taskService.createTaskQuery().taskName("afterSignal").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskName("afterSignal").singleResult();
         assertNotNull(task);
         taskService.complete(task.getId());
         
@@ -76,7 +75,7 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
         assertEquals(0, managementService.createJobQuery().count());
         assertEquals(0, managementService.createTimerJobQuery().count());
 
-        Task task = taskService.createTaskQuery().taskName("afterTimer").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskName("afterTimer").singleResult();
 
         assertNotNull(task);
 
@@ -115,7 +114,7 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
         assertEquals(0, managementService.createTimerJobQuery().count());
         assertEquals(0, managementService.createJobQuery().count());
 
-        Task task = taskService.createTaskQuery().taskName("afterMessage").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().taskName("afterMessage").singleResult();
         assertNotNull(task);
         taskService.complete(task.getId());
         
@@ -144,7 +143,7 @@ public class EventBasedGatewayTest extends PluggableFlowableTestCase {
 
         // Trying to fire the signal should fail, job not yet created
         runtimeService.signalEventReceived("alert");
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNull(task);
 
         Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();

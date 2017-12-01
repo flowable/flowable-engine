@@ -16,9 +16,9 @@ package org.flowable.rest.api.runtime;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
-import org.flowable.engine.task.Task;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.api.RestUrls;
+import org.flowable.task.api.Task;
 
 import com.fasterxml.jackson.databind.JsonNode;
 

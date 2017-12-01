@@ -22,9 +22,9 @@ import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
+import org.flowable.task.api.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -36,6 +36,7 @@ public class CamelVariableBodyMapTest extends SpringFlowableTestCase {
     @Autowired
     protected CamelContext camelContext;
 
+    @Override
     public void setUp() throws Exception {
         camelContext.addRoutes(new RouteBuilder() {
 
@@ -49,6 +50,7 @@ public class CamelVariableBodyMapTest extends SpringFlowableTestCase {
         service1.reset();
     }
 
+    @Override
     public void tearDown() throws Exception {
         List<Route> routes = camelContext.getRoutes();
         for (Route r : routes) {
@@ -57,9 +59,9 @@ public class CamelVariableBodyMapTest extends SpringFlowableTestCase {
         }
     }
 
-    @Deployment(resources = { "process/HelloCamelBodyMap.bpmn20.xml" })
+    @Deployment(resources = {"process/HelloCamelBodyMap.bpmn20.xml"})
     public void testCamelBody() throws Exception {
-        Map<String, Object> varMap = new HashMap<String, Object>();
+        Map<String, Object> varMap = new HashMap<>();
         varMap.put("camelBody", "hello world");
         service1.expectedBodiesReceived(varMap);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("HelloCamel", varMap);

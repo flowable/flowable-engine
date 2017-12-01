@@ -13,7 +13,7 @@
 
 package org.flowable.engine.form;
 
-import org.flowable.engine.task.Task;
+import org.flowable.task.api.Task;
 
 /**
  * Specific {@link FormData} for completing a task.

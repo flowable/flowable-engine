@@ -31,10 +31,10 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.AbstractFlowableTestCase;
-import org.flowable.engine.impl.variable.EntityManagerSession;
-import org.flowable.engine.impl.variable.EntityManagerSessionFactory;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.variable.service.impl.types.EntityManagerSession;
+import org.flowable.variable.service.impl.types.EntityManagerSessionFactory;
 
 /**
  * @author Frederik Heremans
@@ -69,6 +69,7 @@ public class JPAVariableTest extends AbstractFlowableTestCase {
 
     private static EntityManagerFactory entityManagerFactory;
 
+    @Override
     protected void initializeProcessEngine() {
         if (cachedProcessEngine == null) {
             ProcessEngineConfigurationImpl processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration

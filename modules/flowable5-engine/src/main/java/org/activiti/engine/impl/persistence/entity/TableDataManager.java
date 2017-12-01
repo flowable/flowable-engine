@@ -43,7 +43,7 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.task.Task;
 import org.apache.ibatis.session.RowBounds;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.api.Job;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,8 +54,8 @@ public class TableDataManager extends AbstractManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TableDataManager.class);
 
-    public static Map<Class<?>, String> apiTypeToTableNameMap = new HashMap<Class<?>, String>();
-    public static Map<Class<? extends PersistentObject>, String> persistentObjectToTableNameMap = new HashMap<Class<? extends PersistentObject>, String>();
+    public static Map<Class<?>, String> apiTypeToTableNameMap = new HashMap<>();
+    public static Map<Class<? extends PersistentObject>, String> persistentObjectToTableNameMap = new HashMap<>();
 
     static {
         // runtime
@@ -119,7 +119,7 @@ public class TableDataManager extends AbstractManager {
     }
 
     public Map<String, Long> getTableCount() {
-        Map<String, Long> tableCount = new HashMap<String, Long>();
+        Map<String, Long> tableCount = new HashMap<>();
         try {
             for (String tableName : getTablesPresentInDatabase()) {
                 tableCount.put(tableName, getTableCount(tableName));
@@ -132,7 +132,7 @@ public class TableDataManager extends AbstractManager {
     }
 
     public List<String> getTablesPresentInDatabase() {
-        List<String> tableNames = new ArrayList<String>();
+        List<String> tableNames = new ArrayList<>();
         Connection connection = null;
         try {
             connection = getDbSqlSession().getSqlSession().getConnection();

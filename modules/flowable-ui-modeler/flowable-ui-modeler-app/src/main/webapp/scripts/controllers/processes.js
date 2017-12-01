@@ -76,7 +76,7 @@ angular.module('flowableModeler')
 		    params.filterText = $scope.model.filterText;
 		  }
 
-		  $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models', params: params}).
+		  $http({method: 'GET', url: FLOWABLE.APP_URL.getModelsUrl(), params: params}).
 		  	success(function(data, status, headers, config) {
 	    		$scope.model.processes = data;
 	    		$scope.model.loading = false;
@@ -168,7 +168,7 @@ angular.module('flowableModeler')
 
         $scope.model.loading = true;
 
-        $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models', data: $scope.model.process}).
+        $http({method: 'POST', url: FLOWABLE.APP_URL.getModelsUrl(), data: $scope.model.process}).
             success(function(data) {
                 $scope.$hide();
 
@@ -208,6 +208,7 @@ angular.module('flowableModeler')
         $scope.model.process.key = $scope.originalModel.process.key;
         $scope.model.process.description = $scope.originalModel.process.description;
         $scope.model.process.id = $scope.originalModel.process.id;
+        $scope.model.process.modelType = $scope.originalModel.process.modelType;
     }
 
     $scope.ok = function () {
@@ -220,7 +221,7 @@ angular.module('flowableModeler')
 
         $scope.model.loading = true;
 
-        $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/'+$scope.model.process.id+'/clone', data: $scope.model.process}).
+        $http({method: 'POST', url: FLOWABLE.APP_URL.getCloneModelsUrl(), data: $scope.model.process}).
             success(function(data) {
                 $scope.$hide();
 
@@ -228,9 +229,9 @@ angular.module('flowableModeler')
                 $rootScope.editorHistory = [];
                 $location.path("/editor/" + data.id);
             }).
-            error(function() {
+            error(function(data, status, headers, config) {
                 $scope.model.loading = false;
-                $modal.$hide();
+                $scope.model.errorMessage = data.message;
             });
     };
 
@@ -257,9 +258,9 @@ angular.module('flowableModeler')
 
           var url;
           if (isIE) {
-              url = FLOWABLE.CONFIG.contextRoot + '/app/rest/import-process-model/text';
+              url = FLOWABLE.APP_URL.getImportProcessModelTextUrl();
           } else {
-              url = FLOWABLE.CONFIG.contextRoot + '/app/rest/import-process-model';
+              url = FLOWABLE.APP_URL.getImportProcessModelUrl();
           }
 
           Upload.upload({

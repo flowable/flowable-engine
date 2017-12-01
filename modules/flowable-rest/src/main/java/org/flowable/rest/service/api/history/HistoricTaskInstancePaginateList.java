@@ -17,11 +17,12 @@ import java.util.List;
 
 import org.flowable.rest.api.AbstractPaginateList;
 import org.flowable.rest.service.api.RestResponseFactory;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 /**
  * @author Tijs Rademakers
  */
-public class HistoricTaskInstancePaginateList extends AbstractPaginateList {
+public class HistoricTaskInstancePaginateList extends AbstractPaginateList<HistoricTaskInstanceResponse, HistoricTaskInstance> {
 
     protected RestResponseFactory restResponseFactory;
     protected String serverRootUrl;
@@ -31,9 +32,8 @@ public class HistoricTaskInstancePaginateList extends AbstractPaginateList {
         this.serverRootUrl = serverRootUrl;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
     @Override
-    protected List processList(List list) {
+    protected List<HistoricTaskInstanceResponse> processList(List<HistoricTaskInstance> list) {
         return restResponseFactory.createHistoricTaskInstanceResponseList(list);
     }
 }

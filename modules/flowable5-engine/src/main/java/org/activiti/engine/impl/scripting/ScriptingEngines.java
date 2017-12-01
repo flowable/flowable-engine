@@ -24,7 +24,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.activiti.engine.ActivitiException;
-import org.flowable.engine.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Tom Baeyens
@@ -49,7 +49,7 @@ public class ScriptingEngines {
 
     public ScriptingEngines(ScriptEngineManager scriptEngineManager) {
         this.scriptEngineManager = scriptEngineManager;
-        cachedEngines = new HashMap<String, ScriptEngine>();
+        cachedEngines = new HashMap<>();
     }
 
     public ScriptingEngines addScriptEngineFactory(ScriptEngineFactory scriptEngineFactory) {
@@ -126,12 +126,16 @@ public class ScriptingEngines {
         return scriptEngine;
     }
 
-    /** override to build a spring aware ScriptingEngines */
+    /**
+     * override to build a spring aware ScriptingEngines
+     */
     protected Bindings createBindings(VariableScope variableScope) {
         return scriptBindingsFactory.createBindings(variableScope);
     }
 
-    /** override to build a spring aware ScriptingEngines */
+    /**
+     * override to build a spring aware ScriptingEngines
+     */
     protected Bindings createBindings(VariableScope variableScope, boolean storeScriptVariables) {
         return scriptBindingsFactory.createBindings(variableScope, storeScriptVariables);
     }

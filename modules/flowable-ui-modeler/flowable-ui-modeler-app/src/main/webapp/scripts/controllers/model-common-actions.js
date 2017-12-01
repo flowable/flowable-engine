@@ -21,6 +21,9 @@ angular.module('flowableModeler')
         if ($scope.model.process) {
             model = $scope.model.process;
             popupType = 'PROCESS';
+        } else if ($scope.model.caseModel) {
+            model = $scope.model.caseModel;
+            popupType = 'CASE';
         } else if ($scope.model.form) {
             model = $scope.model.form;
             popupType = 'FORM';
@@ -60,10 +63,12 @@ angular.module('flowableModeler')
     			$scope.model.description
     		};
 
-    		$http({method: 'PUT', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.popup.id, data: updateData}).
+    		$http({method: 'PUT', url: FLOWABLE.APP_URL.getModelUrl($scope.popup.id), data: updateData}).
     			success(function(data, status, headers, config) {
     				if ($scope.model.process) {
     					$scope.model.process = data;
+    				} else if ($scope.model.caseModel) {
+                        $scope.model.caseModel = data;
     				} else if ($scope.model.form) {
     					$scope.model.form = data;
     				} else if ($scope.model.decisionTable) {
@@ -82,6 +87,8 @@ angular.module('flowableModeler')
                         $location.path("/apps/" +  $scope.popup.id);
                     } else if (popupType === 'DECISION-TABLE') {
                         $location.path("/decision-tables/" +  $scope.popup.id);
+                    } else if (popupType === 'CASE') {
+                        $location.path("/casemodels/" +  $scope.popup.id);
                     } else {
                         $location.path("/processes/" +  $scope.popup.id);
                     }
@@ -108,6 +115,9 @@ angular.module('flowableModeler')
         if ($scope.model.process) {
             model = $scope.model.process;
             popupType = 'PROCESS';
+        } else if ($scope.model.caseModel) {
+            model = $scope.model.caseModel;
+            popupType = 'CASE';
         } else if ($scope.model.form) {
             model = $scope.model.form;
             popupType = 'FORM';
@@ -128,7 +138,7 @@ angular.module('flowableModeler')
         };
 
         // Loading relations when opening
-        $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.popup.model.id + '/parent-relations'}).
+        $http({method: 'GET', url: FLOWABLE.APP_URL.getModelParentRelationsUrl($scope.popup.model.id)}).
             success(function (data, status, headers, config) {
                 $scope.popup.loading = false;
                 $scope.popup.loadingRelations = false;
@@ -146,7 +156,7 @@ angular.module('flowableModeler')
                 cascade: $scope.popup.cascade === 'true'
             };
 
-            $http({method: 'DELETE', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.popup.model.id, params: params}).
+            $http({method: 'DELETE', url: FLOWABLE.APP_URL.getModelUrl($scope.popup.model.id), params: params}).
                 success(function (data, status, headers, config) {
                     $scope.$hide();
                     $scope.popup.loading = false;
@@ -174,6 +184,9 @@ angular.module('flowableModeler')
 	if ($scope.model.process) {
 		model = $scope.model.process;
 		popupType = 'PROCESS';
+	} else if ($scope.model.caseModel) {
+        model = $scope.model.caseModel;
+        popupType = 'CASE';
 	} else if ($scope.model.form) {
         model = $scope.model.form;
         popupType = 'FORM';
@@ -201,7 +214,7 @@ angular.module('flowableModeler')
 			comment: $scope.popup.comment
 		};
 
-		$http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.popup.latestModelId + '/history/' + $scope.popup.model.id, data: actionData}).
+		$http({method: 'POST', url: FLOWABLE.APP_URL.getModelHistoryUrl($scope.popup.latestModelId, $scope.popup.model.id), data: actionData}).
 			success(function(data, status, headers, config) {
 
                 var backToOverview = function() {
@@ -211,6 +224,8 @@ angular.module('flowableModeler')
                         $location.path("/apps/" +  $scope.popup.latestModelId);
                     } else if (popupType === 'DECISION-TABLE') {
                         $location.path("/decision-tables/" +  $scope.popup.latestModelId);
+                    } else if (popupType === 'CASE') {
+                        $location.path("/casemodels/" +  $scope.popup.latestModelId);
                     } else {
                         $location.path("/processes/" +  $scope.popup.latestModelId);
                     }

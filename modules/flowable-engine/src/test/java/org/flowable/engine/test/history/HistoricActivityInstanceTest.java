@@ -16,16 +16,15 @@ package org.flowable.engine.test.history;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -96,7 +95,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         assertEquals("The Start event is completed", 1, finishedActivityInstanceCount);
 
         long unfinishedActivityInstanceCount = historicActivityInstanceQuery.unfinished().count();
-        assertEquals("One active (unfinished) User Task", 1, unfinishedActivityInstanceCount);
+        assertEquals("One active (unfinished) User org.flowable.task.service.Task", 1, unfinishedActivityInstanceCount);
     }
 
     @Deployment
@@ -196,7 +195,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         // Get task list
         HistoricActivityInstance historicActivityInstance = historyService.createHistoricActivityInstanceQuery().activityId("theTask").singleResult();
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals(task.getId(), historicActivityInstance.getTaskId());
         assertEquals("kermit", historicActivityInstance.getAssignee());
     }
@@ -288,7 +287,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
     public void testBoundaryEvent() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("boundaryEventProcess");
         // Complete the task with the boundary-event on it
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
         taskService.complete(task.getId());
 
@@ -345,7 +344,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
     public void testParallelJoinEndTime() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("forkJoin");
 
-        List<Task> tasksToComplete = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        List<org.flowable.task.api.Task> tasksToComplete = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(2, tasksToComplete.size());
 
         // Complete both tasks, second task-complete should end the fork-gateway and set time
@@ -373,7 +372,7 @@ public class HistoricActivityInstanceTest extends PluggableFlowableTestCase {
         // 15 service tasks should have passed
 
         for (int i = 0; i < 10; i++) {
-            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             Number inputNumber = (Number) taskService.getVariable(task.getId(), "input");
             int input = inputNumber.intValue();
             assertEquals(i, input);

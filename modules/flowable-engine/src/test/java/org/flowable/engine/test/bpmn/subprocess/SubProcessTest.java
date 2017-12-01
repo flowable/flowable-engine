@@ -18,17 +18,16 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.history.HistoricActivityInstance;
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskQuery;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
+import org.flowable.task.api.TaskQuery;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 /**
  * @author Joram Barrez
@@ -41,7 +40,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
 
         // After staring the process, the task in the subprocess should be active
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess");
-        Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals("Task in subprocess", subProcessTask.getName());
 
         // After completing the task in the subprocess,
@@ -67,7 +66,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
 
         // After staring the process, the task in the subprocess should be active
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcess");
-        Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals("Task in subprocess", subProcessTask.getName());
 
         // Setting the clock forward 2 hours 1 second (timer fires in 2 hours) and fire up the job executor
@@ -76,7 +75,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         waitForJobExecutorToProcessAllJobs(5000L, 500L);
 
         // The subprocess should be left, and the escalated task should be active
-        Task escalationTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task escalationTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals("Fix escalated problem", escalationTask.getName());
 
         // Verify history for task that was killed
@@ -99,17 +98,17 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleSubProcessWithConcurrentTimer");
         TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(pi.getId()).orderByTaskName().asc();
 
-        Task subProcessTask = taskQuery.singleResult();
+        org.flowable.task.api.Task subProcessTask = taskQuery.singleResult();
         assertEquals("Task in subprocess", subProcessTask.getName());
 
         // When the timer is fired (after 2 hours), two concurrent paths should be created
         Job job = managementService.createJobQuery().singleResult();
         managementService.executeJob(job.getId());
 
-        List<Task> tasksAfterTimer = taskQuery.list();
+        List<org.flowable.task.api.Task> tasksAfterTimer = taskQuery.list();
         assertEquals(2, tasksAfterTimer.size());
-        Task taskAfterTimer1 = tasksAfterTimer.get(0);
-        Task taskAfterTimer2 = tasksAfterTimer.get(1);
+        org.flowable.task.api.Task taskAfterTimer1 = tasksAfterTimer.get(0);
+        org.flowable.task.api.Task taskAfterTimer2 = tasksAfterTimer.get(1);
         assertEquals("Task after timer 1", taskAfterTimer1.getName());
         assertEquals("Task after timer 2", taskAfterTimer2.getName());
 
@@ -131,13 +130,13 @@ public class SubProcessTest extends PluggableFlowableTestCase {
 
         // After staring the process, the task in the inner subprocess must be active
         pi = runtimeService.startProcessInstanceByKey("nestedSimpleSubProcess");
-        Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals("Task in subprocess", subProcessTask.getName());
 
         // After completing the task in the subprocess,
         // both subprocesses are destroyed and the task after the subprocess should be active
         taskService.complete(subProcessTask.getId());
-        Task taskAfterSubProcesses = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task taskAfterSubProcesses = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertNotNull(taskAfterSubProcesses);
         assertEquals("Task after subprocesses", taskAfterSubProcesses.getName());
         taskService.complete(taskAfterSubProcesses.getId());
@@ -151,7 +150,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
 
         // After staring the process, the task in the subprocess should be active
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("nestedSubProcessWithTimer");
-        Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals("Task in subprocess", subProcessTask.getName());
 
         // Setting the clock forward 1 hour 1 second (timer fires in 1 hour) and
@@ -160,13 +159,13 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         waitForJobExecutorToProcessAllJobs(5000L, 50L);
 
         // The inner subprocess should be destroyed, and the escalated task should be active
-        Task escalationTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task escalationTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals("Escalated task", escalationTask.getName());
 
         // Completing the escalated task, destroys the outer scope and activates
         // the task after the subprocess
         taskService.complete(escalationTask.getId());
-        Task taskAfterSubProcess = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task taskAfterSubProcess = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals("Task after subprocesses", taskAfterSubProcess.getName());
     }
 
@@ -177,14 +176,14 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     public void testDoubleNestedSimpleSubProcess() {
         // After staring the process, the task in the inner subprocess must be active
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("nestedSimpleSubProcess");
-        Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task subProcessTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals("Task in subprocess", subProcessTask.getName());
 
         // After completing the task in the subprocess,
         // both subprocesses are destroyed and the task after the subprocess
         // should be active
         taskService.complete(subProcessTask.getId());
-        Task taskAfterSubProcesses = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task taskAfterSubProcesses = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals("Task after subprocesses", taskAfterSubProcesses.getName());
     }
 
@@ -193,11 +192,11 @@ public class SubProcessTest extends PluggableFlowableTestCase {
 
         // After starting the process, the two task in the subprocess should be active
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("simpleParallelSubProcess");
-        List<Task> subProcessTasks = taskService.createTaskQuery().processInstanceId(pi.getId()).orderByTaskName().asc().list();
+        List<org.flowable.task.api.Task> subProcessTasks = taskService.createTaskQuery().processInstanceId(pi.getId()).orderByTaskName().asc().list();
 
         // Tasks are ordered by name (see query)
-        Task taskA = subProcessTasks.get(0);
-        Task taskB = subProcessTasks.get(1);
+        org.flowable.task.api.Task taskA = subProcessTasks.get(0);
+        org.flowable.task.api.Task taskB = subProcessTasks.get(1);
         assertEquals("Task A", taskA.getName());
         assertEquals("Task B", taskB.getName());
 
@@ -205,7 +204,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         // task after the subprocess
         taskService.complete(taskA.getId());
         taskService.complete(taskB.getId());
-        Task taskAfterSubProcess = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task taskAfterSubProcess = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals("Task after sub process", taskAfterSubProcess.getName());
     }
 
@@ -214,11 +213,11 @@ public class SubProcessTest extends PluggableFlowableTestCase {
 
         // After staring the process, the tasks in the subprocess should be active
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("simpleParallelSubProcessWithTimer");
-        List<Task> subProcessTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
+        List<org.flowable.task.api.Task> subProcessTasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).orderByTaskName().asc().list();
 
         // Tasks are ordered by name (see query)
-        Task taskA = subProcessTasks.get(0);
-        Task taskB = subProcessTasks.get(1);
+        org.flowable.task.api.Task taskA = subProcessTasks.get(0);
+        org.flowable.task.api.Task taskB = subProcessTasks.get(1);
         assertEquals("Task A", taskA.getName());
         assertEquals("Task B", taskB.getName());
 
@@ -228,7 +227,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         managementService.executeJob(job.getId());
 
         // The inner subprocess should be destroyed, and the task after the timer should be active
-        Task taskAfterTimer = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task taskAfterTimer = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("Task after timer", taskAfterTimer.getName());
 
         // Completing the task after the timer ends the process instance
@@ -241,7 +240,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     public void testTwoSubProcessInParallel() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("twoSubProcessInParallel");
         TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(pi.getId()).orderByTaskName().asc();
-        List<Task> tasks = taskQuery.list();
+        List<org.flowable.task.api.Task> tasks = taskQuery.list();
 
         // After process start, both tasks in the subprocesses should be active
         assertEquals("Task in subprocess A", tasks.get(0).getName());
@@ -273,11 +272,11 @@ public class SubProcessTest extends PluggableFlowableTestCase {
     public void testTwoSubProcessInParallelWithinSubProcess() {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("twoSubProcessInParallelWithinSubProcess");
         TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(pi.getId()).orderByTaskName().asc();
-        List<Task> tasks = taskQuery.list();
+        List<org.flowable.task.api.Task> tasks = taskQuery.list();
 
         // After process start, both tasks in the subprocesses should be active
-        Task taskA = tasks.get(0);
-        Task taskB = tasks.get(1);
+        org.flowable.task.api.Task taskA = tasks.get(0);
+        org.flowable.task.api.Task taskB = tasks.get(1);
         assertEquals("Task in subprocess A", taskA.getName());
         assertEquals("Task in subprocess B", taskB.getName());
 
@@ -285,7 +284,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         taskService.complete(taskA.getId());
         taskService.complete(taskB.getId());
 
-        Task taskAfterSubProcess = taskQuery.singleResult();
+        org.flowable.task.api.Task taskAfterSubProcess = taskQuery.singleResult();
         assertEquals("Task after subprocess", taskAfterSubProcess.getName());
 
         // Completing this task should end the process
@@ -300,11 +299,11 @@ public class SubProcessTest extends PluggableFlowableTestCase {
 
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("nestedParallelSubProcessesWithTimer");
         TaskQuery taskQuery = taskService.createTaskQuery().processInstanceId(pi.getId()).orderByTaskName().asc();
-        List<Task> tasks = taskQuery.list();
+        List<org.flowable.task.api.Task> tasks = taskQuery.list();
 
         // After process start, both tasks in the subprocesses should be active
-        Task taskA = tasks.get(0);
-        Task taskB = tasks.get(1);
+        org.flowable.task.api.Task taskA = tasks.get(0);
+        org.flowable.task.api.Task taskB = tasks.get(1);
         assertEquals("Task in subprocess A", taskA.getName());
         assertEquals("Task in subprocess B", taskB.getName());
 
@@ -316,7 +315,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         managementService.moveTimerToExecutableJob(job.getId());
         managementService.executeJob(job.getId());
 
-        Task taskAfterTimer = taskQuery.singleResult();
+        org.flowable.task.api.Task taskAfterTimer = taskQuery.singleResult();
         assertEquals("Task after timer", taskAfterTimer.getName());
 
         // Completing the task should end the process instance
@@ -361,7 +360,7 @@ public class SubProcessTest extends PluggableFlowableTestCase {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("dataObjectScope");
 
         // get main process task
-        Task currentTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task currentTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
 
         assertEquals("Complete Task A", currentTask.getName());
 

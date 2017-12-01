@@ -31,6 +31,7 @@ public class DbSchemaDrop {
         CommandExecutor commandExecutor = idmEngine.getIdmEngineConfiguration().getCommandExecutor();
         CommandConfig config = new CommandConfig().transactionNotSupported();
         commandExecutor.execute(config, new Command<Object>() {
+            @Override
             public Object execute(CommandContext commandContext) {
                 CommandContextUtil.getIdmEngineConfiguration(commandContext).getDbSchemaManager().dbSchemaDrop();
                 return null;

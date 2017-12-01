@@ -69,8 +69,8 @@ import org.flowable.engine.repository.NativeModelQuery;
 import org.flowable.engine.repository.NativeProcessDefinitionQuery;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
-import org.flowable.engine.task.IdentityLink;
 import org.flowable.form.api.FormDefinition;
+import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.validation.ValidationError;
 
 /**
@@ -80,6 +80,7 @@ import org.flowable.validation.ValidationError;
  */
 public class RepositoryServiceImpl extends ServiceImpl implements RepositoryService {
 
+    @Override
     public DeploymentBuilder createDeployment() {
         return commandExecutor.execute(new Command<DeploymentBuilder>() {
             @Override
@@ -93,6 +94,7 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
         return commandExecutor.execute(new DeployCmd<Deployment>(deploymentBuilder));
     }
 
+    @Override
     public void deleteDeployment(String deploymentId) {
         commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, false));
     }
@@ -101,18 +103,22 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
         commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, true));
     }
 
+    @Override
     public void deleteDeployment(String deploymentId, boolean cascade) {
         commandExecutor.execute(new DeleteDeploymentCmd(deploymentId, cascade));
     }
 
+    @Override
     public void setDeploymentCategory(String deploymentId, String category) {
         commandExecutor.execute(new SetDeploymentCategoryCmd(deploymentId, category));
     }
 
+    @Override
     public void setDeploymentKey(String deploymentId, String key) {
         commandExecutor.execute(new SetDeploymentKeyCmd(deploymentId, key));
     }
 
+    @Override
     public ProcessDefinitionQuery createProcessDefinitionQuery() {
         return new ProcessDefinitionQueryImpl(commandExecutor);
     }
@@ -122,11 +128,13 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
         return new NativeProcessDefinitionQueryImpl(commandExecutor);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public List<String> getDeploymentResourceNames(String deploymentId) {
         return commandExecutor.execute(new GetDeploymentResourceNamesCmd(deploymentId));
     }
 
+    @Override
     public InputStream getResourceAsStream(String deploymentId, String resourceName) {
         return commandExecutor.execute(new GetDeploymentResourceCmd(deploymentId, resourceName));
     }
@@ -136,6 +144,7 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
         commandExecutor.execute(new ChangeDeploymentTenantIdCmd(deploymentId, newTenantId));
     }
 
+    @Override
     public DeploymentQuery createDeploymentQuery() {
         return new DeploymentQueryImpl(commandExecutor);
     }
@@ -145,14 +154,17 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
         return new NativeDeploymentQueryImpl(commandExecutor);
     }
 
+    @Override
     public ProcessDefinition getProcessDefinition(String processDefinitionId) {
         return commandExecutor.execute(new GetDeploymentProcessDefinitionCmd(processDefinitionId));
     }
 
+    @Override
     public Boolean isFlowable5ProcessDefinition(String processDefinitionId) {
         return commandExecutor.execute(new IsFlowable5ProcessDefinitionCmd(processDefinitionId));
     }
 
+    @Override
     public BpmnModel getBpmnModel(String processDefinitionId) {
         return commandExecutor.execute(new GetBpmnModelCmd(processDefinitionId));
     }
@@ -161,102 +173,127 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
         return commandExecutor.execute(new GetDeploymentProcessDefinitionCmd(processDefinitionId));
     }
 
+    @Override
     public boolean isProcessDefinitionSuspended(String processDefinitionId) {
         return commandExecutor.execute(new IsProcessDefinitionSuspendedCmd(processDefinitionId));
     }
 
+    @Override
     public void suspendProcessDefinitionById(String processDefinitionId) {
         commandExecutor.execute(new SuspendProcessDefinitionCmd(processDefinitionId, null, false, null, null));
     }
 
+    @Override
     public void suspendProcessDefinitionById(String processDefinitionId, boolean suspendProcessInstances, Date suspensionDate) {
         commandExecutor.execute(new SuspendProcessDefinitionCmd(processDefinitionId, null, suspendProcessInstances, suspensionDate, null));
     }
 
+    @Override
     public void suspendProcessDefinitionByKey(String processDefinitionKey) {
         commandExecutor.execute(new SuspendProcessDefinitionCmd(null, processDefinitionKey, false, null, null));
     }
 
+    @Override
     public void suspendProcessDefinitionByKey(String processDefinitionKey, boolean suspendProcessInstances, Date suspensionDate) {
         commandExecutor.execute(new SuspendProcessDefinitionCmd(null, processDefinitionKey, suspendProcessInstances, suspensionDate, null));
     }
 
+    @Override
     public void suspendProcessDefinitionByKey(String processDefinitionKey, String tenantId) {
         commandExecutor.execute(new SuspendProcessDefinitionCmd(null, processDefinitionKey, false, null, tenantId));
     }
 
+    @Override
     public void suspendProcessDefinitionByKey(String processDefinitionKey, boolean suspendProcessInstances, Date suspensionDate, String tenantId) {
         commandExecutor.execute(new SuspendProcessDefinitionCmd(null, processDefinitionKey, suspendProcessInstances, suspensionDate, tenantId));
     }
 
+    @Override
     public void activateProcessDefinitionById(String processDefinitionId) {
         commandExecutor.execute(new ActivateProcessDefinitionCmd(processDefinitionId, null, false, null, null));
     }
 
+    @Override
     public void activateProcessDefinitionById(String processDefinitionId, boolean activateProcessInstances, Date activationDate) {
         commandExecutor.execute(new ActivateProcessDefinitionCmd(processDefinitionId, null, activateProcessInstances, activationDate, null));
     }
 
+    @Override
     public void activateProcessDefinitionByKey(String processDefinitionKey) {
         commandExecutor.execute(new ActivateProcessDefinitionCmd(null, processDefinitionKey, false, null, null));
     }
 
+    @Override
     public void activateProcessDefinitionByKey(String processDefinitionKey, boolean activateProcessInstances, Date activationDate) {
         commandExecutor.execute(new ActivateProcessDefinitionCmd(null, processDefinitionKey, activateProcessInstances, activationDate, null));
     }
 
+    @Override
     public void activateProcessDefinitionByKey(String processDefinitionKey, String tenantId) {
         commandExecutor.execute(new ActivateProcessDefinitionCmd(null, processDefinitionKey, false, null, tenantId));
     }
 
+    @Override
     public void activateProcessDefinitionByKey(String processDefinitionKey, boolean activateProcessInstances, Date activationDate, String tenantId) {
         commandExecutor.execute(new ActivateProcessDefinitionCmd(null, processDefinitionKey, activateProcessInstances, activationDate, tenantId));
     }
 
+    @Override
     public void setProcessDefinitionCategory(String processDefinitionId, String category) {
         commandExecutor.execute(new SetProcessDefinitionCategoryCmd(processDefinitionId, category));
     }
 
+    @Override
     public InputStream getProcessModel(String processDefinitionId) {
         return commandExecutor.execute(new GetDeploymentProcessModelCmd(processDefinitionId));
     }
 
+    @Override
     public InputStream getProcessDiagram(String processDefinitionId) {
         return commandExecutor.execute(new GetDeploymentProcessDiagramCmd(processDefinitionId));
     }
 
+    @Override
     public DiagramLayout getProcessDiagramLayout(String processDefinitionId) {
         return commandExecutor.execute(new GetDeploymentProcessDiagramLayoutCmd(processDefinitionId));
     }
 
+    @Override
     public Object getAppResourceObject(String deploymentId) {
         return commandExecutor.execute(new GetAppResourceObjectCmd(deploymentId));
     }
 
+    @Override
     public AppModel getAppResourceModel(String deploymentId) {
         return commandExecutor.execute(new GetAppResourceModelCmd(deploymentId));
     }
 
+    @Override
     public Model newModel() {
         return commandExecutor.execute(new CreateModelCmd());
     }
 
+    @Override
     public void saveModel(Model model) {
         commandExecutor.execute(new SaveModelCmd((ModelEntity) model));
     }
 
+    @Override
     public void deleteModel(String modelId) {
         commandExecutor.execute(new DeleteModelCmd(modelId));
     }
 
+    @Override
     public void addModelEditorSource(String modelId, byte[] bytes) {
         commandExecutor.execute(new AddEditorSourceForModelCmd(modelId, bytes));
     }
 
+    @Override
     public void addModelEditorSourceExtra(String modelId, byte[] bytes) {
         commandExecutor.execute(new AddEditorSourceExtraForModelCmd(modelId, bytes));
     }
 
+    @Override
     public ModelQuery createModelQuery() {
         return new ModelQueryImpl(commandExecutor);
     }
@@ -266,46 +303,57 @@ public class RepositoryServiceImpl extends ServiceImpl implements RepositoryServ
         return new NativeModelQueryImpl(commandExecutor);
     }
 
+    @Override
     public Model getModel(String modelId) {
         return commandExecutor.execute(new GetModelCmd(modelId));
     }
 
+    @Override
     public byte[] getModelEditorSource(String modelId) {
         return commandExecutor.execute(new GetModelEditorSourceCmd(modelId));
     }
 
+    @Override
     public byte[] getModelEditorSourceExtra(String modelId) {
         return commandExecutor.execute(new GetModelEditorSourceExtraCmd(modelId));
     }
 
+    @Override
     public void addCandidateStarterUser(String processDefinitionId, String userId) {
         commandExecutor.execute(new AddIdentityLinkForProcessDefinitionCmd(processDefinitionId, userId, null));
     }
 
+    @Override
     public void addCandidateStarterGroup(String processDefinitionId, String groupId) {
         commandExecutor.execute(new AddIdentityLinkForProcessDefinitionCmd(processDefinitionId, null, groupId));
     }
 
+    @Override
     public void deleteCandidateStarterGroup(String processDefinitionId, String groupId) {
         commandExecutor.execute(new DeleteIdentityLinkForProcessDefinitionCmd(processDefinitionId, null, groupId));
     }
 
+    @Override
     public void deleteCandidateStarterUser(String processDefinitionId, String userId) {
         commandExecutor.execute(new DeleteIdentityLinkForProcessDefinitionCmd(processDefinitionId, userId, null));
     }
 
+    @Override
     public List<IdentityLink> getIdentityLinksForProcessDefinition(String processDefinitionId) {
         return commandExecutor.execute(new GetIdentityLinksForProcessDefinitionCmd(processDefinitionId));
     }
 
+    @Override
     public List<ValidationError> validateProcess(BpmnModel bpmnModel) {
         return commandExecutor.execute(new ValidateBpmnModelCmd(bpmnModel));
     }
 
+    @Override
     public List<DmnDecisionTable> getDecisionTablesForProcessDefinition(String processDefinitionId) {
         return commandExecutor.execute(new GetDecisionTablesForProcessDefinitionCmd(processDefinitionId));
     }
 
+    @Override
     public List<FormDefinition> getFormDefinitionsForProcessDefinition(String processDefinitionId) {
         return commandExecutor.execute(new GetFormDefinitionsForProcessDefinitionCmd(processDefinitionId));
     }

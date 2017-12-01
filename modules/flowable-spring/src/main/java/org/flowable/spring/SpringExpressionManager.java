@@ -15,6 +15,8 @@ package org.flowable.spring;
 
 import java.util.Map;
 
+import org.flowable.engine.common.api.variable.VariableContainer;
+import org.flowable.engine.common.impl.el.DefaultExpressionManager;
 import org.flowable.engine.common.impl.el.JsonNodeELResolver;
 import org.flowable.engine.common.impl.el.ReadOnlyMapELResolver;
 import org.flowable.engine.common.impl.javax.el.ArrayELResolver;
@@ -23,17 +25,16 @@ import org.flowable.engine.common.impl.javax.el.CompositeELResolver;
 import org.flowable.engine.common.impl.javax.el.ELResolver;
 import org.flowable.engine.common.impl.javax.el.ListELResolver;
 import org.flowable.engine.common.impl.javax.el.MapELResolver;
-import org.flowable.engine.delegate.VariableScope;
-import org.flowable.engine.impl.el.DefaultExpressionManager;
-import org.flowable.engine.impl.el.VariableScopeElResolver;
+import org.flowable.engine.impl.el.ProcessExpressionManager;
 import org.springframework.context.ApplicationContext;
 
 /**
  * {@link DefaultExpressionManager} that exposes the full application-context or a limited set of beans in expressions.
  * 
  * @author Tom Baeyens
+ * @author Joram Barrez
  */
-public class SpringExpressionManager extends DefaultExpressionManager {
+public class SpringExpressionManager extends ProcessExpressionManager {
 
     protected ApplicationContext applicationContext;
 
@@ -47,11 +48,11 @@ public class SpringExpressionManager extends DefaultExpressionManager {
         super(beans);
         this.applicationContext = applicationContext;
     }
-
+    
     @Override
-    protected ELResolver createElResolver(VariableScope variableScope) {
+    protected ELResolver createElResolver(VariableContainer variableContainer) {
         CompositeELResolver compositeElResolver = new CompositeELResolver();
-        compositeElResolver.add(new VariableScopeElResolver(variableScope));
+        compositeElResolver.add(createVariableElResolver(variableContainer));
 
         if (beans != null) {
             // Only expose limited set of beans in expressions

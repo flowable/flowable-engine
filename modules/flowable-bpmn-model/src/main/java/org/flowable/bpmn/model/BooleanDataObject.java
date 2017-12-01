@@ -12,15 +12,23 @@
  */
 package org.flowable.bpmn.model;
 
+import org.apache.commons.lang3.StringUtils;
+
 /**
  * @author Lori Small
  */
 public class BooleanDataObject extends ValuedDataObject {
 
+    @Override
     public void setValue(Object value) {
-        this.value = Boolean.valueOf(value.toString());
+    	if (value instanceof String && !StringUtils.isEmpty(((String) value).trim())) {
+    		this.value = Boolean.valueOf(value.toString());
+    	} else if (value instanceof Boolean) {
+    		this.value = value;
+    	}
     }
 
+    @Override
     public BooleanDataObject clone() {
         BooleanDataObject clone = new BooleanDataObject();
         clone.setValues(this);

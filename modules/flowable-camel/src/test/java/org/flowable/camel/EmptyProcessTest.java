@@ -20,9 +20,9 @@ import org.apache.camel.Exchange;
 import org.apache.camel.ProducerTemplate;
 import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
-import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.BeforeClass;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -34,6 +34,7 @@ public class EmptyProcessTest extends SpringFlowableTestCase {
     protected CamelContext camelContext;
 
     @BeforeClass
+    @Override
     public void setUp() throws Exception {
         camelContext.addRoutes(new RouteBuilder() {
 
@@ -46,6 +47,7 @@ public class EmptyProcessTest extends SpringFlowableTestCase {
         });
     }
 
+    @Override
     public void tearDown() throws Exception {
         List<Route> routes = camelContext.getRoutes();
         for (Route r : routes) {

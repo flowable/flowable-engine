@@ -12,7 +12,7 @@
  */
 package org.flowable.crystalball.simulator;
 
-import org.flowable.engine.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * Allows to run simulation in debug mode

@@ -16,6 +16,7 @@ package org.flowable.engine.impl;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.AbstractQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -56,11 +57,13 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         super(commandExecutor);
     }
 
+    @Override
     public ModelQueryImpl modelId(String modelId) {
         this.id = modelId;
         return this;
     }
 
+    @Override
     public ModelQueryImpl modelCategory(String category) {
         if (category == null) {
             throw new FlowableIllegalArgumentException("category is null");
@@ -69,6 +72,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQueryImpl modelCategoryLike(String categoryLike) {
         if (categoryLike == null) {
             throw new FlowableIllegalArgumentException("categoryLike is null");
@@ -77,6 +81,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQueryImpl modelCategoryNotEquals(String categoryNotEquals) {
         if (categoryNotEquals == null) {
             throw new FlowableIllegalArgumentException("categoryNotEquals is null");
@@ -85,6 +90,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQueryImpl modelName(String name) {
         if (name == null) {
             throw new FlowableIllegalArgumentException("name is null");
@@ -93,6 +99,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQueryImpl modelNameLike(String nameLike) {
         if (nameLike == null) {
             throw new FlowableIllegalArgumentException("nameLike is null");
@@ -101,6 +108,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQuery modelKey(String key) {
         if (key == null) {
             throw new FlowableIllegalArgumentException("key is null");
@@ -109,6 +117,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQueryImpl modelVersion(Integer version) {
         if (version == null) {
             throw new FlowableIllegalArgumentException("version is null");
@@ -119,11 +128,13 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQuery latestVersion() {
         this.latest = true;
         return this;
     }
 
+    @Override
     public ModelQuery deploymentId(String deploymentId) {
         if (deploymentId == null) {
             throw new FlowableIllegalArgumentException("DeploymentId is null");
@@ -132,6 +143,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQuery notDeployed() {
         if (deployed) {
             throw new FlowableIllegalArgumentException("Invalid usage: cannot use deployed() and notDeployed() in the same query");
@@ -140,6 +152,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQuery deployed() {
         if (notDeployed) {
             throw new FlowableIllegalArgumentException("Invalid usage: cannot use deployed() and notDeployed() in the same query");
@@ -148,6 +161,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQuery modelTenantId(String tenantId) {
         if (tenantId == null) {
             throw new FlowableIllegalArgumentException("Model tenant id is null");
@@ -156,6 +170,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQuery modelTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
             throw new FlowableIllegalArgumentException("Model tenant id is null");
@@ -164,6 +179,7 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
         return this;
     }
 
+    @Override
     public ModelQuery modelWithoutTenantId() {
         this.withoutTenantId = true;
         return this;
@@ -171,45 +187,55 @@ public class ModelQueryImpl extends AbstractQuery<ModelQuery, Model> implements 
 
     // sorting ////////////////////////////////////////////
 
+    @Override
     public ModelQuery orderByModelCategory() {
         return orderBy(ModelQueryProperty.MODEL_CATEGORY);
     }
 
+    @Override
     public ModelQuery orderByModelId() {
         return orderBy(ModelQueryProperty.MODEL_ID);
     }
 
+    @Override
     public ModelQuery orderByModelKey() {
         return orderBy(ModelQueryProperty.MODEL_KEY);
     }
 
+    @Override
     public ModelQuery orderByModelVersion() {
         return orderBy(ModelQueryProperty.MODEL_VERSION);
     }
 
+    @Override
     public ModelQuery orderByModelName() {
         return orderBy(ModelQueryProperty.MODEL_NAME);
     }
 
+    @Override
     public ModelQuery orderByCreateTime() {
         return orderBy(ModelQueryProperty.MODEL_CREATE_TIME);
     }
 
+    @Override
     public ModelQuery orderByLastUpdateTime() {
         return orderBy(ModelQueryProperty.MODEL_LAST_UPDATE_TIME);
     }
 
+    @Override
     public ModelQuery orderByTenantId() {
         return orderBy(ModelQueryProperty.MODEL_TENANT_ID);
     }
 
     // results ////////////////////////////////////////////
 
+    @Override
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
         return CommandContextUtil.getModelEntityManager(commandContext).findModelCountByQueryCriteria(this);
     }
 
+    @Override
     public List<Model> executeList(CommandContext commandContext) {
         checkQueryOk();
         return CommandContextUtil.getModelEntityManager(commandContext).findModelsByQueryCriteria(this);

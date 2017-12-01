@@ -31,6 +31,7 @@ public class DeleteGroupCmd implements Command<Void>, Serializable {
         this.groupId = groupId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (groupId == null) {
             throw new FlowableIllegalArgumentException("groupId is null");

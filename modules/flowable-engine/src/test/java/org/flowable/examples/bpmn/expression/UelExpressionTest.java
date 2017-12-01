@@ -16,7 +16,6 @@ package org.flowable.examples.bpmn.expression;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -30,7 +29,7 @@ public class UelExpressionTest extends PluggableFlowableTestCase {
         // expression)
         UelExpressionTestOrder order = new UelExpressionTestOrder(150);
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("uelExpressions", CollectionUtil.singletonMap("order", order));
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("Standard service", task.getName());
 
         // While an order of 300, gives us a premium service (goes through an

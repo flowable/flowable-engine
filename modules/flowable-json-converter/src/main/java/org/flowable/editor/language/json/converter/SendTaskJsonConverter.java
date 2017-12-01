@@ -40,14 +40,17 @@ public class SendTaskJsonConverter extends BaseBpmnJsonConverter {
         convertersToJsonMap.put(SendTask.class, SendTaskJsonConverter.class);
     }
 
+    @Override
     protected String getStencilId(BaseElement baseElement) {
         return STENCIL_TASK_SEND;
     }
 
+    @Override
     protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
 
     }
 
+    @Override
     protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
         SendTask task = new SendTask();
         return task;

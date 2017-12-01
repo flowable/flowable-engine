@@ -14,16 +14,18 @@ package org.flowable.engine.test.api.event;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.impl.event.FlowableEventDispatcherImpl;
+import org.flowable.engine.common.impl.event.FlowableEventImpl;
+import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.delegate.event.BaseEntityEventListener;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEntityEventImpl;
-import org.flowable.engine.delegate.event.impl.FlowableEventImpl;
+import org.flowable.engine.delegate.event.impl.FlowableProcessEventImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.task.Task;
+import org.flowable.task.service.TaskServiceConfiguration;
 
 /**
  * 
@@ -50,8 +52,9 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
         // Add event-listener to dispatcher
         dispatcher.addEventListener(newListener);
 
-        FlowableEntityEventImpl event1 = new FlowableEntityEventImpl(processEngineConfiguration.getTaskEntityManager().create(), FlowableEngineEventType.ENTITY_CREATED);
-        FlowableEntityEventImpl event2 = new FlowableEntityEventImpl(processEngineConfiguration.getTaskEntityManager().create(), FlowableEngineEventType.ENTITY_CREATED);
+        TaskServiceConfiguration taskServiceConfiguration = (TaskServiceConfiguration) processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
+        FlowableEntityEventImpl event1 = new FlowableEntityEventImpl(taskServiceConfiguration.getTaskEntityManager().create(), FlowableEngineEventType.ENTITY_CREATED);
+        FlowableEntityEventImpl event2 = new FlowableEntityEventImpl(taskServiceConfiguration.getTaskEntityManager().create(), FlowableEngineEventType.ENTITY_CREATED);
 
         // Dispatch events
         dispatcher.dispatchEvent(event1);
@@ -81,9 +84,10 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
         // Add event-listener to dispatcher
         dispatcher.addEventListener(newListener, FlowableEngineEventType.ENTITY_CREATED, FlowableEngineEventType.ENTITY_DELETED);
 
-        FlowableEntityEventImpl event1 = new FlowableEntityEventImpl(processEngineConfiguration.getTaskEntityManager().create(), FlowableEngineEventType.ENTITY_CREATED);
-        FlowableEntityEventImpl event2 = new FlowableEntityEventImpl(processEngineConfiguration.getTaskEntityManager().create(), FlowableEngineEventType.ENTITY_DELETED);
-        FlowableEntityEventImpl event3 = new FlowableEntityEventImpl(processEngineConfiguration.getTaskEntityManager().create(), FlowableEngineEventType.ENTITY_UPDATED);
+        TaskServiceConfiguration taskServiceConfiguration = (TaskServiceConfiguration) processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
+        FlowableEntityEventImpl event1 = new FlowableEntityEventImpl(taskServiceConfiguration.getTaskEntityManager().create(), FlowableEngineEventType.ENTITY_CREATED);
+        FlowableEntityEventImpl event2 = new FlowableEntityEventImpl(taskServiceConfiguration.getTaskEntityManager().create(), FlowableEngineEventType.ENTITY_DELETED);
+        FlowableEntityEventImpl event3 = new FlowableEntityEventImpl(taskServiceConfiguration.getTaskEntityManager().create(), FlowableEngineEventType.ENTITY_UPDATED);
 
         // Dispatch events, only 2 out of 3 should have entered the listener
         dispatcher.dispatchEvent(event1);
@@ -115,8 +119,9 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
         // Add event-listener to dispatcher
         dispatcher.addEventListener(newListener, (FlowableEngineEventType) null);
 
-        FlowableEntityEventImpl event1 = new FlowableEntityEventImpl(processEngineConfiguration.getTaskEntityManager().create(), FlowableEngineEventType.ENTITY_CREATED);
-        FlowableEntityEventImpl event2 = new FlowableEntityEventImpl(processEngineConfiguration.getTaskEntityManager().create(), FlowableEngineEventType.ENTITY_DELETED);
+        TaskServiceConfiguration taskServiceConfiguration = (TaskServiceConfiguration) processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
+        FlowableEntityEventImpl event1 = new FlowableEntityEventImpl(taskServiceConfiguration.getTaskEntityManager().create(), FlowableEngineEventType.ENTITY_CREATED);
+        FlowableEntityEventImpl event2 = new FlowableEntityEventImpl(taskServiceConfiguration.getTaskEntityManager().create(), FlowableEngineEventType.ENTITY_DELETED);
 
         // Dispatch events, all should have entered the listener
         dispatcher.dispatchEvent(event1);
@@ -133,10 +138,11 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
 
         dispatcher.addEventListener(listener);
 
-        FlowableEntityEventImpl createEvent = new FlowableEntityEventImpl(processEngineConfiguration.getTaskEntityManager().create(), FlowableEngineEventType.ENTITY_CREATED);
-        FlowableEntityEventImpl deleteEvent = new FlowableEntityEventImpl(processEngineConfiguration.getTaskEntityManager().create(), FlowableEngineEventType.ENTITY_DELETED);
-        FlowableEntityEventImpl updateEvent = new FlowableEntityEventImpl(processEngineConfiguration.getTaskEntityManager().create(), FlowableEngineEventType.ENTITY_UPDATED);
-        FlowableEntityEventImpl otherEvent = new FlowableEntityEventImpl(processEngineConfiguration.getTaskEntityManager().create(), FlowableEngineEventType.CUSTOM);
+        TaskServiceConfiguration taskServiceConfiguration = (TaskServiceConfiguration) processEngineConfiguration.getServiceConfigurations().get(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG);
+        FlowableEntityEventImpl createEvent = new FlowableEntityEventImpl(taskServiceConfiguration.getTaskEntityManager().create(), FlowableEngineEventType.ENTITY_CREATED);
+        FlowableEntityEventImpl deleteEvent = new FlowableEntityEventImpl(taskServiceConfiguration.getTaskEntityManager().create(), FlowableEngineEventType.ENTITY_DELETED);
+        FlowableEntityEventImpl updateEvent = new FlowableEntityEventImpl(taskServiceConfiguration.getTaskEntityManager().create(), FlowableEngineEventType.ENTITY_UPDATED);
+        FlowableEntityEventImpl otherEvent = new FlowableEntityEventImpl(taskServiceConfiguration.getTaskEntityManager().create(), FlowableEngineEventType.CUSTOM);
 
         // Dispatch create event
         dispatcher.dispatchEvent(createEvent);
@@ -172,7 +178,7 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
         listener.reset();
 
         // Test typed entity-listener
-        listener = new TestBaseEntityEventListener(Task.class);
+        listener = new TestBaseEntityEventListener(org.flowable.task.api.Task.class);
 
         // Dispatch event for a task, should be received
         dispatcher.addEventListener(listener);
@@ -199,7 +205,7 @@ public abstract class FlowableEventDispatcherTest extends PluggableFlowableTestC
         dispatcher.addEventListener(listener);
         dispatcher.addEventListener(secondListener);
 
-        FlowableEventImpl event = new FlowableEventImpl(FlowableEngineEventType.ENTITY_CREATED);
+        FlowableEventImpl event = new FlowableProcessEventImpl(FlowableEngineEventType.ENTITY_CREATED);
         try {
             dispatcher.dispatchEvent(event);
             assertEquals(1, secondListener.getEventsReceived().size());

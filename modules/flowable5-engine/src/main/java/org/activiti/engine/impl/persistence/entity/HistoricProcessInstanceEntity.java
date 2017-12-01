@@ -68,8 +68,9 @@ public class HistoricProcessInstanceEntity extends HistoricScopeInstanceEntity i
         }
     }
 
+    @Override
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("endTime", endTime);
         persistentState.put("businessKey", businessKey);
         persistentState.put("name", name);
@@ -87,6 +88,7 @@ public class HistoricProcessInstanceEntity extends HistoricScopeInstanceEntity i
 
     // getters and setters //////////////////////////////////////////////////////
 
+    @Override
     public String getEndActivityId() {
         return endActivityId;
     }
@@ -95,6 +97,7 @@ public class HistoricProcessInstanceEntity extends HistoricScopeInstanceEntity i
         this.endActivityId = endActivityId;
     }
 
+    @Override
     public String getBusinessKey() {
         return businessKey;
     }
@@ -103,6 +106,7 @@ public class HistoricProcessInstanceEntity extends HistoricScopeInstanceEntity i
         this.businessKey = businessKey;
     }
 
+    @Override
     public String getStartUserId() {
         return startUserId;
     }
@@ -111,6 +115,7 @@ public class HistoricProcessInstanceEntity extends HistoricScopeInstanceEntity i
         this.startUserId = startUserId;
     }
 
+    @Override
     public String getStartActivityId() {
         return startActivityId;
     }
@@ -119,6 +124,7 @@ public class HistoricProcessInstanceEntity extends HistoricScopeInstanceEntity i
         this.startActivityId = startUserId;
     }
 
+    @Override
     public String getSuperProcessInstanceId() {
         return superProcessInstanceId;
     }
@@ -127,6 +133,7 @@ public class HistoricProcessInstanceEntity extends HistoricScopeInstanceEntity i
         this.superProcessInstanceId = superProcessInstanceId;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
@@ -135,6 +142,7 @@ public class HistoricProcessInstanceEntity extends HistoricScopeInstanceEntity i
         this.tenantId = tenantId;
     }
 
+    @Override
     public String getName() {
         if (localizedName != null && localizedName.length() > 0) {
             return localizedName;
@@ -151,10 +159,12 @@ public class HistoricProcessInstanceEntity extends HistoricScopeInstanceEntity i
         return localizedName;
     }
 
+    @Override
     public void setLocalizedName(String localizedName) {
         this.localizedName = localizedName;
     }
 
+    @Override
     public String getDescription() {
         if (localizedDescription != null && localizedDescription.length() > 0) {
             return localizedDescription;
@@ -171,12 +181,14 @@ public class HistoricProcessInstanceEntity extends HistoricScopeInstanceEntity i
         return localizedDescription;
     }
 
+    @Override
     public void setLocalizedDescription(String localizedDescription) {
         this.localizedDescription = localizedDescription;
     }
 
+    @Override
     public Map<String, Object> getProcessVariables() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         if (queryVariables != null) {
             for (HistoricVariableInstanceEntity variableInstance : queryVariables) {
                 if (variableInstance.getId() != null && variableInstance.getTaskId() == null) {

@@ -28,6 +28,7 @@ public class TransactionRollbackTest extends PluggableFlowableTestCase {
 
         private static final long serialVersionUID = 1L;
 
+        @Override
         public void execute(DelegateExecution execution) {
             throw new FlowableException("Buzzz");
         }

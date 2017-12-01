@@ -30,8 +30,8 @@ import org.activiti.engine.impl.variable.SerializableType;
 import org.activiti.engine.impl.variable.ShortType;
 import org.activiti.engine.impl.variable.StringType;
 import org.activiti.engine.impl.variable.UUIDType;
-import org.flowable.engine.delegate.event.FlowableVariableEvent;
-import org.flowable.engine.impl.variable.VariableType;
+import org.flowable.variable.api.event.FlowableVariableEvent;
+import org.flowable.variable.api.types.VariableType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +53,7 @@ public abstract class VariableEventHandler extends AbstractDatabaseEventLoggerEv
     public static final String TYPE_JSON = "json";
 
     protected Map<String, Object> createData(FlowableVariableEvent variableEvent) {
-        Map<String, Object> data = new HashMap<String, Object>();
+        Map<String, Object> data = new HashMap<>();
         putInMapIfNotNull(data, Fields.NAME, variableEvent.getVariableName());
         putInMapIfNotNull(data, Fields.PROCESS_DEFINITION_ID, variableEvent.getProcessDefinitionId());
         putInMapIfNotNull(data, Fields.PROCESS_INSTANCE_ID, variableEvent.getProcessInstanceId());

@@ -16,12 +16,13 @@ import java.util.Collections;
 import java.util.List;
 
 import org.apache.ibatis.type.JdbcType;
-import org.flowable.engine.cfg.AbstractEngineConfigurator;
+import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.AbstractEngineConfigurator;
+import org.flowable.engine.common.EngineDeployer;
 import org.flowable.engine.common.impl.db.CustomMyBatisTypeHandlerConfig;
 import org.flowable.engine.common.impl.db.CustomMybatisTypeAliasConfig;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.engine.impl.persistence.deploy.Deployer;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.cfg.StandaloneIdmEngineConfiguration;
 import org.flowable.idm.engine.impl.db.EntityDependencyOrder;
@@ -42,7 +43,7 @@ public class IdmEngineConfigurator extends AbstractEngineConfigurator {
     }
     
     @Override
-    protected List<Deployer> getCustomDeployers() {
+    protected List<EngineDeployer> getCustomDeployers() {
         return null;
     }
     
@@ -65,14 +66,16 @@ public class IdmEngineConfigurator extends AbstractEngineConfigurator {
     }
     
     @Override
-    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public void configure(AbstractEngineConfiguration engineConfiguration) {
         if (idmEngineConfiguration == null) {
             idmEngineConfiguration = new StandaloneIdmEngineConfiguration();
         }
         
-        initialiseCommonProperties(processEngineConfiguration, idmEngineConfiguration, EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
+        initialiseCommonProperties(engineConfiguration, idmEngineConfiguration);
         
         idmEngineConfiguration.buildIdmEngine();
+        
+        initServiceConfigurations(engineConfiguration, idmEngineConfiguration);
     }
     
     @Override

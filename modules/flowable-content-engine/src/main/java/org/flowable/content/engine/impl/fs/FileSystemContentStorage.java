@@ -94,6 +94,7 @@ public class FileSystemContentStorage implements ContentStorage {
         return new FileSystemContentObject(contentFile, id.toString(), length);
     }
 
+    @Override
     public ContentObject getContentObject(String id) {
         File contentFile = getFileForId(id, true);
         return new FileSystemContentObject(contentFile, id, null);
@@ -161,6 +162,7 @@ public class FileSystemContentStorage implements ContentStorage {
         return new FileSystemContentObject(contentFile, id, length);
     }
 
+    @Override
     public void deleteContentObject(String id) {
         try {
             File contentFile = getFileForId(id, true);
@@ -170,6 +172,7 @@ public class FileSystemContentStorage implements ContentStorage {
         }
     }
 
+    @Override
     public String getContentStoreName() {
         return "file";
     }

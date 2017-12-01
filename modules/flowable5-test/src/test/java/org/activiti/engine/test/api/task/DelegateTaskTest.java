@@ -19,10 +19,9 @@ import java.util.Map;
 import java.util.Set;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 /**
  * @author Falko Menge
@@ -36,7 +35,7 @@ public class DelegateTaskTest extends PluggableFlowableTestCase {
     public void testGetCandidates() {
         runtimeService.startProcessInstanceByKey("DelegateTaskTest.testGetCandidates");
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
 
         @SuppressWarnings("unchecked")
@@ -63,8 +62,8 @@ public class DelegateTaskTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("delegateTaskTest", variables);
 
         // Assert there are three tasks with the default category
-        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        for (Task task : tasks) {
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        for (org.flowable.task.api.Task task : tasks) {
             assertEquals("approval", task.getCategory());
             Map<String, Object> taskVariables = new HashMap<String, Object>();
             taskVariables.put("outcome", "approve");

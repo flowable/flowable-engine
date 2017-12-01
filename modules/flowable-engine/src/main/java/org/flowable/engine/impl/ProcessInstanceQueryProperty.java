@@ -42,6 +42,7 @@ public class ProcessInstanceQueryProperty implements QueryProperty {
         properties.put(name, this);
     }
 
+    @Override
     public String getName() {
         return name;
     }

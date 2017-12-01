@@ -16,7 +16,7 @@
     )  
   </insert>
 
-  <insert id="bulkInsertIdmBByteArray" parameterType="java.util.List">
+  <insert id="bulkInsertIdmByteArray" parameterType="java.util.List">
     insert into ${prefix}ACT_ID_BYTEARRAY(ID_, REV_, NAME_, BYTES_)
     values
       <foreach collection="list" item="byteArray" index="index" separator=","> 
@@ -27,7 +27,7 @@
       </foreach>
   </insert>
 
-  <insert id="bulkInsertIdmBByteArray" databaseId="oracle" parameterType="java.util.List">
+  <insert id="bulkInsertIdmByteArray" databaseId="oracle" parameterType="java.util.List">
     INSERT ALL 
       <foreach collection="list" item="byteArray" index="index">
         into ${prefix}ACT_ID_BYTEARRAY(ID_, REV_, NAME_, BYTES_) VALUES 
@@ -41,7 +41,7 @@
   
   <!-- BYTE ARRAY UPDATE -->
 
-  <update id="updateIdmBByteArray" parameterType="org.flowable.idm.engine.impl.persistence.entity.IdmByteArrayEntityImpl">
+  <update id="updateIdmByteArray" parameterType="org.flowable.idm.engine.impl.persistence.entity.IdmByteArrayEntityImpl">
     update ${prefix}ACT_ID_BYTEARRAY 
     set
       REV_ = #{revisionNext, jdbcType=INTEGER},

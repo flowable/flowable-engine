@@ -23,6 +23,7 @@ import org.flowable.app.model.editor.ModelKeyRepresentation;
 import org.flowable.app.model.editor.ModelRepresentation;
 import org.flowable.app.model.editor.ReviveModelResultRepresentation;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.idm.api.User;
 
 public interface ModelService {
@@ -46,6 +47,15 @@ public interface ModelService {
     byte[] getBpmnXML(AbstractModel model);
 
     BpmnModel getBpmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap);
+    
+    CmmnModel getCmmnModel(AbstractModel model);
+
+    byte[] getCmmnXML(CmmnModel cmmnModel);
+
+    byte[] getCmmnXML(AbstractModel model);
+    
+    CmmnModel getCmmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap, 
+                    Map<String, Model> caseModelMap, Map<String, Model> processModelMap);
     
     String createModelJson(ModelRepresentation model);
 

@@ -39,7 +39,7 @@ public class ModelHistoryRepositoryImpl implements ModelHistoryRepository {
     }
 
     public List<ModelHistory> findByModelTypAndCreatedBy(String createdBy, Integer modelType) {
-        Map<String, Object> params = new HashMap<String, Object>();
+        Map<String, Object> params = new HashMap<>();
         params.put("modelType", modelType);
         params.put("createdBy", createdBy);
         return sqlSessionTemplate.selectList(NAMESPACE + "selectModelHistoryByTypeAndCreatedBy", params);

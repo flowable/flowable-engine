@@ -46,25 +46,30 @@ public interface FormService {
      * @param values
      *            json node with the values of the
      */
-    FormInstance createFormInstance(Map<String, Object> values, FormModel formModel, String taskId, String processInstanceId);
+    FormInstance createFormInstance(Map<String, Object> variables, FormModel formModel, String taskId, String processInstanceId, String processDefinitionId);
 
-    FormInstance saveFormInstance(Map<String, Object> values, FormModel formModel, String taskId, String processInstanceId);
+    FormInstance saveFormInstance(Map<String, Object> variables, FormModel formModel, String taskId, String processInstanceId, String processDefinitionId);
 
-    FormInstance saveFormInstanceByFormModelId(Map<String, Object> variables, String formModelId, String taskId, String processInstanceId);
+    FormInstance saveFormInstanceByFormModelId(Map<String, Object> variables, String formModelId, String taskId, String processInstanceId, String processDefinitionId);
+    
+    FormInstance createFormInstanceWithScopeId(Map<String, Object> variables, FormModel formModel, String taskId, String scopeId, String scopeType, String scopeDefinitionId);
 
-    FormModel getFormModelWithVariablesById(String formDefinitionId, String processInstanceId, String taskId, Map<String, Object> variables);
+    FormInstance saveFormInstanceWithScopeId(Map<String, Object> variables, FormModel formModel, String taskId, String scopeId, String scopeType, String scopeDefinitionId);
 
-    FormModel getFormModelWithVariablesById(String formDefinitionId, String processInstanceId, String taskId, Map<String, Object> variables, String tenantId);
+    FormInstance saveFormInstanceWithScopeId(Map<String, Object> variables, String formModelId, String taskId, String scopeId, String scopeType, String scopeDefinitionId);
 
-    FormModel getFormModelWithVariablesByKey(String formDefinitionKey, String processInstanceId, String taskId, Map<String, Object> variables);
+    FormModel getFormModelWithVariablesById(String formDefinitionId, String taskId, Map<String, Object> variables);
 
-    FormModel getFormModelWithVariablesByKey(String formDefinitionKey, String processInstanceId, String taskId,
-                                             Map<String, Object> variables, String tenantId);
+    FormModel getFormModelWithVariablesById(String formDefinitionId, String taskId, Map<String, Object> variables, String tenantId);
 
-    FormModel getFormModelWithVariablesByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String processInstanceId,
+    FormModel getFormModelWithVariablesByKey(String formDefinitionKey, String taskId, Map<String, Object> variables);
+
+    FormModel getFormModelWithVariablesByKey(String formDefinitionKey, String taskId, Map<String, Object> variables, String tenantId);
+
+    FormModel getFormModelWithVariablesByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId,
                                                                   String taskId, Map<String, Object> variables);
 
-    FormModel getFormModelWithVariablesByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String processInstanceId,
+    FormModel getFormModelWithVariablesByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId,
                                                                   String taskId, Map<String, Object> variables, String tenantId);
 
     FormInstanceModel getFormInstanceModelById(String formInstanceId, Map<String, Object> variables);

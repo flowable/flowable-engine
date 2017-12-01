@@ -15,16 +15,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.flowable.engine.history.HistoricData;
-import org.flowable.engine.history.HistoricVariableInstance;
+import org.flowable.engine.common.api.history.HistoricData;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailVariableInstanceUpdateEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.task.Task;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 /**
  * @author Daisuke Yoshimoto
@@ -57,7 +56,7 @@ public class ProcessInstanceLogQueryAndByteArrayTypeVariableTest extends Pluggab
         this.processInstanceId = runtimeService.startProcessInstanceByKey("twoTasksProcess", vars).getId();
 
         // Finish tasks
-        for (Task task : taskService.createTaskQuery().list()) {
+        for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
             taskService.complete(task.getId());
         }
     }

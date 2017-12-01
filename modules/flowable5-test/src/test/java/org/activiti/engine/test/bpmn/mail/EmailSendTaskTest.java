@@ -29,7 +29,7 @@ import javax.mail.internet.MimeMultipart;
 
 import org.activiti.engine.impl.util.CollectionUtil;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.test.Deployment;
 import org.subethamail.wiser.WiserMessage;
 

@@ -31,6 +31,7 @@ public class PingPongTest extends SpringFlowableTestCase {
     @Autowired
     protected CamelContext camelContext;
 
+    @Override
     public void setUp() throws Exception {
         camelContext.addRoutes(new RouteBuilder() {
 
@@ -43,10 +44,10 @@ public class PingPongTest extends SpringFlowableTestCase {
 
     @Deployment
     public void testPingPong() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
 
         variables.put("input", "Hello");
-        Map<String, String> outputMap = new HashMap<String, String>();
+        Map<String, String> outputMap = new HashMap<>();
         variables.put("outputMap", outputMap);
 
         runtimeService.startProcessInstanceByKey("PingPongProcess", variables);

@@ -44,8 +44,6 @@ import org.flowable.dmn.engine.impl.deployer.CachingAndArtifactsManager;
 import org.flowable.dmn.engine.impl.deployer.DmnDeployer;
 import org.flowable.dmn.engine.impl.deployer.DmnDeploymentHelper;
 import org.flowable.dmn.engine.impl.deployer.ParsedDeploymentBuilderFactory;
-import org.flowable.dmn.engine.impl.el.DefaultExpressionManager;
-import org.flowable.dmn.engine.impl.el.ExpressionManager;
 import org.flowable.dmn.engine.impl.el.FlowableAddDateFunctionDelegate;
 import org.flowable.dmn.engine.impl.el.FlowableCurrentDateFunctionDelegate;
 import org.flowable.dmn.engine.impl.el.FlowableSubtractDateFunctionDelegate;
@@ -61,9 +59,7 @@ import org.flowable.dmn.engine.impl.hitpolicy.HitPolicyUnique;
 import org.flowable.dmn.engine.impl.parser.DmnParseFactory;
 import org.flowable.dmn.engine.impl.persistence.GenericManagerFactory;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
-import org.flowable.dmn.engine.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.dmn.engine.impl.persistence.deploy.Deployer;
-import org.flowable.dmn.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.dmn.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManager;
 import org.flowable.dmn.engine.impl.persistence.entity.DecisionTableEntityManagerImpl;
@@ -86,18 +82,16 @@ import org.flowable.dmn.engine.impl.persistence.entity.data.impl.MybatisHistoric
 import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
-import org.flowable.engine.common.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
-import org.flowable.engine.common.impl.interceptor.CommandContextFactory;
-import org.flowable.engine.common.impl.interceptor.CommandContextInterceptor;
+import org.flowable.engine.common.impl.el.DefaultExpressionManager;
+import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
-import org.flowable.engine.common.impl.interceptor.DefaultCommandInvoker;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.common.impl.interceptor.LogInterceptor;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
-import org.flowable.engine.common.impl.interceptor.TransactionContextInterceptor;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
+import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
+import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.common.runtime.Clock;
 import org.slf4j.Logger;
@@ -242,7 +236,11 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
 
         initBeans();
         initTransactionFactory();
-        initSqlSessionFactory();
+        
+        if (usingRelationalDatabase) {
+            initSqlSessionFactory();
+        }
+        
         initSessionFactories();
         initServices();
         initDataManagers();
@@ -340,6 +338,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         }
     }
 
+    @Override
     public void initDbSqlSessionFactory() {
         if (dbSqlSessionFactory == null) {
             dbSqlSessionFactory = createDbSqlSessionFactory();
@@ -355,23 +354,20 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         initDbSqlSessionFactoryEntitySettings();
     }
     
+    @Override
     public DbSqlSessionFactory createDbSqlSessionFactory() {
         return new DbSqlSessionFactory();
     }
     
+    @Override
     protected void initDbSqlSessionFactoryEntitySettings() {
-        for (Class<? extends Entity> clazz : EntityDependencyOrder.INSERT_ORDER) {
-            dbSqlSessionFactory.getInsertionOrder().add(clazz);
-        }
-        
-        for (Class<? extends Entity> clazz : EntityDependencyOrder.DELETE_ORDER) {
-            dbSqlSessionFactory.getDeletionOrder().add(clazz);
-        }
+        defaultInitDbSqlSessionFactoryEntitySettings(EntityDependencyOrder.INSERT_ORDER, EntityDependencyOrder.DELETE_ORDER);
     }
 
     // command executors
     // ////////////////////////////////////////////////////////
 
+    @Override
     public void initCommandExecutors() {
         initDefaultCommandConfig();
         initSchemaCommandConfig();
@@ -380,54 +376,12 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         initCommandExecutor();
     }
 
-    public void initCommandInvoker() {
-        if (commandInvoker == null) {
-            commandInvoker = new DefaultCommandInvoker();
-        }
+    @Override
+    public String getEngineCfgKey() {
+        return EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG;
     }
 
-    public void initCommandInterceptors() {
-        if (commandInterceptors == null) {
-            commandInterceptors = new ArrayList<>();
-            if (customPreCommandInterceptors != null) {
-                commandInterceptors.addAll(customPreCommandInterceptors);
-            }
-            commandInterceptors.addAll(getDefaultCommandInterceptors());
-            if (customPostCommandInterceptors != null) {
-                commandInterceptors.addAll(customPostCommandInterceptors);
-            }
-            commandInterceptors.add(commandInvoker);
-        }
-    }
-
-    public Collection<? extends CommandInterceptor> getDefaultCommandInterceptors() {
-        if (defaultCommandInterceptors == null) {
-            List<CommandInterceptor> interceptors = new ArrayList<>();
-            interceptors.add(new LogInterceptor());
-            
-            CommandInterceptor transactionInterceptor = createTransactionInterceptor();
-            if (transactionInterceptor != null) {
-                interceptors.add(transactionInterceptor);
-            }
-            
-            if (commandContextFactory != null) {
-                CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory);
-                engineConfigurations.put(EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG, this);
-                commandContextInterceptor.setEngineConfigurations(engineConfigurations);
-                commandContextInterceptor.setCurrentEngineConfigurationKey(EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
-                interceptors.add(commandContextInterceptor);
-            }
-            
-            if (transactionContextFactory != null) {
-                interceptors.add(new TransactionContextInterceptor(transactionContextFactory));
-            } 
-          
-            
-            defaultCommandInterceptors = interceptors;
-        }
-        return defaultCommandInterceptors;
-    }
-
+    @Override
     public CommandInterceptor createTransactionInterceptor() {
         return null;
     }
@@ -523,24 +477,10 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         }
     }
 
-    // OTHER
-    // ////////////////////////////////////////////////////////////////////
-
-    public void initCommandContextFactory() {
-        if (commandContextFactory == null) {
-            commandContextFactory = new CommandContextFactory();
-        }
-    }
-
-    public void initTransactionContextFactory() {
-        if (transactionContextFactory == null) {
-            transactionContextFactory = new StandaloneMybatisTransactionContextFactory();
-        }
-    }
-
     // myBatis SqlSessionFactory
     // ////////////////////////////////////////////////
 
+    @Override
     public InputStream getMyBatisXmlConfigurationStream() {
         return getResourceAsStream(DEFAULT_MYBATIS_MAPPING_FILE);
     }
@@ -602,6 +542,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
     // getters and setters
     // //////////////////////////////////////////////////////
 
+    @Override
     public String getEngineName() {
         return dmnEngineName;
     }
@@ -611,81 +552,97 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setDatabaseType(String databaseType) {
         this.databaseType = databaseType;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setJdbcDriver(String jdbcDriver) {
         this.jdbcDriver = jdbcDriver;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setJdbcUrl(String jdbcUrl) {
         this.jdbcUrl = jdbcUrl;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setJdbcUsername(String jdbcUsername) {
         this.jdbcUsername = jdbcUsername;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setJdbcPassword(String jdbcPassword) {
         this.jdbcPassword = jdbcPassword;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setJdbcMaxActiveConnections(int jdbcMaxActiveConnections) {
         this.jdbcMaxActiveConnections = jdbcMaxActiveConnections;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setJdbcMaxIdleConnections(int jdbcMaxIdleConnections) {
         this.jdbcMaxIdleConnections = jdbcMaxIdleConnections;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setJdbcMaxCheckoutTime(int jdbcMaxCheckoutTime) {
         this.jdbcMaxCheckoutTime = jdbcMaxCheckoutTime;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setJdbcMaxWaitTime(int jdbcMaxWaitTime) {
         this.jdbcMaxWaitTime = jdbcMaxWaitTime;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setJdbcPingEnabled(boolean jdbcPingEnabled) {
         this.jdbcPingEnabled = jdbcPingEnabled;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setJdbcPingConnectionNotUsedFor(int jdbcPingConnectionNotUsedFor) {
         this.jdbcPingConnectionNotUsedFor = jdbcPingConnectionNotUsedFor;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setJdbcDefaultTransactionIsolationLevel(int jdbcDefaultTransactionIsolationLevel) {
         this.jdbcDefaultTransactionIsolationLevel = jdbcDefaultTransactionIsolationLevel;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setJdbcPingQuery(String jdbcPingQuery) {
         this.jdbcPingQuery = jdbcPingQuery;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setDataSourceJndiName(String dataSourceJndiName) {
         this.dataSourceJndiName = dataSourceJndiName;
         return this;
     }
 
+    @Override
     public DmnManagementService getDmnManagementService() {
         return dmnManagementService;
     }
@@ -695,6 +652,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         return this;
     }
 
+    @Override
     public DmnRepositoryService getDmnRepositoryService() {
         return dmnRepositoryService;
     }
@@ -704,6 +662,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         return this;
     }
 
+    @Override
     public DmnRuleService getDmnRuleService() {
         return ruleService;
     }
@@ -713,6 +672,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         return this;
     }
     
+    @Override
     public DmnHistoryService getDmnHistoryService() {
         return dmnHistoryService;
     }
@@ -892,56 +852,67 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setSqlSessionFactory(SqlSessionFactory sqlSessionFactory) {
         this.sqlSessionFactory = sqlSessionFactory;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setTransactionFactory(TransactionFactory transactionFactory) {
         this.transactionFactory = transactionFactory;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setCustomMybatisMappers(Set<Class<?>> customMybatisMappers) {
         this.customMybatisMappers = customMybatisMappers;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setCustomMybatisXMLMappers(Set<String> customMybatisXMLMappers) {
         this.customMybatisXMLMappers = customMybatisXMLMappers;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setCustomSessionFactories(List<SessionFactory> customSessionFactories) {
         this.customSessionFactories = customSessionFactories;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setUsingRelationalDatabase(boolean usingRelationalDatabase) {
         this.usingRelationalDatabase = usingRelationalDatabase;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setDatabaseTablePrefix(String databaseTablePrefix) {
         this.databaseTablePrefix = databaseTablePrefix;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setDatabaseCatalog(String databaseCatalog) {
         this.databaseCatalog = databaseCatalog;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setDatabaseSchema(String databaseSchema) {
         this.databaseSchema = databaseSchema;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setTablePrefixIsSchema(boolean tablePrefixIsSchema) {
         this.tablePrefixIsSchema = tablePrefixIsSchema;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setSessionFactories(Map<Class<?>, SessionFactory> sessionFactories) {
         this.sessionFactories = sessionFactories;
         return this;
@@ -965,11 +936,13 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setClock(Clock clock) {
         this.clock = clock;
         return this;
     }
 
+    @Override
     public DmnEngineConfiguration setDatabaseSchemaUpdate(String databaseSchemaUpdate) {
         this.databaseSchemaUpdate = databaseSchemaUpdate;
         return this;

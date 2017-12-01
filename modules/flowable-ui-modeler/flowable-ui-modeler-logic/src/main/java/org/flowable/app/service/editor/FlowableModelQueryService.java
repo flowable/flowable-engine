@@ -12,9 +12,6 @@
  */
 package org.flowable.app.service.editor;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -43,6 +40,10 @@ import org.flowable.app.util.XmlUtil;
 import org.flowable.bpmn.BpmnAutoLayout;
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.cmmn.converter.CmmnXmlConverter;
+import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter;
+import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.slf4j.Logger;
@@ -51,6 +52,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Tijs Rademakers
@@ -78,6 +82,9 @@ public class FlowableModelQueryService {
 
     protected BpmnXMLConverter bpmnXmlConverter = new BpmnXMLConverter();
     protected BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
+    
+    protected CmmnXmlConverter cmmnXmlConverter = new CmmnXmlConverter();
+    protected CmmnJsonConverter cmmnJsonConverter = new CmmnJsonConverter();
 
     public ResultListDataRepresentation getModels(String filter, String sort, Integer modelType, HttpServletRequest request) {
 
@@ -92,7 +99,7 @@ public class FlowableModelQueryService {
             }
         }
 
-        List<ModelRepresentation> resultList = new ArrayList<ModelRepresentation>();
+        List<ModelRepresentation> resultList = new ArrayList<>();
         List<Model> models = null;
 
         String validFilter = makeValidFilterText(filterText);
@@ -105,7 +112,7 @@ public class FlowableModelQueryService {
         }
 
         if (CollectionUtils.isNotEmpty(models)) {
-            List<String> addedModelIds = new ArrayList<String>();
+            List<String> addedModelIds = new ArrayList<>();
             for (Model model : models) {
                 if (!addedModelIds.contains(model.getId())) {
                     addedModelIds.add(model.getId());
@@ -121,10 +128,31 @@ public class FlowableModelQueryService {
 
     public ResultListDataRepresentation getModelsToIncludeInAppDefinition() {
 
-        List<ModelRepresentation> resultList = new ArrayList<ModelRepresentation>();
+        List<ModelRepresentation> resultList = new ArrayList<>();
 
-        List<String> addedModelIds = new ArrayList<String>();
+        List<String> addedModelIds = new ArrayList<>();
         List<Model> models = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_BPMN, ModelSort.MODIFIED_DESC);
+
+        if (CollectionUtils.isNotEmpty(models)) {
+            for (Model model : models) {
+                if (!addedModelIds.contains(model.getId())) {
+                    addedModelIds.add(model.getId());
+                    ModelRepresentation representation = createModelRepresentation(model);
+                    resultList.add(representation);
+                }
+            }
+        }
+
+        ResultListDataRepresentation result = new ResultListDataRepresentation(resultList);
+        return result;
+    }
+    
+    public ResultListDataRepresentation getCmmnModelsToIncludeInAppDefinition() {
+
+        List<ModelRepresentation> resultList = new ArrayList<>();
+
+        List<String> addedModelIds = new ArrayList<>();
+        List<Model> models = modelRepository.findByModelType(AbstractModel.MODEL_TYPE_CMMN, ModelSort.MODIFIED_DESC);
 
         if (CollectionUtils.isNotEmpty(models)) {
             for (Model model : models) {
@@ -184,6 +212,52 @@ public class FlowableModelQueryService {
             }
         } else {
             throw new BadRequestException("Invalid file name, only .bpmn and .bpmn20.xml files are supported not " + fileName);
+        }
+    }
+    
+    public ModelRepresentation importCaseModel(HttpServletRequest request, MultipartFile file) {
+
+        String fileName = file.getOriginalFilename();
+        if (fileName != null && (fileName.endsWith(".cmmn") || fileName.endsWith(".cmmn.xml"))) {
+            try {
+                XMLInputFactory xif = XmlUtil.createSafeXmlInputFactory();
+                InputStreamReader xmlIn = new InputStreamReader(file.getInputStream(), "UTF-8");
+                XMLStreamReader xtr = xif.createXMLStreamReader(xmlIn);
+                CmmnModel cmmnModel = cmmnXmlConverter.convertToCmmnModel(xtr);
+                if (CollectionUtils.isEmpty(cmmnModel.getCases())) {
+                    throw new BadRequestException("No cases found in definition " + fileName);
+                }
+
+                if (cmmnModel.getLocationMap().size() == 0) {
+                    throw new BadRequestException("No CMMN DI found in definition " + fileName);
+                }
+
+                ObjectNode modelNode = cmmnJsonConverter.convertToJson(cmmnModel);
+
+                Case caseModel = cmmnModel.getPrimaryCase();
+                String name = caseModel.getId();
+                if (StringUtils.isNotEmpty(caseModel.getName())) {
+                    name = caseModel.getName();
+                }
+                String description = caseModel.getDocumentation();
+
+                ModelRepresentation model = new ModelRepresentation();
+                model.setKey(caseModel.getId());
+                model.setName(name);
+                model.setDescription(description);
+                model.setModelType(AbstractModel.MODEL_TYPE_CMMN);
+                Model newModel = modelService.createModel(model, modelNode.toString(), SecurityUtils.getCurrentUserObject());
+                return new ModelRepresentation(newModel);
+
+            } catch (BadRequestException e) {
+                throw e;
+
+            } catch (Exception e) {
+                LOGGER.error("Import failed for {}", fileName, e);
+                throw new BadRequestException("Import failed for " + fileName + ", error message " + e.getMessage());
+            }
+        } else {
+            throw new BadRequestException("Invalid file name, only .cmmn and .cmmn.xml files are supported not " + fileName);
         }
     }
 

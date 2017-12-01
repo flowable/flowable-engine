@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+  <process id="handleStatusCodes" name="test" isExecutable="true">
+    <documentation>test</documentation>
+    <startEvent id="theStart" name="theStart"></startEvent>
+    <serviceTask id="handleGet" name="HTTP Task" flowable:type="http">
+      <extensionElements>
+        <flowable:field name="requestMethod">
+          <flowable:string><![CDATA[GET]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="requestUrl">
+          <flowable:string><![CDATA[http://localhost:9798/api/fail]]></flowable:string>
+        </flowable:field>
+        <flowable:field name="handleStatusCodes">
+          <flowable:string><![CDATA[4XX]]></flowable:string>
+        </flowable:field>
+      </extensionElements>
+    </serviceTask>
+    <endEvent id="theEnd" name="theEnd"></endEvent>
+    <sequenceFlow id="sid-E1E7E4BF-FBAD-4566-B7C0-B7D72EB4F615" sourceRef="handleGet" targetRef="theEnd"></sequenceFlow>
+    <sequenceFlow id="sid-EB36EAB7-7AC6-4139-9AA1-8996020E9F67" sourceRef="theStart" targetRef="handleGet"></sequenceFlow>
+    <sequenceFlow id="sid-40287957-7F26-43E8-9B9C-2D452ADA1DA6" sourceRef="catch400" targetRef="theEnd">
+      <extensionElements>
+        <flowable:executionListener event="start" class="org.flowable.http.bpmn.HttpExecutionListener"></flowable:executionListener>
+      </extensionElements>
+    </sequenceFlow>
+    <boundaryEvent id="catch400" attachedToRef="handleGet">
+      <errorEventDefinition errorRef="HTTP400"></errorEventDefinition>
+    </boundaryEvent>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_handleStatusCodes">
+    <bpmndi:BPMNPlane bpmnElement="handleStatusCodes" id="BPMNPlane_handleStatusCodes">
+      <bpmndi:BPMNShape bpmnElement="theStart" id="BPMNShape_theStart">
+        <omgdc:Bounds height="30.0" width="30.0" x="100.0" y="159.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="handleGet" id="BPMNShape_handleGet">
+        <omgdc:Bounds height="80.0" width="100.0" x="170.0" y="134.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="theEnd" id="BPMNShape_theEnd">
+        <omgdc:Bounds height="28.0" width="28.0" x="315.0" y="160.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="catch400" id="BPMNShape_catch400">
+        <omgdc:Bounds height="30.0" width="30.0" x="211.52628209605365" y="199.24540625899758"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-EB36EAB7-7AC6-4139-9AA1-8996020E9F67" id="BPMNEdge_sid-EB36EAB7-7AC6-4139-9AA1-8996020E9F67">
+        <omgdi:waypoint x="130.0" y="174.0"></omgdi:waypoint>
+        <omgdi:waypoint x="170.0" y="174.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-40287957-7F26-43E8-9B9C-2D452ADA1DA6" id="BPMNEdge_sid-40287957-7F26-43E8-9B9C-2D452ADA1DA6">
+        <omgdi:waypoint x="226.62690400527367" y="229.24506876291363"></omgdi:waypoint>
+        <omgdi:waypoint x="226.82650836230536" y="259.0"></omgdi:waypoint>
+        <omgdi:waypoint x="329.0" y="259.0"></omgdi:waypoint>
+        <omgdi:waypoint x="329.0" y="188.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-E1E7E4BF-FBAD-4566-B7C0-B7D72EB4F615" id="BPMNEdge_sid-E1E7E4BF-FBAD-4566-B7C0-B7D72EB4F615">
+        <omgdi:waypoint x="270.0" y="174.0"></omgdi:waypoint>
+        <omgdi:waypoint x="315.0" y="174.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

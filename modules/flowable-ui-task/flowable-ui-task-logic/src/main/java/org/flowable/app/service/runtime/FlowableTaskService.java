@@ -24,14 +24,15 @@ import org.flowable.app.model.runtime.TaskUpdateRepresentation;
 import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.api.UserCache.CachedUser;
 import org.flowable.app.service.exception.NotFoundException;
+import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.history.HistoricIdentityLink;
-import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.task.IdentityLinkType;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskInfo;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.idm.api.User;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.history.HistoricTaskInstance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -50,16 +51,28 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
         User currentUser = SecurityUtils.getCurrentUserObject();
         HistoricTaskInstance task = permissionService.validateReadPermissionOnTask(currentUser, taskId);
 
-        ProcessDefinition processDefinition = null;
+        TaskRepresentation rep = null;
         if (StringUtils.isNotEmpty(task.getProcessDefinitionId())) {
             try {
-                processDefinition = repositoryService.getProcessDefinition(task.getProcessDefinitionId());
+                ProcessDefinition processDefinition = repositoryService.getProcessDefinition(task.getProcessDefinitionId());
+                rep = new TaskRepresentation(task, processDefinition);
+                
             } catch (FlowableException e) {
                 LOGGER.error("Error getting process definition {}", task.getProcessDefinitionId(), e);
             }
+            
+        } else if (StringUtils.isNotEmpty(task.getScopeDefinitionId())) {
+            try {
+                CaseDefinition caseDefinition = cmmnRepositoryService.getCaseDefinition(task.getScopeDefinitionId());
+                rep = new TaskRepresentation(task, caseDefinition);
+                
+            } catch (FlowableException e) {
+                LOGGER.error("Error getting case definition {}", task.getScopeDefinitionId(), e);
+            }
+        } else {
+            rep = new TaskRepresentation(task);
         }
 
-        TaskRepresentation rep = new TaskRepresentation(task, processDefinition);
         fillPermissionInformation(rep, task, currentUser);
 
         // Populate the people
@@ -80,7 +93,7 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
 
     protected List<UserRepresentation> getInvolvedUsers(String taskId) {
         List<HistoricIdentityLink> idLinks = historyService.getHistoricIdentityLinksForTask(taskId);
-        List<UserRepresentation> result = new ArrayList<UserRepresentation>(idLinks.size());
+        List<UserRepresentation> result = new ArrayList<>(idLinks.size());
 
         for (HistoricIdentityLink link : idLinks) {
             // Only include users and non-assignee links

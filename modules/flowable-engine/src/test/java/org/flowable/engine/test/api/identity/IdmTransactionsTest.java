@@ -16,15 +16,14 @@ import java.util.List;
 
 import org.flowable.engine.IdentityService;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.DelegateTask;
 import org.flowable.engine.delegate.JavaDelegate;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
+import org.flowable.task.service.delegate.DelegateTask;
 
 /**
  * @author Joram Barrez
@@ -54,7 +53,7 @@ public class IdmTransactionsTest extends PluggableFlowableTestCase {
         assertEquals(0, identityService.createUserQuery().list().size());
 
         runtimeService.startProcessInstanceByKey("testProcess");
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
         taskService.complete(task.getId());
         assertEquals(1, identityService.createUserQuery().list().size());
@@ -68,7 +67,7 @@ public class IdmTransactionsTest extends PluggableFlowableTestCase {
         assertEquals(0, identityService.createUserQuery().list().size());
 
         runtimeService.startProcessInstanceByKey("testProcess");
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
         // Completing the task throws an exception
         try {

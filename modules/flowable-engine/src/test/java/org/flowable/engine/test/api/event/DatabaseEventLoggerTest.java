@@ -18,15 +18,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.impl.identity.Authentication;
 import org.flowable.engine.common.impl.util.CollectionUtil;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.event.logger.EventLogger;
 import org.flowable.engine.impl.event.logger.handler.Fields;
-import org.flowable.engine.impl.identity.Authentication;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 import com.fasterxml.jackson.core.JsonParseException;
@@ -290,7 +289,7 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
         }
 
         // Completing two tasks
-        for (Task task : taskService.createTaskQuery().list()) {
+        for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
             Authentication.setAuthenticatedUserId(task.getAssignee());
             Map<String, Object> varMap = new HashMap<>();
             varMap.put("test", "test");
@@ -306,7 +305,7 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
 
             EventLogEntry entry = eventLogEntries.get(i);
 
-            // Task completion
+            // org.flowable.task.service.Task completion
             if (i == 1 || i == 6) {
                 assertNotNull(entry.getType());
                 assertEquals(FlowableEngineEventType.TASK_COMPLETED.name(), entry.getType());
@@ -538,7 +537,7 @@ public class DatabaseEventLoggerTest extends PluggableFlowableTestCase {
 
     public void testStandaloneTaskEvents() throws JsonParseException, JsonMappingException, IOException {
 
-        Task task = taskService.newTask();
+        org.flowable.task.api.Task task = taskService.newTask();
         task.setAssignee("kermit");
         task.setTenantId("myTenant");
         taskService.saveTask(task);

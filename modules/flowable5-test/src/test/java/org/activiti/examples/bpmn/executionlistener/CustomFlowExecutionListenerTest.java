@@ -17,8 +17,8 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.impl.test.ResourceFlowableTestCase;
-import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 
 /**
  * @author Tijs Rademakers

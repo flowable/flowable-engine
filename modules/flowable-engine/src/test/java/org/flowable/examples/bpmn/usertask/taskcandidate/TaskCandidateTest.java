@@ -19,7 +19,6 @@ import java.util.Map;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
@@ -33,6 +32,7 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
 
     private static final String GONZO = "gonzo";
 
+    @Override
     public void setUp() throws Exception {
         super.setUp();
 
@@ -54,6 +54,7 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
         identityService.createMembership(GONZO, "sales");
     }
 
+    @Override
     public void tearDown() throws Exception {
         identityService.deleteUser(KERMIT);
         identityService.deleteUser(GONZO);
@@ -70,14 +71,14 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
         // Deploy and start process
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("singleCandidateGroup");
 
-        // Task should not yet be assigned to kermit
-        List<Task> tasks = taskService.createTaskQuery().taskAssignee(KERMIT).list();
+        // org.flowable.task.service.Task should not yet be assigned to kermit
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee(KERMIT).list();
         assertTrue(tasks.isEmpty());
 
         // The task should be visible in the candidate task list
         tasks = taskService.createTaskQuery().taskCandidateUser(KERMIT).list();
         assertEquals(1, tasks.size());
-        Task task = tasks.get(0);
+        org.flowable.task.api.Task task = tasks.get(0);
         assertEquals("Pay out expenses", task.getName());
 
         // Claim the task
@@ -105,8 +106,8 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
         // Deploy and start process
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("multipleCandidatesGroup");
 
-        // Task should not yet be assigned to anyone
-        List<Task> tasks = taskService.createTaskQuery().taskAssignee(KERMIT).list();
+        // org.flowable.task.service.Task should not yet be assigned to anyone
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee(KERMIT).list();
 
         assertTrue(tasks.isEmpty());
         tasks = taskService.createTaskQuery().taskAssignee(GONZO).list();
@@ -124,7 +125,7 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
 
         // Gonzo claims the task
         tasks = taskService.createTaskQuery().taskCandidateUser(GONZO).list();
-        Task task = tasks.get(0);
+        org.flowable.task.api.Task task = tasks.get(0);
         assertEquals("Approve expenses", task.getName());
         taskService.claim(task.getId(), GONZO);
 
@@ -152,10 +153,10 @@ public class TaskCandidateTest extends PluggableFlowableTestCase {
         assertEquals(1, taskService.createTaskQuery().taskCandidateUser(GONZO).list().size());
         assertEquals(1, taskService.createTaskQuery().taskCandidateUser(KERMIT).list().size());
 
-        List<Task> tasks = taskService.createTaskQuery().taskInvolvedUser(KERMIT).list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskInvolvedUser(KERMIT).list();
         assertEquals(1, tasks.size());
 
-        Task task = tasks.get(0);
+        org.flowable.task.api.Task task = tasks.get(0);
         taskService.setVariableLocal(task.getId(), "taskVar", 123);
         tasks = taskService.createTaskQuery().taskInvolvedUser(KERMIT).includeProcessVariables().includeTaskLocalVariables().list();
         task = tasks.get(0);

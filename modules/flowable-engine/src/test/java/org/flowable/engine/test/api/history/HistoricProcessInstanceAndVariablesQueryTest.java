@@ -17,12 +17,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.task.Task;
 
 /**
  * @author Tijs Rademakers
@@ -40,6 +39,7 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
     /**
      * Setup starts 4 process instances of oneTaskProcess and 1 instance of oneTaskProcess2
      */
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         repositoryService.createDeployment()
@@ -55,7 +55,7 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
         for (int i = 0; i < 4; i++) {
             processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, String.valueOf(i), startMap).getId());
             if (i == 0) {
-                Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(0)).singleResult();
+                org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstanceIds.get(0)).singleResult();
                 taskService.complete(task.getId());
             }
         }
@@ -68,6 +68,7 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
         processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY_3, "1", startMap).getId());
     }
 
+    @Override
     protected void tearDown() throws Exception {
         deleteDeployments();
         
@@ -220,6 +221,36 @@ public class HistoricProcessInstanceAndVariablesQueryTest extends PluggableFlowa
             processInstance = historyService.createHistoricProcessInstanceQuery().includeProcessVariables()
                     .variableValueEquals("test", "test").processDefinitionCategory(PROCESS_DEFINITION_CATEGORY_2).singleResult();
             assertNull(processInstance);
+        }
+    }
+    
+    public void testQueryByVariableExist() {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
+            // DeploymentId
+            String deploymentId = repositoryService.createDeploymentQuery().list().get(0).getId();
+            HistoricProcessInstance processInstance = historyService.createHistoricProcessInstanceQuery().variableExists("anothertest")
+                            .deploymentId(deploymentId).singleResult();
+            assertNotNull(processInstance);
+
+            List<HistoricProcessInstance> processInstanceList = historyService.createHistoricProcessInstanceQuery()
+                            .variableNotExists("anothertest").deploymentId(deploymentId).list();
+            assertEquals(5, processInstanceList.size());
+            
+            processInstance = historyService.createHistoricProcessInstanceQuery().or().variableExists("anothertest")
+                            .processInstanceId("notexisting").endOr().deploymentId(deploymentId).singleResult();
+            assertNotNull(processInstance);
+            
+            processInstanceList = historyService.createHistoricProcessInstanceQuery().or().variableNotExists("anothertest")
+                            .processInstanceId("nonexisting").endOr().deploymentId(deploymentId).list();
+            assertEquals(5, processInstanceList.size());
+            
+            processInstanceList = historyService.createHistoricProcessInstanceQuery().or().variableNotExists("anothertest")
+                            .variableValueEquals("test", "test").endOr().deploymentId(deploymentId).list();
+            assertEquals(5, processInstanceList.size());
+            
+            processInstanceList = historyService.createHistoricProcessInstanceQuery().or().variableNotExists("anothertest").endOr().or()
+                            .variableValueEquals("test", "test").endOr().deploymentId(deploymentId).list();
+            assertEquals(4, processInstanceList.size());
         }
     }
 

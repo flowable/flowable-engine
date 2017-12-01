@@ -13,7 +13,6 @@
 
 package org.flowable.standalone.testing;
 
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.FlowableTestCase;
 
@@ -26,7 +25,7 @@ public class FlowableTestCaseTest extends FlowableTestCase {
     public void testSimpleProcess() {
         runtimeService.startProcessInstanceByKey("simpleProcess");
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("My Task", task.getName());
 
         taskService.complete(task.getId());

@@ -17,13 +17,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 /**
  * @author Tom Baeyens
@@ -32,17 +31,17 @@ import org.flowable.engine.task.Task;
 public class SubTaskTest extends PluggableFlowableTestCase {
 
     public void testSubTask() {
-        Task gonzoTask = taskService.newTask();
+        org.flowable.task.api.Task gonzoTask = taskService.newTask();
         gonzoTask.setName("gonzoTask");
         taskService.saveTask(gonzoTask);
 
-        Task subTaskOne = taskService.newTask();
+        org.flowable.task.api.Task subTaskOne = taskService.newTask();
         subTaskOne.setName("subtask one");
         String gonzoTaskId = gonzoTask.getId();
         subTaskOne.setParentTaskId(gonzoTaskId);
         taskService.saveTask(subTaskOne);
 
-        Task subTaskTwo = taskService.newTask();
+        org.flowable.task.api.Task subTaskTwo = taskService.newTask();
         subTaskTwo.setName("subtask two");
         subTaskTwo.setParentTaskId(gonzoTaskId);
         taskService.saveTask(subTaskTwo);
@@ -51,9 +50,9 @@ public class SubTaskTest extends PluggableFlowableTestCase {
         assertTrue(taskService.getSubTasks(subTaskId).isEmpty());
         assertTrue(historyService.createHistoricTaskInstanceQuery().taskParentTaskId(subTaskId).list().isEmpty());
 
-        List<Task> subTasks = taskService.getSubTasks(gonzoTaskId);
+        List<org.flowable.task.api.Task> subTasks = taskService.getSubTasks(gonzoTaskId);
         Set<String> subTaskNames = new HashSet<>();
-        for (Task subTask : subTasks) {
+        for (org.flowable.task.api.Task subTask : subTasks) {
             subTaskNames.add(subTask.getName());
         }
 
@@ -83,22 +82,22 @@ public class SubTaskTest extends PluggableFlowableTestCase {
                 .deploy();
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.setAssignee(task.getId(), "test");
 
-        Task subTask1 = taskService.newTask();
+        org.flowable.task.api.Task subTask1 = taskService.newTask();
         subTask1.setName("Sub task 1");
         subTask1.setParentTaskId(task.getId());
         subTask1.setAssignee("test");
         taskService.saveTask(subTask1);
 
-        Task subTask2 = taskService.newTask();
+        org.flowable.task.api.Task subTask2 = taskService.newTask();
         subTask2.setName("Sub task 2");
         subTask2.setParentTaskId(task.getId());
         subTask2.setAssignee("test");
         taskService.saveTask(subTask2);
 
-        List<Task> tasks = taskService.createTaskQuery().taskAssignee("test").list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee("test").list();
         assertEquals(3, tasks.size());
 
         runtimeService.deleteProcessInstance(processInstance.getId(), "none");

@@ -21,6 +21,43 @@
             #{tenantId, jdbcType=VARCHAR})
   </insert>
   
+  <insert id="bulkInsertFormDefinition" parameterType="java.util.List">
+    insert into ${prefix}ACT_FO_FORM_DEFINITION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, 
+                        PARENT_DEPLOYMENT_ID_, RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_)
+    values 
+    <foreach collection="list" item="formDefinition" index="index" separator=",">
+        (#{formDefinition.id, jdbcType=VARCHAR},
+         #{formDefinition.category, jdbcType=VARCHAR},
+         #{formDefinition.name, jdbcType=VARCHAR},
+         #{formDefinition.key, jdbcType=VARCHAR}, 
+         #{formDefinition.version, jdbcType=INTEGER},
+         #{formDefinition.deploymentId, jdbcType=VARCHAR},
+         #{formDefinition.parentDeploymentId, jdbcType=VARCHAR},
+         #{formDefinition.resourceName, jdbcType=VARCHAR},
+         #{formDefinition.description, jdbcType=VARCHAR},
+         #{formDefinition.tenantId, jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+  
+  <insert id="bulkInsertFormDefinition" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL
+    <foreach collection="list" item="formDefinition" index="index">
+        INTO ${prefix}ACT_FO_FORM_DEFINITION(ID_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, 
+                PARENT_DEPLOYMENT_ID_, RESOURCE_NAME_, DESCRIPTION_, TENANT_ID_) VALUES 
+        (#{formDefinition.id, jdbcType=VARCHAR},
+         #{formDefinition.category, jdbcType=VARCHAR},
+         #{formDefinition.name, jdbcType=VARCHAR},
+         #{formDefinition.key, jdbcType=VARCHAR}, 
+         #{formDefinition.version, jdbcType=INTEGER},
+         #{formDefinition.deploymentId, jdbcType=VARCHAR},
+         #{formDefinition.parentDeploymentId, jdbcType=VARCHAR},
+         #{formDefinition.resourceName, jdbcType=VARCHAR},
+         #{formDefinition.description, jdbcType=VARCHAR},
+         #{formDefinition.tenantId, jdbcType=VARCHAR})                        
+    </foreach>
+    SELECT * FROM dual
+  </insert>
+  
   <!-- FORM DEFINITION UPDATE -->
 
   <update id="updateFormDefinition" parameterType="org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntityImpl">

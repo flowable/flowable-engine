@@ -25,12 +25,12 @@ import org.flowable.engine.common.impl.util.io.InputStreamSource;
 import org.flowable.engine.common.impl.util.io.StreamSource;
 import org.flowable.engine.history.HistoricActivityInstance;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
-import org.flowable.engine.history.HistoricVariableInstance;
-import org.flowable.engine.history.HistoricVariableInstanceQuery;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
 
 public class CallActivityTest extends ResourceFlowableTestCase {
 
@@ -196,6 +196,7 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         }
     }
 
+    @Override
     protected void tearDown() throws Exception {
         for (Deployment deployment : repositoryService.createDeploymentQuery().list()) {
             repositoryService.deleteDeployment(deployment.getId(), true);

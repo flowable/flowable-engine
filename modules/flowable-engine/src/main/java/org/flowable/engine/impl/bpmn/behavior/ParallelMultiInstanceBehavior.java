@@ -50,6 +50,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
     /**
      * Handles the parallel case of spawning the instances. Will create child executions accordingly for every instance needed.
      */
+    @Override
     protected int createInstances(DelegateExecution multiInstanceRootExecution) {
         int nrOfInstances = resolveNrOfInstances(multiInstanceRootExecution);
         if (nrOfInstances < 0) {
@@ -102,6 +103,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
     /**
      * Called when the wrapped {@link ActivityBehavior} calls the {@link AbstractBpmnActivityBehavior#leave(DelegateExecution)} method. Handles the completion of one of the parallel instances
      */
+    @Override
     public void leave(DelegateExecution execution) {
 
         boolean zeroNrOfInstances = false;
@@ -165,12 +167,22 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
                             toVerify.addAll(childExecutions);
                         }
                     }
+                    sendCompletedWithConditionEvent(leavingExecution);
                 }
-                
+                else {
+                    sendCompletedEvent(leavingExecution);
+                }
+
+                // Clean up execution that resulted in the mult-instance finishing so that cancelled events aren't sent for it.
+                ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
+                executionEntityManager.deleteChildExecutions(executionEntity, DELETE_REASON_END, false);
+                executionEntityManager.deleteExecutionAndRelatedData(executionEntity, DELETE_REASON_END);
+
                 super.leave(leavingExecution);
             }
 
         } else {
+            sendCompletedEvent(execution);
             super.leave(execution);
         }
     }
@@ -253,21 +265,4 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
 
         parentScopeExecution.forceUpdate();
     }
-
-    // TODO: can the ExecutionManager.deleteChildExecution not be used?
-    protected void deleteChildExecutions(ExecutionEntity parentExecution, boolean deleteExecution, CommandContext commandContext) {
-        // Delete all child executions
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-        Collection<ExecutionEntity> childExecutions = executionEntityManager.findChildExecutionsByParentExecutionId(parentExecution.getId());
-        if (CollectionUtil.isNotEmpty(childExecutions)) {
-            for (ExecutionEntity childExecution : childExecutions) {
-                deleteChildExecutions(childExecution, true, commandContext);
-            }
-        }
-
-        if (deleteExecution) {
-            executionEntityManager.deleteExecutionAndRelatedData(parentExecution, null);
-        }
-    }
-
 }

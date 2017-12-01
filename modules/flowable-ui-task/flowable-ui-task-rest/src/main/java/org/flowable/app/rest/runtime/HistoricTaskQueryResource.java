@@ -26,9 +26,9 @@ import org.flowable.app.service.exception.NotPermittedException;
 import org.flowable.app.service.runtime.PermissionService;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.HistoryService;
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.history.HistoricTaskInstanceQuery;
 import org.flowable.idm.api.User;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -88,7 +88,7 @@ public class HistoricTaskQueryResource {
     }
 
     protected List<TaskRepresentation> convertTaskInfoList(List<HistoricTaskInstance> tasks) {
-        List<TaskRepresentation> result = new ArrayList<TaskRepresentation>();
+        List<TaskRepresentation> result = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(tasks)) {
             TaskRepresentation representation = null;
             for (HistoricTaskInstance task : tasks) {

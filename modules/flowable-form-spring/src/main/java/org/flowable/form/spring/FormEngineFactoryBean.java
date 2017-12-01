@@ -34,16 +34,19 @@ public class FormEngineFactoryBean implements FactoryBean<FormEngine>, Disposabl
     protected ApplicationContext applicationContext;
     protected FormEngine formEngine;
 
+    @Override
     public void destroy() throws Exception {
         if (formEngine != null) {
             formEngine.close();
         }
     }
 
+    @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
         this.applicationContext = applicationContext;
     }
 
+    @Override
     public FormEngine getObject() throws Exception {
         configureExternallyManagedTransactions();
 
@@ -60,10 +63,12 @@ public class FormEngineFactoryBean implements FactoryBean<FormEngine>, Disposabl
         }
     }
 
+    @Override
     public Class<FormEngine> getObjectType() {
         return FormEngine.class;
     }
 
+    @Override
     public boolean isSingleton() {
         return true;
     }

@@ -28,12 +28,12 @@ public class RemoteIdmAuthenticationProvider implements AuthenticationProvider {
             throw new FlowableException("user not found " + authentication.getPrincipal());
         }
 
-        Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
+        Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
         for (String privilege : user.getPrivileges()) {
             grantedAuthorities.add(new SimpleGrantedAuthority(privilege));
         }
 
-        org.flowable.engine.impl.identity.Authentication.setAuthenticatedUserId(user.getId());
+        org.flowable.engine.common.impl.identity.Authentication.setAuthenticatedUserId(user.getId());
 
         Authentication auth = new UsernamePasswordAuthenticationToken(authentication.getPrincipal(),
                 authentication.getCredentials(), grantedAuthorities);

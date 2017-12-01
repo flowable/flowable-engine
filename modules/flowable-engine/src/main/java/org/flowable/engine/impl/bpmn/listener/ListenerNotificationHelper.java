@@ -36,9 +36,10 @@ import org.flowable.engine.delegate.TransactionDependentExecutionListener;
 import org.flowable.engine.delegate.TransactionDependentTaskListener;
 import org.flowable.engine.impl.bpmn.parser.factory.ListenerFactory;
 import org.flowable.engine.impl.delegate.invocation.TaskListenerInvocation;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.ExecutionHelper;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Joram Barrez
@@ -114,10 +115,11 @@ public class ListenerNotificationHelper {
                 BaseTaskListener taskListener = createTaskListener(listener);
 
                 if (listener.getOnTransaction() != null) {
-                    planTransactionDependentTaskListener(taskEntity.getExecution(), (TransactionDependentTaskListener) taskListener, listener);
+                    planTransactionDependentTaskListener(ExecutionHelper.getExecution(taskEntity.getExecutionId()), (TransactionDependentTaskListener) taskListener, listener);
                 } else {
                     taskEntity.setEventName(eventType);
-                    taskEntity.setCurrentFlowableListener(listener);
+                    taskEntity.setEventHandlerId(listener.getId());
+                    
                     try {
                         CommandContextUtil.getProcessEngineConfiguration().getDelegateInterceptor()
                                 .handleInvocation(new TaskListenerInvocation((TaskListener) taskListener, taskEntity));
@@ -125,7 +127,6 @@ public class ListenerNotificationHelper {
                         throw new FlowableException("Exception while invoking TaskListener: " + e.getMessage(), e);
                     } finally {
                         taskEntity.setEventName(null);
-                        taskEntity.setCurrentFlowableListener(null);
                     }
                 }
             }

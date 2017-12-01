@@ -35,6 +35,7 @@ public class Warning {
         column = element.getXmlColumnNumber();
     }
 
+    @Override
     public String toString() {
         return warningMessage + (resource != null ? " | " + resource : "") + " | line " + line + " | column " + column;
     }

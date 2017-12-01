@@ -13,8 +13,8 @@
 
 package org.flowable.spring;
 
-import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.engine.runtime.JobInfo;
+import org.flowable.job.api.JobInfo;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 
 /**
  * <p>

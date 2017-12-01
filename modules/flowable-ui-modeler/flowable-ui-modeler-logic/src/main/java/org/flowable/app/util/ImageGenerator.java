@@ -19,6 +19,9 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.cmmn.image.CaseDiagramGenerator;
+import org.flowable.cmmn.image.impl.DefaultCaseDiagramGenerator;
+import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.image.ProcessDiagramGenerator;
 import org.flowable.image.exception.FlowableImageException;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
@@ -34,6 +37,12 @@ public class ImageGenerator {
     public static BufferedImage createImage(BpmnModel bpmnModel, double scaleFactor) {
         ProcessDiagramGenerator diagramGenerator = new DefaultProcessDiagramGenerator(scaleFactor);
         BufferedImage diagramImage = diagramGenerator.generatePngImage(bpmnModel, scaleFactor);
+        return diagramImage;
+    }
+    
+    public static BufferedImage createCmmnImage(CmmnModel cmmnModel, double scaleFactor) {
+        CaseDiagramGenerator diagramGenerator = new DefaultCaseDiagramGenerator(scaleFactor);
+        BufferedImage diagramImage = diagramGenerator.generatePngImage(cmmnModel, scaleFactor);
         return diagramImage;
     }
 

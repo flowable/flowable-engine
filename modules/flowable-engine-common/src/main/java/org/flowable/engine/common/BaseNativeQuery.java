@@ -34,12 +34,14 @@ public abstract class BaseNativeQuery<T extends NativeQuery<?, ?>, U> implements
     protected String sqlStatement;
 
     @SuppressWarnings("unchecked")
+    @Override
     public T sql(String sqlStatement) {
         this.sqlStatement = sqlStatement;
         return (T) this;
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public T parameter(String name, Object value) {
         parameters.put(name, value);
         return (T) this;

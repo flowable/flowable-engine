@@ -26,25 +26,26 @@ import org.drools.KnowledgeBase;
 import org.drools.runtime.StatefulKnowledgeSession;
 import org.flowable.engine.delegate.BusinessRuleTaskDelegate;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * activity implementation of the BPMN 2.0 business rule task.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class BusinessRuleTaskActivityBehavior extends TaskActivityBehavior implements BusinessRuleTaskDelegate {
 
     private static final long serialVersionUID = 1L;
 
-    protected Set<Expression> variablesInputExpressions = new HashSet<Expression>();
-    protected Set<Expression> rulesExpressions = new HashSet<Expression>();
+    protected Set<Expression> variablesInputExpressions = new HashSet<>();
+    protected Set<Expression> rulesExpressions = new HashSet<>();
     protected boolean exclude;
     protected String resultVariable;
 
     public BusinessRuleTaskActivityBehavior() {
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
         ActivityExecution activityExecution = (ActivityExecution) execution;
         PvmProcessDefinition processDefinition = activityExecution.getActivity().getProcessDefinition();
@@ -77,7 +78,7 @@ public class BusinessRuleTaskActivityBehavior extends TaskActivityBehavior imple
 
         Collection<Object> ruleOutputObjects = ksession.getObjects();
         if (ruleOutputObjects != null && !ruleOutputObjects.isEmpty()) {
-            Collection<Object> outputVariables = new ArrayList<Object>();
+            Collection<Object> outputVariables = new ArrayList<>();
             outputVariables.addAll(ruleOutputObjects);
             execution.setVariable(resultVariable, outputVariables);
         }
@@ -85,18 +86,22 @@ public class BusinessRuleTaskActivityBehavior extends TaskActivityBehavior imple
         leave(activityExecution);
     }
 
+    @Override
     public void addRuleVariableInputIdExpression(Expression inputId) {
         this.variablesInputExpressions.add(inputId);
     }
 
+    @Override
     public void addRuleIdExpression(Expression inputId) {
         this.rulesExpressions.add(inputId);
     }
 
+    @Override
     public void setExclude(boolean exclude) {
         this.exclude = exclude;
     }
 
+    @Override
     public void setResultVariable(String resultVariableName) {
         this.resultVariable = resultVariableName;
     }

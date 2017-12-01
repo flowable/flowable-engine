@@ -64,6 +64,14 @@ flowableModeler
             templateUrl: appResourceRoot + 'views/process.html',
             controller: 'ProcessCtrl'
         })
+        .when('/casemodels', {
+            templateUrl: appResourceRoot + 'views/casemodels.html',
+            controller: 'CaseModelsCtrl'
+        })
+        .when('/casemodels/:modelId', {
+            templateUrl: appResourceRoot + 'views/casemodel.html',
+            controller: 'CaseModelCtrl'
+        })
         .when('/forms', {
             templateUrl: appResourceRoot + 'views/forms.html',
             controller: 'FormsCtrl'
@@ -108,6 +116,10 @@ flowableModeler
             templateUrl: appResourceRoot + 'views/form-builder.html',
             controller: 'FormBuilderController'
         })
+        .when('/case-editor/:modelId', {
+            templateUrl: appResourceRoot + 'editor-app/editor.html',
+            controller: 'EditorController'
+        })
         .when('/decision-table-editor/:modelId', {
             templateUrl: appResourceRoot + 'views/decision-table-editor.html',
             controller: 'DecisionTableEditorController'
@@ -116,12 +128,12 @@ flowableModeler
             templateUrl: appResourceRoot + 'views/app-definition-builder.html',
             controller: 'AppDefinitionBuilderController'
         });
-            
+
         if (FLOWABLE.CONFIG.appDefaultRoute) {
             $routeProvider.when('/', {
                 redirectTo: FLOWABLE.CONFIG.appDefaultRoute
             });
-            
+
         } else {
             $routeProvider.when('/', {
                 redirectTo: '/processes'
@@ -140,7 +152,7 @@ flowableModeler
         // .registerAvailableLanguageKeys(['en'], {
         //     'en-*': 'en'
         // })
-        .useSanitizeValueStrategy('sanitizeParameters')
+        .useSanitizeValueStrategy('escapeParameters')
         .uniformLanguageTag('bcp47')
         .determinePreferredLanguage();
 
@@ -192,6 +204,11 @@ flowableModeler
                     'path': '/processes'
                 },
                 {
+                    'id': 'casemodels',
+                    'title': 'GENERAL.NAVIGATION.CASEMODELS',
+                    'path': '/casemodels'
+                },
+                {
                     'id': 'forms',
                     'title': 'GENERAL.NAVIGATION.FORMS',
                     'path': '/forms'
@@ -211,6 +228,10 @@ flowableModeler
             $rootScope.config = FLOWABLE.CONFIG;
 
             $rootScope.mainPage = $rootScope.mainNavigation[0];
+
+            // Add url helpers to root scope:
+            $rootScope.getModelThumbnailUrl = FLOWABLE.APP_URL.getModelThumbnailUrl;
+            $rootScope.getImageUrl = FLOWABLE.APP_URL.getImageUrl;
 
             /*
              * History of process and form pages accessed by the editor.
@@ -304,18 +325,18 @@ flowableModeler
                     });
                 }
             };
-            
-            $http.get(FLOWABLE.CONFIG.contextRoot + '/app/rest/account')
+
+            $http.get(FLOWABLE.APP_URL.getAccountUrl())
 	        	.success(function (data, status, headers, config) {
 	              	$rootScope.account = data;
 	               	$rootScope.invalidCredentials = false;
 	 				$rootScope.authenticated = true;
 	          	});
-	          	
+
 	        $rootScope.logout = function () {
                 $rootScope.authenticated = false;
                 $rootScope.authenticationError = false;
-                $http.get(FLOWABLE.CONFIG.contextRoot + '/app/logout')
+                $http.get(FLOWABLE.APP_URL.getLogoutUrl())
                     .success(function (data, status, headers, config) {
                         $rootScope.login = null;
                         $rootScope.authenticated = false;

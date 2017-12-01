@@ -13,6 +13,7 @@
 package org.flowable.rest.variable;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import io.swagger.annotations.ApiModelProperty;
 
 /**
  * Pojo representing a variable used in REST-service which defines it's name, variable and type.
@@ -26,6 +27,7 @@ public class EngineRestVariable {
     private Object value;
     private String valueUrl;
 
+    @ApiModelProperty(example = "myVariable", value = "Name of the variable")
     public String getName() {
         return name;
     }
@@ -34,6 +36,7 @@ public class EngineRestVariable {
         this.name = name;
     }
 
+    @ApiModelProperty(example = "string", value = "Type of the variable.", notes = " When writing a variable and this value is omitted, the type will be deducted from the raw JSON-attribute request type and is limited to either string, double, integer and boolean. It’s advised to always include a type to make sure no wrong assumption about the type can be done.")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     public String getType() {
         return type;
@@ -43,6 +46,7 @@ public class EngineRestVariable {
         this.type = type;
     }
 
+    @ApiModelProperty(example = "test", value = "Value of the variable.", notes = "When writing a variable and value is omitted, null will be used as value.")
     public Object getValue() {
         return value;
     }
@@ -51,6 +55,7 @@ public class EngineRestVariable {
         this.value = value;
     }
 
+    @ApiModelProperty(example = "http://....", notes = "When reading a variable of type binary or serializable, this attribute will point to the URL where the raw binary data can be fetched from.")
     public void setValueUrl(String valueUrl) {
         this.valueUrl = valueUrl;
     }

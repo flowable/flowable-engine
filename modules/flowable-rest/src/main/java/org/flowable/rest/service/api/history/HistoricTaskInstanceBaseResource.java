@@ -20,11 +20,11 @@ import java.util.Map;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.query.QueryProperty;
-import org.flowable.engine.history.HistoricTaskInstanceQuery;
-import org.flowable.engine.impl.HistoricTaskInstanceQueryProperty;
 import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
+import org.flowable.task.api.history.HistoricTaskInstanceQuery;
+import org.flowable.task.service.impl.HistoricTaskInstanceQueryProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -63,7 +63,7 @@ public class HistoricTaskInstanceBaseResource {
     @Autowired
     protected HistoryService historyService;
 
-    protected DataResponse getQueryResponse(HistoricTaskInstanceQueryRequest queryRequest, Map<String, String> allRequestParams, String serverRootUrl) {
+    protected DataResponse<HistoricTaskInstanceResponse> getQueryResponse(HistoricTaskInstanceQueryRequest queryRequest, Map<String, String> allRequestParams, String serverRootUrl) {
         HistoricTaskInstanceQuery query = historyService.createHistoricTaskInstanceQuery();
 
         // Populate query based on request

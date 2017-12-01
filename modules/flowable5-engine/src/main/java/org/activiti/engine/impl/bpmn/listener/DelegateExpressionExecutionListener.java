@@ -22,8 +22,8 @@ import org.activiti.engine.impl.delegate.ExecutionListenerInvocation;
 import org.activiti.engine.impl.delegate.JavaDelegateInvocation;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.JavaDelegate;
+import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * @author Joram Barrez
@@ -38,6 +38,7 @@ public class DelegateExpressionExecutionListener implements ExecutionListener {
         this.fieldDeclarations = fieldDeclarations;
     }
 
+    @Override
     public void notify(DelegateExecution execution) {
         // Note: we can't cache the result of the expression, because the
         // execution can change: eg. delegateExpression='${mySpringBeanFactory.randomSpringBean()}'

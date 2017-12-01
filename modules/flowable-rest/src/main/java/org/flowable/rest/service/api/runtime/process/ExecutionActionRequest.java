@@ -13,13 +13,13 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import java.util.List;
-
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import io.swagger.annotations.ApiModelProperty;
 import org.flowable.rest.service.api.RestActionRequest;
 import org.flowable.rest.service.api.engine.variable.RestVariable;
 
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeInfo.Id;
+import java.util.List;
 
 /**
  * @author Frederik Heremans
@@ -54,6 +54,7 @@ public class ExecutionActionRequest extends RestActionRequest {
         return transientVariables;
     }
 
+    @ApiModelProperty(value = "Name of the signal", example = "My Signal")
     public String getSignalName() {
         return signalName;
     }
@@ -62,11 +63,18 @@ public class ExecutionActionRequest extends RestActionRequest {
         this.signalName = signalName;
     }
 
+    @ApiModelProperty(value = "Message of the signal", example = "My Signal")
     public String getMessageName() {
         return messageName;
     }
 
     public void setMessageName(String messageName) {
         this.messageName = messageName;
+    }
+
+    @Override
+    @ApiModelProperty(value = "Action to perform: Either signal, trigger, signalEventReceived or messageEventReceived", example = "signalEventReceived", required = true)
+    public String getAction() {
+        return super.getAction();
     }
 }

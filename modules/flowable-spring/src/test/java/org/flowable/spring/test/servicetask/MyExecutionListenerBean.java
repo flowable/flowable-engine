@@ -24,6 +24,7 @@ public class MyExecutionListenerBean implements ExecutionListener {
 
     private FixedValue someField;
 
+    @Override
     public void notify(DelegateExecution execution) {
         execution.setVariable("executionListenerVar", "working");
         if (someField != null) {

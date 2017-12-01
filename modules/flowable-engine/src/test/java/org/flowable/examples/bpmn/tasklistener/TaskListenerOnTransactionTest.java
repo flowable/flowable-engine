@@ -16,12 +16,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -40,7 +39,7 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenersOnCompleteCommitted", variables);
 
         // task 1 has committed listener
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         // task 2 has rolled-back listener
@@ -68,7 +67,7 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("taskListenersOnCompleteCommitted", variables);
 
         // task 1 has before-commit listener
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         // task 2 has rolled-back listener
@@ -106,7 +105,7 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("taskListenersOnCompleteExecutionVariables");
 
         // task 1 has committed listener
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         // task 2 has committed listener
@@ -142,7 +141,7 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
 
         ProcessInstance secondProcessInstance = runtimeService.startProcessInstanceByKey("secondTransactionDependentTaskListenerProcess");
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         assertProcessEnded(secondProcessInstance.getId());
@@ -167,7 +166,7 @@ public class TaskListenerOnTransactionTest extends PluggableFlowableTestCase {
 
         runtimeService.startProcessInstanceByKey("transactionDependentTaskListenerProcess");
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         taskService.complete(task.getId());
 
         List<CurrentTaskTransactionDependentTaskListener.CurrentTask> currentTasks = CurrentTaskTransactionDependentTaskListener.getCurrentTasks();

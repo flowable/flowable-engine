@@ -14,21 +14,23 @@ package org.flowable.engine.impl;
 
 import java.util.List;
 
+import org.flowable.engine.common.api.history.HistoricData;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.history.HistoricActivityInstance;
-import org.flowable.engine.history.HistoricData;
-import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.history.HistoricVariableUpdate;
 import org.flowable.engine.history.ProcessInstanceHistoryLog;
 import org.flowable.engine.history.ProcessInstanceHistoryLogQuery;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.impl.variable.CacheableVariable;
-import org.flowable.engine.impl.variable.JPAEntityListVariableType;
-import org.flowable.engine.impl.variable.JPAEntityVariableType;
+import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
+import org.flowable.variable.api.history.HistoricVariableInstance;
+import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
+import org.flowable.variable.service.impl.types.CacheableVariable;
+import org.flowable.variable.service.impl.types.JPAEntityListVariableType;
+import org.flowable.variable.service.impl.types.JPAEntityVariableType;
 
 /**
  * @author Joram Barrez
@@ -108,8 +110,8 @@ public class ProcessInstanceHistoryLogQueryImpl implements ProcessInstanceHistor
 
         // Tasks
         if (includeTasks) {
-            List<? extends HistoricData> tasks = CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext).findHistoricTaskInstancesByQueryCriteria(
-                    new HistoricTaskInstanceQueryImpl(commandExecutor).processInstanceId(processInstanceId));
+            List<? extends HistoricData> tasks = CommandContextUtil.getHistoricTaskService().findHistoricTaskInstancesByQueryCriteria(
+                            new HistoricTaskInstanceQueryImpl(commandExecutor).processInstanceId(processInstanceId));
             processInstanceHistoryLog.addHistoricData(tasks);
         }
 
@@ -122,7 +124,7 @@ public class ProcessInstanceHistoryLogQueryImpl implements ProcessInstanceHistor
 
         // Variables
         if (includeVariables) {
-            List<HistoricVariableInstance> variables = CommandContextUtil.getHistoricVariableInstanceEntityManager(commandContext).findHistoricVariableInstancesByQueryCriteria(
+            List<HistoricVariableInstance> variables = CommandContextUtil.getHistoricVariableService().findHistoricVariableInstancesByQueryCriteria(
                     new HistoricVariableInstanceQueryImpl(commandExecutor).processInstanceId(processInstanceId));
 
             // Make sure all variables values are fetched (similar to the HistoricVariableInstance query)

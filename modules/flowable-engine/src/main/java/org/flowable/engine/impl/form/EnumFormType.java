@@ -31,6 +31,7 @@ public class EnumFormType extends AbstractFormType {
         this.values = values;
     }
 
+    @Override
     public String getName() {
         return "enum";
     }

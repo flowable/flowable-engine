@@ -45,8 +45,9 @@ public class ModelEntity implements Model, HasRevision, PersistentObject, Serial
     protected String editorSourceExtraValueId;
     protected String tenantId = ProcessEngineConfiguration.NO_TENANT_ID;
 
+    @Override
     public Object getPersistentState() {
-        Map<String, Object> persistentState = new HashMap<String, Object>();
+        Map<String, Object> persistentState = new HashMap<>();
         persistentState.put("name", this.name);
         persistentState.put("key", key);
         persistentState.put("category", this.category);
@@ -62,38 +63,47 @@ public class ModelEntity implements Model, HasRevision, PersistentObject, Serial
 
     // getters and setters //////////////////////////////////////////////////////
 
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public void setId(String id) {
         this.id = id;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public void setName(String name) {
         this.name = name;
     }
 
+    @Override
     public String getKey() {
         return key;
     }
 
+    @Override
     public void setKey(String key) {
         this.key = key;
     }
 
+    @Override
     public String getCategory() {
         return category;
     }
 
+    @Override
     public void setCategory(String category) {
         this.category = category;
     }
 
+    @Override
     public Date getCreateTime() {
         return createTime;
     }
@@ -102,6 +112,7 @@ public class ModelEntity implements Model, HasRevision, PersistentObject, Serial
         this.createTime = createTime;
     }
 
+    @Override
     public Date getLastUpdateTime() {
         return lastUpdateTime;
     }
@@ -110,26 +121,32 @@ public class ModelEntity implements Model, HasRevision, PersistentObject, Serial
         this.lastUpdateTime = lastUpdateTime;
     }
 
+    @Override
     public Integer getVersion() {
         return version;
     }
 
+    @Override
     public void setVersion(Integer version) {
         this.version = version;
     }
 
+    @Override
     public String getMetaInfo() {
         return metaInfo;
     }
 
+    @Override
     public void setMetaInfo(String metaInfo) {
         this.metaInfo = metaInfo;
     }
 
+    @Override
     public String getDeploymentId() {
         return deploymentId;
     }
 
+    @Override
     public void setDeploymentId(String deploymentId) {
         this.deploymentId = deploymentId;
     }
@@ -150,30 +167,37 @@ public class ModelEntity implements Model, HasRevision, PersistentObject, Serial
         this.editorSourceExtraValueId = editorSourceExtraValueId;
     }
 
+    @Override
     public int getRevision() {
         return revision;
     }
 
+    @Override
     public int getRevisionNext() {
         return revision + 1;
     }
 
+    @Override
     public void setRevision(int revision) {
         this.revision = revision;
     }
 
+    @Override
     public String getTenantId() {
         return tenantId;
     }
 
+    @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
     }
 
+    @Override
     public boolean hasEditorSource() {
         return this.editorSourceValueId != null;
     }
 
+    @Override
     public boolean hasEditorSourceExtra() {
         return this.editorSourceExtraValueId != null;
     }

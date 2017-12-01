@@ -28,10 +28,11 @@ import org.flowable.bpmn.model.Message;
 import org.flowable.bpmn.model.SendTask;
 import org.flowable.bpmn.model.ServiceTask;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.delegate.BpmnError;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.impl.bpmn.data.AbstractDataAssociation;
 import org.flowable.engine.impl.bpmn.data.Assignment;
 import org.flowable.engine.impl.bpmn.data.ClassStructureDefinition;
@@ -50,7 +51,6 @@ import org.flowable.engine.impl.bpmn.webservice.MessageImplicitDataOutputAssocia
 import org.flowable.engine.impl.bpmn.webservice.MessageInstance;
 import org.flowable.engine.impl.bpmn.webservice.Operation;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.el.ExpressionManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.webservice.WSOperation;
@@ -77,10 +77,12 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
     protected Map<String, ItemDefinition> itemDefinitionMap = new HashMap<>();
     protected Map<String, MessageDefinition> messageDefinitionMap = new HashMap<>();
 
-    public WebServiceActivityBehavior() {
+    public WebServiceActivityBehavior(BpmnModel bpmnModel) {
         itemDefinitionMap.put("http://www.w3.org/2001/XMLSchema:string", new ItemDefinition("http://www.w3.org/2001/XMLSchema:string", new ClassStructureDefinition(String.class)));
+        fillDefinitionMaps(bpmnModel);
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
         BpmnModel bpmnModel = ProcessDefinitionUtil.getBpmnModel(execution.getProcessDefinitionId());
         FlowElement flowElement = execution.getCurrentFlowElement();
@@ -109,8 +111,6 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
         }
 
         MessageInstance message = null;
-
-        fillDefinitionMaps(bpmnModel);
 
         Operation operation = operationMap.get(operationRef);
 
@@ -276,12 +276,16 @@ public class WebServiceActivityBehavior extends AbstractBpmnActivityBehavior {
                     wsServiceMap.putAll(importerInstance.getServices());
                     wsOperationMap.putAll(importerInstance.getOperations());
 
+                } catch (ClassNotFoundException e) {
+                    throw new FlowableException("Could not find importer class for type " + theImport.getImportType(),
+                            e);
                 } catch (Exception e) {
-                    throw new FlowableException("Could not find importer for type " + theImport.getImportType());
+                    throw new FlowableException(String.format("Error importing '%s' as '%s'", theImport.getLocation(),
+                            theImport.getImportType()), e);
                 }
 
             } else {
-                throw new FlowableException("Could not import item of type " + theImport.getImportType());
+                throw new FlowableException(String.format("Unsupported import type '%s'", theImport.getImportType()));
             }
         }
     }

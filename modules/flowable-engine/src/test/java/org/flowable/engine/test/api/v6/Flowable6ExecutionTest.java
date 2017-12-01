@@ -16,16 +16,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.common.impl.history.HistoryLevel;
+import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.delegate.event.FlowableActivityCancelledEvent;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
 import org.flowable.engine.history.HistoricActivityInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
@@ -57,7 +56,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         assertNotNull(rootProcessInstance);
         assertNotNull(childExecution);
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals(childExecution.getId(), task.getExecutionId());
 
         taskService.complete(task.getId());
@@ -109,7 +108,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         assertNotNull(rootProcessInstance);
         assertNotNull(childExecution);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals(childExecution.getId(), task.getExecutionId());
 
         taskService.complete(task.getId());
@@ -215,7 +214,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         assertNotNull(rootProcessInstance);
         assertNotNull(childExecution);
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals(childExecution.getId(), task.getExecutionId());
 
         taskService.complete(task.getId());
@@ -301,7 +300,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("subProcessEvents");
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         taskService.complete(task.getId());
 
         Execution subProcessExecution = runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).activityId("subProcess").singleResult();
@@ -329,7 +328,7 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         processEngineConfiguration.getEventDispatcher().removeEventListener(listener);
     }
 
-    public class SubProcessEventListener implements FlowableEventListener {
+    public class SubProcessEventListener extends AbstractFlowableEngineEventListener {
 
         private List<FlowableEvent> eventsReceived;
 
@@ -346,23 +345,24 @@ public class Flowable6ExecutionTest extends PluggableFlowableTestCase {
         }
 
         @Override
-        public void onEvent(FlowableEvent activitiEvent) {
-            if (activitiEvent instanceof FlowableActivityEvent) {
-                FlowableActivityEvent event = (FlowableActivityEvent) activitiEvent;
-                if ("subProcess".equals(event.getActivityType())) {
-                    eventsReceived.add(event);
-                }
-            } else if (activitiEvent instanceof FlowableActivityCancelledEvent) {
-                FlowableActivityCancelledEvent event = (FlowableActivityCancelledEvent) activitiEvent;
-                if ("subProcess".equals(event.getActivityType())) {
-                    eventsReceived.add(event);
-                }
+        protected void activityStarted(FlowableActivityEvent event) {
+            if ("subProcess".equals(event.getActivityType())) {
+                eventsReceived.add(event);
             }
         }
 
         @Override
-        public boolean isFailOnException() {
-            return true;
+        protected void activityCancelled(FlowableActivityCancelledEvent event) {
+            if ("subProcess".equals(event.getActivityType())) {
+                eventsReceived.add(event);
+            }
+        }
+
+        @Override
+        protected void activityCompleted(FlowableActivityEvent event) {
+            if ("subProcess".equals(event.getActivityType())) {
+                eventsReceived.add(event);
+            }
         }
     }
 }

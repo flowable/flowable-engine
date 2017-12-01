@@ -79,7 +79,7 @@ public class ResourceParentFolderAutoDeploymentStrategy extends AbstractAutoDepl
     }
 
     private Map<String, Set<Resource>> createMap(final Resource[] resources) {
-        final Map<String, Set<Resource>> resourcesMap = new HashMap<String, Set<Resource>>();
+        final Map<String, Set<Resource>> resourcesMap = new HashMap<>();
 
         for (final Resource resource : resources) {
             final String parentFolderName = determineGroupName(resource);

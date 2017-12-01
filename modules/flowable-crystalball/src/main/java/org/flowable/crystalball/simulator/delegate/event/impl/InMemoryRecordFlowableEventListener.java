@@ -21,7 +21,6 @@ import org.flowable.crystalball.simulator.delegate.event.Function;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 
 /**
- * 
  * @author martin.grofcik
  */
 public class InMemoryRecordFlowableEventListener extends AbstractRecordFlowableEventListener {
@@ -30,9 +29,10 @@ public class InMemoryRecordFlowableEventListener extends AbstractRecordFlowableE
 
     public InMemoryRecordFlowableEventListener(List<Function<FlowableEvent, SimulationEvent>> transformers) {
         super(transformers);
-        events = new HashSet<SimulationEvent>();
+        events = new HashSet<>();
     }
 
+    @Override
     public Collection<SimulationEvent> getSimulationEvents() {
         return events;
     }

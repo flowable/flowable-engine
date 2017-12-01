@@ -41,6 +41,7 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
         childParserMap.put(outParameterParser.getElementName(), outParameterParser);
     }
 
+    @Override
     public Class<? extends BaseElement> getBpmnElementType() {
         return CallActivity.class;
     }
@@ -129,10 +130,12 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
 
     public class InParameterParser extends BaseChildElementParser {
 
+        @Override
         public String getElementName() {
             return ELEMENT_CALL_ACTIVITY_IN_PARAMETERS;
         }
 
+        @Override
         public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
             String source = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE);
             String sourceExpression = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION);
@@ -155,10 +158,12 @@ public class CallActivityXMLConverter extends BaseBpmnXMLConverter {
 
     public class OutParameterParser extends BaseChildElementParser {
 
+        @Override
         public String getElementName() {
             return ELEMENT_CALL_ACTIVITY_OUT_PARAMETERS;
         }
 
+        @Override
         public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
             String source = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE);
             String sourceExpression = xtr.getAttributeValue(null, ATTRIBUTE_IOPARAMETER_SOURCE_EXPRESSION);

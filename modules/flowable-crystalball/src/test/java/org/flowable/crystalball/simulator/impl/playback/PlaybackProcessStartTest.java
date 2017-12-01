@@ -12,19 +12,19 @@
  */
 package org.flowable.crystalball.simulator.impl.playback;
 
-import org.flowable.crystalball.simulator.impl.EventRecorderTestUtils;
-import org.flowable.engine.RepositoryService;
-import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.repository.ProcessDefinition;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.test.Deployment;
+import static org.apache.commons.lang3.StringUtils.startsWith;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.apache.commons.lang3.StringUtils.startsWith;
+import org.flowable.crystalball.simulator.impl.EventRecorderTestUtils;
+import org.flowable.engine.RepositoryService;
+import org.flowable.engine.history.HistoricProcessInstance;
+import org.flowable.engine.repository.ProcessDefinition;
+import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 /**
  * @author martin.grofcik
@@ -38,7 +38,7 @@ public class PlaybackProcessStartTest extends AbstractPlaybackTest {
     @CheckStatus(methodName = "demoCheckStatus")
     @Deployment
     public void testDemo() {
-        Map<String, Object> variables = new HashMap<String, Object>();
+        Map<String, Object> variables = new HashMap<>();
         variables.put(TEST_VARIABLE, TEST_VALUE);
         processEngine.getRuntimeService().startProcessInstanceByKey(SIMPLEST_PROCESS, BUSINESS_KEY, variables);
     }

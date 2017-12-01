@@ -148,6 +148,30 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
 
         repositoryService.deleteDeployment(deploymentId);
     }
+    
+    public void testDeploySameFileTwiceAfterInitialDeployment() {
+        String bpmnResourceName = "org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testProcessDiagramResource.bpmn20.xml";
+        repositoryService.createDeployment().enableDuplicateFiltering().addClasspathResource(bpmnResourceName).name("twice").deploy();
+        
+        bpmnResourceName = "org/flowable/engine/test/bpmn/deployment/BpmnDeploymentTest.testGetBpmnXmlFileThroughService.bpmn20.xml";
+        repositoryService.createDeployment().enableDuplicateFiltering().addClasspathResource(bpmnResourceName).name("twice").deploy();
+
+        List<org.flowable.engine.repository.Deployment> deploymentList = repositoryService.createDeploymentQuery().orderByDeploymenTime().desc().list();
+        assertEquals(2, deploymentList.size());
+        List<String> deploymentResources = repositoryService.getDeploymentResourceNames(deploymentList.get(0).getId());
+
+        // verify bpmn file name
+        assertEquals(1, deploymentResources.size());
+        assertEquals(bpmnResourceName, deploymentResources.get(0));
+
+        repositoryService.createDeployment().enableDuplicateFiltering().addClasspathResource(bpmnResourceName).name("twice").deploy();
+        deploymentList = repositoryService.createDeploymentQuery().list();
+        assertEquals(2, deploymentList.size());
+
+        for (org.flowable.engine.repository.Deployment deployment : deploymentList) {
+            repositoryService.deleteDeployment(deployment.getId());
+        }
+    }
 
     public void testDeployTwoProcessesWithDuplicateIdAtTheSameTime() {
         try {
@@ -209,6 +233,7 @@ public class BpmnDeploymentTest extends PluggableFlowableTestCase {
             // do some plumbing
             CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutor();
             ProcessDefinition processDefinition = commandExecutor.execute(new Command<ProcessDefinition>() {
+                @Override
                 public ProcessDefinition execute(CommandContext commandContext) {
                     return Context.getProcessEngineConfiguration().getDeploymentManager().findDeployedLatestProcessDefinitionByKey("myProcess");
                 }

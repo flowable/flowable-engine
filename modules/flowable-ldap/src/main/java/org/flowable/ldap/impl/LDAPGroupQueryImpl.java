@@ -71,10 +71,10 @@ public class LDAPGroupQueryImpl extends GroupQueryImpl {
                 return groups;
             }
         }
-        
+
         String searchExpression = ldapConfigurator.getLdapQueryBuilder().buildQueryGroupsForUser(ldapConfigurator, userId);
         List<Group> groups = executeGroupQuery(searchExpression);
-        
+
         // Cache results for later
         if (ldapGroupCache != null) {
             ldapGroupCache.add(userId, groups);
@@ -82,20 +82,21 @@ public class LDAPGroupQueryImpl extends GroupQueryImpl {
 
         return groups;
     }
-    
+
     protected List<Group> findAllGroups() {
         String searchExpression = ldapConfigurator.getQueryAllGroups();
         List<Group> groups = executeGroupQuery(searchExpression);
         return groups;
     }
-    
+
     protected List<Group> executeGroupQuery(final String searchExpression) {
         LDAPTemplate ldapTemplate = new LDAPTemplate(ldapConfigurator);
         return ldapTemplate.execute(new LDAPCallBack<List<Group>>() {
 
+            @Override
             public List<Group> executeInContext(InitialDirContext initialDirContext) {
 
-                List<Group> groups = new ArrayList<Group>();
+                List<Group> groups = new ArrayList<>();
                 try {
                     String baseDn = ldapConfigurator.getGroupBaseDn() != null ? ldapConfigurator.getGroupBaseDn() : ldapConfigurator.getBaseDn();
                     NamingEnumeration<?> namingEnum = initialDirContext.search(baseDn, searchExpression, createSearchControls());

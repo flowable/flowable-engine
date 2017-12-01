@@ -24,6 +24,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
  */
 public class SchemaOperationProcessEngineClose implements Command<Void> {
 
+    @Override
     public Void execute(CommandContext commandContext) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         if (processEngineConfiguration.isUsingRelationalDatabase()) {

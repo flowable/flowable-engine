@@ -20,15 +20,15 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
+import org.flowable.engine.common.impl.db.CachedEntityMatcher;
+import org.flowable.engine.common.impl.db.SingleCachedEntityMatcher;
 import org.flowable.engine.impl.ExecutionQueryImpl;
 import org.flowable.engine.impl.ProcessInstanceQueryImpl;
 import org.flowable.engine.impl.cfg.PerformanceSettings;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.CachedEntityMatcher;
-import org.flowable.engine.impl.persistence.SingleCachedEntityMatcher;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityImpl;
-import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ExecutionDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.ExecutionByProcessInstanceMatcher;
 import org.flowable.engine.impl.persistence.entity.data.impl.cachematcher.ExecutionsByParentExecutionIdAndActivityIdEntityMatcher;
@@ -47,7 +47,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 /**
  * @author Joram Barrez
  */
-public class MybatisExecutionDataManager extends AbstractDataManager<ExecutionEntity> implements ExecutionDataManager {
+public class MybatisExecutionDataManager extends AbstractProcessDataManager<ExecutionEntity> implements ExecutionDataManager {
 
     protected PerformanceSettings performanceSettings;
 

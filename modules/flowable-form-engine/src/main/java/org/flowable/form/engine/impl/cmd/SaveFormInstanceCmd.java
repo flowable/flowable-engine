@@ -25,14 +25,23 @@ public class SaveFormInstanceCmd extends AbstractSaveFormInstanceCmd {
 
     private static final long serialVersionUID = 1L;
 
-    public SaveFormInstanceCmd(FormModel formModel, Map<String, Object> variables, String taskId, String processInstanceId) {
-        super(formModel, variables, taskId, processInstanceId);
+    public SaveFormInstanceCmd(FormModel formModel, Map<String, Object> variables, String taskId, String processInstanceId, String processDefinitionId) {
+        super(formModel, variables, taskId, processInstanceId, processDefinitionId);
     }
 
-    public SaveFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String processInstanceId) {
-        super(formModelId, variables, taskId, processInstanceId);
+    public SaveFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String processInstanceId, String processDefinitionId) {
+        super(formModelId, variables, taskId, processInstanceId, processDefinitionId);
+    }
+    
+    public SaveFormInstanceCmd(FormModel formModel, Map<String, Object> variables, String taskId, String scopeId, String scopeType, String scopeDefinitionId) {
+        super(formModel, variables, taskId, scopeId, scopeType, scopeDefinitionId);
     }
 
+    public SaveFormInstanceCmd(String formModelId, Map<String, Object> variables, String taskId, String scopeId, String scopeType, String scopeDefinitionId) {
+        super(formModelId, variables, taskId, scopeId, scopeType, scopeDefinitionId);
+    }
+
+    @Override
     protected FormInstanceEntity findExistingFormInstance(FormEngineConfiguration formEngineConfiguration) {
 
         if (taskId == null) {

@@ -16,6 +16,7 @@ package org.flowable.idm.engine.impl;
 import java.util.List;
 
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.impl.AbstractQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.idm.api.User;
@@ -56,6 +57,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
         super(commandExecutor);
     }
 
+    @Override
     public UserQuery userId(String id) {
         if (id == null) {
             throw new FlowableIllegalArgumentException("Provided id is null");
@@ -64,6 +66,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
         return this;
     }
 
+    @Override
     public UserQuery userIds(List<String> ids) {
         if (ids == null) {
             throw new FlowableIllegalArgumentException("Provided ids is null");
@@ -72,6 +75,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
         return this;
     }
 
+    @Override
     public UserQuery userIdIgnoreCase(String id) {
         if (id == null) {
             throw new FlowableIllegalArgumentException("Provided id is null");
@@ -80,6 +84,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
         return this;
     }
 
+    @Override
     public UserQuery userFirstName(String firstName) {
         if (firstName == null) {
             throw new FlowableIllegalArgumentException("Provided first name is null");
@@ -88,6 +93,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
         return this;
     }
 
+    @Override
     public UserQuery userFirstNameLike(String firstNameLike) {
         if (firstNameLike == null) {
             throw new FlowableIllegalArgumentException("Provided first name is null");
@@ -96,6 +102,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
         return this;
     }
 
+    @Override
     public UserQuery userFirstNameLikeIgnoreCase(String firstNameLikeIgnoreCase) {
         if (firstNameLikeIgnoreCase == null) {
             throw new FlowableIllegalArgumentException("Provided first name is null");
@@ -104,6 +111,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
         return this;
     }
 
+    @Override
     public UserQuery userLastName(String lastName) {
         if (lastName == null) {
             throw new FlowableIllegalArgumentException("Provided last name is null");
@@ -112,6 +120,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
         return this;
     }
 
+    @Override
     public UserQuery userLastNameLike(String lastNameLike) {
         if (lastNameLike == null) {
             throw new FlowableIllegalArgumentException("Provided last name is null");
@@ -120,6 +129,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
         return this;
     }
 
+    @Override
     public UserQuery userLastNameLikeIgnoreCase(String lastNameLikeIgnoreCase) {
         if (lastNameLikeIgnoreCase == null) {
             throw new FlowableIllegalArgumentException("Provided last name is null");
@@ -128,6 +138,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
         return this;
     }
 
+    @Override
     public UserQuery userFullNameLike(String fullNameLike) {
         if (fullNameLike == null) {
             throw new FlowableIllegalArgumentException("Provided full name is null");
@@ -136,6 +147,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
         return this;
     }
 
+    @Override
     public UserQuery userFullNameLikeIgnoreCase(String fullNameLikeIgnoreCase) {
         if (fullNameLikeIgnoreCase == null) {
             throw new FlowableIllegalArgumentException("Provided full name is null");
@@ -144,6 +156,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
         return this;
     }
 
+    @Override
     public UserQuery userEmail(String email) {
         if (email == null) {
             throw new FlowableIllegalArgumentException("Provided email is null");
@@ -152,6 +165,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
         return this;
     }
 
+    @Override
     public UserQuery userEmailLike(String emailLike) {
         if (emailLike == null) {
             throw new FlowableIllegalArgumentException("Provided emailLike is null");
@@ -160,6 +174,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
         return this;
     }
 
+    @Override
     public UserQuery memberOfGroup(String groupId) {
         if (groupId == null) {
             throw new FlowableIllegalArgumentException("Provided groupId is null");
@@ -168,6 +183,7 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
         return this;
     }
 
+    @Override
     public UserQuery memberOfGroups(List<String> groupIds) {
         if (groupIds == null) {
             throw new FlowableIllegalArgumentException("Provided groupIds is null");
@@ -178,29 +194,35 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
 
     // sorting //////////////////////////////////////////////////////////
 
+    @Override
     public UserQuery orderByUserId() {
         return orderBy(UserQueryProperty.USER_ID);
     }
 
+    @Override
     public UserQuery orderByUserEmail() {
         return orderBy(UserQueryProperty.EMAIL);
     }
 
+    @Override
     public UserQuery orderByUserFirstName() {
         return orderBy(UserQueryProperty.FIRST_NAME);
     }
 
+    @Override
     public UserQuery orderByUserLastName() {
         return orderBy(UserQueryProperty.LAST_NAME);
     }
 
     // results //////////////////////////////////////////////////////////
 
+    @Override
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
         return CommandContextUtil.getUserEntityManager(commandContext).findUserCountByQueryCriteria(this);
     }
 
+    @Override
     public List<User> executeList(CommandContext commandContext) {
         checkQueryOk();
         return CommandContextUtil.getUserEntityManager(commandContext).findUserByQueryCriteria(this);

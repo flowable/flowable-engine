@@ -16,7 +16,7 @@ package org.activiti.engine.impl.jobexecutor;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.api.Job;
 
 /**
  * @author Daniel Meyer
@@ -25,10 +25,12 @@ public class ProcessEventJobHandler implements JobHandler {
 
     public static final String TYPE = "event";
 
+    @Override
     public String getType() {
         return TYPE;
     }
 
+    @Override
     public void execute(Job job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
         // lookup subscription:
         EventSubscriptionEntity eventSubscription = commandContext.getEventSubscriptionEntityManager()

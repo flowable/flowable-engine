@@ -62,6 +62,7 @@ public abstract class SpringFlowableTestCase extends AbstractFlowableTestCase im
         this.contentEngine = engine;
     }
 
+    @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }

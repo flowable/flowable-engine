@@ -27,6 +27,7 @@ import org.flowable.bpmn.model.ImplementationType;
  */
 public class FlowableHttpRequestHandlerParser extends BaseChildElementParser {
 
+    @Override
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
 
         FlowableHttpRequestHandler requestHandler = new FlowableHttpRequestHandler();

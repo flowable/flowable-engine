@@ -12,9 +12,9 @@
  */
 package org.activiti.engine.delegate.event.impl;
 
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.delegate.event.FlowableVariableEvent;
-import org.flowable.engine.impl.variable.VariableType;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.variable.api.event.FlowableVariableEvent;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * Implementation of {@link FlowableVariableEvent}.
@@ -50,6 +50,7 @@ public class ActivitiVariableEventImpl extends ActivitiEventImpl implements Flow
         this.variableValue = variableValue;
     }
 
+    @Override
     public VariableType getVariableType() {
         return variableType;
     }

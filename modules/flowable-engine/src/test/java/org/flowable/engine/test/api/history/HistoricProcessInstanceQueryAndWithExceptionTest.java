@@ -14,13 +14,13 @@ package org.flowable.engine.test.api.history;
 
 import java.util.List;
 
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.runtime.TimerJobQuery;
+import org.flowable.job.api.Job;
+import org.flowable.job.api.TimerJobQuery;
 
 public class HistoricProcessInstanceQueryAndWithExceptionTest extends PluggableFlowableTestCase {
 
@@ -28,6 +28,7 @@ public class HistoricProcessInstanceQueryAndWithExceptionTest extends PluggableF
     private static final String PROCESS_DEFINITION_KEY_WITH_EXCEPTION_1 = "JobErrorCheck";
     private static final String PROCESS_DEFINITION_KEY_WITH_EXCEPTION_2 = "JobErrorDoubleCheck";
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         repositoryService.createDeployment()
@@ -37,6 +38,7 @@ public class HistoricProcessInstanceQueryAndWithExceptionTest extends PluggableF
                 .deploy();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         deleteDeployments();
         super.tearDown();

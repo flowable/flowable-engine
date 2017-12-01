@@ -24,11 +24,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.editor.form.converter.FormJsonConverter;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.engine.common.impl.el.VariableContainerWrapper;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.form.api.FormInstance;
 import org.flowable.form.engine.FormEngineConfiguration;
-import org.flowable.form.engine.FormExpression;
 import org.flowable.form.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.form.engine.impl.persistence.deploy.FormDefinitionCacheEntry;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
@@ -58,32 +59,29 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
     protected String formDefinitionKey;
     protected String parentDeploymentId;
     protected String formDefinitionId;
-    protected String processInstanceId;
     protected String taskId;
     protected String tenantId;
     protected Map<String, Object> variables;
 
-    public GetFormModelWithVariablesCmd(String formDefinitionKey, String formDefinitionId, String processInstanceId, String taskId, Map<String, Object> variables) {
+    public GetFormModelWithVariablesCmd(String formDefinitionKey, String formDefinitionId, String taskId, Map<String, Object> variables) {
         initializeValues(formDefinitionKey, formDefinitionId, null, variables);
-        this.processInstanceId = processInstanceId;
         this.taskId = taskId;
     }
 
-    public GetFormModelWithVariablesCmd(String formDefinitionKey, String parentDeploymentId, String formDefinitionId, String processInstanceId, String taskId, Map<String, Object> variables) {
+    public GetFormModelWithVariablesCmd(String formDefinitionKey, String parentDeploymentId, String formDefinitionId, String taskId, Map<String, Object> variables) {
         initializeValues(formDefinitionKey, formDefinitionId, null, variables);
         this.parentDeploymentId = parentDeploymentId;
-        this.processInstanceId = processInstanceId;
         this.taskId = taskId;
     }
 
-    public GetFormModelWithVariablesCmd(String formDefinitionKey, String parentDeploymentId, String formDefinitionId, String processInstanceId, String taskId, String tenantId, Map<String, Object> variables) {
+    public GetFormModelWithVariablesCmd(String formDefinitionKey, String parentDeploymentId, String formDefinitionId, String taskId, String tenantId, Map<String, Object> variables) {
         initializeValues(formDefinitionKey, formDefinitionId, null, variables);
         this.parentDeploymentId = parentDeploymentId;
-        this.processInstanceId = processInstanceId;
         this.taskId = taskId;
         this.tenantId = tenantId;
     }
 
+    @Override
     public FormModel execute(CommandContext commandContext) {
         FormDefinitionCacheEntry formCacheEntry = resolveFormDefinition(commandContext);
         FormInstance formInstance = resolveFormInstance(formCacheEntry, commandContext);
@@ -112,15 +110,15 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
             Map<String, JsonNode> formInstanceFieldMap = new HashMap<>();
             if (formInstance != null) {
                 fillFormInstanceValues(formInstance, formInstanceFieldMap, formEngineConfiguration.getObjectMapper());
-                fillVariablesWithFormInstanceValues(formInstanceFieldMap, allFields);
+                fillVariablesWithFormInstanceValues(formInstanceFieldMap, allFields, formInstance.getId());
             }
 
             for (FormField field : allFields) {
                 if (field instanceof ExpressionFormField) {
                     ExpressionFormField expressionField = (ExpressionFormField) field;
-                    FormExpression formExpression = formEngineConfiguration.getExpressionManager().createExpression(expressionField.getExpression());
+                    Expression formExpression = formEngineConfiguration.getExpressionManager().createExpression(expressionField.getExpression());
                     try {
-                        field.setValue(formExpression.getValue(variables));
+                        field.setValue(formExpression.getValue(new VariableContainerWrapper(variables)));
                     } catch (Exception e) {
                         LOGGER.error("Error getting value for expression {} {}", expressionField.getExpression(), e.getMessage(), e);
                     }
@@ -225,7 +223,7 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
         }
     }
 
-    public void fillVariablesWithFormInstanceValues(Map<String, JsonNode> formInstanceFieldMap, List<FormField> allFields) {
+    public void fillVariablesWithFormInstanceValues(Map<String, JsonNode> formInstanceFieldMap, List<FormField> allFields, String formInstanceId) {
         for (FormField field : allFields) {
 
             JsonNode fieldValueNode = formInstanceFieldMap.get(field.getId());
@@ -245,7 +243,7 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
                     }
                     
                 } catch (Exception e) {
-                    LOGGER.error("Error parsing form date value for process instance {} with value {}", processInstanceId, fieldValue, e);
+                    LOGGER.error("Error parsing form date value for form instance {} with value {}", formInstanceId, fieldValue, e);
                 }
 
             } else {

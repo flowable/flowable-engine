@@ -22,13 +22,13 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityImpl;
-import org.flowable.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.engine.impl.persistence.entity.data.AbstractProcessDataManager;
 import org.flowable.engine.impl.persistence.entity.data.HistoricProcessInstanceDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisHistoricProcessInstanceDataManager extends AbstractDataManager<HistoricProcessInstanceEntity> implements HistoricProcessInstanceDataManager {
+public class MybatisHistoricProcessInstanceDataManager extends AbstractProcessDataManager<HistoricProcessInstanceEntity> implements HistoricProcessInstanceDataManager {
 
     public MybatisHistoricProcessInstanceDataManager(ProcessEngineConfigurationImpl processEngineConfiguration) {
         super(processEngineConfiguration);

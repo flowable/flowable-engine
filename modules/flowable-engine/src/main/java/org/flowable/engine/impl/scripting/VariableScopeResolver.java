@@ -17,10 +17,10 @@ import java.util.List;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Tom Baeyens
@@ -63,10 +63,12 @@ public class VariableScopeResolver implements Resolver {
         this.variableScope = variableScope;
     }
 
+    @Override
     public boolean containsKey(Object key) {
         return variableScopeKey.equals(key) || KEYS.contains(key) || variableScope.hasVariable((String) key);
     }
 
+    @Override
     public Object get(Object key) {
         if (variableScopeKey.equals(key)) {
             return variableScope;

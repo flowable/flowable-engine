@@ -23,7 +23,6 @@ import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.TaskEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.TaskHelper;
 import org.flowable.form.api.FormRepositoryService;
@@ -31,6 +30,7 @@ import org.flowable.form.api.FormService;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.FormFieldTypes;
 import org.flowable.form.model.FormModel;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Tijs Rademakers
@@ -65,6 +65,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
         this.transientVariables = transientVariables;
     }
 
+    @Override
     protected Void execute(CommandContext commandContext, TaskEntity task) {
         FormService formService = CommandContextUtil.getFormService();
         if (formService == null) {
@@ -78,7 +79,11 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
             // Extract raw variables and complete the task
             Map<String, Object> formVariables = formService.getVariablesFromFormSubmission(formModel, variables, outcome);
 
-            formService.saveFormInstance(formVariables, formModel, task.getId(), task.getProcessInstanceId());
+            if (task.getProcessInstanceId() != null) {
+                formService.saveFormInstance(formVariables, formModel, task.getId(), task.getProcessInstanceId(), task.getProcessDefinitionId());
+            } else {
+                formService.saveFormInstanceWithScopeId(formVariables, formModel, task.getId(), task.getScopeId(), task.getScopeType(), task.getScopeDefinitionId());
+            }
 
             processUploadFieldsIfNeeded(formModel, task, commandContext);
 

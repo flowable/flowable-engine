@@ -22,6 +22,46 @@
             #{executionJson, jdbcType=VARCHAR})
   </insert>
   
+  <insert id="bulkInsertHistoricDecisionExecution" parameterType="java.util.List">
+    insert into ${prefix}ACT_DMN_HI_DECISION_EXECUTION(ID_, DECISION_DEFINITION_ID_, DEPLOYMENT_ID_, START_TIME_, END_TIME_, INSTANCE_ID_, EXECUTION_ID_, 
+        ACTIVITY_ID_, FAILED_, TENANT_ID_, EXECUTION_JSON_)
+    values
+    <foreach collection="list" item="historicDecisionExecution" index="index" separator=",">
+        (#{historicDecisionExecution.id, jdbcType=VARCHAR},
+         #{historicDecisionExecution.decisionDefinitionId, jdbcType=VARCHAR},
+         #{historicDecisionExecution.deploymentId, jdbcType=VARCHAR},
+         #{historicDecisionExecution.startTime, jdbcType=TIMESTAMP},
+         #{historicDecisionExecution.endTime, jdbcType=TIMESTAMP},
+         #{historicDecisionExecution.instanceId, jdbcType=VARCHAR},
+         #{historicDecisionExecution.executionId, jdbcType=VARCHAR},
+         #{historicDecisionExecution.activityId, jdbcType=VARCHAR},
+         #{historicDecisionExecution.failed, jdbcType=BOOLEAN},
+         #{historicDecisionExecution.tenantId, jdbcType=VARCHAR},
+         #{historicDecisionExecution.executionJson, jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+  
+  <insert id="bulkInsertHistoricDecisionExecution" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL
+    <foreach collection="list" item="historicDecisionExecution" index="index">
+     INTO ${prefix}ACT_DMN_HI_DECISION_EXECUTION(ID_, DECISION_DEFINITION_ID_, DEPLOYMENT_ID_, START_TIME_, END_TIME_, INSTANCE_ID_, EXECUTION_ID_, 
+        ACTIVITY_ID_, FAILED_, TENANT_ID_, EXECUTION_JSON_) VALUES
+        values
+            (#{historicDecisionExecution.id, jdbcType=VARCHAR},
+             #{historicDecisionExecution.decisionDefinitionId, jdbcType=VARCHAR},
+             #{historicDecisionExecution.deploymentId, jdbcType=VARCHAR},
+             #{historicDecisionExecution.startTime, jdbcType=TIMESTAMP},
+             #{historicDecisionExecution.endTime, jdbcType=TIMESTAMP},
+             #{historicDecisionExecution.instanceId, jdbcType=VARCHAR},
+             #{historicDecisionExecution.executionId, jdbcType=VARCHAR},
+             #{historicDecisionExecution.activityId, jdbcType=VARCHAR},
+             #{historicDecisionExecution.failed, jdbcType=BOOLEAN},
+             #{historicDecisionExecution.tenantId, jdbcType=VARCHAR},
+             #{historicDecisionExecution.executionJson, jdbcType=VARCHAR})
+    </foreach>
+    SELECT * FROM dual   
+  </insert>
+  
   <!-- HISTORIC DECISION EXECUTION UPDATE -->
 
   <update id="updateHistoricDecisionExecution" parameterType="org.flowable.dmn.engine.impl.persistence.entity.HistoricDecisionExecutionEntityImpl">

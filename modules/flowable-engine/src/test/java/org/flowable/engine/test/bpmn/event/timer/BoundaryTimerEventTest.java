@@ -21,17 +21,16 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.JobTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.runtime.TimerJobQuery;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
+import org.flowable.job.api.TimerJobQuery;
 
 /**
  * @author Joram Barrez
@@ -45,6 +44,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
     public static class MyExecutionListener implements ExecutionListener {
         private static final long serialVersionUID = 1L;
 
+        @Override
         public void notify(DelegateExecution execution) {
             if ("end".equals(execution.getEventName())) {
                 listenerExecutedEndEvent = true;
@@ -80,7 +80,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertEquals(0L, jobQuery.count());
 
         // which means that the third task is reached
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("Third Task", task.getName());
     }
 
@@ -90,7 +90,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         Date testStartTime = processEngineConfiguration.getClock().getCurrentTime();
 
         runtimeService.startProcessInstanceByKey("timerOnNestedSubprocesses");
-        List<Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().orderByTaskName().asc().list();
         assertEquals(2, tasks.size());
         assertEquals("Inner subprocess task 1", tasks.get(0).getName());
         assertEquals("Inner subprocess task 2", tasks.get(1).getName());
@@ -101,7 +101,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         managementService.moveTimerToExecutableJob(timer.getId());
         managementService.executeJob(timer.getId());
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("task outside subprocess", task.getName());
     }
 
@@ -300,7 +300,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         }
 
         // there should be a userTask waiting for user input
-        List<Task> tasks = taskService.createTaskQuery().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertEquals(1, tasks.size());
         assertEquals("First Task", tasks.get(0).getName());
         List<Job> jobList = managementService.createTimerJobQuery().list();
@@ -365,7 +365,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         }
 
         // there should be a userTask waiting for user input
-        List<Task> tasks = taskService.createTaskQuery().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertEquals(1, tasks.size());
         assertEquals("Start", tasks.get(0).getName());
         List<Job> jobList = managementService.createTimerJobQuery().list();
@@ -403,7 +403,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         variables.put("startDate", calendar.getTime());
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("rescheduleTimer", variables);
 
-        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(1, tasks.size());
         assertEquals("Task 1", tasks.get(0).getName());
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -463,7 +463,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         variables.put("startDate", calendar.getTime());
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("rescheduleTimer", variables);
 
-        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(1, tasks.size());
         assertEquals("Task 1", tasks.get(0).getName());
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -524,7 +524,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         variables.put("startDate", calendar.getTime());
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("rescheduleTimer", variables);
 
-        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         assertEquals(1, tasks.size());
         assertEquals("Task 1", tasks.get(0).getName());
         Job timerJob = managementService.createTimerJobQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -579,7 +579,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertEquals(0, managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count());
         
         // there should be a userTask waiting for user input
-        List<Task> tasks = taskService.createTaskQuery().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertEquals(1, tasks.size());
         assertEquals("First Task", tasks.get(0).getName());
         
@@ -657,7 +657,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         assertEquals(0, managementService.createTimerJobQuery().executable().processInstanceId(processInstance.getId()).count());
 
         // there should be a userTask waiting for user input
-        List<Task> tasks = taskService.createTaskQuery().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertEquals(1, tasks.size());
         assertEquals("First Task", tasks.get(0).getName());
 

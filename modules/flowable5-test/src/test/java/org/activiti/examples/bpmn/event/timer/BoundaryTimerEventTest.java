@@ -13,10 +13,9 @@
 package org.activiti.examples.bpmn.event.timer;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
 
 /**
  * @author Joram Barrez
@@ -30,7 +29,7 @@ public class BoundaryTimerEventTest extends PluggableFlowableTestCase {
         ProcessInstance pi = runtimeService.startProcessInstanceByKey("escalationExample");
 
         // There should be one task, with a timer : first line support
-        Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
         assertEquals("First line support", task.getName());
 
         // Manually execute the job

@@ -32,8 +32,8 @@ import org.flowable.engine.repository.NativeModelQuery;
 import org.flowable.engine.repository.NativeProcessDefinitionQuery;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.repository.ProcessDefinitionQuery;
-import org.flowable.engine.task.IdentityLink;
 import org.flowable.form.api.FormDefinition;
+import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.validation.ValidationError;
 
 /**

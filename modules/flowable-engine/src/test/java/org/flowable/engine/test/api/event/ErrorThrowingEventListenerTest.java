@@ -12,13 +12,12 @@
  */
 package org.flowable.engine.test.api.event;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.bpmn.helper.ErrorThrowingEventListener;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -40,7 +39,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
             assertNotNull(processInstance);
 
             // Fetch the task and assign it. Should cause error-event to be dispatched
-            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
             assertNotNull(task);
             taskService.setAssignee(task.getId(), "kermit");
 
@@ -63,7 +62,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
 
         // Fetch the task and assign it. Should cause error-event to be
         // dispatched
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
         assertNotNull(task);
         taskService.setAssignee(task.getId(), "kermit");
 
@@ -89,7 +88,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
 
             // Fetch the task and assign it. Should cause error-event to be
             // dispatched
-            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
             assertNotNull(task);
             taskService.setAssignee(task.getId(), "kermit");
 
@@ -125,7 +124,7 @@ public class ErrorThrowingEventListenerTest extends PluggableFlowableTestCase {
         assertNotNull(processInstance);
 
         // Fetch the task and assign it. Should cause error-event to be dispatched
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("userTask").singleResult();
         assertNotNull(task);
         taskService.setAssignee(task.getId(), "kermit");
 

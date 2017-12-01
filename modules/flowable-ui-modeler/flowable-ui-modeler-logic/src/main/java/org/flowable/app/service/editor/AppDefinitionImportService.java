@@ -1,8 +1,5 @@
 package org.flowable.app.service.editor;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -28,6 +25,9 @@ import org.flowable.app.service.api.ModelService;
 import org.flowable.app.service.exception.BadRequestException;
 import org.flowable.app.service.exception.InternalServerErrorException;
 import org.flowable.bpmn.model.BpmnModel;
+import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter;
+import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
+import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.editor.language.json.converter.BpmnJsonConverter;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.editor.language.json.model.ModelInfo;
@@ -38,6 +38,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 @Transactional
@@ -58,12 +61,13 @@ public class AppDefinitionImportService {
     protected ObjectMapper objectMapper;
 
     protected BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
+    protected CmmnJsonConverter cmmnJsonConverter = new CmmnJsonConverter();
 
     public AppDefinitionRepresentation importAppDefinition(HttpServletRequest request, MultipartFile file) {
         try {
             InputStream is = file.getInputStream();
             String fileName = file.getOriginalFilename();
-            return importAppDefinition(request, is, fileName, null, null, null, null);
+            return importAppDefinition(request, is, fileName, null, null, null, null, null);
 
         } catch (IOException e) {
             throw new InternalServerErrorException("Error loading file", e);
@@ -81,9 +85,10 @@ public class AppDefinitionImportService {
 
             AppDefinitionRepresentation appDefinition = createAppDefinitionRepresentation(appModel);
 
-            Map<String, Model> existingProcessModelMap = new HashMap<String, Model>();
-            Map<String, Model> existingFormModelMap = new HashMap<String, Model>();
-            Map<String, Model> existingDecisionTableMap = new HashMap<String, Model>();
+            Map<String, Model> existingProcessModelMap = new HashMap<>();
+            Map<String, Model> existingCaseModelMap = new HashMap<>();
+            Map<String, Model> existingFormModelMap = new HashMap<>();
+            Map<String, Model> existingDecisionTableMap = new HashMap<>();
             if (appDefinition.getDefinition() != null && CollectionUtils.isNotEmpty(appDefinition.getDefinition().getModels())) {
                 for (AppModelDefinition modelDef : appDefinition.getDefinition().getModels()) {
                     Model processModel = modelService.getModel(modelDef.getId());
@@ -101,32 +106,54 @@ public class AppDefinitionImportService {
                     existingProcessModelMap.put(processModel.getKey(), processModel);
                 }
             }
+            
+            if (appDefinition.getDefinition() != null && CollectionUtils.isNotEmpty(appDefinition.getDefinition().getCmmnModels())) {
+                for (AppModelDefinition modelDef : appDefinition.getDefinition().getCmmnModels()) {
+                    Model caseModel = modelService.getModel(modelDef.getId());
 
-            return importAppDefinition(request, is, fileName, appModel, existingProcessModelMap, existingFormModelMap, existingDecisionTableMap);
+                    List<Model> referencedModels = modelRepository.findByParentModelId(caseModel.getId());
+                    for (Model childModel : referencedModels) {
+                        if (Model.MODEL_TYPE_FORM == childModel.getModelType()) {
+                            existingFormModelMap.put(childModel.getKey(), childModel);
+
+                        } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
+                            existingDecisionTableMap.put(childModel.getKey(), childModel);
+                        }
+                    }
+
+                    existingCaseModelMap.put(caseModel.getKey(), caseModel);
+                }
+            }
+
+            return importAppDefinition(request, is, fileName, appModel, existingProcessModelMap, existingCaseModelMap, existingFormModelMap, existingDecisionTableMap);
 
         } catch (IOException e) {
             throw new InternalServerErrorException("Error loading file", e);
         }
     }
 
-    protected AppDefinitionRepresentation importAppDefinition(HttpServletRequest request, InputStream is, String fileName, Model existingAppModel, Map<String, Model> existingProcessModelMap,
-            Map<String, Model> existingFormModelMap, Map<String, Model> existingDecisionTableModelMap) {
+    protected AppDefinitionRepresentation importAppDefinition(HttpServletRequest request, InputStream is, String fileName, Model existingAppModel, 
+                    Map<String, Model> existingProcessModelMap, Map<String, Model> existingCaseModelMap,
+                    Map<String, Model> existingFormModelMap, Map<String, Model> existingDecisionTableModelMap) {
 
         if (fileName != null && (fileName.endsWith(".zip"))) {
-            Map<String, String> formMap = new HashMap<String, String>();
-            Map<String, String> decisionTableMap = new HashMap<String, String>();
-            Map<String, String> bpmnModelMap = new HashMap<String, String>();
-            Map<String, byte[]> thumbnailMap = new HashMap<String, byte[]>();
+            Map<String, String> formMap = new HashMap<>();
+            Map<String, String> decisionTableMap = new HashMap<>();
+            Map<String, String> bpmnModelMap = new HashMap<>();
+            Map<String, String> cmmnModelMap = new HashMap<>();
+            Map<String, byte[]> thumbnailMap = new HashMap<>();
 
-            Model appDefinitionModel = readZipFile(is, formMap, decisionTableMap, bpmnModelMap, thumbnailMap);
+            Model appDefinitionModel = readZipFile(is, formMap, decisionTableMap, bpmnModelMap, cmmnModelMap, thumbnailMap);
             if (StringUtils.isNotEmpty(appDefinitionModel.getKey()) && StringUtils.isNotEmpty(appDefinitionModel.getModelEditorJson())) {
 
                 Map<String, Model> formKeyAndModelMap = importForms(formMap, thumbnailMap, existingFormModelMap);
                 Map<String, Model> decisionTableKeyAndModelMap = importDecisionTables(decisionTableMap, thumbnailMap, existingDecisionTableModelMap);
                 Map<String, Model> bpmnModelIdAndModelMap = importBpmnModels(bpmnModelMap, formKeyAndModelMap, decisionTableKeyAndModelMap,
                         thumbnailMap, existingProcessModelMap);
+                Map<String, Model> cmmnModelIdAndModelMap = importCmmnModels(cmmnModelMap, formKeyAndModelMap, decisionTableKeyAndModelMap,
+                                thumbnailMap, existingCaseModelMap);
 
-                AppDefinitionRepresentation result = importAppDefinitionModel(appDefinitionModel, existingAppModel, bpmnModelIdAndModelMap);
+                AppDefinitionRepresentation result = importAppDefinitionModel(appDefinitionModel, existingAppModel, bpmnModelIdAndModelMap, cmmnModelIdAndModelMap);
                 return result;
 
             } else {
@@ -169,7 +196,7 @@ public class AppDefinitionImportService {
     }
 
     protected Model readZipFile(InputStream inputStream, Map<String, String> formMap, Map<String, String> decisionTableMap,
-            Map<String, String> bpmnModelMap, Map<String, byte[]> thumbnailMap) {
+                                Map<String, String> bpmnModelMap, Map<String, String> cmmnModelMap, Map<String, byte[]> thumbnailMap) {
 
         Model appDefinitionModel = null;
         ZipInputStream zipInputStream = null;
@@ -192,10 +219,13 @@ public class AppDefinitionImportService {
 
                     } else {
                         modelFileName = modelFileName.replace(".json", "");
-                        String json = IOUtils.toString(zipInputStream);
+                        String json = IOUtils.toString(zipInputStream, "utf-8");
 
                         if (zipEntryName.startsWith("bpmn-models/")) {
                             bpmnModelMap.put(modelFileName, json);
+                            
+                        } else if (zipEntryName.startsWith("cmmn-models/")) {
+                            cmmnModelMap.put(modelFileName, json);
 
                         } else if (zipEntryName.startsWith("form-models/")) {
                             formMap.put(modelFileName, json);
@@ -221,6 +251,7 @@ public class AppDefinitionImportService {
                     zipInputStream.closeEntry();
                 } catch (Exception e) {
                 }
+                
                 try {
                     zipInputStream.close();
                 } catch (Exception e) {
@@ -233,7 +264,7 @@ public class AppDefinitionImportService {
 
     protected Map<String, Model> importForms(Map<String, String> formMap, Map<String, byte[]> thumbnailMap, Map<String, Model> existingFormModelMap) {
 
-        Map<String, Model> oldFormIdAndModelMap = new HashMap<String, Model>();
+        Map<String, Model> oldFormIdAndModelMap = new HashMap<>();
 
         for (String formKey : formMap.keySet()) {
 
@@ -271,9 +302,9 @@ public class AppDefinitionImportService {
     }
 
     protected Map<String, Model> importDecisionTables(Map<String, String> decisionTableMap, Map<String, byte[]> thumbnailMap,
-            Map<String, Model> existingDecisionTableMap) {
+                                                      Map<String, Model> existingDecisionTableMap) {
 
-        Map<String, Model> oldDecisionTableIdAndModelMap = new HashMap<String, Model>();
+        Map<String, Model> oldDecisionTableIdAndModelMap = new HashMap<>();
 
         for (String decisionTableKey : decisionTableMap.keySet()) {
 
@@ -311,9 +342,9 @@ public class AppDefinitionImportService {
     }
 
     protected Map<String, Model> importBpmnModels(Map<String, String> bpmnModelMap, Map<String, Model> formKeyAndModelMap,
-            Map<String, Model> decisionTableKeyAndModelMap, Map<String, byte[]> thumbnailMap, Map<String, Model> existingProcessModelMap) {
+                                                  Map<String, Model> decisionTableKeyAndModelMap, Map<String, byte[]> thumbnailMap, Map<String, Model> existingProcessModelMap) {
 
-        Map<String, Model> bpmnModelIdAndModelMap = new HashMap<String, Model>();
+        Map<String, Model> bpmnModelIdAndModelMap = new HashMap<>();
         for (String bpmnModelKey : bpmnModelMap.keySet()) {
 
             Model existingModel = null;
@@ -333,16 +364,16 @@ public class AppDefinitionImportService {
                 throw new InternalServerErrorException("Error reading BPMN json for " + bpmnModelKey);
             }
 
-            Map<String, String> oldFormIdFormKeyMap = new HashMap<String, String>();
-            Map<String, ModelInfo> formKeyModelIdMap = new HashMap<String, ModelInfo>();
+            Map<String, String> oldFormIdFormKeyMap = new HashMap<>();
+            Map<String, ModelInfo> formKeyModelIdMap = new HashMap<>();
             for (String oldFormId : formKeyAndModelMap.keySet()) {
                 Model formModel = formKeyAndModelMap.get(oldFormId);
                 oldFormIdFormKeyMap.put(oldFormId, formModel.getKey());
                 formKeyModelIdMap.put(formModel.getKey(), new ModelInfo(formModel.getId(), formModel.getName(), formModel.getKey()));
             }
 
-            Map<String, String> oldDecisionTableIdDecisionTableKeyMap = new HashMap<String, String>();
-            Map<String, ModelInfo> decisionTableKeyModelIdMap = new HashMap<String, ModelInfo>();
+            Map<String, String> oldDecisionTableIdDecisionTableKeyMap = new HashMap<>();
+            Map<String, ModelInfo> decisionTableKeyModelIdMap = new HashMap<>();
             for (String oldDecisionTableId : decisionTableKeyAndModelMap.keySet()) {
                 Model decisionTableModel = decisionTableKeyAndModelMap.get(oldDecisionTableId);
                 oldDecisionTableIdDecisionTableKeyMap.put(oldDecisionTableId, decisionTableModel.getKey());
@@ -380,8 +411,80 @@ public class AppDefinitionImportService {
 
         return bpmnModelIdAndModelMap;
     }
+    
+    protected Map<String, Model> importCmmnModels(Map<String, String> cmmnModelMap, Map<String, Model> formKeyAndModelMap,
+                    Map<String, Model> decisionTableKeyAndModelMap, Map<String, byte[]> thumbnailMap, Map<String, Model> existingCaseModelMap) {
 
-    protected AppDefinitionRepresentation importAppDefinitionModel(Model appDefinitionModel, Model existingAppModel, Map<String, Model> bpmnModelIdAndModelMap) {
+        Map<String, Model> cmmnModelIdAndModelMap = new HashMap<>();
+        for (String cmmnModelKey : cmmnModelMap.keySet()) {
+
+            Model existingModel = null;
+            if (existingCaseModelMap != null && existingCaseModelMap.containsKey(cmmnModelKey)) {
+                existingModel = existingCaseModelMap.get(cmmnModelKey);
+            }
+
+            String cmmnModelJson = cmmnModelMap.get(cmmnModelKey);
+            Model cmmnModelObject = createModelObject(cmmnModelJson, Model.MODEL_TYPE_CMMN);
+            String oldCmmnModelId = cmmnModelObject.getId();
+
+            JsonNode cmmnModelNode = null;
+            try {
+                cmmnModelNode = objectMapper.readTree(cmmnModelObject.getModelEditorJson());
+            } catch (Exception e) {
+                LOGGER.error("Error reading CMMN json for {}", cmmnModelKey, e);
+                throw new InternalServerErrorException("Error reading CMMN json for " + cmmnModelKey);
+            }
+
+            Map<String, String> oldFormIdFormKeyMap = new HashMap<>();
+            Map<String, CmmnModelInfo> formKeyModelIdMap = new HashMap<>();
+            for (String oldFormId : formKeyAndModelMap.keySet()) {
+                Model formModel = formKeyAndModelMap.get(oldFormId);
+                oldFormIdFormKeyMap.put(oldFormId, formModel.getKey());
+                formKeyModelIdMap.put(formModel.getKey(), new CmmnModelInfo(formModel.getId(), formModel.getName(), formModel.getKey()));
+            }
+
+            Map<String, String> oldDecisionTableIdDecisionTableKeyMap = new HashMap<>();
+            Map<String, CmmnModelInfo> decisionTableKeyModelIdMap = new HashMap<>();
+            for (String oldDecisionTableId : decisionTableKeyAndModelMap.keySet()) {
+                Model decisionTableModel = decisionTableKeyAndModelMap.get(oldDecisionTableId);
+                oldDecisionTableIdDecisionTableKeyMap.put(oldDecisionTableId, decisionTableModel.getKey());
+                decisionTableKeyModelIdMap.put(decisionTableModel.getKey(), new CmmnModelInfo(decisionTableModel.getId(),
+                                decisionTableModel.getName(), decisionTableModel.getKey()));
+            }
+
+            CmmnModel cmmnModel = cmmnJsonConverter.convertToCmmnModel(cmmnModelNode, oldFormIdFormKeyMap, oldDecisionTableIdDecisionTableKeyMap, null, null);
+            String updatedCmmnJson = cmmnJsonConverter.convertToJson(cmmnModel, formKeyModelIdMap, decisionTableKeyModelIdMap).toString();
+
+            Model updatedCaseModel = null;
+            if (existingModel != null) {
+                byte[] imageBytes = null;
+                if (thumbnailMap.containsKey(cmmnModelKey)) {
+                    imageBytes = thumbnailMap.get(cmmnModelKey);
+                }
+
+                existingModel.setModelEditorJson(updatedCmmnJson);
+
+                updatedCaseModel = modelService.saveModel(existingModel, existingModel.getModelEditorJson(), imageBytes, true, "App definition import", SecurityUtils.getCurrentUserObject());
+
+            } else {
+                cmmnModelObject.setId(null);
+                cmmnModelObject.setModelEditorJson(updatedCmmnJson);
+                updatedCaseModel = modelService.createModel(cmmnModelObject, SecurityUtils.getCurrentUserObject());
+
+                if (thumbnailMap.containsKey(cmmnModelKey)) {
+                    updatedCaseModel.setThumbnail(thumbnailMap.get(cmmnModelKey));
+                    modelService.saveModel(updatedCaseModel);
+                }
+            }
+
+            cmmnModelIdAndModelMap.put(oldCmmnModelId, updatedCaseModel);
+        }
+
+        return cmmnModelIdAndModelMap;
+    }
+
+    protected AppDefinitionRepresentation importAppDefinitionModel(Model appDefinitionModel, Model existingAppModel, 
+                    Map<String, Model> bpmnModelIdAndModelMap, Map<String, Model> cmmnModelIdAndModelMap) {
 
         AppDefinition appDefinition = null;
         try {
@@ -391,15 +494,31 @@ public class AppDefinitionImportService {
             throw new BadRequestException("Error reading app definition", e);
         }
 
-        for (AppModelDefinition modelDef : appDefinition.getModels()) {
-            if (bpmnModelIdAndModelMap.containsKey(modelDef.getId())) {
-                Model newModel = bpmnModelIdAndModelMap.get(modelDef.getId());
-                modelDef.setId(newModel.getId());
-                modelDef.setName(newModel.getName());
-                modelDef.setCreatedBy(newModel.getCreatedBy());
-                modelDef.setLastUpdatedBy(newModel.getLastUpdatedBy());
-                modelDef.setLastUpdated(newModel.getLastUpdated());
-                modelDef.setVersion(newModel.getVersion());
+        if (appDefinition.getModels() != null) {
+            for (AppModelDefinition modelDef : appDefinition.getModels()) {
+                if (bpmnModelIdAndModelMap.containsKey(modelDef.getId())) {
+                    Model newModel = bpmnModelIdAndModelMap.get(modelDef.getId());
+                    modelDef.setId(newModel.getId());
+                    modelDef.setName(newModel.getName());
+                    modelDef.setCreatedBy(newModel.getCreatedBy());
+                    modelDef.setLastUpdatedBy(newModel.getLastUpdatedBy());
+                    modelDef.setLastUpdated(newModel.getLastUpdated());
+                    modelDef.setVersion(newModel.getVersion());
+                }
+            }
+        }
+        
+        if (appDefinition.getCmmnModels() != null) {
+            for (AppModelDefinition modelDef : appDefinition.getCmmnModels()) {
+                if (cmmnModelIdAndModelMap.containsKey(modelDef.getId())) {
+                    Model newModel = cmmnModelIdAndModelMap.get(modelDef.getId());
+                    modelDef.setId(newModel.getId());
+                    modelDef.setName(newModel.getName());
+                    modelDef.setCreatedBy(newModel.getCreatedBy());
+                    modelDef.setLastUpdatedBy(newModel.getLastUpdatedBy());
+                    modelDef.setLastUpdated(newModel.getLastUpdated());
+                    modelDef.setVersion(newModel.getVersion());
+                }
             }
         }
 

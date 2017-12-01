@@ -12,6 +12,11 @@
  */
 package org.flowable.app.service.idm;
 
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import com.google.common.util.concurrent.UncheckedExecutionException;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ExecutionException;
@@ -28,16 +33,11 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
-import com.google.common.util.concurrent.UncheckedExecutionException;
-
 /**
  * Cache containing User objects to prevent too much DB-traffic (users exist separately from the Flowable tables, they need to be fetched afterward one by one to join with those entities).
- * 
+ * <p>
  * TODO: This could probably be made more efficient with bulk getting. The Google cache impl allows this: override loadAll and use getAll() to fetch multiple entities.
- * 
+ *
  * @author Frederik Heremans
  * @author Joram Barrez
  */
@@ -66,7 +66,7 @@ public class UserCacheImpl implements UserCache {
                             throw new UsernameNotFoundException("User " + userId + " was not found in the database");
                         }
 
-                        Collection<GrantedAuthority> grantedAuthorities = new ArrayList<GrantedAuthority>();
+                        Collection<GrantedAuthority> grantedAuthorities = new ArrayList<>();
 
                         return new CachedUser(user, grantedAuthorities);
                     }

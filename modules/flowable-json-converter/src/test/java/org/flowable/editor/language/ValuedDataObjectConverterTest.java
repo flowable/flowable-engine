@@ -49,6 +49,7 @@ public class ValuedDataObjectConverterTest extends AbstractConverterTest {
         validateModel(bpmnModel);
     }
 
+    @Override
     protected String getResource() {
         return "test.valueddataobjectmodel.json";
     }
@@ -61,7 +62,7 @@ public class ValuedDataObjectConverterTest extends AbstractConverterTest {
 
         // verify main process data objects
         List<ValuedDataObject> dataObjects = model.getMainProcess().getDataObjects();
-        assertEquals(6, dataObjects.size());
+        assertEquals(12, dataObjects.size());
         for (ValuedDataObject dObj : dataObjects) {
             if ("dObj1".equals(dObj.getId())) {
                 assertEquals(StringDataObject.class, dObj.getClass());
@@ -113,11 +114,11 @@ public class ValuedDataObjectConverterTest extends AbstractConverterTest {
         assertTrue(flowElement instanceof SubProcess);
         assertEquals("subprocess1", flowElement.getId());
         SubProcess subProcess = (SubProcess) flowElement;
-        assertEquals(11, subProcess.getFlowElements().size());
+        assertEquals(17, subProcess.getFlowElements().size());
 
         // verify subprocess data objects
         dataObjects = ((SubProcess) flowElement).getDataObjects();
-        assertEquals(6, dataObjects.size());
+        assertEquals(12, dataObjects.size());
         for (ValuedDataObject dObj : dataObjects) {
             if ("dObj1".equals(dObj.getId())) {
                 assertEquals(StringDataObject.class, dObj.getClass());

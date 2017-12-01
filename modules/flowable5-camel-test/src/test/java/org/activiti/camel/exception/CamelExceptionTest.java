@@ -26,8 +26,8 @@ import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.test.JobTestHelper;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 

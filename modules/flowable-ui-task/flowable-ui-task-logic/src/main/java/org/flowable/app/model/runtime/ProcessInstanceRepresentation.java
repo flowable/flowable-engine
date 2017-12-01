@@ -25,7 +25,7 @@ import org.flowable.idm.api.User;
 
 /**
  * REST representation of a process instance.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class ProcessInstanceRepresentation extends AbstractRepresentation {
@@ -47,7 +47,7 @@ public class ProcessInstanceRepresentation extends AbstractRepresentation {
     protected boolean graphicalNotationDefined;
     protected boolean startFormDefined;
 
-    protected List<RestVariable> variables = new ArrayList<RestVariable>();
+    protected List<RestVariable> variables = new ArrayList<>();
 
     public ProcessInstanceRepresentation(ProcessInstance processInstance, ProcessDefinition processDefinition, boolean graphicalNotation, User startedBy) {
         this(processInstance, graphicalNotation, startedBy);

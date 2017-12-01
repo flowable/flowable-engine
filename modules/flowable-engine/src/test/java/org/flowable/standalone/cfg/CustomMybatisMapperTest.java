@@ -18,7 +18,6 @@ import java.util.Map;
 import org.flowable.engine.common.impl.cmd.CustomSqlExecution;
 import org.flowable.engine.impl.cmd.AbstractCustomSqlExecution;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
-import org.flowable.engine.task.Task;
 
 /**
  * @author jbarrez
@@ -33,7 +32,7 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
 
         // Create test data
         for (int i = 0; i < 5; i++) {
-            Task task = taskService.newTask();
+            org.flowable.task.api.Task task = taskService.newTask();
             task.setName(String.valueOf(i));
             taskService.saveTask(task);
         }
@@ -41,6 +40,7 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
         // Fetch the columns we're interested in
         CustomSqlExecution<MyTestMapper, List<Map<String, Object>>> customSqlExecution = new AbstractCustomSqlExecution<MyTestMapper, List<Map<String, Object>>>(MyTestMapper.class) {
 
+            @Override
             public List<Map<String, Object>> execute(MyTestMapper customMapper) {
                 return customMapper.selectTasks();
             }
@@ -57,7 +57,7 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
         }
 
         // Cleanup
-        for (Task task : taskService.createTaskQuery().list()) {
+        for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
             taskService.deleteTask(task.getId());
             historyService.deleteHistoricTaskInstance(task.getId());
         }
@@ -68,7 +68,7 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
 
         // Create test data
         for (int i = 0; i < 5; i++) {
-            Task task = taskService.newTask();
+            org.flowable.task.api.Task task = taskService.newTask();
             task.setName(String.valueOf(i));
             taskService.saveTask(task);
 
@@ -79,6 +79,7 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
         // Fetch data with custom query
         CustomSqlExecution<MyTestMapper, List<Map<String, Object>>> customSqlExecution = new AbstractCustomSqlExecution<MyTestMapper, List<Map<String, Object>>>(MyTestMapper.class) {
 
+            @Override
             public List<Map<String, Object>> execute(MyTestMapper customMapper) {
                 return customMapper.selectTaskWithSpecificVariable("myVar");
             }
@@ -96,7 +97,7 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
         }
 
         // Cleanup
-        for (Task task : taskService.createTaskQuery().list()) {
+        for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
             taskService.deleteTask(task.getId());
             historyService.deleteHistoricTaskInstance(task.getId());
         }

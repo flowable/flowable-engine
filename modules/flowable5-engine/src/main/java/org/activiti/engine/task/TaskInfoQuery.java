@@ -20,7 +20,7 @@ import org.activiti.engine.ActivitiIllegalArgumentException;
 import org.activiti.engine.history.HistoricTaskInstanceQuery;
 import org.activiti.engine.query.Query;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.task.IdentityLink;
+import org.flowable.identitylink.api.IdentityLink;
 
 /**
  * Interface containing shared methods between the {@link TaskQuery} and the {@link HistoricTaskInstanceQuery}.

@@ -8,7 +8,6 @@ import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.event.EventLogEntry;
 import org.flowable.engine.impl.event.logger.EventLogger;
 import org.flowable.engine.impl.event.logger.handler.Fields;
-import org.flowable.engine.task.Task;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -42,7 +41,7 @@ public class StandaloneDatabaseEventLoggerTest extends PluggableFlowableTestCase
 
     public void testStandaloneTaskEvents() throws Exception {
 
-        Task task = taskService.newTask();
+        org.flowable.task.api.Task task = taskService.newTask();
         task.setAssignee("kermit");
         task.setTenantId("myTenant");
         taskService.saveTask(task);

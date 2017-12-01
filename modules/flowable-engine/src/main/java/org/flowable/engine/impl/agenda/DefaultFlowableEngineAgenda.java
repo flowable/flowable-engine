@@ -12,10 +12,8 @@
  */
 package org.flowable.engine.impl.agenda;
 
-import java.util.LinkedList;
-
 import org.flowable.engine.FlowableEngineAgenda;
-import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.impl.agenda.AbstractAgenda;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -36,48 +34,18 @@ import org.slf4j.LoggerFactory;
  *
  * @author Joram Barrez
  */
-public class DefaultFlowableEngineAgenda implements FlowableEngineAgenda {
-
+public class DefaultFlowableEngineAgenda extends AbstractAgenda implements FlowableEngineAgenda {
+    
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultFlowableEngineAgenda.class);
 
-    protected CommandContext commandContext;
-
-    protected LinkedList<Runnable> operations = new LinkedList<>();
-
     public DefaultFlowableEngineAgenda(CommandContext commandContext) {
-        this.commandContext = commandContext;
-    }
-
-    public boolean isEmpty() {
-        return operations.isEmpty();
-    }
-
-    public Runnable getNextOperation() {
-        assertOperationsNotEmpty();
-        return operations.poll();
-    }
-
-    public Runnable peekOperation() {
-        assertOperationsNotEmpty();
-        return operations.peek();
-    }
-
-    private void assertOperationsNotEmpty() {
-        if (operations.isEmpty()) {
-            throw new FlowableException("Unable to peek empty agenda.");
-        }
+        super(commandContext);
     }
 
     /**
      * Generic method to plan a {@link Runnable}.
      */
-    public void planOperation(Runnable operation) {
-        planOperation(operation, null);
-    }
-
-    /**
-     * Generic method to plan a {@link Runnable}.
-     */
+    @Override
     public void planOperation(Runnable operation, ExecutionEntity executionEntity) {
         operations.add(operation);
         LOGGER.debug("Operation {} added to agenda", operation.getClass());
@@ -89,62 +57,49 @@ public class DefaultFlowableEngineAgenda implements FlowableEngineAgenda {
 
     /* SPECIFIC operations */
 
+    @Override
     public void planContinueProcessOperation(ExecutionEntity execution) {
         planOperation(new ContinueProcessOperation(commandContext, execution), execution);
     }
 
+    @Override
     public void planContinueProcessSynchronousOperation(ExecutionEntity execution) {
         planOperation(new ContinueProcessOperation(commandContext, execution, true, false), execution);
     }
 
+    @Override
     public void planContinueProcessInCompensation(ExecutionEntity execution) {
         planOperation(new ContinueProcessOperation(commandContext, execution, false, true), execution);
     }
 
+    @Override
     public void planContinueMultiInstanceOperation(ExecutionEntity execution, int loopCounter) {
         planOperation(new ContinueMultiInstanceOperation(commandContext, execution, loopCounter), execution);
     }
 
+    @Override
     public void planTakeOutgoingSequenceFlowsOperation(ExecutionEntity execution, boolean evaluateConditions) {
         planOperation(new TakeOutgoingSequenceFlowsOperation(commandContext, execution, evaluateConditions), execution);
     }
 
+    @Override
     public void planEndExecutionOperation(ExecutionEntity execution) {
         planOperation(new EndExecutionOperation(commandContext, execution), execution);
     }
 
+    @Override
     public void planTriggerExecutionOperation(ExecutionEntity execution) {
         planOperation(new TriggerExecutionOperation(commandContext, execution), execution);
     }
 
+    @Override
     public void planDestroyScopeOperation(ExecutionEntity execution) {
         planOperation(new DestroyScopeOperation(commandContext, execution), execution);
     }
 
+    @Override
     public void planExecuteInactiveBehaviorsOperation() {
         planOperation(new ExecuteInactiveBehaviorsOperation(commandContext));
-    }
-
-    public CommandContext getCommandContext() {
-        return commandContext;
-    }
-
-    public void setCommandContext(CommandContext commandContext) {
-        this.commandContext = commandContext;
-    }
-
-    public LinkedList<Runnable> getOperations() {
-        return operations;
-    }
-
-    @Override
-    public void flush() {
-        
-    }
-
-    @Override
-    public void close() {
-        
     }
 
 }

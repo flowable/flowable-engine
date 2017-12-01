@@ -16,14 +16,14 @@ import java.util.Date;
 import java.util.List;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.history.HistoricVariableInstance;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.impl.context.Context;
-import org.flowable.engine.impl.history.HistoryLevel;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.junit.Assert;
 
 /**

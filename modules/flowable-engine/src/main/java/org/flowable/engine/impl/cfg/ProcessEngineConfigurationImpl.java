@@ -13,10 +13,25 @@
 
 package org.flowable.engine.impl.cfg;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.ServiceLoader;
+import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
-import org.apache.ibatis.builder.xml.XMLConfigBuilder;
-import org.apache.ibatis.mapping.Environment;
+import javax.xml.namespace.QName;
+
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
@@ -37,38 +52,43 @@ import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.app.AppResourceConverter;
-import org.flowable.engine.cfg.ProcessEngineConfigurator;
+import org.flowable.engine.common.EngineConfigurator;
+import org.flowable.engine.common.EngineDeployer;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
+import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
+import org.flowable.engine.common.impl.calendar.CycleBusinessCalendar;
+import org.flowable.engine.common.impl.calendar.DueDateBusinessCalendar;
+import org.flowable.engine.common.impl.calendar.DurationBusinessCalendar;
+import org.flowable.engine.common.impl.calendar.MapBusinessCalendarManager;
+import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
-import org.flowable.engine.common.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
-import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
+import org.flowable.engine.common.impl.db.DbSchemaManager;
+import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.event.FlowableEventDispatcherImpl;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.common.impl.interceptor.CommandContextFactory;
-import org.flowable.engine.common.impl.interceptor.CommandContextInterceptor;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.common.impl.interceptor.CommandInterceptor;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.common.impl.interceptor.LogInterceptor;
 import org.flowable.engine.common.impl.interceptor.SessionFactory;
-import org.flowable.engine.common.impl.interceptor.TransactionContextInterceptor;
 import org.flowable.engine.common.impl.persistence.GenericManagerFactory;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
+import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.common.impl.util.ReflectUtil;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.compatibility.DefaultFlowable5CompatibilityHandlerFactory;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandlerFactory;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.BpmnModelEventDispatchAction;
+import org.flowable.engine.dynamic.DynamicStateManager;
 import org.flowable.engine.form.AbstractFormType;
 import org.flowable.engine.impl.DynamicBpmnServiceImpl;
 import org.flowable.engine.impl.FormServiceImpl;
@@ -85,12 +105,6 @@ import org.flowable.engine.impl.agenda.AgendaSessionFactory;
 import org.flowable.engine.impl.agenda.DefaultFlowableEngineAgendaFactory;
 import org.flowable.engine.impl.app.AppDeployer;
 import org.flowable.engine.impl.app.AppResourceConverterImpl;
-import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.engine.impl.asyncexecutor.AsyncRunnableExecutionExceptionHandler;
-import org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
-import org.flowable.engine.impl.asyncexecutor.DefaultJobManager;
-import org.flowable.engine.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
-import org.flowable.engine.impl.asyncexecutor.JobManager;
 import org.flowable.engine.impl.bpmn.data.ItemInstance;
 import org.flowable.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.flowable.engine.impl.bpmn.deployer.BpmnDeploymentHelper;
@@ -140,23 +154,17 @@ import org.flowable.engine.impl.bpmn.parser.handler.TimerEventDefinitionParseHan
 import org.flowable.engine.impl.bpmn.parser.handler.TransactionParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.UserTaskParseHandler;
 import org.flowable.engine.impl.bpmn.webservice.MessageInstance;
-import org.flowable.engine.impl.calendar.BusinessCalendarManager;
-import org.flowable.engine.impl.calendar.CycleBusinessCalendar;
-import org.flowable.engine.impl.calendar.DueDateBusinessCalendar;
-import org.flowable.engine.impl.calendar.DurationBusinessCalendar;
-import org.flowable.engine.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.engine.impl.cmd.RedeployV5ProcessDefinitionsCmd;
 import org.flowable.engine.impl.cmd.ValidateExecutionRelatedEntityCountCfgCmd;
 import org.flowable.engine.impl.cmd.ValidateTaskRelatedEntityCountCfgCmd;
 import org.flowable.engine.impl.cmd.ValidateV5EntitiesCmd;
 import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.impl.db.EntityDependencyOrder;
-import org.flowable.engine.impl.db.IbatisVariableTypeHandler;
 import org.flowable.engine.impl.db.ProcessDbSchemaManager;
 import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
-import org.flowable.engine.impl.el.DefaultExpressionManager;
-import org.flowable.engine.impl.el.ExpressionManager;
+import org.flowable.engine.impl.dynamic.DefaultDynamicStateManager;
 import org.flowable.engine.impl.el.FlowableDateFunctionDelegate;
+import org.flowable.engine.impl.el.ProcessExpressionManager;
 import org.flowable.engine.impl.event.CompensationEventHandler;
 import org.flowable.engine.impl.event.EventHandler;
 import org.flowable.engine.impl.event.MessageEventHandler;
@@ -171,7 +179,8 @@ import org.flowable.engine.impl.form.JuelFormEngine;
 import org.flowable.engine.impl.form.LongFormType;
 import org.flowable.engine.impl.form.StringFormType;
 import org.flowable.engine.impl.history.DefaultHistoryManager;
-import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.impl.history.DefaultHistoryTaskManager;
+import org.flowable.engine.impl.history.DefaultHistoryVariableManager;
 import org.flowable.engine.impl.history.HistoryManager;
 import org.flowable.engine.impl.history.async.AsyncHistoryJobHandler;
 import org.flowable.engine.impl.history.async.AsyncHistoryJobZippedHandler;
@@ -179,7 +188,6 @@ import org.flowable.engine.impl.history.async.AsyncHistoryListener;
 import org.flowable.engine.impl.history.async.AsyncHistoryManager;
 import org.flowable.engine.impl.history.async.AsyncHistorySession;
 import org.flowable.engine.impl.history.async.AsyncHistorySessionFactory;
-import org.flowable.engine.impl.history.async.DefaultAsyncHistoryJobExecutor;
 import org.flowable.engine.impl.history.async.DefaultAsyncHistoryJobProducer;
 import org.flowable.engine.impl.interceptor.BpmnOverrideContextInterceptor;
 import org.flowable.engine.impl.interceptor.CommandInvoker;
@@ -187,17 +195,11 @@ import org.flowable.engine.impl.interceptor.DelegateInterceptor;
 import org.flowable.engine.impl.interceptor.LoggingExecutionTreeCommandInvoker;
 import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.flowable.engine.impl.jobexecutor.DefaultFailedJobCommandFactory;
-import org.flowable.engine.impl.jobexecutor.FailedJobCommandFactory;
-import org.flowable.engine.impl.jobexecutor.HistoryJobHandler;
-import org.flowable.engine.impl.jobexecutor.JobHandler;
 import org.flowable.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
 import org.flowable.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.flowable.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.flowable.engine.impl.jobexecutor.TriggerTimerEventJobHandler;
-import org.flowable.engine.impl.persistence.deploy.DefaultDeploymentCache;
-import org.flowable.engine.impl.persistence.deploy.Deployer;
-import org.flowable.engine.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionCacheEntry;
 import org.flowable.engine.impl.persistence.deploy.ProcessDefinitionInfoCache;
@@ -207,8 +209,6 @@ import org.flowable.engine.impl.persistence.entity.ByteArrayEntityManager;
 import org.flowable.engine.impl.persistence.entity.ByteArrayEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.CommentEntityManager;
 import org.flowable.engine.impl.persistence.entity.CommentEntityManagerImpl;
-import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntityManager;
-import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityManager;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.EventLogEntryEntityImpl;
@@ -222,20 +222,8 @@ import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntit
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricDetailEntityManagerImpl;
-import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManager;
 import org.flowable.engine.impl.persistence.entity.HistoricProcessInstanceEntityManagerImpl;
-import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntityManagerImpl;
-import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntityManagerImpl;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntityManagerImpl;
-import org.flowable.engine.impl.persistence.entity.IdentityLinkEntityManager;
-import org.flowable.engine.impl.persistence.entity.IdentityLinkEntityManagerImpl;
-import org.flowable.engine.impl.persistence.entity.JobEntityManager;
-import org.flowable.engine.impl.persistence.entity.JobEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.ModelEntityManager;
 import org.flowable.engine.impl.persistence.entity.ModelEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
@@ -246,125 +234,104 @@ import org.flowable.engine.impl.persistence.entity.PropertyEntityManager;
 import org.flowable.engine.impl.persistence.entity.PropertyEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManager;
 import org.flowable.engine.impl.persistence.entity.ResourceEntityManagerImpl;
-import org.flowable.engine.impl.persistence.entity.SuspendedJobEntityManager;
-import org.flowable.engine.impl.persistence.entity.SuspendedJobEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.TableDataManager;
 import org.flowable.engine.impl.persistence.entity.TableDataManagerImpl;
-import org.flowable.engine.impl.persistence.entity.TaskEntityManager;
-import org.flowable.engine.impl.persistence.entity.TaskEntityManagerImpl;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntityManager;
-import org.flowable.engine.impl.persistence.entity.TimerJobEntityManagerImpl;
-import org.flowable.engine.impl.persistence.entity.VariableInstanceEntityManager;
-import org.flowable.engine.impl.persistence.entity.VariableInstanceEntityManagerImpl;
 import org.flowable.engine.impl.persistence.entity.data.AttachmentDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ByteArrayDataManager;
 import org.flowable.engine.impl.persistence.entity.data.CommentDataManager;
-import org.flowable.engine.impl.persistence.entity.data.DeadLetterJobDataManager;
 import org.flowable.engine.impl.persistence.entity.data.DeploymentDataManager;
 import org.flowable.engine.impl.persistence.entity.data.EventLogEntryDataManager;
 import org.flowable.engine.impl.persistence.entity.data.EventSubscriptionDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ExecutionDataManager;
 import org.flowable.engine.impl.persistence.entity.data.HistoricActivityInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.HistoricDetailDataManager;
-import org.flowable.engine.impl.persistence.entity.data.HistoricIdentityLinkDataManager;
 import org.flowable.engine.impl.persistence.entity.data.HistoricProcessInstanceDataManager;
-import org.flowable.engine.impl.persistence.entity.data.HistoricTaskInstanceDataManager;
-import org.flowable.engine.impl.persistence.entity.data.HistoricVariableInstanceDataManager;
-import org.flowable.engine.impl.persistence.entity.data.HistoryJobDataManager;
-import org.flowable.engine.impl.persistence.entity.data.IdentityLinkDataManager;
-import org.flowable.engine.impl.persistence.entity.data.JobDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ModelDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ProcessDefinitionInfoDataManager;
 import org.flowable.engine.impl.persistence.entity.data.PropertyDataManager;
 import org.flowable.engine.impl.persistence.entity.data.ResourceDataManager;
-import org.flowable.engine.impl.persistence.entity.data.SuspendedJobDataManager;
-import org.flowable.engine.impl.persistence.entity.data.TaskDataManager;
-import org.flowable.engine.impl.persistence.entity.data.TimerJobDataManager;
-import org.flowable.engine.impl.persistence.entity.data.VariableInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisAttachmentDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisByteArrayDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisCommentDataManager;
-import org.flowable.engine.impl.persistence.entity.data.impl.MybatisDeadLetterJobDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisDeploymentDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisEventLogEntryDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisEventSubscriptionDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisExecutionDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisHistoricActivityInstanceDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisHistoricDetailDataManager;
-import org.flowable.engine.impl.persistence.entity.data.impl.MybatisHistoricIdentityLinkDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisHistoricProcessInstanceDataManager;
-import org.flowable.engine.impl.persistence.entity.data.impl.MybatisHistoricTaskInstanceDataManager;
-import org.flowable.engine.impl.persistence.entity.data.impl.MybatisHistoricVariableInstanceDataManager;
-import org.flowable.engine.impl.persistence.entity.data.impl.MybatisHistoryJobDataManager;
-import org.flowable.engine.impl.persistence.entity.data.impl.MybatisIdentityLinkDataManager;
-import org.flowable.engine.impl.persistence.entity.data.impl.MybatisJobDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisModelDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessDefinitionDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisProcessDefinitionInfoDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisPropertyDataManager;
 import org.flowable.engine.impl.persistence.entity.data.impl.MybatisResourceDataManager;
-import org.flowable.engine.impl.persistence.entity.data.impl.MybatisSuspendedJobDataManager;
-import org.flowable.engine.impl.persistence.entity.data.impl.MybatisTaskDataManager;
-import org.flowable.engine.impl.persistence.entity.data.impl.MybatisTimerJobDataManager;
-import org.flowable.engine.impl.persistence.entity.data.impl.MybatisVariableInstanceDataManager;
 import org.flowable.engine.impl.scripting.BeansResolverFactory;
 import org.flowable.engine.impl.scripting.ResolverFactory;
 import org.flowable.engine.impl.scripting.ScriptBindingsFactory;
 import org.flowable.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.impl.scripting.VariableScopeResolverFactory;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
-import org.flowable.engine.impl.variable.BooleanType;
-import org.flowable.engine.impl.variable.ByteArrayType;
-import org.flowable.engine.impl.variable.CustomObjectType;
-import org.flowable.engine.impl.variable.DateType;
-import org.flowable.engine.impl.variable.DefaultVariableTypes;
-import org.flowable.engine.impl.variable.DoubleType;
-import org.flowable.engine.impl.variable.EntityManagerSession;
-import org.flowable.engine.impl.variable.EntityManagerSessionFactory;
-import org.flowable.engine.impl.variable.IntegerType;
-import org.flowable.engine.impl.variable.JPAEntityListVariableType;
-import org.flowable.engine.impl.variable.JPAEntityVariableType;
-import org.flowable.engine.impl.variable.JodaDateTimeType;
-import org.flowable.engine.impl.variable.JodaDateType;
-import org.flowable.engine.impl.variable.JsonType;
-import org.flowable.engine.impl.variable.LongJsonType;
-import org.flowable.engine.impl.variable.LongStringType;
-import org.flowable.engine.impl.variable.LongType;
-import org.flowable.engine.impl.variable.NullType;
-import org.flowable.engine.impl.variable.SerializableType;
-import org.flowable.engine.impl.variable.ShortType;
-import org.flowable.engine.impl.variable.StringType;
-import org.flowable.engine.impl.variable.UUIDType;
-import org.flowable.engine.impl.variable.VariableType;
-import org.flowable.engine.impl.variable.VariableTypes;
 import org.flowable.engine.parse.BpmnParseHandler;
+import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
+import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
+import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
+import org.flowable.job.service.HistoryJobHandler;
+import org.flowable.job.service.InternalJobCompatibilityManager;
+import org.flowable.job.service.HistoryJobProcessor;
+import org.flowable.job.service.InternalJobManager;
+import org.flowable.job.service.JobHandler;
+import org.flowable.job.service.JobProcessor;
+import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.AsyncRunnableExecutionExceptionHandler;
+import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncHistoryJobExecutor;
+import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
+import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncRunnableExecutionExceptionHandler;
+import org.flowable.job.service.impl.asyncexecutor.ExecuteAsyncRunnableFactory;
+import org.flowable.job.service.impl.asyncexecutor.FailedJobCommandFactory;
+import org.flowable.job.service.impl.asyncexecutor.JobManager;
+import org.flowable.job.service.impl.db.JobDbSchemaManager;
+import org.flowable.task.service.InternalTaskLocalizationManager;
+import org.flowable.task.service.InternalTaskVariableScopeResolver;
+import org.flowable.task.service.TaskServiceConfiguration;
+import org.flowable.task.service.history.InternalHistoryTaskManager;
+import org.flowable.task.service.impl.db.TaskDbSchemaManager;
 import org.flowable.validation.ProcessValidator;
 import org.flowable.validation.ProcessValidatorFactory;
+import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.api.types.VariableTypes;
+import org.flowable.variable.service.VariableServiceConfiguration;
+import org.flowable.variable.service.history.InternalHistoryVariableManager;
+import org.flowable.variable.service.impl.db.IbatisVariableTypeHandler;
+import org.flowable.variable.service.impl.db.VariableDbSchemaManager;
+import org.flowable.variable.service.impl.types.BooleanType;
+import org.flowable.variable.service.impl.types.ByteArrayType;
+import org.flowable.variable.service.impl.types.CustomObjectType;
+import org.flowable.variable.service.impl.types.DateType;
+import org.flowable.variable.service.impl.types.DefaultVariableTypes;
+import org.flowable.variable.service.impl.types.DoubleType;
+import org.flowable.variable.service.impl.types.EntityManagerSession;
+import org.flowable.variable.service.impl.types.EntityManagerSessionFactory;
+import org.flowable.variable.service.impl.types.IntegerType;
+import org.flowable.variable.service.impl.types.JPAEntityListVariableType;
+import org.flowable.variable.service.impl.types.JPAEntityVariableType;
+import org.flowable.variable.service.impl.types.JodaDateTimeType;
+import org.flowable.variable.service.impl.types.JodaDateType;
+import org.flowable.variable.service.impl.types.JsonType;
+import org.flowable.variable.service.impl.types.LongJsonType;
+import org.flowable.variable.service.impl.types.LongStringType;
+import org.flowable.variable.service.impl.types.LongType;
+import org.flowable.variable.service.impl.types.NullType;
+import org.flowable.variable.service.impl.types.SerializableType;
+import org.flowable.variable.service.impl.types.ShortType;
+import org.flowable.variable.service.impl.types.StringType;
+import org.flowable.variable.service.impl.types.UUIDType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.InputStream;
-import java.io.Reader;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
-import javax.xml.namespace.QName;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tom Baeyens
@@ -377,9 +344,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public static final String DEFAULT_WS_SYNC_FACTORY = "org.flowable.engine.impl.webservice.CxfWebServiceClientFactory";
 
     public static final String DEFAULT_MYBATIS_MAPPING_FILE = "org/flowable/db/mapping/mappings.xml";
-
-    public static final int DEFAULT_GENERIC_MAX_LENGTH_STRING = 4000;
-    public static final int DEFAULT_ORACLE_MAX_LENGTH_STRING = 2000;
 
     // SERVICES /////////////////////////////////////////////////////////////////
 
@@ -406,23 +370,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected ExecutionDataManager executionDataManager;
     protected HistoricActivityInstanceDataManager historicActivityInstanceDataManager;
     protected HistoricDetailDataManager historicDetailDataManager;
-    protected HistoricIdentityLinkDataManager historicIdentityLinkDataManager;
     protected HistoricProcessInstanceDataManager historicProcessInstanceDataManager;
-    protected HistoricTaskInstanceDataManager historicTaskInstanceDataManager;
-    protected HistoricVariableInstanceDataManager historicVariableInstanceDataManager;
-    protected IdentityLinkDataManager identityLinkDataManager;
-    protected JobDataManager jobDataManager;
-    protected TimerJobDataManager timerJobDataManager;
-    protected SuspendedJobDataManager suspendedJobDataManager;
-    protected DeadLetterJobDataManager deadLetterJobDataManager;
-    protected HistoryJobDataManager historyJobDataManager;
     protected ModelDataManager modelDataManager;
     protected ProcessDefinitionDataManager processDefinitionDataManager;
     protected ProcessDefinitionInfoDataManager processDefinitionInfoDataManager;
     protected PropertyDataManager propertyDataManager;
     protected ResourceDataManager resourceDataManager;
-    protected TaskDataManager taskDataManager;
-    protected VariableInstanceDataManager variableInstanceDataManager;
 
     // ENTITY MANAGERS ///////////////////////////////////////////////////////////
 
@@ -435,24 +388,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected ExecutionEntityManager executionEntityManager;
     protected HistoricActivityInstanceEntityManager historicActivityInstanceEntityManager;
     protected HistoricDetailEntityManager historicDetailEntityManager;
-    protected HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager;
     protected HistoricProcessInstanceEntityManager historicProcessInstanceEntityManager;
-    protected HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager;
-    protected HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager;
-    protected IdentityLinkEntityManager identityLinkEntityManager;
-    protected JobEntityManager jobEntityManager;
-    protected TimerJobEntityManager timerJobEntityManager;
-    protected SuspendedJobEntityManager suspendedJobEntityManager;
-    protected DeadLetterJobEntityManager deadLetterJobEntityManager;
-    protected HistoryJobEntityManager historyJobEntityManager;
     protected ModelEntityManager modelEntityManager;
     protected ProcessDefinitionEntityManager processDefinitionEntityManager;
     protected ProcessDefinitionInfoEntityManager processDefinitionInfoEntityManager;
     protected PropertyEntityManager propertyEntityManager;
     protected ResourceEntityManager resourceEntityManager;
     protected TableDataManager tableDataManager;
-    protected TaskEntityManager taskEntityManager;
-    protected VariableInstanceEntityManager variableInstanceEntityManager;
 
     // Candidate Manager
 
@@ -461,7 +403,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // History Manager
 
     protected HistoryManager historyManager;
-    
+
     protected boolean isAsyncHistoryEnabled;
     protected boolean isAsyncHistoryJsonGzipCompressionEnabled;
     protected boolean isAsyncHistoryJsonGroupingEnabled;
@@ -472,13 +414,21 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected JobManager jobManager;
 
+    // Dynamic state manager
+
+    protected DynamicStateManager dynamicStateManager;
+
     // CONFIGURATORS ////////////////////////////////////////////////////////////
 
     protected boolean enableConfiguratorServiceLoader = true; // Enabled by default. In certain environments this should be set to false (eg osgi)
-    protected List<ProcessEngineConfigurator> configurators; // The injected configurators
-    protected List<ProcessEngineConfigurator> allConfigurators; // Including auto-discovered configurators
+    protected List<EngineConfigurator> configurators; // The injected configurators
+    protected List<EngineConfigurator> allConfigurators; // Including auto-discovered configurators
 
-    protected ProcessEngineConfigurator idmProcessEngineConfigurator;
+    protected VariableServiceConfiguration variableServiceConfiguration;
+    protected IdentityLinkServiceConfiguration identityLinkServiceConfiguration;
+    protected TaskServiceConfiguration taskServiceConfiguration;
+    protected JobServiceConfiguration jobServiceConfiguration;
+    protected EngineConfigurator idmEngineConfigurator;
 
     // DEPLOYERS //////////////////////////////////////////////////////////////////
 
@@ -491,9 +441,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected BpmnDeploymentHelper bpmnDeploymentHelper;
     protected CachingAndArtifactsManager cachingAndArtifactsManager;
     protected ProcessDefinitionDiagramHelper processDefinitionDiagramHelper;
-    protected List<Deployer> customPreDeployers;
-    protected List<Deployer> customPostDeployers;
-    protected List<Deployer> deployers;
     protected DeploymentManager deploymentManager;
 
     protected int processDefinitionCacheLimit = -1; // By default, no limit
@@ -514,8 +461,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected List<JobHandler> customJobHandlers;
     protected Map<String, JobHandler> jobHandlers;
-    protected AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler;
-    
+    protected List<AsyncRunnableExecutionExceptionHandler> customAsyncRunnableExecutionExceptionHandlers;
+    protected boolean addDefaultExceptionHandler = true;
+
     protected List<HistoryJobHandler> customHistoryJobHandlers;
     protected Map<String, HistoryJobHandler> historyJobHandlers;
 
@@ -529,7 +477,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
      * The number of retries for a job.
      */
     protected int asyncExecutorNumberOfRetries = 3;
-    protected int asyncHistoryExecutorNumberOfRetries = 10; 
+    protected int asyncHistoryExecutorNumberOfRetries = 10;
 
     /**
      * The minimal number of threads that are kept alive in the threadpool for job execution. Default value = 2. (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
@@ -544,7 +492,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     /**
      * The time (in milliseconds) a thread used for job execution must be kept alive before it is destroyed. Default setting is 5 seconds. Having a setting > 0 takes resources, but in the case of many
      * job executions it avoids creating new threads all the time. If 0, threads will be destroyed after they've been used for job execution.
-     *
+     * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected long asyncExecutorThreadKeepAliveTime = 5000L;
@@ -557,36 +505,36 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     /**
      * The queue onto which jobs will be placed before they are actually executed. Threads form the async executor threadpool will take work from this queue.
-     *
+     * <p>
      * By default null. If null, an {@link ArrayBlockingQueue} will be created of size {@link #asyncExecutorThreadPoolQueueSize}.
-     *
+     * <p>
      * When the queue is full, the job will be executed by the calling thread (ThreadPoolExecutor.CallerRunsPolicy())
-     *
+     * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected BlockingQueue<Runnable> asyncExecutorThreadPoolQueue;
 
     /**
      * The time (in seconds) that is waited to gracefully shut down the threadpool used for job execution when the a shutdown on the executor (or process engine) is requested. Default value = 60.
-     *
+     * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected long asyncExecutorSecondsToWaitOnShutdown = 60L;
 
     /**
      * The number of timer jobs that are acquired during one query (before a job is executed, an acquirement thread fetches jobs from the database and puts them on the queue).
-     *
+     * <p>
      * Default value = 1, as this lowers the potential on optimistic locking exceptions. Change this value if you know what you are doing.
-     *
+     * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected int asyncExecutorMaxTimerJobsPerAcquisition = 1;
 
     /**
      * The number of async jobs that are acquired during one query (before a job is executed, an acquirement thread fetches jobs from the database and puts them on the queue).
-     *
+     * <p>
      * Default value = 1, as this lowers the potential on optimistic locking exceptions. Change this value if you know what you are doing.
-     *
+     * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected int asyncExecutorMaxAsyncJobsDuePerAcquisition = 1;
@@ -594,7 +542,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     /**
      * The time (in milliseconds) the timer acquisition thread will wait to execute the next acquirement query. This happens when no new timer jobs were found or when less timer jobs have been fetched
      * than set in {@link #asyncExecutorMaxTimerJobsPerAcquisition}. Default value = 10 seconds.
-     *
+     * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected int asyncExecutorDefaultTimerJobAcquireWaitTime = 10 * 1000;
@@ -602,7 +550,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     /**
      * The time (in milliseconds) the async job acquisition thread will wait to execute the next acquirement query. This happens when no new async jobs were found or when less async jobs have been
      * fetched than set in {@link #asyncExecutorMaxAsyncJobsDuePerAcquisition}. Default value = 10 seconds.
-     *
+     * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected int asyncExecutorDefaultAsyncJobAcquireWaitTime = 10 * 1000;
@@ -615,29 +563,29 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     /**
      * When a job is acquired, it is locked so other async executors can't lock and execute it. While doing this, the 'name' of the lock owner is written into a column of the job.
-     *
+     * <p>
      * By default, a random UUID will be generated when the executor is created.
-     *
+     * <p>
      * It is important that each async executor instance in a cluster of Flowable engines has a different name!
-     *
+     * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected String asyncExecutorLockOwner;
 
     /**
      * The amount of time (in milliseconds) a timer job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
-     *
+     * <p>
      * Default value = 5 minutes;
-     *
+     * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected int asyncExecutorTimerLockTimeInMillis = 5 * 60 * 1000;
 
     /**
      * The amount of time (in milliseconds) an async job is locked when acquired by the async executor. During this period of time, no other async executor will try to acquire and lock this job.
-     *
+     * <p>
      * Default value = 5 minutes;
-     *
+     * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected int asyncExecutorAsyncJobLockTimeInMillis = 5 * 60 * 1000;
@@ -645,20 +593,20 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     /**
      * The amount of time (in milliseconds) that is between two consecutive checks of 'expired jobs'. Expired jobs are jobs that were locked (a lock owner + time was written by some executor, but the
      * job was never completed).
-     *
+     * <p>
      * During such a check, jobs that are expired are again made available, meaning the lock owner and lock time will be removed. Other executors will now be able to pick it up.
-     *
+     * <p>
      * A job is deemed expired if the current time has passed the lock time.
-     *
+     * <p>
      * By default one minute.
      */
     protected int asyncExecutorResetExpiredJobsInterval = 60 * 1000;
-    
+
     /**
      * The amount of time (in milliseconds) a job can maximum be in the 'executable' state before being deemed expired.
      * Note that this won't happen when using the threadpool based executor, as the acquire thread will fetch these kind of jobs earlier.
      * However, in the message queue based execution, it could be some job is posted to a queue but then never is locked nor executed.
-     * 
+     * <p>
      * By default 24 hours, as this should be a very exceptional case.
      */
     protected int asyncExecutorResetExpiredJobsMaxTimeout = 24 * 60 * 60 * 1000;
@@ -671,7 +619,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     /**
      * Experimental!
-     *
+     * <p>
      * Set this to true when using the message queue based job executor.
      */
     protected boolean asyncExecutorMessageQueueMode;
@@ -679,7 +627,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     /**
      * Allows to define a custom factory for creating the {@link Runnable} that is executed by the async executor.
-     *
+     * <p>
      * (This property is only applicable when using the {@link DefaultAsyncJobExecutor}).
      */
     protected ExecuteAsyncRunnableFactory asyncExecutorExecuteAsyncRunnableFactory;
@@ -713,13 +661,22 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected List<VariableType> customPostVariableTypes;
     protected VariableTypes variableTypes;
 
+    protected InternalHistoryVariableManager internalHistoryVariableManager;
+    protected InternalTaskVariableScopeResolver internalTaskVariableScopeResolver;
+    protected InternalHistoryTaskManager internalHistoryTaskManager;
+    protected InternalTaskLocalizationManager internalTaskLocalizationManager;
+    protected InternalJobManager internalJobManager;
+    protected InternalJobCompatibilityManager internalJobCompatibilityManager;
+
+    protected Map<String, List<RuntimeInstanceStateChangeCallback>> processInstanceStateChangedCallbacks;
+
     /**
      * This flag determines whether variables of the type 'serializable' will be tracked. This means that, when true, in a JavaDelegate you can write
-     *
+     * <p>
      * MySerializableVariable myVariable = (MySerializableVariable) execution.getVariable("myVariable"); myVariable.setNumber(123);
-     *
+     * <p>
      * And the changes to the java object will be reflected in the database. Otherwise, a manual call to setVariable will be needed.
-     *
+     * <p>
      * By default true for backwards compatibility.
      */
     protected boolean serializableVariableTypeTrackDeserializedObjects = true;
@@ -748,7 +705,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     /**
      * Set this to true if you want to have extra checks on the BPMN xml that is parsed. See http://www.jorambarrez.be/blog/2013/02/19/uploading-a-funny-xml -can-bring-down-your-server/
-     *
+     * <p>
      * Unfortunately, this feature is not available on some platforms (JDK 6, JBoss), hence the reason why it is disabled by default. If your platform allows the use of StaxSource during XML parsing,
      * do enable it.
      */
@@ -757,7 +714,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     /**
      * The following settings will determine the amount of entities loaded at once when the engine needs to load multiple entities (eg. when suspending a process definition with all its process
      * instances).
-     *
+     * <p>
      * The default setting is quite low, as not to surprise anyone with sudden memory spikes. Change it to something higher if the environment Flowable runs in allows it.
      */
     protected int batchSizeProcessInstances = 25;
@@ -769,34 +726,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     /**
      * Using field injection together with a delegate expression for a service task / execution listener / task listener is not thread-sade , see user guide section 'Field Injection' for more
      * information.
-     *
+     * <p>
      * Set this flag to false to throw an exception at runtime when a field is injected and a delegateExpression is used.
      *
      * @since 5.21
      */
     protected DelegateExpressionFieldInjectionMode delegateExpressionFieldInjectionMode = DelegateExpressionFieldInjectionMode.MIXED;
 
-    /**
-     * Define a max length for storing String variable types in the database. Mainly used for the Oracle NVARCHAR2 limit of 2000 characters
-     */
-    protected int maxLengthStringVariableType = -1;
-
-    /**
-     * If set to true, enables bulk insert (grouping sql inserts together). Default true. For some databases (eg DB2 on Zos: https://activiti.atlassian.net/browse/ACT-4042) needs to be set to false
-     */
-    protected boolean isBulkInsertEnabled = true;
-
-    /**
-     * Some databases have a limit of how many parameters one sql insert can have (eg SQL Server, 2000 params (!= insert statements) ). Tweak this parameter in case of exceptions indicating too much
-     * is being put into one bulk insert, or make it higher if your database can cope with it and there are inserts with a huge amount of data.
-     *
-     * By default: 100 (75 for mssql server as it has a hard limit of 2000 parameters in a statement)
-     */
-    protected int maxNrOfStatementsInBulkInsert = 100;
-
-    public int DEFAULT_MAX_NR_OF_STATEMENTS_BULK_INSERT_SQL_SERVER = 70; // currently Execution has most params (28). 2000 / 28 = 71.
-
     protected ObjectMapper objectMapper = new ObjectMapper();
+
+    protected List<Object> flowable5JobProcessors = Collections.emptyList();
+    protected List<JobProcessor> jobProcessors = Collections.emptyList();
+    protected List<HistoryJobProcessor> historyJobProcessors = Collections.emptyList();
 
     /**
      * Enabled a very verbose debug output of the execution tree whilst executing operations. Most useful for core engine developers or people fiddling around with the execution tree.
@@ -807,6 +748,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // agenda factory
     protected FlowableEngineAgendaFactory agendaFactory;
+
+    protected DbSchemaManager identityLinkDbSchemaManager;
+    protected DbSchemaManager variableDbSchemaManager;
+    protected DbSchemaManager taskDbSchemaManager;
+    protected DbSchemaManager jobDbSchemaManager;
 
     // Backwards compatibility //////////////////////////////////////////////////////////////
 
@@ -865,7 +811,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
         if (usingRelationalDatabase) {
             initDataSource();
-            initDbSchemaManager();
+            initDbSchemaManagers();
         }
 
         initHelpers();
@@ -890,7 +836,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initKnowledgeBaseCache();
         initJobHandlers();
         initHistoryJobHandlers();
-        initJobManager();
 
         initTransactionFactory();
 
@@ -903,8 +848,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initEntityManagers();
         initCandidateManager();
         initHistoryManager();
-        initAsyncExecutor();
-        initAsyncHistoryExecutor();
+        initDynamicStateManager();
         initJpa();
         initDeployers();
         initEventHandlers();
@@ -913,7 +857,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initProcessValidator();
         initDatabaseEventLogging();
         initFlowable5CompatibilityHandler();
+        initVariableServiceConfiguration();
+        initIdentityLinkServiceConfiguration();
+        initTaskServiceConfiguration();
+        initJobServiceConfiguration();
+        initAsyncExecutor();
+        initAsyncHistoryExecutor();
         configuratorsAfterInit();
+        afterInitTaskServiceConfiguration();
     }
 
     // failedJobCommandFactory
@@ -928,6 +879,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // command executors
     // ////////////////////////////////////////////////////////
 
+    @Override
     public void initCommandExecutors() {
         initDefaultCommandConfig();
         initSchemaCommandConfig();
@@ -936,6 +888,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initCommandExecutor();
     }
 
+    @Override
     public void initCommandInvoker() {
         if (commandInvoker == null) {
             if (enableVerboseExecutionTreeLogging) {
@@ -946,51 +899,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
-    public void initCommandInterceptors() {
-        if (commandInterceptors == null) {
-            commandInterceptors = new ArrayList<>();
-            if (customPreCommandInterceptors != null) {
-                commandInterceptors.addAll(customPreCommandInterceptors);
-            }
-            
-            commandInterceptors.addAll(getDefaultCommandInterceptors());
-            
-            commandInterceptors.add(new BpmnOverrideContextInterceptor());
-            
-            if (customPostCommandInterceptors != null) {
-                commandInterceptors.addAll(customPostCommandInterceptors);
-            }
-            commandInterceptors.add(commandInvoker);
-        }
+    @Override
+    public String getEngineCfgKey() {
+        return EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG;
     }
 
-    public Collection<? extends CommandInterceptor> getDefaultCommandInterceptors() {
-        if (defaultCommandInterceptors == null) {
-            List<CommandInterceptor> interceptors = new ArrayList<>();
-            interceptors.add(new LogInterceptor());
-    
-            CommandInterceptor transactionInterceptor = createTransactionInterceptor();
-            if (transactionInterceptor != null) {
-                interceptors.add(transactionInterceptor);
-            }
-    
-            if (commandContextFactory != null) {
-                CommandContextInterceptor commandContextInterceptor = new CommandContextInterceptor(commandContextFactory);
-                engineConfigurations.put(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG, this);
-                commandContextInterceptor.setEngineConfigurations(engineConfigurations);
-                commandContextInterceptor.setCurrentEngineConfigurationKey(EngineConfigurationConstants.KEY_PROCESS_ENGINE_CONFIG);
-                interceptors.add(commandContextInterceptor);
-            }
-    
-            if (transactionContextFactory != null) {
-                interceptors.add(new TransactionContextInterceptor(transactionContextFactory));
-            }
-    
-            defaultCommandInterceptors = interceptors;
-        }
-        return defaultCommandInterceptors;
+    @Override
+    public List<CommandInterceptor> getAdditionalDefaultCommandInterceptors() {
+        return Collections.<CommandInterceptor>singletonList(new BpmnOverrideContextInterceptor());
     }
-    
     // services
     // /////////////////////////////////////////////////////////////////
 
@@ -1011,42 +928,47 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
-    @Override
-    public void initDatabaseType() {
-        super.initDatabaseType();
-        // Special care for MSSQL, as it has a hard limit of 2000 params per statement (incl bulk statement).
-        // Especially with executions, with 100 as default, this limit is passed.
-        if (DATABASE_TYPE_MSSQL.equals(databaseType)) {
-            maxNrOfStatementsInBulkInsert = DEFAULT_MAX_NR_OF_STATEMENTS_BULK_INSERT_SQL_SERVER;
-        }
+    public void initDbSchemaManagers() {
+        super.initDbSchemaManager();
+        initProcessDbSchemaManager();
+        initIdentityLinkDbSchemaManager();
+        initVariableDbSchemaManager();
+        initTaskDbSchemaManager();
+        initJobDbSchemaManager();
     }
-    
-    public void initDbSchemaManager() {
+
+    protected void initProcessDbSchemaManager() {
         if (this.dbSchemaManager == null) {
             this.dbSchemaManager = new ProcessDbSchemaManager();
         }
     }
 
-    @Override
-    public Configuration initMybatisConfiguration(Environment environment, Reader reader, Properties properties) {
-        XMLConfigBuilder parser = new XMLConfigBuilder(reader, "", properties);
-        Configuration configuration = parser.getConfiguration();
-
-        if (databaseType != null) {
-            configuration.setDatabaseId(databaseType);
+    protected void initVariableDbSchemaManager() {
+        if (this.variableDbSchemaManager == null) {
+            this.variableDbSchemaManager = new VariableDbSchemaManager();
         }
+    }
 
-        configuration.setEnvironment(environment);
+    protected void initTaskDbSchemaManager() {
+        if (this.taskDbSchemaManager == null) {
+            this.taskDbSchemaManager = new TaskDbSchemaManager();
+        }
+    }
 
-        initMybatisTypeHandlers(configuration);
-        initCustomMybatisMappers(configuration);
+    protected void initIdentityLinkDbSchemaManager() {
+        if (this.identityLinkDbSchemaManager == null) {
+            this.identityLinkDbSchemaManager = new IdentityLinkDbSchemaManager();
+        }
+    }
 
-        configuration = parseMybatisConfiguration(parser);
-        return configuration;
+    protected void initJobDbSchemaManager() {
+        if (this.jobDbSchemaManager == null) {
+            this.jobDbSchemaManager = new JobDbSchemaManager();
+        }
     }
 
     public void initMybatisTypeHandlers(Configuration configuration) {
-        configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler());
+        configuration.getTypeHandlerRegistry().register(VariableType.class, JdbcType.VARCHAR, new IbatisVariableTypeHandler(variableTypes));
     }
 
     @Override
@@ -1096,35 +1018,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (historicDetailDataManager == null) {
             historicDetailDataManager = new MybatisHistoricDetailDataManager(this);
         }
-        if (historicIdentityLinkDataManager == null) {
-            historicIdentityLinkDataManager = new MybatisHistoricIdentityLinkDataManager(this);
-        }
         if (historicProcessInstanceDataManager == null) {
             historicProcessInstanceDataManager = new MybatisHistoricProcessInstanceDataManager(this);
-        }
-        if (historicTaskInstanceDataManager == null) {
-            historicTaskInstanceDataManager = new MybatisHistoricTaskInstanceDataManager(this);
-        }
-        if (historicVariableInstanceDataManager == null) {
-            historicVariableInstanceDataManager = new MybatisHistoricVariableInstanceDataManager(this);
-        }
-        if (identityLinkDataManager == null) {
-            identityLinkDataManager = new MybatisIdentityLinkDataManager(this);
-        }
-        if (jobDataManager == null) {
-            jobDataManager = new MybatisJobDataManager(this);
-        }
-        if (timerJobDataManager == null) {
-            timerJobDataManager = new MybatisTimerJobDataManager(this);
-        }
-        if (suspendedJobDataManager == null) {
-            suspendedJobDataManager = new MybatisSuspendedJobDataManager(this);
-        }
-        if (deadLetterJobDataManager == null) {
-            deadLetterJobDataManager = new MybatisDeadLetterJobDataManager(this);
-        }
-        if (historyJobDataManager == null) {
-            historyJobDataManager = new MybatisHistoryJobDataManager(this);
         }
         if (modelDataManager == null) {
             modelDataManager = new MybatisModelDataManager(this);
@@ -1140,12 +1035,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
         if (resourceDataManager == null) {
             resourceDataManager = new MybatisResourceDataManager(this);
-        }
-        if (taskDataManager == null) {
-            taskDataManager = new MybatisTaskDataManager(this);
-        }
-        if (variableInstanceDataManager == null) {
-            variableInstanceDataManager = new MybatisVariableInstanceDataManager(this);
         }
     }
 
@@ -1179,35 +1068,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (historicDetailEntityManager == null) {
             historicDetailEntityManager = new HistoricDetailEntityManagerImpl(this, historicDetailDataManager);
         }
-        if (historicIdentityLinkEntityManager == null) {
-            historicIdentityLinkEntityManager = new HistoricIdentityLinkEntityManagerImpl(this, historicIdentityLinkDataManager);
-        }
         if (historicProcessInstanceEntityManager == null) {
             historicProcessInstanceEntityManager = new HistoricProcessInstanceEntityManagerImpl(this, historicProcessInstanceDataManager);
-        }
-        if (historicTaskInstanceEntityManager == null) {
-            historicTaskInstanceEntityManager = new HistoricTaskInstanceEntityManagerImpl(this, historicTaskInstanceDataManager);
-        }
-        if (historicVariableInstanceEntityManager == null) {
-            historicVariableInstanceEntityManager = new HistoricVariableInstanceEntityManagerImpl(this, historicVariableInstanceDataManager);
-        }
-        if (identityLinkEntityManager == null) {
-            identityLinkEntityManager = new IdentityLinkEntityManagerImpl(this, identityLinkDataManager);
-        }
-        if (jobEntityManager == null) {
-            jobEntityManager = new JobEntityManagerImpl(this, jobDataManager);
-        }
-        if (timerJobEntityManager == null) {
-            timerJobEntityManager = new TimerJobEntityManagerImpl(this, timerJobDataManager);
-        }
-        if (suspendedJobEntityManager == null) {
-            suspendedJobEntityManager = new SuspendedJobEntityManagerImpl(this, suspendedJobDataManager);
-        }
-        if (deadLetterJobEntityManager == null) {
-            deadLetterJobEntityManager = new DeadLetterJobEntityManagerImpl(this, deadLetterJobDataManager);
-        }
-        if (historyJobEntityManager == null) {
-            historyJobEntityManager = new HistoryJobEntityManagerImpl(this, historyJobDataManager);
         }
         if (modelEntityManager == null) {
             modelEntityManager = new ModelEntityManagerImpl(this, modelDataManager);
@@ -1226,12 +1088,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
         if (tableDataManager == null) {
             tableDataManager = new TableDataManagerImpl(this);
-        }
-        if (taskEntityManager == null) {
-            taskEntityManager = new TaskEntityManagerImpl(this, taskDataManager);
-        }
-        if (variableInstanceEntityManager == null) {
-            variableInstanceEntityManager = new VariableInstanceEntityManagerImpl(this, variableInstanceDataManager);
         }
     }
 
@@ -1255,14 +1111,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
-    // Job manager ///////////////////////////////////////////////////////////
+    // Dynamic state manager ////////////////////////////////////////////////////
 
-    public void initJobManager() {
-        if (jobManager == null) {
-            jobManager = new DefaultJobManager(this);
+    public void initDynamicStateManager() {
+        if (dynamicStateManager == null) {
+            dynamicStateManager = new DefaultDynamicStateManager();
         }
-
-        jobManager.setProcessEngineConfiguration(this);
     }
 
     // session factories ////////////////////////////////////////////////////////
@@ -1274,17 +1128,17 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             if (usingRelationalDatabase) {
                 initDbSqlSessionFactory();
             }
-            
+
             if (isAsyncHistoryEnabled) {
                 initAsyncHistorySessionFactory();
             }
-            
+
             if (agendaFactory != null) {
                 addSessionFactory(new AgendaSessionFactory(agendaFactory));
             }
 
             addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
-            
+
             commandContextFactory.setSessionFactories(sessionFactories);
         }
 
@@ -1296,49 +1150,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     }
 
-    public void initDbSqlSessionFactory() {
-        if (dbSqlSessionFactory == null) {
-            dbSqlSessionFactory = createDbSqlSessionFactory();
-        }
-        dbSqlSessionFactory.setDatabaseType(databaseType);
-        dbSqlSessionFactory.setIdGenerator(idGenerator);
-        dbSqlSessionFactory.setSqlSessionFactory(sqlSessionFactory);
-        dbSqlSessionFactory.setDbHistoryUsed(isDbHistoryUsed);
-        dbSqlSessionFactory.setDatabaseTablePrefix(databaseTablePrefix);
-        dbSqlSessionFactory.setTablePrefixIsSchema(tablePrefixIsSchema);
-        dbSqlSessionFactory.setDatabaseCatalog(databaseCatalog);
-        dbSqlSessionFactory.setDatabaseSchema(databaseSchema);
-        dbSqlSessionFactory.setMaxNrOfStatementsInBulkInsert(maxNrOfStatementsInBulkInsert);
-        
-        initDbSqlSessionFactoryEntitySettings();
-        
-        addSessionFactory(dbSqlSessionFactory);
-    }
-
+    @Override
     protected void initDbSqlSessionFactoryEntitySettings() {
-        for (Class<? extends Entity> clazz : EntityDependencyOrder.INSERT_ORDER) {
-            // All entities except one of the bpmn engine are bulk inserteable
-            dbSqlSessionFactory.getInsertionOrder().add(clazz);
-            
-            if (isBulkInsertEnabled) {
-                dbSqlSessionFactory.getBulkInserteableEntityClasses().add(clazz);
-            }
-        }
-        
+        defaultInitDbSqlSessionFactoryEntitySettings(EntityDependencyOrder.INSERT_ORDER, EntityDependencyOrder.DELETE_ORDER);
+
         // Oracle doesn't support bulk inserting for event log entries
         if (isBulkInsertEnabled && "oracle".equals(databaseType)) {
             dbSqlSessionFactory.getBulkInserteableEntityClasses().remove(EventLogEntryEntityImpl.class);
         }
-        
-        for (Class<? extends Entity> clazz : EntityDependencyOrder.DELETE_ORDER) {
-            dbSqlSessionFactory.getDeletionOrder().add(clazz);
-        }
     }
 
-    public DbSqlSessionFactory createDbSqlSessionFactory() {
-        return new DbSqlSessionFactory();
-    }
-    
     public void initAsyncHistorySessionFactory() {
         AsyncHistorySessionFactory asyncHistorySessionFactory = new AsyncHistorySessionFactory();
         if (asyncHistoryListener == null) {
@@ -1360,8 +1181,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         allConfigurators = new ArrayList<>();
 
         if (!disableIdmEngine) {
-            if (idmProcessEngineConfigurator != null) {
-                allConfigurators.add(idmProcessEngineConfigurator);
+            if (idmEngineConfigurator != null) {
+                allConfigurators.add(idmEngineConfigurator);
             } else {
                 allConfigurators.add(new IdmEngineConfigurator());
             }
@@ -1379,9 +1200,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 classLoader = ReflectUtil.getClassLoader();
             }
 
-            ServiceLoader<ProcessEngineConfigurator> configuratorServiceLoader = ServiceLoader.load(ProcessEngineConfigurator.class, classLoader);
+            ServiceLoader<EngineConfigurator> configuratorServiceLoader = ServiceLoader.load(EngineConfigurator.class, classLoader);
             int nrOfServiceLoadedConfigurators = 0;
-            for (ProcessEngineConfigurator configurator : configuratorServiceLoader) {
+            for (EngineConfigurator configurator : configuratorServiceLoader) {
                 allConfigurators.add(configurator);
                 nrOfServiceLoadedConfigurators++;
             }
@@ -1394,9 +1215,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
                 // Order them according to the priorities (useful for dependent
                 // configurator)
-                Collections.sort(allConfigurators, new Comparator<ProcessEngineConfigurator>() {
+                Collections.sort(allConfigurators, new Comparator<EngineConfigurator>() {
                     @Override
-                    public int compare(ProcessEngineConfigurator configurator1, ProcessEngineConfigurator configurator2) {
+                    public int compare(EngineConfigurator configurator1, EngineConfigurator configurator2) {
                         int priority1 = configurator1.getPriority();
                         int priority2 = configurator2.getPriority();
 
@@ -1410,8 +1231,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 });
 
                 // Execute the configurators
-                LOGGER.info("Found {} Process Engine Configurators in total:", allConfigurators.size());
-                for (ProcessEngineConfigurator configurator : allConfigurators) {
+                LOGGER.info("Found {} Engine Configurators in total:", allConfigurators.size());
+                for (EngineConfigurator configurator : allConfigurators) {
                     LOGGER.info("{} (priority:{})", configurator.getClass(), configurator.getPriority());
                 }
 
@@ -1421,16 +1242,145 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     }
 
     public void configuratorsBeforeInit() {
-        for (ProcessEngineConfigurator configurator : allConfigurators) {
+        for (EngineConfigurator configurator : allConfigurators) {
             LOGGER.info("Executing beforeInit() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
             configurator.beforeInit(this);
         }
     }
 
+    public void initVariableServiceConfiguration() {
+        this.variableServiceConfiguration = new VariableServiceConfiguration();
+        this.variableServiceConfiguration.setHistoryLevel(this.historyLevel);
+        this.variableServiceConfiguration.setClock(this.clock);
+        this.variableServiceConfiguration.setObjectMapper(this.objectMapper);
+        this.variableServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+
+        this.variableServiceConfiguration.setVariableTypes(this.variableTypes);
+
+        if (this.internalHistoryVariableManager != null) {
+            this.variableServiceConfiguration.setInternalHistoryVariableManager(this.internalHistoryVariableManager);
+        } else {
+            this.variableServiceConfiguration.setInternalHistoryVariableManager(new DefaultHistoryVariableManager(this));
+        }
+
+        this.variableServiceConfiguration.setMaxLengthString(this.getMaxLengthString());
+        this.variableServiceConfiguration.setSerializableVariableTypeTrackDeserializedObjects(this.isSerializableVariableTypeTrackDeserializedObjects());
+
+        this.variableServiceConfiguration.init();
+
+        addServiceConfiguration(EngineConfigurationConstants.KEY_VARIABLE_SERVICE_CONFIG, this.variableServiceConfiguration);
+    }
+
+    public void initIdentityLinkServiceConfiguration() {
+        this.identityLinkServiceConfiguration = new IdentityLinkServiceConfiguration();
+        this.identityLinkServiceConfiguration.setHistoryLevel(this.historyLevel);
+        this.identityLinkServiceConfiguration.setClock(this.clock);
+        this.identityLinkServiceConfiguration.setObjectMapper(this.objectMapper);
+        this.identityLinkServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+
+        this.identityLinkServiceConfiguration.init();
+
+        addServiceConfiguration(EngineConfigurationConstants.KEY_IDENTITY_LINK_SERVICE_CONFIG, this.identityLinkServiceConfiguration);
+    }
+
+    public void initTaskServiceConfiguration() {
+        this.taskServiceConfiguration = new TaskServiceConfiguration();
+        this.taskServiceConfiguration.setHistoryLevel(this.historyLevel);
+        this.taskServiceConfiguration.setClock(this.clock);
+        this.taskServiceConfiguration.setObjectMapper(this.objectMapper);
+        this.taskServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+
+        if (this.internalHistoryTaskManager != null) {
+            this.taskServiceConfiguration.setInternalHistoryTaskManager(this.internalHistoryTaskManager);
+        } else {
+            this.taskServiceConfiguration.setInternalHistoryTaskManager(new DefaultHistoryTaskManager(this));
+        }
+
+        if (this.internalTaskVariableScopeResolver != null) {
+            this.taskServiceConfiguration.setInternalTaskVariableScopeResolver(this.internalTaskVariableScopeResolver);
+        } else {
+            this.taskServiceConfiguration.setInternalTaskVariableScopeResolver(new DefaultTaskVariableScopeResolver(this));
+        }
+
+        if (this.internalTaskLocalizationManager != null) {
+            this.taskServiceConfiguration.setInternalTaskLocalizationManager(this.internalTaskLocalizationManager);
+        } else {
+            this.taskServiceConfiguration.setInternalTaskLocalizationManager(new DefaultTaskLocalizationManager(this));
+        }
+
+        this.taskServiceConfiguration.setEnableTaskRelationshipCounts(this.performanceSettings.isEnableTaskRelationshipCounts());
+        this.taskServiceConfiguration.setEnableLocalization(this.performanceSettings.isEnableLocalization());
+        this.taskServiceConfiguration.setTaskQueryLimit(this.taskQueryLimit);
+        this.taskServiceConfiguration.setHistoricTaskQueryLimit(this.historicTaskQueryLimit);
+
+        this.taskServiceConfiguration.init();
+
+        addServiceConfiguration(EngineConfigurationConstants.KEY_TASK_SERVICE_CONFIG, this.taskServiceConfiguration);
+    }
+
+    public void initJobServiceConfiguration() {
+        this.jobServiceConfiguration = new JobServiceConfiguration();
+        this.jobServiceConfiguration.setHistoryLevel(this.historyLevel);
+        this.jobServiceConfiguration.setClock(this.clock);
+        this.jobServiceConfiguration.setObjectMapper(this.objectMapper);
+        this.jobServiceConfiguration.setEventDispatcher(this.eventDispatcher);
+        this.jobServiceConfiguration.setCommandExecutor(this.commandExecutor);
+        this.jobServiceConfiguration.setExpressionManager(this.expressionManager);
+        this.jobServiceConfiguration.setBusinessCalendarManager(this.businessCalendarManager);
+
+        this.jobServiceConfiguration.setJobHandlers(this.jobHandlers);
+        this.jobServiceConfiguration.setHistoryJobHandlers(this.historyJobHandlers);
+        this.jobServiceConfiguration.setFailedJobCommandFactory(this.failedJobCommandFactory);
+
+        List<AsyncRunnableExecutionExceptionHandler> exceptionHandlers = new ArrayList<>();
+        if (customAsyncRunnableExecutionExceptionHandlers != null) {
+            exceptionHandlers.addAll(customAsyncRunnableExecutionExceptionHandlers);
+        }
+
+        if (addDefaultExceptionHandler) {
+            exceptionHandlers.add(new DefaultAsyncRunnableExecutionExceptionHandler());
+        }
+
+        this.jobServiceConfiguration.setAsyncRunnableExecutionExceptionHandlers(exceptionHandlers);
+        this.jobServiceConfiguration.setAsyncExecutorNumberOfRetries(this.asyncExecutorNumberOfRetries);
+        this.jobServiceConfiguration.setAsyncExecutorResetExpiredJobsMaxTimeout(this.asyncExecutorResetExpiredJobsMaxTimeout);
+
+        if (this.jobManager != null) {
+            this.jobServiceConfiguration.setJobManager(this.jobManager);
+        }
+
+        if (this.internalJobManager != null) {
+            this.jobServiceConfiguration.setInternalJobManager(this.internalJobManager);
+        } else {
+            this.jobServiceConfiguration.setInternalJobManager(new DefaultInternalJobManager(this));
+        }
+
+        if (this.internalJobCompatibilityManager != null) {
+            this.jobServiceConfiguration.setInternalJobCompatibilityManager(internalJobCompatibilityManager);
+        } else {
+            this.jobServiceConfiguration.setInternalJobCompatibilityManager(new DefaultInternalJobCompatibilityManager(this));
+        }
+
+        // set the job processors
+        this.jobServiceConfiguration.setJobProcessors(this.jobProcessors);
+        this.jobServiceConfiguration.setHistoryJobProcessors(this.historyJobProcessors);
+
+        this.jobServiceConfiguration.init();
+
+        addServiceConfiguration(EngineConfigurationConstants.KEY_JOB_SERVICE_CONFIG, this.jobServiceConfiguration);
+    }
+
     public void configuratorsAfterInit() {
-        for (ProcessEngineConfigurator configurator : allConfigurators) {
+        for (EngineConfigurator configurator : allConfigurators) {
             LOGGER.info("Executing configure() of {} (priority:{})", configurator.getClass(), configurator.getPriority());
             configurator.configure(this);
+        }
+    }
+
+    public void afterInitTaskServiceConfiguration() {
+        if (engineConfigurations.containsKey(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG)) {
+            IdmEngineConfiguration idmEngineConfiguration = (IdmEngineConfiguration) engineConfigurations.get(EngineConfigurationConstants.KEY_IDM_ENGINE_CONFIG);
+            this.taskServiceConfiguration.setIdmIdentityService(idmEngineConfiguration.getIdmIdentityService());
         }
     }
 
@@ -1543,8 +1493,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
-    public Collection<? extends Deployer> getDefaultDeployers() {
-        List<Deployer> defaultDeployers = new ArrayList<>();
+    public Collection<? extends EngineDeployer> getDefaultDeployers() {
+        List<EngineDeployer> defaultDeployers = new ArrayList<>();
 
         if (bpmnDeployer == null) {
             bpmnDeployer = new BpmnDeployer();
@@ -1720,21 +1670,21 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             }
         }
     }
-    
+
     protected void initHistoryJobHandlers() {
         if (isAsyncHistoryEnabled) {
             historyJobHandlers = new HashMap<>();
-            
+
             AsyncHistoryJobHandler asyncHistoryJobHandler = new AsyncHistoryJobHandler();
             asyncHistoryJobHandler.initDefaultTransformers();
             asyncHistoryJobHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
             historyJobHandlers.put(asyncHistoryJobHandler.getType(), asyncHistoryJobHandler);
-            
+
             AsyncHistoryJobZippedHandler asyncHistoryJobZippedHandler = new AsyncHistoryJobZippedHandler();
             asyncHistoryJobZippedHandler.initDefaultTransformers();
             asyncHistoryJobZippedHandler.setAsyncHistoryJsonGroupingEnabled(isAsyncHistoryJsonGroupingEnabled);
             historyJobHandlers.put(asyncHistoryJobZippedHandler.getType(), asyncHistoryJobZippedHandler);
-    
+
             if (getCustomHistoryJobHandlers() != null) {
                 for (HistoryJobHandler customJobHandler : getCustomHistoryJobHandlers()) {
                     historyJobHandlers.put(customJobHandler.getType(), customJobHandler);
@@ -1791,14 +1741,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             asyncExecutor = defaultAsyncExecutor;
         }
 
-        asyncExecutor.setProcessEngineConfiguration(this);
+        asyncExecutor.setJobServiceConfiguration(jobServiceConfiguration);
         asyncExecutor.setAutoActivate(asyncExecutorActivate);
+        jobServiceConfiguration.setAsyncExecutor(asyncExecutor);
     }
-    
+
     public void initAsyncHistoryExecutor() {
         if (asyncHistoryExecutor == null) {
             DefaultAsyncJobExecutor defaultAsyncHistoryExecutor = new DefaultAsyncHistoryJobExecutor();
-            
+
             // Message queue mode
             defaultAsyncHistoryExecutor.setMessageQueueMode(asyncHistoryExecutorMessageQueueMode);
 
@@ -1835,7 +1786,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             asyncHistoryExecutor = defaultAsyncHistoryExecutor;
         }
 
-        asyncHistoryExecutor.setProcessEngineConfiguration(this);
+        asyncHistoryExecutor.setJobServiceConfiguration(jobServiceConfiguration);
         asyncHistoryExecutor.setAutoActivate(asyncHistoryExecutorActivate);
     }
 
@@ -1865,18 +1816,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // OTHER
     // ////////////////////////////////////////////////////////////////////
-
-    public void initCommandContextFactory() {
-        if (commandContextFactory == null) {
-            commandContextFactory = new CommandContextFactory();
-        }
-    }
-
-    public void initTransactionContextFactory() {
-        if (transactionContextFactory == null) {
-            transactionContextFactory = new StandaloneMybatisTransactionContextFactory();
-        }
-    }
 
     @Override
     public void initTransactionFactory() {
@@ -1932,24 +1871,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
-    public int getMaxLengthString() {
-        if (maxLengthStringVariableType == -1) {
-            if ("oracle".equalsIgnoreCase(databaseType)) {
-                return DEFAULT_ORACLE_MAX_LENGTH_STRING;
-            } else {
-                return DEFAULT_GENERIC_MAX_LENGTH_STRING;
-            }
-        } else {
-            return maxLengthStringVariableType;
-        }
-    }
-
     public void initFormEngines() {
         if (formEngines == null) {
             formEngines = new HashMap<>();
             FormEngine defaultFormEngine = new JuelFormEngine();
             formEngines.put(null, defaultFormEngine); // default form engine is
-                                                      // looked up with null
+            // looked up with null
             formEngines.put(defaultFormEngine.getName(), defaultFormEngine);
         }
         if (customFormEngines != null) {
@@ -1988,9 +1915,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public void initExpressionManager() {
         if (expressionManager == null) {
-            expressionManager = new DefaultExpressionManager(delegateInterceptor, beans, true);
+            expressionManager = new ProcessExpressionManager(delegateInterceptor, beans);
         }
-
         expressionManager.setFunctionDelegates(flowableFunctionDelegates);
     }
 
@@ -2073,7 +1999,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (this.eventDispatcher == null) {
             this.eventDispatcher = new FlowableEventDispatcherImpl();
         }
-        
+
         if (this.additionalEventDispatchActions == null) {
             this.additionalEventDispatchActions = new ArrayList<>();
             this.additionalEventDispatchActions.add(new BpmnModelEventDispatchAction());
@@ -2163,7 +2089,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
             if (flowable5CompatibilityHandler != null) {
                 LOGGER.info("Found compatibility handler instance : {}", flowable5CompatibilityHandler.getClass());
-                
+
                 flowable5CompatibilityHandler.setFlowable6ProcessEngineConfiguration(this);
             }
         }
@@ -2189,6 +2115,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (performanceSettings.isValidateTaskRelationshipCountConfigOnBoot()) {
             commandExecutor.execute(new ValidateTaskRelatedEntityCountCfgCmd());
         }
+
+        // if Flowable 5 support is needed configure the Flowable 5 job processors via the compatibility handler
+        if (flowable5CompatibilityEnabled) {
+            flowable5CompatibilityHandler.setJobProcessor(this.flowable5JobProcessors);
+        }
     }
 
     public Runnable getProcessEngineCloseRunnable() {
@@ -2203,16 +2134,19 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // getters and setters
     // //////////////////////////////////////////////////////
 
+    @Override
     public ProcessEngineConfigurationImpl setEngineName(String processEngineName) {
         this.processEngineName = processEngineName;
         return this;
     }
 
+    @Override
     public ProcessEngineConfigurationImpl setDatabaseSchemaUpdate(String databaseSchemaUpdate) {
         this.databaseSchemaUpdate = databaseSchemaUpdate;
         return this;
     }
 
+    @Override
     public ProcessEngineConfigurationImpl setJdbcUrl(String jdbcUrl) {
         this.jdbcUrl = jdbcUrl;
         return this;
@@ -2230,28 +2164,34 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    @Override
     public List<CommandInterceptor> getCustomPreCommandInterceptors() {
         return customPreCommandInterceptors;
     }
 
+    @Override
     public ProcessEngineConfigurationImpl setCustomPreCommandInterceptors(List<CommandInterceptor> customPreCommandInterceptors) {
         this.customPreCommandInterceptors = customPreCommandInterceptors;
         return this;
     }
 
+    @Override
     public List<CommandInterceptor> getCustomPostCommandInterceptors() {
         return customPostCommandInterceptors;
     }
 
+    @Override
     public ProcessEngineConfigurationImpl setCustomPostCommandInterceptors(List<CommandInterceptor> customPostCommandInterceptors) {
         this.customPostCommandInterceptors = customPostCommandInterceptors;
         return this;
     }
 
+    @Override
     public List<CommandInterceptor> getCommandInterceptors() {
         return commandInterceptors;
     }
 
+    @Override
     public ProcessEngineConfigurationImpl setCommandInterceptors(List<CommandInterceptor> commandInterceptors) {
         this.commandInterceptors = commandInterceptors;
         return this;
@@ -2356,11 +2296,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public List<ProcessEngineConfigurator> getConfigurators() {
+    public List<EngineConfigurator> getConfigurators() {
         return configurators;
     }
 
-    public ProcessEngineConfigurationImpl addConfigurator(ProcessEngineConfigurator configurator) {
+    public ProcessEngineConfigurationImpl addConfigurator(EngineConfigurator configurator) {
         if (this.configurators == null) {
             this.configurators = new ArrayList<>();
         }
@@ -2368,7 +2308,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public ProcessEngineConfigurationImpl setConfigurators(List<ProcessEngineConfigurator> configurators) {
+    public ProcessEngineConfigurationImpl setConfigurators(List<EngineConfigurator> configurators) {
         this.configurators = configurators;
         return this;
     }
@@ -2377,16 +2317,16 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.enableConfiguratorServiceLoader = enableConfiguratorServiceLoader;
     }
 
-    public List<ProcessEngineConfigurator> getAllConfigurators() {
+    public List<EngineConfigurator> getAllConfigurators() {
         return allConfigurators;
     }
 
-    public ProcessEngineConfigurator getIdmProcessEngineConfigurator() {
-        return idmProcessEngineConfigurator;
+    public EngineConfigurator getIdmEngineConfigurator() {
+        return idmEngineConfigurator;
     }
 
-    public ProcessEngineConfigurationImpl setIdmProcessEngineConfigurator(ProcessEngineConfigurator idmProcessEngineConfigurator) {
-        this.idmProcessEngineConfigurator = idmProcessEngineConfigurator;
+    public ProcessEngineConfigurationImpl setIdmEngineConfigurator(EngineConfigurator idmEngineConfigurator) {
+        this.idmEngineConfigurator = idmEngineConfigurator;
         return this;
     }
 
@@ -2459,15 +2399,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public List<Deployer> getDeployers() {
-        return deployers;
-    }
-
-    public ProcessEngineConfigurationImpl setDeployers(List<Deployer> deployers) {
-        this.deployers = deployers;
-        return this;
-    }
-
     @Override
     public ProcessEngineConfigurationImpl setIdGenerator(IdGenerator idGenerator) {
         this.idGenerator = idGenerator;
@@ -2486,10 +2417,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     /**
      * Add or replace the address of the given web-service endpoint with the given value
      *
-     * @param endpointName
-     *            The endpoint name for which a new address must be set
-     * @param address
-     *            The new address of the endpoint
+     * @param endpointName The endpoint name for which a new address must be set
+     * @param address      The new address of the endpoint
      */
     public ProcessEngineConfiguration addWsEndpointAddress(QName endpointName, URL address) {
         this.wsOverridenEndpointAddresses.put(endpointName, address);
@@ -2499,8 +2428,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     /**
      * Remove the address definition of the given web-service endpoint
      *
-     * @param endpointName
-     *            The endpoint name for which the address definition must be removed
+     * @param endpointName The endpoint name for which the address definition must be removed
      */
     public ProcessEngineConfiguration removeWsEndpointAddress(QName endpointName) {
         this.wsOverridenEndpointAddresses.remove(endpointName);
@@ -2549,6 +2477,60 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setVariableTypes(VariableTypes variableTypes) {
         this.variableTypes = variableTypes;
+        return this;
+    }
+
+    public InternalHistoryVariableManager getInternalHistoryVariableManager() {
+        return internalHistoryVariableManager;
+    }
+
+    public ProcessEngineConfigurationImpl setInternalHistoryVariableManager(InternalHistoryVariableManager internalHistoryVariableManager) {
+        this.internalHistoryVariableManager = internalHistoryVariableManager;
+        return this;
+    }
+
+    public InternalTaskVariableScopeResolver getInternalTaskVariableScopeResolver() {
+        return internalTaskVariableScopeResolver;
+    }
+
+    public ProcessEngineConfigurationImpl setInternalTaskVariableScopeResolver(InternalTaskVariableScopeResolver internalTaskVariableScopeResolver) {
+        this.internalTaskVariableScopeResolver = internalTaskVariableScopeResolver;
+        return this;
+    }
+
+    public InternalHistoryTaskManager getInternalHistoryTaskManager() {
+        return internalHistoryTaskManager;
+    }
+
+    public ProcessEngineConfigurationImpl setInternalHistoryTaskManager(InternalHistoryTaskManager internalHistoryTaskManager) {
+        this.internalHistoryTaskManager = internalHistoryTaskManager;
+        return this;
+    }
+
+    public InternalTaskLocalizationManager getInternalTaskLocalizationManager() {
+        return internalTaskLocalizationManager;
+    }
+
+    public ProcessEngineConfigurationImpl setInternalTaskLocalizationManager(InternalTaskLocalizationManager internalTaskLocalizationManager) {
+        this.internalTaskLocalizationManager = internalTaskLocalizationManager;
+        return this;
+    }
+
+    public InternalJobManager getInternalJobManager() {
+        return internalJobManager;
+    }
+
+    public ProcessEngineConfigurationImpl setInternalJobManager(InternalJobManager internalJobManager) {
+        this.internalJobManager = internalJobManager;
+        return this;
+    }
+
+    public InternalJobCompatibilityManager getInternalJobCompatibilityManager() {
+        return internalJobCompatibilityManager;
+    }
+
+    public ProcessEngineConfigurationImpl setInternalJobCompatibilityManager(InternalJobCompatibilityManager internalJobCompatibilityManager) {
+        this.internalJobCompatibilityManager = internalJobCompatibilityManager;
         return this;
     }
 
@@ -2623,24 +2605,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public List<Deployer> getCustomPreDeployers() {
-        return customPreDeployers;
-    }
-
-    public ProcessEngineConfigurationImpl setCustomPreDeployers(List<Deployer> customPreDeployers) {
-        this.customPreDeployers = customPreDeployers;
-        return this;
-    }
-
-    public List<Deployer> getCustomPostDeployers() {
-        return customPostDeployers;
-    }
-
-    public ProcessEngineConfigurationImpl setCustomPostDeployers(List<Deployer> customPostDeployers) {
-        this.customPostDeployers = customPostDeployers;
-        return this;
-    }
-
     public Map<String, JobHandler> getJobHandlers() {
         return jobHandlers;
     }
@@ -2649,7 +2613,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.jobHandlers = jobHandlers;
         return this;
     }
-    
+
     public Map<String, HistoryJobHandler> getHistoryJobHandlers() {
         return historyJobHandlers;
     }
@@ -2703,7 +2667,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.customJobHandlers = customJobHandlers;
         return this;
     }
-    
+
     public List<HistoryJobHandler> getCustomHistoryJobHandlers() {
         return customHistoryJobHandlers;
     }
@@ -3033,33 +2997,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public int getMaxLengthStringVariableType() {
-        return maxLengthStringVariableType;
-    }
-
-    public ProcessEngineConfigurationImpl setMaxLengthStringVariableType(int maxLengthStringVariableType) {
-        this.maxLengthStringVariableType = maxLengthStringVariableType;
-        return this;
-    }
-
-    public boolean isBulkInsertEnabled() {
-        return isBulkInsertEnabled;
-    }
-
-    public ProcessEngineConfigurationImpl setBulkInsertEnabled(boolean isBulkInsertEnabled) {
-        this.isBulkInsertEnabled = isBulkInsertEnabled;
-        return this;
-    }
-
-    public int getMaxNrOfStatementsInBulkInsert() {
-        return maxNrOfStatementsInBulkInsert;
-    }
-
-    public ProcessEngineConfigurationImpl setMaxNrOfStatementsInBulkInsert(int maxNrOfStatementsInBulkInsert) {
-        this.maxNrOfStatementsInBulkInsert = maxNrOfStatementsInBulkInsert;
-        return this;
-    }
-
     @Override
     public ProcessEngineConfigurationImpl setUsingRelationalDatabase(boolean usingRelationalDatabase) {
         this.usingRelationalDatabase = usingRelationalDatabase;
@@ -3184,93 +3121,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public HistoricIdentityLinkDataManager getHistoricIdentityLinkDataManager() {
-        return historicIdentityLinkDataManager;
-    }
-
-    public ProcessEngineConfigurationImpl setHistoricIdentityLinkDataManager(HistoricIdentityLinkDataManager historicIdentityLinkDataManager) {
-        this.historicIdentityLinkDataManager = historicIdentityLinkDataManager;
-        return this;
-    }
-
     public HistoricProcessInstanceDataManager getHistoricProcessInstanceDataManager() {
         return historicProcessInstanceDataManager;
     }
 
     public ProcessEngineConfigurationImpl setHistoricProcessInstanceDataManager(HistoricProcessInstanceDataManager historicProcessInstanceDataManager) {
         this.historicProcessInstanceDataManager = historicProcessInstanceDataManager;
-        return this;
-    }
-
-    public HistoricTaskInstanceDataManager getHistoricTaskInstanceDataManager() {
-        return historicTaskInstanceDataManager;
-    }
-
-    public ProcessEngineConfigurationImpl setHistoricTaskInstanceDataManager(HistoricTaskInstanceDataManager historicTaskInstanceDataManager) {
-        this.historicTaskInstanceDataManager = historicTaskInstanceDataManager;
-        return this;
-    }
-
-    public HistoricVariableInstanceDataManager getHistoricVariableInstanceDataManager() {
-        return historicVariableInstanceDataManager;
-    }
-
-    public ProcessEngineConfigurationImpl setHistoricVariableInstanceDataManager(HistoricVariableInstanceDataManager historicVariableInstanceDataManager) {
-        this.historicVariableInstanceDataManager = historicVariableInstanceDataManager;
-        return this;
-    }
-
-    public IdentityLinkDataManager getIdentityLinkDataManager() {
-        return identityLinkDataManager;
-    }
-
-    public ProcessEngineConfigurationImpl setIdentityLinkDataManager(IdentityLinkDataManager identityLinkDataManager) {
-        this.identityLinkDataManager = identityLinkDataManager;
-        return this;
-    }
-
-    public JobDataManager getJobDataManager() {
-        return jobDataManager;
-    }
-
-    public ProcessEngineConfigurationImpl setJobDataManager(JobDataManager jobDataManager) {
-        this.jobDataManager = jobDataManager;
-        return this;
-    }
-
-    public TimerJobDataManager getTimerJobDataManager() {
-        return timerJobDataManager;
-    }
-
-    public ProcessEngineConfigurationImpl setTimerJobDataManager(TimerJobDataManager timerJobDataManager) {
-        this.timerJobDataManager = timerJobDataManager;
-        return this;
-    }
-
-    public SuspendedJobDataManager getSuspendedJobDataManager() {
-        return suspendedJobDataManager;
-    }
-
-    public ProcessEngineConfigurationImpl setSuspendedJobDataManager(SuspendedJobDataManager suspendedJobDataManager) {
-        this.suspendedJobDataManager = suspendedJobDataManager;
-        return this;
-    }
-
-    public DeadLetterJobDataManager getDeadLetterJobDataManager() {
-        return deadLetterJobDataManager;
-    }
-
-    public ProcessEngineConfigurationImpl setDeadLetterJobDataManager(DeadLetterJobDataManager deadLetterJobDataManager) {
-        this.deadLetterJobDataManager = deadLetterJobDataManager;
-        return this;
-    }
-    
-    public HistoryJobDataManager getHistoryJobDataManager() {
-        return historyJobDataManager;
-    }
-
-    public ProcessEngineConfigurationImpl setHistoryJobDataManager(HistoryJobDataManager historyJobDataManager) {
-        this.historyJobDataManager = historyJobDataManager;
         return this;
     }
 
@@ -3316,24 +3172,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setResourceDataManager(ResourceDataManager resourceDataManager) {
         this.resourceDataManager = resourceDataManager;
-        return this;
-    }
-
-    public TaskDataManager getTaskDataManager() {
-        return taskDataManager;
-    }
-
-    public ProcessEngineConfigurationImpl setTaskDataManager(TaskDataManager taskDataManager) {
-        this.taskDataManager = taskDataManager;
-        return this;
-    }
-
-    public VariableInstanceDataManager getVariableInstanceDataManager() {
-        return variableInstanceDataManager;
-    }
-
-    public ProcessEngineConfigurationImpl setVariableInstanceDataManager(VariableInstanceDataManager variableInstanceDataManager) {
-        this.variableInstanceDataManager = variableInstanceDataManager;
         return this;
     }
 
@@ -3422,93 +3260,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public HistoricIdentityLinkEntityManager getHistoricIdentityLinkEntityManager() {
-        return historicIdentityLinkEntityManager;
-    }
-
-    public ProcessEngineConfigurationImpl setHistoricIdentityLinkEntityManager(HistoricIdentityLinkEntityManager historicIdentityLinkEntityManager) {
-        this.historicIdentityLinkEntityManager = historicIdentityLinkEntityManager;
-        return this;
-    }
-
     public HistoricProcessInstanceEntityManager getHistoricProcessInstanceEntityManager() {
         return historicProcessInstanceEntityManager;
     }
 
     public ProcessEngineConfigurationImpl setHistoricProcessInstanceEntityManager(HistoricProcessInstanceEntityManager historicProcessInstanceEntityManager) {
         this.historicProcessInstanceEntityManager = historicProcessInstanceEntityManager;
-        return this;
-    }
-
-    public HistoricTaskInstanceEntityManager getHistoricTaskInstanceEntityManager() {
-        return historicTaskInstanceEntityManager;
-    }
-
-    public ProcessEngineConfigurationImpl setHistoricTaskInstanceEntityManager(HistoricTaskInstanceEntityManager historicTaskInstanceEntityManager) {
-        this.historicTaskInstanceEntityManager = historicTaskInstanceEntityManager;
-        return this;
-    }
-
-    public HistoricVariableInstanceEntityManager getHistoricVariableInstanceEntityManager() {
-        return historicVariableInstanceEntityManager;
-    }
-
-    public ProcessEngineConfigurationImpl setHistoricVariableInstanceEntityManager(HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager) {
-        this.historicVariableInstanceEntityManager = historicVariableInstanceEntityManager;
-        return this;
-    }
-
-    public IdentityLinkEntityManager getIdentityLinkEntityManager() {
-        return identityLinkEntityManager;
-    }
-
-    public ProcessEngineConfigurationImpl setIdentityLinkEntityManager(IdentityLinkEntityManager identityLinkEntityManager) {
-        this.identityLinkEntityManager = identityLinkEntityManager;
-        return this;
-    }
-
-    public JobEntityManager getJobEntityManager() {
-        return jobEntityManager;
-    }
-
-    public ProcessEngineConfigurationImpl setJobEntityManager(JobEntityManager jobEntityManager) {
-        this.jobEntityManager = jobEntityManager;
-        return this;
-    }
-
-    public TimerJobEntityManager getTimerJobEntityManager() {
-        return timerJobEntityManager;
-    }
-
-    public ProcessEngineConfigurationImpl setTimerJobEntityManager(TimerJobEntityManager timerJobEntityManager) {
-        this.timerJobEntityManager = timerJobEntityManager;
-        return this;
-    }
-
-    public SuspendedJobEntityManager getSuspendedJobEntityManager() {
-        return suspendedJobEntityManager;
-    }
-
-    public ProcessEngineConfigurationImpl setSuspendedJobEntityManager(SuspendedJobEntityManager suspendedJobEntityManager) {
-        this.suspendedJobEntityManager = suspendedJobEntityManager;
-        return this;
-    }
-
-    public DeadLetterJobEntityManager getDeadLetterJobEntityManager() {
-        return deadLetterJobEntityManager;
-    }
-
-    public ProcessEngineConfigurationImpl setDeadLetterJobEntityManager(DeadLetterJobEntityManager deadLetterJobEntityManager) {
-        this.deadLetterJobEntityManager = deadLetterJobEntityManager;
-        return this;
-    }
-    
-    public HistoryJobEntityManager getHistoryJobEntityManager() {
-        return historyJobEntityManager;
-    }
-
-    public ProcessEngineConfigurationImpl setHistoryJobEntityManager(HistoryJobEntityManager historyJobEntityManager) {
-        this.historyJobEntityManager = historyJobEntityManager;
         return this;
     }
 
@@ -3557,24 +3314,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
-    public TaskEntityManager getTaskEntityManager() {
-        return taskEntityManager;
-    }
-
-    public ProcessEngineConfigurationImpl setTaskEntityManager(TaskEntityManager taskEntityManager) {
-        this.taskEntityManager = taskEntityManager;
-        return this;
-    }
-
-    public VariableInstanceEntityManager getVariableInstanceEntityManager() {
-        return variableInstanceEntityManager;
-    }
-
-    public ProcessEngineConfigurationImpl setVariableInstanceEntityManager(VariableInstanceEntityManager variableInstanceEntityManager) {
-        this.variableInstanceEntityManager = variableInstanceEntityManager;
-        return this;
-    }
-
     public TableDataManager getTableDataManager() {
         return tableDataManager;
     }
@@ -3591,18 +3330,27 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     public void setCandidateManager(CandidateManager candidateManager) {
         this.candidateManager = candidateManager;
     }
-    
-    public AsyncRunnableExecutionExceptionHandler getAsyncRunnableExecutionExceptionHandler() {
-        return asyncRunnableExecutionExceptionHandler;
+
+    public List<AsyncRunnableExecutionExceptionHandler> getCustomAsyncRunnableExecutionExceptionHandlers() {
+        return customAsyncRunnableExecutionExceptionHandlers;
     }
 
-    public ProcessEngineConfigurationImpl setAsyncRunnableExecutionExceptionHandler(
-                    AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler) {
-        
-        this.asyncRunnableExecutionExceptionHandler = asyncRunnableExecutionExceptionHandler;
+    public ProcessEngineConfigurationImpl setCustomAsyncRunnableExecutionExceptionHandlers(
+            List<AsyncRunnableExecutionExceptionHandler> customAsyncRunnableExecutionExceptionHandlers) {
+
+        this.customAsyncRunnableExecutionExceptionHandlers = customAsyncRunnableExecutionExceptionHandlers;
         return this;
     }
-    
+
+    public boolean isAddDefaultExceptionHandler() {
+        return addDefaultExceptionHandler;
+    }
+
+    public ProcessEngineConfigurationImpl setAddDefaultExceptionHandler(boolean addDefaultExceptionHandler) {
+        this.addDefaultExceptionHandler = addDefaultExceptionHandler;
+        return this;
+    }
+
     public HistoryManager getHistoryManager() {
         return historyManager;
     }
@@ -3629,7 +3377,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.isAsyncHistoryJsonGzipCompressionEnabled = isAsyncHistoryJsonGzipCompressionEnabled;
         return this;
     }
-    
+
     public boolean isAsyncHistoryJsonGroupingEnabled() {
         return isAsyncHistoryJsonGroupingEnabled;
     }
@@ -3638,7 +3386,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.isAsyncHistoryJsonGroupingEnabled = isAsyncHistoryJsonGroupingEnabled;
         return this;
     }
-    
+
     public int getAsyncHistoryJsonGroupingThreshold() {
         return asyncHistoryJsonGroupingThreshold;
     }
@@ -3662,6 +3410,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setJobManager(JobManager jobManager) {
         this.jobManager = jobManager;
+        return this;
+    }
+
+    public DynamicStateManager getDynamicStateManager() {
+        return dynamicStateManager;
+    }
+
+    public ProcessEngineConfigurationImpl setDynamicStateManager(DynamicStateManager dynamicStateManager) {
+        this.dynamicStateManager = dynamicStateManager;
         return this;
     }
 
@@ -3703,6 +3460,78 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+        return this;
+    }
+
+    public List<Object> getFlowable5JobProcessors() {
+        return flowable5JobProcessors;
+    }
+
+    public ProcessEngineConfigurationImpl setFlowable5JobProcessors(List<Object> jobProcessors) {
+        this.flowable5JobProcessors = jobProcessors;
+        return this;
+    }
+
+    public List<JobProcessor> getJobProcessors() {
+        return jobProcessors;
+    }
+
+    public ProcessEngineConfigurationImpl setJobProcessors(List<JobProcessor> jobProcessors) {
+        this.jobProcessors = jobProcessors;
+        return this;
+    }
+
+    public List<HistoryJobProcessor> getHistoryJobProcessors() {
+        return historyJobProcessors;
+    }
+
+    public ProcessEngineConfigurationImpl setHistoryJobProcessors(List<HistoryJobProcessor> historyJobProcessors) {
+        this.historyJobProcessors = historyJobProcessors;
+        return this;
+    }
+
+    public Map<String, List<RuntimeInstanceStateChangeCallback>> getProcessInstanceStateChangedCallbacks() {
+        return processInstanceStateChangedCallbacks;
+    }
+
+    public ProcessEngineConfigurationImpl setProcessInstanceStateChangedCallbacks(Map<String, List<RuntimeInstanceStateChangeCallback>> processInstanceStateChangedCallbacks) {
+        this.processInstanceStateChangedCallbacks = processInstanceStateChangedCallbacks;
+        return this;
+    }
+
+    public DbSchemaManager getVariableDbSchemaManager() {
+        return variableDbSchemaManager;
+    }
+
+    public ProcessEngineConfigurationImpl setVariableDbSchemaManager(DbSchemaManager variableDbSchemaManager) {
+        this.variableDbSchemaManager = variableDbSchemaManager;
+        return this;
+    }
+
+    public DbSchemaManager getTaskDbSchemaManager() {
+        return taskDbSchemaManager;
+    }
+
+    public ProcessEngineConfigurationImpl setTaskDbSchemaManager(DbSchemaManager taskDbSchemaManager) {
+        this.taskDbSchemaManager = taskDbSchemaManager;
+        return this;
+    }
+
+    public DbSchemaManager getIdentityLinkDbSchemaManager() {
+        return identityLinkDbSchemaManager;
+    }
+
+    public ProcessEngineConfigurationImpl setIdentityLinkDbSchemaManager(DbSchemaManager identityLinkDbSchemaManager) {
+        this.identityLinkDbSchemaManager = identityLinkDbSchemaManager;
+        return this;
+    }
+
+    public DbSchemaManager getJobDbSchemaManager() {
+        return jobDbSchemaManager;
+    }
+
+    public ProcessEngineConfigurationImpl setJobDbSchemaManager(DbSchemaManager jobDbSchemaManager) {
+        this.jobDbSchemaManager = jobDbSchemaManager;
         return this;
     }
 
@@ -3825,6 +3654,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    @Override
     public ProcessEngineConfigurationImpl setAsyncExecutorActivate(boolean asyncExecutorActivate) {
         this.asyncExecutorActivate = asyncExecutorActivate;
         return this;
@@ -3847,7 +3677,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.asyncExecutorNumberOfRetries = asyncExecutorNumberOfRetries;
         return this;
     }
-    
+
     public int getAsyncHistoryExecutorNumberOfRetries() {
         return asyncHistoryExecutorNumberOfRetries;
     }
@@ -3982,7 +3812,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.asyncExecutorResetExpiredJobsInterval = asyncExecutorResetExpiredJobsInterval;
         return this;
     }
-    
+
     public int getAsyncExecutorResetExpiredJobsMaxTimeout() {
         return asyncExecutorResetExpiredJobsMaxTimeout;
     }
@@ -4000,7 +3830,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.asyncExecutorExecuteAsyncRunnableFactory = asyncExecutorExecuteAsyncRunnableFactory;
         return this;
     }
-    
+
     public int getAsyncExecutorResetExpiredJobsPageSize() {
         return asyncExecutorResetExpiredJobsPageSize;
     }

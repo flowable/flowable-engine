@@ -18,7 +18,6 @@ import java.util.Map;
 import org.activiti.engine.impl.cmd.AbstractCustomSqlExecution;
 import org.activiti.engine.impl.cmd.CustomSqlExecution;
 import org.activiti.engine.impl.test.ResourceFlowableTestCase;
-import org.flowable.engine.task.Task;
 
 /**
  * @author jbarrez
@@ -33,7 +32,7 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
 
         // Create test data
         for (int i = 0; i < 5; i++) {
-            Task task = taskService.newTask();
+            org.flowable.task.api.Task task = taskService.newTask();
             task.setName(String.valueOf(i));
             taskService.saveTask(task);
         }
@@ -61,7 +60,7 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
         }
 
         // Cleanup
-        for (Task task : taskService.createTaskQuery().list()) {
+        for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
             taskService.deleteTask(task.getId());
             historyService.deleteHistoricTaskInstance(task.getId());
         }
@@ -72,7 +71,7 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
 
         // Create test data
         for (int i = 0; i < 5; i++) {
-            Task task = taskService.newTask();
+            org.flowable.task.api.Task task = taskService.newTask();
             task.setName(String.valueOf(i));
             taskService.saveTask(task);
 
@@ -103,7 +102,7 @@ public class CustomMybatisMapperTest extends ResourceFlowableTestCase {
         }
 
         // Cleanup
-        for (Task task : taskService.createTaskQuery().list()) {
+        for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
             taskService.deleteTask(task.getId());
             historyService.deleteHistoricTaskInstance(task.getId());
         }

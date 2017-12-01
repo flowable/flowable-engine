@@ -34,6 +34,7 @@ public class MetaDataTest extends PluggableFlowableTestCase {
 
     public void testMetaData() {
         ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().getCommandExecutor().execute(new Command<Object>() {
+            @Override
             public Object execute(CommandContext commandContext) {
                 // PRINT THE TABLE NAMES TO CHECK IF WE CAN USE METADATA INSTEAD
                 // THIS IS INTENDED FOR TEST THAT SHOULD RUN ON OUR QA

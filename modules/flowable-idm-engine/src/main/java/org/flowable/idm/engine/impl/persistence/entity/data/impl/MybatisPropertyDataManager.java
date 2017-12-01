@@ -17,13 +17,13 @@ import java.util.List;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.persistence.entity.IdmPropertyEntity;
 import org.flowable.idm.engine.impl.persistence.entity.IdmPropertyEntityImpl;
-import org.flowable.idm.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.idm.engine.impl.persistence.entity.data.AbstractIdmDataManager;
 import org.flowable.idm.engine.impl.persistence.entity.data.PropertyDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisPropertyDataManager extends AbstractDataManager<IdmPropertyEntity> implements PropertyDataManager {
+public class MybatisPropertyDataManager extends AbstractIdmDataManager<IdmPropertyEntity> implements PropertyDataManager {
 
     public MybatisPropertyDataManager(IdmEngineConfiguration idmEngineConfiguration) {
         super(idmEngineConfiguration);

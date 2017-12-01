@@ -17,9 +17,8 @@ import java.util.List;
 import org.flowable.bpmn.exceptions.XMLException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.impl.test.TestHelper;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskQuery;
 import org.flowable.engine.test.Deployment;
+import org.flowable.task.api.TaskQuery;
 
 /**
  * Testcase for the non-spec extensions to the task candidate use case.
@@ -28,6 +27,7 @@ import org.flowable.engine.test.Deployment;
  */
 public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
 
+    @Override
     public void setUp() throws Exception {
         identityService.saveUser(identityService.newUser("kermit"));
         identityService.saveUser(identityService.newUser("gonzo"));
@@ -41,6 +41,7 @@ public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
         identityService.createMembership("fozzie", "management");
     }
 
+    @Override
     public void tearDown() throws Exception {
         identityService.deleteGroup("accountancy");
         identityService.deleteGroup("management");
@@ -52,7 +53,7 @@ public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
     @Deployment
     public void testAssigneeExtension() {
         runtimeService.startProcessInstanceByKey("assigneeExtension");
-        List<Task> tasks = taskService.createTaskQuery().taskAssignee("kermit").list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskAssignee("kermit").list();
         assertEquals(1, tasks.size());
         assertEquals("my task", tasks.get(0).getName());
     }
@@ -70,7 +71,7 @@ public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
     @Deployment
     public void testOwnerExtension() {
         runtimeService.startProcessInstanceByKey("ownerExtension");
-        List<Task> tasks = taskService.createTaskQuery().taskOwner("gonzo").list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskOwner("gonzo").list();
         assertEquals(1, tasks.size());
         assertEquals("my task", tasks.get(0).getName());
     }
@@ -78,7 +79,7 @@ public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
     @Deployment
     public void testCandidateUsersExtension() {
         runtimeService.startProcessInstanceByKey("candidateUsersExtension");
-        List<Task> tasks = taskService.createTaskQuery().taskCandidateUser("kermit").list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskCandidateUser("kermit").list();
         assertEquals(1, tasks.size());
         tasks = taskService.createTaskQuery().taskCandidateUser("gonzo").list();
         assertEquals(1, tasks.size());
@@ -90,7 +91,7 @@ public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
 
         // Bugfix check: potentially the query could return 2 tasks since
         // kermit is a member of the two candidate groups
-        List<Task> tasks = taskService.createTaskQuery().taskCandidateUser("kermit").list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskCandidateUser("kermit").list();
         assertEquals(1, tasks.size());
         assertEquals("make profit", tasks.get(0).getName());
 
@@ -110,7 +111,7 @@ public class TaskAssignmentExtensionsTest extends PluggableFlowableTestCase {
     public void testMixedCandidateUserDefinition() {
         runtimeService.startProcessInstanceByKey("mixedCandidateUser");
 
-        List<Task> tasks = taskService.createTaskQuery().taskCandidateUser("kermit").list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().taskCandidateUser("kermit").list();
         assertEquals(1, tasks.size());
 
         tasks = taskService.createTaskQuery().taskCandidateUser("fozzie").list();

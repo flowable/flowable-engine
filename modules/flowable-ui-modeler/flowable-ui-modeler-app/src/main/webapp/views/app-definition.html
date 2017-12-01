@@ -96,10 +96,36 @@
                         {{'APP.DETAILS.NO-MODELS-SELECTED' | translate}}
                     </div>
                 </div>
+            </div>
+            
+            <br/>
+            
+            <div class="row">
+                
+                <div class="tabs-wrapper">
 
-                <div class="col-xs-12 item-wrapper">
+                <div tab-control="tabs" active-tab="model.activeTab">
+                </div>
+                
+                <div class="col-xs-12 item-wrapper" ng-show="model.activeTab == 'bpmn'">
                     <div class="item fadein" ng-repeat="model in model.appDefinition.definition.models">
-                        <div class="item-box" ng-style="{'background-image': 'url(\'' + config.contextRoot + '/app/rest/models/' + model.id + '/thumbnail\')'}">
+                        <div class="item-box" ng-style="{'background-image': 'url(\'' + getModelThumbnailUrl(model.id) + '\')'}">
+                            <div class="actions">
+                                <span class="badge">v{{model.version}}</span>
+                            </div>
+                            <div class="details">
+                                <h3 class="truncate" title="{{model.name}}">
+                                    {{model.name}}
+                                </h3>
+                                <p>{{model.description}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-xs-12 item-wrapper" ng-show="model.activeTab == 'cmmn'">
+                    <div class="item fadein" ng-repeat="model in model.appDefinition.definition.cmmnModels">
+                        <div class="item-box" ng-style="{'background-image': 'url(\'' + getModelThumbnailUrl(model.id) + '\')'}">
                             <div class="actions">
                                 <span class="badge">v{{model.version}}</span>
                             </div>

@@ -25,7 +25,7 @@ import java.util.Map;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.dmn.engine.DmnEngine;
-import org.flowable.dmn.engine.test.DmnDeploymentAnnotation;
+import org.flowable.dmn.engine.test.DmnDeployment;
 import org.flowable.dmn.engine.test.FlowableDmnRule;
 import org.junit.Rule;
 import org.junit.Test;
@@ -39,7 +39,7 @@ public class HitPolicyOutputOrderTest {
     public FlowableDmnRule flowableDmnRule = new FlowableDmnRule();
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void outputOrderHitPolicy() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
@@ -57,7 +57,7 @@ public class HitPolicyOutputOrderTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void outputOrderHitPolicyNoOutputValuesStrictModeDisabled() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
         dmnEngine.getDmnEngineConfiguration().setStrictMode(false);
@@ -84,7 +84,7 @@ public class HitPolicyOutputOrderTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void outputOrderHitPolicyNoOutputValues() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
@@ -105,7 +105,7 @@ public class HitPolicyOutputOrderTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void outputOrderHitPolicyCompound() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
@@ -129,7 +129,7 @@ public class HitPolicyOutputOrderTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void outputOrderHitPolicyCompoundOtherTypes() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
@@ -153,7 +153,7 @@ public class HitPolicyOutputOrderTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void outputOrderHitPolicyCompoundFirstOutputValues() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 
@@ -177,7 +177,7 @@ public class HitPolicyOutputOrderTest {
     }
 
     @Test
-    @DmnDeploymentAnnotation
+    @DmnDeployment
     public void outputOrderHitPolicyCompoundSecondOutputValues() {
         DmnEngine dmnEngine = flowableDmnRule.getDmnEngine();
 

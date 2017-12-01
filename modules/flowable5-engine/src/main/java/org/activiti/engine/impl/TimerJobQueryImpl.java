@@ -22,7 +22,7 @@ import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.runtime.TimerJobQuery;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.api.Job;
 
 /**
  * @author Joram Barrez
@@ -60,6 +60,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         super(commandExecutor);
     }
 
+    @Override
     public TimerJobQuery jobId(String jobId) {
         if (jobId == null) {
             throw new ActivitiIllegalArgumentException("Provided job id is null");
@@ -68,6 +69,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQueryImpl processInstanceId(String processInstanceId) {
         if (processInstanceId == null) {
             throw new ActivitiIllegalArgumentException("Provided process instance id is null");
@@ -76,6 +78,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQueryImpl processDefinitionId(String processDefinitionId) {
         if (processDefinitionId == null) {
             throw new ActivitiIllegalArgumentException("Provided process definition id is null");
@@ -84,6 +87,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQueryImpl executionId(String executionId) {
         if (executionId == null) {
             throw new ActivitiIllegalArgumentException("Provided execution id is null");
@@ -92,11 +96,13 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQuery executable() {
         executable = true;
         return this;
     }
 
+    @Override
     public TimerJobQuery timers() {
         if (onlyMessages) {
             throw new ActivitiIllegalArgumentException("Cannot combine onlyTimers() with onlyMessages() in the same query");
@@ -105,6 +111,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQuery messages() {
         if (onlyTimers) {
             throw new ActivitiIllegalArgumentException("Cannot combine onlyTimers() with onlyMessages() in the same query");
@@ -113,6 +120,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQuery duedateHigherThan(Date date) {
         if (date == null) {
             throw new ActivitiIllegalArgumentException("Provided date is null");
@@ -121,6 +129,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQuery duedateLowerThan(Date date) {
         if (date == null) {
             throw new ActivitiIllegalArgumentException("Provided date is null");
@@ -129,10 +138,12 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQuery duedateHigherThen(Date date) {
         return duedateHigherThan(date);
     }
 
+    @Override
     public TimerJobQuery duedateHigherThenOrEquals(Date date) {
         if (date == null) {
             throw new ActivitiIllegalArgumentException("Provided date is null");
@@ -141,10 +152,12 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQuery duedateLowerThen(Date date) {
         return duedateLowerThan(date);
     }
 
+    @Override
     public TimerJobQuery duedateLowerThenOrEquals(Date date) {
         if (date == null) {
             throw new ActivitiIllegalArgumentException("Provided date is null");
@@ -153,11 +166,13 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQuery withException() {
         this.withException = true;
         return this;
     }
 
+    @Override
     public TimerJobQuery exceptionMessage(String exceptionMessage) {
         if (exceptionMessage == null) {
             throw new ActivitiIllegalArgumentException("Provided exception message is null");
@@ -166,6 +181,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQuery jobTenantId(String tenantId) {
         if (tenantId == null) {
             throw new ActivitiIllegalArgumentException("Provided tentant id is null");
@@ -174,6 +190,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQuery jobTenantIdLike(String tenantIdLike) {
         if (tenantIdLike == null) {
             throw new ActivitiIllegalArgumentException("Provided tentant id is null");
@@ -182,6 +199,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
         return this;
     }
 
+    @Override
     public TimerJobQuery jobWithoutTenantId() {
         this.withoutTenantId = true;
         return this;
@@ -189,32 +207,39 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
 
     // sorting //////////////////////////////////////////
 
+    @Override
     public TimerJobQuery orderByJobDuedate() {
         return orderBy(JobQueryProperty.DUEDATE);
     }
 
+    @Override
     public TimerJobQuery orderByExecutionId() {
         return orderBy(JobQueryProperty.EXECUTION_ID);
     }
 
+    @Override
     public TimerJobQuery orderByJobId() {
         return orderBy(JobQueryProperty.JOB_ID);
     }
 
+    @Override
     public TimerJobQuery orderByProcessInstanceId() {
         return orderBy(JobQueryProperty.PROCESS_INSTANCE_ID);
     }
 
+    @Override
     public TimerJobQuery orderByJobRetries() {
         return orderBy(JobQueryProperty.RETRIES);
     }
 
+    @Override
     public TimerJobQuery orderByTenantId() {
         return orderBy(JobQueryProperty.TENANT_ID);
     }
 
     // results //////////////////////////////////////////
 
+    @Override
     public long executeCount(CommandContext commandContext) {
         checkQueryOk();
         return commandContext
@@ -222,6 +247,7 @@ public class TimerJobQueryImpl extends AbstractQuery<TimerJobQuery, Job> impleme
                 .findTimerJobCountByQueryCriteria(this);
     }
 
+    @Override
     public List<Job> executeList(CommandContext commandContext, Page page) {
         checkQueryOk();
         return commandContext

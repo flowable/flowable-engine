@@ -12,11 +12,6 @@
  */
 package org.flowable.rest.dmn.service.api.repository;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiImplicitParams;
@@ -32,10 +27,13 @@ import org.flowable.engine.common.api.query.QueryProperty;
 import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.dmn.service.api.DmnRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author Yvo Swillens
@@ -62,7 +60,7 @@ public class DecisionTableCollectionResource {
     @Autowired
     protected DmnRepositoryService dmnRepositoryService;
 
-    @ApiOperation(value = "List of decision tables", tags = { "Decision Tables" })
+    @ApiOperation(value = "List of decision tables", tags = { "Decision Tables" }, nickname = "listDecisionTables")
     @ApiImplicitParams({
             @ApiImplicitParam(name = "category", dataType = "string", value = "Only return decision tables with the given category.", paramType = "query"),
             @ApiImplicitParam(name = "categoryLike", dataType = "string", value = "Only return decision tables with a category like the given name.", paramType = "query"),
@@ -83,8 +81,8 @@ public class DecisionTableCollectionResource {
             @ApiResponse(code = 200, message = "Indicates request was successful and the process-definitions are returned"),
             @ApiResponse(code = 400, message = "Indicates a parameter was passed in the wrong format or that latest is used with other parameters other than key and keyLike. The status-message contains additional information.")
     })
-    @RequestMapping(value = "/dmn-repository/decision-tables", method = RequestMethod.GET, produces = "application/json")
-    public DataResponse getDecisionTables(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
+    @GetMapping(value = "/dmn-repository/decision-tables", produces = "application/json")
+    public DataResponse<DecisionTableResponse> getDecisionTables(@ApiParam(hidden = true) @RequestParam Map<String, String> allRequestParams, HttpServletRequest request) {
         DmnDecisionTableQuery decisionTableQuery = dmnRepositoryService.createDecisionTableQuery();
 
         // Populate filter-parameters

@@ -439,7 +439,7 @@ angular.module('flowableModeler')
                     $rootScope.currentDecisionTableModel = {
                         id: decisionTable.id,
                         name: decisionTable.name,
-                        key: decisionTable.decisionTableDefinition.key,
+                        key: decisionTable.key,
                         description: decisionTable.description
                     };
 

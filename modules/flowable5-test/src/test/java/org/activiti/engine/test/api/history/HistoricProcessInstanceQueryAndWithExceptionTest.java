@@ -5,9 +5,9 @@ import java.util.List;
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
 import org.flowable.engine.repository.DeploymentProperties;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.runtime.TimerJobQuery;
+import org.flowable.job.api.Job;
+import org.flowable.job.api.TimerJobQuery;
 
 public class HistoricProcessInstanceQueryAndWithExceptionTest extends PluggableFlowableTestCase {
 

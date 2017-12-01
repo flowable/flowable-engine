@@ -13,7 +13,7 @@
 package org.activiti.engine.impl.variable;
 
 import org.activiti.engine.ActivitiException;
-import org.flowable.engine.impl.variable.ValueFields;
+import org.flowable.variable.api.types.ValueFields;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -31,10 +31,12 @@ public class LongJsonType extends SerializableType {
         this.objectMapper = objectMapper;
     }
 
+    @Override
     public String getTypeName() {
         return "longJson";
     }
 
+    @Override
     public boolean isAbleToStore(Object value) {
         if (value == null) {
             return true;
@@ -46,6 +48,7 @@ public class LongJsonType extends SerializableType {
         return false;
     }
 
+    @Override
     public byte[] serialize(Object value, ValueFields valueFields) {
         if (value == null) {
             return null;
@@ -58,6 +61,7 @@ public class LongJsonType extends SerializableType {
         }
     }
 
+    @Override
     public Object deserialize(byte[] bytes, ValueFields valueFields) {
         JsonNode valueNode = null;
         try {

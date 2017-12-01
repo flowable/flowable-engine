@@ -43,9 +43,9 @@ import org.flowable.engine.common.impl.util.DefaultClockImpl;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.impl.ProcessEngineImpl;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.el.NoExecutionVariableScope;
 import org.flowable.engine.impl.test.AbstractFlowableTestCase;
 import org.flowable.engine.impl.test.TestHelper;
+import org.flowable.variable.service.impl.el.NoExecutionVariableScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.FactoryBean;
@@ -238,14 +238,14 @@ public abstract class AbstractPlaybackTest extends AbstractFlowableTestCase {
     }
 
     protected List<Function<FlowableEvent, SimulationEvent>> getTransformers() {
-        List<Function<FlowableEvent, SimulationEvent>> transformers = new ArrayList<Function<FlowableEvent, SimulationEvent>>();
+        List<Function<FlowableEvent, SimulationEvent>> transformers = new ArrayList<>();
         transformers.add(new ProcessInstanceCreateTransformer(PROCESS_INSTANCE_START_EVENT_TYPE, PROCESS_DEFINITION_ID_KEY, BUSINESS_KEY, VARIABLES_KEY));
         transformers.add(new UserTaskCompleteTransformer(USER_TASK_COMPLETED_EVENT_TYPE));
         return transformers;
     }
 
     protected Map<String, SimulationEventHandler> getHandlers() {
-        Map<String, SimulationEventHandler> handlers = new HashMap<String, SimulationEventHandler>();
+        Map<String, SimulationEventHandler> handlers = new HashMap<>();
         handlers.put(PROCESS_INSTANCE_START_EVENT_TYPE, new StartProcessByIdEventHandler(PROCESS_DEFINITION_ID_KEY, BUSINESS_KEY, VARIABLES_KEY));
         handlers.put(USER_TASK_COMPLETED_EVENT_TYPE, new PlaybackUserTaskCompleteEventHandler());
         return handlers;

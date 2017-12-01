@@ -27,6 +27,7 @@ public class CreateTokenQueryCmd implements Command<TokenQuery>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public TokenQuery execute(CommandContext commandContext) {
         return CommandContextUtil.getTokenEntityManager(commandContext).createNewTokenQuery();
     }

@@ -13,9 +13,12 @@
 
 package org.flowable.rest.service.api.history;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
@@ -25,23 +28,19 @@ import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.CommentResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Frederik Heremans
  */
 @RestController
-@Api(tags = { "History" }, description = "Manage History", authorizations = { @Authorization(value = "basicAuth") })
+@Api(tags = { "History Process" }, description = "Manage History Process Instances", authorizations = { @Authorization(value = "basicAuth") })
 public class HistoricProcessInstanceCommentResource {
 
     @Autowired
@@ -53,11 +52,11 @@ public class HistoricProcessInstanceCommentResource {
     @Autowired
     protected TaskService taskService;
 
-    @ApiOperation(value = "Get a comment on a historic process instance", tags = { "History" }, notes = "")
+    @ApiOperation(value = "Get a comment on a historic process instance", tags = { "History Process" }, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Indicates the historic process instance and comment were found and the comment is returned."),
             @ApiResponse(code = 404, message = "Indicates the requested historic process instance was not found or the historic process instance doesn’t have a comment with the given ID.") })
-    @RequestMapping(value = "/history/historic-process-instances/{processInstanceId}/comments/{commentId}", method = RequestMethod.GET, produces = "application/json")
+    @GetMapping(value = "/history/historic-process-instances/{processInstanceId}/comments/{commentId}", produces = "application/json")
     public CommentResponse getComment(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "commentId") @PathVariable("commentId") String commentId, HttpServletRequest request) {
 
         HistoricProcessInstance instance = getHistoricProcessInstanceFromRequest(processInstanceId);
@@ -70,11 +69,11 @@ public class HistoricProcessInstanceCommentResource {
         return restResponseFactory.createRestComment(comment);
     }
 
-    @ApiOperation(value = "Delete a comment on a historic process instance", tags = { "History" }, notes = "")
+    @ApiOperation(value = "Delete a comment on a historic process instance", tags = { "History Process" }, notes = "")
     @ApiResponses(value = {
             @ApiResponse(code = 204, message = "Indicates the historic process instance and comment were found and the comment is deleted. Response body is left empty intentionally."),
             @ApiResponse(code = 404, message = "Indicates the requested historic process instance was not found or the historic process instance doesn’t have a comment with the given ID.") })
-    @RequestMapping(value = "/history/historic-process-instances/{processInstanceId}/comments/{commentId}", method = RequestMethod.DELETE)
+    @DeleteMapping(value = "/history/historic-process-instances/{processInstanceId}/comments/{commentId}")
     public void deleteComment(@ApiParam(name = "processInstanceId") @PathVariable("processInstanceId") String processInstanceId, @ApiParam(name = "commentId") @PathVariable("commentId") String commentId, HttpServletRequest request,
             HttpServletResponse response) {
 

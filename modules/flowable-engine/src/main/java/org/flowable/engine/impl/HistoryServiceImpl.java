@@ -19,20 +19,24 @@ import java.util.List;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.history.HistoricActivityInstanceQuery;
 import org.flowable.engine.history.HistoricDetailQuery;
-import org.flowable.engine.history.HistoricIdentityLink;
 import org.flowable.engine.history.HistoricProcessInstanceQuery;
-import org.flowable.engine.history.HistoricTaskInstanceQuery;
-import org.flowable.engine.history.HistoricVariableInstanceQuery;
 import org.flowable.engine.history.NativeHistoricActivityInstanceQuery;
 import org.flowable.engine.history.NativeHistoricDetailQuery;
 import org.flowable.engine.history.NativeHistoricProcessInstanceQuery;
-import org.flowable.engine.history.NativeHistoricTaskInstanceQuery;
-import org.flowable.engine.history.NativeHistoricVariableInstanceQuery;
 import org.flowable.engine.history.ProcessInstanceHistoryLogQuery;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.DeleteHistoricProcessInstanceCmd;
 import org.flowable.engine.impl.cmd.DeleteHistoricTaskInstanceCmd;
 import org.flowable.engine.impl.cmd.GetHistoricIdentityLinksForTaskCmd;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.task.api.history.HistoricTaskInstanceQuery;
+import org.flowable.task.service.history.NativeHistoricTaskInstanceQuery;
+import org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl;
+import org.flowable.task.service.impl.NativeHistoricTaskInstanceQueryImpl;
+import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
+import org.flowable.variable.api.history.NativeHistoricVariableInstanceQuery;
+import org.flowable.variable.service.impl.HistoricVariableInstanceQueryImpl;
+import org.flowable.variable.service.impl.NativeHistoricVariableInstanceQueryImpl;
 
 /**
  * @author Tom Baeyens
@@ -49,18 +53,22 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
         super(processEngineConfiguration);
     }
 
+    @Override
     public HistoricProcessInstanceQuery createHistoricProcessInstanceQuery() {
         return new HistoricProcessInstanceQueryImpl(commandExecutor);
     }
 
+    @Override
     public HistoricActivityInstanceQuery createHistoricActivityInstanceQuery() {
         return new HistoricActivityInstanceQueryImpl(commandExecutor);
     }
 
+    @Override
     public HistoricTaskInstanceQuery createHistoricTaskInstanceQuery() {
         return new HistoricTaskInstanceQueryImpl(commandExecutor, processEngineConfiguration.getDatabaseType());
     }
 
+    @Override
     public HistoricDetailQuery createHistoricDetailQuery() {
         return new HistoricDetailQueryImpl(commandExecutor);
     }
@@ -70,6 +78,7 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
         return new NativeHistoricDetailQueryImpl(commandExecutor);
     }
 
+    @Override
     public HistoricVariableInstanceQuery createHistoricVariableInstanceQuery() {
         return new HistoricVariableInstanceQueryImpl(commandExecutor);
     }
@@ -79,22 +88,27 @@ public class HistoryServiceImpl extends ServiceImpl implements HistoryService {
         return new NativeHistoricVariableInstanceQueryImpl(commandExecutor);
     }
 
+    @Override
     public void deleteHistoricTaskInstance(String taskId) {
         commandExecutor.execute(new DeleteHistoricTaskInstanceCmd(taskId));
     }
 
+    @Override
     public void deleteHistoricProcessInstance(String processInstanceId) {
         commandExecutor.execute(new DeleteHistoricProcessInstanceCmd(processInstanceId));
     }
 
+    @Override
     public NativeHistoricProcessInstanceQuery createNativeHistoricProcessInstanceQuery() {
         return new NativeHistoricProcessInstanceQueryImpl(commandExecutor);
     }
 
+    @Override
     public NativeHistoricTaskInstanceQuery createNativeHistoricTaskInstanceQuery() {
         return new NativeHistoricTaskInstanceQueryImpl(commandExecutor);
     }
 
+    @Override
     public NativeHistoricActivityInstanceQuery createNativeHistoricActivityInstanceQuery() {
         return new NativeHistoricActivityInstanceQueryImpl(commandExecutor);
     }

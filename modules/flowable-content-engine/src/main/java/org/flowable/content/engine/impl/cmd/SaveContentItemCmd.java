@@ -47,6 +47,7 @@ public class SaveContentItemCmd implements Command<Void>, Serializable {
         this.inputStream = inputStream;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (contentItem == null) {
             throw new FlowableIllegalArgumentException("contentItem is null");

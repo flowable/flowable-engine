@@ -32,7 +32,7 @@ import org.w3c.dom.NodeList;
 /**
  * Used to deploy processes. When the flowable-cdi extension is initialized, the classpath is scanned for a file named {@value #PROCESSES_FILE_NAME}. All processes listed in that file are
  * automatically deployed to the engine.
- * 
+ *
  * @author Daniel Meyer
  */
 public class ProcessDeployer {
@@ -51,7 +51,7 @@ public class ProcessDeployer {
 
     /**
      * Deploys a single process
-     * 
+     *
      * @return the processDefinitionId of the deployed process as returned by {@link ProcessDefinition#getId()}
      */
     public String deployProcess(String resourceName) {
@@ -88,7 +88,7 @@ public class ProcessDeployer {
     }
 
     public Set<String> getResourceNames() {
-        Set<String> result = new HashSet<String>();
+        Set<String> result = new HashSet<>();
         URL processFileUrl = getClass().getClassLoader().getResource(PROCESSES_FILE_NAME);
         if (processFileUrl == null) {
             LOGGER.debug("No '{}'-file provided.", PROCESSES_FILE_NAME);

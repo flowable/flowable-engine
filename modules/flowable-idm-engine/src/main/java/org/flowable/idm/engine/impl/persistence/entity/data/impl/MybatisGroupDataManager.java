@@ -20,13 +20,13 @@ import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.idm.engine.impl.GroupQueryImpl;
 import org.flowable.idm.engine.impl.persistence.entity.GroupEntity;
 import org.flowable.idm.engine.impl.persistence.entity.GroupEntityImpl;
-import org.flowable.idm.engine.impl.persistence.entity.data.AbstractDataManager;
+import org.flowable.idm.engine.impl.persistence.entity.data.AbstractIdmDataManager;
 import org.flowable.idm.engine.impl.persistence.entity.data.GroupDataManager;
 
 /**
  * @author Joram Barrez
  */
-public class MybatisGroupDataManager extends AbstractDataManager<GroupEntity> implements GroupDataManager {
+public class MybatisGroupDataManager extends AbstractIdmDataManager<GroupEntity> implements GroupDataManager {
 
     public MybatisGroupDataManager(IdmEngineConfiguration idmEngineConfiguration) {
         super(idmEngineConfiguration);
@@ -43,15 +43,18 @@ public class MybatisGroupDataManager extends AbstractDataManager<GroupEntity> im
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<Group> findGroupByQueryCriteria(GroupQueryImpl query) {
         return getDbSqlSession().selectList("selectGroupByQueryCriteria", query);
     }
 
+    @Override
     public long findGroupCountByQueryCriteria(GroupQueryImpl query) {
         return (Long) getDbSqlSession().selectOne("selectGroupCountByQueryCriteria", query);
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<Group> findGroupsByUser(String userId) {
         return getDbSqlSession().selectList("selectGroupsByUserId", userId);
     }
@@ -63,10 +66,12 @@ public class MybatisGroupDataManager extends AbstractDataManager<GroupEntity> im
     }
 
     @SuppressWarnings("unchecked")
+    @Override
     public List<Group> findGroupsByNativeQuery(Map<String, Object> parameterMap) {
         return getDbSqlSession().selectListWithRawParameter("selectGroupByNativeQuery", parameterMap);
     }
 
+    @Override
     public long findGroupCountByNativeQuery(Map<String, Object> parameterMap) {
         return (Long) getDbSqlSession().selectOne("selectGroupCountByNativeQuery", parameterMap);
     }

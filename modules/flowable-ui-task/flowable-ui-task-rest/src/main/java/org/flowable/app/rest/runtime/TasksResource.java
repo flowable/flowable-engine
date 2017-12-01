@@ -20,7 +20,7 @@ import org.flowable.app.model.runtime.TaskRepresentation;
 import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.exception.BadRequestException;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.task.Task;
+import org.flowable.task.api.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;

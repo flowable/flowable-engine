@@ -37,6 +37,7 @@ public class DeletePrivilegeCmd implements Command<Void>, Serializable {
         this.id = id;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         CommandContextUtil.getPrivilegeMappingEntityManager(commandContext).deleteByPrivilegeId(id);
         CommandContextUtil.getPrivilegeEntityManager(commandContext).delete(id);

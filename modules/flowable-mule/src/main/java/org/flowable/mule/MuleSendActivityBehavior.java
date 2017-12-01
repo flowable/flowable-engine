@@ -30,7 +30,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.context.Context;
 import org.flowable.engine.delegate.DelegateExecution;
-import org.flowable.engine.delegate.Expression;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.impl.bpmn.behavior.AbstractBpmnActivityBehavior;
 import org.flowable.engine.impl.scripting.ScriptingEngines;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -58,6 +58,7 @@ public class MuleSendActivityBehavior extends AbstractBpmnActivityBehavior {
     private Expression username;
     private Expression password;
 
+    @Override
     public void execute(DelegateExecution execution) {
         String endpointUrlValue = this.getStringFromField(this.endpointUrl, execution);
         String languageValue = this.getStringFromField(this.language, execution);

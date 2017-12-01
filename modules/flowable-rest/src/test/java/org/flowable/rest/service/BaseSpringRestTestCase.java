@@ -59,7 +59,6 @@ import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.engine.impl.ProcessEngineImpl;
-import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.test.AbstractTestCase;
 import org.flowable.engine.impl.test.TestHelper;
@@ -67,6 +66,7 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.idm.api.Group;
 import org.flowable.idm.api.User;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.rest.conf.ApplicationConfiguration;
 import org.flowable.rest.service.api.RestUrlBuilder;
 import org.flowable.rest.util.TestServerUtil;
@@ -301,6 +301,7 @@ public class BaseSpringRestTestCase extends AbstractTestCase {
 
             CommandExecutor commandExecutor = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration().getCommandExecutor();
             commandExecutor.execute(new Command<Object>() {
+                @Override
                 public Object execute(CommandContext commandContext) {
                     DbSchemaManager dbSchemaManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager();
                     dbSchemaManager.dbSchemaDrop();
@@ -423,6 +424,7 @@ public class BaseSpringRestTestCase extends AbstractTestCase {
             return timeLimitExceeded;
         }
 
+        @Override
         public void run() {
             timeLimitExceeded = true;
             thread.interrupt();

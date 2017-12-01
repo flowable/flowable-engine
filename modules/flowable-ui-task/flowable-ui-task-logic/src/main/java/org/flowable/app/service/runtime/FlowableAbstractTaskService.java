@@ -12,13 +12,10 @@
  */
 package org.flowable.app.service.runtime;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.math.NumberUtils;
+import org.flowable.app.model.common.RemoteGroup;
 import org.flowable.app.model.runtime.TaskRepresentation;
 import org.flowable.app.service.api.UserCache;
 import org.flowable.app.service.idm.RemoteIdmService;
@@ -26,15 +23,17 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.ExtensionElement;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.history.HistoricVariableInstance;
-import org.flowable.engine.task.TaskInfo;
-import org.flowable.idm.api.Group;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.idm.api.User;
+import org.flowable.task.api.TaskInfo;
 import org.springframework.beans.factory.annotation.Autowired;
 
 public abstract class FlowableAbstractTaskService {
@@ -43,33 +42,39 @@ public abstract class FlowableAbstractTaskService {
     protected RemoteIdmService remoteIdmService;
 
     @Autowired
-    protected HistoryService historyService;
-
-    @Autowired
     protected RepositoryService repositoryService;
+    
+    @Autowired
+    protected CmmnRepositoryService cmmnRepositoryService;
 
     @Autowired
     protected TaskService taskService;
-
+    
+    @Autowired
+    protected CmmnTaskService cmmnTaskService;
+    
+    @Autowired
+    protected HistoryService historyService;
+    
     @Autowired
     protected UserCache userCache;
-
+    
     @Autowired
     protected PermissionService permissionService;
 
     public void fillPermissionInformation(TaskRepresentation taskRepresentation, TaskInfo task, User currentUser) {
+        verifyProcessInstanceStartUser(taskRepresentation, task);
 
-        String processInstanceStartUserId = null;
-        boolean initiatorCanCompleteTask = true;
-        boolean isMemberOfCandidateGroup = false;
-        boolean isMemberOfCandidateUsers = false;
+        List<HistoricIdentityLink> taskIdentityLinks = historyService.getHistoricIdentityLinksForTask(task.getId());
+        verifyCandidateGroups(taskRepresentation, currentUser, taskIdentityLinks);
+        verifyCandidateUsers(taskRepresentation, currentUser, taskIdentityLinks);
+    }
 
+    protected void verifyProcessInstanceStartUser(TaskRepresentation taskRepresentation, TaskInfo task) {
         if (task.getProcessInstanceId() != null) {
-
             HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(task.getProcessInstanceId()).singleResult();
-
             if (historicProcessInstance != null && StringUtils.isNotEmpty(historicProcessInstance.getStartUserId())) {
-                processInstanceStartUserId = historicProcessInstance.getStartUserId();
+                taskRepresentation.setProcessInstanceStartUserId(historicProcessInstance.getStartUserId());
                 BpmnModel bpmnModel = repositoryService.getBpmnModel(task.getProcessDefinitionId());
                 FlowElement flowElement = bpmnModel.getFlowElement(task.getTaskDefinitionKey());
                 if (flowElement instanceof UserTask) {
@@ -78,96 +83,45 @@ public abstract class FlowableAbstractTaskService {
                     if (CollectionUtils.isNotEmpty(extensionElements)) {
                         String value = extensionElements.get(0).getElementText();
                         if (StringUtils.isNotEmpty(value)) {
-                            initiatorCanCompleteTask = Boolean.valueOf(value);
-                        }
-                    }
-
-                    Map<String, Object> variableMap = new HashMap<String, Object>();
-                    if ((CollectionUtils.isNotEmpty(userTask.getCandidateGroups()) && userTask.getCandidateGroups().size() == 1
-                            && userTask.getCandidateGroups().get(0).contains("${taskAssignmentBean.assignTaskToCandidateGroups('"))
-                            || (CollectionUtils.isNotEmpty(userTask.getCandidateUsers()) && userTask.getCandidateUsers().size() == 1
-                                    && userTask.getCandidateUsers().get(0).contains("${taskAssignmentBean.assignTaskToCandidateUsers('"))) {
-
-                        List<HistoricVariableInstance> processVariables = historyService.createHistoricVariableInstanceQuery().processInstanceId(task.getProcessInstanceId()).list();
-                        if (CollectionUtils.isNotEmpty(processVariables)) {
-                            for (HistoricVariableInstance historicVariableInstance : processVariables) {
-                                variableMap.put(historicVariableInstance.getVariableName(), historicVariableInstance.getValue());
-                            }
-                        }
-                    }
-
-                    if (CollectionUtils.isNotEmpty(userTask.getCandidateGroups())) {
-                        List<? extends Group> groups = remoteIdmService.getUser(currentUser.getId()).getGroups();
-                        if (CollectionUtils.isNotEmpty(groups)) {
-
-                            List<String> groupIds = new ArrayList<String>();
-                            if (userTask.getCandidateGroups().size() == 1 && userTask.getCandidateGroups().get(0).contains("${taskAssignmentBean.assignTaskToCandidateGroups('")) {
-
-                                String candidateGroupString = userTask.getCandidateGroups().get(0);
-                                candidateGroupString = candidateGroupString.replace("${taskAssignmentBean.assignTaskToCandidateGroups('", "");
-                                candidateGroupString = candidateGroupString.replace("', execution)}", "");
-                                String groupsArray[] = candidateGroupString.split(",");
-                                for (String group : groupsArray) {
-                                    if (group.contains("field(")) {
-                                        String fieldCandidate = group.trim().substring(6, group.length() - 1);
-                                        Object fieldValue = variableMap.get(fieldCandidate);
-                                        if (fieldValue != null && NumberUtils.isNumber(fieldValue.toString())) {
-                                            groupIds.add(fieldValue.toString());
-                                        }
-
-                                    } else {
-                                        groupIds.add(group);
-                                    }
-                                }
-
-                            } else {
-                                groupIds.addAll(userTask.getCandidateGroups());
-                            }
-
-                            for (Group group : groups) {
-                                if (groupIds.contains(String.valueOf(group.getId()))) {
-                                    isMemberOfCandidateGroup = true;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-
-                    if (CollectionUtils.isNotEmpty(userTask.getCandidateUsers())) {
-                        if (userTask.getCandidateUsers().size() == 1 && userTask.getCandidateUsers().get(0).contains("${taskAssignmentBean.assignTaskToCandidateUsers('")) {
-
-                            String candidateUserString = userTask.getCandidateUsers().get(0);
-                            candidateUserString = candidateUserString.replace("${taskAssignmentBean.assignTaskToCandidateUsers('", "");
-                            candidateUserString = candidateUserString.replace("', execution)}", "");
-                            String users[] = candidateUserString.split(",");
-                            for (String user : users) {
-                                if (user.contains("field(")) {
-                                    String fieldCandidate = user.substring(6, user.length() - 1);
-                                    Object fieldValue = variableMap.get(fieldCandidate);
-                                    if (fieldValue != null && NumberUtils.isNumber(fieldValue.toString()) && String.valueOf(currentUser.getId()).equals(fieldValue.toString())) {
-
-                                        isMemberOfCandidateGroup = true;
-                                        break;
-                                    }
-
-                                } else if (user.equals(String.valueOf(currentUser.getId()))) {
-                                    isMemberOfCandidateGroup = true;
-                                    break;
-                                }
-                            }
-
-                        } else if (userTask.getCandidateUsers().contains(String.valueOf(currentUser.getId()))) {
-                            isMemberOfCandidateUsers = true;
+                            taskRepresentation.setInitiatorCanCompleteTask(Boolean.valueOf(value));
                         }
                     }
                 }
             }
         }
-
-        taskRepresentation.setProcessInstanceStartUserId(processInstanceStartUserId);
-        taskRepresentation.setInitiatorCanCompleteTask(initiatorCanCompleteTask);
-        taskRepresentation.setMemberOfCandidateGroup(isMemberOfCandidateGroup);
-        taskRepresentation.setMemberOfCandidateUsers(isMemberOfCandidateUsers);
+    }
+    
+    protected void verifyCandidateGroups(TaskRepresentation taskRepresentation, User currentUser, List<HistoricIdentityLink> taskIdentityLinks) {
+        List<RemoteGroup> userGroups = remoteIdmService.getUser(currentUser.getId()).getGroups();
+        taskRepresentation.setMemberOfCandidateGroup(userGroupsMatchTaskCandidateGroups(userGroups, taskIdentityLinks));
+    }
+    
+    protected boolean userGroupsMatchTaskCandidateGroups(List<RemoteGroup> userGroups, List<HistoricIdentityLink> taskIdentityLinks) {
+        for (RemoteGroup group : userGroups) {
+            for (HistoricIdentityLink identityLink : taskIdentityLinks) {
+                if (identityLink.getGroupId() != null 
+                        && identityLink.getType().equals(IdentityLinkType.CANDIDATE) 
+                        && group.getId().equals(identityLink.getGroupId())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    
+    protected void verifyCandidateUsers(TaskRepresentation taskRepresentation, User currentUser, List<HistoricIdentityLink> taskIdentityLinks) {
+        taskRepresentation.setMemberOfCandidateUsers(currentUserMatchesTaskCandidateUsers(currentUser, taskIdentityLinks));
+    }
+    
+    protected boolean currentUserMatchesTaskCandidateUsers(User currentUser, List<HistoricIdentityLink> taskIdentityLinks) {
+        for (HistoricIdentityLink identityLink : taskIdentityLinks) {
+            if (identityLink.getUserId() != null
+                    && identityLink.getType().equals(IdentityLinkType.CANDIDATE)
+                    && identityLink.getUserId().equals(currentUser.getId())) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

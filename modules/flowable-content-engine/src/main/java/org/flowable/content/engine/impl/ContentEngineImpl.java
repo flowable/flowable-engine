@@ -47,6 +47,7 @@ public class ContentEngineImpl implements ContentEngine {
         ContentEngines.registerContentEngine(this);
     }
 
+    @Override
     public void close() {
         ContentEngines.unregister(this);
     }
@@ -54,18 +55,22 @@ public class ContentEngineImpl implements ContentEngine {
     // getters and setters
     // //////////////////////////////////////////////////////
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public ContentManagementService getContentManagementService() {
         return managementService;
     }
 
+    @Override
     public ContentService getContentService() {
         return contentService;
     }
 
+    @Override
     public ContentEngineConfiguration getContentEngineConfiguration() {
         return engineConfiguration;
     }

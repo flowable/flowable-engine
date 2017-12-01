@@ -37,6 +37,7 @@ public class GetCommentCmd implements Command<Comment>, Serializable {
         }
     }
 
+    @Override
     public Comment execute(CommandContext commandContext) {
         return CommandContextUtil.getCommentEntityManager(commandContext).findComment(commentId);
     }

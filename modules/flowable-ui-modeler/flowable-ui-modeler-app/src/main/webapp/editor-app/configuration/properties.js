@@ -34,6 +34,10 @@ FLOWABLE.PROPERTY_CONFIG =
         "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/ordering-property-write-template.html"
     },
+    "oryx-dataproperties-complex": {
+        "readModeTemplateUrl": "editor-app/configuration/properties/data-properties-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/data-properties-write-template.html"
+    },
     "oryx-formproperties-complex": {
         "readModeTemplateUrl": "editor-app/configuration/properties/form-properties-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/form-properties-write-template.html"
@@ -105,5 +109,21 @@ FLOWABLE.PROPERTY_CONFIG =
     "oryx-decisiontaskdecisiontablereference-complex": {
         "readModeTemplateUrl": "editor-app/configuration/properties/decisiontable-reference-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/decisiontable-reference-write-template.html"
+    },
+    "oryx-casetaskcasereference-complex": {
+        "readModeTemplateUrl": "editor-app/configuration/properties/case-reference-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/case-reference-write-template.html"
+    },
+    "oryx-processtaskprocessreference-complex": {
+        "readModeTemplateUrl": "editor-app/configuration/properties/process-reference-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/process-reference-write-template.html"
+    },
+    "flowable-transitionevent" : {
+        "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/transition-event-write-template.html"
+    },
+    "flowable-planitem-dropdown" : {
+        "readModeTemplateUrl": "editor-app/configuration/properties/planitem-dropdown-read-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/planitem-dropdown-write-template.html"
     }
 };

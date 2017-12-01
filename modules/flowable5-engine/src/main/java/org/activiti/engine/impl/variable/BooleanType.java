@@ -12,8 +12,8 @@
  */
 package org.activiti.engine.impl.variable;
 
-import org.flowable.engine.impl.variable.ValueFields;
-import org.flowable.engine.impl.variable.VariableType;
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * @author Frederik Heremans
@@ -22,14 +22,17 @@ public class BooleanType implements VariableType {
 
     private static final long serialVersionUID = 1L;
 
+    @Override
     public String getTypeName() {
         return "boolean";
     }
 
+    @Override
     public boolean isCachable() {
         return true;
     }
 
+    @Override
     public Object getValue(ValueFields valueFields) {
         if (valueFields.getLongValue() != null) {
             return valueFields.getLongValue() == 1;
@@ -37,6 +40,7 @@ public class BooleanType implements VariableType {
         return null;
     }
 
+    @Override
     public void setValue(Object value, ValueFields valueFields) {
         if (value == null) {
             valueFields.setLongValue(null);
@@ -50,6 +54,7 @@ public class BooleanType implements VariableType {
         }
     }
 
+    @Override
     public boolean isAbleToStore(Object value) {
         if (value == null) {
             return true;

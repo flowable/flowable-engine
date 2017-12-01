@@ -36,8 +36,8 @@ import org.flowable.content.api.ContentService;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.task.Task;
 import org.flowable.idm.api.User;
+import org.flowable.task.api.Task;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -258,7 +258,7 @@ public abstract class AbstractRelatedContentResource {
     }
 
     protected ResultListDataRepresentation createResultRepresentation(List<ContentItem> results) {
-        List<ContentItemRepresentation> resultList = new ArrayList<ContentItemRepresentation>(results.size());
+        List<ContentItemRepresentation> resultList = new ArrayList<>(results.size());
 
         for (ContentItem content : results) {
             resultList.add(createContentItemResponse(content));

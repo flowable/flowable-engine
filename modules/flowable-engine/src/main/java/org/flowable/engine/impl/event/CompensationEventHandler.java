@@ -17,8 +17,8 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SubProcess;
 import org.flowable.engine.common.api.FlowableException;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.bpmn.helper.ScopeUtil;
 import org.flowable.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
@@ -34,10 +34,12 @@ import java.util.List;
  */
 public class CompensationEventHandler implements EventHandler {
 
+    @Override
     public String getEventHandlerType() {
         return CompensateEventSubscriptionEntity.EVENT_TYPE;
     }
 
+    @Override
     public void handleEvent(EventSubscriptionEntity eventSubscription, Object payload, CommandContext commandContext) {
 
         String configuration = eventSubscription.getConfiguration();

@@ -12,7 +12,7 @@
  */
 package org.flowable.standalone.escapeclause;
 
-import org.flowable.engine.runtime.TimerJobQuery;
+import org.flowable.job.api.TimerJobQuery;
 
 public class JobQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
 
@@ -20,6 +20,7 @@ public class JobQueryEscapeClauseTest extends AbstractEscapeClauseTestCase {
     private String deploymentTwoId;
     private String deploymentThreeId;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
 

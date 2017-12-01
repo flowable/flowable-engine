@@ -19,18 +19,17 @@ import java.util.GregorianCalendar;
 import java.util.List;
 
 import org.apache.commons.lang.time.DateUtils;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEvent;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.impl.util.DefaultClockImpl;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.impl.delegate.event.FlowableEngineEvent;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
 
 /**
  * Test case for all {@link FlowableEvent}s related to jobs.
@@ -311,7 +310,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
         runtimeService.startProcessInstanceByKey("testTimerCancelledEvent");
         listener.clearEventsReceived();
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
 
         taskService.complete(task.getId());
 
@@ -520,7 +519,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testTerminateEndEvent");
         listener.clearEventsReceived();
 
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertEquals("Inside Task", task.getName());
 
         // Force timer to trigger so that subprocess will flow to terminate end event

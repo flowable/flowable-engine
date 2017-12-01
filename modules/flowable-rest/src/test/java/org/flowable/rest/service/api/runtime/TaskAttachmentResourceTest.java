@@ -26,12 +26,12 @@ import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.flowable.engine.history.HistoricTaskInstance;
 import org.flowable.engine.task.Attachment;
-import org.flowable.engine.task.Task;
 import org.flowable.rest.service.BaseSpringRestTestCase;
 import org.flowable.rest.service.HttpMultipartHelper;
 import org.flowable.rest.service.api.RestUrls;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -370,7 +370,7 @@ public class TaskAttachmentResourceTest extends BaseSpringRestTestCase {
             // Post JSON without name
             HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + RestUrls.createRelativeResourceUrl(RestUrls.URL_TASK_ATTACHMENT_COLLECTION, task.getId()));
             httpPost.setEntity(new StringEntity(requestNode.toString()));
-            closeResponse(executeBinaryRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
+            closeResponse(executeRequest(httpPost, HttpStatus.SC_BAD_REQUEST));
 
         } finally {
             // Clean adhoc-tasks even if test fails

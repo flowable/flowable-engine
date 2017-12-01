@@ -31,6 +31,7 @@ public class DeleteUserCmd implements Command<Void>, Serializable {
         this.userId = userId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         if (userId == null) {
             throw new FlowableIllegalArgumentException("userId is null");

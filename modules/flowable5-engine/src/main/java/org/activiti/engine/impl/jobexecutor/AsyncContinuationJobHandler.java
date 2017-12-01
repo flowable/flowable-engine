@@ -15,7 +15,7 @@ package org.activiti.engine.impl.jobexecutor;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.pvm.runtime.AtomicOperation;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.api.Job;
 
 /**
  * 
@@ -25,10 +25,12 @@ public class AsyncContinuationJobHandler implements JobHandler {
 
     public static final String TYPE = "async-continuation";
 
+    @Override
     public String getType() {
         return TYPE;
     }
 
+    @Override
     public void execute(Job job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
         // ATM only AtomicOperationTransitionCreateScope can be performed asynchronously
         AtomicOperation atomicOperation = AtomicOperation.TRANSITION_CREATE_SCOPE;

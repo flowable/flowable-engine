@@ -28,8 +28,6 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.history.HistoricVariableInstance;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -37,6 +35,8 @@ import org.flowable.form.api.FormService;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.FormFieldTypes;
 import org.flowable.form.model.FormModel;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.variable.api.history.HistoricVariableInstance;
 
 /**
  * @author Tijs Rademakers
@@ -51,6 +51,7 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
         this.taskId = taskId;
     }
 
+    @Override
     public FormModel execute(CommandContext commandContext) {
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         FormService formService = CommandContextUtil.getFormService();
@@ -58,7 +59,7 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
             throw new FlowableIllegalArgumentException("Form engine is not initialized");
         }
 
-        HistoricTaskInstance task = processEngineConfiguration.getHistoricTaskInstanceEntityManager().findById(taskId);
+        HistoricTaskInstance task = CommandContextUtil.getHistoricTaskService().getHistoricTask(taskId);
         if (task == null) {
             throw new FlowableObjectNotFoundException("Task not found with id " + taskId);
         }
@@ -89,7 +90,7 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
 
         } else {
             formModel = formService.getFormModelWithVariablesByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId,
-                            task.getProcessInstanceId(), taskId, variables, task.getTenantId());
+                            taskId, variables, task.getTenantId());
         }
 
         // If form does not exists, we don't want to leak out this info to just anyone

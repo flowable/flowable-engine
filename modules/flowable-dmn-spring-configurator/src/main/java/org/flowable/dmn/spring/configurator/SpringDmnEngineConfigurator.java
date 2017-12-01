@@ -16,9 +16,8 @@ import org.flowable.dmn.engine.DmnEngine;
 import org.flowable.dmn.engine.configurator.DmnEngineConfigurator;
 import org.flowable.dmn.spring.SpringDmnEngineConfiguration;
 import org.flowable.dmn.spring.SpringDmnExpressionManager;
+import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.spring.SpringProcessEngineConfiguration;
 
 /**
@@ -30,20 +29,23 @@ public class SpringDmnEngineConfigurator extends DmnEngineConfigurator {
     protected SpringDmnEngineConfiguration dmnEngineConfiguration;
 
     @Override
-    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public void configure(AbstractEngineConfiguration engineConfiguration) {
         if (dmnEngineConfiguration == null) {
             dmnEngineConfiguration = new SpringDmnEngineConfiguration();
         }
-        initialiseCommonProperties(processEngineConfiguration, dmnEngineConfiguration, EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
+        initialiseCommonProperties(engineConfiguration, dmnEngineConfiguration);
         
-        SpringProcessEngineConfiguration springProcessEngineConfiguration = (SpringProcessEngineConfiguration) processEngineConfiguration;
+        SpringProcessEngineConfiguration springProcessEngineConfiguration = (SpringProcessEngineConfiguration) engineConfiguration;
         dmnEngineConfiguration.setTransactionManager(springProcessEngineConfiguration.getTransactionManager());
         dmnEngineConfiguration.setExpressionManager(new SpringDmnExpressionManager(
                         springProcessEngineConfiguration.getApplicationContext(), springProcessEngineConfiguration.getBeans()));
 
         initDmnEngine();
+        
+        initServiceConfigurations(engineConfiguration, dmnEngineConfiguration);
     }
 
+    @Override
     protected synchronized DmnEngine initDmnEngine() {
         if (dmnEngineConfiguration == null) {
             throw new FlowableException("DmnEngineConfiguration is required");
@@ -52,6 +54,7 @@ public class SpringDmnEngineConfigurator extends DmnEngineConfigurator {
         return dmnEngineConfiguration.buildDmnEngine();
     }
 
+    @Override
     public SpringDmnEngineConfiguration getDmnEngineConfiguration() {
         return dmnEngineConfiguration;
     }

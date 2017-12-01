@@ -12,16 +12,16 @@
  */
 package org.flowable.engine.delegate.event.impl;
 
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.delegate.event.FlowableVariableEvent;
-import org.flowable.engine.impl.variable.VariableType;
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.variable.api.event.FlowableVariableEvent;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * Implementation of {@link FlowableVariableEvent}.
  * 
  * @author Frederik Heremans
  */
-public class FlowableVariableEventImpl extends FlowableEventImpl implements FlowableVariableEvent {
+public class FlowableVariableEventImpl extends FlowableProcessEventImpl implements FlowableVariableEvent {
 
     protected String variableName;
     protected Object variableValue;
@@ -50,6 +50,7 @@ public class FlowableVariableEventImpl extends FlowableEventImpl implements Flow
         this.variableValue = variableValue;
     }
 
+    @Override
     public VariableType getVariableType() {
         return variableType;
     }

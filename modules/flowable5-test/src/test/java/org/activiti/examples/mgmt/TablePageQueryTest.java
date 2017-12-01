@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.activiti.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.common.api.management.TablePage;
-import org.flowable.engine.task.Task;
 
 /**
  * @author Joram Barrez
@@ -90,7 +89,7 @@ public class TablePageQueryTest extends PluggableFlowableTestCase {
     private List<String> generateDummyTasks(int nrOfTasks) {
         ArrayList<String> taskIds = new ArrayList<String>();
         for (int i = 0; i < nrOfTasks; i++) {
-            Task task = taskService.newTask();
+            org.flowable.task.api.Task task = taskService.newTask();
             task.setName(String.valueOf((char) ('A' + i)));
             taskService.saveTask(task);
             taskIds.add(task.getId());

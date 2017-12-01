@@ -48,6 +48,7 @@ public class SubProcessConverterAutoLayoutTest extends AbstractConverterTest {
         deployProcess(parsedModel);
     }
 
+    @Override
     protected String getResource() {
         return "subprocessmodel_autolayout.bpmn";
     }

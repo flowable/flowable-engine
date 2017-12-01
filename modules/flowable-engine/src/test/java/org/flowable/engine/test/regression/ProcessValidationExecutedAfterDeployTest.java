@@ -42,6 +42,7 @@ public class ProcessValidationExecutedAfterDeployTest extends PluggableFlowableT
         processEngineConfiguration.getProcessDefinitionCache().clear();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         enableValidation();
         super.tearDown();

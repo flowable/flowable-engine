@@ -20,7 +20,6 @@ import org.activiti.engine.test.ActivitiRule;
 import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,7 +43,7 @@ public class ActivitiRuleJunit4Test {
         runtimeService.startProcessInstanceByKey("ruleUsage");
 
         TaskService taskService = activitiRule.getTaskService();
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("My Task", task.getName());
 
         taskService.complete(task.getId());

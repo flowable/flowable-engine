@@ -40,13 +40,16 @@ public class EventGatewayJsonConverter extends BaseBpmnJsonConverter {
         convertersToJsonMap.put(EventGateway.class, EventGatewayJsonConverter.class);
     }
 
+    @Override
     protected String getStencilId(BaseElement baseElement) {
         return STENCIL_GATEWAY_EVENT;
     }
 
+    @Override
     protected void convertElementToJson(ObjectNode propertiesNode, BaseElement baseElement) {
     }
 
+    @Override
     protected FlowElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, Map<String, JsonNode> shapeMap) {
         EventGateway gateway = new EventGateway();
         return gateway;

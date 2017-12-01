@@ -14,17 +14,16 @@ package org.flowable.engine.test.api.deletereason;
 
 import java.util.List;
 
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.DeleteReason;
 import org.flowable.engine.history.HistoricActivityInstance;
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
+import org.flowable.task.api.history.HistoricTaskInstance;
 
 /**
  * @author Joram Barrez
@@ -34,7 +33,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
     @Deployment
     public void testDeleteProcessInstance() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("deleteReasonProcess");
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("A", task.getName());
         taskService.complete(task.getId());
         runtimeService.deleteProcessInstance(processInstance.getId(), null);
@@ -47,7 +46,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
                     .processInstanceId(processInstance.getId()).list();
             assertEquals(4, historicTaskInstances.size());
 
-            // Task A is completed normally, the others are deleted
+            // org.flowable.task.service.Task A is completed normally, the others are deleted
             for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
                 if (historicTaskInstance.getName().equals("A")) {
                     assertNull(historicTaskInstance.getDeleteReason());
@@ -64,7 +63,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
     @Deployment
     public void testDeleteProcessInstanceWithCustomDeleteReason() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("deleteReasonProcess");
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("A", task.getName());
         taskService.complete(task.getId());
 
@@ -81,7 +80,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
                     .processInstanceId(processInstance.getId()).list();
             assertEquals(4, historicTaskInstances.size());
 
-            // Task A is completed normally, the others are deleted
+            // org.flowable.task.service.Task A is completed normally, the others are deleted
             for (HistoricTaskInstance historicTaskInstance : historicTaskInstances) {
                 if (historicTaskInstance.getName().equals("A")) {
                     assertNull(historicTaskInstance.getDeleteReason());
@@ -98,9 +97,9 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
     @Deployment
     public void testRegularProcessInstanceEnd() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("deleteReasonProcess");
-        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
         while (!tasks.isEmpty()) {
-            for (Task task : tasks) {
+            for (org.flowable.task.api.Task task : tasks) {
                 taskService.complete(task.getId());
             }
             tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
@@ -170,7 +169,7 @@ public class DeleteReasonTest extends PluggableFlowableTestCase {
     @Deployment
     public void testInterruptingBoundaryEvent() {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("deleteReasonProcess");
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertEquals("A", task.getName());
         taskService.complete(task.getId());
 

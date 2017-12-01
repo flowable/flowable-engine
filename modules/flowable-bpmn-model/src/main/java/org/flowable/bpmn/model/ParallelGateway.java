@@ -17,6 +17,7 @@ package org.flowable.bpmn.model;
  */
 public class ParallelGateway extends Gateway {
 
+    @Override
     public ParallelGateway clone() {
         ParallelGateway clone = new ParallelGateway();
         clone.setValues(this);

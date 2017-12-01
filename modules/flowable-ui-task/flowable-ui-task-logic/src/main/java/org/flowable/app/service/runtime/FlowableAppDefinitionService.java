@@ -49,7 +49,7 @@ public class FlowableAppDefinitionService {
 
     @Autowired
     protected RepositoryService repositoryService;
-    
+
     @Autowired
     protected RemoteIdmService remoteIdmService;
 
@@ -65,7 +65,7 @@ public class FlowableAppDefinitionService {
         resultList.add(taskAppDefinitionRepresentation);
 
         // Custom apps
-        Map<String, Deployment> deploymentMap = new HashMap<String, Deployment>();
+        Map<String, Deployment> deploymentMap = new HashMap<>();
         List<Deployment> deployments = repositoryService.createDeploymentQuery().list();
         for (Deployment deployment : deployments) {
             if (deployment.getKey() != null) {
@@ -83,18 +83,18 @@ public class FlowableAppDefinitionService {
             if (CollectionUtils.isNotEmpty(appDefinition.getUsersAccess()) || CollectionUtils.isNotEmpty(appDefinition.getGroupsAccess())) {
                 appDefinitionHaveAccessControl = true;
             }
-            
+
             resultList.add(appDefinition);
         }
-        
+
         if (appDefinitionHaveAccessControl) {
             User currentUser = SecurityUtils.getCurrentUserObject();
             String userId = currentUser.getId();
             List<RemoteGroup> groups = getUserGroups(userId);
-            
+
             List<AppDefinitionRepresentation> appDefinitionList = new ArrayList<>(resultList);
             resultList.clear();
-            
+
             for (AppDefinitionRepresentation appDefinition : appDefinitionList) {
                 if (hasAppAccess(appDefinition, userId, groups)) {
                     resultList.add(appDefinition);
@@ -115,32 +115,32 @@ public class FlowableAppDefinitionService {
 
         return createRepresentation(deployment);
     }
-    
+
     protected List<RemoteGroup> getUserGroups(String userId) {
         return remoteIdmService.getUser(userId).getGroups();
     }
-    
+
     protected boolean hasAppAccess(AppDefinitionRepresentation appDefinition, String userId, List<RemoteGroup> groups) {
         if (CollectionUtils.isEmpty(appDefinition.getUsersAccess()) && CollectionUtils.isEmpty(appDefinition.getGroupsAccess())) {
             return true;
         }
-        
+
         if (CollectionUtils.isNotEmpty(appDefinition.getUsersAccess())) {
             if (appDefinition.getUsersAccess().contains(userId)) {
                 return true;
             }
         }
-        
+
         if (CollectionUtils.isNotEmpty(appDefinition.getGroupsAccess())) {
-           for (String groupId : appDefinition.getGroupsAccess()) {
-               for (RemoteGroup group : groups) {
-                   if (group.getId().equals(groupId)) {
-                       return true;
-                   }
-               }
-           }
+            for (String groupId : appDefinition.getGroupsAccess()) {
+                for (RemoteGroup group : groups) {
+                    if (group.getId().equals(groupId)) {
+                        return true;
+                    }
+                }
+            }
         }
-        
+
         return false;
     }
 
@@ -161,19 +161,19 @@ public class FlowableAppDefinitionService {
         if (StringUtils.isNotEmpty(appModel.getUsersAccess())) {
             resultAppDef.setUsersAccess(convertToList(appModel.getUsersAccess()));
         }
-        
+
         if (StringUtils.isNotEmpty(appModel.getGroupsAccess())) {
             resultAppDef.setGroupsAccess(convertToList(appModel.getGroupsAccess()));
         }
-        
+
         return resultAppDef;
     }
-    
+
     protected List<String> convertToList(String commaSeperatedString) {
         List<String> resultList = new ArrayList<>();
         String[] stringArray = commaSeperatedString.split(",");
         resultList.addAll(Arrays.asList(stringArray));
-        
+
         return resultList;
     }
 }

@@ -12,13 +12,12 @@
  */
 package org.flowable.engine.test.api.event;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.impl.bpmn.helper.MessageThrowingEventListener;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -41,7 +40,7 @@ public class MessageThrowingEventListenerTest extends PluggableFlowableTestCase 
             assertNotNull(processInstance);
 
             // Fetch the task and reassign it to trigger the event-listener
-            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             assertNotNull(task);
             taskService.setAssignee(task.getId(), "kermit");
 
@@ -52,7 +51,7 @@ public class MessageThrowingEventListenerTest extends PluggableFlowableTestCase 
             assertNotNull(task);
             assertEquals("kermit", task.getAssignee());
 
-            Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask").singleResult();
+            org.flowable.task.api.Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask").singleResult();
             assertNotNull(boundaryTask);
 
         } finally {
@@ -66,7 +65,7 @@ public class MessageThrowingEventListenerTest extends PluggableFlowableTestCase 
         assertNotNull(processInstance);
 
         // Fetch the task and re-assign it to trigger the event-listener
-        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
         taskService.setAssignee(task.getId(), "kermit");
 
@@ -76,7 +75,7 @@ public class MessageThrowingEventListenerTest extends PluggableFlowableTestCase 
         assertNotNull(task);
         assertEquals("kermit", task.getAssignee());
 
-        Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask").singleResult();
+        org.flowable.task.api.Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask").singleResult();
         assertNotNull(boundaryTask);
     }
 
@@ -93,7 +92,7 @@ public class MessageThrowingEventListenerTest extends PluggableFlowableTestCase 
             assertNotNull(processInstance);
 
             // Fetch the task and reassign it to trigger the event-listener
-            Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+            org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             assertNotNull(task);
             taskService.setAssignee(task.getId(), "kermit");
 
@@ -102,7 +101,7 @@ public class MessageThrowingEventListenerTest extends PluggableFlowableTestCase 
             task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("subTask").singleResult();
             assertNull(task);
 
-            Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask").singleResult();
+            org.flowable.task.api.Task boundaryTask = taskService.createTaskQuery().processInstanceId(processInstance.getId()).taskDefinitionKey("boundaryTask").singleResult();
             assertNotNull(boundaryTask);
             
             waitForHistoryJobExecutorToProcessAllJobs(5000, 100);

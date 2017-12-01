@@ -66,20 +66,24 @@ public class ByteArrayEntity implements Serializable, PersistentObject, HasRevis
         return bytes;
     }
 
+    @Override
     public Object getPersistentState() {
         return new PersistentState(name, bytes);
     }
 
+    @Override
     public int getRevisionNext() {
         return revision + 1;
     }
 
     // getters and setters //////////////////////////////////////////////////////
 
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public void setId(String id) {
         this.id = id;
     }
@@ -104,10 +108,12 @@ public class ByteArrayEntity implements Serializable, PersistentObject, HasRevis
         this.bytes = bytes;
     }
 
+    @Override
     public int getRevision() {
         return revision;
     }
 
+    @Override
     public void setRevision(int revision) {
         this.revision = revision;
     }
@@ -129,6 +135,7 @@ public class ByteArrayEntity implements Serializable, PersistentObject, HasRevis
             this.bytes = bytes;
         }
 
+        @Override
         public boolean equals(Object obj) {
             if (obj instanceof PersistentState) {
                 PersistentState other = (PersistentState) obj;

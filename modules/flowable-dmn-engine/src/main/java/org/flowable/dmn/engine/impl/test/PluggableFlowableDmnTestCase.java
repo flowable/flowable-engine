@@ -31,6 +31,7 @@ public abstract class PluggableFlowableDmnTestCase extends AbstractFlowableDmnTe
 
     protected static DmnEngine cachedDmnEngine;
 
+    @Override
     protected void initializeDmnEngine() {
         if (cachedDmnEngine == null) {
             LOGGER.info("No cached dmn engine found for test. Retrieving the default engine.");

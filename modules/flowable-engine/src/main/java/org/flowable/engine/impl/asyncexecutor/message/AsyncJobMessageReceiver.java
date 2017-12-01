@@ -17,12 +17,11 @@ import java.util.List;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.JobQueryImpl;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntityManager;
-import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.api.Job;
+import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.impl.JobQueryImpl;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobEntityManager;
 
 /**
  * Experimental.
@@ -40,31 +39,31 @@ import org.flowable.engine.runtime.Job;
  */
 public class AsyncJobMessageReceiver {
 
-    protected ProcessEngineConfigurationImpl processEngineConfiguration;
+    protected JobServiceConfiguration jobServiceConfiguration;
     protected AsyncJobMessageHandler asyncJobMessageHandler;
     
     public AsyncJobMessageReceiver() {
         
     }
     
-    public AsyncJobMessageReceiver(ProcessEngineConfigurationImpl processEngineConfiguration, AsyncJobMessageHandler asyncJobMessageHandler) {
-        this.processEngineConfiguration = processEngineConfiguration;
+    public AsyncJobMessageReceiver(JobServiceConfiguration jobServiceConfiguration, AsyncJobMessageHandler asyncJobMessageHandler) {
+        this.jobServiceConfiguration = jobServiceConfiguration;
         this.asyncJobMessageHandler = asyncJobMessageHandler;
     }
     
     public void messageForJobReceived(final String jobId) {
-        if (processEngineConfiguration == null) {
-            throw new FlowableException("Programmatic error: this class needs a ProcessEngineConfigurationImpl instance");
+        if (jobServiceConfiguration == null) {
+            throw new FlowableException("Programmatic error: this class needs a JobServiceEngineConfiguration instance");
         }
         if (asyncJobMessageHandler == null) {
             throw new FlowableException("Programmatic error: this class needs an AsyncJobMessageHandler instance.");
         }
         
-        processEngineConfiguration.getManagementService().executeCommand(new Command<Void>() {
+        jobServiceConfiguration.getCommandExecutor().execute(new Command<Void>() {
             
             @Override
             public Void execute(CommandContext commandContext) {
-                JobEntityManager jobEntityManager = CommandContextUtil.getJobEntityManager(commandContext);
+                JobEntityManager jobEntityManager = jobServiceConfiguration.getJobEntityManager();
                 
                 JobQueryImpl query = new JobQueryImpl();
                 query.jobId(jobId);
@@ -90,12 +89,12 @@ public class AsyncJobMessageReceiver {
         });
     }
     
-    public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
-        return processEngineConfiguration;
+    public JobServiceConfiguration getJobServiceConfiguration() {
+        return jobServiceConfiguration;
     }
 
-    public void setProcessEngineConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
-        this.processEngineConfiguration = processEngineConfiguration;
+    public void setJobServiceConfiguration(JobServiceConfiguration jobServiceConfiguration) {
+        this.jobServiceConfiguration = jobServiceConfiguration;
     }
 
     public AsyncJobMessageHandler getAsyncJobMessageHandler() {

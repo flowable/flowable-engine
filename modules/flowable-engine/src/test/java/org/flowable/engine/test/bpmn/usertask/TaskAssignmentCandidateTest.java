@@ -15,7 +15,6 @@ package org.flowable.engine.test.bpmn.usertask;
 import java.util.List;
 
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -25,11 +24,13 @@ import org.flowable.engine.test.Deployment;
  */
 public class TaskAssignmentCandidateTest extends PluggableFlowableTestCase {
 
+    @Override
     public void setUp() throws Exception {
         identityService.saveGroup(identityService.newGroup("accounting"));
         identityService.saveGroup(identityService.newGroup("management"));
     }
 
+    @Override
     public void tearDown() throws Exception {
         identityService.deleteGroup("accounting");
         identityService.deleteGroup("management");
@@ -38,7 +39,7 @@ public class TaskAssignmentCandidateTest extends PluggableFlowableTestCase {
     @Deployment
     public void testCandidateGroups() {
         runtimeService.startProcessInstanceByKey("taskCandidateExample");
-        List<Task> tasks = taskService
+        List<org.flowable.task.api.Task> tasks = taskService
                 .createTaskQuery()
                 .taskCandidateGroup("management")
                 .list();

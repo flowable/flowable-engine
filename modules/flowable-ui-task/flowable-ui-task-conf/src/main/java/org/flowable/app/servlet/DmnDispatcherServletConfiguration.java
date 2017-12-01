@@ -17,12 +17,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 
 @Configuration
-@ComponentScan({ "org.flowable.rest.dmn.exception", "org.flowable.rest.dmn.service.api" })
+@ComponentScan({"org.flowable.rest.dmn.exception", "org.flowable.rest.dmn.service.api"})
 @EnableAsync
-public class DmnDispatcherServletConfiguration extends WebMvcConfigurationSupport {
+public class DmnDispatcherServletConfiguration extends BaseDispatcherServletConfiguration {
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(DmnDispatcherServletConfiguration.class);
 

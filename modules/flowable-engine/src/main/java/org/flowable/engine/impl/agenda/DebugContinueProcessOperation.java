@@ -14,12 +14,12 @@ package org.flowable.engine.impl.agenda;
 
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntity;
-import org.flowable.engine.impl.persistence.entity.DeadLetterJobEntityManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
-import org.flowable.engine.impl.persistence.entity.JobEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.runtime.ProcessDebugger;
+import org.flowable.job.service.JobService;
+import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
 
 /**
  * This class extends {@link ContinueProcessOperation} with the possibility to check whether execution is trying to
@@ -44,6 +44,7 @@ public class DebugContinueProcessOperation extends ContinueProcessOperation {
         this.debugger = debugger;
     }
 
+    @Override
     protected void continueThroughFlowNode(FlowNode flowNode) {
         if (debugger.isBreakpoint(execution)) {
             breakExecution(flowNode);
@@ -53,7 +54,8 @@ public class DebugContinueProcessOperation extends ContinueProcessOperation {
     }
 
     protected void breakExecution(FlowNode flowNode) {
-        DeadLetterJobEntity brokenJob = getDeadLetterJobEntityManager().create();
+        JobService jobService = CommandContextUtil.getJobService();
+        DeadLetterJobEntity brokenJob = jobService.createDeadLetterJob();
         brokenJob.setJobType(JobEntity.JOB_TYPE_MESSAGE);
         brokenJob.setRevision(1);
         brokenJob.setRetries(0);
@@ -68,11 +70,6 @@ public class DebugContinueProcessOperation extends ContinueProcessOperation {
             brokenJob.setTenantId(execution.getTenantId());
         }
 
-        getDeadLetterJobEntityManager().insert(brokenJob);
+        jobService.insertDeadLetterJob(brokenJob);
     }
-
-    protected DeadLetterJobEntityManager getDeadLetterJobEntityManager() {
-        return CommandContextUtil.getDeadLetterJobEntityManager(commandContext);
-    }
-
 }

@@ -13,8 +13,8 @@
 
 package org.flowable.engine.impl.scripting;
 
-import org.flowable.engine.delegate.VariableScope;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Tom Baeyens
@@ -22,6 +22,7 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
  */
 public class VariableScopeResolverFactory implements ResolverFactory {
 
+    @Override
     public Resolver createResolver(ProcessEngineConfigurationImpl processEngineConfiguration, VariableScope variableScope) {
         if (variableScope != null) {
             return new VariableScopeResolver(processEngineConfiguration, variableScope);

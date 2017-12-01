@@ -12,8 +12,6 @@
  */
 package org.flowable.app.servlet;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.List;
 
 import org.flowable.rest.service.api.PutAwareCommonsMultipartResolver;
@@ -29,6 +27,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupp
 import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Yvo Swillens

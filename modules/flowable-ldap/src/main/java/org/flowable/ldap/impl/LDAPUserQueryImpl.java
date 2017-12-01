@@ -56,18 +56,18 @@ public class LDAPUserQueryImpl extends UserQueryImpl {
 
     protected List<User> executeQuery() {
         if (getId() != null) {
-            List<User> result = new ArrayList<User>();
+            List<User> result = new ArrayList<>();
             result.add(findById(getId()));
             return result;
-            
+
         } else if (getIdIgnoreCase() != null) {
-            List<User> result = new ArrayList<User>();
+            List<User> result = new ArrayList<>();
             result.add(findById(getIdIgnoreCase()));
             return result;
-            
+
         } else if (getFullNameLike() != null) {
             return executeNameQuery(getFullNameLike());
-            
+
         } else if (getFullNameLikeIgnoreCase() != null) {
             return executeNameQuery(getFullNameLikeIgnoreCase());
 
@@ -75,13 +75,13 @@ public class LDAPUserQueryImpl extends UserQueryImpl {
             return executeAllUserQuery();
         }
     }
-    
+
     protected List<User> executeNameQuery(String name) {
         String fullName = name.replaceAll("%", "");
         String searchExpression = ldapConfigurator.getLdapQueryBuilder().buildQueryByFullNameLike(ldapConfigurator, fullName);
         return executeUsersQuery(searchExpression);
     }
-    
+
     protected List<User> executeAllUserQuery() {
         String searchExpression = ldapConfigurator.getQueryAllUsers();
         return executeUsersQuery(searchExpression);
@@ -91,6 +91,7 @@ public class LDAPUserQueryImpl extends UserQueryImpl {
         LDAPTemplate ldapTemplate = new LDAPTemplate(ldapConfigurator);
         return ldapTemplate.execute(new LDAPCallBack<UserEntity>() {
 
+            @Override
             public UserEntity executeInContext(InitialDirContext initialDirContext) {
                 try {
 
@@ -115,13 +116,14 @@ public class LDAPUserQueryImpl extends UserQueryImpl {
 
         });
     }
-    
+
     protected List<User> executeUsersQuery(final String searchExpression) {
         LDAPTemplate ldapTemplate = new LDAPTemplate(ldapConfigurator);
         return ldapTemplate.execute(new LDAPCallBack<List<User>>() {
 
+            @Override
             public List<User> executeInContext(InitialDirContext initialDirContext) {
-                List<User> result = new ArrayList<User>();
+                List<User> result = new ArrayList<>();
                 try {
                     String baseDn = ldapConfigurator.getUserBaseDn() != null ? ldapConfigurator.getUserBaseDn() : ldapConfigurator.getBaseDn();
                     NamingEnumeration<?> namingEnum = initialDirContext.search(baseDn, searchExpression, createSearchControls());

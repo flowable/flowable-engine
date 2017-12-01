@@ -46,7 +46,7 @@ public class ContentItemBaseResource {
     @Autowired
     protected ContentService contentService;
 
-    protected DataResponse getContentItemsFromQueryRequest(ContentItemQueryRequest request, Map<String, String> requestParams) {
+    protected DataResponse<ContentItemResponse> getContentItemsFromQueryRequest(ContentItemQueryRequest request, Map<String, String> requestParams) {
 
         ContentItemQuery contentItemQuery = contentService.createContentItemQuery();
 

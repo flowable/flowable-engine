@@ -18,12 +18,11 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.history.async.HistoryJsonConstants;
-import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricVariableInstanceEntityManager;
-import org.flowable.engine.impl.persistence.entity.HistoryJobEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.impl.variable.VariableType;
-import org.flowable.engine.impl.variable.VariableTypes;
+import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
+import org.flowable.variable.api.types.VariableType;
+import org.flowable.variable.api.types.VariableTypes;
+import org.flowable.variable.service.impl.persistence.entity.HistoricVariableInstanceEntity;
 
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -36,15 +35,13 @@ public class VariableUpdatedHistoryJsonTransformer extends AbstractHistoryJsonTr
 
     @Override
     public boolean isApplicable(ObjectNode historicalData, CommandContext commandContext) {
-        return CommandContextUtil.getHistoricVariableInstanceEntityManager(commandContext).findById(getStringFromJson(historicalData, HistoryJsonConstants.ID)) != null;
+        return CommandContextUtil.getHistoricVariableService().getHistoricVariableInstance(getStringFromJson(historicalData, HistoryJsonConstants.ID)) != null;
     }
 
     @Override
     public void transformJson(HistoryJobEntity job, ObjectNode historicalData, CommandContext commandContext) {
-        HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager 
-            = CommandContextUtil.getProcessEngineConfiguration(commandContext).getHistoricVariableInstanceEntityManager();
-        HistoricVariableInstanceEntity historicVariable 
-            = historicVariableInstanceEntityManager.findById(getStringFromJson(historicalData, HistoryJsonConstants.ID));
+        HistoricVariableInstanceEntity historicVariable = CommandContextUtil.getHistoricVariableService().getHistoricVariableInstance(
+                        getStringFromJson(historicalData, HistoryJsonConstants.ID));
         
         Date time = getDateFromJson(historicalData, HistoryJsonConstants.LAST_UPDATED_TIME);
         if (historicVariable.getLastUpdatedTime().after(time)) {

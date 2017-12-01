@@ -15,15 +15,14 @@ package org.flowable.engine.test.regression;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
 //SLF4J
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +37,8 @@ public class DeleteProcessInstanceTest extends PluggableFlowableTestCase {
     @Deployment
     public void testNoEndTimeSet() {
 
-        // Note that the instance with a Task Type of "user" is being started.
-        LOGGER.info("Starting an instance of \"Demo Partial Deletion\" with a Task Type of \"user\".");
+        // Note that the instance with a org.flowable.task.service.Task Type of "user" is being started.
+        LOGGER.info("Starting an instance of \"Demo Partial Deletion\" with a org.flowable.task.service.Task Type of \"user\".");
 
         // Set the inputs for the first process instance, which we will be able
         // to completely delete.
@@ -56,7 +55,7 @@ public class DeleteProcessInstanceTest extends PluggableFlowableTestCase {
         assertFalse(executionUser.isEnded());
 
         // Assert that a user task is available for claiming.
-        Task taskUser = taskService.createTaskQuery().processInstanceId(instanceUser.getProcessInstanceId()).singleResult();
+        org.flowable.task.api.Task taskUser = taskService.createTaskQuery().processInstanceId(instanceUser.getProcessInstanceId()).singleResult();
         assertNotNull(taskUser);
 
         // Delete the process instance.
@@ -67,12 +66,12 @@ public class DeleteProcessInstanceTest extends PluggableFlowableTestCase {
             // end time.
             HistoricProcessInstance hInstanceUser = historyService.createHistoricProcessInstanceQuery().processInstanceId(instanceUser.getId()).singleResult();
             assertNotNull(hInstanceUser.getEndTime());
-            LOGGER.info("End time for the deleted instance of \"Demo Partial Deletion\" that was started with a Task Type of \"user\": {}.", hInstanceUser.getEndTime());
-            LOGGER.info("Successfully deleted the instance of \"Demo Partial Deletion\" that was started with a Task Type of \"user\".");
+            LOGGER.info("End time for the deleted instance of \"Demo Partial Deletion\" that was started with a org.flowable.task.service.Task Type of \"user\": {}.", hInstanceUser.getEndTime());
+            LOGGER.info("Successfully deleted the instance of \"Demo Partial Deletion\" that was started with a org.flowable.task.service.Task Type of \"user\".");
         }
 
-        // Note that the instance with a Task Type of "java" is being started.
-        LOGGER.info("Starting an instance of \"Demo Partial Deletion\" with a Task Type of \"java\".");
+        // Note that the instance with a org.flowable.task.service.Task Type of "java" is being started.
+        LOGGER.info("Starting an instance of \"Demo Partial Deletion\" with a org.flowable.task.service.Task Type of \"java\".");
 
         // Set the inputs for the second process instance, which we will NOT be
         // able to completely delete.

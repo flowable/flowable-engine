@@ -49,6 +49,7 @@ public class SpringAutoDeployTest extends AbstractDmnTestCase {
         this.repositoryService = applicationContext.getBean(DmnRepositoryService.class);
     }
 
+    @Override
     protected void tearDown() throws Exception {
         removeAllDeployments();
         this.applicationContext = null;

@@ -12,8 +12,8 @@
  */
 package org.activiti.engine.impl.variable;
 
-import org.flowable.engine.impl.variable.ValueFields;
-import org.flowable.engine.impl.variable.VariableType;
+import org.flowable.variable.api.types.ValueFields;
+import org.flowable.variable.api.types.VariableType;
 
 /**
  * Custom object type
@@ -30,14 +30,17 @@ public class CustomObjectType implements VariableType {
         this.typeName = typeName;
     }
 
+    @Override
     public String getTypeName() {
         return this.typeName;
     }
 
+    @Override
     public Object getValue(ValueFields valueFields) {
         return valueFields.getCachedValue();
     }
 
+    @Override
     public boolean isAbleToStore(Object value) {
         if (value == null) {
             return true;
@@ -45,10 +48,12 @@ public class CustomObjectType implements VariableType {
         return this.theClass.isAssignableFrom(value.getClass());
     }
 
+    @Override
     public boolean isCachable() {
         return true;
     }
 
+    @Override
     public void setValue(Object value, ValueFields valueFields) {
         valueFields.setCachedValue(value);
     }

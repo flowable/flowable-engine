@@ -15,10 +15,10 @@ package org.flowable.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
-import org.flowable.engine.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.persistence.entity.AttachmentEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
@@ -38,6 +38,7 @@ public class DeleteAttachmentCmd implements Command<Object>, Serializable {
         this.attachmentId = attachmentId;
     }
 
+    @Override
     public Object execute(CommandContext commandContext) {
         AttachmentEntity attachment = CommandContextUtil.getAttachmentEntityManager().findById(attachmentId);
 

@@ -29,6 +29,7 @@ public class UserFormType extends AbstractFormType {
 
     public static final String TYPE_NAME = "user";
 
+    @Override
     public String getName() {
         return TYPE_NAME;
     }

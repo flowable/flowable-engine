@@ -34,6 +34,7 @@ public class DeletePrivilegeMappingCmd implements Command<Void>, Serializable {
         this.groupId = groupId;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         PrivilegeMappingEntityManager privilegeMappingEntityManager = CommandContextUtil.getPrivilegeMappingEntityManager(commandContext);
         if (userId != null) {

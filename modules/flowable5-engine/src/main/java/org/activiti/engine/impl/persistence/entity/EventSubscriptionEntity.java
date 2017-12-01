@@ -29,7 +29,7 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
-import org.flowable.engine.runtime.Job;
+import org.flowable.job.api.Job;
 
 /**
  * @author Daniel Meyer
@@ -151,8 +151,9 @@ public abstract class EventSubscriptionEntity implements PersistentObject, HasRe
         }
     }
 
+    @Override
     public Object getPersistentState() {
-        HashMap<String, Object> persistentState = new HashMap<String, Object>();
+        HashMap<String, Object> persistentState = new HashMap<>();
         persistentState.put("executionId", executionId);
         persistentState.put("configuration", configuration);
         return persistentState;
@@ -194,22 +195,27 @@ public abstract class EventSubscriptionEntity implements PersistentObject, HasRe
         }
     }
 
+    @Override
     public String getId() {
         return id;
     }
 
+    @Override
     public void setId(String id) {
         this.id = id;
     }
 
+    @Override
     public int getRevision() {
         return revision;
     }
 
+    @Override
     public void setRevision(int revision) {
         this.revision = revision;
     }
 
+    @Override
     public int getRevisionNext() {
         return revision + 1;
     }

@@ -21,7 +21,7 @@ import org.flowable.cdi.annotation.ProcessInstanceId;
 import org.flowable.cdi.annotation.TaskId;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
+import org.flowable.task.api.Task;
 
 /**
  * Allows to access executions and tasks of a managed process instance via dependency injection. A process instance can be managed, using the {@link BusinessProcess}-bean.

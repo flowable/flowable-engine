@@ -26,12 +26,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.editor.form.converter.FormJsonConverter;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.engine.common.api.delegate.Expression;
+import org.flowable.engine.common.impl.el.VariableContainerWrapper;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.form.api.FormInstance;
 import org.flowable.form.api.FormInstanceQuery;
 import org.flowable.form.engine.FormEngineConfiguration;
-import org.flowable.form.engine.FormExpression;
 import org.flowable.form.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.form.engine.impl.persistence.deploy.FormDefinitionCacheEntry;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
@@ -92,6 +93,7 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
         initializeValues(formDefinitionKey, parentDeploymentId, formDefinitionId, tenantId, taskId, processInstanceId, variables);
     }
 
+    @Override
     public FormInstanceModel execute(CommandContext commandContext) {
         if (formInstanceId == null && (taskId == null && processInstanceId == null)) {
             throw new FlowableException("A processtask id or process instance id should be provided");
@@ -135,9 +137,9 @@ public class GetFormInstanceModelCmd implements Command<FormInstanceModel>, Seri
             for (FormField field : allFields) {
                 if (field instanceof ExpressionFormField) {
                     ExpressionFormField expressionField = (ExpressionFormField) field;
-                    FormExpression formExpression = formEngineConfiguration.getExpressionManager().createExpression(expressionField.getExpression());
+                    Expression formExpression = formEngineConfiguration.getExpressionManager().createExpression(expressionField.getExpression());
                     try {
-                        field.setValue(formExpression.getValue(variables));
+                        field.setValue(formExpression.getValue(new VariableContainerWrapper(variables)));
                     } catch (Exception e) {
                         LOGGER.error("Error getting value for expression {} {}", expressionField.getExpression(), e.getMessage());
                     }

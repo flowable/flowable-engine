@@ -33,6 +33,7 @@ public class IsProcessDefinitionSuspendedCmd implements Command<Boolean>, Serial
         this.processDefinitionId = processDefinitionId;
     }
 
+    @Override
     public Boolean execute(CommandContext commandContext) {
         // Backwards compatibility
         if (Flowable5Util.isFlowable5ProcessDefinitionId(commandContext, processDefinitionId)) {

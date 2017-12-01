@@ -64,7 +64,7 @@ public class PrivilegeRepresentation extends AbstractRepresentation {
 
     public void addUser(UserRepresentation userRepresentation) {
         if (users == null) {
-            users = new ArrayList<UserRepresentation>();
+            users = new ArrayList<>();
         }
         users.add(userRepresentation);
     }
@@ -79,7 +79,7 @@ public class PrivilegeRepresentation extends AbstractRepresentation {
 
     public void addGroup(GroupRepresentation groupRepresentation) {
         if (groups == null) {
-            groups = new ArrayList<GroupRepresentation>();
+            groups = new ArrayList<>();
         }
         groups.add(groupRepresentation);
     }

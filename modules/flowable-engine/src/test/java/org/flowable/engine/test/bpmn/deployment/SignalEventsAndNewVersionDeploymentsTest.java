@@ -15,12 +15,11 @@ package org.flowable.engine.test.bpmn.deployment;
 
 import java.util.List;
 
-import org.flowable.engine.impl.history.HistoryLevel;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.EventSubscription;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -57,10 +56,10 @@ public class SignalEventsAndNewVersionDeploymentsTest extends PluggableFlowableT
         runtimeService.signalEventReceived("mySignal");
         assertEquals(0, getAllEventSubscriptions().size());
 
-        List<Task> tasks = taskService.createTaskQuery().list();
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().list();
         assertEquals(2, tasks.size());
 
-        for (Task task : tasks) {
+        for (org.flowable.task.api.Task task : tasks) {
             assertEquals("Task after signal", task.getName());
         }
 

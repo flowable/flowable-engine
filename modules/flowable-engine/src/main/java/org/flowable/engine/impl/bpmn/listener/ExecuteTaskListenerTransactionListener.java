@@ -43,6 +43,7 @@ public class ExecuteTaskListenerTransactionListener implements TransactionListen
         CommandExecutor commandExecutor = CommandContextUtil.getProcessEngineConfiguration(commandContext).getCommandExecutor();
         CommandConfig commandConfig = new CommandConfig(false, TransactionPropagation.REQUIRES_NEW);
         commandExecutor.execute(commandConfig, new Command<Void>() {
+            @Override
             public Void execute(CommandContext commandContext) {
                 listener.notify(scope.getProcessInstanceId(), scope.getExecutionId(), scope.getTask(),
                         scope.getExecutionVariables(), scope.getCustomPropertiesMap());

@@ -25,10 +25,12 @@ public class StartEventHistoryParseHandler extends AbstractBpmnParseHandler<Star
 
     protected static final StartEventEndHandler START_EVENT_END_HANDLER = new StartEventEndHandler();
 
+    @Override
     protected Class<? extends BaseElement> getHandledType() {
         return StartEvent.class;
     }
 
+    @Override
     protected void executeParse(BpmnParse bpmnParse, StartEvent element) {
         bpmnParse.getCurrentActivity().addExecutionListener(org.activiti.engine.impl.pvm.PvmEvent.EVENTNAME_END, START_EVENT_END_HANDLER);
     }

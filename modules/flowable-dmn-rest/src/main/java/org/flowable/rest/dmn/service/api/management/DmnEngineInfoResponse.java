@@ -12,6 +12,8 @@
  */
 package org.flowable.rest.dmn.service.api.management;
 
+import io.swagger.annotations.ApiModelProperty;
+
 /**
  * @author Yvo Swillens
  */
@@ -22,6 +24,7 @@ public class DmnEngineInfoResponse {
     private String exception;
     private String version;
 
+    @ApiModelProperty(example = "default")
     public String getName() {
         return name;
     }
@@ -30,6 +33,7 @@ public class DmnEngineInfoResponse {
         this.name = name;
     }
 
+    @ApiModelProperty(example = "file://flowable-dmn/flowable.dmn.cfg.xml")
     public String getResourceUrl() {
         return resourceUrl;
     }
@@ -38,6 +42,7 @@ public class DmnEngineInfoResponse {
         this.resourceUrl = resourceUrl;
     }
 
+    @ApiModelProperty(example = "null")
     public String getException() {
         return exception;
     }
@@ -46,6 +51,7 @@ public class DmnEngineInfoResponse {
         this.exception = exception;
     }
 
+    @ApiModelProperty(example = "6.2.0")
     public String getVersion() {
         return version;
     }

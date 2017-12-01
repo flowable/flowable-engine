@@ -22,6 +22,7 @@ public class ToUppercase implements JavaDelegate {
 
     private static final String VARIABLE_NAME = "input";
 
+    @Override
     public void execute(DelegateExecution execution) {
         String var = (String) execution.getVariable(VARIABLE_NAME);
         var = var.toUpperCase();

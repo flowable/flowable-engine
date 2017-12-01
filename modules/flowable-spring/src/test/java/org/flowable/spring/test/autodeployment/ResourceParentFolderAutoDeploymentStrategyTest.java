@@ -29,7 +29,7 @@ import java.io.InputStream;
 import java.util.zip.ZipInputStream;
 
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.spring.autodeployment.ResourceParentFolderAutoDeploymentStrategy;
+import org.flowable.spring.configurator.ResourceParentFolderAutoDeploymentStrategy;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -54,6 +54,7 @@ public class ResourceParentFolderAutoDeploymentStrategyTest extends AbstractAuto
     private final String parentFilename1 = "parentFilename1";
     private final String parentFilename2 = "parentFilename2";
 
+    @Override
     @Before
     public void before() throws Exception {
         super.before();

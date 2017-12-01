@@ -30,6 +30,7 @@ import org.flowable.idm.engine.test.PluggableFlowableIdmTestCase;
  */
 public class TokenQueryTest extends PluggableFlowableIdmTestCase {
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
 

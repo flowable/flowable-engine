@@ -15,8 +15,8 @@ package org.flowable.engine.test.api.history;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.impl.history.HistoryLevel;
 import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 
@@ -25,6 +25,7 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
     private static final String PROCESS_DEFINITION_KEY = "oneTaskProcess";
     private static final String DEPLOYMENT_FILE_PATH = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml";
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
         repositoryService.createDeployment()
@@ -46,6 +47,7 @@ public class HistoricProcessInstanceQueryVersionTest extends PluggableFlowableTe
         waitForHistoryJobExecutorToProcessAllJobs(5000, 100);
     }
 
+    @Override
     protected void tearDown() throws Exception {
         deleteDeployments();
     }

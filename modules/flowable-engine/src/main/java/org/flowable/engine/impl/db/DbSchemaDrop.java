@@ -31,6 +31,7 @@ public class DbSchemaDrop {
         CommandExecutor commandExecutor = processEngine.getProcessEngineConfiguration().getCommandExecutor();
         CommandConfig config = new CommandConfig().transactionNotSupported();
         commandExecutor.execute(config, new Command<Object>() {
+            @Override
             public Object execute(CommandContext commandContext) {
                 CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager().dbSchemaDrop();
                 return null;

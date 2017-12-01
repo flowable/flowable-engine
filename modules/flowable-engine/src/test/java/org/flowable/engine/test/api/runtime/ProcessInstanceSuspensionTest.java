@@ -21,11 +21,10 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.Execution;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.IdentityLinkType;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
+import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.job.api.Job;
 
 /**
  * @author Daniel Meyer
@@ -131,15 +130,15 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         runtimeService.suspendProcessInstanceById(processInstance.getId());
 
         // Assert that the task is now also suspended
-        List<Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        for (Task task : tasks) {
+        List<org.flowable.task.api.Task> tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
+        for (org.flowable.task.api.Task task : tasks) {
             assertTrue(task.isSuspended());
         }
 
         // Activate process instance again
         runtimeService.activateProcessInstanceById(processInstance.getId());
         tasks = taskService.createTaskQuery().processInstanceId(processInstance.getId()).list();
-        for (Task task : tasks) {
+        for (org.flowable.task.api.Task task : tasks) {
             assertFalse(task.isSuspended());
         }
     }
@@ -149,7 +148,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
 
-        Task task = taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService.createTaskQuery().singleResult();
         assertNotNull(task);
 
         task = taskService.createTaskQuery().active().singleResult();
@@ -192,7 +191,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
 
         // Finish process
         while (taskService.createTaskQuery().count() > 0) {
-            for (Task task : taskService.createTaskQuery().list()) {
+            for (org.flowable.task.api.Task task : taskService.createTaskQuery().list()) {
                 taskService.complete(task.getId());
             }
         }
@@ -395,7 +394,7 @@ public class ProcessInstanceSuspensionTest extends PluggableFlowableTestCase {
         // Start a new process instance with one task
         ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
-        final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        final org.flowable.task.api.Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
         assertNotNull(task);
 
         // Suspend the process instance

@@ -34,7 +34,7 @@ import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
 @Configuration
-@ComponentScan(value = { "org.flowable.app.rest.editor", "org.flowable.app.rest.idm.remote" })
+@ComponentScan(value = { "org.flowable.app.rest.editor", "org.flowable.app.rest.idm.remote", "org.flowable.app.rest.exception" })
 @EnableAsync
 public class AppDispatcherServletConfiguration extends WebMvcConfigurationSupport {
 

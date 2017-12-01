@@ -20,12 +20,12 @@ import org.flowable.dmn.engine.DmnEngineConfiguration;
 import org.flowable.dmn.engine.deployer.DmnDeployer;
 import org.flowable.dmn.engine.impl.cfg.StandaloneInMemDmnEngineConfiguration;
 import org.flowable.dmn.engine.impl.db.EntityDependencyOrder;
-import org.flowable.engine.cfg.AbstractEngineConfigurator;
+import org.flowable.engine.common.AbstractEngineConfiguration;
+import org.flowable.engine.common.AbstractEngineConfigurator;
+import org.flowable.engine.common.EngineDeployer;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.engine.impl.persistence.deploy.Deployer;
 
 /**
  * @author Tijs Rademakers
@@ -41,8 +41,8 @@ public class DmnEngineConfigurator extends AbstractEngineConfigurator {
     }
     
     @Override
-    protected List<Deployer> getCustomDeployers() {
-        List<Deployer> deployers = new ArrayList<>();
+    protected List<EngineDeployer> getCustomDeployers() {
+        List<EngineDeployer> deployers = new ArrayList<>();
         deployers.add(new DmnDeployer());
         return deployers;
     }
@@ -53,14 +53,16 @@ public class DmnEngineConfigurator extends AbstractEngineConfigurator {
     }
 
     @Override
-    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public void configure(AbstractEngineConfiguration engineConfiguration) {
         if (dmnEngineConfiguration == null) {
             dmnEngineConfiguration = new StandaloneInMemDmnEngineConfiguration();
         }
         
-        initialiseCommonProperties(processEngineConfiguration, dmnEngineConfiguration, EngineConfigurationConstants.KEY_DMN_ENGINE_CONFIG);
+        initialiseCommonProperties(engineConfiguration, dmnEngineConfiguration);
 
         initDmnEngine();
+        
+        initServiceConfigurations(engineConfiguration, dmnEngineConfiguration);
     }
     
     @Override

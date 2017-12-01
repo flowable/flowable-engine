@@ -19,12 +19,13 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.history.HistoricIdentityLink;
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.impl.persistence.entity.HistoricIdentityLinkEntity;
-import org.flowable.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.task.IdentityLinkType;
+import org.flowable.identitylink.api.history.HistoricIdentityLink;
+import org.flowable.identitylink.service.HistoricIdentityLinkService;
+import org.flowable.identitylink.service.IdentityLinkType;
+import org.flowable.identitylink.service.impl.persistence.entity.HistoricIdentityLinkEntity;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.service.impl.persistence.entity.HistoricTaskInstanceEntity;
 
 /**
  * @author Frederik Heremans
@@ -43,6 +44,7 @@ public class GetHistoricIdentityLinksForTaskCmd implements Command<List<Historic
         this.processInstanceId = processInstanceId;
     }
 
+    @Override
     public List<HistoricIdentityLink> execute(CommandContext commandContext) {
         if (taskId != null) {
             return getLinksForTask(commandContext);
@@ -53,17 +55,18 @@ public class GetHistoricIdentityLinksForTaskCmd implements Command<List<Historic
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected List<HistoricIdentityLink> getLinksForTask(CommandContext commandContext) {
-        HistoricTaskInstanceEntity task = CommandContextUtil.getHistoricTaskInstanceEntityManager(commandContext).findById(taskId);
+        HistoricTaskInstanceEntity task = CommandContextUtil.getHistoricTaskService().getHistoricTask(taskId);
 
         if (task == null) {
             throw new FlowableObjectNotFoundException("No historic task exists with the given id: " + taskId, HistoricTaskInstance.class);
         }
 
-        List<HistoricIdentityLink> identityLinks = (List) CommandContextUtil.getHistoricIdentityLinkEntityManager(commandContext).findHistoricIdentityLinksByTaskId(taskId);
+        HistoricIdentityLinkService historicIdentityLinkService = CommandContextUtil.getHistoricIdentityLinkService();
+        List<HistoricIdentityLinkEntity> identityLinks = historicIdentityLinkService.findHistoricIdentityLinksByTaskId(taskId);
 
-        HistoricIdentityLink assigneeIdentityLink = null;
-        HistoricIdentityLink ownerIdentityLink = null;
-        for (HistoricIdentityLink historicIdentityLink : identityLinks) {
+        HistoricIdentityLinkEntity assigneeIdentityLink = null;
+        HistoricIdentityLinkEntity ownerIdentityLink = null;
+        for (HistoricIdentityLinkEntity historicIdentityLink : identityLinks) {
             if (IdentityLinkType.ASSIGNEE.equals(historicIdentityLink.getType())) {
                 assigneeIdentityLink = historicIdentityLink;
 
@@ -74,7 +77,7 @@ public class GetHistoricIdentityLinksForTaskCmd implements Command<List<Historic
 
         // Similar to GetIdentityLinksForTask, return assignee and owner as identity link
         if (task.getAssignee() != null && assigneeIdentityLink == null) {
-            HistoricIdentityLinkEntity identityLink = CommandContextUtil.getHistoricIdentityLinkEntityManager(commandContext).create();
+            HistoricIdentityLinkEntity identityLink = historicIdentityLinkService.createHistoricIdentityLink();
             identityLink.setUserId(task.getAssignee());
             identityLink.setTaskId(task.getId());
             identityLink.setType(IdentityLinkType.ASSIGNEE);
@@ -82,19 +85,19 @@ public class GetHistoricIdentityLinksForTaskCmd implements Command<List<Historic
         }
 
         if (task.getOwner() != null && ownerIdentityLink == null) {
-            HistoricIdentityLinkEntity identityLink = CommandContextUtil.getHistoricIdentityLinkEntityManager(commandContext).create();
+            HistoricIdentityLinkEntity identityLink = historicIdentityLinkService.createHistoricIdentityLink();
             identityLink.setTaskId(task.getId());
             identityLink.setUserId(task.getOwner());
             identityLink.setType(IdentityLinkType.OWNER);
             identityLinks.add(identityLink);
         }
 
-        return identityLinks;
+        return (List) identityLinks;
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
     protected List<HistoricIdentityLink> getLinksForProcessInstance(CommandContext commandContext) {
-        return (List) CommandContextUtil.getHistoricIdentityLinkEntityManager(commandContext).findHistoricIdentityLinksByProcessInstanceId(processInstanceId);
+        return (List) CommandContextUtil.getHistoricIdentityLinkService().findHistoricIdentityLinksByProcessInstanceId(processInstanceId);
     }
 
 }

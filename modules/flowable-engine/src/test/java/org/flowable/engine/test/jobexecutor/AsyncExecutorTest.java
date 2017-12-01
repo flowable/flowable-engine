@@ -18,13 +18,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.flowable.engine.ProcessEngine;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.impl.asyncexecutor.AsyncExecutor;
-import org.flowable.engine.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.flowable.engine.impl.test.JobTestHelper;
-import org.flowable.engine.runtime.JobInfo;
 import org.flowable.engine.runtime.ProcessInstance;
+import org.flowable.job.api.JobInfo;
+import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
+import org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor;
 import org.junit.Assert;
 import org.junit.Test;
 import org.slf4j.Logger;

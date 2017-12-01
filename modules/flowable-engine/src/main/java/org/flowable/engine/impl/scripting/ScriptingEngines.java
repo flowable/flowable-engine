@@ -24,7 +24,7 @@ import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.delegate.VariableScope;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Tom Baeyens

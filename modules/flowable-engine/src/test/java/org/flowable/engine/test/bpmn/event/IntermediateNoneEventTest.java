@@ -23,6 +23,7 @@ public class IntermediateNoneEventTest extends PluggableFlowableTestCase {
     private static boolean listenerExecuted;
 
     public static class MyExecutionListener implements ExecutionListener {
+        @Override
         public void notify(DelegateExecution execution) {
             listenerExecuted = true;
         }

@@ -42,6 +42,7 @@ public class JtaTransactionInterceptor extends AbstractCommandInterceptor {
         this.transactionManager = transactionManager;
     }
 
+    @Override
     public <T> T execute(CommandConfig config, Command<T> command) {
         LOGGER.debug("Running command with propagation {}", config.getTransactionPropagation());
 

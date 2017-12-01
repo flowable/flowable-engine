@@ -17,7 +17,6 @@ import static org.junit.Assert.assertThat;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.test.ResourceFlowableTestCase;
-import org.flowable.engine.task.Task;
 import org.flowable.engine.test.Deployment;
 
 /**
@@ -32,7 +31,7 @@ public class WatchDogAgendaTest extends ResourceFlowableTestCase {
     @Deployment(resources = "org/flowable/engine/test/api/oneTaskProcess.bpmn20.xml")
     public void testWatchDogWithOneTaskProcess() {
         this.runtimeService.startProcessInstanceByKey("oneTaskProcess");
-        Task task = this.taskService.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = this.taskService.createTaskQuery().singleResult();
         this.taskService.complete(task.getId());
         assertThat(this.runtimeService.createProcessInstanceQuery().count(), is(0L));
     }

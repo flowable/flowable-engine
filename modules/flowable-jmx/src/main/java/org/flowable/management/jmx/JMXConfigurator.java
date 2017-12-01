@@ -14,7 +14,7 @@ package org.flowable.management.jmx;
 
 import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.cfg.AbstractProcessEngineConfigurator;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,12 +109,12 @@ public class JMXConfigurator extends AbstractProcessEngineConfigurator {
     }
 
     @Override
-    public void beforeInit(ProcessEngineConfigurationImpl arg0) {
+    public void beforeInit(AbstractEngineConfiguration engineConfiguration) {
         // nothing to do
     }
 
     @Override
-    public void configure(ProcessEngineConfigurationImpl processEngineConfig) {
+    public void configure(AbstractEngineConfiguration engineConfiguration) {
         try {
             this.processEngineConfig = processEngineConfig;
             if (!disabled) {

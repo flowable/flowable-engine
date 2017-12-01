@@ -33,6 +33,7 @@ public class GetDmnDefinitionCmd implements Command<DmnDefinition>, Serializable
         this.decisionTableId = decisionTableId;
     }
 
+    @Override
     public DmnDefinition execute(CommandContext commandContext) {
         if (decisionTableId == null) {
             throw new FlowableIllegalArgumentException("decisionTableId is null");

@@ -21,27 +21,35 @@ angular.module('flowableModeler')
     $scope.model = {
         // Store the main model id, this points to the current version of a model,
         // even when we're showing history
-        latestModelId: $routeParams.modelId
+        latestModelId: $routeParams.modelId,
+        activeTab: 'bpmn'
     };
+    
+    $scope.tabs = [
+        {
+            id: 'bpmn',
+            title: 'BPMN models'
+        },
+        {
+            id: 'cmmn',
+            title: 'CMMN models'
+        }
+    ];
 
     $scope.loadApp = function() {
     	var url;
     	var definitionUrl;
 
     	if ($routeParams.modelHistoryId) {
-    		url = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $routeParams.modelId
-    			+ '/history/' + $routeParams.modelHistoryId;
-    		definitionUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/' + $routeParams.modelId
-                + '/history/' + $routeParams.modelHistoryId;
+    		url = FLOWABLE.APP_URL.getModelHistoryUrl($routeParams.modelId, $routeParams.modelHistoryId);
+    		definitionUrl = FLOWABLE.APP_URL.getAppDefinitionHistoryUrl($routeParams.modelId, $routeParams.modelHistoryId);
     	} else {
-    		url = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $routeParams.modelId;
-    		definitionUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/' + $routeParams.modelId;
+    		url = FLOWABLE.APP_URL.getModelUrl($routeParams.modelId);
+    		definitionUrl = FLOWABLE.APP_URL.getAppDefinitionUrl($routeParams.modelId);
 
-    		$scope.model.appExportUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/' + $routeParams.modelId +
-                '/export?version=' + Date.now();
+    		$scope.model.appExportUrl = FLOWABLE.APP_URL.getAppDefinitionExportUrl($routeParams.modelId);
 
-    		$scope.model.appBarExportUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/' + $routeParams.modelId +
-                '/export-bar?version=' + Date.now();
+    		$scope.model.appBarExportUrl = FLOWABLE.APP_URL.getAppDefinitionBarExportUrl($routeParams.modelId);
     	}
 
     	$http({method: 'GET', url: url}).
@@ -72,7 +80,7 @@ angular.module('flowableModeler')
         includeLatestVersion: !$scope.model.app.latestVersion
       };
 
-      $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.model.latestModelId + '/history', params: params}).
+      $http({method: 'GET', url: FLOWABLE.APP_URL.getModelHistoriesUrl($scope.model.latestModelId), params: params}).
 	      success(function(data, status, headers, config) {
 	        if ($scope.model.app.latestVersion) {
 	          if (!data.data) {
@@ -202,7 +210,7 @@ angular.module('flowableModeler')
 
         delete $scope.popup.error;
 
-        $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/' + $scope.model.app.id + '/publish', data: data}).
+        $http({method: 'POST', url: FLOWABLE.APP_URL.getAppDefinitionPublishUrl($scope.model.app.id), data: data}).
             success(function(data, status, headers, config) {
                 $scope.$hide();
 
@@ -245,7 +253,7 @@ angular.module('flowableModeler')
             deleteRuntimeApp: true
         };
 
-        $http({method: 'DELETE', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.model.app.id, params: params}).
+        $http({method: 'DELETE', url: FLOWABLE.APP_URL.getModelUrl($scope.model.app.id), params: params}).
             success(function(data, status, headers, config) {
                 $scope.$hide();
                 $scope.popup.loading = false;
@@ -282,9 +290,9 @@ angular.module('flowableModeler')
 
           var url;
           if (isIE) {
-              url = FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/' + $scope.model.app.id + '/text/import?renewIdmEntries=' + $scope.popup.renewIdmIds;
+              url = FLOWABLE.APP_URL.getAppDefinitionModelTextImportUrl($scope.model.app.id, $scope.popup.renewIdmIds);
           } else {
-              url = FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/' + $scope.model.app.id + '/import?renewIdmEntries=' + $scope.popup.renewIdmIds;
+              url = FLOWABLE.APP_URL.getAppDefinitionModelImportUrl($scope.model.app.id, $scope.popup.renewIdmIds);
           }
 
           Upload.upload({

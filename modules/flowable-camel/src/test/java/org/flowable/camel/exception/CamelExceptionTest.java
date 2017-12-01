@@ -25,8 +25,8 @@ import org.flowable.engine.ManagementService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.impl.test.JobTestHelper;
-import org.flowable.engine.runtime.Job;
 import org.flowable.engine.test.Deployment;
+import org.flowable.job.api.Job;
 import org.flowable.spring.impl.test.SpringFlowableTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -46,6 +46,7 @@ public class CamelExceptionTest extends SpringFlowableTestCase {
     @Autowired
     protected ManagementService managementService;
 
+    @Override
     public void setUp() throws Exception {
         ExceptionServiceMock.reset();
         NoExceptionServiceMock.reset();
@@ -58,6 +59,7 @@ public class CamelExceptionTest extends SpringFlowableTestCase {
         });
     }
 
+    @Override
     public void tearDown() throws Exception {
         List<Route> routes = camelContext.getRoutes();
         for (Route r : routes) {

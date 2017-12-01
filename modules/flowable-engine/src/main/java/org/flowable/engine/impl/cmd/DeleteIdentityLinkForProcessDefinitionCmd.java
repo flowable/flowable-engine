@@ -55,6 +55,7 @@ public class DeleteIdentityLinkForProcessDefinitionCmd implements Command<Object
         }
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         ProcessDefinitionEntity processDefinition = CommandContextUtil.getProcessDefinitionEntityManager(commandContext).findById(processDefinitionId);
 
@@ -68,7 +69,7 @@ public class DeleteIdentityLinkForProcessDefinitionCmd implements Command<Object
             return null;
         }
 
-        CommandContextUtil.getIdentityLinkEntityManager(commandContext).deleteIdentityLink(processDefinition, userId, groupId);
+        CommandContextUtil.getIdentityLinkService().deleteProcessDefinitionIdentityLink(processDefinition.getId(), userId, groupId);
 
         return null;
     }

@@ -52,6 +52,7 @@ public class EventSubProcessSignalStartEventActivityBehavior extends AbstractBpm
         this.signal = signal;
     }
 
+    @Override
     public void execute(DelegateExecution execution) {
         StartEvent startEvent = (StartEvent) execution.getCurrentFlowElement();
         EventSubProcess eventSubProcess = (EventSubProcess) startEvent.getSubProcess();

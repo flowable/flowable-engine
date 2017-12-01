@@ -22,15 +22,15 @@ import org.flowable.engine.TaskService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.api.query.QueryProperty;
-import org.flowable.engine.history.HistoricTaskInstance;
-import org.flowable.engine.impl.TaskQueryProperty;
-import org.flowable.engine.task.DelegationState;
-import org.flowable.engine.task.Task;
-import org.flowable.engine.task.TaskQuery;
 import org.flowable.rest.api.DataResponse;
 import org.flowable.rest.service.api.RestResponseFactory;
 import org.flowable.rest.service.api.engine.variable.QueryVariable;
 import org.flowable.rest.service.api.engine.variable.QueryVariable.QueryVariableOperation;
+import org.flowable.task.api.DelegationState;
+import org.flowable.task.api.Task;
+import org.flowable.task.api.TaskQuery;
+import org.flowable.task.api.history.HistoricTaskInstance;
+import org.flowable.task.service.impl.TaskQueryProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**
@@ -118,7 +118,7 @@ public class TaskBaseResource {
         }
     }
 
-    protected DataResponse getTasksFromQueryRequest(TaskQueryRequest request, Map<String, String> requestParams) {
+    protected DataResponse<TaskResponse> getTasksFromQueryRequest(TaskQueryRequest request, Map<String, String> requestParams) {
 
         TaskQuery taskQuery = taskService.createTaskQuery();
 

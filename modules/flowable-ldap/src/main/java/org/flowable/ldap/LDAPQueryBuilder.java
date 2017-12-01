@@ -53,6 +53,7 @@ public class LDAPQueryBuilder {
             LDAPTemplate ldapTemplate = new LDAPTemplate(ldapConfigurator);
             String userDn = ldapTemplate.execute(new LDAPCallBack<String>() {
 
+                @Override
                 public String executeInContext(InitialDirContext initialDirContext) {
 
                     String userDnSearch = buildQueryByUserId(ldapConfigurator, userId);

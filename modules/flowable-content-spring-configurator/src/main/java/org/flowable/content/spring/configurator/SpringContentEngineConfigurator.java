@@ -15,10 +15,9 @@ package org.flowable.content.spring.configurator;
 import org.flowable.content.engine.ContentEngine;
 import org.flowable.content.engine.configurator.ContentEngineConfigurator;
 import org.flowable.content.spring.SpringContentEngineConfiguration;
+import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.impl.interceptor.EngineConfigurationConstants;
-import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.flowable.spring.SpringProcessEngineConfiguration;
+import org.flowable.spring.common.SpringEngineConfiguration;
 
 /**
  * @author Tijs Rademakers
@@ -29,16 +28,20 @@ public class SpringContentEngineConfigurator extends ContentEngineConfigurator {
     protected SpringContentEngineConfiguration contentEngineConfiguration;
 
     @Override
-    public void configure(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    public void configure(AbstractEngineConfiguration engineConfiguration) {
         if (contentEngineConfiguration == null) {
             contentEngineConfiguration = new SpringContentEngineConfiguration();
         }
-        initialiseCommonProperties(processEngineConfiguration, contentEngineConfiguration, EngineConfigurationConstants.KEY_CONTENT_ENGINE_CONFIG);
-        contentEngineConfiguration.setTransactionManager(((SpringProcessEngineConfiguration) processEngineConfiguration).getTransactionManager());
+        initialiseCommonProperties(engineConfiguration, contentEngineConfiguration);
+        SpringEngineConfiguration springEngineConfiguration = (SpringEngineConfiguration) engineConfiguration;
+        contentEngineConfiguration.setTransactionManager(springEngineConfiguration.getTransactionManager());
         
         initContentEngine();
+        
+        initServiceConfigurations(engineConfiguration, contentEngineConfiguration);
     }
 
+    @Override
     protected synchronized ContentEngine initContentEngine() {
         if (contentEngineConfiguration == null) {
             throw new FlowableException("ContentEngineConfiguration is required");
@@ -47,6 +50,7 @@ public class SpringContentEngineConfigurator extends ContentEngineConfigurator {
         return contentEngineConfiguration.buildContentEngine();
     }
 
+    @Override
     public SpringContentEngineConfiguration getContentEngineConfiguration() {
         return contentEngineConfiguration;
     }

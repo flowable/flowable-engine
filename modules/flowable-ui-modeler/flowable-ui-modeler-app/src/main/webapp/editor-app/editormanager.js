@@ -182,6 +182,21 @@ angular.module("flowableModeler").factory("editorManager", ["$http", function ($
         },
         getModel: function () {
             this.syncCanvasTracker();
+            
+            var modelMetaData = this.getBaseModelData();
+            
+            var stencilId = undefined;
+            var stencilSetNamespace = undefined;
+            var stencilSetUrl = undefined;
+            if (modelMetaData.model.stencilset.namespace == 'http://b3mn.org/stencilset/cmmn1.1#') {
+                stencilId = 'CMMNDiagram';
+                stencilSetNamespace = 'http://b3mn.org/stencilset/cmmn1.1#';
+                stencilSetUrl = '../editor/stencilsets/cmmn1.1/cmmn1.1.json';
+            } else {
+                stencilId = 'BPMNDiagram';
+                stencilSetNamespace = 'http://b3mn.org/stencilset/bpmn2.0#';
+                stencilSetUrl = '../editor/stencilsets/bpmn2.0/bpmn2.0.json';
+            }
 
             //this is an object.
             var editorConfig = this.editor.getJSON();
@@ -191,11 +206,11 @@ angular.module("flowableModeler").factory("editorManager", ["$http", function ($
                 properties: editorConfig.properties,
                 childShapes: JSON.parse(this.canvasTracker.get(this.modelId)),
                 stencil: {
-                    id: "BPMNDiagram",
+                    id: stencilId,
                 },
                 stencilset: {
-                    namespace: "http://b3mn.org/stencilset/bpmn2.0#",
-                    url: "../editor/stencilsets/bpmn2.0/bpmn2.0.json"
+                    namespace: stencilSetNamespace,
+                    url: stencilSetUrl
                 }
             };
 
@@ -203,20 +218,21 @@ angular.module("flowableModeler").factory("editorManager", ["$http", function ($
 
             return model;
         },
-        bootEditor: function (response) {
+        setModelData: function(response){
+            this.modelData = response.data;
+        },
+        bootEditor: function () {
             //TODO: populate the canvas with correct json sections.
             //resetting the state
             this.canvasTracker = new Hash();
-
-            var config = jQuery.extend(true, {}, response.data); //avoid a reference to the original object.
+            var config = jQuery.extend(true, {}, this.modelData); //avoid a reference to the original object.
             if(!config.model.childShapes){
                 config.model.childShapes = [];
             }
-
+            
             this.findAndRegisterCanvas(config.model.childShapes); //this will remove any childshapes of a collapseable subprocess.
             this.canvasTracker.set(config.modelId, JSON.stringify(config.model.childShapes)); //this will be overwritten almost instantly.
 
-            this.modelData = response.data;
             this.editor = new ORYX.Editor(config);
             this.current = this.editor.id;
             this.loading = false;

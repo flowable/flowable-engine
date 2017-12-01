@@ -12,10 +12,6 @@
  */
 package org.flowable.app.service.runtime;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -34,24 +30,35 @@ import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.api.UserCache;
 import org.flowable.app.service.api.UserCache.CachedUser;
 import org.flowable.app.service.exception.BadRequestException;
+import org.flowable.cmmn.api.CmmnHistoryService;
+import org.flowable.cmmn.api.CmmnRepositoryService;
+import org.flowable.cmmn.api.CmmnRuntimeService;
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
+import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
+import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.HistoryService;
 import org.flowable.engine.RepositoryService;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.TaskService;
 import org.flowable.engine.history.HistoricProcessInstance;
-import org.flowable.engine.history.HistoricTaskInstanceQuery;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.repository.Deployment;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.TaskInfo;
-import org.flowable.engine.task.TaskInfoQueryWrapper;
 import org.flowable.idm.api.User;
+import org.flowable.task.api.TaskInfo;
+import org.flowable.task.api.TaskInfoQueryWrapper;
+import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.databind.util.ISO8601DateFormat;
 
 /**
  * @author Tijs Rademakers
@@ -71,15 +78,24 @@ public class FlowableTaskQueryService {
 
     @Autowired
     protected RepositoryService repositoryService;
+    
+    @Autowired
+    protected CmmnRepositoryService cmmnRepositoryService;
 
     @Autowired
     protected TaskService taskService;
 
     @Autowired
     protected RuntimeService runtimeService;
+    
+    @Autowired
+    protected CmmnRuntimeService cmmnRuntimeService;
 
     @Autowired
     protected HistoryService historyService;
+    
+    @Autowired
+    protected CmmnHistoryService cmmnHistoryService;
 
     @Autowired
     protected UserCache userCache;
@@ -106,13 +122,20 @@ public class FlowableTaskQueryService {
         JsonNode deploymentKeyNode = requestNode.get("deploymentKey");
         if (deploymentKeyNode != null && !deploymentKeyNode.isNull()) {
             List<Deployment> deployments = repositoryService.createDeploymentQuery().deploymentKey(deploymentKeyNode.asText()).list();
-            List<String> deploymentIds = new ArrayList<String>(deployments.size());
+            List<String> deploymentIds = new ArrayList<>();
             for (Deployment deployment : deployments) {
                 deploymentIds.add(deployment.getId());
+            }
+            
+            List<CmmnDeployment> cmmnDeployments = cmmnRepositoryService.createDeploymentQuery().deploymentKey(deploymentKeyNode.asText()).list();
+            List<String> cmmnDeploymentIds = new ArrayList<>();
+            for (CmmnDeployment deployment : cmmnDeployments) {
+                cmmnDeploymentIds.add(deployment.getId());
             }
 
             taskInfoQueryWrapper.getTaskInfoQuery().or()
                     .deploymentIdIn(deploymentIds)
+                    .cmmnDeploymentIdIn(cmmnDeploymentIds)
                     .taskCategory(deploymentKeyNode.asText())
                     .endOr();
         }
@@ -120,6 +143,11 @@ public class FlowableTaskQueryService {
         JsonNode processInstanceIdNode = requestNode.get("processInstanceId");
         if (processInstanceIdNode != null && !processInstanceIdNode.isNull()) {
             handleProcessInstanceFiltering(currentUser, taskInfoQueryWrapper, processInstanceIdNode);
+        }
+        
+        JsonNode caseInstanceIdNode = requestNode.get("caseInstanceId");
+        if (caseInstanceIdNode != null && !caseInstanceIdNode.isNull()) {
+            handleCaseInstanceFiltering(currentUser, taskInfoQueryWrapper, caseInstanceIdNode);
         }
 
         JsonNode textNode = requestNode.get("text");
@@ -167,13 +195,14 @@ public class FlowableTaskQueryService {
         List<? extends TaskInfo> tasks = taskInfoQueryWrapper.getTaskInfoQuery().listPage(page * size, size);
 
         JsonNode includeProcessInstanceNode = requestNode.get("includeProcessInstance");
-        // todo Once a ProcessInstanceInfo class has been implement use it instead rather than just the name
-        Map<String, String> processInstancesNames = new HashMap<String, String>();
+        Map<String, String> processInstancesNames = new HashMap<>();
+        Map<String, String> caseInstancesNames = new HashMap<>();
         if (includeProcessInstanceNode != null) {
             handleIncludeProcessInstance(taskInfoQueryWrapper, includeProcessInstanceNode, tasks, processInstancesNames);
+            handleIncludeCaseInstance(taskInfoQueryWrapper, includeProcessInstanceNode, tasks, caseInstancesNames);
         }
 
-        ResultListDataRepresentation result = new ResultListDataRepresentation(convertTaskInfoList(tasks, processInstancesNames));
+        ResultListDataRepresentation result = new ResultListDataRepresentation(convertTaskInfoList(tasks, processInstancesNames, caseInstancesNames));
 
         // In case we're not on the first page and the size exceeds the page size, we need to do an additional count for the total
         if (page != 0 || tasks.size() == size) {
@@ -188,6 +217,11 @@ public class FlowableTaskQueryService {
     protected void handleProcessInstanceFiltering(User currentUser, TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode processInstanceIdNode) {
         String processInstanceId = processInstanceIdNode.asText();
         taskInfoQueryWrapper.getTaskInfoQuery().processInstanceId(processInstanceId);
+    }
+    
+    protected void handleCaseInstanceFiltering(User currentUser, TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode caseInstanceIdNode) {
+        String caseInstanceId = caseInstanceIdNode.asText();
+        taskInfoQueryWrapper.getTaskInfoQuery().scopeId(caseInstanceId).scopeType("cmmn");
     }
 
     protected void handleTextFiltering(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode textNode) {
@@ -281,7 +315,7 @@ public class FlowableTaskQueryService {
 
     protected void handleIncludeProcessInstance(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode includeProcessInstanceNode, List<? extends TaskInfo> tasks, Map<String, String> processInstanceNames) {
         if (includeProcessInstanceNode.asBoolean() && CollectionUtils.isNotEmpty(tasks)) {
-            Set<String> processInstanceIds = new HashSet<String>();
+            Set<String> processInstanceIds = new HashSet<>();
             for (TaskInfo task : tasks) {
                 if (task.getProcessInstanceId() != null) {
                     processInstanceIds.add(task.getProcessInstanceId());
@@ -302,26 +336,58 @@ public class FlowableTaskQueryService {
             }
         }
     }
+    
+    protected void handleIncludeCaseInstance(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode includeProcessInstanceNode, List<? extends TaskInfo> tasks, Map<String, String> caseInstanceNames) {
+        if (includeProcessInstanceNode.asBoolean() && CollectionUtils.isNotEmpty(tasks)) {
+            Set<String> caseInstanceIds = new HashSet<>();
+            for (TaskInfo task : tasks) {
+                if (task.getScopeId() != null) {
+                    caseInstanceIds.add(task.getScopeId());
+                }
+            }
+            if (CollectionUtils.isNotEmpty(caseInstanceIds)) {
+                if (taskInfoQueryWrapper.getTaskInfoQuery() instanceof HistoricTaskInstanceQuery) {
+                    List<HistoricCaseInstance> caseInstances = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceIds(caseInstanceIds).list();
+                    for (HistoricCaseInstance caseInstance : caseInstances) {
+                        caseInstanceNames.put(caseInstance.getId(), caseInstance.getName());
+                    }
+                } else {
+                    List<CaseInstance> caseInstances = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceIds(caseInstanceIds).list();
+                    for (CaseInstance caseInstance : caseInstances) {
+                        caseInstanceNames.put(caseInstance.getId(), caseInstance.getName());
+                    }
+                }
+            }
+        }
+    }
 
-    protected List<TaskRepresentation> convertTaskInfoList(List<? extends TaskInfo> tasks, Map<String, String> processInstanceNames) {
-        List<TaskRepresentation> result = new ArrayList<TaskRepresentation>();
+    protected List<TaskRepresentation> convertTaskInfoList(List<? extends TaskInfo> tasks, Map<String, String> processInstanceNames, Map<String, String> caseInstancesNames) {
+        List<TaskRepresentation> result = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(tasks)) {
             for (TaskInfo task : tasks) {
-                ProcessDefinitionEntity processDefinition = null;
-                if (task.getProcessDefinitionId() != null) {
-                    processDefinition = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(task.getProcessDefinitionId());
+                
+                TaskRepresentation taskRepresentation = null;
+                if (task.getScopeDefinitionId() != null) {
+                    CaseDefinition caseDefinition = cmmnRepositoryService.getCaseDefinition(task.getScopeDefinitionId());
+                    taskRepresentation = new TaskRepresentation(task, caseDefinition, caseInstancesNames.get(task.getScopeId()));
+                    
+                } else {
+                    ProcessDefinitionEntity processDefinition = null;
+                    if (task.getProcessDefinitionId() != null) {
+                        processDefinition = (ProcessDefinitionEntity) repositoryService.getProcessDefinition(task.getProcessDefinitionId());
+                    }
+                    taskRepresentation = new TaskRepresentation(task, processDefinition, processInstanceNames.get(task.getProcessInstanceId()));
                 }
-                TaskRepresentation representation = new TaskRepresentation(task, processDefinition, processInstanceNames.get(task.getProcessInstanceId()));
 
                 if (StringUtils.isNotEmpty(task.getAssignee())) {
                     CachedUser cachedUser = userCache.getUser(task.getAssignee());
                     if (cachedUser != null && cachedUser.getUser() != null) {
                         User assignee = cachedUser.getUser();
-                        representation.setAssignee(new UserRepresentation(assignee));
+                        taskRepresentation.setAssignee(new UserRepresentation(assignee));
                     }
                 }
 
-                result.add(representation);
+                result.add(taskRepresentation);
             }
         }
         return result;

@@ -21,9 +21,9 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
-import org.flowable.engine.impl.persistence.entity.IdentityLinkEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
+import org.flowable.engine.impl.util.IdentityLinkUtil;
 
 /**
  * @author Marcus Klimstra
@@ -65,6 +65,7 @@ public class AddIdentityLinkForProcessInstanceCmd implements Command<Void>, Seri
 
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
 
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
@@ -80,8 +81,7 @@ public class AddIdentityLinkForProcessInstanceCmd implements Command<Void>, Seri
             return null;
         }
 
-        IdentityLinkEntityManager identityLinkEntityManager = CommandContextUtil.getIdentityLinkEntityManager(commandContext);
-        identityLinkEntityManager.addIdentityLink(processInstance, userId, groupId, type);
+        IdentityLinkUtil.createProcessInstanceIdentityLink(processInstance, userId, groupId, type);
         CommandContextUtil.getHistoryManager(commandContext).createProcessInstanceIdentityLinkComment(processInstanceId, userId, groupId, type, true);
 
         return null;

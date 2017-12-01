@@ -13,6 +13,7 @@
 package org.flowable.engine.impl.cfg.multitenant;
 
 import org.flowable.engine.ProcessEngineConfiguration;
+import org.flowable.engine.common.impl.cfg.multitenant.TenantInfoHolder;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -34,6 +35,7 @@ public class ExecuteSchemaOperationCommand implements Command<Void> {
         this.schemaOperation = schemaOperation;
     }
 
+    @Override
     public Void execute(CommandContext commandContext) {
         ProcessDbSchemaManager processDbSchemaManager = (ProcessDbSchemaManager) CommandContextUtil.getProcessEngineConfiguration(commandContext).getDbSchemaManager();
         if (ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE.equals(schemaOperation)) {

@@ -28,7 +28,6 @@ import org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.flowable.engine.repository.DeploymentProperties;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
-import org.flowable.engine.task.Task;
 
 /**
  * Test cases for testing functionality when the process engine is rebooted.
@@ -108,7 +107,7 @@ public class ProcessDefinitionCacheTest extends PvmTestCase {
 
         // Complete the task. That will end the process instance
         TaskService taskService = processEngine.getTaskService();
-        Task task = taskService
+        org.flowable.task.api.Task task = taskService
                 .createTaskQuery()
                 .list()
                 .get(0);
@@ -168,7 +167,7 @@ public class ProcessDefinitionCacheTest extends PvmTestCase {
         // Start process instance on second engine
         String processDefinitionId = repositoryService2.createProcessDefinitionQuery().singleResult().getId();
         runtimeService2.startProcessInstanceById(processDefinitionId);
-        Task task = taskService2.createTaskQuery().singleResult();
+        org.flowable.task.api.Task task = taskService2.createTaskQuery().singleResult();
         assertEquals("original task", task.getName());
 
         // Delete the deployment on second process engine

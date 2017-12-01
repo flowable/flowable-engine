@@ -16,13 +16,13 @@ import java.util.List;
 
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.delegate.DelegateTask;
-import org.flowable.engine.delegate.Expression;
 import org.flowable.engine.delegate.TaskListener;
 import org.flowable.engine.impl.bpmn.helper.DelegateExpressionUtil;
 import org.flowable.engine.impl.bpmn.parser.FieldDeclaration;
 import org.flowable.engine.impl.delegate.invocation.TaskListenerInvocation;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.task.service.delegate.DelegateTask;
+import org.flowable.engine.common.api.delegate.Expression;
 
 /**
  * @author Joram Barrez
@@ -37,6 +37,7 @@ public class DelegateExpressionTaskListener implements TaskListener {
         this.fieldDeclarations = fieldDeclarations;
     }
 
+    @Override
     public void notify(DelegateTask delegateTask) {
         Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, delegateTask, fieldDeclarations);
         if (delegate instanceof TaskListener) {
