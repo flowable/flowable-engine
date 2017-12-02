@@ -47,32 +47,6 @@ public interface FlowableEventDispatcher {
     void removeEventListener(FlowableEventListener listenerToRemove);
 
     /**
-     * Adds an event-listener which will be notified of ALL events by the dispatcher.
-     *
-     * @param listenerToAdd
-     *            the listener to add
-     */
-//    void addEventListener(TransactionFlowableEventListener listenerToAdd);
-
-    /**
-     * Adds an event-listener which will only be notified when an event of the given types occurs.
-     *
-     * @param listenerToAdd
-     *            the listener to add
-     * @param types
-     *            types of events the listener should be notified for
-     */
-//    void addEventListener(TransactionFlowableEventListener listenerToAdd, FlowableEventType... types);
-
-    /**
-     * Removes the given listener from this dispatcher. The listener will no longer be notified, regardless of the type(s) it was registered for in the first place.
-     *
-     * @param listenerToRemove
-     *            listener to remove
-     */
-//    void removeEventListener(TransactionFlowableEventListener listenerToRemove);
-
-    /**
      * Dispatches the given event to any listeners that are registered.
      * 
      * @param event

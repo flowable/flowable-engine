@@ -41,7 +41,6 @@ public class BpmnModelEventDispatchAction implements EventDispatchAction {
             BpmnModel bpmnModel = extractBpmnModelFromEvent(event);
             if (bpmnModel != null) {
                 ((FlowableEventSupport) bpmnModel.getEventSupport()).dispatchEvent(event);
-//                ((TransactionDependentFlowableEventSupport) bpmnModel.getTransactionEventSupport()).dispatchEvent(event);
             }
         }
     }

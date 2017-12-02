@@ -12,20 +12,11 @@
  */
 package org.flowable.idm.engine;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
 import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 import org.flowable.engine.common.impl.cfg.BeansConfigurationHelper;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
@@ -37,7 +28,6 @@ import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.common.impl.persistence.GenericManagerFactory;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.IdmManagementService;
@@ -94,6 +84,14 @@ import org.flowable.idm.engine.impl.persistence.entity.data.impl.MybatisTokenDat
 import org.flowable.idm.engine.impl.persistence.entity.data.impl.MybatisUserDataManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class IdmEngineConfiguration extends AbstractEngineConfiguration {
 
@@ -839,13 +837,6 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         this.eventListeners = eventListeners;
         return this;
     }
-
-    @Override
-    public IdmEngineConfiguration setTransactionEventListeners(List<TransactionFlowableEventListener> eventListeners) {
-        this.transactionDependentEventListeners = eventListeners;
-        return this;
-    }
-
 
     @Override
     public IdmEngineConfiguration setTypedEventListeners(Map<String, List<FlowableEventListener>> typedEventListeners) {

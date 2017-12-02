@@ -13,24 +13,7 @@
 
 package org.flowable.engine.impl.cfg;
 
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.ServiceLoader;
-import java.util.Set;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
-import javax.xml.namespace.QName;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -59,7 +42,6 @@ import org.flowable.engine.common.api.delegate.FlowableFunctionDelegate;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
 import org.flowable.engine.common.impl.calendar.CycleBusinessCalendar;
 import org.flowable.engine.common.impl.calendar.DueDateBusinessCalendar;
@@ -279,8 +261,8 @@ import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.flowable.job.service.HistoryJobHandler;
-import org.flowable.job.service.InternalJobCompatibilityManager;
 import org.flowable.job.service.HistoryJobProcessor;
+import org.flowable.job.service.InternalJobCompatibilityManager;
 import org.flowable.job.service.InternalJobManager;
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.JobProcessor;
@@ -332,7 +314,24 @@ import org.flowable.variable.service.impl.types.UUIDType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.ServiceLoader;
+import java.util.Set;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import javax.xml.namespace.QName;
 
 /**
  * @author Tom Baeyens
@@ -2030,23 +2029,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             this.transactionDependentFactory = new DefaultTransactionDependentEventListenerFactory();
         }
 
-        if (transactionDependentEventListeners != null) {
-            for (TransactionFlowableEventListener listenerToAdd : transactionDependentEventListeners) {
-                this.eventDispatcher.addEventListener(listenerToAdd);
-            }
-        }
-
-        if (transactionDependentTypedEventListeners != null) {
-            for (Entry<String, List<TransactionFlowableEventListener>> listenersToAdd : transactionDependentTypedEventListeners.entrySet()) {
-                // Extract types from the given string
-                FlowableEngineEventType[] types = FlowableEngineEventType.getTypesFromString(listenersToAdd.getKey());
-
-                for (TransactionFlowableEventListener listenerToAdd : listenersToAdd.getValue()) {
-                    this.eventDispatcher.addEventListener(listenerToAdd, types);
-                }
-            }
-        }
-
     }
 
     public void initProcessValidator() {
@@ -2954,13 +2936,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.eventListeners = eventListeners;
         return this;
     }
-
-    @Override
-    public ProcessEngineConfigurationImpl setTransactionEventListeners(List<TransactionFlowableEventListener> eventListeners) {
-        this.transactionDependentEventListeners = eventListeners;
-        return this;
-    }
-
 
     public ProcessValidator getProcessValidator() {
         return processValidator;

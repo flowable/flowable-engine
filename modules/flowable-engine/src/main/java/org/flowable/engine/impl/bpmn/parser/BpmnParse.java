@@ -188,7 +188,6 @@ public class BpmnParse implements BpmnXMLConstants {
 
             bpmnModel.setSourceSystemId(sourceSystemId);
             bpmnModel.setEventSupport(new FlowableEventSupport());
-//            bpmnModel.setTransactionEventSupport(new TransactionDependentFlowableEventSupport());
 
             // Validation successful (or no validation)
 

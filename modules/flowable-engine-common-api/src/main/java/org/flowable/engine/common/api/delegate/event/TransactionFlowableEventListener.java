@@ -8,11 +8,10 @@ package org.flowable.engine.common.api.delegate.event;
 
 public interface TransactionFlowableEventListener extends FlowableEventListener {
 
-    String ON_TRANSACTION_BEFORE_COMMIT = "before-commit";
-    String ON_TRANSACTION_COMMITTED = "committed";
-    String ON_TRANSACTION_ROLLED_BACK = "rolled-back";
-
-
+    /*
+     *
+     * org.flowable.engine.common.impl.cfg.TransactionState
+     */
     String getOnTransaction();
 
     void setOnTransaction(String onTransaction);
