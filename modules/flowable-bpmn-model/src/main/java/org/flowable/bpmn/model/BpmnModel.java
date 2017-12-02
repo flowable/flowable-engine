@@ -51,7 +51,7 @@ public class BpmnModel {
     protected List<String> startEventFormTypes;
     protected int nextFlowIdCounter = 1;
     protected Object eventSupport;
-    protected Object transactionEventSupport;
+//    protected Object transactionEventSupport;
 
     public Map<String, List<ExtensionAttribute>> getDefinitionsAttributes() {
         return definitionsAttributes;
@@ -566,12 +566,12 @@ public class BpmnModel {
         this.eventSupport = eventSupport;
     }
 
-    @JsonIgnore
-    public Object getTransactionEventSupport() {
-        return transactionEventSupport;
-    }
+//    @JsonIgnore
+//    public Object getTransactionEventSupport() {
+//        return transactionEventSupport;
+//    }
 
-    public void setTransactionEventSupport(Object eventSupport) {
-        this.transactionEventSupport = eventSupport;
-    }
+//    public void setTransactionEventSupport(Object eventSupport) {
+//        this.transactionEventSupport = eventSupport;
+//    }
 }

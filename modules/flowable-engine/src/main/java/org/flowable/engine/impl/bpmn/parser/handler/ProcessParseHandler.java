@@ -21,7 +21,6 @@ import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.TransactionEventListener;
 import org.flowable.engine.common.impl.event.FlowableEventSupport;
-import org.flowable.engine.common.impl.event.TransactionDependentFlowableEventSupport;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.impl.event.FlowableEventSupport;
 import org.flowable.engine.impl.bpmn.parser.BpmnParse;
@@ -73,7 +72,7 @@ public class ProcessParseHandler extends AbstractBpmnParseHandler<Process> {
 
         createEventListeners(bpmnParse, process.getEventListeners());
 
-        createTransactionEventListeners(bpmnParse, process.getTransactionEventListeners());
+//        createTransactionEventListeners(bpmnParse, process.getTransactionEventListeners());
 
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Parsing process {}", currentProcessDefinition.getKey());
@@ -113,40 +112,40 @@ public class ProcessParseHandler extends AbstractBpmnParseHandler<Process> {
 
     }
 
-    protected void createTransactionEventListeners(BpmnParse bpmnParse, List<TransactionEventListener> eventListeners) {
-
-        if (eventListeners != null && !eventListeners.isEmpty()) {
-            for (TransactionEventListener eventListener : eventListeners) {
-                // Extract specific event-types (if any)
-                FlowableEngineEventType[] types = FlowableEngineEventType.getTypesFromString(eventListener.getEvents());
-
-                if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(eventListener.getImplementationType())) {
-                    getTrasactionEventSupport(bpmnParse.getBpmnModel()).addEventListener(bpmnParse.getListenerFactory().createClassDelegateTransactionDependentEventListener(eventListener), types);
-
-                } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(eventListener.getImplementationType())) {
-                    getTrasactionEventSupport(bpmnParse.getBpmnModel()).addEventListener(bpmnParse.getListenerFactory().createDelegateExpressionTransactionDependentEventListener(eventListener), types);
-
-                } else if (ImplementationType.IMPLEMENTATION_TYPE_THROW_SIGNAL_EVENT.equals(eventListener.getImplementationType())
-                        || ImplementationType.IMPLEMENTATION_TYPE_THROW_GLOBAL_SIGNAL_EVENT.equals(eventListener.getImplementationType())
-                        || ImplementationType.IMPLEMENTATION_TYPE_THROW_MESSAGE_EVENT.equals(eventListener.getImplementationType())
-                        || ImplementationType.IMPLEMENTATION_TYPE_THROW_ERROR_EVENT.equals(eventListener.getImplementationType())) {
-
-//                    getEventSupport(bpmnParse.getBpmnModel()).addEventListener(bpmnParse.getListenerFactory().createEventThrowingEventListener(eventListener), types);
-
-                } else {
-                    LOGGER.warn("Unsupported implementation type for EventListener: {} for element {}", eventListener.getImplementationType(), bpmnParse.getCurrentFlowElement().getId());
-                }
-            }
-        }
-
-    }
+//    protected void createTransactionEventListeners(BpmnParse bpmnParse, List<TransactionEventListener> eventListeners) {
+//
+//        if (eventListeners != null && !eventListeners.isEmpty()) {
+//            for (TransactionEventListener eventListener : eventListeners) {
+//                // Extract specific event-types (if any)
+//                FlowableEngineEventType[] types = FlowableEngineEventType.getTypesFromString(eventListener.getEvents());
+//
+//                if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(eventListener.getImplementationType())) {
+//                    getTrasactionEventSupport(bpmnParse.getBpmnModel()).addEventListener(bpmnParse.getListenerFactory().createClassDelegateTransactionDependentEventListener(eventListener), types);
+//
+//                } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(eventListener.getImplementationType())) {
+//                    getTrasactionEventSupport(bpmnParse.getBpmnModel()).addEventListener(bpmnParse.getListenerFactory().createDelegateExpressionTransactionDependentEventListener(eventListener), types);
+//
+//                } else if (ImplementationType.IMPLEMENTATION_TYPE_THROW_SIGNAL_EVENT.equals(eventListener.getImplementationType())
+//                        || ImplementationType.IMPLEMENTATION_TYPE_THROW_GLOBAL_SIGNAL_EVENT.equals(eventListener.getImplementationType())
+//                        || ImplementationType.IMPLEMENTATION_TYPE_THROW_MESSAGE_EVENT.equals(eventListener.getImplementationType())
+//                        || ImplementationType.IMPLEMENTATION_TYPE_THROW_ERROR_EVENT.equals(eventListener.getImplementationType())) {
+//
+////                    getEventSupport(bpmnParse.getBpmnModel()).addEventListener(bpmnParse.getListenerFactory().createEventThrowingEventListener(eventListener), types);
+//
+//                } else {
+//                    LOGGER.warn("Unsupported implementation type for EventListener: {} for element {}", eventListener.getImplementationType(), bpmnParse.getCurrentFlowElement().getId());
+//                }
+//            }
+//        }
+//
+//    }
 
     protected FlowableEventSupport getEventSupport(BpmnModel bpmnModel) {
         return (FlowableEventSupport) bpmnModel.getEventSupport();
     }
 
-    protected TransactionDependentFlowableEventSupport getTrasactionEventSupport(BpmnModel bpmnModel) {
-        return (TransactionDependentFlowableEventSupport) bpmnModel.getTransactionEventSupport();
-    }
+//    protected TransactionDependentFlowableEventSupport getTrasactionEventSupport(BpmnModel bpmnModel) {
+//        return (TransactionDependentFlowableEventSupport) bpmnModel.getTransactionEventSupport();
+//    }
 
 }

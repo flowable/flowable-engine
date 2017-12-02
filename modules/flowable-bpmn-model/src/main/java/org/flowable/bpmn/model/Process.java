@@ -38,7 +38,7 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
     protected List<String> candidateStarterUsers = new ArrayList<>();
     protected List<String> candidateStarterGroups = new ArrayList<>();
     protected List<EventListener> eventListeners = new ArrayList<>();
-    protected List<TransactionEventListener> transactionEventListeners = new ArrayList<>();
+//    protected List<TransactionEventListener> transactionEventListeners = new ArrayList<>();
     protected Map<String, FlowElement> flowElementMap = new LinkedHashMap<>();
 
     // Added during process definition parsing
@@ -292,13 +292,13 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
         this.eventListeners = eventListeners;
     }
 
-    public List<TransactionEventListener> getTransactionEventListeners() {
-        return transactionEventListeners;
-    }
+//    public List<TransactionEventListener> getTransactionEventListeners() {
+//        return transactionEventListeners;
+//    }
 
-    public void setTransactionEventListeners(List<TransactionEventListener> transactionEventListeners) {
-        this.transactionEventListeners = transactionEventListeners;
-    }
+//    public void setTransactionEventListeners(List<TransactionEventListener> transactionEventListeners) {
+//        this.transactionEventListeners = transactionEventListeners;
+//    }
 
     public <FlowElementType extends FlowElement> List<FlowElementType> findFlowElementsOfType(Class<FlowElementType> type) {
         return findFlowElementsOfType(type, true);
@@ -403,12 +403,12 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
             }
         }
 
-        transactionEventListeners = new ArrayList<>();
-        if (otherElement.getTransactionEventListeners() != null && !otherElement.getTransactionEventListeners().isEmpty()) {
-            for (TransactionEventListener listener : otherElement.getTransactionEventListeners()) {
-                transactionEventListeners.add(listener.clone());
-            }
-        }
+//        transactionEventListeners = new ArrayList<>();
+//        if (otherElement.getTransactionEventListeners() != null && !otherElement.getTransactionEventListeners().isEmpty()) {
+//            for (TransactionEventListener listener : otherElement.getTransactionEventListeners()) {
+//                transactionEventListeners.add(listener.clone());
+//            }
+//        }
 
         /*
          * This is required because data objects in Designer have no DI info and are added as properties, not flow elements

@@ -19,7 +19,7 @@
         <property name="asyncExecutorActivate" value="false"/>
 
         <!-- Add transaction-event listener -->
-        <property name="transactionDependentEventListeners">
+        <property name="eventListeners">
             <list>
                 <ref bean="transactionEventListener"/>
             </list>

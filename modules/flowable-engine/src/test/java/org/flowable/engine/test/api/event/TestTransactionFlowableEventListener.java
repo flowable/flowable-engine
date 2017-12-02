@@ -53,8 +53,8 @@ public class TestTransactionFlowableEventListener implements TransactionFlowable
 
     @Override
     public void onEvent(FlowableEvent event) {
-                eventsReceived.add(event);
-                LOGGER.debug("{} {} event triggered ... {}", onTransaction, event.getType(), eventsReceived.size());
+        eventsReceived.add(event);
+        LOGGER.debug("{} {} event triggered ... {}", onTransaction, event.getType(), eventsReceived.size());
     }
 
     public boolean isEventTriggered(FlowableEngineEventType flowableEvent) {

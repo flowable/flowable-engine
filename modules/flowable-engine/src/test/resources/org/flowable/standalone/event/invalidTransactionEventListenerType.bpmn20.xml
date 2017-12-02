@@ -4,8 +4,10 @@
 
     <process id="testInvalidEventClass">
         <extensionElements>
-            <activiti:transactionEventListener events="invalid"
-                                               class="org.flowable.engine.test.api.event.StaticTestFlowableTransactionEventListener"/>
+            <activiti:eventListener events="invalid"
+                                               class="org.flowable.engine.test.api.event.StaticTestFlowableTransactionEventListener"
+            onTransaction="committed"
+            />
         </extensionElements>
 
         <startEvent id="theStart"/>

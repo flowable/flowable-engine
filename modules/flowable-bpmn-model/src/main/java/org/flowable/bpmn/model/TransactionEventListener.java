@@ -17,45 +17,9 @@ package org.flowable.bpmn.model;
  *
  * @author Frederik Heremans
  */
-public class TransactionEventListener extends BaseElement {
+public class TransactionEventListener extends EventListener {
 
-    protected String events;
-    protected String implementationType;
-    protected String implementation;
     protected String transaction;
-    protected String entityType;
-
-    public String getEvents() {
-        return events;
-    }
-
-    public void setEvents(String events) {
-        this.events = events;
-    }
-
-    public String getImplementationType() {
-        return implementationType;
-    }
-
-    public void setImplementationType(String implementationType) {
-        this.implementationType = implementationType;
-    }
-
-    public String getImplementation() {
-        return implementation;
-    }
-
-    public void setImplementation(String implementation) {
-        this.implementation = implementation;
-    }
-
-    public String getEntityType() {
-        return entityType;
-    }
-
-    public void setEntityType(String entityType) {
-        this.entityType = entityType;
-    }
 
     public String getTransaction() {
         return transaction;
@@ -72,10 +36,6 @@ public class TransactionEventListener extends BaseElement {
     }
 
     public void setValues(TransactionEventListener otherListener) {
-        setEvents(otherListener.getEvents());
-        setImplementation(otherListener.getImplementation());
-        setImplementationType(otherListener.getImplementationType());
-        setEntityType(otherListener.getEntityType());
         setTransaction(otherListener.getTransaction());
     }
 }

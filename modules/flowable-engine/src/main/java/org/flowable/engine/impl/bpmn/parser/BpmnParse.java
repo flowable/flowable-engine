@@ -28,7 +28,6 @@ import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.repository.EngineDeployment;
 import org.flowable.engine.common.impl.event.FlowableEventSupport;
-import org.flowable.engine.common.impl.event.TransactionDependentFlowableEventSupport;
 import org.flowable.engine.common.impl.util.io.InputStreamSource;
 import org.flowable.engine.common.impl.util.io.StreamSource;
 import org.flowable.engine.common.impl.util.io.StringStreamSource;
@@ -189,7 +188,7 @@ public class BpmnParse implements BpmnXMLConstants {
 
             bpmnModel.setSourceSystemId(sourceSystemId);
             bpmnModel.setEventSupport(new FlowableEventSupport());
-            bpmnModel.setTransactionEventSupport(new TransactionDependentFlowableEventSupport());
+//            bpmnModel.setTransactionEventSupport(new TransactionDependentFlowableEventSupport());
 
             // Validation successful (or no validation)
 

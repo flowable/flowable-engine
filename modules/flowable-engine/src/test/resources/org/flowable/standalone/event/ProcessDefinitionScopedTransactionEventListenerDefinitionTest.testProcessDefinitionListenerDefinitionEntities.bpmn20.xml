@@ -1,31 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns:activiti="http://activiti.org/bpmn"
+<definitions xmlns:flowable="http://flowable.org/bpmn"
              xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" targetNamespace="Examples">
 
     <process id="testTransactionEventListeners">
         <extensionElements>
-            <activiti:transactionEventListener
+            <flowable:eventListener
                     delegateExpression="${testAttachmentTransactionEventListener}"
                     entityType="attachment" onTransaction="COMMITTING"/>
-            <activiti:transactionEventListener
+            <flowable:eventListener
                     delegateExpression="${testCommentTransactionEventListener}" entityType="comment"
                     onTransaction="COMMITTING"/>
-            <activiti:transactionEventListener
+            <flowable:eventListener
                     delegateExpression="${testExecutionTransactionEventListener}"
                     entityType="execution" onTransaction="COMMITTING"/>
-            <activiti:transactionEventListener
+            <flowable:eventListener
                     delegateExpression="${testIdentityLinkTransactionEventListener}"
                     entityType="identity-link" onTransaction="COMMITTING"/>
-            <activiti:transactionEventListener
+            <flowable:eventListener
                     delegateExpression="${testJobTransactionEventListener}" entityType="job"
                     onTransaction="COMMITTING"/>
-            <activiti:transactionEventListener
+            <flowable:eventListener
                     delegateExpression="${testProcessDefinitionTransactionEventListener}"
                     entityType="process-definition" onTransaction="COMMITTING"/>
-            <activiti:transactionEventListener
+            <flowable:eventListener
                     delegateExpression="${testProcessInstanceTransactionEventListener}"
                     entityType="process-instance" onTransaction="COMMITTING"/>
-            <activiti:transactionEventListener
+            <flowable:eventListener
                     delegateExpression="${testTaskTransactionEventListener}" entityType="task"
                     onTransaction="COMMITTING"/>
         </extensionElements>

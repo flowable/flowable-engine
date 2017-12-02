@@ -125,7 +125,11 @@ public class DefaultListenerFactory extends AbstractBehaviorFactory implements L
 
     @Override
     public FlowableEventListener createClassDelegateEventListener(EventListener eventListener) {
-        return new DelegateFlowableEventListener(eventListener.getImplementation(), getEntityType(eventListener.getEntityType()));
+        if (eventListener instanceof TransactionEventListener){
+            return createClassDelegateTransactionDependentEventListener((TransactionEventListener)eventListener);
+        }else {
+            return new DelegateFlowableEventListener(eventListener.getImplementation(), getEntityType(eventListener.getEntityType()));
+        }
     }
 
     @Override
@@ -135,7 +139,11 @@ public class DefaultListenerFactory extends AbstractBehaviorFactory implements L
 
     @Override
     public FlowableEventListener createDelegateExpressionEventListener(EventListener eventListener) {
-        return new DelegateExpressionFlowableEventListener(expressionManager.createExpression(eventListener.getImplementation()), getEntityType(eventListener.getEntityType()));
+        if (eventListener instanceof TransactionEventListener){
+            return createDelegateExpressionTransactionDependentEventListener((TransactionEventListener)eventListener);
+        }else {
+            return new DelegateExpressionFlowableEventListener(expressionManager.createExpression(eventListener.getImplementation()), getEntityType(eventListener.getEntityType()));
+        }
     }
 
     @Override

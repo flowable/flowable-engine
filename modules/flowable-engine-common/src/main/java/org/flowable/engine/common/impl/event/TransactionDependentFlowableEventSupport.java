@@ -36,6 +36,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  *
  * @author Frederik Heremans
  */
+@Deprecated
 public class TransactionDependentFlowableEventSupport {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(TransactionDependentFlowableEventSupport.class);

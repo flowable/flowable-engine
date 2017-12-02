@@ -4,10 +4,10 @@
 
     <process id="testTransactionEventListeners">
         <extensionElements>
-            <activiti:transactionEventListener
+            <activiti:eventListener
                     class="org.flowable.engine.test.api.event.StaticTestFlowableTransactionEventListener"
                     onTransaction="COMMITTING"/>
-            <activiti:transactionEventListener delegateExpression="${testTransactionEventListener}"
+            <activiti:eventListener delegateExpression="${testTransactionEventListener}"
                                                events="ENTITY_CREATED" onTransaction="COMMITTING"/>
         </extensionElements>
 

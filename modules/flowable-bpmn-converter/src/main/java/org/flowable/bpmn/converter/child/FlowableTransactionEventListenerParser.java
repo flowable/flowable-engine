@@ -25,6 +25,7 @@ import javax.xml.stream.XMLStreamReader;
 /**
  * @author Frederik Heremans
  */
+@Deprecated
 public class FlowableTransactionEventListenerParser extends BaseChildElementParser {
 
     public void parseChildElement(XMLStreamReader xtr, BaseElement parentElement, BpmnModel model) throws Exception {
@@ -62,7 +63,7 @@ public class FlowableTransactionEventListenerParser extends BaseChildElementPars
         listener.setEntityType(xtr.getAttributeValue(null, ATTRIBUTE_LISTENER_ENTITY_TYPE));
 
         Process parentProcess = (Process) parentElement;
-        parentProcess.getTransactionEventListeners().add(listener);
+//        parentProcess.getTransactionEventListeners().add(listener);
     }
 
     @Override

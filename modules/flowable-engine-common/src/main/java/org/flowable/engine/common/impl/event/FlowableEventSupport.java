@@ -143,13 +143,13 @@ public class FlowableEventSupport {
         }
         TransactionContext transactionContext = Context.getTransactionContext();
         if (null == transactionContext) return;
-        if (listener.getOnTransaction().equals(TransactionState.COMMITTING.name())) {
+        if (listener.getOnTransaction().equalsIgnoreCase(TransactionState.COMMITTING.name())) {
             transactionContext.addTransactionListener(TransactionState.COMMITTING, transactionListener);
-        } else if (listener.getOnTransaction().equals(TransactionState.COMMITTED.name())) {
+        } else if (listener.getOnTransaction().equalsIgnoreCase(TransactionState.COMMITTED.name())) {
             transactionContext.addTransactionListener(TransactionState.COMMITTED, transactionListener);
-        } else if (listener.getOnTransaction().equals(TransactionState.ROLLINGBACK.name())) {
+        } else if (listener.getOnTransaction().equalsIgnoreCase(TransactionState.ROLLINGBACK.name())) {
             transactionContext.addTransactionListener(TransactionState.ROLLINGBACK, transactionListener);
-        } else if (listener.getOnTransaction().equals(TransactionState.ROLLED_BACK.name())) {
+        } else if (listener.getOnTransaction().equalsIgnoreCase(TransactionState.ROLLED_BACK.name())) {
             transactionContext.addTransactionListener(TransactionState.ROLLED_BACK, transactionListener);
         } else {
             LOGGER.warn("Unrecognised TransactionState {}", listener.getOnTransaction());

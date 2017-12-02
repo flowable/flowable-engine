@@ -6,8 +6,9 @@
 
 
         <extensionElements>
-            <flowable:transactionEventListener
+            <flowable:eventListener
                     class="org.flowable.engine.test.api.event.TestTransactionFlowableEventListener"
+                    onTransaction="committed"
                     entityType="task"/>
         </extensionElements>
 

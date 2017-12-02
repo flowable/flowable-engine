@@ -14,7 +14,7 @@ package org.flowable.engine.test.api.event;
 
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.common.impl.cfg.TransactionState;
-import org.flowable.engine.common.impl.event.TransactionDependentFlowableEventSupport;
+import org.flowable.engine.common.impl.event.FlowableEventSupport;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -51,7 +51,8 @@ public class ProcessDefinitionScopedTransactionEventListenerTest extends Pluggab
         BpmnModel bpmnModel = repositoryService.getBpmnModel(firstDefinition.getId());
         assertNotNull(bpmnModel);
 
-        ((TransactionDependentFlowableEventSupport) bpmnModel.getTransactionEventSupport()).addEventListener(listener);
+
+        ((FlowableEventSupport) bpmnModel.getEventSupport()).addEventListener(listener);
 
         // Start a process for the first definition, events should be received
         ProcessInstance processInstance = runtimeService.startProcessInstanceById(firstDefinition.getId());
