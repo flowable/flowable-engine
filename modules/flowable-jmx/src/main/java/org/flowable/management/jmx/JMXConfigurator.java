@@ -116,7 +116,7 @@ public class JMXConfigurator extends AbstractProcessEngineConfigurator {
     @Override
     public void configure(AbstractEngineConfiguration engineConfiguration) {
         try {
-            this.processEngineConfig = processEngineConfig;
+            this.processEngineConfig = (ProcessEngineConfiguration) engineConfiguration;
             if (!disabled) {
                 managementAgent = new DefaultManagementAgent(this);
                 managementAgent.doStart();

@@ -613,7 +613,7 @@
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
 				<artifactId>groovy-all</artifactId>
-				<version>2.4.8</version>
+				<version>2.4.13</version>
 			</dependency>
 			<dependency>
 				<groupId>org.drools</groupId>
@@ -817,7 +817,7 @@
 			<dependency>
 				<groupId>joda-time</groupId>
 				<artifactId>joda-time</artifactId>
-				<version>2.6</version>
+				<version>2.9.9</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
@@ -1241,27 +1241,7 @@
 				<module>modules/flowable-content-rest</module>
 				<module>modules/flowable-jms-spring-executor</module>
 				<module>modules/flowable-ui-common</module>
-			</modules>
-		</profile>
-		<profile>
-			<!-- A profile dedicated to JDK 6. SpringBoot module is disabled as it
-				needs JDK7+. -->
-			<id>checkJdk6</id>
-			<modules>
-				<module>modules/flowable-bpmn-model</module>
-				<module>modules/flowable-process-validation</module>
-				<module>modules/flowable-image-generator</module>
-				<module>modules/flowable-bpmn-converter</module>
-				<module>modules/flowable-bpmn-layout</module>
-				<module>modules/flowable-json-converter</module>
-                <module>modules/flowable-spring-common</module>
-				<module>modules/flowable-idm-spring</module>
-				<module>modules/flowable-spring</module>
-				<module>modules/flowable-common-rest</module>
-				<module>modules/flowable-rest</module>
-				<module>modules/flowable-app-rest</module>
-				<module>modules/flowable-cxf</module>
-				<module>modules/flowable-secure-javascript</module>
+				<module>modules/flowable-http</module>
 			</modules>
 		</profile>
 		<profile>
