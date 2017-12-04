@@ -159,7 +159,7 @@
     <sql id="selectCaseInstancesByQueryCriteriaSql">
         from ${prefix}ACT_CMMN_RU_CASE_INST RES
         <if test="caseDefinitionKey != null or caseDefinitionKeys != null or caseDefinitionCategory != null or caseDefinitionName != null">
-            inner join ${prefix}ACT_CMMN_RU_CASE_INST CASE_DEF
+            inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
         </if>
         <where>
             <if test="caseInstanceId != null">
