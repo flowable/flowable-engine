@@ -18,7 +18,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import liquibase.util.StringUtils;
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
-import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
@@ -81,6 +80,7 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
             decisionExecutionAuditContainer = dmnRuleService.createExecuteDecisionBuilder().
                     decisionKey(externalRef).
                     instanceId(planItemInstanceEntity.getCaseInstanceId()).
+                    parentDeploymentId(CaseDefinitionUtil.getParentParentDeploymentId(planItemInstanceEntity.getCaseDefinitionId())).
                     executionId(planItemInstanceEntity.getId()).
                     activityId(decisionTask.getId()).
                     variables(planItemInstanceEntity.getVariables()).
