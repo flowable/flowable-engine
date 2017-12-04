@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -79,7 +79,7 @@ public class DeploymentManager {
         DecisionTableEntity decisionTable = decisionTableEntityManager.findLatestDecisionTableByKey(decisionKey);
 
         if (decisionTable == null) {
-            throw new FlowableObjectNotFoundException("no decisions deployed with key '" + decisionKey + "'");
+            return null;
         }
         decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
         return decisionTable;
@@ -89,7 +89,7 @@ public class DeploymentManager {
         DecisionTableEntity decisionTable = decisionTableEntityManager.findLatestDecisionTableByKeyAndTenantId(decisionKey, tenantId);
 
         if (decisionTable == null) {
-            throw new FlowableObjectNotFoundException("no decisions deployed with key '" + decisionKey + "' for tenant identifier '" + tenantId + "'");
+            return null;
         }
         decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
         return decisionTable;
@@ -99,8 +99,7 @@ public class DeploymentManager {
         DecisionTableEntity decisionTable = decisionTableEntityManager.findLatestDecisionTableByKeyAndParentDeploymentId(decisionTableKey, parentDeploymentId);
 
         if (decisionTable == null) {
-            throw new FlowableObjectNotFoundException("no decisions deployed with key '" + decisionTableKey +
-                            "' for parent deployment id '" + parentDeploymentId + "'");
+            return null;
         }
         decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
         return decisionTable;
@@ -113,8 +112,7 @@ public class DeploymentManager {
                 decisionTableKey, parentDeploymentId, tenantId);
 
         if (decisionTable == null) {
-            throw new FlowableObjectNotFoundException("no decisions deployed with key '" + decisionTableKey +
-                            "' for parent deployment id '" + parentDeploymentId + "' and tenant identifier " + tenantId);
+            return null;
         }
         decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();
         return decisionTable;
@@ -124,7 +122,7 @@ public class DeploymentManager {
         DecisionTableEntity decisionTable = decisionTableEntityManager.findDecisionTableByKeyAndVersionAndTenantId(decisionKey, decisionVersion, tenantId);
 
         if (decisionTable == null) {
-            throw new FlowableObjectNotFoundException("no decisions deployed with key = '" + decisionKey + "' and version = '" + decisionVersion + "'");
+            return null;
         }
 
         decisionTable = resolveDecisionTable(decisionTable).getDecisionTableEntity();

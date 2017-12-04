@@ -26,6 +26,7 @@ import org.flowable.cmmn.model.DecisionTask;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnRuleService;
+import org.flowable.dmn.api.ExecuteDecisionBuilder;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.Expression;
@@ -78,9 +79,9 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
             throw new FlowableException("Blocking decision task execution is not supported.");
         } else {
             decisionExecutionAuditContainer = dmnRuleService.createExecuteDecisionBuilder().
+                    parentDeploymentId(CaseDefinitionUtil.getDefinitionDeploymentId(planItemInstanceEntity.getCaseDefinitionId())).
                     decisionKey(externalRef).
                     instanceId(planItemInstanceEntity.getCaseInstanceId()).
-                    parentDeploymentId(CaseDefinitionUtil.getParentParentDeploymentId(planItemInstanceEntity.getCaseDefinitionId())).
                     executionId(planItemInstanceEntity.getId()).
                     activityId(decisionTask.getId()).
                     variables(planItemInstanceEntity.getVariables()).
