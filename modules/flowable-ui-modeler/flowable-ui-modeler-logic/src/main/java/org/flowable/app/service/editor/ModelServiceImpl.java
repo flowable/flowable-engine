@@ -706,7 +706,6 @@ public class ModelServiceImpl implements ModelService {
                 handleCmmnFormModelRelations(model, jsonNode);
                 handleCmmnCaseModelRelations(model, jsonNode);
                 handleCmmnProcessModelRelations(model, jsonNode);
-                handleCmmnDecisionModelRelations(model, jsonNode);
 
             } else if (model.getModelType().intValue() == Model.MODEL_TYPE_FORM ||
                     model.getModelType().intValue() == Model.MODEL_TYPE_DECISION_TABLE) {
@@ -762,13 +761,6 @@ public class ModelServiceImpl implements ModelService {
         Set<String> processModelIds = JsonConverterUtil.gatherStringPropertyFromJsonNodes(processReferenceNodes, "id");
 
         handleModelRelations(caseModel, processModelIds, ModelRelationTypes.TYPE_PROCESS_MODEL_CHILD);
-    }
-
-    protected void handleCmmnDecisionModelRelations(AbstractModel caseModel, ObjectNode editorJsonNode) {
-        List<JsonNode> processReferenceNodes = CmmnModelJsonConverterUtil.filterOutJsonNodes(CmmnModelJsonConverterUtil.getCmmnModelDecisionReferences(editorJsonNode));
-        Set<String> processModelIds = JsonConverterUtil.gatherStringPropertyFromJsonNodes(processReferenceNodes, "id");
-
-        handleModelRelations(caseModel, processModelIds, ModelRelationTypes.TYPE_DECISION_TABLE_MODEL_CHILD);
     }
 
     protected void handleAppModelProcessRelations(AbstractModel appModel, ObjectNode appModelJsonNode) {

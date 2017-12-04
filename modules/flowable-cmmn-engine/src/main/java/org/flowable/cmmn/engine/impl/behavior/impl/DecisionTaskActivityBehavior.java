@@ -26,7 +26,6 @@ import org.flowable.cmmn.model.DecisionTask;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnRuleService;
-import org.flowable.dmn.api.ExecuteDecisionBuilder;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.Expression;
@@ -73,21 +72,15 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
             }
         }
 
-        DecisionExecutionAuditContainer decisionExecutionAuditContainer;
-        boolean blocking = evaluateIsBlocking(planItemInstanceEntity);
-        if (blocking) {
-            throw new FlowableException("Blocking decision task execution is not supported.");
-        } else {
-            decisionExecutionAuditContainer = dmnRuleService.createExecuteDecisionBuilder().
-                    parentDeploymentId(CaseDefinitionUtil.getDefinitionDeploymentId(planItemInstanceEntity.getCaseDefinitionId())).
-                    decisionKey(externalRef).
-                    instanceId(planItemInstanceEntity.getCaseInstanceId()).
-                    executionId(planItemInstanceEntity.getId()).
-                    activityId(decisionTask.getId()).
-                    variables(planItemInstanceEntity.getVariables()).
-                    tenantId(planItemInstanceEntity.getTenantId()).
-                    executeWithAuditTrail();
-        }
+        DecisionExecutionAuditContainer decisionExecutionAuditContainer = dmnRuleService.createExecuteDecisionBuilder().
+                parentDeploymentId(CaseDefinitionUtil.getDefinitionDeploymentId(planItemInstanceEntity.getCaseDefinitionId())).
+                decisionKey(externalRef).
+                instanceId(planItemInstanceEntity.getCaseInstanceId()).
+                executionId(planItemInstanceEntity.getId()).
+                activityId(decisionTask.getId()).
+                variables(planItemInstanceEntity.getVariables()).
+                tenantId(planItemInstanceEntity.getTenantId()).
+                executeWithAuditTrail();
 
         if (decisionExecutionAuditContainer == null) {
             throw new FlowableException("DMN decision table with key " + externalRef + " was not executed.");
