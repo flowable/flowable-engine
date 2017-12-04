@@ -33,6 +33,8 @@ public class PlanItemInstanceQueryImpl extends AbstractQuery<PlanItemInstanceQue
     protected String caseInstanceId;
     protected String stageInstanceId;
     protected String elementId;
+    protected String planItemDefinitionId;
+    protected String planItemDefinitionType;
     protected String name;
     protected String state;
     protected Date startedBefore;
@@ -88,6 +90,24 @@ public class PlanItemInstanceQueryImpl extends AbstractQuery<PlanItemInstanceQue
             throw new FlowableIllegalArgumentException("Element id is null");
         }
         this.elementId = elementId;
+        return this;
+    }
+    
+    @Override
+    public PlanItemInstanceQuery planItemDefinitionId(String planItemDefinitionId) {
+        if (planItemDefinitionId == null) {
+            throw new FlowableIllegalArgumentException("Plan item definition id is null");
+        }
+        this.planItemDefinitionId = planItemDefinitionId;
+        return this;
+    }
+    
+    @Override
+    public PlanItemInstanceQuery planItemDefinitionType(String planItemDefinitionType) {
+        if (planItemDefinitionType == null) {
+            throw new FlowableIllegalArgumentException("Plan item definition type is null");
+        }
+        this.planItemDefinitionType = planItemDefinitionType;
         return this;
     }
 
@@ -219,6 +239,14 @@ public class PlanItemInstanceQueryImpl extends AbstractQuery<PlanItemInstanceQue
 
     public String getElementId() {
         return elementId;
+    }
+    
+    public String getPlanItemDefinitionId() {
+        return planItemDefinitionId;
+    }
+    
+    public String getPlanItemDefinitionType() {
+        return planItemDefinitionType;
     }
 
     public String getName() {

@@ -288,6 +288,7 @@
 
     </changeSet>
     
+    <!-- Version 6.2.1 -->
     <changeSet id="2" author="flowable">
     
         <addColumn tableName="ACT_CMMN_CASEDEF">
@@ -302,6 +303,11 @@
         <addColumn tableName="ACT_CMMN_RU_CASE_INST">
             <column name="LOCK_TIME_" type="datetime" />
         </addColumn>
+        
+        <addColumn tableName="ACT_CMMN_RU_PLAN_ITEM_INST">
+            <column name="ITEM_DEFINITION_ID_" type="varchar(255)" />
+            <column name="ITEM_DEFINITION_TYPE_" type="varchar(255)" />
+        </addColumn>        
     
     </changeSet>
 

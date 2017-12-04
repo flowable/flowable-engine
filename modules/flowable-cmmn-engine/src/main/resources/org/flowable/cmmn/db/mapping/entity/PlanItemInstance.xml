@@ -5,8 +5,8 @@
 <mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl">
 
     <insert id="insertPlanItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl">
-        insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, NAME_, STATE_, 
-                                                         START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_)
+        insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, 
+                                                         NAME_, STATE_, START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_)
         values (
             #{id ,jdbcType=VARCHAR},
             1,
@@ -15,6 +15,8 @@
             #{stageInstanceId ,jdbcType=VARCHAR},
             #{isStage, jdbcType=BOOLEAN},
             #{elementId ,jdbcType=VARCHAR},
+            #{planItemDefinitionId, jdbcType=VARCHAR},
+            #{planItemDefinitionType, jdbcType=VARCHAR},
             #{name ,jdbcType=VARCHAR},
             #{state ,jdbcType=VARCHAR},
             #{startTime ,jdbcType=TIMESTAMP},
@@ -24,10 +26,10 @@
             #{tenantId ,jdbcType=VARCHAR}
         )
     </insert>
-	
+
   <insert id="bulkInsertPlanItemInstance" parameterType="java.util.List">
-    insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, NAME_, STATE_, 
-                                                     START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_) 
+    insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, 
+                                                     NAME_, STATE_, START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_) 
     values 
       <foreach collection="list" item="planItemInstance" index="index" separator=",">
         (
@@ -38,6 +40,8 @@
             #{planItemInstance.stageInstanceId ,jdbcType=VARCHAR},
             #{planItemInstance.isStage, jdbcType=BOOLEAN},
             #{planItemInstance.elementId ,jdbcType=VARCHAR},
+            #{planItemInstance.planItemDefinitionId, jdbcType=VARCHAR},
+            #{planItemInstance.planItemDefinitionType, jdbcType=VARCHAR},
             #{planItemInstance.name ,jdbcType=VARCHAR},
             #{planItemInstance.state ,jdbcType=VARCHAR},
             #{planItemInstance.startTime ,jdbcType=TIMESTAMP},
@@ -45,15 +49,15 @@
             #{planItemInstance.referenceId, jdbcType=VARCHAR},
             #{planItemInstance.referenceType, jdbcType=VARCHAR},
             #{planItemInstance.tenantId ,jdbcType=VARCHAR}
-		)
+        )
       </foreach>
   </insert>
 
     <insert id="bulkInsertPlanItemInstance" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
         <foreach collection="list" item="planItemInstance" index="index">
-            into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, NAME_, STATE_, 
-                                                      START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_) VALUES
+            into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, 
+                                                      NAME_, STATE_, START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_) VALUES
             (
                 #{planItemInstance.id ,jdbcType=VARCHAR},
                 1,
@@ -62,6 +66,8 @@
                 #{planItemInstance.stageInstanceId ,jdbcType=VARCHAR},
                 #{planItemInstance.isStage ,jdbcType=VARCHAR},
                 #{planItemInstance.elementId ,jdbcType=VARCHAR},
+                #{planItemInstance.planItemDefinitionId, jdbcType=VARCHAR},
+                #{planItemInstance.planItemDefinitionType, jdbcType=VARCHAR},
                 #{planItemInstance.name ,jdbcType=VARCHAR},
                 #{planItemInstance.state ,jdbcType=VARCHAR},
                 #{planItemInstance.startTime ,jdbcType=TIMESTAMP},
@@ -92,6 +98,12 @@
         </if>
         <if test="originalPersistentState.elementId != elementId">
             ELEMENT_ID_ = #{elementId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.planItemDefinitionId != planItemDefinitionId">
+            ITEM_DEFINITION_ID_ = #{planItemDefinitionId, jdbcType=VARCHAR},
+        </if>
+        <if test="originalPersistentState.planItemDefinitionType != planItemDefinitionType">
+            ITEM_DEFINITION_TYPE_ = #{planItemDefinitionType, jdbcType=VARCHAR},
         </if>
         <if test="originalPersistentState.name != name">
             NAME_ = #{name, jdbcType=VARCHAR},
@@ -134,6 +146,8 @@
     <result property="stageInstanceId" column="STAGE_INST_ID_" jdbcType="VARCHAR" />
     <result property="isStage" column="IS_STAGE_" jdbcType="BOOLEAN" />
     <result property="elementId" column="ELEMENT_ID_" jdbcType="VARCHAR" />
+    <result property="planItemDefinitionId" column="ITEM_DEFINITION_ID_" jdbcType="VARCHAR" />
+    <result property="planItemDefinitionType" column="ITEM_DEFINITION_TYPE_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="state" column="STATE_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
@@ -182,6 +196,12 @@
         </if>
         <if test="elementId != null">
             and RES.ELEMENT_ID_ = #{elementId}
+        </if>
+        <if test="planItemDefinitionId != null">
+            and RES.ITEM_DEFINITION_ID_ = #{planItemDefinitionId}
+        </if>
+        <if test="planItemDefinitionType != null">
+            and RES.ITEM_DEFINITION_TYPE_ = #{planItemDefinitionType}
         </if>
         <if test="name != null">
             and RES.NAME_ = #{name}

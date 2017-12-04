@@ -93,6 +93,11 @@ public abstract class CmmnOperation implements Runnable {
             planItemInstanceEntity.setState(PlanItemInstanceState.AVAILABLE);
             planItemInstanceEntity.setStartTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
             planItemInstanceEntity.setElementId(planItem.getId());
+            PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
+            if (planItemDefinition != null) {
+                planItemInstanceEntity.setPlanItemDefinitionId(planItemDefinition.getId());
+                planItemInstanceEntity.setPlanItemDefinitionType(planItemDefinition.getClass().getSimpleName().toLowerCase());
+            }
             planItemInstanceEntity.setStage(false);
             planItemInstanceEntity.setStageInstanceId(stagePlanItemInstanceId);
             planItemInstanceEntity.setTenantId(tenantId);
