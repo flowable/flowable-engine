@@ -438,6 +438,24 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 PlanItem startTriggerPlanItem = timerEventListener.getParentStage().findPlanItemInPlanFragmentOrUpwards(sourceRef);
                 if (startTriggerPlanItem != null) {
                     timerEventListener.setTimerStartTriggerPlanItem(startTriggerPlanItem);
+                    
+                    // Although the CMMN spec does not categorize the timer start trigger as an entry criterion,
+                    // it is exposed as such to the engine as there is no difference in handling it vs a real criterion
+                    // which means no special care will need to be taken in the core engine operations
+                    
+                    Criterion criterion = new Criterion();
+                    criterion.setEntryCriterion(true);
+                    
+                    SentryOnPart sentryOnPart = new SentryOnPart();
+                    sentryOnPart.setSourceRef(startTriggerPlanItem.getId());
+                    sentryOnPart.setSource(startTriggerPlanItem);
+                    sentryOnPart.setStandardEvent(timerEventListener.getTimerStartTriggerStandardEvent());
+                    
+                    Sentry sentry = new Sentry();
+                    sentry.addSentryOnPart(sentryOnPart);
+                    
+                    criterion.setSentry(sentry);
+                    planItem.addEntryCriterion(criterion);
                 }
             }
 

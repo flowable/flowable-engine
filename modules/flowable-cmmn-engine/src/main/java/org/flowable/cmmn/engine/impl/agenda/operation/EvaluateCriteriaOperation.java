@@ -109,6 +109,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                     if (criteriaChangeOrActiveChildrenForStage) {
                         activeChildren++;
                     } else {
+                        criteriaChanged = true;
                         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance(planItemInstanceEntity);
                     }
 
@@ -289,4 +290,12 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         return stringBuilder.toString();
     }
 
+    public PlanItemLifeCycleEvent getPlanItemLifeCycleEvent() {
+        return planItemLifeCycleEvent;
+    }
+
+    public void setPlanItemLifeCycleEvent(PlanItemLifeCycleEvent planItemLifeCycleEvent) {
+        this.planItemLifeCycleEvent = planItemLifeCycleEvent;
+    }
+    
 }
