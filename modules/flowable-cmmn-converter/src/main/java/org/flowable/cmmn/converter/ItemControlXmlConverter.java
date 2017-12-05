@@ -14,34 +14,29 @@ package org.flowable.cmmn.converter;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.flowable.cmmn.model.BaseElement;
-import org.flowable.cmmn.model.TimerEventListener;
+import org.flowable.cmmn.model.CmmnElement;
+import org.flowable.cmmn.model.PlanItemControl;
 
 /**
  * @author Joram Barrez
  */
-public class StandardEventXmlConverter extends CaseElementXmlConverter {
+public class ItemControlXmlConverter extends CaseElementXmlConverter {
     
     @Override
     public String getXMLElementName() {
-        return CmmnXmlConstants.ELEMENT_STANDARD_EVENT;
+        return CmmnXmlConstants.ELEMENT_ITEM_CONTROL;
     }
     
     @Override
     public boolean hasChildElements() {
-        return false;
+        return true;
     }
 
     @Override
-    protected BaseElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        String event = xtr.getText();
-        if (conversionHelper.getCurrentCmmnElement() instanceof TimerEventListener) {
-            TimerEventListener timerEventListener = (TimerEventListener) conversionHelper.getCurrentCmmnElement();
-            timerEventListener.setTimerStartTriggerStandardEvent(event);
-        } else {
-            conversionHelper.getCurrentSentryOnPart().setStandardEvent(xtr.getText());
-        }
-        return null;
+    protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
+        PlanItemControl planItemControl = new PlanItemControl();
+        conversionHelper.getCurrentPlanItem().setItemControl(planItemControl);
+        return planItemControl;
     }
     
 }

@@ -22,6 +22,7 @@ public class PlanItem extends CaseElement implements HasEntryCriteria, HasExitCr
     
     protected String definitionRef;
     protected PlanItemDefinition planItemDefinition;
+    protected PlanItemControl itemControl;
     protected List<String> criteriaRefs = new ArrayList<>();
     protected List<Criterion> entryCriteria = new ArrayList<>();
     protected List<Criterion> exitCriteria = new ArrayList<>();
@@ -46,6 +47,14 @@ public class PlanItem extends CaseElement implements HasEntryCriteria, HasExitCr
         this.planItemDefinition = planItemDefinition;
     }
     
+    public PlanItemControl getItemControl() {
+        return itemControl;
+    }
+
+    public void setItemControl(PlanItemControl itemControl) {
+        this.itemControl = itemControl;
+    }
+
     public void addCriteriaRef(String entryCriteriaRef) {
         this.criteriaRefs.add(entryCriteriaRef);
     }

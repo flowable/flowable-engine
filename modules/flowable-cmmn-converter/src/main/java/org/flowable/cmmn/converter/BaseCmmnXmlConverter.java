@@ -27,7 +27,11 @@ public abstract class BaseCmmnXmlConverter {
 
     public abstract String getXMLElementName();
 
-    public abstract boolean isCmmnElement();
+    /**
+     * @return True of the current {@link CmmnElement} can have child elements and needs to be pushed 
+     *         to the stack of elements during parsing. 
+     */
+    public abstract boolean hasChildElements();
 
     public BaseElement convertToCmmnModel(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         BaseElement baseElement = convert(xtr, conversionHelper);
@@ -55,7 +59,7 @@ public abstract class BaseCmmnXmlConverter {
     protected abstract BaseElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper);
 
     protected void elementEnd(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        if (isCmmnElement()) {
+        if (hasChildElements()) {
             conversionHelper.removeCurrentCmmnElement();
         }
     }

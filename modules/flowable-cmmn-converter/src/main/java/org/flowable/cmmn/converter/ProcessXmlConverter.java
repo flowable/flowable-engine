@@ -28,7 +28,7 @@ public class ProcessXmlConverter extends BaseCmmnXmlConverter {
     }
     
     @Override
-    public boolean isCmmnElement() {
+    public boolean hasChildElements() {
         return true;
     }
 

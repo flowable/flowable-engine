@@ -49,6 +49,8 @@ public interface CmmnXmlConstants {
     String ELEMENT_PROCESS_TASK = "processTask";
     String ELEMENT_TIMER_EVENT_LISTENER = "timerEventListener";
     String ELEMENT_PLAN_ITEM = "planItem";
+    String ELEMENT_ITEM_CONTROL = "itemControl";
+    String ELEMENT_DEFAULT_CONTROL = "defaultControl";
     String ELEMENT_SENTRY = "sentry";
     String ELEMENT_PLAN_ITEM_ON_PART = "planItemOnPart";
     String ELEMENT_STANDARD_EVENT = "standardEvent";
@@ -58,6 +60,8 @@ public interface CmmnXmlConstants {
     String ELEMENT_EXTENSIONS = "extensionElements";
     String ELEMENT_HTTP_RESPONSE_HANDLER = "httpResponseHandler";
     String ELEMENT_HTTP_REQUEST_HANDLER = "httpRequestHandler";
+    
+    String ELEMENT_REPETITION_RULE = "repetitionRule";
 
     String ELEMENT_PROCESS = "process";
     String ATTRIBUTE_IMPLEMENTATION_TYPE = "implementationType";

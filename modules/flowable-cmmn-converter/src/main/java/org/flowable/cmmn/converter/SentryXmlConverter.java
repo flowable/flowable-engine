@@ -28,7 +28,7 @@ public class SentryXmlConverter extends CaseElementXmlConverter {
     }
     
     @Override
-    public boolean isCmmnElement() {
+    public boolean hasChildElements() {
         return true;
     }
 

@@ -28,7 +28,7 @@ public class PlanItemXmlConverter extends CaseElementXmlConverter {
     }
     
     @Override
-    public boolean isCmmnElement() {
+    public boolean hasChildElements() {
         return true;
     }
 

@@ -28,7 +28,7 @@ public class PlanItemStartTriggerXmlConverter extends CaseElementXmlConverter {
     }
     
     @Override
-    public boolean isCmmnElement() {
+    public boolean hasChildElements() {
         return false;
     }
 
