@@ -19,4 +19,6 @@
 
     <bean id="testDelegateFieldsBean" class="org.flowable.cmmn.test.delegate.TestFieldsJavaDelegate" />
     
+    <bean id="timerBean" class="org.flowable.cmmn.test.bean.TimerBean" />
+    
 </beans>
