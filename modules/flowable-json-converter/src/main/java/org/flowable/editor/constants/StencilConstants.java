@@ -270,6 +270,8 @@ public interface StencilConstants {
     final String PROPERTY_HTTPTASK_SAVE_RESPONSE_PARAMETERS = "httptasksaveresponseparameters";
     final String PROPERTY_HTTPTASK_RESULT_VARIABLE_PREFIX = "httptaskresultvariableprefix";
 
+    final String PROPERTY_SKIP_EXPRESSION = "skipexpression";
+
     final String PROPERTY_SHELLTASK_COMMAND = "shellcommand";
     final String PROPERTY_SHELLTASK_ARG1 = "shellarg1";
     final String PROPERTY_SHELLTASK_ARG2 = "shellarg2";

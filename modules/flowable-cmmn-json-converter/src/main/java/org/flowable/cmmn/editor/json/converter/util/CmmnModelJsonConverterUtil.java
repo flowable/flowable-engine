@@ -125,13 +125,13 @@ public class CmmnModelJsonConverterUtil implements EditorJsonConstants, CmmnSten
     public static List<JsonLookupResult> getCmmnModelFormReferences(JsonNode editorJsonNode) {
         List<String> allowedStencilTypes = new ArrayList<>();
         allowedStencilTypes.add(STENCIL_TASK_HUMAN);
-        return getCmmnModelChildShapesPropertyValues(editorJsonNode, "formreference", allowedStencilTypes);
+        return getCmmnModelChildShapesPropertyValues(editorJsonNode, PROPERTY_FORM_REFERENCE, allowedStencilTypes);
     }
 
     public static List<JsonLookupResult> getCmmnModelDecisionTableReferences(JsonNode editorJsonNode) {
         List<String> allowedStencilTypes = new ArrayList<>();
         allowedStencilTypes.add(STENCIL_TASK_DECISION);
-        return getCmmnModelChildShapesPropertyValues(editorJsonNode, "decisiontaskdecisiontablereference", allowedStencilTypes);
+        return getCmmnModelChildShapesPropertyValues(editorJsonNode, PROPERTY_DECISIONTABLE_REFERENCE, allowedStencilTypes);
     }
     
     public static List<JsonLookupResult> getCmmnModelCaseReferences(JsonNode editorJsonNode) {

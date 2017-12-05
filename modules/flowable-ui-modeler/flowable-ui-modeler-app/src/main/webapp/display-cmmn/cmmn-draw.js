@@ -120,6 +120,12 @@ function _drawProcessTask(element)
     _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
 }
 
+function _drawDecisionTask(element) {
+    _drawTask(element);
+    _drawDecisionTaskIcon(paper, element.x + 1, element.y + 1);
+    _addHoverLogic(element, "rect", ACTIVITY_STROKE_COLOR);
+}
+
 function _drawServiceTask(element)
 {
     _drawTask(element);
