@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -109,8 +109,20 @@ public class ServiceTaskJsonConverter extends BaseBpmnJsonConverter implements D
             setPropertyFieldValue(PROPERTY_HTTPTASK_SAVE_RESPONSE_PARAMETERS, "saveResponseParameters", serviceTask, propertiesNode);
             setPropertyFieldValue(PROPERTY_HTTPTASK_RESULT_VARIABLE_PREFIX, "resultVariablePrefix", serviceTask, propertiesNode);
 
+        } else if ("shell".equalsIgnoreCase(serviceTask.getType())) {
+            setPropertyFieldValue(PROPERTY_SHELLTASK_COMMAND, "command", serviceTask, propertiesNode);
+            setPropertyFieldValue(PROPERTY_SHELLTASK_ARG1, "arg1", serviceTask, propertiesNode);
+            setPropertyFieldValue(PROPERTY_SHELLTASK_ARG2, "arg2", serviceTask, propertiesNode);
+            setPropertyFieldValue(PROPERTY_SHELLTASK_ARG3, "arg3", serviceTask, propertiesNode);
+            setPropertyFieldValue(PROPERTY_SHELLTASK_ARG4, "arg4", serviceTask, propertiesNode);
+            setPropertyFieldValue(PROPERTY_SHELLTASK_ARG5, "arg5", serviceTask, propertiesNode);
+            setPropertyFieldValue(PROPERTY_SHELLTASK_CLEAN_ENV, "cleanEnv", serviceTask, propertiesNode);
+            setPropertyFieldValue(PROPERTY_SHELLTASK_DIRECTORY, "directory", serviceTask, propertiesNode);
+            setPropertyFieldValue(PROPERTY_SHELLTASK_ERROR_CODE_VARIABLE, "errorCodeVariable", serviceTask, propertiesNode);
+            setPropertyFieldValue(PROPERTY_SHELLTASK_ERROR_REDIRECT, "errorRedirect", serviceTask, propertiesNode);
+            setPropertyFieldValue(PROPERTY_SHELLTASK_OUTPUT_VARIABLE, "outputVariable", serviceTask, propertiesNode);
+            setPropertyFieldValue(PROPERTY_SHELLTASK_WAIT, "wait", serviceTask, propertiesNode);
         } else {
-
             if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(serviceTask.getImplementationType())) {
                 propertiesNode.put(PROPERTY_SERVICETASK_CLASS, serviceTask.getImplementation());
             } else if (ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equals(serviceTask.getImplementationType())) {

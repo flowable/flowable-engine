@@ -274,23 +274,123 @@
       "popular" : true
     } ]
   }, {
-    "name" : "scriptformatpackage",
+    "name" : "shellcommandpackage",
     "properties" : [ {
-      "id" : "scriptformat",
+      "id" : "shellcommand",
       "type" : "String",
-      "title" : "Script format",
+      "title" : "Command",
       "value" : "",
-      "description" : "Script format of the script task.",
+      "description" : "Shell task command",
       "popular" : true
     } ]
   }, {
-    "name" : "scripttextpackage",
+    "name" : "shellarg1package",
     "properties" : [ {
-      "id" : "scripttext",
+      "id" : "shellarg1",
       "type" : "Text",
-      "title" : "Script",
+      "title" : "Argument 1",
       "value" : "",
-      "description" : "Script text of the script task.",
+      "description" : "Shell commnad arg 1",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "shellarg2package",
+    "properties" : [ {
+      "id" : "shellarg2",
+      "type" : "Text",
+      "title" : "Argument 2",
+      "value" : "",
+      "description" : "Shell commnad arg 2",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "shellarg3package",
+    "properties" : [ {
+      "id" : "shellarg3",
+      "type" : "Text",
+      "title" : "Argument 3",
+      "value" : "",
+      "description" : "Shell commnad arg 3",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "shellarg4package",
+    "properties" : [ {
+      "id" : "shellarg4",
+      "type" : "Text",
+      "title" : "Argument 4",
+      "value" : "",
+      "description" : "Shell commnad arg 4",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "shellarg5package",
+    "properties" : [ {
+      "id" : "shellarg5",
+      "type" : "Text",
+      "title" : "Argument 5",
+      "value" : "",
+      "description" : "Shell commnad arg 5",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "shellwaitpackage",
+    "properties" : [ {
+      "id" : "shellwait",
+      "type" : "Text",
+      "title" : "Wait",
+      "value" : "",
+      "description" : "Flag to wait for shell command execution end",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "shelloutputvariablepackage",
+    "properties" : [ {
+      "id" : "shelloutputvariable",
+      "type" : "Text",
+      "title" : "Output variable",
+      "value" : "",
+      "description" : "Variable to store shell commnad output",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "shellerrorcodevariablepackage",
+    "properties" : [ {
+      "id" : "shellerrorcodevariable",
+      "type" : "Text",
+      "title" : "Error code variable",
+      "value" : "",
+      "description" : "Variable to store shell commnad error code",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "shellredirecterrorpackage",
+    "properties" : [ {
+      "id" : "shellredirecterror",
+      "type" : "Text",
+      "title" : "Redirect error",
+      "value" : "",
+      "description" : "If true merge error output with standard output",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "shellcleanenvpackage",
+    "properties" : [ {
+      "id" : "shellcleanenv",
+      "type" : "Text",
+      "title" : "Clean env",
+      "value" : "",
+      "description" : "Clean shell execution environment",
+      "popular" : true
+    } ]
+  }, {
+    "name" : "shelldirectorypackage",
+    "properties" : [ {
+      "id" : "shelldirectory",
+      "type" : "Text",
+      "title" : "Directory",
+      "value" : "",
+      "description" : "Shell process working directory",
       "popular" : true
     } ]
   }, {
@@ -1171,7 +1271,52 @@
     "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "asynchronousdefinitionpackage", "exclusivedefinitionpackage", "executionlistenerspackage", "multiinstance_typepackage", "multiinstance_cardinalitypackage", "multiinstance_collectionpackage", "multiinstance_variablepackage", "multiinstance_conditionpackage", "isforcompensationpackage", "decisiontaskdecisiontablereferencepackage", "decisiontaskthrowerroronnohitspackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "sequence_start", "sequence_end", "ActivitiesMorph", "all" ]
-  }, {
+  },
+    {
+      "type": "node",
+      "id": "ShellTask",
+      "title": "Shell task",
+      "description": "An automatic task with shell batch logic",
+      "view": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n\n   width=\"102\"\n   height=\"82\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n\t<rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"79\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" />\n\t<rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"100\" height=\"80\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\" fill=\"#f9f9f9\" />\n\t\t<text \n\t\t\tfont-size=\"12\" \n\t\t\tid=\"text_name\" \n\t\t\tx=\"50\" \n\t\t\ty=\"40\" \n\t\t\toryx:align=\"middle center\"\n\t\t\toryx:fittoelem=\"text_frame\"\n\t\t\tstroke=\"#373e48\">\n\t\t</text>\n\t\n\t<g id=\"shellTask\" transform=\"translate(2,2)\">\n\t\t<path oryx:anchors=\"top left\"\n\t\t\td=\"m 1,2 0,14 16,0 0,-14 z m 1.4,3 12.7,0 0,10 -12.7,0 z\"\n     \t\tstyle=\"fill:#72a7d0;stroke:none\"\n\t\t/><text x='3' y='9' style='fill:#72a7d0;font-size:5px;'><![CDATA[>_]]></text>\n\t</g>\n  \n\t<g id=\"parallel\">\n\t\t<path oryx:anchors=\"bottom\" fill=\"none\" stroke=\"#bbbbbb\" d=\"M46 70 v8 M50 70 v8 M54 70 v8\" stroke-width=\"2\" />\n\t</g>\n\t<g id=\"sequential\">\n\t\t<path oryx:anchors=\"bottom\" fill=\"none\" stroke=\"#bbbbbb\" stroke-width=\"2\" d=\"M46,76h10M46,72h10 M46,68h10\"/>\n\t</g>\n\t\n\n\t<g id=\"compensation\">\n\t\t<path oryx:anchors=\"bottom\" fill=\"none\" stroke=\"#bbbbbb\" d=\"M 62 74 L 66 70 L 66 78 L 62 74 L 62 70 L 58 74 L 62 78 L 62 74\" stroke-width=\"1\" />\n\t</g>\n  </g>\n</svg>",
+      "icon": "activity/list/type.shell.png",
+      "groups": [
+        "Activities"
+      ],
+      "propertyPackages": [
+        "overrideidpackage",
+        "namepackage",
+        "documentationpackage",
+        "asynchronousdefinitionpackage",
+        "shellcommandpackage",
+        "shellarg1package",
+        "shellarg2package",
+        "shellarg3package",
+        "shellarg4package",
+        "shellarg5package",
+        "shellwaitpackage",
+        "shelloutputvariablepackage",
+        "shellerrorcodevariablepackage",
+        "shellredirecterrorpackage",
+        "shellcleanenvpackage",
+        "shelldirectorypackage",
+        "exclusivedefinitionpackage",
+        "executionlistenerspackage",
+        "multiinstance_typepackage",
+        "multiinstance_cardinalitypackage",
+        "multiinstance_collectionpackage",
+        "multiinstance_variablepackage",
+        "multiinstance_conditionpackage",
+        "isforcompensationpackage"
+      ],
+      "hiddenPropertyPackages": [],
+      "roles": [
+        "Activity",
+        "sequence_start",
+        "sequence_end",
+        "ActivitiesMorph",
+        "all"
+      ]
+    },{
     "type" : "node",
     "id" : "SubProcess",
     "title" : "Sub process",
