@@ -84,8 +84,14 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
         
         if (planItem.getItemControl() != null) {
             RepetitionRule repetitionRule = planItem.getItemControl().getRepetitionRule();
-            if (repetitionRule != null && StringUtils.isNotEmpty(repetitionRule.getCondition())) {
-                propertiesNode.put(PROPERTY_REPETITION_RULE_CONDITION, repetitionRule.getCondition());
+            if (repetitionRule != null) {
+                propertiesNode.put(PROPERTY_REPETITION_ENABLED, true);
+                if (StringUtils.isNotEmpty(repetitionRule.getCondition())) {
+                    propertiesNode.put(PROPERTY_REPETITION_RULE_CONDITION, repetitionRule.getCondition());
+                }
+                if (StringUtils.isNotEmpty(repetitionRule.getRepetitionCounterVariableName())) {
+                    propertiesNode.put(PROPERTY_REPETITION_RULE_VARIABLE_NAME, repetitionRule.getRepetitionCounterVariableName());    
+                }
             }
         }
 
@@ -148,10 +154,15 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
                 }
             }
             
-            String repetitionRuleCondition = getPropertyValueAsString(PROPERTY_REPETITION_RULE_CONDITION, elementNode);
-            if (StringUtils.isNotEmpty(repetitionRuleCondition)) {
+            boolean repetitionEnabled = getPropertyValueAsBoolean(PROPERTY_REPETITION_ENABLED, elementNode);
+            if (repetitionEnabled) {
                 RepetitionRule repetitionRule = new RepetitionRule();
-                repetitionRule.setCondition(repetitionRuleCondition);
+                repetitionRule.setCondition(getPropertyValueAsString(PROPERTY_REPETITION_RULE_CONDITION, elementNode));
+                
+                String repetitionCounterVariableName = getPropertyValueAsString(PROPERTY_REPETITION_RULE_VARIABLE_NAME, elementNode);
+                if (StringUtils.isNotEmpty(repetitionCounterVariableName)) {
+                    repetitionRule.setRepetitionCounterVariableName(repetitionCounterVariableName);
+                }
                 
                 PlanItemControl itemControl = new PlanItemControl();
                 itemControl.setRepetitionRule(repetitionRule);

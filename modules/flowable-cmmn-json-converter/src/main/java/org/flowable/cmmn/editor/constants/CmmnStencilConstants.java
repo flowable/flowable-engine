@@ -63,7 +63,9 @@ public interface CmmnStencilConstants {
     String PROPERTY_IS_BLOCKING = "isblocking";
     String PROPERTY_IS_BLOCKING_EXPRESSION = "isblockingexpression";
     
+    String PROPERTY_REPETITION_ENABLED = "repetitionenabled";
     String PROPERTY_REPETITION_RULE_CONDITION = "repetitionrulecondition";
+    String PROPERTY_REPETITION_RULE_VARIABLE_NAME = "repetitioncountervariablename";
 
     String PROPERTY_USERTASK_ASSIGNMENT = "usertaskassignment";
     String PROPERTY_USERTASK_PRIORITY = "prioritydefinition";

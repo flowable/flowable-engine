@@ -39,11 +39,13 @@ public class RepetitionRuleXmlConverter extends CaseElementXmlConverter {
             
             RepetitionRule repetitionRule = new RepetitionRule();
             repetitionRule.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
+            repetitionRule.setRepetitionCounterVariableName(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, 
+                    CmmnXmlConstants.ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME));
             
             PlanItemControl planItemControl = (PlanItemControl) conversionHelper.getCurrentCmmnElement();
             planItemControl.setRepetitionRule(repetitionRule);
             
-            return planItemControl;
+            return repetitionRule;
         }
         return null;
     }

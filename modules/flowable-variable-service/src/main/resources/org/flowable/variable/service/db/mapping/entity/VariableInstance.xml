@@ -249,7 +249,7 @@
     
      <select id="selectVariableInstancesBySubScopeIdAndScopeType" parameterType="java.util.Map" resultMap="variableInstanceResultMap">
         select * from ${prefix}ACT_RU_VARIABLE
-        where SCOPE_ID_ = #{parameter.subScopeId, jdbcType=VARCHAR} and SCOPE_TYPE_ =  #{parameter.scopeType, jdbcType=VARCHAR}
+        where SUB_SCOPE_ID_ = #{parameter.subScopeId, jdbcType=VARCHAR} and SCOPE_TYPE_ =  #{parameter.scopeType, jdbcType=VARCHAR}
     </select> 
     
     <select id="selectVariableInstanceBySubScopeIdAndScopeTypeAndName" parameterType="java.util.Map" resultMap="variableInstanceResultMap">

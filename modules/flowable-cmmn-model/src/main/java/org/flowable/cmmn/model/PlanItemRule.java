@@ -15,16 +15,6 @@ package org.flowable.cmmn.model;
 /**
  * @author Joram Barrez
  */
-public class PlanItemRule extends CmmnElement {
-    
-    protected String name;
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
+public class PlanItemRule extends CaseElement {
     
 }

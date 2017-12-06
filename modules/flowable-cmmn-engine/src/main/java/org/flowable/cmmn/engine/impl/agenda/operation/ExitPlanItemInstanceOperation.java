@@ -54,4 +54,9 @@ public class ExitPlanItemInstanceOperation extends AbstractDeletePlanItemInstanc
         }
     }
     
+    @Override
+    protected boolean isEvaluateRepetitionRule() {
+        return false;
+    }
+    
 }

@@ -44,6 +44,10 @@ public class PlanItemExport implements CmmnXmlConstants {
             RepetitionRule repetitionRule = planItem.getItemControl().getRepetitionRule(); 
             if (repetitionRule != null) {
                 xtw.writeStartElement(ELEMENT_REPETITION_RULE);
+                if (StringUtils.isNotEmpty(repetitionRule.getRepetitionCounterVariableName())) {
+                    xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, 
+                            ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME, repetitionRule.getRepetitionCounterVariableName());
+                }
                 if (StringUtils.isNotEmpty(repetitionRule.getCondition())) {
                     xtw.writeStartElement(ELEMENT_CONDITION);
                     xtw.writeCData(repetitionRule.getCondition());

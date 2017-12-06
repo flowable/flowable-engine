@@ -714,11 +714,26 @@
   }, {
     "name" : "repetitionruleconditionpackage",
     "properties" : [ {
+      "id" : "repetitionenabled",
+      "type" : "Boolean",
+      "title" : "Repetition",
+      "value" : "",
+      "description" : "Flag indicating if repetition is enabled",
+      "popular" : true
+    }, {
       "id" : "repetitionrulecondition",
       "type" : "String",
       "title" : "Repetition Rule",
       "value" : "",
       "description" : "An expression that is resolved to determine if new instances of the planitem need to be created",
+      "popular" : true
+    },
+    {
+      "id" : "repetitioncountervariablename",
+      "type" : "String",
+      "title" : "Repetition counter variable",
+      "value" : "",
+      "description" : "The name of the local variable which stores the instance counter of the repetition. Default value is 'repetitionCounter'.",
       "popular" : true
     } ]
   }, {

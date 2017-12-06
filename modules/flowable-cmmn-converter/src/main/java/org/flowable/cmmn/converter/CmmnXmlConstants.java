@@ -109,6 +109,8 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_FORM_KEY = "formKey";
     String ATTRIBUTE_DUE_DATE = "dueDate";
     String ATTRIBUTE_CATEGORY = "category";
+    
+    String ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME = "counterVariable";
 
     String ELEMENT_DI_CMMN = "CMMNDI";
     String ELEMENT_DI_DIAGRAM = "CMMNDiagram";

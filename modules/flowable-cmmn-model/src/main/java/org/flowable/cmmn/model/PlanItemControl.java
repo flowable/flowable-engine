@@ -15,7 +15,7 @@ package org.flowable.cmmn.model;
 /**
  * @author Joram Barrez
  */
-public class PlanItemControl extends CmmnElement {
+public class PlanItemControl extends CaseElement {
     
     protected RepetitionRule repetitionRule;
 
