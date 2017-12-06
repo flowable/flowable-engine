@@ -52,9 +52,10 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
         DmnDecisionTable decisionTable = null;
 
         if (StringUtils.isNotEmpty(getDecisionKey()) && StringUtils.isNotEmpty(getParentDeploymentId()) && StringUtils.isNotEmpty(getTenantId())) {
-            
-            decisionTable = deploymentManager.findDeployedLatestDecisionByKeyParentDeploymentIdAndTenantId(
-                            getDecisionKey(), getParentDeploymentId(), getTenantId());
+            try {
+                decisionTable = deploymentManager.findDeployedLatestDecisionByKeyParentDeploymentIdAndTenantId(
+                        getDecisionKey(), getParentDeploymentId(), getTenantId());
+            } catch(FlowableObjectNotFoundException e){}
 
             // Fall back
             // If there is no decision table found linked to the deployment id, try to find one without a specific deployment id.
@@ -69,7 +70,10 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
             }
 
         } else if (StringUtils.isNotEmpty(getDecisionKey()) && StringUtils.isNotEmpty(getParentDeploymentId())) {
-            decisionTable = deploymentManager.findDeployedLatestDecisionByKeyAndParentDeploymentId(getDecisionKey(), getParentDeploymentId());
+            try{
+                decisionTable = deploymentManager.findDeployedLatestDecisionByKeyAndParentDeploymentId(getDecisionKey(), getParentDeploymentId());
+            } catch(FlowableObjectNotFoundException e){}
+
 
             // Fall back
             // If there is no decision table found linked to the deployment id, try to find one without a specific deployment id.
