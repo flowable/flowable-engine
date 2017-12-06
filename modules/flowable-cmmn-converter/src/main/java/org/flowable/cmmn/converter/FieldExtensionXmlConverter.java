@@ -34,7 +34,7 @@ public class FieldExtensionXmlConverter extends BaseCmmnXmlConverter {
     }
     
     @Override
-    public boolean isCmmnElement() {
+    public boolean hasChildElements() {
         return false;
     }
 

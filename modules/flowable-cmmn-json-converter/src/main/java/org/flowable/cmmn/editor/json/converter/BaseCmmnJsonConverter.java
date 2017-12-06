@@ -30,7 +30,9 @@ import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.PlanItemDefinition;
+import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
@@ -78,6 +80,19 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
 
         if (StringUtils.isNotEmpty(planItemDefinition.getDocumentation())) {
             propertiesNode.put(PROPERTY_DOCUMENTATION, planItemDefinition.getDocumentation());
+        }
+        
+        if (planItem.getItemControl() != null) {
+            RepetitionRule repetitionRule = planItem.getItemControl().getRepetitionRule();
+            if (repetitionRule != null) {
+                propertiesNode.put(PROPERTY_REPETITION_ENABLED, true);
+                if (StringUtils.isNotEmpty(repetitionRule.getCondition())) {
+                    propertiesNode.put(PROPERTY_REPETITION_RULE_CONDITION, repetitionRule.getCondition());
+                }
+                if (StringUtils.isNotEmpty(repetitionRule.getRepetitionCounterVariableName())) {
+                    propertiesNode.put(PROPERTY_REPETITION_RULE_VARIABLE_NAME, repetitionRule.getRepetitionCounterVariableName());    
+                }
+            }
         }
 
         convertElementToJson(planItemNode, propertiesNode, processor, baseElement, model);
@@ -137,6 +152,22 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
                         planItem.addCriteriaRef(criterionRefId);
                     }
                 }
+            }
+            
+            boolean repetitionEnabled = getPropertyValueAsBoolean(PROPERTY_REPETITION_ENABLED, elementNode);
+            if (repetitionEnabled) {
+                RepetitionRule repetitionRule = new RepetitionRule();
+                repetitionRule.setCondition(getPropertyValueAsString(PROPERTY_REPETITION_RULE_CONDITION, elementNode));
+                
+                String repetitionCounterVariableName = getPropertyValueAsString(PROPERTY_REPETITION_RULE_VARIABLE_NAME, elementNode);
+                if (StringUtils.isNotEmpty(repetitionCounterVariableName)) {
+                    repetitionRule.setRepetitionCounterVariableName(repetitionCounterVariableName);
+                }
+                
+                PlanItemControl itemControl = new PlanItemControl();
+                itemControl.setRepetitionRule(repetitionRule);
+                
+                planItem.setItemControl(itemControl);
             }
 
             planItemDefinition.setPlanItemRef(planItem.getId());

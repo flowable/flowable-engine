@@ -16,6 +16,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.PlanItem;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
@@ -45,6 +46,31 @@ public abstract class AbstractPlanItemInstanceOperation extends CmmnOperation {
                 sentryPartInstanceEntityManager.delete(sentryPartInstanceEntity);
             }
         }
+    }
+    
+    protected boolean isPlanItemRepeatableOnComplete(PlanItem planItem) {
+        return  planItem != null
+                && planItem.getEntryCriteria().isEmpty()
+                && planItem.getItemControl() != null
+                && planItem.getItemControl().getRepetitionRule() != null;
+    }
+    
+    protected int getRepetitionCounter(PlanItemInstanceEntity repeatingPlanItemInstanceEntity) {
+        Integer counter = (Integer) repeatingPlanItemInstanceEntity.getVariableLocal(getCounterVariable(repeatingPlanItemInstanceEntity));
+        if (counter == null) {
+            return 0;
+        } else {
+            return counter.intValue();
+        }
+    }
+    
+    protected void setRepetitionCounter(PlanItemInstanceEntity repeatingPlanItemInstanceEntity, int counterValue) {
+        repeatingPlanItemInstanceEntity.setVariableLocal(getCounterVariable(repeatingPlanItemInstanceEntity), counterValue);
+    }
+
+    protected String getCounterVariable(PlanItemInstanceEntity repeatingPlanItemInstanceEntity) {
+        String repetitionCounterVariableName = repeatingPlanItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule().getRepetitionCounterVariableName();
+        return repetitionCounterVariableName;
     }
     
 }

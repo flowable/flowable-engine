@@ -32,7 +32,7 @@ public class FlowableHttpResponseHandlerXmlConverter extends AbstractFlowableHtt
     }
 
     @Override
-    public boolean isCmmnElement() {
+    public boolean hasChildElements() {
         return false;
     }
 

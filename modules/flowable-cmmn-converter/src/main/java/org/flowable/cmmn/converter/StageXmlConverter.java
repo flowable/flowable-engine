@@ -28,7 +28,7 @@ public class StageXmlConverter extends PlanItemDefinitiomXmlConverter {
     }
     
     @Override
-    public boolean isCmmnElement() {
+    public boolean hasChildElements() {
         return true;
     }
 

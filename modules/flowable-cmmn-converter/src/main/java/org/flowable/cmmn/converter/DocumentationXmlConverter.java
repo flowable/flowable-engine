@@ -28,7 +28,7 @@ public class DocumentationXmlConverter extends BaseCmmnXmlConverter {
     }
     
     @Override
-    public boolean isCmmnElement() {
+    public boolean hasChildElements() {
         return false;
     }
 

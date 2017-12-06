@@ -29,7 +29,7 @@ public class ProcessRefExpressionXmlConverter extends CaseElementXmlConverter {
     }
     
     @Override
-    public boolean isCmmnElement() {
+    public boolean hasChildElements() {
         return false;
     }
 

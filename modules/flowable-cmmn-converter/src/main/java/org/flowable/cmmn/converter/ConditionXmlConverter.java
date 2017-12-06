@@ -16,6 +16,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CmmnElement;
+import org.flowable.cmmn.model.RepetitionRule;
 import org.flowable.cmmn.model.SentryIfPart;
 
 /**
@@ -29,16 +30,20 @@ public class ConditionXmlConverter extends CaseElementXmlConverter {
     }
     
     @Override
-    public boolean isCmmnElement() {
+    public boolean hasChildElements() {
         return false;
     }
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         String condition = xtr.getText();
-        if (StringUtils.isNotEmpty(condition) && conversionHelper.getCurrentCmmnElement() instanceof SentryIfPart) {
-            SentryIfPart ifPart = (SentryIfPart) conversionHelper.getCurrentCmmnElement();
-            ifPart.setCondition(condition);;
+        if (StringUtils.isNotEmpty(condition)) {
+            CmmnElement currentCmmnElement = conversionHelper.getCurrentCmmnElement();
+            if (currentCmmnElement instanceof SentryIfPart) {
+                ((SentryIfPart) currentCmmnElement).setCondition(condition);
+            } else if (currentCmmnElement instanceof RepetitionRule) {
+                ((RepetitionRule) currentCmmnElement).setCondition(condition);
+            }
         }
         return null;
     }

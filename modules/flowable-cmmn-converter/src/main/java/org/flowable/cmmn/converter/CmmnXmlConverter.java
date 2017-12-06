@@ -90,6 +90,9 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new TaskXmlConverter());
         addElementConverter(new HumanTaskXmlConverter());
         addElementConverter(new PlanItemXmlConverter());
+        addElementConverter(new ItemControlXmlConverter());
+        addElementConverter(new DefaultControlXmlConverter());
+        addElementConverter(new RepetitionRuleXmlConverter());
         addElementConverter(new SentryXmlConverter());
         addElementConverter(new EntryCriterionXmlConverter());
         addElementConverter(new ExitCriterionXmlConverter());

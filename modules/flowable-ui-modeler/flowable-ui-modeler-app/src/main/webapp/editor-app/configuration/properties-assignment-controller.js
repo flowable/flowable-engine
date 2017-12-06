@@ -37,6 +37,9 @@ angular.module('flowableModeler').controller('FlowableAssignmentPopupCtrl',
         && $scope.property.value.assignment !== null) {
 
         $scope.assignment = $scope.property.value.assignment;
+        if (typeof $scope.assignment.type === 'undefined') {
+            $scope.assignment.type = 'static';
+        }
 
     } else {
         $scope.assignment = {type:'idm'};

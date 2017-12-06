@@ -28,7 +28,7 @@ public class MilestoneXmlConverter extends PlanItemDefinitiomXmlConverter {
     }
     
     @Override
-    public boolean isCmmnElement() {
+    public boolean hasChildElements() {
         return true;
     }
 

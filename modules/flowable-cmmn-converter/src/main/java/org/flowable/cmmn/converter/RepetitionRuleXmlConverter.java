@@ -14,31 +14,38 @@ package org.flowable.cmmn.converter;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CmmnElement;
-import org.flowable.cmmn.model.TimerEventListener;
+import org.flowable.cmmn.model.PlanItemControl;
+import org.flowable.cmmn.model.RepetitionRule;
 
 /**
  * @author Joram Barrez
  */
-public class TimerExpressionXmlConverter extends CaseElementXmlConverter {
+public class RepetitionRuleXmlConverter extends CaseElementXmlConverter {
     
     @Override
     public String getXMLElementName() {
-        return CmmnXmlConstants.ELEMENT_TIMER_EXPRESSION;
+        return CmmnXmlConstants.ELEMENT_REPETITION_RULE;
     }
     
     @Override
     public boolean hasChildElements() {
-        return false;
+        return true;
     }
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        String expression = xtr.getText();
-        if (StringUtils.isNotEmpty(expression) && conversionHelper.getCurrentCmmnElement() instanceof TimerEventListener) {
-            TimerEventListener timerEventListener = (TimerEventListener) conversionHelper.getCurrentCmmnElement();
-            timerEventListener.setTimerExpression(expression);
+        if (conversionHelper.getCurrentCmmnElement() instanceof PlanItemControl) {
+            
+            RepetitionRule repetitionRule = new RepetitionRule();
+            repetitionRule.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
+            repetitionRule.setRepetitionCounterVariableName(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, 
+                    CmmnXmlConstants.ATTRIBUTE_REPETITION_COUNTER_VARIABLE_NAME));
+            
+            PlanItemControl planItemControl = (PlanItemControl) conversionHelper.getCurrentCmmnElement();
+            planItemControl.setRepetitionRule(repetitionRule);
+            
+            return repetitionRule;
         }
         return null;
     }

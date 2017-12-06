@@ -28,7 +28,7 @@ public class CmmnDiWaypointXmlConverter extends BaseCmmnXmlConverter {
     }
     
     @Override
-    public boolean isCmmnElement() {
+    public boolean hasChildElements() {
         return false;
     }
 

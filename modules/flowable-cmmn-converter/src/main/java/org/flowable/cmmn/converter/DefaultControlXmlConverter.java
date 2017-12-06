@@ -12,31 +12,14 @@
  */
 package org.flowable.cmmn.converter;
 
-import javax.xml.stream.XMLStreamReader;
-
-import org.flowable.cmmn.model.BaseElement;
-import org.flowable.cmmn.model.SentryIfPart;
-
 /**
  * @author Joram Barrez
  */
-public class SentryIfPartXmlConverter extends BaseCmmnXmlConverter {
-
+public class DefaultControlXmlConverter extends ItemControlXmlConverter {
+    
     @Override
     public String getXMLElementName() {
-        return CmmnXmlConstants.ELEMENT_IF_PART;
+        return CmmnXmlConstants.ELEMENT_DEFAULT_CONTROL;
     }
-
-    @Override
-    public boolean hasChildElements() {
-        return true;
-    }
-
-    @Override
-    protected BaseElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        SentryIfPart ifPart = new SentryIfPart();
-        conversionHelper.addSentryIfPartToCurrentSentry(ifPart);
-        return ifPart;
-    }
-
+    
 }
