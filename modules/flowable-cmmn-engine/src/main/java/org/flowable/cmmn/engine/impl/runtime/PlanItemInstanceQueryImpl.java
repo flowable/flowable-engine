@@ -20,14 +20,14 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.AbstractQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 
 /**
  * @author Joram Barrez
  */
-public class PlanItemInstanceQueryImpl extends AbstractQuery<PlanItemInstanceQuery, PlanItemInstance> implements PlanItemInstanceQuery {
+public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanItemInstanceQuery, PlanItemInstance> implements PlanItemInstanceQuery {
     
     protected String caseDefinitionId;
     protected String caseInstanceId;
@@ -204,12 +204,79 @@ public class PlanItemInstanceQueryImpl extends AbstractQuery<PlanItemInstanceQue
     }
     
     @Override
+    public PlanItemInstanceQuery caseVariableValueEquals(String name, Object value) {
+        return variableValueEquals(name, value, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableValueEquals(Object value) {
+        return variableValueEquals(value, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableValueEqualsIgnoreCase(String name, String value) {
+        return variableValueEqualsIgnoreCase(name, value, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableValueNotEquals(String name, Object value) {
+        return variableValueNotEquals(name, value, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableValueNotEqualsIgnoreCase(String name, String value) {
+        return variableValueNotEqualsIgnoreCase(name, value, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableValueGreaterThan(String name, Object value) {
+        return variableValueGreaterThan(name, value, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableValueGreaterThanOrEqual(String name, Object value) {
+        return variableValueGreaterThanOrEqual(name, value, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableValueLessThan(String name, Object value) {
+        return variableValueLessThan(name, value, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableValueLessThanOrEqual(String name, Object value) {
+        return variableValueLessThanOrEqual(name, value, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableValueLike(String name, String value) {
+        return variableValueLike(name, value, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableValueLikeIgnoreCase(String name, String value) {
+        return variableValueLikeIgnoreCase(name, value, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableExists(String name) {
+        return variableExists(name, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableNotExists(String name) {
+        return variableNotExists(name, false);
+    }
+
+    @Override
     public long executeCount(CommandContext commandContext) {
+        ensureVariablesInitialized();
         return CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).countByCriteria(this);
     }
 
     @Override
     public List<PlanItemInstance> executeList(CommandContext commandContext) {
+        ensureVariablesInitialized();
         return CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findByCriteria(this);
     }
     

@@ -224,12 +224,13 @@
     
     <select id="selectVariableInstancesByScopeIdAndScopeType" parameterType="java.util.Map" resultMap="variableInstanceResultMap">
         select * from ${prefix}ACT_RU_VARIABLE
-        where SCOPE_ID_ = #{parameter.scopeId, jdbcType=VARCHAR} and SCOPE_TYPE_ =  #{parameter.scopeType, jdbcType=VARCHAR}
+        where SCOPE_ID_ = #{parameter.scopeId, jdbcType=VARCHAR} and SUB_SCOPE_ID_ is null and SCOPE_TYPE_ =  #{parameter.scopeType, jdbcType=VARCHAR}
     </select> 
     
     <select id="selectVariableInstanceByScopeIdAndScopeTypeAndName" parameterType="java.util.Map" resultMap="variableInstanceResultMap">
         select * from ${prefix}ACT_RU_VARIABLE
         where SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR} 
+        and SUB_SCOPE_ID_ is null
         and SCOPE_TYPE_ =  #{scopeType, jdbcType=VARCHAR}
         and NAME_ = #{variableName, jdbcType=VARCHAR}
     </select> 
@@ -237,6 +238,7 @@
     <select id="selectVariableInstanceByScopeIdAndScopeTypeAndNames"  parameterType="java.util.Map" resultMap="variableInstanceResultMap">
         select * from ${prefix}ACT_RU_VARIABLE
         where SCOPE_ID_ = #{parameter.scopeId, jdbcType=VARCHAR} 
+        and SUB_SCOPE_ID_ is null
         and SCOPE_TYPE_ =  #{parameter.scopeType, jdbcType=VARCHAR}
         <if test="parameter.variableNames != null and parameter.variableNames.size > 0">
             and (
@@ -249,7 +251,7 @@
     
      <select id="selectVariableInstancesBySubScopeIdAndScopeType" parameterType="java.util.Map" resultMap="variableInstanceResultMap">
         select * from ${prefix}ACT_RU_VARIABLE
-        where SCOPE_ID_ = #{parameter.subScopeId, jdbcType=VARCHAR} and SCOPE_TYPE_ =  #{parameter.scopeType, jdbcType=VARCHAR}
+        where SUB_SCOPE_ID_ = #{parameter.subScopeId, jdbcType=VARCHAR} and SCOPE_TYPE_ =  #{parameter.scopeType, jdbcType=VARCHAR}
     </select> 
     
     <select id="selectVariableInstanceBySubScopeIdAndScopeTypeAndName" parameterType="java.util.Map" resultMap="variableInstanceResultMap">

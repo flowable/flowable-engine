@@ -112,6 +112,16 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
                 milestoneInstanceEntityManager.delete(milestoneInstanceEntity);
             }
         }
+        
+        // Plan item instances
+        PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
+        List<PlanItemInstanceEntity> planItemInstanceEntities = planItemInstanceEntityManager
+                .findChildPlanItemInstancesForCaseInstance(caseInstanceId);
+        if (planItemInstanceEntities != null) {
+            for (PlanItemInstanceEntity planItemInstanceEntity : planItemInstanceEntities) {
+                planItemInstanceEntityManager.delete(planItemInstanceEntity);
+            }
+        }
 
         delete(caseInstanceEntity);
     }
