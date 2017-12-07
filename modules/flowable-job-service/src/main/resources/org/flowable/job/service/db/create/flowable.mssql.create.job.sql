@@ -60,7 +60,6 @@ create table ACT_RU_SUSPENDED_JOB (
     EXECUTION_ID_ nvarchar(64),
     PROCESS_INSTANCE_ID_ nvarchar(64),
     PROC_DEF_ID_ nvarchar(64),
-    PROC_DEF_ID_ nvarchar(64),
     SCOPE_ID_ nvarchar(255),
     SUB_SCOPE_ID_ nvarchar(255),
     SCOPE_TYPE_ nvarchar(255),
