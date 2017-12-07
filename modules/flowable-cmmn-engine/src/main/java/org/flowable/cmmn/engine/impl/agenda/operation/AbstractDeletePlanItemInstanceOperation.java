@@ -38,14 +38,7 @@ public abstract class AbstractDeletePlanItemInstanceOperation extends AbstractCh
         if (isRepeating) {
             
             // Create new repeating instance
-            PlanItemInstanceEntity newPlanItemInstanceEntity = createAndInsertPlanItemInstance(commandContext, 
-                    planItemInstanceEntity.getPlanItem(), 
-                    planItemInstanceEntity.getCaseDefinitionId(), 
-                    planItemInstanceEntity.getCaseInstanceId(), 
-                    planItemInstanceEntity.getStageInstanceId(), 
-                    planItemInstanceEntity.getTenantId());
-            CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(planItemInstanceEntity.getCaseInstanceId());
-            caseInstanceEntity.getChildPlanItemInstances().add(newPlanItemInstanceEntity);
+            PlanItemInstanceEntity newPlanItemInstanceEntity = createNewPlanItemInstance();
             
             // Set repetition counter
             int counter = getRepetitionCounter(planItemInstanceEntity);
@@ -57,6 +50,26 @@ public abstract class AbstractDeletePlanItemInstanceOperation extends AbstractCh
         
         deleteSentryPartInstances();
         CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).delete(planItemInstanceEntity);
+    }
+
+    protected PlanItemInstanceEntity createNewPlanItemInstance() {
+        PlanItemInstanceEntity newPlanItemInstanceEntity = createAndInsertPlanItemInstance(commandContext, 
+                planItemInstanceEntity.getPlanItem(), 
+                planItemInstanceEntity.getCaseDefinitionId(), 
+                planItemInstanceEntity.getCaseInstanceId(), 
+                planItemInstanceEntity.getStageInstanceId(), 
+                planItemInstanceEntity.getTenantId());
+        
+        if (planItemInstanceEntity.getStageInstanceId() != null) {
+            PlanItemInstanceEntity stagePlanItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
+                    .findById(planItemInstanceEntity.getStageInstanceId());
+            stagePlanItemInstanceEntity.getChildren().add(newPlanItemInstanceEntity);
+        } else {
+            CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(planItemInstanceEntity.getCaseInstanceId());
+            caseInstanceEntity.getChildPlanItemInstances().add(newPlanItemInstanceEntity);
+        }
+        
+        return newPlanItemInstanceEntity;
     }
 
     protected boolean verifyRepetitionRule() {

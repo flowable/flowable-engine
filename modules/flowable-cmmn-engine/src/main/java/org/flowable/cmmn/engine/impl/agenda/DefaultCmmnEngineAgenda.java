@@ -47,7 +47,14 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     }
 
     public void addOperation(CmmnOperation operation, String caseInstanceId) {
-        operations.add(operation);
+        
+        int operationIndex = getOperationIndex(operation);
+        if (operationIndex >= 0) {
+            operations.add(operationIndex, operation);
+        } else {
+            operations.addLast(operation);
+        }
+        
         if (LOGGER.isDebugEnabled()) {
             LOGGER.debug("Planned {}", operation);
         }
@@ -55,6 +62,28 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
         if (caseInstanceId != null) {
             CommandContextUtil.addInvolvedCaseInstanceId(commandContext, caseInstanceId);
         }
+    }
+    
+    /**
+     * Returns the index in the list of operations where the {@link CmmnOperation} should be inserted.
+     * Returns a negative value if the element should be added to the end of the list. 
+     */
+    protected int getOperationIndex(CmmnOperation operation) {
+        
+        // The operation to evaluate the criteria is the most expensive operation.
+        // As such, when it's planned it is always 
+        // - moved to the end of the operations list
+        // - checked for duplicates to avoid duplicate evaluations (see the add method for it)
+        // - other operations are always planned before, as these can trigger new evaluation operations
+        
+        if (!operations.isEmpty() && !(operation instanceof EvaluateCriteriaOperation)) {
+            for (int i=0; i<operations.size(); i++) {
+                if (operations.get(i) instanceof EvaluateCriteriaOperation) {
+                    return i;
+                }
+            }
+        }
+        return -1;
     }
 
     @Override
@@ -147,6 +176,4 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
         addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntityId, manualTermination), caseInstanceEntityId);
     }
     
-    
-
 }

@@ -76,7 +76,7 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
     public PlanItem getPlanItem() {
         if (planItem == null) {
             Case caze = CaseDefinitionUtil.getCase(caseDefinitionId);
-            return (PlanItem) caze.getAllCaseElements().get(elementId);
+            planItem = (PlanItem) caze.getAllCaseElements().get(elementId);
         }
         return planItem;
     }
@@ -176,6 +176,14 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
             children = CommandContextUtil.getPlanItemInstanceEntityManager().findChildPlanItemInstancesForStage(id);
         }
         return children;
+    }
+    
+    @Override
+    public PlanItemInstanceEntity getStagePlanItemInstanceEntity() {
+        if (stagePlanItemInstance == null) {
+            stagePlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager().findById(stageInstanceId);
+        }
+        return stagePlanItemInstance;
     }
     
     @Override

@@ -25,4 +25,6 @@ public interface PlanItemInstanceEntity extends Entity, DelegatePlanItemInstance
     void setChildren(List<PlanItemInstanceEntity> children);
     List<PlanItemInstanceEntity> getChildren();
     
+    PlanItemInstanceEntity getStagePlanItemInstanceEntity();
+    
 }
