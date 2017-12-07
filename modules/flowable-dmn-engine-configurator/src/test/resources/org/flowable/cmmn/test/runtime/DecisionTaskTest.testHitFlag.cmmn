@@ -20,7 +20,7 @@
             <decisionTask id="decisionTask" name="dmn" isBlocking="false" decisionRef="decisionTableInternal">
                 <extensionElements>
                     <flowable:field name="decisionTaskThrowErrorOnNoHits">
-                        <flowable:string><![CDATA[${throwErrorOnNoHits}]]></flowable:string>
+                        <flowable:expression><![CDATA[${throwErrorOnNoHits}]]></flowable:expression>
                     </flowable:field>
                 </extensionElements>
             </decisionTask>

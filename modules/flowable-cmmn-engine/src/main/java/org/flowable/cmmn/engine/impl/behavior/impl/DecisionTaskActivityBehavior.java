@@ -61,12 +61,15 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
         String externalRef = null;
         if (decisionTask != null && decisionTask.getDecision() != null &&
                 StringUtils.isNotEmpty(decisionTask.getDecision().getExternalRef())) {
+            
             externalRef = decisionTask.getDecision().getExternalRef();
+            
         } else if (decisionRefExpression != null) {
             Object externalRefValue = decisionRefExpression.getValue(planItemInstanceEntity);
             if (externalRefValue != null) {
                 externalRef = externalRefValue.toString();
             }
+            
             if (StringUtils.isEmpty(externalRef)) {
                 throw new FlowableException("Could not execute decision: no externalRef defined");
             }
@@ -92,8 +95,18 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
 
         /* Throw error if there were no rules hit when the flag indicates to do this. */
         String throwErrorFieldValue = getFieldString(EXPRESSION_DECISION_TABLE_THROW_ERROR_FLAG);
-        if (decisionExecutionAuditContainer.getDecisionResult().isEmpty() && throwErrorFieldValue != null && "true".equalsIgnoreCase(throwErrorFieldValue)) {
-            throw new FlowableException("DMN decision table with key " + externalRef + " did not hit any rules for the provided input.");
+        if (decisionExecutionAuditContainer.getDecisionResult().isEmpty() && throwErrorFieldValue != null) {
+            if ("true".equalsIgnoreCase(throwErrorFieldValue)) {
+                throw new FlowableException("DMN decision table with key " + externalRef + " did not hit any rules for the provided input.");
+            
+            } else if (!"false".equalsIgnoreCase(throwErrorFieldValue)) {
+                Expression expression = CommandContextUtil.getExpressionManager(commandContext).createExpression(throwErrorFieldValue);
+                Object expressionValue = expression.getValue(planItemInstanceEntity);
+                
+                if (expressionValue != null && expressionValue instanceof Boolean && ((Boolean) expressionValue)) {
+                    throw new FlowableException("DMN decision table with key " + externalRef + " did not hit any rules for the provided input.");
+                }
+            }
         }
 
         setVariables(decisionExecutionAuditContainer.getDecisionResult(), externalRef, planItemInstanceEntity, 
@@ -107,6 +120,7 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
                                 String decisionKey,
                                 PlanItemInstanceEntity planItemInstanceEntity,
                                 ObjectMapper objectMapper) {
+        
         if (executionResult == null || executionResult.isEmpty()) {
             return;
         }
@@ -127,6 +141,7 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
             }
 
             planItemInstanceEntity.setVariable(decisionKey, ruleResultNode);
+            
         } else {
             // single rule result
             // put on execution output id (key) and output value (value)
@@ -141,7 +156,12 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
     protected String getFieldString(String fieldName) {
         for (FieldExtension fieldExtension : decisionTask.getFieldExtensions()) {
             if (fieldName.equals(fieldExtension.getFieldName())) {
-                return fieldExtension.getStringValue();
+                if (StringUtils.isNotEmpty(fieldExtension.getStringValue())) {
+                    return fieldExtension.getStringValue();
+                    
+                } else if (StringUtils.isNotEmpty(fieldExtension.getExpression())) {
+                    return fieldExtension.getExpression();
+                }
             }
         }
         

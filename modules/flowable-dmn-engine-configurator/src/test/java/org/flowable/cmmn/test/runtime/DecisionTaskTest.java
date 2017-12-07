@@ -12,20 +12,19 @@
  */
 package org.flowable.cmmn.test.runtime;
 
+import static org.junit.Assert.assertNotNull;
+
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnRule;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.junit.Assert;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
-
-import static org.junit.Assert.assertNotNull;
 
 /**
  * @author martin.grofcik
@@ -46,7 +45,7 @@ public class DecisionTaskTest {
     public void testDecisionServiceTask() {
         CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
-                .variable("test", "test2")
+                .variable("testVar", "test2")
                 .start();
 
         assertResultVariable(caseInstance);
@@ -60,8 +59,8 @@ public class DecisionTaskTest {
     )
     public void testUnknowPropertyUsedInDmn() {
         this.expectedException.expect(FlowableException.class);
-        this.expectedException.expectMessage("Unknown property used in expression: #{test == \"test2\"");
-
+        this.expectedException.expectMessage("DMN decision table with key decisionTable execution failed. Cause: Unknown property used in expression: #{testVar == \"test2\"}");
+        
         CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
                 .start();
@@ -78,7 +77,7 @@ public class DecisionTaskTest {
     public void testDecisionServiceTaskWithoutHitDefaultBehavior() {
         CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
-                .variable("test", "noHit")
+                .variable("testVar", "noHit")
                 .start();
 
         assertNoResultVariable(caseInstance);
@@ -93,7 +92,7 @@ public class DecisionTaskTest {
     public void testDoNotThrowErrorOnNoHitWithHit() {
         CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
                 .variable("throwErrorOnNoHits", false)
-                .variable("test", "test2")
+                .variable("testVar", "test2")
                 .caseDefinitionKey("myCase")
                 .start();
 
@@ -109,7 +108,7 @@ public class DecisionTaskTest {
     public void testThrowErrorOnNoHitBooleanExpression() {
         CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
                 .variable("throwErrorOnNoHits", Boolean.FALSE)
-                .variable("test", "test2")
+                .variable("testVar", "test2")
                 .caseDefinitionKey("myCase")
                 .start();
 
@@ -122,27 +121,10 @@ public class DecisionTaskTest {
                           "org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTask.dmn"
             }
     )
-    public void testThrowErrorOnNoHitNonBooleanExpression() {
-        this.expectedException.expect(FlowableIllegalArgumentException.class);
-        this.expectedException.expectMessage("Expression 'decisionTaskThrowErrorOnNoHits' must be resolved to java.lang.Boolean was 1");
-
-        cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
-                .variable("throwErrorOnNoHits", 1)
-                .variable("test", "test2")
-                .caseDefinitionKey("myCase")
-                .start();
-    }
-
-    @Test
-    @CmmnDeployment(
-            resources = { "org/flowable/cmmn/test/runtime/DecisionTaskTest.testHitFlag.cmmn",
-                          "org/flowable/cmmn/test/runtime/DecisionTaskTest.testDecisionServiceTask.dmn"
-            }
-    )
     public void testThrowErrorOnNoHitWithHit() {
         CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
                 .variable("throwErrorOnNoHits", true)
-                .variable("test", "test2")
+                .variable("testVar", "test2")
                 .caseDefinitionKey("myCase")
                 .start();
 
@@ -161,7 +143,7 @@ public class DecisionTaskTest {
 
         cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
                 .variable("throwErrorOnNoHits", true)
-                .variable("test", "noHit")
+                .variable("testVar", "noHit")
                 .caseDefinitionKey("myCase")
                 .start();
     }
@@ -175,7 +157,7 @@ public class DecisionTaskTest {
     public void testDoNotThrowErrorOnNoHit() {
         CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
                 .variable("throwErrorOnNoHits", false)
-                .variable("test", "noHitValue")
+                .variable("testVar", "noHitValue")
                 .caseDefinitionKey("myCase")
                 .start();
 
@@ -191,7 +173,7 @@ public class DecisionTaskTest {
     public void testExpressionReferenceKey() {
         CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
-                .variable("test", "test2")
+                .variable("testVar", "test2")
                 .variable("referenceKey", "decisionTable")
                 .start();
 
@@ -208,7 +190,7 @@ public class DecisionTaskTest {
 
         cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
-                .variable("test", "test2")
+                .variable("testVar", "test2")
                 .variable("referenceKey", null)
                 .start();
     }
@@ -223,7 +205,7 @@ public class DecisionTaskTest {
 
         cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
-                .variable("test", "test2")
+                .variable("testVar", "test2")
                 .variable("referenceKey", 1)
                 .start();
     }
@@ -238,7 +220,7 @@ public class DecisionTaskTest {
 
         cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
-                .variable("test", "test2")
+                .variable("testVar", "test2")
                 .variable("referenceKey", "NonExistingReferenceKey")
                 .start();
     }
@@ -254,7 +236,7 @@ public class DecisionTaskTest {
         // is blocking is not taken into the execution
         CaseInstance caseInstance = cmmnRule.getCmmnRuntimeService().createCaseInstanceBuilder()
                 .caseDefinitionKey("myCase")
-                .variable("test", "test2")
+                .variable("testVar", "test2")
                 .variable("referenceKey", "decisionTable")
                 .start();
 
