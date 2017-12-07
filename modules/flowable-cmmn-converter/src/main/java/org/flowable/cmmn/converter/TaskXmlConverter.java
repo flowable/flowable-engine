@@ -66,10 +66,6 @@ public class TaskXmlConverter extends PlanItemDefinitiomXmlConverter {
             serviceTask.setResultVariableName(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_RESULT_VARIABLE_NAME));
             task = serviceTask;
 
-        } else if (ServiceTask.DMN_TASK.equals(type)) {
-            ServiceTask serviceTask = new ServiceTask();
-            serviceTask.setType(type);
-            task = serviceTask;
         } else if (HttpServiceTask.HTTP_TASK.equals(type)) {
             HttpServiceTask httpServiceTask = new HttpServiceTask();
             if (StringUtils.isNotEmpty(className)) {

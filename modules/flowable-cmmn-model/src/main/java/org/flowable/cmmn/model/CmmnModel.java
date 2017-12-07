@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -13,6 +13,7 @@
 package org.flowable.cmmn.model;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -23,7 +24,7 @@ import java.util.Map;
  * @author Joram Barrez
  */
 public class CmmnModel {
-    
+
     protected String id;
     protected String name;
     protected String targetNamespace;
@@ -32,30 +33,32 @@ public class CmmnModel {
     protected String exporterVersion;
     protected String author;
     protected Date creationDate;
-    
+
     protected List<Case> cases = new ArrayList<>();
-    
+
     protected List<Process> processes = new ArrayList<>();
-    
+
+    protected List<Decision> decisions = new ArrayList<>();
+
     protected List<Association> associations = new ArrayList<>();
-    
+
     protected Map<String, Criterion> criterionMap = new LinkedHashMap<>();
     protected Map<String, String> criterionTechnicalIdMap = new HashMap<>();
 
     protected Map<String, GraphicInfo> locationMap = new LinkedHashMap<>();
     protected Map<String, GraphicInfo> labelLocationMap = new LinkedHashMap<>();
     protected Map<String, List<GraphicInfo>> flowLocationMap = new LinkedHashMap<>();
-    
+
     protected Map<String, String> namespaceMap = new LinkedHashMap<>();
-    
+
     public void addCase(Case caze) {
         cases.add(caze);
     }
-    
+
     public Case getPrimaryCase() {
         return cases.get(0);
     }
-    
+
     public Case getCaseById(String id) {
         for (Case caze : cases) {
             if (id.equals(caze.getId())) {
@@ -64,11 +67,11 @@ public class CmmnModel {
         }
         return null;
     }
-    
+
     public void addProcess(Process process) {
         processes.add(process);
     }
-    
+
     public Process getProcessById(String id) {
         for (Process process : processes) {
             if (id.equals(process.getId())) {
@@ -77,7 +80,24 @@ public class CmmnModel {
         }
         return null;
     }
-    
+
+    public void addDecision(Decision decision) {
+        decisions.add(decision);
+    }
+
+    public Decision getDecisionById(String id) {
+        for (Decision decision : decisions) {
+            if (id.equals(decision.getId())) {
+                return decision;
+            }
+        }
+        return null;
+    }
+
+    public Collection<Decision> getDecisions() {
+        return decisions;
+    }
+
     public PlanItemDefinition findPlanItemDefinition(String id) {
         PlanItemDefinition foundPlanItemDefinition = null;
         for (Case caseModel : cases) {
@@ -103,7 +123,7 @@ public class CmmnModel {
 
         return foundPlanItemDefinition;
     }
-    
+
     public PlanItem findPlanItem(String id) {
         PlanItem foundPlanItem = null;
         for (Case caseModel : cases) {
@@ -129,11 +149,11 @@ public class CmmnModel {
 
         return foundPlanItem;
     }
-    
+
     public void addAssociation(Association association) {
         associations.add(association);
     }
-    
+
     public void addCriterion(String key, Criterion criterion) {
         criterionMap.put(key, criterion);
     }
@@ -141,7 +161,7 @@ public class CmmnModel {
     public Criterion getCriterion(String key) {
         return criterionMap.get(key);
     }
-    
+
     public void addCriterionTechnicalId(String technicalId, String id) {
         criterionTechnicalIdMap.put(technicalId, id);
     }
@@ -149,7 +169,7 @@ public class CmmnModel {
     public String getCriterionId(String technicalId) {
         return criterionTechnicalIdMap.get(technicalId);
     }
-    
+
     public void addGraphicInfo(String key, GraphicInfo graphicInfo) {
         locationMap.put(key, graphicInfo);
     }
@@ -197,7 +217,7 @@ public class CmmnModel {
     public void addFlowGraphicInfoList(String key, List<GraphicInfo> graphicInfoList) {
         flowLocationMap.put(key, graphicInfoList);
     }
-    
+
     public String getId() {
         return id;
     }

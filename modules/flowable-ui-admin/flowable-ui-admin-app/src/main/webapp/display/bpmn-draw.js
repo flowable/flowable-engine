@@ -159,6 +159,10 @@ function _drawServiceTask(element)
     {
         _drawHttpTaskIcon(paper, element.x + 4, element.y + 4);
     }
+	else if (element.taskType === "dmn")
+    {
+        _drawDecisionTaskIcon(paper, element.x + 4, element.y + 4);
+    }
 	else if (element.taskType === "shell")
     {
         _drawShellTaskIcon(paper, element.x + 4, element.y + 4);

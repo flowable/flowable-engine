@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,34 +32,34 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
  * @author Joram Barrez
  */
 public class CaseTaskActivityBehavior extends TaskActivityBehavior implements PlanItemActivityBehavior {
-    
+
     protected Expression caseRefExpression;
-    
+
     public CaseTaskActivityBehavior(Expression caseRefExpression,CaseTask caseTask) {
-        super(caseTask);
+        super(caseTask.isBlocking(), caseTask.getBlockingExpression());
         this.caseRefExpression = caseRefExpression;
     }
-    
+
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        
+
         CaseInstanceHelper caseInstanceHelper = CommandContextUtil.getCaseInstanceHelper(commandContext);
         CaseInstanceBuilder caseInstanceBuilder = new CaseInstanceBuilderImpl().caseDefinitionKey(caseRefExpression.getValue(planItemInstanceEntity).toString());
         CaseInstanceEntity caseInstanceEntity = caseInstanceHelper.startCaseInstance(caseInstanceBuilder);
         caseInstanceEntity.setParentId(planItemInstanceEntity.getCaseInstanceId());
-        
+
         // Bidirectional storing of reference to avoid queries later on
         caseInstanceEntity.setCallbackType(PlanItemInstanceCallbackType.CHILD_CASE);
         caseInstanceEntity.setCallbackId(planItemInstanceEntity.getId());
-        
+
         planItemInstanceEntity.setReferenceType(PlanItemInstanceCallbackType.CHILD_CASE);
         planItemInstanceEntity.setReferenceId(caseInstanceEntity.getId());
-        
+
         if (!evaluateIsBlocking(planItemInstanceEntity)) {
             CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance((PlanItemInstanceEntity) planItemInstanceEntity);
         }
     }
-    
+
     @Override
     public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstance) {
         if (!PlanItemInstanceState.ACTIVE.equals(planItemInstance.getState())) {
@@ -69,10 +69,10 @@ public class CaseTaskActivityBehavior extends TaskActivityBehavior implements Pl
             throw new FlowableException("Cannot trigger case task plan item instance : no reference id set");
         }
         if (!PlanItemInstanceCallbackType.CHILD_CASE.equals(planItemInstance.getReferenceType())) {
-            throw new FlowableException("Cannot trigger case task plan item instance : reference type '" 
+            throw new FlowableException("Cannot trigger case task plan item instance : reference type '"
                     + planItemInstance.getReferenceType() + "' not supported");
         }
-        
+
         // Triggering the plan item (as opposed to a regular complete) terminates the case instance
         CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstance(planItemInstance.getReferenceId(), true);
         CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance(planItemInstance);
@@ -85,5 +85,5 @@ public class CaseTaskActivityBehavior extends TaskActivityBehavior implements Pl
             CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstance(planItemInstance.getReferenceId(), true);
         }
     }
-    
+
 }

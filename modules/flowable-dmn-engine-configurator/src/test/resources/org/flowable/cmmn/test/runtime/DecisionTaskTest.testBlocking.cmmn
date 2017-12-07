@@ -17,15 +17,7 @@
                 </planItemOnPart>
             </sentry>
 
-            <decisionTask id="decisionTask" name="dmn" isBlocking="false" decisionRef="decisionTableInternal">
-                <extensionElements>
-                    <flowable:field name="decisionTaskThrowErrorOnNoHits">
-                        <flowable:string><![CDATA[${throwErrorOnNoHits}]]></flowable:string>
-                    </flowable:field>
-                </extensionElements>
-            </decisionTask>
-
-
+            <decisionTask id="decisionTask" name="dmn" isBlocking="true" decisionRef="decisionTableInternal"/>
 
             <task id="task" name="The Task" isBlocking="true" />
 

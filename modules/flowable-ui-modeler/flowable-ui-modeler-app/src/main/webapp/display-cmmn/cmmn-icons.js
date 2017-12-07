@@ -81,36 +81,20 @@ function _drawProcessTaskIcon(paper, startX, startY)
     processTaskIcon.scale(0.7, 0.7);
 }
 
-function _drawDecisionTaskIcon(paper, startX, startY) {
-    var color = _bpmnGetColor(element, "#B3B1B3");
-    var rect1 = paper.rect(0, 0, 22, 4);
-    rect1.attr({
-        "stroke": "#000000",
-        "fill": color
-    });
-
-    var rect2 = paper.rect(0, 4, 22, 12);
-    rect2.attr({
-        "stroke": "#000000",
-        "fill": "none"
-    });
-
-    var path1 = paper.path("M 0 10 L 22 10");
+function _drawDecisionTaskIcon(paper, startX, startY)
+{
+    var path1 = paper.path("m 1,2 0,14 16,0 0,-14 z m 1.9,2.4000386 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m -8.67364,3.9 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m -8.67364,3.9 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z");
     path1.attr({
+        "opacity": 1,
         "stroke": "#000000",
-        "fill": "none"
+        "fill": "#F4F6F7"
     });
 
-    var path2 = paper.path("M 7 4 L 7 16");
-    path2.attr({
-        "stroke": "#000000",
-        "fill": "none"
-    });
+    var decisionTaskIcon = paper.set();
+    decisionTaskIcon.push(path1);
 
-    var businessRuleTaskIcon = paper.set();
-    businessRuleTaskIcon.push(rect1, rect2, path1, path2);
-
-    businessRuleTaskIcon.transform("S0.7,0.7,0,0 T" + startX + "," + startY);
+    decisionTaskIcon.translate(startX, startY);
+    decisionTaskIcon.scale(0.7, 0.7);
 }
 
 function _drawHttpTaskIcon(paper, startX, startY)

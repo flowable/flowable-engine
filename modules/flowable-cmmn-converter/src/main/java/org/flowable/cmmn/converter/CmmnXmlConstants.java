@@ -47,6 +47,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_HUMAN_TASK = "humanTask";
     String ELEMENT_CASE_TASK = "caseTask";
     String ELEMENT_PROCESS_TASK = "processTask";
+    String ELEMENT_DECISION_TASK = "decisionTask";
     String ELEMENT_TIMER_EVENT_LISTENER = "timerEventListener";
     String ELEMENT_PLAN_ITEM = "planItem";
     String ELEMENT_ITEM_CONTROL = "itemControl";
@@ -64,6 +65,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_REPETITION_RULE = "repetitionRule";
 
     String ELEMENT_PROCESS = "process";
+    String ELEMENT_DECISION = "decision";
     String ATTRIBUTE_IMPLEMENTATION_TYPE = "implementationType";
     String ATTRIBUTE_EXTERNAL_REF = "externalRef";
 
@@ -79,8 +81,10 @@ public interface CmmnXmlConstants {
 
     String ATTRIBUTE_CASE_REF = "caseRef";
     String ATTRIBUTE_PROCESS_REF = "processRef";
+    String ATTRIBUTE_DECISION_REF = "decisionRef";
 
     String ELEMENT_PROCESS_REF_EXPRESSION = "processRefExpression";
+    String ELEMENT_DECISION_REF_EXPRESSION = "decisionRefExpression";
     String ELEMENT_CONDITION = "condition";
 
     String ELEMENT_TIMER_EXPRESSION = "timerExpression";

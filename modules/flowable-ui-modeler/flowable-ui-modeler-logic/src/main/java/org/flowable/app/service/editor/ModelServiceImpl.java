@@ -102,7 +102,7 @@ public class ModelServiceImpl implements ModelService {
     protected BpmnJsonConverter bpmnJsonConverter = new BpmnJsonConverter();
 
     protected BpmnXMLConverter bpmnXMLConverter = new BpmnXMLConverter();
-    
+
     protected CmmnJsonConverter cmmnJsonConverter = new CmmnJsonConverter();
 
     protected CmmnXmlConverter cmmnXMLConverter = new CmmnXmlConverter();
@@ -163,7 +163,7 @@ public class ModelServiceImpl implements ModelService {
         byte[] xmlBytes = bpmnXMLConverter.convertToXML(bpmnModel);
         return xmlBytes;
     }
-    
+
     @Override
     public byte[] getCmmnXML(AbstractModel model) {
         CmmnModel cmmnModel = getCmmnModel(model);
@@ -224,7 +224,7 @@ public class ModelServiceImpl implements ModelService {
                 LOGGER.error("Error creating app definition", e);
                 throw new InternalServerErrorException("Error creating app definition");
             }
-            
+
         } else if (Integer.valueOf(AbstractModel.MODEL_TYPE_CMMN).equals(model.getModelType())) {
             ObjectNode editorNode = objectMapper.createObjectNode();
             editorNode.put("id", "canvas");
@@ -262,7 +262,7 @@ public class ModelServiceImpl implements ModelService {
             childNode.set("stencil", stencilNode);
             stencilNode.put("id", "CasePlanModel");
             json = editorNode.toString();
-            
+
         } else {
             ObjectNode editorNode = objectMapper.createObjectNode();
             editorNode.put("id", "canvas");
@@ -586,7 +586,7 @@ public class ModelServiceImpl implements ModelService {
             throw new InternalServerErrorException("Could not generate BPMN 2.0 model");
         }
     }
-    
+
     @Override
     public CmmnModel getCmmnModel(AbstractModel model) {
         CmmnModel cmmnModel = null;
@@ -603,10 +603,10 @@ public class ModelServiceImpl implements ModelService {
 
                 } else if (Model.MODEL_TYPE_DECISION_TABLE == childModel.getModelType()) {
                     decisionTableMap.put(childModel.getId(), childModel);
-                
+
                 } else if (Model.MODEL_TYPE_CMMN == childModel.getModelType()) {
                     caseModelMap.put(childModel.getId(), childModel);
-                
+
                 } else if (Model.MODEL_TYPE_BPMN == childModel.getModelType()) {
                     processModelMap.put(childModel.getId(), childModel);
                 }
@@ -621,11 +621,11 @@ public class ModelServiceImpl implements ModelService {
 
         return cmmnModel;
     }
-    
+
     @Override
-    public CmmnModel getCmmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap, 
+    public CmmnModel getCmmnModel(AbstractModel model, Map<String, Model> formMap, Map<String, Model> decisionTableMap,
                     Map<String, Model> caseModelMap, Map<String, Model> processModelMap) {
-        
+
         try {
             ObjectNode editorJsonNode = (ObjectNode) objectMapper.readTree(model.getModelEditorJson());
             Map<String, String> formKeyMap = convertToModelKeyMap(formMap);
@@ -691,7 +691,7 @@ public class ModelServiceImpl implements ModelService {
                 // Relations
                 handleBpmnProcessFormModelRelations(model, jsonNode);
                 handleBpmnProcessDecisionTaskModelRelations(model, jsonNode);
-                
+
             } else if (model.getModelType().intValue() == Model.MODEL_TYPE_CMMN) {
 
                 // Thumbnail
@@ -742,28 +742,28 @@ public class ModelServiceImpl implements ModelService {
 
         handleModelRelations(bpmnProcessModel, decisionTableIds, ModelRelationTypes.TYPE_DECISION_TABLE_MODEL_CHILD);
     }
-    
+
     protected void handleCmmnFormModelRelations(AbstractModel caseModel, ObjectNode editorJsonNode) {
         List<JsonNode> formReferenceNodes = CmmnModelJsonConverterUtil.filterOutJsonNodes(CmmnModelJsonConverterUtil.getCmmnModelFormReferences(editorJsonNode));
         Set<String> formIds = JsonConverterUtil.gatherStringPropertyFromJsonNodes(formReferenceNodes, "id");
 
         handleModelRelations(caseModel, formIds, ModelRelationTypes.TYPE_FORM_MODEL_CHILD);
     }
-    
+
     protected void handleCmmnDecisionModelRelations(AbstractModel caseModel, ObjectNode editorJsonNode) {
         List<JsonNode> processReferenceNodes = CmmnModelJsonConverterUtil.filterOutJsonNodes(CmmnModelJsonConverterUtil.getCmmnModelDecisionTableReferences(editorJsonNode));
         Set<String> processModelIds = JsonConverterUtil.gatherStringPropertyFromJsonNodes(processReferenceNodes, "id");
 
         handleModelRelations(caseModel, processModelIds, ModelRelationTypes.TYPE_DECISION_TABLE_MODEL_CHILD);
     }
-    
+
     protected void handleCmmnCaseModelRelations(AbstractModel caseModel, ObjectNode editorJsonNode) {
         List<JsonNode> caseReferenceNodes = CmmnModelJsonConverterUtil.filterOutJsonNodes(CmmnModelJsonConverterUtil.getCmmnModelCaseReferences(editorJsonNode));
         Set<String> caseModelIds = JsonConverterUtil.gatherStringPropertyFromJsonNodes(caseReferenceNodes, "id");
 
         handleModelRelations(caseModel, caseModelIds, ModelRelationTypes.TYPE_CASE_MODEL_CHILD);
     }
-    
+
     protected void handleCmmnProcessModelRelations(AbstractModel caseModel, ObjectNode editorJsonNode) {
         List<JsonNode> processReferenceNodes = CmmnModelJsonConverterUtil.filterOutJsonNodes(CmmnModelJsonConverterUtil.getCmmnModelProcessReferences(editorJsonNode));
         Set<String> processModelIds = JsonConverterUtil.gatherStringPropertyFromJsonNodes(processReferenceNodes, "id");
@@ -847,7 +847,7 @@ public class ModelServiceImpl implements ModelService {
         model.setVersion(basedOn.getVersion());
         model.setComment(basedOn.getComment());
     }
-    
+
     protected Map<String, String> convertToModelKeyMap(Map<String, Model> modelMap) {
         Map<String, String> modelKeyMap = new HashMap<>();
         if (modelMap != null) {
@@ -855,7 +855,7 @@ public class ModelServiceImpl implements ModelService {
                 modelKeyMap.put(formModel.getId(), formModel.getKey());
             }
         }
-        
+
         return modelKeyMap;
     }
 }

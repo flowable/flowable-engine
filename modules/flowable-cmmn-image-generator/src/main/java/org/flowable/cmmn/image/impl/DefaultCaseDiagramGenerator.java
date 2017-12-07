@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -30,6 +30,7 @@ import org.flowable.cmmn.model.CaseTask;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
+import org.flowable.cmmn.model.DecisionTask;
 import org.flowable.cmmn.model.GraphicInfo;
 import org.flowable.cmmn.model.HumanTask;
 import org.flowable.cmmn.model.Milestone;
@@ -41,13 +42,13 @@ import org.flowable.cmmn.model.Task;
 
 /**
  * Class to generate an image based the diagram interchange information in a CMMN 1.1 case.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
 
     protected Map<Class<? extends CmmnElement>, ActivityDrawInstruction> activityDrawInstructions = new HashMap<>();
-    
+
     public DefaultCaseDiagramGenerator() {
         this(1.0);
     }
@@ -84,7 +85,7 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
                 caseDiagramCanvas.drawServiceTask(caseElement.getName(), graphicInfo, scaleFactor);
             }
         });
-        
+
         // case task
         activityDrawInstructions.put(CaseTask.class, new ActivityDrawInstruction() {
 
@@ -94,7 +95,7 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
                 caseDiagramCanvas.drawCaseTask(caseElement.getName(), graphicInfo, scaleFactor);
             }
         });
-        
+
         // process task
         activityDrawInstructions.put(ProcessTask.class, new ActivityDrawInstruction() {
 
@@ -104,7 +105,17 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
                 caseDiagramCanvas.drawProcessTask(caseElement.getName(), graphicInfo, scaleFactor);
             }
         });
-        
+
+        // decision task
+        activityDrawInstructions.put(DecisionTask.class, new ActivityDrawInstruction() {
+
+            @Override
+            public void draw(DefaultCaseDiagramCanvas caseDiagramCanvas, CmmnModel cmmnModel, CaseElement caseElement) {
+                GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(caseElement.getId());
+                caseDiagramCanvas.drawDecisionTask(caseElement.getName(), graphicInfo, scaleFactor);
+            }
+        });
+
         // milestone
         activityDrawInstructions.put(Milestone.class, new ActivityDrawInstruction() {
 
@@ -114,7 +125,7 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
                 caseDiagramCanvas.drawMilestone(caseElement.getName(), graphicInfo, scaleFactor);
             }
         });
-        
+
         // criterion
         activityDrawInstructions.put(Criterion.class, new ActivityDrawInstruction() {
 
@@ -142,7 +153,7 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
     }
 
     @Override
-    public InputStream generateDiagram(CmmnModel cmmnModel, String imageType, 
+    public InputStream generateDiagram(CmmnModel cmmnModel, String imageType,
             String activityFontName, String labelFontName, String annotationFontName, ClassLoader customClassLoader, double scaleFactor) {
 
         return generateCaseDiagram(cmmnModel, imageType, activityFontName, labelFontName, annotationFontName, customClassLoader, scaleFactor).generateImage(imageType);
@@ -184,14 +195,14 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
     public InputStream generateJpgDiagram(CmmnModel cmmnModel, double scaleFactor) {
         return generateDiagram(cmmnModel, "jpg", scaleFactor);
     }
-    
-    public BufferedImage generateImage(CmmnModel cmmnModel, String imageType, 
+
+    public BufferedImage generateImage(CmmnModel cmmnModel, String imageType,
             String activityFontName, String labelFontName, String annotationFontName, ClassLoader customClassLoader, double scaleFactor) {
 
-        return generateCaseDiagram(cmmnModel, imageType, activityFontName, labelFontName, annotationFontName, 
+        return generateCaseDiagram(cmmnModel, imageType, activityFontName, labelFontName, annotationFontName,
                         customClassLoader, scaleFactor).generateBufferedImage(imageType);
     }
-    
+
     public BufferedImage generateImage(CmmnModel cmmnModel, String imageType, double scaleFactor) {
         return generateImage(cmmnModel, imageType, null, null, null, null, scaleFactor);
     }
@@ -210,11 +221,11 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
 
         // Draw elements
         for (Case caseModel : cmmnModel.getCases()) {
-            
+
             Stage planModel = caseModel.getPlanModel();
             GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(planModel.getId());
             caseDiagramCanvas.drawStage(planModel.getName(), graphicInfo, scaleFactor);
-            
+
             for (Criterion criterion : planModel.getExitCriteria()) {
                 ActivityDrawInstruction criterionInstruction = activityDrawInstructions.get(criterion.getClass());
                 criterionInstruction.draw(caseDiagramCanvas, cmmnModel, criterion);
@@ -306,33 +317,33 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
                 drawActivity(caseDiagramCanvas, cmmnModel, childPlanItem, scaleFactor);
             }
         }
-        
+
         for (Criterion criterion : planItem.getEntryCriteria()) {
             ActivityDrawInstruction criterionInstruction = activityDrawInstructions.get(criterion.getClass());
             criterionInstruction.draw(caseDiagramCanvas, cmmnModel, criterion);
         }
-        
+
         for (Criterion criterion : planItem.getExitCriteria()) {
             ActivityDrawInstruction criterionInstruction = activityDrawInstructions.get(criterion.getClass());
             criterionInstruction.draw(caseDiagramCanvas, cmmnModel, criterion);
         }
     }
-    
+
     protected void drawAssociation(DefaultCaseDiagramCanvas caseDiagramCanvas, CmmnModel cmmnModel, Association association, double scaleFactor) {
         // Outgoing transitions of activity
         String sourceRef = association.getSourceRef();
         String targetRef = association.getTargetRef();
-        
+
         BaseElement sourceElement = cmmnModel.getCriterion(sourceRef);
         if (sourceElement == null) {
             sourceElement = cmmnModel.findPlanItem(sourceRef);
         }
-        
+
         BaseElement targetElement = cmmnModel.getCriterion(targetRef);
         if (targetElement == null) {
             targetElement = cmmnModel.findPlanItem(targetRef);
         }
-        
+
         List<GraphicInfo> graphicInfoList = cmmnModel.getFlowLocationGraphicInfo(association.getId());
         if (graphicInfoList != null && graphicInfoList.size() > 0) {
             graphicInfoList = connectionPerfectionizer(caseDiagramCanvas, cmmnModel, sourceElement, targetElement, graphicInfoList);
@@ -356,9 +367,9 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
         }
     }
 
-    protected static List<GraphicInfo> connectionPerfectionizer(DefaultCaseDiagramCanvas processDiagramCanvas, CmmnModel cmmnModel, 
+    protected static List<GraphicInfo> connectionPerfectionizer(DefaultCaseDiagramCanvas processDiagramCanvas, CmmnModel cmmnModel,
                     BaseElement sourceElement, BaseElement targetElement, List<GraphicInfo> graphicInfoList) {
-        
+
         GraphicInfo sourceGraphicInfo = cmmnModel.getGraphicInfo(sourceElement.getId());
         GraphicInfo targetGraphicInfo = cmmnModel.getGraphicInfo(targetElement.getId());
 
@@ -371,7 +382,7 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
     /**
      * This method returns shape type of base element.<br>
      * Each element can be presented as rectangle, rhombus, or ellipse.
-     * 
+     *
      * @param baseElement
      * @return DefaultProcessDiagramCanvas.SHAPE_TYPE
      */
@@ -456,7 +467,7 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
         for (Case caseModel : cmmnModel.getCases()) {
             Stage stage = caseModel.getPlanModel();
             GraphicInfo stageInfo = cmmnModel.getGraphicInfo(stage.getId());
-            
+
             // width
             if (stageInfo.getX() + stageInfo.getWidth() > maxX) {
                 maxX = stageInfo.getX() + stageInfo.getWidth();
@@ -472,7 +483,7 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
                 minY = stageInfo.getY();
             }
         }
-        
+
         return new DefaultCaseDiagramCanvas((int) maxX + 10, (int) maxY + 10, (int) minX, (int) minY,
                 imageType, activityFontName, labelFontName, annotationFontName, customClassLoader);
     }
