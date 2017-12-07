@@ -22,6 +22,7 @@ import org.flowable.dmn.engine.impl.ExecuteDecisionInfo;
 import org.flowable.dmn.engine.impl.persistence.deploy.DecisionTableCacheEntry;
 import org.flowable.dmn.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.dmn.model.Decision;
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 
 /**
@@ -55,38 +56,46 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
             try {
                 decisionTable = deploymentManager.findDeployedLatestDecisionByKeyParentDeploymentIdAndTenantId(
                         getDecisionKey(), getParentDeploymentId(), getTenantId());
+                
             } catch (FlowableObjectNotFoundException e) {
                 // Fall back
                 // If there is no decision table found linked to the deployment id, try to find one without a specific deployment id.
                 try {
                     decisionTable = deploymentManager.findDeployedLatestDecisionByKeyAndTenantId(getDecisionKey(), getTenantId());
+                    
                 } catch (FlowableObjectNotFoundException ex) {
                     throw new FlowableObjectNotFoundException("No decision found for key: " + getDecisionKey() +
                             ", parent deployment id " + getParentDeploymentId() + " and tenant id: " + getTenantId() +
                             ". There was also no fall back decision table found without parent deployment id.");
                 }
             }
+            
         } else if (StringUtils.isNotEmpty(getDecisionKey()) && StringUtils.isNotEmpty(getParentDeploymentId())) {
             try {
                 decisionTable = deploymentManager.findDeployedLatestDecisionByKeyAndParentDeploymentId(getDecisionKey(), getParentDeploymentId());
+                
             } catch (FlowableObjectNotFoundException e) {
 
                 // Fall back
                 // If there is no decision table found linked to the deployment id, try to find one without a specific deployment id.
                 try {
                     decisionTable = deploymentManager.findDeployedLatestDecisionByKey(getDecisionKey());
+                    
                 } catch (FlowableObjectNotFoundException ex) {
                     throw new FlowableObjectNotFoundException("No decision found for key: " + getDecisionKey() +
                             " and parent deployment id " + getParentDeploymentId() +
                             ". There was also no fall back decision table found without parent deployment id.");
                 }
             }
+            
         } else if (StringUtils.isNotEmpty(getDecisionKey()) && StringUtils.isNotEmpty(getTenantId())) {
             decisionTable = deploymentManager.findDeployedLatestDecisionByKeyAndTenantId(getDecisionKey(), getTenantId());
+            
         } else if (StringUtils.isNotEmpty(getDecisionKey())) {
             decisionTable = deploymentManager.findDeployedLatestDecisionByKey(getDecisionKey());
+            
         } else {
-            throw new IllegalArgumentException("decisionKey is null");
+            throw new FlowableIllegalArgumentException("decisionKey is null");
         }
 
         executeDecisionInfo.setDecisionDefinitionId(decisionTable.getId());
@@ -97,7 +106,7 @@ public abstract class AbstractExecuteDecisionCmd implements Serializable {
 
     protected Decision resolveDecision(DeploymentManager deploymentManager, DmnDecisionTable decisionTable) {
         if (decisionTable == null) {
-            throw new IllegalArgumentException("decisionTable is null");
+            throw new FlowableIllegalArgumentException("decisionTable is null");
         }
 
         DecisionTableCacheEntry decisionTableCacheEntry = deploymentManager.resolveDecisionTable(decisionTable);

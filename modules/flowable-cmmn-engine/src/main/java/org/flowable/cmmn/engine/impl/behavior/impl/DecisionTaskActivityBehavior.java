@@ -12,11 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import liquibase.util.StringUtils;
+import java.util.List;
+import java.util.Map;
+
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -27,13 +25,15 @@ import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
 import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.engine.common.api.FlowableException;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import liquibase.util.StringUtils;
 
 /**
  * @author martin.grofcik
@@ -85,22 +85,19 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
         if (decisionExecutionAuditContainer == null) {
             throw new FlowableException("DMN decision table with key " + externalRef + " was not executed.");
         }
+        
         if (decisionExecutionAuditContainer.isFailed()) {
             throw new FlowableException("DMN decision table with key " + externalRef + " execution failed. Cause: " + decisionExecutionAuditContainer.getExceptionMessage());
         }
 
-        /*Throw error if there were no rules hit when the flag indicates to do this.*/
-        Boolean throwErrorFieldValue = getExpressionValue(EXPRESSION_DECISION_TABLE_THROW_ERROR_FLAG, Boolean.class, false, commandContext, planItemInstanceEntity);
-        if (decisionExecutionAuditContainer.getDecisionResult().isEmpty() && throwErrorFieldValue) {
+        /* Throw error if there were no rules hit when the flag indicates to do this. */
+        String throwErrorFieldValue = getFieldString(EXPRESSION_DECISION_TABLE_THROW_ERROR_FLAG);
+        if (decisionExecutionAuditContainer.getDecisionResult().isEmpty() && throwErrorFieldValue != null && "true".equalsIgnoreCase(throwErrorFieldValue)) {
             throw new FlowableException("DMN decision table with key " + externalRef + " did not hit any rules for the provided input.");
         }
 
-        setVariables(
-                decisionExecutionAuditContainer.getDecisionResult(),
-                externalRef,
-                planItemInstanceEntity,
-                CommandContextUtil.getCmmnEngineConfiguration(commandContext).getObjectMapper()
-        );
+        setVariables(decisionExecutionAuditContainer.getDecisionResult(), externalRef, planItemInstanceEntity, 
+                        CommandContextUtil.getCmmnEngineConfiguration(commandContext).getObjectMapper());
 
         CommandContextUtil.getAgenda().planCompletePlanItemInstance(planItemInstanceEntity);
     }
@@ -141,35 +138,13 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
         }
     }
 
-    protected <T> T getExpressionValue(String expressionString, Class<T> expectedType, T defaultValue, CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        Object expressionValue;
-        try {
-            String fieldString = getFieldString(expressionString);
-            if (fieldString != null) {
-                Expression referenceKeyExpression = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getExpressionManager().createExpression(
-                        fieldString
-                );
-                expressionValue = referenceKeyExpression.getValue(planItemInstanceEntity);
-            } else {
-                expressionValue = defaultValue;
-            }
-        } catch (Exception exc) {
-            throw new FlowableException(exc.getMessage(), exc);
-        }
-        if (expressionValue != null && !expressionValue.getClass().isAssignableFrom(expectedType)) {
-            throw new FlowableIllegalArgumentException("Expression '" + expressionString + "' must be resolved to " + expectedType.getName() + " was " + expressionValue);
-        }
-        return (T) expressionValue;
-    }
-
-    private String getFieldString(String fieldName) {
-        Iterator<FieldExtension> iterator = this.decisionTask.getFieldExtensions().iterator();
-        while (iterator.hasNext()) {
-            FieldExtension fieldExtension = iterator.next();
+    protected String getFieldString(String fieldName) {
+        for (FieldExtension fieldExtension : decisionTask.getFieldExtensions()) {
             if (fieldName.equals(fieldExtension.getFieldName())) {
                 return fieldExtension.getStringValue();
             }
         }
+        
         return null;
     }
 

@@ -114,7 +114,6 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
             throw new FlowableException("DMN decision table with key " + finaldecisionTableKeyValue + " did not hit any rules for the provided input.");
         }
 
-
         setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue, execution, processEngineConfiguration.getObjectMapper());
 
         leave(execution);
