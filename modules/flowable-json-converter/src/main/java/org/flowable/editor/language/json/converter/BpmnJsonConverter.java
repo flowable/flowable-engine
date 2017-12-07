@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -100,6 +100,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         ReceiveTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
         ScriptTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
         ServiceTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
+        ShellTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
         UserTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
         CallActivityJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
         CamelTaskJsonConverter.fillTypes(convertersToBpmnMap, convertersToJsonMap);
@@ -180,6 +181,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         DI_RECTANGLES.add(STENCIL_TASK_MULE);
         DI_RECTANGLES.add(STENCIL_TASK_HTTP);
         DI_RECTANGLES.add(STENCIL_TASK_DECISION);
+        DI_RECTANGLES.add(STENCIL_TASK_SHELL);
         DI_RECTANGLES.add(STENCIL_TEXT_ANNOTATION);
 
         DI_GATEWAY.add(STENCIL_GATEWAY_EVENT);
@@ -560,25 +562,25 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                 process.setDataObjects(dataObjects);
                 process.getFlowElements().addAll(dataObjects);
             }
-            
+
             String userStarterValue = BpmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_PROCESS_POTENTIALSTARTERUSER, modelNode);
             String groupStarterValue = BpmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_PROCESS_POTENTIALSTARTERGROUP, modelNode);
-            
+
             if (StringUtils.isNotEmpty(userStarterValue)) {
                 List<String> userStarters = new ArrayList<>();
                 String userStartArray[] = userStarterValue.split(",");
 
                 userStarters.addAll(Arrays.asList(userStartArray));
-                
+
                 process.setCandidateStarterUsers(userStarters);
             }
-            
+
             if (StringUtils.isNotEmpty(groupStarterValue)) {
                 List<String> groupStarters = new ArrayList<>();
                 String groupStarterArray[] = groupStarterValue.split(",");
 
                 groupStarters.addAll(Arrays.asList(groupStarterArray));
-                
+
                 process.setCandidateStarterGroups(groupStarters);
             }
 
@@ -623,7 +625,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                         }
                     }
                 }
-                
+
                 List<SubProcess> collapsedSubProcess = new ArrayList<>();
                 for (SubProcess subProcess : subShapesMap.values()) {
                     // determine if its a collapsed subprocess
@@ -632,10 +634,10 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                         collapsedSubProcess.add(subProcess);
                     }
                 }
-                
+
                 for (String flowId : removeSubFlowsList) {
                     process.removeFlowElement(flowId);
-                    
+
                     // check if the sequenceflow to remove is not assigned to a collapsed subprocess.
                     for (SubProcess subProcess : collapsedSubProcess) {
                         subProcess.removeFlowElement(flowId);
@@ -646,7 +648,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
 
         Map<String, FlowWithContainer> allFlowMap = new HashMap<>();
         List<Gateway> gatewayWithOrderList = new ArrayList<>();
-        
+
         // post handling of process elements
         for (Process process : bpmnModel.getProcesses()) {
             postProcessElements(process, process.getFlowElements(), edgeMap, bpmnModel, allFlowMap, gatewayWithOrderList);
@@ -713,9 +715,9 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
             Map<String, FlowWithContainer> allFlowMap, List<Gateway> gatewayWithOrderList) {
 
         for (FlowElement flowElement : flowElementList) {
-            
+
             parentContainer.addFlowElementToMap(flowElement);
-            
+
             if (flowElement instanceof Event) {
                 Event event = (Event) flowElement;
                 if (CollectionUtils.isNotEmpty(event.getEventDefinitions())) {
@@ -825,7 +827,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                     JsonNode boundsNode = jsonChildNode.get(EDITOR_BOUNDS);
                     ObjectNode upperLeftNode = (ObjectNode) boundsNode.get(EDITOR_BOUNDS_UPPER_LEFT);
                     ObjectNode lowerRightNode = (ObjectNode) boundsNode.get(EDITOR_BOUNDS_LOWER_RIGHT);
-                    
+
                     graphicInfo.setX(upperLeftNode.get(EDITOR_BOUNDS_X).asDouble() + parentX);
                     graphicInfo.setY(upperLeftNode.get(EDITOR_BOUNDS_Y).asDouble() + parentY);
                     graphicInfo.setWidth(lowerRightNode.get(EDITOR_BOUNDS_X).asDouble() - graphicInfo.getX() + parentX);
@@ -865,9 +867,9 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
 
                 ObjectNode childNode = (ObjectNode) jsonChildNode;
                 String stencilId = BpmnJsonConverterUtil.getStencilId(childNode);
-                if (STENCIL_SUB_PROCESS.equals(stencilId) || STENCIL_POOL.equals(stencilId) || STENCIL_LANE.equals(stencilId) || 
+                if (STENCIL_SUB_PROCESS.equals(stencilId) || STENCIL_POOL.equals(stencilId) || STENCIL_LANE.equals(stencilId) ||
                         STENCIL_COLLAPSED_SUB_PROCESS.equals(stencilId) || STENCIL_EVENT_SUB_PROCESS.equals(stencilId)) {
-                    
+
                     filterAllEdges(childNode, edgeMap, sourceAndTargetMap, shapeMap, sourceRefMap);
 
                 } else if (STENCIL_SEQUENCE_FLOW.equals(stencilId) || STENCIL_ASSOCIATION.equals(stencilId)) {

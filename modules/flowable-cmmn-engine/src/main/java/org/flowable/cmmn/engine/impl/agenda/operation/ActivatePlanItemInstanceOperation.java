@@ -37,6 +37,12 @@ public class ActivatePlanItemInstanceOperation extends AbstractPlanItemInstanceO
             
             planItemInstanceEntity.setState(PlanItemInstanceState.ACTIVE);
             executeActivityBehavior();
+            
+            // For the first instance of a repeatable plan item, the counter variable needs to be set.
+            if (isPlanItemRepeatableOnComplete(planItemInstanceEntity.getPlanItem()) 
+                    && getRepetitionCounter(planItemInstanceEntity) == 0) {
+                setRepetitionCounter(planItemInstanceEntity, 1);
+            }
         }
     }
     

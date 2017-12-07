@@ -79,9 +79,6 @@ public class CaseDefinitionEntityManagerImpl extends AbstractCmmnEntityManager<C
     
     @Override
     public void deleteCaseDefinitionAndRelatedData(String caseDefinitionId, boolean cascadeHistory) {
-        getMilestoneInstanceEntityManager().deleteByCaseDefinitionId(caseDefinitionId);
-        getPlanItemInstanceEntityManager().deleteByCaseDefinitionId(caseDefinitionId);
-        
         CaseInstanceEntityManager caseInstanceEntityManager = getCaseInstanceEntityManager();
         List<CaseInstanceEntity> caseInstances = caseInstanceEntityManager.findCaseInstancesByCaseDefinitionId(caseDefinitionId);
         

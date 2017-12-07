@@ -77,31 +77,42 @@ public abstract class CmmnOperation implements Runnable {
                                                                         String caseInstanceId, 
                                                                         String stagePlanItemInstanceId, 
                                                                         String tenantId) {
+        List<PlanItemInstanceEntity> planItemInstances = new ArrayList<>();
+        for (PlanItem planItem : planItems) {
+            planItemInstances.add(createAndInsertPlanItemInstance(commandContext, planItem,
+                    caseDefinitionId, caseInstanceId, stagePlanItemInstanceId, tenantId));
+        }
+        return planItemInstances;
+    }
+
+    protected PlanItemInstanceEntity createAndInsertPlanItemInstance(CommandContext commandContext, PlanItem planItem,
+            String caseDefinitionId, String caseInstanceId, String stagePlanItemInstanceId, String tenantId) {
+        
         ExpressionManager expressionManager = CommandContextUtil.getExpressionManager(commandContext);
         PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
         CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceId);
         
-        List<PlanItemInstanceEntity> planItemInstances = new ArrayList<>();
-        for (PlanItem planItem : planItems) {
-            PlanItemInstanceEntity planItemInstanceEntity = planItemInstanceEntityManager.create();
-            planItemInstanceEntity.setCaseDefinitionId(caseDefinitionId);
-            planItemInstanceEntity.setCaseInstanceId(caseInstanceId);
-            if (planItem.getName() != null) {
-                Expression nameExpression = expressionManager.createExpression(planItem.getName());
-                planItemInstanceEntity.setName(nameExpression.getValue(caseInstanceEntity).toString());
-            }
-            planItemInstanceEntity.setState(PlanItemInstanceState.AVAILABLE);
-            planItemInstanceEntity.setStartTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
-            planItemInstanceEntity.setElementId(planItem.getId());
-            planItemInstanceEntity.setStage(false);
-            planItemInstanceEntity.setStageInstanceId(stagePlanItemInstanceId);
-            planItemInstanceEntity.setTenantId(tenantId);
-         
-            planItemInstanceEntityManager.insert(planItemInstanceEntity);
-            planItemInstances.add(planItemInstanceEntity);
+        PlanItemInstanceEntity planItemInstanceEntity = planItemInstanceEntityManager.create();
+        planItemInstanceEntity.setCaseDefinitionId(caseDefinitionId);
+        planItemInstanceEntity.setCaseInstanceId(caseInstanceId);
+        if (planItem.getName() != null) {
+            Expression nameExpression = expressionManager.createExpression(planItem.getName());
+            planItemInstanceEntity.setName(nameExpression.getValue(caseInstanceEntity).toString());
         }
-        
-        return planItemInstances;
+        planItemInstanceEntity.setState(PlanItemInstanceState.AVAILABLE);
+        planItemInstanceEntity.setStartTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
+        planItemInstanceEntity.setElementId(planItem.getId());
+        PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
+        if (planItemDefinition != null) {
+            planItemInstanceEntity.setPlanItemDefinitionId(planItemDefinition.getId());
+            planItemInstanceEntity.setPlanItemDefinitionType(planItemDefinition.getClass().getSimpleName().toLowerCase());
+        }
+        planItemInstanceEntity.setStage(false);
+        planItemInstanceEntity.setStageInstanceId(stagePlanItemInstanceId);
+        planItemInstanceEntity.setTenantId(tenantId);
+       
+        planItemInstanceEntityManager.insert(planItemInstanceEntity);
+        return planItemInstanceEntity;
     }
 
 }

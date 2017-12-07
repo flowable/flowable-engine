@@ -1,18 +1,18 @@
 /* Copyright 2005-2015 Alfresco Software, Ltd.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-function _bpmnGetColor(element, defaultColor) 
+function _bpmnGetColor(element, defaultColor)
 {
     var strokeColor;
     if(element.current) {
@@ -33,7 +33,7 @@ function _drawPool(pool)
 		"stroke": "#000000",
 		"fill": "white"
  	});
-	
+
 	if (pool.name)
 	{
 		var poolName = paper.text(pool.x + 14, pool.y + (pool.height / 2), pool.name).attr({
@@ -42,10 +42,10 @@ function _drawPool(pool)
 	        "font-size" : "12",
 	        "fill" : "#000000"
 	  	});
-		
+
 		poolName.transform("r270");
 	}
-	
+
 	if (pool.lanes)
 	{
 		for (var i = 0; i < pool.lanes.length; i++)
@@ -64,7 +64,7 @@ function _drawLane(lane)
 		"stroke": "#000000",
 		"fill": "white"
  	});
-	
+
 	if (lane.name)
 	{
 		var laneName = paper.text(lane.x + 10, lane.y + (lane.height / 2), lane.name).attr({
@@ -73,7 +73,7 @@ function _drawLane(lane)
 	        "font-size" : "12",
 	        "fill" : "#000000"
 	  	});
-		
+
 		laneName.transform("r270");
 	}
 }
@@ -83,7 +83,7 @@ function _drawSubProcess(element)
 	var rect = paper.rect(element.x, element.y, element.width, element.height, 4);
 
 	var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
-	
+
 	rect.attr({"stroke-width": 1,
 		"stroke": strokeColor,
 		"fill": "white"
@@ -95,14 +95,14 @@ function _drawTransaction(element)
 	var rect = paper.rect(element.x, element.y, element.width, element.height, 4);
 
 	var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
-	
+
 	rect.attr({"stroke-width": 1,
 		"stroke": strokeColor,
 		"fill": "white"
  	});
-	
+
 	var borderRect = paper.rect(element.x + 2, element.y + 2, element.width - 4, element.height -4, 4);
-	
+
 	borderRect.attr({"stroke-width": 1,
 		"stroke": "black",
 		"fill": "none"
@@ -113,7 +113,7 @@ function _drawEventSubProcess(element)
 {
 	var rect = paper.rect(element.x, element.y, element.width, element.height, 4);
 	var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
-	
+
 	rect.attr({"stroke-width": 1,
 		"stroke": strokeColor,
 		"stroke-dasharray": ".",
@@ -164,9 +164,9 @@ function _drawEvent(element, strokeWidth, radius)
  	});
 
 	circle.id = element.id;
-	
+
 	_drawEventIcon(paper, element);
-	
+
 	return circle;
 }
 
@@ -193,6 +193,10 @@ function _drawServiceTask(element)
     {
         _drawHttpTaskIcon(paper, element.x + 4, element.y + 4);
     }
+	else if (element.taskType === "shell")
+    {
+        _drawShellTaskIcon(paper, element.x + 4, element.y + 4);
+    }
 	else if (element.stencilIconId)
 	{
 		paper.image("../service/stencilitem/" + element.stencilIconId + "/icon", element.x + 4, element.y + 4, 16, 16);
@@ -217,7 +221,7 @@ function _drawCallActivity(element)
     var height = element.height - (CALL_ACTIVITY_STROKE / 2);
 
     var rect = paper.rect(element.x, element.y, width, height, 4);
-  
+
     var strokeColor = _bpmnGetColor(element, ACTIVITY_STROKE_COLOR);
 
     // Fill
@@ -234,9 +238,9 @@ function _drawCallActivity(element)
         "fill": callActivityFillColor,
         "fill-opacity": callActivityOpacity
     });
-  
+
     rect.id = element.id;
-  
+
     if (element.name) {
         this._drawMultilineText(element.name, element.x, element.y, element.width, element.height, "middle", "middle", 11);
     }
@@ -288,18 +292,18 @@ function _drawReceiveTask(element)
 function _drawTask(element)
 {
     var rectAttrs = {};
-    
+
     // Stroke
     var strokeColor = _bpmnGetColor(element, ACTIVITY_STROKE_COLOR);
     rectAttrs['stroke'] = strokeColor;
-    
+
     var strokeWidth;
     if (strokeColor === ACTIVITY_STROKE_COLOR) {
         strokeWidth = TASK_STROKE;
     } else {
         strokeWidth = TASK_HIGHLIGHT_STROKE;
     }
-    
+
 	var width = element.width - (strokeWidth / 2);
 	var height = element.height - (strokeWidth / 2);
 
@@ -317,7 +321,7 @@ function _drawTask(element)
 
 	rect.attr(rectAttrs);
 	rect.id = element.id;
-	
+
 	if (element.name) {
 		this._drawMultilineText(element.name, element.x, element.y, element.width, element.height, "middle", "middle", 11);
 	}
@@ -328,14 +332,14 @@ function _drawExclusiveGateway(element)
 	_drawGateway(element);
 	var quarterWidth = element.width / 4;
 	var quarterHeight = element.height / 4;
-	
+
 	var iks = paper.path(
-		"M" + (element.x + quarterWidth + 3) + " " + (element.y + quarterHeight + 3) + 
-		"L" + (element.x + 3 * quarterWidth - 3) + " " + (element.y + 3 * quarterHeight - 3) + 
-		"M" + (element.x + quarterWidth + 3) + " " + (element.y + 3 * quarterHeight - 3) + 
+		"M" + (element.x + quarterWidth + 3) + " " + (element.y + quarterHeight + 3) +
+		"L" + (element.x + 3 * quarterWidth - 3) + " " + (element.y + 3 * quarterHeight - 3) +
+		"M" + (element.x + quarterWidth + 3) + " " + (element.y + 3 * quarterHeight - 3) +
 		"L" + (element.x + 3 * quarterWidth - 3) + " " + (element.y + quarterHeight + 3)
 	);
-	
+
 	var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
 
     // Fill
@@ -349,16 +353,16 @@ function _drawExclusiveGateway(element)
 
 
     iks.attr({"stroke-width": 3, "stroke": strokeColor, "fill": gatewayFillColor, "fill-opacity": gatewayOpacity});
-	
+
 	_addHoverLogic(element, "rhombus", MAIN_STROKE_COLOR);
 }
 
 function _drawParallelGateway(element)
 {
 	_drawGateway(element);
-	
+
 	var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
-	
+
 	var path1 = paper.path("M 6.75,16 L 25.75,16 M 16,6.75 L 16,25.75");
 
     // Fill
@@ -371,23 +375,23 @@ function _drawParallelGateway(element)
     }
 
 	path1.attr({
-		"stroke-width": 3, 
+		"stroke-width": 3,
 		"stroke": strokeColor,
 		"fill": gatewayFillColor,
         "fill-opacity": gatewayOpacity
 	});
-	
+
 	path1.transform("T" + (element.x + 4) + "," + (element.y + 4));
-	
+
 	_addHoverLogic(element, "rhombus", MAIN_STROKE_COLOR);
 }
 
 function _drawInclusiveGateway(element)
 {
 	_drawGateway(element);
-	
+
 	var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
-	
+
 	var circle1 = paper.circle(element.x + (element.width / 2), element.y + (element.height / 2), 9.75);
 
     // Fill
@@ -400,21 +404,21 @@ function _drawInclusiveGateway(element)
     }
 
 	circle1.attr({
-		"stroke-width": 2.5, 
+		"stroke-width": 2.5,
 		"stroke": strokeColor,
 		"fill": gatewayFillColor,
         "fill-opacity": gatewayOpacity
 	});
-	
+
 	_addHoverLogic(element, "rhombus", MAIN_STROKE_COLOR);
 }
 
 function _drawEventGateway(element)
 {
 	_drawGateway(element);
-	
+
 	var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
-	
+
 	var circle1 = paper.circle(element.x + (element.width / 2), element.y + (element.height / 2), 10.4);
 
     // Fill
@@ -427,40 +431,40 @@ function _drawEventGateway(element)
     }
 
 	circle1.attr({
-		"stroke-width": 0.5, 
+		"stroke-width": 0.5,
 		"stroke": strokeColor,
 		"fill": gatewayFillColor,
         "fill-opacity": gatewayOpacity
     });
-	
+
 	var circle2 = paper.circle(element.x + (element.width / 2), element.y + (element.height / 2), 11.7);
 	circle2.attr({
-		"stroke-width": 0.5, 
+		"stroke-width": 0.5,
 		"stroke": strokeColor,
         "fill": gatewayFillColor,
         "fill-opacity": gatewayOpacity
 	});
-	
+
 	var path1 = paper.path("M 20.327514,22.344972 L 11.259248,22.344216 L 8.4577203,13.719549 L 15.794545,8.389969 L 23.130481,13.720774 L 20.327514,22.344972 z");
 	path1.attr({
-		"stroke-width": 1.39999998, 
+		"stroke-width": 1.39999998,
 		"stroke": strokeColor,
         "fill": gatewayFillColor,
         "fill-opacity": gatewayOpacity,
 		"stroke-linejoin": "bevel"
 	});
-	
+
 	path1.transform("T" + (element.x + 4) + "," + (element.y + 4));
-	
+
 	_addHoverLogic(element, "rhombus", MAIN_STROKE_COLOR);
 }
 
 function _drawGateway(element)
 {
     var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
-    
-	var rhombus = paper.path("M" + element.x + " " + (element.y + (element.height / 2)) + 
-		"L" + (element.x + (element.width / 2)) + " " + (element.y + element.height) + 
+
+	var rhombus = paper.path("M" + element.x + " " + (element.y + (element.height / 2)) +
+		"L" + (element.x + (element.width / 2)) + " " + (element.y + element.height) +
 		"L" + (element.x + element.width) + " " + (element.y + (element.height / 2)) +
 		"L" + (element.x + (element.width / 2)) + " " + element.y + "z"
 	);
@@ -478,9 +482,9 @@ function _drawGateway(element)
 	rhombus.attr("stroke", strokeColor);
 	rhombus.attr("fill", gatewayFillColor);
     rhombus.attr("fill-opacity", gatewayOpacity);
-	
+
 	rhombus.id = element.id;
-	
+
 	return rhombus;
 }
 
@@ -490,24 +494,24 @@ function _drawBoundaryEvent(element)
 	var y = element.y + (element.height / 2);
 
 	var circle = paper.circle(x, y, 15);
-	
+
 	var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
 
 	circle.attr({"stroke-width": 1,
 		"stroke": strokeColor,
 		"fill": "white"
  	});
-	
+
 	var innerCircle = paper.circle(x, y, 12);
-	
+
 	innerCircle.attr({"stroke-width": 1,
 		"stroke": strokeColor,
 		"fill": "none"
  	});
-	
+
 	_drawEventIcon(paper, element);
 	_addHoverLogic(element, "circle", MAIN_STROKE_COLOR);
-	
+
 	circle.id = element.id;
 	innerCircle.id = element.id + "_inner";
 }
@@ -518,24 +522,24 @@ function _drawIntermediateCatchEvent(element)
 	var y = element.y + (element.height / 2);
 
 	var circle = paper.circle(x, y, 15);
-	
+
 	var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
 
 	circle.attr({"stroke-width": 1,
 		"stroke": strokeColor,
 		"fill": "white"
  	});
-	
+
 	var innerCircle = paper.circle(x, y, 12);
-	
+
 	innerCircle.attr({"stroke-width": 1,
 		"stroke": strokeColor,
 		"fill": "none"
  	});
-	
+
 	_drawEventIcon(paper, element);
 	_addHoverLogic(element, "circle", MAIN_STROKE_COLOR);
-	
+
 	circle.id = element.id;
 	innerCircle.id = element.id + "_inner";
 }
@@ -548,36 +552,36 @@ function _drawThrowEvent(element)
 	var circle = paper.circle(x, y, 15);
 
 	var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
-	
+
 	circle.attr({"stroke-width": 1,
 		"stroke": strokeColor,
 		"fill": "white"
  	});
-	
+
 	var innerCircle = paper.circle(x, y, 12);
-	
+
 	innerCircle.attr({"stroke-width": 1,
 		"stroke": strokeColor,
 		"fill": "none"
  	});
-	
+
 	_drawEventIcon(paper, element);
 	_addHoverLogic(element, "circle", MAIN_STROKE_COLOR);
-	
+
 	circle.id = element.id;
 	innerCircle.id = element.id + "_inner";
 }
 
-function _drawMultilineText(text, x, y, boxWidth, boxHeight, horizontalAnchor, verticalAnchor, fontSize) 
+function _drawMultilineText(text, x, y, boxWidth, boxHeight, horizontalAnchor, verticalAnchor, fontSize)
 {
 	if (!text || text == "")
 	{
 		return;
 	}
-	
+
 	var textBoxX, textBoxY;
     var width = boxWidth - (2 * TEXT_PADDING);
-    
+
     if (horizontalAnchor === "middle")
     {
     	textBoxX = x + (boxWidth / 2);
@@ -586,22 +590,22 @@ function _drawMultilineText(text, x, y, boxWidth, boxHeight, horizontalAnchor, v
     {
     	textBoxX = x;
     }
-    
+
     textBoxY = y + (boxHeight / 2);
-    
+
  	var t = paper.text(textBoxX + TEXT_PADDING, textBoxY + TEXT_PADDING).attr({
         "text-anchor" : horizontalAnchor,
         "font-family" : "Arial",
         "font-size" : fontSize,
         "fill" : "#373e48"
   	});
-  	
+
     var abc = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ";
     t.attr({
         "text" : abc
     });
     var letterWidth = t.getBBox().width / abc.length;
-	   
+
     t.attr({
         "text" : text
     });
@@ -611,7 +615,7 @@ function _drawMultilineText(text, x, y, boxWidth, boxHeight, horizontalAnchor, v
     {
   	    var words = removedLineBreaks[r].split(" ");
   	    for ( var i = 0; i < words.length; i++) {
-  
+
   	        var l = words[i].length;
   	        if (x + (l * letterWidth) > width) {
   	            s.push("\n");
@@ -626,7 +630,7 @@ function _drawMultilineText(text, x, y, boxWidth, boxHeight, horizontalAnchor, v
     t.attr({
     	"text" : s.join("")
     });
-    
+
     if (verticalAnchor && verticalAnchor === "top")
     {
     	t.attr({"y": y + (t.getBBox().height / 2)});
@@ -640,112 +644,112 @@ function _drawTextAnnotation(element)
 		"stroke": "#585858",
 		"fill": "none"
  	});
-	
+
 	var annotation = paper.set();
 	annotation.push(path1);
 
 	annotation.transform("T" + element.x + "," + element.y);
-	
+
 	if (element.text) {
 		this._drawMultilineText(element.text, element.x + 2, element.y, element.width, element.height, "start", "middle", 11);
 	}
 }
- 
+
 function _drawFlow(flow){
-	
+
 	var polyline = new Polyline(flow.id, flow.waypoints, SEQUENCEFLOW_STROKE, paper);
-	
+
 	var strokeColor = _bpmnGetColor(flow, MAIN_STROKE_COLOR);
-	
+
 	polyline.element = paper.path(polyline.path);
 	polyline.element.attr({"stroke-width":SEQUENCEFLOW_STROKE});
 	polyline.element.attr({"stroke":strokeColor});
-	
+
 	polyline.element.id = flow.id;
-	
+
 	var lastLineIndex = polyline.getLinesCount() - 1;
 	var line = polyline.getLine(lastLineIndex);
-	
+
 	if (line == undefined) return;
-	
+
 	if (flow.type == "connection" && flow.conditions)
 	{
 		var middleX = (line.x1 + line.x2) / 2;
 		var middleY = (line.y1 + line.y2) / 2;
 		var image = paper.image("../editor/images/condition-flow.png", middleX - 8, middleY - 8, 16, 16);
 	}
-	
+
 	var polylineInvisible = new Polyline(flow.id, flow.waypoints, SEQUENCEFLOW_STROKE, paper);
-	
+
 	polylineInvisible.element = paper.path(polyline.path);
 	polylineInvisible.element.attr({
 			"opacity": 0,
 			"stroke-width": 8,
             "stroke" : "#000000"
 	});
-	
+
 	_showTip(jQuery(polylineInvisible.element.node), flow);
-	
+
 	polylineInvisible.element.mouseover(function() {
 		paper.getById(polyline.element.id).attr({"stroke":"blue"});
 	});
-	
+
 	polylineInvisible.element.mouseout(function() {
 		paper.getById(polyline.element.id).attr({"stroke":"#585858"});
 	});
-	
+
 	_drawArrowHead(line);
 }
 
 function _drawAssociation(flow){
-	
+
 	var polyline = new Polyline(flow.id, flow.waypoints, ASSOCIATION_STROKE, paper);
-	
+
 	polyline.element = paper.path(polyline.path);
 	polyline.element.attr({"stroke-width": ASSOCIATION_STROKE});
 	polyline.element.attr({"stroke-dasharray": ". "});
 	polyline.element.attr({"stroke":"#585858"});
-	
+
 	polyline.element.id = flow.id;
-	
+
 	var polylineInvisible = new Polyline(flow.id, flow.waypoints, ASSOCIATION_STROKE, paper);
-	
+
 	polylineInvisible.element = paper.path(polyline.path);
 	polylineInvisible.element.attr({
 			"opacity": 0,
 			"stroke-width": 8,
             "stroke" : "#000000"
 	});
-	
+
 	_showTip(jQuery(polylineInvisible.element.node), flow);
-	
+
 	polylineInvisible.element.mouseover(function() {
 		paper.getById(polyline.element.id).attr({"stroke":"blue"});
 	});
-	
+
 	polylineInvisible.element.mouseout(function() {
 		paper.getById(polyline.element.id).attr({"stroke":"#585858"});
 	});
 }
 
-function _drawArrowHead(line, connectionType) 
+function _drawArrowHead(line, connectionType)
 {
 	var doubleArrowWidth = 2 * ARROW_WIDTH;
-	
+
 	var arrowHead = paper.path("M0 0L-" + (ARROW_WIDTH / 2 + .5) + " -" + doubleArrowWidth + "L" + (ARROW_WIDTH/2 + .5) + " -" + doubleArrowWidth + "z");
-	
+
 	// anti smoothing
 	if (this.strokeWidth%2 == 1)
 		line.x2 += .5, line.y2 += .5;
-	
+
 	arrowHead.transform("t" + line.x2 + "," + line.y2 + "");
 	arrowHead.transform("...r" + Raphael.deg(line.angle - Math.PI / 2) + " " + 0 + " " + 0);
-	
+
 	arrowHead.attr("fill", "#585858");
-		
+
 	arrowHead.attr("stroke-width", SEQUENCEFLOW_STROKE);
 	arrowHead.attr("stroke", "#585858");
-	
+
 	return arrowHead;
 }
 

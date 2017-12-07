@@ -20,7 +20,12 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
+import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.variable.api.type.VariableScopeType;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
 
 /**
  * @author Joram Barrez
@@ -66,6 +71,29 @@ public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager
     @Override
     public List<PlanItemInstance> findByCriteria(PlanItemInstanceQuery planItemInstanceQuery) {
         return planItemInstanceDataManager.findByCriteria((PlanItemInstanceQueryImpl) planItemInstanceQuery);
+    }
+
+    @Override
+    public void delete(PlanItemInstanceEntity planItemInstanceEntity, boolean fireEvent) {
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
+        
+        // Variables
+        VariableInstanceEntityManager variableInstanceEntityManager 
+            = CommandContextUtil.getVariableServiceConfiguration(commandContext).getVariableInstanceEntityManager();
+        List<VariableInstanceEntity> variableInstanceEntities = variableInstanceEntityManager
+                .findVariableInstanceBySubScopeIdAndScopeType(planItemInstanceEntity.getId(), VariableScopeType.CMMN);
+        for (VariableInstanceEntity variableInstanceEntity : variableInstanceEntities) {
+            variableInstanceEntityManager.delete(variableInstanceEntity);
+        }
+        
+        List<PlanItemInstanceEntity> childPlanItems = findChildPlanItemInstancesForStage(planItemInstanceEntity.getId());
+        if (childPlanItems != null && childPlanItems.size() > 0) {
+            for (PlanItemInstanceEntity childPlanItem : childPlanItems) {
+                delete(childPlanItem, fireEvent);
+            }
+        }
+        
+        getDataManager().delete(planItemInstanceEntity);
     }
     
 }

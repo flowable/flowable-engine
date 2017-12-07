@@ -20,19 +20,21 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.AbstractQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 
 /**
  * @author Joram Barrez
  */
-public class PlanItemInstanceQueryImpl extends AbstractQuery<PlanItemInstanceQuery, PlanItemInstance> implements PlanItemInstanceQuery {
+public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanItemInstanceQuery, PlanItemInstance> implements PlanItemInstanceQuery {
     
     protected String caseDefinitionId;
     protected String caseInstanceId;
     protected String stageInstanceId;
     protected String elementId;
+    protected String planItemDefinitionId;
+    protected String planItemDefinitionType;
     protected String name;
     protected String state;
     protected Date startedBefore;
@@ -88,6 +90,24 @@ public class PlanItemInstanceQueryImpl extends AbstractQuery<PlanItemInstanceQue
             throw new FlowableIllegalArgumentException("Element id is null");
         }
         this.elementId = elementId;
+        return this;
+    }
+    
+    @Override
+    public PlanItemInstanceQuery planItemDefinitionId(String planItemDefinitionId) {
+        if (planItemDefinitionId == null) {
+            throw new FlowableIllegalArgumentException("Plan item definition id is null");
+        }
+        this.planItemDefinitionId = planItemDefinitionId;
+        return this;
+    }
+    
+    @Override
+    public PlanItemInstanceQuery planItemDefinitionType(String planItemDefinitionType) {
+        if (planItemDefinitionType == null) {
+            throw new FlowableIllegalArgumentException("Plan item definition type is null");
+        }
+        this.planItemDefinitionType = planItemDefinitionType;
         return this;
     }
 
@@ -184,12 +204,79 @@ public class PlanItemInstanceQueryImpl extends AbstractQuery<PlanItemInstanceQue
     }
     
     @Override
+    public PlanItemInstanceQuery caseVariableValueEquals(String name, Object value) {
+        return variableValueEquals(name, value, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableValueEquals(Object value) {
+        return variableValueEquals(value, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableValueEqualsIgnoreCase(String name, String value) {
+        return variableValueEqualsIgnoreCase(name, value, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableValueNotEquals(String name, Object value) {
+        return variableValueNotEquals(name, value, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableValueNotEqualsIgnoreCase(String name, String value) {
+        return variableValueNotEqualsIgnoreCase(name, value, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableValueGreaterThan(String name, Object value) {
+        return variableValueGreaterThan(name, value, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableValueGreaterThanOrEqual(String name, Object value) {
+        return variableValueGreaterThanOrEqual(name, value, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableValueLessThan(String name, Object value) {
+        return variableValueLessThan(name, value, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableValueLessThanOrEqual(String name, Object value) {
+        return variableValueLessThanOrEqual(name, value, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableValueLike(String name, String value) {
+        return variableValueLike(name, value, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableValueLikeIgnoreCase(String name, String value) {
+        return variableValueLikeIgnoreCase(name, value, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableExists(String name) {
+        return variableExists(name, false);
+    }
+
+    @Override
+    public PlanItemInstanceQuery caseVariableNotExists(String name) {
+        return variableNotExists(name, false);
+    }
+
+    @Override
     public long executeCount(CommandContext commandContext) {
+        ensureVariablesInitialized();
         return CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).countByCriteria(this);
     }
 
     @Override
     public List<PlanItemInstance> executeList(CommandContext commandContext) {
+        ensureVariablesInitialized();
         return CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findByCriteria(this);
     }
     
@@ -219,6 +306,14 @@ public class PlanItemInstanceQueryImpl extends AbstractQuery<PlanItemInstanceQue
 
     public String getElementId() {
         return elementId;
+    }
+    
+    public String getPlanItemDefinitionId() {
+        return planItemDefinitionId;
+    }
+    
+    public String getPlanItemDefinitionType() {
+        return planItemDefinitionType;
     }
 
     public String getName() {

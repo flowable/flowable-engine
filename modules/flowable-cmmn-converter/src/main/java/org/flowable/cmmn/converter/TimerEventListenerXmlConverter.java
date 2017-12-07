@@ -23,7 +23,7 @@ import org.flowable.cmmn.model.TimerEventListener;
 public class TimerEventListenerXmlConverter extends PlanItemDefinitiomXmlConverter {
 
     @Override
-    public boolean isCmmnElement() {
+    public boolean hasChildElements() {
         return true;
     }
     

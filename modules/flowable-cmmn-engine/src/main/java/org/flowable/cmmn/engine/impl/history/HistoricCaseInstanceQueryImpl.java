@@ -20,15 +20,18 @@ import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.AbstractQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 
 /**
  * @author Joram Barrez
+ * @author Tijs Rademakers
  */
-public class HistoricCaseInstanceQueryImpl extends AbstractQuery<HistoricCaseInstanceQuery, HistoricCaseInstance> implements HistoricCaseInstanceQuery {
+public class HistoricCaseInstanceQueryImpl extends AbstractVariableQueryImpl<HistoricCaseInstanceQuery, HistoricCaseInstance> implements HistoricCaseInstanceQuery {
 
+    private static final long serialVersionUID = 1L;
+    
     protected String caseDefinitionId;
     protected String caseDefinitionKey;
     protected Set<String> caseDefinitionKeys;
@@ -300,10 +303,12 @@ public class HistoricCaseInstanceQueryImpl extends AbstractQuery<HistoricCaseIns
     // results ////////////////////////////////////////////////////
 
     public long executeCount(CommandContext commandContext) {
+        ensureVariablesInitialized();
         return CommandContextUtil.getHistoricCaseInstanceEntityManager(commandContext).countByCriteria(this);
     }
 
     public List<HistoricCaseInstance> executeList(CommandContext commandContext) {
+        ensureVariablesInitialized();
         return CommandContextUtil.getHistoricCaseInstanceEntityManager(commandContext).findByCriteria(this);
     }
 

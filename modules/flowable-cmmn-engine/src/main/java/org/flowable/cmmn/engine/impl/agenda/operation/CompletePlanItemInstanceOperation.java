@@ -36,4 +36,9 @@ public class CompletePlanItemInstanceOperation extends AbstractDeletePlanItemIns
         return PlanItemTransition.COMPLETE;
     }
     
+    @Override
+    protected boolean isEvaluateRepetitionRule() {
+        return true;
+    }
+    
 }

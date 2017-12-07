@@ -163,6 +163,10 @@ function _drawServiceTask(element)
     {
         _drawDecisionTaskIcon(paper, element.x + 4, element.y + 4);
     }
+	else if (element.taskType === "shell")
+    {
+        _drawShellTaskIcon(paper, element.x + 4, element.y + 4);
+    }
 	else if (element.stencilIconId)
 	{
 		paper.image("../service/stencilitem/" + element.stencilIconId + "/icon", element.x + 4, element.y + 4, 16, 16);

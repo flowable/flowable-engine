@@ -179,6 +179,25 @@ function _drawHttpTaskIcon(paper, startX, startY)
 
 }
 
+function _drawShellTaskIcon(paper, startX, startY)
+{
+    var path = paper.path("m 1,2 0,14 16,0 0,-14 z m 1.4,3 12.7,0 0,10 -12.7,0 z");
+    path.attr({
+        "opacity": 1,
+        "stroke": "none",
+        "fill": "#16964d"
+    });
+    var text = paper.text(3, 9, ">_").attr({
+        "font-size": "5px",
+        "fill": "#16964d"
+    });
+
+    startY += -2;
+    text.transform("T" + startX + "," + startY);
+    startX += -2;
+    path.transform("T" + startX + "," + startY);
+}
+
 function _drawDecisionTaskIcon(paper, startX, startY)
 {
     var path = paper.path("m 1,2 0,14 16,0 0,-14 z m 1.9,2.4000386 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m -8.67364,3.9 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m -8.67364,3.9 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z");

@@ -16,6 +16,7 @@ package org.flowable.cmmn.image.impl;
 import java.awt.image.BufferedImage;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.EventListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -390,6 +391,8 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
             return DefaultCaseDiagramCanvas.SHAPE_TYPE.Rectangle;
         } else if (baseElement instanceof Criterion) {
             return DefaultCaseDiagramCanvas.SHAPE_TYPE.Rhombus;
+        } else if (baseElement instanceof EventListener) {
+            return DefaultCaseDiagramCanvas.SHAPE_TYPE.Ellipse;
         } else {
             // unknown source element, just do not correct coordinates
         }

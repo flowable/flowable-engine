@@ -37,6 +37,8 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
     protected String stageInstanceId;
     protected boolean isStage;
     protected String elementId;
+    protected String planItemDefinitionId;
+    protected String planItemDefinitionType;
     protected String name;
     protected String state;
     protected Date startTime;
@@ -58,6 +60,8 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
         persistentState.put("stageInstanceId", stageInstanceId);
         persistentState.put("isStage", isStage);
         persistentState.put("elementId", elementId);
+        persistentState.put("planItemDefinitionId", planItemDefinitionId);
+        persistentState.put("planItemDefinitionType", planItemDefinitionType);
         persistentState.put("name", name);
         persistentState.put("state", state);
         persistentState.put("startTime", startTime);
@@ -106,6 +110,18 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
     }
     public void setElementId(String elementId) {
         this.elementId = elementId;
+    }
+    public String getPlanItemDefinitionId() {
+        return planItemDefinitionId;
+    }
+    public void setPlanItemDefinitionId(String planItemDefinitionId) {
+        this.planItemDefinitionId = planItemDefinitionId;
+    }
+    public String getPlanItemDefinitionType() {
+        return planItemDefinitionType;
+    }
+    public void setPlanItemDefinitionType(String planItemDefinitionType) {
+        this.planItemDefinitionType = planItemDefinitionType;
     }
     public String getName() {
         return name;

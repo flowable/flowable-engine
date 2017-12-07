@@ -39,5 +39,21 @@ public abstract class AbstractCaseInstanceOperation extends CmmnOperation {
             caseInstanceEntityId = caseInstanceEntity.getId();
         }
     }
+
+    public String getCaseInstanceEntityId() {
+        return caseInstanceEntityId;
+    }
+
+    public void setCaseInstanceEntityId(String caseInstanceEntityId) {
+        this.caseInstanceEntityId = caseInstanceEntityId;
+    }
+
+    public CaseInstanceEntity getCaseInstanceEntity() {
+        return caseInstanceEntity;
+    }
+
+    public void setCaseInstanceEntity(CaseInstanceEntity caseInstanceEntity) {
+        this.caseInstanceEntity = caseInstanceEntity;
+    }
     
 }

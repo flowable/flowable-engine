@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+  <case id="testStageExitOnTimerOccurrence" name="testStageExitOnTimerOccurrence" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="casePlanModel">
+      <planItem id="planItem1" definitionRef="sid-70070696-CCA4-4028-A3FA-5B587E018E05"></planItem>
+      <planItem id="planItem2" name="A" definitionRef="sid-6FF3770A-BD9A-48B5-A923-31386B33C56E"></planItem>
+      <planItem id="planItem3" name="B" definitionRef="sid-7BE76536-5D18-438F-93DE-0847F0FA23B2"></planItem>
+      <planItem id="planItem5" definitionRef="sid-1ACB3F70-0179-48BC-B9DE-537EF2CBA087"></planItem>
+      <sentry id="sentry1">
+        <planItemOnPart id="sentryOnPart1" sourceRef="planItem1">
+          <standardEvent>occur</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <timerEventListener id="sid-70070696-CCA4-4028-A3FA-5B587E018E05">
+        <timerExpression><![CDATA[PT24H]]></timerExpression>
+      </timerEventListener>
+      <humanTask id="sid-6FF3770A-BD9A-48B5-A923-31386B33C56E" name="A"></humanTask>
+      <humanTask id="sid-7BE76536-5D18-438F-93DE-0847F0FA23B2" name="B"></humanTask>
+      <stage id="sid-1ACB3F70-0179-48BC-B9DE-537EF2CBA087">
+        <planItem id="planItem4" name="C" definitionRef="sid-FC8D163E-C196-4DCE-824C-67DEECA0D5CF"></planItem>
+        <humanTask id="sid-FC8D163E-C196-4DCE-824C-67DEECA0D5CF" name="C"></humanTask>
+      </stage>
+      <exitCriterion id="sid-E185183B-7DF1-41EB-9C9B-BD3ED080A79D" sentryRef="sentry1"></exitCriterion>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_testStageExitOnTimerOccurrence">
+      <cmmndi:CMMNShape id="CMMNShape_casePlanModel" cmmnElementRef="casePlanModel">
+        <dc:Bounds height="714.0" width="718.0" x="30.0" y="30.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_sid-E185183B-7DF1-41EB-9C9B-BD3ED080A79D" cmmnElementRef="sid-E185183B-7DF1-41EB-9C9B-BD3ED080A79D">
+        <dc:Bounds height="22.0" width="14.0" x="741.7193299322522" y="383.0731328919263"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+        <dc:Bounds height="31.0" width="31.0" x="600.0" y="379.5"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+        <dc:Bounds height="80.0" width="100.0" x="155.0" y="140.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem3" cmmnElementRef="planItem3">
+        <dc:Bounds height="80.0" width="100.0" x="305.0" y="140.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem5" cmmnElementRef="planItem5">
+        <dc:Bounds height="170.0" width="370.0" x="75.0" y="331.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem4" cmmnElementRef="planItem4">
+        <dc:Bounds height="80.0" width="100.0" x="119.0" y="355.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="CMMNEdge_sid-4E720442-D652-4BC5-A64C-DA9C4DF52432" cmmnElementRef="sid-E185183B-7DF1-41EB-9C9B-BD3ED080A79D" targetCMMNElementRef="planItem1">
+        <di:waypoint x="742.2878013179256" y="393.17982071443953"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>
