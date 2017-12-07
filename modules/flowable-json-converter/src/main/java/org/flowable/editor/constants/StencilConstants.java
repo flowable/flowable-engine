@@ -271,4 +271,17 @@ public interface StencilConstants {
     final String PROPERTY_HTTPTASK_RESULT_VARIABLE_PREFIX = "httptaskresultvariableprefix";
 
     final String PROPERTY_SKIP_EXPRESSION = "skipexpression";
+
+    final String PROPERTY_SHELLTASK_COMMAND = "shellcommand";
+    final String PROPERTY_SHELLTASK_ARG1 = "shellarg1";
+    final String PROPERTY_SHELLTASK_ARG2 = "shellarg2";
+    final String PROPERTY_SHELLTASK_ARG3 = "shellarg3";
+    final String PROPERTY_SHELLTASK_ARG4 = "shellarg4";
+    final String PROPERTY_SHELLTASK_ARG5 = "shellarg5";
+    final String PROPERTY_SHELLTASK_WAIT = "shellwait";
+    final String PROPERTY_SHELLTASK_OUTPUT_VARIABLE = "shelloutputvariable";
+    final String PROPERTY_SHELLTASK_ERROR_CODE_VARIABLE = "shellerrorcodevariable";
+    final String PROPERTY_SHELLTASK_ERROR_REDIRECT = "shellerrorredirect";
+    final String PROPERTY_SHELLTASK_CLEAN_ENV = "shellcleanenv";
+    final String PROPERTY_SHELLTASK_DIRECTORY = "shelldirectory";
 }

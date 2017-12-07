@@ -10,10 +10,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 function _drawUserTaskIcon(paper, startX, startY, element)
 {
-  
+
   var color = _bpmnGetColor(element, "#d1b575");
 	var path1 = paper.path("m 1,17 16,0 0,-1.7778 -5.333332,-3.5555 0,-1.7778 c 1.244444,0 1.244444,-2.3111 1.244444,-2.3111 l 0,-3.0222 C 12.555557,0.8221 9.0000001,1.0001 9.0000001,1.0001 c 0,0 -3.5555556,-0.178 -3.9111111,3.5555 l 0,3.0222 c 0,0 0,2.3111 1.2444443,2.3111 l 0,1.7778 L 1,15.2222 1,17 17,17");
 	path1.attr({
@@ -21,7 +21,7 @@ function _drawUserTaskIcon(paper, startX, startY, element)
 		"stroke": "none",
 		"fill": color
  	});
-	
+
 	var userTaskIcon = paper.set();
 	userTaskIcon.push(path1);
 
@@ -37,7 +37,7 @@ function _drawServiceTaskIcon(paper, startX, startY, element)
 		"stroke": "none",
 		"fill": color
  	});
-	
+
 	var serviceTaskIcon = paper.set();
 	serviceTaskIcon.push(path1);
 
@@ -53,7 +53,7 @@ function _drawScriptTaskIcon(paper, startX, startY, element)
 		"stroke": "none",
 		"fill": color
  	});
-	
+
 	var scriptTaskIcon = paper.set();
 	scriptTaskIcon.push(path1);
 
@@ -68,25 +68,25 @@ function _drawBusinessRuleTaskIcon(paper, startX, startY, element)
 		"stroke": "#000000",
 		"fill": color
  	});
-	
+
 	var rect2 = paper.rect(0, 4, 22, 12);
 	rect2.attr({
 		"stroke": "#000000",
 		"fill": "none"
  	});
-	
+
 	var path1 = paper.path("M 0 10 L 22 10");
 	path1.attr({
 		"stroke": "#000000",
 		"fill": "none"
  	});
-	
+
 	var path2 = paper.path("M 7 4 L 7 16");
 	path2.attr({
 		"stroke": "#000000",
 		"fill": "none"
  	});
-	
+
 	var businessRuleTaskIcon = paper.set();
 	businessRuleTaskIcon.push(rect1, rect2, path1, path2);
 
@@ -101,13 +101,13 @@ function _drawSendTaskIcon(paper, startX, startY, element)
 		"stroke": "white",
 		"fill": color
  	});
-	
+
 	var path2 = paper.path("M7,10 L16,17 L25 10z6");
 	path2.attr({
 		"stroke": "white",
 		"fill": color
  	});
-	
+
 	var sendTaskIcon = paper.set();
 	sendTaskIcon.push(path1, path2);
 
@@ -123,7 +123,7 @@ function _drawManualTaskIcon(paper, startX, startY, element)
 		"stroke": "none",
 		"fill": color
  	});
-	
+
 	var manualTaskIcon = paper.set();
 	manualTaskIcon.push(path1);
 
@@ -139,12 +139,12 @@ function _drawReceiveTaskIcon(paper, startX, startY, element)
 		"stroke": "none",
 		"fill": color
  	});
-	
+
 	startX += 4;
 	startY += 2;
-	
+
 	path.transform("T" + startX + "," + startY);
-	
+
 }
 
 function _drawCamelTaskIcon(paper, startX, startY)
@@ -155,12 +155,12 @@ function _drawCamelTaskIcon(paper, startX, startY)
         "stroke": "none",
         "fill": "#bd4848"
     });
-    
+
     startX += 4;
     startY += 2;
-    
+
     path.transform("T" + startX + "," + startY);
-    
+
 }
 
 function _drawHttpTaskIcon(paper, startX, startY)
@@ -179,6 +179,25 @@ function _drawHttpTaskIcon(paper, startX, startY)
 
 }
 
+function _drawShellTaskIcon(paper, startX, startY)
+{
+    var path = paper.path("m 1,2 0,14 16,0 0,-14 z m 1.4,3 12.7,0 0,10 -12.7,0 z");
+    path.attr({
+        "opacity": 1,
+        "stroke": "none",
+        "fill": "#16964d"
+    });
+    var text = paper.text(3, 9, ">_").attr({
+        "font-size": "5px",
+        "fill": "#16964d"
+    });
+
+    startY += -2;
+    text.transform("T" + startX + "," + startY);
+    startX += -2;
+    path.transform("T" + startX + "," + startY);
+}
+
 function _drawMuleTaskIcon(paper, startX, startY)
 {
     var path = paper.path("M 8,0 C 3.581722,0 0,3.5817 0,8 c 0,4.4183 3.581722,8 8,8 4.418278,0 8,-3.5817 8,-8 L 16,7.6562 C 15.813571,3.3775 12.282847,0 8,0 z M 5.1875,2.7812 8,7.3437 10.8125,2.7812 c 1.323522,0.4299 2.329453,1.5645 2.8125,2.8438 1.136151,2.8609 -0.380702,6.4569 -3.25,7.5937 -0.217837,-0.6102 -0.438416,-1.2022 -0.65625,-1.8125 0.701032,-0.2274 1.313373,-0.6949 1.71875,-1.3125 0.73624,-1.2317 0.939877,-2.6305 -0.03125,-4.3125 l -2.75,4.0625 -0.65625,0 -0.65625,0 -2.75,-4 C 3.5268433,7.6916 3.82626,8.862 4.5625,10.0937 4.967877,10.7113 5.580218,11.1788 6.28125,11.4062 6.063416,12.0165 5.842837,12.6085 5.625,13.2187 2.755702,12.0819 1.238849,8.4858 2.375,5.625 2.858047,4.3457 3.863978,3.2112 5.1875,2.7812 z");
@@ -187,12 +206,12 @@ function _drawMuleTaskIcon(paper, startX, startY)
         "stroke": "none",
         "fill": "#bd4848"
     });
-    
+
     startX += 4;
     startY += 2;
 
     path.transform("T" + startX + "," + startY);
-    
+
 }
 
 function _drawEventIcon(paper, element)
@@ -222,16 +241,16 @@ function _drawTimerIcon(paper, element)
 {
 	var x = element.x + (element.width / 2);
 	var y = element.y + (element.height / 2);
-	
+
 	var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
-  
+
 	var circle = paper.circle(x, y, 10);
 
 	circle.attr({"stroke-width": 1,
 		"stroke": strokeColor,
 		"fill": "none"
  	});
-	
+
 	var path = paper.path("M 16 6 L 16 9 M 21 7 L 19.5 10 M 25 11 L 22 12.5 M 26 16 L 23 16 " +
 		"M 25 21 L 22 19.5 M 21 25 L 19.5 22 M 16 26 L 16 23 M 11 25 L 12.5 22 M 7 21 L 10 19.5 " +
 		"M 6 16 L 9 16 M 7 11 L 10 12.5 M 11 7 L 12.5 10 M 18 9 L 16 16 L 20 16");
@@ -247,9 +266,9 @@ function _drawTimerIcon(paper, element)
 function _drawErrorIcon(paper, element)
 {
 	var path = paper.path("M 22.820839,11.171502 L 19.36734,24.58992 L 13.54138,14.281819 L 9.3386512,20.071607 L 13.048949,6.8323057 L 18.996148,16.132659 L 22.820839,11.171502 z");
-	
+
 	var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
-	
+
 	var fill = "none";
 	var x = element.x - 1;
 	var y = element.y - 1;
@@ -259,14 +278,14 @@ function _drawErrorIcon(paper, element)
 		x -= 1;
 		y -= 1;
 	}
-	
-	
+
+
 	path.attr({
 		"stroke": strokeColor,
 		"stroke-width": 1,
 		"fill": fill
  	});
-	
+
 	path.transform("T" + x + "," + y);
 	return path;
 }
@@ -274,13 +293,13 @@ function _drawErrorIcon(paper, element)
 function _drawSignalIcon(paper, element)
 {
   var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
-  
+
 	var fill = "none";
 	if (element.type === "ThrowEvent")
 	{
 		fill = strokeColor;
 	}
-	
+
 	var path = paper.path("M 8.7124971,21.247342 L 23.333334,21.247342 L 16.022915,8.5759512 L 8.7124971,21.247342 z");
 	path.attr({
 		"stroke": strokeColor,
@@ -294,7 +313,7 @@ function _drawSignalIcon(paper, element)
 function _drawMessageIcon(paper, element)
 {
   var strokeColor = _bpmnGetColor(element, MAIN_STROKE_COLOR);
-  
+
 	var path = paper.path("M8,11 L8,21 L24,21 L24,11z M8,11 L16,17 L24,11");
 	path.attr({
 		"stroke": strokeColor,
