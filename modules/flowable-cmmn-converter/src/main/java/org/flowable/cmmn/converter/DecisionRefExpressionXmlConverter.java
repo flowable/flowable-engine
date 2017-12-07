@@ -30,7 +30,7 @@ public class DecisionRefExpressionXmlConverter extends CaseElementXmlConverter {
     }
 
     @Override
-    public boolean isCmmnElement() {
+    public boolean hasChildElements() {
         return false;
     }
 
