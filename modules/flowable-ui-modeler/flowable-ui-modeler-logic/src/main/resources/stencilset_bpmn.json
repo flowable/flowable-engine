@@ -274,6 +274,27 @@
       "popular" : true
     } ]
   }, {
+      "name": "scriptformatpackage",
+    "properties" : [ {
+          "id": "scriptformat",
+          "type": "String",
+          "title": "Script format",
+          "value": "",
+          "description": "Script format of the script task.",
+          "popular": true
+    } ]
+  }, {
+      "name": "scripttextpackage",
+    "properties" : [ {
+          "id": "scripttext",
+          "type": "Text",
+          "title": "Script",
+          "value": "",
+          "description": "Script text of the script task.",
+          "popular": true
+        }
+      ]
+    }, {
     "name" : "shellcommandpackage",
     "properties" : [ {
       "id" : "shellcommand",
