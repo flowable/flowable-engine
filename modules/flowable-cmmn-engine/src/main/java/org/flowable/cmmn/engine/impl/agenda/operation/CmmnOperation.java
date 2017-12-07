@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -24,6 +25,7 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -84,6 +86,15 @@ public abstract class CmmnOperation implements Runnable {
         }
         return planItemInstances;
     }
+    
+    protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy) {
+        return createAndInsertPlanItemInstance(commandContext, 
+                planItemInstanceEntityToCopy.getPlanItem(), 
+                planItemInstanceEntityToCopy.getCaseDefinitionId(), 
+                planItemInstanceEntityToCopy.getCaseInstanceId(), 
+                planItemInstanceEntityToCopy.getStageInstanceId(), 
+                planItemInstanceEntityToCopy.getTenantId());
+    }
 
     protected PlanItemInstanceEntity createAndInsertPlanItemInstance(CommandContext commandContext, PlanItem planItem,
             String caseDefinitionId, String caseInstanceId, String stagePlanItemInstanceId, String tenantId) {
@@ -112,7 +123,41 @@ public abstract class CmmnOperation implements Runnable {
         planItemInstanceEntity.setTenantId(tenantId);
        
         planItemInstanceEntityManager.insert(planItemInstanceEntity);
+        
+        if (planItemInstanceEntity.getStageInstanceId() != null) {
+            PlanItemInstanceEntity stagePlanItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
+                    .findById(planItemInstanceEntity.getStageInstanceId());
+            stagePlanItemInstanceEntity.getChildren().add(planItemInstanceEntity);
+        } else {
+            caseInstanceEntity.getChildPlanItemInstances().add(planItemInstanceEntity);
+        }
+        
         return planItemInstanceEntity;
+    }
+    
+    protected boolean evaluateRepetitionRule(PlanItemInstanceEntity planItemInstanceEntity) {
+        if (planItemInstanceEntity.getPlanItem() != null) {
+            PlanItem planItem = planItemInstanceEntity.getPlanItem();
+            if (planItem.getItemControl() != null && planItem.getItemControl().getRepetitionRule() != null) {
+                String repetitionCondition = planItem.getItemControl().getRepetitionRule().getCondition();
+                boolean isRepeating = false;
+                if (StringUtils.isNotEmpty(repetitionCondition)) {
+                    Expression repetitionExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(repetitionCondition);
+                    Object evaluationResult = repetitionExpression.getValue(planItemInstanceEntity);
+                    if (evaluationResult instanceof Boolean) {
+                        isRepeating = (boolean) evaluationResult;
+                    } else if (evaluationResult instanceof String) {
+                        isRepeating = ((String) evaluationResult).toLowerCase().equals("true");
+                    } else {
+                        throw new FlowableException("Repetition condition " + repetitionCondition + " did not evaluate to a boolean value");
+                    }
+                } else {
+                    isRepeating = true; // no condition set, but a repetition rule defined is assumed to be defaulting to true
+                }
+                return isRepeating;
+            }
+        }
+        return false;
     }
 
 }

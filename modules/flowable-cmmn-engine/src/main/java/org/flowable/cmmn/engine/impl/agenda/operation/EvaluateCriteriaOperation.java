@@ -45,7 +45,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
     protected PlanItemLifeCycleEvent planItemLifeCycleEvent;
 
-    private enum CriteriaEvaluationResult {SENTRY_SATISFIED, PART_TRIGGERED, NONE}
+    private enum CriteriaEvaluationResult {SENTRY_SATISFIED, SENTRY_SATISFIED_BUT_IGNORED, PART_TRIGGERED, NONE}
 
     public EvaluateCriteriaOperation(CommandContext commandContext, String caseInstanceEntityId) {
         super(commandContext, caseInstanceEntityId, null);
@@ -96,7 +96,19 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             if (PlanItemInstanceState.AVAILABLE.equals(planItemInstanceEntity.getState())) {
                 evaluationResult = evaluateEntryCriteria(planItemInstanceEntity, planItem);
                 if (evaluationResult.equals(CriteriaEvaluationResult.SENTRY_SATISFIED)) {
-                    CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstance(planItemInstanceEntity);
+                    boolean activatePlanItemInstance = true;
+                    if (!planItem.getEntryCriteria().isEmpty() && planItem.getItemControl() != null && planItem.getItemControl().getRepetitionRule() != null) {
+                        boolean isRepeating = evaluateRepetitionRule(planItemInstanceEntity);
+                        if (isRepeating) {
+                            copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity);
+                        } else {
+                            evaluationResult = CriteriaEvaluationResult.SENTRY_SATISFIED_BUT_IGNORED;
+                            activatePlanItemInstance = false;
+                        }
+                    }
+                    if (activatePlanItemInstance) {
+                        CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstance(planItemInstanceEntity);
+                    }
                 }
 
             } else if (PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState())) {
@@ -120,7 +132,9 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
 
             }
 
-            if (evaluationResult != null && !evaluationResult.equals(CriteriaEvaluationResult.NONE)) {
+            if (evaluationResult != null 
+                    && !evaluationResult.equals(CriteriaEvaluationResult.NONE)
+                    && !evaluationResult.equals(CriteriaEvaluationResult.SENTRY_SATISFIED_BUT_IGNORED)) {
                 criteriaChanged = true; // some part of a sentry has changed
             }
 
