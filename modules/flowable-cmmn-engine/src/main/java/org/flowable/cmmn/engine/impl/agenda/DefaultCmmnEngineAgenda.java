@@ -18,6 +18,7 @@ import org.flowable.cmmn.engine.impl.agenda.operation.ActivatePlanItemInstanceOp
 import org.flowable.cmmn.engine.impl.agenda.operation.CmmnOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.CompleteCaseInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.CompletePlanItemInstanceOperation;
+import org.flowable.cmmn.engine.impl.agenda.operation.CreatePlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.EvaluateCriteriaOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.ExitPlanItemInstanceOperation;
 import org.flowable.cmmn.engine.impl.agenda.operation.InitPlanModelInstanceOperation;
@@ -95,18 +96,23 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
     public void planInitStageOperation(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new InitStageInstanceOperation(commandContext, planItemInstanceEntity), planItemInstanceEntity.getCaseInstanceId());
     }
-
+    
     @Override
-    public void planEvaluateCriteria(String caseInstanceEntityId) {
-        internalPlanEvaluateCriteria(caseInstanceEntityId, null);
-    }
-
-    @Override
-    public void planEvaluateCriteria(String caseInstanceEntityId, PlanItemLifeCycleEvent lifeCycleEvent) {
-        internalPlanEvaluateCriteria(caseInstanceEntityId, lifeCycleEvent);
+    public void planEvaluateCriteriaOperation(String caseInstanceEntityId) {
+        internalPlanEvaluateCriteria(caseInstanceEntityId, null, false);
     }
     
-    protected void internalPlanEvaluateCriteria(String caseInstanceEntityId, PlanItemLifeCycleEvent planItemLifeCycleEvent) {
+    @Override
+    public void planEvaluateCriteriaOperation(String caseInstanceEntityId, boolean evaluateCaseInstanceCompleted) {
+        internalPlanEvaluateCriteria(caseInstanceEntityId, null, evaluateCaseInstanceCompleted);
+    }
+
+    @Override
+    public void planEvaluateCriteriaOperation(String caseInstanceEntityId, PlanItemLifeCycleEvent lifeCycleEvent) {
+        internalPlanEvaluateCriteria(caseInstanceEntityId, lifeCycleEvent, false);
+    }
+    
+    protected void internalPlanEvaluateCriteria(String caseInstanceEntityId, PlanItemLifeCycleEvent planItemLifeCycleEvent, boolean evaluateCaseInstanceCompleted) {
         
         // To avoid too many evaluations of the 'same situation', the currently planned operations are looked at
         // and when one is found that matches the pattern of one that is now to be planned, it is removed as the new one will
@@ -125,7 +131,8 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
                         && planItemLifeCycleEvent != null
                         && evaluateCriteriaOperation.getCaseInstanceEntityId().equals(caseInstanceEntityId)
                         && evaluateCriteriaOperation.getPlanItemLifeCycleEvent().getTransition().equals(planItemLifeCycleEvent.getTransition())
-                        && evaluateCriteriaOperation.getPlanItemLifeCycleEvent().getPlanItem().getId().equals(planItemLifeCycleEvent.getPlanItem().getId())) {
+                        && evaluateCriteriaOperation.getPlanItemLifeCycleEvent().getPlanItem().getId().equals(planItemLifeCycleEvent.getPlanItem().getId())
+                        && evaluateCriteriaOperation.isEvaluateCaseInstanceCompleted() == evaluateCaseInstanceCompleted) {
                     LOGGER.info("Deferred criteria evaluation for {} to later in the execution", caseInstanceEntityId);
                     plannedOperations.remove();
                     found = true;
@@ -133,46 +140,53 @@ public class DefaultCmmnEngineAgenda extends AbstractAgenda implements CmmnEngin
             }
         }
         
-        addOperation(new EvaluateCriteriaOperation(commandContext, caseInstanceEntityId, planItemLifeCycleEvent), caseInstanceEntityId);
+        EvaluateCriteriaOperation evaluateCriteriaOperation = new EvaluateCriteriaOperation(commandContext, caseInstanceEntityId, planItemLifeCycleEvent);
+        evaluateCriteriaOperation.setEvaluateCaseInstanceCompleted(evaluateCaseInstanceCompleted);
+        addOperation(evaluateCriteriaOperation, caseInstanceEntityId);
+    }
+    
+    @Override
+    public void planCreatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
+        addOperation(new CreatePlanItemInstanceOperation(commandContext, planItemInstanceEntity), planItemInstanceEntity.getCaseInstanceId());
     }
 
     @Override
-    public void planActivatePlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
+    public void planActivatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new ActivatePlanItemInstanceOperation(commandContext, planItemInstanceEntity), planItemInstanceEntity.getCaseInstanceId());
     }
 
     @Override
-    public void planCompletePlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
+    public void planCompletePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new CompletePlanItemInstanceOperation(commandContext, planItemInstanceEntity), planItemInstanceEntity.getCaseInstanceId());
     }
 
     @Override
-    public void planOccurPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
+    public void planOccurPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new OccurPlanItemInstanceOperation(commandContext, planItemInstanceEntity), planItemInstanceEntity.getCaseInstanceId());
     }
 
     @Override
-    public void planExitPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
+    public void planExitPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new ExitPlanItemInstanceOperation(commandContext, planItemInstanceEntity), planItemInstanceEntity.getCaseInstanceId());
     }
 
     @Override
-    public void planTerminatePlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
+    public void planTerminatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new TerminatePlanItemInstanceOperation(commandContext, planItemInstanceEntity), planItemInstanceEntity.getCaseInstanceId());
     }
 
     @Override
-    public void planTriggerPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
+    public void planTriggerPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity) {
         addOperation(new TriggerPlanItemInstanceOperation(commandContext, planItemInstanceEntity), planItemInstanceEntity.getCaseInstanceId());
     }
 
     @Override
-    public void planCompleteCaseInstance(CaseInstanceEntity caseInstanceEntity) {
+    public void planCompleteCaseInstanceOperation(CaseInstanceEntity caseInstanceEntity) {
         addOperation(new CompleteCaseInstanceOperation(commandContext, caseInstanceEntity), caseInstanceEntity.getId());
     }
 
     @Override
-    public void planTerminateCaseInstance(String caseInstanceEntityId, boolean manualTermination) {
+    public void planTerminateCaseInstanceOperation(String caseInstanceEntityId, boolean manualTermination) {
         addOperation(new TerminateCaseInstanceOperation(commandContext, caseInstanceEntityId, manualTermination), caseInstanceEntityId);
     }
     

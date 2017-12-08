@@ -49,7 +49,7 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
     
     // Non-persisted
     protected PlanItem planItem;
-    protected List<PlanItemInstanceEntity> children;
+    protected List<PlanItemInstanceEntity> childPlanItemInstances;
     protected PlanItemInstanceEntity stagePlanItemInstance;
     protected List<SentryPartInstanceEntity> satisfiedSentryPartInstances;
     
@@ -167,15 +167,16 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
     }
     
     @Override
-    public void setChildren(List<PlanItemInstanceEntity> children) {
-        this.children = children;
+    public void setChildPlanItemInstances(List<PlanItemInstanceEntity> childPlanItemInstances) {
+        this.childPlanItemInstances = childPlanItemInstances;
     }
     
-    public List<PlanItemInstanceEntity> getChildren() {
-        if (children == null) {
-            children = CommandContextUtil.getPlanItemInstanceEntityManager().findChildPlanItemInstancesForStage(id);
+    @Override
+    public List<PlanItemInstanceEntity> getChildPlanItemInstances() {
+        if (childPlanItemInstances == null) {
+            childPlanItemInstances = CommandContextUtil.getPlanItemInstanceEntityManager().findChildPlanItemInstancesForStage(id);
         }
-        return children;
+        return childPlanItemInstances;
     }
     
     @Override

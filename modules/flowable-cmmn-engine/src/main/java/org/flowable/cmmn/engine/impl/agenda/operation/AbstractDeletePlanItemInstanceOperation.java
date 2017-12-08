@@ -41,7 +41,7 @@ public abstract class AbstractDeletePlanItemInstanceOperation extends AbstractCh
             setRepetitionCounter(newPlanItemInstanceEntity, ++counter);
             
             // Plan item doesn't have entry criteria (checked in the if condition) and immediately goes to ACTIVE
-            CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstance(newPlanItemInstanceEntity);
+            CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(newPlanItemInstanceEntity);
         }
         
         deleteSentryPartInstances();
@@ -49,12 +49,7 @@ public abstract class AbstractDeletePlanItemInstanceOperation extends AbstractCh
     }
 
     protected PlanItemInstanceEntity createNewPlanItemInstance() {
-        return createAndInsertPlanItemInstance(commandContext, 
-                planItemInstanceEntity.getPlanItem(), 
-                planItemInstanceEntity.getCaseDefinitionId(), 
-                planItemInstanceEntity.getCaseInstanceId(), 
-                planItemInstanceEntity.getStageInstanceId(), 
-                planItemInstanceEntity.getTenantId());
+        return copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity);
     }
 
     protected boolean isRepeatingOnDelete() {

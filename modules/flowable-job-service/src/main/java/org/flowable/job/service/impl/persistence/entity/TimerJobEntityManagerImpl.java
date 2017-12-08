@@ -160,6 +160,10 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
         newTimerEntity.setExecutionId(te.getExecutionId());
         newTimerEntity.setProcessInstanceId(te.getProcessInstanceId());
         newTimerEntity.setProcessDefinitionId(te.getProcessDefinitionId());
+        newTimerEntity.setScopeId(te.getScopeId());
+        newTimerEntity.setSubScopeId(te.getSubScopeId());
+        newTimerEntity.setScopeDefinitionId(te.getScopeDefinitionId());
+        newTimerEntity.setScopeType(te.getScopeType());
 
         // Inherit tenant
         newTimerEntity.setTenantId(te.getTenantId());

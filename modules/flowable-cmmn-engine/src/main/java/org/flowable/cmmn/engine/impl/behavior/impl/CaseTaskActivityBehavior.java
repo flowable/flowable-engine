@@ -56,7 +56,7 @@ public class CaseTaskActivityBehavior extends TaskActivityBehavior implements Pl
         planItemInstanceEntity.setReferenceId(caseInstanceEntity.getId());
 
         if (!evaluateIsBlocking(planItemInstanceEntity)) {
-            CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance((PlanItemInstanceEntity) planItemInstanceEntity);
+            CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation((PlanItemInstanceEntity) planItemInstanceEntity);
         }
     }
 
@@ -74,15 +74,15 @@ public class CaseTaskActivityBehavior extends TaskActivityBehavior implements Pl
         }
 
         // Triggering the plan item (as opposed to a regular complete) terminates the case instance
-        CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstance(planItemInstance.getReferenceId(), true);
-        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance(planItemInstance);
+        CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstanceOperation(planItemInstance.getReferenceId(), true);
+        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstance);
     }
 
     @Override
     public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
         if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {
             // The plan item will be deleted by the regular TerminatePlanItemOperation
-            CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstance(planItemInstance.getReferenceId(), true);
+            CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstanceOperation(planItemInstance.getReferenceId(), true);
         }
     }
 

@@ -45,7 +45,7 @@ public class InitPlanModelInstanceOperation extends AbstractCaseInstanceOperatio
                 null, 
                 caseInstanceEntity.getTenantId());
         
-        CommandContextUtil.getAgenda(commandContext).planEvaluateCriteria(caseInstanceEntity.getId());
+        CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(caseInstanceEntity.getId());
     }
     
     @Override

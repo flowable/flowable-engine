@@ -43,7 +43,7 @@ public class InitStageInstanceOperation extends AbstractPlanItemInstanceOperatio
                 planItemInstanceEntity.getId(), 
                 planItemInstanceEntity.getTenantId());
         
-        CommandContextUtil.getAgenda(commandContext).planEvaluateCriteria(planItemInstanceEntity.getCaseInstanceId());
+        CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(planItemInstanceEntity.getCaseInstanceId());
     }
 
     @Override

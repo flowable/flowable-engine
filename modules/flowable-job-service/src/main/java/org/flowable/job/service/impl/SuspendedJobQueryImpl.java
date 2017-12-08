@@ -24,6 +24,7 @@ import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.SuspendedJobQuery;
 import org.flowable.job.service.impl.util.CommandContextUtil;
+import org.flowable.variable.api.type.VariableScopeType;
 
 /**
  * @author Joram Barrez
@@ -128,6 +129,36 @@ public class SuspendedJobQueryImpl extends AbstractQuery<SuspendedJobQuery, Job>
             throw new FlowableIllegalArgumentException("Provided scope definitionid is null");
         }
         this.scopeDefinitionId = scopeDefinitionId;
+        return this;
+    }
+    
+    @Override
+    public SuspendedJobQueryImpl caseInstanceId(String caseInstanceId) {
+        if (caseInstanceId == null) {
+            throw new FlowableIllegalArgumentException("Provided case instance id is null");
+        }
+        scopeId(caseInstanceId);
+        scopeType(VariableScopeType.CMMN);
+        return this;
+    }
+    
+    @Override
+    public SuspendedJobQueryImpl caseDefinitionId(String caseDefinitionId) {
+        if (caseDefinitionId == null) {
+            throw new FlowableIllegalArgumentException("Provided case definition id is null");
+        }
+        scopeDefinitionId(caseDefinitionId);
+        scopeType(VariableScopeType.CMMN);
+        return this;
+    }
+    
+    @Override
+    public SuspendedJobQueryImpl planItemInstanceId(String planItemInstanceId) {
+        if (planItemInstanceId == null) {
+            throw new FlowableIllegalArgumentException("Provided plan item instance id is null");
+        }
+        subScopeId(planItemInstanceId);
+        scopeType(VariableScopeType.CMMN);
         return this;
     }
 

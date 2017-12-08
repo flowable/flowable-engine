@@ -15,6 +15,7 @@ package org.flowable.job.service;
 
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**
@@ -33,5 +34,7 @@ public interface InternalJobManager {
     void clearJobScopeLock(Job job);
     
     void preTimerJobDelete(JobEntity jobEntity, VariableScope variableScope);
+    
+    void preRepeatedTimerSchedule(TimerJobEntity timerJobEntity, VariableScope variableScope);
     
 }

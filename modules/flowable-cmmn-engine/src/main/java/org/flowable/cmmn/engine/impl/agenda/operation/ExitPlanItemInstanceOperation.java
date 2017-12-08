@@ -47,9 +47,9 @@ public class ExitPlanItemInstanceOperation extends AbstractDeletePlanItemInstanc
     }
 
     protected void completeChildPlanItems() {
-        for (PlanItemInstanceEntity child : planItemInstanceEntity.getChildren()) {
+        for (PlanItemInstanceEntity child : planItemInstanceEntity.getChildPlanItemInstances()) {
             if (StateTransition.isPossible(planItemInstanceEntity, PlanItemTransition.EXIT)) {
-                CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstance(child);
+                CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(child);
             }
         }
     }

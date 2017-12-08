@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
@@ -45,11 +46,8 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
         assertNotNull(caseInstance);
         assertEquals(1, cmmnRuntimeService.createCaseInstanceQuery().count());
         
-        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
-                .caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
-                .singleResult();
-        assertNotNull(planItemInstance);
+        assertNotNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER).planItemInstanceStateAvailable().singleResult());
+        assertNotNull(cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).planItemInstanceStateAvailable().singleResult());
         
         assertEquals(1L, cmmnManagementService.createTimerJobQuery().count());
         assertEquals(1L, cmmnManagementService.createTimerJobQuery().scopeId(caseInstance.getId()).scopeType(VariableScopeType.CMMN).count());
@@ -73,23 +71,24 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testTimerExpressionDurationWithRealAsyncExeutor() {
-        Date startTime = setClockToCurrentTime();
+        Date startTime = setClockFixedToCurrentTime();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTimerExpression").start();
-        
+
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .planItemInstanceState(PlanItemInstanceState.AVAILABLE)
+                .planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER)
                 .singleResult();
         assertNotNull(planItemInstance);
-        
+
         // User task should not be active before the timer triggers
         assertEquals(0L, cmmnTaskService.createTaskQuery().count());
-        
+
         // Timer fires after 1 hour, so setting it to 1 hours + 1 second
         setClockTo(new Date(startTime.getTime() + (60 * 60 * 1000 + 1)));
-        
+
         CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 5000L, 200L, true);
-        
+
         // User task should be active after the timer has triggered 
         assertEquals(1L, cmmnTaskService.createTaskQuery().count());
     }
@@ -97,12 +96,13 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testStageAfterTimer() {
-        Date startTime = setClockToCurrentTime();
+        Date startTime = setClockFixedToCurrentTime();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testStageAfterTimerEventListener").start();
         
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
+                .planItemInstanceState(PlanItemInstanceState.AVAILABLE)
+                .planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER)
                 .singleResult();
         assertNotNull(planItemInstance);
         
@@ -120,14 +120,14 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testTimerInStage() {
-        Date startTime = setClockToCurrentTime();
+        Date startTime = setClockFixedToCurrentTime();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testTimerInStage").start();
         
-        assertEquals(2L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceState(PlanItemInstanceState.ACTIVE).count());
+        assertEquals(1L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceState(PlanItemInstanceState.ACTIVE).count());
         PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
                 .caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.ACTIVE)
-                .planItemDefinitionType(TimerEventListener.class.getSimpleName().toLowerCase())
+                .planItemInstanceState(PlanItemInstanceState.AVAILABLE)
+                .planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER)
                 .singleResult();
         assertNotNull(planItemInstance);
         
@@ -148,16 +148,16 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testExitPlanModelOnTimerOccurrence() {
-        Date startTime = setClockToCurrentTime();
+        Date startTime = setClockFixedToCurrentTime();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testStageExitOnTimerOccurrence").start();
         
         assertEquals(3L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(HumanTask.class.getSimpleName().toLowerCase()).count());
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).count());
         assertEquals(1L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(TimerEventListener.class.getSimpleName().toLowerCase()).count());
+                .planItemInstanceState(PlanItemInstanceState.AVAILABLE).planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER).count());
         assertEquals(1L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(Stage.class.getSimpleName().toLowerCase()).count());
-        assertEquals(5L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
+                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(PlanItemDefinitionType.STAGE).count());
+        assertEquals(4L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.ACTIVE).count());
         
         // Timer fires after 24 hours, so setting it to 24 hours + 1 second
@@ -187,7 +187,7 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testDateExpression").start();
         
         assertEquals(1L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(TimerEventListener.class.getSimpleName().toLowerCase()).count());
+                .planItemInstanceState(PlanItemInstanceState.AVAILABLE).planItemDefinitionType(TimerEventListener.class.getSimpleName().toLowerCase()).count());
         assertEquals(2L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
                 .planItemInstanceState(PlanItemInstanceState.AVAILABLE).planItemDefinitionType(Stage.class.getSimpleName().toLowerCase()).count());
         assertEquals(0L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
@@ -217,7 +217,7 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testTimerWithBeanExpression() {
-        Date startTime = setClockToCurrentTime();
+        Date startTime = setClockFixedToCurrentTime();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testBean")
                 .variable("startTime", startTime)
@@ -245,7 +245,7 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
         // Completing the stage will be the start trigger for the timer.
         // The timer event will exit the whole plan model
         
-        Date startTime = setClockToCurrentTime();
+        Date startTime = setClockFixedToCurrentTime();
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testStartTrigger").start();
         
         assertEquals(1L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
@@ -261,22 +261,11 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
         assertEquals("C", task.getName());
         
         assertEquals(1L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId())
-                .planItemInstanceState(PlanItemInstanceState.ACTIVE).planItemDefinitionType(TimerEventListener.class.getSimpleName().toLowerCase()).count());
+                .planItemInstanceState(PlanItemInstanceState.AVAILABLE).planItemDefinitionType(TimerEventListener.class.getSimpleName().toLowerCase()).count());
         
         setClockTo(new Date(startTime.getTime() + (3 * 60 * 60 * 1000)));
         CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 5000L, 200L, true);
         assertCaseInstanceEnded(caseInstance);
-    }
-    
-    
-    private Date setClockToCurrentTime() {
-        Date date = new Date();
-        cmmnEngineConfiguration.getClock().setCurrentTime(date);
-        return date;
-    }
-    
-    private void setClockTo(Date date) {
-        cmmnEngineConfiguration.getClock().setCurrentTime(date);
     }
     
 }

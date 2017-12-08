@@ -103,6 +103,10 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
         newSuspendedJobEntity.setExecutionId(job.getExecutionId());
         newSuspendedJobEntity.setProcessInstanceId(job.getProcessInstanceId());
         newSuspendedJobEntity.setProcessDefinitionId(job.getProcessDefinitionId());
+        newSuspendedJobEntity.setScopeId(job.getScopeId());
+        newSuspendedJobEntity.setSubScopeId(job.getSubScopeId());
+        newSuspendedJobEntity.setScopeType(job.getScopeType());
+        newSuspendedJobEntity.setScopeDefinitionId(job.getScopeDefinitionId());
 
         // Inherit tenant
         newSuspendedJobEntity.setTenantId(job.getTenantId());

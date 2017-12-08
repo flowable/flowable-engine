@@ -13,7 +13,6 @@
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.Date;
-import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
@@ -22,7 +21,7 @@ import org.flowable.variable.api.delegate.VariableScope;
 /**
  * @author Joram Barrez
  */
-public interface CaseInstanceEntity extends Entity, CaseInstance, EntityWithSentryPartInstances, VariableScope {
+public interface CaseInstanceEntity extends Entity, EntityWithSentryPartInstances, VariableScope, PlanItemInstanceContainer, CaseInstance {
 
     void setBusinessKey(String businessKey);
     void setName(String name);
@@ -34,8 +33,5 @@ public interface CaseInstanceEntity extends Entity, CaseInstance, EntityWithSent
     void setCallbackId(String callbackId);
     void setCallbackType(String callbackType);
     void setTenantId(String tenantId);
-    
-    List<PlanItemInstanceEntity> getChildPlanItemInstances();
-    void setChildPlanItemInstances(List<PlanItemInstanceEntity> childPlanItemInstances);
     
 }

@@ -15,11 +15,14 @@ package org.flowable.cmmn.engine.impl.behavior.impl;
 import java.text.ParseException;
 import java.util.Date;
 
+import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
-import org.flowable.cmmn.engine.impl.behavior.CoreCmmnTriggerableActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
+import org.flowable.cmmn.engine.impl.behavior.PlanItemActivityBehavior;
 import org.flowable.cmmn.engine.impl.job.TriggerTimerEventJobHandler;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.Expression;
@@ -44,7 +47,7 @@ import org.joda.time.format.ISODateTimeFormat;
  * 
  * @author Joram Barrez
  */
-public class TimerEventListenerActivityBehaviour extends CoreCmmnTriggerableActivityBehavior {
+public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavior implements PlanItemActivityBehavior {
     
     protected String timerExpression;
     protected String startTriggerSourceRef;
@@ -57,31 +60,38 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnTriggerableActi
     }
     
     @Override
-    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        Object timerValue = resolveTimerExpression(commandContext, planItemInstanceEntity);
-        Date timerDueDate = resolveTimerDueDate(commandContext, timerValue);
-        
-        if (timerDueDate != null) {
-            JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getJobServiceConfiguration();
-            TimerJobEntity timer = jobServiceConfiguration.getTimerJobService().createTimerJob();
-            timer.setJobType(JobEntity.JOB_TYPE_TIMER);
-            timer.setJobHandlerType(TriggerTimerEventJobHandler.TYPE);
-            timer.setExclusive(true);
-            timer.setRetries(jobServiceConfiguration.getAsyncExecutorNumberOfRetries());
-            timer.setDuedate(timerDueDate);
-            timer.setScopeDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
-            timer.setScopeId(planItemInstanceEntity.getCaseInstanceId());
-            timer.setSubScopeId(planItemInstanceEntity.getId());
-            timer.setScopeType(VariableScopeType.CMMN);
-            timer.setTenantId(planItemInstanceEntity.getTenantId());
+    public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
+        if (PlanItemTransition.CREATE.equals(transition)) {
+            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) planItemInstance;
+            Object timerValue = resolveTimerExpression(commandContext, planItemInstanceEntity);
+            Date timerDueDate = resolveTimerDueDate(commandContext, timerValue);
             
-            if (timerValue instanceof String && isRepetitionString((String) timerValue)) {
-                timer.setRepeat(prepareRepeat((String) timerValue, CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock()));
+            if (timerDueDate != null) {
+                JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getJobServiceConfiguration();
+                TimerJobEntity timer = jobServiceConfiguration.getTimerJobService().createTimerJob();
+                timer.setJobType(JobEntity.JOB_TYPE_TIMER);
+                timer.setJobHandlerType(TriggerTimerEventJobHandler.TYPE);
+                timer.setExclusive(true);
+                timer.setRetries(jobServiceConfiguration.getAsyncExecutorNumberOfRetries());
+                timer.setDuedate(timerDueDate);
+                timer.setScopeDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
+                timer.setScopeId(planItemInstanceEntity.getCaseInstanceId());
+                timer.setSubScopeId(planItemInstanceEntity.getId());
+                timer.setScopeType(VariableScopeType.CMMN);
+                timer.setTenantId(planItemInstanceEntity.getTenantId());
+                
+                if (timerValue instanceof String && isRepetitionString((String) timerValue)) {
+                    timer.setRepeat(prepareRepeat((String) timerValue, CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock()));
+                }
+                
+                jobServiceConfiguration.getTimerJobService().scheduleTimerJob(timer);
             }
-            
-            jobServiceConfiguration.getTimerJobService().scheduleTimerJob(timer);
         }
-        
+    }
+    
+    @Override
+    public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+        CommandContextUtil.getAgenda(commandContext).planOccurPlanItemInstanceOperation(planItemInstanceEntity);
     }
 
     protected Object resolveTimerExpression(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
@@ -153,11 +163,10 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnTriggerableActi
         }
         return dueDate;
     }
-
     
     @Override
-    public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        CommandContextUtil.getAgenda(commandContext).planOccurPlanItemInstance(planItemInstanceEntity);
+    public void trigger(DelegatePlanItemInstance planItemInstance) {
+        execute(planItemInstance);
     }
-
+    
 }

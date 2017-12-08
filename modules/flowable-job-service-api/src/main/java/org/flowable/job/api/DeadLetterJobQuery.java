@@ -40,17 +40,26 @@ public interface DeadLetterJobQuery extends Query<DeadLetterJobQuery, Job> {
     /** Only select jobs which exist for the given process definition id */
     DeadLetterJobQuery processDefinitionId(String processDefinitionId);
     
-    /** Only select tasks for the given scope identifier. */
+    /** Only select jobs for the given scope identifier. */
     DeadLetterJobQuery scopeId(String scopeId);
 
-    /** Only select tasks for the given sub scope identifier. */
+    /** Only select jobs for the given sub scope identifier. */
     DeadLetterJobQuery subScopeId(String subScopeId);
     
-    /** Only select tasks for the given scope type. */
+    /** Only select jobs for the given scope type. */
     DeadLetterJobQuery scopeType(String scopeType);
     
-    /** Only select tasks for the given scope definition identifier. */
+    /** Only select jobs for the given scope definition identifier. */
     DeadLetterJobQuery scopeDefinitionId(String scopeDefinitionId);
+    
+    /** Only select jobs for the given case instance. */
+    DeadLetterJobQuery caseInstanceId(String caseInstanceId);
+    
+    /** Only select jobs for the given case definition. */
+    DeadLetterJobQuery caseDefinitionId(String caseDefinitionId);
+    
+    /** Only select jobs for the given plan item instance.  */
+    DeadLetterJobQuery planItemInstanceId(String planItemInstanceId);
 
     /**
      * Only select jobs which are executable, ie. duedate is null or duedate is in the past

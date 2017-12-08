@@ -112,7 +112,7 @@ public class DecisionTaskActivityBehavior extends TaskActivityBehavior implement
         setVariables(decisionExecutionAuditContainer.getDecisionResult(), externalRef, planItemInstanceEntity, 
                         CommandContextUtil.getCmmnEngineConfiguration(commandContext).getObjectMapper());
 
-        CommandContextUtil.getAgenda().planCompletePlanItemInstance(planItemInstanceEntity);
+        CommandContextUtil.getAgenda().planCompletePlanItemInstanceOperation(planItemInstanceEntity);
     }
 
 

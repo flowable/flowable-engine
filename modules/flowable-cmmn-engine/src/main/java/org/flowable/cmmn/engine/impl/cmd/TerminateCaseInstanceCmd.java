@@ -41,7 +41,7 @@ public class TerminateCaseInstanceCmd implements Command<Void> {
             throw new FlowableObjectNotFoundException("Cannot find case instance entity for id " + caseInstanceId, CaseInstanceEntity.class);
         }
         
-        CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstance(caseInstanceEntity.getId(), true);
+        CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstanceOperation(caseInstanceEntity.getId(), true);
         return null;
     }
 

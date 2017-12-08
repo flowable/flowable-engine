@@ -423,6 +423,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     resolveExitCriteriaSentry(planItem);
                 } else {
                     LOGGER.warn("Ignoring exit criteria on plan item {}", planItem.getId());
+                    planItem.getExitCriteria().clear();
                 }
             }
 

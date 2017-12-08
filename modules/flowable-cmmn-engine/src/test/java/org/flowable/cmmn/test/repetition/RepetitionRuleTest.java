@@ -15,11 +15,17 @@ package org.flowable.cmmn.test.repetition;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import java.util.Date;
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
+import org.flowable.cmmn.model.HumanTask;
+import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.junit.Test;
 
@@ -131,6 +137,53 @@ public class RepetitionRuleTest extends FlowableCmmnTestCase {
         // Completing C should end the case instance
         cmmnTaskService.complete(task.getId());
         assertCaseInstanceEnded(caseInstance);
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testRepeatingTimer() {
+        Date currentTime = setClockFixedToCurrentTime();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testRepeatingTimer").start();
+        
+        // Should have the task plan item state available
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(HumanTask.class.getSimpleName().toLowerCase()).singleResult();
+        assertEquals(PlanItemInstanceState.AVAILABLE, planItemInstance.getState());
+        assertEquals(0L, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        // Should have a timer job available
+        Job job = cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertNotNull(job);
+        
+        // Moving the timer 1 hour ahead, should create a task instance. 
+        currentTime = new Date(currentTime.getTime() + (60 * 60 * 1000) + 10);
+        setClockTo(currentTime);
+        job = cmmnManagementService.moveTimerToExecutableJob(job.getId());
+        cmmnManagementService.executeJob(job.getId());
+        assertEquals(1L, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        // This can be repeated forever
+        for (int i=0; i<10; i++) {
+            currentTime = new Date(currentTime.getTime() + (60 * 60 * 1000) + 10);
+            setClockTo(currentTime);
+            job = cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            job = cmmnManagementService.moveTimerToExecutableJob(job.getId());
+            cmmnManagementService.executeJob(job.getId());
+            assertEquals(i + 2, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        }
+        
+        // Completing all the tasks should still keep the case instance running
+        for (Task task : cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list()) {
+            cmmnTaskService.complete(task.getId());
+        }
+        assertEquals(0L, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        assertEquals(1L, cmmnRuntimeService.createCaseInstanceQuery().count());
+        
+        // Terminating the case instance should remove the timer
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+        assertEquals(0L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count());
+        assertEquals(0L, cmmnRuntimeService.createCaseInstanceQuery().count());
+        assertEquals(0L, cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count());
     }
     
 }
