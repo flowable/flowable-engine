@@ -104,6 +104,8 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
             newChildExecution.setCurrentFlowElement(subProcess);
             newChildExecution.setScope(true);
             
+            CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(newChildExecution);
+            
             ProcessInstanceHelper processInstanceHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getProcessInstanceHelper();
             processInstanceHelper.processAvailableEventSubProcesses(newChildExecution, subProcess, commandContext);
 

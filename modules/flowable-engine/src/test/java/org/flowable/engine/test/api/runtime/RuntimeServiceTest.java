@@ -1230,6 +1230,6 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         
         taskService.complete(task.getId());
         
-        assertProcessEnded(processInstance.getId(), 30000);
+        assertProcessEnded(processInstance.getId());
     }
 }
