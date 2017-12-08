@@ -15,17 +15,16 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.Stage;
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.Expression;
-import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
@@ -79,40 +78,54 @@ public abstract class CmmnOperation implements Runnable {
                                                                         String tenantId) {
         List<PlanItemInstanceEntity> planItemInstances = new ArrayList<>();
         for (PlanItem planItem : planItems) {
-            planItemInstances.add(createAndInsertPlanItemInstance(commandContext, planItem,
-                    caseDefinitionId, caseInstanceId, stagePlanItemInstanceId, tenantId));
+            planItemInstances.add(CommandContextUtil.getPlanItemInstanceEntityManager(commandContext)
+                    .createChildPlanItemInstance(planItem, caseDefinitionId, caseInstanceId, stagePlanItemInstanceId, tenantId, true));
+        }
+        for (PlanItemInstanceEntity planItemInstance : planItemInstances) {
+            CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(planItemInstance);
         }
         return planItemInstances;
     }
-
-    protected PlanItemInstanceEntity createAndInsertPlanItemInstance(CommandContext commandContext, PlanItem planItem,
-            String caseDefinitionId, String caseInstanceId, String stagePlanItemInstanceId, String tenantId) {
-        
-        ExpressionManager expressionManager = CommandContextUtil.getExpressionManager(commandContext);
-        PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
-        CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceId);
-        
-        PlanItemInstanceEntity planItemInstanceEntity = planItemInstanceEntityManager.create();
-        planItemInstanceEntity.setCaseDefinitionId(caseDefinitionId);
-        planItemInstanceEntity.setCaseInstanceId(caseInstanceId);
-        if (planItem.getName() != null) {
-            Expression nameExpression = expressionManager.createExpression(planItem.getName());
-            planItemInstanceEntity.setName(nameExpression.getValue(caseInstanceEntity).toString());
-        }
-        planItemInstanceEntity.setState(PlanItemInstanceState.AVAILABLE);
-        planItemInstanceEntity.setStartTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime());
-        planItemInstanceEntity.setElementId(planItem.getId());
-        PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
-        if (planItemDefinition != null) {
-            planItemInstanceEntity.setPlanItemDefinitionId(planItemDefinition.getId());
-            planItemInstanceEntity.setPlanItemDefinitionType(planItemDefinition.getClass().getSimpleName().toLowerCase());
-        }
-        planItemInstanceEntity.setStage(false);
-        planItemInstanceEntity.setStageInstanceId(stagePlanItemInstanceId);
-        planItemInstanceEntity.setTenantId(tenantId);
-       
-        planItemInstanceEntityManager.insert(planItemInstanceEntity);
+    
+    protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy) {
+        return copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntityToCopy, true);
+    }
+    
+    protected PlanItemInstanceEntity copyAndInsertPlanItemInstance(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntityToCopy, boolean addToParent) {
+        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).createChildPlanItemInstance( 
+                planItemInstanceEntityToCopy.getPlanItem(), 
+                planItemInstanceEntityToCopy.getCaseDefinitionId(), 
+                planItemInstanceEntityToCopy.getCaseInstanceId(), 
+                planItemInstanceEntityToCopy.getStageInstanceId(), 
+                planItemInstanceEntityToCopy.getTenantId(),
+                addToParent);
+        CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(planItemInstanceEntity);
         return planItemInstanceEntity;
+    }
+    
+    protected boolean evaluateRepetitionRule(PlanItemInstanceEntity planItemInstanceEntity) {
+        if (planItemInstanceEntity.getPlanItem() != null) {
+            PlanItem planItem = planItemInstanceEntity.getPlanItem();
+            if (planItem.getItemControl() != null && planItem.getItemControl().getRepetitionRule() != null) {
+                String repetitionCondition = planItem.getItemControl().getRepetitionRule().getCondition();
+                boolean isRepeating = false;
+                if (StringUtils.isNotEmpty(repetitionCondition)) {
+                    Expression repetitionExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(repetitionCondition);
+                    Object evaluationResult = repetitionExpression.getValue(planItemInstanceEntity);
+                    if (evaluationResult instanceof Boolean) {
+                        isRepeating = (boolean) evaluationResult;
+                    } else if (evaluationResult instanceof String) {
+                        isRepeating = ((String) evaluationResult).toLowerCase().equals("true");
+                    } else {
+                        throw new FlowableException("Repetition condition " + repetitionCondition + " did not evaluate to a boolean value");
+                    }
+                } else {
+                    isRepeating = true; // no condition set, but a repetition rule defined is assumed to be defaulting to true
+                }
+                return isRepeating;
+            }
+        }
+        return false;
     }
 
 }

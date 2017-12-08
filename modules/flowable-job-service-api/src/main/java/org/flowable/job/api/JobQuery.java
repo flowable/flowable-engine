@@ -51,7 +51,16 @@ public interface JobQuery extends Query<JobQuery, Job> {
     
     /** Only select tasks for the given scope definition identifier. */
     JobQuery scopeDefinitionId(String scopeDefinitionId);
-
+    
+    /** Only select jobs for the given case instance. */
+    JobQuery caseInstanceId(String caseInstanceId);
+    
+    /** Only select jobs for the given case definition. */
+    JobQuery caseDefinitionId(String caseDefinitionId);
+    
+    /** Only select jobs for the given plan item instance.  */
+    JobQuery planItemInstanceId(String planItemInstanceId);
+    
     /**
      * Only select jobs that are timers. Cannot be used together with {@link #messages()}
      */

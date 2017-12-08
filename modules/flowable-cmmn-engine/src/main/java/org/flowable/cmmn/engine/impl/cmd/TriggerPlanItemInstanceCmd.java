@@ -42,7 +42,7 @@ public class TriggerPlanItemInstanceCmd implements Command<Void>, Serializable {
             throw new FlowableObjectNotFoundException("Cannot find plan item instance for id " + planItemInstanceId, PlanItemInstanceEntity.class);
         }
         
-        CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstance(planItemInstanceEntity);
+        CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
         return null;
     }
    

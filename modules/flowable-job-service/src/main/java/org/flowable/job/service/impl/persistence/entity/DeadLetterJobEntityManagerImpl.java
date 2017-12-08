@@ -98,6 +98,10 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
         newJobEntity.setExecutionId(job.getExecutionId());
         newJobEntity.setProcessInstanceId(job.getProcessInstanceId());
         newJobEntity.setProcessDefinitionId(job.getProcessDefinitionId());
+        newJobEntity.setScopeId(job.getScopeId());
+        newJobEntity.setSubScopeId(job.getSubScopeId());
+        newJobEntity.setScopeType(job.getScopeType());
+        newJobEntity.setScopeDefinitionId(job.getScopeDefinitionId());
 
         // Inherit tenant
         newJobEntity.setTenantId(job.getTenantId());

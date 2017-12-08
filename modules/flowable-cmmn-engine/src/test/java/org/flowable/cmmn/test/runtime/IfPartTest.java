@@ -21,6 +21,7 @@ import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.engine.common.impl.util.CollectionUtil;
@@ -34,14 +35,14 @@ public class IfPartTest extends FlowableCmmnTestCase {
     @Test
     @CmmnDeployment
     public void testIfPartOnly() {
-        // Passing variable from the start
+        // Case 1 : Passing variable from the start
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testIfPartOnly")
                 .variable("variable", true)
                 .start();
         assertEquals(2, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count());
         
-        // Passing variable after case instance start
+        // Case 2 : Passing variable after case instance start
         caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testIfPartOnly")
                 .start();
@@ -50,13 +51,26 @@ public class IfPartTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.setVariables(caseInstance.getId(), CollectionUtil.singletonMap("variable", true));
         assertEquals(2, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count());
         
-        // Completing A after start should end the case instance
+        // Case 3 : Completing A after start should end the case instance
         caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                 .caseDefinitionKey("testIfPartOnly")
                 .start();
         planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().list();
         assertEquals(1, planItemInstances.size());
         assertEquals("A", planItemInstances.get(0).getName());
+        cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
+        
+        // Be should remain in the available state, until the variable is set
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateAvailable().list();
+        assertEquals(1, planItemInstances.size());
+        assertEquals("B", planItemInstances.get(0).getName());
+        cmmnRuntimeService.setVariables(caseInstance.getId(), CollectionUtil.singletonMap("variable", true));
+        
+        planItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().list();
+        assertEquals(1, planItemInstances.size());
+        assertEquals("B", planItemInstances.get(0).getName());
+        
+        // Completing B ends the case instance
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
         assertCaseInstanceEnded(caseInstance);
     }
@@ -93,9 +107,12 @@ public class IfPartTest extends FlowableCmmnTestCase {
         assertEquals(1, planItemInstances.size());
         assertEquals("A", planItemInstances.get(0).getName());
         
-        // Competing plan item A should not trigger B
+        // Completing plan item A should not trigger B
         cmmnRuntimeService.triggerPlanItemInstance(planItemInstances.get(0).getId());
-        assertCaseInstanceEnded(caseInstance);
+        
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().singleResult();
+        assertEquals("B", planItemInstance.getName());
+        assertEquals(PlanItemInstanceState.AVAILABLE, planItemInstance.getState());
     }
     
     @Test

@@ -52,7 +52,7 @@ public class SetLocalVariablesCmd implements Command<Void> {
         }
         planItemInstanceEntity.setVariablesLocal(variables);
         
-        CommandContextUtil.getAgenda(commandContext).planEvaluateCriteria(planItemInstanceEntity.getCaseInstanceId());
+        CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(planItemInstanceEntity.getCaseInstanceId());
         
         return null;
     }

@@ -202,6 +202,11 @@ public class DefaultInternalJobManager implements InternalJobManager {
         }
         jobEntity.setMaxIterations(maxIterations);
     }
+    
+    @Override
+    public void preRepeatedTimerSchedule(TimerJobEntity ti, VariableScope variableScope) {
+        // Nothing to do
+    }
 
     protected int getMaxIterations(org.flowable.bpmn.model.Process process, String activityId) {
         FlowElement flowElement = process.getFlowElement(activityId, true);

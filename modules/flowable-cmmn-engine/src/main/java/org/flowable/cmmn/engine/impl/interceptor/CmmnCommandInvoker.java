@@ -51,7 +51,7 @@ public class CmmnCommandInvoker extends AbstractCommandInterceptor {
             Set<String> involvedCaseInstanceIds = CommandContextUtil.getInvolvedCaseInstanceIds(commandContext);
             if (involvedCaseInstanceIds != null) {
                 for (String caseInstanceId : involvedCaseInstanceIds) {
-                    CommandContextUtil.getAgenda(commandContext).planEvaluateCriteria(caseInstanceId);
+                    CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(caseInstanceId, true);
                 }
                 executeOperations(commandContext);
             }

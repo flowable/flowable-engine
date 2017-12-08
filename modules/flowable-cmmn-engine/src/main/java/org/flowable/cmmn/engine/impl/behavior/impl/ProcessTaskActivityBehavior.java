@@ -71,7 +71,7 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
         planItemInstanceEntity.setReferenceId(processInstanceId);
 
         if (!blocking) {
-            CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance(planItemInstanceEntity);
+            CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
         }
     }
 
@@ -89,7 +89,7 @@ public class ProcessTaskActivityBehavior extends TaskActivityBehavior implements
         }
 
         // Triggering the plan item (as opposed to a regular complete) terminates the process instance
-        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance(planItemInstance);
+        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstance);
         deleteProcessInstance(commandContext, planItemInstance);
     }
 

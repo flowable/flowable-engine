@@ -38,7 +38,7 @@ public class CompleteCaseInstanceOperation extends AbstractDeleteCaseInstanceOpe
     
     @Override
     protected void changeStateForChildPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
-        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance(planItemInstanceEntity);
+        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
     }
     
     @Override

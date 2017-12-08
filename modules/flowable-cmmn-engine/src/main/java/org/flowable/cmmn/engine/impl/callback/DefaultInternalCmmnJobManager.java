@@ -12,11 +12,14 @@
  */
 package org.flowable.cmmn.engine.impl.callback;
 
+import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.InternalJobManager;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.variable.api.delegate.VariableScope;
 
 /**
@@ -64,6 +67,33 @@ public class DefaultInternalCmmnJobManager implements InternalJobManager {
     @Override
     public void preTimerJobDelete(JobEntity jobEntity, VariableScope variableScope) {
         // Nothing additional needed (no support for endDate for cmmn timer yet)
+    }
+    
+    @Override
+    public void preRepeatedTimerSchedule(TimerJobEntity timerJobEntity, VariableScope variableScope) {
+        // In CMMN (and contrary to BPMN), when a timer is repeated a new plan item instance needs to be created
+        // as the original one is removed when the timer event has occurred.
+        if (variableScope instanceof PlanItemInstanceEntity) {
+            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) variableScope;
+            
+            // Create new plan item instance based on the data of the original one
+            PlanItemInstanceEntity newPlanItemInstanceEntity = cmmnEngineConfiguration.getPlanItemInstanceEntityManager()
+                    .createChildPlanItemInstance(planItemInstanceEntity.getPlanItem(), 
+                            planItemInstanceEntity.getCaseDefinitionId(), 
+                            planItemInstanceEntity.getCaseInstanceId(), 
+                            planItemInstanceEntity.getStageInstanceId(), 
+                            planItemInstanceEntity.getTenantId(), 
+                            true);
+            
+            // The plan item instance state needs to be set to available manually. 
+            // Leaving it to empty will automaticalluy make it available it and execute the behavior,
+            // creating a duplicate timer. The job server logic will take care of scheduling 
+            // the repeating timer.
+            newPlanItemInstanceEntity.setState(PlanItemInstanceState.AVAILABLE);
+            
+            // Switch job references to new plan item instance
+            timerJobEntity.setSubScopeId(newPlanItemInstanceEntity.getId());
+        }
     }
 
 }

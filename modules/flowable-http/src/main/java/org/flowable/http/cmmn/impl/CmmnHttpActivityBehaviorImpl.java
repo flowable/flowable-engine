@@ -187,7 +187,7 @@ public class CmmnHttpActivityBehaviorImpl extends CoreCmmnActivityBehavior {
                 CommandContextUtil.getCmmnEngineConfiguration().getHttpClientConfig().getConnectionRequestTimeout()
         );
 
-        CommandContextUtil.getAgenda().planCompletePlanItemInstance(planItemInstanceEntity);
+        CommandContextUtil.getAgenda().planCompletePlanItemInstanceOperation(planItemInstanceEntity);
 
     }
 

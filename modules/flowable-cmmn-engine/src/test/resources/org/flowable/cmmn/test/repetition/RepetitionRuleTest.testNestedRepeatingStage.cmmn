@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+  <case id="testNestedRepeatingStage" name="testNestedRepeatingStage" flowable:initiatorVariableName="initiator">
+    <casePlanModel id="casePlanModel">
+      <planItem id="planItem1" name="A" definitionRef="sid-0348928E-E0EA-48DF-8CB3-39D8BF770CAF">
+        <itemControl>
+          <repetitionRule flowable:counterVariable="repetitionCounter">
+            <condition><![CDATA[${repetitionCounter < 3}]]></condition>
+          </repetitionRule>
+        </itemControl>
+      </planItem>
+      <planItem id="planItem6" name="Stage1" definitionRef="sid-B80F95D8-24D7-497F-8102-4276753CAB8C">
+        <entryCriterion id="sid-5BED84F0-2EC0-48C3-8B29-45A85E441B58" sentryRef="sentry2"></entryCriterion>
+      </planItem>
+      <sentry id="sentry2">
+        <planItemOnPart id="sentryOnPart2" sourceRef="planItem1">
+          <standardEvent>complete</standardEvent>
+        </planItemOnPart>
+      </sentry>
+      <humanTask id="sid-0348928E-E0EA-48DF-8CB3-39D8BF770CAF" name="A"></humanTask>
+      <stage id="sid-B80F95D8-24D7-497F-8102-4276753CAB8C" name="Stage1">
+        <planItem id="planItem5" name="Stage 2" definitionRef="sid-F8FDC505-81C6-4888-943C-16C6AFA1676C"></planItem>
+        <stage id="sid-F8FDC505-81C6-4888-943C-16C6AFA1676C" name="Stage 2">
+          <planItem id="planItem4" name="Stage 3" definitionRef="sid-817F2286-EAA9-4C80-9EBE-FAEC3A387CD9">
+            <itemControl>
+              <repetitionRule flowable:counterVariable="repetitionCounter">
+                <condition><![CDATA[${repetitionCounter < 2}]]></condition>
+              </repetitionRule>
+            </itemControl>
+          </planItem>
+          <stage id="sid-817F2286-EAA9-4C80-9EBE-FAEC3A387CD9" name="Stage 3">
+            <planItem id="planItem2" name="B" definitionRef="sid-3455CFA9-8A66-440C-9DFA-F7E625956EA7"></planItem>
+            <planItem id="planItem3" name="C" definitionRef="sid-1C13F77A-C77B-4E0A-8D01-6B7E8AECFA69">
+              <entryCriterion id="sid-B1CCA98E-8AA4-4F2B-A604-F35896AB0F87" sentryRef="sentry1"></entryCriterion>
+            </planItem>
+            <sentry id="sentry1">
+              <planItemOnPart id="sentryOnPart1" sourceRef="planItem2">
+                <standardEvent>complete</standardEvent>
+              </planItemOnPart>
+            </sentry>
+            <humanTask id="sid-3455CFA9-8A66-440C-9DFA-F7E625956EA7" name="B"></humanTask>
+            <humanTask id="sid-1C13F77A-C77B-4E0A-8D01-6B7E8AECFA69" name="C"></humanTask>
+          </stage>
+        </stage>
+      </stage>
+    </casePlanModel>
+  </case>
+  <cmmndi:CMMNDI>
+    <cmmndi:CMMNDiagram id="CMMNDiagram_testNestedRepeatingStage">
+      <cmmndi:CMMNShape id="CMMNShape_casePlanModel" cmmnElementRef="casePlanModel">
+        <dc:Bounds height="710.0" width="976.0" x="40.0" y="40.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem1" cmmnElementRef="planItem1">
+        <dc:Bounds height="80.0" width="100.0" x="99.0" y="251.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem6" cmmnElementRef="planItem6">
+        <dc:Bounds height="438.0" width="616.0" x="345.0" y="239.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_sid-5BED84F0-2EC0-48C3-8B29-45A85E441B58" cmmnElementRef="sid-5BED84F0-2EC0-48C3-8B29-45A85E441B58">
+        <dc:Bounds height="22.0" width="14.0" x="337.94864141406083" y="406.13850197122287"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem5" cmmnElementRef="planItem5">
+        <dc:Bounds height="304.0" width="518.0" x="375.0" y="310.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem4" cmmnElementRef="planItem4">
+        <dc:Bounds height="170.0" width="370.0" x="435.0" y="385.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem2" cmmnElementRef="planItem2">
+        <dc:Bounds height="80.0" width="100.0" x="495.0" y="430.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_planItem3" cmmnElementRef="planItem3">
+        <dc:Bounds height="80.0" width="100.0" x="660.0" y="433.0"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNShape id="CMMNShape_sid-B1CCA98E-8AA4-4F2B-A604-F35896AB0F87" cmmnElementRef="sid-B1CCA98E-8AA4-4F2B-A604-F35896AB0F87">
+        <dc:Bounds height="22.0" width="14.0" x="652.1322518155669" y="459.8354149708752"></dc:Bounds>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNShape>
+      <cmmndi:CMMNEdge id="CMMNEdge_sid-BD2EBDD3-B5C8-4247-B235-964A36C7A585" cmmnElementRef="sid-5BED84F0-2EC0-48C3-8B29-45A85E441B58" targetCMMNElementRef="planItem1">
+        <di:waypoint x="340.70514417663384" y="412.80685477289387"></di:waypoint>
+        <di:waypoint x="199.0" y="322.76932348269776"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+      <cmmndi:CMMNEdge id="CMMNEdge_sid-80F0AB6A-2217-404D-BFD8-467E11A6F533" cmmnElementRef="sid-B1CCA98E-8AA4-4F2B-A604-F35896AB0F87" targetCMMNElementRef="planItem2">
+        <di:waypoint x="652.7619106450043" y="469.84595109604504"></di:waypoint>
+        <di:waypoint x="595.0" y="469.9285234907989"></di:waypoint>
+        <cmmndi:CMMNLabel></cmmndi:CMMNLabel>
+      </cmmndi:CMMNEdge>
+    </cmmndi:CMMNDiagram>
+  </cmmndi:CMMNDI>
+</definitions>

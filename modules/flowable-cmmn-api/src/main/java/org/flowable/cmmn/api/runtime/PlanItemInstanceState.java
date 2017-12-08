@@ -12,6 +12,10 @@
  */
 package org.flowable.cmmn.api.runtime;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 public interface PlanItemInstanceState {
 
     /*
@@ -28,5 +32,6 @@ public interface PlanItemInstanceState {
     String CLOSED = "closed";
     String TERMINATED = "terminated";
     
+    Set<String> END_STATES = new HashSet<>(Arrays.asList(DISABLED, COMPLETED, TERMINATED, FAILED));
     
 }

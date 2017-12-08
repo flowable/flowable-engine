@@ -29,7 +29,7 @@ public class EvaluateCriteriaCmd implements Command<Void> {
 
     @Override
     public Void execute(CommandContext commandContext) {
-        CommandContextUtil.getAgenda(commandContext).planEvaluateCriteria(caseInstanceId);
+        CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(caseInstanceId);
         return null;
     }
 

@@ -339,10 +339,7 @@ public class DefaultJobManager implements JobManager {
     protected void executeTimerJob(JobEntity timerEntity) {
         TimerJobEntityManager timerJobEntityManager = jobServiceConfiguration.getTimerJobEntityManager();
 
-        VariableScope variableScope = null;
-        if (timerEntity.getExecutionId() != null) {
-            variableScope = jobServiceConfiguration.getInternalJobManager().resolveVariableScope(timerEntity);
-        }
+        VariableScope variableScope = jobServiceConfiguration.getInternalJobManager().resolveVariableScope(timerEntity);
 
         if (variableScope == null) {
             variableScope = NoExecutionVariableScope.getSharedInstance();
@@ -368,6 +365,7 @@ public class DefaultJobManager implements JobManager {
         if (timerEntity.getRepeat() != null) {
             TimerJobEntity newTimerJobEntity = timerJobEntityManager.createAndCalculateNextTimer(timerEntity, variableScope);
             if (newTimerJobEntity != null) {
+                jobServiceConfiguration.getInternalJobManager().preRepeatedTimerSchedule(newTimerJobEntity, variableScope);
                 scheduleTimerJob(newTimerJobEntity);
             }
         }

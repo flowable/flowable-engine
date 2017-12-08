@@ -37,9 +37,9 @@ public class TerminateCaseInstanceOperation extends AbstractDeleteCaseInstanceOp
     @Override
     protected void changeStateForChildPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity) {
         if (manualTermination) {
-            CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstance(planItemInstanceEntity);
+            CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(planItemInstanceEntity);
         } else {
-            CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstance(planItemInstanceEntity);
+            CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity);
         }
     }
     

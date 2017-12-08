@@ -41,9 +41,13 @@ public abstract class AbstractPlanItemInstanceOperation extends CmmnOperation {
     
     protected void deleteSentryPartInstances() {
         SentryPartInstanceEntityManager sentryPartInstanceEntityManager = CommandContextUtil.getSentryPartInstanceEntityManager(commandContext);
-        if (planItemInstanceEntity.getSatisfiedSentryPartInstances() != null) {
-            for (SentryPartInstanceEntity sentryPartInstanceEntity : planItemInstanceEntity.getSatisfiedSentryPartInstances()) {
-                sentryPartInstanceEntityManager.delete(sentryPartInstanceEntity);
+        if (planItemInstanceEntity.getPlanItem() != null 
+                && (!planItemInstanceEntity.getPlanItem().getEntryCriteria().isEmpty()
+                        || !planItemInstanceEntity.getPlanItem().getExitCriteria().isEmpty())) {
+            if (planItemInstanceEntity.getSatisfiedSentryPartInstances() != null) {
+                for (SentryPartInstanceEntity sentryPartInstanceEntity : planItemInstanceEntity.getSatisfiedSentryPartInstances()) {
+                    sentryPartInstanceEntityManager.delete(sentryPartInstanceEntity);
+                }
             }
         }
     }

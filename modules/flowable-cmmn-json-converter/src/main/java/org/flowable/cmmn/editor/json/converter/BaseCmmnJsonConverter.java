@@ -155,9 +155,11 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             }
             
             boolean repetitionEnabled = getPropertyValueAsBoolean(PROPERTY_REPETITION_ENABLED, elementNode);
-            if (repetitionEnabled) {
+            String repetitionCondition = getPropertyValueAsString(PROPERTY_REPETITION_RULE_CONDITION, elementNode);
+            if (repetitionEnabled 
+                    || StringUtils.isNotEmpty(repetitionCondition)) { // Assume checking the checkbox was forgotten
                 RepetitionRule repetitionRule = new RepetitionRule();
-                repetitionRule.setCondition(getPropertyValueAsString(PROPERTY_REPETITION_RULE_CONDITION, elementNode));
+                repetitionRule.setCondition(repetitionCondition);
                 
                 String repetitionCounterVariableName = getPropertyValueAsString(PROPERTY_REPETITION_RULE_VARIABLE_NAME, elementNode);
                 if (StringUtils.isNotEmpty(repetitionCounterVariableName)) {

@@ -16,6 +16,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Date;
 
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.CmmnManagementService;
@@ -98,6 +99,16 @@ public class FlowableCmmnTestCase {
                 .addClasspathResource("org/flowable/cmmn/test/one-task-model.cmmn")
                 .deploy()
                 .getId();
+    }
+    
+    protected Date setClockFixedToCurrentTime() {
+        Date date = new Date();
+        cmmnEngineConfiguration.getClock().setCurrentTime(date);
+        return date;
+    }
+    
+    protected void setClockTo(Date date) {
+        cmmnEngineConfiguration.getClock().setCurrentTime(date);
     }
 
     protected void assertCaseInstanceEnded(CaseInstance caseInstance) {

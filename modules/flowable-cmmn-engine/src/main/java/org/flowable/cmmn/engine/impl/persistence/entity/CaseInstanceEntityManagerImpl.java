@@ -14,6 +14,7 @@
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -24,9 +25,16 @@ import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.cmmn.engine.impl.task.TaskHelper;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
+import org.flowable.job.api.Job;
+import org.flowable.job.service.impl.DeadLetterJobQueryImpl;
+import org.flowable.job.service.impl.JobQueryImpl;
+import org.flowable.job.service.impl.SuspendedJobQueryImpl;
+import org.flowable.job.service.impl.TimerJobQueryImpl;
+import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityManager;
+import org.flowable.job.service.impl.persistence.entity.JobEntityManager;
+import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManager;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
 import org.flowable.variable.api.type.VariableScopeType;
@@ -79,11 +87,8 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
     public void deleteCaseInstanceAndRelatedData(String caseInstanceId, String deleteReason) {
         CaseInstanceEntity caseInstanceEntity = caseInstanceDataManager.findById(caseInstanceId);
 
-        CommandContext commandContext = CommandContextUtil.getCommandContext();
-        
         // Variables
-        VariableInstanceEntityManager variableInstanceEntityManager 
-            = CommandContextUtil.getVariableServiceConfiguration(commandContext).getVariableInstanceEntityManager();
+        VariableInstanceEntityManager variableInstanceEntityManager = getVariableInstanceEntityManager();
         List<VariableInstanceEntity> variableInstanceEntities = variableInstanceEntityManager
                 .findVariableInstanceByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
         for (VariableInstanceEntity variableInstanceEntity : variableInstanceEntities) {
@@ -91,20 +96,21 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         }
         
         // Tasks
-        TaskEntityManager taskEntityManager = CommandContextUtil.getTaskServiceConfiguration(commandContext).getTaskEntityManager();
+        TaskEntityManager taskEntityManager = getTaskEntityManager();
         List<TaskEntity> taskEntities = taskEntityManager.findTasksByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
         for (TaskEntity taskEntity : taskEntities) {
             TaskHelper.deleteTask(taskEntity, deleteReason, false, true);
         }
         
         // Sentry part instances
+        SentryPartInstanceEntityManager sentryPartInstanceEntityManager = getSentryPartInstanceEntityManager();
         List<SentryPartInstanceEntity> sentryPartInstances = caseInstanceEntity.getSatisfiedSentryPartInstances();
         for (SentryPartInstanceEntity sentryPartInstanceEntity : sentryPartInstances) {
-            CommandContextUtil.getSentryPartInstanceEntityManager(commandContext).delete(sentryPartInstanceEntity);
+            sentryPartInstanceEntityManager.delete(sentryPartInstanceEntity);
         }
 
         // Runtime milestones
-        MilestoneInstanceEntityManager milestoneInstanceEntityManager = CommandContextUtil.getMilestoneInstanceEntityManager(commandContext);
+        MilestoneInstanceEntityManager milestoneInstanceEntityManager = getMilestoneInstanceEntityManager(); 
         List<MilestoneInstanceEntity> milestoneInstanceEntities = milestoneInstanceEntityManager
                 .findMilestoneInstancesByCaseInstanceId(caseInstanceId);
         if (milestoneInstanceEntities != null) {
@@ -114,15 +120,44 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         }
         
         // Plan item instances
-        PlanItemInstanceEntityManager planItemInstanceEntityManager = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext);
+        PlanItemInstanceEntityManager planItemInstanceEntityManager = getPlanItemInstanceEntityManager();
         List<PlanItemInstanceEntity> planItemInstanceEntities = planItemInstanceEntityManager
-                .findChildPlanItemInstancesForCaseInstance(caseInstanceId);
+                .findAllChildPlanItemInstancesForCaseInstance(caseInstanceId);
+        Collections.reverse(planItemInstanceEntities); // Need to have them in leaf -> root order
         if (planItemInstanceEntities != null) {
             for (PlanItemInstanceEntity planItemInstanceEntity : planItemInstanceEntities) {
+                if (planItemInstanceEntity.getSatisfiedSentryPartInstances() != null) {
+                    for (SentryPartInstanceEntity sentryPartInstanceEntity : planItemInstanceEntity.getSatisfiedSentryPartInstances()) {
+                        sentryPartInstanceEntityManager.delete(sentryPartInstanceEntity);
+                    }
+                }
                 planItemInstanceEntityManager.delete(planItemInstanceEntity);
             }
         }
+        
+        // Jobs
+        JobEntityManager jobEntityManager = cmmnEngineConfiguration.getJobServiceConfiguration().getJobEntityManager();
+        List<Job> jobs = jobEntityManager.findJobsByQueryCriteria(new JobQueryImpl().scopeId(caseInstanceId).scopeType(VariableScopeType.CMMN));
+        for (Job job : jobs) {
+            jobEntityManager.delete(job.getId());
+        }
+        TimerJobEntityManager timerJobEntityManager = cmmnEngineConfiguration.getJobServiceConfiguration().getTimerJobEntityManager();
+        List<Job> timerJobs = timerJobEntityManager.findJobsByQueryCriteria(new TimerJobQueryImpl().scopeId(caseInstanceId).scopeType(VariableScopeType.CMMN));
+        for (Job timerJob : timerJobs) {
+            timerJobEntityManager.delete(timerJob.getId());
+        }
+        SuspendedJobEntityManager suspendedJobEntityManager = cmmnEngineConfiguration.getJobServiceConfiguration().getSuspendedJobEntityManager();
+        List<Job> suspendedJobs = suspendedJobEntityManager.findJobsByQueryCriteria(new SuspendedJobQueryImpl().scopeId(caseInstanceId).scopeType(VariableScopeType.CMMN));
+        for (Job suspendedJob : suspendedJobs) {
+            suspendedJobEntityManager.delete(suspendedJob.getId());
+        }
+        DeadLetterJobEntityManager deadLetterJobEntityManager = cmmnEngineConfiguration.getJobServiceConfiguration().getDeadLetterJobEntityManager();
+        List<Job> deadLetterJobs = deadLetterJobEntityManager.findJobsByQueryCriteria(new DeadLetterJobQueryImpl().scopeId(caseInstanceId).scopeType(VariableScopeType.CMMN));
+        for (Job deadLetterJob : deadLetterJobs) {
+            deadLetterJobEntityManager.delete(deadLetterJob.getId());
+        }
 
+        // Actual case instance
         delete(caseInstanceEntity);
     }
     
