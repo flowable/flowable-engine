@@ -289,10 +289,11 @@ public class DefaultJobManager implements JobManager {
 
                 newHistoryJobEntity.setRetries(newHistoryJobEntity.getRetries() - 1);
                 jobServiceConfiguration.getHistoryJobEntityManager().insert(newHistoryJobEntity);
-
+                jobServiceConfiguration.getHistoryJobEntityManager().deleteNoCascade(historyJobEntity);
+            
+            } else {
+                jobServiceConfiguration.getHistoryJobEntityManager().delete(historyJobEntity);
             }
-
-            jobServiceConfiguration.getHistoryJobEntityManager().deleteNoCascade(historyJobEntity);
 
         } else {
             JobEntity jobEntity = (JobEntity) job;

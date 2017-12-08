@@ -19,6 +19,7 @@
     
     <!-- job executor configurations -->
     <property name="asyncExecutor" ref="asyncExecutor" />
+    <property name="asyncHistoryExecutor" ref="asyncHistoryExecutor" />
     <property name="asyncExecutorActivate" value="false" />
     
     <property name="defaultFailedJobWaitTime" value="1" />
@@ -47,6 +48,11 @@
   </bean>
   
   <bean id="asyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">
+    <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
+    <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
+  </bean>
+  
+  <bean id="asyncHistoryExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncHistoryJobExecutor">
     <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000" />
     <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000" />
   </bean>
