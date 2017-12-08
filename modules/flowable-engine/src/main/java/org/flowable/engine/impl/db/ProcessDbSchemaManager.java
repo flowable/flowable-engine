@@ -169,54 +169,69 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
     @Override
     public String dbSchemaUpdate() {
         
+        PropertyEntity dbVersionProperty = null;
+        String dbVersion = null;
+        String feedback = null;
+        boolean isUpgradeNeeded = false;
+        int matchingVersionIndex = -1;
+
+        DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
+        boolean isEngineTablePresent = isEngineTablePresent();
+        if (isEngineTablePresent) {
+
+            dbVersionProperty = dbSqlSession.selectById(PropertyEntityImpl.class, "schema.version");
+            dbVersion = dbVersionProperty.getValue();
+
+            matchingVersionIndex = FlowableVersions.getFlowableVersionForDbVersion(dbVersion);
+            isUpgradeNeeded = (matchingVersionIndex != (FlowableVersions.FLOWABLE_VERSIONS.size() - 1));
+        }
+        
+        boolean isHistoryTablePresent = isHistoryTablePresent();
+        if (isUpgradeNeeded) {
+            dbSchemaUpgradeUntil6120("engine", matchingVersionIndex);
+            
+            if (isHistoryTablePresent) {
+                dbSchemaUpgradeUntil6120("history", matchingVersionIndex);
+            }
+        }
+        
         getCommonDbSchemaManager().dbSchemaUpdate();
         getIdentityLinkDbSchemaManager().dbSchemaUpdate();
         getTaskDbSchemaManager().dbSchemaUpdate();
         getVariableDbSchemaManager().dbSchemaUpdate();
         getJobDbSchemaManager().dbSchemaUpdate();
 
-        String feedback = null;
-        boolean isUpgradeNeeded = false;
-        int matchingVersionIndex = -1;
+        if (isUpgradeNeeded) {
+            dbVersionProperty.setValue(ProcessEngine.VERSION);
 
-        DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
-        if (isEngineTablePresent()) {
-
-            PropertyEntity dbVersionProperty = dbSqlSession.selectById(PropertyEntityImpl.class, "schema.version");
-            String dbVersion = dbVersionProperty.getValue();
-
-            matchingVersionIndex = FlowableVersions.getFlowableVersionForDbVersion(dbVersion);
-            isUpgradeNeeded = (matchingVersionIndex != (FlowableVersions.FLOWABLE_VERSIONS.size() - 1));
-
-            if (isUpgradeNeeded) {
-                dbVersionProperty.setValue(ProcessEngine.VERSION);
-
-                PropertyEntity dbHistoryProperty;
-                if ("5.0".equals(dbVersion)) {
-                    dbHistoryProperty = CommandContextUtil.getPropertyEntityManager().create();
-                    dbHistoryProperty.setName("schema.history");
-                    dbHistoryProperty.setValue("create(5.0)");
-                    dbSqlSession.insert(dbHistoryProperty);
-                } else {
-                    dbHistoryProperty = dbSqlSession.selectById(PropertyEntity.class, "schema.history");
-                }
-
-                // Set upgrade history
-                String dbHistoryValue = dbHistoryProperty.getValue() + " upgrade(" + dbVersion + "->" + ProcessEngine.VERSION + ")";
-                dbHistoryProperty.setValue(dbHistoryValue);
-
-                // Engine upgrade
-                dbSchemaUpgrade("engine", matchingVersionIndex);
-                feedback = "upgraded Flowable from " + dbVersion + " to " + ProcessEngine.VERSION;
+            PropertyEntity dbHistoryProperty;
+            if ("5.0".equals(dbVersion)) {
+                dbHistoryProperty = CommandContextUtil.getPropertyEntityManager().create();
+                dbHistoryProperty.setName("schema.history");
+                dbHistoryProperty.setValue("create(5.0)");
+                dbSqlSession.insert(dbHistoryProperty);
+            } else {
+                dbHistoryProperty = dbSqlSession.selectById(PropertyEntity.class, "schema.history");
             }
 
-        } else {
+            // Set upgrade history
+            String dbHistoryValue = dbHistoryProperty.getValue() + " upgrade(" + dbVersion + "->" + ProcessEngine.VERSION + ")";
+            dbHistoryProperty.setValue(dbHistoryValue);
+
+            // Engine upgrade
+            LOGGER.info("upgrading engine " + FlowableVersions.getFlowableVersionForDbVersion(FlowableVersions.LAST_V6_VERSION_BEFORE_SERVICES));
+            dbSchemaUpgrade("engine", FlowableVersions.getFlowableVersionForDbVersion(FlowableVersions.LAST_V6_VERSION_BEFORE_SERVICES));
+            feedback = "upgraded Flowable from " + dbVersion + " to " + ProcessEngine.VERSION;
+            
+        } else if (!isEngineTablePresent) {
             dbSchemaCreateEngine();
         }
-        if (isHistoryTablePresent()) {
+        
+        if (isHistoryTablePresent) {
             if (isUpgradeNeeded) {
-                dbSchemaUpgrade("history", matchingVersionIndex);
+                dbSchemaUpgrade("history", FlowableVersions.getFlowableVersionForDbVersion(FlowableVersions.LAST_V6_VERSION_BEFORE_SERVICES));
             }
+            
         } else if (dbSqlSession.getDbSqlSessionFactory().isDbHistoryUsed()) {
             dbSchemaCreateHistory();
         }

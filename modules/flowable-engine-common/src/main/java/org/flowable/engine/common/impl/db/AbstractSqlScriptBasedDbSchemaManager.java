@@ -45,6 +45,33 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
     
     protected static final String SCHEMA_VERSION_PROPERTY = "schema.version";
     
+    protected void dbSchemaUpgradeUntil6120(final String component, final int currentDatabaseVersionsIndex) {
+        FlowableVersion version = FlowableVersions.FLOWABLE_VERSIONS.get(currentDatabaseVersionsIndex);
+        String dbVersion = version.getMainVersion();
+        LOGGER.info("upgrading flowable {} schema from {} to {}", component, dbVersion, FlowableVersions.LAST_V6_VERSION_BEFORE_SERVICES);
+        
+        // Actual execution of schema DDL SQL
+        for (int i = currentDatabaseVersionsIndex + 1; i < FlowableVersions.getFlowableVersionForDbVersion(FlowableVersions.LAST_V6_VERSION_BEFORE_SERVICES); i++) {
+            String nextVersion = FlowableVersions.FLOWABLE_VERSIONS.get(i).getMainVersion();
+
+            // Taking care of -SNAPSHOT version in development
+            if (nextVersion.endsWith("-SNAPSHOT")) {
+                nextVersion = nextVersion.substring(0, nextVersion.length() - "-SNAPSHOT".length());
+            }
+
+            dbVersion = dbVersion.replace(".", "");
+            nextVersion = nextVersion.replace(".", "");
+            LOGGER.info("Upgrade needed: {} -> {}. Looking for schema update resource for component '{}'", dbVersion, nextVersion, component);
+            String databaseType = getDbSqlSession().getDbSqlSessionFactory().getDatabaseType();
+            executeSchemaResource("upgrade", component, getResourceForDbOperation("upgrade", "upgradestep." + dbVersion + ".to." + nextVersion, component, databaseType), true);
+            
+            // To avoid having too much similar scripts, for upgrades the 'all' database is supported and executed for every database type
+            executeSchemaResource("upgrade", component, getResourceForDbOperation("upgrade", "upgradestep." + dbVersion + ".to." + nextVersion, component, "all"), true);
+            
+            dbVersion = nextVersion;
+        }
+    }
+    
     protected void dbSchemaUpgrade(final String component, final int currentDatabaseVersionsIndex) {
         FlowableVersion version = FlowableVersions.FLOWABLE_VERSIONS.get(currentDatabaseVersionsIndex);
         String dbVersion = version.getMainVersion();
