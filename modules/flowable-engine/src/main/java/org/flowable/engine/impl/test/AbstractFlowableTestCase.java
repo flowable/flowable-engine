@@ -295,8 +295,12 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
         managementService = processEngine.getManagementService();
         dynamicBpmnService = processEngine.getDynamicBpmnService();
     }
-
+    
     public void assertProcessEnded(final String processInstanceId) {
+        assertProcessEnded(processInstanceId, 10000);
+    }
+
+    public void assertProcessEnded(final String processInstanceId, long timeout) {
         ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
 
         if (processInstance != null) {
@@ -304,7 +308,7 @@ public abstract class AbstractFlowableTestCase extends AbstractTestCase {
         }
 
         // Verify historical data if end times are correctly set
-        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration)) {
+        if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.AUDIT, processEngineConfiguration, timeout)) {
 
             // process instance
             HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery()
