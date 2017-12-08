@@ -47,6 +47,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import math.geom2d.Point2D;
+import math.geom2d.conic.Circle2D;
 import math.geom2d.curve.AbstractContinuousCurve2D;
 import math.geom2d.line.Line2D;
 import math.geom2d.polygon.Polyline2D;
@@ -93,9 +94,12 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
     }
 
     private static final List<String> DI_RECTANGLES = new ArrayList<>();
+    private static final List<String> DI_CIRCLES = new ArrayList<>();
     private static final List<String> DI_SENTRY = new ArrayList<>();
 
     static {
+        DI_CIRCLES.add(STENCIL_TIMER_EVENT_LISTENER);
+        
         DI_RECTANGLES.add(STENCIL_TASK);
         DI_RECTANGLES.add(STENCIL_TASK_HUMAN);
         DI_RECTANGLES.add(STENCIL_TASK_SERVICE);
@@ -675,7 +679,10 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             List<GraphicInfo> graphicInfoList = new ArrayList<>();
 
             AbstractContinuousCurve2D source2D = null;
-            if (DI_RECTANGLES.contains(sourceRefStencilId)) {
+            if (DI_CIRCLES.contains(sourceRefStencilId)) {
+                source2D = new Circle2D(sourceInfo.getX() + sourceDockersX, sourceInfo.getY() + sourceDockersY, sourceDockersX);
+                
+            } else if (DI_RECTANGLES.contains(sourceRefStencilId)) {
                 source2D = createRectangle(sourceInfo);
 
             } else if (DI_SENTRY.contains(sourceRefStencilId)) {
@@ -717,7 +724,13 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             }
 
             AbstractContinuousCurve2D target2D = null;
-            if (DI_RECTANGLES.contains(targetRefStencilId)) {
+            if (DI_CIRCLES.contains(targetRefStencilId)) {
+                double targetDockersX = dockersNode.get(dockersNode.size() - 1).get(EDITOR_BOUNDS_X).asDouble();
+                double targetDockersY = dockersNode.get(dockersNode.size() - 1).get(EDITOR_BOUNDS_Y).asDouble();
+
+                target2D = new Circle2D(targetInfo.getX() + targetDockersX, targetInfo.getY() + targetDockersY, targetDockersX);
+                
+            } if (DI_RECTANGLES.contains(targetRefStencilId)) {
                 target2D = createRectangle(targetInfo);
 
             } else if (DI_SENTRY.contains(targetRefStencilId)) {

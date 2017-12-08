@@ -29,6 +29,8 @@ public class FlowableVersions {
     
     public static final String LAST_V5_VERSION = "5.99.0.0";
     
+    public static final String LAST_V6_VERSION_BEFORE_SERVICES = "6.1.2.0";
+    
     static {
 
         /* Previous */
@@ -88,7 +90,7 @@ public class FlowableVersions {
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.0.1.0"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.1.0.0"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.1.1.0"));
-        FLOWABLE_VERSIONS.add(new FlowableVersion("6.1.2.0"));
+        FLOWABLE_VERSIONS.add(new FlowableVersion(LAST_V6_VERSION_BEFORE_SERVICES));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.2.0.0"));
 
         /* Current */

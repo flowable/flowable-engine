@@ -89,6 +89,7 @@ public class DefaultCaseDiagramCanvas {
     protected static Color LABEL_COLOR = new Color(112, 146, 190);
     protected static Color TASK_BORDER_COLOR = new Color(187, 187, 187);
     protected static Color STAGE_BORDER_COLOR = new Color(0, 0, 0);
+    protected static Color EVENT_BORDER_COLOR = new Color(88, 88, 88);
 
     // Fonts
     protected static Font LABEL_FONT;
@@ -101,6 +102,7 @@ public class DefaultCaseDiagramCanvas {
 
     // icons
     protected static int ICON_PADDING = 5;
+    protected static BufferedImage TIMER_IMAGE;
     protected static BufferedImage USERTASK_IMAGE;
     protected static BufferedImage SERVICETASK_IMAGE;
     protected static BufferedImage CASETASK_IMAGE;
@@ -192,6 +194,7 @@ public class DefaultCaseDiagramCanvas {
         ANNOTATION_FONT = new Font(annotationFontName, Font.PLAIN, FONT_SIZE);
 
         try {
+            TIMER_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/timer.png", customClassLoader));
             USERTASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/userTask.png", customClassLoader));
             SERVICETASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/serviceTask.png", customClassLoader));
             CASETASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/caseTask.png", customClassLoader));
@@ -317,6 +320,29 @@ public class DefaultCaseDiagramCanvas {
         g.setTransform(transformation);
         g.fill(arrowHead);
         g.setTransform(originalTransformation);
+    }
+    
+    public void drawTimerEventListener(GraphicInfo graphicInfo, double scaleFactor) {
+        drawEventListener(graphicInfo, TIMER_IMAGE, scaleFactor);
+    }
+    
+    public void drawEventListener(GraphicInfo graphicInfo, BufferedImage image, double scaleFactor) {
+        Paint originalPaint = g.getPaint();
+        g.setPaint(EVENT_COLOR);
+        Ellipse2D circle = new Ellipse2D.Double(graphicInfo.getX(), graphicInfo.getY(),
+                graphicInfo.getWidth(), graphicInfo.getHeight());
+        g.fill(circle);
+        g.setPaint(EVENT_BORDER_COLOR);
+        g.draw(circle);
+        g.setPaint(originalPaint);
+        if (image != null) {
+            // calculate coordinates to center image
+            int imageX = (int) Math.round(graphicInfo.getX() + (graphicInfo.getWidth() / 2) - (image.getWidth() / (2 * scaleFactor)));
+            int imageY = (int) Math.round(graphicInfo.getY() + (graphicInfo.getHeight() / 2) - (image.getHeight() / (2 * scaleFactor)));
+            g.drawImage(image, imageX, imageY,
+                    (int) (image.getWidth() / scaleFactor), (int) (image.getHeight() / scaleFactor), null);
+        }
+
     }
 
     public void drawTask(BufferedImage icon, String name, GraphicInfo graphicInfo, double scaleFactor) {
