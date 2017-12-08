@@ -39,6 +39,7 @@ import org.flowable.cmmn.model.ProcessTask;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
+import org.flowable.cmmn.model.TimerEventListener;
 
 /**
  * Class to generate an image based the diagram interchange information in a CMMN 1.1 case.
@@ -56,6 +57,15 @@ public class DefaultCaseDiagramGenerator implements CaseDiagramGenerator {
     // The instructions on how to draw a certain construct is
     // created statically and stored in a map for performance.
     public DefaultCaseDiagramGenerator(final double scaleFactor) {
+        // timer event listener
+        activityDrawInstructions.put(TimerEventListener.class, new ActivityDrawInstruction() {
+
+            @Override
+            public void draw(DefaultCaseDiagramCanvas caseDiagramCanvas, CmmnModel cmmnModel, CaseElement caseElement) {
+                GraphicInfo graphicInfo = cmmnModel.getGraphicInfo(caseElement.getId());
+                caseDiagramCanvas.drawTimerEventListener(graphicInfo, scaleFactor);
+            }
+        });
         // task
         activityDrawInstructions.put(Task.class, new ActivityDrawInstruction() {
 

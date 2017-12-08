@@ -936,7 +936,7 @@
     "groups" : [ "Sentries" ],
     "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "ifpartconditionpackage" ],
     "hiddenPropertyPackages" : [ ],
-    "roles" : [ "association_start", "SentriesMorph", "EntryCriterionOnItemBoundary" ]
+    "roles" : [ "association_start", "association_end", "SentriesMorph", "EntryCriterionOnItemBoundary" ]
   }, {
     "type" : "node",
     "id" : "ExitCriterion",
@@ -982,7 +982,7 @@
       "connects" : [ {
         "from" : "association_start",
         "to" : [ "association_end" ]
-      } ]
+      }]
     }, {
       "role" : "EntryCriterionOnItemBoundary",
       "connects" : [ {
@@ -991,7 +991,8 @@
       }, {
         "from" : "StageActivity",
         "to" : [ "EntryCriterionOnItemBoundary"]
-      }]},  {
+      }]
+    }, {
         "role" : "ExitCriterionOnItemBoundary",
         "connects" : [ {
           "from" : "Activity",
