@@ -14,6 +14,7 @@ package org.flowable.cmmn.test.repetition;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 import java.util.List;
@@ -184,6 +185,26 @@ public class RepetitionRuleTest extends FlowableCmmnTestCase {
         assertEquals(0L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count());
         assertEquals(0L, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(0L, cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testRepeatingTimerWithCronExpression() {
+        Date currentTime = setClockFixedToCurrentTime();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testRepeatingTimer").start();
+        
+        // Moving the timer 6 minutes should trigger the timer
+        for (int i=0; i<3; i++) {
+            currentTime = new Date(currentTime.getTime() + (6 * 60 * 1000));
+            setClockTo(currentTime);
+        
+            Job job = cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertTrue(job.getDuedate().getTime() - currentTime.getTime() <= (5 * 60 * 1000));
+            job = cmmnManagementService.moveTimerToExecutableJob(job.getId());
+            cmmnManagementService.executeJob(job.getId());
+            
+            assertEquals(i + 1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        }
     }
     
 }

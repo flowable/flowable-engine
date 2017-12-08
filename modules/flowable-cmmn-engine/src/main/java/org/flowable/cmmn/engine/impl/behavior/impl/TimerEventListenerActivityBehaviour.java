@@ -12,7 +12,6 @@
  */
 package org.flowable.cmmn.engine.impl.behavior.impl;
 
-import java.text.ParseException;
 import java.util.Date;
 
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
@@ -27,7 +26,6 @@ import org.flowable.cmmn.model.TimerEventListener;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
-import org.flowable.engine.common.impl.calendar.CronExpression;
 import org.flowable.engine.common.impl.calendar.CycleBusinessCalendar;
 import org.flowable.engine.common.impl.calendar.DueDateBusinessCalendar;
 import org.flowable.engine.common.impl.el.ExpressionManager;
@@ -64,28 +62,77 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
         if (PlanItemTransition.CREATE.equals(transition)) {
             PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) planItemInstance;
             Object timerValue = resolveTimerExpression(commandContext, planItemInstanceEntity);
-            Date timerDueDate = resolveTimerDueDate(commandContext, timerValue);
             
-            if (timerDueDate != null) {
-                JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getJobServiceConfiguration();
-                TimerJobEntity timer = jobServiceConfiguration.getTimerJobService().createTimerJob();
-                timer.setJobType(JobEntity.JOB_TYPE_TIMER);
-                timer.setJobHandlerType(TriggerTimerEventJobHandler.TYPE);
-                timer.setExclusive(true);
-                timer.setRetries(jobServiceConfiguration.getAsyncExecutorNumberOfRetries());
-                timer.setDuedate(timerDueDate);
-                timer.setScopeDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
-                timer.setScopeId(planItemInstanceEntity.getCaseInstanceId());
-                timer.setSubScopeId(planItemInstanceEntity.getId());
-                timer.setScopeType(VariableScopeType.CMMN);
-                timer.setTenantId(planItemInstanceEntity.getTenantId());
-                
-                if (timerValue instanceof String && isRepetitionString((String) timerValue)) {
-                    timer.setRepeat(prepareRepeat((String) timerValue, CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock()));
+            Date timerDueDate = null;
+            boolean isRepeating = false;
+            if (timerValue != null) {
+                if (timerValue instanceof Date) {
+                    timerDueDate = (Date) timerValue;
+                    
+                } else if (timerValue instanceof DateTime) {
+                    DateTime timerDateTime = (DateTime) timerValue;
+                    timerDueDate = timerDateTime.toDate();
+                    
+                } else if (timerValue instanceof String) {
+                    String timerString = (String) timerValue;
+                    
+                    BusinessCalendarManager businessCalendarManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getBusinessCalendarManager();
+                    if (isDurationString(timerString)) {
+                        timerDueDate = businessCalendarManager.getBusinessCalendar(DueDateBusinessCalendar.NAME).resolveDuedate(timerString);
+                        
+                    } else if (isRepetitionString(timerString)) {
+                        timerDueDate = businessCalendarManager.getBusinessCalendar(CycleBusinessCalendar.NAME).resolveDuedate(timerString);
+                        isRepeating = true;
+                        
+                    } else {
+                       
+                        // Try to parse as ISO8601 first
+                        try {
+                            timerDueDate = DateTime.parse(timerString).toDate();
+                        } catch (Exception e) { }
+                        
+                        // Try to parse as cron expression
+                        try {
+                            timerDueDate = businessCalendarManager.getBusinessCalendar(CycleBusinessCalendar.NAME).resolveDuedate(timerString);
+                            isRepeating = true;
+                            
+                        } catch (Exception pe) { }
+                        
+                    }
+                    
                 }
-                
-                jobServiceConfiguration.getTimerJobService().scheduleTimerJob(timer);
             }
+            
+            if (timerDueDate == null) {
+                throw new FlowableException("Timer expression '" + timerExpression + "' did not resolve to java.util.Date, org.joda.time.DateTime, "
+                        + "an ISO8601 date/duration/repetition string or a cron expression");
+            }
+            
+            scheduleTimerJob(commandContext, planItemInstanceEntity, timerValue, timerDueDate, isRepeating);
+        }
+    }
+
+    protected void scheduleTimerJob(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, 
+            Object timerValue, Date timerDueDate, boolean isRepeating) {
+        if (timerDueDate != null) {
+            JobServiceConfiguration jobServiceConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getJobServiceConfiguration();
+            TimerJobEntity timer = jobServiceConfiguration.getTimerJobService().createTimerJob();
+            timer.setJobType(JobEntity.JOB_TYPE_TIMER);
+            timer.setJobHandlerType(TriggerTimerEventJobHandler.TYPE);
+            timer.setExclusive(true);
+            timer.setRetries(jobServiceConfiguration.getAsyncExecutorNumberOfRetries());
+            timer.setDuedate(timerDueDate);
+            timer.setScopeDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
+            timer.setScopeId(planItemInstanceEntity.getCaseInstanceId());
+            timer.setSubScopeId(planItemInstanceEntity.getId());
+            timer.setScopeType(VariableScopeType.CMMN);
+            timer.setTenantId(planItemInstanceEntity.getTenantId());
+            
+            if (isRepeating && timerValue instanceof String) {
+                timer.setRepeat(prepareRepeat((String) timerValue, CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock()));
+            }
+            
+            jobServiceConfiguration.getTimerJobService().scheduleTimerJob(timer);
         }
     }
     
@@ -100,54 +147,6 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
         return expression.getValue(planItemInstanceEntity);
     }
     
-    protected Date resolveTimerDueDate(CommandContext commandContext, Object timerValue) {
-        Date timerDueDate = null;
-        if (timerValue != null) {
-            if (timerValue instanceof Date) {
-                timerDueDate = (Date) timerValue;
-                
-            } else if (timerValue instanceof DateTime) {
-                DateTime timerDateTime = (DateTime) timerValue;
-                timerDueDate = timerDateTime.toDate();
-                
-            } else if (timerValue instanceof String) {
-                String timerString = (String) timerValue;
-                
-                BusinessCalendarManager businessCalendarManager = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getBusinessCalendarManager();
-                if (isDurationString(timerString)) {
-                    timerDueDate = businessCalendarManager.getBusinessCalendar(DueDateBusinessCalendar.NAME).resolveDuedate(timerString);
-                    
-                } else if (isRepetitionString(timerString)) {
-                    timerDueDate = businessCalendarManager.getBusinessCalendar(CycleBusinessCalendar.NAME).resolveDuedate(timerString);
-                    
-                } else {
-                   
-                    // Try to parse as ISO8601 first
-                    try {
-                        timerDueDate = DateTime.parse(timerString).toDate();
-                    } catch (Exception e) { }
-                    
-                    // Try to parse as cron expression
-                    try {
-                        Clock clock = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock();
-                        CronExpression cronExpression = new CronExpression(timerString, clock);
-                        if (cronExpression != null) {
-                            timerDueDate = cronExpression.getTimeAfter(clock.getCurrentTime());
-                        }
-                    } catch (ParseException pe) { }
-                    
-                }
-                
-            }
-        }
-        
-        if (timerDueDate == null) {
-            throw new FlowableException("Timer expression '" + timerExpression + "' did not resolve to java.util.Date, org.joda.time.DateTime, "
-                    + "an ISO8601 date/duration/repetition string or a cron expression");
-        }
-        return timerDueDate;
-    }
-
     protected boolean isRepetitionString(String timerString) {
         return timerString != null && timerString.startsWith("R");
     }
@@ -157,7 +156,7 @@ public class TimerEventListenerActivityBehaviour extends CoreCmmnActivityBehavio
     }
     
     public String prepareRepeat(String dueDate, Clock clock) {
-        if (isRepetitionString(dueDate) && dueDate.split("/").length == 2) {
+        if (dueDate.startsWith("R") && dueDate.split("/").length == 2) {
             DateTimeFormatter fmt = ISODateTimeFormat.dateTime();
             return dueDate.replace("/", "/" + fmt.print(new DateTime(clock.getCurrentTime(),DateTimeZone.forTimeZone(clock.getCurrentTimeZone()))) + "/");
         }
