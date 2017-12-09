@@ -59,22 +59,4 @@ public abstract class AbstractPlanItemInstanceOperation extends CmmnOperation {
                 && planItem.getItemControl().getRepetitionRule() != null;
     }
     
-    protected int getRepetitionCounter(PlanItemInstanceEntity repeatingPlanItemInstanceEntity) {
-        Integer counter = (Integer) repeatingPlanItemInstanceEntity.getVariableLocal(getCounterVariable(repeatingPlanItemInstanceEntity));
-        if (counter == null) {
-            return 0;
-        } else {
-            return counter.intValue();
-        }
-    }
-    
-    protected void setRepetitionCounter(PlanItemInstanceEntity repeatingPlanItemInstanceEntity, int counterValue) {
-        repeatingPlanItemInstanceEntity.setVariableLocal(getCounterVariable(repeatingPlanItemInstanceEntity), counterValue);
-    }
-
-    protected String getCounterVariable(PlanItemInstanceEntity repeatingPlanItemInstanceEntity) {
-        String repetitionCounterVariableName = repeatingPlanItemInstanceEntity.getPlanItem().getItemControl().getRepetitionRule().getRepetitionCounterVariableName();
-        return repetitionCounterVariableName;
-    }
-    
 }

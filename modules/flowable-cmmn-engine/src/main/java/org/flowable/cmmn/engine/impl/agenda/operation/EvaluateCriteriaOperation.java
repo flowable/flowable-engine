@@ -118,7 +118,12 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                             if (newChildPlanItemInstances == null) {
                                 newChildPlanItemInstances = new ArrayList<>(1);
                             }
-                            newChildPlanItemInstances.add(copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false));
+                            
+                            PlanItemInstanceEntity childPlamItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false);
+                            int counter = getRepetitionCounter(childPlamItemInstanceEntity);
+                            setRepetitionCounter(childPlamItemInstanceEntity, ++counter);
+                            newChildPlanItemInstances.add(childPlamItemInstanceEntity);
+                            
                         } else {
                             evaluationResult = CriteriaEvaluationResult.SENTRY_SATISFIED_BUT_IGNORED;
                             activatePlanItemInstance = false;

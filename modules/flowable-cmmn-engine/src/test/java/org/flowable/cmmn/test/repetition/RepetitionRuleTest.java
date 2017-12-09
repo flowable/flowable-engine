@@ -14,6 +14,7 @@ package org.flowable.cmmn.test.repetition;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Date;
 import java.util.List;
@@ -184,6 +185,97 @@ public class RepetitionRuleTest extends FlowableCmmnTestCase {
         assertEquals(0L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).count());
         assertEquals(0L, cmmnRuntimeService.createCaseInstanceQuery().count());
         assertEquals(0L, cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count());
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testRepeatingTimerWithCronExpression() {
+        Date currentTime = setClockFixedToCurrentTime();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testRepeatingTimer").start();
+        
+        // Moving the timer 6 minutes should trigger the timer
+        for (int i=0; i<3; i++) {
+            currentTime = new Date(currentTime.getTime() + (6 * 60 * 1000));
+            setClockTo(currentTime);
+        
+            Job job = cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertTrue(job.getDuedate().getTime() - currentTime.getTime() <= (5 * 60 * 1000));
+            job = cmmnManagementService.moveTimerToExecutableJob(job.getId());
+            cmmnManagementService.executeJob(job.getId());
+            
+            assertEquals(i + 1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        }
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testLimitedRepeatingTimer() {
+        Date currentTime = setClockFixedToCurrentTime();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testLimitedRepeatingTimer").start();
+        
+        currentTime = new Date(currentTime.getTime() + (5 * 60 * 60 * 1000) + 10000);
+        setClockTo(currentTime);
+    
+        Job job = cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertTrue(job.getDuedate().getTime() - currentTime.getTime() <= (5 * 60 * 1000));
+        job = cmmnManagementService.moveTimerToExecutableJob(job.getId());
+        cmmnManagementService.executeJob(job.getId());
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        // new timer should be scheduled
+        assertEquals(1L, cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        // Should only repeat two times
+        currentTime = new Date(currentTime.getTime() + (5 * 60 * 60 * 1000) + 10000);
+        setClockTo(currentTime);
+        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 10000L, 100L, true);
+        
+        assertEquals(0L, cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count());
+        assertEquals(0L, cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+        assertEquals(2, tasks.size());
+        for (Task task : tasks) {
+            cmmnTaskService.complete(task.getId());
+        }
+        
+        // A plan item instance for the human task will still be available (won't be triggered anymore)
+        assertEquals(1L, cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceState(PlanItemInstanceState.AVAILABLE).count());
+        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
+        assertCaseInstanceEnded(caseInstance);
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testLimitedRepeatingTimerIgnoredAfterFirst() {
+        
+        // No repetition rule for task A, hence only the first one will be listened too.
+        
+        Date currentTime = setClockFixedToCurrentTime();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testLimitedRepeatingTimer").start();
+        
+        currentTime = new Date(currentTime.getTime() + (5 * 60 * 60 * 1000) + 10000);
+        setClockTo(currentTime);
+    
+        Job job = cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertTrue(job.getDuedate().getTime() - currentTime.getTime() <= (5 * 60 * 1000));
+        job = cmmnManagementService.moveTimerToExecutableJob(job.getId());
+        cmmnManagementService.executeJob(job.getId());
+        assertEquals(1, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        // new timer should be scheduled
+        assertEquals(1L, cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        // Should only repeat two times
+        currentTime = new Date(currentTime.getTime() + (5 * 60 * 60 * 1000) + 10000);
+        setClockTo(currentTime);
+        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 10000L, 100L, true);
+        
+        assertEquals(0L, cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count());
+        assertEquals(0L, cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        // Ignoring second occur event
+        assertEquals(1L, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
     }
     
 }
