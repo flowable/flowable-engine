@@ -125,7 +125,7 @@ public class FlowableVersions {
         return null;
     }
     
-    public static int getFlowableVersionForDbVersion(String dbVersion) {
+    public static int getFlowableVersionIndexForDbVersion(String dbVersion) {
         int matchingVersionIndex;
         // Determine index in the sequence of Flowable releases
         matchingVersionIndex = findMatchingVersionIndex(dbVersion);

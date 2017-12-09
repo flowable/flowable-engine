@@ -51,7 +51,7 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
         LOGGER.info("upgrading flowable {} schema from {} to {}", component, dbVersion, FlowableVersions.LAST_V6_VERSION_BEFORE_SERVICES);
         
         // Actual execution of schema DDL SQL
-        for (int i = currentDatabaseVersionsIndex + 1; i < FlowableVersions.getFlowableVersionForDbVersion(FlowableVersions.LAST_V6_VERSION_BEFORE_SERVICES); i++) {
+        for (int i = currentDatabaseVersionsIndex + 1; i < FlowableVersions.getFlowableVersionIndexForDbVersion(FlowableVersions.LAST_V6_VERSION_BEFORE_SERVICES); i++) {
             String nextVersion = FlowableVersions.FLOWABLE_VERSIONS.get(i).getMainVersion();
 
             // Taking care of -SNAPSHOT version in development

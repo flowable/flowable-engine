@@ -174,6 +174,7 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         String feedback = null;
         boolean isUpgradeNeeded = false;
         int matchingVersionIndex = -1;
+        int version6120Index = FlowableVersions.getFlowableVersionIndexForDbVersion(FlowableVersions.LAST_V6_VERSION_BEFORE_SERVICES);
 
         DbSqlSession dbSqlSession = CommandContextUtil.getDbSqlSession();
         boolean isEngineTablePresent = isEngineTablePresent();
@@ -182,12 +183,12 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
             dbVersionProperty = dbSqlSession.selectById(PropertyEntityImpl.class, "schema.version");
             dbVersion = dbVersionProperty.getValue();
 
-            matchingVersionIndex = FlowableVersions.getFlowableVersionForDbVersion(dbVersion);
+            matchingVersionIndex = FlowableVersions.getFlowableVersionIndexForDbVersion(dbVersion);
             isUpgradeNeeded = (matchingVersionIndex != (FlowableVersions.FLOWABLE_VERSIONS.size() - 1));
         }
         
         boolean isHistoryTablePresent = isHistoryTablePresent();
-        if (isUpgradeNeeded) {
+        if (isUpgradeNeeded && matchingVersionIndex < version6120Index) {
             dbSchemaUpgradeUntil6120("engine", matchingVersionIndex);
             
             if (isHistoryTablePresent) {
@@ -219,8 +220,12 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
             dbHistoryProperty.setValue(dbHistoryValue);
 
             // Engine upgrade
-            LOGGER.info("upgrading engine " + FlowableVersions.getFlowableVersionForDbVersion(FlowableVersions.LAST_V6_VERSION_BEFORE_SERVICES));
-            dbSchemaUpgrade("engine", FlowableVersions.getFlowableVersionForDbVersion(FlowableVersions.LAST_V6_VERSION_BEFORE_SERVICES));
+            if (version6120Index > matchingVersionIndex) {
+                dbSchemaUpgrade("engine", version6120Index);
+            } else {
+                dbSchemaUpgrade("engine", matchingVersionIndex);
+            }
+            
             feedback = "upgraded Flowable from " + dbVersion + " to " + ProcessEngine.VERSION;
             
         } else if (!isEngineTablePresent) {
@@ -229,7 +234,11 @@ public class ProcessDbSchemaManager extends AbstractSqlScriptBasedDbSchemaManage
         
         if (isHistoryTablePresent) {
             if (isUpgradeNeeded) {
-                dbSchemaUpgrade("history", FlowableVersions.getFlowableVersionForDbVersion(FlowableVersions.LAST_V6_VERSION_BEFORE_SERVICES));
+                if (version6120Index > matchingVersionIndex) {
+                    dbSchemaUpgrade("history", version6120Index);
+                } else {
+                    dbSchemaUpgrade("history", matchingVersionIndex);
+                }
             }
             
         } else if (dbSqlSession.getDbSqlSessionFactory().isDbHistoryUsed()) {
