@@ -268,4 +268,68 @@ public class TimerEventListenerTest extends FlowableCmmnTestCase {
         assertCaseInstanceEnded(caseInstance);
     }
     
+    @Test
+    @CmmnDeployment
+    public void testExitNestedStageThroughTimer() {
+        Date startTime = setClockFixedToCurrentTime();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testExitNestedStageThroughTimer").start();
+        assertEquals(3L, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemDefinitionType(PlanItemDefinitionType.STAGE).count());
+        Task task = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertEquals("The task", task.getName());
+        
+        setClockTo(new Date(startTime.getTime() + (5 * 60 * 60 * 1000)));
+        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 10000L, 100L, true);
+        assertEquals(0L, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        assertCaseInstanceEnded(caseInstance);
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void timerActivatesAndExitStages() {
+        Date startTime = setClockFixedToCurrentTime();
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("timerActivatesAndExitStages").start();
+        
+        List<Task> tasks = cmmnTaskService.createTaskQuery()
+                .caseInstanceId(caseInstance.getId())
+                .orderByTaskName().asc()
+                .list();
+        assertEquals(2, tasks.size());
+        assertEquals("A", tasks.get(0).getName());
+        assertEquals("B", tasks.get(1).getName());
+        
+        assertEquals(0L, cmmnManagementService.createTimerJobQuery().count());
+        
+        // Completing A activates the stage and the timer event listener
+        cmmnTaskService.complete(tasks.get(0).getId());
+        cmmnTaskService.complete(tasks.get(1).getId());
+        
+        // Timer event listener created a timer job
+        assertEquals(1L, cmmnManagementService.createTimerJobQuery().count());
+        tasks = cmmnTaskService.createTaskQuery()
+                .caseInstanceId(caseInstance.getId())
+                .orderByTaskName().asc()
+                .list();
+        assertEquals(3, tasks.size());
+        assertEquals("Stage 1 task", tasks.get(0).getName());
+        assertEquals("Stage 3 task 1", tasks.get(1).getName());
+        assertEquals("Stage 3 task 2", tasks.get(2).getName());
+        
+        // Timer is set to 10 hours
+        setClockTo(new Date(startTime.getTime() + (11 * 60 * 60 * 1000)));
+        CmmnJobTestHelper.waitForJobExecutorToProcessAllJobs(cmmnEngineConfiguration, 10000L, 100L, true);
+        
+        tasks = cmmnTaskService.createTaskQuery()
+                .caseInstanceId(caseInstance.getId())
+                .orderByTaskName().asc()
+                .list();
+        assertEquals(2, tasks.size());
+        assertEquals("Stage 1 task", tasks.get(0).getName());
+        assertEquals("Stage 2 task", tasks.get(1).getName());
+        
+        for(Task task : tasks) {
+            cmmnTaskService.complete(task.getId());
+        }
+        assertCaseInstanceEnded(caseInstance);
+    }
+    
 }
