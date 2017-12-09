@@ -176,10 +176,13 @@ public class CmmnDbSchemaManager implements DbSchemaManager {
         try {
             
             getCommonDbSchemaManager().dbSchemaUpdate();
-            getIdentityLinkDbSchemaManager().dbSchemaUpdate();
-            getTaskDbSchemaManager().dbSchemaUpdate();
-            getVariableDbSchemaManager().dbSchemaUpdate();
-            getJobDbSchemaManager().dbSchemaUpdate();
+            
+            if (CommandContextUtil.getCmmnEngineConfiguration().isExecuteServiceDbSchemaManagers()) {
+                getIdentityLinkDbSchemaManager().dbSchemaUpdate();
+                getTaskDbSchemaManager().dbSchemaUpdate();
+                getVariableDbSchemaManager().dbSchemaUpdate();
+                getJobDbSchemaManager().dbSchemaUpdate();
+            }
             
             Liquibase liquibase = createLiquibaseInstance(CommandContextUtil.getCmmnEngineConfiguration());
             liquibase.update("cmmn");

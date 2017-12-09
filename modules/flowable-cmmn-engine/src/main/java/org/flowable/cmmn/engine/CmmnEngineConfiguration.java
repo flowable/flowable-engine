@@ -227,6 +227,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected CmmnHistoryManager cmmnHistoryManager;
     protected ProcessInstanceService processInstanceService;
     protected Map<String, List<RuntimeInstanceStateChangeCallback>> caseInstanceStateChangeCallbacks;
+    
+    protected boolean executeServiceDbSchemaManagers = true;
 
     protected boolean enableSafeCmmnXml;
     protected CmmnActivityBehaviorFactory activityBehaviorFactory;
@@ -606,10 +608,13 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void initDbSchemaManager() {
         super.initDbSchemaManager();
         initCmmnDbSchemaManager();
-        initIdentityLinkDbSchemaManager();
-        initVariableDbSchemaManager();
-        initTaskDbSchemaManager();
-        initJobDbSchemaManager();
+        
+        if (executeServiceDbSchemaManagers) {
+            initIdentityLinkDbSchemaManager();
+            initVariableDbSchemaManager();
+            initTaskDbSchemaManager();
+            initJobDbSchemaManager();
+        }
     }
 
     protected void initCmmnDbSchemaManager() {
@@ -1562,6 +1567,14 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public CmmnEngineConfiguration setDataSource(DataSource dataSource) {
         this.dataSource = dataSource;
         return this;
+    }
+
+    public boolean isExecuteServiceDbSchemaManagers() {
+        return executeServiceDbSchemaManagers;
+    }
+
+    public void setExecuteServiceDbSchemaManagers(boolean executeServiceDbSchemaManagers) {
+        this.executeServiceDbSchemaManagers = executeServiceDbSchemaManagers;
     }
 
     public HistoryLevel getHistoryLevel() {
