@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,6 +43,8 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
     protected String taskIdLike;
     protected String processInstanceId;
     protected String processInstanceIdLike;
+    protected String caseId;
+    protected String caseIdLike;
     protected String contentStoreId;
     protected String contentStoreIdLike;
     protected String contentStoreName;
@@ -132,6 +134,18 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
     @Override
     public ContentItemQueryImpl processInstanceIdLike(String processInstanceIdLike) {
         this.processInstanceIdLike = processInstanceIdLike;
+        return this;
+    }
+
+    @Override
+    public ContentItemQueryImpl caseId(String caseId) {
+        this.caseId = caseId;
+        return this;
+    }
+
+    @Override
+    public ContentItemQueryImpl caseIdLike(String caseIdLike) {
+        this.caseIdLike = caseIdLike;
         return this;
     }
 

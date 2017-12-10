@@ -77,7 +77,7 @@ public class FlowableTaskQueryService {
 
     @Autowired
     protected RepositoryService repositoryService;
-    
+
     @Autowired
     protected CmmnRepositoryService cmmnRepositoryService;
 
@@ -86,13 +86,13 @@ public class FlowableTaskQueryService {
 
     @Autowired
     protected RuntimeService runtimeService;
-    
+
     @Autowired
     protected CmmnRuntimeService cmmnRuntimeService;
 
     @Autowired
     protected HistoryService historyService;
-    
+
     @Autowired
     protected CmmnHistoryService cmmnHistoryService;
 
@@ -136,7 +136,7 @@ public class FlowableTaskQueryService {
         if (processInstanceIdNode != null && !processInstanceIdNode.isNull()) {
             handleProcessInstanceFiltering(currentUser, taskInfoQueryWrapper, processInstanceIdNode);
         }
-        
+
         JsonNode caseInstanceIdNode = requestNode.get("caseInstanceId");
         if (caseInstanceIdNode != null && !caseInstanceIdNode.isNull()) {
             handleCaseInstanceFiltering(currentUser, taskInfoQueryWrapper, caseInstanceIdNode);
@@ -210,10 +210,13 @@ public class FlowableTaskQueryService {
         String processInstanceId = processInstanceIdNode.asText();
         taskInfoQueryWrapper.getTaskInfoQuery().processInstanceId(processInstanceId);
     }
-    
+
     protected void handleCaseInstanceFiltering(User currentUser, TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode caseInstanceIdNode) {
         String caseInstanceId = caseInstanceIdNode.asText();
-        taskInfoQueryWrapper.getTaskInfoQuery().scopeId(caseInstanceId).scopeType("cmmn");
+        taskInfoQueryWrapper.getTaskInfoQuery()
+                .scopeId(caseInstanceId).or()
+                .taskCategory(caseInstanceId)
+                .endOr();
     }
 
     protected void handleTextFiltering(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode textNode) {
@@ -328,7 +331,7 @@ public class FlowableTaskQueryService {
             }
         }
     }
-    
+
     protected void handleIncludeCaseInstance(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode includeProcessInstanceNode, List<? extends TaskInfo> tasks, Map<String, String> caseInstanceNames) {
         if (includeProcessInstanceNode.asBoolean() && CollectionUtils.isNotEmpty(tasks)) {
             Set<String> caseInstanceIds = new HashSet<>();
@@ -357,12 +360,12 @@ public class FlowableTaskQueryService {
         List<TaskRepresentation> result = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(tasks)) {
             for (TaskInfo task : tasks) {
-                
+
                 TaskRepresentation taskRepresentation = null;
                 if (task.getScopeDefinitionId() != null) {
                     CaseDefinition caseDefinition = cmmnRepositoryService.getCaseDefinition(task.getScopeDefinitionId());
                     taskRepresentation = new TaskRepresentation(task, caseDefinition, caseInstancesNames.get(task.getScopeId()));
-                    
+
                 } else {
                     ProcessDefinitionEntity processDefinition = null;
                     if (task.getProcessDefinitionId() != null) {

@@ -26,6 +26,7 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
+import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.content.api.ContentItem;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.HistoryService;
@@ -65,7 +66,7 @@ public class PermissionService {
 
     @Autowired
     protected HistoryService historyService;
-    
+
     @Autowired
     protected CmmnHistoryService cmmnHistoryService;
 
@@ -151,7 +152,7 @@ public class PermissionService {
                     }
                 }
             }
-            
+
         } else if (task.getScopeId() != null) {
             HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(task.getScopeId()).singleResult();
             if (historicCaseInstance != null && StringUtils.isNotEmpty(historicCaseInstance.getStartUserId())) {
@@ -174,6 +175,14 @@ public class PermissionService {
     public boolean hasReadPermissionOnProcessInstance(User user, String processInstanceId) {
         HistoricProcessInstance historicProcessInstance = historyService.createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
         return hasReadPermissionOnProcessInstance(user, historicProcessInstance, processInstanceId);
+    }
+
+    /**
+     * Check if the given user is allowed to read the Case.
+     */
+    public boolean hasReadPermissionOnCase(User user, String caseId) {
+        HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseId).singleResult();
+        return hasReadPermissionOnCaseInstance(user, historicCaseInstance, caseId);
     }
 
     /**
@@ -215,6 +224,42 @@ public class PermissionService {
         return false;
     }
 
+    /**
+     * Check if the given user is allowed to read the process instance.
+     */
+    public boolean hasReadPermissionOnCaseInstance(User user, HistoricCaseInstance historicCaseInstance, String caseInstanceId) {
+        if (historicCaseInstance == null) {
+            throw new NotFoundException("Case instance not found for id " + caseInstanceId);
+        }
+
+        // Start user check
+        if (historicCaseInstance.getStartUserId() != null && historicCaseInstance.getStartUserId().equals(user.getId())) {
+            return true;
+        }
+
+        // check if the user started the case
+        if (user.getId().equals(historicCaseInstance.getStartUserId())) {
+            return true;
+        }
+
+        // Visibility: check if there are any tasks for the current user
+        HistoricTaskInstanceQuery historicTaskInstanceQuery = cmmnHistoryService.createHistoricTaskInstanceQuery();
+        historicTaskInstanceQuery.caseInstanceId(caseInstanceId);
+        historicTaskInstanceQuery.taskInvolvedUser(user.getId());
+        if (historicTaskInstanceQuery.count() > 0) {
+            return true;
+        }
+
+        List<String> groupIds = getGroupIdsForUser(user);
+        if (!groupIds.isEmpty()) {
+            historicTaskInstanceQuery = historyService.createHistoricTaskInstanceQuery();
+            historicTaskInstanceQuery.caseInstanceId(caseInstanceId).taskCandidateGroupIn(groupIds);
+            return historicTaskInstanceQuery.count() > 0;
+        }
+
+        return false;
+    }
+
     public boolean canAddRelatedContentToTask(User user, String taskId) {
         validateReadPermissionOnTask(user, taskId);
         return true;
@@ -224,12 +269,18 @@ public class PermissionService {
         return hasReadPermissionOnProcessInstance(user, processInstanceId);
     }
 
+    public boolean canAddRelatedContentToCase(User user, String caseId) {
+        return hasReadPermissionOnCase(user, caseId);
+    }
+
     public boolean canDownloadContent(User currentUserObject, ContentItem content) {
         if (content.getTaskId() != null) {
             validateReadPermissionOnTask(currentUserObject, content.getTaskId());
             return true;
         } else if (content.getProcessInstanceId() != null) {
             return hasReadPermissionOnProcessInstance(currentUserObject, content.getProcessInstanceId());
+        } else if (content.getCaseId() != null) {
+            return hasReadPermissionOnCase(currentUserObject, content.getCaseId());
         } else {
             return false;
         }

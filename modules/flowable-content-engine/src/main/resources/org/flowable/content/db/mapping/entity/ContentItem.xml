@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
 
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
@@ -10,6 +10,7 @@
 		<result property="mimeType" column="MIME_TYPE_" jdbcType="VARCHAR" />
 		<result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
 		<result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
+		<result property="caseId" column="CASE_ID_" jdbcType="VARCHAR" />
 		<result property="contentStoreId" column="CONTENT_STORE_ID_" jdbcType="VARCHAR" />
 		<result property="contentStoreName" column="CONTENT_STORE_NAME_" jdbcType="VARCHAR" />
 		<result property="field" column="FIELD_" jdbcType="VARCHAR" />
@@ -21,8 +22,8 @@
 		<result property="lastModified" column="LAST_MODIFIED_" jdbcType="VARCHAR" />
 		<result property="lastModifiedBy" column="LAST_MODIFIED_BY_" jdbcType="VARCHAR" />
 	</resultMap>
-	
-	
+
+
     <insert id="insertContentItem" parameterType="org.flowable.content.engine.impl.persistence.entity.ContentItemEntityImpl">
         insert into ${prefix}ACT_CO_CONTENT_ITEM (
             ID_,
@@ -30,6 +31,7 @@
             MIME_TYPE_,
             TASK_ID_,
             PROC_INST_ID_,
+            CASE_ID_,
             CONTENT_STORE_ID_,
             CONTENT_STORE_NAME_,
             FIELD_,
@@ -46,6 +48,7 @@
             #{mimeType, jdbcType=VARCHAR},
             #{taskId, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
+            #{caseId, jdbcType=VARCHAR},
             #{contentStoreId, jdbcType=VARCHAR},
             #{contentStoreName, jdbcType=VARCHAR},
             #{field, jdbcType=VARCHAR},
@@ -58,7 +61,7 @@
             #{lastModifiedBy, jdbcType=VARCHAR}
           )
     </insert>
-    
+
     <insert id="bulkInsertContentItem" parameterType="java.util.List">
         insert into ${prefix}ACT_CO_CONTENT_ITEM (
             ID_,
@@ -66,7 +69,8 @@
             MIME_TYPE_,
             TASK_ID_,
             PROC_INST_ID_,
-            CONTENT_STORE_ID_,
+			CASE_ID_,
+			CONTENT_STORE_ID_,
             CONTENT_STORE_NAME_,
             FIELD_,
             CONTENT_AVAILABLE_,
@@ -76,7 +80,7 @@
             CREATED_BY_,
             LAST_MODIFIED_,
             LAST_MODIFIED_BY_)
-         values 
+         values
          <foreach collection="list" item="contentItem" index="index" separator=",">
          (
             #{contentItem.id, jdbcType=VARCHAR},
@@ -84,6 +88,7 @@
             #{contentItem.mimeType, jdbcType=VARCHAR},
             #{contentItem.taskId, jdbcType=VARCHAR},
             #{contentItem.processInstanceId, jdbcType=VARCHAR},
+            #{contentItem.caseId, jdbcType=VARCHAR},
             #{contentItem.contentStoreId, jdbcType=VARCHAR},
             #{contentItem.contentStoreName, jdbcType=VARCHAR},
             #{contentItem.field, jdbcType=VARCHAR},
@@ -97,7 +102,7 @@
           )
           </foreach>
     </insert>
-    
+
      <insert id="bulkInsertContentItem" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
         <foreach collection="list" item="contentItem" index="index">
@@ -107,7 +112,8 @@
                 MIME_TYPE_,
                 TASK_ID_,
                 PROC_INST_ID_,
-                CONTENT_STORE_ID_,
+				CASE_ID_,
+				CONTENT_STORE_ID_,
                 CONTENT_STORE_NAME_,
                 FIELD_,
                 CONTENT_AVAILABLE_,
@@ -117,13 +123,14 @@
                 CREATED_BY_,
                 LAST_MODIFIED_,
                 LAST_MODIFIED_BY_)
-         values 
+         values
          (
             #{contentItem.id, jdbcType=VARCHAR},
             #{contentItem.name, jdbcType=VARCHAR},
             #{contentItem.mimeType, jdbcType=VARCHAR},
             #{contentItem.taskId, jdbcType=VARCHAR},
             #{contentItem.processInstanceId, jdbcType=VARCHAR},
+            #{contentItem.caseId, jdbcType=VARCHAR},
             #{contentItem.contentStoreId, jdbcType=VARCHAR},
             #{contentItem.contentStoreName, jdbcType=VARCHAR},
             #{contentItem.field, jdbcType=VARCHAR},
@@ -138,7 +145,7 @@
         </foreach>
         SELECT * FROM dual
     </insert>
-    
+
     <update id="updateContentItem" parameterType="org.flowable.content.engine.impl.persistence.entity.ContentItemEntityImpl">
         update ${prefix}ACT_CO_CONTENT_ITEM
         <set>
@@ -146,7 +153,8 @@
             MIME_TYPE_=#{mimeType, jdbcType=VARCHAR},
             TASK_ID_=#{taskId, jdbcType=VARCHAR},
             PROC_INST_ID_=#{processInstanceId, jdbcType=VARCHAR},
-            CONTENT_STORE_ID_=#{contentStoreId, jdbcType=VARCHAR},
+			CASE_ID_=#{caseId, jdbcType=VARCHAR},
+			CONTENT_STORE_ID_=#{contentStoreId, jdbcType=VARCHAR},
             CONTENT_STORE_NAME_=#{contentStoreName, jdbcType=VARCHAR},
             FIELD_=#{field, jdbcType=VARCHAR},
             CONTENT_AVAILABLE_=#{contentAvailable, jdbcType=BOOLEAN},
@@ -159,7 +167,7 @@
         </set>
         where ID_ = #{id, jdbcType=VARCHAR}
     </update>
-    
+
     <select id="selectContentItem" parameterType="string" resultMap="contentItemResultMap">
         select * from ${prefix}ACT_CO_CONTENT_ITEM where ID_ = #{id, jdbcType=VARCHAR}
     </select>
@@ -171,13 +179,13 @@
 	    ${orderBy}
 	    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
     </select>
-	
+
 	<select id="selectContentItemCountByQueryCriteria" parameterType="org.flowable.content.engine.impl.ContentItemQueryImpl" resultType="long">
 	    select count(RES.ID_)
 	    <include refid="selectContentItemsByQueryCriteriaSql"/>
 	</select>
-	  
-	<sql id="selectContentItemsByQueryCriteriaSql">  
+
+	<sql id="selectContentItemsByQueryCriteriaSql">
 	    from ${prefix}ACT_CO_CONTENT_ITEM RES
 	    <where>
 	      <if test="id != null">
@@ -213,7 +221,13 @@
 	      <if test="processInstanceIdLike != null">
 	        and RES.PROC_INST_ID_ like #{processInstanceIdLike}
 	      </if>
-	      <if test="contentStoreId != null">
+		  <if test="caseId != null">
+		  	and RES.CASE_ID_ = #{caseId}
+		  </if>
+		  <if test="taskIdLike != null">
+		  	and RES.CASE_ID_ like #{caseIdLike}
+		  </if>
+		  <if test="contentStoreId != null">
 	        and RES.CONTENT_STORE_ID_ = #{contentStoreId}
 	      </if>
 	      <if test="contentStoreIdLike != null">
@@ -236,13 +250,13 @@
 	      </if>
 	      <if test="contentSize != null">
             and RES.CONTENT_SIZE_ = #{contentSize}
-          </if> 
+          </if>
           <if test="minContentSize != null">
             and RES.CONTENT_SIZE_ &gt;= #{minContentSize}
-          </if> 
+          </if>
           <if test="maxContentSize != null">
             and RES.CONTENT_SIZE_ &lt;= #{maxContentSize}
-          </if> 
+          </if>
 	      <if test="createdDate != null">
 	        and RES.CREATED_ = #{createdDate}
 	      </if>
@@ -284,7 +298,7 @@
 	      </if>
 	    </where>
 	</sql>
-	    
+
 	<!-- mysql specific sql -->
 	<select id="selectContentItemsByQueryCriteria" databaseId="mysql" parameterType="org.flowable.content.engine.impl.persistence.entity.ContentItemEntityImpl" resultMap="contentItemResultMap">
 	  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
@@ -293,23 +307,27 @@
 	    ${orderBy}
 	    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
 	</select>
-	
+
 	<!-- mysql specific sql -->
 	<select id="selectContentItemCountByQueryCriteria" databaseId="mysql" parameterType="org.flowable.content.engine.impl.persistence.entity.ContentItemEntityImpl" resultType="long">
 	   	select distinct count(RES.ID_)
 	    <include refid="selectContentItemsByQueryCriteriaSql"/>
 	</select>
-	
+
 	<delete id="deleteContentItem" parameterType="org.flowable.content.engine.impl.persistence.entity.ContentItemEntityImpl">
 	   delete from ${prefix}ACT_CO_CONTENT_ITEM where ID_ = #{id, jdbcType=VARCHAR}
 	</delete>
-	
+
 	<delete id="deleteContentItemsByProcessInstanceId" parameterType="string">
 	   delete from ${prefix}ACT_CO_CONTENT_ITEM where PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
 	</delete>
-	
+
 	<delete id="deleteContentItemsByTaskId" parameterType="string">
 	   delete from ${prefix}ACT_CO_CONTENT_ITEM where TASK_ID_ = #{taskId, jdbcType=VARCHAR}
 	</delete>
-	
+
+	<delete id="deleteContentItemsByCaseId" parameterType="string">
+	   delete from ${prefix}ACT_CO_CONTENT_ITEM where CASE_ID_ = #{caseId, jdbcType=VARCHAR}
+	</delete>
+
 </mapper>

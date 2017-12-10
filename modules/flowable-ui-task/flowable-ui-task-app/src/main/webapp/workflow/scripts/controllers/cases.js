@@ -28,7 +28,11 @@ angular.module('flowableApp')
             mode: 'case-list'
         };
 
-        $scope.model.runtimeSorts = [
+        $scope.model.contentSummary = {
+            loading: false
+        };
+
+         $scope.model.runtimeSorts = [
             { 'id': 'created-desc', 'title': 'CASE.FILTER.CREATED-DESC'},
             { 'id': 'created-asc', 'title': 'CASE.FILTER.CREATED-ASC' }
         ];
@@ -197,7 +201,7 @@ angular.module('flowableApp')
                 });
         };
 
-        $scope.selectCaseDefinition = function (definition) {
+            $scope.selectCaseDefinition = function (definition) {
             $scope.newCaseInstance.caseDefinitionId = definition.id;
             $scope.newCaseInstance.name = definition.name + ' - ' + new moment().format('MMMM Do YYYY');
             $scope.newCaseInstance.caseDefinition = definition;
@@ -207,7 +211,45 @@ angular.module('flowableApp')
             }, 20);
         };
 
-        $scope.selectStateFilter = function (state) {
+            $scope.dragOverContent = function (over) {
+                if (over && !$scope.model.contentSummary.addContent) {
+                    $scope.model.contentSummary.addContent = true;
+                }
+            };
+
+            $scope.toggleCreateContent = function () {
+                $scope.model.contentSummary.addContent = !$scope.model.contentSummary.addContent;
+            };
+
+            $scope.onContentUploaded = function (content) {
+                if ($scope.model.content && $scope.model.content.data) {
+                    $scope.model.content.data.push(content);
+                    RelatedContentService.addUrlToContent(content);
+                    $scope.model.selectedContent = content;
+                }
+                $rootScope.addAlertPromise($translate('TASK.ALERT.RELATED-CONTENT-ADDED', content), 'info');
+                $scope.toggleCreateContent();
+            };
+
+            $scope.onContentDeleted = function (content) {
+                if ($scope.model.content && $scope.model.content.data) {
+                    $scope.model.content.data.forEach(function (value, i, arr) {
+                        if (content === value) {
+                            arr.splice(i, 1);
+                        }
+                    })
+                }
+            };
+
+            $scope.selectContent = function (content) {
+                if ($scope.model.selectedContent == content) {
+                    $scope.model.selectedContent = undefined;
+                } else {
+                    $scope.model.selectedContent = content;
+                }
+            };
+
+            $scope.selectStateFilter = function (state) {
             if (state != $scope.model.filter.param.state) {
                 $scope.model.filter.param.state = state;
                 $scope.collapseFilter();

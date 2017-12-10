@@ -258,6 +258,10 @@ angular.module('flowableApp')
                 }
             };
 
+            $scope.setTaskAssignee = function (user) {
+                $scope.newTask.assignee = user;
+            };
+
             $scope.confirmTaskCreation = function (newTask) {
 
                 if(!newTask) {
@@ -267,6 +271,7 @@ angular.module('flowableApp')
                     var taskData = {
                         name: newTask.name,
                         description: newTask.description,
+                        assignee: newTask.assignee.id
                     };
 
                     if ($rootScope.activeAppDefinition) {
@@ -306,7 +311,7 @@ angular.module('flowableApp')
                     $scope.refreshFilter();
                 }
             });
-            
+
             $scope.$on('task-saved', function (event, data) {
                 $rootScope.addAlertPromise($translate('TASK.ALERT.SAVED', data));
             });
@@ -314,7 +319,7 @@ angular.module('flowableApp')
             $scope.$on('task-completed-error', function (event, data) {
                 $rootScope.addAlert(data.error.message, 'error');
             });
-            
+
             $scope.$on('task-save-error', function (event, data) {
                 $rootScope.addAlert(data.error.message, 'error');
             });
@@ -346,10 +351,10 @@ angular.module('flowableApp')
                 	.success(function (data, status, headers, config) {
                       	$rootScope.account = data;
                        	$rootScope.invalidCredentials = false;
-         				$scope.refreshFilter();	
-         					
+         				$scope.refreshFilter();
+
                   	});
-                      
+
             } else {
             	$scope.refreshFilter();
             }

@@ -49,7 +49,12 @@
     </div>
     <div class="header" ng-show="model.task && !noSuchTask">
         <div class=" pull-right">
-        
+            <button ng-if="!model.task.formKey && !model.task.endDate && (model.task.assignee.id == account.id || (model.task.initiatorCanCompleteTask && model.task.processInstanceStartUserId == ('' + account.id)))"
+                    id="toggle-create-subtask"
+                    class="btn dropdown-toggle toggle-create-task"
+                    translate="TASK.ACTION.CREATE-NEXT-TASK" ng-click="createNextTask()">&nbsp;
+            </button>
+
             <button class="btn" ng-if="!model.task.formKey && !model.task.endDate && (model.task.assignee.id == account.id || (model.task.initiatorCanCompleteTask && model.task.processInstanceStartUserId == ('' + account.id)))"
                     translate="TASK.ACTION.COMPLETE"
                     ng-disabled="model.completeButtonDisabled || model.uploadInProgress"

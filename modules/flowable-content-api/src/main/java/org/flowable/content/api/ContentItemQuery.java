@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +20,7 @@ import org.flowable.engine.common.api.query.Query;
 
 /**
  * Allows programmatic querying of {@link ContentItem}s.
- * 
+ *
  * @author Tijs Rademakers
  */
 public interface ContentItemQuery extends Query<ContentItemQuery, ContentItem> {
@@ -74,6 +74,16 @@ public interface ContentItemQuery extends Query<ContentItemQuery, ContentItem> {
      * Only select content items with a process instance id like the given string.
      */
     ContentItemQuery processInstanceIdLike(String processInstanceIdLike);
+
+    /**
+     * Only select content items with the given case id.
+     */
+    ContentItemQuery caseId(String taskId);
+
+    /**
+     * Only select content items with a case id like the given string.
+     */
+    ContentItemQuery caseIdLike(String taskIdLike);
 
     /**
      * Only select content items with the given content store id.

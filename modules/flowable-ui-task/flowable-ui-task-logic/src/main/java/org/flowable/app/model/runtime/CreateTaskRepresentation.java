@@ -14,6 +14,8 @@ package org.flowable.app.model.runtime;
 
 import org.flowable.app.model.common.AbstractRepresentation;
 
+import java.util.Map;
+
 /**
  * @author Joram Barrez
  */
@@ -22,6 +24,8 @@ public class CreateTaskRepresentation extends AbstractRepresentation {
     protected String name;
     protected String description;
     protected String category;
+    protected String assignee;
+    protected Map<String, Object> variables;
 
     public String getName() {
         return name;
@@ -47,4 +51,19 @@ public class CreateTaskRepresentation extends AbstractRepresentation {
         this.category = category;
     }
 
+    public String getAssignee() {
+        return assignee;
+    }
+
+    public void setAssignee(String assignee) {
+        this.assignee = assignee;
+    }
+
+    public Map<String, Object> getVariables() {
+        return variables;
+    }
+
+    public void setVariables(Map<String, Object> variables) {
+        this.variables = variables;
+    }
 }

@@ -14,7 +14,7 @@ package org.flowable.content.api;
 
 /**
  * The metadata keys that are common for each bit of content used with Flowable.
- * 
+ *
  * @author Joram Barrez
  */
 public interface ContentMetaDataKeys {
@@ -22,6 +22,8 @@ public interface ContentMetaDataKeys {
     String TASK_ID = "taskId";
 
     String PROCESS_INSTANCE_ID = "processInstanceId";
+
+    String CASE_ID = "caseId";
 
     String FIELD_ID = "fieldId";
 

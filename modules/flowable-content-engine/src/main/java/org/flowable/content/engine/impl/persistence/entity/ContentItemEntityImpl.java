@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,6 +32,7 @@ public class ContentItemEntityImpl extends AbstractEntityNoRevision implements C
     protected String mimeType;
     protected String taskId;
     protected String processInstanceId;
+    protected String caseId;
     protected String contentStoreId;
     protected String contentStoreName;
     protected boolean contentAvailable;
@@ -50,6 +51,7 @@ public class ContentItemEntityImpl extends AbstractEntityNoRevision implements C
         persistentState.put("mimeType", this.mimeType);
         persistentState.put("taskId", this.taskId);
         persistentState.put("processInstanceId", this.processInstanceId);
+        persistentState.put("caseId", this.caseId);
         persistentState.put("contentStoreId", this.contentStoreId);
         persistentState.put("contentStoreName", this.contentStoreName);
         persistentState.put("contentAvailable", this.contentAvailable);
@@ -104,6 +106,16 @@ public class ContentItemEntityImpl extends AbstractEntityNoRevision implements C
     @Override
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
+    }
+
+    @Override
+    public String getCaseId() {
+        return this.caseId;
+    }
+
+    @Override
+    public void setCaseId(String caseId) {
+        this.caseId = caseId;
     }
 
     @Override
