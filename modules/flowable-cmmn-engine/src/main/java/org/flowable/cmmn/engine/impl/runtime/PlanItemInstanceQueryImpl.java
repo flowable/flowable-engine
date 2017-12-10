@@ -130,6 +130,11 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     }
     
     @Override
+    public PlanItemInstanceQuery planItemInstanceStateWaitingForRepetition() {
+        return planItemInstanceState(PlanItemInstanceState.WAITING_FOR_REPETITION);
+    }
+    
+    @Override
     public PlanItemInstanceQuery planItemInstanceStateActive() {
         return planItemInstanceState(PlanItemInstanceState.ACTIVE);
     }

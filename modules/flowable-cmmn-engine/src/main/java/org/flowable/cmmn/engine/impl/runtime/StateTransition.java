@@ -32,6 +32,7 @@ public class StateTransition {
     
     static {
         addTransition(null, PlanItemTransition.CREATE);
+        addTransition(PlanItemInstanceState.WAITING_FOR_REPETITION, PlanItemTransition.CREATE);
         
         addTransition(PlanItemInstanceState.AVAILABLE, 
                 PlanItemTransition.START, 

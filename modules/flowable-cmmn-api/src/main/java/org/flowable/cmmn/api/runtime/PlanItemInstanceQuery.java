@@ -29,6 +29,7 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery planItemInstanceElementId(String elementId);
     PlanItemInstanceQuery planItemInstanceName(String name);
     PlanItemInstanceQuery planItemInstanceState(String state);
+    PlanItemInstanceQuery planItemInstanceStateWaitingForRepetition();
     PlanItemInstanceQuery planItemInstanceStateActive();
     PlanItemInstanceQuery planItemInstanceStateAvailable();
     PlanItemInstanceQuery planItemInstanceStateCompleted();

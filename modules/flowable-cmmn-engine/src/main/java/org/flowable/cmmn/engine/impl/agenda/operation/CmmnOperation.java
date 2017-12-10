@@ -99,7 +99,6 @@ public abstract class CmmnOperation implements Runnable {
                 planItemInstanceEntityToCopy.getStageInstanceId(), 
                 planItemInstanceEntityToCopy.getTenantId(),
                 addToParent);
-        CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(planItemInstanceEntity);
         return planItemInstanceEntity;
     }
     

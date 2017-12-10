@@ -20,6 +20,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.CaseInstance;
+import org.flowable.cmmn.api.runtime.PlanItemDefinitionType;
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
@@ -147,9 +148,15 @@ public class RepetitionRuleTest extends FlowableCmmnTestCase {
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder().caseDefinitionKey("testRepeatingTimer").start();
         
         // Should have the task plan item state available
-        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(HumanTask.class.getSimpleName().toLowerCase()).singleResult();
+        PlanItemInstance planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK).singleResult();
         assertEquals(PlanItemInstanceState.AVAILABLE, planItemInstance.getState());
+        
+        // Task should not be created yet
         assertEquals(0L, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        // And one for the timer event listener
+        planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery().planItemDefinitionType(PlanItemDefinitionType.TIMER_EVENT_LISTENER).singleResult();
+        assertEquals(PlanItemInstanceState.AVAILABLE, planItemInstance.getState());
         
         // Should have a timer job available
         Job job = cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).singleResult();
@@ -161,6 +168,13 @@ public class RepetitionRuleTest extends FlowableCmmnTestCase {
         job = cmmnManagementService.moveTimerToExecutableJob(job.getId());
         cmmnManagementService.executeJob(job.getId());
         assertEquals(1L, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
+        
+        // A plan item in state 'waiting for repetition' should exist for the yask
+        planItemInstance = cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemInstanceStateWaitingForRepetition()
+                .singleResult();
+        assertEquals(PlanItemInstanceState.WAITING_FOR_REPETITION, planItemInstance.getState());
         
         // This can be repeated forever
         for (int i=0; i<10; i++) {
@@ -179,6 +193,11 @@ public class RepetitionRuleTest extends FlowableCmmnTestCase {
         assertEquals(0L, cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).count());
         
         assertEquals(1L, cmmnRuntimeService.createCaseInstanceQuery().count());
+        // There should also still be a plan item instance in the 'wait for repetition' state
+        assertNotNull(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemInstanceStateWaitingForRepetition()
+                .singleResult());
         
         // Terminating the case instance should remove the timer
         cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
@@ -232,6 +251,11 @@ public class RepetitionRuleTest extends FlowableCmmnTestCase {
         
         assertEquals(0L, cmmnManagementService.createTimerJobQuery().caseInstanceId(caseInstance.getId()).count());
         assertEquals(0L, cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count());
+
+        assertNotNull(cmmnRuntimeService.createPlanItemInstanceQuery()
+                .planItemDefinitionType(PlanItemDefinitionType.HUMAN_TASK)
+                .planItemInstanceStateWaitingForRepetition()
+                .singleResult());
         
         List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
         assertEquals(2, tasks.size());
@@ -239,9 +263,6 @@ public class RepetitionRuleTest extends FlowableCmmnTestCase {
             cmmnTaskService.complete(task.getId());
         }
         
-        // A plan item instance for the human task will still be available (won't be triggered anymore)
-        assertEquals(1L, cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceState(PlanItemInstanceState.AVAILABLE).count());
-        cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
         assertCaseInstanceEnded(caseInstance);
     }
     

@@ -107,7 +107,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             PlanItem planItem = planItemInstanceEntity.getPlanItem();
             CriteriaEvaluationResult evaluationResult = null;
             String state = planItemInstanceEntity.getState();
-            if (PlanItemInstanceState.AVAILABLE.equals(state)) {
+            if (PlanItemInstanceState.EVALUATE_ENTRY_CRITERIA_STATES.contains(state)) {
                 
                 evaluationResult = evaluateEntryCriteria(planItemInstanceEntity, planItem);
                 if (evaluationResult.equals(CriteriaEvaluationResult.SENTRY_SATISFIED)) {
@@ -119,10 +119,11 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                                 newChildPlanItemInstances = new ArrayList<>(1);
                             }
                             
-                            PlanItemInstanceEntity childPlamItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false);
-                            int counter = getRepetitionCounter(childPlamItemInstanceEntity);
-                            setRepetitionCounter(childPlamItemInstanceEntity, ++counter);
-                            newChildPlanItemInstances.add(childPlamItemInstanceEntity);
+                            PlanItemInstanceEntity childPlanItemInstanceEntity = copyAndInsertPlanItemInstance(commandContext, planItemInstanceEntity, false);
+                            childPlanItemInstanceEntity.setState(PlanItemInstanceState.WAITING_FOR_REPETITION); // Special state indicating 'before creation', but allowing variable persistence
+                            int counter = getRepetitionCounter(childPlanItemInstanceEntity);
+                            setRepetitionCounter(childPlanItemInstanceEntity, ++counter);
+                            newChildPlanItemInstances.add(childPlanItemInstanceEntity);
                             
                         } else {
                             evaluationResult = CriteriaEvaluationResult.SENTRY_SATISFIED_BUT_IGNORED;

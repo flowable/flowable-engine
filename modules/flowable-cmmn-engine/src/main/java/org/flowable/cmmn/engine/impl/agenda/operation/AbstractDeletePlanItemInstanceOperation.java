@@ -35,6 +35,7 @@ public abstract class AbstractDeletePlanItemInstanceOperation extends AbstractCh
             
             // Create new repeating instance
             PlanItemInstanceEntity newPlanItemInstanceEntity = createNewPlanItemInstance();
+            CommandContextUtil.getAgenda(commandContext).planCreatePlanItemInstanceOperation(newPlanItemInstanceEntity);
             
             // Set repetition counter
             int counter = getRepetitionCounter(planItemInstanceEntity);

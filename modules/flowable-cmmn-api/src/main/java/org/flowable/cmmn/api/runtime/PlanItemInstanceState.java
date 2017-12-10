@@ -21,7 +21,6 @@ public interface PlanItemInstanceState {
     /*
      * The case states according to the CMMN spec
      */
-    
     String ACTIVE = "active";
     String AVAILABLE = "available";
     String ENABLED = "enabled";
@@ -32,6 +31,18 @@ public interface PlanItemInstanceState {
     String CLOSED = "closed";
     String TERMINATED = "terminated";
     
-    Set<String> END_STATES = new HashSet<>(Arrays.asList(DISABLED, COMPLETED, TERMINATED, FAILED));
+    /*
+     * Non-spec state, indicating the plan item instance is waiting to be repeated.
+     * The repetition will happen when both the repetition rule is resolving to true and a sentry is satisfied.
+     * 
+     * The reason a plan item instance is created (according to the spec, an instance should be 
+     * created only when the sentry is satisfied) is because the local variables (such as repetitionCounter)
+     * need an instance to be persisted.
+     */
+    String WAITING_FOR_REPETITION = "wait_repetition";
+
+    Set<String> EVALUATE_ENTRY_CRITERIA_STATES = new HashSet<>(Arrays.asList(AVAILABLE, WAITING_FOR_REPETITION));
+    
+    Set<String> END_STATES = new HashSet<>(Arrays.asList(DISABLED, COMPLETED, TERMINATED, FAILED, WAITING_FOR_REPETITION));
     
 }
