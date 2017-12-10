@@ -540,6 +540,30 @@ A service task is visualized as a rounded rectangle with a cog icon in the top l
 
 image::images/cmmn.servicetask.png[align="center"]
 
+==== Decision task
+
+A _Decision task_ allows to call out to a DMN decision table and store the resulting variable in the case instance.
+
+Properties:
+
+* *Decision table reference*: the referenced DMN decision table that needs to be invoked.
+
+It is also possible to throw an error when no rule is hit during the evaluation of the DMN decision table, by setting the '_Throw error if no rules were hit_' property. 
+
+A decision task is visualized as a _task_ with a table icon in the top left corner:
+
+image::images/cmmn.decisiontask.png[align="center"]
+
+==== Http Task
+
+The Http task is an out-of-the-box implementation of a _service task_. It is used when a REST service needs to be called over HTTP.
+
+The Http task has various options to customize the request and response. See the BPMN http task documentation for details on all the configuration options. 
+
+A http task is visualized as a _task_ with a rocket icon in the top left corner:
+
+image::images/cmmn.httptask.png[align="center"]
+
 ==== Milestone
 
 A milestone is used to mark arriving at a certain point in the case instance. At runtime, they are represented as *MilestoneInstances* and they can be queried through the *MilestoneInstanceQuery* via the _CmmnRuntimeService_. There is also a historical counterpart via the _CmmnHistoryService_.
@@ -589,7 +613,9 @@ A process task is visualized as a rounded rectangle with an arrow icon in the to
 
 image::images/cmmn.processtask.png[align="center"]
 
-==== Entry criterion
+==== Criteria
+
+===== Entry criterion
 
 Entry criteria form a sentry for a given plan item instance. They consist of two parts:
 
@@ -604,7 +630,7 @@ An entry criteria is visualized as a diamond shape (white color inside) on the b
 
 image::images/cmmn.entrycriteria.png[align="center"]
 
-==== Exit criterion
+===== Exit criterion
 
 Exit criteria form a sentry for a given plan item instance. They consist of two parts:
 
@@ -618,3 +644,45 @@ Multiple sentries are possible on a plan item. However, when one is satisfied, t
 An exit criteria is visualized as a diamond shape (white color inside) on the border of a plan item:
 
 image::images/cmmn.exitcriteria.png[align="center"]
+
+==== Event Listeners
+
+===== Timer Event Listener
+
+A timer event listener is used when the passing of time needs to be captured in a case model.
+
+A timer event listener is not a task and has a simpler plan item lifecycle compared to a _task_: the timer will simply move from _available_ to _completed_ when the event (in this case, the time passing) occurs.
+
+Properties:
+
+* *Timer expression*: an expression that defines when the timer should occur. Following options are possible:
+** An expression resolving to a java.util.Date or org.joda.time.DateTime instance (for example _${someBean.calculateNextDate(someCaseInstanceVariable)})
+** An ISO8601 date 
+** An ISO8601 duration String (for example _PT5H_, indicating the timer should fire in 5 hours from instantiation)
+** AN ISO8601 repetition String (for example R5/PT2H, indicating the timer should fire 5 times, each time waiting 2 hours)  
+** A String containing a cron expression
+* *Start trigger plan item/event*: allows to reference a plan item in the case model that triggers the start of the timer event listener.
+
+Note that setting a _start trigger_ for the timer event listener does not have a visual indication in the case model, as entry/exit criteria on sentries do have.
+
+A timer event listener is visualized as circle with a clock icon inside:
+
+image::images/cmmn.timereventlistener.png[align="center"]
+
+==== Item controls
+
+===== Repetition Rule
+
+Plan items on the case model can have a _repetition rule_, an expression that can be used to indicate a certain plan item needs to be repeated.
+
+An optional _repetition counter variable_ can be set, that holds the index (one-based) of the instance. If not set, the default variable name is _repeitionCounter_.
+
+If the plan item does not have any entry criteria, the repetition rule expression is evaluated when the plan item is completed or terminated. If the expression resolved to _true_, a new instance is created. For example, a human task with a repetition rule expression _${repetitionCounter < 3}_, will create three sequential human tasks.
+
+If the plan item does have entry criteria, the behavior is different. The repetition rule is not evaluated on completion or termination, but when a sentry of the plan item is satisfied. If both the sentry is satisfied and the repetition rule evaluates to true, a new instance is created. 
+
+Take for example the following timer event listener followed by a human task. The sentry has one entry criteria for the _occur_ event of the timer event listener. 
+
+image::images/cmmn.timereventlistener.png[align="center"]
+
+If the timer event listener is repeating (for example _R/PT1H_), the _occur_ event will be fired every hour. When the repetition rule expression of the human task evaluates to true, a new human task instance will be created each hour.
