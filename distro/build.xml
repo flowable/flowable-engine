@@ -85,6 +85,9 @@
 			<fileset dir="../modules/flowable-engine-common/target">
 				<include name="flowable-engine-common-*.jar" />
 			</fileset>
+			<fileset dir="../modules/flowable-spring-common/target">
+                <include name="flowable-spring-common-*.jar" />
+            </fileset>
 			<fileset dir="../modules/flowable-spring/target">
 				<include name="flowable-spring-*.jar" />
 			</fileset>
@@ -347,7 +350,7 @@
 			<fileset dir="../modules/flowable-ui-task/flowable-ui-task-app/target">
 				<include name="flowable-task.war" />
 			</fileset>
-			<fileset dir="../modules/flowable-ui-admin/flowble-ui-admin-app/target">
+			<fileset dir="../modules/flowable-ui-admin/flowable-ui-admin-app/target">
 				<include name="flowable-admin.war" />
 			</fileset>
 			<fileset dir="../modules/flowable-app-rest/target">
