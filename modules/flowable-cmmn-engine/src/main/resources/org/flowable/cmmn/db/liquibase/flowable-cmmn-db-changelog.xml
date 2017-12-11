@@ -288,7 +288,7 @@
 
     </changeSet>
     
-    <!-- Version 6.2.1 -->
+    <!-- Version 6.3.0-SNAPSHOT -->
     <changeSet id="2" author="flowable">
     
         <addColumn tableName="ACT_CMMN_CASEDEF">
