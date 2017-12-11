@@ -683,6 +683,6 @@ If the plan item does have entry criteria, the behavior is different. The repeti
 
 Take for example the following timer event listener followed by a human task. The sentry has one entry criteria for the _occur_ event of the timer event listener. Note that enabling and setting the repetition rule on the task has a visual indication at the bottom of the rectangle.  
 
-image::images/cmmn.timereventlistener.png[align="center"]
+image::images/cmmn.repeatingtimereventlistener.png[align="center"]
 
 If the timer event listener is repeating (for example _R/PT1H_), the _occur_ event will be fired every hour. When the repetition rule expression of the human task evaluates to true, a new human task instance will be created each hour.
