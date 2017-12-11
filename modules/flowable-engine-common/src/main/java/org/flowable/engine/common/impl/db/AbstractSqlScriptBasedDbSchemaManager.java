@@ -168,6 +168,10 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
             tableName = prependDatabaseTablePrefix(tableName);
         }
         
+        if (!isTablePresent(tableName)) {
+            return null;
+        }
+        
         PreparedStatement statement = null;
         try {
             
@@ -181,6 +185,7 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
                 return null;
             }
         } catch (SQLException e) {
+            LOGGER.error("Could not get property from table " + tableName, e);
             return null;
         } finally {
             if (statement != null) {
