@@ -16,7 +16,7 @@ create table ACT_GE_BYTEARRAY (
 );
 
 insert into ACT_GE_PROPERTY
-values ('common.schema.version', '6.2.0.0', 1);
+values ('common.schema.version', '6.2.1.0', 1);
 
 insert into ACT_GE_PROPERTY
 values ('next.dbid', '1', 1);
@@ -36,7 +36,7 @@ create table ACT_RU_IDENTITYLINK (
 create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);
 create index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK(GROUP_ID_);
 
-insert into ACT_GE_PROPERTY values ('identitylink.schema.version', '6.2.0.0', 1);
+insert into ACT_GE_PROPERTY values ('identitylink.schema.version', '6.2.1.0', 1);
 create table ACT_RU_TASK (
     ID_ varchar(64),
     REV_ integer,
@@ -63,7 +63,7 @@ create table ACT_RU_TASK (
     FORM_KEY_ varchar(255),
     CLAIM_TIME_ timestamp,
     IS_COUNT_ENABLED_ bit,
-    VAR_COUNT_ integer,
+    VAR_COUNT_ integer, 
     ID_LINK_COUNT_ integer,
     primary key (ID_)
 );
@@ -73,7 +73,7 @@ create index ACT_IDX_TASK_SCOPE on ACT_RU_TASK(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SUB_SCOPE on ACT_RU_TASK(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SCOPE_DEF on ACT_RU_TASK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-insert into ACT_GE_PROPERTY values ('task.schema.version', '6.2.0.0', 1);
+insert into ACT_GE_PROPERTY values ('task.schema.version', '6.2.1.0', 1);
 create table ACT_RU_VARIABLE (
     ID_ varchar(64) not null,
     REV_ integer,
@@ -101,7 +101,7 @@ alter table ACT_RU_VARIABLE
     foreign key (BYTEARRAY_ID_)
     references ACT_GE_BYTEARRAY;
 
-insert into ACT_GE_PROPERTY values ('variable.schema.version', '6.2.0.0', 1);
+insert into ACT_GE_PROPERTY values ('variable.schema.version', '6.2.1.0', 1);
 create table ACT_RU_JOB (
     ID_ varchar(64) NOT NULL,
     REV_ integer,
@@ -112,6 +112,10 @@ create table ACT_RU_JOB (
     EXECUTION_ID_ varchar(64),
     PROCESS_INSTANCE_ID_ varchar(64),
     PROC_DEF_ID_ varchar(64),
+    SCOPE_ID_ varchar(255),
+    SUB_SCOPE_ID_ varchar(255),
+    SCOPE_TYPE_ varchar(255),
+    SCOPE_DEFINITION_ID_ varchar(255),
     RETRIES_ integer,
     EXCEPTION_STACK_ID_ varchar(64),
     EXCEPTION_MSG_ varchar(4000),
@@ -135,6 +139,10 @@ create table ACT_RU_TIMER_JOB (
     EXECUTION_ID_ varchar(64),
     PROCESS_INSTANCE_ID_ varchar(64),
     PROC_DEF_ID_ varchar(64),
+    SCOPE_ID_ varchar(255),
+    SUB_SCOPE_ID_ varchar(255),
+    SCOPE_TYPE_ varchar(255),
+    SCOPE_DEFINITION_ID_ varchar(255),
     RETRIES_ integer,
     EXCEPTION_STACK_ID_ varchar(64),
     EXCEPTION_MSG_ varchar(4000),
@@ -156,6 +164,10 @@ create table ACT_RU_SUSPENDED_JOB (
     EXECUTION_ID_ varchar(64),
     PROCESS_INSTANCE_ID_ varchar(64),
     PROC_DEF_ID_ varchar(64),
+    SCOPE_ID_ varchar(255),
+    SUB_SCOPE_ID_ varchar(255),
+    SCOPE_TYPE_ varchar(255),
+    SCOPE_DEFINITION_ID_ varchar(255),
     RETRIES_ integer,
     EXCEPTION_STACK_ID_ varchar(64),
     EXCEPTION_MSG_ varchar(4000),
@@ -177,6 +189,10 @@ create table ACT_RU_DEADLETTER_JOB (
     EXECUTION_ID_ varchar(64),
     PROCESS_INSTANCE_ID_ varchar(64),
     PROC_DEF_ID_ varchar(64),
+    SCOPE_ID_ varchar(255),
+    SUB_SCOPE_ID_ varchar(255),
+    SCOPE_TYPE_ varchar(255),
+    SCOPE_DEFINITION_ID_ varchar(255),
     EXCEPTION_STACK_ID_ varchar(64),
     EXCEPTION_MSG_ varchar(4000),
     DUEDATE_ timestamp,
@@ -258,6 +274,22 @@ alter table ACT_RU_DEADLETTER_JOB
     foreign key (CUSTOM_VALUES_ID_)
     references ACT_GE_BYTEARRAY (ID_);
 
+create index ACT_IDX_JOB_SCOPE on ACT_RU_JOB(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_JOB_SUB_SCOPE on ACT_RU_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_JOB_SCOPE_DEF on ACT_RU_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
+
+create index ACT_IDX_TJOB_SCOPE on ACT_RU_TIMER_JOB(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_TJOB_SUB_SCOPE on ACT_RU_TIMER_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_TJOB_SCOPE_DEF on ACT_RU_TIMER_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_); 
+
+create index ACT_IDX_SJOB_SCOPE on ACT_RU_SUSPENDED_JOB(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_SJOB_SUB_SCOPE on ACT_RU_SUSPENDED_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_SJOB_SCOPE_DEF on ACT_RU_SUSPENDED_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);   
+
+create index ACT_IDX_DJOB_SCOPE on ACT_RU_DEADLETTER_JOB(SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_DJOB_SUB_SCOPE on ACT_RU_DEADLETTER_JOB(SUB_SCOPE_ID_, SCOPE_TYPE_);
+create index ACT_IDX_DJOB_SCOPE_DEF on ACT_RU_DEADLETTER_JOB(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
+
 insert into ACT_GE_PROPERTY values ('job.schema.version', '6.2.1.0', 1);
 create table ACT_RE_DEPLOYMENT (
     ID_ varchar(64),
@@ -311,13 +343,13 @@ create table ACT_RU_EXECUTION (
     START_USER_ID_ varchar(255),
     LOCK_TIME_ timestamp,
     IS_COUNT_ENABLED_ bit,
-    EVT_SUBSCR_COUNT_ integer,
-    TASK_COUNT_ integer,
-    JOB_COUNT_ integer,
+    EVT_SUBSCR_COUNT_ integer, 
+    TASK_COUNT_ integer, 
+    JOB_COUNT_ integer, 
     TIMER_JOB_COUNT_ integer,
     SUSP_JOB_COUNT_ integer,
     DEADLETTER_JOB_COUNT_ integer,
-    VAR_COUNT_ integer,
+    VAR_COUNT_ integer, 
     ID_LINK_COUNT_ integer,
     CALLBACK_ID_ varchar(255),
     CALLBACK_TYPE_ varchar(255),
@@ -396,7 +428,7 @@ alter table ACT_GE_BYTEARRAY
 alter table ACT_RE_PROCDEF
     add constraint ACT_UNIQ_PROCDEF
     unique (KEY_,VERSION_, TENANT_ID_);
-
+    
 alter table ACT_RU_EXECUTION
     add constraint ACT_FK_EXE_PROCINST
     foreign key (PROC_INST_ID_)
@@ -406,17 +438,17 @@ alter table ACT_RU_EXECUTION
     add constraint ACT_FK_EXE_PARENT
     foreign key (PARENT_ID_)
     references ACT_RU_EXECUTION;
-
+    
 alter table ACT_RU_EXECUTION
-    add constraint ACT_FK_EXE_SUPER
-    foreign key (SUPER_EXEC_)
+    add constraint ACT_FK_EXE_SUPER 
+    foreign key (SUPER_EXEC_) 
     references ACT_RU_EXECUTION;
-
+    
 alter table ACT_RU_EXECUTION
-    add constraint ACT_FK_EXE_PROCDEF
-    foreign key (PROC_DEF_ID_)
-    references ACT_RE_PROCDEF (ID_);
-
+    add constraint ACT_FK_EXE_PROCDEF 
+    foreign key (PROC_DEF_ID_) 
+    references ACT_RE_PROCDEF (ID_);    
+    
 alter table ACT_RU_IDENTITYLINK
     add constraint ACT_FK_TSKASS_TASK
     foreign key (TASK_ID_)
@@ -426,11 +458,11 @@ alter table ACT_RU_IDENTITYLINK
     add constraint ACT_FK_ATHRZ_PROCEDEF
     foreign key (PROC_DEF_ID_)
     references ACT_RE_PROCDEF;
-
+    
 alter table ACT_RU_IDENTITYLINK
     add constraint ACT_FK_IDL_PROCINST
-    foreign key (PROC_INST_ID_)
-    references ACT_RU_EXECUTION (ID_);
+    foreign key (PROC_INST_ID_) 
+    references ACT_RU_EXECUTION (ID_);       
 
 alter table ACT_RU_TASK
     add constraint ACT_FK_TASK_EXE
@@ -461,57 +493,57 @@ alter table ACT_RU_JOB
     add constraint ACT_FK_JOB_EXECUTION
     foreign key (EXECUTION_ID_)
     references ACT_RU_EXECUTION;
-
+    
 alter table ACT_RU_JOB
     add constraint ACT_FK_JOB_PROCESS_INSTANCE
     foreign key (PROCESS_INSTANCE_ID_)
     references ACT_RU_EXECUTION;
-
+    
 alter table ACT_RU_JOB
     add constraint ACT_FK_JOB_PROC_DEF
     foreign key (PROC_DEF_ID_)
     references ACT_RE_PROCDEF;
-
+    
 alter table ACT_RU_TIMER_JOB
     add constraint ACT_FK_TIMER_JOB_EXECUTION
     foreign key (EXECUTION_ID_)
     references ACT_RU_EXECUTION;
-
+    
 alter table ACT_RU_TIMER_JOB
     add constraint ACT_FK_TIMER_JOB_PROCESS_INSTANCE
     foreign key (PROCESS_INSTANCE_ID_)
     references ACT_RU_EXECUTION;
-
+    
 alter table ACT_RU_TIMER_JOB
     add constraint ACT_FK_TIMER_JOB_PROC_DEF
     foreign key (PROC_DEF_ID_)
-    references ACT_RE_PROCDEF;
-
+    references ACT_RE_PROCDEF;    
+    
 alter table ACT_RU_SUSPENDED_JOB
     add constraint ACT_FK_SUSPENDED_JOB_EXECUTION
     foreign key (EXECUTION_ID_)
     references ACT_RU_EXECUTION;
-
+    
 alter table ACT_RU_SUSPENDED_JOB
     add constraint ACT_FK_SUSPENDED_JOB_PROCESS_INSTANCE
     foreign key (PROCESS_INSTANCE_ID_)
     references ACT_RU_EXECUTION;
-
+    
 alter table ACT_RU_SUSPENDED_JOB
     add constraint ACT_FK_SUSPENDED_JOB_PROC_DEF
     foreign key (PROC_DEF_ID_)
     references ACT_RE_PROCDEF;
-
+    
 alter table ACT_RU_DEADLETTER_JOB
     add constraint ACT_FK_DEADLETTER_JOB_EXECUTION
     foreign key (EXECUTION_ID_)
     references ACT_RU_EXECUTION;
-
+    
 alter table ACT_RU_DEADLETTER_JOB
     add constraint ACT_FK_DEADLETTER_JOB_PROCESS_INSTANCE
     foreign key (PROCESS_INSTANCE_ID_)
     references ACT_RU_EXECUTION;
-
+    
 alter table ACT_RU_DEADLETTER_JOB
     add constraint ACT_FK_DEADLETTER_JOB_PROC_DEF
     foreign key (PROC_DEF_ID_)
@@ -522,38 +554,38 @@ alter table ACT_RU_EVENT_SUBSCR
     foreign key (EXECUTION_ID_)
     references ACT_RU_EXECUTION;
 
-alter table ACT_RE_MODEL
-    add constraint ACT_FK_MODEL_SOURCE
-    foreign key (EDITOR_SOURCE_VALUE_ID_)
+alter table ACT_RE_MODEL 
+    add constraint ACT_FK_MODEL_SOURCE 
+    foreign key (EDITOR_SOURCE_VALUE_ID_) 
     references ACT_GE_BYTEARRAY (ID_);
 
-alter table ACT_RE_MODEL
-    add constraint ACT_FK_MODEL_SOURCE_EXTRA
-    foreign key (EDITOR_SOURCE_EXTRA_VALUE_ID_)
+alter table ACT_RE_MODEL 
+    add constraint ACT_FK_MODEL_SOURCE_EXTRA 
+    foreign key (EDITOR_SOURCE_EXTRA_VALUE_ID_) 
+    references ACT_GE_BYTEARRAY (ID_);
+    
+alter table ACT_RE_MODEL 
+    add constraint ACT_FK_MODEL_DEPLOYMENT 
+    foreign key (DEPLOYMENT_ID_) 
+    references ACT_RE_DEPLOYMENT (ID_);        
+
+alter table ACT_PROCDEF_INFO 
+    add constraint ACT_FK_INFO_JSON_BA 
+    foreign key (INFO_JSON_ID_) 
     references ACT_GE_BYTEARRAY (ID_);
 
-alter table ACT_RE_MODEL
-    add constraint ACT_FK_MODEL_DEPLOYMENT
-    foreign key (DEPLOYMENT_ID_)
-    references ACT_RE_DEPLOYMENT (ID_);
-
-alter table ACT_PROCDEF_INFO
-    add constraint ACT_FK_INFO_JSON_BA
-    foreign key (INFO_JSON_ID_)
-    references ACT_GE_BYTEARRAY (ID_);
-
-alter table ACT_PROCDEF_INFO
-    add constraint ACT_FK_INFO_PROCDEF
-    foreign key (PROC_DEF_ID_)
+alter table ACT_PROCDEF_INFO 
+    add constraint ACT_FK_INFO_PROCDEF 
+    foreign key (PROC_DEF_ID_) 
     references ACT_RE_PROCDEF (ID_);
-
+    
 alter table ACT_PROCDEF_INFO
     add constraint ACT_UNIQ_INFO_PROCDEF
     unique (PROC_DEF_ID_);
+    
+insert into ACT_GE_PROPERTY
+values ('schema.version', '6.2.1.0', 1);
 
 insert into ACT_GE_PROPERTY
-values ('schema.version', '6.2.0.0', 1);
-
-insert into ACT_GE_PROPERTY
-values ('schema.history', 'create(6.2.0.0)', 1);
+values ('schema.history', 'create(6.2.1.0)', 1);   
 

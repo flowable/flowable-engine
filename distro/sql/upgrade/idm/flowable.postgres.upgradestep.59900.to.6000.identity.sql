@@ -49,14 +49,4 @@ alter table ACT_ID_PRIV_MAPPING
     references ACT_ID_PRIV (ID_);
     
 create index ACT_IDX_PRIV_USER on ACT_ID_PRIV_MAPPING(USER_ID_);
-create index ACT_IDX_PRIV_GROUP on ACT_ID_PRIV_MAPPING(GROUP_ID_);alter table ACT_RE_PROCDEF add column ENGINE_VERSION_ varchar(255);
-update ACT_RE_PROCDEF set ENGINE_VERSION_ = 'v5';
-
-alter table ACT_RE_DEPLOYMENT add column ENGINE_VERSION_ varchar(255);
-update ACT_RE_DEPLOYMENT set ENGINE_VERSION_ = 'v5';
-
-alter table ACT_RU_EXECUTION add column ROOT_PROC_INST_ID_ varchar(64);
-create index ACT_IDX_EXEC_ROOT on ACT_RU_EXECUTION(ROOT_PROC_INST_ID_);    
-
-update ACT_GE_PROPERTY set VALUE_ = '6.0.0.0' where NAME_ = 'schema.version';
-
+create index ACT_IDX_PRIV_GROUP on ACT_ID_PRIV_MAPPING(GROUP_ID_);

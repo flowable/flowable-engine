@@ -16,7 +16,7 @@ create table ACT_GE_BYTEARRAY (
 );
 
 insert into ACT_GE_PROPERTY
-values ('common.schema.version', '6.2.0.0', 1);
+values ('common.schema.version', '6.2.1.0', 1);
 
 insert into ACT_GE_PROPERTY
 values ('next.dbid', '1', 1);
@@ -36,7 +36,7 @@ create table ACT_RU_IDENTITYLINK (
 create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);
 create index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK(GROUP_ID_);
 
-insert into ACT_GE_PROPERTY values ('identitylink.schema.version', '6.2.0.0', 1);
+insert into ACT_GE_PROPERTY values ('identitylink.schema.version', '6.2.1.0', 1);
 create table ACT_RU_TASK (
     ID_ nvarchar(64),
     REV_ int,
@@ -73,7 +73,7 @@ create index ACT_IDX_TASK_SCOPE on ACT_RU_TASK(SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SUB_SCOPE on ACT_RU_TASK(SUB_SCOPE_ID_, SCOPE_TYPE_);
 create index ACT_IDX_TASK_SCOPE_DEF on ACT_RU_TASK(SCOPE_DEFINITION_ID_, SCOPE_TYPE_);
 
-insert into ACT_GE_PROPERTY values ('task.schema.version', '6.2.0.0', 1);
+insert into ACT_GE_PROPERTY values ('task.schema.version', '6.2.1.0', 1);
 create table ACT_RU_VARIABLE (
     ID_ nvarchar(64) not null,
     REV_ int,
@@ -102,7 +102,7 @@ alter table ACT_RU_VARIABLE
     foreign key (BYTEARRAY_ID_) 
     references ACT_GE_BYTEARRAY (ID_);
 
-insert into ACT_GE_PROPERTY values ('variable.schema.version', '6.2.0.0', 1);
+insert into ACT_GE_PROPERTY values ('variable.schema.version', '6.2.1.0', 1);
 
 CREATE TABLE [ACT_CMMN_DATABASECHANGELOG] ([ID] [nvarchar](255) NOT NULL, [AUTHOR] [nvarchar](255) NOT NULL, [FILENAME] [nvarchar](255) NOT NULL, [DATEEXECUTED] [datetime2](3) NOT NULL, [ORDEREXECUTED] [int] NOT NULL, [EXECTYPE] [nvarchar](10) NOT NULL, [MD5SUM] [nvarchar](35), [DESCRIPTION] [nvarchar](255), [COMMENTS] [nvarchar](255), [TAG] [nvarchar](255), [LIQUIBASE] [nvarchar](20), [CONTEXTS] [nvarchar](255), [LABELS] [nvarchar](255), [DEPLOYMENT_ID] [nvarchar](10))
 GO
@@ -197,7 +197,28 @@ GO
 CREATE TABLE [ACT_CMMN_HI_MIL_INST] ([ID_] [varchar](255) NOT NULL, [REV_] [int] NOT NULL, [NAME_] [varchar](255) NOT NULL, [TIME_STAMP_] [datetime] NOT NULL, [CASE_INST_ID_] [varchar](255) NOT NULL, [CASE_DEF_ID_] [varchar](255) NOT NULL, [ELEMENT_ID_] [varchar](255) NOT NULL, CONSTRAINT [PK_ACT_CMMN_HI_MIL_INST] PRIMARY KEY ([ID_]))
 GO
 
-INSERT INTO [ACT_CMMN_DATABASECHANGELOG] ([ID], [AUTHOR], [FILENAME], [DATEEXECUTED], [ORDEREXECUTED], [MD5SUM], [DESCRIPTION], [COMMENTS], [EXECTYPE], [CONTEXTS], [LABELS], [LIQUIBASE], [DEPLOYMENT_ID]) VALUES ('1', 'flowable', 'org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog.xml', GETDATE(), 1, '7:1ed01100eeb9bb6054c28320b6c5fb22', 'createTable tableName=ACT_CMMN_DEPLOYMENT; createTable tableName=ACT_CMMN_DEPLOYMENT_RESOURCE; addForeignKeyConstraint baseTableName=ACT_CMMN_DEPLOYMENT_RESOURCE, constraintName=ACT_FK_CMMN_RSRC_DPL, referencedTableName=ACT_CMMN_DEPLOYMENT; create...', '', 'EXECUTED', NULL, NULL, '3.5.3', '7878884556')
+INSERT INTO [ACT_CMMN_DATABASECHANGELOG] ([ID], [AUTHOR], [FILENAME], [DATEEXECUTED], [ORDEREXECUTED], [MD5SUM], [DESCRIPTION], [COMMENTS], [EXECTYPE], [CONTEXTS], [LABELS], [LIQUIBASE], [DEPLOYMENT_ID]) VALUES ('1', 'flowable', 'org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog.xml', GETDATE(), 1, '7:1ed01100eeb9bb6054c28320b6c5fb22', 'createTable tableName=ACT_CMMN_DEPLOYMENT; createTable tableName=ACT_CMMN_DEPLOYMENT_RESOURCE; addForeignKeyConstraint baseTableName=ACT_CMMN_DEPLOYMENT_RESOURCE, constraintName=ACT_FK_CMMN_RSRC_DPL, referencedTableName=ACT_CMMN_DEPLOYMENT; create...', '', 'EXECUTED', NULL, NULL, '3.5.3', '2985400802')
+GO
+
+ALTER TABLE [ACT_CMMN_CASEDEF] ADD [DGRM_RESOURCE_NAME_] [varchar](4000)
+GO
+
+ALTER TABLE [ACT_CMMN_CASEDEF] ADD [HAS_START_FORM_KEY_] [bit]
+GO
+
+ALTER TABLE [ACT_CMMN_DEPLOYMENT_RESOURCE] ADD [GENERATED_] [bit]
+GO
+
+ALTER TABLE [ACT_CMMN_RU_CASE_INST] ADD [LOCK_TIME_] [datetime]
+GO
+
+ALTER TABLE [ACT_CMMN_RU_PLAN_ITEM_INST] ADD [ITEM_DEFINITION_ID_] [varchar](255)
+GO
+
+ALTER TABLE [ACT_CMMN_RU_PLAN_ITEM_INST] ADD [ITEM_DEFINITION_TYPE_] [varchar](255)
+GO
+
+INSERT INTO [ACT_CMMN_DATABASECHANGELOG] ([ID], [AUTHOR], [FILENAME], [DATEEXECUTED], [ORDEREXECUTED], [MD5SUM], [DESCRIPTION], [COMMENTS], [EXECTYPE], [CONTEXTS], [LABELS], [LIQUIBASE], [DEPLOYMENT_ID]) VALUES ('2', 'flowable', 'org/flowable/cmmn/db/liquibase/flowable-cmmn-db-changelog.xml', GETDATE(), 3, '7:72a1f3f4767524ec0e22288a1621ebb9', 'addColumn tableName=ACT_CMMN_CASEDEF; addColumn tableName=ACT_CMMN_DEPLOYMENT_RESOURCE; addColumn tableName=ACT_CMMN_RU_CASE_INST; addColumn tableName=ACT_CMMN_RU_PLAN_ITEM_INST', '', 'EXECUTED', NULL, NULL, '3.5.3', '2985400802')
 GO
 
 
