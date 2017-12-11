@@ -681,7 +681,7 @@ If the plan item does not have any entry criteria, the repetition rule expressio
 
 If the plan item does have entry criteria, the behavior is different. The repetition rule is not evaluated on completion or termination, but when a sentry of the plan item is satisfied. If both the sentry is satisfied and the repetition rule evaluates to true, a new instance is created. 
 
-Take for example the following timer event listener followed by a human task. The sentry has one entry criteria for the _occur_ event of the timer event listener. 
+Take for example the following timer event listener followed by a human task. The sentry has one entry criteria for the _occur_ event of the timer event listener. Note that enabling and setting the repetition rule on the task has a visual indication at the bottom of the rectangle.  
 
 image::images/cmmn.timereventlistener.png[align="center"]
 
