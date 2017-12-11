@@ -42,15 +42,17 @@ import java.awt.geom.Area;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.Line2D;
 import java.awt.geom.Path2D;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-
-import static java.awt.geom.Path2D.WIND_NON_ZERO;
 
 /**
  * @author Tijs Rademakers
@@ -112,6 +114,8 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         DI_SENTRY.add(STENCIL_ENTRY_CRITERION);
         DI_SENTRY.add(STENCIL_EXIT_CRITERION);
     }
+
+    protected double lineWidth = 0.000001d;
 
     public ObjectNode convertToJson(CmmnModel model) {
         return convertToJson(model, null, null);
@@ -681,8 +685,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
 
             Shape source2D = null;
             if (DI_CIRCLES.contains(sourceRefStencilId)) {
-                source2D = new Ellipse2D.Double(sourceInfo.getX(), sourceInfo.getY(),
-                        sourceDockersX, sourceDockersY);
+                source2D = createEllipse(sourceInfo, sourceDockersX, sourceDockersY);
 
             } else if (DI_RECTANGLES.contains(sourceRefStencilId)) {
                 source2D = createRectangle(sourceInfo);
@@ -692,16 +695,13 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             }
 
             if (source2D != null) {
-                Area lineArea = new Area(firstLine);
-                lineArea.intersect(new Area(source2D));
-
-//                Collection<Point2D> intersections = source2D.intersections(firstLine);
-//                if (intersections != null && intersections.size() > 0) {
-//                    Point2D intersection = intersections.iterator().next();
-//                    graphicInfoList.add(createGraphicInfo(intersection.x(), intersection.y()));
-//                } else {
-//                    graphicInfoList.add(createGraphicInfo(sourceRefLineX, sourceRefLineY));
-//                }
+                Collection<Point2D> intersections = getIntersections(firstLine, source2D);
+                if (intersections != null && intersections.size() > 0) {
+                    Point2D intersection = intersections.iterator().next();
+                    graphicInfoList.add(createGraphicInfo(intersection.getX(), intersection.getY()));
+                } else {
+                    graphicInfoList.add(createGraphicInfo(sourceRefLineX, sourceRefLineY));
+                }
             }
 
             Line2D lastLine = null;
@@ -722,45 +722,82 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
                 endLastLineX += targetInfo.getX();
                 endLastLineY += targetInfo.getY();
 
-//                lastLine = new Line2D(startLastLineX, startLastLineY, endLastLineX, endLastLineY);
+                lastLine = new Line2D.Double(startLastLineX, startLastLineY, endLastLineX, endLastLineY);
 
             } else {
                 lastLine = firstLine;
             }
 
-//            AbstractContinuousCurve2D target2D = null;
-//            if (DI_CIRCLES.contains(targetRefStencilId)) {
-//                double targetDockersX = dockersNode.get(dockersNode.size() - 1).get(EDITOR_BOUNDS_X).asDouble();
-//                double targetDockersY = dockersNode.get(dockersNode.size() - 1).get(EDITOR_BOUNDS_Y).asDouble();
-//
-//                target2D = new Circle2D(targetInfo.getX() + targetDockersX, targetInfo.getY() + targetDockersY, targetDockersX);
-//
-//            } if (DI_RECTANGLES.contains(targetRefStencilId)) {
-//                target2D = createRectangle(targetInfo);
-//
-//            } else if (DI_SENTRY.contains(targetRefStencilId)) {
-//                target2D = createGateway(targetInfo);
-//            }
-//
-//            if (target2D != null) {
-//                Collection<Point2D> intersections = target2D.intersections(lastLine);
-//                if (intersections != null && intersections.size() > 0) {
-//                    Point2D intersection = intersections.iterator().next();
-//                    graphicInfoList.add(createGraphicInfo(intersection.x(), intersection.y()));
-//                } else {
-//                    graphicInfoList.add(createGraphicInfo(lastLine.getPoint2().x(), lastLine.getPoint2().y()));
-//                }
-//            }
-//
+            Shape target2D = null;
+            if (DI_CIRCLES.contains(targetRefStencilId)) {
+                double targetDockersX = dockersNode.get(dockersNode.size() - 1).get(EDITOR_BOUNDS_X).asDouble();
+                double targetDockersY = dockersNode.get(dockersNode.size() - 1).get(EDITOR_BOUNDS_Y).asDouble();
+
+                target2D = createEllipse(targetInfo, targetDockersX, targetDockersY);
+
+            } if (DI_RECTANGLES.contains(targetRefStencilId)) {
+                target2D = createRectangle(targetInfo);
+
+            } else if (DI_SENTRY.contains(targetRefStencilId)) {
+                target2D = createGateway(targetInfo);
+            }
+
+            if (target2D != null) {
+                Collection<Point2D> intersections = getIntersections(lastLine, target2D);
+                if (intersections != null && intersections.size() > 0) {
+                    Point2D intersection = intersections.iterator().next();
+                    graphicInfoList.add(createGraphicInfo(intersection.getX(), intersection.getY()));
+                } else {
+                    graphicInfoList.add(createGraphicInfo(lastLine.getX2(), lastLine.getY2()));
+                }
+            }
+
             cmmnModel.addFlowGraphicInfoList(edgeId, graphicInfoList);
         }
     }
 
+
+    protected Shape createEllipse(GraphicInfo sourceInfo, double halfWidth, double halfHeight) {
+        return new Ellipse2D.Double(
+                sourceInfo.getX(), sourceInfo.getY(), 2 * halfWidth, 2 * halfHeight
+        );
+    }
+
+    protected Collection<Point2D> getIntersections(java.awt.geom.Line2D line, Shape shape) {
+        Area intersectionArea = new Area(getLineShape(line));
+        Area shapeArea = new Area(shape);
+        intersectionArea.intersect(shapeArea);
+        if (!intersectionArea.isEmpty()) {
+            Rectangle2D bounds2D = intersectionArea.getBounds2D();
+            HashSet<Point2D> intersections = new HashSet<>(2);
+
+            if (!shapeArea.contains(line.getX1(), line.getY1())) {
+                intersections.add(new java.awt.geom.Point2D.Double(bounds2D.getX(), bounds2D.getY()));
+            }
+            if (!shapeArea.contains(line.getX2(), line.getY2())) {
+                intersections.add(new java.awt.geom.Point2D.Double(
+                        bounds2D.getX() + bounds2D.getWidth(), bounds2D.getY() + bounds2D.getHeight()));
+            }
+
+            return intersections;
+        }
+        return Collections.EMPTY_SET;
+    }
+
+    protected Shape getLineShape(java.awt.geom.Line2D line2D) {
+        Path2D line = new Path2D.Double(Path2D.WIND_NON_ZERO, 4);
+        line.moveTo(line2D.getX1(), line2D.getY1());
+        line.lineTo(line2D.getX2(), line2D.getY2());
+        line.lineTo(line2D.getX2() + lineWidth, line2D.getY2() + lineWidth);
+        line.closePath();
+        return line;
+    }
+
     protected Shape createRectangle(GraphicInfo graphicInfo) {
-        return new Rectangle2D.Float(
-                (float) graphicInfo.getX(), (float) graphicInfo.getY(),
-                (float) graphicInfo.getWidth(), (float) graphicInfo.getHeight()
-                );
+        return new Rectangle2D.Double(
+                graphicInfo.getX(), graphicInfo.getY(),
+                graphicInfo.getWidth(), graphicInfo.getHeight()
+        );
     }
 
     protected Shape createGateway(GraphicInfo graphicInfo) {
@@ -768,13 +805,14 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         double middleX = graphicInfo.getX() + (graphicInfo.getWidth() / 2);
         double middleY = graphicInfo.getY() + (graphicInfo.getHeight() / 2);
 
-        Path2D.Double path = new Path2D.Double(WIND_NON_ZERO, 4);
-        path.moveTo(graphicInfo.getX(), middleY);
-        path.lineTo(middleX, graphicInfo.getY());
-        path.lineTo(graphicInfo.getX() + graphicInfo.getWidth(), middleY);
-        path.lineTo(middleX, graphicInfo.getY() + graphicInfo.getHeight());
-        path.lineTo(graphicInfo.getX(), middleY);
-        return path;
+        Path2D.Double gatewayShape = new Path2D.Double(Path2D.WIND_NON_ZERO, 4);
+        gatewayShape.moveTo(graphicInfo.getX(), middleY);
+        gatewayShape.lineTo(middleX, graphicInfo.getY());
+        gatewayShape.lineTo(graphicInfo.getX() + graphicInfo.getWidth(), middleY);
+        gatewayShape.lineTo(middleX, graphicInfo.getY() + graphicInfo.getHeight());
+        gatewayShape.closePath();
+
+        return gatewayShape;
     }
 
     protected GraphicInfo createGraphicInfo(double x, double y) {

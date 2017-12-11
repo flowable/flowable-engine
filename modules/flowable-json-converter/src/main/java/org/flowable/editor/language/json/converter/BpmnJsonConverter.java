@@ -945,9 +945,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
 
             Shape source2D = null;
             if (DI_CIRCLES.contains(sourceRefStencilId)) {
-                source2D = new Ellipse2D.Double(
-                        sourceInfo.getX(), sourceInfo.getY(), 2*sourceDockersX, 2*sourceDockersY
-                );
+                source2D = createEllipse(sourceInfo, sourceDockersX, sourceDockersY);
 
             } else if (DI_RECTANGLES.contains(sourceRefStencilId)) {
                 source2D = createRectangle(sourceInfo);
@@ -999,9 +997,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                 double targetDockersX = dockersNode.get(dockersNode.size() - 1).get(EDITOR_BOUNDS_X).asDouble();
                 double targetDockersY = dockersNode.get(dockersNode.size() - 1).get(EDITOR_BOUNDS_Y).asDouble();
 
-                target2D = new Ellipse2D.Double(
-                        targetInfo.getX(), targetInfo.getY(), 2*targetDockersX, 2*targetDockersY
-                );
+                target2D = createEllipse(targetInfo, targetDockersX, targetDockersY);
 
             } else if (DI_GATEWAY.contains(targetRefStencilId)) {
                 target2D = createGateway(targetInfo);
@@ -1021,7 +1017,13 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         }
     }
 
-    private Collection<java.awt.geom.Point2D> getIntersections(java.awt.geom.Line2D line, Shape shape) {
+    protected Shape createEllipse(GraphicInfo sourceInfo, double halfWidth, double halfHeight) {
+        return new Ellipse2D.Double(
+                sourceInfo.getX(), sourceInfo.getY(), 2* halfWidth, 2* halfHeight
+        );
+    }
+
+    protected Collection<java.awt.geom.Point2D> getIntersections(java.awt.geom.Line2D line, Shape shape) {
         Area intersectionArea = new Area(getLineShape(line));
         Area shapeArea = new Area(shape);
         intersectionArea.intersect(shapeArea);
