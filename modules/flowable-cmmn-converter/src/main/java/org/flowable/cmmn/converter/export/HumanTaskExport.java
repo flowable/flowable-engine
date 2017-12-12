@@ -24,8 +24,7 @@ public class HumanTaskExport extends AbstractPlanItemDefinitionExport {
     public static void writeHumanTask(HumanTask humanTask, XMLStreamWriter xtw) throws Exception {
         // start human task element
         xtw.writeStartElement(ELEMENT_HUMAN_TASK);
-        writeCommonPlanItemDefinitionAttributes(humanTask, xtw);
-        writeBlockingAttribute(xtw, humanTask);
+        writeCommonTaskAttributes(xtw, humanTask);
         
         if (StringUtils.isNotEmpty(humanTask.getAssignee())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_ASSIGNEE, humanTask.getAssignee());
