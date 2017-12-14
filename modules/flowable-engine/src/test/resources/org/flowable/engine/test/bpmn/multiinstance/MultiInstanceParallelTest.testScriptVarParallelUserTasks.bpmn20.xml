@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:flowable="http://flowable.org/bpmn" targetNamespace="Examples">
+
+	<process id="newscriptvarmultiinstancetest" name="newmultiinstancetest"
+		isExecutable="true">
+		<startEvent id="startEvent1"></startEvent>
+		<sequenceFlow id="sid-18F6D831-FF05-4E51-A135-BE532C3202BD"
+			sourceRef="startEvent1" targetRef="sid-3DA07E73-4C05-44C2-A0C1-CBDEC491E7F6"></sequenceFlow>
+		<scriptTask id="sid-3DA07E73-4C05-44C2-A0C1-CBDEC491E7F6"
+			name="Create Collection" scriptFormat="javascript"
+			flowable:autoStoreVariables="false">
+			<script><![CDATA[
+			var assigneeList = ["kermit", "gonzo", "fozzie"]; 
+			execution.setVariable("assigneeList", assigneeList);       
+			print("List: " + assigneeList);
+			]]></script>
+		</scriptTask>
+		<sequenceFlow id="sid-A29BF2FA-669A-4578-B78A-99B44720AFB5"
+			sourceRef="sid-3DA07E73-4C05-44C2-A0C1-CBDEC491E7F6" targetRef="miTasks"></sequenceFlow>
+		<userTask id="miTasks" name="Multi Instance Test"
+			flowable:assignee="${assignee}">
+			<extensionElements>
+				<modeler:initiator-can-complete
+					xmlns:modeler="http://flowable.org/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
+			</extensionElements>
+			<multiInstanceLoopCharacteristics
+				isSequential="false" flowable:collection="assigneeList"
+				flowable:elementVariable="assignee"></multiInstanceLoopCharacteristics>
+		</userTask>
+		<sequenceFlow id="sid-864EF8FF-7A21-4141-B93E-F1116C56F9F1"
+			sourceRef="miTasks" targetRef="sid-3E534C8E-8EF5-4333-9E95-1F9B6BF4FA9E"></sequenceFlow>
+		<endEvent id="sid-3E534C8E-8EF5-4333-9E95-1F9B6BF4FA9E"></endEvent>
+	</process>
+</definitions>
