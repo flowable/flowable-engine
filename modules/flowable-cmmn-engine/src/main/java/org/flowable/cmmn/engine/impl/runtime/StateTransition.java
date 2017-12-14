@@ -59,6 +59,9 @@ public class StateTransition {
                 PlanItemTransition.PARENT_SUSPEND, 
                 PlanItemTransition.EXIT);
         
+        addTransition(PlanItemInstanceState.ASYNC_ACTIVE, 
+                PlanItemTransition.ASYNC_ACTIVATE);
+        
         addTransition(PlanItemInstanceState.FAILED, 
                 PlanItemTransition.REACTIVATE, 
                 PlanItemTransition.EXIT);

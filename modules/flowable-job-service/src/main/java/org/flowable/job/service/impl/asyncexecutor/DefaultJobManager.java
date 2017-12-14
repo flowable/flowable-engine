@@ -60,7 +60,6 @@ public class DefaultJobManager implements JobManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultJobManager.class);
 
-    public static final String ASYNC_JOB_TYPE = "async-continuation";
     public static final String CYCLE_TYPE = "cycle";
 
     protected JobServiceConfiguration jobServiceConfiguration;
@@ -73,7 +72,7 @@ public class DefaultJobManager implements JobManager {
     }
 
     @Override
-    public void createAsyncJob(JobEntity jobEntity, boolean exclusive) {
+    public void setAsyncJobProperties(JobEntity jobEntity, boolean exclusive) {
         // When the async executor is activated, the job is directly passed on to the async executor thread
         if (isAsyncExecutorActive()) {
             internalCreateLockedAsyncJob(jobEntity, exclusive);
@@ -455,7 +454,6 @@ public class DefaultJobManager implements JobManager {
         jobEntity.setRevision(1);
         jobEntity.setRetries(jobServiceConfiguration.getAsyncExecutorNumberOfRetries());
         jobEntity.setExclusive(exclusive);
-        jobEntity.setJobHandlerType(ASYNC_JOB_TYPE);
     }
 
     protected JobEntity createExecutableJobFromOtherJob(AbstractRuntimeJobEntity job) {

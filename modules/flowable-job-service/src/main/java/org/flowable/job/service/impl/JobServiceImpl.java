@@ -100,8 +100,8 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
     }
     
     @Override
-    public void createAsyncJob(JobEntity job, boolean isExclusive) {
-        getJobManager().createAsyncJob(job, isExclusive);
+    public void setAsyncJobProperties(JobEntity job, boolean isExclusive) {
+        getJobManager().setAsyncJobProperties(job, isExclusive);
     }
 
     @Override

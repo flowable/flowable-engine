@@ -37,4 +37,7 @@ public interface PlanItemTransition {
     String SUSPEND = "suspend";
     String TERMINATE = "terminate";
     
+    /* Non-spec transition from async-active to active */
+    String ASYNC_ACTIVATE = "async-activate";
+    
 }

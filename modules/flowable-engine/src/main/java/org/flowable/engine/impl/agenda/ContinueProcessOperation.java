@@ -30,6 +30,7 @@ import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
+import org.flowable.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
@@ -166,6 +167,7 @@ public class ContinueProcessOperation extends AbstractOperation {
         job.setExecutionId(execution.getId());
         job.setProcessInstanceId(execution.getProcessInstanceId());
         job.setProcessDefinitionId(execution.getProcessDefinitionId());
+        job.setJobHandlerType(AsyncContinuationJobHandler.TYPE);
 
         // Inherit tenant id (if applicable)
         if (execution.getTenantId() != null) {
@@ -174,7 +176,7 @@ public class ContinueProcessOperation extends AbstractOperation {
         
         execution.getJobs().add(job);
         
-        jobService.createAsyncJob(job, flowNode.isExclusive());
+        jobService.setAsyncJobProperties(job, flowNode.isExclusive());
         jobService.scheduleAsyncJob(job);
     }
 
