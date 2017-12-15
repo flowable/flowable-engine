@@ -26,8 +26,10 @@
 		<cxf.version>3.1.6</cxf.version>
 		<batik.version>1.7</batik.version>
 		<slf4j.version>1.7.25</slf4j.version>
+		<flink.version>1.4.0</flink.version>
+		<flink.scala.binary.version>2.11</flink.scala.binary.version>
 
-        <checkstyle.config.location>checkstyle/flowable-checkstyle.xml</checkstyle.config.location>
+		<checkstyle.config.location>checkstyle/flowable-checkstyle.xml</checkstyle.config.location>
         <checkstyle.suppressions.location>/checkstyle/flowable-suppressions.xml</checkstyle.suppressions.location>
 
         <!-- JVM params for test execution -->

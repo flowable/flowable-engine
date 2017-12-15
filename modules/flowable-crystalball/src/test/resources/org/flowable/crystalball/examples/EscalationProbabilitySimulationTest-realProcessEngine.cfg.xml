@@ -31,7 +31,6 @@
   </bean>
 
   <bean id="randomNumberGenerator" class="org.flowable.crystalball.simulator.impl.DefaultUniformRandomNumberGenerator">
-    <constructor-arg name="seed" value="1"/>
   </bean>
 
 </beans>
