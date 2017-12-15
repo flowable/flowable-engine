@@ -247,6 +247,38 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         assertEquals("The child process must have the name of the newest child process deployment", "User Task V2", task.getName());
     }
 
+    public void testSameDeploymentSubprocessNotInSameDeployment() throws Exception {
+        BpmnModel mainBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_MAIN_PROCESS_RESOURCE);
+        BpmnModel childBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_PROCESS_RESOURCE);
+        BpmnModel childV2BpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_V2_PROCESS_RESOURCE);
+
+        // deploy the main and child process within one deployment
+        Deployment deployment = processEngine.getRepositoryService()
+                .createDeployment()
+                .name("mainProcessDeployment")
+                .addBpmnModel("mainProcess.bpmn20.xml", mainBpmnModel).deploy();
+
+        processEngine.getRepositoryService()
+                .createDeployment()
+                .name("mainProcessDeployment")
+                .addBpmnModel("childProcess.bpmn20.xml", childBpmnModel).deploy();
+
+        // deploy a new version of the child process in which the user task has an updated name
+        processEngine.getRepositoryService()
+                .createDeployment()
+                .name("childProcessDeployment")
+                .addBpmnModel("childProcessV2.bpmn20.xml", childV2BpmnModel).deploy();
+
+        runtimeService.startProcessInstanceByKey("mainProcess");
+
+        List<Task> list = taskService.createTaskQuery().list();
+        assertEquals("There must be one task from the child process", 1, list.size());
+
+        Task task = list.get(0);
+        assertEquals("The child process must have the name of the newest child process deployment as it there " +
+                "is no deployed child process in the same deployment", "User Task V2", task.getName());
+    }
+
     private void suspendProcessDefinitions(Deployment childDeployment) {
         List<ProcessDefinition> childProcessDefinitionList = repositoryService.createProcessDefinitionQuery().deploymentId(childDeployment.getId()).list();
 
