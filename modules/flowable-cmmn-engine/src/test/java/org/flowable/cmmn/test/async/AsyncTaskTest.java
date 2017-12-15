@@ -81,7 +81,7 @@ public class AsyncTaskTest extends FlowableCmmnTestCase {
         assertEquals(3L, cmmnManagementService.createJobQuery().caseInstanceId(caseInstance.getId()).count());
         waitForJobExecutorToProcessAllJobs();
         
-        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).list();
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
         assertEquals(3, tasks.size());
         assertEquals("B", tasks.get(0).getName());
         assertEquals("C", tasks.get(1).getName());
