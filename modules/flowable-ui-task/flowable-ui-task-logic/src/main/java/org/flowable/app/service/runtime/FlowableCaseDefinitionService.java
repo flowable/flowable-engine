@@ -12,28 +12,29 @@
  */
 package org.flowable.app.service.runtime;
 
-import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.servlet.http.HttpServletRequest;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.model.common.ResultListDataRepresentation;
 import org.flowable.app.model.runtime.CaseDefinitionRepresentation;
-import org.flowable.app.service.exception.BadRequestException;
-import org.flowable.app.service.exception.InternalServerErrorException;
+import org.flowable.app.service.exception.NotFoundException;
 import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CaseDefinitionQuery;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
+import org.flowable.cmmn.model.Case;
+import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.model.FormModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author Tijs Rademakers
@@ -52,6 +53,9 @@ public class FlowableCaseDefinitionService {
 
     @Autowired
     protected ObjectMapper objectMapper;
+
+    @Autowired
+    protected FormRepositoryService formRepositoryService;
 
     public ResultListDataRepresentation getCaseDefinitions(Boolean latest, String deploymentKey) {
 
@@ -79,16 +83,16 @@ public class FlowableCaseDefinitionService {
         return result;
     }
 
-    protected CaseDefinition getCaseDefinitionFromRequest(String[] requestInfoArray, boolean isTableRequest) {
-        int paramPosition = requestInfoArray.length - 3;
-        if (isTableRequest) {
-            paramPosition--;
-        }
-        String caseDefinitionId = getCaseDefinitionId(requestInfoArray, paramPosition);
+    public FormModel getCaseDefinitionStartForm(String caseDefinitionId) {
 
         CaseDefinition caseDefinition = cmmnRepositoryService.getCaseDefinition(caseDefinitionId);
 
-        return caseDefinition;
+        try {
+            return getStartForm(caseDefinition);
+
+        } catch (FlowableObjectNotFoundException aonfe) {
+            throw new NotFoundException("No case definition found with the given id: " + caseDefinitionId);
+        }
     }
 
     protected List<CaseDefinitionRepresentation> convertDefinitionList(List<CaseDefinition> definitions) {
@@ -102,24 +106,21 @@ public class FlowableCaseDefinitionService {
         return result;
     }
 
-    protected String[] parseRequest(HttpServletRequest request) {
-        String requestURI = request.getRequestURI();
-        String[] requestInfoArray = requestURI.split("/");
-        if (requestInfoArray.length < 2) {
-            throw new BadRequestException("Start form request is not valid " + requestURI);
+    protected FormModel getStartForm(CaseDefinition caseDefinition) {
+        CmmnModel cmmnModel = this.cmmnRepositoryService.getCmmnModel(caseDefinition.getId());
+        List<Case> cases = cmmnModel.getCases();
+        if (cases == null || cases.size() != 1) {
+            throw new FlowableObjectNotFoundException("Case definition " + caseDefinition.getId()+ " start form was not found.");
         }
-        return requestInfoArray;
+
+        Case caze = cases.get(0);
+        if (caze == null || caze.getPlanModel() == null || StringUtils.isEmpty(caze.getPlanModel().getFormKey())) {
+            throw new FlowableObjectNotFoundException("Case from case definition " + caseDefinition.getId() + " does not contain any start form.");
+        }
+
+        String formKey = caze.getPlanModel().getFormKey();
+        LOGGER.debug("Getting form model by keys without restrictions.");
+        return formRepositoryService.getFormModelByKey(formKey);
     }
 
-    protected String getCaseDefinitionId(String[] requestInfoArray, int position) {
-        String caseDefinitionVariable = requestInfoArray[position];
-        String caseDefinitionId = null;
-        try {
-            caseDefinitionId = URLDecoder.decode(caseDefinitionVariable, "UTF-8");
-        } catch (Exception e) {
-            LOGGER.error("Error decoding case definition {}", caseDefinitionVariable, e);
-            throw new InternalServerErrorException("Error decoding case definition " + caseDefinitionVariable);
-        }
-        return caseDefinitionId;
-    }
 }

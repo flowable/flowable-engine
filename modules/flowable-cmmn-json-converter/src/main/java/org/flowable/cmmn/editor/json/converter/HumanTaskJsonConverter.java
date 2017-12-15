@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,6 +19,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
+import org.flowable.cmmn.editor.json.converter.util.CmmnModelJsonConverterUtil;
 import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
 import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.BaseElement;
@@ -32,6 +33,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import static org.flowable.cmmn.editor.json.converter.util.CmmnModelJsonConverterUtil.getPropertyFormKey;
+
 /**
  * @author Tijs Rademakers
  */
@@ -40,7 +43,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
     protected Map<String, String> formMap;
     protected Map<String, CmmnModelInfo> formKeyMap;
 
-    public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap, 
+    public static void fillTypes(Map<String, Class<? extends BaseCmmnJsonConverter>> convertersToCmmnMap,
             Map<Class<? extends BaseElement>, Class<? extends BaseCmmnJsonConverter>> convertersToJsonMap) {
 
         fillJsonTypes(convertersToCmmnMap);
@@ -138,12 +141,12 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
                     if (humanTask.getCandidateGroups().size() == 1) {
                         idmNode.put("type", "groups");
 
-                        String candidateGroupsString = humanTask.getCandidateGroups().get(0);  
+                        String candidateGroupsString = humanTask.getCandidateGroups().get(0);
                         String[] candidateGroupArray = candidateGroupsString.split(",");
                         for (String candidate : candidateGroupArray) {
                             candidateGroupIds.add(candidate.trim());
                         }
-                        
+
                     } else {
                         candidateGroupIds.addAll(humanTask.getCandidateGroups());
                     }
@@ -235,24 +238,13 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
     }
 
     @Override
-    protected CaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, 
+    protected CaseElement convertJsonToElement(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor,
                     BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
-        
+
         HumanTask task = new HumanTask();
 
         task.setPriority(getPropertyValueAsString(PROPERTY_USERTASK_PRIORITY, elementNode));
-        String formKey = getPropertyValueAsString(PROPERTY_FORMKEY, elementNode);
-        if (StringUtils.isNotEmpty(formKey)) {
-            task.setFormKey(formKey);
-        } else {
-            JsonNode formReferenceNode = getProperty(PROPERTY_FORM_REFERENCE, elementNode);
-            if (formReferenceNode != null && formReferenceNode.get("id") != null) {
-
-                if (formMap != null && formMap.containsKey(formReferenceNode.get("id").asText())) {
-                    task.setFormKey(formMap.get(formReferenceNode.get("id").asText()));
-                }
-            }
-        }
+        task.setFormKey(getPropertyFormKey(elementNode, formMap));
 
         task.setDueDate(getPropertyValueAsString(PROPERTY_USERTASK_DUEDATE, elementNode));
         task.setCategory(getPropertyValueAsString(PROPERTY_USERTASK_CATEGORY, elementNode));
@@ -309,7 +301,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
                 }
             }
         }
-        
+
         return task;
     }
 
@@ -324,7 +316,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
                 addExtensionElement("assignee-info-email", emailNode, task);
                 addExtensionElement("assignee-info-firstname", assigneeNode.get("firstName"), task);
                 addExtensionElement("assignee-info-lastname", assigneeNode.get("lastName"), task);
-            } 
+            }
         }
 
         if (canCompleteTaskNode != null && !canCompleteTaskNode.isNull()) {

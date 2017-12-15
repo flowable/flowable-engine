@@ -52,7 +52,7 @@ public class FlowableCaseInstanceService {
 
     @Autowired
     protected CmmnRuntimeService cmmnRuntimeService;
-    
+
     @Autowired
     protected CmmnHistoryService cmmnHistoryService;
 
@@ -102,7 +102,9 @@ public class FlowableCaseInstanceService {
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                         .caseDefinitionId(startRequest.getCaseDefinitionId())
-                        .name(startRequest.getName()).start();
+                        .name(startRequest.getName())
+                        .variables(startRequest.getValues())
+                        .start();
 
         User user = null;
         if (caseInstance.getStartUserId() != null) {

@@ -47,6 +47,9 @@ public class StageConverterTest extends AbstractConverterTest {
         Stage planModelStage = caseModel.getPlanModel();
         assertNotNull(planModelStage);
         assertEquals("myPlanModel", planModelStage.getId());
+        assertEquals("My plan model", planModelStage.getName());
+        assertEquals("My plan model documentation", planModelStage.getDocumentation());
+        assertEquals("formKeyDefinition", planModelStage.getFormKey());
         assertTrue(planModelStage.isPlanModel());
 
         GraphicInfo graphicInfo = model.getGraphicInfo("myPlanModel");

@@ -17,8 +17,10 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.constants.EditorJsonConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverterUtil;
@@ -74,6 +76,22 @@ public class CmmnModelJsonConverterUtil implements EditorJsonConstants, CmmnSten
             propertyNode = propertiesNode.get(name);
         }
         return propertyNode;
+    }
+
+    public static String getPropertyFormKey(JsonNode elementNode, Map<String, String> formMap) {
+        String formKey = CmmnModelJsonConverterUtil.getPropertyValueAsString(PROPERTY_FORMKEY, elementNode);
+        if (StringUtils.isNotEmpty(formKey)) {
+            return (formKey);
+        } else {
+            JsonNode formReferenceNode = CmmnModelJsonConverterUtil.getProperty(PROPERTY_FORM_REFERENCE, elementNode);
+            if (formReferenceNode != null && formReferenceNode.get("id") != null) {
+
+                if (formMap != null && formMap.containsKey(formReferenceNode.get("id").asText())) {
+                    return formMap.get(formReferenceNode.get("id").asText());
+                }
+            }
+        }
+        return null;
     }
 
     /**

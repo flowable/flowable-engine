@@ -770,7 +770,7 @@
     "icon" : "containers/caseplanmodel.png",
     "groups" : [ "Containers" ],
     "hide" : true,
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage" ],
+    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "formkeydefinitionpackage", "formreferencepackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "StageModelActivity" ]
   }, {

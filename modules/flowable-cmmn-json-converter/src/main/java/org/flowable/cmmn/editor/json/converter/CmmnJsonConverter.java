@@ -23,6 +23,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.constants.EditorJsonConstants;
+import org.flowable.cmmn.editor.json.converter.util.CmmnModelJsonConverterUtil;
 import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
 import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.Association;
@@ -99,7 +100,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
 
     static {
         DI_CIRCLES.add(STENCIL_TIMER_EVENT_LISTENER);
-        
+
         DI_RECTANGLES.add(STENCIL_TASK);
         DI_RECTANGLES.add(STENCIL_TASK_HUMAN);
         DI_RECTANGLES.add(STENCIL_TASK_SERVICE);
@@ -180,6 +181,19 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         GraphicInfo planModelGraphicInfo = model.getGraphicInfo(planModelStage.getId());
         ObjectNode planModelNode = CmmnJsonConverterUtil.createChildShape(planModelStage.getId(), STENCIL_PLANMODEL, planModelGraphicInfo.getX() + planModelGraphicInfo.getWidth(),
                         planModelGraphicInfo.getY() + planModelGraphicInfo.getHeight(), planModelGraphicInfo.getX(), planModelGraphicInfo.getY());
+
+        ObjectNode planModelPropertiesNode = objectMapper.createObjectNode();
+        if (StringUtils.isNotEmpty(planModelStage.getName())) {
+            planModelPropertiesNode.put(PROPERTY_NAME, planModelStage.getName());
+        }
+        if (StringUtils.isNotEmpty(planModelStage.getDocumentation())) {
+            planModelPropertiesNode.put(PROPERTY_DOCUMENTATION, planModelStage.getDocumentation());
+        }
+        if (StringUtils.isNotEmpty(planModelStage.getFormKey())) {
+            planModelPropertiesNode.put(PROPERTY_FORMKEY, planModelStage.getFormKey());
+        }
+        planModelNode.set(EDITOR_SHAPE_PROPERTIES, planModelPropertiesNode);
+
         planModelNode.putArray(EDITOR_OUTGOING);
         shapesArrayNode.add(planModelNode);
 
@@ -300,6 +314,8 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         Stage planModelStage = new Stage();
         planModelStage.setId(CmmnJsonConverterUtil.getElementId(planModelShape));
         planModelStage.setName(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_NAME, planModelShape));
+        planModelStage.setDocumentation(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_DOCUMENTATION, planModelShape));
+        planModelStage.setFormKey(CmmnModelJsonConverterUtil.getPropertyFormKey(planModelShape, formKeyMap));
         planModelStage.setPlanModel(true);
 
         caseModel.setPlanModel(planModelStage);
@@ -681,7 +697,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
             AbstractContinuousCurve2D source2D = null;
             if (DI_CIRCLES.contains(sourceRefStencilId)) {
                 source2D = new Circle2D(sourceInfo.getX() + sourceDockersX, sourceInfo.getY() + sourceDockersY, sourceDockersX);
-                
+
             } else if (DI_RECTANGLES.contains(sourceRefStencilId)) {
                 source2D = createRectangle(sourceInfo);
 
@@ -729,7 +745,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
                 double targetDockersY = dockersNode.get(dockersNode.size() - 1).get(EDITOR_BOUNDS_Y).asDouble();
 
                 target2D = new Circle2D(targetInfo.getX() + targetDockersX, targetInfo.getY() + targetDockersY, targetDockersX);
-                
+
             } if (DI_RECTANGLES.contains(targetRefStencilId)) {
                 target2D = createRectangle(targetInfo);
 

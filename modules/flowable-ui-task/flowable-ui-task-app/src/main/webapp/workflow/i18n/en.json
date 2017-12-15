@@ -376,7 +376,8 @@
         },
         "DEFAULT-OUTCOME": {
             "COMPLETE": "Complete",
-            "START-PROCESS": "Start process"
+            "START-PROCESS": "Start process",
+            "START-CASE": "Start case"
         },
         "MESSAGE" : {
             "SELECT-PERSON": "No person selected...",

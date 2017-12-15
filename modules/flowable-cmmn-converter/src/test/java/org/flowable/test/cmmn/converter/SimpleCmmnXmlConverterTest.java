@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -34,9 +34,9 @@ import org.junit.Test;
  * @author Tijs Rademakers
  */
 public class SimpleCmmnXmlConverterTest extends AbstractConverterTest {
-    
+
     private static final String CMMN_RESOURCE = "org/flowable/test/cmmn/converter/simple.cmmn";
-    
+
     @Test
     public void convertXMLToModel() throws Exception {
         CmmnModel cmmnModel = readXMLFile(CMMN_RESOURCE);
@@ -49,21 +49,22 @@ public class SimpleCmmnXmlConverterTest extends AbstractConverterTest {
         CmmnModel parsedModel = exportAndReadXMLFile(cmmnModel);
         validateModel(parsedModel);
     }
-    
+
     public void validateModel(CmmnModel cmmnModel) {
         assertNotNull(cmmnModel);
         assertEquals(1, cmmnModel.getCases().size());
-        
+
         // Case
         Case caze = cmmnModel.getCases().get(0);
         assertEquals("myCase", caze.getId());
-        
+
         // Plan model
         Stage planModel = caze.getPlanModel();
         assertNotNull(planModel);
         assertEquals("myPlanModel", planModel.getId());
         assertEquals("My CasePlanModel", planModel.getName());
-        
+        assertEquals("formKey", planModel.getFormKey());
+
         // Sentries
         assertEquals(3, planModel.getSentries().size());
         for (Sentry sentry : planModel.getSentries()) {
@@ -74,7 +75,7 @@ public class SimpleCmmnXmlConverterTest extends AbstractConverterTest {
             assertNotNull(onParts.get(0).getSource());
             assertNotNull(onParts.get(0).getStandardEvent());
         }
-        
+
         // Plan items definitions
         List<PlanItemDefinition> planItemDefinitions = planModel.getPlanItemDefinitions();
         assertEquals(4, planItemDefinitions.size());
@@ -84,7 +85,7 @@ public class SimpleCmmnXmlConverterTest extends AbstractConverterTest {
             assertNotNull(planItemDefinition.getId());
             assertNotNull(planItemDefinition.getName());
         }
-        
+
         // Plan items
         List<PlanItem> planItems = planModel.getPlanItems();
         assertEquals(4, planItems.size());
@@ -94,20 +95,20 @@ public class SimpleCmmnXmlConverterTest extends AbstractConverterTest {
             assertNotNull(planItem.getId());
             assertNotNull(planItem.getDefinitionRef());
             assertNotNull(planItem.getPlanItemDefinition()); // Verify plan item definition ref is resolved
-            
+
             PlanItemDefinition planItemDefinition = planItem.getPlanItemDefinition();
             if (planItemDefinition instanceof Milestone) {
                 nrOfMileStones++;
             } else if (planItemDefinition instanceof Task) {
                 nrOfTasks++;
             }
-            
+
             if (!planItem.getId().equals("planItemTaskA")) {
                 assertNotNull(planItem.getEntryCriteria());
                 assertEquals(1, planItem.getEntryCriteria().size());
                 assertNotNull(planItem.getEntryCriteria().get(0).getSentry()); // Verify if sentry reference is resolved
             }
-            
+
             if (planItem.getPlanItemDefinition() instanceof Task) {
                 if (planItem.getId().equals("planItemTaskB")) {
                     assertFalse(((Task) planItem.getPlanItemDefinition()).isBlocking());
@@ -116,7 +117,7 @@ public class SimpleCmmnXmlConverterTest extends AbstractConverterTest {
                 }
             }
         }
-        
+
         assertEquals(2, nrOfMileStones);
         assertEquals(2, nrOfTasks);
     }
