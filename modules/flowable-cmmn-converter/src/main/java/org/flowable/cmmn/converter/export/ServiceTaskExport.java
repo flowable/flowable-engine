@@ -27,10 +27,7 @@ public class ServiceTaskExport extends AbstractPlanItemDefinitionExport {
     public static void writeTask(ServiceTask task, XMLStreamWriter xtw) throws Exception {
         // start task element
         xtw.writeStartElement(ELEMENT_TASK);
-        writeCommonPlanItemDefinitionAttributes(task, xtw);
-        if (!task.isBlocking()) {
-            xtw.writeAttribute(ATTRIBUTE_IS_BLOCKING, "false");
-        }
+        writeCommonTaskAttributes(xtw, task);
 
         if (StringUtils.isNotEmpty(task.getType())) {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_TYPE, task.getType());

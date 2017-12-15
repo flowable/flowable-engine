@@ -222,6 +222,23 @@
       "popular" : true
     } ]
   }, {
+    "name" : "asyncpackage",
+    "properties" : [ {
+      "id" : "isasync",
+      "type" : "Boolean",
+      "title" : "Asynchronous",
+      "value" : "",
+      "description" : "Indicates if the task needs to be executed asynchronously.",
+      "popular" : true
+    }, {
+      "id" : "isexclusive",
+      "type" : "Boolean",
+      "title" : "Exclusive",
+      "value" : "",
+      "description" : "Indicates if an asynchronous task must be executed exclusively",
+      "popular" : true
+    } ]
+  }, {
     "name" : "mailtasktopackage",
     "properties" : [ {
       "id" : "mailtaskto",
@@ -770,7 +787,12 @@
     "icon" : "containers/caseplanmodel.png",
     "groups" : [ "Containers" ],
     "hide" : true,
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "formkeydefinitionpackage", "formreferencepackage" ],
+    "propertyPackages" : [
+      "overrideidpackage",
+      "namepackage",
+      "documentationpackage",
+      "formkeydefinitionpackage",
+      "formreferencepackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "StageModelActivity" ]
   }, {
@@ -782,7 +804,11 @@
     "icon" : "containers/expanded.stage.png",
     "groups" : [ "Containers" ],
     "hide" : true,
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "repetitionruleconditionpackage" ],
+    "propertyPackages" : [
+      "overrideidpackage",
+      "namepackage",
+      "documentationpackage",
+      "repetitionruleconditionpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "StageActivity", "all", "association_start", "association_end" ]
   }, {
@@ -793,7 +819,13 @@
     "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"102\" height=\"82\" version=\"1.0\"><defs></defs><oryx:magnets><oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" /><oryx:magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" /><oryx:magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" /><oryx:magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /><oryx:magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /><oryx:magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /><oryx:magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" /><oryx:magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" /><oryx:magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" /><oryx:magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" /><oryx:magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" /><oryx:magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" /><oryx:magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" /></oryx:magnets><g pointer-events=\"fill\" oryx:minimumSize=\"50 40\"><rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"79\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" /><rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"100\" height=\"80\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\" fill=\"#f9f9f9\" /><text font-size=\"12\" id=\"text_name\" x=\"50\" y=\"40\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"#373e48\"></text><g id=\"repetition\" oryx:anchors=\"bottom\"><path oryx:anchors=\"bottom\" fill=\"none\" stroke=\"#bbbbbb\" stroke-width=\"2\" d=\"M47 68 v10 M50 68 v10 M53 68 v10\" transform=\"translate(10,0)\"/></g></g></svg>",
     "icon" : "activity/task.png",
     "groups" : [ "Activities" ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "blockingpackage", "repetitionruleconditionpackage"],
+    "propertyPackages" : [
+      "overrideidpackage",
+      "namepackage",
+      "documentationpackage",
+      "blockingpackage",
+      "asyncpackage",
+      "repetitionruleconditionpackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -804,7 +836,18 @@
     "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"102\" height=\"82\" version=\"1.0\"> <defs></defs>  <oryx:magnets>  <oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />  <oryx:magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />  <oryx:magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" /> <oryx:magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />  <oryx:magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /> <oryx:magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /> <oryx:magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" /> <oryx:magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" /> <oryx:magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" /> <oryx:magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" /> <oryx:magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" /> <oryx:magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" /> <oryx:magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" /> </oryx:magnets> <g pointer-events=\"fill\" oryx:minimumSize=\"50 40\"> <rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"79\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" /> <rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"100\" height=\"80\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\" fill=\"#f9f9f9\" /> <text font-size=\"12\" id=\"text_name\" x=\"50\" y=\"40\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"#373e48\"></text><g id=\"userTask\" transform=\"translate(3,3)\"><path oryx:anchors=\"top left\" style=\"fill:#d1b575;stroke:none;\" d=\"m 1,17 16,0 0,-1.7778 -5.333332,-3.5555 0,-1.7778 c 1.244444,0 1.244444,-2.3111 1.244444,-2.3111 l 0,-3.0222 C 12.555557,0.8221 9.0000001,1.0001 9.0000001,1.0001 c 0,0 -3.5555556,-0.178 -3.9111111,3.5555 l 0,3.0222 c 0,0 0,2.3111 1.2444443,2.3111 l 0,1.7778 L 1,15.2222 1,17 17,17\" /></g><g id=\"repetition\" oryx:anchors=\"bottom\"><path oryx:anchors=\"bottom\" fill=\"none\" stroke=\"#bbbbbb\" stroke-width=\"2\" d=\"M47 68 v10 M50 68 v10 M53 68 v10\" transform=\"translate(10,0)\"/></g></g></svg>",
     "icon" : "activity/humantask.png",
     "groups" : [ "Activities" ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "blockingpackage", "usertaskassignmentpackage", "formkeydefinitionpackage", "formreferencepackage", "duedatedefinitionpackage", "prioritydefinitionpackage", "repetitionruleconditionpackage" ],
+    "propertyPackages" : [
+      "overrideidpackage",
+      "namepackage",
+      "documentationpackage",
+      "blockingpackage",
+      "usertaskassignmentpackage",
+      "formkeydefinitionpackage",
+      "formreferencepackage",
+      "duedatedefinitionpackage",
+      "prioritydefinitionpackage",
+      "asyncpackage",
+      "repetitionruleconditionpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -815,7 +858,17 @@
     "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:svg=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   xmlns:xlink=\"http://www.w3.org/1999/xlink\"\n\n   width=\"102\"\n   height=\"82\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" />\n  \t<oryx:magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" />\n  \t<oryx:magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t<oryx:magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" />\n  \t\n  \t<oryx:magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"fill\" oryx:minimumSize=\"50 40\">\n\t<rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"79\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" />\n\t<rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"100\" height=\"80\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\" fill=\"#f9f9f9\" />\n\t\t<text \n\t\t\tfont-size=\"12\" \n\t\t\tid=\"text_name\" \n\t\t\tx=\"50\" \n\t\t\ty=\"40\" \n\t\t\toryx:align=\"middle center\"\n\t\t\toryx:fittoelem=\"text_frame\"\n\t\t\tstroke=\"#373e48\">\n\t\t</text>\n\t\n\t<g id=\"serviceTask\" transform=\"translate(3,3)\">\n\t<path oryx:anchors=\"top left\"\n\t\tstyle=\"fill:#72a7d0;stroke:none\"\n     d=\"M 8,1 7.5,2.875 c 0,0 -0.02438,0.250763 -0.40625,0.4375 C 7.05724,3.330353 7.04387,3.358818 7,3.375 6.6676654,3.4929791 6.3336971,3.6092802 6.03125,3.78125 6.02349,3.78566 6.007733,3.77681 6,3.78125 5.8811373,3.761018 5.8125,3.71875 5.8125,3.71875 l -1.6875,-1 -1.40625,1.4375 0.96875,1.65625 c 0,0 0.065705,0.068637 0.09375,0.1875 0.002,0.00849 -0.00169,0.022138 0,0.03125 C 3.6092802,6.3336971 3.4929791,6.6676654 3.375,7 3.3629836,7.0338489 3.3239228,7.0596246 3.3125,7.09375 3.125763,7.4756184 2.875,7.5 2.875,7.5 L 1,8 l 0,2 1.875,0.5 c 0,0 0.250763,0.02438 0.4375,0.40625 0.017853,0.03651 0.046318,0.04988 0.0625,0.09375 0.1129372,0.318132 0.2124732,0.646641 0.375,0.9375 -0.00302,0.215512 -0.09375,0.34375 -0.09375,0.34375 L 2.6875,13.9375 4.09375,15.34375 5.78125,14.375 c 0,0 0.1229911,-0.09744 0.34375,-0.09375 0.2720511,0.147787 0.5795915,0.23888 0.875,0.34375 0.033849,0.01202 0.059625,0.05108 0.09375,0.0625 C 7.4756199,14.874237 7.5,15.125 7.5,15.125 L 8,17 l 2,0 0.5,-1.875 c 0,0 0.02438,-0.250763 0.40625,-0.4375 0.03651,-0.01785 0.04988,-0.04632 0.09375,-0.0625 0.332335,-0.117979 0.666303,-0.23428 0.96875,-0.40625 0.177303,0.0173 0.28125,0.09375 0.28125,0.09375 l 1.65625,0.96875 1.40625,-1.40625 -0.96875,-1.65625 c 0,0 -0.07645,-0.103947 -0.09375,-0.28125 0.162527,-0.290859 0.262063,-0.619368 0.375,-0.9375 0.01618,-0.04387 0.04465,-0.05724 0.0625,-0.09375 C 14.874237,10.52438 15.125,10.5 15.125,10.5 L 17,10 17,8 15.125,7.5 c 0,0 -0.250763,-0.024382 -0.4375,-0.40625 C 14.669647,7.0572406 14.641181,7.0438697 14.625,7 14.55912,6.8144282 14.520616,6.6141566 14.4375,6.4375 c -0.224363,-0.4866 0,-0.71875 0,-0.71875 L 15.40625,4.0625 14,2.625 l -1.65625,1 c 0,0 -0.253337,0.1695664 -0.71875,-0.03125 l -0.03125,0 C 11.405359,3.5035185 11.198648,3.4455201 11,3.375 10.95613,3.3588185 10.942759,3.3303534 10.90625,3.3125 10.524382,3.125763 10.5,2.875 10.5,2.875 L 10,1 8,1 z m 1,5 c 1.656854,0 3,1.3431458 3,3 0,1.656854 -1.343146,3 -3,3 C 7.3431458,12 6,10.656854 6,9 6,7.3431458 7.3431458,6 9,6 z\" /></g><g id=\"repetition\" oryx:anchors=\"bottom\"><path oryx:anchors=\"bottom\" fill=\"none\" stroke=\"#bbbbbb\" stroke-width=\"2\" d=\"M47 68 v10 M50 68 v10 M53 68 v10\" transform=\"translate(10,0)\"/></g></g></svg>",
     "icon" : "activity/servicetask.png",
     "groups" : [ "Activities" ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "servicetaskclasspackage", "servicetaskexpressionpackage", "servicetaskdelegateexpressionpackage", "servicetaskfieldspackage", "servicetaskresultvariablepackage", "repetitionruleconditionpackage" ],
+    "propertyPackages" : [
+      "overrideidpackage",
+      "namepackage",
+      "documentationpackage",
+      "servicetaskclasspackage",
+      "servicetaskexpressionpackage",
+      "servicetaskdelegateexpressionpackage",
+      "servicetaskfieldspackage",
+      "servicetaskresultvariablepackage",
+      "asyncpackage",
+      "repetitionruleconditionpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   },
@@ -835,6 +888,7 @@
         "documentationpackage",
         "decisiontaskdecisiontablereferencepackage",
         "decisiontaskthrowerroronnohitspackage",
+        "asyncpackage",
         "repetitionruleconditionpackage"
       ],
       "hiddenPropertyPackages": [],
@@ -873,6 +927,7 @@
         "httptasksaveresponseparameterspackage",
         "httptaskresultvariableprefixpackage",
         "servicetaskclasspackage",
+        "asyncpackage",
         "repetitionruleconditionpackage"
       ],
       "hiddenPropertyPackages": [],
@@ -891,7 +946,11 @@
     "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?> <svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" width=\"146\" height=\"54\" version=\"1.0\"> <oryx:magnets> <oryx:magnet oryx:cx=\"1\" oryx:cy=\"27\" oryx:anchors=\"left\" /> <oryx:magnet oryx:cx=\"36\" oryx:cy=\"53\" oryx:anchors=\"bottom\" /> <oryx:magnet oryx:cx=\"72\" oryx:cy=\"53\" oryx:anchors=\"bottom\" /> <oryx:magnet oryx:cx=\"108\" oryx:cy=\"53\" oryx:anchors=\"bottom\" /> <oryx:magnet oryx:cx=\"145\" oryx:cy=\"27\" oryx:anchors=\"right\" /> <oryx:magnet oryx:cx=\"36\" oryx:cy=\"1\" oryx:anchors=\"top\" /> <oryx:magnet oryx:cx=\"72\" oryx:cy=\"1\" oryx:anchors=\"top\" /> <oryx:magnet oryx:cx=\"108\" oryx:cy=\"1\" oryx:anchors=\"top\" /> <oryx:magnet oryx:cx=\"72\" oryx:cy=\"27\" oryx:default=\"yes\" /> </oryx:magnets> <g pointer-events=\"fill\" oryx:minimumSize=\"146 54\" oryx:maximumSize=\"400 54\"> <rect id=\"mileStone\" oryx:resize=\"horizontal\" x=\"0\" y=\"0\" width=\"146\" height=\"54\" rx=\"24\" ry=\"30\" stroke=\"black\" fill=\"#ffffff\"/> <text font-size=\"12\" id=\"text_name\" x=\"73\" y=\"26\" oryx:align=\"middle center\" oryx:fittoelem=\"mileStone\" stroke=\"black\"> </text> <g id=\"required\" display=\"none\"> <path d=\"M68 40 L68 47 M68 49 L68 51 \" fill=\"none\" oryx:anchors=\"bottom\"/> </g> <g id=\"repetition\" oryx:anchors=\"bottom\"><path oryx:anchors=\"bottom\" fill=\"none\" stroke=\"#bbbbbb\" stroke-width=\"2\" d=\"M64 40 v11 M67 40 v11 M70 40 v11\" transform=\"translate(13,0)\"/></g></g> </svg>",
     "icon" : "activity/milestone.png",
     "groups" : [ "Activities" ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "repetitionruleconditionpackage" ],
+    "propertyPackages" : [
+      "overrideidpackage",
+      "namepackage",
+      "documentationpackage",
+      "repetitionruleconditionpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -902,7 +961,14 @@
     "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?> <svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"102\" height=\"82\" version=\"1.0\"> <defs></defs> <oryx:magnets> <oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" /> <oryx:magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" /> <oryx:magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" /> <oryx:magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /> <oryx:magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /> <oryx:magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /> <oryx:magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" /> <oryx:magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" /> <oryx:magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" /> <oryx:magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" /> <oryx:magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" /> <oryx:magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" /> <oryx:magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" /> </oryx:magnets> <g pointer-events=\"fill\" oryx:minimumSize=\"50 40\"> <rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"79\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" /> <rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"100\" height=\"80\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\" fill=\"#f9f9f9\" /> <text font-size=\"12\" id=\"text_name\" x=\"50\" y=\"40\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"#373e48\"> </text> <g id=\"caseTask\" transform=\"scale(0.7,0.7) translate(8,8)\"> <path oryx:anchors=\"top left\" style=\"opacity:1;fill:#000000;stroke:#000000\" d=\"M5 4 L9 0 L18 0 L 21 3z\"/> <path oryx:anchors=\"top left\" style=\"opacity:1;fill:#F4F6F7;stroke:#000000\" d=\"M1 23 L1 4 L30 4 L30 23z\"/> </g> <g id=\"repetition\" oryx:anchors=\"bottom\"><path oryx:anchors=\"bottom\" fill=\"none\" stroke=\"#bbbbbb\" stroke-width=\"2\" d=\"M47 68 v10 M50 68 v10 M53 68 v10\" transform=\"translate(10,0)\"/></g> </g> </svg>",
     "icon" : "activity/casetask.png",
     "groups" : [ "Activities" ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "blockingpackage", "casetaskcasereferencepackage", "repetitionruleconditionpackage"],
+    "propertyPackages" : [
+      "overrideidpackage",
+      "namepackage",
+      "documentationpackage",
+      "blockingpackage",
+      "casetaskcasereferencepackage",
+      "asyncpackage",
+      "repetitionruleconditionpackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -913,7 +979,14 @@
     "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?> <svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"102\" height=\"82\" version=\"1.0\"> <defs></defs> <oryx:magnets> <oryx:magnet oryx:cx=\"1\" oryx:cy=\"20\" oryx:anchors=\"left\" /> <oryx:magnet oryx:cx=\"1\" oryx:cy=\"40\" oryx:anchors=\"left\" /> <oryx:magnet oryx:cx=\"1\" oryx:cy=\"60\" oryx:anchors=\"left\" /> <oryx:magnet oryx:cx=\"25\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /> <oryx:magnet oryx:cx=\"50\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /> <oryx:magnet oryx:cx=\"75\" oryx:cy=\"79\" oryx:anchors=\"bottom\" /> <oryx:magnet oryx:cx=\"99\" oryx:cy=\"20\" oryx:anchors=\"right\" /> <oryx:magnet oryx:cx=\"99\" oryx:cy=\"40\" oryx:anchors=\"right\" /> <oryx:magnet oryx:cx=\"99\" oryx:cy=\"60\" oryx:anchors=\"right\" /> <oryx:magnet oryx:cx=\"25\" oryx:cy=\"1\" oryx:anchors=\"top\" /> <oryx:magnet oryx:cx=\"50\" oryx:cy=\"1\" oryx:anchors=\"top\" /> <oryx:magnet oryx:cx=\"75\" oryx:cy=\"1\" oryx:anchors=\"top\" /> <oryx:magnet oryx:cx=\"50\" oryx:cy=\"40\" oryx:default=\"yes\" /> </oryx:magnets> <g pointer-events=\"fill\" oryx:minimumSize=\"50 40\"> <rect id=\"text_frame\" oryx:anchors=\"bottom top right left\" x=\"1\" y=\"1\" width=\"94\" height=\"79\" rx=\"10\" ry=\"10\" stroke=\"none\" stroke-width=\"0\" fill=\"none\" /> <rect id=\"bg_frame\" oryx:resize=\"vertical horizontal\" x=\"0\" y=\"0\" width=\"100\" height=\"80\" rx=\"10\" ry=\"10\" stroke=\"#bbbbbb\" stroke-width=\"1\" fill=\"#f9f9f9\" /> <text font-size=\"12\" id=\"text_name\" x=\"50\" y=\"40\" oryx:align=\"middle center\" oryx:fittoelem=\"text_frame\" stroke=\"#373e48\"> </text> <g id=\"processTask\" transform=\"scale(0.7,0.7) translate(8,8)\"> <path oryx:anchors=\"top left\" style=\"opacity:1;fill:#F4F6F7;stroke:#000000\" d=\"M1 23 L7 11 L1 0 L30 0 L 35 11 L 30 23z\"/> </g> <g id=\"repetition\" oryx:anchors=\"bottom\"><path oryx:anchors=\"bottom\" fill=\"none\" stroke=\"#bbbbbb\" stroke-width=\"2\" d=\"M47 68 v10 M50 68 v10 M53 68 v10\" transform=\"translate(10,0)\"/></g> </g> </svg>",
     "icon" : "activity/processtask.png",
     "groups" : [ "Activities" ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "blockingpackage", "processtaskprocessreferencepackage", "repetitionruleconditionpackage"],
+    "propertyPackages" : [
+      "overrideidpackage",
+      "namepackage",
+      "documentationpackage",
+      "blockingpackage",
+      "processtaskprocessreferencepackage",
+      "asyncpackage",
+      "repetitionruleconditionpackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -924,7 +997,12 @@
     "view" : "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>\n<svg\n   xmlns=\"http://www.w3.org/2000/svg\"\n   xmlns:oryx=\"http://www.b3mn.org/oryx\"\n   width=\"40\"\n   height=\"40\"\n   version=\"1.0\">\n  <defs></defs>\n  <oryx:magnets>\n  \t<oryx:magnet oryx:cx=\"16\" oryx:cy=\"16\" oryx:default=\"yes\" />\n  </oryx:magnets>\n  <g pointer-events=\"fill\">\n    <circle \n    \tid=\"bg_frame\" \n    \tcx=\"16\" \n    \tcy=\"16\" \n    \tr=\"15\" \n    \tstroke=\"#585858\" \n    \tfill=\"#ffffff\" \n    \tstroke-width=\"1\"\n    \tstyle=\"stroke-dasharray: 5.5, 3\" />\n    <circle id=\"frame\" cx=\"16\" cy=\"16\" r=\"15\" stroke=\"#585858\" fill=\"none\" stroke-width=\"1\"/>\n    \n    <path id=\"path1\" transform=\"translate(6,6)\"\n    \td=\"M 10 0 C 4.4771525 0 0 4.4771525 0 10 C 0 15.522847 4.4771525 20 10 20 C 15.522847 20 20 15.522847 20 10 C 20 4.4771525 15.522847 1.1842379e-15 10 0 z M 9.09375 1.03125 C 9.2292164 1.0174926 9.362825 1.0389311 9.5 1.03125 L 9.5 3.5 L 10.5 3.5 L 10.5 1.03125 C 15.063526 1.2867831 18.713217 4.9364738 18.96875 9.5 L 16.5 9.5 L 16.5 10.5 L 18.96875 10.5 C 18.713217 15.063526 15.063526 18.713217 10.5 18.96875 L 10.5 16.5 L 9.5 16.5 L 9.5 18.96875 C 4.9364738 18.713217 1.2867831 15.063526 1.03125 10.5 L 3.5 10.5 L 3.5 9.5 L 1.03125 9.5 C 1.279102 5.0736488 4.7225326 1.4751713 9.09375 1.03125 z M 9.5 5 L 9.5 8.0625 C 8.6373007 8.2844627 8 9.0680195 8 10 C 8 11.104569 8.8954305 12 10 12 C 10.931981 12 11.715537 11.362699 11.9375 10.5 L 14 10.5 L 14 9.5 L 11.9375 9.5 C 11.756642 8.7970599 11.20294 8.2433585 10.5 8.0625 L 10.5 5 L 9.5 5 z \"  \n    \tfill=\"#585858\" stroke=\"none\" />\n   \n\t<text font-size=\"11\" \n\t\tid=\"text_name\" \n\t\tx=\"16\" y=\"33\" \n\t\toryx:align=\"top center\" \n\t\tstroke=\"#373e48\"\n\t></text>\n  </g>\n</svg>",
     "icon" : "activity/timereventlistener.png",
     "groups" : [ "Event Listeners" ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "timerexpressionpackage", "timerstarttriggerpackage"],
+    "propertyPackages" : [
+      "overrideidpackage",
+      "namepackage",
+      "documentationpackage",
+      "timerexpressionpackage",
+      "timerstarttriggerpackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -935,7 +1013,11 @@
     "view" : "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\" ?><svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"14\"  height=\"22\" version=\"1.0\"> <oryx:magnets><oryx:magnet oryx:cx=\"8\" oryx:cy=\"10\" oryx:default=\"yes\" /></oryx:magnets><oryx:docker oryx:cx=\"16\" oryx:cy=\"16\" /><g pointer-events=\"fill\"><defs><radialGradient id=\"background\" cx=\"10%\" cy=\"10%\" r=\"100%\" fx=\"10%\" fy=\"10%\"><stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/><stop id=\"fill_el\" offset=\"100%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/></radialGradient></defs><polygon id=\"bg_frame\" points=\"7 0  14 11  7 22 0 11\" fill=\"url(#background) #ffffff\" stroke=\"#000000\"/></g></svg>",
     "icon" : "sentry/entry.png",
     "groups" : [ "Sentries" ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "ifpartconditionpackage" ],
+    "propertyPackages" : [
+      "overrideidpackage",
+      "namepackage",
+      "documentationpackage",
+      "ifpartconditionpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "association_start", "association_end", "SentriesMorph", "EntryCriterionOnItemBoundary" ]
   }, {
@@ -946,7 +1028,11 @@
     "view" : "<?xml version=\"1.0\" encoding=\"utf-8\" standalone=\"no\" ?><svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:svg=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://www.b3mn.org/oryx\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" width=\"14\"  height=\"22\" version=\"1.0\"> <oryx:magnets><oryx:magnet oryx:cx=\"8\" oryx:cy=\"10\" oryx:default=\"yes\" /></oryx:magnets><oryx:docker oryx:cx=\"16\" oryx:cy=\"16\" /><g pointer-events=\"fill\"><defs><radialGradient id=\"background\" cx=\"10%\" cy=\"10%\" r=\"100%\" fx=\"10%\" fy=\"10%\"><stop offset=\"0%\" stop-color=\"#ffffff\" stop-opacity=\"1\"/><stop id=\"fill_el\" offset=\"100%\" stop-color=\"#000000\" stop-opacity=\"1\"/></radialGradient></defs><polygon id=\"bg_frame\" points=\"7 0  14 11  7 22 0 11\" fill=\"url(#background) #000000\" /></g></svg>",
     "icon" : "sentry/exit.png",
     "groups" : [ "Sentries" ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "ifpartconditionpackage" ],
+    "propertyPackages" : [
+      "overrideidpackage",
+      "namepackage",
+      "documentationpackage",
+      "ifpartconditionpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "association_start", "SentriesMorph", "ExitCriterionOnItemBoundary" ]
   }, {
@@ -960,7 +1046,11 @@
     "layout" : [ {
       "type" : "layout.bpmn2_0.sequenceflow"
     } ],
-    "propertyPackages" : [ "overrideidpackage", "namepackage", "documentationpackage", "transitioneventpackage" ],
+    "propertyPackages" : [
+      "overrideidpackage",
+      "namepackage",
+      "documentationpackage",
+      "transitioneventpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "ConnectingObjectsMorph", "all" ]
   }],

@@ -24,8 +24,7 @@ public class DecisionTaskExport extends AbstractPlanItemDefinitionExport {
     public static void writeDecisionTask(DecisionTask decisionTask, XMLStreamWriter xtw) throws Exception {
         // start decision task element
         xtw.writeStartElement(ELEMENT_DECISION_TASK);
-        writeCommonPlanItemDefinitionAttributes(decisionTask, xtw);
-        writeBlockingAttribute(xtw, decisionTask);
+        writeCommonTaskAttributes(xtw, decisionTask);
 
         writeExtensions(decisionTask, xtw);
 

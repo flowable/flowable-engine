@@ -89,9 +89,22 @@ public class TaskXmlConverter extends PlanItemDefinitiomXmlConverter {
             task.setBlocking(Boolean.valueOf(isBlockingString));
         }
 
-        String isBlockingExpressionString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_IS_BLOCKING_EXPRESSION);
+        String isBlockingExpressionString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, 
+                CmmnXmlConstants.ATTRIBUTE_IS_BLOCKING_EXPRESSION);
         if (StringUtils.isNotEmpty(isBlockingExpressionString)) {
             task.setBlockingExpression(isBlockingExpressionString);
+        }
+        
+        String isAsyncString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, 
+                CmmnXmlConstants.ATTRIBUTE_IS_ASYNCHRONOUS);
+        if (StringUtils.isNotEmpty(isAsyncString)) {
+            task.setAsync(Boolean.valueOf(isAsyncString.toLowerCase()));
+        }
+        
+        String isExclusiveString = xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, 
+                CmmnXmlConstants.ATTRIBUTE_IS_EXCLUSIVE);
+        if (StringUtils.isNotEmpty(isExclusiveString)) {
+            task.setExclusive(Boolean.valueOf(isExclusiveString));
         }
     }
 }

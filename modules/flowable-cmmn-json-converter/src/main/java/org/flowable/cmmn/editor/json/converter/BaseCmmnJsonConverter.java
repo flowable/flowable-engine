@@ -94,6 +94,16 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
                 }
             }
         }
+        
+        if (planItemDefinition instanceof Task) {
+            Task task = (Task) planItemDefinition;
+            if (task.isAsync()) {
+                propertiesNode.put(PROPERTY_IS_ASYNC, task.isAsync());
+            }
+            if (task.isExclusive()) {
+                propertiesNode.put(PROPERTY_IS_EXCLUSIVE, task.isExclusive());
+            }
+        }
 
         convertElementToJson(planItemNode, propertiesNode, processor, baseElement, model);
 
@@ -132,6 +142,8 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
                 Task task = (Task) planItemDefinition;
                 task.setBlocking(getPropertyValueAsBoolean(PROPERTY_IS_BLOCKING, elementNode));
                 task.setBlockingExpression(getPropertyValueAsString(PROPERTY_IS_BLOCKING_EXPRESSION, elementNode));
+                task.setAsync(getPropertyValueAsBoolean(PROPERTY_IS_ASYNC, elementNode));
+                task.setExclusive(getPropertyValueAsBoolean(PROPERTY_IS_EXCLUSIVE, elementNode));
             }
 
             Stage stage = (Stage) parentElement;

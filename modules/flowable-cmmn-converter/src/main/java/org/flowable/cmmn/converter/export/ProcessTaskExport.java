@@ -22,8 +22,7 @@ public class ProcessTaskExport extends AbstractPlanItemDefinitionExport {
     public static void writeProcessTask(ProcessTask processTask, XMLStreamWriter xtw) throws Exception {
         // start process task element
         xtw.writeStartElement(ELEMENT_PROCESS_TASK);
-        writeCommonPlanItemDefinitionAttributes(processTask, xtw);
-        writeBlockingAttribute(xtw, processTask);
+        writeCommonTaskAttributes(xtw, processTask);
 
         if (StringUtils.isNotEmpty(processTask.getProcessRef()) || StringUtils.isNotEmpty(processTask.getProcessRefExpression())) {
             xtw.writeStartElement(ELEMENT_PROCESS_REF_EXPRESSION);

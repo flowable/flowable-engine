@@ -63,6 +63,7 @@ import org.flowable.cmmn.engine.impl.history.CmmnHistoryTaskManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryVariableManager;
 import org.flowable.cmmn.engine.impl.history.DefaultCmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.interceptor.CmmnCommandInvoker;
+import org.flowable.cmmn.engine.impl.job.AsyncActivatePlanItemInstanceJobHandler;
 import org.flowable.cmmn.engine.impl.job.TriggerTimerEventJobHandler;
 import org.flowable.cmmn.engine.impl.parser.CmmnActivityBehaviorFactory;
 import org.flowable.cmmn.engine.impl.parser.CmmnParser;
@@ -1092,6 +1093,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     public void initJobHandlers() {
         jobHandlers = new HashMap<>();
         jobHandlers.put(TriggerTimerEventJobHandler.TYPE, new TriggerTimerEventJobHandler());
+        jobHandlers.put(AsyncActivatePlanItemInstanceJobHandler.TYPE, new AsyncActivatePlanItemInstanceJobHandler());
 
         // if we have custom job handlers, register them
         if (customJobHandlers != null) {

@@ -40,6 +40,11 @@ public interface PlanItemInstanceState {
      * need an instance to be persisted.
      */
     String WAITING_FOR_REPETITION = "wait_repetition";
+    
+    /*
+     * Non-spec state, indicating the plan item instance is scheduled to be made ACTIVE asynchronously.
+     */
+    String ASYNC_ACTIVE = "async-active";
 
     Set<String> EVALUATE_ENTRY_CRITERIA_STATES = new HashSet<>(Arrays.asList(AVAILABLE, WAITING_FOR_REPETITION));
     
