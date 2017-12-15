@@ -639,7 +639,7 @@ public class ModelServiceImpl implements ModelService {
 
         } catch (Exception e) {
             LOGGER.error("Could not generate BPMN 2.0 model for {}", model.getId(), e);
-            throw new InternalServerErrorException("Could not generate BPMN 2.0 model");
+            throw new InternalServerErrorException("Could not generate BPMN 2.0 model", e);
         }
     }
 
@@ -820,6 +820,9 @@ public class ModelServiceImpl implements ModelService {
         {
           addFormToProcess(process, processFormAttribute, processedForms);
         }
+
+        handleProcessForm(process,"viewprocessforms", processedForms );
+        handleProcessForm(process,"editprocessforms", processedForms );
   
         for (FlowElement flowElement : process.getFlowElements())
         {
@@ -843,6 +846,27 @@ public class ModelServiceImpl implements ModelService {
         }
       }
     }
+
+    private void handleProcessForm(Process process, String elementName, Map processedForms) {
+        if(process.getExtensionElements().get(elementName) != null && process.getExtensionElements().get(elementName).size() > 0) {
+            List<ExtensionElement> viewProcessFormList = process.getExtensionElements().get(elementName).get(0)
+                .getChildElements().get("processform");
+            if(viewProcessFormList == null) {
+                return;
+            }
+
+            for(ExtensionElement viewProcessForm : viewProcessFormList) {
+                String formkey = viewProcessForm.getAttributeValue(null, "formkey");
+
+                if (StringUtils.isNotBlank(formkey) && !processedForms.containsKey(formkey))
+                {
+                    addFormToProcess(process, formkey, processedForms);
+                }
+            }
+        }
+    }
+
+
   
     private void addFormToProcess(Process process, String formKey, Map<String, String> processedForms)
     { 

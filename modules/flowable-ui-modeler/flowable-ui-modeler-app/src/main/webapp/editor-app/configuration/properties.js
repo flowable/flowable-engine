@@ -62,9 +62,9 @@ FLOWABLE.PROPERTY_CONFIG =
         "readModeTemplateUrl": "editor-app/configuration/properties/form-reference-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/form-reference-write-template.html"
     },
-    "oryx-rds_processformkey-complex": {
-      	"readModeTemplateUrl": "editor-app/configuration/properties/form-reference-display-template.html",
-        "writeModeTemplateUrl": "editor-app/configuration/properties/form-reference-write-template.html"
+    "rds-processforms": {
+        "readModeTemplateUrl": "editor-app/configuration/properties/processforms-reference-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/processforms-reference-write-template.html"
     },
     "oryx-rds_conditionsequenceflowformkey-complex": {
         "readModeTemplateUrl": "editor-app/configuration/properties/form-reference-display-template.html",

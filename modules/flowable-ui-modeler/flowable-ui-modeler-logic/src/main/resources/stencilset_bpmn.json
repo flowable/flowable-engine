@@ -3,22 +3,22 @@
   "namespace" : "http://b3mn.org/stencilset/bpmn2.0#",
   "description" : "BPMN process editor",
   "propertyPackages" : [ {
-    "name" : "rds_formkeypackage",
+    "name" : "rds_viewprocessformspackage",
     "properties" : [ {
-      "id" : "rds_processformkey",
-      "type" : "Complex",
-      "title" : "Form key (View Process)",
-      "value" : "",
-      "description" : "Form Key to view process instance",
+      "id" : "rds_viewprocessforms",
+      "type" : "rds-processforms",
+      "title" : "Forms to view process",
+      "value" : [],
+      "description" : "Forms to view process instance",
       "popular" : true
     } ]
   }, {
-    "name" : "rds_editformkeypackage",
+    "name" : "rds_editprocessformspackage",
     "properties" : [ {
-      "id" : "rds_editprocessformkey",
-      "type" : "Complex",
-      "title" : "Form key (Edit Process)",
-      "value" : "",
+      "id" : "rds_editprocessforms",
+      "type" : "rds-processforms",
+      "title" : "Forms to edit process",
+      "value" : [],
       "description" : "Form Key to edit process instance",
       "popular" : true
     } ]
@@ -32,46 +32,6 @@
       "description" : "Is this a RDS workbox task?",
       "popular" : true
     } ]
-  }, {
-	"name" : "rds_viewprocessuserpackage",
-	"properties" : [ {
-		"id" : "rds_viewprocessuser",
-		"type" : "String",
-		"title" : "User (View Process)",
-		"value" : "",
-		"description" : "Which user, can view the entire process info?",
-		"popular" : true
-		} ]
-  }, {
-	"name" : "rds_viewprocessgrouppackage",
-	"properties" : [ {
-		"id" : "rds_viewprocessgroup",
-		"type" : "String",
-		"title" : "Group (View Process)",
-		"value" : "",
-		"description" : "Which group, can view the entire process info?",
-		"popular" : true
-	} ]
-  }, {
-	"name" : "rds_editprocessuserpackage",
-	"properties" : [ {
-		"id" : "rds_editprocessuser",
-		"type" : "String",
-		"title" : "User (Edit Process)",
-		"value" : "",
-		"description" : "Which user, can edit the entire process info?",
-		"popular" : true
-		} ]
-  }, {
-	"name" : "rds_editprocessgrouppackage",
-	"properties" : [ {
-		"id" : "rds_editprocessgroup",
-		"type" : "String",
-		"title" : "Group (Edit Process)",
-		"value" : "",
-		"description" : "Which group, can edit the entire process info?",
-		"popular" : true
-	} ]
   }, {
     "name" : "process_candidatespackage",
     "properties" : [ {
@@ -1021,7 +981,7 @@
     "groups" : [ "Diagram" ],
     "mayBeRoot" : true,
     "hide" : true,
-    "propertyPackages" : [ "process_idpackage", "namepackage", "documentationpackage", "process_authorpackage", "process_versionpackage", "process_namespacepackage", "executionlistenerspackage", "eventlistenerspackage", "signaldefinitionspackage", "messagedefinitionspackage", "rds_formkeypackage", "rds_viewprocessuserpackage", "rds_viewprocessgrouppackage", "rds_editformkeypackage", "rds_editprocessuserpackage", "rds_editprocessgrouppackage", "process_potentialstarteruserpackage","process_potentialstartergrouppackage" ],
+    "propertyPackages" : [ "process_idpackage", "namepackage", "documentationpackage", "process_authorpackage", "process_versionpackage", "process_namespacepackage", "executionlistenerspackage", "eventlistenerspackage", "signaldefinitionspackage", "messagedefinitionspackage", "rds_viewprocessformspackage", "rds_editprocessformspackage", "process_potentialstarteruserpackage","process_potentialstartergrouppackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ ]
   }, {

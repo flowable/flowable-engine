@@ -78,7 +78,12 @@ angular.module('flowableModeler').controller('FlowableFormReferencePopupCtrl',
    	 	} else {
    	 		$scope.property.value = null; 
    	 	}
-   	 	$scope.updatePropertyInModel($scope.property);
+
+   	 	if($scope.updatePropertyInModelForDialog) {
+   	 	    $scope.updatePropertyInModelForDialog($scope.property);
+   	 	} else {
+   	 	    $scope.updatePropertyInModel($scope.property);
+   	 	}
    	 	$scope.close();
     };
     
