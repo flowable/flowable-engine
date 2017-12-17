@@ -153,7 +153,7 @@ joda-time                       joda-time                   2.9.9           Apac
 log4j                           log4j                       1.2.17          The Apache Software License, Version 2.0
 math.geom2d                     javaGeom                    0.11.1          Lesser General Public License version 2.0 (LGPLv2)
 org.apache.commons              commons-email               1.5             Apache License, Version 2.0
-org.apache.commons              commons-lang3               3.3.2           The Apache Software License, Version 2.0
+org.apache.commons              commons-lang3               3.7             The Apache Software License, Version 2.0
 org.apache.httpcomponents       httpclient                  4.5.3           Apache License, Version 2.0
 org.apache.httpcomponents       httpcore                    4.4.6           Apache License, Version 2.0
 org.apache.httpcomponents       httpmime                    4.5.3           Apache License, Version 2.0
