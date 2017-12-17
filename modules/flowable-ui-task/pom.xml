@@ -72,9 +72,8 @@
             <version>2.3.20</version>
         </dependency>
         <dependency>
-        	<groupId>javax.mail</groupId>
-        	<artifactId>mail</artifactId>
-        	<version>1.4.7</version>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
         </dependency>
         <dependency>
 			<groupId>commons-validator</groupId>
