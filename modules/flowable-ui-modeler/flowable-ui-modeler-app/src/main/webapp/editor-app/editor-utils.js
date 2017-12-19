@@ -69,6 +69,10 @@ EDITOR.UTIL = {
     },
 
     collectSortedElementsFromPrecedingElements: function (startElement) {
+        if(!startElement.getIncomingShapes) {
+            return;
+        }
+
         var visitedElements = [];
         var collectedElements = [];
 
