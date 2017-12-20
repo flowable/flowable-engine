@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             xmlns:sasbpmn="http://www.sas.com/xml/schema/bpmn"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.flowable.org/Test">
+    <message id="ID_f23a827c-28a1-49a1-b25a-d2c897a06682" name="cancel" />
+    <process id="ID_b8a6875f-6c4b-4864-b369-af6e69c612a5" name="EventsMessageEventOnMultiInstanceSequentialUserTask" isExecutable="true">
+        <extensionElements>
+        </extensionElements>
+        <boundaryEvent id="cancelBoundaryEvent" cancelActivity='true' attachedToRef="usertask1">
+            <messageEventDefinition messageRef="ID_f23a827c-28a1-49a1-b25a-d2c897a06682"/>
+        </boundaryEvent>
+
+        <startEvent id="startevent1" name="Start"></startEvent>
+        <endEvent id="endevent1" name="End"></endEvent>
+        <userTask id="usertask1" name="Task A-${loopCounter}">
+            <multiInstanceLoopCharacteristics isSequential="true">
+                <loopCardinality>2</loopCardinality>
+            </multiInstanceLoopCharacteristics>
+        </userTask>
+        <sequenceFlow id="Cancel" sourceRef="cancelBoundaryEvent" targetRef="endevent1"/>
+        <sequenceFlow id="Start" sourceRef="startevent1" targetRef="usertask1"/>
+        <sequenceFlow id="Done" sourceRef="usertask1" targetRef="endevent1"/>
+    </process>
+</definitions>

@@ -15,6 +15,7 @@ package org.flowable.engine.impl.bpmn.behavior;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -145,7 +146,9 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         ExecutionEntity parentExecution = multiInstanceRootExecution.getParent();
         
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
-        executionEntityManager.deleteChildExecutions(multiInstanceRootExecution, DELETE_REASON_END, true);
+        Collection<String> executionIdsNotToSendCancelledEventsFor = execution.isMultiInstanceRoot() ? Collections.<String>emptyList() : Collections
+                .singletonList(execution.getId());
+        executionEntityManager.deleteChildExecutions(multiInstanceRootExecution, executionIdsNotToSendCancelledEventsFor, DELETE_REASON_END, true, false);
         executionEntityManager.deleteRelatedDataForExecution(multiInstanceRootExecution, null);
         executionEntityManager.delete(multiInstanceRootExecution);
 
