@@ -43,6 +43,7 @@ public class HitPolicyOutputOrder extends AbstractHitPolicy implements ComposeDe
             List<Object> outputValues = entry.getValue();
             if (outputValues != null && !outputValues.isEmpty()) {
                 outputValuesPresent = true;
+                break;
             }
         }
         
