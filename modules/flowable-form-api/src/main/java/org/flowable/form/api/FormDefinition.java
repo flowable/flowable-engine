@@ -43,7 +43,7 @@ public interface FormDefinition {
     int getVersion();
 
     /**
-     * name of {@link FormRepositoryService#getResourceAsStream(String, String) the resource} of this process definition.
+     * name of {@link FormRepositoryService#getResourceAsStream(String, String) the resource} of this form definition.
      */
     String getResourceName();
 

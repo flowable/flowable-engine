@@ -18,7 +18,7 @@ import java.util.List;
 import org.flowable.dmn.model.DmnDefinition;
 
 /**
- * Service providing access to the repository of process definitions and deployments.
+ * Service providing access to the repository of decision tables and deployments.
  *
  * @author Tijs Rademakers
  * @author Yvo Swillens
