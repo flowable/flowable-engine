@@ -859,6 +859,11 @@
 				<artifactId>imgscalr-lib</artifactId>
 				<version>4.2</version>
 			</dependency>
+			<dependency>
+				<groupId>math.geom2d</groupId>
+				<artifactId>javaGeom</artifactId>
+				<version>0.11.1</version>
+			</dependency>
 			<!-- Camel integration -->
 			<dependency>
 				<groupId>org.apache.camel</groupId>
