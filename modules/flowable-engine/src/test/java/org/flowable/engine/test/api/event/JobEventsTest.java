@@ -394,7 +394,7 @@ public class JobEventsTest extends PluggableFlowableTestCase {
         Calendar tomorrow = Calendar.getInstance();
         tomorrow.add(Calendar.DAY_OF_YEAR, 1);
         processEngineConfiguration.getClock().setCurrentTime(tomorrow.getTime());
-        waitForJobExecutorToProcessAllJobs(2000, 100);
+        waitForJobExecutorToProcessAllJobs(20000, 100);
 
         // Check Timer fired event has been dispatched
         assertEquals(6, listener.getEventsReceived().size());
