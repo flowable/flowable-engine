@@ -12,12 +12,19 @@
  */
 package org.flowable.editor.language.json.converter;
 
+import java.awt.Shape;
+import java.awt.geom.Area;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.Path2D;
+import java.awt.geom.Rectangle2D;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -59,12 +66,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import math.geom2d.Point2D;
-import math.geom2d.conic.Circle2D;
-import math.geom2d.curve.AbstractContinuousCurve2D;
-import math.geom2d.line.Line2D;
-import math.geom2d.polygon.Polyline2D;
 
 /**
  * @author Tijs Rademakers
@@ -189,6 +190,8 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         DI_GATEWAY.add(STENCIL_GATEWAY_INCLUSIVE);
         DI_GATEWAY.add(STENCIL_GATEWAY_PARALLEL);
     }
+
+    protected double lineWidth = 0.05d;
 
     public ObjectNode convertToJson(BpmnModel model) {
         return convertToJson(model, null, null);
@@ -934,16 +937,16 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                 nextPointInLineY += targetInfo.getY();
             }
 
-            Line2D firstLine = new Line2D(sourceRefLineX, sourceRefLineY, nextPointInLineX, nextPointInLineY);
+            java.awt.geom.Line2D firstLine = new java.awt.geom.Line2D.Double(sourceRefLineX, sourceRefLineY, nextPointInLineX, nextPointInLineY);
 
             String sourceRefStencilId = BpmnJsonConverterUtil.getStencilId(sourceRefNode);
             String targetRefStencilId = BpmnJsonConverterUtil.getStencilId(targetRefNode);
 
             List<GraphicInfo> graphicInfoList = new ArrayList<>();
 
-            AbstractContinuousCurve2D source2D = null;
+            Area source2D = null;
             if (DI_CIRCLES.contains(sourceRefStencilId)) {
-                source2D = new Circle2D(sourceInfo.getX() + sourceDockersX, sourceInfo.getY() + sourceDockersY, sourceDockersX);
+                source2D = createEllipse(sourceInfo, sourceDockersX, sourceDockersY);
 
             } else if (DI_RECTANGLES.contains(sourceRefStencilId)) {
                 source2D = createRectangle(sourceInfo);
@@ -953,16 +956,16 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
             }
 
             if (source2D != null) {
-                Collection<Point2D> intersections = source2D.intersections(firstLine);
+                Collection<java.awt.geom.Point2D> intersections = getIntersections(firstLine, source2D);
                 if (intersections != null && intersections.size() > 0) {
-                    Point2D intersection = intersections.iterator().next();
-                    graphicInfoList.add(createGraphicInfo(intersection.x(), intersection.y()));
+                    java.awt.geom.Point2D intersection = intersections.iterator().next();
+                    graphicInfoList.add(createGraphicInfo(intersection.getX(), intersection.getY()));
                 } else {
                     graphicInfoList.add(createGraphicInfo(sourceRefLineX, sourceRefLineY));
                 }
             }
 
-            Line2D lastLine = null;
+            java.awt.geom.Line2D lastLine = null;
 
             if (dockersNode.size() > 2) {
                 for (int i = 1; i < dockersNode.size() - 1; i++) {
@@ -980,13 +983,13 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                 endLastLineX += targetInfo.getX();
                 endLastLineY += targetInfo.getY();
 
-                lastLine = new Line2D(startLastLineX, startLastLineY, endLastLineX, endLastLineY);
+                lastLine = new java.awt.geom.Line2D.Double(startLastLineX, startLastLineY, endLastLineX, endLastLineY);
 
             } else {
                 lastLine = firstLine;
             }
 
-            AbstractContinuousCurve2D target2D = null;
+            Area target2D = null;
             if (DI_RECTANGLES.contains(targetRefStencilId)) {
                 target2D = createRectangle(targetInfo);
 
@@ -995,19 +998,19 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
                 double targetDockersX = dockersNode.get(dockersNode.size() - 1).get(EDITOR_BOUNDS_X).asDouble();
                 double targetDockersY = dockersNode.get(dockersNode.size() - 1).get(EDITOR_BOUNDS_Y).asDouble();
 
-                target2D = new Circle2D(targetInfo.getX() + targetDockersX, targetInfo.getY() + targetDockersY, targetDockersX);
+                target2D = createEllipse(targetInfo, targetDockersX, targetDockersY);
 
             } else if (DI_GATEWAY.contains(targetRefStencilId)) {
                 target2D = createGateway(targetInfo);
             }
 
             if (target2D != null) {
-                Collection<Point2D> intersections = target2D.intersections(lastLine);
+                Collection<java.awt.geom.Point2D> intersections = getIntersections(lastLine, target2D);
                 if (intersections != null && intersections.size() > 0) {
-                    Point2D intersection = intersections.iterator().next();
-                    graphicInfoList.add(createGraphicInfo(intersection.x(), intersection.y()));
+                    java.awt.geom.Point2D intersection = intersections.iterator().next();
+                    graphicInfoList.add(createGraphicInfo(intersection.getX(), intersection.getY()));
                 } else {
-                    graphicInfoList.add(createGraphicInfo(lastLine.getPoint2().x(), lastLine.getPoint2().y()));
+                    graphicInfoList.add(createGraphicInfo(lastLine.getX2(), lastLine.getY2()));
                 }
             }
 
@@ -1015,22 +1018,74 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         }
     }
 
-    private Polyline2D createRectangle(GraphicInfo graphicInfo) {
-        Polyline2D rectangle = new Polyline2D(new Point2D(graphicInfo.getX(), graphicInfo.getY()), new Point2D(graphicInfo.getX() + graphicInfo.getWidth(), graphicInfo.getY()),
-                new Point2D(graphicInfo.getX() + graphicInfo.getWidth(), graphicInfo.getY() + graphicInfo.getHeight()), new Point2D(graphicInfo.getX(), graphicInfo.getY() + graphicInfo.getHeight()),
-                new Point2D(graphicInfo.getX(), graphicInfo.getY()));
-        return rectangle;
+    protected Area createEllipse(GraphicInfo sourceInfo, double halfWidth, double halfHeight) {
+        Area outerCircle = new Area(new Ellipse2D.Double(
+                sourceInfo.getX(), sourceInfo.getY(), 2 * halfWidth, 2 * halfHeight
+        ));
+        Area innerCircle = new Area(new Ellipse2D.Double(
+                sourceInfo.getX() + lineWidth, sourceInfo.getY() + lineWidth, 2 * (halfWidth - lineWidth), 2 * (halfHeight - lineWidth)
+        ));
+        outerCircle.subtract(innerCircle);
+        return outerCircle;
     }
 
-    private Polyline2D createGateway(GraphicInfo graphicInfo) {
+    protected Collection<java.awt.geom.Point2D> getIntersections(java.awt.geom.Line2D line, Area shape) {
+        Area intersectionArea = new Area(getLineShape(line));
+        intersectionArea.intersect(shape);
+        if (!intersectionArea.isEmpty()) {
+            Rectangle2D bounds2D = intersectionArea.getBounds2D();
+            HashSet<java.awt.geom.Point2D> intersections = new HashSet<>(1);
+            intersections.add(new java.awt.geom.Point2D.Double(bounds2D.getX(), bounds2D.getY()));
+            return intersections;
+        }
+        return Collections.EMPTY_SET;
+    }
 
-        double middleX = graphicInfo.getX() + (graphicInfo.getWidth() / 2);
-        double middleY = graphicInfo.getY() + (graphicInfo.getHeight() / 2);
+    protected Shape getLineShape(java.awt.geom.Line2D line2D) {
+        Path2D line = new Path2D.Double(Path2D.WIND_NON_ZERO, 4);
+        line.moveTo(line2D.getX1(), line2D.getY1());
+        line.lineTo(line2D.getX2(), line2D.getY2());
+        line.lineTo(line2D.getX2() + lineWidth, line2D.getY2() + lineWidth);
+        line.closePath();
+        return line;
+    }
 
-        Polyline2D gatewayRectangle = new Polyline2D(new Point2D(graphicInfo.getX(), middleY), new Point2D(middleX, graphicInfo.getY()), new Point2D(graphicInfo.getX() + graphicInfo.getWidth(), middleY),
-                new Point2D(middleX, graphicInfo.getY() + graphicInfo.getHeight()), new Point2D(graphicInfo.getX(), middleY));
+    protected Area createRectangle(GraphicInfo graphicInfo) {
+        Area outerRectangle = new Area(new Rectangle2D.Double(
+                graphicInfo.getX(), graphicInfo.getY(),
+                graphicInfo.getWidth(), graphicInfo.getHeight()
+        ));
+        Area innerRectangle = new Area(new Rectangle2D.Double(
+                graphicInfo.getX() + lineWidth, graphicInfo.getY() + lineWidth,
+                graphicInfo.getWidth() - 2*lineWidth, graphicInfo.getHeight() - 2*lineWidth
+        ));
+        outerRectangle.subtract(innerRectangle);
+        return outerRectangle;
+    }
 
-        return gatewayRectangle;
+    protected Area createGateway(GraphicInfo graphicInfo) {
+        Area outerGatewayArea = new Area(
+                        createGatewayShape(graphicInfo.getX(), graphicInfo.getY(), graphicInfo.getWidth(), graphicInfo.getHeight())
+                );
+        Area innerGatewayArea = new Area(
+                        createGatewayShape(graphicInfo.getX()+lineWidth, graphicInfo.getY()+lineWidth,
+                                graphicInfo.getWidth()-2*lineWidth, graphicInfo.getHeight()-2*lineWidth)
+                );
+        outerGatewayArea.subtract(innerGatewayArea);
+        return outerGatewayArea;
+    }
+
+    private Path2D.Double createGatewayShape(double x, double y, double width, double height) {
+        double middleX = x + (width / 2);
+        double middleY = y + (height / 2);
+
+        Path2D.Double gatewayShape = new Path2D.Double(Path2D.WIND_NON_ZERO, 4);
+        gatewayShape.moveTo(x, middleY);
+        gatewayShape.lineTo(middleX, y);
+        gatewayShape.lineTo(x + width, middleY);
+        gatewayShape.lineTo(middleX, y + height);
+        gatewayShape.closePath();
+        return gatewayShape;
     }
 
     private GraphicInfo createGraphicInfo(double x, double y) {
