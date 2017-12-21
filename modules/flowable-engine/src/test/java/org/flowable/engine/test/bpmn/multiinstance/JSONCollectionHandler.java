@@ -17,8 +17,10 @@ import java.util.Collection;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.impl.delegate.FlowableCollectionHandler;
-import org.flowable.engine.impl.util.json.JSONArray;
-import org.flowable.engine.impl.util.json.JSONObject;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 /**
  * @author Lori Small
@@ -30,13 +32,13 @@ public class JSONCollectionHandler implements FlowableCollectionHandler {
     @Override
     @SuppressWarnings("rawtypes")
     public Collection resolveCollection(Object collectionValue, DelegateExecution execution) {
-        JSONArray jsonArray = new JSONArray((String) collectionValue);
+        JsonArray jsonArray = new JsonParser().parse((String) collectionValue).getAsJsonArray();
         ArrayList<String> collection = new ArrayList<>();
-        JSONObject jsonObj = null;
+        JsonObject jsonObj = null;
 
-        for (int i = 0; i < jsonArray.length(); i++) {
-            jsonObj = jsonArray.getJSONObject(i);
-            collection.add(jsonObj.getString("principal"));
+        for (int i = 0; i < jsonArray.size(); i++) {
+            jsonObj = jsonArray.get(i).getAsJsonObject();
+            collection.add(jsonObj.get("principal") != null ? jsonObj.get("principal").getAsString() : null);
         }
 
         return collection;
