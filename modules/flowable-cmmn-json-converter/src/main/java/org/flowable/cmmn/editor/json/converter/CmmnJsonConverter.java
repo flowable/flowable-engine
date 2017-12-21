@@ -115,7 +115,7 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         DI_SENTRY.add(STENCIL_EXIT_CRITERION);
     }
 
-    protected double lineWidth = 0.000001d;
+    protected double lineWidth = 0.05d;
 
     public ObjectNode convertToJson(CmmnModel model) {
         return convertToJson(model, null, null);

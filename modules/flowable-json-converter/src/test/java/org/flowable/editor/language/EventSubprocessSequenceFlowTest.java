@@ -30,7 +30,7 @@ public class EventSubprocessSequenceFlowTest extends AbstractConverterTest {
     private static final String EVENT_SUBPROCESS_ID = "sid-3AE5DD30-CE0E-4660-871F-A515E39EECA6";
     private static final String FROM_SE_TO_TASK = "sid-45B32336-D4E3-4576-8377-2D81C0EE02C4";
 
-    private static final double PRECISION = 0.0002;
+    private static final double PRECISION = 0.1;
 
     @Test
     public void oneWay() throws Exception{
