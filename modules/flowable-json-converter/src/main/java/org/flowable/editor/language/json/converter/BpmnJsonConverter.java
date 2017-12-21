@@ -190,7 +190,7 @@ public class BpmnJsonConverter implements EditorJsonConstants, StencilConstants,
         DI_GATEWAY.add(STENCIL_GATEWAY_PARALLEL);
     }
 
-    protected double lineWidth = 0.000001d;
+    protected double lineWidth = 0.05d;
 
     public ObjectNode convertToJson(BpmnModel model) {
         return convertToJson(model, null, null);

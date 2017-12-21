@@ -40,7 +40,7 @@ public class CollapsebleSubprocessTest extends AbstractConverterTest {
     private static final String IN_CSB_USERTASK = "sid-F64640C9-9585-4927-806B-8B0A03DB2B8B";
     private static final String IN_CSB_SEQUENCEFLOW_TO_END = "sid-C1EFE310-3B12-42DA-AEE6-5E442C2FEF19";
 
-    private static final double PRECISION = 0.0002;
+    private static final double PRECISION = 0.1d;
 
     @Test
     public void testItShouldBePossibleToConvertModelerJsonToJava() throws Exception{
@@ -107,7 +107,7 @@ public class CollapsebleSubprocessTest extends AbstractConverterTest {
         assertEquals(150.0, start.getY(), PRECISION);
 
         end = flowLocationGraphicInfo.get(1);
-        assertThat(end.getX(),is(232.0));
+        assertEquals(232.0, end.getX(), PRECISION);
         assertThat(end.getY(),is(150.0));
 
         flowElement = bpmnModel.getFlowElement(IN_CSB_USERTASK);
