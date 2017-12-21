@@ -14,8 +14,10 @@ package org.flowable.engine.impl.jobexecutor;
 
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.cmd.SuspendProcessDefinitionCmd;
-import org.flowable.engine.impl.util.json.JSONObject;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 /**
  * @author Joram Barrez
@@ -31,7 +33,7 @@ public class TimerSuspendProcessDefinitionHandler extends TimerChangeProcessDefi
 
     @Override
     public void execute(JobEntity job, String configuration, Object execution, CommandContext commandContext) {
-        JSONObject cfgJson = new JSONObject(configuration);
+    	JsonObject cfgJson = new JsonParser().parse(configuration).getAsJsonObject();
         String processDefinitionId = job.getProcessDefinitionId();
         boolean suspendProcessInstances = getIncludeProcessInstances(cfgJson);
 
