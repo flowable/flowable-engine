@@ -19,8 +19,10 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.runtime.ProcessInstance;
 
 public class SetProcessInstanceNameCmd implements Command<Void>, Serializable {
@@ -42,11 +44,23 @@ public class SetProcessInstanceNameCmd implements Command<Void>, Serializable {
         }
 
         ExecutionEntity execution = CommandContextUtil.getExecutionEntityManager(commandContext).findById(processInstanceId);
-
+        
         if (execution == null) {
+            
+            if (CommandContextUtil.getProcessEngineConfiguration(commandContext).isFlowable5CompatibilityEnabled()) {
+                Flowable5CompatibilityHandler compatibilityHandler = Flowable5Util.getFlowable5CompatibilityHandler();
+                if (compatibilityHandler != null) {
+                    ProcessInstance processInstance = compatibilityHandler.getProcessInstance(processInstanceId);
+                    if (processInstance != null) {
+                        compatibilityHandler.setProcessInstanceName(processInstance.getId(), name);
+                        return null;
+                    }
+                }
+            }
+            
             throw new FlowableObjectNotFoundException("process instance " + processInstanceId + " doesn't exist", ProcessInstance.class);
         }
-
+        
         if (!execution.isProcessInstanceType()) {
             throw new FlowableObjectNotFoundException("process instance " + processInstanceId + " doesn't exist, the given ID references an execution, though", ProcessInstance.class);
         }
