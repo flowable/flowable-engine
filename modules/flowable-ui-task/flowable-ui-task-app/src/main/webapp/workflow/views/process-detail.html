@@ -45,15 +45,15 @@
             <button ng-if="!model.processInstance.ended" class="btn" ng-click="cancelProcess()" translate="PROCESS.ACTION.CANCEL"></button>
             <button ng-if="model.processInstance.ended" class="btn" ng-click="deleteProcess()" translate="PROCESS.ACTION.DELETE"></button>
         </div>
-        <div class="btn-group pull-right" ng-show="model.processInstance.graphicalNotationDefined && !model.processInstance.ended">
+        <div class="btn-group pull-right" ng-show="model.processInstance.graphicalNotationDefined">
             <button class="btn" id="processDiagramTrigger" translate="PROCESS.ACTION.SHOW-DIAGRAM" ng-click="showDiagram()"></button>
         </div>
         <h2> {{model.processInstance.name && model.processInstance.name ||
             model.processInstance.processDefinitionName}}</h2>
 
         <div class="detail">
-            <span class="label" ng-show="model.processInstance.startedBy">{{'PROCESS.FIELD.STARTED-BY' | translate}}: </span>
-            <span user-name="model.processInstance.startedBy" ng-show="model.processInstance.startedBy"></span>
+            <span class="label" ng-if="model.processInstance.startedBy">{{'PROCESS.FIELD.STARTED-BY' | translate}}: </span>
+            <span user-name="model.processInstance.startedBy" ng-if="model.processInstance.startedBy"></span>
             <span class="label">{{'PROCESS.FIELD.STARTED' | translate}}: </span>
             <span title="{{model.processInstance.started | dateformat}}">{{model.processInstance.started | dateformat:'fromNow'}}</span>
             <span class="label" ng-show="model.processInstance.ended">{{'PROCESS.FIELD.ENDED' | translate}}: </span>
@@ -119,7 +119,7 @@
                             </div>
                             <div class="subtle">
                                 <span ng-if="task.assignee.id">
-                                    {{'TASK.MESSAGE.ASSIGNEE' | translate:task.assignee}}
+                                    {{'TASK.MESSAGE.ASSIGNEE' | translate}} {{task.assignee.firstName && task.assignee.firstName != 'null' ? task.assignee.firstName : ''}} {{task.assignee.lastName && task.assignee.lastName != 'null' ? task.assignee.lastName : ''}}
                                 </span>
                                 <span ng-if="!task.assignee.id" translate="TASK.MESSAGE.NO-ASSIGNEE">
                                 </span>
@@ -142,7 +142,7 @@
                             </div>
                             <div class="subtle">
                                 <span ng-if="model.processInstance.startedBy.id">
-                                    {{'TASK.MESSAGE.COMPLETED-BY' | translate:model.processInstance.startedBy}}
+                                	{{'TASK.MESSAGE.COMPLETED-BY' | translate}} {{model.processInstance.startedBy.firstName && model.processInstance.startedBy.firstName != 'null' ? model.processInstance.startedBy.firstName : ''}} {{model.processInstance.startedBy.lastName && model.processInstance.startedBy.lastName != 'null' ? model.processInstance.startedBy.lastName : ''}}
                                     {{model.processInstance.started | dateformat:'fromNow'}}
                                 </span>
                             </div>
@@ -166,7 +166,7 @@
                             </div>
                             <div class="subtle">
                                 <span ng-if="task.assignee.id">
-                                    {{'TASK.MESSAGE.COMPLETED-BY' | translate:task.assignee}}
+                                	{{'TASK.MESSAGE.COMPLETED-BY' | translate}} {{task.assignee.firstName && task.assignee.firstName != 'null' ? task.assignee.firstName : ''}} {{task.assignee.lastName && task.assignee.lastName != 'null' ? task.assignee.lastName : ''}}
                                     {{task.endDate | dateformat:'fromNow'}}
                                 </span>
                                 <span ng-if="!task.assignee.id" translate="TASK.MESSAGE.NO-ASSIGNEE">

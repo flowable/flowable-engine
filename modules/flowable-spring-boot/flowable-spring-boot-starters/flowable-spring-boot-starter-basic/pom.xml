@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.flowable</groupId>
 		<artifactId>flowable-spring-boot-starters</artifactId>
-		<version>6.0.0.RC1-SNAPSHOT</version>
+		<version>6.3.0-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>flowable-spring-boot-starter-basic</artifactId>
@@ -45,10 +45,6 @@
 					<groupId>org.slf4j</groupId>
 					<artifactId>slf4j-api</artifactId>
 				</exclusion>
-				<exclusion>
-					<groupId>org.slf4j</groupId>
-					<artifactId>slf4j-log4j12</artifactId>
-				</exclusion>
 			</exclusions>
 			<optional>true</optional>
 		</dependency>
@@ -56,6 +52,12 @@
 			<groupId>org.flowable</groupId>
 			<artifactId>flowable-common-rest</artifactId>
 			<optional>true</optional>
+			<exclusions>
+				<exclusion>
+					<groupId>org.slf4j</groupId>
+					<artifactId>slf4j-api</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
 		<!-- integration -->

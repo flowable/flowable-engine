@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
+    <message id="start-by-message" name="start-by-message"></message>
+    <process id="start-by-message-1" name="start-by-message-1" isExecutable="true">
+        <startEvent id="sid-AFF21E0A-B9AB-48DF-9250-90DF32B2C58A" isInterrupting="true">
+            <messageEventDefinition messageRef="start-by-message"></messageEventDefinition>
+        </startEvent>
+        <userTask id="sid-9D8F0713-5230-4B5D-B1DC-61B4AFE883F9" name="Review"></userTask>
+        <sequenceFlow id="sid-D804FF17-C59D-4C1C-88F1-1DAF3348159E" sourceRef="sid-AFF21E0A-B9AB-48DF-9250-90DF32B2C58A" targetRef="sid-9D8F0713-5230-4B5D-B1DC-61B4AFE883F9"></sequenceFlow>
+        <endEvent id="sid-80808B51-F8EA-45BA-82BB-AFFD5C86C736"></endEvent>
+        <sequenceFlow id="sid-A2414E84-854D-4573-B490-507BEA482D84" sourceRef="sid-9D8F0713-5230-4B5D-B1DC-61B4AFE883F9" targetRef="sid-80808B51-F8EA-45BA-82BB-AFFD5C86C736"></sequenceFlow>
+    </process>
+</definitions>

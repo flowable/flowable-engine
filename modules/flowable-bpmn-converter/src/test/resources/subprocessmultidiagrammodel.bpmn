@@ -11,7 +11,7 @@
     <startEvent id="start1"></startEvent>
     <endEvent id="sid-194696BA-1A7D-47D7-95A9-A77390D25048"></endEvent>
     <userTask id="userTask1" name="User task 1" activiti:async="true" activiti:exclusive="false" activiti:candidateUsers="kermit" activiti:candidateGroups="management"></userTask>
-    <subProcess id="subprocess1" name="Sub Process" isExpanded="false">
+    <subProcess id="subprocess1" name="Sub Process">
       <dataObject id="dObj7" name="StringSubTest" itemSubjectRef="xsd:string"/>
       <dataObject id="dObj8" name="BooleanSubTest" itemSubjectRef="xsd:boolean"/>
       <dataObject id="dObj9" name="DateSubTest" itemSubjectRef="xsd:datetime"/>
@@ -23,9 +23,17 @@
       <startEvent id="subStartEvent"></startEvent>
       <sequenceFlow id="subFlowId1" sourceRef="subStartEvent" targetRef="subUserTask1"></sequenceFlow>
       <endEvent id="sid-565296D1-FCF9-4B31-9048-528B10A27C46"></endEvent>
+      <textAnnotation id="textannotation2">
+        <text>Sub Test Annotation</text>
+      </textAnnotation>
+      <association associationDirection="One" id="association2" sourceRef="subUserTask1" targetRef="textannotation2"/>
     </subProcess>
     <sequenceFlow id="flow1" sourceRef="userTask1" targetRef="subprocess1"></sequenceFlow>
     <sequenceFlow id="flow2" sourceRef="subprocess1" targetRef="sid-194696BA-1A7D-47D7-95A9-A77390D25048"></sequenceFlow>
+    <textAnnotation id="textannotation1">
+      <text>Test Annotation</text>
+    </textAnnotation>
+    <association associationDirection="One" id="association1" sourceRef="userTask1" targetRef="textannotation1"/>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_process">
     <bpmndi:BPMNPlane bpmnElement="process" id="BPMNPlane_process">
@@ -38,8 +46,11 @@
       <bpmndi:BPMNShape bpmnElement="userTask1" id="BPMNShape_userTask1">
         <omgdc:Bounds height="80.0" width="100.0" x="211.0" y="169.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="subprocess1" id="BPMNShape_subprocess1">
+      <bpmndi:BPMNShape bpmnElement="subprocess1" id="BPMNShape_subprocess1" isExpanded="false">
         <omgdc:Bounds height="205.0" width="335.0" x="380.0" y="105.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="textannotation2" id="BPMNShape_textannotation2">
+        <omgdc:Bounds height="50.0" width="100.0" x="120.0" y="50.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="sid-04DAFAA0-34C1-48DF-BAD5-1038344BBFA9" id="BPMNEdge_sid-04DAFAA0-34C1-48DF-BAD5-1038344BBFA9">
         <omgdi:waypoint x="141.0" y="208.0"></omgdi:waypoint>
@@ -52,6 +63,10 @@
       <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
         <omgdi:waypoint x="715.0" y="207.0"></omgdi:waypoint>
         <omgdi:waypoint x="780.0" y="208.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="association2" id="BPMNEdge_association2">
+        <omgdi:waypoint x="420.0" y="203.0"/>
+        <omgdi:waypoint x="289.0" y="204.0"/>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
@@ -66,6 +81,9 @@
       <bpmndi:BPMNShape bpmnElement="sid-565296D1-FCF9-4B31-9048-528B10A27C46" id="BPMNShape_sid-565296D1-FCF9-4B31-9048-528B10A27C46">
         <omgdc:Bounds height="35.0" width="35.0" x="650.0" y="192.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="textannotation1" id="BPMNShape_textannotation1">
+        <omgdc:Bounds height="50.0" width="100.0" x="420.0" y="285.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="sid-C7145ECA-31A2-4A91-B20A-023CF0764155" id="BPMNEdge_sid-C7145ECA-31A2-4A91-B20A-023CF0764155">
         <omgdi:waypoint x="590.0" y="210.0"></omgdi:waypoint>
         <omgdi:waypoint x="650.0" y="209.0"></omgdi:waypoint>
@@ -73,6 +91,10 @@
       <bpmndi:BPMNEdge bpmnElement="subFlowId1" id="BPMNEdge_subFlowId1">
         <omgdi:waypoint x="435.0" y="212.0"></omgdi:waypoint>
         <omgdi:waypoint x="490.0" y="210.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="association1" id="BPMNEdge_association1">
+        <omgdi:waypoint x="420.0" y="203.0"/>
+        <omgdi:waypoint x="289.0" y="204.0"/>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

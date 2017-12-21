@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl">
+
+    <insert id="insertCaseInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl">
+        insert into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, TENANT_ID_) values (
+            #{id ,jdbcType=VARCHAR},
+            1,
+            #{parentId ,jdbcType=VARCHAR},
+            #{caseDefinitionId ,jdbcType=VARCHAR},
+            #{businessKey ,jdbcType=VARCHAR},
+            #{name ,jdbcType=VARCHAR},
+            #{state ,jdbcType=VARCHAR},
+            #{startTime ,jdbcType=TIMESTAMP},
+            #{startUserId ,jdbcType=VARCHAR},
+            #{callbackId, jdbcType=VARCHAR},
+            #{callbackType,jdbcType=VARCHAR},
+            #{tenantId ,jdbcType=VARCHAR}
+        )
+    </insert>
+
+    <insert id="bulkInsertCaseInstance" parameterType="java.util.List">
+        insert into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, TENANT_ID_)
+        values
+        <foreach collection="list" item="caseInstance" index="index" separator=",">
+            (
+                #{caseInstance.id ,jdbcType=VARCHAR},
+                1,
+                #{caseInstance.parentId ,jdbcType=VARCHAR},
+                #{caseInstance.caseDefinitionId ,jdbcType=VARCHAR},
+                #{caseInstance.businessKey ,jdbcType=VARCHAR},
+                #{caseInstance.name ,jdbcType=VARCHAR},
+                #{caseInstance.state ,jdbcType=VARCHAR},
+                #{caseInstance.startTime ,jdbcType=TIMESTAMP},
+                #{caseInstance.startUserId ,jdbcType=VARCHAR},
+                #{caseInstance.callbackId, jdbcType=VARCHAR},
+                #{caseInstance.callbackType, jdbcType=VARCHAR},
+                #{caseInstance.tenantId ,jdbcType=VARCHAR}
+            )
+        </foreach>
+    </insert>
+
+    <insert id="bulkInsertCaseInstance" databaseId="oracle" parameterType="java.util.List">
+        INSERT ALL
+        <foreach collection="list" item="caseInstance" index="index">
+            into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, TENANT_ID_) VALUES
+            (
+                #{caseInstance.id ,jdbcType=VARCHAR},
+                1,
+                #{caseInstance.parentId ,jdbcType=VARCHAR},
+                #{caseInstance.caseDefinitionId ,jdbcType=VARCHAR},
+                #{caseInstance.businessKey ,jdbcType=VARCHAR},
+                #{caseInstance.name ,jdbcType=VARCHAR},
+                #{caseInstance.state ,jdbcType=VARCHAR},
+                #{caseInstance.startTime ,jdbcType=TIMESTAMP},
+                #{caseInstance.startUserId ,jdbcType=VARCHAR},
+                #{caseInstance.callbackId, jdbcType=VARCHAR},
+                #{caseInstance.callbackType, jdbcType=VARCHAR},
+                #{caseInstance.tenantId ,jdbcType=VARCHAR}
+            )
+        </foreach>
+        SELECT * FROM dual
+    </insert>
+
+    <update id="updateCaseInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl">
+        update ${prefix}ACT_CMMN_RU_CASE_INST
+        <set>
+            REV_ = #{revisionNext, jdbcType=INTEGER},
+            <if test="originalPersistentState.parentId != parentId">
+                PARENT_ID_ = #{parentId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.caseDefinitionId != caseDefinitionId">
+                CASE_DEF_ID_ = #{caseDefinitionId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.businessKey != businessKey">
+                BUSINESS_KEY_ = #{businessKey, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.name != name">
+                NAME_ = #{name, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.state != state">
+                STATE_ = #{state, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.startTime != startTime">
+                START_TIME_ = #{startTime, jdbcType=TIMESTAMP},
+            </if>
+            <if test="originalPersistentState.startUserId != startUserId">
+                START_USER_ID_ = #{startUserId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.callbackId != callbackId">
+                CALLBACK_ID_ = #{callbackId, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.callbackType != callbackType">
+                CALLBACK_TYPE_ = #{callbackType, jdbcType=VARCHAR},
+            </if>
+            <if test="originalPersistentState.tenantId != tenantId">
+                TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
+            </if>
+        </set>    
+        where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
+    </update>
+    
+    <update id="updateCaseInstanceLockTime" parameterType="java.util.Map">
+        update ${prefix}ACT_CMMN_RU_CASE_INST 
+        set
+          LOCK_TIME_ = #{lockTime, jdbcType=TIMESTAMP}
+        where ID_ = #{id}
+          and (LOCK_TIME_ is null OR LOCK_TIME_ &lt; #{expirationTime, jdbcType=TIMESTAMP})
+    </update>
+  
+    <update id="clearCaseInstanceLockTime" parameterType="java.util.Map">
+        update ${prefix}ACT_CMMN_RU_CASE_INST 
+        set LOCK_TIME_ = null
+        where ID_ = #{id}
+    </update>
+
+    <delete id="deleteCaseInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl">
+        delete from ${prefix}ACT_CMMN_RU_CASE_INST where ID_ = #{id} and REV_ = #{revision}
+    </delete>
+
+    <delete id="deleteCaseInstanceByCaseDefinitionId" parameterType="string">
+        delete from ${prefix}ACT_CMMN_RU_CASE_INST where CASE_DEF_ID_ = #{value}
+    </delete>
+
+    <resultMap id="caseInstanceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl">
+        <id property="id" column="ID_" jdbcType="VARCHAR" />
+        <result property="revision" column="REV_" jdbcType="INTEGER" />
+        <result property="parentId" column="PARENT_ID_" jdbcType="VARCHAR" />
+        <result property="caseDefinitionId" column="CASE_DEF_ID_" jdbcType="VARCHAR" />
+        <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
+        <result property="name" column="NAME_" jdbcType="VARCHAR" />
+        <result property="state" column="STATE_" jdbcType="VARCHAR" />
+        <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
+        <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
+        <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
+        <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
+        <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    </resultMap>
+
+    <select id="selectCaseInstance" parameterType="string" resultMap="caseInstanceResultMap">
+        select * from ${prefix}ACT_CMMN_RU_CASE_INST where ID_ = #{id, jdbcType=VARCHAR}
+    </select>
+
+    <select id="selectCaseInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl" resultMap="caseInstanceResultMap">
+        <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+        select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+        <include refid="selectCaseInstancesByQueryCriteriaSql" />
+        ${orderBy}
+        <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    </select>
+
+    <select id="selectCaseInstanceCountByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl" resultType="long">
+        select count(RES.ID_)
+        <include refid="selectCaseInstancesByQueryCriteriaSql" />
+    </select>
+
+    <sql id="selectCaseInstancesByQueryCriteriaSql">
+        from ${prefix}ACT_CMMN_RU_CASE_INST RES
+        <if test="caseDefinitionKey != null or caseDefinitionKeys != null or caseDefinitionCategory != null or caseDefinitionName != null">
+            inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
+        </if>
+        <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
+            <if test="!queryVariableValue.operator.equals('EXISTS') &amp;&amp; !queryVariableValue.operator.equals('NOT_EXISTS')">
+                inner join ${prefix}ACT_RU_VARIABLE A${index} on RES.ID_ = A${index}.SCOPE_ID_ and SUB_SCOPE_ID_ is null and A${index}.SCOPE_TYPE_ = 'cmmn' 
+            </if>
+        </foreach>
+        <where>
+            <if test="caseInstanceId != null">
+                and RES.ID_ = #{caseInstanceId}
+            </if>
+            <if test="caseInstanceIds != null">
+                and RES.ID_ IN
+                <foreach item="caseInstanceId" index="index" collection="caseInstanceIds" open="(" separator="," close=")">
+                    #{caseInstanceId}
+                </foreach>
+            </if>
+            <if test="caseDefinitionId != null">
+                RES.CASE_DEF_ID_ = #{caseDefinitionId}
+            </if>
+            <if test="caseDefinitionKey != null">
+                and CASE_DEF.KEY_ = #{caseDefinitionId}
+            </if>
+            <if test="caseDefinitionIds != null">
+                and RES.CASE_DEF_ID_ IN
+                <foreach item="caseDefinitionId" index="index" collection="caseDefinitionIds" open="(" separator="," close=")">
+                    #{caseDefinitionId}
+                </foreach>
+            </if>
+            <if test="caseDefinitionKeys != null">
+                and CASE_DEF.KEY_ IN
+                <foreach item="caseDefinitionKey" index="index" collection="caseDefinitionKeys" open="(" separator="," close=")">
+                    #{caseDefinitionKey}
+                </foreach>
+            </if>
+            <if test="caseDefinitionCategory != null">
+                and CASE_DEF.CATEGORY_ = #{caseDefinitionCategory}
+            </if>
+            <if test="caseDefinitionName != null">
+                and CASE_DEF.NAME_ = #{caseDefinitionName}
+            </if>
+            <if test="caseInstanceParentId != null">
+                and RES.PARENT_ID_ = #{caseInstanceParentId}
+            </if>
+            <if test="businessKey != null">
+                and RES.BUSINESS_KEY_ = #{businessKey}
+            </if>
+            <if test="startedBefore != null">
+                and RES.START_TIME_ &lt;= #{startedBefore}
+            </if>
+            <if test="startedAfter != null">
+                and RES.START_TIME_ &gt;= #{startedAfter}
+            </if>
+            <if test="startedBy != null">
+                and RES.START_USER_ID_ = #{startedBy}
+            </if>
+            <if test="callbackId != null">
+                and RES.CALLBACK_ID_ = #{callbackId}
+            </if>
+            <if test="callbackType != null">
+                and RES.CALLBACK_TYPE_ = #{callbackType}
+            </if>
+            <if test="tenantId != null">
+                and RES.TENANT_ID_ = #{tenantId}
+            </if>
+            <if test="withoutTenantId">
+                and RES.TENANT_ID_ is null or RES.TENANT_ID_ = ''
+            </if>
+            <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
+                <choose>
+                    <when test="queryVariableValue.operator.equals('EXISTS')">
+                      and EXISTS (select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name} and RES.ID_ = SCOPE_ID_ and SUB_SCOPE_ID_ is null and SCOPE_TYPE_ = 'cmmn')
+                    </when>
+                    <when test="queryVariableValue.operator.equals('NOT_EXISTS')">
+                      and NOT EXISTS (select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name} and RES.ID_ = SCOPE_ID_ and SUB_SCOPE_ID_ is null and SCOPE_TYPE_ = 'cmmn')
+                    </when>
+                    <otherwise>
+                        <if test="queryVariableValue.name != null">
+                          <!-- Match-all variable-names when name is null -->
+                          and A${index}.NAME_= #{queryVariableValue.name}
+                        </if>
+                        <if test="!queryVariableValue.type.equals('null')">
+                        <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
+                          and A${index}.TYPE_ = #{queryVariableValue.type}
+                        </if>
+                        <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+                          <choose>
+                            <when test="queryVariableValue.operator.equals('EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">
+                              and lower(A${index}.TEXT_)
+                            </when>
+                            <otherwise>
+                              and A${index}.TEXT_
+                            </otherwise>
+                          </choose>
+                          <choose>
+                            <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
+                            <otherwise><include refid="variableOperator" /></otherwise>
+                          </choose>
+                          #{queryVariableValue.textValue}
+                          <choose>
+                            <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
+                          </choose>
+                        </if>
+                        <if test="queryVariableValue.textValue2 != null">
+                        and A${index}.TEXT2_
+                        <choose>
+                          <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
+                          <otherwise><include refid="variableOperator" /></otherwise>
+                        </choose>
+                          #{queryVariableValue.textValue2}
+                          <choose>
+                            <when test="queryVariableValue.operator.equals('LIKE')">${wildcardEscapeClause}</when>
+                          </choose>
+                        </if>
+                        <if test="queryVariableValue.longValue != null">
+                            and A${index}.LONG_
+                            <include refid="variableOperator" />
+                            #{queryVariableValue.longValue}
+                        </if>
+                        <if test="queryVariableValue.doubleValue != null">
+                            and A${index}.DOUBLE_
+                            <include refid="variableOperator" />
+                            #{queryVariableValue.doubleValue}
+                        </if>
+                        <!-- Null variable type -->
+                        <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+                          <choose>
+                            <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
+                                and (A${index}.TEXT_ is not null or A${index}.TEXT2_ is not null or A${index}.LONG_ is not null or A${index}.DOUBLE_ is not null or A${index}.BYTEARRAY_ID_ is not null)
+                            </when>
+                            <otherwise>
+                                and A${index}.TEXT_ is null and A${index}.TEXT2_ is null and A${index}.LONG_ is null and A${index}.DOUBLE_ is null and A${index}.BYTEARRAY_ID_ is null
+                            </otherwise>
+                          </choose>
+                        </if>
+                    </otherwise>
+                </choose>
+            </foreach>
+        </where>
+    </sql>
+    
+    <select id="selectCaseInstancesByCaseDefinitionId" resultMap="caseInstanceResultMap">
+        select * from ${prefix}ACT_CMMN_RU_CASE_INST where CASE_DEF_ID_ = #{parameter}
+    </select>
+    
+    <sql id="variableOperator">
+        <choose>
+          <when test="queryVariableValue.operator.equals('EQUALS')">=</when>
+          <when test="queryVariableValue.operator.equals('EQUALS_IGNORE_CASE')">=</when>
+          <when test="queryVariableValue.operator.equals('NOT_EQUALS')">&lt;&gt;</when>
+          <when test="queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">&lt;&gt;</when>
+          <when test="queryVariableValue.operator.equals('GREATER_THAN')">&gt;</when>
+          <when test="queryVariableValue.operator.equals('GREATER_THAN_OR_EQUAL')">&gt;=</when>
+          <when test="queryVariableValue.operator.equals('LESS_THAN')">&lt;</when>
+          <when test="queryVariableValue.operator.equals('LESS_THAN_OR_EQUAL')">&lt;=</when>
+       </choose>
+    </sql>
+
+</mapper>

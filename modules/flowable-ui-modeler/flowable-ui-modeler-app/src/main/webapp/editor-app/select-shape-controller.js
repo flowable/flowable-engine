@@ -15,8 +15,8 @@
  * Controller for morph shape selection
  */
 
-angular.module('activitiModeler').controller('KisBpmShapeSelectionCtrl',
-    [ '$rootScope', '$scope', '$timeout', '$translate', function($rootScope, $scope, $timeout, $translate) {
+angular.module('flowableModeler').controller('FlowableBpmShapeSelectionCtrl',
+    [ '$rootScope', '$scope', '$timeout', '$translate', 'editorManager', function($rootScope, $scope, $timeout, $translate, editorManager) {
 
     $scope.currentSelectedMorph = undefined;
     
@@ -278,7 +278,7 @@ angular.module('activitiModeler').controller('KisBpmShapeSelectionCtrl',
     		});
     		
         	var stencil = undefined;
-        	var stencilSets = $scope.editor.getStencilSets().values();
+        	var stencilSets = editorManager.getStencilSets().values();
         	
         	var stencilId = $scope.currentSelectedMorph.id;
         	if ($scope.currentSelectedMorph.genericTaskId) {
@@ -299,8 +299,8 @@ angular.module('activitiModeler').controller('KisBpmShapeSelectionCtrl',
         	if (!stencil) return;
         	
     		// Create and execute command (for undo/redo)			
-    		var command = new MorphTo($scope.currentSelectedShape, stencil, $scope.editor);
-    		$scope.editor.executeCommands([command]);
+    		var command = new MorphTo($scope.currentSelectedShape, stencil, editorManager.getEditor());
+    		editorManager.executeCommands([command]);
         }
 
         $scope.close();

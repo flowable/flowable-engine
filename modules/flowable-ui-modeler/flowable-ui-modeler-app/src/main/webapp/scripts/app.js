@@ -12,7 +12,7 @@
  */
 'use strict';
 
-var activitiModeler = angular.module('activitiModeler', [
+var flowableModeler = angular.module('flowableModeler', [
   'ngCookies',
   'ngResource',
   'ngSanitize',
@@ -31,13 +31,14 @@ var activitiModeler = angular.module('activitiModeler', [
   'ngFileUpload',
   'angularSpectrumColorpicker',
   'duScroll',
-  'dndLists'
+  'dndLists',
+  'ngHandsontable'
 ]);
 
-var activitiModule = activitiModeler;
-var activitiApp = activitiModeler;
+var flowableModule = flowableModeler;
+var flowableApp = flowableModeler;
 
-activitiModeler
+flowableModeler
   // Initialize routes
   .config(['$provide', '$routeProvider', '$selectProvider', '$translateProvider', function ($provide, $routeProvider, $selectProvider, $translateProvider) {
 
@@ -62,6 +63,14 @@ activitiModeler
         .when('/processes/:modelId/history/:modelHistoryId', {
             templateUrl: appResourceRoot + 'views/process.html',
             controller: 'ProcessCtrl'
+        })
+        .when('/casemodels', {
+            templateUrl: appResourceRoot + 'views/casemodels.html',
+            controller: 'CaseModelsCtrl'
+        })
+        .when('/casemodels/:modelId', {
+            templateUrl: appResourceRoot + 'views/casemodel.html',
+            controller: 'CaseModelCtrl'
         })
         .when('/forms', {
             templateUrl: appResourceRoot + 'views/forms.html',
@@ -107,6 +116,10 @@ activitiModeler
             templateUrl: appResourceRoot + 'views/form-builder.html',
             controller: 'FormBuilderController'
         })
+        .when('/case-editor/:modelId', {
+            templateUrl: appResourceRoot + 'editor-app/editor.html',
+            controller: 'EditorController'
+        })
         .when('/decision-table-editor/:modelId', {
             templateUrl: appResourceRoot + 'views/decision-table-editor.html',
             controller: 'DecisionTableEditorController'
@@ -115,12 +128,12 @@ activitiModeler
             templateUrl: appResourceRoot + 'views/app-definition-builder.html',
             controller: 'AppDefinitionBuilderController'
         });
-            
+
         if (FLOWABLE.CONFIG.appDefaultRoute) {
             $routeProvider.when('/', {
                 redirectTo: FLOWABLE.CONFIG.appDefaultRoute
             });
-            
+
         } else {
             $routeProvider.when('/', {
                 redirectTo: '/processes'
@@ -129,18 +142,31 @@ activitiModeler
 
         // Initialize angular-translate
         $translateProvider.useStaticFilesLoader({
-            prefix: appResourceRoot + 'i18n/',
-            suffix: '.json'
-        });
+          prefix: './i18n/',
+          suffix: '.json'
+        })
+        /*
+        This can be used to map multiple browser language keys to a
+        angular translate language key.
+        */
+        // .registerAvailableLanguageKeys(['en'], {
+        //     'en-*': 'en'
+        // })
+        .useSanitizeValueStrategy('escapeParameters')
+        .uniformLanguageTag('bcp47')
+        .determinePreferredLanguage();
 
-        $translateProvider.registerAvailableLanguageKeys(['en'], {
-            'en_*': 'en',
-            'en-*': 'en'
-        });
-        
   }])
   .run(['$rootScope', '$timeout', '$modal', '$translate', '$location', '$http', '$window', 'appResourceRoot',
         function($rootScope, $timeout, $modal, $translate, $location, $http, $window, appResourceRoot) {
+
+            // set angular translate fallback language
+            $translate.fallbackLanguage(['en']);
+
+            // setting Moment-JS (global) locale
+            if (FLOWABLE.CONFIG.datesLocalization) {
+                moment.locale($translate.proposedLanguage());
+            }
 
             $rootScope.restRootUrl = function() {
                 return FLOWABLE.CONFIG.contextRoot;
@@ -178,6 +204,11 @@ activitiModeler
                     'path': '/processes'
                 },
                 {
+                    'id': 'casemodels',
+                    'title': 'GENERAL.NAVIGATION.CASEMODELS',
+                    'path': '/casemodels'
+                },
+                {
                     'id': 'forms',
                     'title': 'GENERAL.NAVIGATION.FORMS',
                     'path': '/forms'
@@ -197,6 +228,10 @@ activitiModeler
             $rootScope.config = FLOWABLE.CONFIG;
 
             $rootScope.mainPage = $rootScope.mainNavigation[0];
+
+            // Add url helpers to root scope:
+            $rootScope.getModelThumbnailUrl = FLOWABLE.APP_URL.getModelThumbnailUrl;
+            $rootScope.getImageUrl = FLOWABLE.APP_URL.getImageUrl;
 
             /*
              * History of process and form pages accessed by the editor.
@@ -290,31 +325,29 @@ activitiModeler
                     });
                 }
             };
-            
-            $http.get(FLOWABLE.CONFIG.contextRoot + '/app/rest/account')
+
+            $http.get(FLOWABLE.APP_URL.getAccountUrl())
 	        	.success(function (data, status, headers, config) {
 	              	$rootScope.account = data;
 	               	$rootScope.invalidCredentials = false;
 	 				$rootScope.authenticated = true;
 	          	});
-	          	
+
 	        $rootScope.logout = function () {
                 $rootScope.authenticated = false;
                 $rootScope.authenticationError = false;
-                $http.get(FLOWABLE.CONFIG.contextRoot + '/app/logout')
+                $http.get(FLOWABLE.APP_URL.getLogoutUrl())
                     .success(function (data, status, headers, config) {
                         $rootScope.login = null;
                         $rootScope.authenticated = false;
                         $window.location.href = '/';
                         $window.location.reload();
                     });
-            }  	
+            };
         }
   ])
   .run(['$rootScope', '$location', '$translate', '$window', '$modal',
         function($rootScope, $location, $translate, $window , $modal) {
-      
-            $translate.use('en');
 
             var fixedUrlPart = '/editor/';
 
@@ -327,7 +360,7 @@ activitiModeler
                 }
                 $window.location.href = baseUrl;
             };
-    }])
+        }])
 
     // Moment-JS date-formatting filter
     .filter('dateformat', function() {

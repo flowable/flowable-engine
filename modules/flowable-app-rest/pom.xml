@@ -10,10 +10,16 @@
     <groupId>org.flowable</groupId>
     <artifactId>flowable-root</artifactId>
     <relativePath>../..</relativePath>
-    <version>6.0.0.RC1-SNAPSHOT</version>
+    <version>6.3.0-SNAPSHOT</version>
   </parent>
 
+  <properties>
+    <swagger.host>localhost:8080</swagger.host>
+    <swagger.generated.directory>target/generated-swagger</swagger.generated.directory>
+  </properties>
+
   <build>
+    <finalName>flowable-rest</finalName>
     <plugins>
       <plugin>
         <groupId>org.zeroturnaround</groupId>
@@ -32,12 +38,28 @@
 	    <groupId>org.apache.tomcat.maven</groupId>
         <artifactId>tomcat7-maven-plugin</artifactId>
 		<configuration>
-		  <port>9977</port>
+		  <port>8080</port>
 		  <path>/flowable-rest</path>
-		  <systemProperties>
+          <warDirectory>${project.build.directory}/${project.build.finalName}</warDirectory>
+          <systemProperties>
 		    <com.sun.management.jmxremote.port>4000</com.sun.management.jmxremote.port>
           </systemProperties>
 		</configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-clean-plugin</artifactId>
+        <version>3.0.0</version>
+        <configuration>
+          <filesets>
+            <fileset>
+              <directory>src/main/webapp/docs/specfile</directory>
+              <includes>
+                <include>**</include>
+              </includes>
+              <followSymlinks>false</followSymlinks>
+            </fileset>
+          </filesets>
+        </configuration>
       </plugin>
     </plugins>
     <pluginManagement>
@@ -69,6 +91,19 @@
                     <ignore></ignore>
                   </action>
                 </pluginExecution>
+                <pluginExecution>
+                	<pluginExecutionFilter>
+                		<groupId>com.github.kongchen</groupId>
+                		<artifactId>swagger-maven-plugin</artifactId>
+                		<versionRange>[3.1.4,)</versionRange>
+                		<goals>
+                			<goal>generate</goal>
+                		</goals>
+                	</pluginExecutionFilter>
+                	<action>
+                		<ignore></ignore>
+                	</action>
+                </pluginExecution>
               </pluginExecutions>
             </lifecycleMappingMetadata>
           </configuration>
@@ -85,7 +120,7 @@
             <plugin>
               <groupId>org.apache.tomcat.maven</groupId>
 			  <artifactId>tomcat7-maven-plugin</artifactId>
-			  <version>2.1</version>
+			  <version>2.2</version>
 			  <configuration>
 			    <path>/</path>
 			  </configuration>
@@ -107,333 +142,27 @@
     </profile>
     <profile>
       <id>swagger</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
       <build>
         <plugins>
           <plugin>
             <groupId>com.github.kongchen</groupId>
             <artifactId>swagger-maven-plugin</artifactId>
-            <version>3.1.4</version>
+            <version>3.1.5</version>
             <configuration>
               <apiSources>
-                <!-- ++++++++++ -->
-                <!-- FORMS -->
-                <!-- ++++++++++ -->
                 <apiSource>
                   <springmvc>true</springmvc>
                   <locations>
-                    <location>org.activiti.rest.service.api.form</location>
+                    <location>org.flowable.rest.service.api</location>
                   </locations>
                   <schemes>
                     <scheme>http</scheme>
                     <scheme>https</scheme>
                   </schemes>
-                  <host>localhost:8080</host>
-                  <basePath>/flowable-rest/service</basePath>
-                  <info>
-                    <title>Flowable REST API</title>
-                    <version>v1</version>
-                    <contact>
-                      <email></email>
-                      <name>Flowable</name>
-                      <url>http://www.flowable.org/</url>
-                    </contact>
-                    <license>
-                      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
-                      <name>Apache 2.0</name>
-                    </license>
-                  </info>
-                  <securityDefinitions>
-                    <securityDefinition>
-                      <name>basicAuth</name>
-                      <type>basic</type>
-                    </securityDefinition>
-                  </securityDefinitions>
-                  <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
-                  <outputFormats>json,yaml</outputFormats>
-                  <swaggerFileName>flowable-forms</swaggerFileName>
-                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/forms</swaggerDirectory>
-                </apiSource>
-                <!-- ++++++++++ -->
-                <!-- HISTORY -->
-                <!-- ++++++++++ -->
-                <apiSource>
-                  <springmvc>true</springmvc>
-                  <locations>
-                    <location>org.activiti.rest.service.api.history</location>
-                  </locations>
-                  <schemes>
-                    <scheme>http</scheme>
-                    <scheme>https</scheme>
-                  </schemes>
-                  <host>localhost:8080</host>
-                  <basePath>/flowable-rest/service</basePath>
-                  <info>
-                    <title>Flowable REST API</title>
-                    <version>v1</version>
-                    <contact>
-                      <email></email>
-                      <name>Flowable</name>
-                      <url>http://www.flowable.org/</url>
-                    </contact>
-                    <license>
-                      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
-                      <name>Apache 2.0</name>
-                    </license>
-                  </info>
-                  <securityDefinitions>
-                    <securityDefinition>
-                      <name>basicAuth</name>
-                      <type>basic</type>
-                    </securityDefinition>
-                  </securityDefinitions>
-                  <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
-                  <outputFormats>json,yaml</outputFormats>
-                  <swaggerFileName>flowable-history</swaggerFileName>
-                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/history</swaggerDirectory>
-                </apiSource>
-                <!-- ++++++++++ -->
-                <!-- IDENTITY -->
-                <!-- ++++++++++ -->
-                <apiSource>
-                  <springmvc>true</springmvc>
-                  <locations>
-                    <location>org.activiti.rest.service.api.identity</location>
-                  </locations>
-                  <schemes>
-                    <scheme>http</scheme>
-                    <scheme>https</scheme>
-                  </schemes>
-                  <host>localhost:8080</host>
-                  <basePath>/flowable-rest/service</basePath>
-                  <info>
-                    <title>Flowable REST API</title>
-                    <version>v1</version>
-                    <contact>
-                      <email></email>
-                      <name>Flowable</name>
-                      <url>http://www.flowable.org/</url>
-                    </contact>
-                    <license>
-                      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
-                      <name>Apache 2.0</name>
-                    </license>
-                  </info>
-                  <securityDefinitions>
-                    <securityDefinition>
-                      <name>basicAuth</name>
-                      <type>basic</type>
-                    </securityDefinition>
-                  </securityDefinitions>
-                  <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
-                  <outputFormats>json,yaml</outputFormats>
-                  <swaggerFileName>flowable-identity</swaggerFileName>
-                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/identity</swaggerDirectory>
-                </apiSource>
-                <!-- ++++++++++ -->
-                <!-- MANAGEMENT -->
-                <!-- ++++++++++ -->
-                <apiSource>
-                  <springmvc>true</springmvc>
-                  <locations>
-                    <location>org.activiti.rest.service.api.management</location>
-                  </locations>
-                  <schemes>
-                    <scheme>http</scheme>
-                    <scheme>https</scheme>
-                  </schemes>
-                  <host>localhost:8080</host>
-                  <basePath>/flowable-rest/service</basePath>
-                  <info>
-                    <title>Flowable REST API</title>
-                    <version>v1</version>
-                    <contact>
-                      <email></email>
-                      <name>Flowable</name>
-                      <url>http://www.flowable.org/</url>
-                    </contact>
-                    <license>
-                      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
-                      <name>Apache 2.0</name>
-                    </license>
-                  </info>
-                  <securityDefinitions>
-                    <securityDefinition>
-                      <name>basicAuth</name>
-                      <type>basic</type>
-                    </securityDefinition>
-                  </securityDefinitions>
-                  <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
-                  <outputFormats>json,yaml</outputFormats>
-                  <swaggerFileName>flowable-management</swaggerFileName>
-                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/management</swaggerDirectory>
-                </apiSource>
-                <!-- ++++++++++ -->
-                <!-- REPOSITORY -->
-                <!-- ++++++++++ -->
-                <apiSource>
-                  <springmvc>true</springmvc>
-                  <locations>
-                    <location>org.activiti.rest.service.api.repository</location>
-                  </locations>
-                  <schemes>
-                    <scheme>http</scheme>
-                    <scheme>https</scheme>
-                  </schemes>
-                  <host>localhost:8080</host>
-                  <basePath>/flowable-rest/service</basePath>
-                  <info>
-                    <title>Flowable REST API</title>
-                    <version>v1</version>
-                    <contact>
-                      <email></email>
-                      <name>Flowable</name>
-                      <url>http://www.flowable.org/</url>
-                    </contact>
-                    <license>
-                      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
-                      <name>Apache 2.0</name>
-                    </license>
-                  </info>
-                  <securityDefinitions>
-                    <securityDefinition>
-                      <name>basicAuth</name>
-                      <type>basic</type>
-                    </securityDefinition>
-                  </securityDefinitions>
-                  <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
-                  <outputFormats>json,yaml</outputFormats>
-                  <swaggerFileName>flowable-repository</swaggerFileName>
-                  <templatePath>${basedir}/src/main/resources/swagger/templates/strapdown.html.hbs</templatePath>
-                  <outputPath>${basedir}/target/generated/document.html</outputPath>
-                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/repository</swaggerDirectory>
-                </apiSource>
-                <!-- ++++++++++ -->
-                <!-- RUNTIME -->
-                <!-- ++++++++++ -->
-                <apiSource>
-                  <springmvc>true</springmvc>
-                  <locations>
-                    <location>org.activiti.rest.service.api.runtime</location>
-                  </locations>
-                  <schemes>
-                    <scheme>http</scheme>
-                    <scheme>https</scheme>
-                  </schemes>
-                  <host>localhost:8080</host>
-                  <basePath>/flowable-rest/service</basePath>
-                  <info>
-                    <title>Flowable Runtime REST API</title>
-                    <version>v1</version>
-                    <contact>
-                      <email></email>
-                      <name>Flowable</name>
-                      <url>http://www.flowable.org/</url>
-                    </contact>
-                    <license>
-                      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
-                      <name>Apache 2.0</name>
-                    </license>
-                  </info>
-                  <securityDefinitions>
-                    <securityDefinition>
-                      <name>basicAuth</name>
-                      <type>basic</type>
-                    </securityDefinition>
-                  </securityDefinitions>
-                  <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
-                  <outputFormats>json,yaml</outputFormats>
-                  <swaggerFileName>flowable-runtime</swaggerFileName>
-                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/runtime</swaggerDirectory>
-                </apiSource>
-                <!-- ++++++++++ -->
-                <!-- RUNTIME PROCESS -->
-                <!-- ++++++++++ -->
-                <apiSource>
-                  <springmvc>true</springmvc>
-                  <locations>
-                    <location>org.activiti.rest.service.api.runtime.process</location>
-                  </locations>
-                  <schemes>
-                    <scheme>http</scheme>
-                    <scheme>https</scheme>
-                  </schemes>
-                  <host>localhost:8080</host>
-                  <basePath>/flowable-rest/service</basePath>
-                  <info>
-                    <title>Flowable Runtime REST API</title>
-                    <version>v1</version>
-                    <contact>
-                      <email></email>
-                      <name>Flowable</name>
-                      <url>http://www.flowable.org/</url>
-                    </contact>
-                    <license>
-                      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
-                      <name>Apache 2.0</name>
-                    </license>
-                  </info>
-                  <securityDefinitions>
-                    <securityDefinition>
-                      <name>basicAuth</name>
-                      <type>basic</type>
-                    </securityDefinition>
-                  </securityDefinitions>
-                  <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
-                  <outputFormats>json,yaml</outputFormats>
-                  <swaggerFileName>flowable-runtime-process</swaggerFileName>
-                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/process</swaggerDirectory>
-                </apiSource>
-                <!-- ++++++++++ -->
-                <!-- RUNTIME TASK -->
-                <!-- ++++++++++ -->
-                <apiSource>
-                  <springmvc>true</springmvc>
-                  <locations>
-                    <location>org.activiti.rest.service.api.runtime.task</location>
-                  </locations>
-                  <schemes>
-                    <scheme>http</scheme>
-                    <scheme>https</scheme>
-                  </schemes>
-                  <host>localhost:8080</host>
-                  <basePath>/flowable-rest/service</basePath>
-                  <info>
-                    <title>Flowable Runtime REST API</title>
-                    <version>v1</version>
-                    <contact>
-                      <email></email>
-                      <name>Flowable</name>
-                      <url>http://www.flowable.org/</url>
-                    </contact>
-                    <license>
-                      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
-                      <name>Apache 2.0</name>
-                    </license>
-                  </info>
-                  <securityDefinitions>
-                    <securityDefinition>
-                      <name>basicAuth</name>
-                      <type>basic</type>
-                    </securityDefinition>
-                  </securityDefinitions>
-                  <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
-                  <outputFormats>json,yaml</outputFormats>
-                  <swaggerFileName>flowable-runtime-task</swaggerFileName>
-                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/task</swaggerDirectory>
-                </apiSource>
-                <!-- ++++++++++ -->
-                <!-- ALL -->
-                <!-- ++++++++++ -->
-                <apiSource>
-                  <springmvc>true</springmvc>
-                  <locations>
-                    <location>org.activiti.rest.service.api</location>
-                  </locations>
-                  <schemes>
-                    <scheme>http</scheme>
-                    <scheme>https</scheme>
-                  </schemes>
-                  <host>localhost:8080</host>
+                  <host>${swagger.host}</host>
                   <basePath>/flowable-rest/service</basePath>
                   <info>
                     <title>Flowable REST API</title>
@@ -457,8 +186,121 @@
                   <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
                   <outputFormats>json,yaml</outputFormats>
                   <swaggerFileName>flowable</swaggerFileName>
-                  <!-- <swaggerDirectory>${basedir}/target/generated/swagger</swaggerDirectory> -->
-                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile</swaggerDirectory>
+                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/process</swaggerDirectory>
+                </apiSource>
+                <!-- ++++++++++ -->
+                <!-- DMN -->
+                <!-- ++++++++++ -->
+                <apiSource>
+                  <springmvc>true</springmvc>
+                  <locations>
+                    <location>org.flowable.rest.dmn.service.api</location>
+                  </locations>
+                  <schemes>
+                    <scheme>http</scheme>
+                    <scheme>https</scheme>
+                  </schemes>
+                  <host>${swagger.host}</host>
+                  <basePath>/flowable-rest/dmn-api</basePath>
+                  <info>
+                    <title>Flowable DMN REST API</title>
+                    <version>v1</version>
+                    <contact>
+                      <email></email>
+                      <name>Flowable</name>
+                      <url>http://www.flowable.org/</url>
+                    </contact>
+                    <license>
+                      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+                      <name>Apache 2.0</name>
+                    </license>
+                  </info>
+                  <securityDefinitions>
+                    <securityDefinition>
+                      <name>basicAuth</name>
+                      <type>basic</type>
+                    </securityDefinition>
+                  </securityDefinitions>
+                  <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
+                  <outputFormats>json,yaml</outputFormats>
+                  <swaggerFileName>flowable</swaggerFileName>
+                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/dmn</swaggerDirectory>
+                </apiSource>
+                <!-- ++++++++++ -->
+                <!-- FORM -->
+                <!-- ++++++++++ -->
+                <apiSource>
+                  <springmvc>true</springmvc>
+                  <locations>
+                    <location>org.flowable.rest.form.service.api</location>
+                  </locations>
+                  <schemes>
+                    <scheme>http</scheme>
+                    <scheme>https</scheme>
+                  </schemes>
+                  <host>${swagger.host}</host>
+                  <basePath>/flowable-rest/form-api</basePath>
+                  <info>
+                    <title>Flowable FORM REST API</title>
+                    <version>v1</version>
+                    <contact>
+                      <email></email>
+                      <name>Flowable</name>
+                      <url>http://www.flowable.org/</url>
+                    </contact>
+                    <license>
+                      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+                      <name>Apache 2.0</name>
+                    </license>
+                  </info>
+                  <securityDefinitions>
+                    <securityDefinition>
+                      <name>basicAuth</name>
+                      <type>basic</type>
+                    </securityDefinition>
+                  </securityDefinitions>
+                  <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
+                  <outputFormats>json,yaml</outputFormats>
+                  <swaggerFileName>flowable</swaggerFileName>
+                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/form</swaggerDirectory>
+                </apiSource>
+                <!-- ++++++++++ -->
+                <!-- CONTENT -->
+                <!-- ++++++++++ -->
+                <apiSource>
+                  <springmvc>true</springmvc>
+                  <locations>
+                    <location>org.flowable.rest.content.service.api</location>
+                  </locations>
+                  <schemes>
+                    <scheme>http</scheme>
+                    <scheme>https</scheme>
+                  </schemes>
+                  <host>${swagger.host}</host>
+                  <basePath>/flowable-rest/content-api</basePath>
+                  <info>
+                    <title>Flowable CONTENT REST API</title>
+                    <version>v1</version>
+                    <contact>
+                      <email></email>
+                      <name>Flowable</name>
+                      <url>http://www.flowable.org/</url>
+                    </contact>
+                    <license>
+                      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+                      <name>Apache 2.0</name>
+                    </license>
+                  </info>
+                  <securityDefinitions>
+                    <securityDefinition>
+                      <name>basicAuth</name>
+                      <type>basic</type>
+                    </securityDefinition>
+                  </securityDefinitions>
+                  <descriptionFile>${basedir}/src/main/resources/swagger/info.txt</descriptionFile>
+                  <outputFormats>json,yaml</outputFormats>
+                  <swaggerFileName>flowable</swaggerFileName>
+                  <swaggerDirectory>${basedir}/src/main/webapp/docs/specfile/content</swaggerDirectory>
                 </apiSource>
               </apiSources>
             </configuration>
@@ -468,6 +310,205 @@
                 <goals>
                   <goal>generate</goal>
                 </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>h2mem</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.tomcat.maven</groupId>
+            <artifactId>tomcat7-maven-plugin</artifactId>
+            <configuration>
+              <path>/flowable-rest</path>
+              <port>8080</port>
+              <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
+              <systemProperties>
+                <com.sun.management.jmxremote.port>4000</com.sun.management.jmxremote.port>
+              </systemProperties>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>postgresql</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.tomcat.maven</groupId>
+            <artifactId>tomcat7-maven-plugin</artifactId>
+            <configuration>
+              <path>/flowable-rest</path>
+              <port>8080</port>
+              <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
+              <systemProperties>
+                <datasource.driver>org.postgresql.Driver</datasource.driver>
+                <datasource.url>jdbc:postgresql://localhost:5432/flowable</datasource.url>
+                <datasource.username>flowable</datasource.username>
+                <datasource.password>flowable</datasource.password>
+                <com.sun.management.jmxremote.port>4000</com.sun.management.jmxremote.port>
+              </systemProperties>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>mysql</id>
+      <dependencies>
+        <dependency>
+          <groupId>mysql</groupId>
+          <artifactId>mysql-connector-java</artifactId>
+          <scope>compile</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.tomcat.maven</groupId>
+            <artifactId>tomcat7-maven-plugin</artifactId>
+            <configuration>
+              <path>/flowable-rest</path>
+              <port>8080</port>
+              <protocol>org.apache.coyote.http11.Http11NioProtocol</protocol>
+              <systemProperties>
+                <datasource.driver>com.mysql.jdbc.Driver</datasource.driver>
+                <datasource.url>jdbc:mysql://127.0.0.1:3306/flowable?characterEncoding=UTF-8</datasource.url>
+                <datasource.username>flowable</datasource.username>
+                <datasource.password>flowable</datasource.password>
+                <com.sun.management.jmxremote.port>4000</com.sun.management.jmxremote.port>
+              </systemProperties>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>buildDockerImage</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+          <scope>compile</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.tomcat.maven</groupId>
+            <artifactId>tomcat7-maven-plugin</artifactId>
+            <version>2.1</version>
+            <configuration>
+              <path>/</path>
+              <finalName>${project.build.finalName}.jar</finalName>
+            </configuration>
+            <executions>
+              <execution>
+                <id>tomcat-run</id>
+                <goals>
+                  <goal>exec-war-only</goal>
+                </goals>
+                <phase>package</phase>
+                <configuration>
+                  <path>/flowable-rest</path>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>com.spotify</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <version>0.4.13</version>
+            <configuration>
+              <imageName>flowable/${project.build.finalName}</imageName>
+              <baseImage>flowable/java8_server</baseImage>
+              <entryPoint>["java", "-jar", "/${project.build.finalName}.jar", "-httpPort=8080", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]</entryPoint>
+              <forceTags>true</forceTags>
+              <imageTags>
+                <imageTag>${project.version}</imageTag>
+                <imageTag>latest</imageTag>
+              </imageTags>
+              <resources>
+                <resource>
+                  <targetPath>/</targetPath>
+                  <directory>${project.build.directory}</directory>
+                  <include>${project.build.finalName}.jar</include>
+                </resource>
+                <resource>
+                <targetPath>/</targetPath>
+                  <directory>${project.basedir}/src/main/docker</directory>
+                  <include>wait-for-something.sh</include>
+                </resource>
+              </resources>
+            </configuration>
+            <executions>
+              <execution>
+                <id>build-image</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>build</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>pushDockerImage</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.spotify</groupId>
+            <artifactId>docker-maven-plugin</artifactId>
+            <version>0.4.13</version>
+            <executions>
+              <execution>
+                <id>tag-image-version</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>tag</goal>
+                </goals>
+                <configuration>
+                  <image>flowable/${project.build.finalName}</image>
+                  <newName>docker.io/flowable/${project.build.finalName}:${project.version}</newName>
+                  <serverId>docker-hub</serverId>
+                  <pushImage>true</pushImage>
+                </configuration>
+              </execution>
+              <execution>
+                <id>tag-image-latest</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>tag</goal>
+                </goals>
+                <configuration>
+                  <image>flowable/${project.build.finalName}</image>
+                  <newName>docker.io/flowable/${project.build.finalName}:latest</newName>
+                  <serverId>docker-hub</serverId>
+                  <pushImage>true</pushImage>
+                </configuration>
               </execution>
             </executions>
           </plugin>
@@ -518,6 +559,29 @@
       <artifactId>flowable-content-spring-configurator</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.flowable</groupId>
+      <artifactId>flowable-groovy-script-static-engine</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.flowable</groupId>
+      <artifactId>flowable-http</artifactId>
+    </dependency>
+
+    <!-- LOGGING -->
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+    </dependency>
+    <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
     </dependency>
@@ -535,11 +599,6 @@
       <artifactId>javax.servlet-api</artifactId>
       <version>3.1.0</version>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-        <groupId>mysql</groupId>
-        <artifactId>mysql-connector-java</artifactId>
-        <scope>compile</scope>
     </dependency>
   </dependencies>
 </project>

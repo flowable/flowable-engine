@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-angular.module('activitiApp').directive('documentPreview', ['$parse', 'appResourceRoot', function ($parse, appResourceRoot) {
+angular.module('flowableApp').directive('documentPreview', ['$parse', 'appResourceRoot', function ($parse, appResourceRoot) {
     return {
         restrict: 'E',
         templateUrl: appResourceRoot + 'views/templates/document-preview.html',
@@ -25,7 +25,7 @@ angular.module('activitiApp').directive('documentPreview', ['$parse', 'appResour
     };
 }]);
 
-angular.module('activitiApp').directive('activitiForm', ['$rootScope', 'appResourceRoot', function ($rootScope, appResourceRoot) {
+angular.module('flowableApp').directive('activitiForm', ['$rootScope', 'appResourceRoot', function ($rootScope, appResourceRoot) {
     return {
         restrict: 'E',
         templateUrl: appResourceRoot + 'views/templates/form-template.html',
@@ -45,7 +45,7 @@ angular.module('activitiApp').directive('activitiForm', ['$rootScope', 'appResou
     };
 }]);
 
-angular.module('activitiApp').
+angular.module('flowableApp').
     directive('optimalGrid', ['$compile', '$http', function($compile, $http) {
         var directive = {};
         directive.restrict = 'A';
@@ -95,7 +95,7 @@ angular.module('activitiApp').
         return directive;
     }]);
 
-angular.module('activitiApp').
+angular.module('flowableApp').
     directive('jumpers', ['$compile', '$http', function($compile, $http) {
         var directive = {};
         directive.restrict = 'A';
@@ -179,7 +179,7 @@ angular.module('activitiApp').
  *
  * Taken/inspired from https://github.com/luisfarzati/ng-bs-daterangepicker
  */
-angular.module('activitiApp')
+angular.module('flowableApp')
     .directive('input', ['$compile', '$http', function($compile, $http) {
         return {
             restrict: 'E',
@@ -241,14 +241,14 @@ angular.module('activitiApp')
         };
     }]);
 
-angular.module('activitiApp').
+angular.module('flowableApp').
     directive('userPicture', ['$compile', '$http', function($compile, $http) {
         var directive = {};
         directive.restrict = 'A';
         directive.replace = true;
         directive.transclude = false;
         directive.template =
-            '<div class="{{userPic.class}}" ng-style="{\'background-image\': userPic.style}" title="{{userPic.userName}}">' +
+            '<div class="{{userPic.class}}" ng-style="{\'background-image\': userPic.style}" title="{{userPic.userName | username}}">' +
                 '<span>{{userPic.text}}</span>'+
             '</div>';
 
@@ -293,8 +293,18 @@ angular.module('activitiApp').
                         }
                         newUserPic.userName = user.firstName;
                     } else {
-                        newUserPic.text = '??';
-                        newUserPic.userName = '';
+                        if (user != undefined && user != null){
+							if (user.length > 1) {
+								newUserPic.text = user.substring(0, 2).toUpperCase();
+							} else if (user.length == 1) {
+								newUserPic.text = user.substring(0, 1).toUpperCase();
+							}
+							newUserPic.userName = user;
+							
+						} else {
+							newUserPic.text ='??';
+							newUserPic.userName = '';
+						}
                     }
                 }
 
@@ -309,7 +319,7 @@ angular.module('activitiApp').
     }]);
 
 //form builder element renderer
-angular.module('activitiApp')
+angular.module('flowableApp')
     .directive('formElement', ['$rootScope', '$timeout', '$modal', '$http', '$templateCache', '$translate', 'appResourceRoot', 'RecursionHelper', function ($rootScope, $timeout, $modal, $http, $templateCache, $translate, appResourceRoot, RecursionHelper) {
         return {
             restrict: 'E',
@@ -343,10 +353,6 @@ angular.module('activitiApp')
 
                 $scope.fieldPersonSelected = function(user, field){
                     return $scope.controlCallbacks.fieldPersonSelected(user, field);
-                };
-
-                $scope.fieldPersonEmailSelected = function(email, field){
-                    return $scope.controlCallbacks.fieldPersonEmailSelected(email, field);
                 };
                 
                 $scope.fieldPersonRemoved = function(user, field){

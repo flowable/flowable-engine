@@ -10,9 +10,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-angular.module('activitiApp')
-    .controller('RenderFormController', ['$rootScope', '$scope', '$http', '$translate', '$modal', 'appResourceRoot', 'FormService', 'RelatedContentService', '$sce', '$timeout', 'TaskService', 'hotkeys', 'uiGridConstants',
-        function ($rootScope, $scope, $http, $translate, $modal, appResourceRoot, FormService, RelatedContentService, $sce, $timeout, TaskService, hotkeys, uiGridConstants) {
+angular.module('flowableApp')
+    .controller('RenderFormController', ['$rootScope', '$scope', '$http', '$translate', '$modal', 'appResourceRoot', 'FormService', 'UserService', 'FunctionalGroupService', 'RelatedContentService', '$sce', '$timeout', 'TaskService', 'hotkeys', 'uiGridConstants',
+        function ($rootScope, $scope, $http, $translate, $modal, appResourceRoot, FormService, UserService, FunctionalGroupService, RelatedContentService, $sce, $timeout, TaskService, hotkeys, uiGridConstants) {
 
             // when you bind it to the controller's scope, it will automatically unbind
             // the hotkey when the scope is destroyed (due to ng-if or something that changes the DOM)
@@ -82,7 +82,7 @@ angular.module('activitiApp')
                     currentHtmlElementId = "activiti-" + currentHtmlElement.name;
                 }
 
-                var fields = $scope.allFormFields;
+                var fields = $scope.model.allFormFields;
 
                 //calculate the index of the current element in the fields array.
                 var indexInSorted = 0;
@@ -99,7 +99,7 @@ angular.module('activitiApp')
             $scope.getNextTabFormElement = function (currentElement) {
                 var elementToBeSelected = null;
                 if (currentElement && currentElement != null) {
-                    var fields = $scope.allFormFields;
+                    var fields = $scope.model.allFormFields;
 
                     var sortedElements = filterAndSortElements(fields);
 
@@ -126,7 +126,7 @@ angular.module('activitiApp')
                 var elementToBeSelected = null;
                 if (currentElement && currentElement != null) {
 
-                    var fields = $scope.allFormFields;
+                    var fields = $scope.model.allFormFields;
                     var sortedElements = filterAndSortElements(fields);
 
                     //calculate the index of the next element in the sorted array.
@@ -245,9 +245,9 @@ angular.module('activitiApp')
                 jQuery("#" + $rootScope.activitiFieldIdPrefix + field.id).blur();
             };
 
-            $scope.combineFormVariables = function (processInstanceVariables) {
+            $scope.combineFormVariables = function () {
 
-                var fields = $scope.allFormFields;
+                var fields = $scope.model.allFormFields;
                 var localVariables = [];
 
                 for (var fieldArrayIndex = 0; fieldArrayIndex < fields.length; fieldArrayIndex++) {
@@ -257,11 +257,7 @@ angular.module('activitiApp')
                     }
                 }
 
-                if (processInstanceVariables && processInstanceVariables.length > 0) {
-                    $scope.currentAndHistoricFormFields = processInstanceVariables.concat(localVariables);
-                } else {
-                    $scope.currentAndHistoricFormFields = localVariables;
-                }
+                $scope.currentAndHistoricFormFields = localVariables;
             };
 
             /**
@@ -298,13 +294,29 @@ angular.module('activitiApp')
                         field.isVisible = true;
                     }
                     
-                    if (field.type == 'dropdown' && field.value && field.options) {
+                    if (field.type == 'dropdown' && field.value && field.options && !field.readOnly) {
                         for (var j = 0; j < field.options.length; j++) {
                             if (field.options[j].name == field.value) {
                                 field.value = field.options[j];
                                 break;
                             }
                         }
+                        
+                    } else if (field.type == 'date' && field.value && !field.readOnly) {
+                        var dateArray = field.value.split('-');
+                        if (dateArray && dateArray.length == 3) {
+                            field.value = new Date(dateArray[0],dateArray[1]-1,dateArray[2]);
+                        }
+                        
+                    } else if (field.type == 'people' && field.value) {
+                        UserService.getUserInfoForForm(field.value, i).then(function (userInfoFormObject) {
+                            fields[userInfoFormObject.index].value = userInfoFormObject.userData;
+                        });
+                        
+                    } else if (field.type == 'functional-group' && field.value) {
+                        FunctionalGroupService.getGroupInfoForForm(field.value, i).then(function (groupInfoFormObject) {
+                            fields[groupInfoFormObject.index].value = groupInfoFormObject.groupData;
+                        });
 
                     } else if (field.type == 'upload' && field.value) {
                         $scope.model.uploads[field.id] = [];
@@ -316,6 +328,7 @@ angular.module('activitiApp')
                             }
                             newUploadValue += field.value[j].id;
                         }
+                        field.value = newUploadValue;
 					}
                 }
             };
@@ -325,13 +338,13 @@ angular.module('activitiApp')
              */
             var prepareFormFields = function (formData) {
 
-                $scope.allFormFields = formData.fields;
+                $scope.model.allFormFields = formData.fields;
 
                 $scope.model.restValues = {};
 
                 // populate only REST values in case of outcomesOnly
                 if (!$scope.outcomesOnly) {
-                    $scope.preProcessFields($scope.allFormFields);
+                    $scope.preProcessFields($scope.model.allFormFields);
                 }
             };
 
@@ -363,10 +376,10 @@ angular.module('activitiApp')
                     return foundItem;
                 }
 
-                if ($scope.allFormFields) {
+                if ($scope.model.allFormFields) {
                     var formValid = true;
-                    for (var fieldIndex = 0; fieldIndex < $scope.allFormFields.length; fieldIndex++) {
-                        var field = $scope.allFormFields[fieldIndex];
+                    for (var fieldIndex = 0; fieldIndex < $scope.model.allFormFields.length; fieldIndex++) {
+                        var field = $scope.model.allFormFields[fieldIndex];
 
                         if (field) {
                             // Required field check
@@ -451,16 +464,8 @@ angular.module('activitiApp')
 
                     if ($scope.model.outcomesOnly !== true) {
 
-                        if ($scope.taskId) {
-                            TaskService.getProcessInstanceVariables($scope.taskId).then(function (instanceVariables) {
-                                $scope.combineFormVariables(instanceVariables);
-                                $scope.model.loading = false;
-                            });
-
-                        } else {
-                            $scope.combineFormVariables(undefined);
-                            $scope.model.loading = false;
-                        }
+                        $scope.combineFormVariables();
+                        $scope.model.loading = false;
                     }
 
                     $scope.model.loading = false;
@@ -473,14 +478,8 @@ angular.module('activitiApp')
                         prepareFormFields($scope.formData); // Prepare the form fields to allow for layouting
 
                         if ($scope.model.outcomesOnly !== true) {
-
+                            $scope.combineFormVariables();
                             $scope.model.loading = false;
-
-                            TaskService.getProcessInstanceVariables($scope.taskId).then(function (instanceVariables) {
-                                $scope.combineFormVariables(instanceVariables);
-
-                                $scope.model.loading = false;
-                            });
 
                         }
 
@@ -492,10 +491,10 @@ angular.module('activitiApp')
 
                     FormService.getStartForm($scope.processDefinitionId).then(function (formData) {
                         $scope.formData = formData;
-                        prepareFormFields($scope.formData);// Prepare the form fields to allow for layouting
+                        prepareFormFields($scope.formData); // Prepare the form fields to allow for layouting
                         $scope.model.loading = false;
 
-                        $scope.combineFormVariables(undefined);
+                        $scope.combineFormVariables();
                     });
                 }
             };
@@ -521,6 +520,31 @@ angular.module('activitiApp')
                 } else {
                     return $translate.instant('FORM.DEFAULT-OUTCOME.COMPLETE');
                 }
+            };
+
+            $scope.saveForm = function () {
+
+                $scope.model.loading = true;
+                $scope.model.completeButtonDisabled = true;
+
+                // Prep data
+                var postData = $scope.createPostData();
+                postData.formId = $scope.formData.id;
+
+                 FormService.saveTaskForm($scope.taskId, postData).then(
+                     function (data) {
+                         $rootScope.addAlertPromise($translate('TASK.ALERT.SAVED'));
+                         $scope.model.completeButtonDisabled = false;
+                         $scope.model.loading = false;
+                     },
+                     function (errorResponse) {
+                         $scope.model.completeButtonDisabled = false;
+                         $scope.model.loading = false;
+                         $scope.$emit('task-save-error', {
+                             taskId: $scope.taskId,
+                             error: errorResponse
+                         });
+                     });
             };
 
             $scope.completeForm = function (outcome) {
@@ -584,10 +608,6 @@ angular.module('activitiApp')
             $scope.fieldPersonSelected = function (user, field) {
                 field.value = user;
             };
-
-            $scope.fieldPersonEmailSelected = function (email, field) {
-                field.value = email;
-            };
             
             $scope.fieldPersonRemoved = function (user, field) {
                 field.value = undefined;
@@ -646,17 +666,17 @@ angular.module('activitiApp')
             
             $scope.createPostData = function() {
                 var postData = {values: {}};
-                if (!$scope.allFormFields) return postData;
+                if (!$scope.model.allFormFields) return postData;
                     
-                for (var fieldArrayIndex = 0; fieldArrayIndex < $scope.allFormFields.length; fieldArrayIndex++) {
-                    var field = $scope.allFormFields[fieldArrayIndex];
+                for (var fieldArrayIndex = 0; fieldArrayIndex < $scope.model.allFormFields.length; fieldArrayIndex++) {
+                    var field = $scope.model.allFormFields[fieldArrayIndex];
                     if (!field || !field.isVisible) continue;
 
                     if (field.type === 'boolean' && field.value == null) {
                         field.value = false;
                     }
 
-                    if (field && field.type !== 'expression') {
+                    if (field && field.type !== 'expression' && !field.readOnly) {
                         
                         if (field.type === 'dropdown' && field.hasEmptyValue !== null && field.hasEmptyValue !== undefined && field.hasEmptyValue === true) {
 
@@ -664,13 +684,13 @@ angular.module('activitiApp')
                             if (field.options !== null && field.options !== undefined && field.options.length > 0) {
 
                                 var emptyValue = field.options[0];
-                                if (emptyValue.name !== field.value.name) {
+                                if (field.value != null && field.value != undefined && emptyValue.name !== field.value.name) {
                                     postData.values[field.id] = field.value;
                                 }
                             }
                             
                         } else if (field.type === 'date' && field.value) {
-                        	postData.values[field.id] = field.value.toISOString().slice(0, 10);
+                            postData.values[field.id] = field.value.getFullYear() + '-' + (field.value.getMonth() + 1) + '-' + field.value.getDate();
 
                         } else {
                             postData.values[field.id] = field.value;
@@ -688,7 +708,6 @@ angular.module('activitiApp')
                 isEmpty: $scope.isEmpty,
                 isEmptyDropdown: $scope.isEmptyDropdown,
                 fieldPersonSelected: $scope.fieldPersonSelected,
-                fieldPersonEmailSelected: $scope.fieldPersonEmailSelected,
                 fieldPersonRemoved: $scope.fieldPersonRemoved,
                 fieldGroupSelected: $scope.fieldGroupSelected,
                 fieldGroupRemoved: $scope.fieldGroupRemoved,

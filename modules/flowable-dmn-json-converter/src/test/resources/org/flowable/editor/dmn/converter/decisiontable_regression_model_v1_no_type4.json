@@ -1,0 +1,38 @@
+{
+  "id": "ea5c731e-f1c4-11e6-95e0-acde48001122",
+  "name": "Manager approval needed2",
+  "key": "managerApprovalNeeded",
+  "hitIndicator": "FIRST",
+  "inputExpressions": [
+    {
+      "id": "3",
+      "variableId": "amountOfVacationDays",
+      "variableType": null,
+      "type": null,
+      "label": "Amount of vacation days",
+      "entries": null,
+      "newVariable": false
+    }
+  ],
+  "outputExpressions": [
+    {
+      "id": "4",
+      "variableId": "managerApprovalNeeded",
+      "variableType": null,
+      "type": "boolean",
+      "label": "Manager approval needed",
+      "entries": null,
+      "newVariable": false
+    }
+  ],
+  "rules": [
+    {
+      "3": "< 10",
+      "4": "false"
+    },
+    {
+      "3": ">= 10",
+      "4": "true"
+    }
+  ]
+}

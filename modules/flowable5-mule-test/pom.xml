@@ -11,15 +11,15 @@
     <groupId>org.flowable</groupId>
     <artifactId>flowable-root</artifactId>
     <relativePath>../..</relativePath>
-    <version>6.0.0.RC1-SNAPSHOT</version>
+    <version>6.3.0-SNAPSHOT</version>
   </parent>
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <spring.mule.version>3.2.10.RELEASE</spring.mule.version>
-    <activiti.artifact>
+    <flowable.artifact>
       org.activiti.mule.test
-    </activiti.artifact>
+    </flowable.artifact>
   </properties>
 
   <build>
@@ -35,7 +35,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.6</version>
         <configuration>
           <workingDirectory>${project.build.directory}</workingDirectory>
           <systemPropertyVariables>
@@ -43,14 +42,6 @@
             <buildDirectory>${project.build.directory}</buildDirectory>
           </systemPropertyVariables>
           <runOrder>alphabetical</runOrder>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
         </configuration>
       </plugin>
       <plugin>

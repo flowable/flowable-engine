@@ -7,7 +7,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Activiti Workflow</title>
+    <title>Flowable Workflow</title>
     <link rel="icon" type="image/ico" href="../favicon.ico">
 
     <!-- build:css styles/3thparty.css -->
@@ -23,12 +23,12 @@
     
     <link rel="Stylesheet" href="../libs/ui-grid_3.0.0/ui-grid.css" type="text/css"/>
 </head>
-<body ng-app="activitiApp" ng-cloak>
+<body ng-app="flowableApp" ng-cloak>
     <div class="navbar navbar-fixed-top navbar-inverse" ng-show="!root.headless" role="navigation" id="main-nav">
         <div class="fixed-container">
             <div class="navbar-header">
                 <a ng-click="backToLanding()" class="landing-logo" ng-if="account != null && account != undefined" title="{{'GENERAL.MAIN-TITLE' | translate}}">
-                    <img ng-src="{{appResourceRoot}}../images/flowable-logo.png">
+                    <img ng-src="{{appResourceRoot}}../images/flowable-logo.png" ng-srcset="{{appResourceRoot}}../images/flowable-logo.png 1x, {{appResourceRoot}}../images/flowable-logo@2x.png 2x">
                 </a>
                 <ul class="nav navbar-nav" ng-show="authenticated">
                     <li ng-repeat="item in mainNavigation" ng-class="{'active': item.id == mainPage.id}">
@@ -43,7 +43,7 @@
                 <i class="glyphicon {{activeAppDefinition.icon}}"></i>
                 <div class="dropdown btn-group btn-group-sm">
                     <button type="button" class="btn btn-default dropdown-toggle"
-                            data-toggle="dropdown">{{account.firstName}} {{account.lastName}}
+                            data-toggle="dropdown">{{account.firstName && account.firstName != 'null' ? account.firstName : ''}} {{account.lastName && account.lastName != 'null' ? account.lastName : ''}}
                         <span class="glyphicon glyphicon-chevron-down" style="font-size: 10px" aria-hidden="true"></span>
                     </button>
                     <ul class="dropdown-menu pull-right">
@@ -106,7 +106,7 @@
     <script src="../libs/angular-cookies_1.3.13/angular-cookies.min.js"></script>
     <script src="../libs/angular-sanitize_1.3.13/angular-sanitize.min.js"></script>
     <script src="../libs/angular-route_1.3.13/angular-route.min.js"></script>
-    <script src="../libs/angular-translate_2.4.2/angular-translate.min.js"></script>
+    <script src="../libs/angular-translate_2.15.1/angular-translate.min.js"></script>
     <script src="../libs/angular-translate-storage-cookie/angular-translate-storage-cookie.js"></script>
     <script src="../libs/angular-translate-loader-static-files/angular-translate-loader-static-files.js"></script>
     <script src="../libs/angular-strap_2.1.6/angular-strap.min.js"></script>
@@ -114,10 +114,11 @@
     <script src="../libs/angular-dragdrop_1.0.11/angular-dragdrop.min.js"></script>
     <script src="../libs/ng-file-upload/ng-file-upload-shim.min.js"></script>
     <script src="../libs/ng-file-upload/ng-file-upload.min.js"></script>
-    <script src="../libs/momentjs_2.5.1/momentjs.min.js"></script>
+    <script src="../libs/momentjs_2.18.1/momentjs.min.js"></script>
     <script src="../libs/ui-grid_3.0.0/ui-grid.js" type="text/javascript"></script>
     <script src="../libs/angular-loading-bar-0.7.0/loading-bar.min.js"></script>
     <script src="../libs/angular-hotkeys_1.4.5/hotkeys--activiti-patch.js"></script>
+    <script src="../libs/angular-ui-mask/mask.min.js"></script>
 
     <!-- Configuration -->
     <script src="../scripts/app-cfg.js?v=2"></script>
@@ -126,6 +127,7 @@
     <script src="scripts/workflow-app.js"></script>
     <script src="scripts/services/comment-service.js"></script>
     <script src="scripts/services/process-service.js"></script>
+    <script src="scripts/services/case-service.js"></script>
     <script src="scripts/services/task-service.js"></script>
     <script src="scripts/services/form-service.js"></script>
     <script src="scripts/services/app-definition-service.js"></script>
@@ -138,6 +140,9 @@
     <script src="scripts/controllers/render-form.js"></script>
     <script src="scripts/controllers/start-form.js"></script>
     <script src="scripts/controllers/start-process.js"></script>
+    <script src="scripts/controllers/cases.js"></script>
+    <script src="scripts/controllers/case.js"></script>
+    <script src="scripts/controllers/case-start-form.js"></script>
     <script src="scripts/workflow-directives.js"></script>
 
     <script src="../scripts/common/services/user-service.js"></script>

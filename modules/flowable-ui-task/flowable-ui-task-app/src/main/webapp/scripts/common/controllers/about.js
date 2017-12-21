@@ -12,7 +12,7 @@
  */
 'use strict';
 
-activitiApp.controller('AboutActivitiPopupCrtl', ['$rootScope', '$scope', '$http', '$translate', '$interval', '$dateFormatter', function($rootScope, $scope, $http, $translate, $interval, $dateFormatter) {
+flowableApp.controller('AboutFlowablePopupCtrl', ['$rootScope', '$scope', '$http', '$translate', '$interval', '$dateFormatter', function($rootScope, $scope, $http, $translate, $interval, $dateFormatter) {
     $scope.popup = {
         loading: true,
         activitiVersion: {},

@@ -1,5 +1,5 @@
 spring:
-  activiti:
+  flowable:
     customMybatisXMLMappers:
       - mappers/CustomMybatisXmlMapper.xml
     customMybatisMappers:

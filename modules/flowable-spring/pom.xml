@@ -9,29 +9,21 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.0.0.RC1-SNAPSHOT</version>
+        <version>6.3.0-SNAPSHOT</version>
     </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <activiti.artifact>
-            org.activiti.spring
-        </activiti.artifact>
-        <activiti.osgi.import.additional>
+        <flowable.artifact>
+            org.flowable.spring
+        </flowable.artifact>
+        <flowable.osgi.import.additional>
           org.springframework.test.context*;resolution:=optional,
-        </activiti.osgi.import.additional>
+        </flowable.osgi.import.additional>
     </properties>
 
     <build>
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
-                </configuration>
-            </plugin>
             <plugin>
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration>
@@ -104,6 +96,10 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-idm-spring</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-spring-common</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -210,12 +206,12 @@
                                 <phase>generate-sources</phase>
                                 <configuration>
                                     <tasks>
-                                        <delete dir="src/test/java/org/activiti/engine/test" />
-                                        <delete dir="src/test/resources/org/activiti/engine/test" />
-                                        <delete dir="src/test/java/org/activiti/examples" />
-                                        <delete dir="src/test/resources/org/activiti/examples" />
-                                        <delete dir="src/test/java/org/activiti/standalone" />
-                                        <delete dir="src/test/resources/org/activiti/standalone" />
+                                        <delete dir="src/test/java/org/flowable/engine/test" />
+                                        <delete dir="src/test/resources/org/flowable/engine/test" />
+                                        <delete dir="src/test/java/org/flowable/examples" />
+                                        <delete dir="src/test/resources/org/flowable/examples" />
+                                        <delete dir="src/test/java/org/flowable/standalone" />
+                                        <delete dir="src/test/resources/org/flowable/standalone" />
                                     </tasks>
                                 </configuration>
                                 <goals>
@@ -242,12 +238,12 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <delete dir="src/test/java/org/activiti/engine/test" />
-                                        <delete dir="src/test/resources/org/activiti/engine/test" />
-                                        <delete dir="src/test/java/org/activiti/examples" />
-                                        <delete dir="src/test/resources/org/activiti/examples" />
-                                        <delete dir="src/test/java/org/activiti/standalone" />
-                                        <delete dir="src/test/resources/org/activiti/standalone" />
+                                        <delete dir="src/test/java/org/flowable/engine/test" />
+                                        <delete dir="src/test/resources/org/flowable/engine/test" />
+                                        <delete dir="src/test/java/org/flowable/examples" />
+                                        <delete dir="src/test/resources/org/flowable/examples" />
+                                        <delete dir="src/test/java/org/flowable/standalone" />
+                                        <delete dir="src/test/resources/org/flowable/standalone" />
                                         <copy todir="src/test/java" overwrite="true">
                                             <fileset dir="../flowable-engine/src/test/java" />
                                         </copy>
@@ -265,12 +261,12 @@
                                 </goals>
                                 <configuration>
                                     <tasks>
-                                        <delete dir="src/test/java/org/activiti/engine/test" />
-                                        <delete dir="src/test/resources/org/activiti/engine/test" />
-                                        <delete dir="src/test/java/org/activiti/examples" />
-                                        <delete dir="src/test/resources/org/activiti/examples" />
-                                        <delete dir="src/test/java/org/activiti/standalone" />
-                                        <delete dir="src/test/resources/org/activiti/standalone" />
+                                        <delete dir="src/test/java/org/flowable/engine/test" />
+                                        <delete dir="src/test/resources/org/flowable/engine/test" />
+                                        <delete dir="src/test/java/org/flowable/examples" />
+                                        <delete dir="src/test/resources/org/flowable/examples" />
+                                        <delete dir="src/test/java/org/flowable/standalone" />
+                                        <delete dir="src/test/resources/org/flowable/standalone" />
                                     </tasks>
                                 </configuration>
                             </execution>
@@ -282,14 +278,14 @@
                             <systemProperties>
                                 <property>
                                     <name>process.engine.initializer</name>
-                                    <value>org.activiti.spring.SpringProcessEngineInitializer</value>
+                                    <value>org.flowable.spring.SpringProcessEngineInitializer</value>
                                 </property>
                             </systemProperties>
                             <excludes>
-                                <exclude>org/activiti/standalone/**</exclude>
+                                <exclude>org/flowable/standalone/**</exclude>
                                 <exclude>**/*TestCase.java</exclude>
-                                <exclude>**/ActivitiRuleJunit4Test.java</exclude><!-- Can't run in
-									Spring since ActivitiRule must be used different in Spring -->
+                                <exclude>**/FlowableRuleJunit4Test.java</exclude><!-- Can't run in
+									Spring since FlowableRule must be used different in Spring -->
                                 <exclude>**/CompetingJobAcquisitionTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-234 -->
                                 <exclude>**/WSDLImporterTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-315 -->
                                 <exclude>**/JobExecutorTest.java</exclude> <!-- https://activiti.atlassian.net/browse/ACT-427 -->

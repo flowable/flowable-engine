@@ -1,6 +1,6 @@
 {
    "GENERAL": {
-        "MAIN-TITLE": "Activiti",
+        "MAIN-TITLE": "Flowable",
         "ERROR": {
             "GENERIC": "Sorry, an error occured...",
             "UNKNOWN": "Sorry, an error occured while performing the requested operation.",
@@ -8,9 +8,7 @@
             "NOT_FOUND": "The resource you are trying to access does not exist",
             "UNAUTHORIZED": "You should sign in in order to perform the requested operation.",
             "FORBIDDEN": "You are not allowed to perform the requested operation",
-            "INTERNAL_SERVER_ERROR": "Sorry, an unexpected error occured while performing the requested operation.",
-            "QUOTA-EXCEEDED-RUNTIME-APPS": "As a trial user, you can only have {{quota}} apps deployed at the same time.",
-            "QUOTA-EXCEEDED-LICENSE-APPS": "The license only permits {{quota}} apps deployed at the same time."
+            "INTERNAL_SERVER_ERROR": "Sorry, an unexpected error occured while performing the requested operation."
         },
         "ACTION": {
             "LOGOUT": "Sign out",
@@ -20,7 +18,7 @@
             "CANCEL": "Cancel",
             "CLOSE": "Close",
             "DEPLOY": "Deploy",
-            "ABOUT": "About Alfresco Activiti"
+            "ABOUT": "About Flowable"
         }
     },
     "LOGIN": {

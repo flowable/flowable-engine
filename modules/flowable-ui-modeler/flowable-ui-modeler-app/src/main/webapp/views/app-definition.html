@@ -8,6 +8,9 @@
 			<a href="{{model.appExportUrl}}" class="btn btn-default" title="{{'APP.ACTION.EXPORT-ZIP' | translate}}" ng-if="model.app.latestVersion">
                 <i class="glyphicon glyphicon-save"></i>
             </a>
+            <a href="{{model.appBarExportUrl}}" class="btn btn-default" title="{{'APP.ACTION.EXPORT-BAR' | translate}}" ng-if="model.app.latestVersion">
+                <i class="glyphicon glyphicon-export"></i>
+            </a>
             <button type="button" class="btn btn-default" ng-click="importAppDefinition()" ng-if="model.app.latestVersion" translate>APPS-LIST.ACTION.IMPORT</button>
 			<button type="button" class="btn btn-default" ng-click="publish()" ng-if="model.app.latestVersion">
                 {{'APP.ACTION.PUBLISH' | translate}}
@@ -15,12 +18,6 @@
 		    <button type="button" class="btn btn-default" ng-click="openEditor()" ng-if="model.app.latestVersion">
                 <i class="glyphicon glyphicon-edit icon-and-label"></i> {{'APP.ACTION.OPEN-IN-EDITOR' | translate}}
             </button>
-		</div>
-		<div class="btn-group pull-right">
-			<button type="button" ng-click="shareApp()" class="btn btn-default" title="{{'APP.ACTION.SHARE' | translate}}"
-			    title="{{'APP.ACTION.SHARE' | translate}}" ng-disabled="!model.app.latestVersion || model.app.createdBy != account.id">
-				<i class="glyphicon glyphicon-share"></i>
-			</button>
 		</div>
 		<div class="btn-group pull-right">
 			<button type="button" class="btn btn-default" ng-click="editApp()" ng-disabled="!model.app.latestVersion"
@@ -32,7 +29,7 @@
                 <i class="editor-icon editor-icon-copy"></i>
 			</button>
 			<button type="button" class="btn btn-default" ng-click="deleteApp()" title="{{'APP.ACTION.DELETE' | translate}}"
-				 title="{{'APP.ACTION.DELETE' | translate}}" ng-disabled="!model.app.latestVersion">
+				ng-disabled="!model.app.latestVersion">
 				<i class="glyphicon glyphicon-trash"></i>
 			</button>
 		</div>		
@@ -99,10 +96,36 @@
                         {{'APP.DETAILS.NO-MODELS-SELECTED' | translate}}
                     </div>
                 </div>
+            </div>
+            
+            <br/>
+            
+            <div class="row">
+                
+                <div class="tabs-wrapper">
 
-                <div class="col-xs-12 item-wrapper">
+                <div tab-control="tabs" active-tab="model.activeTab">
+                </div>
+                
+                <div class="col-xs-12 item-wrapper" ng-show="model.activeTab == 'bpmn'">
                     <div class="item fadein" ng-repeat="model in model.appDefinition.definition.models">
-                        <div class="item-box" ng-style="{'background-image': 'url(\'' + config.contextRoot + '/app/rest/models/' + model.id + '/thumbnail\')'}">
+                        <div class="item-box" ng-style="{'background-image': 'url(\'' + getModelThumbnailUrl(model.id) + '\')'}">
+                            <div class="actions">
+                                <span class="badge">v{{model.version}}</span>
+                            </div>
+                            <div class="details">
+                                <h3 class="truncate" title="{{model.name}}">
+                                    {{model.name}}
+                                </h3>
+                                <p>{{model.description}}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-xs-12 item-wrapper" ng-show="model.activeTab == 'cmmn'">
+                    <div class="item fadein" ng-repeat="model in model.appDefinition.definition.cmmnModels">
+                        <div class="item-box" ng-style="{'background-image': 'url(\'' + getModelThumbnailUrl(model.id) + '\')'}">
                             <div class="actions">
                                 <span class="badge">v{{model.version}}</span>
                             </div>

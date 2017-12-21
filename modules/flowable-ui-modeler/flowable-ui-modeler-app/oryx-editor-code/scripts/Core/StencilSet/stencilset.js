@@ -53,50 +53,16 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
      * @param source {URL} A reference to the stencil set specification.
      *
      */
-    construct: function(source, modelMetaData, editorId){
-        arguments.callee.$.construct.apply(this, arguments);
-        
-        if (!source) {
-            throw "ORYX.Core.StencilSet.StencilSet(construct): Parameter 'source' is not defined.";
-        }
-        
-        if (source.endsWith("/")) {
-            source = source.substr(0, source.length - 1);
-        }
+    construct: function(baseUrl, data) {
 		
 		this._extensions = new Hash();
         
-        this._source = source;
-        this._baseUrl = source.substring(0, source.lastIndexOf("/") + 1);
-        
+        this._baseUrl = baseUrl;
         this._jsonObject = {};
         
         this._stencils = new Hash();
 		this._availableStencils = new Hash();
-        
-		if(ORYX.CONFIG.BACKEND_SWITCH) {
-			var stencilType = "bpmn";
-			this._baseUrl = "editor/stencilsets/bpmn2.0/";
-			this._source = "stencilsets/bpmn2.0/bpmn2.0.json";
-			
-			new Ajax.Request(FLOWABLE.CONFIG.contextRoot + "/app/rest/stencil-sets/editor?version=" + Date.now(), {
-	            asynchronous: false,
-	            method: 'get',
-	            onSuccess: this._init.bind(this),
-	            onFailure: this._cancelInit.bind(this)
-	        });
-			
-		} else {
-			new Ajax.Request(source, {
-	            asynchronous: false,
-	            method: 'get',
-	            onSuccess: this._init.bind(this),
-	            onFailure: this._cancelInit.bind(this)
-	        });
-		}
-        
-        if (this.errornous) 
-            throw "Loading stencil set " + source + " failed.";
+       	this._init(data);
     },
     
     /**
@@ -203,7 +169,7 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
     },
     
     stencil: function(id){
-        return this._stencils[id];
+        return this._stencils.get(id);
     },
     
     title: function(){
@@ -257,7 +223,7 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
 					jsonExtension["extends"] += "#";
 					
 			if(jsonExtension["extends"] == this.namespace()) {
-				this._extensions[jsonExtension.namespace] = jsonExtension;
+				this._extensions.set(jsonExtension.namespace, jsonExtension);
 				
 				var defaultPosition = this._stencils.keys().size();
 				//load new stencils
@@ -265,8 +231,8 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
 					$A(jsonExtension.stencils).each(function(stencil) {
 						defaultPosition++;
 						var oStencil = new ORYX.Core.StencilSet.Stencil(stencil, this.namespace(), this._baseUrl, this, undefined, defaultPosition);            
-						this._stencils[oStencil.id()] = oStencil;
-						this._availableStencils[oStencil.id()] = oStencil;
+						this._stencils.set(oStencil.id(),oStencil);
+						this._availableStencils.set(oStencil.id(),oStencil);
 					}.bind(this));
 				}
 				
@@ -326,8 +292,8 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
 			if(jsonExtension.stencils) {
 				$A(jsonExtension.stencils).each(function(stencil) {
 					var oStencil = new ORYX.Core.StencilSet.Stencil(stencil, this.namespace(), this._baseUrl, this);            
-					delete this._stencils[oStencil.id()]; // maybe not ??
-					delete this._availableStencils[oStencil.id()];
+					this._stencils.unset(oStencil.id());
+					this._availableStencils.unset(oStencil.id());
 				}.bind(this));
 			}
 			
@@ -373,7 +339,7 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
 			if(jsonExtension.removestencils) {
 				$A(jsonExtension.removestencils).each(function(remstencil) {
 					var sId = jsonExtension["extends"] + remstencil;
-					this._availableStencils[sId] = this._stencils[sId];
+					this._availableStencils.set(sId, this._stencils.get(sId));
 				}.bind(this));
 			}
 		}
@@ -382,14 +348,7 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
     
     __handleStencilset: function(response){
     
-        try {
-            // using eval instead of prototype's parsing,
-            // since there are functions in this JSON.
-            eval("this._jsonObject =" + response.responseText);
-        } 
-        catch (e) {
-            throw "Stenciset corrupt: " + e;
-        }
+        this._jsonObject = response;
         
         // assert it was parsed.
         if (!this._jsonObject) {
@@ -434,7 +393,7 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
 		// init property packages
 		if(this._jsonObject.propertyPackages) {
 			$A(this._jsonObject.propertyPackages).each((function(pp) {
-				pps[pp.name] = pp.properties;
+				pps.set(pp.name, pp.properties);
 			}).bind(this));
 		}
 		
@@ -446,8 +405,8 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
         	
             // instantiate normally.
             var oStencil = new ORYX.Core.StencilSet.Stencil(stencil, this.namespace(), this._baseUrl, this, pps, defaultPosition);      
-			this._stencils[oStencil.id()] = oStencil;
-			this._availableStencils[oStencil.id()] = oStencil;
+			this._stencils.set(oStencil.id(), oStencil);
+			this._availableStencils.set(oStencil.id(), oStencil);
             
         }).bind(this));
     },

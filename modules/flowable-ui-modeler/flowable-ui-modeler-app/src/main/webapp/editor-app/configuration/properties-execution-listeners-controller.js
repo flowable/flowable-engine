@@ -15,7 +15,7 @@
  * Execution listeners
  */
 
-angular.module('activitiModeler').controller('KisBpmExecutionListenersCtrl',
+angular.module('flowableModeler').controller('FlowableExecutionListenersCtrl',
     ['$scope', '$modal', '$timeout', '$translate', function ($scope, $modal, $timeout, $translate) {
 
         // Config for the modal window
@@ -28,7 +28,7 @@ angular.module('activitiModeler').controller('KisBpmExecutionListenersCtrl',
         _internalCreateModal(opts, $modal, $scope);
     }]);
 
-angular.module('activitiModeler').controller('KisBpmExecutionListenersPopupCtrl',
+angular.module('flowableModeler').controller('FlowableExecutionListenersPopupCtrl',
     ['$scope', '$q', '$translate', '$timeout', function ($scope, $q, $translate, $timeout) {
 
         // Put json representing form properties on scope

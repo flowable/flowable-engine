@@ -12,7 +12,7 @@
  */
 'use strict';
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
   .controller('ProcessesCtrl', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$modal', function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal) {
 
       // Main page (needed for visual indicator of current page)
@@ -24,7 +24,7 @@ angular.module('activitiModeler')
 
 	  $scope.model = {
         filters: [
-            {id: 'myProcesses', labelKey: 'MY-PROCESSES'}
+            {id: 'processes', labelKey: 'PROCESSES'}
 		],
 
 		sorts: [
@@ -76,7 +76,7 @@ angular.module('activitiModeler')
 		    params.filterText = $scope.model.filterText;
 		  }
 
-		  $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models', params: params}).
+		  $http({method: 'GET', url: FLOWABLE.APP_URL.getModelsUrl(), params: params}).
 		  	success(function(data, status, headers, config) {
 	    		$scope.model.processes = data;
 	    		$scope.model.loading = false;
@@ -140,8 +140,8 @@ angular.module('activitiModeler')
 	  $scope.loadProcesses();
   }]);
 
-angular.module('activitiModeler')
-.controller('CreateNewProcessModelCrtl', ['$rootScope', '$scope', '$modal', '$http', '$location',
+angular.module('flowableModeler')
+.controller('CreateNewProcessModelCtrl', ['$rootScope', '$scope', '$modal', '$http', '$location',
                                           function ($rootScope, $scope, $modal, $http, $location) {
 
     $scope.model = {
@@ -168,7 +168,7 @@ angular.module('activitiModeler')
 
         $scope.model.loading = true;
 
-        $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models', data: $scope.model.process}).
+        $http({method: 'POST', url: FLOWABLE.APP_URL.getModelsUrl(), data: $scope.model.process}).
             success(function(data) {
                 $scope.$hide();
 
@@ -189,8 +189,8 @@ angular.module('activitiModeler')
     };
 }]);
 
-angular.module('activitiModeler')
-.controller('DuplicateProcessModelCrtl', ['$rootScope', '$scope', '$modal', '$http', '$location',
+angular.module('flowableModeler')
+.controller('DuplicateProcessModelCtrl', ['$rootScope', '$scope', '$modal', '$http', '$location',
                                           function ($rootScope, $scope, $modal, $http, $location) {
 
     $scope.model = {
@@ -208,6 +208,7 @@ angular.module('activitiModeler')
         $scope.model.process.key = $scope.originalModel.process.key;
         $scope.model.process.description = $scope.originalModel.process.description;
         $scope.model.process.id = $scope.originalModel.process.id;
+        $scope.model.process.modelType = $scope.originalModel.process.modelType;
     }
 
     $scope.ok = function () {
@@ -220,7 +221,7 @@ angular.module('activitiModeler')
 
         $scope.model.loading = true;
 
-        $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/'+$scope.model.process.id+'/clone', data: $scope.model.process}).
+        $http({method: 'POST', url: FLOWABLE.APP_URL.getCloneModelsUrl(), data: $scope.model.process}).
             success(function(data) {
                 $scope.$hide();
 
@@ -228,9 +229,9 @@ angular.module('activitiModeler')
                 $rootScope.editorHistory = [];
                 $location.path("/editor/" + data.id);
             }).
-            error(function() {
+            error(function(data, status, headers, config) {
                 $scope.model.loading = false;
-                $modal.$hide();
+                $scope.model.errorMessage = data.message;
             });
     };
 
@@ -241,8 +242,8 @@ angular.module('activitiModeler')
     };
 }]);
 
-angular.module('activitiModeler')
-.controller('ImportProcessModelCrtl', ['$rootScope', '$scope', '$http', 'Upload', '$location', function ($rootScope, $scope, $http, Upload, $location) {
+angular.module('flowableModeler')
+.controller('ImportProcessModelCtrl', ['$rootScope', '$scope', '$http', 'Upload', '$location', function ($rootScope, $scope, $http, Upload, $location) {
 
   $scope.model = {
        loading: false
@@ -257,9 +258,9 @@ angular.module('activitiModeler')
 
           var url;
           if (isIE) {
-              url = FLOWABLE.CONFIG.contextRoot + '/app/rest/import-process-model/text';
+              url = FLOWABLE.APP_URL.getImportProcessModelTextUrl();
           } else {
-              url = FLOWABLE.CONFIG.contextRoot + '/app/rest/import-process-model';
+              url = FLOWABLE.APP_URL.getImportProcessModelUrl();
           }
 
           Upload.upload({

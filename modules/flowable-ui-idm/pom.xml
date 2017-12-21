@@ -10,7 +10,7 @@
     <groupId>org.flowable</groupId>
     <artifactId>flowable-root</artifactId>
     <relativePath>../..</relativePath>
-    <version>6.0.0.RC1-SNAPSHOT</version>
+    <version>6.3.0-SNAPSHOT</version>
   </parent>
   
   <properties>
@@ -56,11 +56,6 @@
 			<version>3.1.0</version>
 			<scope>provided</scope>
 		</dependency>
-		<dependency>
-            <groupId>com.mchange</groupId>
-            <artifactId>c3p0</artifactId>
-            <version>0.9.2.1</version>
-        </dependency>
 	 </dependencies>
 	</dependencyManagement>
 
@@ -84,8 +79,7 @@
 							<version>[3.0.0,)</version>
 						</requireMavenVersion>
 						<requireJavaVersion>
-							<message>You are running an older version of Java. The Activiti
-								Modeler Application requires at least JDK 1.6</message>
+							<message>You are running an older version of Java. The Modeler Application requires at least JDK 1.6</message>
 							<version>[1.6.0,)</version>
 						</requireJavaVersion>
 					</rules>
@@ -95,7 +89,6 @@
 	  </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.16</version>
         <configuration>
 			<argLine>-XX:MaxPermSize=128m -Xmx256m</argLine>
 			<forkCount>1</forkCount>

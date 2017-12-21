@@ -15,7 +15,7 @@
  * Execution listeners
  */
 
-angular.module('activitiModeler').controller('ActivitiSignalDefinitionsCtrl', ['$scope', '$modal', function ($scope, $modal) {
+angular.module('flowableModeler').controller('FlowableSignalDefinitionsCtrl', ['$scope', '$modal', function ($scope, $modal) {
 
     // Config for the modal window
     var opts = {
@@ -29,7 +29,7 @@ angular.module('activitiModeler').controller('ActivitiSignalDefinitionsCtrl', ['
 
 //Need a separate controller for the modal window due to https://github.com/angular-ui/bootstrap/issues/259
 // Will be fixed in a newer version of Angular UI
-angular.module('activitiModeler').controller('ActivitiSignalDefinitionsPopupCtrl',
+angular.module('flowableModeler').controller('FlowableSignalDefinitionsPopupCtrl',
     ['$scope', '$q', '$translate', '$timeout', function ($scope, $q, $translate, $timeout) {
 
         // Put json representing signal definitions on scope

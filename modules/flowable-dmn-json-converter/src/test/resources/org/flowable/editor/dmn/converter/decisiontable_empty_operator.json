@@ -1,0 +1,49 @@
+{
+    "id": "8dd36898-4c56-11e7-9d73-a26608126000",
+    "modelVersion": "2",
+    "name": "Dates134",
+    "key": "Dates134",
+    "hitIndicator": "FIRST",
+    "inputExpressions": [
+        {
+            "id": "1",
+            "variableId": "date1",
+            "variableType": null,
+            "type": "date",
+            "label": "Date One",
+            "entries": [],
+            "newVariable": false
+        },
+        {
+            "id": "3",
+            "variableId": "date2",
+            "variableType": null,
+            "type": "date",
+            "label": "Date Two",
+            "entries": [],
+            "newVariable": false
+        }
+    ],
+    "outputExpressions": [
+        {
+            "id": "2",
+            "variableId": "output1",
+            "variableType": null,
+            "type": "date",
+            "label": "Output One",
+            "entries": [],
+            "newVariable": false
+        }
+    ],
+    "rules": [
+        {
+            "2": "2017-06-03",
+            "1_operator": "",
+            "3_operator": "",
+            "1_expression": "2017-06-01"
+        },
+        {
+            "1_expression": "2017-06-02"
+        }
+    ]
+}

@@ -1,0 +1,60 @@
+<definitions xmlns="http://www.omg.org/spec/DMN/20151101" id="definition_60947267-5070-11e7-9d6e-a26608126000" name="ad" namespace="http://www.flowable.org/dmn">
+  <decision id="ad" name="ad">
+    <decisionTable id="decisionTable_05a1291e-506b-11e7-8580-c28c1dcfb61b" hitPolicy="COLLECT">
+      <input label="Quantity">
+        <inputExpression id="inputExpression_1" typeRef="number">
+          <text>count</text>
+        </inputExpression>
+      </input>
+      <input label="Price">
+        <inputExpression id="inputExpression_3" typeRef="number">
+          <text>price</text>
+        </inputExpression>
+      </input>
+      <input label="Status">
+        <inputExpression id="inputExpression_4" typeRef="string">
+          <text>status</text>
+        </inputExpression>
+        <inputValues>
+          <text>"bronze","silver","gold"</text>
+        </inputValues>
+      </input>
+      <output id="outputExpression_2" label="Discount" name="discount" typeRef="number"></output>
+      <output id="outputExpression_5" label="Total" name="total" typeRef="number"></output>
+      <rule>
+        <inputEntry id="inputEntry_1_1">
+          <text>&gt;10</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_3_1">
+          <text>&gt;50</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_4_1">
+          <text>"bronze"</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_1">
+          <text>0.9</text>
+        </outputEntry>
+        <outputEntry id="outputEntry_5_1">
+          <text>count*price</text>
+        </outputEntry>
+      </rule>
+      <rule>
+        <inputEntry id="inputEntry_1_2">
+          <text>&gt;100</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_3_2">
+          <text>100</text>
+        </inputEntry>
+        <inputEntry id="inputEntry_4_2">
+          <text>-</text>
+        </inputEntry>
+        <outputEntry id="outputEntry_2_2">
+          <text>0</text>
+        </outputEntry>
+        <outputEntry id="outputEntry_5_2">
+          <text>500</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+</definitions>

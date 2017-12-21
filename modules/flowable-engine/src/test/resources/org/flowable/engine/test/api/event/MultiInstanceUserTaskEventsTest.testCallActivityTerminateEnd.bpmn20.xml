@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:flowable="http://flowable.org/bpmn"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="edoras vis" exporterVersion="DEVELOPER"
+             targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+  <process id="multiInstanceCallActivityTerminateEnd" isExecutable="true" name="call activity">
+    <startEvent id="startevent1"/>
+
+    <callActivity id="callActivityId1" calledElement="multiInstanceCalledTerminateEnd">
+      <extensionElements>
+        <flowable:in source="Name" target="FullName" />
+        <flowable:out source="FullName" target="Name" />
+      </extensionElements>
+    </callActivity>
+    <dataObject id="dataObject1" name="Name" itemSubjectRef="xsd:string">
+      <extensionElements>
+        <flowable:value>Default name</flowable:value>
+      </extensionElements>
+    </dataObject>
+
+    <endEvent id="endevent1">
+      <terminateEventDefinition></terminateEventDefinition>
+    </endEvent>
+    <userTask id="task1" name="User Task1 in Parent">
+    </userTask>
+
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="callActivityId1"/>
+
+    <sequenceFlow id="flow2" sourceRef="startevent1" targetRef="task1"/>
+
+    <sequenceFlow id="flow3" sourceRef="task1" targetRef="endevent1"/>
+    <sequenceFlow id="flow4" sourceRef="callActivityId1" targetRef="endevent1"/>
+
+  </process>
+</definitions>

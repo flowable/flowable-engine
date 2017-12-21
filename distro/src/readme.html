@@ -13,6 +13,8 @@
 <h1>Documentation</h1>
 <ul>
     <li><a href="docs/userguide/index.html">The Flowable User Guide</a></li>
+    <li><a href="docs/userguide-dmn/index.html">The Flowable DMN User Guide</a></li>
+    <li><a href="docs/userguide-form/index.html">The Flowable Form User Guide</a></li>
     <li><a href="docs/javadocs/index.html">Flowable Javadocs</a></li>
 </ul>
 
@@ -24,11 +26,224 @@
 
 <h1>Flowable Release Notes</h1>
 
-<h3>Release Notes - Flowable - 6.0.0.Beta4</h3>
+<h3>Release Notes - Flowable - 6.2.1</h3>
 
 <h4>Highlights</h4>
+
 <ul>
-    <li></li>
+    <li>Lots of additions to the CMMN 1.1 Engine, including timer support, repetition support, DMN and HTTP task support and variable query support.</li>
+    <li>Rest documentation is now also generated based on the Swagger definitions to ensure it's always in sync with the REST controller code</li>
+    <li>Improved support of ChangeActivityStateBuilder to move an execution in a process instance to another activity that's part of the process definition</li>
+    <li>Enhanced the CMMN Modeler palette with timer event listeners, DMN and HTTP tasks and additional properties like timer expressions and repetition expressions.</li>
+    <li>Improved support of CMMN in the Flowable Task app.</li>
+    <li>Various small bugfixes all around.</li>
+</ul>
+
+<h4>Community contributors</h4>
+
+<ul>
+    <li>Pascal Schumacher (PascalSchumacher)</li>
+    <li>Stijn de Pestel (stijndepestel)</li>
+    <li>Robert Hafner (roberthafner)</li>
+    <li>Xin Wang (dram)</li>
+    <li>David Malkovsky (dbmalkovsky)</li>
+    <li>Michael Lippens (mlippens)</li>
+    <li>Marco van Zwetselaar (zwets)</li>
+    <li>Yanming Zhou (quaff)</li>
+    <li>Christophe Deneux (cdeneux)</li>
+</ul>
+
+<h4>Upgrade notes</h4>
+
+<p>To harmonize the deployers between the BPMN and CMMN engine the ProcessEngineConfigurator interface has been renamed to EngineConfigurator and moved to the flowable-engine-common module.
+In addition a new flowable-spring-common module has been added to shared common Spring classes between the BPMN and CMMN spring modules.</p>
+
+<h3>Release Notes - Flowable - 6.2.0</h3>
+
+<h4>Highlights</h4>
+
+<ul>
+    <li>Introduction of a new CMMN 1.1 Engine. This provides an implementation of the <a href="http://www.omg.org/spec/CMMN/1.1/">CMMN 1.1 OMG standard</a>. A lot of effort has been put in this
+    new Engine, and it uses a new set of database tables optimized for CMMN execution. We've added a new CMMN user guide to help you getting started. Note that since this is a first release, the
+    CMMN Engine is marked as an experimental feature and missing features like timers and HTTP and Decision tasks will be added in next releases.</li>
+    <li>Added a CMMN editor to the Flowable Modeler app.</li>
+    <li>Added support for CMMN cases ot the Flowable Task app.</li>
+    <li>The BPMN and CMMN engine share a number of common services like Tasks, Variables, Identity links and Jobs. Therefore these services are extracted from the core BPMN engine module and
+    new modules have been created for each one of these services. The BPMN and CMMN engines make use of these services to provide for example Task and Variable support. With this approach Flowable is very
+    flexible in the deployment model. You can run only the BPMN Engine, only the CMMN Engine or run them both together without any issues.</li>
+    <li>Various small bugfixes all around.</li>
+</ul>
+
+<h4>Community contributors</h4>
+
+<ul>
+    <li>David Malkovsky (dbmalkovsky)</li>
+    <li>Filip Hrisafov (filiphr)</li>
+    <li>Robert Hafner (roberthafner)</li>
+    <li>Marco van Zwetselaar (zwets)</li>
+    <li>Lori Small (lsmall)</li>
+    <li>Michael Lippens (mlippens)</li>
+</ul>
+
+<h4>Upgrade notes</h4>
+
+<p>Because of the extraction of the Task, Variable, Identity Link and Job services, we had to change the package names of the classes used in these modules.
+This means that for example TaskQuery and Job Query have been moved to a new package. This was done to adhere to OSGi standards and to be ready for the new Java 9 version.
+This however does mean that you run into some compilation issues while migration to version 6.2.0. We always try to prevent this as much as we can, but due to the new modules this wasn't possible in this release.
+The common naming pattern of these new service is org.flowable.{servicename}.api for the API module and org.flowable.{servicename}.service for the service implementation module.
+So org.flowable.task.api and org.flowable.task.service for example.</p>
+
+<h3>Release Notes - Flowable - 6.1.2</h3>
+
+<h4>Bug fix release</h4>
+
+<p>Thanks to whee we found out that there's an issue with the release 6.1.1 when running it without an Internet connection <a href="https://forum.flowable.org/t/upgrading-6-1-0-to-6-1-1-could-not-read-idm-mybatis-configuration-file/753">https://forum.flowable.org/t/upgrading-6-1-0-to-6-1-1-could-not-read-idm-mybatis-configuration-file/753</a>.
+This was fixed with the following commit <a href="https://github.com/flowable/flowable-engine/commit/7338015dc8aadc984ff9dd4ad3385b6a7b4ace6f">https://github.com/flowable/flowable-engine/commit/7338015dc8aadc984ff9dd4ad3385b6a7b4ace6f</a>.
+Although an Internet connection is often available, we decided to do a bug fix release to prevent people from running into this issue.</p>
+
+<h3>Release Notes - Flowable - 6.1.1</h3>
+
+<h4>Highlights</h4>
+
+<ul>
+    <li>Introduction of audit history in the DMN Engine. When history is enabled in the DMN Engine, an audit log of each decision execution is stored in the DMN database.
+    By default the history is disabled.</li>
+    <li>Replaced the MVEL expression language in the DMN Engine with the same JUEL expression language as used in the BPMN and Form Engine.</li>
+    <li>Refactored DmnRuleService with new ExecuteDecisionBuilder and deprecated old execute decision methods.</li>
+    <li>Call activity - allow to set output parameters a local variables for multi instance executions.</li>
+    <li>Easier usage of async history in combination with a message queue (see <a href="https://github.com/flowable/flowable-examples/tree/master/async-history">https://github.com/flowable/flowable-examples/tree/master/async-history</a>)</li>
+    <li>Performance improvement: introduce grouping and compression for async history data</li>
+    <li>Various small bugfixes all around.</li>
+</ul>
+
+<h4>Community contributors</h4>
+
+<ul>
+    <li>Faizal Abdul Manan (faizal-manan)</li>
+    <li>David Malkovsky (dbmalkovsky)</li>
+    <li>Harsha Teja Kanna (h7kanna)</li>
+    <li>Lori Small (lsmall)</li>
+    <li>bsydow</li>
+    <li>stephraleigh</li>
+</ul>
+
+<h4>Upgrade notes</h4>
+
+<p><b>CommandContext and related classes package changes:</b></p>
+
+<p>
+As a result of a refactoring that involved consolidating various classes and moving them to the <i>flowable-engine-common</i> module, following <i>internal</i> classes have changed packages.
+</p>
+
+<p>
+The following applies to all engines (process, dmn, form, content and idm):
+</p>
+
+<ul>
+    <li>The <i>CommandContext</i> class is now in the <i>org.flowable.engine.common.impl.interceptor</i> package.</li>
+    <li>The various getter methods on the <i>CommandContext</i> that gave quick-access to various internal components are removed 
+    (because the CommandContext is now shared between all engines). All engines now have a <i>CommandContextUtil</i> class that 
+    should be used instead and which has said getter methods. The <i>org.flowable.engine.impl.context.Context</i> utlity class 
+    in the process engine is still there for backwards compatibility and can be used as before, but simply delegates to the <i>CommandContextUtil</i> methods.</li>
+    <li>The classes related to the command stack interceptors (<i>Command</i>, <i>CommandContextInterceptor</i>, <i>CommandExecutor</i>, <i>Log/Jta/RetryInterceptor</i>) are now in the <i>org.flowable.engine.common.impl.interceptor</i> package.</li>
+    <li>The <i>DbSqlSession</i> and <i>DbSqlSessionFactory</i> classes are now found in the <i>org.flowable.engine.common.impl.db</i> package.</li>
+    <li>Database schema management logic has moved from the <i>DbSqlSession</i> class to implementations of the <i>org.flowable.engine.common.impl.db.DbSchemaManager</i> interface.</li>
+    <li>The <i>GenericManagerFactory</i> class is now in the <i>org.flowable.engine.common.impl.persistence</i> package.</li>
+</ul>
+
+<p>
+The process engine now has the <i>org.flowable.engine.impl.util.EngineServiceUtil</i> utility class that can be used to get easily access to the configuration and services of the other engines.
+</p>
+
+<p><b>FlowableCancelledEvent.getCause() return value change</b></p>
+
+<p>
+The value that's passed in the <i>cause</i> of a <i>org.flowable.engine.delegate.event.FlowableCancelledEvent</i> has changed in the following cases:
+<ul>
+    <li>The event that is thrown for activities cancelled by a <i>message boundary event</i>.</li>
+    <li>The event that is thrown for activities cancelled by a <i>signal boundary event</i>.</li>
+    <li>The event that is thrown for activities cancelled by a <i>timer boundary event</i>.</li>
+</ul>
+Instead of passing an entity instance (MessageEventSubscriptionEntity, SignalEventSubscriptionEntity or JobEntity respectively) the BpmnModel
+counterpart, as an instance of a subclass of <i>org.flowable.bpmn.model.FlowElement</i>, is passed instead which is consistent with the general value of the <i>cause</i> property.
+Do note that due to the fact the return type of <i>getCause()</i> is <i>Object</i>, the compiler will not notice this, so best to look at the usage of the <i>FlowableCancelledEvent</i> in your code.
+</p>
+
+<h3>Release Notes - Flowable - 6.1.0</h3>
+
+<h4>Highlights</h4>
+
+<ul>
+    <li>Introduction of async history. By enabling the asyncHistoryEnabled property on the process engine configuration (default is false), 
+    the history tables are not filled in the same transaction as the runtime tables. Instead an async history job is created and the history information will be written
+    to the history tables in a separate, asynchronous transaction. This also opens up the option to not use the relational history tables at all, 
+    and move the historic information to a NoSQL database directly. Pluggability points are available to implement the persistence logic to a NoSQL database.</li>
+    <li>New REST task feature thanks to Harsha. With the new REST task it becomes trivial to do REST calls from a Flowable process instance. There's also support in the Flowable Modeler for REST tasks.</li>
+    <li>Introduction of a new DMN decision table editor. To improve the usability of the DMN decision table editor we are now using the <a href="https://github.com/handsontable/handsontable">Handsontable</a> framework.</li>
+    <li>The Engine SQL update logic has been improved to only update changed columns.</li>
+    <li>The Odysseus JUEL code is now included directly in the flowable-engine-common module to prevent classloading issues due to conflicting JUEL libraries or even different versions of JUEL libraries.</li>
+    <li>Added option to use a password encoder for the Flowable IDM engine (instead of the default plain text password persistence), thanks to Faizal!</li>
+    <li>Support for static Groovy scripts compilation with the new flowable-groovy-script-static-engine module by using the groovy-static scriptFormat value, thanks to Filip (fgroch)!</li>
+    <li>Several additions to the Form builder and renderer (min/max length, improved expression field and more).</li>
+    <li>Various small bugfixes all around.</li>
+</ul>
+
+<h3>Release Notes - Flowable - 6.0.1</h3>
+
+<h4>Highlights</h4>
+
+<ul>
+	<li>First bug fix release for Flowable 6!</li>
+	<li>Improved LDAP support for the UI apps</li>
+	<li>The i18n in the UI apps is now pluggable and there are some first additional languages included</li>
+	<li>Improved event sub process support with nested event sub process support for non interrupting ones</li>
+	<li>More hit policy support in the DMN Engine. The Decision Table editor will be updated in the Flowable 6.1.0 release. 
+	The DMN Engine API has been refactored to take into account single and multiple output result objects.</li>
+	<li>Various small bugfixes all around.</li>
+</ul>
+
+<h3>Release Notes - Flowable - 6.0.0</h3>
+
+<h4>Highlights</h4>
+
+<ul>
+	<li>First official release of Flowable 6!</li>
+	<li>Documentation has been updated to Flowable 6 and a DMN and Form Engine user guide have been added.</li>
+	<li>Various small bugfixes all around.</li>
+</ul>
+
+<h3>Release Notes - Flowable - 6.0.0.RC1</h3>
+
+<h4>Highlights</h4>
+
+<ul>
+	<li>Package renaming to org.flowable, and renaming of config files to flowable.cfg.xml and flowable-context.xml.
+	It was not an easy decision to go this route, but for the clear distinction and separation of the Flowable project this is the best way forward.
+	The discussion for this choice can be found in this forum post <a href="http://forum.flowable.org/t/opinions-on-package-renaming-for-flowable-6-to-org-flowable/118/13">http://forum.flowable.org/t/opinions-on-package-renaming-for-flowable-6-to-org-flowable/118/13</a></li>
+	<li>Class name renaming to use Flowable instead of Activiti where needed.</li>
+	<li>The identity functionality is separated in the IDM engine, and the identity database tables are managed by this engine. 
+	By default the IDM engine is enabled when starting the Flowable engine, but it can be disabled with the disableIdmEngine property.</li>
+	<li>Introduction of a content engine, which provides a simple file store for attaching files/documents to a task or process instance.</li>
+	<li>Support for non interrupting event sub processes. Until this version only interrupting event sub processes were supported, 
+	but now it's possible to handle events and let the main process execution continue as well.</li>
+	<li>The task app has been refactored into 3 separate web applications. There's a Flowable Modeler app that contains the modeling repository functionality + the BPMN, form and DMN editor.
+	The second app is the Flowable IDM app that manages the users and groups and handles authentication for each app. 
+	For example the Flowable Modeler will redirect to the Flowable IDM app when no valid cookie is found. 
+	After logging in to the Flowable IDM app, a redirect to the Flowable Modeler is executed and you can access the Modeler repository.
+	This is done to allow for single sign-on between the different apps. The third app is the Flowable task app, that allows you to start process instances and work with tasks and fill-in forms.</li>
+	<li>Introduction of the Flowable Admin application that allows for querying the BPM, DMN, Form and Content engines.</li>
+	<li>Introduction of Docker images to make it easy to start all apps in a convenient way. In the docker folder several docker start scripts can be found that use a Docker compose file.
+	In an upcoming blog post we will share more information on how this can be used.</li>
+	<li>Persistency logic that was written in Hibernate has all been rewritten to MyBatis to have a common framework for all persistency logic.</li>
+	<li>Various and many small bugfixes all around.</li>
+</ul>
+
+<h4>Release remarks</h4>
+
+<ul>
+	<li>This a major milestone to get to the final Flowable 6.0.0 release. All parts of the release are now considered feature complete, so the remaining work will be bug fixing and smaller features.</li>
+	<li>We will continue to improve the docs for the 6.0.0 release.</li>
+	<li>At this point all community testing is extremely important for the quality of the 6.0.0 release. So every contribution is this area is very welcome.</li>
 </ul>
 
 </body>

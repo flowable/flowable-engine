@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-2.5.xsd">
+
+    <bean id="dmnEngineConfiguration" class="org.flowable.dmn.engine.impl.cfg.StandaloneDmnEngineConfiguration">
+
+        <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000"/>
+        <property name="jdbcDriver" value="org.h2.Driver"/>
+        <property name="jdbcUsername" value="sa"/>
+        <property name="jdbcPassword" value=""/>
+
+        <property name="customHitPolicyBehaviors" ref="customHitPolicyBehaviors"/>
+    </bean>
+
+    <util:map id="customHitPolicyBehaviors">
+        <entry key="CUSTOM_HIT_POLICY"><ref bean="customHitPolicyBehavior"/></entry>
+    </util:map>
+
+    <bean id="customHitPolicyBehavior" class="org.flowable.dmn.engine.test.TestHitPolicyBehavior" />
+
+</beans>

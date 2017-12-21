@@ -58,7 +58,7 @@ ORYX.Plugins.View = {
 		
 		//Read properties
 		if (ownPluginData !== undefined && ownPluginData !== null) {
-			ownPluginData.properties.each( function(property) {			
+			ownPluginData.get('properties').each( function(property) {
 				if (property.zoomLevel) {this.zoomLevel = Number(1.0);}		
 				if (property.maxFitToScreenLevel) {this.maxFitToScreenLevel=Number(property.maxFitToScreenLevel);}
 				if (property.minZoomLevel) {this.minZoomLevel = Number(property.minZoomLevel);}

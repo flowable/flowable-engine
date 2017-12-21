@@ -12,7 +12,7 @@
  */
 'use strict';
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
   .controller('FormsCtrl', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$modal', function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal) {
 
       // Main page (needed for visual indicator of current page)
@@ -24,7 +24,7 @@ angular.module('activitiModeler')
 
 	  $scope.model = {
         filters: [
-            {id: 'myReusableForms', labelKey: 'MY-REUSABLE-FORMS'}
+            {id: 'forms', labelKey: 'FORMS'}
 		],
 
 		sorts: [
@@ -76,7 +76,7 @@ angular.module('activitiModeler')
 		    params.filterText = $scope.model.filterText;
 		  }
 
-		  $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models', params: params}).
+		  $http({method: 'GET', url: FLOWABLE.APP_URL.getModelsUrl(), params: params}).
 		  	success(function(data, status, headers, config) {
 	    		$scope.model.forms = data;
 	    		$scope.model.loading = false;
@@ -140,7 +140,7 @@ angular.module('activitiModeler')
   }]);
 
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
 .controller('CreateNewFormCtrl', ['$rootScope', '$scope', '$http',
     function ($rootScope, $scope, $http) {
 
@@ -164,7 +164,7 @@ angular.module('activitiModeler')
 
         $scope.model.loading = true;
 
-        $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models', data: $scope.model.form}).
+        $http({method: 'POST', url: FLOWABLE.APP_URL.getModelsUrl(), data: $scope.model.form}).
             success(function(data, status, headers, config) {
                 $scope.$hide();
                 $scope.model.loading = false;
@@ -188,7 +188,7 @@ angular.module('activitiModeler')
     };
 }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
 	.controller('DuplicateFormCtrl', ['$rootScope', '$scope', '$http',
 		function ($rootScope, $scope, $http) {
 
@@ -222,7 +222,7 @@ angular.module('activitiModeler')
 
 				$scope.model.loading = true;
 
-				$http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/'+$scope.model.form.id+'/clone', data: $scope.model.form}).
+				$http({method: 'POST', url: FLOWABLE.APP_URL.getCloneModelsUrl($scope.model.form.id), data: $scope.model.form}).
 					success(function(data, status, headers, config) {
 						$scope.$hide();
 						$scope.model.loading = false;
@@ -235,7 +235,7 @@ angular.module('activitiModeler')
 					}).
 					error(function(data, status, headers, config) {
 						$scope.model.loading = false;
-						$scope.$hide();
+						 $scope.model.errorMessage = data.message;
 					});
 			};
 

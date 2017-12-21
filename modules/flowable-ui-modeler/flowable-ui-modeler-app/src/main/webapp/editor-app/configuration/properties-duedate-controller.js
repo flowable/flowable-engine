@@ -16,7 +16,7 @@
  */
 'use strict';
 
-angular.module('activitiModeler').controller('BpmnEditorDueDateCtrl', [ '$scope', '$modal', function($scope, $modal) {
+angular.module('flowableModeler').controller('BpmnEditorDueDateCtrl', [ '$scope', '$modal', function($scope, $modal) {
 
     // Config for the modal window
     var opts = {
@@ -28,7 +28,7 @@ angular.module('activitiModeler').controller('BpmnEditorDueDateCtrl', [ '$scope'
     _internalCreateModal(opts, $modal, $scope);
 }]);
 
-angular.module('activitiModeler').controller('BpmnEditorDueDatePopupCtrl',
+angular.module('flowableModeler').controller('BpmnEditorDueDatePopupCtrl',
     [ '$rootScope', '$scope', '$translate', function($rootScope, $scope, $translate) {
 
     // Put json representing assignment on scope

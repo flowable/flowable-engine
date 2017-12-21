@@ -14,13 +14,24 @@
  */
 'use strict';
 
-angular.module('activitiModeler')
-    .controller('DecisionTableEditorController', ['$rootScope', '$scope', '$q', '$translate', '$http', '$timeout', '$location', '$modal', '$route', '$routeParams', 'DecisionTableService',
-        'UtilityService', 'uiGridConstants', 'appResourceRoot',
-        function ($rootScope, $scope, $q, $translate, $http, $timeout, $location, $modal, $route, $routeParams, DecisionTableService,
-                  UtilityService, uiGridConstants, appResourceRoot) {
+var extScope;
 
-            var MIN_COLUMN_WIDTH = 200;
+angular.module('flowableModeler')
+    .controller('DecisionTableEditorController', ['$rootScope', '$scope', '$q', '$translate', '$http', '$timeout', '$location', '$modal', '$route', '$routeParams', 'DecisionTableService',
+        'UtilityService', 'uiGridConstants', 'appResourceRoot', 'hotRegisterer',
+        function ($rootScope, $scope, $q, $translate, $http, $timeout, $location, $modal, $route, $routeParams, DecisionTableService,
+                  UtilityService, uiGridConstants, appResourceRoot, hotRegisterer) {
+
+            extScope = $scope;
+
+            $rootScope.decisionTableChanges = false;
+
+            var hotDecisionTableEditorInstance;
+            var hitPolicies = ['FIRST', 'ANY', 'UNIQUE', 'PRIORITY', 'RULE ORDER', 'OUTPUT ORDER', 'COLLECT'];
+            var operators = ['==', '!=', '<', '>', '>=', '<='];
+            var columnIdCounter = 0;
+            var hitPolicyHeaderElement;
+            var dateFormat = 'YYYY-MM-DD';
 
             // Export name to grid's scope
             $scope.appResourceRoot = appResourceRoot;
@@ -28,133 +39,284 @@ angular.module('activitiModeler')
             // Model init
             $scope.status = {loading: true};
             $scope.model = {
+                rulesData: [],
                 columnDefs: [],
-                columnVariableIdMap: {}
+                columnVariableIdMap: {},
+                startOutputExpression: 0,
+                selectedRow: undefined,
+                availableVariableTypes: ['string', 'number', 'boolean', 'date']
             };
 
-            $rootScope.decisionTableChanges = false;
-            
-            var hitPolicies = ['FIRST','ANY'];
+            // Hot Model init
+            $scope.model.hotSettings = {
+                contextMenu: {
+                    items: {
+                        "insert_row_above": {
+                            name: 'Insert rule above',
+                            callback: function(key, options) {
+                                if (hotDecisionTableEditorInstance.getSelected()) {
+                                    $scope.addRule(hotDecisionTableEditorInstance.getSelected()[0]);
+                                }
+                            }
+                        },
+                        "insert_row_below": {
+                            name: 'Add rule below',
+                            callback: function(key, options) {
+                                if (hotDecisionTableEditorInstance.getSelected()) {
+                                    $scope.addRule(hotDecisionTableEditorInstance.getSelected()[0] + 1);
+                                }
+                            }
+                        },
+                        "clear_row": {
+                            name: 'Clear rule',
+                            callback: function(key, options) {
+                                if (hotDecisionTableEditorInstance.getSelected()) {
+                                    $scope.clearRule(hotDecisionTableEditorInstance.getSelected()[0]);
+                                }
+                            }
+                        },
+                        "remove_row": {
+                            name: 'Remove this rule',
+                            disabled: function () {
+                                // if only 1 rule disable
+                                if (hotDecisionTableEditorInstance.getSelected()) {
+                                    return $scope.model.rulesData.length < 2;
+                                } else {
+                                    return false;
+                                }
+                            }
+                        },
+                        "hsep1": "---------",
+                        "move_rule_up": {
+                            name: 'Move rule up',
+                            disabled: function() {
+                                if (hotDecisionTableEditorInstance.getSelected()) {
+                                    return hotDecisionTableEditorInstance.getSelected()[0] === 0;
+                                }
+                            },
+                            callback: function(key, options) {
+                                $scope.moveRuleUpwards();
+                            }
+                        },
+                        "move_rule_down": {
+                            name: 'Move rule down',
+                            disabled: function() {
+                                if (hotDecisionTableEditorInstance.getSelected()) {
+                                    return hotDecisionTableEditorInstance.getSelected()[0] + 1 === $scope.model.rulesData.length;
+                                }
+                            },
+                            callback: function(key, options) {
+                                $scope.moveRuleDownwards();
+                            }
+                        },
+                        "hsep2": "---------",
+                        "add_input": {
+                            name: 'Add input',
+                            callback: function (key, options) {
+                                if (hotDecisionTableEditorInstance.getSelected()) {
+                                    $scope.openInputExpressionEditor(hotDecisionTableEditorInstance.getSelected()[1], true);
+                                }
+                            }
+                        },
+                        "add_output": {
+                            name: 'Add output',
+                            callback: function (key, options) {
+                                if (hotDecisionTableEditorInstance.getSelected()) {
+                                    if (hotDecisionTableEditorInstance.getSelected()[1] < $scope.model.startOutputExpression) {
+                                        $scope.openOutputExpressionEditor($scope.currentDecisionTable.outputExpressions.length, true);
+                                    } else {
+                                        $scope.openOutputExpressionEditor((hotDecisionTableEditorInstance.getSelected()[1] - $scope.model.startOutputExpression), true);
+                                    }
+                                }
+                            }
+                        },
+                        "hsep3": "---------",
+                        "undo": {
+                            name: 'Undo'
+                        },
+                        "redo": {
+                            name: 'Redo'
+                        }
+                    }
+                },
+                manualColumnResize: false,
+                stretchH: 'all',
+                outsideClickDeselects: false,
+                viewportColumnRenderingOffset: $scope.model.columnDefs.length + 10
+            };
+
+
             $scope.hitPolicies = [];
-            hitPolicies.forEach(function(id){
+            hitPolicies.forEach(function (id) {
                 $scope.hitPolicies.push({
                     id: id,
                     label: 'DECISION-TABLE.HIT-POLICIES.' + id
                 });
             });
 
-            $rootScope.currentDecisionTableRules = [];
-
-            $scope.availableVariableTypes = ['string', 'number', 'boolean', 'date'];
-
-            var columnIdCounter = 0;
-
-            $scope.$on('$locationChangeStart', function (event, next, current) {
-                var handleResponseFunction = function (discard) {
-                    $scope.unsavedDecisionTableChangesModalInstance = undefined;
-                    if (discard) {
-                        $rootScope.ignoreChanges = true;
-                        $location.url(next.substring(next.indexOf('/#') + 2));
-                    } else {
-                        $rootScope.ignoreChanges = false;
-                        $rootScope.setMainPageById('decision-tables');
-                    }
-                };
-                $scope.confirmNavigation(handleResponseFunction, event);
-            });
-
-            $scope.confirmNavigation = function (handleResponseFunction, event) {
-                if (!$rootScope.ignoreChanges && $rootScope.decisionTableChanges) {
-
-                    if (event) {
-                        // Always prevent location from changing. We'll use a popup to determine the action we want to take
-                        event.preventDefault();
-                    }
-
-                    $scope.handleResponseFunction = handleResponseFunction;
-                    $scope.unsavedDecisionTableChangesModalInstance = _internalCreateModal({
-                        template: 'editor-app/popups/unsaved-changes.html',
-                        scope: $scope
-                    }, $modal, $scope);
+            $scope.addRule = function (rowNumber) {
+                if (rowNumber !== undefined) {
+                    $scope.model.rulesData.splice(rowNumber, 0, createDefaultRow());
                 } else {
-                    // Clear marker
-                    $rootScope.ignoreChanges = false;
+                    $scope.model.rulesData.push(createDefaultRow());
                 }
-
+                if (hotDecisionTableEditorInstance) {
+                    hotDecisionTableEditorInstance.render();
+                }
             };
 
-            $scope.editInputExpression = function (column) {
+            $scope.removeRule = function () {
+                $scope.model.rulesData.splice($scope.model.selectedRow, 1);
+            };
 
-                if (!column) {
+            $scope.clearRule = function (rowNumber) {
+                if (rowNumber === undefined) {
                     return;
                 }
-
-                $scope.model.selectedColumn = column;
-                var editTemplate = 'views/popup/decision-table-edit-input-expression.html';
-
-                // get expression for selected column
-                $scope.currentDecisionTable.inputExpressions.forEach(function (inputExpression) {
-                    if (inputExpression.id === column.name) {
-                        $scope.model.selectedExpression = inputExpression;
-                    }
-                });
-
-                _internalCreateModal({
-                    template: editTemplate,
-                    scope: $scope
-                }, $modal, $scope);
+                $scope.model.rulesData[rowNumber] = createDefaultRow();
+                if (hotDecisionTableEditorInstance) {
+                    hotDecisionTableEditorInstance.render();
+                }
             };
 
-            $scope.editOutputExpression = function (column) {
-
-                if (!column) {
-                    return;
+            $scope.moveRuleUpwards = function () {
+                $scope.model.rulesData.splice($scope.model.selectedRow - 1, 0, $scope.model.rulesData.splice($scope.model.selectedRow, 1)[0]);
+                if (hotDecisionTableEditorInstance) {
+                    hotDecisionTableEditorInstance.render();
                 }
-
-                $scope.model.selectedColumn = column;
-                var editTemplate = 'views/popup/decision-table-edit-output-expression.html';
-
-                $scope.currentDecisionTable.outputExpressions.forEach(function(outputExpression) {
-                    if (outputExpression.id === column.name) {
-                        $scope.model.selectedExpression = outputExpression;
-                    }
-                });
-
-                _internalCreateModal({
-                    template: editTemplate,
-                    scope: $scope
-                }, $modal, $scope);
             };
 
-            $scope.addInputExpression = function (inputExpression, insertPos) {
+            $scope.moveRuleDownwards = function () {
+                $scope.model.rulesData.splice($scope.model.selectedRow + 1, 0, $scope.model.rulesData.splice($scope.model.selectedRow, 1)[0]);
+                if (hotDecisionTableEditorInstance) {
+                    hotDecisionTableEditorInstance.render();
+                }
+            };
 
-                if (!$scope.currentDecisionTable.inputExpressions) {
-                    $scope.currentDecisionTable.inputExpressions = [];
+            $scope.doAfterGetColHeader = function (col, TH) {
+                if ($scope.model.columnDefs[col] && $scope.model.columnDefs[col].expressionType === 'input-operator') {
+                    TH.className += "input-operator-header";
+                } else if ($scope.model.columnDefs[col] && $scope.model.columnDefs[col].expressionType === 'input-expression') {
+                    TH.className += "input-expression-header";
+                    if ($scope.model.startOutputExpression - 1 === col) {
+                        TH.className += " last";
+                    }
+                } else if ($scope.model.columnDefs[col] && $scope.model.columnDefs[col].expressionType === 'output') {
+                    TH.className += "output-header";
+                    if ($scope.model.startOutputExpression === col) {
+                        TH.className += " first";
+                    }
+                }
+            };
+
+            $scope.doAfterModifyColWidth = function (width, col) {
+                if ($scope.model.columnDefs[col] && $scope.model.columnDefs[col].width) {
+                    var settingsWidth = $scope.model.columnDefs[col].width;
+                    if (settingsWidth > width) {
+                        return settingsWidth;
+                    }
+                }
+                return width;
+            };
+
+            $scope.doAfterOnCellMouseDown = function (event, coords, TD) {
+                // clicked hit policy indicator
+                if (coords.row === 0 && coords.col === 0 && TD.className === '') {
+                    $scope.openHitPolicyEditor();
+                } else {
+                    if (coords && coords.row !== undefined) {
+                        $timeout(function () {
+                            $scope.model.selectedRow = coords.row;
+                        });
+                    }
+                }
+            };
+
+            $scope.doAfterScroll = function () {
+                if (hotDecisionTableEditorInstance) {
+                    hotDecisionTableEditorInstance.render();
+                }
+            };
+
+            $scope.doAfterRender = function (isForced) {
+
+                if (hitPolicyHeaderElement) {
+                    var element = document.querySelector("thead > tr > th:first-of-type");
+                    if (element) {
+                        var firstChild = element.firstChild;
+                        element.className = 'hit-policy-container';
+                        element.replaceChild(hitPolicyHeaderElement[0], firstChild);
+                    }
                 }
 
+                if (hotDecisionTableEditorInstance === undefined) {
+                    $timeout(function () {
+                        hotDecisionTableEditorInstance = hotRegisterer.getInstance('decision-table-editor');
+                        hotDecisionTableEditorInstance.validateCells();
+                    });
+                } else {
+                    hotDecisionTableEditorInstance.validateCells();
+                }
+            };
+
+            $scope.dumpData = function () {
+                console.log($scope.currentDecisionTable);
+                console.log($scope.model.rulesData);
+                console.log($scope.model.columnDefs);
+            };
+
+            var createNewInputExpression = function (inputExpression) {
                 var newInputExpression;
-                if (!inputExpression) {
-                    newInputExpression = {id: _generateColumnId()};
-                } else {
+                if (inputExpression) {
                     newInputExpression = {
                         id: _generateColumnId(),
                         label: inputExpression.label,
                         variableId: inputExpression.variableId,
                         type: inputExpression.type,
-                        variableType: inputExpression.variableType,
-                        newVariable : inputExpression.newVariable
+                        newVariable: inputExpression.newVariable,
+                        entries: inputExpression.entries
+                    };
+                    
+                } else {
+                    newInputExpression = {
+                        id: _generateColumnId(),
+                        label: null,
+                        variableId: null,
+                        type: null,
+                        newVariable: null,
+                        entries: null
                     };
                 }
+                return newInputExpression;
+            };
 
-                // if no rules present add one
-                if ($rootScope.currentDecisionTableRules.length === 0) {
-                    $scope.addRule();
+            var createNewOutputExpression = function (outputExpression) {
+                var newOutputExpression;
+                if (outputExpression) {
+                    newOutputExpression = {
+                        id: _generateColumnId(),
+                        label: outputExpression.label,
+                        variableId: outputExpression.variableId,
+                        type: outputExpression.type,
+                        newVariable: outputExpression.newVariable,
+                        entries: outputExpression.entries
+                    };
+                    
+                } else {
+                    newOutputExpression = {
+                        id: _generateColumnId(),
+                        label: null,
+                        variableId: null,
+                        type: null,
+                        newVariable: null,
+                        entries: null
+                    };
                 }
+                return newOutputExpression;
+            };
 
-                // add props to rule data
-                $rootScope.currentDecisionTableRules.forEach(function (rowObject) {
-                    rowObject[newInputExpression.id] = "";
-                });
+            $scope.addNewInputExpression = function (inputExpression, insertPos) {
+                var newInputExpression = createNewInputExpression(inputExpression);
 
                 // insert expression at position or just add
                 if (insertPos !== undefined && insertPos !== -1) {
@@ -163,513 +325,567 @@ angular.module('activitiModeler')
                     $scope.currentDecisionTable.inputExpressions.push(newInputExpression);
                 }
 
-                $scope.model.columnVariableIdMap[newInputExpression.id] = newInputExpression.variableId;
+                // update data model with initial values
+                $scope.model.rulesData.forEach(function (rowData) {
+                    rowData[newInputExpression.id + '_expression'] = '-';
+                });
 
                 // update column definitions off the source model
-                $scope.getColumnDefinitions($scope.currentDecisionTable);
-
-                // refresh grid
-                $scope.gridApi.core.notifyDataChange(uiGridConstants.dataChange.COLUMN);
+                $scope.evaluateDecisionHeaders($scope.currentDecisionTable);
             };
 
-            $scope.enableRemoveInputExpression = function(){
-                return $scope.currentDecisionTable && $scope.currentDecisionTable.inputExpressions && $scope.currentDecisionTable.inputExpressions.length > 1;
-            };
+            $scope.addNewOutputExpression = function (outputExpression, insertPos) {
+                var newOutputExpression = createNewOutputExpression(outputExpression);
 
-            $scope.removeInputExpression = function (column, event) {
-
-                if (!column) {
-                    return;
-                }
-
-                // remove props from data
-                $rootScope.currentDecisionTableRules.forEach(function (rowObject) {
-                    if (rowObject.hasOwnProperty(column.name)) {
-                        delete rowObject[column.name];
-                    }
-                });
-                delete $scope.model.columnVariableIdMap[column.name];
-
-                var expressionPos = -1;
-                // remove input expression from table
-                for (var i = 0; i < $scope.currentDecisionTable.inputExpressions.length; i++) {
-                    if ($scope.currentDecisionTable.inputExpressions[i].id === column.name) {
-                        $scope.currentDecisionTable.inputExpressions.splice(i, 1);
-                        expressionPos = i;
-                        break;
-                    }
-                    
-                }
-
-                // set updated column definitions
-                $scope.getColumnDefinitions($scope.currentDecisionTable);
-
-                // prevent edit modal opening
-                if (event) {
-                    event.stopPropagation();
-                }
-
-                return expressionPos;
-            };
-
-            $scope.updateInputExpression = function (oldInputExpressionColumn, newInputExpression) {
-                var deletedColumnIndex = $scope.removeInputExpression(oldInputExpressionColumn);
-                $scope.addInputExpression(newInputExpression, deletedColumnIndex);
-            };
-
-            $scope.addOutputExpression = function (outputExpression, insertPos) {
-
-                if (!$scope.currentDecisionTable.outputExpressions) {
-                    $scope.currentDecisionTable.outputExpressions = [];
-                }
-
-                var newOutputExpression;
-                if (!outputExpression) {
-                    newOutputExpression = {id: _generateColumnId()};
-                } else {
-                    newOutputExpression = {
-                        id: _generateColumnId(),
-                        label: outputExpression.label,
-                        variableId: outputExpression.variableId,
-                        type: outputExpression.type,
-                        variableType: outputExpression.variableType,
-                        newVariable: outputExpression.newVariable
-                    };
-                }
-
-                // if no rules present add one
-                if ($rootScope.currentDecisionTableRules.length === 0) {
-                    $scope.addRule();
-                }
-
-                // add props to rule data
-                $rootScope.currentDecisionTableRules.forEach(function (rowObject) {
-                    rowObject[newOutputExpression.id] = "";
-                });
-
+                // insert expression at position or just add
                 if (insertPos !== undefined && insertPos !== -1) {
                     $scope.currentDecisionTable.outputExpressions.splice(insertPos, 0, newOutputExpression);
                 } else {
                     $scope.currentDecisionTable.outputExpressions.push(newOutputExpression);
                 }
-                $scope.model.columnVariableIdMap[newOutputExpression.id] = newOutputExpression.variableId;
-
 
                 // update column definitions off the source model
-                $scope.getColumnDefinitions($scope.currentDecisionTable);
-
-                // refresh grid
-                $scope.gridApi.core.notifyDataChange(uiGridConstants.dataChange.COLUMN);
+                $scope.evaluateDecisionHeaders($scope.currentDecisionTable);
             };
 
-            $scope.enableRemoveOutputExpression = function(){
-                return $scope.currentDecisionTable && $scope.currentDecisionTable.outputExpressions && $scope.currentDecisionTable.outputExpressions.length > 1;
+            $scope.removeInputExpression = function (expressionPos) {
+                var removedElements = $scope.currentDecisionTable.inputExpressions.splice(expressionPos, 1);
+                removePropertyFromGrid(removedElements[0].id, 'input');
+                $scope.evaluateDecisionHeaders($scope.currentDecisionTable);
             };
 
-            $scope.removeOutputExpression = function (column, event) {
-
-                if (!column) {
-                    return;
-                }
-
-                // remove props from data
-                $rootScope.currentDecisionTableRules.forEach(function (rowObject) {
-                    if (rowObject.hasOwnProperty(column.name)) {
-                        delete rowObject[column.name];
-                    }
-                });
-                delete $scope.model.columnVariableIdMap[column.name];
-
-                var expressionPos = -1;
-                for (var i = 0; i < $scope.currentDecisionTable.outputExpressions.length; i++) {
-                    if ($scope.currentDecisionTable.outputExpressions[i].id === column.name) {
-                        $scope.currentDecisionTable.outputExpressions.splice(i, 1);
-                        expressionPos = i;
-                        break;
-                    }
-                }
-                $scope.getColumnDefinitions($scope.currentDecisionTable);
-
-                // prevent edit modal opening
-                if (event) {
-                    event.stopPropagation();
-                }
-
-                return expressionPos;
-            };
-
-            // create rule row with unique id
-            $scope.addRule = function () {
-                $rootScope.currentDecisionTableRules.push({});
-            };
-
-            $scope.enableRemoveRule = function () {
-                return $scope.model.selectedRule && $rootScope.currentDecisionTableRules.length > 1;
-            };
-
-            $scope.removeRule = function () {
-                if (!$scope.model.selectedRule) {
-                    return;
-                }
-
-                var index =  $rootScope.currentDecisionTableRules.indexOf($scope.model.selectedRule);
-                if (index > -1) {
-                    $rootScope.currentDecisionTableRules.splice(index, 1);
-                }
-
-                $scope.model.selectedRule = undefined;
-            };
-
-            $scope.enableMoveUpwards = function (selectedRule) {
-                return selectedRule && $rootScope.currentDecisionTableRules.indexOf(selectedRule) !== 0;
-            };
-
-            $scope.moveRuleUpwards = function () {
-                var index =  $rootScope.currentDecisionTableRules.indexOf($scope.model.selectedRule);
-                if (index > -1) {
-                    var row = $rootScope.currentDecisionTableRules[index];
-                    $rootScope.currentDecisionTableRules.splice(index, 1);
-                    $rootScope.currentDecisionTableRules.splice(index - 1, 0, row);
+            var removePropertyFromGrid = function (key, type) {
+                if ($scope.model.rulesData) {
+                    $scope.model.rulesData.forEach(function (rowData) {
+                        if (type === 'input') {
+                            delete rowData[key + '_operator'];
+                            delete rowData[key + '_expression'];
+                        } else if (type === 'output') {
+                            delete rowData[key];
+                        }
+                    });
                 }
             };
 
-            $scope.enableMoveDownwards = function (selectedRule) {
-                return selectedRule && $rootScope.currentDecisionTableRules.indexOf(selectedRule) !== ($rootScope.currentDecisionTableRules.length - 1);
+            $scope.removeOutputExpression = function (expressionPos) {
+                var removedElements = $scope.currentDecisionTable.outputExpressions.splice(expressionPos, 1);
+                removePropertyFromGrid(removedElements[0].id, 'output');
+                $scope.evaluateDecisionHeaders($scope.currentDecisionTable);
             };
 
-            $scope.moveRuleDownwards = function () {
-                var index =  $rootScope.currentDecisionTableRules.indexOf($scope.model.selectedRule);
-                if (index > -1) {
-                    var row = $rootScope.currentDecisionTableRules[index];
-                    $rootScope.currentDecisionTableRules.splice(index, 1);
-                    $rootScope.currentDecisionTableRules.splice(index + 1, 0, row);
-                }
-            };
+            $scope.openInputExpressionEditor = function (expressionPos, newExpression) {
+                var editTemplate = 'views/popup/decision-table-edit-input-expression.html';
 
-            // helper for looking up variable id by col id
-            $scope.getVariableNameByColumnId = function (colId) {
+                $scope.model.newExpression = !!newExpression;
 
-                if (!colId) {
-                    return;
-                }
-
-                if ($scope.model.columnVariableIdMap[colId]) {
-                    return $scope.model.columnVariableIdMap[colId];
+                if (!$scope.model.newExpression) {
+                    $scope.model.selectedExpression = $scope.currentDecisionTable.inputExpressions[expressionPos];
                 } else {
-                    return $translate.instant('DECISION-TABLE-EDITOR.EMPTY-MESSAGES.NO-VARIABLE-SELECTED');
+                    if (expressionPos >= $scope.model.startOutputExpression) {
+                        $scope.model.selectedColumn = $scope.model.startOutputExpression - 1;
+                    } else {
+                        $scope.model.selectedColumn = Math.floor(expressionPos / 2);
+                    }
                 }
+
+                _internalCreateModal({
+                    template: editTemplate,
+                    scope: $scope
+                }, $modal, $scope);
             };
 
+            $scope.openOutputExpressionEditor = function (expressionPos, newExpression) {
+                var editTemplate = 'views/popup/decision-table-edit-output-expression.html';
+
+                $scope.model.newExpression = !!newExpression;
+                $scope.model.hitPolicy = $scope.currentDecisionTable.hitIndicator;
+                $scope.model.selectedColumn = expressionPos;
+
+
+                if (!$scope.model.newExpression) {
+                    $scope.model.selectedExpression = $scope.currentDecisionTable.outputExpressions[expressionPos];
+                }
+
+                _internalCreateModal({
+                    template: editTemplate,
+                    scope: $scope
+                }, $modal, $scope);
+            };
+
+            $scope.openHitPolicyEditor = function () {
+                var editTemplate = 'views/popup/decision-table-edit-hit-policy.html';
+
+                $scope.model.hitPolicy = $scope.currentDecisionTable.hitIndicator;
+
+                _internalCreateModal({
+                    template: editTemplate,
+                    scope: $scope
+                }, $modal, $scope);
+            };
 
             var _loadDecisionTableDefinition = function (modelId) {
-
-                DecisionTableService.fetchDecisionTableDetails(modelId).then( function (decisionTable) {
+                DecisionTableService.fetchDecisionTableDetails(modelId).then(function (decisionTable) {
 
                     $rootScope.currentDecisionTable = decisionTable.decisionTableDefinition;
                     $rootScope.currentDecisionTable.id = decisionTable.id;
                     $rootScope.currentDecisionTable.key = decisionTable.decisionTableDefinition.key;
                     $rootScope.currentDecisionTable.name = decisionTable.name;
                     $rootScope.currentDecisionTable.description = decisionTable.description;
-                    
+
+                    $scope.model.lastUpdatedBy = decisionTable.lastUpdatedBy;
+                    $scope.model.createdBy = decisionTable.createdBy;
+
                     // decision table model to used in save dialog
                     $rootScope.currentDecisionTableModel = {
                         id: decisionTable.id,
                         name: decisionTable.name,
-                        key: decisionTable.decisionTableDefinition.key,
+                        key: decisionTable.key,
                         description: decisionTable.description
                     };
 
                     if (!$rootScope.currentDecisionTable.hitIndicator) {
                         $rootScope.currentDecisionTable.hitIndicator = hitPolicies[0];
                     }
-                    _initializeDecisionTableGrid($rootScope.currentDecisionTable);
+
+                    hitPolicyHeaderElement = angular.element('<div class="hit-policy-header"><a onclick="triggerHitPolicyEditor()">' + $rootScope.currentDecisionTable.hitIndicator.substring(0, 1) + '</a></div>');
+
+                    evaluateDecisionTableGrid($rootScope.currentDecisionTable);
 
                     $timeout(function () {
                         // Flip switch in timeout to start watching all decision-related models
                         // after next digest cycle, to prevent first false-positive
                         $scope.status.loading = false;
                         $rootScope.decisionTableChanges = false;
-                    }, 200);
+                    });
 
                 });
             };
 
-            var _initializeDecisionTableGrid = function (decisionTable) {
+            var composeInputOperatorColumnDefinition = function (inputExpression) {
+                var expressionPosition = $scope.currentDecisionTable.inputExpressions.indexOf(inputExpression);
 
-                // initialize ui grid model
-                if (decisionTable.rules && decisionTable.rules.length > 0) {
-                    Array.prototype.push.apply($rootScope.currentDecisionTableRules, decisionTable.rules);
+                var columnDefinition = {
+                    data: inputExpression.id + '_operator',
+                    expressionType: 'input-operator',
+                    expression: inputExpression,
+                    width: '60',
+                    className: 'input-operator-cell',
+                    type: 'dropdown',
+                    source: operators
+                };
+
+                if ($scope.currentDecisionTable.inputExpressions.length !== 1) {
+                    columnDefinition.title = '<div class="header-remove-expression">' +
+                        '<a onclick="triggerRemoveExpression(\'input\',' + expressionPosition + ',true)"><span class="glyphicon glyphicon-minus-sign"></span></a>' +
+                        '</div>';
                 }
 
-                // if no input condition present; add one
-                if (!decisionTable.inputExpressions || decisionTable.inputExpressions.length === 0) {
-                    $scope.addInputExpression();
-                } else {
-                    // initialize map
-                    decisionTable.inputExpressions.forEach( function (inputExpression) {
-                        $scope.model.columnVariableIdMap[inputExpression.id] = inputExpression.variableId;
-
-                        // set counter to max value
-                        var expressionId = 0;
-                        try {
-                            expressionId = parseInt(inputExpression.id);
-                        } catch(e){}
-                        if (expressionId > columnIdCounter) {
-                            columnIdCounter = expressionId;
-                        }
-                    });
-                }
-
-                // if no output conclusion present; add one
-                if (!decisionTable.outputExpressions || decisionTable.outputExpressions.length === 0) {
-                    $scope.addOutputExpression();
-                    
-                } else {
-                    // initialize map
-                    decisionTable.outputExpressions.forEach( function (outputExpression) {
-                        $scope.model.columnVariableIdMap[outputExpression.id] = outputExpression.variableId;
-
-                        // set counter to max value
-                        var expressionId = 0;
-                        try {
-                            expressionId = parseInt(outputExpression.id);
-                        } catch(e){}
-                        if (expressionId > columnIdCounter) {
-                            columnIdCounter = expressionId;
-                        }
-                    });
-                }
-
-                // get column definitions
-                $scope.getColumnDefinitions(decisionTable);
+                return columnDefinition;
             };
 
-            // Custom UI grid template
-            var _getHeaderInputExpressionCellTemplate = function () {
-                return "" +
-                    "<div role=\"columnheader\" ng-class=\"{ 'sortable': sortable }\" ui-grid-one-bind-aria-labelledby-grid=\"col.uid + '-header-text ' + col.uid + '-sortdir-text'\">" +
-                    "   <div role=\"button\" tabindex=\"0\" class=\"ui-grid-cell-contents ui-grid-header-cell-primary-focus\" col-index=\"renderIndex\" title=\"TOOLTIP\" ng-click=\"grid.appScope.editInputExpression(col)\">" +
-                    "       <div class=\"text-center\"><span>{{ col.displayName CUSTOM_FILTERS }}</span></div>" +
-                    "       <div class=\"text-center\"><span ui-grid-one-bind-id-grid=\"col.uid + '-header-text'\" style=\"text-decoration: underline;cursor:pointer\">[ {{ grid.appScope.getVariableNameByColumnId(col.name) }} ]</span></div>" +
-                    "       <div tabindex=\"0\" ng-show=\"grid.appScope.enableRemoveInputExpression()\" class=\"ui-grid-column-menu-button\" style=\"margin-right: 10px\" ng-click=\"grid.appScope.removeInputExpression(col, $event)\"><i class=\"glyphicon glyphicon-trash\" style=\"font-size: 12px;\"></i></div>" +
-                    "   </div>" +
-                    "</div>";
-            };
+            var composeInputExpressionColumnDefinition = function (inputExpression) {
+                var expressionPosition = $scope.currentDecisionTable.inputExpressions.indexOf(inputExpression);
 
-            var _getHeaderOutputExpressionCellTemplate = function () {
-                return "" +
-                    "<div role=\"columnheader\" ng-class=\"{ 'sortable': sortable }\" ui-grid-one-bind-aria-labelledby-grid=\"col.uid + '-header-text ' + col.uid + '-sortdir-text'\">" +
-                    "   <div role=\"button\" tabindex=\"0\" class=\"ui-grid-cell-contents ui-grid-header-cell-primary-focus\" col-index=\"renderIndex\" title=\"TOOLTIP\" ng-click=\"grid.appScope.editOutputExpression(col)\">" +
-                    "       <div class=\"text-center\"><span>{{ col.displayName CUSTOM_FILTERS }}</span></div>" +
-                    "       <div class=\"text-center\"><span ui-grid-one-bind-id-grid=\"col.uid + '-header-text'\" style=\"text-decoration: underline;cursor:pointer\">[ {{ grid.appScope.getVariableNameByColumnId(col.name) }} ]</span></div>" +
-                    "       <div tabindex=\"0\" ng-show=\"grid.appScope.enableRemoveOutputExpression()\" class=\"ui-grid-column-menu-button\" style=\"margin-right: 10px\" ng-click=\"grid.appScope.removeOutputExpression(col, $event)\"><i class=\"glyphicon glyphicon-trash\" style=\"font-size: 12px;\"></i></div>" +
-                    "   </div>" +
-                    "</div>";
-            };
-
-            var _rowHeaderTemplate = function () {
-                return "<div class=\"ui-grid-disable-selection\"><div class=\"ui-grid-cell-contents text-center customRowHeader\">{{rowRenderIndex + 1}}</div></div>"
-            };
-
-            var _getCellTemplate = function (columnType) {
-
-                var editableCellTemplate = "" +
-                    "<div class=\"ui-grid-cell-contents\" ng-class=\"{ 'ui-grid-cell-contents-empty': !COL_FIELD }\" title=\"TOOLTIP\">" +
-                    "   <span class=\"contents-value\">{{COL_FIELD}}</span>" +
-                    "</div>";
-                var cellTemplate;
-                switch (columnType) {
-
-                    case "date":
-                        cellTemplate = editableCellTemplate;
+                var type;
+                switch (inputExpression.type) {
+                    case 'date':
+                        type = 'date';
                         break;
-
-                    case "number":
-                        cellTemplate = editableCellTemplate;
+                    case 'number':
+                        type = 'numeric';
                         break;
-
-                    case "boolean":
-                        cellTemplate = editableCellTemplate;
+                    case 'boolean':
+                        type = 'dropdown';
                         break;
-
-                    case "string":
-                        cellTemplate = editableCellTemplate;
-                        break;
-
                     default:
-                        cellTemplate = "<div class=\"ui-grid-cell-contents\" title=\"TOOLTIP\">{{COL_FIELD}}</div>";
+                        type = 'text';
                 }
 
-                return cellTemplate;
+                var columnDefinition = {
+                    data: inputExpression.id + '_expression',
+                    type: type,
+                    title: '<div class="input-header">' +
+                    '<a onclick="triggerExpressionEditor(\'input\',' + expressionPosition + ',false)"><span class="header-label">' + (inputExpression.label ? inputExpression.label : "New Input") + '</span></a>' +
+                    '<br><span class="header-variable">' + (inputExpression.variableId ? inputExpression.variableId : "none") + '</span>' +
+                    '<br/><span class="header-variable-type">' + (inputExpression.type ? inputExpression.type : "") + '</brspan>' +
+                    '</div>' +
+                    '<div class="header-add-new-expression">' +
+                    '<a onclick="triggerExpressionEditor(\'input\',' + expressionPosition + ',true)"><span class="glyphicon glyphicon-plus-sign"></span></a>' +
+                    '</div>',
+                    expressionType: 'input-expression',
+                    expression: inputExpression,
+                    className: 'htCenter',
+                    width: '200'
+                };
 
+                if (inputExpression.entries && inputExpression.entries.length > 0) {
+                    var entriesOptionValues = inputExpression.entries.slice(0, inputExpression.entries.length);
+                    entriesOptionValues.push('-', '', ' ');
+
+                    columnDefinition.type = 'dropdown';
+                    columnDefinition.strict = true;
+                    columnDefinition.source = entriesOptionValues;
+
+                    columnDefinition.title = '<div class="input-header">' +
+                        '<a onclick="triggerExpressionEditor(\'input\',' + expressionPosition + ',false)"><span class="header-label">' + (inputExpression.label ? inputExpression.label : "New Input") + '</span></a>' +
+                        '<br><span class="header-variable">' + (inputExpression.variableId ? inputExpression.variableId : "none") + '</span>' +
+                        '<br/><span class="header-variable-type">' + (inputExpression.type ? inputExpression.type : "") + '</span>' +
+                        '<br><span class="header-entries">[' + inputExpression.entries.join() + ']</span>' +
+                        '</div>' +
+                        '<div class="header-add-new-expression">' +
+                        '<a onclick="triggerExpressionEditor(\'input\',' + expressionPosition + ',true)"><span class="glyphicon glyphicon-plus-sign"></span></a>' +
+                        '</div>';
+                }
+
+                if (type === 'date') {
+                    columnDefinition.dateFormat = dateFormat;
+                    columnDefinition.validator = function(value, callback) {
+                        if (value === '-') {
+                            callback(true);
+                        } else {
+                            Handsontable.DateValidator.call(this, value, callback);
+                        }
+                    }
+
+                } else if (type === 'dropdown') {
+                    columnDefinition.source = ['true', 'false', '-'];
+                }
+
+                if (type !== 'string') {
+                    columnDefinition.allowEmpty = false;
+                }
+
+                return columnDefinition;
             };
 
-            // create UI grid column definitions based on input / output expression
-            $scope.getColumnDefinitions = function (decisionTable) {
+            var composeOutputColumnDefinition = function (outputExpression) {
+                var expressionPosition = $scope.currentDecisionTable.outputExpressions.indexOf(outputExpression);
 
-                if (!decisionTable) {
-                    return;
+                var type;
+                switch (outputExpression.type) {
+                    case 'date':
+                        type = 'date';
+                        break;
+                    case 'number':
+                        type = 'numeric';
+                        break;
+                    case 'boolean':
+                        type = 'dropdown';
+                        break;
+                    default:
+                        type = 'text';
                 }
 
-                var expressionCounter = 0;
-                var newColumnDefs = [];
+                if (outputExpression.complexExpression) {
+                    type = 'text';
+                }
 
-                // input expression column defs
+                var title = '';
+                var columnDefinition = {
+                    data: outputExpression.id,
+                    type: type,
+                    expressionType: 'output',
+                    expression: outputExpression,
+                    className: 'htCenter',
+                    width: '270'
+                };
+
+                if ($scope.currentDecisionTable.outputExpressions.length !== 1) {
+                    title = '<div class="header-remove-expression">' +
+                        '<a onclick="triggerRemoveExpression(\'output\',' + expressionPosition + ',true)"><span class="glyphicon glyphicon-minus-sign"></span></a>' +
+                        '</div>';
+                }
+
+                if (outputExpression.entries && outputExpression.entries.length > 0) {
+                    var entriesOptionValues = outputExpression.entries.slice(0, outputExpression.entries.length);
+                    columnDefinition.type = 'dropdown';
+                    columnDefinition.source = entriesOptionValues;
+                    columnDefinition.strict = true;
+
+                    title += '<div class="output-header">' +
+                        '<a onclick="triggerExpressionEditor(\'output\',' + expressionPosition + ',false)"><span class="header-label">' + (outputExpression.label ? outputExpression.label : "New Output") + '</span></a>' +
+                        '<br><span class="header-variable">' + (outputExpression.variableId ? outputExpression.variableId : "none") + '</span>' +
+                        '<br/><span class="header-variable-type">' + (outputExpression.type ? outputExpression.type : "") + '</span>' +
+                        '<br><span class="header-entries">[' + outputExpression.entries.join() + ']</span>' +
+                        '</div>' +
+                        '<div class="header-add-new-expression">' +
+                        '<a onclick="triggerExpressionEditor(\'output\',' + expressionPosition + ',true)"><span class="glyphicon glyphicon-plus-sign"></span></a>' +
+                        '</div>';
+                        
+                } else {
+                    title += '<div class="output-header">' +
+                        '<a onclick="triggerExpressionEditor(\'output\',' + expressionPosition + ',false)"><span class="header-label">' + (outputExpression.label ? outputExpression.label : "New Output") + '</span></a>' +
+                        '<br><span class="header-variable">' + (outputExpression.variableId ? outputExpression.variableId : "none") + '</span>' +
+                        '<br/><span class="header-variable-type">' + (outputExpression.type ? outputExpression.type : "") + '</span>' +
+                        '</div>' +
+                        '<div class="header-add-new-expression">' +
+                        '<a onclick="triggerExpressionEditor(\'output\',' + expressionPosition + ',true)"><span class="glyphicon glyphicon-plus-sign"></span></a>' +
+                        '</div>';
+                }
+
+                if (type === 'date') {
+                    columnDefinition.dateFormat = dateFormat;
+                } else if (type === 'dropdown') {
+                    columnDefinition.source = ['true', 'false', '-'];
+                }
+
+                columnDefinition.title = title;
+
+                return columnDefinition;
+            };
+
+            $scope.evaluateDecisionHeaders = function (decisionTable) {
+            
+                var element = document.querySelector("thead > tr > th:first-of-type > div > a");
+                if (element) {
+                    element.innerHTML = decisionTable.hitIndicator.substring(0, 1);
+                }
+            
+                var columnDefinitions = [];
+                var inputExpressionCounter = 0;
                 if (decisionTable.inputExpressions && decisionTable.inputExpressions.length > 0) {
-
                     decisionTable.inputExpressions.forEach(function (inputExpression) {
+                        var inputOperatorColumnDefinition = composeInputOperatorColumnDefinition(inputExpression);
+                        columnDefinitions.push(inputOperatorColumnDefinition);
+                        setGridValues(inputOperatorColumnDefinition.data, inputOperatorColumnDefinition.expressionType);
 
-                        newColumnDefs.push({
-                            name: inputExpression.id,
-                            displayName: inputExpression.label ? inputExpression.label : "",
-                            field: inputExpression.id,
-                            type: 'string',
-                            headerCellClass: 'header-expression header-input-expression',
-                            headerCellTemplate: _getHeaderInputExpressionCellTemplate(),
-                            cellClass: 'cell-expression cell-input-expression',
-                            cellTemplate: _getCellTemplate(inputExpression.type),
-                            enableHiding: false,
-                            enableCellEditOnFocus: false,
-                            minWidth: MIN_COLUMN_WIDTH,
-                            cellEditableCondition: function($scope){
-                                // check if column has been mapped to variable
-                                if ($scope.grid.appScope.model.columnVariableIdMap[inputExpression.id]) {
-                                    return true;
-                                } else {
-                                    return false;
-                                }
-                            }
-                        });
+                        var inputExpressionColumnDefinition = composeInputExpressionColumnDefinition(inputExpression);
+                        columnDefinitions.push(inputExpressionColumnDefinition);
+                        setGridValues(inputExpressionColumnDefinition.data, inputExpressionColumnDefinition.expressionType);
 
-                        expressionCounter++;
+                        inputExpressionCounter += 2;
                     });
+                    
+                } else { // create default input expression
+                    decisionTable.inputExpressions = [];
+                    var inputExpression = createNewInputExpression();
+                    decisionTable.inputExpressions.push(inputExpression);
+                    columnDefinitions.push(composeInputOperatorColumnDefinition(inputExpression));
+                    columnDefinitions.push(composeInputExpressionColumnDefinition(inputExpression));
+                    inputExpressionCounter += 2;
                 }
 
-                // output expression column defs
+                columnDefinitions[inputExpressionCounter - 1].className += ' last';
+                $scope.model.startOutputExpression = inputExpressionCounter;
+
                 if (decisionTable.outputExpressions && decisionTable.outputExpressions.length > 0) {
-
                     decisionTable.outputExpressions.forEach(function (outputExpression) {
-
-                        newColumnDefs.push({
-                            name: outputExpression.id,
-                            displayName: outputExpression.label ? outputExpression.label : "",
-                            field: outputExpression.id,
-                            type: 'string',
-                            headerCellTemplate: _getHeaderOutputExpressionCellTemplate(),
-                            headerCellClass: 'header-expression header-output-expression',
-                            cellClass: 'cell-expression cell-output-expression',
-                            cellTemplate: _getCellTemplate(outputExpression.type),
-                            enableHiding: false,
-                            enableCellEditOnFocus: false,
-                            minWidth: MIN_COLUMN_WIDTH,
-                            cellEditableCondition: function($scope){
-                                // check if column has been mapped to variable
-                                if ($scope.grid.appScope.model.columnVariableIdMap[outputExpression.id]) {
-                                    return true;
-                                } else {
-                                    return false;
-                                }
-                            }
-                        });
-
-                        expressionCounter++;
+                        columnDefinitions.push(composeOutputColumnDefinition(outputExpression));
                     });
+                    
+                } else { // create default output expression
+                    decisionTable.outputExpressions = [];
+                    var outputExpression = createNewOutputExpression();
+                    decisionTable.outputExpressions.push(outputExpression);
+                    columnDefinitions.push(composeOutputColumnDefinition(outputExpression));
                 }
 
-                // merge models
-                $scope.model.columnDefs.length = 0;
-                Array.prototype.push.apply($scope.model.columnDefs, newColumnDefs);
+                columnDefinitions[inputExpressionCounter].className += ' first';
 
-                $scope.gridApi.core.notifyDataChange( uiGridConstants.dataChange.ALL );
-            };
-
-            // config for grid
-            $scope.gridOptions = {
-                data: $rootScope.currentDecisionTableRules,
-                enableRowHeaderSelection: true,
-                multiSelect: false,
-                modifierKeysToMultiSelect: false,
-                enableHorizontalScrollbar: 2,
-                enableColumnMenus: true,
-                enableSorting: false,
-                enableCellEditOnFocus: true,
-                columnDefs: $scope.model.columnDefs,
-                headerTemplate: 'views/templates/decision-table-header-template.html'
-            };
-
-            // register UI grid API
-            $scope.gridOptions.onRegisterApi = function (gridApi) {
-                //set gridApi on scope
-                $scope.gridApi = gridApi;
-                gridApi.selection.on.rowSelectionChanged($scope, function (row) {
-                    if (row.isSelected) {
-                        $scope.model.selectedRule = row.entity;
-                    } else {
-                        delete $scope.model.selectedRule;
+                // timeout needed for trigger hot update when removing column defs
+                $scope.model.columnDefs = columnDefinitions;
+                $timeout(function () {
+                    if (hotDecisionTableEditorInstance) {
+                        hotDecisionTableEditorInstance.render();
                     }
                 });
-                
-                var cellTemplate = _rowHeaderTemplate();   // you could use your own template here
-                $scope.gridApi.core.addRowHeaderColumn( { name: 'rowHeaderCol', displayName: '', width: 35, cellTemplate: cellTemplate} );
             };
+
+            var setGridValues = function (key, type) {
+                if ($scope.model.rulesData) {
+                    $scope.model.rulesData.forEach(function (rowData) {
+                        if (type === 'input-operator') {
+                            if (!(key in rowData) || rowData[key] === '') {
+                                rowData[key] = '==';
+                            }
+                        }
+                        // else if (type === 'input-expression') {
+                        //     if (!(key in rowData) || rowData[key] === '') {
+                        //         rowData[key] = '-';
+                        //     }
+                        // }
+                    });
+                }
+            };
+
+            var createDefaultRow = function () {
+                var defaultRow = {};
+                $scope.model.columnDefs.forEach(function (columnDefinition) {
+                    if (columnDefinition.expressionType === 'input-operator') {
+                        defaultRow[columnDefinition.data] = '==';
+                    }
+                    else if (columnDefinition.expressionType === 'input-expression') {
+                        defaultRow[columnDefinition.data] = '-';
+                    }
+                    else if (columnDefinition.expressionType === 'output') {
+                        defaultRow[columnDefinition.data] = '';
+                    }
+                });
+
+                return defaultRow;
+            };
+
+            var evaluateDecisionGrid = function (decisionTable) {
+                var tmpRuleGrid = [];
+
+                // rows
+                if (decisionTable.rules && decisionTable.rules.length > 0) {
+                    decisionTable.rules.forEach(function (rule) {
+
+                        // rule data
+                        var tmpRowValues = {};
+                        for (var i = 0; i < Object.keys(rule).length; i++) {
+                            var id = Object.keys(rule)[i];
+
+                            $scope.model.columnDefs.forEach(function (columnDef) {
+                                // set counter to max value
+                                var expressionId = 0;
+                                try {
+                                    expressionId = parseInt(columnDef.expression.id);
+                                } catch (e) {
+                                }
+                                if (expressionId > columnIdCounter) {
+                                    columnIdCounter = expressionId;
+                                }
+                            });
+
+                            tmpRowValues[id] = rule[id];
+                        }
+
+                        tmpRuleGrid.push(tmpRowValues);
+                    });
+                } else {
+                    // initialize default values
+                    tmpRuleGrid.push(createDefaultRow());
+                }
+                // $rootScope.currentDecisionTableRules = tmpRuleGrid;
+                $scope.model.rulesData = tmpRuleGrid;
+            };
+
+            var evaluateDecisionTableGrid = function (decisionTable) {
+                $scope.evaluateDecisionHeaders(decisionTable);
+                evaluateDecisionGrid(decisionTable);
+            };
+
 
             // fetch table from service and populate model
             _loadDecisionTableDefinition($routeParams.modelId);
-
-            $scope.changeDetector = function(){
-                $rootScope.decisionTableChanges = true;
-            };
-            $rootScope.$watch('currentDecisionTable', $scope.changeDetector, true);
-            $rootScope.$watch('currentDecisionTableRules', $scope.changeDetector, true);
 
             var _generateColumnId = function () {
                 columnIdCounter++;
                 return "" + columnIdCounter;
             };
+
         }]);
 
-angular.module('activitiModeler')
-    .controller('DecisionTableInputConditionEditorCtlr', ['$rootScope', '$scope', function ($rootScope, $scope) {
-        var previousVariableId = $scope.model.selectedExpression.variableId;
+angular.module('flowableModeler')
+    .controller('DecisionTableInputConditionEditorCtlr', ['$rootScope', '$scope', 'hotRegisterer', '$timeout', function ($rootScope, $scope, hotRegisterer, $timeout) {
 
-        // condition input options
-        $scope.popup = {
-            selectedExpressionLabel: $scope.model.selectedExpression.label ? $scope.model.selectedExpression.label : '',
-            selectedExpressionVariable: previousVariableId ? $scope.getSelectedVariableModel(previousVariableId) : undefined
+        var hotInstance;
+
+        var getEntriesValues = function (entriesArrayOfArrays) {
+            var newEntriesArray = [];
+            // remove last value
+            entriesArrayOfArrays.pop();
+
+            entriesArrayOfArrays.forEach(function (entriesArray) {
+                newEntriesArray.push(entriesArray[0]);
+            });
+
+            return newEntriesArray;
         };
 
-        $scope.save = function () {
-            if (previousVariableId !== $scope.popup.selectedExpressionVariable.id) {
+        var createEntriesValues = function (entriesArray) {
+            var localCopy = entriesArray.slice(0);
+            var entriesArrayOfArrays = [];
+            while (localCopy.length) {
+                entriesArrayOfArrays.push(localCopy.splice(0, 1));
+            }
+            
+            return entriesArrayOfArrays;
+        };
 
+        var deleteRowRenderer = function (instance, td, row) {
+            td.innerHTML = '';
+            td.className = 'remove_container';
+
+            if ((row + 1) != $scope.popup.selectedExpressionInputValues.length) {
+                var div = document.createElement('div');
+                div.onclick = function () {
+                    return instance.alter("remove_row", row);
+                };
+                div.className = 'btn';
+                div.appendChild(document.createTextNode('x'));
+                td.appendChild(div);
+            }
+            return td;
+        };
+
+        // condition input options
+        if ($scope.model.newExpression === false) {
+            $scope.popup = {
+                selectedExpressionLabel: $scope.model.selectedExpression.label ? $scope.model.selectedExpression.label : '',
+                selectedExpressionVariableId: $scope.model.selectedExpression.variableId,
+                selectedExpressionVariableType: $scope.model.selectedExpression.type ? $scope.model.selectedExpression.type : $scope.model.availableVariableTypes[0],
+                selectedExpressionInputValues: $scope.model.selectedExpression.entries && $scope.model.selectedExpression.entries.length > 0 ? createEntriesValues($scope.model.selectedExpression.entries) : [['']],
+                columnDefs: [
+                    {
+                        width: '300'
+                    },
+                    {
+                        width: '40',
+                        readOnly: true,
+                        renderer: deleteRowRenderer
+                    }
+                ],
+                hotSettings: {
+                    stretchH: 'none'
+                }
+            };
+        } else {
+            $scope.popup = {
+                selectedExpressionLabel: '',
+                selectedExpressionVariableId: '',
+                selectedExpressionVariableType: $scope.model.availableVariableTypes[0],
+                selectedExpressionInputValues: [['']],
+                columnDefs: [
+                    {
+                        width: '300'
+
+                    },
+                    {
+                        renderer: deleteRowRenderer,
+                        readOnly: true,
+                        width: '40'
+                    }
+                ],
+                hotSettings: {
+                    stretchH: 'none'
+                }
+            };
+        }
+
+        $scope.save = function () {
+            if ($scope.model.newExpression) {
                 var newInputExpression = {
+                    variableId: $scope.popup.selectedExpressionVariableId,
+                    type: $scope.popup.selectedExpressionVariableType,
                     label: $scope.popup.selectedExpressionLabel,
-                    variableId: $scope.popup.selectedExpressionVariable.id,
-                    newVariable: $scope.popup.selectedExpressionNewVariable
+                    entries: getEntriesValues($scope.popup.selectedExpressionInputValues)
                 };
 
-                $scope.updateInputExpression($scope.model.selectedColumn, newInputExpression);
-
-                if ($scope.popup.selectedExpressionNewVariable) {
-                    saveNewDefinedVariable();
-                }
-
+                $scope.addNewInputExpression(newInputExpression, $scope.model.selectedColumn + 1);
+                
             } else {
-                $scope.model.selectedColumn.displayName = $scope.popup.selectedExpressionLabel;
+                $scope.model.selectedExpression.variableId = $scope.popup.selectedExpressionVariableId;
+                $scope.model.selectedExpression.type = $scope.popup.selectedExpressionVariableType;
+                $scope.model.selectedExpression.label = $scope.popup.selectedExpressionLabel;
+                $scope.model.selectedExpression.entries = getEntriesValues($scope.popup.selectedExpressionInputValues);
+                $scope.evaluateDecisionHeaders($scope.currentDecisionTable);
             }
 
             $scope.close();
         };
-
-        function saveNewDefinedVariable() {
-            var newVariable = {
-                processVariableName: $scope.popup.selectedExpressionVariable.id,
-                processVariableType: $scope.model.selectedExpression.type
-            };
-
-            if ($scope.currentDecisionTable.executionVariables.indexOf(newVariable)) {
-                $scope.currentDecisionTable.executionVariables.push(newVariable);
-            }
-        }
 
         $scope.setExpressionVariableType = function (variableType) {
             $scope.popup.selectedExpressionVariable = null;
@@ -693,56 +909,157 @@ angular.module('activitiModeler')
         };
     }]);
 
-angular.module('activitiModeler')
-    .controller('DecisionTableConclusionEditorCtrl', ['$rootScope', '$scope', '$q', '$translate', function ($rootScope, $scope, $q, $translate) {
+angular.module('flowableModeler')
+    .controller('DecisionTableConclusionEditorCtrl', ['$rootScope', '$scope', '$q', '$translate', 'hotRegisterer', function ($rootScope, $scope, $q, $translate, hotRegisterer) {
 
-        // condition input options
-        $scope.popup = {
-            selectedExpressionVariableType: '',
-            selectedExpressionLabel: '',
-            selectedExpressionNewVariableType: $scope.availableVariableTypes[0]
+        var hotInstance;
+        var getEntriesValues = function (entriesArrayOfArrays) {
+            var newEntriesArray = [];
+            // remove last value
+            entriesArrayOfArrays.pop();
+
+            entriesArrayOfArrays.forEach(function (entriesArray) {
+                newEntriesArray.push(entriesArray[0]);
+            });
+
+            return newEntriesArray;
         };
 
-        $scope.popup.selectedExpressionNewVariableId = $scope.model.selectedExpression.variableId;
-        $scope.popup.selectedExpressionNewVariableType = $scope.model.selectedExpression.type;
+        var createEntriesValues = function (entriesArray) {
+            var localCopy = entriesArray.slice(0);
+            var entriesArrayOfArrays = [];
+            while (localCopy.length) {
+                entriesArrayOfArrays.push(localCopy.splice(0, 1));
+            }
+            
+            return entriesArrayOfArrays;
+        };
 
-        // make copy of variable id and type to see if full update is needed
-        var variableIdCopy = angular.copy($scope.model.selectedExpression.variableId);
-        var newVariableIdCopy = angular.copy($scope.model.selectedExpressionNewVariableId);
-        var newVariableTypeCopy = angular.copy($scope.model.selectedExpressionNewVariableType);
+        var deleteRowRenderer = function (instance, td, row) {
+            td.innerHTML = '';
+            td.className = 'remove_container';
+
+            if ((row + 1) != $scope.popup.selectedExpressionOutputValues.length) {
+                var div = document.createElement('div');
+                div.onclick = function () {
+                    return instance.alter("remove_row", row);
+                };
+                div.className = 'btn';
+                div.appendChild(document.createTextNode('x'));
+                td.appendChild(div);
+            }
+            return td;
+        };
+
+        $scope.doAfterRender = function () {
+            hotInstance = hotRegisterer.getInstance('decision-table-allowed-values');
+        };
+
+        if ($scope.model.newExpression === false) {
+            $scope.popup = {
+                selectedExpressionLabel: $scope.model.selectedExpression.label ? $scope.model.selectedExpression.label : '',
+                selectedExpressionNewVariableId: $scope.model.selectedExpression.variableId,
+                selectedExpressionNewVariableType: $scope.model.selectedExpression.type ? $scope.model.selectedExpression.type : $scope.model.availableVariableTypes[0],
+                selectedExpressionOutputValues: $scope.model.selectedExpression.entries && $scope.model.selectedExpression.entries.length > 0 ? createEntriesValues($scope.model.selectedExpression.entries) : [['']],
+                currentHitPolicy: $scope.model.hitPolicy,
+                columnDefs: [
+                    {
+                        width: '250'
+                    },
+                    {
+                        width: '40',
+                        readOnly: true,
+                        renderer: deleteRowRenderer
+                    }
+                ],
+                hotSettings: {
+                    currentColClassName: 'currentCol',
+                    stretchH: 'none'
+                },
+                complexExpression:  $scope.model.selectedExpression.complexExpression
+            };
+            
+        } else {
+            $scope.popup = {
+                selectedExpressionLabel: '',
+                selectedExpressionNewVariableId: '',
+                selectedExpressionNewVariableType: $scope.model.availableVariableTypes[0],
+                selectedExpressionOutputValues: [['']],
+                currentHitPolicy: $scope.model.hitPolicy,
+                columnDefs: [
+                    {
+                        width: '250'
+                    },
+                    {
+                        width: '40',
+                        readOnly: true,
+                        renderer: deleteRowRenderer
+                    }
+                ],
+                hotSettings: {
+                    stretchH: 'none'
+                },
+                complexExpression: false
+            };
+        }
 
         // Cancel button handler
-        $scope.cancel = function() {
+        $scope.cancel = function () {
             $scope.close();
         };
 
         // Saving the edited input
-        $scope.save = function() {
-            $scope.model.selectedExpression.variableId = $scope.popup.selectedExpressionNewVariableId;
-            $scope.model.selectedExpression.type = $scope.popup.selectedExpressionNewVariableType;
-            
-            $scope.model.selectedExpression.newVariable = $scope.popup.selectedExpressionNewVariable;
-            $scope.model.selectedExpression.label = $scope.popup.selectedExpressionLabel;
-
-            if (variableIdCopy !== $scope.model.selectedExpression.variableId || newVariableIdCopy !== $scope.model.selectedExpressionNewVariableId || newVariableTypeCopy !== $scope.model.selectedExpressionNewVariableType) {
-
-                // remove current column
-                var deletedColumnIndex = $scope.removeOutputExpression($scope.model.selectedColumn);
-
-                // add new conclusion
-                $scope.addOutputExpression(
-                    {
-                        label: $scope.model.selectedExpression.label,
-                        variableId: $scope.model.selectedExpression.variableId,
-                        type: $scope.model.selectedExpression.type,
-                        variableType: $scope.model.selectedExpression.variableType,
-                        newVariable: $scope.model.selectedExpression.newVariable
-                    },
-                    deletedColumnIndex
-                );
+        $scope.save = function () {
+            if ($scope.model.newExpression) {
+                var newOutputExpression = {
+                    variableId: $scope.popup.selectedExpressionNewVariableId,
+                    type: $scope.popup.selectedExpressionNewVariableType,
+                    label: $scope.popup.selectedExpressionLabel,
+                    entries: getEntriesValues(hotInstance.getData()),
+                    complexExpression: $scope.popup.complexExpression
+                };
+                $scope.addNewOutputExpression(newOutputExpression, $scope.model.selectedColumn + 1);
+                
             } else {
-                $scope.model.selectedColumn.displayName = $scope.model.selectedExpression.label;
+                $scope.model.selectedExpression.variableId = $scope.popup.selectedExpressionNewVariableId;
+                $scope.model.selectedExpression.type = $scope.popup.selectedExpressionNewVariableType;
+                $scope.model.selectedExpression.label = $scope.popup.selectedExpressionLabel;
+                $scope.model.selectedExpression.entries = getEntriesValues(hotInstance.getData());
+                $scope.model.selectedExpression.complexExpression = $scope.popup.complexExpression;
+                $scope.evaluateDecisionHeaders($scope.currentDecisionTable);
             }
+
+            $scope.close();
+        };
+
+        $scope.close = function () {
+
+            $scope.$hide();
+        };
+
+        $scope.dumpData = function () {
+            console.log(hotInstance.getData());
+        }
+
+    }]);
+
+angular.module('flowableModeler')
+    .controller('DecisionTableHitPolicyEditorCtrl', ['$rootScope', '$scope', '$q', '$translate', function ($rootScope, $scope, $q, $translate) {
+
+        $scope.popup = {
+            currentHitPolicy: $scope.model.hitPolicy,
+            availableHitPolicies: $scope.hitPolicies
+        };
+
+        // Cancel button handler
+        $scope.cancel = function () {
+            $scope.close();
+        };
+
+        // Saving the edited input
+        $scope.save = function () {
+            $scope.currentDecisionTable.hitIndicator = $scope.popup.currentHitPolicy;
+            $scope.evaluateDecisionHeaders($scope.currentDecisionTable);
 
             $scope.close();
         };

@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.flowable.idm.engine.impl.persistence.entity.GroupEntityImpl">
+
+  <!-- GROUP INSERT -->
+
+  <insert id="insertGroup" parameterType="org.flowable.idm.engine.impl.persistence.entity.GroupEntityImpl">
+    insert into ${prefix}ACT_ID_GROUP (ID_, REV_, NAME_, TYPE_)
+    values (
+      #{id ,jdbcType=VARCHAR},
+      1, 
+      #{name ,jdbcType=VARCHAR},
+      #{type ,jdbcType=VARCHAR}
+    )
+  </insert>
+
+  <insert id="bulkInsertGroup" parameterType="java.util.List">
+    insert into ${prefix}ACT_ID_GROUP (ID_, REV_, NAME_, TYPE_)
+    values 
+      <foreach collection="list" item="group" index="index" separator=",">
+        (#{group.id ,jdbcType=VARCHAR},
+         1,
+         #{group.name ,jdbcType=VARCHAR},
+         #{group.type ,jdbcType=VARCHAR})
+      </foreach>
+  </insert>
+
+  <insert id="bulkInsertGroup" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL 
+      <foreach collection="list" item="group" index="index">
+        INTO ${prefix}ACT_ID_GROUP (ID_, REV_, NAME_, TYPE_) VALUES 
+            (#{group.id ,jdbcType=VARCHAR},
+             1,
+             #{group.name ,jdbcType=VARCHAR},
+             #{group.type ,jdbcType=VARCHAR})
+      </foreach>
+    SELECT * FROM dual
+  </insert>
+
+  <!-- GROUP UPDATE -->
+  
+  <update id="updateGroup" parameterType="org.flowable.idm.engine.impl.persistence.entity.GroupEntityImpl">
+    update ${prefix}ACT_ID_GROUP set
+      REV_ = #{revisionNext ,jdbcType=INTEGER},
+      NAME_ = #{name ,jdbcType=VARCHAR},
+      TYPE_ = #{type ,jdbcType=VARCHAR}
+    where ID_ = #{id}
+       and REV_ = #{revision}
+  </update>
+  
+  <!-- GROUP DELETE -->
+
+  <delete id="deleteGroup" parameterType="org.flowable.idm.engine.impl.persistence.entity.GroupEntityImpl">
+    delete from ${prefix}ACT_ID_GROUP where ID_ = #{id} and REV_ = #{revision} 
+  </delete>
+
+  <!-- GROUP RESULTMAP -->
+
+  <resultMap id="groupResultMap" type="org.flowable.idm.engine.impl.persistence.entity.GroupEntityImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
+    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="type" column="TYPE_" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <!-- GROUP SELECT -->
+
+  <select id="selectGroup" parameterType="string" resultMap="groupResultMap">
+    select * from ${prefix}ACT_ID_GROUP where ID_ = #{id, jdbcType=VARCHAR}
+  </select>
+    
+  <select id="selectGroupsByUserId" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="groupResultMap">
+    select g.*
+    from ${prefix}ACT_ID_GROUP g, ${prefix}ACT_ID_MEMBERSHIP membership
+    where g.ID_ = membership.GROUP_ID_
+      and membership.USER_ID_ = #{parameter}
+  </select>
+
+  <select id="selectGroupsByUserIdAndGroupType" parameterType="org.flowable.engine.common.impl.db.ListQueryParameterObject" resultMap="groupResultMap">
+    select g.*
+    from ${prefix}ACT_ID_GROUP g, ${prefix}ACT_ID_MEMBERSHIP membership
+    where g.ID_ = membership.GROUP_ID_
+      and membership.USER_ID_ = #{parameter.userId}
+      <if test="groupType != null">
+         and g.TYPE_ = #{parameter.groupType}
+      </if>
+  </select>
+  
+  <select id="selectGroupByQueryCriteria" parameterType="org.flowable.idm.engine.impl.GroupQueryImpl" resultMap="groupResultMap">
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <include refid="selectGroupByQueryCriteriaSql" />
+    ${orderBy}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+  </select>
+  
+   <select id="selectGroupCountByQueryCriteria" parameterType="org.flowable.idm.engine.impl.GroupQueryImpl" resultType="long">
+    select count(RES.ID_)
+    <include refid="selectGroupByQueryCriteriaSql" />
+  </select>
+  
+  <sql id="selectGroupByQueryCriteriaSql">
+    from ${prefix}ACT_ID_GROUP RES
+    <if test="userId != null">
+      inner join ${prefix}ACT_ID_MEMBERSHIP M on RES.ID_ = M.GROUP_ID_
+      inner join ${prefix}ACT_ID_USER U on M.USER_ID_ = U.ID_
+    </if>
+    <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+      <if test="ids != null &amp;&amp; ids.size() &gt; 0">
+        and RES.ID_ IN
+        <foreach item="id" index="index" collection="ids" 
+                 open="(" separator="," close=")">
+          #{id}
+        </foreach>
+      </if>
+      <if test="name != null">
+        and RES.NAME_ = #{name}
+      </if>
+      <if test="nameLike != null">
+        and RES.NAME_ like #{nameLike}${wildcardEscapeClause}
+      </if>
+      <if test="nameLikeIgnoreCase != null">
+        and lower(RES.NAME_) like #{nameLikeIgnoreCase}${wildcardEscapeClause}
+      </if>
+      <if test="type != null">
+        and RES.TYPE_ = #{type}
+      </if>
+      <if test="userId != null">
+        and U.ID_ = #{userId}
+      </if>
+      <if test="userIds != null &amp;&amp; userIds.size() &gt; 0">
+        and RES.ID_ IN
+        <foreach item="userId" index="index" collection="userIds" 
+                 open="(" separator="," close=")">
+          #{userId}
+        </foreach>
+      </if>
+    </where>
+  </sql>
+
+  <select id="selectGroupByNativeQuery" parameterType="java.util.Map" resultMap="groupResultMap">
+    <include refid="org.flowable.idm.engine.db.common.selectByNativeQuery"/>
+  </select>
+
+  <select id="selectGroupCountByNativeQuery" parameterType="java.util.Map" resultType="long">
+    ${sql}
+  </select>
+  
+  <select id="selectGroupsWithPrivilegeId" parameterType="string" resultMap="groupResultMap">
+    select RES.* from ${prefix}ACT_ID_GROUP RES
+    inner join ${prefix}ACT_ID_PRIV_MAPPING MAPPING on MAPPING.GROUP_ID_ = RES.ID_
+    inner join ${prefix}ACT_ID_PRIV PRIV on PRIV.ID_ = MAPPING.PRIV_ID_
+    where PRIV.ID_ = #{parameter}
+    order by RES.NAME_
+  </select>
+  
+</mapper>

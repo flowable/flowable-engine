@@ -1,9 +1,9 @@
 #!/bin/sh
 echo "Dropping DB schema"
-mysql -u alfresco -palfresco -e "DROP SCHEMA activiticompatibility"
+mysql -u flowable -pflowable -e "DROP SCHEMA flowablecompatibility"
 
 echo "Creating DB schema"
-mysql -u alfresco -palfresco -e "CREATE SCHEMA activiticompatibility DEFAULT CHARACTER SET utf8 COLLATE utf8_bin"
+mysql -u flowable -pflowable -e "CREATE SCHEMA flowablecompatibility DEFAULT CHARACTER SET utf8 COLLATE utf8_bin"
 
 echo "Building dependencies" 
 cd ..

@@ -51,23 +51,23 @@
                 <div>
                     <div class="help-text wide">
                         <div class="description">
-                            {{'PROCESS-LIST.FILTER.MY-PROCESSES-EMPTY' | translate}}
+                            {{'PROCESS-LIST.FILTER.PROCESSES-EMPTY' | translate}}
                         </div>
                         <div class="help-entry" ng-click="createProcess()">
                             <span class="glyphicon glyphicon-plus-sign"></span>
-                            <span translate="PROCESS-LIST.FILTER.MY-PROCESSES-BPMN-HINT"></span>
+                            <span translate="PROCESS-LIST.FILTER.PROCESSES-BPMN-HINT"></span>
                             <br>
                         </div>
 						<div class="help-entry" ng-click="importProcess()">
                             <span class="glyphicon glyphicon-plus-sign"></span>
-                            <span translate="PROCESS-LIST.FILTER.MY-PROCESSES-BPMN-IMPORT-HINT"></span>
+                            <span translate="PROCESS-LIST.FILTER.PROCESSES-BPMN-IMPORT-HINT"></span>
                             <br>
                         </div>
                     </div>
                 </div>
             </div>
 			<div class="item fadein" ng-repeat="process in model.processes.data track by $index">
-				<div class="item-box" ng-style="{'background-image': 'url(\'' + config.contextRoot + '/app/rest/models/' + process.id + '/thumbnail?version=' + imageVersion + '\')'}" ng-click="showProcessDetails(process);">
+				<div class="item-box" ng-style="{'background-image': 'url(\'' + getModelThumbnailUrl(process.id, imageVersion) + '\')'}" ng-click="showProcessDetails(process);">
 					<div class="actions">
 						<span class="badge">v{{process.version}}</span>
 						<div class="btn-group pull-right">
@@ -84,7 +84,7 @@
 							{{process.name}}
 						</h3>
 						<div class="basic-details truncate">
-							<span><i class="glyphicon glyphicon-user"></i> {{process.createdByFullName}}</span> <span title="{{process.lastUpdated | dateformat:'LLLL'}}"><i class="glyphicon glyphicon-pencil"></i> {{process.lastUpdated | dateformat}}</span>
+							<span><i class="glyphicon glyphicon-user"></i> {{process.createdBy}}</span> <span title="{{process.lastUpdated | dateformat:'LLLL'}}"><i class="glyphicon glyphicon-pencil"></i> {{process.lastUpdated | dateformat}}</span>
 						</div>
 						<p>{{process.description}}</p>
 					</div>

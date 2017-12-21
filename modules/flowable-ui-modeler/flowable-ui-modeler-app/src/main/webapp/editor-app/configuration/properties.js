@@ -12,8 +12,8 @@
  */
 'use strict';
 
-var KISBPM = KISBPM || {};
-KISBPM.PROPERTY_CONFIG =
+var FLOWABLE = FLOWABLE || {};
+FLOWABLE.PROPERTY_CONFIG =
 {
     "string": {
         "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
@@ -26,9 +26,17 @@ KISBPM.PROPERTY_CONFIG =
         "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/text-property-write-template.html"
     },
-    "kisbpm-multiinstance" : {
+    "flowable-multiinstance" : {
         "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/multiinstance-property-write-template.html"
+    },
+    "flowable-ordering" : {
+        "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/ordering-property-write-template.html"
+    },
+    "oryx-dataproperties-complex": {
+        "readModeTemplateUrl": "editor-app/configuration/properties/data-properties-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/data-properties-write-template.html"
     },
     "oryx-formproperties-complex": {
         "readModeTemplateUrl": "editor-app/configuration/properties/form-properties-display-template.html",
@@ -101,5 +109,21 @@ KISBPM.PROPERTY_CONFIG =
     "oryx-decisiontaskdecisiontablereference-complex": {
         "readModeTemplateUrl": "editor-app/configuration/properties/decisiontable-reference-display-template.html",
         "writeModeTemplateUrl": "editor-app/configuration/properties/decisiontable-reference-write-template.html"
+    },
+    "oryx-casetaskcasereference-complex": {
+        "readModeTemplateUrl": "editor-app/configuration/properties/case-reference-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/case-reference-write-template.html"
+    },
+    "oryx-processtaskprocessreference-complex": {
+        "readModeTemplateUrl": "editor-app/configuration/properties/process-reference-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/process-reference-write-template.html"
+    },
+    "flowable-transitionevent" : {
+        "readModeTemplateUrl": "editor-app/configuration/properties/default-value-display-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/transition-event-write-template.html"
+    },
+    "flowable-planitem-dropdown" : {
+        "readModeTemplateUrl": "editor-app/configuration/properties/planitem-dropdown-read-template.html",
+        "writeModeTemplateUrl": "editor-app/configuration/properties/planitem-dropdown-write-template.html"
     }
 };

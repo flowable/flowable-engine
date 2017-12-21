@@ -1,26 +1,29 @@
-
 <div class="login-container">
+    <div class="text-center" style="padding:50px 0">
+        <div class="logo">
+            <img src="images/logo-login.png" srcset="images/logo-login.png 1x, images/logo-login@2x.png 2x">
+        </div>
+        <div class="login-form-1">
+            <form id="login-form" class="text-left">
+                <div class="login-form-main-message"></div>
+                <div class="main-login-form">
+                    <div class="login-group">
+                        <div class="form-group">
+                            <input type="text" class="form-control" id="username" placeholder="{{'LOGIN.USERNAME-PLACEHOLDER' | translate}}" ng-model="username" auto-focus>
+                        </div>
+                        <div class="form-group">
+                            <input type="password" class="form-control" id="password" placeholder="{{'LOGIN.PASSWORD-PLACEHOLDER' | translate}}" ng-model="password" >
+                        </div>
+                    </div>
+                    <button type="submit" class="login-button"  ng-click="login()" ng-disabled="model.loading">
+                        <i class="glyphicon glyphicon-chevron-right"></i>
+                    </button>
+                </div>
 
-    <div class="login-left-column"></div>
-
-    <div class="login-right-column">
-
-        <form class="form clearfix login-form" role="form">
-
-            <div class="form-group">
-                <input type="text" class="form-control" id="username" placeholder="{{'LOGIN.USERNAME-PLACEHOLDER' | translate}}" ng-model="username">
-            </div>
-            <div class="form-group">
-                <input type="password" class="form-control" id="password" placeholder="{{'LOGIN.PASSWORD-PLACEHOLDER' | translate}}" ng-model="password" >
-            </div>
-            <div class="btn-group pull-right">
-                <button id="login" type="submit" class="btn btn-default" ng-click="login()" ng-disabled="model.loading">
-                    {{'LOGIN.ACTION.CONFIRM' | translate}}
-                </button>
-            </div>
-            <p ng-if="invalidCredentials" class="login-error" translate="LOGIN.INVALID-CREDENTIALS"></p>
-        </form>
-
+                <div ng-if="invalidCredentials" class="login-error">
+                    <p translate="LOGIN.INVALID-CREDENTIALS"></p>
+                </div>
+            </form>
+        </div>
     </div>
-
 </div>

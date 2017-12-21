@@ -15,7 +15,7 @@
  * Form Properties
  */
 
-angular.module('activitiModeler').controller('KisBpmFormPropertiesCtrl',
+angular.module('flowableModeler').controller('FlowableFormPropertiesCtrl',
     ['$scope', '$modal', '$timeout', '$translate', function ($scope, $modal, $timeout, $translate) {
 
         // Config for the modal window
@@ -28,7 +28,7 @@ angular.module('activitiModeler').controller('KisBpmFormPropertiesCtrl',
         _internalCreateModal(opts, $modal, $scope);
     }]);
 
-angular.module('activitiModeler').controller('KisBpmFormPropertiesPopupCtrl',
+angular.module('flowableModeler').controller('FlowableFormPropertiesPopupCtrl',
     ['$scope', '$q', '$translate', '$timeout', function ($scope, $q, $translate, $timeout) {
 
         // Put json representing form properties on scope
@@ -56,8 +56,7 @@ angular.module('activitiModeler').controller('KisBpmFormPropertiesPopupCtrl',
             $scope.formProperties = [];
         }
         
-        $scope.selectedProperties = [];
-    	$scope.selectedEnumValues = [];
+        $scope.enumValues = [];
 
         $scope.translationsRetrieved = false;
 
@@ -90,22 +89,39 @@ angular.module('activitiModeler').controller('KisBpmFormPropertiesPopupCtrl',
             };
             
             $scope.enumGridOptions = {
-    		    data: 'selectedProperties[0].enumValues',
-                enableRowReordering: true,
+    		    data: $scope.enumValues,
                 headerRowHeight: 28,
+                enableRowSelection: true,
+                enableRowHeaderSelection: false,
                 multiSelect: false,
-                keepLastSelected : false,
-                selectedItems: $scope.selectedEnumValues,
+                modifierKeysToMultiSelect: false,
+                enableHorizontalScrollbar: 0,
+                enableColumnMenus: false,
+                enableSorting: false,
                 columnDefs: [{ field: 'id', displayName: $scope.labels.idLabel },
                 { field: 'name', displayName: $scope.labels.nameLabel}]
-           }
-
+            }
 
             $scope.gridOptions.onRegisterApi = function (gridApi) {
                 //set gridApi on scope
                 $scope.gridApi = gridApi;
                 gridApi.selection.on.rowSelectionChanged($scope, function (row) {
                     $scope.selectedProperty = row.entity;
+                    $scope.selectedEnumValue = undefined;
+                    if ($scope.selectedProperty && $scope.selectedProperty.enumValues) {
+                        $scope.enumValues.length = 0;
+                        for (var i = 0; i < $scope.selectedProperty.enumValues.length; i++) {
+                            $scope.enumValues.push($scope.selectedProperty.enumValues[i]);
+                        }
+                    }
+                });
+            };
+            
+            $scope.enumGridOptions.onRegisterApi = function (gridApi) {
+                //set gridApi on scope
+                $scope.enumGridApi = gridApi;
+                gridApi.selection.on.rowSelectionChanged($scope, function (row) {
+                    $scope.selectedEnumValue = row.entity;
                 });
             };
         });
@@ -122,9 +138,15 @@ angular.module('activitiModeler').controller('KisBpmFormPropertiesPopupCtrl',
 
             // Check enum. If enum, show list of options
             if ($scope.selectedProperty.type === 'enum') {
-                $scope.selectedProperties[0].enumValues = [ {id: 'value1', name: 'Value 1'}, {id: 'value2', name: 'Value 2'}];
+                $scope.selectedProperty.enumValues = [ {id: 'value1', name: 'Value 1'}, {id: 'value2', name: 'Value 2'}];
+                $scope.enumValues.length = 0;
+                for (var i = 0; i < $scope.selectedProperty.enumValues.length; i++) {
+                    $scope.enumValues.push($scope.selectedProperty.enumValues[i]);
+                }
+                
             } else {
                 delete $scope.selectedProperty.enumValues;
+                $scope.enumValues.length = 0;
             }
         };
 
@@ -138,10 +160,6 @@ angular.module('activitiModeler').controller('KisBpmFormPropertiesPopupCtrl',
                 readable: true,
                 writable: true
             };
-            
-            $timeout(function(){
-				$scope.gridOptions.selectItem($scope.formProperties.length - 1, true);
-			});
 
             $scope.formProperties.push(newProperty);
 
@@ -207,67 +225,78 @@ angular.module('activitiModeler').controller('KisBpmFormPropertiesPopupCtrl',
         };
         
         $scope.addNewEnumValue = function() {
-    	if ($scope.selectedProperties.length > 0) {
-	        $scope.selectedProperties[0].enumValues.push({ id : '', name : ''});
-    	}
-    	
-    	$timeout(function(){
-        	$scope.enumGridOptions.selectItem($scope.selectedProperties[0].enumValues.length - 1, true);
-        });
-    };
-
-    // Click handler for remove button
-    $scope.removeEnumValue = function() {
-    	if ($scope.selectedProperties.length > 0 && $scope.selectedEnumValues.length > 0) {
-            var index = $scope.selectedProperties[0].enumValues.indexOf($scope.selectedEnumValues[0]);
-            $scope.enumGridOptions.selectItem(index, false);
-            $scope.selectedProperties[0].enumValues.splice(index, 1);
-
-            $scope.selectedEnumValues.length = 0;
-            if (index < $scope.selectedProperties[0].enumValues.length) {
-            	$timeout(function(){
-            		$scope.enumGridOptions.selectItem(index + 1, true);
-            	});
-            	
-            } else if ($scope.selectedProperties[0].enumValues.length > 0) {
-            	$timeout(function(){
-            		$scope.enumGridOptions.selectItem(index - 1, true);
-            	});
-            }
-        }
-    };
-
-    // Click handler for up button
-    $scope.moveEnumValueUp = function() {
-    	if ($scope.selectedProperties.length > 0 && $scope.selectedEnumValues.length > 0) {
-    		var index = $scope.selectedProperties[0].enumValues.indexOf($scope.selectedEnumValues[0]);
-            if (index != 0) { // If it's the first, no moving up of course
-                // Reason for funny way of swapping, see https://github.com/angular-ui/ng-grid/issues/272
-                var temp = $scope.selectedProperties[0].enumValues[index];
-                $scope.selectedProperties[0].enumValues.splice(index, 1);
-                $timeout(function(){
-                    $scope.selectedProperties[0].enumValues.splice(index + -1, 0, temp);
+            if ($scope.selectedProperty) {
+        	    var newEnumValue = { id : '', name : ''};
+        	    $scope.selectedProperty.enumValues.push(newEnumValue);
+        	    $scope.enumValues.push(newEnumValue);
+    	       
+    	        $timeout(function () {
+                    $scope.enumGridApi.selection.toggleRowSelection(newEnumValue);
                 });
+        	}
+        };
 
-            }
-        }
-    };
+        // Click handler for remove button
+        $scope.removeEnumValue = function() {
+            var selectedItems = $scope.enumGridApi.selection.getSelectedRows();
+            if (selectedItems && selectedItems.length > 0) {
+                var index = $scope.enumValues.indexOf(selectedItems[0]);
+                $scope.enumGridApi.selection.toggleRowSelection(selectedItems[0]);
 
-    // Click handler for down button
-    $scope.moveEnumValueDown = function() {
-    	if ($scope.selectedProperties.length > 0 && $scope.selectedEnumValues.length > 0) {
-    		var index = $scope.selectedProperties[0].enumValues.indexOf($scope.selectedEnumValues[0]);
-            if (index != $scope.selectedProperties[0].enumValues.length - 1) { // If it's the last element, no moving down of course
-                // Reason for funny way of swapping, see https://github.com/angular-ui/ng-grid/issues/272
-                var temp = $scope.selectedProperties[0].enumValues[index];
-                $scope.selectedProperties[0].enumValues.splice(index, 1);
-                $timeout(function(){
-                    $scope.selectedProperties[0].enumValues.splice(index + 1, 0, temp);
+                $scope.enumValues.splice(index, 1);
+                $scope.selectedProperty.enumValues.splice(index, 1);
+
+                if ($scope.enumValues.length == 0) {
+                    $scope.selectedEnumValue = undefined;
+                }
+
+                $timeout(function () {
+                    if ($scope.enumValues.length > 0) {
+                        $scope.enumGridApi.selection.toggleRowSelection($scope.enumValues[0]);
+                    }
                 });
-
             }
-        }
-    };
+        };
+    
+        // Click handler for up button
+        $scope.moveEnumValueUp = function() {
+            var selectedItems = $scope.enumGridApi.selection.getSelectedRows();
+            if (selectedItems && selectedItems.length > 0) {
+                var index = $scope.enumValues.indexOf(selectedItems[0]);
+                if (index != 0) { // If it's the first, no moving up of course
+                    var temp = $scope.enumValues[index];
+                    $scope.enumValues.splice(index, 1);
+                    $scope.selectedProperty.enumValues.splice(index, 1);
+                    $timeout(function () {
+                        $scope.enumValues.splice(index + -1, 0, temp);
+                        $scope.selectedProperty.enumValues.splice(index + -1, 0, temp);
+                        $timeout(function () {
+                            $scope.enumGridApi.selection.toggleRowSelection(temp);
+                        });
+                    });
+                }
+            }
+        };
+    
+        // Click handler for down button
+        $scope.moveEnumValueDown = function() {
+            var selectedItems = $scope.enumGridApi.selection.getSelectedRows();
+            if (selectedItems && selectedItems.length > 0) {
+                var index = $scope.enumValues.indexOf(selectedItems[0]);
+                if (index != $scope.enumValues.length - 1) { // If it's the last element, no moving down of course
+                    var temp = $scope.enumValues[index];
+                    $scope.enumValues.splice(index, 1);
+                    $scope.selectedProperty.enumValues.splice(index, 1);
+                    $timeout(function () {
+                        $scope.enumValues.splice(index + 1, 0, temp);
+                        $scope.selectedProperty.enumValues.splice(index + 1, 0, temp);
+                        $timeout(function () {
+                            $scope.enumGridApi.selection.toggleRowSelection(temp);
+                        });
+                    });
+                }
+            }
+        };
 
         // Click handler for save button
         $scope.save = function () {

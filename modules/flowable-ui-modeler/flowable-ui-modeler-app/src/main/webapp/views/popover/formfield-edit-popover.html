@@ -40,18 +40,28 @@
                         <input type="text" class="form-control" ng-model="formElement.id" ng-disabled="!formElement.overrideId" editor-input-check>
                     </div>
 
-                    <div ng-show="formElement.type !== 'expression'">
-                        <div class="form-group">
-                            <div class="checkbox">
-                                <label>
-                                    <input type="checkbox" ng-model="formElement.required">
-                                    {{'FORM-BUILDER.COMPONENT.REQUIRED' | translate}}
-                                </label>
+                    <div ng-show="formElement.type !== 'expression' && formElement.type !== 'hyperlink'">
+                        <div class="row">
+                           <div class="form-group col-md-2">
+                               <div class="checkbox">
+                                   <label>
+                                       <input type="checkbox" ng-model="formElement.required">
+                                       {{'FORM-BUILDER.COMPONENT.REQUIRED' | translate}}
+                                   </label>
+                               </div>
                             </div>
+                            <div class="form-group col-md-10">
+                               <div class="checkbox">
+                                   <label>
+                                       <input type="checkbox" ng-model="formElement.readOnly">
+                                       {{'FORM-BUILDER.COMPONENT.READONLY' | translate}}
+                                   </label>
+                               </div>                               
+                           </div>
                         </div>
                     </div>
 
-                    <div ng-show="formElement.type === 'functional-group' || formElement.type === 'people' || formElement.type === 'dropdown' || formElement.type === 'date' || formElement.type === 'text' || formElement.type === 'multi-line-text' || formElement.type === 'integer'">
+                    <div ng-show="formElement.type === 'functional-group' || formElement.type === 'people' || formElement.type === 'dropdown' || formElement.type === 'date' || formElement.type === 'text' || formElement.type === 'multi-line-text' || formElement.type === 'integer' || formElement.type === 'decimal'">
                         <label translate="FORM-BUILDER.COMPONENT.PLACEHOLDER"></label>
                         <input type="text" class="form-control" ng-model="formElement.placeholder">
                     </div>
@@ -98,11 +108,68 @@
                     </div>
                 </div>
 
+                <div ng-if="activeTab.id == 'advanced' && (formElement.type === 'text' || formElement.type === 'multi-line-text' || formElement.type === 'decimal' || formElement.type === 'integer')">
+		     <div class="form-group">
+			  <label translate="FORM-BUILDER.COMPONENT.MIN-LENGTH"></label> <input
+				 type="text" number-input-check maxlength="5" class="form-control"
+				 ng-model="formElement.params.minLength">
+		     </div>
+		     <div class="form-group">
+			  <label translate="FORM-BUILDER.COMPONENT.MAX-LENGTH"></label> <input
+			         type="text" number-input-check maxlength="5" class="form-control"
+			         ng-model="formElement.params.maxLength">
+                     </div>
+		     <div class="form-group">
+			  <label translate="FORM-BUILDER.COMPONENT.REGEX-PATTERN"></label>
+				<div class="input-group">
+			            <span class="input-group-addon">/^</span> <input type="text" class="form-control" ng-model="formElement.params.regexPattern">
+				    <span class="input-group-addon">$/</span>
+				</div>
+		    </div>
+                    <div class="row">
+			<div class="col-md-4">
+			    <div class="form-group">
+			        <label translate="FORM-BUILDER.COMPONENT.MASK.TITLE"></label>
+			        <input type="text" class="form-control" ng-model="formElement.params.mask">
+			    </div>
+			</div>
+			<div class="col-md-4">
+			    <div class="form-group">
+			        <label translate>FORM-BUILDER.COMPONENT.MASK.EXAMPLES.TITLE</label>
+				<ul>
+			   	    <li><span translate>FORM-BUILDER.COMPONENT.MASK.EXAMPLES.NUMBER</span>: <b>9</b></li>
+				    <li><span translate>FORM-BUILDER.COMPONENT.MASK.EXAMPLES.LETTER</span>: <b>A</b></li>
+				    <li><span translate>FORM-BUILDER.COMPONENT.MASK.EXAMPLES.NUMBERORLETTER</span>: <b>*</b></li>
+				    <li><span translate>FORM-BUILDER.COMPONENT.MASK.EXAMPLES.OPTIONAL</span>: <b>?</b></li>
+				    <li><span translate>FORM-BUILDER.COMPONENT.MASK.EXAMPLES.PHONE</span>: <b>(99) 9999-9999</b></li>
+				</ul>
+			   </div>
+			</div>
+		    </div>
+		</div>
+                
+		<div ng-if="activeTab.id == 'advanced' && formElement.type === 'hyperlink'">
+		    <div class="form-group">
+			<label translate="FORM-BUILDER.COMPONENT.HYPERLINK-URL"></label> <input
+			type="text" class="form-control" ng-model="formElement.params.hyperlinkUrl">
+		    </div>
+		</div>	    
+		    
                 <div ng-if="activeTab.id == 'general' && formElement.type === 'expression'">
                     <div class="form-group">
                         <label translate="FORM-BUILDER.COMPONENT.EXPRESSION"></label>
                         <textarea rows="3" ng-model="formElement.expression" class="form-control" id="readonly-text-value"></textarea>
                         <div class="subtle" translate="FORM-BUILDER.MESSAGE.EXPRESSION-HELP" style="padding: 5px 0 5px 1px;"></div>
+                    </div>
+                    <div class="form-group">
+                    	<label translate="FORM-BUILDER.COMPONENT.SIZE"></label>
+                    	<select class="form-control" ng-model="formElement.params.size">
+                        	<option>1</option>
+                        	<option>2</option>
+                        	<option>3</option>
+                        	<option>4</option>
+                        	<option>5</option>
+                        </select>
                     </div>
                 </div>
             </div>

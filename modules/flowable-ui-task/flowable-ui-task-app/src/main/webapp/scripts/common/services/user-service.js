@@ -13,7 +13,7 @@
 'use strict';
 
 // User service
-activitiModule.service('UserService', ['$http', '$q',
+flowableModule.service('UserService', ['$http', '$q',
     function ($http, $q) {
 
         var httpAsPromise = function(options) {
@@ -26,6 +26,45 @@ activitiModule.service('UserService', ['$http', '$q',
                     deferred.reject(response);
                 });
             return deferred.promise;
+        };
+        
+        var userInfoHttpAsPromise = function(options, index) {
+            var deferred = $q.defer();
+            $http(options).
+                success(function (response, status, headers, config) {
+                    var userInfoFormObject = {
+                        userData: response,
+                        index: index
+                    };
+                    deferred.resolve(userInfoFormObject);
+                })
+                .error(function (response, status, headers, config) {
+                    deferred.reject(response);
+                });
+                
+            return deferred.promise;
+        };
+        
+        /*
+         * Get user info by id
+         */
+        this.getUserInfo = function (userId) {
+            
+            return httpAsPromise({
+                method: 'GET',
+                url: FLOWABLE.CONFIG.contextRoot + '/app/rest/users/' + userId
+            });
+        };
+        
+        /*
+         * Get user info by id
+         */
+        this.getUserInfoForForm = function (userId, index) {
+        
+            return userInfoHttpAsPromise({
+                method: 'GET',
+                url: FLOWABLE.CONFIG.contextRoot + '/app/rest/users/' + userId
+            }, index);
         };
 
         /*
@@ -82,24 +121,6 @@ activitiModule.service('UserService', ['$http', '$q',
                     params: params
                 }
             )
-        };
-
-        /*
-         * Get all recent users
-         */
-        this.getRecentUsers = function (username, taskId) {
-            var params = {};
-            if(taskId) {
-                params.excludeTaskId = taskId;
-            }
-
-            return httpAsPromise(
-                {
-                    method: 'GET',
-                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/workflow-users/' + username + '/recent-users',
-                    params: params
-                }
-            );
         };
 
     }]);

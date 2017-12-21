@@ -80,12 +80,6 @@ angular.module('dndLists', [])
       element.on('dragstart', function(event) {
         event = event.originalEvent || event;
 
-        // <FLOWABLE>
-        // Prototype (used by the oryx editor) adds a toJSON method to the form fields
-        // which corrupts the serialization, therefor remove it before drag value is stored.
-        delete Array.prototype.toJSON;
-        // </FLOWABLE>
-
         // Serialize the data associated with this element. IE only supports the Text drag type
         event.dataTransfer.setData("Text", angular.toJson(scope.$eval(attr.dndDraggable)));
 
@@ -105,7 +99,7 @@ angular.module('dndLists', [])
         // and since this class is used to hide elements it seems like the element is gone,
         // therefor make sure the dragging still is happening when adding this class
         $timeout(function() {
-          // Activiti This code
+          // Flowable This code
           if (dndDragTypeWorkaround.isDragging) {
             element.addClass("dndDraggingSource");
           }
@@ -404,7 +398,7 @@ angular.module('dndLists', [])
       }
 
         /**
-         * Activiti-patched version of isMouseInFirstHalf that uses page and bounding client rect
+         * Flowable-patched version of isMouseInFirstHalf that uses page and bounding client rect
          * instead of the offsetX and layerX properties to determine which half of target the mouse pointer is hovering
          * this is more natural since th method now actually works like above, but it also adds some mild
          * flickering when sorting inside the list, why its still not in use.

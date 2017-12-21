@@ -15,7 +15,7 @@
  * Condition expression
  */
 
-angular.module('activitiModeler').controller('KisBpmConditionExpressionCtrl', [ '$scope', '$modal', function($scope, $modal) {
+angular.module('flowableModeler').controller('FlowableConditionExpressionCtrl', [ '$scope', '$modal', function($scope, $modal) {
 
     // Config for the modal window
     var opts = {
@@ -27,7 +27,7 @@ angular.module('activitiModeler').controller('KisBpmConditionExpressionCtrl', [ 
     _internalCreateModal(opts, $modal, $scope);
 }]);
 
-angular.module('activitiModeler').controller('KisBpmConditionExpressionPopupCtrl',
+angular.module('flowableModeler').controller('FlowableConditionExpressionPopupCtrl',
     [ '$rootScope', '$scope', '$translate', 'FormBuilderService', function($rootScope, $scope, $translate, FormBuilderService) {
     	
     // Put json representing assignment on scope

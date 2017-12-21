@@ -12,7 +12,7 @@
  */
 'use strict';
 
-var activitiApp = angular.module('activitiLanding', [
+var flowableApp = angular.module('flowableLanding', [
   'ngCookies',
   'ngResource',
   'ngSanitize',
@@ -22,8 +22,8 @@ var activitiApp = angular.module('activitiLanding', [
   'pascalprecht.translate'
 ]);
 
-var activitiModule = activitiApp;
-activitiApp
+var flowableModule = flowableApp;
+flowableApp
   // Initialize routes
   .config(['$provide', '$routeProvider', '$selectProvider', '$datepickerProvider', '$translateProvider', function ($provide, $routeProvider, $selectProvider, $datepickerProvider, $translateProvider) {
 
@@ -53,23 +53,28 @@ activitiApp
         .otherwise({
             redirectTo: FLOWABLE.CONFIG.appDefaultRoute || '/'
         });
-    
+
         // Initialize angular-translate
         $translateProvider.useStaticFilesLoader({
-            prefix: './i18n/',
-            suffix: '.json'
+          prefix: './i18n/',
+          suffix: '.json'
         })
-
-        .registerAvailableLanguageKeys(['en'], {
-            'en_*': 'en',
-            'en-*': 'en'
-        });
-
-
+        /*
+        This can be used to map multiple browser language keys to a
+        angular translate language key.
+        */
+        // .registerAvailableLanguageKeys(['en'], {
+        //     'en-*': 'en'
+        // })
+        .useSanitizeValueStrategy('escapeParameters')
+        .uniformLanguageTag('bcp47')
+        .determinePreferredLanguage();
     }])
     .run(['$rootScope', '$timeout', '$translate', '$location', '$http', '$window', '$popover', 'appResourceRoot', 'RuntimeAppDefinitionService',
         function($rootScope, $timeout, $translate, $location, $http, $window, $popover, appResourceRoot, RuntimeAppDefinitionService) {
 
+        // set angular translate fallback language
+        $translate.fallbackLanguage(['en']);
 
         $rootScope.appResourceRoot = appResourceRoot;
 
@@ -131,11 +136,29 @@ activitiApp
                 });
             }
         };
+
+        $rootScope.logout = function () {
+            $rootScope.authenticated = false;
+            $rootScope.authenticationError = false;
+            $http.get(FLOWABLE.CONFIG.contextRoot + '/app/logout')
+                .success(function (data, status, headers, config) {
+                    $rootScope.login = null;
+                    $rootScope.authenticated = false;
+                    $window.location.href = '/';
+                    $window.location.reload();
+                });
+        };
+
+        $http.get(FLOWABLE.CONFIG.contextRoot + '/app/rest/account')
+        	.success(function (data, status, headers, config) {
+              	$rootScope.account = data;
+               	$rootScope.invalidCredentials = false;
+ 				$rootScope.authenticated = true;
+          	});
+
      }])
      .run(['$rootScope', '$location', '$window', '$translate', '$modal',
         function($rootScope, $location, $window, $translate, $modal) {
-         
-        $translate.use('en');
          
         /* Auto-height */
 

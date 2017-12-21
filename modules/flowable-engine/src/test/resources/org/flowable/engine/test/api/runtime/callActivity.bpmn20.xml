@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="org.flowable.engine.test.api.runtime.Category">
+
+  <process id="callActivity" name="callActivity">
+	<documentation>oneTaskProcessDescription</documentation>
+
+    <dataObject itemSubjectRef="xsd:string" name="var1" id="var1">
+      <extensionElements>
+        <activiti:value>var1 value</activiti:value>
+      </extensionElements>
+    </dataObject>    
+
+    <startEvent id="theStart" />
+    
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="callSubProcess" />
+    
+    <callActivity id="callSubProcess" calledElement="calledActivity">
+      <extensionElements>
+        <activiti:in source="var1" target="var3" />
+      </extensionElements>
+    </callActivity>
+      
+    <sequenceFlow id="flow2" sourceRef="callSubProcess" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

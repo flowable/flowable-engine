@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" 
+    xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" 
+    xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI"
+    xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+    targetNamespace="http://flowable.org/cmmn">
+
+    <case id="myCase">
+        <casePlanModel id="myPlanModel" name="My CasePlanModel">
+
+            <planItem id="planItem1" name="Task A" definitionRef="rootTask" />
+            <planItem id="planItem2" name="Stage A1" definitionRef="stage1" />
+            <planItem id="planItem3" name="Stage A2" definitionRef="stage2" />
+            <planItem id="planItem4" name="Stage A3" definitionRef="stage3" />
+            
+            <task id="rootTask" name="The Task" isBlocking="false" />
+
+            <stage id="stage1">
+
+                <planItem id="planItem1_1" name="Task B" definitionRef="rootTask" />
+                <planItem id="planItem1_2" name="Task C" definitionRef="nestedTask" />
+                <planItem id="planItem1_3" name="Stage B" definitionRef="stage1_1" />
+
+                <task id="nestedTask" name="Nested Task" isBlocking="true" />
+                <stage id="stage1_1" name="Stage B">
+
+                    <planItem id="planItem1_1_1" definitionRef="rootTask" />
+                    <planItem id="planItem1_1_2" name="Stage C" definitionRef="stage1_2" />
+
+                    <stage id="stage1_2">
+
+                        <planItem id="planItem1_2_1" definitionRef="theCase1" />
+                        
+                        <caseTask id="theCase1" caseRef="oneTaskCase" isBlocking="true" />
+
+                    </stage>
+
+                </stage>
+
+            </stage>
+            
+            <stage id="stage2">
+            
+                <planItem id="planItem2_1" definitionRef="theCase2" />
+                <caseTask id="theCase2" caseRef="oneTaskCase" isBlocking="true" />
+            
+            </stage>
+            
+             <stage id="stage3">
+            
+                <planItem id="planItem3_1" definitionRef="stage3_1" />
+                
+                <stage id="stage3_1">
+                    
+                    <planItem id="planItem3_1_1" definitionRef="theCase3" />
+                    <caseTask id="theCase3" caseRef="oneTaskCase" isBlocking="true" />
+                    
+                </stage>                
+            
+            </stage>
+            
+        </casePlanModel>
+    </case>
+
+</definitions>

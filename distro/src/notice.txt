@@ -1,57 +1,94 @@
-The following Activiti software libraries are distributed under the Apache License Version 2.0 (the License):
- * activiti-bpmn-converter-<version>-sources.jar
- * activiti-bpmn-converter-<version>.jar
- * activiti-bpmn-layout-<version>-sources.jar
- * activiti-bpmn-layout-<version>.jar
- * activiti-bpmn-model-<version>-sources.jar
- * activiti-bpmn-model-<version>.jar
- * activiti-camel-<version>-sources.jar
- * activiti-camel-<version>.jar
- * activiti-cdi-<version>-sources.jar
- * activiti-cdi-<version>.jar
- * activiti-common-rest-<version>-sources.jar
- * activiti-common-rest-<version>.jar
- * activiti-cxf-<version>-sources.jar
- * activiti-cxf-<version>.jar
- * activiti-diagram-rest-<version>-sources.jar
- * activiti-diagram-rest-<version>.jar
- * activiti-engine-<version>-sources.jar
- * activiti-engine-<version>.jar
- * activiti-json-converter-<version>-sources.jar
- * activiti-json-converter-<version>.jar
- * activiti-ldap-<version>-sources.jar
- * activiti-ldap-<version>.jar
- * activiti-modeler-<version>-sources.jar
- * activiti-modeler-<version>.jar
- * activiti-mule-<version>-sources.jar
- * activiti-mule-<version>.jar
- * activiti-osgi-<version>-sources.jar
- * activiti-osgi-<version>.jar
- * activiti-rest-<version>-sources.jar
- * activiti-rest-<version>.jar
- * activiti-simple-workflow-<version>-sources.jar
- * activiti-simple-workflow-<version>.jar
- * activiti-spring-<version>-sources.jar
- * activiti-spring-<version>.jar
+Flowable (http://www.flowable.org) includes work under the Apache License v2.0
+requiring this NOTICE file to be provided.
+
+
+Portions of this software (C) Copyright 2010-2016 Alfresco Software, Ltd, licensed under the Apache License v2.0.
+
+
+The following Flowable software libraries are distributed under the Apache License Version 2.0 (the License):
+
+flowable5-compatibility<version><.jar | -source.jar | -javadoc.jar>
+flowable5-engine<version><.jar | -source.jar | -javadoc.jar>
+flowable5-spring<version><.jar | -source.jar | -javadoc.jar>
+flowable5-spring-compatibility<version><.jar | -source.jar | -javadoc.jar>
+flowable-bpmn-converter<version><.jar | -source.jar | -javadoc.jar>
+flowable-bpmn-layout<version><.jar | -source.jar | -javadoc.jar>
+flowable-bpmn-model<version><.jar | -source.jar | -javadoc.jar>
+flowable-camel<version><.jar | -source.jar | -javadoc.jar>
+flowable-cdi<version><.jar | -source.jar | -javadoc.jar>
+flowable-common-rest<version><.jar | -source.jar | -javadoc.jar>
+flowable-content-api<version><.jar | -source.jar | -javadoc.jar>
+flowable-content-engine<version><.jar | -source.jar | -javadoc.jar>
+flowable-content-engine-configurator<version><.jar | -source.jar | -javadoc.jar>
+flowable-content-rest<version><.jar | -source.jar | -javadoc.jar>
+flowable-content-spring<version><.jar | -source.jar | -javadoc.jar>
+flowable-content-spring-configurator<version><.jar | -source.jar | -javadoc.jar>
+flowable-cxf<version><.jar | -source.jar | -javadoc.jar>
+flowable-dmn-api<version><.jar | -source.jar | -javadoc.jar>
+flowable-dmn-engine<version><.jar | -source.jar | -javadoc.jar>
+flowable-dmn-engine-configurator<version><.jar | -source.jar | -javadoc.jar>
+flowable-dmn-json-converter<version><.jar | -source.jar | -javadoc.jar>
+flowable-dmn-model<version><.jar | -source.jar | -javadoc.jar>
+flowable-dmn-rest<version><.jar | -source.jar | -javadoc.jar>
+flowable-dmn-spring<version><.jar | -source.jar | -javadoc.jar>
+flowable-dmn-spring-configurator<version><.jar | -source.jar | -javadoc.jar>
+flowable-dmn-xml-converter<version><.jar | -source.jar | -javadoc.jar>
+flowable-engine<version><.jar | -source.jar | -javadoc.jar>
+flowable-engine-common<version><.jar | -source.jar | -javadoc.jar>
+flowable-engine-common-api<version><.jar | -source.jar | -javadoc.jar>
+flowable-form-api<version><.jar | -source.jar | -javadoc.jar>
+flowable-form-engine<version><.jar | -source.jar | -javadoc.jar>
+flowable-form-engine-configurator<version><.jar | -source.jar | -javadoc.jar>
+flowable-form-json-converter<version><.jar | -source.jar | -javadoc.jar>
+flowable-form-model<version><.jar | -source.jar | -javadoc.jar>
+flowable-form-rest<version><.jar | -source.jar | -javadoc.jar>
+flowable-form-spring<version><.jar | -source.jar | -javadoc.jar>
+flowable-form-spring-configurator<version><.jar | -source.jar | -javadoc.jar>
+flowable-http<version><.jar | -source.jar | -javadoc.jar>
+flowable-image-generator<version><.jar | -source.jar | -javadoc.jar>
+flowable-jms-spring-executor<version><.jar | -source.jar | -javadoc.jar>
+flowable-jmx<version><.jar | -source.jar | -javadoc.jar>
+flowable-json-converter<version><.jar | -source.jar | -javadoc.jar>
+flowable-ldap<version><.jar | -source.jar | -javadoc.jar>
+flowable-mule<version><.jar | -source.jar | -javadoc.jar>
+flowable-osgi<version><.jar | -source.jar | -javadoc.jar>
+flowable-process-validation<version><.jar | -source.jar | -javadoc.jar>
+flowable-rest<version><.jar | -source.jar | -javadoc.jar>
+flowable-secure-javascript<version><.jar | -source.jar | -javadoc.jar>
+flowable-spring<version><.jar | -source.jar | -javadoc.jar>
+flowable-spring-boot-starter-actuator<version><.jar | -source.jar | -javadoc.jar>
+flowable-spring-boot-starter-basic<version><.jar | -source.jar | -javadoc.jar>
+flowable-spring-boot-starter-integration<version><.jar | -source.jar | -javadoc.jar>
+flowable-spring-boot-starter-jpa<version><.jar | -source.jar | -javadoc.jar>
+flowable-spring-boot-starter-rest-api<version><.jar | -source.jar | -javadoc.jar>
+flowable-spring-boot-starter-security<version><.jar | -source.jar | -javadoc.jar>
+flowable-ui-common<version><.jar | -source.jar | -javadoc.jar>
+flowable-ui-idm-conf<version><.jar | -source.jar | -javadoc.jar>
+flowable-ui-idm-logic<version><.jar | -source.jar | -javadoc.jar>
+flowable-ui-idm-rest<version><.jar | -source.jar | -javadoc.jar>
+flowable-ui-modeler-conf<version><.jar | -source.jar | -javadoc.jar>
+flowable-ui-modeler-logic<version><.jar | -source.jar | -javadoc.jar>
+flowable-ui-modeler-rest<version><.jar | -source.jar | -javadoc.jar>
+flowable-ui-task-conf<version><.jar | -source.jar | -javadoc.jar>
+flowable-ui-task-logic<version><.jar | -source.jar | -javadoc.jar>
+flowable-ui-task-rest<version><.jar | -source.jar | -javadoc.jar>
+ 
+ 
 
 You may not use these files except in compliance with the License.  You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0.
 Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an AS IS BASIS, WITHOUT WARRANTIES OR CONDITIONS OR ANY KIND, either express or implied.  See the License for the specific language governing permissions and limitations under the License.
 This software package also includes third party components as listed below.
 This software package includes changed source code of the following libraries:
 
-JUEL
- * Location: http://juel.sourceforge.net/
- * Included in activiti-engine-5.16.jar in package org.activiti.engine.impl.juel
- * License: Apache V2
  
 Quartz
  * Location: http://www.quartz-scheduler.org/
- * CronExpression is included in activiti-engine-5.16.jar in package org.activiti.engine.impl.calendar
+ * CronExpression is included in flowable-engine-<version>.jar in package org.flowable.engine.impl.calendar
  * License: Apache V2
 
 JSON
  * Location: http://www.JSON.org/java
- * Included in activiti-engine-5.16.jar in package org.activiti.engine.impl.json
+ * Included in flowable-engine-<version>.jar in package org.flowable.engine.impl.util.json
  * License:
 ===============================================================================
 Copyright (c) 2002 JSON.org
@@ -80,149 +117,71 @@ SOFTWARE.
 
 This software includes unchanged copies of the following libraries:
 
-FastInfoset-1.2.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-XmlSchema-1.4.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-abdera-client-0.4.0-incubating.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-abdera-core-0.4.0-incubating.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-abdera-extensions-html-0.4.0-incubating.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-abdera-extensions-json-0.4.0-incubating.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-abdera-extensions-main-0.4.0-incubating.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-abdera-i18n-0.4.0-incubating.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-abdera-parser-0.4.0-incubating.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-abdera-server-0.4.0-incubating.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-activation-1.1.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-antlr-2.7.7.jar : http://www.antlr.org/license.html (BSD license)
-antlr-runtime-3.1.3.jar : http://www.antlr.org/license.html (BSD license)
-aopalliance-1.0.jar : Public domain
-apache-mime4j-0.6.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-asm-3.1.jar : http://asm.ow2.org/license.html
-asm-3.2.jar : http://asm.ow2.org/license.html
-asm-analysis-3.2.jar : http://asm.ow2.org/license.html
-asm-commons-3.2.jar : http://asm.ow2.org/license.html
-asm-tree-3.2.jar : http://asm.ow2.org/license.html
-asm-util-3.2.jar : http://asm.ow2.org/license.html
-axiom-api-1.2.5.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-axiom-impl-1.2.5.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-cglib-2.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-commons-beanutils-1.7.0.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-commons-codec-1.3.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-commons-codec-1.4.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-commons-collections-3.1.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-commons-collections-3.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-commons-dbcp-1.4.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-commons-digester-1.6.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-commons-el-1.0.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-commons-email-1.4.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-commons-fileupload-1.2.1.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-commons-httpclient-3.1.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-commons-io-1.4.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-commons-lang3-3.1.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-commons-logging-1.0.4.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-commons-logging-1.1.1.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-commons-pool-1.3.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-commons-pool-1.5.4.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-cxf-api-2.1.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-cxf-common-schemas-2.1.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-cxf-common-utilities-2.1.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-cxf-rt-bindings-soap-2.1.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-cxf-rt-bindings-xml-2.1.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-cxf-rt-core-2.1.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-cxf-rt-databinding-jaxb-2.1.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-cxf-rt-frontend-jaxws-2.1.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-cxf-rt-frontend-simple-2.1.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-cxf-rt-transports-http-2.1.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-cxf-rt-transports-http-jetty-2.1.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-cxf-rt-ws-addr-2.1.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-cxf-tools-common-2.1.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-dom4j-1.6.1.jar : http://www.opensource.org/licenses/bsd-license.php
-drools-api-5.1.1.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-drools-compiler-5.1.1.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-drools-core-5.1.1.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-ecj-3.5.1.jar : http://www.eclipse.org/org/documents/epl-v10.php
-freemarker-2.3.13.jar : http://www.opensource.org/licenses/bsd-license.php
-geronimo-activation_1.0.2_spec-1.1.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-geronimo-annotation_1.0_spec-1.1.1.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-geronimo-jaxws_2.1_spec-1.0.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-geronimo-jms_1.1_spec-1.0.1.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-geronimo-jpa_3.0_spec-1.0.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-geronimo-jta_1.1_spec-1.1.1.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-geronimo-servlet_2.5_spec-1.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-geronimo-stax-api_1.0_spec-1.0.1.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-geronimo-ws-metadata_2.0_spec-1.1.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-groovy-2.4.5.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-h2-1.2.132.jar: http://www.mozilla.org/MPL & http://opensource.org/licenses/eclipse-1.0.php
-hamcrest-core-1.1.jar : http://www.opensource.org/licenses/bsd-license.php
-htmlparser-1.0.5.jar : http://www.opensource.org/licenses/cpl1.0.php
-htmlparser-1.6.jar : http://www.opensource.org/licenses/cpl1.0.php
-httpclient-4.0.1.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-httpcore-4.0.1.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-httpmime-4.0.1.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-javassist-3.6.0.GA.jar : MPL http://www.mozilla.org/MPL/ and the LGPL http://www.opensource.org/licenses/lgpl-2.1.php
-jaxb-api-2.2.1.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-jaxb-impl-2.2.1.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-jaxb-xjc-2.1.7.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-jaxen-1.1.1.jar : http://jaxen.codehaus.org/license.html (modified apache license)
-jcip-annotations-1.0.jar : Creative Commons Attribution License http://creativecommons.org/licenses/by/2.5
-jetty-continuation-7.2.0.v20101020.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-jetty-http-7.2.0.v20101020.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-jetty-io-7.2.0.v20101020.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-jetty-server-7.2.0.v20101020.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-jetty-util-7.2.0.v20101020.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-js-1.6R7.jar : Mozilla Public License version 1.1 http://www.mozilla.org/MPL/MPL-1.1.html
-json-20070829.jar : http://www.json.org/java/ free software
-jstl-1.1.0.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-jtds-1.2.4.jar : LGPL http://www.opensource.org/licenses/lgpl-2.1.php (no version mentioned)
-junit-4.8.1.jar : http://www.opensource.org/licenses/cpl1.0.php
-livetribe-jsr223-2.0.6.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-log4j-1.2.14.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-mail-1.5.2.jar : CDDL https://java.net/projects/javamail/pages/License 
-mime-util-2.1.3.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-mockito-core-1.8.2.jar : MIT http://www.opensource.org/licenses/mit-license.php
-mvel2-2.0.16.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-mybatis-3.0.1.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-myfaces-api-1.1.5.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-myfaces-impl-1.1.5.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-mysql-connector-java-5.1.6.jar : GPL http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
-neethi-2.0.4.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-objenesis-1.0.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-openjpa-1.2.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-org.osgi.core-4.2.0.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-persistence-api-1.0.jar : CDDL http://www.opensource.org/licenses/cddl1
-postgresql-8.4-701.jdbc4.jar : BSD http://www.opensource.org/licenses/bsd-license.php
-saaj-api-1.3.jar : CDDL http://www.opensource.org/licenses/cddl1
-saaj-impl-1.3.jar : CDDL http://www.opensource.org/licenses/cddl1
-scannotation-1.0.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-serp-1.13.1.jar : BSD http://www.opensource.org/licenses/bsd-license.php
-servlet-api-2.5.jar : http://developers.sun.com/license/berkeley_license.html
-slf4j-api-1.5.6.jar : MIT http://www.opensource.org/licenses/mit-license.php
-slf4j-api-1.6.1.jar : MIT http://www.opensource.org/licenses/mit-license.php
-slf4j-jdk14-1.6.1.jar : MIT http://www.opensource.org/licenses/mit-license.php
-slf4j-log4j12-1.5.6.jar : MIT http://www.opensource.org/licenses/mit-license.php
-spring-aop-4.0.6.RELEASE.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-spring-asm-4.0.6.RELEASE.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-spring-beans-4.0.6.RELEASE.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-spring-context-4.0.6.RELEASE.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-spring-context-support-4.0.6.RELEASE.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-spring-core-4.0.6.RELEASE.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-spring-expression-4.0.6.RELEASE.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-spring-jdbc-4.0.6.RELEASE.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-spring-orm-4.0.6.RELEASE.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-spring-test-4.0.6.RELEASE.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-spring-tx-4.0.6.RELEASE.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-spring-web-4.0.6.RELEASE.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-stax-api-1.0-2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-subethasmtp-smtp-1.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-subethasmtp-wiser-1.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-urlrewritefilter-3.1.0.jar : BSD http://www.opensource.org/licenses/bsd-license.php
-vaadin-6.5.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-velocity-1.4.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-velocity-dep-1.4.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-wsdl4j-1.6.2.jar : http://www.opensource.org/licenses/cpl1.0.php
-wstx-asl-3.2.1.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-wstx-asl-3.2.4.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-xercesImpl-2.9.1.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-xml-apis-1.0.b2.jar : CDDL http://www.opensource.org/licenses/cddl1
-xml-apis-1.3.04.jar : CDDL http://www.opensource.org/licenses/cddl1
-xml-resolver-1.2.jar : http://www.apache.org/licenses/LICENSE-2.0.html
-xpp3_min-1.1.4c.jar : http://www.extreme.indiana.edu/viewcvs/~checkout~/XPP3/java/LICENSE.txt Apache 1.0 variant
-xstream-1.3.1.jar : BSD http://www.opensource.org/licenses/bsd-license.php
+aopalliance                     aopalliance                 1.0             Public Domain
+com.carrotsearch                hppc                        0.7.1           The Apache Software License, Version 2.0
+com.fasterxml.jackson.core      jackson-annotations         2.7.5           The Apache Software License, Version 2.0
+com.fasterxml.jackson.core      jackson-core                2.7.5           The Apache Software License, Version 2.0
+com.fasterxml.jackson.core      jackson-databind            2.7.5           The Apache Software License, Version 2.0
+com.fasterxml.jackson.datatype  jackson-datatype-hppc       2.7.5           The Apache Software License, Version 2.0
+com.fasterxml.jackson.datatype  jackson-datatype-joda       2.7.5           The Apache Software License, Version 2.0
+com.fasterxml.jackson.datatype  jackson-datatype-json-org   2.7.5           The Apache Software License, Version 2.0
+com.google.guava                guava                       17.0            The Apache Software License, Version 2.0
+com.h2database                  h2                          1.4.196         The H2 License, Version 1.0
+com.fasterxml.uuid              java-uuid-generator         3.1.3           The Apache Software License, Version 2.0
+com.mchange                     mchange-commons-java        0.2.11          Eclipse Public License, Version 1.0
+com.mchange                     c3p0                        0.9.5.2         Eclipse Public License, Version 1.0
+com.sun.mail                    javax.mail                  1.5.6           CDDL/GPLv2+CE
+commons-beanutils               commons-beanutils           1.8.3           The Apache Software License, Version 2.0
+commons-codec                   commons-codec               1.10            Apache License, Version 2.0
+commons-dbcp                    commons-dbcp                1.4             The Apache Software License, Version 2.0
+commons-digester                commons-digester            1.8             The Apache Software License, Version 2.0
+commons-logging                 commons-logging             1.2             The Apache Software License, Version 2.0
+commons-collections             commons-collections         3.2.1           The Apache Software License, Version 2.0
+commons-fileupload              commons-fileupload          1.3.3           The Apache Software License, Version 2.0
+commons-io                      commons-io                  2.6             The Apache Software License, Version 2.0
+commons-pool                    commons-pool                1.5.4           The Apache Software License, Version 2.0
+commons-validator               commons-validator           1.4.0           The Apache Software License, Version 2.0
+de.odysseus.juel                juel-api                    2.2.7           The Apache Software License, Version 2.0
+de.odysseus.juel                juel-impl                   2.2.7           The Apache Software License, Version 2.0
+de.odysseus.juel                juel-spi                    2.2.7           The Apache Software License, Version 2.0
+io.swagger                      swagger-annotations         1.5.10          Apache License 2.0
+io.swagger                      swagger-models              1.5.10          Apache License 2.0
+javax.activation                activation                  1.1.1           COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
+javax.annotation                jsr250-api                  1.0             COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0
+joda-time                       joda-time                   2.9.9           Apache 2
+log4j                           log4j                       1.2.17          The Apache Software License, Version 2.0
+math.geom2d                     javaGeom                    0.11.1          Lesser General Public License version 2.0 (LGPLv2)
+org.apache.commons              commons-email               1.5             Apache License, Version 2.0
+org.apache.commons              commons-lang3               3.7             The Apache Software License, Version 2.0
+org.apache.httpcomponents       httpclient                  4.5.3           Apache License, Version 2.0
+org.apache.httpcomponents       httpcore                    4.4.6           Apache License, Version 2.0
+org.apache.httpcomponents       httpmime                    4.5.3           Apache License, Version 2.0
+org.apache.geronimo.bundles     json                        20090211_1      The Apache Software License, Version 2.0
+org.codehaus.groovy             groovy-all                  2.4.13          The Apache Software License, Version 2.0
+org.liquibase                   liquibase-core              3.5.3           Apache License, Version 2.0
+org.mybatis                     mybatis                     3.4.1           The Apache Software License, Version 2.0
+org.mybatis                     mybatis-spring              1.3.0           The Apache Software License, Version 2.0
+org.mvel                        mvel2                       2.2.6.Final     The Apache Software License, Version 2.0
+org.slf4j                       jcl-over-slf4j              1.7.6           MIT License
+org.slf4j                       slf4j-api                   1.7.6           MIT License
+org.slf4j                       slf4j-log4j12               1.7.6           MIT License
+org.springframework             spring-beans                4.3.9.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-core                 4.3.9.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-context              4.3.9.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-context-support      4.3.9.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-jdbc                 4.3.9.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-tx                   4.3.9.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-web                  4.3.9.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-webmvc               4.3.9.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-aop                  4.3.9.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-core                 4.3.9.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-expression           4.3.9.RELEASE   The Apache Software License, Version 2.0
+org.springframework             spring-orm                  4.3.9.RELEASE   The Apache Software License, Version 2.0
+org.springframework.security    spring-security-config      4.2.3.RELEASE   The Apache Software License, Version 2.0
+org.springframework.security    spring-security-core        4.2.3.RELEASE   The Apache Software License, Version 2.0
+org.springframework.security    spring-security-crypto      4.2.3.RELEASE   The Apache Software License, Version 2.0
+org.springframework.security    spring-security-web         4.2.3.RELEASE   The Apache Software License, Version 2.0
+org.tinyjee.jgraphx             jgraphx                     1.10.4.1        JGraph Ltd - 3 clause BSD license
+org.yaml                        snakeyaml                   1.17            The Apache Software License, Version 2.0
+xerces                          xercesImpl                  2.10.0          The Apache Software License, Version 2.0
+xml-apis                        xml-apis                    1.4.01          The Apache Software License, Version 2.0-The SAX License-The W3C License

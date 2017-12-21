@@ -94,8 +94,6 @@ ORYX.Editor = {
 		//meta data about the model for the signavio warehouse
 		//directory, new, name, description, revision, model (the model data)
 		
-		this.modelMetaData = config;
-		
 		var model = config;
 		
 		this.id = model.modelId;
@@ -116,15 +114,6 @@ ORYX.Editor = {
 		
 		// Initialize the eventlistener
 		this._initEventListener();
-
-		// Load particular stencilset
-		if(ORYX.CONFIG.BACKEND_SWITCH) {
-			var ssUrl = (model.stencilset.namespace||model.stencilset.url).replace("#", "%23");
-        	ORYX.Core.StencilSet.loadStencilSet(ssUrl, this.modelMetaData, this.id);
-		} else {
-			var ssUrl = model.stencilset.url;
-        	ORYX.Core.StencilSet.loadStencilSet(ssUrl, this.modelMetaData, this.id);
-		}
 
 		// CREATES the canvas
 		this._createCanvas(model.stencil ? model.stencil.id : null, model.properties);
@@ -153,6 +142,7 @@ ORYX.Editor = {
             this.getCanvas().update();
 			loadContentFinished = true;
 			initFinished();
+			this.handleEvents({type: ORYX.CONFIG.EVENT_EDITOR_INIT_COMPLETED});
 		}.bind(this), 200);
 	},
 	
@@ -172,12 +162,12 @@ ORYX.Editor = {
 		this._keydownEnabled = 	true;
 		this._keyupEnabled =  	true;
 
-		this.DOMEventListeners[ORYX.CONFIG.EVENT_MOUSEDOWN] = [];
-		this.DOMEventListeners[ORYX.CONFIG.EVENT_MOUSEUP] 	= [];
-		this.DOMEventListeners[ORYX.CONFIG.EVENT_MOUSEOVER] = [];
-		this.DOMEventListeners[ORYX.CONFIG.EVENT_MOUSEOUT] 	= [];
-		this.DOMEventListeners[ORYX.CONFIG.EVENT_SELECTION_CHANGED] = [];
-		this.DOMEventListeners[ORYX.CONFIG.EVENT_MOUSEMOVE] = [];
+		this.DOMEventListeners.set(ORYX.CONFIG.EVENT_MOUSEDOWN,[]);
+		this.DOMEventListeners.set(ORYX.CONFIG.EVENT_MOUSEUP,[]);
+		this.DOMEventListeners.set(ORYX.CONFIG.EVENT_MOUSEOVER,[]);
+		this.DOMEventListeners.set(ORYX.CONFIG.EVENT_MOUSEOUT,[]);
+		this.DOMEventListeners.set(ORYX.CONFIG.EVENT_SELECTION_CHANGED,[]);
+		this.DOMEventListeners.set(ORYX.CONFIG.EVENT_MOUSEMOVE, []);
 				
 	},
 	
@@ -328,52 +318,53 @@ ORYX.Editor = {
 		// (that comes from the usage of oryx with a mashup api)
 		if( ORYX.MashupAPI && ORYX.MashupAPI.loadablePlugins && ORYX.MashupAPI.loadablePlugins instanceof Array ){
 		
-			// Get the plugins from the available plugins (those who are in the plugins.xml)
+		    // Get the plugins from the available plugins (those who are in the plugins.xml)
 			ORYX.availablePlugins = $A(ORYX.availablePlugins).findAll(function(value){
 										return ORYX.MashupAPI.loadablePlugins.include( value.name )
-									})
+									});
 			
 			// Add those plugins to the list, which are only in the loadablePlugins list
 			ORYX.MashupAPI.loadablePlugins.each(function( className ){
 				if( !(ORYX.availablePlugins.find(function(val){ return val.name == className }))){
 					ORYX.availablePlugins.push( {name: className } );
 				}
-			})
+			});
 		}
 		
 		
 		ORYX.availablePlugins.each(function(value) {
-			ORYX.Log.debug("Initializing plugin '%0'", value.name);
-				if( (!value.requires 	|| !value.requires.namespaces 	|| value.requires.namespaces.any(function(req){ return loadedStencilSetsNamespaces.indexOf(req) >= 0 }) ) &&
-					(!value.notUsesIn 	|| !value.notUsesIn.namespaces 	|| !value.notUsesIn.namespaces.any(function(req){ return loadedStencilSetsNamespaces.indexOf(req) >= 0 }) )&&
-					/*only load activated plugins or undefined */
-					(value.engaged || (value.engaged===undefined)) ){
+			ORYX.Log.debug("Initializing plugin '%0'", value.get("name"));
+
+			if( (!value.get("requires") || !value.get("requires").namespaces 	|| value.get("requires").namespaces.any(function(req){ return loadedStencilSetsNamespaces.indexOf(req) >= 0 }) ) &&
+				(!value.get("notUsesIn")|| !value.get("notUsesIn").namespaces 	|| !value.get("notUsesIn").namespaces.any(function(req){ return loadedStencilSetsNamespaces.indexOf(req) >= 0 }) )&&
+				/*only load activated plugins or undefined */
+				(value.get("engaged") || (value.get("engaged")===undefined)) ){
 
 				try {
-					var className 	= eval(value.name);
+					var className 	= eval(value.get("name")); // wow funcky code here!
 					if( className ){
-						var plugin		= new className(facade, value);
-						plugin.type		= value.name;
+						var plugin = new className(facade, value);
+						plugin.type	= value.get("name");
 						newPlugins.push( plugin );
 						plugin.engaged=true;
 					}
 				} catch(e) {
-					ORYX.Log.warn("Plugin %0 is not available %1", value.name, e);
+					ORYX.Log.warn("Plugin %0 is not available %1", value.get("name"), e);
 				}
-							
-			} else {
-				ORYX.Log.info("Plugin need a stencilset which is not loaded'", value.name);
-			}
+  							
+  			} else {
+				ORYX.Log.info("Plugin need a stencilset which is not loaded'", value.get("name"));
+  			}
 			
 		});
 
 		newPlugins.each(function(value) {
 			// If there is an GUI-Plugin, they get all Plugins-Offer-Meta-Data
-			if(value.registryChanged)
+			if (value.registryChanged)
 				value.registryChanged(me.pluginsData);
 
 			// If there have an onSelection-Method it will pushed to the Editor Event-Handler
-			if(value.onSelectionChanged)
+			if (value.onSelectionChanged)
 				me.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, value.onSelectionChanged.bind(value));
 		});
 
@@ -549,8 +540,7 @@ ORYX.Editor = {
      * @return {Object} Returns JSON representation as JSON object.
      */
     getJSON: function(){
-    	delete Array.prototype.toJSON;
-        var canvasJSON = this.getCanvas().toJSON();
+    	var canvasJSON = this.getCanvas().toJSON();
         canvasJSON.ssextensions = this.getStencilSets().values()[0].extensions().keys().findAll(function(sse){ return !sse.endsWith('/meta#') });
         return canvasJSON;
     },
@@ -867,8 +857,8 @@ ORYX.Editor = {
 			this._keyupEnabled = false;
 		}
 		if(this.DOMEventListeners.keys().member(eventType)) {
-			var value = this.DOMEventListeners.remove(eventType);
-			this.DOMEventListeners['disable_' + eventType] = value;
+			var value = this.DOMEventListeners.unset(eventType);
+			this.DOMEventListeners.set('disable_' + eventType, value);
 		}
 	},
 
@@ -882,8 +872,8 @@ ORYX.Editor = {
 		}
 		
 		if(this.DOMEventListeners.keys().member("disable_" + eventType)) {
-			var value = this.DOMEventListeners.remove("disable_" + eventType);
-			this.DOMEventListeners[eventType] = value;
+			var value = this.DOMEventListeners.unset("disable_" + eventType);
+ 			this.DOMEventListeners.set(eventType,value);
 		}
 	},
 
@@ -892,15 +882,15 @@ ORYX.Editor = {
 	 */
 	registerOnEvent: function(eventType, callback) {
 		if(!(this.DOMEventListeners.keys().member(eventType))) {
-			this.DOMEventListeners[eventType] = [];
+			this.DOMEventListeners.set(eventType,[]);
 		}
 
-		this.DOMEventListeners[eventType].push(callback);
+		this.DOMEventListeners.get(eventType).push(callback);
 	},
 
 	unregisterOnEvent: function(eventType, callback) {
 		if(this.DOMEventListeners.keys().member(eventType)) {
-			this.DOMEventListeners[eventType] = this.DOMEventListeners[eventType].without(callback);
+			this.DOMEventListeners.set(eventType,this.DOMEventListeners.get(eventType).without(callback));
 		} else {
 			// Event is not supported
 			// TODO: Error Handling
@@ -1238,7 +1228,7 @@ ORYX.Editor = {
 	*/
 	_executeEventImmediately: function(eventObj) {
 		if(this.DOMEventListeners.keys().member(eventObj.event.type)) {
-			this.DOMEventListeners[eventObj.event.type].each((function(value) {
+			this.DOMEventListeners.get(eventObj.event.type).each((function(value) {
 				value(eventObj.event, eventObj.arg);		
 			}).bind(this));
 		}

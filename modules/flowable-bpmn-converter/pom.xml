@@ -10,16 +10,16 @@
     <groupId>org.flowable</groupId>
     <artifactId>flowable-root</artifactId>
     <relativePath>../..</relativePath>
-    <version>6.0.0.RC1-SNAPSHOT</version>
+    <version>6.3.0-SNAPSHOT</version>
   </parent>
   
   <properties>
-    <activiti.artifact>
-      org.activiti.bpmn.converter
-    </activiti.artifact>
-    <activiti.osgi.export.additional>
-      org.activiti.bpmn.constants,org.activiti.bpmn.util,org.activiti.bpmn.exceptions
-    </activiti.osgi.export.additional>
+    <flowable.artifact>
+      org.flowable.bpmn.converter
+    </flowable.artifact>
+    <flowable.osgi.export.additional>
+      org.flowable.bpmn.constants,org.flowable.bpmn.util,org.flowable.bpmn.exceptions
+    </flowable.osgi.export.additional>
   </properties>
 
   <build>

@@ -15,19 +15,23 @@
  * a resource using $http.
  */
 
-activitiModule.service('NotPermittedInterceptor', [ '$window', function($window) {
-    var service = this;
-    service.responseError = function(response) {
-        if (response.status === 403) {
-            console.log('test');
-            $window.location.href = FLOWABLE.CONFIG.contextRoot + '/views/not-permitted.html';
-            $window.reload();
+flowableModule.factory('NotPermittedInterceptor', [ '$q', '$window', function($q, $window) {
+    return {
+        responseError: function ( response ) {
+
+            if (response.status === 403) {
+                $window.location.href = FLOWABLE.CONFIG.contextRoot;
+                $window.location.reload();
+                return $q.reject(response);
+            }
+            else{
+                return $q.reject(response);
+            }
         }
-        return response;
-    };
+    }
 }]);
 
-activitiModule.config(['$httpProvider', function($httpProvider) {
+flowableModule.config(['$httpProvider', function($httpProvider) {
 
     if (!$httpProvider.defaults.headers.get) {
         $httpProvider.defaults.headers.get = {};

@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-angular.module('activitiModeler')
+angular.module('flowableModeler')
   .controller('AppDefinitionCtrl', ['$rootScope', '$scope', '$translate', '$http', '$location', '$routeParams', '$modal', '$popover', '$timeout',
                               function ($rootScope, $scope, $translate, $http, $location, $routeParams, $modal, $popover, $timeout) {
 
@@ -21,24 +21,35 @@ angular.module('activitiModeler')
     $scope.model = {
         // Store the main model id, this points to the current version of a model,
         // even when we're showing history
-        latestModelId: $routeParams.modelId
+        latestModelId: $routeParams.modelId,
+        activeTab: 'bpmn'
     };
+    
+    $scope.tabs = [
+        {
+            id: 'bpmn',
+            title: 'BPMN models'
+        },
+        {
+            id: 'cmmn',
+            title: 'CMMN models'
+        }
+    ];
 
     $scope.loadApp = function() {
     	var url;
     	var definitionUrl;
 
     	if ($routeParams.modelHistoryId) {
-    		url = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $routeParams.modelId
-    			+ '/history/' + $routeParams.modelHistoryId;
-    		definitionUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/' + $routeParams.modelId
-                + '/history/' + $routeParams.modelHistoryId;
+    		url = FLOWABLE.APP_URL.getModelHistoryUrl($routeParams.modelId, $routeParams.modelHistoryId);
+    		definitionUrl = FLOWABLE.APP_URL.getAppDefinitionHistoryUrl($routeParams.modelId, $routeParams.modelHistoryId);
     	} else {
-    		url = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $routeParams.modelId;
-    		definitionUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/' + $routeParams.modelId;
+    		url = FLOWABLE.APP_URL.getModelUrl($routeParams.modelId);
+    		definitionUrl = FLOWABLE.APP_URL.getAppDefinitionUrl($routeParams.modelId);
 
-    		$scope.model.appExportUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/' + $routeParams.modelId +
-                '/export?version=' + Date.now();
+    		$scope.model.appExportUrl = FLOWABLE.APP_URL.getAppDefinitionExportUrl($routeParams.modelId);
+
+    		$scope.model.appBarExportUrl = FLOWABLE.APP_URL.getAppDefinitionBarExportUrl($routeParams.modelId);
     	}
 
     	$http({method: 'GET', url: url}).
@@ -69,7 +80,7 @@ angular.module('activitiModeler')
         includeLatestVersion: !$scope.model.app.latestVersion
       };
 
-      $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.model.latestModelId + '/history', params: params}).
+      $http({method: 'GET', url: FLOWABLE.APP_URL.getModelHistoriesUrl($scope.model.latestModelId), params: params}).
 	      success(function(data, status, headers, config) {
 	        if ($scope.model.app.latestVersion) {
 	          if (!data.data) {
@@ -179,7 +190,7 @@ angular.module('activitiModeler')
     $scope.loadApp();
 }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
 .controller('PublishAppDefinitionPopupCtrl', ['$rootScope', '$scope', '$http', '$route', '$translate', function ($rootScope, $scope, $http, $route, $translate) {
 
     $scope.popup = {
@@ -199,18 +210,13 @@ angular.module('activitiModeler')
 
         delete $scope.popup.error;
 
-        $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/' + $scope.model.app.id + '/publish', data: data}).
+        $http({method: 'POST', url: FLOWABLE.APP_URL.getAppDefinitionPublishUrl($scope.model.app.id), data: data}).
             success(function(data, status, headers, config) {
                 $scope.$hide();
 
-                if (data.errorType == 1) {
-                    var error = {modelName: data.errorDescription};
-                    $scope.addAlertPromise($translate('APP.POPUP.HAS-CUSTOM-STENCILITEM', error), 'error');
-
-                } else if (data.errorType == 2) {
-                    var error = { modelName: data.errorDescription};
-                    $scope.addAlertPromise($translate('APP.POPUP.HAS-VALIDATIONERROR', error), 'error');
-
+                if (data.error) {
+                    $scope.popup.loading = false;
+                    $scope.addAlert(data.errorDescription, 'error');
                 } else {
                     $scope.popup.loading = false;
                     $route.reload();
@@ -218,28 +224,9 @@ angular.module('activitiModeler')
                 }
             }).
             error(function(data, status, headers, config) {
-
                 $scope.popup.loading = false;
-
-                if (status === 409 && data && data.messageKey === 'app.publish.procdef.key.conflict') {
-                    $scope.popup.error = {
-                        type: 'conflictingProcDefKey',
-                        data: data.customData
-                    };
-                } else if(status === 409 && data && data.messageKey === 'app.publish.procdef.duplicate.keys') {
-                    $scope.popup.error = {
-                        type: 'duplicateProcDefKeys',
-                        data: data.customData
-                    };
-                } else if (status === 409 && data && data.messageKey === 'app.publish.process.model.already.used') {
-                    $scope.popup.error = {
-                        type: 'processModelAlreadyUsed',
-                        data: data.customData
-                    };
-                } else {
-                    $scope.$hide();
-                    $scope.addAlertPromise($translate('APP.ALERT.PUBLISH-ERROR'), 'error');
-                }
+                $scope.$hide();
+                $scope.addAlertPromise($translate('APP.ALERT.PUBLISH-ERROR'), 'error');
             });
     };
 
@@ -250,8 +237,8 @@ angular.module('activitiModeler')
     };
 }]);
 
-angular.module('activitiModeler')
-.controller('DeleteAppDefinitionPopupCrtl', ['$rootScope', '$scope', '$http', '$translate', function ($rootScope, $scope, $http, $translate) {
+angular.module('flowableModeler')
+.controller('DeleteAppDefinitionPopupCtrl', ['$rootScope', '$scope', '$http', '$translate', function ($rootScope, $scope, $http, $translate) {
 
     $scope.popup = {
         loading: false,
@@ -266,7 +253,7 @@ angular.module('activitiModeler')
             deleteRuntimeApp: true
         };
 
-        $http({method: 'DELETE', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.model.app.id, params: params}).
+        $http({method: 'DELETE', url: FLOWABLE.APP_URL.getModelUrl($scope.model.app.id), params: params}).
             success(function(data, status, headers, config) {
                 $scope.$hide();
                 $scope.popup.loading = false;
@@ -286,7 +273,7 @@ angular.module('activitiModeler')
     };
 }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
 .controller('ImportNewVersionAppDefinitionCtrl', ['$rootScope', '$scope', '$http', 'Upload', '$route', function ($rootScope, $scope, $http, Upload, $route) {
 
   $scope.popup = {
@@ -303,9 +290,9 @@ angular.module('activitiModeler')
 
           var url;
           if (isIE) {
-              url = FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/' + $scope.model.app.id + '/text/import?renewIdmEntries=' + $scope.popup.renewIdmIds;
+              url = FLOWABLE.APP_URL.getAppDefinitionModelTextImportUrl($scope.model.app.id, $scope.popup.renewIdmIds);
           } else {
-              url = FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/' + $scope.model.app.id + '/import?renewIdmEntries=' + $scope.popup.renewIdmIds;
+              url = FLOWABLE.APP_URL.getAppDefinitionModelImportUrl($scope.model.app.id, $scope.popup.renewIdmIds);
           }
 
           Upload.upload({

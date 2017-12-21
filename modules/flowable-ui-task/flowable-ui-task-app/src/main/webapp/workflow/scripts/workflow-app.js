@@ -12,7 +12,7 @@
  */
 'use strict';
 
-var activitiApp = angular.module('activitiApp', [
+var flowableApp = angular.module('flowableApp', [
     'ngCookies',
     'ngResource',
     'ngSanitize',
@@ -27,12 +27,13 @@ var activitiApp = angular.module('activitiApp', [
     'ui.grid.selection',
     'ui.grid.autoResize',
     'angular-loading-bar',
-    'cfp.hotkeys'
+    'cfp.hotkeys',
+    'ui.mask'	 
 ]);
 
-var activitiModule = activitiApp;
+var flowableModule = flowableApp;
 
-activitiApp
+flowableApp
 
   // Initialize routes
    .config(['$provide', '$routeProvider', '$selectProvider', '$datepickerProvider', '$translateProvider', 'cfpLoadingBarProvider',
@@ -95,26 +96,51 @@ activitiApp
             templateUrl: appResourceRoot + 'views/process.html',
             controller: 'ProcessController'
         })
+        .when('/cases', {
+            templateUrl: appResourceRoot + 'views/cases.html',
+            controller: 'CasesController'
+        })
+        .when('/apps/:deploymentKey/cases', {
+            templateUrl: appResourceRoot + 'views/cases.html',
+            controller: 'CasesController'
+        })
+        .when('/apps/:deploymentKey/case/:caseId', {
+            templateUrl: appResourceRoot + 'views/case.html',
+            controller: 'CaseController'
+        })
         .otherwise({
             redirectTo: FLOWABLE.CONFIG.appDefaultRoute || '/tasks'
         });
 
         // Initialize angular-translate
         $translateProvider.useStaticFilesLoader({
-            prefix: appResourceRoot + 'i18n/',
-            suffix: '.json'
-        });
-
-       $translateProvider.registerAvailableLanguageKeys(['en'], {
-           'en_*': 'en',
-           'en-*': 'en'
-       });
+           prefix: './i18n/',
+           suffix: '.json'
+        })
+        /*
+        This can be used to map multiple browser language keys to a
+        angular translate language key.
+        */
+        // .registerAvailableLanguageKeys(['en'], {
+        //     'en-*': 'en'
+        // })
+        .useSanitizeValueStrategy('escapeParameters')
+        .uniformLanguageTag('bcp47')
+        .determinePreferredLanguage();
 
        // turn loading bar spinner off (angular-loading-bar lib)
        cfpLoadingBarProvider.includeSpinner = false;
     }])
-    .run(['$rootScope', '$routeParams', '$timeout', '$translate', '$location', '$http', '$window', 'appResourceRoot', 'AppDefinitionService',
-        function($rootScope, $routeParams, $timeout, $translate, $location, $http, $window, appResourceRoot, AppDefinitionService) {
+    .run(['$rootScope', '$routeParams', '$timeout', '$translate', '$location', '$http', '$window', 'appResourceRoot', 'AppDefinitionService', 'ProcessService', 'CaseService',
+        function($rootScope, $routeParams, $timeout, $translate, $location, $http, $window, appResourceRoot, AppDefinitionService, ProcessService, CaseService) {
+
+        // set angular translate fallback language
+        $translate.fallbackLanguage(['en']);
+
+        // setting Moment-JS (global) locale
+        if (FLOWABLE.CONFIG.datesLocalization) {
+            moment.locale($translate.proposedLanguage());
+        }
 
         $rootScope.restRootUrl = function() {
             return FLOWABLE.CONFIG.contextRoot;
@@ -124,8 +150,6 @@ activitiApp
         $rootScope.appResourceRoot = appResourceRoot;
         $rootScope.activitiFieldIdPrefix = 'activiti-';
 
-        $translate.use('en');
-        
         $rootScope.window = {};
         var updateWindowSize = function() {
             $rootScope.window.width = $window.innerWidth;
@@ -159,6 +183,11 @@ activitiApp
                 'id': 'processes',
                 'title': 'GENERAL.NAVIGATION.PROCESSES',
                 'path': '/processes'
+            },
+            {
+                'id': 'cases',
+                'title': 'GENERAL.NAVIGATION.CASES',
+                'path': '/cases'
             }
         ];
 
@@ -261,17 +290,15 @@ activitiApp
         $rootScope.root = {};
 
         $rootScope.loadProcessDefinitions = function(deploymentKey) {
-            var url = FLOWABLE.CONFIG.contextRoot + '/app/rest/process-definitions?latest=true';
-            if (deploymentKey) {
-                url += '&deploymentKey=' + deploymentKey;
-            }
-            $http({method: 'GET', url: url}).
-                success(function(response, status, headers, config) {
-                    $rootScope.root.processDefinitions = response.data;
-                }).
-                error(function(response, status, headers, config) {
-                    console.log('Something went wrong: ' + response);
-                });
+        	ProcessService.getProcessDefinitions(deploymentKey).then(function(response) {
+        		$rootScope.root.processDefinitions = response.data;
+        	});
+        };
+        
+        $rootScope.loadCaseDefinitions = function(deploymentKey) {
+            CaseService.getCaseDefinitions(deploymentKey).then(function(response) {
+                $rootScope.root.caseDefinitions = response.data;
+            });
         };
 
         $rootScope.$on("$locationChangeStart",
@@ -297,6 +324,19 @@ activitiApp
                 this.$apply(fn);
             }
         };
+
+        $rootScope.logout = function () {
+            $rootScope.authenticated = false;
+            $rootScope.authenticationError = false;
+            $http.get(FLOWABLE.CONFIG.contextRoot + '/app/logout')
+                .success(function (data, status, headers, config) {
+                    $rootScope.login = null;
+                    $rootScope.authenticated = false;
+                    $window.location.href = '/';
+                    $window.location.reload();
+                });
+        };
+
     }
   ])
   .run(['$rootScope', '$location', '$window', '$translate', 'appName', '$modal',
@@ -311,7 +351,7 @@ activitiApp
                 baseUrl = baseUrl.substring(0, index) + '/';
             }
             $window.location.href = baseUrl;
-        }
+        };
     }])
 
     // Moment-JS date-formatting filter
@@ -360,9 +400,22 @@ activitiApp
             if (user) {
                if(user.firstName) {
                    return user.firstName + " " + user.lastName;
-               } else {
+               } else if(user.lastName) {
                    return user.lastName;
-               }
+               } else {
+			       if (user != undefined && user != null){
+				       var _user = user.split(".");
+					   if (_user.length > 1){
+					       user = _user[0].charAt(0).toUpperCase() + _user[0].slice(1) +" "+ _user[1].charAt(0).toUpperCase() + _user[1].slice(1);
+					   } else {
+						   user = _user[0].charAt(0).toUpperCase() + _user[0].slice(1);
+					   }
+					   return user;
+					   
+				   } else {
+					   return "??";
+			       }
+			   }
             }
             return '';
         };

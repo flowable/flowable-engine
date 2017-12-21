@@ -12,11 +12,11 @@
  */
 'use strict';
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
     .controller('HeaderController', ['$rootScope', '$scope', '$http', '$timeout', function ($rootScope, $scope, $http, $timeout) {
     	
     	// Add reference to global header-config
-    	$scope.headerConfig = KISBPM.HEADER_CONFIG;
+    	$scope.headerConfig = FLOWABLE.HEADER_CONFIG;
     	
     	// TODO: generate setting-menu items
     	

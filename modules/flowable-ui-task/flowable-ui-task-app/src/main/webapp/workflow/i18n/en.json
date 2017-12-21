@@ -3,7 +3,7 @@
         "SELECT-FOLDER": "Select folder..."
     },
     "GENERAL": {
-        "MAIN-TITLE": "Activiti - My Tasks",
+        "MAIN-TITLE": "Flowable - My Tasks",
         "ERROR": {
             "GENERIC": "Sorry, an error occured...",
             "UNKNOWN": "Sorry, an error occured while performing the requested operation.",
@@ -11,16 +11,12 @@
             "NOT_FOUND": "The resource you are trying to access does not exist",
             "UNAUTHORIZED": "You should sign in in order to perform the requested operation.",
             "FORBIDDEN": "You are not allowed to perform the requested operation",
-            "INTERNAL_SERVER_ERROR": "Sorry, an unexpected error occured while performing the requested operation.",
-            "UPLOAD-LIMIT-EXCEEDED": "The file you are trying to upload is too large",
-            "UPLOAD-LIMIT-EXCEEDED-TRIAL-USER": "The file you are trying to upload is too large. Upgrade to enterprise to upload files larger than {{quota}}!",
-            "QUOTA-EXCEEDED-RUNTIME-PROCESSES": "As a trial user, you can only have {{quota}} active processes running at the same time.",
-            "QUOTA-EXCEEDED-COMPLETED-PROCESSES": "As a trial user, you can only have {{quota}} completed processes. Delete a completed process in order to start a new one.",
-            "QUOTA-EXCEEDED-TOTAL-CONTENT-SIZE": "As a trial user, you can only store a total of {{quota}} of content. Delete content or complete processes to free up space for new content."
+            "INTERNAL_SERVER_ERROR": "Sorry, an unexpected error occured while performing the requested operation."
         },
         "NAVIGATION": {
             "TASKS": "Tasks",
             "PROCESSES": "Processes",
+            "CASES": "Cases",
             "DESIGN": "Design",
             "CREATE": "+ Create",
             "LOGIN": "Sign in"
@@ -158,6 +154,7 @@
             "ASSIGNEE": "Assignee",
             "DUE": "Due",
             "PROCESS-INSTANCE": "Part of process",
+            "CASE-INSTANCE": "Part of case",
             "ENDED": "Ended",
             "DURATION": "Duration"
         },
@@ -168,14 +165,14 @@
             "DUE-ON": "Due",
             "CREATED-ON": "Created",
             "ENDED-ON": "Completed",
-            "COMPLETED-BY": "Completed by {{firstName}} {{lastName}}, ",
+            "COMPLETED-BY": "Completed by",
             "NO-DESCRIPTION": "This task has no description",
             "NO-RELATED-CONTENT": "This task has no related content yet...",
             "NO-PEOPLE-INVOLVED": "This task has no people involved yet...",
             "NO-COMMENTS": "This task has no comments yet...",
             "INVOLVE-PEOPLE-PLACEHOLDER": "+ Add person",
             "CONTENT-UPLOADED-BY": "Added by ",
-            "ASSIGNEE": "Assigned to {{firstName}} {{lastName}}",
+            "ASSIGNEE": "Assigned to",
             "NEW-COMMENT-PLACEHOLDER": "Enter a comment to add to this task",
             "COMMENT-HEADER": "Added by {{createdBy | username}}, {{created | dateformat:\"fromNow\"}}",
             "NO-FILTER": "Showing your tasks, no filter applied",
@@ -234,7 +231,7 @@
             "SELECT-DEFINITION": "Select a process to start from the list below",
             "NO-PROCESS-DEFINITIONS": "You cannot start a process since there are no process definitions available",
             "START-PROCESS": "Start Process",
-            "STARTED-BY": "Started by {{firstName}} {{lastName}}",
+            "STARTED-BY": "Started by",
             "NO-PROCESS-DEFINITION-SELECTED-HELP": "Please select a process definition"
         },
         "ACTION" : {
@@ -271,12 +268,74 @@
             "DELETE-DESCRIPTION": "Are you sure you want to delete process {{name}}? All tasks, content and comments related to this process will be deleted permanently."
         }
     },
+    "CASE": {
+        "ALERT": {
+            "STARTED": "A new  \"{{caseDefinitionName}}\" case was started",
+            "START-CASE-CONTENT-ADD-FAILED": "Failed to add {{noOfFiles}} file(s) to the case"
+        },
+        "TITLE": {
+            "DIAGRAM": "Case diagram"
+        },
+        "FILTER": {
+            "CREATED-DESC": "Newest first",
+            "CREATED-ASC": "Oldest first",
+            "ENDED-DESC": "Completed most recently",
+            "ENDED-ASC": "Completed least recently",
+            "STATE-SUMMARY": "Showing {{state.title | translate}} cases",
+            "STATE": "Case State",
+            "STATE-RUNNING": "running",
+            "STATE-COMPLETED": "completed",
+            "STATE-ALL": "all"
+        },
+        "MESSAGE": {
+            "NO-DESCRIPTION": "This case instance has no description",
+            "NO-FILTER": "Showing all case instances, not filtered",
+            "NO-INSTANCES": "No matching case instances found...",
+            "NO-INSTANCES-HELP": "There are no cases that are running now. If your cases have completed, you can find them using the filter for the case list. To get going with something new you can:",
+            "NO-INSTANCES-HELP-START": "Start a new case and track its progress",
+            "NO-TASKS": "No tasks are currently active ...",
+            "NO-COMPLETED-TASKS": "No tasks have been completed yet...",
+            "NO-BUSINESS-KEY": "No business key set",
+            "CATEGORY": "Category: {{processDefinitionCategory}}",
+            "SELECT-DEFINITION": "Select a case to start from the list below",
+            "NO-CASE-DEFINITIONS": "You cannot start a case since there are no case definitions available",
+            "START-CASE": "Start Case",
+            "STARTED-BY": "Started by",
+            "NO-CASE-DEFINITION-SELECTED-HELP": "Please select a case definition"
+        },
+        "ACTION" : {
+            "CREATE": "+ Start a case",
+            "BACK-TO-LIST": "Back to case instances",
+            "SHOW-DIAGRAM": "Show diagram",
+            "CANCEL": "Cancel case",
+            "DELETE": "Delete case",
+            "AUDIT-LOG": "Audit Log"
+        },
+        "FIELD": {
+            "BUSINESS-KEY": "Business key",
+            "CATEGORY": "Category",
+            "CASE-DEFINITION": "Case definition",
+            "STARTED": "Started",
+            "STARTED-BY": "Started by",
+            "ENDED": "Ended",
+            "NAME": "Case instance name",
+            "NAME-PLACEHOLDER" : "Enter an optional name for the case being started"
+        },
+        "SECTION": {
+            "ACTIVE-TASKS": "Active tasks",
+            "COMPLETED-TASKS": "Completed tasks",
+            "CONTENT" : "Content"
+        },
+        "POPUP": {
+            "CANCEL-TITLE": "Cancel the case?",
+            "CANCEL-DESCRIPTION": "Are you sure you want to cancel case {{name}}?",
+            "DELETE-TITLE": "Delete the case?",
+            "DELETE-DESCRIPTION": "Are you sure you want to delete case {{name}}? All tasks and content related to this case will be deleted permanently."
+        }
+    },
     "INVOLVE-PEOPLE": {
-        "NO-MATCHING-RESULTS": "Use the search box above to find users or ",
+        "NO-MATCHING-RESULTS": "Use the search box above to find users",
         "SEARCH-PLACEHOLDER": "Search user",
-        "USE-EMAIL": "select someone using an email address",
-        "EMAIL-PLACEHOLDER": "Enter an email address",
-        "EMAIL-HELP": "Press Enter or click the button to continue. This person will be notified by email or invited to sign up",
         "BACK-TO-SEARCH": "Back to search",
         "ACTION-SELECT": "Select"
     },

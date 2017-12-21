@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.flowable.idm.engine.impl.persistence.entity.PrivilegeMappingEntityImpl">
+
+  <resultMap id="privilegeMappingResultMap" type="org.flowable.idm.engine.impl.persistence.entity.PrivilegeMappingEntityImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="privilegeId" column="PRIV_ID_" jdbcType="VARCHAR" />
+    <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
+    <result property="groupId" column="GROUP_ID_" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <insert id="insertPrivilegeMapping" parameterType="org.flowable.idm.engine.impl.persistence.entity.PrivilegeMappingEntityImpl">
+    insert into ${prefix}ACT_ID_PRIV_MAPPING (ID_, PRIV_ID_, USER_ID_, GROUP_ID_)
+    values (
+      #{id ,jdbcType=VARCHAR},
+      #{privilegeId ,jdbcType=VARCHAR},
+      #{userId ,jdbcType=VARCHAR},
+      #{groupId ,jdbcType=VARCHAR}
+    )
+  </insert>
+
+  <insert id="bulkInsertPrivilegeMapping" parameterType="java.util.List">
+    insert into ${prefix}ACT_ID_PRIV_MAPPING (ID_, PRIV_ID_, USER_ID_, GROUP_ID_) VALUES 
+      <foreach collection="list" item="privilege" index="index" separator=",">
+        (#{privilege.id ,jdbcType=VARCHAR},
+         #{privilege.privilegeId ,jdbcType=VARCHAR},
+         #{privilege.userId ,jdbcType=VARCHAR},
+         #{privilege.groupId ,jdbcType=VARCHAR})
+      </foreach>
+  </insert>
+
+  <insert id="bulkInsertPrivilegeMapping" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL 
+      <foreach collection="list" item="privilege" index="index">
+        insert into ${prefix}ACT_ID_PRIV_MAPPING (ID_, PRIV_ID_, USER_ID_, GROUP_ID_) VALUES 
+        (#{privilege.id ,jdbcType=VARCHAR},
+         #{privilege.privilegeId ,jdbcType=VARCHAR},
+         #{privilege.userId ,jdbcType=VARCHAR},
+         #{privilege.groupId ,jdbcType=VARCHAR})
+      </foreach>
+    SELECT * FROM dual
+  </insert>
+
+  <delete id="deletePrivilegeMapping" parameterType="org.flowable.idm.engine.impl.persistence.entity.PrivilegeMappingEntityImpl">
+    delete from ${prefix}ACT_ID_PRIV_MAPPING where ID_ = #{id}
+  </delete>
+  
+  <delete id="deleteByPrivilegeId" parameterType="string">
+    delete from ${prefix}ACT_ID_PRIV_MAPPING where PRIV_ID_ = #{id}
+  </delete>
+  
+  <delete id="deleteByPrivilegeIdAndUserId" parameterType="map">
+    delete from ${prefix}ACT_ID_PRIV_MAPPING where PRIV_ID_ = #{privilegeId} and USER_ID_ = #{userId}
+  </delete>
+
+  <delete id="deleteByPrivilegeIdAndGroupId" parameterType="map">
+    delete from ${prefix}ACT_ID_PRIV_MAPPING where PRIV_ID_ = #{privilegeId} and GROUP_ID_ = #{groupId}
+  </delete>
+
+  <select id="selectPrivilegeMapping" parameterType="string" resultMap="privilegeMappingResultMap">
+    select * from ${prefix}ACT_ID_PRIV_MAPPING where ID_ = #{id,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectPrivilegeMappingsByPrivilegeId" parameterType="string" resultMap="privilegeMappingResultMap">
+    select * from ${prefix}ACT_ID_PRIV_MAPPING where PRIV_ID_ = #{parameter,jdbcType=VARCHAR}
+  </select>
+  
+</mapper>

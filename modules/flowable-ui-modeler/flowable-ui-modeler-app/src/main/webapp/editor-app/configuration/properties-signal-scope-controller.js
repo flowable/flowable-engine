@@ -11,14 +11,14 @@
  * limitations under the License.
  */
 
-angular.module('activitiModeler').controller('ActivitiSignalRefCtrl', [ '$scope', function($scope) {
+angular.module('flowableModeler').controller('FlowableSignalRefCtrl', [ '$scope', function($scope) {
 
     // Find the parent shape on which the signal definitions are defined
     var signalDefinitionsProperty = undefined;
     var parent = $scope.selectedShape;
     while (parent !== null && parent !== undefined && signalDefinitionsProperty === undefined) {
-        if (parent.properties && parent.properties['oryx-signaldefinitions']) {
-            signalDefinitionsProperty = parent.properties['oryx-signaldefinitions'];
+        if (parent.properties && parent.properties.get('oryx-signaldefinitions')) {
+            signalDefinitionsProperty = parent.properties.get('oryx-signaldefinitions');
         } else {
             parent = parent.parent;
         }

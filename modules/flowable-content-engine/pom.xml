@@ -10,16 +10,16 @@
 		<groupId>org.flowable</groupId>
 		<artifactId>flowable-root</artifactId>
 		<relativePath>../..</relativePath>
-		<version>6.0.0.RC1-SNAPSHOT</version>
+		<version>6.3.0-SNAPSHOT</version>
 	</parent>
 
 	<properties>
-		<activiti.artifact>
-			org.activiti.content.engine
-		</activiti.artifact>
-		<activiti.osgi.import.additional>
+		<flowable.artifact>
+			org.flowable.content.engine
+		</flowable.artifact>
+		<flowable.osgi.import.additional>
 			org.springframework*;resolution:=optional,
-		</activiti.osgi.import.additional>
+		</flowable.osgi.import.additional>
 	</properties>
 
     <dependencies>
@@ -54,6 +54,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
       		<groupId>org.mybatis</groupId>
@@ -63,18 +64,6 @@
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
         </dependency>
-        <dependency>
-			<groupId>de.odysseus.juel</groupId>
-			<artifactId>juel-api</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>de.odysseus.juel</groupId>
-			<artifactId>juel-impl</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>de.odysseus.juel</groupId>
-			<artifactId>juel-spi</artifactId>
-		</dependency>
         <dependency>
             <groupId>joda-time</groupId>
             <artifactId>joda-time</artifactId>
@@ -88,7 +77,6 @@
         <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
-            <version>3.4.1</version>
         </dependency>
 
         <dependency>
@@ -224,8 +212,8 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<echo message="updating activiti content configuration to db ${databasecontent}" />
-										<copy file="${basedir}/../../qa/db/activiti.content.cfg.xml"
+										<echo message="updating flowable content configuration to db ${databasecontent}" />
+										<copy file="${basedir}/../../qa/db/flowable.content.cfg.xml"
 											todir="target/test-classes" overwrite="true">
 											<filterset
 												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasecontent}.properties" />
@@ -242,7 +230,7 @@
 								<configuration>
 									<tasks>
 										<echo message="dropping schema in ${databasecontent}" />
-										<java classname="org.activiti.content.engine.impl.db.DbSchemaDrop"
+										<java classname="org.flowable.content.engine.impl.db.DbSchemaDrop"
 											classpathref="maven.test.classpath" />
 									</tasks>
 								</configuration>
@@ -276,8 +264,8 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<echo message="updating activiti content configuration to db ${databasewithschemacontent}" />
-										<copy file="${basedir}/../../qa/db/schema/activiti.content.cfg.xml"
+										<echo message="updating flowable content configuration to db ${databasewithschemacontent}" />
+										<copy file="${basedir}/../../qa/db/schema/flowable.content.cfg.xml"
 											todir="target/test-classes" overwrite="true">
 											<filterset
 												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasewithschemacontent}.properties" />
@@ -294,7 +282,7 @@
 								<configuration>
 									<tasks>
 										<echo message="dropping schema in ${databasewithschemacontent}" />
-										<java classname="org.activiti.content.engine.impl.db.DbSchemaDrop"
+										<java classname="org.flowable.content.engine.impl.db.DbSchemaDrop"
 											classpathref="maven.test.classpath" />
 									</tasks>
 								</configuration>

@@ -15,7 +15,7 @@
  * String controller
  */
 
-angular.module('activitiModeler').controller('KisBpmStringPropertyCtrl', [ '$scope', function ($scope) {
+angular.module('flowableModeler').controller('FlowableStringPropertyCtrl', [ '$scope', function ($scope) {
 
 	$scope.shapeId = $scope.selectedShape.id;
 	$scope.valueFlushed = false;
@@ -52,7 +52,7 @@ angular.module('activitiModeler').controller('KisBpmStringPropertyCtrl', [ '$sco
  * Boolean controller
  */
 
-angular.module('activitiModeler').controller('KisBpmBooleanPropertyCtrl', ['$scope', function ($scope) {
+angular.module('flowableModeler').controller('FlowableBooleanPropertyCtrl', ['$scope', function ($scope) {
 
     $scope.changeValue = function() {
         if ($scope.property.key === 'oryx-defaultflow' && $scope.property.value) {
@@ -67,7 +67,7 @@ angular.module('activitiModeler').controller('KisBpmBooleanPropertyCtrl', ['$sco
                         // in case there are more flows, check if another flow is already defined as default
                         for (var i = 0; i < flows.length; i++) {
                             if (flows[i].resourceId != selectedShape.resourceId) {
-                                var defaultFlowProp = flows[i].properties['oryx-defaultflow'];
+                                var defaultFlowProp = flows[i].properties.get('oryx-defaultflow');
                                 if (defaultFlowProp) {
                                     flows[i].setProperty('oryx-defaultflow', false, true);
                                 }
@@ -86,24 +86,31 @@ angular.module('activitiModeler').controller('KisBpmBooleanPropertyCtrl', ['$sco
  * Text controller
  */
 
-angular.module('activitiModeler').controller('KisBpmTextPropertyCtrl', [ '$scope', '$modal', function($scope, $modal) {
+angular.module('flowableModeler').controller('FlowableTextPropertyCtrl', [ '$scope', '$modal', '$timeout', function($scope, $modal, $timeout) {
 
     var opts = {
         template:  'editor-app/configuration/properties/text-popup.html?version=' + Date.now(),
-        scope: $scope
+        scope: $scope,
+        prefixEvent: 'textModalEvent'
     };
-
+    
+     $scope.$on('textModalEvent.hide.before', function() {
+        $timeout(function() {
+            $scope.property.mode = 'read';
+        }, 0);
+    });
+    
     // Open the dialog
     _internalCreateModal(opts, $modal, $scope);
 }]);
 
-angular.module('activitiModeler').controller('KisBpmTextPropertyPopupCtrl', ['$scope', function($scope) {
-    
+angular.module('flowableModeler').controller('FlowableTextPropertyPopupCtrl', ['$scope', function($scope) {
+
     $scope.save = function() {
         $scope.updatePropertyInModel($scope.property);
         $scope.close();
     };
-
+    
     $scope.close = function() {
         $scope.property.mode = 'read';
         $scope.$hide();

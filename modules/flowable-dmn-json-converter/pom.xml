@@ -7,14 +7,14 @@
 		<groupId>org.flowable</groupId>
 		<artifactId>flowable-root</artifactId>
 		<relativePath>../..</relativePath>
-		<version>6.0.0.RC1-SNAPSHOT</version>
+		<version>6.3.0-SNAPSHOT</version>
 	</parent>
 	<packaging>jar</packaging>
 	
 	<properties>
-		<activiti.artifact>
-			org.activiti.dmn.json.converter
-		</activiti.artifact>
+		<flowable.artifact>
+			org.flowable.dmn.json.converter
+		</flowable.artifact>
 	</properties>
 
 	<dependencies>
@@ -33,10 +33,12 @@
 		<dependency>
       		<groupId>org.slf4j</groupId>
       		<artifactId>slf4j-log4j12</artifactId>
+      		<scope>test</scope>
     	</dependency>
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>commons-io</groupId>

@@ -9,7 +9,7 @@
   
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="theTask" />
-    <serviceTask id="theTask" name="The service task" activiti:class="org.activiti.compatibility.test.delegate.DelegateWithExpression">
+    <serviceTask id="theTask" name="The service task" activiti:class="org.flowable.compatibility.test.delegate.DelegateWithExpression">
       <extensionElements>
         <activiti:field name="param" stringValue="helloWorld" />
       </extensionElements>

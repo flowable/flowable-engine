@@ -13,7 +13,7 @@
 'use strict';
 
 
-angular.module('activitiApp')
+angular.module('flowableApp')
     .controller('TaskController', ['$rootScope', '$scope', '$translate', '$timeout','$location', '$modal', '$popover', 'appResourceRoot', 'CommentService', 'TaskService', '$routeParams', 'AppDefinitionService',
         function ($rootScope, $scope, $translate, $timeout, $location, $modal, $popover, appResourceRoot, CommentService, TaskService, $routeParams, AppDefinitionService) {
 
@@ -39,7 +39,7 @@ angular.module('activitiApp')
         }]
 );
 
-angular.module('activitiApp')
+angular.module('flowableApp')
   .controller('TaskDetailController', ['$rootScope', '$scope', '$translate', '$http','$location', '$routeParams', 'appResourceRoot', 'CommentService', 'TaskService', 'FormService', 'RelatedContentService', '$timeout', '$modal', '$popover',
         function ($rootScope, $scope, $translate, $http, $location, $routeParams, appResourceRoot, CommentService, TaskService, FormService, RelatedContentService, $timeout, $modal, $popover) {
 
@@ -235,10 +235,16 @@ angular.module('activitiApp')
                 $scope.loadComments();
                 $scope.loadRelatedContent();
 
-                if($scope.model.task.processInstanceId) {
+                if ($scope.model.task.processInstanceId) {
                     $scope.loadProcessInstance();
                 } else {
                     $scope.model.processInstance = null;
+                }
+                
+                if ($scope.model.task.scopeId) {
+                    $scope.loadCaseInstance();
+                } else {
+                    $scope.model.caseInstance = null;
                 }
 
                 $scope.refreshInvolvmentSummary();
@@ -483,7 +489,6 @@ angular.module('activitiApp')
         });
     };
 
-    // TODO: move process instance loading to separate service and merge with process.js
     $scope.loadProcessInstance = function() {
         $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/process-instances/' + $scope.model.task.processInstanceId}).
             success(function(response, status, headers, config) {
@@ -501,6 +506,25 @@ angular.module('activitiApp')
             path = "/apps/" + $rootScope.activeAppDefinition.id;
         }
         $location.path(path + "/processes");
+    };
+    
+    $scope.loadCaseInstance = function() {
+        $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/case-instances/' + $scope.model.task.scopeId}).
+            success(function(response, status, headers, config) {
+                $scope.model.caseInstance = response;
+            }).
+            error(function(response, status, headers, config) {
+                // Do nothing. User is not allowed to see the process instance
+            });
+    };
+
+    $scope.openCaseInstance = function(id) {
+        $rootScope.root.selectedCaseId = id;
+        var path='';
+        if($rootScope.activeAppDefinition && !FLOWABLE.CONFIG.integrationProfile) {
+            path = "/apps/" + $rootScope.activeAppDefinition.id;
+        }
+        $location.path(path + "/cases");
     };
 
     $scope.returnToTaskList = function() {
@@ -639,7 +663,7 @@ angular.module('activitiApp')
  }]);
 
 
-angular.module('activitiApp')
+angular.module('flowableApp')
     .controller('CreateTaskController', ['$rootScope', '$scope', '$translate', '$http', '$location', 'TaskService',
         function ($rootScope, $scope, $translate, $http, $location, TaskService) {
 
@@ -662,7 +686,7 @@ angular.module('activitiApp')
         }
 ]);
 
-angular.module('activitiApp')
+angular.module('flowableApp')
     .controller('ContentDetailsController', ['$rootScope', '$scope', '$translate', '$modal', 'appResourceRoot', 'RelatedContentService',
         function ($rootScope, $scope, $translate, $modal, appResourceRoot, RelatedContentService) {
 

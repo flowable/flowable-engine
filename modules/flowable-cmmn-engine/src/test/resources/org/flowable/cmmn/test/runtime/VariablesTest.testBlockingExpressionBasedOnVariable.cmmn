@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/CMMN/20151109/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:flowable="http://flowable.org/cmmn" xmlns:cmmndi="http://www.omg.org/spec/CMMN/20151109/CMMNDI" xmlns:dc="http://www.omg.org/spec/CMMN/20151109/DC" xmlns:di="http://www.omg.org/spec/CMMN/20151109/DI" targetNamespace="http://www.flowable.org/casedef">
+  <case id="testBlockingExpression" name="testBlockingExpression">
+    <casePlanModel id="casePlanModel" name="testBlockingExpression">
+      <planItem id="planItem1" name="${nameVar}" definitionRef="sid-D5527B28-87BB-4CCD-B6B4-16F057CA9438"></planItem>
+      <planItem id="planItem2" name="B" definitionRef="sid-7271A325-5141-4CAB-9EE2-DAF98D024A40"></planItem>
+      <task id="sid-D5527B28-87BB-4CCD-B6B4-16F057CA9438" name="${nameVar}"></task>
+      <task id="sid-7271A325-5141-4CAB-9EE2-DAF98D024A40" name="B" flowable:isBlockingExpression="${blockB}"></task>
+    </casePlanModel>
+  </case>
+</definitions>

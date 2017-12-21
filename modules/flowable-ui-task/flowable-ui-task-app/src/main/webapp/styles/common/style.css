@@ -22,25 +22,17 @@
 }
 
 @font-face {
-    font-family: 'Lato';
-    src: url('../../fonts/lato-regular-webfont.eot');
-    src: url('../../fonts/lato-regular-webfont.eot?#iefix') format('embedded-opentype'),
-    url('../../fonts/lato-regular-webfont.woff') format('woff'),
-    url('../../fonts/lato-regular-webfont.ttf') format('truetype'),
-    url('../../fonts/lato-regular-webfont.svg#latoregular') format('svg');
-    font-weight: normal;
+    font-family: 'Titillium Web';
     font-style: normal;
+    font-weight: normal;
+    url('../../fonts/TitilliumWeb-Regular.ttf') format('truetype');
 }
 
 @font-face {
-    font-family: 'Lato';
-    src: url('../../fonts/lato-bold-webfont.eot');
-    src: url('../../fonts/lato-bold-webfont.eot?#iefix') format('embedded-opentype'),
-    url('../../fonts/lato-bold-webfont.woff') format('woff'),
-    url('../../fonts/lato-bold-webfont.ttf') format('truetype'),
-    url('../../fonts/lato-bold-webfont.svg#latoregular') format('svg');
-    font-weight: bold;
+    font-family: 'Titillium Web';
     font-style: normal;
+    font-weight: bold;
+    url('../../fonts/TitilliumWeb-Bold.ttf') format('truetype');
 }
 
 .form-control {
@@ -52,7 +44,7 @@
 
 body,
 body pre {
-    font-family: 'Lato', sans-serif;
+    font-family: 'Titillium Web', sans-serif;
 }
 
 body pre {
@@ -593,7 +585,7 @@ a.dropdown-toggle {
 }
 
 .subheader h2 {
-    font-family: 'Lato', sans-serif;
+    font-family: 'Titillium Web', sans-serif;
     color: #1a1a1a;
     font-size: 20px;
     font-weight: normal;
@@ -1744,7 +1736,7 @@ h3+div > .dropzone {
 
 .people-select {
     overflow: auto;
-    max-width: 300px;
+    max-width: 100%;
 }
 
 .popover .people-select {
@@ -2683,7 +2675,8 @@ h3+div > .dropzone {
 }
 
 .landing-logo img {
-    max-height: 26px;
+    max-height: 35px;
+    margin-top: -3px;
     margin-left: 10px;
 }
 
@@ -3273,3 +3266,13 @@ ul#strength > li:last-child {
   height:auto;
 }
 
+.form-control.ng-invalid {
+    border-color: #a94442 !important;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.075) inset, 0 0 8px rgba(255,0,0,0.5);
+}
+
+.control-label.ng-invalid {
+    color: #a94442 !important;
+    font-weight: bold;
+   
+}

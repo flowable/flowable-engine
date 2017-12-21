@@ -10,14 +10,14 @@
     <groupId>org.flowable</groupId>
     <artifactId>flowable-root</artifactId>
     <relativePath>../..</relativePath>
-    <version>6.0.0.RC1-SNAPSHOT</version>
+    <version>6.3.0-SNAPSHOT</version>
   </parent>
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <activiti.artifact>
-      org.activiti.cxf
-    </activiti.artifact>
+    <flowable.artifact>
+      org.flowable.cxf
+    </flowable.artifact>
   </properties>
 
   <build>
@@ -30,14 +30,6 @@
       </resource>
     </resources>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.7</source>
-          <target>1.7</target>
-        </configuration>
-      </plugin>
       <plugin>
         <artifactId>maven-jar-plugin</artifactId>
         <configuration>
@@ -67,7 +59,6 @@
       </plugin>
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.7.1</version>
         <configuration>
          <forkMode>always</forkMode>
         </configuration>
@@ -200,7 +191,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-javadoc-plugin</artifactId>
         <configuration>
-          <excludePackageNames>org.activiti.impl*,org.activiti.engine.impl*</excludePackageNames>
+          <excludePackageNames>org.flowable.impl*,org.flowable.engine.impl*</excludePackageNames>
           <additionalparam>-Xdoclint:none</additionalparam>
         </configuration>
       </plugin>

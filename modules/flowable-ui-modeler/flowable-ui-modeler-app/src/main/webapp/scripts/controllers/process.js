@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-angular.module('activitiModeler')
+angular.module('flowableModeler')
   .controller('ProcessCtrl', ['$rootScope', '$scope', '$translate', '$http', '$location', '$routeParams','$modal', '$popover', '$timeout', 'appResourceRoot', 'ResourceService',
                               function ($rootScope, $scope, $translate, $http, $location, $routeParams, $modal, $popover, $timeout, appResourceRoot, ResourceService) {
 
@@ -27,10 +27,10 @@ angular.module('activitiModeler')
     $scope.loadProcess = function() {
       var url;
       if ($routeParams.modelHistoryId) {
-        url = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $routeParams.modelId
+        url = FLOWABLE.APP_URL.getModelUrl($routeParams.modelId);
           + '/history/' + $routeParams.modelHistoryId;
       } else {
-        url = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $routeParams.modelId;
+        url = FLOWABLE.APP_URL.getModelUrl($routeParams.modelId);
       }
       
       $http({method: 'GET', url: url}).
@@ -39,8 +39,9 @@ angular.module('activitiModeler')
           
           $scope.loadVersions();
 
-          $scope.model.bpmn20DownloadUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $routeParams.modelId +
-    			($routeParams.modelHistoryId == undefined ? '' : '/history/' + $routeParams.modelHistoryId) + '/bpmn20?version=' + Date.now();
+          $scope.model.bpmn20DownloadUrl = $routeParams.modelHistoryId == undefined ?
+              FLOWABLE.APP_URL.getModelBpmn20ExportUrl($routeParams.modelId) :
+              FLOWABLE.APP_URL.getModelHistoryBpmn20ExportUrl($routeParams.modelId, $routeParams.modelHistoryId);
 
 
         	  $rootScope.$on('$routeChangeStart', function(event, next, current) {
@@ -58,9 +59,9 @@ angular.module('activitiModeler')
 
                 var viewerUrl = appResourceRoot + "display/displaymodel.html?version=" + Date.now();
 
-                // If Activiti has been deployed inside an AMD environment Raphael will fail to register
-                // itself globally until displaymodel.js (which depends ona global Raphale variable) is runned,
-                // therefor remove AMD's define method until we have loaded in Raphael and displaymodel.js
+                // If Flowable has been deployed inside an AMD environment Raphael will fail to register
+                // itself globally until displaymodel.js (which depends ona global Raphale variable) is running,
+                // therefore remove AMD's define method until we have loaded in Raphael and displaymodel.js
                 // and assume/hope its not used during.
                 var amdDefine = window.define;
                 window.define = undefined;
@@ -88,7 +89,7 @@ angular.module('activitiModeler')
         includeLatestVersion: !$scope.model.process.latestVersion  
       };
       
-      $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.model.latestModelId +'/history', params: params}).
+      $http({method: 'GET', url: FLOWABLE.APP_URL.getModelHistoriesUrl($scope.model.latestModelId), params: params}).
       success(function(data, status, headers, config) {
         if ($scope.model.process.latestVersion) {
           if (!data.data) {

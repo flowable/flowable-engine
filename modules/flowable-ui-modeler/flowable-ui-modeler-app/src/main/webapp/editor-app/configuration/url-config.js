@@ -10,9 +10,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var KISBPM = KISBPM || {};
+var FLOWABLE = FLOWABLE || {};
 
-KISBPM.URL = {
+FLOWABLE.URL = {
 
     getModel: function(modelId) {
         return FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + modelId + '/editor/json?version=' + Date.now();
@@ -21,8 +21,16 @@ KISBPM.URL = {
     getStencilSet: function() {
         return FLOWABLE.CONFIG.contextRoot + '/app/rest/stencil-sets/editor?version=' + Date.now();
     },
+    
+    getCmmnStencilSet: function() {
+        return FLOWABLE.CONFIG.contextRoot + '/app/rest/stencil-sets/cmmneditor?version=' + Date.now();
+    },
 
     putModel: function(modelId) {
         return FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + modelId + '/editor/json';
+    },
+    
+    validateModel: function(){
+		return FLOWABLE.CONFIG.contextRoot + '/app/rest/model/validate';
     }
 };

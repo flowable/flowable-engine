@@ -12,7 +12,7 @@
  */
 'use strict';
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
   .controller('AppDefinitionsCtrl', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$modal', function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal) {
 
       // Main page (needed for visual indicator of current page)
@@ -20,9 +20,7 @@ angular.module('activitiModeler')
 
 	  $scope.model = {
         filters: [
-            {id: 'myApps', labelKey: 'MY-APPS'},
-            {id: 'sharedWithMe', labelKey: 'SHARED-WITH-ME'},
-            {id: 'sharedWithOthers', labelKey: 'SHARED-WITH-OTHERS'}
+            {id: 'apps', labelKey: 'APPS'}
 		],
 
 		sorts: [
@@ -74,7 +72,7 @@ angular.module('activitiModeler')
 		    params.filterText = $scope.model.filterText;
 		  }
 
-		  $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models', params: params}).
+		  $http({method: 'GET', url: FLOWABLE.APP_URL.getModelsUrl(), params: params}).
 		  	success(function(data, status, headers, config) {
 	    		$scope.model.apps = data;
 	    		$scope.model.loading = false;
@@ -138,8 +136,8 @@ angular.module('activitiModeler')
   }]);
 
 
-angular.module('activitiModeler')
-    .controller('CreateNewAppCrtl', ['$rootScope', '$scope', '$http', '$location', '$translate', function ($rootScope, $scope, $http, $location, $translate) {
+angular.module('flowableModeler')
+    .controller('CreateNewAppCtrl', ['$rootScope', '$scope', '$http', '$location', '$translate', function ($rootScope, $scope, $http, $location, $translate) {
 
         $scope.model = {
             loading: false,
@@ -161,7 +159,7 @@ angular.module('activitiModeler')
 
             $scope.model.loading = true;
 
-            $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models', data: $scope.model.app}).
+            $http({method: 'POST', url: FLOWABLE.APP_URL.getModelsUrl(), data: $scope.model.app}).
                 success(function (data, status, headers, config) {
                     $scope.$hide();
 
@@ -174,12 +172,7 @@ angular.module('activitiModeler')
 					
 					if (response && response.message && response.message.length > 0) {
 						$scope.model.errorMessage = response.message;
-						
-					} else if (response && response.messageKey) {
-                        $translate(response.messageKey, response.customData).then(function (message) {
-                            $scope.errorMessage = message;
-                        });
-                    }
+					}
                 });
         };
 
@@ -190,8 +183,8 @@ angular.module('activitiModeler')
         };
     }]);
 
-angular.module('activitiModeler')
-    .controller('DuplicateAppCrtl', ['$rootScope', '$scope', '$http', '$location', '$translate', function ($rootScope, $scope, $http, $location, $translate) {
+angular.module('flowableModeler')
+    .controller('DuplicateAppCtrl', ['$rootScope', '$scope', '$http', '$location', '$translate', function ($rootScope, $scope, $http, $location, $translate) {
 
         $scope.model = {
             loading: false,
@@ -221,7 +214,7 @@ angular.module('activitiModeler')
 
             $scope.model.loading = true;
 
-            $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/'+$scope.model.app.id+'/clone', data: $scope.model.app}).
+            $http({method: 'POST', url: FLOWABLE.APP_URL.getCloneModelsUrl($scope.model.app.id), data: $scope.model.app}).
                 success(function (data, status, headers, config) {
                     $scope.$hide();
 
@@ -231,12 +224,7 @@ angular.module('activitiModeler')
                 }).
                 error(function (response, status, headers, config) {
                     $scope.model.loading = false;
-
-                    if (response && response.messageKey) {
-                        $translate(response.messageKey, response.customData).then(function (message) {
-                            $scope.errorMessage = message;
-                        });
-                    }
+                    $scope.model.errorMessage = response.message;
                 });
         };
 
@@ -247,7 +235,7 @@ angular.module('activitiModeler')
         };
     }]);
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
 .controller('ImportAppDefinitionCtrl', ['$rootScope', '$scope', '$http', 'Upload', '$location', function ($rootScope, $scope, $http, Upload, $location) {
 
   $scope.model = {
@@ -264,9 +252,9 @@ angular.module('activitiModeler')
 
           var url;
           if (isIE) {
-             url = FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/text/import?renewIdmEntries=' + $scope.model.renewIdmIds;
+             url = FLOWABLE.APP_URL.getAppDefinitionTextImportUrl($scope.model.renewIdmIds);
           } else {
-              url = FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/import?renewIdmEntries=' + $scope.model.renewIdmIds;
+              url = FLOWABLE.APP_URL.getAppDefinitionImportUrl($scope.model.renewIdmIds);
           }
           Upload.upload({
               url: url,

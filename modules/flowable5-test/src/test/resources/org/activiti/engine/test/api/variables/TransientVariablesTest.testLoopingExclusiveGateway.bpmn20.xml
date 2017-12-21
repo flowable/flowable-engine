@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef" xmlns:modeler="http://activiti.com/modeler" modeler:version="1.0en" modeler:exportDateTime="20141210093416680" modeler:modelId="924474" modeler:modelVersion="1" modeler:modelLastUpdated="1418204052768">
+  <process id="loopingTransientVarsTest" isExecutable="true">
+  
+    <startEvent id="theStart"/>
+    <sequenceFlow sourceRef="theStart" targetRef="task1"/>
+    
+    <userTask id="task1" />
+    <sequenceFlow sourceRef="task1" targetRef="exclusiveGw1"/>
+    
+    <exclusiveGateway id="exclusiveGw1" />
+    <sequenceFlow sourceRef="exclusiveGw1" targetRef="task3">
+      <conditionExpression xsi:type="tFormalExpression">${status == 200}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow sourceRef="exclusiveGw1" targetRef="task2">
+      <conditionExpression xsi:type="tFormalExpression">${status != 200}</conditionExpression>
+    </sequenceFlow>
+    
+    <userTask id="task2" />
+    <sequenceFlow sourceRef="task2" targetRef="task1"/>
+    
+    <userTask id="task3" />
+    <sequenceFlow sourceRef="task3" targetRef="exclusiveGw2"/>
+    
+    <exclusiveGateway id="exclusiveGw2" />
+    <sequenceFlow sourceRef="exclusiveGw2" targetRef="theEnd">
+      <conditionExpression xsi:type="tFormalExpression">${status2 == 200}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow sourceRef="exclusiveGw2" targetRef="task2">
+      <conditionExpression xsi:type="tFormalExpression">${status2 != 200}</conditionExpression>
+    </sequenceFlow>
+    
+    
+    <endEvent id="theEnd" />
+    
+  </process>
+</definitions>

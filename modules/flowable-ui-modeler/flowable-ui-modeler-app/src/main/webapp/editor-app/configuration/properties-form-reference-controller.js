@@ -11,11 +11,11 @@
  * limitations under the License.
  */
  
-angular.module('activitiModeler').controller('KisBpmFormReferenceDisplayCtrl',
+angular.module('flowableModeler').controller('FlowableFormReferenceDisplayCtrl',
     [ '$scope', '$modal', '$http', function($scope, $modal, $http) {
     
     if ($scope.property && $scope.property.value && $scope.property.value.id) {
-   		$http.get(FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.property.value.id)
+   		$http.get(FLOWABLE.APP_URL.getModelUrl($scope.property.value.id))
             .success(
                 function(response) {
                     $scope.form = {
@@ -27,7 +27,7 @@ angular.module('activitiModeler').controller('KisBpmFormReferenceDisplayCtrl',
 	
 }]);
 
-angular.module('activitiModeler').controller('KisBpmFormReferenceCrtl',
+angular.module('flowableModeler').controller('FlowableFormReferenceCtrl',
     [ '$scope', '$modal', '$http', function($scope, $modal, $http) {
 	
      // Config for the modal window
@@ -40,8 +40,8 @@ angular.module('activitiModeler').controller('KisBpmFormReferenceCrtl',
      _internalCreateModal(opts, $modal, $scope);
 }]);
 
-angular.module('activitiModeler').controller('KisBpmFormReferencePopupCrtl',
-    [ '$rootScope', '$scope', '$http', '$location', function($rootScope, $scope, $http, $location) {
+angular.module('flowableModeler').controller('FlowableFormReferencePopupCtrl',
+    [ '$rootScope', '$scope', '$http', '$location', 'editorManager', function($rootScope, $scope, $http, $location, editorManager) {
 	 
 	$scope.state = {'loadingForms' : true, 'formError' : false};
 	
@@ -93,8 +93,8 @@ angular.module('activitiModeler').controller('KisBpmFormReferencePopupCrtl',
             
             $scope.updatePropertyInModel($scope.property);
             
-            var modelMetaData = $scope.editor.getModelMetaData();
-            var json = $scope.editor.getJSON();
+            var modelMetaData = editorManager.getBaseModelData();
+            var json = editorManager.getModel();
             json = JSON.stringify(json);
 
             var params = {
@@ -120,23 +120,16 @@ angular.module('activitiModeler').controller('KisBpmFormReferencePopupCrtl',
                     }
                     return str.join("&");
                 },
-                url: KISBPM.URL.putModel(modelMetaData.modelId)})
+                url: FLOWABLE.URL.putModel(modelMetaData.modelId)})
 
                 .success(function (data, status, headers, config) {
-                    $scope.editor.handleEvents({
+                    editorManager.handleEvents({
                         type: ORYX.CONFIG.EVENT_SAVED
                     });
 
                     var allSteps = EDITOR.UTIL.collectSortedElementsFromPrecedingElements($scope.selectedShape);
 
-                    $rootScope.editorHistory.push({
-                        id: modelMetaData.modelId, 
-                        name: modelMetaData.name,
-                        key: modelMetaData.key,
-                        stepId: $scope.selectedShape.resourceId,
-                        allSteps: allSteps,
-                        type: 'bpmnmodel'
-                    });
+					$rootScope.addHistoryItem($scope.selectedShape.resourceId);
                     $location.path('form-editor/' + $scope.selectedForm.id);
 
                 })
@@ -151,7 +144,7 @@ angular.module('activitiModeler').controller('KisBpmFormReferencePopupCrtl',
     $scope.newForm = function() {
         $scope.popup.state = 'newForm';
         
-        var modelMetaData = $scope.editor.getModelMetaData();
+        var modelMetaData = editorManager.getBaseModelData();
         
         $scope.model = {
             loading: false,
@@ -174,7 +167,7 @@ angular.module('activitiModeler').controller('KisBpmFormReferencePopupCrtl',
 
         $scope.model.loading = true;
 
-        $http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models', data: $scope.model.form}).
+        $http({method: 'POST', url: FLOWABLE.APP_URL.getModelsUrl(), data: $scope.model.form}).
             success(function(data, status, headers, config) {
                 
                 var newFormId = data.id;
@@ -185,8 +178,8 @@ angular.module('activitiModeler').controller('KisBpmFormReferencePopupCrtl',
                	};
                 $scope.updatePropertyInModel($scope.property);
                 
-                var modelMetaData = $scope.editor.getModelMetaData();
-                var json = $scope.editor.getJSON();
+                var modelMetaData = editorManager.getBaseModelData();
+                var json = editorManager.getModel();
                 json = JSON.stringify(json);
 
                 var params = {
@@ -212,10 +205,10 @@ angular.module('activitiModeler').controller('KisBpmFormReferencePopupCrtl',
                         }
                         return str.join("&");
                     },
-                    url: KISBPM.URL.putModel(modelMetaData.modelId)})
+                    url: FLOWABLE.URL.putModel(modelMetaData.modelId)})
 
                     .success(function (data, status, headers, config) {
-                        $scope.editor.handleEvents({
+                        editorManager.handleEvents({
                             type: ORYX.CONFIG.EVENT_SAVED
                         });
                         
@@ -224,14 +217,7 @@ angular.module('activitiModeler').controller('KisBpmFormReferencePopupCrtl',
 
                         var allSteps = EDITOR.UTIL.collectSortedElementsFromPrecedingElements($scope.selectedShape);
 
-                        $rootScope.editorHistory.push({
-                            id: modelMetaData.modelId, 
-                            name: modelMetaData.name, 
-                            key: modelMetaData.key, 
-                            type: 'bpmnmodel',
-                            stepId: $scope.selectedShape.resourceId,
-                            allSteps: allSteps,
-                        });
+                        $rootScope.addHistoryItem($scope.selectedShape.resourceId);
                         $location.path('form-editor/' + newFormId);
 
                     })
@@ -252,8 +238,8 @@ angular.module('activitiModeler').controller('KisBpmFormReferencePopupCrtl',
     };
 
     $scope.loadForms = function() {
-        var modelMetaData = $scope.editor.getModelMetaData();
-        $http.get(FLOWABLE.CONFIG.contextRoot + '/app/rest/form-models')
+        var modelMetaData = editorManager.getBaseModelData();
+        $http.get(FLOWABLE.APP_URL.getFormModelsUrl())
             .success(
                 function(response) {
                     $scope.state.loadingForms = false;

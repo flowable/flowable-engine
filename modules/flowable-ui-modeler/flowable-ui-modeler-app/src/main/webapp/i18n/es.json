@@ -1,0 +1,836 @@
+{
+    "GENERAL" : {
+        "MAIN-TITLE": "Flowable Editor",
+        "NAVIGATION" : {
+            "PROCESSES": "Procesos",
+            "FORMS": "Formularios",
+            "DECISION-TABLES": "Tablas de decisión",
+            "APPS": "Aplicaciones"
+        },
+        "TITLE": {
+            "SELECT-GROUP" :"Selecciona el grupo",
+            "MATCHING-GROUPS": "Grupos coincidentes",
+            "FILTER": "Filtro",
+            "HISTORY": "Historial"
+        },
+        "ACTION": {
+            "LOGOUT": "Salir",
+            "RETURN-TO-LIST": "Mostrar todas las definiciones",
+            "CANCEL": "Cancelar",
+            "CLOSE": "Cerrar",
+            "EDIT": "Editar",
+            "SAVE": "Guardar",
+            "OPEN": "Abrir",
+            "OK": "Ok",
+            "CONFIRM": "Confirmar",
+            "CONFIRM-AND-CLOSE": "Confirmar y cerrar",
+            "NEW-FORM": "Nuevo formulario",
+            "CREATE-FORM": "Crear formulario",
+            "NEW-DECISION-TABLE": "Nueva tabla de decisión",
+            "CREATE-DECISION-TABLE": "Crear tabla de decisión"
+        },
+        "MESSAGE": {
+          "SELECT-GROUP-HELP": "Usa &uparrow; y &downarrow; para seleccionar y presiona Enter para confirmar",
+          "PEOPLE-NO-MATCHING-RESULTS": "No se encontraron usuarios similares",
+          "GROUP-NO-MATCHING-RESULTS": "No se encontraron grupos similares",
+          "GROUP-SOURCE-TYPE": "Group source",
+          "GROUP-SOURCE-SEARCH-OPTION": "Busqueda de grupo",
+          "GROUP-SOURCE-FIELD-OPTION": "Campo de formulario"
+        }
+    },
+
+    "EDITOR": {
+      "POPUP": {
+        "UNSAVED-CHANGES": {
+          "TITLE": "Tienes cambios sin guardar",
+          "DESCRIPTION": "Que deseas realizar con los cambios sin guardar?",
+          "ACTION": {
+            "SAVE": "Guardar cambios",
+            "DISCARD": "Descartar cambios",
+            "CONTINUE": "Continiar edición"
+          }
+        }
+      }
+    },
+
+    "PROCESS-LIST" : {
+        "TITLE" : "Modelos de procesos de negocio",
+        "SEARCH-PLACEHOLDER": "Buscar",
+        "ACTION" : {
+            "CREATE": "Crear Proceso",
+            "IMPORT": "Importar Proceso"
+        },
+
+        "FILTER" : {
+            "PROCESSES": "Modelo de proceso",
+            "PROCESSES-COUNT": "Existen {{total}} modelos de proceso",
+            "PROCESSES-ONE": "Existe un modelo de proceso",
+            "PROCESSES-EMPTY": "Aun no existe un modelo de proceso creado. puedes diseñar tus propios modelos, formularios y despues incluirlos en una aplicación. El primer paso es crear un modelo de proceso:",
+            "PROCESSES-BPMN-HINT": "Crear un modelo BPMN usando el editor visual BPMN.",
+            "PROCESSES-BPMN-IMPORT-HINT": "Tambien puede importar modelos BPMN existentes.",
+            "FILTER-TEXT": ", parecido a \"{{filterText}}\"",
+            "FILTER-TEXT-EMPTY": "No existen modelos de proceso parecidos a \"{{filterText}}\"",
+            "RECENT": "Reciente",
+            "RECENT-COUNT": "{{total}} modelos usados recientemente",
+            "RECENT-ONE": "Existe un modelo usado recientemente",
+            "RECENT-EMPTY": "No existen modelos usados recientemente"
+        },
+
+        "SORT": {
+            "MODIFIED-ASC": "Antiguo",
+            "MODIFIED-DESC": "Ultimo modificado",
+            "NAME-ASC": "Nombre, A-Z",
+            "NAME-DESC": "Nombre, Z-A"
+        }
+    },
+
+    "FORMS-LIST" : {
+        "TITLE" : "Formularios",
+        "SEARCH-PLACEHOLDER": "Busqueda",
+        "ACTION" : {
+            "CREATE": "Crear formulario",
+            "CREATE-INLINE": "Crear un nuevo formulario ahora!",
+            "SHOW-MORE": "Mostrar más..."
+        },
+
+        "FILTER" : {
+            "FORMS": "Formularios",
+            "FORMS-COUNT": "Existen {{total}} formularios",
+            "FORMS-ONE": "Existe un formulario",
+            "FORMS-EMPTY": "No existen formularios. Para agregar uno da click en Crear formulario.",
+            "FILTER-TEXT": ", parecido a \"{{filterText}}\"",
+            "FILTER-TEXT-EMPTY": "No existe un formulario parecido a \"{{filterText}}\""
+        },
+
+        "SORT": {
+            "MODIFIED-ASC": "Antiguo",
+            "MODIFIED-DESC": "Ultimo modificado",
+            "NAME-ASC": "Nombre, A-Z",
+            "NAME-DESC": "Nombre, Z-A"
+        }
+    },
+
+    "DECISION-TABLES-LIST": {
+        "TITLE": "Tablas de decision",
+        "SEARCH-PLACEHOLDER": "Busqueda",
+        "ACTION": {
+            "CREATE": "Crear tabla de decision",
+            "IMPORT": "Importar tabla de decision",
+            "CREATE-INLINE": "Crear una tabla de decision ahora!",
+            "SHOW-MORE": "Mostrar más..."
+        },
+
+        "FILTER": {
+            "DECISION-TABLES": "Tablas de decision",
+            "DECISION-TABLES-COUNT": "Existen {{total}} tablas de decision",
+            "DECISION-TABLES-ONE": "Existe una tabla de decision",
+            "DECISION-TABLES-EMPTY": "No existen tablas de decision. Para agregar una da click en Crear tabla de decision.",
+            "FILTER-TEXT": ", parecido a \"{{filterText}}\"",
+            "FILTER-TEXT-EMPTY": "no existen tablas de decision parecidas a \"{{filterText}}\""
+        },
+
+        "SORT": {
+            "MODIFIED-ASC": "Antiguo",
+            "MODIFIED-DESC": "Ultimo modificado",
+            "NAME-ASC": "Nombre, A-Z",
+            "NAME-DESC": "Nombre, Z-A"
+        }
+    },
+
+    "APPS-LIST" : {
+        "TITLE" : "Aplicaciones",
+        "SEARCH-PLACEHOLDER": "Busqueda",
+        "ACTION" : {
+            "CREATE": "Crear App",
+            "IMPORT": "Importar App",
+            "SHOW-MORE": "Mostrar mas..."
+        },
+
+        "FILTER" : {
+            "APPS": "Aplicaciones",
+            "APPS-COUNT": "Existen {{total}} aplicaciones",
+            "APPS-ONE": "Existe una aplicacion",
+            "APPS-EMPTY": "No existen aplicaciones. Para agregar una da click en Crear App.",
+            "FILTER-TEXT": ", parecido a \"{{filterText}}\"",
+            "FILTER-TEXT-EMPTY": "No existen aplicaciones parecidas a \"{{filterText}}\"",
+
+            "NO-APPS": "Puedes crear una aplicacion publicando un conjunto de Modelos de Proceso.",
+            "NO-APPS-CALL-TO-ACTION": "Puedes crear una aplicacion ahora.",
+            "NO-APPS-NOTE": "Recuerda publicar cuando estes listo para usar la aplicacion."
+        },
+
+        "SORT": {
+            "MODIFIED-ASC": "Antiguo",
+            "MODIFIED-DESC": "Ultimo modificado",
+            "NAME-ASC": "Nombre, A-Z",
+            "NAME-DESC": "Nombre, Z-A"
+        }
+    },
+    "PROCESS": {
+      "NAME": "Nombre del modelo",
+      "KEY": "Identificador del modelo",
+      "DESCRIPTION": "Descripcion",
+      "VERSION-COMMENT": "Comentario de version",
+      "ACTION": {
+            "DETAILS": "Mostrar detalles",
+            "EDIT": "Modificar propiedades del modelo",
+            "DUPLICATE": "Duplicar este modelo",
+            "EXPORT_BPMN20": "Exportar a BPMN 2.0",
+            "DELETE": "Borrar este modelo",
+            "CREATE-CONFIRM": "Crear nuevo modelo",
+            "DUPLICATE-CONFIRM": "Duplicar el modelo",
+            "OPEN-IN-EDITOR": "Editor visual",
+            "EDIT-CONFIRM": "Guardar",
+            "DELETE-CONFIRM": "Borrar modelo de proceso",
+            "USE-AS-NEW-VERSION": "Usar como nueva version",
+            "FAVORITE": "Hacer modelo favorito"
+
+        },
+        "DETAILS": {
+          "HISTORY-TITLE": "Historial",
+          "LAST-UPDATED-BY": "Ultima actualizacion por {{lastUpdatedBy}} - {{lastUpdated | dateformat}}",
+          "CREATED-BY": "Creado por {{createdBy}}",
+          "NO-DESCRIPTION": "Este modelo no tiene descripcion. Modifica las propiedades del modelo para agregar una"
+        },
+
+        "POPUP": {
+          "CREATE-TITLE": "Crear un nuevo modelo de proceso de negocio",
+          "DUPLICATE-TITLE": "Duplicar modelo de proceso de negocio",
+          "CREATE-DESCRIPTION": "Necesitas dar un nombre para el nuevo modelo y es recomendable que agregues una descripción al mismo tiempo.",
+          "DUPLICATE-DESCRIPTION": "Puedes cambiar el nombre del modelo y es recomendable que cambies la descripción al mismo tiempo.",
+          "EDIT-DESCRIPTION": "Cambia cualquiera de las propiedades del modelo y despues presiona Guardar para actualizar el modelo.",
+          "DELETE-DESCRIPTION": "Estas seguro que deseas borral el modelo de proceso de negocio \"{{name}}\"?",
+          "EDIT-TITLE":"Editar los detalles del modelo",
+          "DELETE-TITLE": "Borrar modelo",
+          "DELETE-LOADING-RELATIONS": "Verificando el uso del modelo...",
+          "DELETE-RELATIONS-DESCRIPTION-SINGLE": "Este modelo no puede ser eliminado porque esta siendo utilizado por otro modelo:",
+          "DELETE-RELATIONS-DESCRIPTION": "Este modelo no puede ser eliminado porque esta siendo utilizado por otros modelos:",
+          "DELETE-PROCESS-RELATION": "Modelo de proceso",
+          "DELETE-FORM-RELATION": "Formulario de modelo",
+          "DELETE-APP-RELATION": "Modelo de App",
+          "IMPORT-DESCRIPTION": "Busca o arrastra una definicion BPMN XML con la extension .bpmn o .bpmn20.xml",
+          "IMPORT-TITLE": "Importar un modelo de proceso",
+          "USE-AS-NEW-TITLE": "Usar como nueva version",
+          "USE-AS-NEW-DESCRIPTION": "Estas seguro que deseas utilizar la version {{version}} para crear una nueva version de \"{{name}}\"?",
+          "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "No se pudo restaurar a la version seleccionada: Algunos modelos no se encuentran debido a que fueron borrados. Por favor actualiza el modelo de la aplicacion. Modelos faltantes:",
+          "USE-AS-NEW-UNRESOLVED-MODEL": "Modelo '{{name}}' con el id {{id}}, creado por {{createdBy}}",
+          "SHARED-WITH": "Compartido con",
+          "PERMISSION": "Permiso",
+          "ACTIONS": "Acciones",
+          "IMPORT": {
+              "DROPZONE": "Arrastra un archivo .bpmn or .bpmn20.xml BPMN XML",
+              "CANCEL-UPLOAD": "Cancelar la carga de archivo",
+              "ERROR": "Error al procesar el archivo BPMN XML",
+              "NO-DROP": "Arrastrar y soltar no soportado"
+          }
+        },
+        "ALERT": {
+          "EDIT-CONFIRM": "Modelo actualizado"
+        },
+        "ERROR": {
+          "NOT-FOUND": "El modelo solicitado no existe"
+        }
+    },
+
+    "SUBPROCESS": {
+        "NAME": "Nombre del Sub proceso",
+        "DESCRIPTION": "Descripcion",
+        "ACTION": {
+            "CREATE-CONFIRM": "Crear nuevo sub proceso"
+        },
+        "POPUP": {
+            "CREATE-TITLE": "Crear nuevo sub proceso",
+            "CREATE-DESCRIPTION": "Necesitas proporcionar un nombre para el nuevo sub proceso y es recomendable agregar una descripcion al mismo tiempo."
+        }
+    },
+
+    "FORM": {
+      "NAME": "Nombre del formulario",
+      "KEY": "identificador del formulario",
+      "DESCRIPTION": "Descripcion",
+      "ACTION": {
+            "DETAILS": "Mostrar detalles",
+            "EDIT": "Modicar propiedades del modelo",
+            "DELETE": "Borrar este formulario",
+            "CREATE-CONFIRM": "Crear nuevo formulario",
+            "DUPLICATE-CONFIRM": "Duplicar el formulario",
+            "OPEN-IN-EDITOR": "Editor de formulario",
+            "EDIT-CONFIRM": "Guardar",
+            "DELETE-CONFIRM": "Borrar formulario",
+            "USE-AS-NEW-VERSION": "Usar como nueva version"
+
+        },
+        "DETAILS": {
+          "HISTORY-TITLE": "Historial",
+          "LAST-UPDATED-BY": "Ultima actualizacion por {{lastUpdatedBy}} - {{lastUpdated | dateformat}}",
+          "CREATED-BY": "Creado por {{createdBy}}"
+        },
+
+        "POPUP": {
+          "CREATE-TITLE": "Crear nuevo formulario",
+          "DUPLICATE-TITLE": "Duplicar formulario",
+          "CREATE-DESCRIPTION": "Necesitas proporcionar un nombre para el nuevo formulario y es recomendable agregar una descripcion al mismo tiempo.",
+          "DUPLICATE-DESCRIPTION": "Necesitas proporcionar un nombre para el nuevo formulario y es recomendable agregar una descripcion al mismo tiempo.",
+          "SAVE-FORM-TITLE": "Guardar formulario",
+          "EDIT-DESCRIPTION": "Cambia cualquiera de las propiedades debajo y despues presiona Guardar para actualizar el formulario.",
+          "DELETE-DESCRIPTION": "Estas seguro de borrar el formulario \"{{name}}\"?",
+          "EDIT-TITLE":"Editar detalles de formulario",
+          "DELETE-TITLE": "Borrar formulario",
+          "USE-AS-NEW-TITLE": "Usar como nueva version",
+          "USE-AS-NEW-VERSION": "Usar como nueva version",
+          "USE-AS-NEW-DESCRIPTION": "Estas seguro que quieres utilizar la version {{version}} para crear una nueva version de \"{{name}}\"?",
+          "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "No se pudo restaurar completamente a la version seleccionada: Algunos modelos referenciados fueron borrados. Por favor actualiza el modelo. Moodelos faltantes:",
+          "USE-AS-NEW-UNRESOLVED-MODEL": "Modelo '{{name}}' con identificador {{id}}, creado por {{createdBy}}"
+        }
+    },
+
+    "DECISION-TABLE": {
+        "NAME": "Nombre de la Tabla de decision",
+        "KEY": "Identificador de la Tabla de decision",
+        "DESCRIPTION": "Descripcion",
+        "VERSION-COMMENT": "Comentario de version",
+        "HIT-POLICY": "Reglas de aciertos:",
+        "ACTION": {
+            "DETAILS": "Mostrar detalles",
+            "EDIT": "Modificar propiedades del modelo",
+            "SHARE": "Compartir esta tabla de decision",
+            "DELETE": "Borrar esta tabla de decision",
+            "ADD-COMMENT": "+ Agregar comentario",
+            "CREATE-CONFIRM": "Crear nueva tabla de decision",
+            "OPEN-IN-EDITOR": "Editor de tabla de decision",
+            "EXPORT": "Exportar tabla de decision",
+            "DELETE-CONFIRM": "Borrar tabla de decision",
+            "USE-AS-NEW-VERSION": "Usar como nueva version",
+            "FAVORITE": "Maracar como favorita esta tabla de decision",
+            "DUPLICATE": "Duplicar esta tabla de decision"
+        },
+        "DETAILS": {
+            "HISTORY-TITLE": "Historial",
+            "COMMENTS-TITLE": "Comentarios",
+            "LAST-UPDATED-BY": "Ultimavez actualizado por {{lastUpdatedBy}} - {{lastUpdated | dateformat}}",
+            "CREATED-BY": "Creado por {{createdBy}}"
+        },
+        "HIT-POLICIES": {
+            "FIRST": "Primero (Single pass)",
+            "ANY": "Cualquiera (Single pass)"
+        },
+        "POPUP": {
+            "CREATE-TITLE": "Crear nueva tabla de decision",
+            "CREATE-DESCRIPTION": "Es necesario dar un nombre par a la tabla de decision, es recomendable proporcionar una descripcion al mismo tiempo.",
+            "DUPLICATE-TITLE": "Duplicar tabla de decision",
+            "DUPLICATE-DESCRIPTION": "Puedes dar un nombre para la nueba tabla de decision es recomendable proporcionar una descripcion al mismo tiempo.",
+            "SAVE-DESCRIPTION": "Es necesario proporcionar un nombre y un identificador unico para la tabla de decision, es recomendable proporcionar una descripcion al mismo tiempo",
+            "DELETE-TITLE": "Borrar tabla de decision",
+            "DELETE-DESCRIPTION": "Estas Seguro que deseas borrar esta tabla de decision \"{{name}}\"?",
+            "SAVE-DECISION-TABLE-TITLE": "Guardar tabla de decision",
+            "IMPORT-DESCRIPTION": "Busca o arrastra una definicion DMN XML con una extension .dmn o .dmn.xml",
+          	"IMPORT-TITLE": "Importar un modelo DMN",
+	        "IMPORT": {
+	            "DROPZONE": "Arrastra un archivo.dmn o .dmn.xml DMN XML",
+	            "CANCEL-UPLOAD": "Cancelar la carga",
+	            "ERROR": "Error cuando se procesaba el archivo DMN XML",
+	            "NO-DROP": "Arrastrar y soltar no soportado"
+	        },
+            "USE-AS-NEW-TITLE": "Usar como nueva version",
+            "USE-AS-NEW-VERSION": "Usar como nueva version",
+            "USE-AS-NEW-DESCRIPTION": "Estas seguro que quieres utilizar la version {{version}} tpara crear una nueva version de \"{{name}}\"?",
+            "USE-AS-NEW-UNRESOLVED-MODELS-ERROR": "No se pudo restaurar completamente a la version seleccionada: Algunos modelos referenciados fueron borrados. Por favor actualiza el modelo. Moodelos faltantes:",
+            "USE-AS-NEW-UNRESOLVED-MODEL": "Modelo '{{name}}' con identificador {{id}}, creado por {{createdBy}}"
+        },
+        "ALERT": {
+            "FAVORITE-CONFIRM": "Esta tabla de decision es ahora favorita",
+            "UN-FAVORITE-CONFIRM": "Esta tabla de decision ya no es favorita"
+        }
+    },
+
+    "APP": {
+        "NAME": "Nombre de la App",
+        "KEY": "Identificador de la App",
+        "DESCRIPTION": "Descripcion",
+        "ICON": "Icono",
+        "THEME": "Tema",
+        "GROUPS-ACCESS": "Acceso a grupos, separado por comas",
+        "USERS-ACCESS": "Acceso a usuarios, separado por comas",
+        "ACTION": {
+            "DETAILS": "Mostrar detalles",
+            "EDIT": "Modificar propiedades de la App",
+            "DUPLICATE": "Duplicar esta App",
+            "SHARE": "Compartir esta App",
+            "DELETE": "Borrar esta App",
+            "CREATE-CONFIRM": "Crear nueva App",
+            "DUPLICATE-CONFIRM": "Duplicar App",
+            "DELETE-CONFIRM": "Borrar App",
+            "USE-AS-NEW-VERSION": "Usar como nueva version",
+            "OPEN-IN-EDITOR": "Editor de App",
+            "PUBLISH": "Publicar",
+            "PUBLISH-CONFIRM": "Publicar App",
+            "SELECT-ICON": "Cambiar icono...",
+            "SELECT-THEME": "Cambiar tema...",
+            "EDIT-MODELS": "Editar modelos incluidos",
+            "EXPORT-ZIP": "Exportar App como archivo zip",
+            "EXPORT-BAR": "Exportar App como archivo deployable bar"
+
+        },
+        "DETAILS": {
+          "TITLE": "Detalles de la App: {{name}}",
+          "HISTORY-TITLE": "Historial",
+          "MODELS-TITLE": "Modelos incluidos en la App",
+          "LAST-UPDATED-BY": "Ultima modificacion por {{lastUpdatedBy}} - {{lastUpdated | dateformat}}",
+          "CREATED-BY": "Creado por {{createdBy}}",
+          "NO-DESCRIPTION": "Esta App no tiene descripcion. Modifica las propiedades de la App para agregar una",
+          "NO-MODELS-SELECTED": "No hay modelos seleccionados para esta App"
+        },
+        "TITLE": {
+          "SELECT-ICON": "Seleccionar icono de la App",
+          "SELECT-THEME": "Seleccionar tema de la App",
+          "PREVIEW": "Vista previa"
+
+        },
+        "POPUP": {
+          "CREATE-TITLE": "Crear nueva App",
+          "DUPLICATE-TITLE": "Duplicar App",
+          "SAVE-APP-TITLE": "Guardar App",
+          "SAVE-APP-SAVE-SUCCESS": "App guardada",
+          "CREATE-DESCRIPTION": "Necesitas dar un nombre para la nueva App es recomendable proporcionar una descripcion al mismo tiempo",
+          "DUPLICATE-DESCRIPTION": "Puedes dar un nombre para la nueba App es recomendable proporcionar una descripcion al mismo tiempo",
+          "PUBLISH-TITLE": "Publicar App",
+          "PUBLISH-DESCRIPTION": "Estas seguro que deseas publicar la App \"{{name}}\"? Esta App sera versionada y actualizada en la App de workflow si ya existe.",
+          "PUBLISH-FIELD": "Publicar? Esta App sera versionada y actualizada en la App de workflow si ya existe.",
+          "PUBLISH-ERROR-PROCDEF-KEY-CONFLICT": "Tu modelo de proceso \"{{modelInAppName}}\" tiene el mismo identificador \"{{processDefinitionKey}}\" que el proceso existente deployado \"{{conflictingModelName}}\" de la App \"{{conflictingAppName}}\". Por favor cambia el \"id\" del modelo de proceso a algo diferente.",
+          "PUBLISH-ERROR-PROCESS-ALREADY-USED": "Los siguientes modelos de proceso ya son utilizados en otra App. Esto es correcto?",
+          "PUBLISH-ERROR-PROCESS-ALREADY-USED-APP": "App",
+          "PUBLISH-ERROR-PROCDEF-DUPLICATE-KEYS": "App invalida: se encontraron identificadores de proceso duplicados (cambia el \"id\" identificador de los procesos que tienen este detalle):",
+          "DELETE-TITLE": "Borrar App",
+          "DELETE-DESCRIPTION": "Estas seguro que deseas borrar la App \"{{name}}\"?",
+          "DELETE-DESCRIPTION-WITH-RUNTIME": "Estas seguro que deseas borrar la App \"{{name}}\"? Esta App se ha publicado en la vista de aplicaciones si confirmas, el acceso a la App sera removido.",
+          "DELETE-CASCADE-FALSE": "Borrar solo la version actual de la App (v{{version}})",
+          "DELETE-CASCADE-TRUE": "Borrar tambien las versiones anteriores de esta App",
+          "HAS-CUSTOM-STENCILITEM" : "Modelo \"{{modelName}}\" uses a stencil with custom stencil items. It is not possible to use this model in an App.",
+          "HAS-VALIDATIONERROR" : "Model \"{{modelName}}\" has validation errors and cannot be added to an App. Open the model in the editor to see more details about the validation error(s).",
+          "IMPORT-DESCRIPTION":"Por favor busca o arrastra una App con una extension .zip",
+          "IMPORT-TITLE":"Importar una App",
+          "IMPORT": {
+              "DROPZONE": "Arrastra un archivo de App .zip",
+              "CANCEL-UPLOAD": "Cancelar la carga",
+              "RENEWIDM-IDS": "Renueva los identificadores de grupo y de usuario cuando importes los modelos BPMN. Esto es comunmente requerido cuando importas la App en un ambiente de Flowable diferente. Se intentara ligar los pasos humanos y las tareas de usuario al usuario y grupo de usuarios correctos en este ambiente.",
+              "ERROR": "Error mientras se procesaba el archivo de la App",
+              "NO-DROP": "Arrastrar y soltar no soportado"
+          },
+          "INCLUDE-MODELS-TITLE": "Modelos incluidos en la App"
+        },
+        "ALERT": {
+          "DELETE-CONFIRM": "App Borrada",
+          "PUBLISH-CONFIRM": "La App ha sido publicada",
+          "PUBLISH-ERROR": "No se pude publicar la App. Por favor revisa que los modelos de proceso incluidos sean correctos"
+        }
+    },
+
+    "SHARE-INFO": {
+        "ACTION": {
+          "ADD": "Agregar otra persona"
+        }
+    },
+
+    "FORM-BUILDER": {
+        "PALLETTE": {
+            "TEXT": "Texto",
+            "MULTILINE-TEXT": "Texto en varias lineas",
+            "NUMBER": "Numero",
+            "CHECKBOX": "Checkbox",
+            "DATE": "Fecha",
+            "DROPDOWN": "Lista",
+            "RADIO": "Radio buttons",
+            "PEOPLE": "Personas",
+            "GROUP-OF-PEOPLE": "Grupo de personas",
+            "UPLOAD": "Upload",
+            "EXPRESSION": "Expresion",
+	    "HYPERLINK": "Hipervínculo"
+        },
+        "TABS": {
+            "GENERAL": "General",
+            "OPTIONS": "Opciones",
+            "UPLOAD-OPTIONS": "Opciones Upload",
+	    "ADVANCED-OPTIONS":"Avanzado"	
+        },
+        "VERSION": "Version {{version}}",
+        "LAST-UPDATED": "Ultima vez actualizado por {{lastUpdatedBy}}, {{lastUpdated | dateformat}}",
+        "TITLE": {
+            "DESIGN": "Diseño",
+            "OUTCOME": "Resultado"
+        },
+        "POPUP": {
+            "EDIT-TITLE": "Editar campo '{{name}}'",
+            "EXPRESSION-TITLE": "Editar expresion"
+        },
+        "MESSAGE": {
+            "EMPTY-EXPRESSION": "(No expression value)",
+            "EXPRESSION-HELP": "Tambien puedes mostrar valores enviados anteriormente en cualquier formulario, como parte del texto, referenciandolo utilizando una notacion como la siguiente ${myFieldId}."
+        },
+        "LABEL" : {
+            "FUNCTIONAL-GROUP": "Selecciona el grupo..",
+            "PERSON": "Selecciona persona..."
+        },
+        "COMPONENT": {
+            "LABEL": "Etiqueta:",
+            "OVERRIDEID": "Sobreescribir identificador?",
+            "ID": "Identificador:",
+            "PLACEHOLDER": "Placeholder:",
+            "OPTIONS": "Opciones",
+            "RADIO-BUTTON-DEFAULT": "Opcion 1",
+            "DROPDOWN-DEFAULT-EMPTY-SELECTION": "Por favor elige uno...",
+            "DROPDOWN-EMPTY-VALUE-HELP": "Este es la opcion 'valor vacio'. Seleccionar esto en tiempo de ejecucion es igual a 'no valor' o 'vacio'.  Esto esta permitido para campos opcionales, pero no para campos requeridos.",
+            "REQUIRED": "Requerido",
+            "EXPRESSION": "Expresion",
+            "ADD-OPTION": "+ Agregar nueva opcion",
+            "UPLOAD-ALLOW-MULTIPLE": "Permitir subir varios archivos",
+	          "MAX-LENGTH":"Longitud máxima:",
+            "MIN-LENGTH":"Longitud mínima:",
+	          "HYPERLINK-URL": "URL hiperlink",
+	          "REGEX-PATTERN":"Estándar  Regex",
+            "MASK":{
+              "TITLE":"Máscara de entrada",
+              "EXAMPLES":{
+                "TITLE":"Ejemplos:",
+                "NUMBER":"Cualquier número",
+                "LETTER":"Cualquier letra",
+                "NUMBERORLETTER":"Cualquier letra o número",
+                "OPTIONAL":"La máscara opcional (no valida)",
+                "PHONE":"Teléfono"
+	              }
+            }
+        },
+        "OUTCOMES": {
+            "DESCRIPTION": "Puedes definir multiples resultados para esta tarea. Cuando se este completando la tarea, el usuario selecciona uno de los resultados disponibles, que pueden ser utilizados por ejemplo eg. una condicion utilizada mas adelante en el proceso.",
+            "NO-OUTCOMES-OPTION": "Don't use custom outcomes, only show a 'Complete' button.",
+            "OUTCOMES-OPTION": "Usar resultados propios para este formulario.",
+            "POSSIBLE-OUTCOMES": "Posibles resultados",
+            "NEW-OUTCOME-PLACEHOLDER": "Introduce un nuevo resultado",
+            "ADD": "Agregar resultado",
+            "REMOVE": "Eliminar"
+        }
+    },
+
+    "DECISION-TABLE-EDITOR": {
+        "EMPTY-MESSAGES": {
+            "NO-VARIABLE-SELECTED": "Indefinido"
+        },
+        "POPUP": {
+            "EXPRESSION-EDITOR": {
+                "INPUT-TITLE": "Editar columna de entrada",
+                "INPUT-DESCRIPTION": "Seleccionar variable de entrada como ebtrada para la columna",
+                "OUTPUT-TITLE": "Editar columna de salida",
+                "OUTPUT-DESCRIPTION": "Selecionar una variable de salida existente o crear una nueva",
+                "EXPRESSION-LABEL": "Etiqueta de columna:",
+                "EXPRESSION-PLACEHOLDER": "Ingresar una etiqueta opcional",
+                "EXPRESSION-VARIABLE-NAME": "Nombre de variable:",
+                "EXPRESSION-VARIABLE-NAME-PLACEHOLDER": "Ingresar nombre de variable",
+                "OUTPUT-NEW-VARIABLE-ID": "Identificador de variable:",
+                "OUTPUT-NEW-VARIABLE-TYPE": "Tipo de variable:"
+            }
+        },
+        "BUTTON-ADD-INPUT-LABEL": "Agregar entrada",
+        "BUTTON-ADD-OUTPUT-LABEL": "Agregar salida",
+        "BUTTON-ADD-RULE-LABEL": "Agregar regla",
+        "BUTTON-MOVE-RULE-UPWARDS-LABEL": "Mover arriba",
+        "BUTTON-MOVE-RULE-DOWNWARDS-LABEL": "Mover abajo",
+        "BUTTON-REMOVE-RULE-LABEL": "Eliminar regla",
+        "ALERT": {
+            "EXPRESSION-VARIABLE-REQUIRED-ERROR": "Todas las expresiones de entrada y salida deben referenciar un campo del formulario o una variable.",
+            "SAVE-CONFIRM": "Guardar tabla de decision '{{name}}'"
+        }
+    },
+
+    "TOUR": {
+        "WELCOME-TITLE": "Bienvenido, {{userName}}",
+        "WELCOME-CONTENT": "Esta es una pequeña guia del Editor Flowable. Los siguientes pasos te guiaran a traves de diferentes secciones de la aplicacion.Presion ESC para detener la guia en cualquier momento." ,
+        "PALETTE-TITLE": "Barra de dibujo",
+        "PALETTE-CONTENT": "Todos los simbolos necesarios para crear un proceso de negocio pueden ser encontrados aqui. Se encuentran agrupados de manera logica. Para abrir un grupo simplemente da click en el:",
+        "CANVAS-TITLE": "El area de trabajo",
+        "CANVAS-CONTENT": "En este espacio crea tu proceso de negocio. Arrastra elementos desde la barra de dibujoe en la izquierda y sueltalos en esta area para empezar a modelar.",
+        "DRAGDROP-TITLE": "Ejemplo arrastrar y soltar",
+        "DRAGDROP-CONTENT": "aqui esta un ejemplo de como comenzar a modelar:",
+        "PROPERTIES-TITLE": "Propiedades",
+        "PROPERTIES-CONTENT": "Aqui puedes configurar las propuedades de un proceso de negocios. Simplemente selecciona un elemento en el area de trabajo y sus propiedades serán mostradas. Da click en la propiedad si deseas editarla",
+        "TOOLBAR-TITLE": "Barra de herramientas",
+        "TOOLBAR-CONTENT": "Todas las acciones pueden ser encontradas aqui: guardar o validar un modelo, copiar y pegar partes del proceso, y continua. Pasa sobre los botnones para ver lo que realizan.",
+        "END-TITLE": "Fin",
+        "END-CONTENT": "Ahora puedes modelar tus procesos. Si tienes alguna duda, sientete libre de preguntar en <a href=\"http://forum.flowable.org/\" target=\"_blank\">Flowable Forum</a> "
+    },
+
+    "FEATURE-TOUR" : {
+        "BENDPOINT" : {
+            "TITLE": "Tutorial punto de curva",
+            "DESCRIPTION" : "Cuando estas conectando un elemento con otro usando un flujo de secuencia (Esas flechas entre los pasos del proceso), encontraras que esos flujos de secuencia se crean de manera automatica, si deseas modificar la direccione de las flechas, puedes agregar o eliminar un punto de curva de un flujo de secuencia.<br/> Como se muestra debajo en la figura, primero das click en el boton 'Agregar punto curva'y despues das click en el flujo de secuencia al que deseas agregarlo. El fluo de secuencia te indicará con un punto en verde que el punto curva puede ser agregado.<br/> Para eliminar un punto curva, click en 'eliminar punto curva' y da click en el flujo de secuencia del cual deseas eliminar."
+        }
+    },
+
+    "ACTION.OK" : "Ok",
+    "ACTION.SAVE" : "Guardar",
+    "ACTION.SAVE-AND-CLOSE" : "Guardar y cerrar el editor",
+    "ACTION.SEND" : "Enviar",
+    "ACTION.CANCEL" : "Cancelar",
+    "ACTION.SELECT" : "Seleccionar",
+    "ACTION.ADD" : "Agregar",
+    "ACTION.REMOVE" : "Eliminar",
+    "ACTION.MOVE.UP" : "Mover arriba",
+    "ACTION.MOVE.DOWN" : "Mover abajo",
+
+    "TOOLBAR.ACTION.CLOSE" : "Cerrar el editor y volver a la pagina de previsualizacion",
+    "TOOLBAR.ACTION.SAVE" : "Guardar el modelo",
+    "TOOLBAR.ACTION.VALIDATE" : "Validar el modelo",
+    "TOOLBAR.ACTION.CUT" : "Cortar (seleciona uno o mas elementos en tu proceso de negocio)",
+    "TOOLBAR.ACTION.COPY" : "Copiar (seleciona uno o mas elementos en tu proceso de negocio)",
+    "TOOLBAR.ACTION.PASTE" : "Pegar",
+    "TOOLBAR.ACTION.DELETE" : "Borrar el elemento seleccionado",
+    "TOOLBAR.ACTION.UNDO" : "Deshacer",
+    "TOOLBAR.ACTION.REDO" : "Rehacer",
+    "TOOLBAR.ACTION.ZOOMIN" : "Zoom in",
+    "TOOLBAR.ACTION.ZOOMOUT" : "Zoom out",
+    "TOOLBAR.ACTION.ZOOMACTUAL" : "Zoom a tamaño actual",
+    "TOOLBAR.ACTION.ZOOMFIT" : "Zoom para ajustar",
+    "TOOLBAR.ACTION.BENDPOINT.ADD" : "Agregar punto de curva al flujo de secuencia seleccionado",
+    "TOOLBAR.ACTION.BENDPOINT.REMOVE" : "Eliminar punto de curva al flujo de secuencia seleccionado",
+    "TOOLBAR.ACTION.ALIGNHORIZONTAL" : "Alinear modelo horizontalmente",
+    "TOOLBAR.ACTION.ALIGNVERTICAL" : "Alinear modelo verticalmente",
+    "TOOLBAR.ACTION.SAMESIZE" : "Mismo tamaño",
+    "TOOLBAR.ACTION.HELP": "Iniciar la visita guiada",
+    "TOOLBAR.ACTION.FEEDBACK": "Proveer retroalimentacion",
+
+    "FORM_TOOLBAR.ACTION.SAVE" : "Guardar el modelo",
+
+    "APP_DEFINITION_TOOLBAR.ACTION.SAVE" : "Guardar la App",
+
+    "BUTTON.ACTION.DELETE.TOOLTIP": "Borrar elemento del modelo",
+    "BUTTON.ACTION.MORPH.TOOLTIP": "Cambiar tipo del elemento",
+
+    "ELEMENT.AUTHOR" : "Autor",
+    "ELEMENT.DATE_CREATED" : "Fecha de creacion",
+
+    "PROPERTY.REMOVED" : "eliminado",
+    "PROPERTY.EMPTY" : "Sin valor",
+    "PROPERTY.PROPERTY.EDIT.TITLE" : "Cambiar valor por",
+
+    "PROPERTY.FEEDBACK.TITLE" : "Por favor proporciona tu retroalimentacion",
+
+    "PROPERTY.ASSIGNMENT.TITLE" : "Asignacion",
+    "PROPERTY.ASSIGNMENT.TYPE" : "Tipo",
+    "PROPERTY.ASSIGNMENT.TYPE.IDENTITYSTORE" : "Almacen de identidad",
+    "PROPERTY.ASSIGNMENT.TYPE.STATIC" : "Valores arreglados",
+    "PROPERTY.ASSIGNMENT.ASSIGNEE" : "Asignado",
+    "PROPERTY.ASSIGNMENT.MATCHING" : "Usa &uparrow; y &downarrow; para seleccionar y presiona Enter para confirmar o usa el mouse",
+    "PROPERTY.ASSIGNMENT.ASSIGNEE_PLACEHOLDER" : "Introduce un asignado",
+    "PROPERTY.ASSIGNMENT.EMPTY" : "No hay asignacion seleccionada",
+    "PROPERTY.ASSIGNMENT.NONE" : "Ninguno ...",
+    "PROPERTY.ASSIGNMENT.PLACEHOLDER-SEARCHUSER": "Buscar usuario",
+    "PROPERTY.ASSIGNMENT.PLACEHOLDER-SEARCHGROUP": "Buscar grupo",
+    "PROPERTY.ASSIGNMENT.SEARCH": "Buscar: ",
+    "PROPERTY.ASSIGNMENT.ASSIGNEE_DISPLAY" : "Assignado {{assignee}}",
+    "PROPERTY.ASSIGNMENT.CANDIDATE_USERS_DISPLAY" : "{{length}} Usuarios candidatos",
+    "PROPERTY.ASSIGNMENT.CANDIDATE_USERS" : "Usuarios candidatos",
+    "PROPERTY.ASSIGNMENT.CANDIDATE_GROUPS_DISPLAY" :  "{{length}} Grupos candidatos",
+    "PROPERTY.ASSIGNMENT.CANDIDATE_GROUPS" :  "Grupos candidatos",
+    "PROPERTY.ASSIGNMENT.USER_IDM_DISPLAY": "Usuario {{firstName}} {{lastName}}",
+    "PROPERTY.ASSIGNMENT.USER_IDM_EMAIL_DISPLAY": "Usuario {{email}}",
+    "PROPERTY.ASSIGNMENT.USER_IDM_FIELD_DISPLAY": "Campo {{name}}",
+    "PROPERTY.ASSIGNMENT.IDM_EMPTY" : "Iniciador del proceso",
+    "PROPERTY.ASSIGNMENT.IDM.TYPE" : "Asignacion",
+    "PROPERTY.ASSIGNMENT.IDM.NO_CANDIDATE_USERS" : "No hay usuarios candidatos seleccionados...",
+    "PROPERTY.ASSIGNMENT.IDM.NO_CANDIDATE_GROUPS" : "No hay grupos candidatos seleccionados...",
+    "PROPERTY.ASSIGNMENT.IDM.DROPDOWN.INITIATOR" : "Asignar al iniciador del proceso",
+    "PROPERTY.ASSIGNMENT.IDM.DROPDOWN.USER" : "Asignar a un solo usuario",
+    "PROPERTY.ASSIGNMENT.IDM.DROPDOWN.USERS" : "Usuarios candidatos",
+    "PROPERTY.ASSIGNMENT.IDM.DROPDOWN.GROUPS" : "Grupos candidatos",
+    "PROPERTY.ASSIGNMENT.INITIATOR-CAN-COMPLETE" : "Permitir al iniciador del proceso completar la tarea",
+    "PROPERTY.EXECUTIONLISTENERS.DISPLAY" : "{{length}} escuchadores de ejecucion",
+    "PROPERTY.EXECUTIONLISTENERS.EMPTY" : "No hay escuchadores de ejecucion configurados",
+    "PROPERTY.EXECUTIONLISTENERS.EVENT" : "Evento",
+    "PROPERTY.EXECUTIONLISTENERS.CLASS" : "Clase",
+    "PROPERTY.EXECUTIONLISTENERS.CLASS.PLACEHOLDER" : "Introduce un nombre de clase",
+    "PROPERTY.EXECUTIONLISTENERS.EXPRESSION" : "Expresion",
+    "PROPERTY.EXECUTIONLISTENERS.EXPRESSION.PLACEHOLDER" : "Introduce una expresion",
+    "PROPERTY.EXECUTIONLISTENERS.DELEGATEEXPRESSION" : "Expresion delegada",
+    "PROPERTY.EXECUTIONLISTENERS.DELEGATEEXPRESSION.PLACEHOLDER" : "Introduce una expresion delegada",
+    "PROPERTY.EXECUTIONLISTENERS.UNSELECTED" : "No hay escuchadores de ejecucion seleccionados",
+    "PROPERTY.EXECUTIONLISTENERS.FIELDS.NAME" : "Nombre",
+    "PROPERTY.EXECUTIONLISTENERS.FIELDS.NAME.PLACEHOLDER" : "Introduce un nombre",
+    "PROPERTY.EXECUTIONLISTENERS.FIELDS.EXPRESSION" : "Expresion",
+    "PROPERTY.EXECUTIONLISTENERS.FIELDS.EXPRESSION.PLACEHOLDER" : "Introduce una expresion",
+    "PROPERTY.EXECUTIONLISTENERS.FIELDS.STRINGVALUE" : "Valor cadena",
+    "PROPERTY.EXECUTIONLISTENERS.FIELDS.STRINGVALUE.PLACEHOLDER" : "Introduce una cadena",
+    "PROPERTY.EXECUTIONLISTENERS.FIELDS.STRING" : "Cadena",
+    "PROPERTY.EXECUTIONLISTENERS.FIELDS.STRING.PLACEHOLDER" : "Introduce una cadena",
+    "PROPERTY.EXECUTIONLISTENERS.FIELDS.IMPLEMENTATION" : "Implementacion",
+    "PROPERTY.EXECUTIONLISTENERS.FIELDS.EMPTY" : "No hay un campo seleccionado",
+
+    "PROPERTY.FIELDS" : "{{length}} campos",
+    "PROPERTY.FIELDS.EMPTY" : "No hay campos seleccionados",
+    "PROPERTY.FIELDS.NAME" : "Nombre",
+    "PROPERTY.FIELDS.NAME.PLACEHOLDER" : "Introduce un nombre",
+    "PROPERTY.FIELDS.EXPRESSION" : "Expresion",
+    "PROPERTY.FIELDS.EXPRESSION.PLACEHOLDER" : "Ingresa una expresion",
+    "PROPERTY.FIELDS.STRINGVALUE" : "Valor cadena",
+    "PROPERTY.FIELDS.STRINGVALUE.PLACEHOLDER" : "Introduce una cadena",
+    "PROPERTY.FIELDS.STRING" : "Cadena",
+    "PROPERTY.FIELDS.STRING.PLACEHOLDER" : "Introduce una cadena",
+    "PROPERTY.FIELDS.IMPLEMENTATION" : "Implementacion",
+
+    "PROPERTY.FORMPROPERTIES.VALUE" : "{{length}} propiedades del formulario",
+    "PROPERTY.FORMPROPERTIES.EMPTY" : "No hay propiedades del formulario seleccionadas",
+    "PROPERTY.FORMPROPERTIES.ID" : "Identificador",
+    "PROPERTY.FORMPROPERTIES.ID.PLACEHOLDER" : "Introduce un identificador",
+    "PROPERTY.FORMPROPERTIES.NAME" : "Nombre",
+    "PROPERTY.FORMPROPERTIES.NAME.PLACEHOLDER" : "Introduce un nombre",
+    "PROPERTY.FORMPROPERTIES.TYPE" : "Tipo",
+    "PROPERTY.FORMPROPERTIES.DATEPATTERN" : "Patron de fecha",
+    "PROPERTY.FORMPROPERTIES.DATEPATTERN.PLACEHOLDER" : "Introduce un patron de fecha",
+    "PROPERTY.FORMPROPERTIES.VALUES" : "Valores",
+    "PROPERTY.FORMPROPERTIES.ENUMVALUES.EMPTY" : "Nose selecciono un valor enum",
+    "PROPERTY.FORMPROPERTIES.VALUES.ID" : "Identificador",
+    "PROPERTY.FORMPROPERTIES.VALUES.NAME" : "Nombre",
+    "PROPERTY.FORMPROPERTIES.VALUES.ID.PLACEHOLDER" : "Introdice el identificador del valor",
+  	"PROPERTY.FORMPROPERTIES.VALUES.NAME.PLACEHOLDER" : "Introduce el nombre del valor",
+    "PROPERTY.FORMPROPERTIES.EXPRESSION" : "Expresion",
+    "PROPERTY.FORMPROPERTIES.EXPRESSION.PLACEHOLDER" : "Introduce una expresion",
+    "PROPERTY.FORMPROPERTIES.VARIABLE" : "Variable",
+    "PROPERTY.FORMPROPERTIES.VARIABLE.PLACEHOLDER" : "Introduce una variable",
+    "PROPERTY.FORMPROPERTIES.REQUIRED" : "Requerido",
+    "PROPERTY.FORMPROPERTIES.READABLE" : "Leible",
+    "PROPERTY.FORMPROPERTIES.WRITABLE" : "Escribible",
+
+    "PROPERTY.INPARAMETERS.VALUE" : "{{length}} parametros de entrada",
+    "PROPERTY.INPARAMETERS.EMPTY" : "No hay parametros de entrada configurados",
+
+    "PROPERTY.OUTPARAMETERS.VALUE" : "{{length}} parametros de salida",
+    "PROPERTY.OUTPARAMETERS.EMPTY" : "No hay parametros de salida configurados",
+
+    "PROPERTY.PARAMETER.SOURCE" : "Fuente",
+    "PROPERTY.PARAMETER.SOURCE.PLACEHOLDER" : "Introduce una fuente",
+    "PROPERTY.PARAMETER.SOURCEEXPRESSION" : "Expresion de fuente",
+    "PROPERTY.PARAMETER.SOURCEEXPRESSION.PLACEHOLDER" : "Expresion de fuente",
+    "PROPERTY.PARAMETER.TARGET" : "Objetivo",
+    "PROPERTY.PARAMETER.TARGET.PLACEHOLDER" : "Introduce un objetivo",
+    "PROPERTY.PARAMETER.EMPTY" : "No hay parametro seleccionado",
+
+    "PROPERTY.SUBPROCESSREFERENCE.EMPTY" : "No hay referencia seleccionada",
+    "PROPERTY.SUBPROCESSREFERENCE.TITLE" : "Referencia a subproceso colapsado",
+    "PROPERTY.SUBPROCESSREFERENCE.ERROR.SUBPROCESS" : "Ocurrio un error cargando subprocesos. Intenta mas tarde",
+    "PROPERTY.SUBPROCESSREFERENCE.SUBPROCESS.LOADING" : "Cargando subprocesos...",
+    "PROPERTY.SUBPROCESSREFERENCE.SUBPROCESS.EMPTY" : "Este folder no contiene subprocesos",
+
+    "PROPERTY.FORMREFERENCE.EMPTY" : "No hay referencia seleccionada",
+    "PROPERTY.FORMREFERENCE.TITLE" : "Referencia a formulario",
+    "PROPERTY.FORMREFERENCE.DESCRIPTION" : "Referencia a formulario",
+    "PROPERTY.FORMREFERENCE.ERROR.FORM" : "Ocurrio un error cargando los formularios. Intenta mas tarde",
+    "PROPERTY.FORMREFERENCE.FORM.LOADING" : "Cargando formularios...",
+    "PROPERTY.FORMREFERENCE.FORM.EMPTY" : "Este folder no contiene formularios",
+
+    "PROPERTY.TASKLISTENERS.VALUE" : "{{length}} escuchadores de tarea",
+    "PROPERTY.TASKLISTENERS.EMPTY" : "No hay escuchadores de tarea configurados",
+    "PROPERTY.TASKLISTENERS.EVENT" : "Evento",
+    "PROPERTY.TASKLISTENERS.CLASS" : "Clase",
+    "PROPERTY.TASKLISTENERS.CLASS.PLACEHOLDER" : "Introduce un nombre de clase",
+    "PROPERTY.TASKLISTENERS.EXPRESSION" : "Expresion",
+    "PROPERTY.TASKLISTENERS.EXPRESSION.PLACEHOLDER" : "Introduce una expresion",
+    "PROPERTY.TASKLISTENERS.DELEGATEEXPRESSION" : "Delegar expresion",
+    "PROPERTY.TASKLISTENERS.DELEGATEEXPRESSION.PLACEHOLDER" : "Introduce una expresion de delegado",
+    "PROPERTY.TASKLISTENERS.UNSELECTED" : "No hay escuchadores de tarea seleccionados",
+    "PROPERTY.TASKLISTENERS.FIELDS.NAME" : "Nombre",
+    "PROPERTY.TASKLISTENERS.FIELDS.NAME.PLACEHOLDER" : "Introduce un nombre",
+    "PROPERTY.TASKLISTENERS.FIELDS.EXPRESSION" : "Expresion",
+    "PROPERTY.TASKLISTENERS.FIELDS.EXPRESSION.PLACEHOLDER" : "Introduce una expresion",
+    "PROPERTY.TASKLISTENERS.FIELDS.STRINGVALUE" : "Valor cadena",
+    "PROPERTY.TASKLISTENERS.FIELDS.STRINGVALUE.PLACEHOLDER" : "Introduce una cadena",
+    "PROPERTY.TASKLISTENERS.FIELDS.STRING" : "Cadena",
+    "PROPERTY.TASKLISTENERS.FIELDS.STRING.PLACEHOLDER" : "Introduce una cadena",
+    "PROPERTY.TASKLISTENERS.FIELDS.IMPLEMENTATION" : "Implementacion",
+    "PROPERTY.TASKLISTENERS.FIELDS.EMPTY" : "No hay campo seleccionado",
+
+    "PROPERTY.EVENTLISTENERS.DISPLAY" : "{{length}} escuchadores de evento",
+    "PROPERTY.EVENTLISTENERS.EMPTY" : "No hay esuchadores de evento seleecionados",
+    "PROPERTY.EVENTLISTENERS.EVENTS": "Eventos",
+    "PROPERTY.EVENTLISTENERS.RETHROW": "Relanzar evento?",
+    "PROPERTY.EVENTLISTENERS.CLASS" : "Clase",
+    "PROPERTY.EVENTLISTENERS.CLASS.PLACEHOLDER" : "Introduce un nombre de clase",
+    "PROPERTY.EVENTLISTENERS.DELEGATEEXPRESSION" : "Expresion delegada",
+    "PROPERTY.EVENTLISTENERS.DELEGATEEXPRESSION.PLACEHOLDER" : "Introduce una expresion de delegado",
+    "PROPERTY.EVENTLISTENERS.ENTITYTYPE" : "Tipo de entidad",
+    "PROPERTY.EVENTLISTENERS.ENTITYTYPE.PLACEHOLDER" : "Introduce un tipo de entidad",
+    "PROPERTY.EVENTLISTENERS.RETHROWTYPE": "Relanzar tipo de evento",
+    "PROPERTY.EVENTLISTENERS.ERRORCODE" : "Codigo de error",
+    "PROPERTY.EVENTLISTENERS.ERRORCODE.PLACEHOLDER" : "Introduce un codigo de error",
+    "PROPERTY.EVENTLISTENERS.MESSAGENAME" : "Nombre de mensaje",
+    "PROPERTY.EVENTLISTENERS.MESSAGENAME.PLACEHOLDER" : "Introduce un nombre de mensaje",
+    "PROPERTY.EVENTLISTENERS.SIGNALNAME" : "Nombre de señal",
+    "PROPERTY.EVENTLISTENERS.SIGNALNAME.PLACEHOLDER" : "Introduce un nombre de señal",
+    "PROPERTY.EVENTLISTENERS.UNSELECTED" : "No hay escuchador de evento seleccionado",
+
+    "PROPERTY.SIGNALDEFINITIONS.DISPLAY" : "{{length}} definiciones de señal",
+    "PROPERTY.SIGNALDEFINITIONS.EMPTY" : "No hay definiciones de señal",
+    "PROPERTY.SIGNALDEFINITIONS.SCOPE-GLOBAL": "Global",
+    "PROPERTY.SIGNALDEFINITIONS.SCOPE-PROCESSINSTANCE": "Instancia de proceso",
+    "PROPERTY.SIGNALDEFINITIONS.ID" : "Identificador",
+    "PROPERTY.SIGNALDEFINITIONS.NAME" : "Nombre",
+    "PROPERTY.SIGNALDEFINITIONS.SCOPE" : "Alcance",
+
+    "PROPERTY.MESSAGEDEFINITIONS.DISPLAY" : "{{length}} definiciones de mensaje",
+    "PROPERTY.MESSAGEDEFINITIONS.EMPTY" : "No hay definiciones de mensaje configuradas",
+    "PROPERTY.MESSAGEDEFINITIONS.ID" : "Identificador",
+    "PROPERTY.MESSAGEDEFINITIONS.NAME" : "Nombre",
+
+    "PROPERTY.SEQUENCEFLOW.ORDER.EMPTY" : "No se definio el orden de los flujos de secuencia",
+    "PROPERTY.SEQUENCEFLOW.ORDER.NOT.EMPTY" : "Orden de flujos de secuencia fijado",
+    "PROPERTY.SEQUENCEFLOW.ORDER.NO.OUTGOING.SEQUENCEFLOW.FOUND" : "No se encontro un flujo de secuencia de salida.",
+    "PROPERTY.SEQUENCEFLOW.ORDER.DESCRIPTION" : "Fijar el orden en el cual el flujo de secuencia necesita ser evaluado:",
+    "PROPERTY.SEQUENCEFLOW.ORDER.SEQUENCEFLOW.VALUE" : "Flujo de secuencia a {{targetType}} {{targetTitle}}",
+
+    "PROPERTY.SEQUENCEFLOW.CONDITION.TITLE" : "Condicion del flujo de secuencia",
+    "PROPERTY.SEQUENCEFLOW.CONDITION.STATIC" : "Expresion de la condicion",
+    "PROPERTY.SEQUENCEFLOW.CONDITION.NO-CONDITION-DISPLAY": "No hay condicion fijada",
+
+    "PROPERTY.DUEDATE.EMPTY" : "No se definio fecha de vencimiento",
+    "PROPERTY.DUEDATE.DEFINED" : "Se definio fecha de vencimiento",
+    "PROPERTY.DUEDATE.TITLE" : "Fecha de vencimiento",
+    "PROPERTY.DUEDATE.EXPRESSION-LABEL" : "Expression de fecha de vencimiento",
+    "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.NO-DUEDATE" : "No hay fecha de vencimiento",
+    "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.EXPRESSION" : "Definicion de expresion",
+    "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.STATIC" : "Duracion arreglada despues de la creacion de la tarea",
+    "PROPERTY.DUEDATE.TASK-DUE-DATE-OPTIONS.FIELD" : "Basado en un campo",
+
+    "MODEL.SAVE.TITLE" : "Guardar modelo",
+    "MODEL.VALIDATE.TITLE" : "Resultados de validacion",
+    "MODEL.NAME" : "Nombre",
+    "MODEL.KEY" : "Llave",
+    "MODEL.DESCRIPTION" : "Descripcion",
+    "MODEL.SAVE.NEWVERSION" : "Guardar como nueva version?  Esto significa que siempre podras volver a una version anterior",
+    "MODEL.SAVE.COMMENT" : "Comentario",
+    "MODEL.SAVE.SAVING" : "Guardando modelo",
+    "MODEL.LASTMODIFIEDDATE" : "Ultimo guardado",
+    "MODEL.SAVE.ERROR": "Error inesperado: No se pudo guardar el modelo",
+    "MODEL.VALIDATIONERRORS": "El modelo tiene errores de validacion. El modelo no puede deployarse al Flowable Engine en el estado actual.",
+    "MODEL.CONFLICT.WRITE": "No se puede guardar el modelo: '{{userFullName}}' ha echo cambios a este modelo",
+    "MODEL.CONFLICT.WRITE.OPTIONS": "Selecciona una opcion para solucionar esto:",
+    "MODEL.CONFLICT.WRITE.OPTION.OVERWRITE": "Sobreescribir el otro modelo",
+    "MODEL.CONFLICT.WRITE.OPTION.DISCARDCHANGES": "Descartar mis cambios",
+    "MODEL.CONFLICT.WRITE.OPTION.SAVEAS": "Guardar como nuevo modelo",
+    "MODEL.CONFLICT.WRITE.OPTION.NEWVERSION": "Crrear una nueva version",
+    "MODEL.CONFLICT.SAVEAS" : "Guardar como:",
+
+    "EVENT_TYPE.ACTIVITY.COMPENSATE.TOOLTIP": "Una actividad esta apunto de ser ejecutada como compensacion para otra actividad. Los eventos objetivo de la actividad que esta apunto de ser ejecutada para la compensacion",
+    "EVENT_TYPE.ACTIVITY.COMPLETED.TOOLTIP": "Una actividad se ha completado exitosamente",
+    "EVENT_TYPE.ACTIVITY.ERROR.RECEIVED.TOOLTIP": "Una actividad ha recibido un mensaje de error. Enviado antes que el actual error haya sido recibido por la actividad",
+    "EVENT_TYPE.MEMBERSHIP.CREATED.TOOLTIP": "Una nueva membresia ha sido creada",
+    "EVENT_TYPE.MEMBERSHIP.DELETED.TOOLTIP": "Una sola membresia ha sido borrada",
+    "EVENT_TYPE.MEMBERSHIPS.DELETED.TOOLTIP": "Todas las membresias relacionadas a un grupo han sido borradas. No se enviaran eventos individuales debido a razones de desempeño",
+    "EVENT_TYPE.TASK.ASSIGNED.TOOLTIP": "Una tarea se ha asignado. Se lanzo junto al evento ENTITY_UPDATED",
+    "EVENT_TYPE.TASK.COMPLETED.TOOLTIP": "Una tarea ha sido completada. Antes que la entidad sea borrada",
+    "EVENT_TYPE.UNCAUGHT.BPMNERROR.TOOLTIP": "Cuando un error BPMN fue lanzado, pero no fue atrapado dentro del proceso",
+    "EVENT_TYPE.VARIABLE.CREATED.TOOLTIP": "Una nueva variable se creo",
+    "EVENT_TYPE.VARIABLE.DELETED.TOOLTIP": "Una variable existente fue borrada",
+    "EVENT_TYPE.VARIABLE.UPDATED.TOOLTIP": "Una variable existente fue actualizada",
+
+    "PROPERTY.DECISIONTABLEREFERENCE.EMPTY" : "No hay referencia selecionada",
+    "PROPERTY.DECISIONTABLEREFERENCE.TITLE" : "Tabla de decision referenciada",
+    "PROPERTY.DECISIONTABLEREFERENCE.ERROR.FORM" : "Ocurrio un error cargando la tabla de decisiones. Intenta mas tarde",
+    "PROPERTY.DECISIONTABLEREFERENCE.DECISIONTABLE.LOADING" : "Cargando tabla de decisiones...",
+    "PROPERTY.DECISIONTABLEREFERENCE.DECISIONTABLE.EMPTY" : "Este folder no contiene tablas de decisiones"
+}

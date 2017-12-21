@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+  <bean id="processEngineConfiguration" class="org.flowable.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+
+    <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000;MVCC=TRUE"/>
+    <property name="jdbcDriver" value="org.h2.Driver"/>
+    <property name="jdbcUsername" value="sa"/>
+    <property name="jdbcPassword" value=""/>
+
+    <!-- Database configurations -->
+    <property name="databaseSchemaUpdate" value="drop-create"/>
+
+    <!-- job executor configurations -->
+    <property name="asyncExecutor" ref="asyncExecutor"/>
+    <property name="asyncExecutorActivate" value="false"/>
+
+    <property name="asyncFailedJobWaitTime" value="1"/>
+
+    <!-- http client configurations -->
+    <property name="httpClientConfig" ref="httpClientConfig"/>
+
+    <property name="history" value="full"/>
+
+    <property name="enableProcessDefinitionInfoCache" value="true"/>
+  </bean>
+
+  <bean id="httpClientConfig" class="org.flowable.engine.cfg.HttpClientConfig">
+    <property name="connectTimeout" value="5000"/>
+    <property name="socketTimeout" value="5000"/>
+    <property name="connectionRequestTimeout" value="5000"/>
+    <property name="requestRetryLimit" value="5"/>
+    <!-- https configuration -->
+    <property name="disableCertVerify" value="true"/>
+  </bean>
+
+  <bean id="asyncExecutor" class="org.flowable.job.service.impl.asyncexecutor.DefaultAsyncJobExecutor">
+    <property name="defaultAsyncJobAcquireWaitTimeInMillis" value="1000"/>
+    <property name="defaultTimerJobAcquireWaitTimeInMillis" value="1000"/>
+  </bean>
+
+  <bean id="throwCustomExceptionBean"
+        class="org.flowable.engine.test.bpmn.event.error.mapError.ThrowCustomExceptionBean"/>
+  <bean id="throwCustomExceptionDelegate"
+        class="org.flowable.engine.test.bpmn.event.error.mapError.ThrowCustomExceptionDelegate"/>
+
+</beans>

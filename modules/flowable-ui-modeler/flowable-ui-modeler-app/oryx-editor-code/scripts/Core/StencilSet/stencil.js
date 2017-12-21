@@ -68,23 +68,6 @@ ORYX.Core.StencilSet.Stencil = {
 		
 		this._view;
 		this._properties = new Hash();
-
-		// check stencil consistency and set defaults.
-		/*with(this._jsonStencil) {
-			
-			if(!type) throw "Stencil does not provide type.";
-			if((type != "edge") && (type != "node"))
-				throw "Stencil type must be 'edge' or 'node'.";
-			if(!id || id == "") throw "Stencil does not provide valid id.";
-			if(!title || title == "")
-				throw "Stencil does not provide title";
-			if(!description) { description = ""; };
-			if(!groups) { groups = []; }
-			if(!roles) { roles = []; }
-
-			// add id of stencil to its roles
-			roles.push(id);
-		}*/
 		
 		//init all JSON values
 		if(!this._jsonStencil.type || !(this._jsonStencil.type === "edge" || this._jsonStencil.type === "node")) {
@@ -163,7 +146,7 @@ ORYX.Core.StencilSet.Stencil = {
 				this._view = xml.documentElement;
 				
 			} else {
-				throw "ORYX.Core.StencilSet.Stencil(_loadSVGOnSuccess): The response is not a SVG document."
+				throw "ORYX.Core.StencilSet.Stencil(_loadSVGOnSuccess): The response is not a valid SVG document."
 			}
 		} else {
 			new Ajax.Request(
@@ -186,12 +169,13 @@ ORYX.Core.StencilSet.Stencil = {
 			var hiddenPropertyPackages = this._jsonStencil.hiddenPropertyPackages;
 			
 			this._jsonStencil.propertyPackages.each((function(ppId) {
-				var pp = this._propertyPackages[ppId];
+				var pp = this._propertyPackages.get(ppId);
 				
 				if(pp) {
 					pp.each((function(prop){
 						var oProp = new ORYX.Core.StencilSet.Property(prop, this._namespace, this);
-						this._properties[oProp.prefix() + "-" + oProp.id()] = oProp;
+						var key = oProp.prefix() + "-" + oProp.id();
+ 						this._properties.set(key,oProp);
 						
 						// Check if we need to hide this property (ie it is there for display purposes,
 						// if the user has filled it in, but it can no longer be edited)
@@ -208,7 +192,8 @@ ORYX.Core.StencilSet.Stencil = {
 		if(this._jsonStencil.properties && this._jsonStencil.properties instanceof Array) {
 			this._jsonStencil.properties.each((function(prop) {
 				var oProp = new ORYX.Core.StencilSet.Property(prop, this._namespace, this);
-				this._properties[oProp.prefix() + "-" + oProp.id()] = oProp;
+				var key = oProp.prefix() + "-" + oProp.id();
+				this._properties.set(key, oProp);
 			}).bind(this));
 		}
 		
@@ -285,7 +270,7 @@ ORYX.Core.StencilSet.Stencil = {
 	},
 
 	property: function(id) {
-		return this._properties[id];
+		return this._properties.get(id);
 	},
 
 	roles: function() {

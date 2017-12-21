@@ -42,7 +42,11 @@ var DECISION_TABLE_TOOLBAR = {
                 
                 if (services.$rootScope.editorHistory.length > 0) {
                 	var navigationObject = services.$rootScope.editorHistory.pop();
-        			services.$location.path('/editor/' + navigationObject.id);
+                	var additionalParameters = '';
+                	if (navigationObject.subProcessId && navigationObject.subProcessId.length > 0) {
+                		additionalParameters = '?subProcessId=' + navigationObject.subProcessId;
+                	}
+        			services.$location.url('/editor/' + navigationObject.id + additionalParameters);
         		} else {
         			services.$location.path('/decision-tables');
         		}
@@ -92,9 +96,9 @@ var DECISION_TABLE_TOOLBAR = {
 };
 
 /** Custom controller for the save dialog */
-angular.module('activitiModeler')
-    .controller('SaveDecisionTableCtrl', [ '$rootScope', '$scope', '$http', '$route', '$location', '$translate', 'DecisionTableService',
-        function ($rootScope, $scope, $http, $route, $location, $translate, DecisionTableService) {
+angular.module('flowableModeler')
+    .controller('SaveDecisionTableCtrl', [ '$rootScope', '$scope', '$http', '$route', '$location', '$translate', 'DecisionTableService', 'hotRegisterer',
+        function ($rootScope, $scope, $http, $route, $location, $translate, DecisionTableService, hotRegisterer) {
 
             var description = '';
             if ($rootScope.currentDecisionTableModel.description) {
@@ -123,7 +127,11 @@ angular.module('activitiModeler')
                 $scope.save(function() {
                     if ($rootScope.editorHistory.length > 0) {
 		    	        var navigationObject = $rootScope.editorHistory.pop();
-		    	        $location.path('/editor/' + navigationObject.id);
+		    	        var additionalParameters = '';
+	                	if (navigationObject.subProcessId && navigationObject.subProcessId.length > 0) {
+	                		additionalParameters = '?subProcessId=' + navigationObject.subProcessId;
+	                	}
+		    	        $location.url('/editor/' + navigationObject.id + additionalParameters);
 		 
 		            } else {
 		            	$location.path('/decision-tables');
@@ -148,6 +156,8 @@ angular.module('activitiModeler')
                     comment: $scope.saveDialog.comment
                 };
 
+                $rootScope.currentDecisionTableRules = $scope.model.rulesData;
+
                 var saveCallback = function() {
                     $scope.$hide();
                     
@@ -168,6 +178,12 @@ angular.module('activitiModeler')
                 	$scope.status.loading = false;
                     $scope.saveDialog.errorMessage = errorMessage.message;
                 };
+
+                // deselect cells before thumbnail generations
+                var hotDecisionTableEditorInstance = hotRegisterer.getInstance('decision-table-editor');
+                if (hotDecisionTableEditorInstance) {
+                    hotDecisionTableEditorInstance.deselectCell();
+                }
 
                 DecisionTableService.saveDecisionTable(data, $scope.saveDialog.name, $scope.saveDialog.key, 
                 	$scope.saveDialog.description, saveCallback, errorCallback);

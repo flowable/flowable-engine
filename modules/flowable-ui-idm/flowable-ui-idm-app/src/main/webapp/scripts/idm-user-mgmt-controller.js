@@ -13,7 +13,7 @@
 /**
  * Controller for user mgmt
  */
-activitiApp.controller('IdmUserMgmtController', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$modal',
+flowableApp.controller('IdmUserMgmtController', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$modal',
     function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal) {
 
         $rootScope.setMainPageById('userMgmt');
@@ -219,7 +219,7 @@ activitiApp.controller('IdmUserMgmtController', ['$rootScope', '$scope', '$trans
 /**
  * Controller for the create user dialog
  */
-activitiApp.controller('IdmCreateUserPopupController', ['$rootScope', '$scope', '$http',
+flowableApp.controller('IdmCreateUserPopupController', ['$rootScope', '$scope', '$http',
     function ($rootScope, $scope, $http) {
 
 
@@ -322,7 +322,7 @@ activitiApp.controller('IdmCreateUserPopupController', ['$rootScope', '$scope', 
 /**
  * Controller for the bulk update dialog
  */
-activitiApp.controller('IdmUserBulkUpdatePopupController', ['$rootScope', '$scope', '$http',
+flowableApp.controller('IdmUserBulkUpdatePopupController', ['$rootScope', '$scope', '$http',
   function ($rootScope, $scope, $http) {
 
       if ($scope.model.mode == 'password') {

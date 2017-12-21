@@ -1,0 +1,99 @@
+{
+   "GENERAL": {
+        "MAIN-TITLE": "Flowable",
+        "ERROR": {
+            "GENERIC": "Désolé, une erreur s'est produite...",
+            "UNKNOWN": "Désolé, une erreur s'est produite lors de l'exécution de l'opération.",
+            "BAD_REQUEST": "Une erreur s'est produite lors de l'exécution de l'opération demandée.",
+            "NOT_FOUND": "La resource demandée n'existe pas",
+            "UNAUTHORIZED": "Veuillez d'abord vous connecter pour effectuer cette opération.",
+            "FORBIDDEN": "Vous n'êtes pas autorisé à effectuer cette opération.",
+            "INTERNAL_SERVER_ERROR": "Désolé, une erreur inattendue s'est produite lors de l'exécution de l'opération."
+        },
+        "ACTION": {
+            "LOGOUT": "Déconnexion",
+            "HELP": "Prise en main",
+            "EDIT-PROFILE": "Editer profil",
+            "SAVE": "Sauver",
+            "CANCEL": "Annuler",
+            "CLOSE": "Fermer",
+            "DEPLOY": "Déployer",
+            "ABOUT": "A propos"
+        }
+    },
+    "LOGIN": {
+        "TITLE": "Se connecter",
+        "USERNAME": "Nom d'utilisateur",
+        "USERNAME-PLACEHOLDER": "Veuillez saisir votre nom d'utilisateur",
+        "PASSWORD": "Mot de passe",
+        "PASSWORD-PLACEHOLDER": "Veuillez saisir votre mot de passe",
+        "INVALID-CREDENTIALS": "Identifiants invalides",
+        "ACTION": {
+            "CONFIRM": "Connexion"
+        }
+    },
+    "ACCOUNT": {
+        "ACTIVATE": {
+          "TITLE": "Activer votre compte",
+          "ACTIVATING-MESSAGE": "Tenez bon {{userFullName}} nous activons votre compte...",
+          "SUCCESS-MESSAGE": "Votre compte a été activé. Veuillez vous connecter ci dessous pour concevoir et executer des processus.",
+          "FAILURE-MESSAGE": "Votre compte ne peut être activé. Il est soit déjà actif soit le lien d'activation a expiré."
+        },
+
+        "RESET-PASSWORD-REQUEST": {
+          "MESSAGE": "Mot de pass oublié ? Veuillez saisir votre adresse e-mail ci dessous afin de recevoir un email de réinitialisation",
+          "TITLE": "Réinitialiser mot de passe",
+          "EMAIL": "Adresse e-mail",
+          "EMAIL-PLACEHOLDER": "Veuillez saisir votre e-mail",
+          "SECURITY-SECTION": "Vérifications de sécurité",
+          "CONFIRM": "Demande de réinitialisation du mot de passe",
+          "SUCCESS-MESSAGE": "Vous recevrez sous peu un e-mail vous expliquant comment réinitialiser votre mot de passe.",
+          "ERROR": {
+              "UNEXISTING-USER": "Aucun utilisateur n'existe avec cet adresse e-mail."
+          }
+        },
+
+        "RESET-PASSWORD": {
+          "TITLE": "Réinitialiser mot de passe",
+          "PASSWORD": "Mot de passe",
+          "PASSWORD-CONFIRM": "Confirmez le mot de passe",
+          "PASSWORD-PLACEHOLDER": "Entrez un nouveau mot de passe",
+          "PASSWORD-CONFIRM-PLACEHOLDER": "Confirmez le nouveau mot de passe ",
+          "CONFIRM": "Changer le mot de passe",
+          "LOADING": "Réinitialisation du mot de passe...",
+          "SUCCESS-MESSAGE": "Votre mot de passe a été modifié.",
+          "LOGIN": "Se connecter",
+          "FAILURE-MESSAGE": "Votre mot de passe ne peut être réinitialisé. Le lien a expiré ou est invalide."
+        }
+    },
+    "APP": {
+        "KICKSTART": {
+            "TITLE": "Conception",
+            "DESCRIPTION": "Créez des modèles de processus, des formulaires et des définitions d'applications puis partagez les avec d'autres personnes."
+        },
+        "TASKS": {
+            "TITLE": "Tâches",
+            "DESCRIPTION": "Accédez à votre liste de tâches et travaillez sur celles qui vous sont assignées. Vous pouvez aussi démarrer des processus et des tâches."
+        },
+        "IDENTITY-MANAGEMENT": {
+            "TITLE": "Gestion des identités",
+            "TITLE-TENANT-ADMIN": "Gestion des identités",
+            "DESCRIPTION": "Gérer votre profil: modifier votre photo, votre nom et d'autres paramètres. En tant qu'administrateur, gérer les utilisateurs et groupes.",
+            "DESCRIPTION-TENANT-ADMIN": "Gérer les groupes et utilisateurs de votre organisation."
+        },
+        "CUSTOM-APP" : {
+            "TITLE-TASKS": "tâches",
+            "TITLE-PROCESSES": "processus"
+        },
+        "POPUP" : {
+            "ADD-APP-TITLE": "Ajouter une application à la page d'accueil",
+            "ADD-APP-SUMMARY": "Ajouter une application sur votre page d'accueil"
+        },
+        "ACTION": {
+            "DELETE": "Enlever une application"
+        },
+        "MESSAGE": {
+            "DELETED": "L'application a été enlevée avec succès."
+        }
+    }
+}

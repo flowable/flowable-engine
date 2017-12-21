@@ -1986,7 +1986,7 @@ ORYX.CONFIG.BACKEND_SWITCH 		= 		true;
 ORYX.CONFIG.PANEL_LEFT_WIDTH 	= 		250;
 ORYX.CONFIG.PANEL_RIGHT_COLLAPSED 	= 	true;
 ORYX.CONFIG.PANEL_RIGHT_WIDTH	= 		300;
-ORYX.CONFIG.APPNAME = 					'KISBPM';
+ORYX.CONFIG.APPNAME = 					'Flowable';
 ORYX.CONFIG.WEB_URL = 					".";
 
 ORYX.CONFIG.BLANK_IMAGE = ORYX.CONFIG.LIBS_PATH + '/ext-2.0.2/resources/images/default/s.gif';
@@ -2064,7 +2064,7 @@ ORYX.CONFIG.TYPE_DIAGRAM_LINK =			"diagramlink";
 ORYX.CONFIG.TYPE_COMPLEX =				"complex";
 ORYX.CONFIG.TYPE_MULTIPLECOMPLEX =		"multiplecomplex";
 ORYX.CONFIG.TYPE_TEXT =					"text";
-ORYX.CONFIG.TYPE_KISBPM_MULTIINSTANCE =	"kisbpm-multiinstance";
+ORYX.CONFIG.TYPE_FLOWABLE_MULTIINSTANCE = "flowable-multiinstance";
 ORYX.CONFIG.TYPE_MODEL_LINK =			"modellink";
 ORYX.CONFIG.TYPE_FORM_FLOW_LINK =		"formflowlink";
 ORYX.CONFIG.TYPE_FORM_LINK =			"formlink";
@@ -2144,6 +2144,7 @@ ORYX.CONFIG.EVENT_LAYOUT_BPEL_AUTORESIZE =	"layout.BPEL.autoresize";
 ORYX.CONFIG.EVENT_AUTOLAYOUT_LAYOUT =		"autolayout.layout";
 ORYX.CONFIG.EVENT_UNDO_EXECUTE =			"undo.execute";
 ORYX.CONFIG.EVENT_UNDO_ROLLBACK =			"undo.rollback";
+ORYX.CONFIG.EVENT_UNDO_RESET =              "undo.reset";
 ORYX.CONFIG.EVENT_BUTTON_UPDATE =           "toolbar.button.update";
 ORYX.CONFIG.EVENT_LAYOUT = 					"layout.dolayout";
 ORYX.CONFIG.EVENT_GLOSSARY_LINK_EDIT = 		"glossary.link.edit";
@@ -2154,6 +2155,12 @@ ORYX.CONFIG.EVENT_CANVAS_SCROLL = 			"canvas.scroll";
 	
 ORYX.CONFIG.EVENT_SHOW_PROPERTYWINDOW =		"propertywindow.show";
 ORYX.CONFIG.EVENT_ABOUT_TO_SAVE = "file.aboutToSave";
+
+//extra events
+ORYX.CONFIG.EVENT_EDITOR_INIT_COMPLETED = "editor.init.completed";
+
+//actions events that are fired when a button or key was pressed after completing the initial logic.
+ORYX.CONFIG.ACTION_DELETE_COMPLETED = 'delete.action.completed';
 	
 	/* Selection Shapes Highlights */
 ORYX.CONFIG.SELECTION_HIGHLIGHT_SIZE =				5;
@@ -2364,52 +2371,6 @@ ORYX = Object.extend(ORYX, {
 	 * the server. Once everything is loaded, the third layer is being invoked.
 	 */
 	_load: function() {
-	/*
-		// if configuration not there already,
-		if(!(ORYX.CONFIG)) {
-			
-			// if this is the first attempt...
-			if(ORYX.configrationRetries == 0) {
-				
-				// get the path and filename.
-				var configuration = ORYX.PATH + ORYX.CONFIGURATION;
-	
-				ORYX.Log.debug("Configuration not found, loading from '%0'.",
-					configuration);
-				
-				// require configuration file.
-				Kickstart.require(configuration);
-				
-			// else if attempts exceeded ...
-			} else if(ORYX.configrationRetries >= ORYX_CONFIGURATION_WAIT_ATTEMPTS) {
-				
-				throw "Tried to get configuration" +
-					ORYX_CONFIGURATION_WAIT_ATTEMPTS +
-					" times from '" + configuration + "'. Giving up."
-					
-			} else if(ORYX.configrationRetries > 0){
-				
-				// point out how many attempts are left...
-				ORYX.Log.debug("Waiting once more (%0 attempts left)",
-					(ORYX_CONFIGURATION_WAIT_ATTEMPTS -
-						ORYX.configrationRetries));
-
-			}
-			
-			// any case: continue in a moment with increased retry count.
-			ORYX.configrationRetries++;
-			window.setTimeout(ORYX._load, ORYX_CONFIGURATION_DELAY);
-			return;
-		}
-		
-		ORYX.Log.info("Configuration loaded.");
-		
-		// load necessary scripts.
-		ORYX.URLS.each(function(url) {
-			ORYX.Log.debug("Requireing '%0'", url);
-			Kickstart.require(ORYX.PATH + url) });
-	*/
-		// configurate logging and load plugins.
 		ORYX.loadPlugins();
 	},
 
@@ -2431,146 +2392,135 @@ ORYX = Object.extend(ORYX, {
 		init();
 	},
 	
-	_loadPlugins: function() {
-
-		// load plugin configuration file.
-		var source = ORYX.CONFIG.PLUGINS_CONFIG;
-
-		ORYX.Log.debug("Loading plugin configuration from '%0'.", source);
+	_loadPlugins: function(plugins) {
 	
-		new Ajax.Request(source, {
-			asynchronous: false,
-			method: 'get',
-			onSuccess: function(result) {
+	    ORYX.availablePlugins.length = 0;
+	
+		// get plugins.xml content
+		var resultXml = jQuery.parseXML(plugins); //jquery parser
 
-				/*
-				 * This is the method that is being called when the plugin
-				 * configuration was successfully loaded from the server. The
-				 * file has to be processed and the contents need to be
-				 * considered for further plugin requireation.
-				 */
-				
-				ORYX.Log.info("Plugin configuration file loaded.");
-		
-				// get plugins.xml content
-				var resultXml = result.responseXML;
-				
-				// TODO: Describe how properties are handled.
-				// Get the globale Properties
-				var globalProperties = [];
-				var preferences = $A(resultXml.getElementsByTagName("properties"));
-				preferences.each( function(p) {
+		// TODO: Describe how properties are handled.
+		// Get the globale Properties
+		var globalProperties = [];
+		var preferences = $A(resultXml.getElementsByTagName("properties"));
+		preferences.each( function(p) {
 
-					var props = $A(p.childNodes);
-					props.each( function(prop) {
-						var property = new Hash(); 
-						
-						// get all attributes from the node and set to global properties
-						var attributes = $A(prop.attributes)
-						attributes.each(function(attr){property[attr.nodeName] = attr.nodeValue});				
-						if(attributes.length > 0) { globalProperties.push(property) };				
-					});
+			var props = $A(p.childNodes);
+			props.each( function(prop) {
+				var property = new Hash();
+
+				// get all attributes from the node and set to global properties
+				var attributes = $A(prop.attributes)
+				attributes.each(function(attr) {
+					property.set(attr.nodeName, attr.nodeValue);
+				});
+				if(attributes.length > 0) {
+					globalProperties.push(property)
+				};
+			});
+		});
+
+
+		// TODO Why are we using XML if we don't respect structure anyway?
+		// for each plugin element in the configuration..
+		var plugin = resultXml.getElementsByTagName("plugin");
+		$A(plugin).each( function(node) {
+
+			// get all element's attributes.
+			// TODO: What about: var pluginData = $H(node.attributes) !?
+			var pluginData = new Hash();
+			$A(node.attributes).each( function(attr){
+				pluginData.set(attr.nodeName,attr.nodeValue);
+			});
+
+			// ensure there's a name attribute.
+			if(!pluginData.get('name')) {
+				ORYX.Log.error("A plugin is not providing a name. Ingnoring this plugin.");
+				return;
+			}
+
+			// ensure there's a source attribute.
+			if(!pluginData.get('source')) {
+				ORYX.Log.error("Plugin with name '%0' doesn't provide a source attribute.", pluginData.get('name'));
+				return;
+			}
+
+			// Get all private Properties
+			var propertyNodes = node.getElementsByTagName("property");
+			var properties = [];
+			$A(propertyNodes).each(function(prop) {
+				var property = new Hash();
+
+				// Get all Attributes from the Node
+				var attributes = $A(prop.attributes)
+				attributes.each(function(attr){
+					property.set(attr.nodeName,attr.nodeValue);
 				});
 
-				
-				// TODO Why are we using XML if we don't respect structure anyway?
-				// for each plugin element in the configuration..
-				var plugin = resultXml.getElementsByTagName("plugin");
-				$A(plugin).each( function(node) {
-					
-					// get all element's attributes.
-					// TODO: What about: var pluginData = $H(node.attributes) !?
-					var pluginData = new Hash();
-					$A(node.attributes).each( function(attr){
-						pluginData[attr.nodeName] = attr.nodeValue});				
-					
-					// ensure there's a name attribute.
-					if(!pluginData['name']) {
-						ORYX.Log.error("A plugin is not providing a name. Ingnoring this plugin.");
-						return;
+				if(attributes.length > 0) {
+					properties.push(property)
+				};
+
+			});
+
+			// Set all Global-Properties to the Properties
+			properties = properties.concat(globalProperties);
+
+			// Set Properties to Plugin-Data
+			pluginData.set('properties',properties);
+
+			// Get the RequieredNodes
+			var requireNodes = node.getElementsByTagName("requires");
+			var requires;
+			$A(requireNodes).each(function(req) {
+				var namespace = $A(req.attributes).find(function(attr){ return attr.name == "namespace"})
+				if( namespace && namespace.nodeValue ){
+					if( !requires ){
+						requires = {namespaces:[]}
 					}
 
-					// ensure there's a source attribute.
-					if(!pluginData['source']) {
-						ORYX.Log.error("Plugin with name '%0' doesn't provide a source attribute.", pluginData['name']);
-						return;
-					}
-					
-					// Get all private Properties
-					var propertyNodes = node.getElementsByTagName("property");
-					var properties = [];
-					$A(propertyNodes).each(function(prop) {
-						var property = new Hash(); 
-						
-						// Get all Attributes from the Node			
-						var attributes = $A(prop.attributes)
-						attributes.each(function(attr){property[attr.nodeName] = attr.nodeValue});				
-						if(attributes.length > 0) { properties.push(property) };	
-					
-					});
-					
-					// Set all Global-Properties to the Properties
-					properties = properties.concat(globalProperties);
-					
-					// Set Properties to Plugin-Data
-					pluginData['properties'] = properties;
-					
-					// Get the RequieredNodes
-					var requireNodes = node.getElementsByTagName("requires");
-					var requires;
-					$A(requireNodes).each(function(req) {			
-						var namespace = $A(req.attributes).find(function(attr){ return attr.name == "namespace"})
-						if( namespace && namespace.nodeValue ){
-							if( !requires ){
-								requires = {namespaces:[]}
-							}
-						
-							requires.namespaces.push(namespace.nodeValue)
-						} 
-					});					
-					
-					// Set Requires to the Plugin-Data, if there is one
-					if( requires ){
-						pluginData['requires'] = requires;
-					}
+					requires.namespaces.push(namespace.nodeValue)
+				}
+			});
+
+			// Set Requires to the Plugin-Data, if there is one
+			if( requires ){
+				pluginData.set('requires',requires);
+			}
 
 
-					// Get the RequieredNodes
-					var notUsesInNodes = node.getElementsByTagName("notUsesIn");
-					var notUsesIn;
-					$A(notUsesInNodes).each(function(not) {			
-						var namespace = $A(not.attributes).find(function(attr){ return attr.name == "namespace"})
-						if( namespace && namespace.nodeValue ){
-							if( !notUsesIn ){
-								notUsesIn = {namespaces:[]}
-							}
-						
-							notUsesIn.namespaces.push(namespace.nodeValue)
-						} 
-					});					
-					
-					// Set Requires to the Plugin-Data, if there is one
-					if( notUsesIn ){
-						pluginData['notUsesIn'] = notUsesIn;
-					}		
-					
-								
-					var url = ORYX.PATH + ORYX.CONFIG.PLUGINS_FOLDER + pluginData['source'];
-		
-					ORYX.Log.debug("Requireing '%0'", url);
-		
-					// Add the Script-Tag to the Site
-					//Kickstart.require(url);
-		
-					ORYX.Log.info("Plugin '%0' successfully loaded.", pluginData['name']);
-		
-					// Add the Plugin-Data to all available Plugins
-					ORYX.availablePlugins.push(pluginData);
-		
-				});
-		
-			},
-			onFailure:this._loadPluginsOnFails
+			// Get the RequieredNodes
+			var notUsesInNodes = node.getElementsByTagName("notUsesIn");
+			var notUsesIn;
+			$A(notUsesInNodes).each(function(not) {
+				var namespace = $A(not.attributes).find(function(attr){ return attr.name == "namespace"})
+				if( namespace && namespace.nodeValue ){
+					if( !notUsesIn ){
+						notUsesIn = {namespaces:[]}
+					}
+
+					notUsesIn.namespaces.push(namespace.nodeValue)
+				}
+			});
+
+			// Set Requires to the Plugin-Data, if there is one
+			if( notUsesIn ){
+				pluginData.set('notUsesIn',notUsesIn);
+			}
+
+
+			var url = ORYX.PATH + ORYX.CONFIG.PLUGINS_FOLDER + pluginData.get('source');
+
+			ORYX.Log.debug("Requireing '%0'", url);
+
+			// Add the Script-Tag to the Site
+			//Kickstart.require(url);
+
+			ORYX.Log.info("Plugin '%0' successfully loaded.", pluginData.get('name'));
+
+			// Add the Plugin-Data to all available Plugins
+			ORYX.availablePlugins.push(pluginData);
+
 		});
 
 	},
@@ -6122,23 +6072,6 @@ ORYX.Core.StencilSet.Stencil = {
 		
 		this._view;
 		this._properties = new Hash();
-
-		// check stencil consistency and set defaults.
-		/*with(this._jsonStencil) {
-			
-			if(!type) throw "Stencil does not provide type.";
-			if((type != "edge") && (type != "node"))
-				throw "Stencil type must be 'edge' or 'node'.";
-			if(!id || id == "") throw "Stencil does not provide valid id.";
-			if(!title || title == "")
-				throw "Stencil does not provide title";
-			if(!description) { description = ""; };
-			if(!groups) { groups = []; }
-			if(!roles) { roles = []; }
-
-			// add id of stencil to its roles
-			roles.push(id);
-		}*/
 		
 		//init all JSON values
 		if(!this._jsonStencil.type || !(this._jsonStencil.type === "edge" || this._jsonStencil.type === "node")) {
@@ -6217,7 +6150,7 @@ ORYX.Core.StencilSet.Stencil = {
 				this._view = xml.documentElement;
 				
 			} else {
-				throw "ORYX.Core.StencilSet.Stencil(_loadSVGOnSuccess): The response is not a SVG document."
+				throw "ORYX.Core.StencilSet.Stencil(_loadSVGOnSuccess): The response is not a valid SVG document."
 			}
 		} else {
 			new Ajax.Request(
@@ -6240,12 +6173,13 @@ ORYX.Core.StencilSet.Stencil = {
 			var hiddenPropertyPackages = this._jsonStencil.hiddenPropertyPackages;
 			
 			this._jsonStencil.propertyPackages.each((function(ppId) {
-				var pp = this._propertyPackages[ppId];
+				var pp = this._propertyPackages.get(ppId);
 				
 				if(pp) {
 					pp.each((function(prop){
 						var oProp = new ORYX.Core.StencilSet.Property(prop, this._namespace, this);
-						this._properties[oProp.prefix() + "-" + oProp.id()] = oProp;
+						var key = oProp.prefix() + "-" + oProp.id();
+ 						this._properties.set(key,oProp);
 						
 						// Check if we need to hide this property (ie it is there for display purposes,
 						// if the user has filled it in, but it can no longer be edited)
@@ -6262,7 +6196,8 @@ ORYX.Core.StencilSet.Stencil = {
 		if(this._jsonStencil.properties && this._jsonStencil.properties instanceof Array) {
 			this._jsonStencil.properties.each((function(prop) {
 				var oProp = new ORYX.Core.StencilSet.Property(prop, this._namespace, this);
-				this._properties[oProp.prefix() + "-" + oProp.id()] = oProp;
+				var key = oProp.prefix() + "-" + oProp.id();
+				this._properties.set(key, oProp);
 			}).bind(this));
 		}
 		
@@ -6339,7 +6274,7 @@ ORYX.Core.StencilSet.Stencil = {
 	},
 
 	property: function(id) {
-		return this._properties[id];
+		return this._properties.get(id);
 	},
 
 	roles: function() {
@@ -7364,16 +7299,16 @@ ORYX.Core.StencilSet.Rules = {
 			
 			// init connection rules
 			var cr = this._connectionRules;
-			if (jsonRules.connectionRules) {
-				jsonRules.connectionRules.each((function(rules){
+			if (jsonRules.get('connectionRules')) {
+				jsonRules.get('connectionRules').each((function(rules){
 					if (this._isRoleOfOtherNamespace(rules.role)) {
-						if (!cr[rules.role]) {
-							cr[rules.role] = new Hash();
+						if (!cr.get(rules.role)) {
+							cr.set(rules.role, new Hash());
 						}
 					}
 					else {
-						if (!cr[namespace + rules.role]) 
-							cr[namespace + rules.role] = new Hash();
+						if (!cr.get(namespace + rules.role)) 
+							cr.set(namespace + rules.role, new Hash());
 					}
 					
 					rules.connects.each((function(connect){
@@ -7403,10 +7338,10 @@ ORYX.Core.StencilSet.Rules = {
 						else 
 							from = namespace + connect.from;
 						
-						if (!cr[role][from]) 
-							cr[role][from] = toRoles;
+						if (!cr.get(role).get(from)) 
+							cr.get(role).set(from, toRoles);
 						else 
-							cr[role][from] = cr[role][from].concat(toRoles);
+							cr.get(role).set(from, cr.get(role).get(from).concat(toRoles));
 						
 					}).bind(this));
 				}).bind(this));
@@ -7414,8 +7349,8 @@ ORYX.Core.StencilSet.Rules = {
 			
 			// init cardinality rules
 			var cardr = this._cardinalityRules;
-			if (jsonRules.cardinalityRules) {
-				jsonRules.cardinalityRules.each((function(rules){
+			if (jsonRules.get('cardinalityRules')) {
+				jsonRules.get('cardinalityRules').each((function(rules){
 					var cardrKey;
 					if (this._isRoleOfOtherNamespace(rules.role)) {
 						cardrKey = rules.role;
@@ -7424,10 +7359,10 @@ ORYX.Core.StencilSet.Rules = {
 						cardrKey = namespace + rules.role;
 					}
 					
-					if (!cardr[cardrKey]) {
-						cardr[cardrKey] = {};
+					if (!cardr.get(cardrKey)) {
+						cardr.set(cardrKey, {});
 						for (i in rules) {
-							cardr[cardrKey][i] = rules[i];
+							cardr.get(cardrKey)[i] = rules[i];
 						}
 					}
 					
@@ -7435,33 +7370,33 @@ ORYX.Core.StencilSet.Rules = {
 					if (rules.outgoingEdges) {
 						rules.outgoingEdges.each((function(rule){
 							if (this._isRoleOfOtherNamespace(rule.role)) {
-								oe[rule.role] = rule;
+								oe.set(rule.role,rule);
 							}
 							else {
-								oe[namespace + rule.role] = rule;
+								oe.set(namespace + rule.role,rule);
 							}
 						}).bind(this));
 					}
-					cardr[cardrKey].outgoingEdges = oe;
+					cardr.get(cardrKey).outgoingEdges = oe;
 					var ie = new Hash();
 					if (rules.incomingEdges) {
 						rules.incomingEdges.each((function(rule){
 							if (this._isRoleOfOtherNamespace(rule.role)) {
-								ie[rule.role] = rule;
+								ie.set(rule.role, rule);
 							}
 							else {
-								ie[namespace + rule.role] = rule;
+								ie.set(namespace + rule.role,rule);
 							}
 						}).bind(this));
 					}
-					cardr[cardrKey].incomingEdges = ie;
+					cardr.get(cardrKey).incomingEdges = ie;
 				}).bind(this));
 			}
 			
 			// init containment rules
 			var conr = this._containmentRules;
-			if (jsonRules.containmentRules) {
-				jsonRules.containmentRules.each((function(rules){
+			if (jsonRules.get('containmentRules')) {
+				jsonRules.get('containmentRules').each((function(rules){
 					var conrKey;
 					if (this._isRoleOfOtherNamespace(rules.role)) {
 						conrKey = rules.role;
@@ -7470,15 +7405,15 @@ ORYX.Core.StencilSet.Rules = {
 						this._containerStencils.push(namespace + rules.role);
 						conrKey = namespace + rules.role;
 					}
-					if (!conr[conrKey]) {
-						conr[conrKey] = [];
-					}
+					if (!conr.get(conrKey)) {
+						conr.set(conrKey, []);
+  					}
 					(rules.contains||[]).each((function(containRole){
 						if (this._isRoleOfOtherNamespace(containRole)) {
-							conr[conrKey].push(containRole);
+							conr.get(conrKey).push(containRole);
 						}
 						else {
-							conr[conrKey].push(namespace + containRole);
+							conr.get(conrKey).push(namespace + containRole);
 						}
 					}).bind(this));
 				}).bind(this));
@@ -7486,8 +7421,8 @@ ORYX.Core.StencilSet.Rules = {
 			
 			// init morphing rules
 			var morphr = this._morphingRules;
-			if (jsonRules.morphingRules) {
-				jsonRules.morphingRules.each((function(rules){
+			if (jsonRules.get('morphingRules')) {
+				jsonRules.get('morphingRules').each((function(rules){
 					var morphrKey;
 					if (this._isRoleOfOtherNamespace(rules.role)) {
 						morphrKey = rules.role;
@@ -7495,16 +7430,16 @@ ORYX.Core.StencilSet.Rules = {
 					else {
 						morphrKey = namespace + rules.role;
 					}
-					if (!morphr[morphrKey]) {
-						morphr[morphrKey] = [];
-					}
+					if (!morphr.get(morphrKey)) {
+						morphr.set(morphrKey,[]);
+  					}
 					if(!rules.preserveBounds) {
 						rules.preserveBounds = false;
 					}
 					rules.baseMorphs.each((function(baseMorphStencilId){
 						var morphStencil = this._getStencilById(namespace + baseMorphStencilId);
 						if(morphStencil) {
-							morphr[morphrKey].push(morphStencil);
+							morphr.get(morphrKey).push(morphStencil);
 						}
 					}).bind(this));
 				}).bind(this));
@@ -7512,7 +7447,7 @@ ORYX.Core.StencilSet.Rules = {
 			
 			// init layouting rules
 			var layoutRules = this._layoutRules;
-			if (jsonRules.layoutRules) {
+			if (jsonRules.get('layoutRules')) {
 				
 				var getDirections = function(o){
 					return {
@@ -7524,7 +7459,7 @@ ORYX.Core.StencilSet.Rules = {
 						}
 				}
 				
-				jsonRules.layoutRules.each(function(rules){
+				jsonRules.get('layoutRules').each(function(rules){
 					var layoutKey;
 					if (this._isRoleOfOtherNamespace(rules.role)) {
 						layoutKey = rules.role;
@@ -7532,20 +7467,20 @@ ORYX.Core.StencilSet.Rules = {
 					else {
 						layoutKey = namespace + rules.role;
 					}
-					if (!layoutRules[layoutKey]) {
-						layoutRules[layoutKey] = {};
-					}
+					if (!layoutRules.get(layoutKey)) {
+						layoutRules.set(layoutKey,{});
+  					}
 					if (rules["in"]){
-						layoutRules[layoutKey]["in"] = getDirections(rules["in"]);
+						layoutRules.get(layoutKey)["in"] = getDirections(rules["in"]);
 					}
 					if (rules["ins"]){
-						layoutRules[layoutKey]["ins"] = (rules["ins"]||[]).map(function(e){ return getDirections(e) })
+						layoutRules.get(layoutKey)["ins"] = (rules["ins"]||[]).map(function(e){ return getDirections(e) })
 					}
 					if (rules["out"]) {
-						layoutRules[layoutKey]["out"] = getDirections(rules["out"]);
+						layoutRules.get(layoutKey)["out"] = getDirections(rules["out"]);
 					}
 					if (rules["outs"]){
-						layoutRules[layoutKey]["outs"] = (rules["outs"]||[]).map(function(e){ return getDirections(e) })
+						layoutRules.get(layoutKey)["outs"] = (rules["outs"]||[]).map(function(e){ return getDirections(e) })
 					}
 				}.bind(this));
 			}			
@@ -8036,7 +7971,7 @@ ORYX.Core.StencilSet.Rules = {
 		} else {
 			if(args.sourceStencil) {
 				resultCR = args.sourceStencil.roles().any(function(sourceRole) {
-					var targetRoles = edgeRules[sourceRole];
+					var targetRoles = edgeRules.get(sourceRole);
 
 					if(!targetRoles) {return false;}
 		
@@ -8166,7 +8101,7 @@ ORYX.Core.StencilSet.Rules = {
 		
 		// check containment rules
 		result = args.containingStencil.roles().any((function(role) {
-			var roles = this._containmentRules[role];
+			var roles = this._containmentRules.get(role);
 			if(roles) {
 				return roles.any(function(role) {
 					return args.containedStencil.roles().member(role);
@@ -8442,7 +8377,7 @@ ORYX.Core.StencilSet.Rules = {
 	_getMaximumOccurrence: function(parent, child) {
 		var max;
 		child.roles().each((function(role) {
-			var cardRule = this._cardinalityRules[role];
+			var cardRule = this._cardinalityRules.get(role);
 			if(cardRule && cardRule.maximumOccurrence) {
 				if(max) {
 					max = Math.min(max, cardRule.maximumOccurrence);
@@ -8474,7 +8409,7 @@ ORYX.Core.StencilSet.Rules = {
 		
 		var max;
 		args.sourceStencil.roles().each((function(role) {
-			var cardRule = this._cardinalityRules[role];
+			var cardRule = this._cardinalityRules.get(role);
 
 			if(cardRule && cardRule.outgoingEdges) {
 				args.edgeStencil.roles().each(function(edgeRole) {
@@ -8541,12 +8476,12 @@ ORYX.Core.StencilSet.Rules = {
 	_getConnectionRulesOfEdgeStencil: function(edgeStencil) {
 		var edgeRules = new Hash();
 		edgeStencil.roles().each((function(role) {
-			if(this._connectionRules[role]) {
-				this._connectionRules[role].each(function(cr) {
-					if(edgeRules[cr.key]) {
-						edgeRules[cr.key] = edgeRules[cr.key].concat(cr.value);
+			if(this._connectionRules.get(role)) {
+				this._connectionRules.get(role).each(function(cr) {
+					if (edgeRules.get(cr.key)) {
+						edgeRules.set(cr.key,edgeRules.get([cr.key]).concat(cr.value));
 					} else {
-						edgeRules[cr.key] = cr.value;
+						edgeRules.set(cr.key,cr.value);
 					}
 				});
 			}
@@ -8617,50 +8552,16 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
      * @param source {URL} A reference to the stencil set specification.
      *
      */
-    construct: function(source, modelMetaData, editorId){
-        arguments.callee.$.construct.apply(this, arguments);
-        
-        if (!source) {
-            throw "ORYX.Core.StencilSet.StencilSet(construct): Parameter 'source' is not defined.";
-        }
-        
-        if (source.endsWith("/")) {
-            source = source.substr(0, source.length - 1);
-        }
+    construct: function(baseUrl, data) {
 		
 		this._extensions = new Hash();
         
-        this._source = source;
-        this._baseUrl = source.substring(0, source.lastIndexOf("/") + 1);
-        
+        this._baseUrl = baseUrl;
         this._jsonObject = {};
         
         this._stencils = new Hash();
 		this._availableStencils = new Hash();
-        
-		if(ORYX.CONFIG.BACKEND_SWITCH) {
-			var stencilType = "bpmn";
-			this._baseUrl = "editor/stencilsets/bpmn2.0/";
-			this._source = "stencilsets/bpmn2.0/bpmn2.0.json";
-			
-			new Ajax.Request(FLOWABLE.CONFIG.contextRoot + "/app/rest/stencil-sets/editor?version=" + Date.now(), {
-	            asynchronous: false,
-	            method: 'get',
-	            onSuccess: this._init.bind(this),
-	            onFailure: this._cancelInit.bind(this)
-	        });
-			
-		} else {
-			new Ajax.Request(source, {
-	            asynchronous: false,
-	            method: 'get',
-	            onSuccess: this._init.bind(this),
-	            onFailure: this._cancelInit.bind(this)
-	        });
-		}
-        
-        if (this.errornous) 
-            throw "Loading stencil set " + source + " failed.";
+       	this._init(data);
     },
     
     /**
@@ -8767,7 +8668,7 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
     },
     
     stencil: function(id){
-        return this._stencils[id];
+        return this._stencils.get(id);
     },
     
     title: function(){
@@ -8821,7 +8722,7 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
 					jsonExtension["extends"] += "#";
 					
 			if(jsonExtension["extends"] == this.namespace()) {
-				this._extensions[jsonExtension.namespace] = jsonExtension;
+				this._extensions.set(jsonExtension.namespace, jsonExtension);
 				
 				var defaultPosition = this._stencils.keys().size();
 				//load new stencils
@@ -8829,8 +8730,8 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
 					$A(jsonExtension.stencils).each(function(stencil) {
 						defaultPosition++;
 						var oStencil = new ORYX.Core.StencilSet.Stencil(stencil, this.namespace(), this._baseUrl, this, undefined, defaultPosition);            
-						this._stencils[oStencil.id()] = oStencil;
-						this._availableStencils[oStencil.id()] = oStencil;
+						this._stencils.set(oStencil.id(),oStencil);
+						this._availableStencils.set(oStencil.id(),oStencil);
 					}.bind(this));
 				}
 				
@@ -8890,8 +8791,8 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
 			if(jsonExtension.stencils) {
 				$A(jsonExtension.stencils).each(function(stencil) {
 					var oStencil = new ORYX.Core.StencilSet.Stencil(stencil, this.namespace(), this._baseUrl, this);            
-					delete this._stencils[oStencil.id()]; // maybe not ??
-					delete this._availableStencils[oStencil.id()];
+					this._stencils.unset(oStencil.id());
+					this._availableStencils.unset(oStencil.id());
 				}.bind(this));
 			}
 			
@@ -8937,7 +8838,7 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
 			if(jsonExtension.removestencils) {
 				$A(jsonExtension.removestencils).each(function(remstencil) {
 					var sId = jsonExtension["extends"] + remstencil;
-					this._availableStencils[sId] = this._stencils[sId];
+					this._availableStencils.set(sId, this._stencils.get(sId));
 				}.bind(this));
 			}
 		}
@@ -8946,14 +8847,7 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
     
     __handleStencilset: function(response){
     
-        try {
-            // using eval instead of prototype's parsing,
-            // since there are functions in this JSON.
-            eval("this._jsonObject =" + response.responseText);
-        } 
-        catch (e) {
-            throw "Stenciset corrupt: " + e;
-        }
+        this._jsonObject = response;
         
         // assert it was parsed.
         if (!this._jsonObject) {
@@ -8998,7 +8892,7 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
 		// init property packages
 		if(this._jsonObject.propertyPackages) {
 			$A(this._jsonObject.propertyPackages).each((function(pp) {
-				pps[pp.name] = pp.properties;
+				pps.set(pp.name, pp.properties);
 			}).bind(this));
 		}
 		
@@ -9010,8 +8904,8 @@ ORYX.Core.StencilSet.StencilSet = Clazz.extend({
         	
             // instantiate normally.
             var oStencil = new ORYX.Core.StencilSet.Stencil(stencil, this.namespace(), this._baseUrl, this, pps, defaultPosition);      
-			this._stencils[oStencil.id()] = oStencil;
-			this._availableStencils[oStencil.id()] = oStencil;
+			this._stencils.set(oStencil.id(), oStencil);
+			this._availableStencils.set(oStencil.id(), oStencil);
             
         }).bind(this));
     },
@@ -9088,12 +8982,12 @@ ORYX.Core.StencilSet._rulesByEditorInstance = new Hash();
  * 					the editor with the editorId.
  */
 ORYX.Core.StencilSet.stencilSets = function(editorId) {
-	var stencilSetNSs = ORYX.Core.StencilSet._StencilSetNSByEditorInstance[editorId];
+	var stencilSetNSs = ORYX.Core.StencilSet._StencilSetNSByEditorInstance.get(editorId);
 	var stencilSets = new Hash();
 	if(stencilSetNSs) {
 		stencilSetNSs.each(function(stencilSetNS) {
 			var stencilSet = ORYX.Core.StencilSet.stencilSet(stencilSetNS)
-			stencilSets[stencilSet.namespace()] = stencilSet;
+			stencilSets.set(stencilSet.namespace(), stencilSet);
 		});
 	}
 	return stencilSets;
@@ -9116,7 +9010,7 @@ ORYX.Core.StencilSet.stencilSet = function(namespace) {
 	var splitted = namespace.split("#", 1);
 	if(splitted.length === 1) {
 		ORYX.Log.trace("Getting stencil set %0", splitted[0]);
-		return ORYX.Core.StencilSet._stencilSetsByNamespace[splitted[0] + "#"];
+		return ORYX.Core.StencilSet._stencilSetsByNamespace.get(splitted[0] + "#");
 	} else {
 		return undefined;
 	}
@@ -9151,10 +9045,10 @@ ORYX.Core.StencilSet.stencil = function(id) {
  * 									specified by its editor id.
  */
 ORYX.Core.StencilSet.rules = function(editorId) {
-	if(!ORYX.Core.StencilSet._rulesByEditorInstance[editorId]) {
-		ORYX.Core.StencilSet._rulesByEditorInstance[editorId] = new ORYX.Core.StencilSet.Rules();
+	if(!ORYX.Core.StencilSet._rulesByEditorInstance.get(editorId)) {
+		ORYX.Core.StencilSet._rulesByEditorInstance.set(editorId, new ORYX.Core.StencilSet.Rules());
 	}
-	return ORYX.Core.StencilSet._rulesByEditorInstance[editorId];
+	return ORYX.Core.StencilSet._rulesByEditorInstance.get(editorId);
 };
 
 /**
@@ -9166,39 +9060,30 @@ ORYX.Core.StencilSet.rules = function(editorId) {
  * It also stores which editor instance loads the stencil set and 
  * initializes the Rules object for the editor instance.
  */
-ORYX.Core.StencilSet.loadStencilSet = function(url, modelMetaData, editorId) {
+ORYX.Core.StencilSet.loadStencilSet = function(url, stencilSet, editorId) {
 	
-	// Alfresco: disable cache, because stencil sets are now flexible
+	//store stencil set
+	ORYX.Core.StencilSet._stencilSetsByNamespace.set(stencilSet.namespace(),stencilSet);
 	
-	//var stencilSet = ORYX.Core.StencilSet._stencilSetsByUrl[url];
-
-	//if(!stencilSet) {
-		//load stencil set
-		stencilSet = new ORYX.Core.StencilSet.StencilSet(url, modelMetaData, editorId);
-		
-		//store stencil set
-		ORYX.Core.StencilSet._stencilSetsByNamespace[stencilSet.namespace()] = stencilSet;
-		
-		//store stencil set by url
-		ORYX.Core.StencilSet._stencilSetsByUrl[url] = stencilSet;
-	//}
+	//store stencil set by url
+ 	ORYX.Core.StencilSet._stencilSetsByUrl.set(url,stencilSet);
 	
 	var namespace = stencilSet.namespace();
 	
 	//store which editorInstance loads the stencil set
-	if(ORYX.Core.StencilSet._StencilSetNSByEditorInstance[editorId]) {
-		ORYX.Core.StencilSet._StencilSetNSByEditorInstance[editorId].push(namespace);
+	if(ORYX.Core.StencilSet._StencilSetNSByEditorInstance.get(editorId)) {
+		ORYX.Core.StencilSet._StencilSetNSByEditorInstance.get(editorId).push(namespace);
 	} else {
-		ORYX.Core.StencilSet._StencilSetNSByEditorInstance[editorId] = [namespace];
+		ORYX.Core.StencilSet._StencilSetNSByEditorInstance.set(editorId, [namespace]);
 	}
 
 	//store the rules for the editor instance
-	if(ORYX.Core.StencilSet._rulesByEditorInstance[editorId]) {
-		ORYX.Core.StencilSet._rulesByEditorInstance[editorId].initializeRules(stencilSet);
+	if(ORYX.Core.StencilSet._rulesByEditorInstance.get(editorId)) {
+		ORYX.Core.StencilSet._rulesByEditorInstance.get(editorId).initializeRules(stencilSet);
 	} else {
 		var rules = new ORYX.Core.StencilSet.Rules();
 		rules.initializeRules(stencilSet);
-		ORYX.Core.StencilSet._rulesByEditorInstance[editorId] = rules;
+		ORYX.Core.StencilSet._rulesByEditorInstance.set(editorId, rules);
 	}
 };
 
@@ -10109,8 +9994,8 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 		//Initialization of property map and initial value.
 		this._stencil.properties().each((function(property) {
 			var key = property.prefix() + "-" + property.id();
-			this.properties[key] = property.value();
-			this.propertiesChanged[key] = true;
+			this.properties.set(key, property.value());
+			this.propertiesChanged.set(key, true);
 		}).bind(this));
 		
 		// if super stencil was defined, also regard stencil's properties:
@@ -10118,9 +10003,9 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 			stencil.properties().each((function(property) {
 				var key = property.prefix() + "-" + property.id();
 				var value = property.value();
-				var oldValue = this.properties[key];
-				this.properties[key] = value;
-				this.propertiesChanged[key] = true;
+				var oldValue = this.properties.get(key);
+				this.properties.set(key,value);
+				this.propertiesChanged.set(key,true);
 
 				// Raise an event, to show that the property has changed
 				// required for plugins like processLink.js
@@ -10286,12 +10171,12 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 					if(candidates.length > 0) {
 						var nodesInZOrder = $A(node.node.parentNode.childNodes);
 						var zOrderIndex = nodesInZOrder.indexOf(node.node);
-						nodesAtPosition[zOrderIndex] = candidates;
+						nodesAtPosition.set(zOrderIndex, candidates);
 					}
 				});
 				
 				nodesAtPosition.keys().sort().each(function(key) {
-					result = result.concat(nodesAtPosition[key]);
+					result = result.concat(nodesAtPosition.get(key));
 				});
  			});
 						
@@ -10308,10 +10193,10 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 	 * @param value {Object} Can be of type String or Number according to property type.
 	 */
 	setProperty: function(key, value, force) {
-		var oldValue = this.properties[key];
+		var oldValue = this.properties.get(key);
 		if(oldValue !== value || force === true) {
-			this.properties[key] = value;
-			this.propertiesChanged[key] = true;
+			this.properties.set(key, value);
+			this.propertiesChanged.set(key, true);
 			this._changed();
 			
 			// Raise an event, to show that the property has changed
@@ -10350,12 +10235,12 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 	setHiddenProperty: function(key, value) {
 		// IF undefined, Delete
 		if (value === undefined) {
-			delete this.hiddenProperties[key];
+			this.hiddenProperties.unset(key);
 			return;
 		}
-		var oldValue = this.hiddenProperties[key];
+		var oldValue = this.hiddenProperties.get(key);
 		if (oldValue !== value) {
-			this.hiddenProperties[key] = value;
+			this.hiddenProperties.set(key, value);
 		}
 	},
 	/**
@@ -10393,7 +10278,7 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
 			var name = property.id();		// Get name
 			
 			//if(typeof this.properties[prefix+'-'+name] == 'boolean' || this.properties[prefix+'-'+name] != "")
-				serializedObject.push({name: name, prefix: prefix, value: this.properties[prefix+'-'+name], type: 'literal'});
+				serializedObject.push({name: name, prefix: prefix, value: this.properties.get(prefix+'-'+name), type: 'literal'});
 
 		}).bind(this));
 		
@@ -10455,34 +10340,38 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
      * Converts the shape to a JSON representation.
      * @return {Object} A JSON object with included ORYX.Core.AbstractShape.JSONHelper and getShape() method.
      */
-    toJSON: function(){
-        var json = {
-            resourceId: this.resourceId,
-            properties: jQuery.extend({}, this.properties, this.hiddenProperties).inject({}, function(props, prop){
-              var key = prop[0];
-              var value = prop[1];
-                
-              //If complex property, value should be a json object
-              if ( this.getStencil().property(key)
-                	&& this.getStencil().property(key).type() === ORYX.CONFIG.TYPE_COMPLEX 
-                	&& Object.prototype.toString.call(value) === "String"){
-						
-                  try {value = JSON.parse(value);} catch(error){}
-            	  //try {value = JSON.parse(value);} catch(error){}
-              
-			  // Parse date
-			  } else if (value instanceof Date&&this.getStencil().property(key)){
-			  	try {
+    toJSON: function() {
+    	
+    	//upgrade to prototype 1.6/1.7 breaks the jquery extend call. rebuilding the properties here.
+		var mergedProperties = this.properties.merge(this.hiddenProperties);
+		var resultProperties = new Hash();
+		mergedProperties.each(function(pair){
+			var key = pair.key;
+			var value = pair.value;
+
+			//If complex property, value should be a json object
+			if ( this.getStencil().property(key)
+					&& this.getStencil().property(key).type() === ORYX.CONFIG.TYPE_COMPLEX
+					&& Object.prototype.toString.call(value) === "String"){
+
+				try {value = JSON.parse(value);} catch(error){}
+
+				// Parse date
+			} else if (value instanceof Date&&this.getStencil().property(key)){
+				try {
 					value = value.format(this.getStencil().property(key).dateFormat());
 				} catch(e){}
-			  }
-              
-              //Takes "my_property" instead of "oryx-my_property" as key
-              key = key.replace(/^[\w_]+-/, "");
-              props[key] = value;
-              
-              return props;
-            }.bind(this)),
+			}
+
+			// Takes "my_property" instead of "oryx-my_property" as key
+			key = key.replace(/^[\w_]+-/, "");
+			resultProperties.set(key,value);
+			
+		}.bind(this));
+    
+        var json = {
+            resourceId: this.resourceId,
+            properties: resultProperties.toObject(),
             stencil: {
                 id: this.getStencil().idWithoutNs()
             },
@@ -10745,19 +10634,6 @@ ORYX.Core.Canvas = ORYX.Core.AbstractShape.extend({
 	
 	focus: function(){
 		
-		try {
-			// Get a href
-			if (!this.focusEl) 
-			{
-				this.focusEl = jQuery('body').append(jQuery('<a href="#" class="x-grid3-focus x-grid3-focus-canvas"/>'));
-				this.focusEl.swallowEvent("click", true);
-			}
-			
-			// Focus it
-			this.focusEl.focus.defer(1, this.focusEl);
-			this.focusEl.blur.defer(3, this.focusEl);
-			
-		} catch(e){}
 	},
 	
 	setHightlightState: function(state) {
@@ -11065,69 +10941,68 @@ ORYX.Core.Canvas = ORYX.Core.AbstractShape.extend({
                     
 
         // prepare deserialisation parameter
-        shapes.each(
-            function(shape){
-            	var properties = [];
-                for(field in shape.json.properties){
-                    properties.push({
-                      prefix: 'oryx',
-                      name: field,
-                      value: shape.json.properties[field]
-                    });
-                  }
-                  
-                  // Outgoings
-                  shape.json.outgoing.each(function(out){
+        shapes.each(function(shape){
+        	var properties = [];
+            for(field in shape.json.properties){
+                properties.push({
+                  prefix: 'oryx',
+                  name: field,
+                  value: shape.json.properties[field]
+                });
+              }
+              
+              // Outgoings
+              shape.json.outgoing.each(function(out){
+                properties.push({
+                  prefix: 'raziel',
+                  name: 'outgoing',
+                  value: "#"+out.resourceId
+                });
+              });
+              
+              // Target 
+              // (because of a bug, the first outgoing is taken when there is no target,
+              // can be removed after some time)
+              if(shape.object instanceof ORYX.Core.Edge) {
+                  var target = shape.json.target || shape.json.outgoing[0];
+                  if(target){
                     properties.push({
                       prefix: 'raziel',
-                      name: 'outgoing',
-                      value: "#"+out.resourceId
-                    });
-                  });
-                  
-                  // Target 
-                  // (because of a bug, the first outgoing is taken when there is no target,
-                  // can be removed after some time)
-                  if(shape.object instanceof ORYX.Core.Edge) {
-	                  var target = shape.json.target || shape.json.outgoing[0];
-	                  if(target){
-	                    properties.push({
-	                      prefix: 'raziel',
-	                      name: 'target',
-	                      value: "#"+target.resourceId
-	                    });
-	                  }
-                  }
-                  
-                  // Bounds
-                  if (shape.json.bounds) {
-                      properties.push({
-                          prefix: 'oryx',
-                          name: 'bounds',
-                          value: shape.json.bounds.upperLeft.x + "," + shape.json.bounds.upperLeft.y + "," + shape.json.bounds.lowerRight.x + "," + shape.json.bounds.lowerRight.y
-                      });
-                  }
-                  
-                  //Dockers [{x:40, y:50}, {x:30, y:60}] => "40 50 30 60  #"
-                  if(shape.json.dockers){
-                    properties.push({
-                      prefix: 'oryx',
-                      name: 'dockers',
-                      value: shape.json.dockers.inject("", function(dockersStr, docker){
-                        return dockersStr + docker.x + " " + docker.y + " ";
-                      }) + " #"
+                      name: 'target',
+                      value: "#"+target.resourceId
                     });
                   }
-                  
-                  //Parent
+              }
+              
+              // Bounds
+              if (shape.json.bounds) {
                   properties.push({
-                    prefix: 'raziel',
-                    name: 'parent',
-                    value: shape.json.parent
+                      prefix: 'oryx',
+                      name: 'bounds',
+                      value: shape.json.bounds.upperLeft.x + "," + shape.json.bounds.upperLeft.y + "," + shape.json.bounds.lowerRight.x + "," + shape.json.bounds.lowerRight.y
                   });
-            
-                  shape.__properties = properties;
-	         }.bind(this)
+              }
+              
+              //Dockers [{x:40, y:50}, {x:30, y:60}] => "40 50 30 60  #"
+              if(shape.json.dockers){
+                properties.push({
+                  prefix: 'oryx',
+                  name: 'dockers',
+                  value: shape.json.dockers.inject("", function(dockersStr, docker){
+                    return dockersStr + docker.x + " " + docker.y + " ";
+                  }) + " #"
+                });
+              }
+              
+              //Parent
+              properties.push({
+                prefix: 'raziel',
+                name: 'parent',
+                value: shape.json.parent
+              });
+        
+              shape.__properties = properties;
+         }.bind(this)
         );
   
         // Deserialize the properties from the shapes
@@ -11493,8 +11368,6 @@ ORYX.Editor = {
 		//meta data about the model for the signavio warehouse
 		//directory, new, name, description, revision, model (the model data)
 		
-		this.modelMetaData = config;
-		
 		var model = config;
 		
 		this.id = model.modelId;
@@ -11515,15 +11388,6 @@ ORYX.Editor = {
 		
 		// Initialize the eventlistener
 		this._initEventListener();
-
-		// Load particular stencilset
-		if(ORYX.CONFIG.BACKEND_SWITCH) {
-			var ssUrl = (model.stencilset.namespace||model.stencilset.url).replace("#", "%23");
-        	ORYX.Core.StencilSet.loadStencilSet(ssUrl, this.modelMetaData, this.id);
-		} else {
-			var ssUrl = model.stencilset.url;
-        	ORYX.Core.StencilSet.loadStencilSet(ssUrl, this.modelMetaData, this.id);
-		}
 
 		// CREATES the canvas
 		this._createCanvas(model.stencil ? model.stencil.id : null, model.properties);
@@ -11552,6 +11416,7 @@ ORYX.Editor = {
             this.getCanvas().update();
 			loadContentFinished = true;
 			initFinished();
+			this.handleEvents({type: ORYX.CONFIG.EVENT_EDITOR_INIT_COMPLETED});
 		}.bind(this), 200);
 	},
 	
@@ -11571,12 +11436,12 @@ ORYX.Editor = {
 		this._keydownEnabled = 	true;
 		this._keyupEnabled =  	true;
 
-		this.DOMEventListeners[ORYX.CONFIG.EVENT_MOUSEDOWN] = [];
-		this.DOMEventListeners[ORYX.CONFIG.EVENT_MOUSEUP] 	= [];
-		this.DOMEventListeners[ORYX.CONFIG.EVENT_MOUSEOVER] = [];
-		this.DOMEventListeners[ORYX.CONFIG.EVENT_MOUSEOUT] 	= [];
-		this.DOMEventListeners[ORYX.CONFIG.EVENT_SELECTION_CHANGED] = [];
-		this.DOMEventListeners[ORYX.CONFIG.EVENT_MOUSEMOVE] = [];
+		this.DOMEventListeners.set(ORYX.CONFIG.EVENT_MOUSEDOWN,[]);
+		this.DOMEventListeners.set(ORYX.CONFIG.EVENT_MOUSEUP,[]);
+		this.DOMEventListeners.set(ORYX.CONFIG.EVENT_MOUSEOVER,[]);
+		this.DOMEventListeners.set(ORYX.CONFIG.EVENT_MOUSEOUT,[]);
+		this.DOMEventListeners.set(ORYX.CONFIG.EVENT_SELECTION_CHANGED,[]);
+		this.DOMEventListeners.set(ORYX.CONFIG.EVENT_MOUSEMOVE, []);
 				
 	},
 	
@@ -11727,52 +11592,53 @@ ORYX.Editor = {
 		// (that comes from the usage of oryx with a mashup api)
 		if( ORYX.MashupAPI && ORYX.MashupAPI.loadablePlugins && ORYX.MashupAPI.loadablePlugins instanceof Array ){
 		
-			// Get the plugins from the available plugins (those who are in the plugins.xml)
+		    // Get the plugins from the available plugins (those who are in the plugins.xml)
 			ORYX.availablePlugins = $A(ORYX.availablePlugins).findAll(function(value){
 										return ORYX.MashupAPI.loadablePlugins.include( value.name )
-									})
+									});
 			
 			// Add those plugins to the list, which are only in the loadablePlugins list
 			ORYX.MashupAPI.loadablePlugins.each(function( className ){
 				if( !(ORYX.availablePlugins.find(function(val){ return val.name == className }))){
 					ORYX.availablePlugins.push( {name: className } );
 				}
-			})
+			});
 		}
 		
 		
 		ORYX.availablePlugins.each(function(value) {
-			ORYX.Log.debug("Initializing plugin '%0'", value.name);
-				if( (!value.requires 	|| !value.requires.namespaces 	|| value.requires.namespaces.any(function(req){ return loadedStencilSetsNamespaces.indexOf(req) >= 0 }) ) &&
-					(!value.notUsesIn 	|| !value.notUsesIn.namespaces 	|| !value.notUsesIn.namespaces.any(function(req){ return loadedStencilSetsNamespaces.indexOf(req) >= 0 }) )&&
-					/*only load activated plugins or undefined */
-					(value.engaged || (value.engaged===undefined)) ){
+			ORYX.Log.debug("Initializing plugin '%0'", value.get("name"));
+
+			if( (!value.get("requires") || !value.get("requires").namespaces 	|| value.get("requires").namespaces.any(function(req){ return loadedStencilSetsNamespaces.indexOf(req) >= 0 }) ) &&
+				(!value.get("notUsesIn")|| !value.get("notUsesIn").namespaces 	|| !value.get("notUsesIn").namespaces.any(function(req){ return loadedStencilSetsNamespaces.indexOf(req) >= 0 }) )&&
+				/*only load activated plugins or undefined */
+				(value.get("engaged") || (value.get("engaged")===undefined)) ){
 
 				try {
-					var className 	= eval(value.name);
+					var className 	= eval(value.get("name")); // wow funcky code here!
 					if( className ){
-						var plugin		= new className(facade, value);
-						plugin.type		= value.name;
+						var plugin = new className(facade, value);
+						plugin.type	= value.get("name");
 						newPlugins.push( plugin );
 						plugin.engaged=true;
 					}
 				} catch(e) {
-					ORYX.Log.warn("Plugin %0 is not available %1", value.name, e);
+					ORYX.Log.warn("Plugin %0 is not available %1", value.get("name"), e);
 				}
-							
-			} else {
-				ORYX.Log.info("Plugin need a stencilset which is not loaded'", value.name);
-			}
+  							
+  			} else {
+				ORYX.Log.info("Plugin need a stencilset which is not loaded'", value.get("name"));
+  			}
 			
 		});
 
 		newPlugins.each(function(value) {
 			// If there is an GUI-Plugin, they get all Plugins-Offer-Meta-Data
-			if(value.registryChanged)
+			if (value.registryChanged)
 				value.registryChanged(me.pluginsData);
 
 			// If there have an onSelection-Method it will pushed to the Editor Event-Handler
-			if(value.onSelectionChanged)
+			if (value.onSelectionChanged)
 				me.registerOnEvent(ORYX.CONFIG.EVENT_SELECTION_CHANGED, value.onSelectionChanged.bind(value));
 		});
 
@@ -11948,8 +11814,7 @@ ORYX.Editor = {
      * @return {Object} Returns JSON representation as JSON object.
      */
     getJSON: function(){
-    	delete Array.prototype.toJSON;
-        var canvasJSON = this.getCanvas().toJSON();
+    	var canvasJSON = this.getCanvas().toJSON();
         canvasJSON.ssextensions = this.getStencilSets().values()[0].extensions().keys().findAll(function(sse){ return !sse.endsWith('/meta#') });
         return canvasJSON;
     },
@@ -12266,8 +12131,8 @@ ORYX.Editor = {
 			this._keyupEnabled = false;
 		}
 		if(this.DOMEventListeners.keys().member(eventType)) {
-			var value = this.DOMEventListeners.remove(eventType);
-			this.DOMEventListeners['disable_' + eventType] = value;
+			var value = this.DOMEventListeners.unset(eventType);
+			this.DOMEventListeners.set('disable_' + eventType, value);
 		}
 	},
 
@@ -12281,8 +12146,8 @@ ORYX.Editor = {
 		}
 		
 		if(this.DOMEventListeners.keys().member("disable_" + eventType)) {
-			var value = this.DOMEventListeners.remove("disable_" + eventType);
-			this.DOMEventListeners[eventType] = value;
+			var value = this.DOMEventListeners.unset("disable_" + eventType);
+ 			this.DOMEventListeners.set(eventType,value);
 		}
 	},
 
@@ -12291,15 +12156,15 @@ ORYX.Editor = {
 	 */
 	registerOnEvent: function(eventType, callback) {
 		if(!(this.DOMEventListeners.keys().member(eventType))) {
-			this.DOMEventListeners[eventType] = [];
+			this.DOMEventListeners.set(eventType,[]);
 		}
 
-		this.DOMEventListeners[eventType].push(callback);
+		this.DOMEventListeners.get(eventType).push(callback);
 	},
 
 	unregisterOnEvent: function(eventType, callback) {
 		if(this.DOMEventListeners.keys().member(eventType)) {
-			this.DOMEventListeners[eventType] = this.DOMEventListeners[eventType].without(callback);
+			this.DOMEventListeners.set(eventType,this.DOMEventListeners.get(eventType).without(callback));
 		} else {
 			// Event is not supported
 			// TODO: Error Handling
@@ -12637,7 +12502,7 @@ ORYX.Editor = {
 	*/
 	_executeEventImmediately: function(eventObj) {
 		if(this.DOMEventListeners.keys().member(eventObj.event.type)) {
-			this.DOMEventListeners[eventObj.event.type].each((function(value) {
+			this.DOMEventListeners.get(eventObj.event.type).each((function(value) {
 				value(eventObj.event, eventObj.arg);		
 			}).bind(this));
 		}
@@ -13320,29 +13185,29 @@ new function(){
 	 */	
 	ORYX.Core.MoveDockersCommand = ORYX.Core.Command.extend({
 		construct: function(dockers){
-			this.dockers 	= $H(dockers);
-			this.edges 		= $H({});
+			this.dockers = new Hash(dockers);
+			this.edges = new Hash();
 		},
 		execute: function(){
 			if (this.changes) {
 				this.executeAgain();
 				return;
 			} else {
-				this.changes = $H({});
+				this.changes = new Hash();
 			}
 			
 			this.dockers.values().each(function(docker){
 				var edge = docker.docker.parent;
 				if (!edge){ return }
 				
-				if (!this.changes[edge.getId()]) {
-					this.changes[edge.getId()] = {
+				if (!this.changes.get(edge.getId())) {
+ 					this.changes.set(edge.getId(), {
 						edge				: edge,
 						oldDockerPositions	: edge.dockers.map(function(r){ return r.bounds.center() })
-					}
+					});
 				}
 				docker.docker.bounds.moveBy(docker.offset);
-				this.edges[edge.getId()] = edge;
+				this.edges.set(edge.getId(),edge);
 				docker.docker.update();
 			}.bind(this));
 			this.edges.each(function(edge){
@@ -13499,10 +13364,10 @@ ORYX.Core.Shape = {
 			var me = this;
 			this.propertiesChanged.each((function(propChanged) {
 				if(propChanged.value) {
-					var prop = this.properties[propChanged.key];
+					var prop = this.properties.get(propChanged.key);
 					var property = this.getStencil().property(propChanged.key);
 					if (property != undefined) {
-						this.propertiesChanged[propChanged.key] = false;
+						this.propertiesChanged.set(propChanged.key, false);
 	
 						//handle choice properties
 						if(property.type() == ORYX.CONFIG.TYPE_CHOICE) {
@@ -13510,7 +13375,7 @@ ORYX.Core.Shape = {
 							property.refToView().each((function(ref) {
 								//if property is referencing a label, update the label
 								if(ref !== "") {
-									var label = this._labels[this.id + ref];
+									var label = this._labels.get(this.id + ref);
 									if (label && property.item(prop)) {
 										label.text(property.item(prop).title());
 									}
@@ -13531,9 +13396,9 @@ ORYX.Core.Shape = {
 									
 									
 									/* Do not refresh the same svg element multiple times */
-									if(!refreshedSvgElements[svgElem.id] || prop == item.value()) {
+									if (!refreshedSvgElements.get(svgElem.id) || prop == item.value()) {
 										svgElem.setAttributeNS(null, 'display', ((prop == item.value()) ? 'inherit' : 'none'));
-										refreshedSvgElements[svgElem.id] = svgElem;
+										refreshedSvgElements.set(svgElem.id, svgElem);
 									}
 									
 									// Reload the href if there is an image-tag
@@ -13552,7 +13417,7 @@ ORYX.Core.Shape = {
 
 								var refId = this.id + ref;
 								
-								if (property.type() === ORYX.CONFIG.TYPE_KISBPM_MULTIINSTANCE)
+								if (property.type() === ORYX.CONFIG.TYPE_FLOWABLE_MULTIINSTANCE)
 								{
 									if (ref === "multiinstance") {
 										
@@ -13626,7 +13491,7 @@ ORYX.Core.Shape = {
 								}
 								
 								if (property.complexAttributeToView()) {
-									var label = this._labels[refId];
+									var label = this._labels.get(refId);
 									if (label) {
 										try {
 									    	propJson = prop.evalJSON();
@@ -13678,25 +13543,25 @@ ORYX.Core.Shape = {
 											}
 											break;
 										case ORYX.CONFIG.TYPE_STRING:
-											var label = this._labels[refId];
+											var label = this._labels.get(refId);
 											if (label) {
 												label.text(prop);
 											}
 											break;
 										case ORYX.CONFIG.TYPE_EXPRESSION:
-											var label = this._labels[refId];
+											var label = this._labels.get(refId);
 											if (label) {
 												label.text(prop);
 											}
 											break;
 										case ORYX.CONFIG.TYPE_DATASOURCE:
-											var label = this._labels[refId];
+											var label = this._labels.get(refId);
 											if (label) {
 												label.text(prop);
 											}
 											break;	
 										case ORYX.CONFIG.TYPE_INTEGER:
-											var label = this._labels[refId];
+											var label = this._labels.get(refId);
 											if (label) {
 												label.text(prop);
 											}
@@ -13709,7 +13574,7 @@ ORYX.Core.Shape = {
 												svgElem.setAttributeNS(null, 'stroke-opacity', prop);
 											}
 											if(!property.fillOpacity() && !property.strokeOpacity()) {
-												var label = this._labels[refId];
+												var label = this._labels.get(refId);
 												if (label) {
 													label.text(prop);
 												}
@@ -13726,7 +13591,7 @@ ORYX.Core.Shape = {
 	  													if (styleAttr) {
                                                         	styleAttr.textContent = "cursor:pointer;"
                                                     	}
-	  													onclickAttr.textContent = "KISBPM.TOOLBAR.ACTIONS.navigateToProcess(" + prop.id + ");return false;";
+	  													onclickAttr.textContent = "FLOWABLE.TOOLBAR.ACTIONS.navigateToProcess(" + prop.id + ");return false;";
 	  							    	   			} else {
 	  							    	   				if (styleAttr) {
                                                         	styleAttr.textContent = "cursor:default;"
@@ -15678,7 +15543,7 @@ ORYX.Core.Node = {
             });
             label.x -= offsetX;
             label.y -= offsetY;
-            this._labels[label.id] = label;
+            this._labels.set(label.id, label);
 			
 			label.registerOnChange(this.layout.bind(this));
 			
@@ -16251,14 +16116,13 @@ ORYX.Core.Edge = {
 		position.y = 0;
 		
 		/* Case: Node was just added */
-		if(!this.attachedNodePositionData[node.getId()]) {
-			this.attachedNodePositionData[node.getId()] = new Object();
-			this.attachedNodePositionData[node.getId()]
-					.relativDistanceFromDocker1 = 0;
-			this.attachedNodePositionData[node.getId()].node = node;
-			this.attachedNodePositionData[node.getId()].segment = new Object();
+		if(!this.attachedNodePositionData.get(node.getId())) {
+			this.attachedNodePositionData.set(node.getId(),new Object());
+			this.attachedNodePositionData.get(node.getId()).relativDistanceFromDocker1 = 0;
+			this.attachedNodePositionData.get(node.getId()).node = node;
+			this.attachedNodePositionData.get(node.getId()).segment = new Object();
 			this.findEdgeSegmentForNode(node);
-		}else if(node.isChanged) {
+		} else if(node.isChanged) {
 			this.findEdgeSegmentForNode(node);
 		}
 		
@@ -16295,10 +16159,8 @@ ORYX.Core.Edge = {
 				
 				smallestDistance = distance;
 				
-				this.attachedNodePositionData[node.getId()].segment.docker1 = 
-													this.dockers[i-1];
-				this.attachedNodePositionData[node.getId()].segment.docker2 = 
-													this.dockers[i];
+				this.attachedNodePositionData.get(node.getId()).segment.docker1 = this.dockers[i-1];
+				this.attachedNodePositionData.get(node.getId()).segment.docker2 = this.dockers[i];
 	
 			}
 			
@@ -16309,23 +16171,25 @@ ORYX.Core.Edge = {
 			 * 
 			 */
 			if(!distance && !smallestDistance && smallestDistance != 0) {
-				(ORYX.Core.Math.getDistancePointToPoint(nodeCenterPoint, lineP1)
-					< ORYX.Core.Math.getDistancePointToPoint(nodeCenterPoint, lineP2)) ?
-					this.attachedNodePositionData[node.getId()].relativDistanceFromDocker1 = 0 :
-					this.attachedNodePositionData[node.getId()].relativDistanceFromDocker1 = 1;
-				this.attachedNodePositionData[node.getId()].segment.docker1 = 
-													this.dockers[i-1];
-				this.attachedNodePositionData[node.getId()].segment.docker2 = 
-													this.dockers[i];
+				var distanceCenterToLineOne = ORYX.Core.Math.getDistancePointToPoint(nodeCenterPoint, lineP1);
+				var distanceCenterToLineTwo = ORYX.Core.Math.getDistancePointToPoint(nodeCenterPoint, lineP2);
+
+				if (distanceCenterToLineOne < distanceCenterToLineTwo) {
+					this.attachedNodePositionData.get(node.getId()).relativDistanceFromDocker1 = 0
+				} else {
+					this.attachedNodePositionData.get(node.getId()).relativDistanceFromDocker1 = 1;
+				}
+				this.attachedNodePositionData.get(node.getId()).segment.docker1 = this.dockers[i-1];
+				this.attachedNodePositionData.get(node.getId()).segment.docker2 = this.dockers[i];
 			}
 		}
 		
 		/* Calculate position on edge segment for the node */
 		if(smallestDistance || smallestDistance == 0) {
-			this.attachedNodePositionData[node.getId()].relativDistanceFromDocker1 =
+			this.attachedNodePositionData.get(node.getId()).relativDistanceFromDocker1 =
 			this.getLineParameterForPosition(
-					this.attachedNodePositionData[node.getId()].segment.docker1,
-					this.attachedNodePositionData[node.getId()].segment.docker2,
+					this.attachedNodePositionData.get(node.getId()).segment.docker1,
+ 					this.attachedNodePositionData.get(node.getId()).segment.docker2,
 					node);
 		}
 	},
@@ -16439,7 +16303,7 @@ ORYX.Core.Edge = {
         //TODO consider points for marker mids
         var lastPoint;
         this._paths.each((function(path, index){
-            var dockers = this._dockersByPath[path.id];
+            var dockers = this._dockersByPath.get(path.id);
             var c = undefined;
 			var d = undefined;
             if (lastPoint) {
@@ -16742,8 +16606,8 @@ ORYX.Core.Edge = {
 	remove: function(shape) {
 		arguments.callee.$.remove.apply(this, arguments);
 		
-		if(this.attachedNodePositionData[shape.getId()]) {
-			delete this.attachedNodePositionData[shape.getId()];
+		if(this.attachedNodePositionData.get(shape.getId())) {
+			this.attachedNodePositionData.unset[shape.getId()];
 		}
 		
 		/* Adjust child shapes if neccessary */
@@ -16959,7 +16823,7 @@ ORYX.Core.Edge = {
                     }
                     else {
                         this.remove(docker);
-                        this._dockersByPath[pair.key] = pair.value.without(docker);
+                        this._dockersByPath.set(pair.key,pair.value.without(docker));
                         this.isChanged = true;
                         this._dockerChanged();
                         return true;
@@ -16977,7 +16841,7 @@ ORYX.Core.Edge = {
 	 * (key is the removed position of the docker, value is docker themselve)
 	 */
 	removeUnusedDockers:function(){
-		var marked = $H({});
+		var marked = new Hash();
 		
 		this.dockers.each(function(docker, i){
 			if (i==0||i==this.dockers.length-1){ return }
@@ -16994,7 +16858,7 @@ ORYX.Core.Edge = {
 			var cd = docker.bounds.center();
 			
 			if (ORYX.Core.Math.isPointInLine(cd.x, cd.y, cp.x, cp.y, cn.x, cn.y, 1)){
-				marked[i] = docker;
+				marked.set(i, docker);
 			}
 		}.bind(this))
 		
@@ -17028,7 +16892,7 @@ ORYX.Core.Edge = {
             markerElements.each(function(markerElement){
                 try {
                     marker = new ORYX.Core.SVG.SVGMarker(markerElement.cloneNode(true));
-                    me._markers[marker.id] = marker;
+                    me._markers.set(marker.id, marker);
                     var textElements = $A(marker.element.getElementsByTagNameNS(NAMESPACE_SVG, "text"));
                     var label;
                     textElements.each(function(textElement){
@@ -17036,7 +16900,7 @@ ORYX.Core.Edge = {
                             textElement: textElement,
 							shapeId: this.id
                         });
-                        me._labels[label.id] = label;
+                        me._labels.set(label.id, label);
                     });
                 } 
                 catch (e) {
@@ -17075,7 +16939,7 @@ ORYX.Core.Edge = {
                     var markerStartId = this.getValidMarkerId(markerUrl);
                     path.setAttributeNS(null, "marker-start", "url(#" + markerStartId + ")");
                     
-                    markersByThisPath.push(this._markers[markerStartId]);
+                    markersByThisPath.push(this._markers.get(markerStartId));
                 }
                 
                 markerUrl = path.getAttributeNS(null, "marker-mid");
@@ -17086,7 +16950,7 @@ ORYX.Core.Edge = {
                     var markerMidId = this.getValidMarkerId(markerUrl);
                     path.setAttributeNS(null, "marker-mid", "url(#" + markerMidId + ")");
                     
-                    markersByThisPath.push(this._markers[markerMidId]);
+                    markersByThisPath.push(this._markers.get(markerMidId));
                 }
                 
                 markerUrl = path.getAttributeNS(null, "marker-end");
@@ -17097,7 +16961,7 @@ ORYX.Core.Edge = {
                     var markerEndId = this.getValidMarkerId(markerUrl);
                     path.setAttributeNS(null, "marker-end", "url(#" + markerEndId + ")");
                     
-                    markersByThisPath.push(this._markers[markerEndId]);
+                    markersByThisPath.push(this._markers.get(markerEndId));
                 }
                 
                 this._markersByPath[pathId] = markersByThisPath;
@@ -17112,7 +16976,7 @@ ORYX.Core.Edge = {
                     throw "Edge: Path has to have two or more points specified.";
                 }
                 
-                this._dockersByPath[pathId] = [];
+                this._dockersByPath.set(pathId, []);
                 
 				for (var i = 0; i < handler.points.length; i += 2) {
 					//handler.points.each((function(point, pIndex){
@@ -17207,7 +17071,7 @@ ORYX.Core.Edge = {
 				shapeId: this.id
             });
             this.node.childNodes[0].childNodes[0].appendChild(label.node);
-            this._labels[label.id] = label;
+            this._labels.set(label.id, label);
 			
 			label.registerOnChange(this.layout.bind(this));
         }).bind(this)); 
@@ -17466,17 +17330,17 @@ ORYX.Core.Edge = {
                     
                     if (path) {
                         if (index === 0) {
-                            while (this._dockersByPath[path.id].length > 2) {
-                                this.removeDocker(this._dockersByPath[path.id][1]);
+                            while (this._dockersByPath.get(path.id).length > 2) {
+								this.removeDocker(this._dockersByPath.get(path.id)[1]);
                             }
                         }
                         else {
-                            while (this._dockersByPath[path.id].length > 1) {
-                                this.removeDocker(this._dockersByPath[path.id][0]);
+                            while (this._dockersByPath.get(path.id).length > 1) {
+                                this.removeDocker(this._dockersByPath.get(path.id)[0]);
                             }
                         }
                         
-                        var dockersByPath = this._dockersByPath[path.id];
+                        var dockersByPath = this._dockersByPath.get(path.id);
                         
                         if (index === 0) {
                             //set position of first docker
@@ -18679,12 +18543,15 @@ ORYX.Plugins.Edit = Clazz.extend({
     editDelete: function(){
         var selection = this.facade.getSelection();
         
-        var clipboard = new ORYX.Plugins.Edit.ClipBoard();
-        clipboard.refresh(selection, this.getAllShapesToConsider(selection));
-        
-		var command = new ORYX.Plugins.Edit.DeleteCommand(clipboard , this.facade);
-                                       
-		this.facade.executeCommands([command]);
+        if (selection.length > 0) {
+			//only update the command stack if something was performed...
+	        var clipboard = new ORYX.Plugins.Edit.ClipBoard();
+	        clipboard.refresh(selection, this.getAllShapesToConsider(selection));
+	        
+			var command = new ORYX.Plugins.Edit.DeleteCommand(clipboard , this.facade);
+	                                       
+			this.facade.executeCommands([command]);
+		}
     }
 }); 
 
@@ -18746,6 +18613,7 @@ ORYX.Plugins.Edit.DeleteCommand = ORYX.Core.Command.extend({
         this.facade.setSelection([]);
         this.facade.getCanvas().update();		
 		this.facade.updateSelection();
+		this.facade.handleEvents({type: ORYX.CONFIG.ACTION_DELETE_COMPLETED});
         
     },
     rollback: function(){
@@ -18766,18 +18634,35 @@ ORYX.Plugins.Edit.DeleteCommand = ORYX.Core.Command.extend({
 		this.facade.updateSelection();
         
     }
-});/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+});/**
+ * Copyright (c) 2006
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * Philipp Berger, Martin Czuchra, Gero Decker, Ole Eckermann, Lutz Gericke,
+ * Alexander Hold, Alexander Koglin, Oliver Kopp, Stefan Krumnow, 
+ * Matthias Kunze, Philipp Maschke, Falko Menge, Christoph Neijenhuis, 
+ * Hagen Overdick, Zhen Peng, Nicolas Peters, Kerstin Pfitzner, Daniel Polak,
+ * Steffen Ryll, Kai Schlichting, Jan-Felix Schwarz, Daniel Taschik, 
+ * Willi Tscheschner, Björn Wagner, Sven Wagner-Boysen, Matthias Weidlich
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+ **/
 
 /**
  * @namespace Oryx name space for plugins
@@ -18809,7 +18694,7 @@ ORYX.Plugins.View = {
 		
 		//Read properties
 		if (ownPluginData !== undefined && ownPluginData !== null) {
-			ownPluginData.properties.each( function(property) {			
+			ownPluginData.get('properties').each( function(property) {
 				if (property.zoomLevel) {this.zoomLevel = Number(1.0);}		
 				if (property.maxFitToScreenLevel) {this.maxFitToScreenLevel=Number(property.maxFitToScreenLevel);}
 				if (property.minZoomLevel) {this.minZoomLevel = Number(property.minZoomLevel);}
@@ -19003,33 +18888,68 @@ ORYX.Plugins.View = {
 };
 
 ORYX.Plugins.View = Clazz.extend(ORYX.Plugins.View);
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+/**
+ * Copyright (c) 2006
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * Philipp Berger, Martin Czuchra, Gero Decker, Ole Eckermann, Lutz Gericke,
+ * Alexander Hold, Alexander Koglin, Oliver Kopp, Stefan Krumnow, 
+ * Matthias Kunze, Philipp Maschke, Falko Menge, Christoph Neijenhuis, 
+ * Hagen Overdick, Zhen Peng, Nicolas Peters, Kerstin Pfitzner, Daniel Polak,
+ * Steffen Ryll, Kai Schlichting, Jan-Felix Schwarz, Daniel Taschik, 
+ * Willi Tscheschner, Björn Wagner, Sven Wagner-Boysen, Matthias Weidlich
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+ **/
+ 
 if(!Signavio){ var Signavio = {} };
 	if (!Signavio.Core) { Signavio.Core = {} };
 	Signavio.Core.Version = "1.0";
-			/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+			/**
+ * Copyright (c) 2006
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * Philipp Berger, Martin Czuchra, Gero Decker, Ole Eckermann, Lutz Gericke,
+ * Alexander Hold, Alexander Koglin, Oliver Kopp, Stefan Krumnow, 
+ * Matthias Kunze, Philipp Maschke, Falko Menge, Christoph Neijenhuis, 
+ * Hagen Overdick, Zhen Peng, Nicolas Peters, Kerstin Pfitzner, Daniel Polak,
+ * Steffen Ryll, Kai Schlichting, Jan-Felix Schwarz, Daniel Taschik, 
+ * Willi Tscheschner, Björn Wagner, Sven Wagner-Boysen, Matthias Weidlich
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+ **/
 
 if (!Signavio) {
 	var Signavio = new Object();
@@ -19074,18 +18994,35 @@ new function() {
 
 }();
 
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+/**
+ * Copyright (c) 2006
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * Philipp Berger, Martin Czuchra, Gero Decker, Ole Eckermann, Lutz Gericke,
+ * Alexander Hold, Alexander Koglin, Oliver Kopp, Stefan Krumnow, 
+ * Matthias Kunze, Philipp Maschke, Falko Menge, Christoph Neijenhuis, 
+ * Hagen Overdick, Zhen Peng, Nicolas Peters, Kerstin Pfitzner, Daniel Polak,
+ * Steffen Ryll, Kai Schlichting, Jan-Felix Schwarz, Daniel Taschik, 
+ * Willi Tscheschner, Björn Wagner, Sven Wagner-Boysen, Matthias Weidlich
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+ **/
 
 if (!ORYX.Plugins) {
     ORYX.Plugins = new Object();
@@ -19287,7 +19224,7 @@ ORYX.Plugins.CanvasResizeButton = Clazz.extend({
 			
 		var actualScrollNode = jQuery('#canvasSection')[0];
 		var scrollNode 	= actualScrollNode;
-		var canvasNode = jQuery('#canvasSection').find(".ORYX_Editor")[0];
+		var canvasNode = $$("#canvasSection .ORYX_Editor")[0];
 		var svgRootNode = canvasNode.children[0];
 		
 		var iconClass = 'glyphicon glyphicon-chevron-';
@@ -19408,18 +19345,35 @@ ORYX.Plugins.CanvasResizeButton = Clazz.extend({
 
 });
 
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+/**
+ * Copyright (c) 2006
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * Philipp Berger, Martin Czuchra, Gero Decker, Ole Eckermann, Lutz Gericke,
+ * Alexander Hold, Alexander Koglin, Oliver Kopp, Stefan Krumnow, 
+ * Matthias Kunze, Philipp Maschke, Falko Menge, Christoph Neijenhuis, 
+ * Hagen Overdick, Zhen Peng, Nicolas Peters, Kerstin Pfitzner, Daniel Polak,
+ * Steffen Ryll, Kai Schlichting, Jan-Felix Schwarz, Daniel Taschik, 
+ * Willi Tscheschner, Björn Wagner, Sven Wagner-Boysen, Matthias Weidlich
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+ **/
 
 if (!ORYX.Plugins) 
     ORYX.Plugins = new Object();
@@ -19506,7 +19460,7 @@ ORYX.Plugins.RenameShapes = Clazz.extend({
                 }
 
 				evtCoord.y += $("editor-header").clientHeight - $("canvasSection").scrollTop - 5;
-				if (KISBPM.HEADER_CONFIG.showAppTitle == false)
+				if (FLOWABLE.HEADER_CONFIG.showAppTitle == false)
 				{
 					evtCoord.y += 61;
 				}
@@ -19544,8 +19498,8 @@ ORYX.Plugins.RenameShapes = Clazz.extend({
 		textInput.style.left = (center.x < 10) ? 10 : center.x + 'px';
 		textInput.style.top = (center.y - 15) + 'px';
 		textInput.className = 'x-form-textarea x-form-field x_form_text_set_absolute';
-		textInput.value = shape.properties[propId];
-		this.oldValueText = shape.properties[propId];
+		textInput.value = shape.properties.get(propId);
+		this.oldValueText = shape.properties.get(propId);
 		document.getElementById('canvasSection').appendChild(textInput);
 		this.shownTextField = textInput;
 		
@@ -19608,7 +19562,7 @@ ORYX.Plugins.RenameShapes = Clazz.extend({
 		var searchShape = shape;
 		while (hasParent)
 		{
-			if (searchShape.getParentShape().getStencil().idWithoutNs() === 'BPMNDiagram')
+		    if (searchShape.getParentShape().getStencil().idWithoutNs() === 'BPMNDiagram' || searchShape.getParentShape().getStencil().idWithoutNs() === 'CMMNDiagram') 
 			{
 				hasParent = false;
 			}
@@ -19689,18 +19643,35 @@ ORYX.Plugins.RenameShapes = Clazz.extend({
 		}
 	}
 });
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+/**
+ * Copyright (c) 2006
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * Philipp Berger, Martin Czuchra, Gero Decker, Ole Eckermann, Lutz Gericke,
+ * Alexander Hold, Alexander Koglin, Oliver Kopp, Stefan Krumnow, 
+ * Matthias Kunze, Philipp Maschke, Falko Menge, Christoph Neijenhuis, 
+ * Hagen Overdick, Zhen Peng, Nicolas Peters, Kerstin Pfitzner, Daniel Polak,
+ * Steffen Ryll, Kai Schlichting, Jan-Felix Schwarz, Daniel Taschik, 
+ * Willi Tscheschner, Björn Wagner, Sven Wagner-Boysen, Matthias Weidlich
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+ **/
 
 if(!ORYX.Plugins)
 	ORYX.Plugins = new Object();
@@ -22672,18 +22643,35 @@ ORYX.Plugins.AddDocker = Clazz.extend({
     }
 });
 
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+/**
+ * Copyright (c) 2006
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * Philipp Berger, Martin Czuchra, Gero Decker, Ole Eckermann, Lutz Gericke,
+ * Alexander Hold, Alexander Koglin, Oliver Kopp, Stefan Krumnow, 
+ * Matthias Kunze, Philipp Maschke, Falko Menge, Christoph Neijenhuis, 
+ * Hagen Overdick, Zhen Peng, Nicolas Peters, Kerstin Pfitzner, Daniel Polak,
+ * Steffen Ryll, Kai Schlichting, Jan-Felix Schwarz, Daniel Taschik, 
+ * Willi Tscheschner, Björn Wagner, Sven Wagner-Boysen, Matthias Weidlich
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+ **/
 
 if(!ORYX.Plugins)
 	ORYX.Plugins = new Object();
@@ -22883,18 +22871,35 @@ if(!ORYX.Plugins)
 });
 
 
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+/**
+ * Copyright (c) 2006
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * Philipp Berger, Martin Czuchra, Gero Decker, Ole Eckermann, Lutz Gericke,
+ * Alexander Hold, Alexander Koglin, Oliver Kopp, Stefan Krumnow, 
+ * Matthias Kunze, Philipp Maschke, Falko Menge, Christoph Neijenhuis, 
+ * Hagen Overdick, Zhen Peng, Nicolas Peters, Kerstin Pfitzner, Daniel Polak,
+ * Steffen Ryll, Kai Schlichting, Jan-Felix Schwarz, Daniel Taschik, 
+ * Willi Tscheschner, Björn Wagner, Sven Wagner-Boysen, Matthias Weidlich
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+ **/
 
 if(!ORYX.Plugins)
 	ORYX.Plugins = new Object(); 
@@ -23125,18 +23130,35 @@ ORYX.Plugins.HighlightingSelectedShapes = Clazz.extend({
 			this.facade.raiseEvent({type:ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE, highlightId:'subselection'});
 		}		
 	}
-});/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+});/**
+ * Copyright (c) 2006
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * Philipp Berger, Martin Czuchra, Gero Decker, Ole Eckermann, Lutz Gericke,
+ * Alexander Hold, Alexander Koglin, Oliver Kopp, Stefan Krumnow, 
+ * Matthias Kunze, Philipp Maschke, Falko Menge, Christoph Neijenhuis, 
+ * Hagen Overdick, Zhen Peng, Nicolas Peters, Kerstin Pfitzner, Daniel Polak,
+ * Steffen Ryll, Kai Schlichting, Jan-Felix Schwarz, Daniel Taschik, 
+ * Willi Tscheschner, Björn Wagner, Sven Wagner-Boysen, Matthias Weidlich
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+ **/
 
 if (!ORYX.Plugins) 
     ORYX.Plugins = new Object();
@@ -23776,18 +23798,35 @@ ORYX.Plugins.KeysMove = ORYX.Plugins.AbstractPlugin.extend({
 //    }
 	
 });
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+/**
+ * Copyright (c) 2006
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * Philipp Berger, Martin Czuchra, Gero Decker, Ole Eckermann, Lutz Gericke,
+ * Alexander Hold, Alexander Koglin, Oliver Kopp, Stefan Krumnow, 
+ * Matthias Kunze, Philipp Maschke, Falko Menge, Christoph Neijenhuis, 
+ * Hagen Overdick, Zhen Peng, Nicolas Peters, Kerstin Pfitzner, Daniel Polak,
+ * Steffen Ryll, Kai Schlichting, Jan-Felix Schwarz, Daniel Taschik, 
+ * Willi Tscheschner, Björn Wagner, Sven Wagner-Boysen, Matthias Weidlich
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+ **/
 
 if(!ORYX.Plugins) { ORYX.Plugins = {} }
 if(!ORYX.Plugins.Layouter) { ORYX.Plugins.Layouter = {} }
@@ -24071,18 +24110,35 @@ new function(){
 	
 	
 }()
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+/**
+ * Copyright (c) 2006
  * 
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * Philipp Berger, Martin Czuchra, Gero Decker, Ole Eckermann, Lutz Gericke,
+ * Alexander Hold, Alexander Koglin, Oliver Kopp, Stefan Krumnow, 
+ * Matthias Kunze, Philipp Maschke, Falko Menge, Christoph Neijenhuis, 
+ * Hagen Overdick, Zhen Peng, Nicolas Peters, Kerstin Pfitzner, Daniel Polak,
+ * Steffen Ryll, Kai Schlichting, Jan-Felix Schwarz, Daniel Taschik, 
+ * Willi Tscheschner, Björn Wagner, Sven Wagner-Boysen, Matthias Weidlich
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a
+ * copy of this software and associated documentation files (the "Software"),
+ * to deal in the Software without restriction, including without limitation
+ * the rights to use, copy, modify, merge, publish, distribute, sublicense,
+ * and/or sell copies of the Software, and to permit persons to whom the
+ * Software is furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+ * FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
+ * DEALINGS IN THE SOFTWARE.
  * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+ **/
 
 if(!ORYX.Plugins)
 	ORYX.Plugins = new Object();
@@ -24487,9 +24543,9 @@ new function(){
                 var allLanes = this.getLanes(pool, true), hp;
                 var considerForDockers = allLanes.clone();
                
-                var hashedPositions = $H({});
+                var hashedPositions = new Hash();
                 allLanes.each(function(lane){
-                        hashedPositions[lane.id] = lane.bounds.upperLeft();
+                	hashedPositions.set(lane.id, lane.bounds.upperLeft());
                 })
                
                
@@ -24497,7 +24553,8 @@ new function(){
                 // Show/hide caption regarding the number of lanes
                 if (lanes.length === 1 && this.getLanes(lanes.first()).length <= 0) {
                         // TRUE if there is a caption
-                        lanes.first().setProperty("oryx-showcaption", lanes.first().properties["oryx-name"].trim().length > 0);
+                        var caption = lanes.first().properties.get("oryx-name").trim().length > 0;
+						lanes.first().setProperty("oryx-showcaption", caption);
                         var rect = lanes.first().node.getElementsByTagName("rect");
                         rect[0].setAttributeNS(null, "display", "none");
                 } else {
@@ -24628,9 +24685,10 @@ new function(){
                         this.updateDockers(considerForDockers, pool);
                        
                         // Check if the order has changed
-                        if (this.hashedPositions[pool.id] && this.hashedPositions[pool.id].keys().any(function(key, i){
-                                        return (allLanes[i]||{}).id     !== key;
-                                })){
+                        var poolHashedPositions = this.hashedPositions[pool.id];
+						if ( poolHashedPositions && poolHashedPositions.keys().any(function(key, i){
+                               return (allLanes[i]||{}).id !== key;
+                            })) {
                                
                                 var LanesHasBeenReordered = ORYX.Core.Command.extend({
                                         construct: function(originPosition, newPosition, lanes, plugin, poolId) {
@@ -24659,9 +24717,9 @@ new function(){
                                         }
                                 });
                                
-                                var hp2 = $H({});
+                                var hp2 = new Hash();
                                 allLanes.each(function(lane){
-                                        hp2[lane.id] = lane.bounds.upperLeft();
+									hp2.set(lane.id, lane.bounds.upperLeft());
                                 })
                        
                                 var command = new LanesHasBeenReordered(hashedPositions, hp2, allLanes, this, pool.id);

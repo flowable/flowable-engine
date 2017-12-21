@@ -9,7 +9,7 @@
         </div>
     </div>
 
-    <div class="popover-wrapper" ng-if="!popupModel.emailMode">
+    <div class="popover-wrapper">
 
         <div class="form-group" ng-if="popupModel.formFields">
             <div class="col-xs-4">
@@ -43,11 +43,6 @@
             <div class="people-select">
                 <div class="no-results" ng-show="popupModel.userResults.length == 0">
                     <span>{{'INVOLVE-PEOPLE.NO-MATCHING-RESULTS' | translate}}</span>
-                    <span class="people-select-link"
-                          ng-click="$event.stopPropagation(); popupModel.emailMode = true"
-                          ng-if="popupModel.emailDisabled == null || popupModel.emailDisabled == undefined || popupModel.emailDisabled == false">
-                        {{'INVOLVE-PEOPLE.USE-EMAIL' | translate}}
-                    </span>
                 </div>
                 <ul class="simple-list selectable pack" ng-show="popupModel.userResults.length > 0" scroll-to-active scroll-to-active-model="popupModel.selectedUser.id">
                     <li ng-click="confirmUser(user);" ng-repeat="user in popupModel.userResults"
@@ -70,27 +65,4 @@
         
     </div>
 
-    <div class="popover-wrapper" ng-if="popupModel.emailMode && (popupModel.emailDisabled == null || popupModel.emailDisabled == undefined || popupModel.emailDisabled == false)">
-        <form name="emailForm" class="form-group">
-            <div class="people-select">
-                <div class="input-group">
-                    <input name="emailInput" class="form-control" type="email" placeholder="{{ 'INVOLVE-PEOPLE.EMAIL-PLACEHOLDER' | translate }}"
-                           ng-model="popupModel.email"
-                           custom-keys enter-pressed="selectPersonByEmail(!emailForm.emailInput.$error.email)"
-                           auto-focus/>
-                    <span class="input-group-btn">
-                        <button class="btn btn-sm" type="button" ng-disabled="popupModel.email == null || popupModel.email == undefined || popupModel.email.length == 0 || emailForm.emailInput.$error.email"
-                                ng-click="selectPersonByEmail(!emailForm.emailInput.$error.email)">{{'INVOLVE-PEOPLE.ACTION-SELECT' | translate}}</button>
-                    </span>
-                </div>
-                <div class="subtle" translate="INVOLVE-PEOPLE.EMAIL-HELP" style="padding: 5px 0 0 1px;"></div>
-                <div class="clearfix"></div>
-                <div class="people-select-link" style="margin-top: 20px"
-                     ng-click="$event.stopPropagation(); popupModel.emailMode = false">
-                    <span ng-if="account.tenantId != null && account.tenantId != undefined" class="glyphicon glyphicon-search">&nbsp;</span>
-                    <span ng-if="account.tenantId != null && account.tenantId != undefined" style="margin-left: -12px;">{{'INVOLVE-PEOPLE.BACK-TO-SEARCH' | translate}}</span>
-                </div>
-            </div>
-        </form>
-    </div>
 </div>

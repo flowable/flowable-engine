@@ -12,7 +12,7 @@
  */
 'use strict';
 
-angular.module('activitiApp')
+angular.module('flowableApp')
   .controller('ProcessController', ['$rootScope', '$scope', '$translate', '$http', '$timeout', '$location', '$modal', '$routeParams', 'AppDefinitionService',
     function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal, $routeParams, AppDefinitionService) {
 
@@ -36,7 +36,7 @@ angular.module('activitiApp')
         };
 }]);
 
-angular.module('activitiApp')
+angular.module('flowableApp')
     .controller('ProcessDetailController', ['$rootScope', '$scope', '$translate', '$http', '$timeout','$location', '$route', '$modal', '$routeParams', '$popover', 'appResourceRoot', 'TaskService', 'CommentService', 'RelatedContentService',
         function ($rootScope, $scope, $translate, $http, $timeout, $location, $route, $modal, $routeParams, $popover, appResourceRoot, TaskService, CommentService, RelatedContentService) {
 
@@ -181,7 +181,7 @@ angular.module('activitiApp')
     };
 }]);
 
-angular.module('activitiApp')
+angular.module('flowableApp')
     .controller('ShowProcessDiagramCtrl', ['$scope', '$timeout', 'ResourceService', 'appResourceRoot',
         function ($scope, $timeout, ResourceService, appResourceRoot) {
 
@@ -190,16 +190,15 @@ angular.module('activitiApp')
                 jQuery("#bpmnModel").attr('data-model-type', 'runtime');
 
                 // in case we want to show a historic model, include additional attribute on the div
-                /*
-                  if(!$scope.model.process.latestVersion) {
-                    jQuery("#bpmnModel").attr('data-history-id', $routeParams.processModelHistoryId);
-                  }
-                */
+                if ($scope.model.processInstance.ended) {
+                    jQuery("#bpmnModel").attr('data-history-id', $scope.model.processInstance.id);
+                }
+                
                 var viewerUrl = appResourceRoot + "../display/displaymodel.html?version=" + Date.now();
 
-                // If Activiti has been deployed inside an AMD environment Raphael will fail to register
-                // itself globally until displaymodel.js (which depends ona global Raphale variable) is runned,
-                // therefor remove AMD's define method until we have loaded in Raphael and displaymodel.js
+                // If Flowable has been deployed inside an AMD environment Raphael will fail to register
+                // itself globally until displaymodel.js (which depends ona global Raphale variable) is running,
+                // therefore remove AMD's define method until we have loaded in Raphael and displaymodel.js
                 // and assume/hope its not used during.
                 var amdDefine = window.define;
                 window.define = undefined;
@@ -212,7 +211,7 @@ angular.module('activitiApp')
     ]
 );
 
-angular.module('activitiApp')
+angular.module('flowableApp')
 .controller('CancelProcessCtrl', ['$scope', '$http', '$route', 'ProcessService', function ($scope, $http, $route, ProcessService) {
 
         $scope.popup = {loading: false};

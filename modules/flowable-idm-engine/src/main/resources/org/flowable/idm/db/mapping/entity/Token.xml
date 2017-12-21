@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.flowable.idm.engine.impl.persistence.entity.TokenEntityImpl">
+
+  <!-- TOKEN INSERT -->
+  
+  <insert id="insertToken" parameterType="org.flowable.idm.engine.impl.persistence.entity.TokenEntityImpl">
+      insert into ${prefix}ACT_ID_TOKEN (
+      	ID_,
+      	REV_, 
+        TOKEN_VALUE_,
+        TOKEN_DATE_,
+        IP_ADDRESS_,
+        USER_AGENT_,
+        USER_ID_,
+        TOKEN_DATA_
+      ) values (
+        #{id ,jdbcType=VARCHAR},
+        1,
+        #{tokenValue, jdbcType=VARCHAR},
+        #{tokenDate, jdbcType=TIMESTAMP},
+        #{ipAddress, jdbcType=VARCHAR},
+        #{userAgent, jdbcType=VARCHAR},
+        #{userId, jdbcType=VARCHAR},
+        #{tokenData, jdbcType=VARCHAR}
+      )
+  </insert>
+  
+  <insert id="bulkInsertToken" parameterType="java.util.List">
+      insert into ${prefix}ACT_ID_TOKEN (
+        ID_,
+        REV_, 
+        TOKEN_VALUE_,
+        TOKEN_DATE_,
+        IP_ADDRESS_,
+        USER_AGENT_,
+        USER_ID_,
+        TOKEN_DATA_
+      ) values 
+      <foreach collection="list" item="token" index="index" separator=",">
+      (
+        #{token.id ,jdbcType=VARCHAR},
+        1,
+        #{token.tokenValue, jdbcType=VARCHAR},
+        #{token.tokenDate, jdbcType=TIMESTAMP},
+        #{token.ipAddress, jdbcType=VARCHAR},
+        #{token.userAgent, jdbcType=VARCHAR},
+        #{token.userId, jdbcType=VARCHAR},
+        #{token.tokenData, jdbcType=VARCHAR}
+      )
+      </foreach>
+  </insert>
+  
+  <insert id="bulkInsertToken" databaseId="oracle" parameterType="java.util.List">
+      INSERT ALL
+      <foreach collection="list" item="token" index="index">
+        INTO ${prefix}ACT_ID_TOKEN (
+            ID_,
+            REV_, 
+            TOKEN_VALUE_,
+            TOKEN_DATE_,
+            IP_ADDRESS_,
+            USER_AGENT_,
+            USER_ID_,
+            TOKEN_DATA_
+      ) VALUES (
+        #{token.id ,jdbcType=VARCHAR},
+        1,
+        #{token.tokenValue, jdbcType=VARCHAR},
+        #{token.tokenDate, jdbcType=TIMESTAMP},
+        #{token.ipAddress, jdbcType=VARCHAR},
+        #{token.userAgent, jdbcType=VARCHAR},
+        #{token.userId, jdbcType=VARCHAR},
+        #{token.tokenData, jdbcType=VARCHAR}
+      )
+      </foreach>
+      SELECT * FROM dual
+  </insert>
+  
+
+  <!-- TOKEN UPDATE -->
+  
+  <update id="updateToken" parameterType="org.flowable.idm.engine.impl.persistence.entity.TokenEntityImpl">
+    update ${prefix}ACT_ID_TOKEN
+    <set>
+      REV_ = #{revisionNext, jdbcType=INTEGER},
+      TOKEN_VALUE_ = #{tokenValue, jdbcType=VARCHAR},
+      TOKEN_DATE_ = #{tokenDate, jdbcType=TIMESTAMP},
+      IP_ADDRESS_ = #{ipAddress, jdbcType=VARCHAR},
+      USER_AGENT_ = #{userAgent, jdbcType=VARCHAR},
+      USER_ID_ = #{userId, jdbcType=VARCHAR},
+      TOKEN_DATA_ = #{tokenData, jdbcType=VARCHAR}
+    </set>
+    where ID_ = #{id, jdbcType=VARCHAR} AND REV_ = #{revision, jdbcType=INTEGER}
+  </update>
+
+  <!-- TOKEN DELETE -->
+  
+  <delete id="deleteToken" parameterType="org.flowable.idm.engine.impl.persistence.entity.TokenEntityImpl">
+    delete from ${prefix}ACT_ID_TOKEN where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision}
+  </delete>
+
+
+  <!-- TOKEN SELECT -->
+  
+  <resultMap id="tokenResultMap" type="org.flowable.idm.engine.impl.persistence.entity.TokenEntityImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
+    <result property="tokenValue" column="TOKEN_VALUE_" jdbcType="VARCHAR" />
+    <result property="tokenDate" column="TOKEN_DATE_" jdbcType="TIMESTAMP" />
+    <result property="ipAddress" column="IP_ADDRESS_" jdbcType="VARCHAR" />
+    <result property="userAgent" column="USER_AGENT_" jdbcType="VARCHAR" />
+    <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
+    <result property="tokenData" column="TOKEN_DATA_" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <select id="selectToken" parameterType="string" resultMap="tokenResultMap">
+    select * from ${prefix}ACT_ID_TOKEN where ID_ = #{id, jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectTokenByQueryCriteria" parameterType="org.flowable.idm.engine.impl.TokenQueryImpl" resultMap="tokenResultMap">
+  	<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <include refid="selectTokenByQueryCriteriaSql" />
+    ${orderBy}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+  </select>
+  
+   <select id="selectTokenCountByQueryCriteria" parameterType="org.flowable.idm.engine.impl.TokenQueryImpl" resultType="long">
+    select count(RES.ID_)
+    <include refid="selectTokenByQueryCriteriaSql" />
+  </select>
+  
+  <sql id="selectTokenByQueryCriteriaSql">
+    from ${prefix}ACT_ID_TOKEN RES 
+    <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+      <if test="ids != null &amp;&amp; ids.size() &gt; 0">
+        and RES.ID_ IN
+        <foreach item="id" index="index" collection="ids" 
+                 open="(" separator="," close=")">
+          #{id}
+        </foreach>
+      </if>
+      <if test="tokenValue != null">
+        and RES.TOKEN_VALUE_ = #{tokenValue}
+      </if>
+      <if test="tokenDate != null">
+        and RES.TOKEN_DATE_ = #{tokenDate}
+      </if>
+      <if test="tokenDateBefore != null">
+        and RES.TOKEN_DATE_ &lt; #{tokenDateBefore}
+      </if>
+      <if test="tokenDateAfter != null">
+        and RES.TOKEN_DATE_ &gt; #{tokenDateAfter}
+      </if>
+      <if test="ipAddress != null">
+        and RES.IP_ADDRESS_ = #{ipAddress}
+      </if>
+      <if test="ipAddressLike != null">
+        and RES.IP_ADDRESS_ like #{ipAddressLike}${wildcardEscapeClause}
+      </if>
+      <if test="userAgent != null">
+        and RES.USER_AGENT_ = #{userAgent}
+      </if>
+      <if test="userAgentLike != null">
+        and RES.USER_AGENT_ like #{userAgentLike}${wildcardEscapeClause}
+      </if>
+      <if test="userId != null">
+        and RES.USER_ID_ = #{userId}
+      </if>
+      <if test="userIdLike != null">
+        and RES.USER_ID_ like #{userIdLike}${wildcardEscapeClause}
+      </if>
+      <if test="tokenData != null">
+        and RES.TOKEN_DATA_ = #{tokenData}
+      </if>
+      <if test="tokenDataLike != null">
+        and RES.TOKEN_DATA_ like #{tokenDataLike}${wildcardEscapeClause}
+      </if>
+    </where>
+  </sql>
+
+  <select id="selectTokenByNativeQuery" parameterType="java.util.Map" resultMap="tokenResultMap">
+    <include refid="org.flowable.idm.engine.db.common.selectByNativeQuery"/>
+  </select>
+
+  <select id="selectTokenCountByNativeQuery" parameterType="java.util.Map" resultType="long">
+    ${sql}
+  </select>
+  
+</mapper>

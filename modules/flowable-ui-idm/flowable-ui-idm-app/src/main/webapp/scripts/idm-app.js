@@ -12,7 +12,7 @@
  */
 'use strict';
 
-var activitiApp = angular.module('activitiApp', [
+var flowableApp = angular.module('flowableApp', [
   	'http-auth-interceptor',
   	'ngCookies',
   	'ngResource',
@@ -29,8 +29,8 @@ var activitiApp = angular.module('activitiApp', [
     'ui.grid.cellNav'
 ]);
 
-var activitiModule = activitiApp;
-activitiApp
+var flowableModule = flowableApp;
+flowableApp
   // Initialize routes
   .config(['$provide', '$routeProvider', '$selectProvider', '$datepickerProvider', '$translateProvider', function ($provide, $routeProvider, $selectProvider, $datepickerProvider, $translateProvider) {
 
@@ -119,13 +119,16 @@ activitiApp
             prefix: './i18n/',
             suffix: '.json'
         })
-
-        .registerAvailableLanguageKeys(['en'], {
-            'en_*': 'en',
-            'en-*': 'en'
-        });
-
-
+        /*
+            This can be used to map multiple browser language keys to a
+            angular translate language key.
+        */
+        // .registerAvailableLanguageKeys(['en'], {
+        //     'en-*': 'en'
+        // })
+        .useSanitizeValueStrategy('escapeParameters')
+        .uniformLanguageTag('bcp47')
+        .determinePreferredLanguage();
     }])
     .run(['$rootScope', function($rootScope) {
         $rootScope.$on( "$routeChangeStart", function(event, next, current) {
@@ -137,8 +140,14 @@ activitiApp
     .run(['$rootScope', '$timeout', '$translate', '$location', '$window', 'AuthenticationSharedService',
         function($rootScope, $timeout, $translate, $location, $window, AuthenticationSharedService) {
 
-            $translate.use('en');
-            
+            // set angular translate fallback language
+            $translate.fallbackLanguage(['en']);
+
+            // setting Moment-JS (global) locale
+            if (FLOWABLE.CONFIG.datesLocalization) {
+                moment.locale($translate.proposedLanguage());
+            }
+
             // Common model (eg selected tenant id)
             $rootScope.common = {};
 
@@ -221,7 +230,6 @@ activitiApp
     .run(['$rootScope', '$timeout', '$translate', '$location', '$http', '$window', '$popover', 'appResourceRoot',
         function($rootScope, $timeout, $translate, $location, $http, $window, $popover, appResourceRoot) {
 
-
         $rootScope.appResourceRoot = appResourceRoot;
 
         // Alerts
@@ -285,14 +293,7 @@ activitiApp
      }])
      .run(['$rootScope', '$location', '$window', 'AuthenticationSharedService', '$translate', '$modal',
         function($rootScope, $location, $window, AuthenticationSharedService, $translate, $modal) {
-         
-        var proposedLanguage = $translate.proposedLanguage();
-        if (proposedLanguage !== 'de' && proposedLanguage !== 'en' && proposedLanguage !== 'es' && proposedLanguage !== 'fr'
-            && proposedLanguage !== 'it' && proposedLanguage !== 'ja') {
-            
-            $translate.use('en');
-        }
-         
+
         /* Auto-height */
 
         $rootScope.window = {};

@@ -12,7 +12,7 @@
  */
 'use strict';
 
-activitiModule.service('RelatedContentService', ['$http', '$q', '$rootScope', '$translate', '$location', 'Upload', '$timeout',
+flowableModule.service('RelatedContentService', ['$http', '$q', '$rootScope', '$translate', '$location', 'Upload', '$timeout',
     function ($http, $q, $rootScope, $translate, $location, Upload, $timeout) {
 
         var httpAsPromise = function(options) {

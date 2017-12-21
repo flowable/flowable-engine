@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definition"
+    xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:flowable="http://flowable.org/bpmn" targetNamespace="Examples">
+
+    <process id="miSubProcessLocalVariables">
+
+        <startEvent id="theStart" />
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="nesting1" />
+
+        <subProcess id="nesting1">
+            <multiInstanceLoopCharacteristics isSequential="true">
+                <loopCardinality>${4}</loopCardinality>
+            </multiInstanceLoopCharacteristics>
+
+            <startEvent id="subStart1" />
+            <sequenceFlow id="flow2" sourceRef="subStart1" targetRef="callActivity" />
+
+            <callActivity id="callActivity" calledElement="externalSubProcess" flowable:useLocalScopeForOutParameters="true">
+                <extensionElements>
+                    <flowable:in source="name" target="name" />
+                    <flowable:out source="output" target="output" />
+                </extensionElements>
+            </callActivity>
+
+            <sequenceFlow id="flow3" sourceRef="callActivity" targetRef="task" />
+            
+            <userTask id="task" />
+            
+            <sequenceFlow id="flow4" sourceRef="task" targetRef="subProcessEnd1" />
+            
+            <endEvent id="subProcessEnd1" />
+
+        </subProcess>
+
+        <sequenceFlow id="flow5" sourceRef="nesting1" targetRef="theEnd" />
+        <endEvent id="theEnd" />
+
+    </process>
+
+</definitions>

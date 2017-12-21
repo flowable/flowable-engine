@@ -14,7 +14,7 @@
 
 var APP_DEFINITION_TOOLBAR = {
     ACTIONS: {
-    	
+
         saveModel: function (services) {
 
             _internalCreateModal({
@@ -26,13 +26,13 @@ var APP_DEFINITION_TOOLBAR = {
         },
 
         help: function (services) {
-            
+
         },
-        
+
         feedback: function (services) {
-            
+
         },
-        
+
         closeEditor:  function (services) {
         	services.$location.path('/apps');
         }
@@ -40,24 +40,24 @@ var APP_DEFINITION_TOOLBAR = {
 };
 
 /** Custom controller for the save dialog */
-angular.module('activitiModeler').controller('SaveAppDefinitionCtrl',
+angular.module('flowableModeler').controller('SaveAppDefinitionCtrl',
     [ '$rootScope', '$scope', '$http', '$route', '$location', '$translate',
     function ($rootScope, $scope, $http, $route, $location, $translate) {
-	
+
     var description = '';
     if ($rootScope.currentAppDefinition.description) {
     	description = $rootScope.currentAppDefinition.description;
     }
-    
-    var saveDialog = { 
+
+    var saveDialog = {
         name: $rootScope.currentAppDefinition.name,
         key: $rootScope.currentAppDefinition.key,
         description: description,
         publish: false
     };
-    
+
     $scope.saveDialog = saveDialog;
-    
+
     $scope.status = {
         loading: false
     };
@@ -71,23 +71,23 @@ angular.module('activitiModeler').controller('SaveAppDefinitionCtrl',
     		$location.path('/apps');
     	}, force);
     };
-    
+
     $scope.save = function (saveCallback, force) {
 
         if (!$scope.saveDialog.name || $scope.saveDialog.name.length == 0 ||
         	!$scope.saveDialog.key || $scope.saveDialog.key.length == 0) {
-        	
+
             return;
         }
 
         // Indicator spinner image
         $scope.status.loading = true;
-        
+
         var data = {
             appDefinition: $rootScope.currentAppDefinition,
             publish: $scope.saveDialog.publish
         };
-        
+
         data.appDefinition.name = $scope.saveDialog.name;
         if ($scope.saveDialog.description && $scope.saveDialog.description.length > 0) {
         	data.appDefinition.description = $scope.saveDialog.description;
@@ -96,15 +96,14 @@ angular.module('activitiModeler').controller('SaveAppDefinitionCtrl',
         if (force !== undefined && force !== null && force === true) {
             data.force = true;
         }
-        
-        delete Array.prototype.toJSON;
+
         delete $scope.conflict;
-        $http({method: 'PUT', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/app-definitions/' + $rootScope.currentAppDefinition.id, data: data}).
+        $http({method: 'PUT', url: FLOWABLE.APP_URL.getAppDefinitionUrl($rootScope.currentAppDefinition.id), data: data}).
             success(function(response, status, headers, config) {
                 // Regular error
                 if (response.error) {
                     $scope.status.loading = false;
-                    
+                    $scope.saveDialog.errorMessage = response.errorDescription;
                 } else {
                     $scope.$hide();
                     $rootScope.addAlert($translate.instant('APP.POPUP.SAVE-APP-SAVE-SUCCESS', 'info'));
@@ -115,30 +114,8 @@ angular.module('activitiModeler').controller('SaveAppDefinitionCtrl',
 
             }).
             error(function(data, status, headers, config) {
-
-                if (status === 409 && data && data.messageKey === 'app.publish.procdef.key.conflict') {
-                    $scope.conflict = {
-                        type: 'conflictingProcDefKey',
-                        data: data.customData
-                    };
-                    
-                } else if(status === 409 && data && data.messageKey === 'app.publish.procdef.duplicate.keys') {
-                    $scope.conflict = {
-                        type: 'duplicateProcDefKeys',
-                        data: data.customData
-                    };
-                    
-                } else if (status === 409 && data && data.messageKey === 'app.publish.process.model.already.used') {
-                    $scope.conflict = {
-                        type: 'processModelAlreadyUsed',
-                        data: data.customData
-                    };
-                    
-                } else {
-                	$scope.status.loading = false;
-                    $scope.saveDialog.errorMessage = data.message;
-                }
-
+                $scope.status.loading = false;
+                $scope.saveDialog.errorMessage = data.message;
             });
     };
 

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntityImpl">
+
+  <resultMap id="privilegeResultMap" type="org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntityImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+  </resultMap>
+
+  <insert id="insertPrivilege" parameterType="org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntityImpl">
+    insert into ${prefix}ACT_ID_PRIV (ID_, NAME_)
+    values (
+      #{id ,jdbcType=VARCHAR},
+      #{name ,jdbcType=VARCHAR}
+    )
+  </insert>
+
+  <insert id="bulkInsertPrivilege" parameterType="java.util.List">
+    insert into ${prefix}ACT_ID_PRIV (ID_, NAME_) VALUES 
+      <foreach collection="list" item="privilege" index="index" separator=",">
+        (#{privilege.id ,jdbcType=VARCHAR},
+         #{privilege.name ,jdbcType=VARCHAR}
+      </foreach>
+  </insert>
+
+  <insert id="bulkInsertPrivilege" databaseId="oracle" parameterType="java.util.List">
+    INSERT ALL 
+      <foreach collection="list" item="privilege" index="index">
+        insert into ${prefix}ACT_ID_PRIV (ID_, NAME_) VALUES 
+        (#{privilege.id ,jdbcType=VARCHAR},
+         #{privilege.name ,jdbcType=VARCHAR}
+      </foreach>
+    SELECT * FROM dual
+  </insert>
+
+  <delete id="deletePrivilege" parameterType="org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntityImpl">
+    delete from ${prefix}ACT_ID_PRIV where ID_ = #{id}
+  </delete>
+
+  <select id="selectPrivilege" parameterType="string" resultMap="privilegeResultMap">
+    select * from ${prefix}ACT_ID_PRIV where ID_ = #{id,jdbcType=VARCHAR}
+  </select>
+  
+  <select id="selectPrivilegeByQueryCriteria" parameterType="org.flowable.idm.engine.impl.PrivilegeQueryImpl" resultMap="privilegeResultMap">
+    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <include refid="selectPrivilegeByQueryCriteriaSql" />
+    ${orderBy}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+  </select>
+  
+   <select id="selectPrivilegeCountByQueryCriteria" parameterType="org.flowable.idm.engine.impl.PrivilegeQueryImpl" resultType="long">
+    select count(RES.ID_)
+    <include refid="selectPrivilegeByQueryCriteriaSql" />
+  </select>
+  
+  <sql id="selectPrivilegeByQueryCriteriaSql">
+    from ${prefix}ACT_ID_PRIV RES 
+    <if test="userId != null || groupId != null || groupIds != null">
+        inner join ${prefix}ACT_ID_PRIV_MAPPING MAPPING on RES.ID_ = MAPPING.PRIV_ID_
+    </if>
+    <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+      <if test="name != null">
+        and RES.NAME_ = #{name}
+      </if>
+      <if test="userId != null">
+        and MAPPING.USER_ID_ = #{userId}
+      </if>
+      <if test="groupId != null">
+        and MAPPING.GROUP_ID_ = #{groupId}
+      </if>
+      <if test="groupIds != null">
+        and MAPPING.GROUP_ID_ IN
+        <foreach item="id" index="index" collection="groupIds" 
+                 open="(" separator="," close=")">
+          #{id}
+        </foreach>
+      </if>
+    </where>
+  </sql>
+
+  <select id="selectPrivilegeByNativeQuery" parameterType="java.util.Map" resultMap="privilegeResultMap">
+    <include refid="org.flowable.idm.engine.db.common.selectByNativeQuery"/>
+  </select>
+
+  <select id="selectPrivilegeCountByNativeQuery" parameterType="java.util.Map" resultType="long">
+    ${sql}
+  </select>
+  
+</mapper>

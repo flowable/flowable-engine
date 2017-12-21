@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="InclusiveGateway" name="InclusiveGateway">
+    <startEvent id="startevent1"/>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="parallelGateway1" />
+    <parallelGateway id="parallelGateway1"/>
+    <sequenceFlow id="flow2" sourceRef="parallelGateway1" targetRef="usertask1" />
+    <userTask id="usertask1" name="Task1" />
+    <sequenceFlow id="flow3" sourceRef="parallelGateway1" targetRef="exclusiveGateway1" />
+    <exclusiveGateway id="exclusiveGateway1"/>
+    <sequenceFlow id="flow4" sourceRef="exclusiveGateway1" targetRef="receiveTask1" />
+    <receiveTask id="receiveTask1" />
+    <sequenceFlow id="flow5" sourceRef="receiveTask1" targetRef="parallelGateway2" />
+    <parallelGateway id="parallelGateway2"/>
+    <sequenceFlow id="flow6" sourceRef="parallelGateway2" targetRef="inclusiveGateway1" />
+    <inclusiveGateway id="inclusiveGateway1"/>
+    <exclusiveGateway id="exclusiveGateway2"/>
+    <sequenceFlow id="flow7" sourceRef="parallelGateway2" targetRef="exclusiveGateway2" />
+    <sequenceFlow id="flow8" sourceRef="exclusiveGateway2" targetRef="exclusiveGateway1" />
+    <sequenceFlow id="flow9" sourceRef="exclusiveGateway2" targetRef="exclusiveGateway1" />
+    
+    <sequenceFlow id="flow10" sourceRef="usertask1" targetRef="inclusiveGateway1" />
+    
+    <sequenceFlow id="flow11" sourceRef="inclusiveGateway1" targetRef="endevent1" />
+    <endEvent id="endevent1" name="End" />
+  </process>
+</definitions>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="org.flowable.idm.engine.db.common">
+
+  <!-- select By Native Query -->
+
+	<sql id="selectByNativeQuery">
+		<if test="resultType == 'LIST_PAGE'">
+			<include refid="org.flowable.idm.engine.db.common.limitBeforeNativeQuerySql"/> 
+		</if>
+		${sql}
+		<if test="resultType == 'LIST_PAGE'">
+			<if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+		</if>
+	</sql>
+	
+	<sql id="limitBeforeNativeQuerySql">
+			<if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+	</sql>
+	
+	<sql id="limitBeforeNativeQuerySql" databaseId="db2">
+			<if test="firstResult != null and firstResult &gt;= 0">${limitBeforeNativeQuery}</if>
+	</sql>
+	
+	<sql id="limitBeforeNativeQuerySql" databaseId="mssql">
+			<if test="firstResult != null and firstResult &gt;= 0">${limitBeforeNativeQuery}</if>
+	</sql>
+	
+
+</mapper>

@@ -12,7 +12,7 @@
  */
 'use strict';
 
-angular.module('activitiModeler')
+angular.module('flowableModeler')
   .controller('FormReadonlyViewController', ['$rootScope', '$scope', '$translate', '$http', '$timeout', '$location', '$modal', '$routeParams', '$popover',
     function ($rootScope, $scope, $translate, $http, $timeout, $location, $modal, $routeParams, $popover) {
 
@@ -35,10 +35,9 @@ angular.module('activitiModeler')
 
           var url;
           if ($routeParams.modelHistoryId) {
-              url = FLOWABLE.CONFIG.contextRoot + '/app/rest/form-models/' + $routeParams.modelId
-                  + '/history/' + $routeParams.modelHistoryId;
+              url = FLOWABLE.APP_URL.getFormModelHistoryUrl($routeParams.modelId,$routeParams.modelHistoryId);
           } else {
-              url = FLOWABLE.CONFIG.contextRoot + '/app/rest/form-models/' + $routeParams.modelId;
+              url = FLOWABLE.APP_URL.getFormModelUrl($routeParams.modelId);
           }
 
           $http({method: 'GET', url: url}).

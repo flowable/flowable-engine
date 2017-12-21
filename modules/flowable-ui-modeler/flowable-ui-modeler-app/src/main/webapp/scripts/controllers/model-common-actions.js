@@ -12,8 +12,8 @@
  */
 'use strict';
 
-angular.module('activitiModeler')
-.controller('EditModelPopupCrtl', ['$rootScope', '$scope', '$http', '$translate', '$location',
+angular.module('flowableModeler')
+.controller('EditModelPopupCtrl', ['$rootScope', '$scope', '$http', '$translate', '$location',
     function ($rootScope, $scope, $http, $translate, $location) {
 
         var model;
@@ -21,6 +21,9 @@ angular.module('activitiModeler')
         if ($scope.model.process) {
             model = $scope.model.process;
             popupType = 'PROCESS';
+        } else if ($scope.model.caseModel) {
+            model = $scope.model.caseModel;
+            popupType = 'CASE';
         } else if ($scope.model.form) {
             model = $scope.model.form;
             popupType = 'FORM';
@@ -60,10 +63,12 @@ angular.module('activitiModeler')
     			$scope.model.description
     		};
 
-    		$http({method: 'PUT', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.popup.id, data: updateData}).
+    		$http({method: 'PUT', url: FLOWABLE.APP_URL.getModelUrl($scope.popup.id), data: updateData}).
     			success(function(data, status, headers, config) {
     				if ($scope.model.process) {
     					$scope.model.process = data;
+    				} else if ($scope.model.caseModel) {
+                        $scope.model.caseModel = data;
     				} else if ($scope.model.form) {
     					$scope.model.form = data;
     				} else if ($scope.model.decisionTable) {
@@ -82,6 +87,8 @@ angular.module('activitiModeler')
                         $location.path("/apps/" +  $scope.popup.id);
                     } else if (popupType === 'DECISION-TABLE') {
                         $location.path("/decision-tables/" +  $scope.popup.id);
+                    } else if (popupType === 'CASE') {
+                        $location.path("/casemodels/" +  $scope.popup.id);
                     } else {
                         $location.path("/processes/" +  $scope.popup.id);
                     }
@@ -100,14 +107,17 @@ angular.module('activitiModeler')
     	};
 }]);
 
-angular.module('activitiModeler')
-    .controller('DeleteModelPopupCrtl', ['$rootScope', '$scope', '$http', '$translate', function ($rootScope, $scope, $http, $translate) {
+angular.module('flowableModeler')
+    .controller('DeleteModelPopupCtrl', ['$rootScope', '$scope', '$http', '$translate', function ($rootScope, $scope, $http, $translate) {
 
         var model;
         var popupType;
         if ($scope.model.process) {
             model = $scope.model.process;
             popupType = 'PROCESS';
+        } else if ($scope.model.caseModel) {
+            model = $scope.model.caseModel;
+            popupType = 'CASE';
         } else if ($scope.model.form) {
             model = $scope.model.form;
             popupType = 'FORM';
@@ -128,7 +138,7 @@ angular.module('activitiModeler')
         };
 
         // Loading relations when opening
-        $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.popup.model.id + '/parent-relations'}).
+        $http({method: 'GET', url: FLOWABLE.APP_URL.getModelParentRelationsUrl($scope.popup.model.id)}).
             success(function (data, status, headers, config) {
                 $scope.popup.loading = false;
                 $scope.popup.loadingRelations = false;
@@ -146,7 +156,7 @@ angular.module('activitiModeler')
                 cascade: $scope.popup.cascade === 'true'
             };
 
-            $http({method: 'DELETE', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.popup.model.id, params: params}).
+            $http({method: 'DELETE', url: FLOWABLE.APP_URL.getModelUrl($scope.popup.model.id), params: params}).
                 success(function (data, status, headers, config) {
                     $scope.$hide();
                     $scope.popup.loading = false;
@@ -166,14 +176,17 @@ angular.module('activitiModeler')
         };
     }]);
 
-angular.module('activitiModeler')
-.controller('UseAsNewVersionPopupCrtl', ['$rootScope', '$scope', '$http', '$translate', '$location', function ($rootScope, $scope, $http, $translate, $location) {
+angular.module('flowableModeler')
+.controller('UseAsNewVersionPopupCtrl', ['$rootScope', '$scope', '$http', '$translate', '$location', function ($rootScope, $scope, $http, $translate, $location) {
 
 	var model;
 	var popupType;
 	if ($scope.model.process) {
 		model = $scope.model.process;
 		popupType = 'PROCESS';
+	} else if ($scope.model.caseModel) {
+        model = $scope.model.caseModel;
+        popupType = 'CASE';
 	} else if ($scope.model.form) {
         model = $scope.model.form;
         popupType = 'FORM';
@@ -201,7 +214,7 @@ angular.module('activitiModeler')
 			comment: $scope.popup.comment
 		};
 
-		$http({method: 'POST', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.popup.latestModelId + '/history/' + $scope.popup.model.id, data: actionData}).
+		$http({method: 'POST', url: FLOWABLE.APP_URL.getModelHistoryUrl($scope.popup.latestModelId, $scope.popup.model.id), data: actionData}).
 			success(function(data, status, headers, config) {
 
                 var backToOverview = function() {
@@ -211,6 +224,8 @@ angular.module('activitiModeler')
                         $location.path("/apps/" +  $scope.popup.latestModelId);
                     } else if (popupType === 'DECISION-TABLE') {
                         $location.path("/decision-tables/" +  $scope.popup.latestModelId);
+                    } else if (popupType === 'CASE') {
+                        $location.path("/casemodels/" +  $scope.popup.latestModelId);
                     } else {
                         $location.path("/processes/" +  $scope.popup.latestModelId);
                     }
@@ -255,214 +270,4 @@ angular.module('activitiModeler')
 			$scope.$hide();
 		}
 	};
-}]);
-
-/**
- * The controller for driving the share model popup.
- */
-angular.module('activitiModeler')
-	.controller('ShareModelPopupCrtl', ['$rootScope', '$scope', '$http', '$timeout', '$translate', 'UserService',
-        function ($rootScope, $scope, $http, $timeout, $translate, UserService) {
-
-            var model = $scope.model.app;
-            var popupType = 'APP';
-
-            $scope.popup = {
-                loading: false,
-                popupType: popupType,
-                model: model,
-                comment: '',
-                updated: {},
-                removed: {},
-                added: {},
-                groupsAdded: {},
-                recentUsers: []
-            };
-
-            // Fetch the share info from the server
-            var shareInfoUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.popup.model.id + '/share-info';
-
-            $http({method: 'GET', url: shareInfoUrl}).
-                success(function (data, status, headers, config) {
-                    $scope.popup.shareInfo = data;
-
-                    // Get user ids. Used in the people picker to filter out users
-                    $scope.currentlySharedUserIds = [];
-
-                    if (data && data.data && data.data.length > 0) {
-                        for (var infoIndex = 0; infoIndex < data.data.length; infoIndex++) {
-
-                            if (data.data[infoIndex].person !== null && data.data[infoIndex].person !== undefined) {
-                                $scope.currentlySharedUserIds.push(data.data[infoIndex].person.id);
-                            } 
-                        }
-                    }
-
-                }).
-                error(function (data, status, headers, config) {
-                    $scope.$hide();
-                    $scope.popup.loading = false;
-                });
-
-            /**
-             * Change permission of a user
-             */
-            $scope.setPermission = function (info, permission) {
-                if (!permission) { // no permission => User or group should be removed
-
-                    var list = $scope.popup.shareInfo.data;
-
-                    // Only send removal to server in case it was an existing share
-                    if (info.id) { // Entries from the server have an id property
-
-                        $scope.popup.removed[info.id] = true;
-
-                        if ($scope.popup.updated[info.id]) {
-                            delete $scope.popup.updated[info.id];
-                        }
-
-                    } else {
-                        // Remove info from the added list as well
-                        if (info.person && info.person.id) {
-                            delete $scope.popup.added[info.person.id];
-
-                        } else if (info.person.email) {
-                            delete $scope.popup.added[info.person.email];
-                        } 
-                    }
-
-                    if (info.person) {
-                        var personIndex = $scope.currentlySharedUserIds.indexOf(info.person.id);
-                        if (personIndex >= 0) {
-                            $scope.currentlySharedUserIds.splice(personIndex, 1);
-                        }
-                    }
-
-                    for (var i = 0; i < list.length; i++) {
-                        if (list[i] == info) {
-                            list.splice(i, 1);
-                            break;
-                        }
-                    }
-
-                } else {
-                    info.permission = permission;
-                    if (info.id) {
-                        $scope.popup.updated[info.id] = permission;
-                    }
-                }
-            };
-
-            /**
-             * Adds a user using en email address
-             */
-            $scope.addEmailUser = function (email) {
-                var added = {person: {email: email}, permission: 'read'};
-                if ($scope.popup.shareInfo.data) {
-
-                    for (var i = 0; i < $scope.popup.shareInfo.data.length; i++) {
-                        if ($scope.popup.shareInfo.data[i].email == email) {
-                            // Skip duplicate emails
-                            return;
-                        }
-                    }
-
-                    $scope.popup.shareInfo.data.push(added);
-                    $scope.popup.added[email] = added;
-
-                } else {
-                    $scope.popup.shareInfo.data = [added];
-                    $scope.popup.added[email] = added;
-                }
-
-                $scope.popup.newPerson = undefined;
-            };
-
-            /**
-             * Add a 'real user' (ie one from the same tenant)
-             */
-            $scope.addRealUser = function (user) {
-                var added = {person: user, permission: 'read'};
-                if ($scope.popup.shareInfo.data) {
-
-                    // Skip duplicate person
-                    for (var i = 0; i < $scope.popup.shareInfo.data.length; i++) {
-                        if ($scope.popup.shareInfo.data[i].person && $scope.popup.shareInfo.data[i].person.id == user.id) {
-                            return;
-                        }
-                    }
-
-                    $scope.popup.shareInfo.data.splice(0, 0, added);
-                    $scope.popup.added[user.id] = added;
-
-                } else {
-                    $scope.popup.shareInfo.data = [added];
-                    $scope.popup.added[user.id] = added;
-
-                }
-
-                // Add to list that is filtered when fetching users
-                $scope.currentlySharedUserIds.push(user.id);
-
-                $scope.popup.newPerson = undefined;
-            };
-
-            /**
-             * Saves the changes to the server
-             */
-            $scope.ok = function () {
-                $scope.popup.loading = true;
-                var shareData = {added: [], updated: [], removed: []};
-
-                // Add additions
-                for (var prop in $scope.popup.added) {
-                    if ($scope.popup.added[prop].person) {
-                        var person = $scope.popup.added[prop].person;
-                        shareData.added.push({
-                            userId: person.id,
-                            email: person.email,
-                            permission: $scope.popup.added[prop].permission
-                        });
-                    }
-                }
-
-                // Add removals
-                for (var prop in $scope.popup.removed) {
-                    shareData.removed.push(prop);
-                }
-
-                // Add updates
-                for (var prop in $scope.popup.updated) {
-                    shareData.updated.push({
-                        id: prop,
-                        permission: $scope.popup.updated[prop]
-                    });
-                }
-
-                delete Array.prototype.toJSON;
-
-                var putUrl = FLOWABLE.CONFIG.contextRoot + '/app/rest/models/' + $scope.popup.model.id + '/share-info';
-
-                $http({method: 'PUT', url: putUrl, data: shareData}).
-                    success(function (data, status, headers, config) {
-                        $scope.$hide();
-
-                        $scope.popup.loading = false;
-                        $scope.addAlertPromise($translate(popupType + '.ALERT.SHARE-CONFIRM'), 'info');
-                    }).
-                    error(function (data, status, headers, config) {
-                        $scope.$hide();
-                        $scope.popup.loading = false;
-                    });
-
-            };
-
-            /**
-             * Close the popup
-             */
-            $scope.cancel = function () {
-                if (!$scope.popup.loading) {
-                    $scope.$hide();
-                }
-            };
 }]);

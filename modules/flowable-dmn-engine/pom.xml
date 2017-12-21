@@ -10,16 +10,16 @@
 		<groupId>org.flowable</groupId>
 		<artifactId>flowable-root</artifactId>
 		<relativePath>../..</relativePath>
-		<version>6.0.0.RC1-SNAPSHOT</version>
+		<version>6.3.0-SNAPSHOT</version>
 	</parent>
 
 	<properties>
-		<activiti.artifact>
-			org.activiti.dmn.engine
-		</activiti.artifact>
-		<activiti.osgi.import.additional>
+		<flowable.artifact>
+			org.flowable.dmn.engine
+		</flowable.artifact>
+		<flowable.osgi.import.additional>
 			org.springframework*;resolution:=optional,
-		</activiti.osgi.import.additional>
+		</flowable.osgi.import.additional>
 	</properties>
 
     <dependencies>
@@ -62,6 +62,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
+            <scope>test</scope>
         </dependency>
         <dependency>
       		<groupId>org.mybatis</groupId>
@@ -70,11 +71,6 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-beans</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.mvel</groupId>
-            <artifactId>mvel2</artifactId>
-            <version>2.2.6.Final</version>
         </dependency>
         <dependency>
             <groupId>joda-time</groupId>
@@ -89,7 +85,6 @@
         <dependency>
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
-            <version>3.4.1</version>
         </dependency>
 
         <dependency>
@@ -225,8 +220,8 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<echo message="updating activiti dmn configuration to db ${databasedmn}" />
-										<copy file="${basedir}/../../qa/db/activiti.dmn.cfg.xml"
+										<echo message="updating flowable dmn configuration to db ${databasedmn}" />
+										<copy file="${basedir}/../../qa/db/flowable.dmn.cfg.xml"
 											todir="target/test-classes" overwrite="true">
 											<filterset
 												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasedmn}.properties" />
@@ -243,7 +238,7 @@
 								<configuration>
 									<tasks>
 										<echo message="dropping schema in ${databasedmn}" />
-										<java classname="org.activiti.dmn.engine.impl.db.DbSchemaDrop"
+										<java classname="org.flowable.dmn.engine.impl.db.DbSchemaDrop"
 											classpathref="maven.test.classpath" />
 									</tasks>
 								</configuration>
@@ -277,8 +272,8 @@
 								</goals>
 								<configuration>
 									<tasks>
-										<echo message="updating activiti dmn configuration to db ${databasewithschemadmn}" />
-										<copy file="${basedir}/../../qa/db/schema/activiti.dmn.cfg.xml"
+										<echo message="updating dmn configuration to db ${databasewithschemadmn}" />
+										<copy file="${basedir}/../../qa/db/schema/flowable.dmn.cfg.xml"
 											todir="target/test-classes" overwrite="true">
 											<filterset
 												filtersfile="${user.home}/.flowable/jdbc/build.flowable6.${databasewithschemadmn}.properties" />
@@ -295,7 +290,7 @@
 								<configuration>
 									<tasks>
 										<echo message="dropping schema in ${databasewithschemadmn}" />
-										<java classname="org.activiti.dmn.engine.impl.db.DbSchemaDrop"
+										<java classname="org.flowable.dmn.engine.impl.db.DbSchemaDrop"
 											classpathref="maven.test.classpath" />
 									</tasks>
 								</configuration>

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,7 +18,7 @@ function _drawUserTaskIcon(paper, startX, startY)
 		"stroke": "none",
 		"fill": "#d1b575"
  	});
-	
+
 	var userTaskIcon = paper.set();
 	userTaskIcon.push(path1);
 
@@ -33,7 +33,7 @@ function _drawServiceTaskIcon(paper, startX, startY)
 		"stroke": "none",
 		"fill": "#72a7d0"
  	});
-	
+
 	var serviceTaskIcon = paper.set();
 	serviceTaskIcon.push(path1);
 
@@ -48,7 +48,7 @@ function _drawScriptTaskIcon(paper, startX, startY)
 		"stroke": "none",
 		"fill": "#72a7d0"
  	});
-	
+
 	var scriptTaskIcon = paper.set();
 	scriptTaskIcon.push(path1);
 
@@ -62,7 +62,7 @@ function _drawBusinessRuleTaskIcon(paper, startX, startY)
 		"stroke": "none",
 		"fill": "#72a7d0"
  	});
-	
+
 	var businessRuleTaskIcon = paper.set();
 	businessRuleTaskIcon.push(path1);
 
@@ -76,7 +76,7 @@ function _drawSendTaskIcon(paper, startX, startY)
 		"stroke": "none",
 		"fill": "#16964d"
  	});
-	
+
 	var sendTaskIcon = paper.set();
 	sendTaskIcon.push(path1);
 
@@ -91,7 +91,7 @@ function _drawManualTaskIcon(paper, startX, startY)
 		"stroke": "none",
 		"fill": "#d1b575"
  	});
-	
+
 	var manualTaskIcon = paper.set();
 	manualTaskIcon.push(path1);
 
@@ -106,12 +106,12 @@ function _drawReceiveTaskIcon(paper, startX, startY)
 		"stroke": "none",
 		"fill": "#16964d"
  	});
-	
+
 	startX += 4;
 	startY += 2;
-	
+
 	path.transform("T" + startX + "," + startY);
-	
+
 }
 
 function _drawCamelTaskIcon(paper, startX, startY)
@@ -122,12 +122,12 @@ function _drawCamelTaskIcon(paper, startX, startY)
 		"stroke": "none",
 		"fill": "#bd4848"
  	});
-	
+
 	startX += 4;
 	startY += 2;
-	
+
 	path.transform("T" + startX + "," + startY);
-	
+
 }
 
 function _drawMuleTaskIcon(paper, startX, startY)
@@ -138,12 +138,12 @@ function _drawMuleTaskIcon(paper, startX, startY)
 		"stroke": "none",
 		"fill": "#bd4848"
  	});
-	
+
 	startX += 4;
 	startY += 2;
 
 	path.transform("T" + startX + "," + startY);
-	
+
 }
 
 function _drawAlfrescoPublishTaskIcon(paper, startX, startY)
@@ -188,13 +188,13 @@ function _drawAlfrescoPublishTaskIcon(paper, startX, startY)
     path.transform("T" + startX + "," + startY);
 }
 
-function _drawRestCallTaskIcon(paper, startX, startY)
+function _drawHttpTaskIcon(paper, startX, startY)
 {
     var path = paper.path("m 16.704699,5.9229055 q 0.358098,0 0.608767,0.2506681 0.250669,0.250668 0.250669,0.6087677 0,0.3580997 -0.250669,0.6087677 -0.250669,0.2506679 -0.608767,0.2506679 -0.358098,0 -0.608767,-0.2506679 -0.250669,-0.250668 -0.250669,-0.6087677 0,-0.3580997 0.250669,-0.6087677 0.250669,-0.2506681 0.608767,-0.2506681 z m 2.578308,-2.0053502 q -2.229162,0 -3.854034,0.6759125 -1.624871,0.6759067 -3.227361,2.2694472 -0.716197,0.725146 -1.575633,1.7457293 L 7.2329969,8.7876913 Q 7.0897576,8.8055849 7.000233,8.9309334 L 4.9948821,12.368677 q -0.035811,0.06267 -0.035811,0.143242 0,0.107426 0.080572,0.205905 l 0.5729577,0.572957 q 0.125334,0.116384 0.2864786,0.07162 l 2.4708789,-0.760963 2.5156417,2.515645 -0.76096,2.470876 q -0.009,0.02687 -0.009,0.08057 0,0.125338 0.08058,0.205905 l 0.572957,0.572958 q 0.170096,0.152194 0.349146,0.04476 l 3.437744,-2.005351 q 0.125335,-0.08953 0.143239,-0.232763 l 0.17905,-3.392986 q 1.02058,-0.859435 1.745729,-1.575629 1.67411,-1.6830612 2.309735,-3.2049805 0.635625,-1.5219191 0.635625,-3.8585111 0,-0.1253369 -0.08505,-0.2148575 -0.08505,-0.089526 -0.201431,-0.089526 z");
     path.attr({
         "opacity": 1,
         "stroke": "none",
-        "fill": "#bd4848"
+        "fill": "#16964d"
     });
 
     startX += -2;
@@ -202,6 +202,39 @@ function _drawRestCallTaskIcon(paper, startX, startY)
 
     path.transform("T" + startX + "," + startY);
 
+}
+
+function _drawShellTaskIcon(paper, startX, startY) {
+    var path = paper.path("m 1,2 0,14 16,0 0,-14 z m 1.4,3 12.7,0 0,10 -12.7,0 z");
+    path.attr({
+        "opacity": 1,
+        "stroke": "none",
+        "fill": "#16964d"
+    });
+    var text = paper.text(3, 9, ">_").attr({
+        "font-size": "5px",
+        "fill": "#16964d"
+    });
+
+    startY += -2;
+    text.transform("T" + startX + "," + startY);
+    startX += -2;
+    path.transform("T" + startX + "," + startY);
+}
+
+function _drawDecisionTaskIcon(paper, startX, startY) {
+    var path1 = paper.path("m 1,2 0,14 16,0 0,-14 z m 1.9,2.4000386 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m -8.67364,3.9 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m -8.67364,3.9 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z");
+    path1.attr({
+        "opacity": 1,
+        "stroke": "#000000",
+        "fill": "#F4F6F7"
+    });
+
+    var decisionTaskIcon = paper.set();
+    decisionTaskIcon.push(path1);
+
+    decisionTaskIcon.translate(startX, startY);
+    decisionTaskIcon.scale(0.7, 0.7);
 }
 
 function _drawEventIcon(paper, element)
@@ -231,14 +264,14 @@ function _drawTimerIcon(paper, element)
 {
 	var x = element.x + (element.width / 2);
 	var y = element.y + (element.height / 2);
-	
+
 	var circle = paper.circle(x, y, 10);
 
 	circle.attr({"stroke-width": 1,
 		"stroke": "black",
 		"fill": "none"
  	});
-	
+
 	var path = paper.path("M 10 0 C 4.4771525 0 0 4.4771525 0 10 C 0 15.522847 4.4771525 20 10 20 C 15.522847 20 20 15.522847 20 10 C 20 4.4771525 15.522847 1.1842379e-15 10 0 z M 9.09375 1.03125 C 9.2292164 1.0174926 9.362825 1.0389311 9.5 1.03125 L 9.5 3.5 L 10.5 3.5 L 10.5 1.03125 C 15.063526 1.2867831 18.713217 4.9364738 18.96875 9.5 L 16.5 9.5 L 16.5 10.5 L 18.96875 10.5 C 18.713217 15.063526 15.063526 18.713217 10.5 18.96875 L 10.5 16.5 L 9.5 16.5 L 9.5 18.96875 C 4.9364738 18.713217 1.2867831 15.063526 1.03125 10.5 L 3.5 10.5 L 3.5 9.5 L 1.03125 9.5 C 1.279102 5.0736488 4.7225326 1.4751713 9.09375 1.03125 z M 9.5 5 L 9.5 8.0625 C 8.6373007 8.2844627 8 9.0680195 8 10 C 8 11.104569 8.8954305 12 10 12 C 10.931981 12 11.715537 11.362699 11.9375 10.5 L 14 10.5 L 14 9.5 L 11.9375 9.5 C 11.756642 8.7970599 11.20294 8.2433585 10.5 8.0625 L 10.5 5 L 9.5 5 z");
 	path.attr({
 		"stroke": "none",
@@ -251,7 +284,7 @@ function _drawTimerIcon(paper, element)
 function _drawErrorIcon(paper, element)
 {
 	var path = paper.path("M 22.820839,11.171502 L 19.36734,24.58992 L 13.54138,14.281819 L 9.3386512,20.071607 L 13.048949,6.8323057 L 18.996148,16.132659 L 22.820839,11.171502 z");
-	
+
 	var fill = "none";
 	var x = element.x - 1;
 	var y = element.y - 1;
@@ -261,13 +294,13 @@ function _drawErrorIcon(paper, element)
 		x -= 1;
 		y -= 1;
 	}
-	
+
 	path.attr({
 		"stroke": "black",
 		"stroke-width": 1,
 		"fill": fill
  	});
-	
+
 	path.transform("T" + x + "," + y);
 	return path;
 }
@@ -279,7 +312,7 @@ function _drawSignalIcon(paper, element)
 	{
 		fill = "black";
 	}
-	
+
 	var path = paper.path("M 8.7124971,21.247342 L 23.333334,21.247342 L 16.022915,8.5759512 L 8.7124971,21.247342 z");
 	path.attr({
 		"stroke": "black",
@@ -292,11 +325,17 @@ function _drawSignalIcon(paper, element)
 
 function _drawMessageIcon(paper, element)
 {
+    var fill = "none";
+    if (element.type === "ThrowEvent")
+    {
+        fill = "black";
+    }
+
 	var path = paper.path("M 1 3 L 9 11 L 17 3 L 1 3 z M 1 5 L 1 13 L 5 9 L 1 5 z M 17 5 L 13 9 L 17 13 L 17 5 z M 6 10 L 1 15 L 17 15 L 12 10 L 9 13 L 6 10 z");
 	path.attr({
-		"stroke": "none",
+		"stroke": "black",
 		"stroke-width": 1,
-		"fill": "#585858"
+		"fill": fill
  	});
 	path.transform("T" + (element.x + 6) + "," + (element.y + 6));
 	return path;

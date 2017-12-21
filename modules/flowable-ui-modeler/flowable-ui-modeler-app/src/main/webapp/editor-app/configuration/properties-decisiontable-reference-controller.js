@@ -11,9 +11,9 @@
  * limitations under the License.
  */
 
-angular.module('activitiModeler').controller('ActivitiDecisionTableReferenceCtrl',
+angular.module('flowableModeler').controller('FlowableDecisionTableReferenceCtrl',
     [ '$scope', '$modal', '$http', function($scope, $modal, $http) {
-	
+
      // Config for the modal window
      var opts = {
          template:  'editor-app/configuration/properties/decisiontable-reference-popup.html?version=' + Date.now(),
@@ -23,9 +23,9 @@ angular.module('activitiModeler').controller('ActivitiDecisionTableReferenceCtrl
      // Open the dialog
      _internalCreateModal(opts, $modal, $scope);
 }]);
- 
-angular.module('activitiModeler').controller('ActivitiDecisionTableReferencePopupCtrl', ['$rootScope', '$scope', '$http', '$location',
-    function($rootScope, $scope, $http, $location) {
+
+angular.module('flowableModeler').controller('FlowableDecisionTableReferencePopupCtrl', ['$rootScope', '$scope', '$http', '$location', 'editorManager',
+    function($rootScope, $scope, $http, $location, editorManager) {
 
         $scope.state = {
             'loadingDecisionTables': true,
@@ -77,7 +77,7 @@ angular.module('activitiModeler').controller('ActivitiDecisionTableReferencePopu
                     'name': $scope.selectedDecisionTable.name,
                     'key': $scope.selectedDecisionTable.key
                 };
-                
+
             } else {
                 $scope.property.value = null;
             }
@@ -95,8 +95,8 @@ angular.module('activitiModeler').controller('ActivitiDecisionTableReferencePopu
                 };
                 $scope.updatePropertyInModel($scope.property);
 
-                var modelMetaData = $scope.editor.getModelMetaData();
-                var json = $scope.editor.getJSON();
+                var modelMetaData = editorManager.getBaseModelData();
+                var json = editorManager.getModel();
                 json = JSON.stringify(json);
 
                 var params = {
@@ -125,28 +125,21 @@ angular.module('activitiModeler').controller('ActivitiDecisionTableReferencePopu
 	                    }
 	                    return str.join("&");
 	                },
-                    url: KISBPM.URL.putModel(modelMetaData.modelId)
+                    url: FLOWABLE.URL.putModel(modelMetaData.modelId)
                 })
 
                 .success(function(data, status, headers, config) {
-                        $scope.editor.handleEvents({
+                        editorManager.handleEvents({
                             type: ORYX.CONFIG.EVENT_SAVED
                         });
 
-						$rootScope.editorHistory.push({
-	                        id: modelMetaData.modelId, 
-	                        name: modelMetaData.name,
-	                        key: modelMetaData.key,
-	                        stepId: $scope.selectedShape.resourceId,
-	                        type: 'bpmnmodel'
-	                    });
-	                    
-	                    $location.path('decision-table-editor/' + $scope.selectedDecisionTable.id);
+						$rootScope.addHistoryItem($scope.selectedShape.resourceId);
+						$location.path('decision-table-editor/' + $scope.selectedDecisionTable.id);
                     })
                     .error(function(data, status, headers, config) {
 
                     });
-                
+
                 $scope.close();
             }
         };
@@ -156,7 +149,7 @@ angular.module('activitiModeler').controller('ActivitiDecisionTableReferencePopu
 
             $scope.popup.state = 'newDecisionTable';
 
-            var modelMetaData = $scope.editor.getModelMetaData();
+            var modelMetaData = editorManager.getBaseModelData();
 
             $scope.model = {
                 loading: false,
@@ -175,7 +168,7 @@ angular.module('activitiModeler').controller('ActivitiDecisionTableReferencePopu
 
             if (!$scope.model.decisionTable.name || $scope.model.decisionTable.name.length == 0 ||
             	!$scope.model.decisionTable.key || $scope.model.decisionTable.key.length == 0) {
-            	
+
                 return;
             }
 
@@ -184,7 +177,7 @@ angular.module('activitiModeler').controller('ActivitiDecisionTableReferencePopu
 
             $http({
                 method: 'POST',
-                url: FLOWABLE.CONFIG.contextRoot + '/app/rest/models',
+                url: FLOWABLE.APP_URL.getModelsUrl(),
                 data: $scope.model.decisionTable
             }).
             success(function(data, status, headers, config) {
@@ -197,8 +190,8 @@ angular.module('activitiModeler').controller('ActivitiDecisionTableReferencePopu
                 };
                 $scope.updatePropertyInModel($scope.property);
 
-                var modelMetaData = $scope.editor.getModelMetaData();
-                var json = $scope.editor.getJSON();
+                var modelMetaData = editorManager.getBaseModelData();
+                var json = editorManager.getModel();
                 json = JSON.stringify(json);
 
                 var params = {
@@ -228,26 +221,19 @@ angular.module('activitiModeler').controller('ActivitiDecisionTableReferencePopu
 	                    }
 	                    return str.join("&");
 	                },
-                    url: KISBPM.URL.putModel(modelMetaData.modelId)
+                    url: FLOWABLE.URL.putModel(modelMetaData.modelId)
                 })
 
                 .success(function(data, status, headers, config) {
-                        $scope.editor.handleEvents({
+                        editorManager.handleEvents({
                             type: ORYX.CONFIG.EVENT_SAVED
                         });
 
                         $scope.model.loading = false;
                         $scope.$hide();
-                        
-                        $rootScope.editorHistory.push({
-	                        id: modelMetaData.modelId, 
-	                        name: modelMetaData.name,
-	                        key: modelMetaData.key,
-	                        stepId: $scope.selectedShape.resourceId,
-	                        type: 'bpmnmodel'
-	                    });
-	                    
-	                    $location.path('decision-table-editor/' + newDecisionTableId);
+
+                        $rootScope.addHistoryItem($scope.selectedShape.resourceId);
+                        $location.path('decision-table-editor/' + newDecisionTableId);
                     })
                     .error(function(data, status, headers, config) {
                         $scope.model.loading = false;
@@ -276,8 +262,8 @@ angular.module('activitiModeler').controller('ActivitiDecisionTableReferencePopu
         };
 
         $scope.loadDecisionTables = function() {
-            var modelMetaData = $scope.editor.getModelMetaData();
-            $http.get(FLOWABLE.CONFIG.contextRoot + '/app/rest/decision-table-models')
+            var modelMetaData = editorManager.getBaseModelData();
+            $http.get(FLOWABLE.APP_URL.getDecisionTableModelsUrl())
                 .success(
                     function(response) {
                         $scope.state.loadingDecisionTables = false;

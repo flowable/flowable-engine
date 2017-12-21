@@ -1,0 +1,97 @@
+{
+  "GENERAL":{
+    "MAIN-TITLE":"Flowable",
+    "ERROR":{
+      "GENERIC":"Desculpe, ocorreu um erro...",
+      "UNKNOWN":"Desculpe, um erro ocorreu durante a execução da operação solicitada.",
+      "BAD_REQUEST":"Um erro ocorreu durante a execução da operação solicitada",
+      "NOT_FOUND":"O recurso que você está tentando acessar não existe",
+      "UNAUTHORIZED":"Você deveria assinar para executar a operação solicitada.",
+      "FORBIDDEN":"Você não está autorizado a executar a operação solicitada",
+      "INTERNAL_SERVER_ERROR":"Desculpe, um erro inesperado ocorreu durante a execução da operação solicitada."
+    },
+    "ACTION":{
+      "LOGOUT":"Sair",
+      "HELP":"Guia de introdução",
+      "EDIT-PROFILE":"Editar perfil",
+      "SAVE":"Salvar",
+      "CANCEL":"Cancelar",
+      "CLOSE":"Fechar",
+      "DEPLOY":"Implantar",
+      "ABOUT":"Sobre Flowable"
+    }
+  },
+  "LOGIN":{
+    "TITLE":"Entrar",
+    "USERNAME":"Nome de Usuário",
+    "USERNAME-PLACEHOLDER":"Digite seu nome de usuário",
+    "PASSWORD":"Senha",
+    "PASSWORD-PLACEHOLDER":"Digite sua senha",
+    "INVALID-CREDENTIALS":"Credenciais inválidas",
+    "ACTION":{
+      "CONFIRM":"Entrar"
+    }
+  },
+  "ACCOUNT":{
+    "ACTIVATE":{
+      "TITLE":"Ativar Conta",
+      "ACTIVATING-MESSAGE":"Aguarde um momento {{userFullName}} que estamos ativando sua conta...",
+      "SUCCESS-MESSAGE":"Sua conta foi ativada. Por favor, Cadastre-se abaixo para começar a desenhar e executar processos",
+      "FAILURE-MESSAGE":"Sua conta não pode ser ativada. Ou já foi ativada ou o link de ativação expirou."
+    },
+    "RESET-PASSWORD-REQUEST":{
+      "MESSAGE":"Esqueceu sua senha? Digite seu endereço de e-mail abaixo para receber um e-mail e redefinir sua senha.",
+      "TITLE":"Redefinir senha",
+      "EMAIL":"E-mail",
+      "EMAIL-PLACEHOLDER":"Digite seu e-mail",
+      "SECURITY-SECTION":"Verificação de segurança",
+      "CONFIRM":"Pedido de redefinição de senha",
+      "SUCCESS-MESSAGE":"Em breve você receberá um e-mail com um link para redefinir sua senha.",
+      "ERROR":{
+        "UNEXISTING-USER":"O usuário com o endereço de e-mail fornecido não existe."
+      }
+    },
+    "RESET-PASSWORD":{
+      "TITLE":"Redefinir senha",
+      "PASSWORD":"Senha",
+      "PASSWORD-CONFIRM":"Confirme a senha",
+      "PASSWORD-PLACEHOLDER":"Digite a nova senha",
+      "PASSWORD-CONFIRM-PLACEHOLDER":"Confirme a nova senha",
+      "CONFIRM":"Alterar a senha",
+      "LOADING":"Redefinindo senha...",
+      "SUCCESS-MESSAGE":"Sua senha foi alterada.",
+      "LOGIN":"Entrar agora",
+      "FAILURE-MESSAGE":"Sua senha não pode ser redefinida. O link de redefinição é inválido ou está expirado."
+    }
+  },
+  "APP":{
+    "KICKSTART":{
+      "TITLE":"Aplicativo inicial",
+      "DESCRIPTION":"Crie modelos de processos, formulários e definições de aplicativo, em seguida, compartilhe seus modelos e definições com outras pessoas."
+    },
+    "TASKS":{
+      "TITLE":"Aplicativo de Tarefa",
+      "DESCRIPTION":"Acesse a sua lista de tarefa completa e trabalhe em qualquer tarefa atribuídas a você de qualquer aplicativo de processo. Além disso, inicie novos processos e tarefas."
+    },
+    "IDENTITY-MANAGEMENT":{
+      "TITLE":"Gerenciamento de identidade",
+      "TITLE-TENANT-ADMIN":"Gerenciamento de identidade",
+      "DESCRIPTION":"Gerenciar seu perfil: mude sua imagem, nome e outras configurações. Como um usuário administrador, gerencie usuários e grupos.",
+      "DESCRIPTION-TENANT-ADMIN":"Gerencie usuários e grupos em sua organização."
+    },
+    "CUSTOM-APP":{
+      "TITLE-TASKS":"tarefas",
+      "TITLE-PROCESSES":"processos"
+    },
+    "POPUP":{
+      "ADD-APP-TITLE":"Adicione o aplicativo na página inicial",
+      "ADD-APP-SUMMARY":"Adicionar um aplicativo em sua página inicial"
+    },
+    "ACTION":{
+      "DELETE":"Remover aplicativo"
+    },
+    "MESSAGE":{
+      "DELETED":"O aplicativo foi removido com êxito"
+    }
+  }
+}

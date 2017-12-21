@@ -13,7 +13,7 @@
             "documentation" : "",
             "process_id" : "diagramProcess",
             "process_author" : "",
-            "process_executable" : "No",
+            "isexecutable" : "No",
             "process_version" : "",
             "process_namespace" : "http://www.activiti.org/processdef",
             "executionlisteners" : ""
@@ -29,7 +29,7 @@
                 "documentation" : "",
                 "process_id" : "poolProcess",
                 "process_author" : "",
-                "process_executable" : "No",
+                "isexecutable" : "No",
                 "process_version" : "",
                 "process_namespace" : "http://www.activiti.org/processdef"
             },

@@ -1518,7 +1518,7 @@
 
     /*
     <FLOWABLE PATCH START>
-     Can't let hotkeys define itself as a module since it will cause Activiti to not work in Alfresco Share:
+     Can't let hotkeys define itself as a module since it will cause Flowable to not work in Alfresco Share:
      In Share this file is being loaded from a <script> element (and not using dojos and define/require calls)
      dojo therefor throws an error named "multipleDefine" ( http://dojotoolkit.org/reference-guide/1.10/loader/amd.html )
      and stops the app.

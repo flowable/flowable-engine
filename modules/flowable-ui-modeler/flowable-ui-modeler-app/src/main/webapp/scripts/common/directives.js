@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-activitiModule
+flowableModule
   .directive('restrictInput', ["$parse", function ($parse) {
     return {
       restrict: 'A',
@@ -100,7 +100,7 @@ activitiModule
   ]);
 
 
-activitiModule
+flowableModule
     .directive('autoHeight', ['$rootScope', '$timeout', function($rootScope, $timeout) {
         return {
             restrict: 'AC',
@@ -112,7 +112,7 @@ activitiModule
                     var offset = 0;
                     if($attrs['offset']) {
                         offset = parseInt($attrs['offset']);
-                        if(offset == NaN || offset == undefined) {
+                        if(isNaN(offset) || offset == undefined) {
                             offset = 0;
                         }
                     }
@@ -173,7 +173,7 @@ activitiModule
  * Directive that ensures the child-element with class .active is visible and scrolls if needed. Watches the value
  * of the directive and will re-apply if this value is changes.
  */
-activitiModule
+flowableModule
     .directive('scrollToActive', ['$timeout', function($timeout) {
         return {
             restrict: 'AC',
@@ -188,7 +188,7 @@ activitiModule
                             var offsetTop = $attrs['offsetTop'];
                             if(offsetTop) {
                                 offsetTop = parseInt(offsetTop);
-                                if(offsetTop == NaN) {
+                                if(isNaN(offsetTop)) {
                                     offsetTop = 0;
                                 }
                             }
@@ -227,7 +227,7 @@ activitiModule
  * Directive that ensures the popup is scrolled into view, using the first parent as scroll-pane that has
  * a class 'scroll-container' set on it. Is applied when the popup is shown.
  */
-activitiModule
+flowableModule
     .directive('autoScroll', ['$timeout', function($timeout) {
         return {
             restrict: 'AC',
@@ -260,7 +260,7 @@ activitiModule
         };
     }]);
 
-activitiModule
+flowableModule
     .directive('userName', function() {
         var directive = {};
         directive.template = '{{user.firstName && user.firstName || ""}} {{user.lastName && user.lastName || ""}} {{ (user.email && !user.firstName && !user.lastName) && user.email || ""}}';
@@ -276,7 +276,7 @@ activitiModule
  * directive is on, or any of it's children.
  *
  */
-activitiModule
+flowableModule
     .directive('clickAnywhere', ["$document", "$parse", function ($document, $parse) {
 
         var linkFunction = function ($scope, $element, $attributes) {
@@ -334,7 +334,7 @@ activitiModule
 
 
 
-activitiModule
+flowableModule
     .directive('autoFocus', ['$timeout', '$parse', function($timeout, $parse) {
         return {
             restrict: 'AC',
@@ -371,7 +371,7 @@ activitiModule
         };
     }]);
 
-activitiModule
+flowableModule
     .directive('focusWhen', ['$timeout', function ($timeout) {
         return {
             link: function (scope, element, attrs) {
@@ -393,7 +393,7 @@ activitiModule
     }]);
 
 
-activitiModule
+flowableModule
     .directive('loading', [function() {
         var directive = {};
         directive.restrict = 'A';
@@ -407,7 +407,7 @@ activitiModule
 
 // Workaround for https://github.com/twbs/bootstrap/issues/8379 :
 // prototype.js interferes with regular dropdown behavior
-activitiModule
+flowableModule
     .directive('activitiFixDropdownBug', function() {
         return {
             restrict: 'AEC',
@@ -422,7 +422,7 @@ activitiModule
 /**
  * Directive for rendering user link.
  */
-activitiModule
+flowableModule
   .directive('userLink', function() {
     var directive = {};
     directive.template = '{{user.firstName && user.firstName || ""}} {{user.lastName && user.lastName || ""}} {{ (user.email && !user.firstName && !user.lastName) && user.email || ""}}';
@@ -440,7 +440,7 @@ activitiModule
 /**
  * Directive for rendering a form field.
  */
-activitiModule
+flowableModule
     .directive('formField', function () {
         var directive = {};
 
@@ -457,7 +457,7 @@ activitiModule
 /**
  * Directive to capture mouse up, down, enter and escape on input fields (eg. list navigation)
  */
-activitiModule
+flowableModule
     .directive('customKeys', ["$parse", function ($parse) {
         var directive = {};
         directive.compile = function($element, attr) {
@@ -517,7 +517,7 @@ activitiModule
 
 // Delayed setting of model value in scope, based on input value unchanged after a number of millis
 // See below: ngDebounce is preferred (as it hooks into ngModel, meaning that ng-change will keep working - but not with delayedModel)
-activitiModule
+flowableModule
     .directive('delayedModel', ['$timeout', function($timeout) {
     return {
         scope: {
@@ -556,7 +556,7 @@ activitiModule
 
 
 // From https://gist.github.com/benbrandt22/bb44184a2eddcd4b0b8a
-activitiModule.directive('ngDebounce', ['$timeout', function($timeout) {
+flowableModule.directive('ngDebounce', ['$timeout', function($timeout) {
     return {
         restrict: 'A',
         require: 'ngModel',
@@ -585,107 +585,7 @@ activitiModule.directive('ngDebounce', ['$timeout', function($timeout) {
     }
 }]);
 
-activitiModule.directive('externalContent', ['$parse', '$timeout', 'appResourceRoot', function ($parse, $timeout, appResourceRoot) {
-    var directive = {};
-    directive.restrict = 'A';
-    directive.templateUrl = appResourceRoot + '../views/common/templates/external-content-template.html';
-
-    directive.scope = {
-        taskId : '=taskId',
-        processInstanceId: '=formDefinition',
-        folderSelect: '=folderSelect',
-        linkOnly: '=linkOnly',
-        preSelectedAlfrescoAccount: '=account',
-        uploadInProgress: '=uploadInProgress'
-    };
-    directive.link = function ($scope, $element, $attributes) {
-
-        if($attributes["onContentUpload"]) {
-            $scope.uploadedCallback = $parse($attributes['onContentUpload']);
-        }
-
-        if($attributes["onFolderSelect"]) {
-            $scope.folderSelectCallback = $parse($attributes['onFolderSelect']);
-        }
-
-        if($attributes["onUploadInProgress"]) {
-            $scope.uploadInProgressCallback = $parse($attributes['onUploadInProgress']);
-        }
-
-        // Schedule hooking in of click-listener. we cannot use angular ng-click since this
-        // will force a new $apply/$digest to happen when the click() is called on the button
-        $timeout(function() {
-            $element.find('div.select-file').click(function() {
-                $element.find('input[type="file"]').click();
-            });
-        }, 200);
-    };
-    directive.controller = ['$scope', '$element', 'RelatedContentService', '$modal', '$window', '$translate', '$rootScope',  function($scope, $element, RelatedContentService, $modal, $window, $translate, $rootScope) {
-        $scope.uploadModel = {uploading: false};
-
-        $scope.clearPopupError = function() {
-        };
-
-        $scope.openFileSelect = function(element) {
-            $scope.errorMessage = undefined;
-            var parent = angular.element(element).parent();
-            parent.children('input').click();
-        };
-
-        $scope.onFileSelect = function ($files, isIE) {
-            $scope.errorMessage = undefined;
-            if(!$scope.linkOnly) {
-                $scope.errorMessage = undefined;
-                if(!$scope.folderSelect && !$scope.uploadModel.uploading && $files.length > 0) {
-                    if ($scope.uploadInProgressCallback) {
-                        $scope.uploadInProgressCallback($scope.$parent, {status: true});
-                    }
-
-                    $scope.uploadModel.uploading = true;
-                    var file = $files[0];
-
-                    $scope.clearPopupError();
-                    RelatedContentService.addRelatedContent($scope.taskId, $scope.processInstanceId, file, isIE).progress(function (evt) {
-                        $scope.uploadModel.uploadProgress = parseInt(100.0 * evt.loaded / evt.total);
-                    }).then(function (data) {
-                        if ($scope.uploadInProgressCallback) {
-                            $scope.uploadInProgressCallback($scope.$parent, {status: false});
-
-                        }
-
-                        $scope.uploadModel.uploading = false;
-                        if($scope.uploadedCallback) {
-                            $scope.uploadedCallback($scope.$parent, {'content': data});
-                        }
-                    }, function (error) {
-                        // Error callback
-                        if ($scope.uploadInProgressCallback) {
-                            $scope.uploadInProgressCallback($scope.$parent, {status: false});
-                        }
-
-                        if(error && error.messageKey) {
-                            var formattedData = {};
-                            if(error.customData) {
-                                formattedData.quota =  $scope.formatFileSize(error.customData.quota)
-                            };
-
-                            $translate(error.messageKey, formattedData).then(function(message) {
-                                $scope.errorMessage = message;
-                            });
-                        }
-                        $scope.uploadModel.uploading = false;
-                    });
-                }
-            }
-        };
-
-    }];
-
-    return directive;
-}]);
-
-
-activitiModule.
+flowableModule.
     directive('selectPeoplePopover', ['$rootScope', '$http', '$popover', 'appResourceRoot', 'UserService', '$parse', function($rootScope, $http, $popover, appResourceRoot, UserService, $parse) {
         var directive = {};
         directive.restrict = 'A';
@@ -923,7 +823,7 @@ activitiModule.
         return directive;
     }]);
 
-activitiModule.
+flowableModule.
 directive('selectFunctionalGroupPopover', ['$rootScope', '$http', '$popover','appResourceRoot', 'FunctionalGroupService', '$parse',
     function($rootScope, $http, $popover, appResourceRoot, FunctionalGroupService, $parse) {
 
@@ -1076,7 +976,7 @@ directive('selectFunctionalGroupPopover', ['$rootScope', '$http', '$popover','ap
     return directive;
 }]);
 
-activitiModule.directive('tabControl', ['$compile', '$http', '$templateCache', function($compile, $http, $templateCache) {
+flowableModule.directive('tabControl', ['$compile', '$http', '$templateCache', function($compile, $http, $templateCache) {
 
         var updateTemplate = function($scope, element, attributes) {
             if(!$scope.activeTemplate || $scope.activeTemplate != $scope.activeTab.id) {
@@ -1199,7 +1099,7 @@ activitiModule.directive('tabControl', ['$compile', '$http', '$templateCache', f
  * Directive that calls the function present in the toggle-dragover attribute with a single parameter (over) when
  * dragging over the element has started (over = true) or ended (over = false)
  */
-activitiModule
+flowableModule
     .directive('toggleDragover', ["$document", "$parse", function ($document, $parse) {
         var linkFunction = function ($scope, $element, $attributes) {
 
@@ -1231,7 +1131,7 @@ activitiModule
         return( linkFunction );
     }]);
 
-activitiModule.directive('editInPlace', function () {
+flowableModule.directive('editInPlace', function () {
     return {
         restrict: 'E',
         scope: {
@@ -1304,7 +1204,7 @@ var _internalCreateModal = function(modalConfig, $modal, $scope) {
 
 };
 
-activitiModule.
+flowableModule.
     directive('numberInputCheck', function() {
 
         return {
@@ -1331,3 +1231,49 @@ activitiModule.
             }
         };
     });
+
+flowableModule.
+directive('decimalNumberInputCheck', function() {
+
+    return {
+        require: 'ngModel',
+        link: function(scope, element, attrs, modelCtrl) {
+
+            modelCtrl.$parsers.push(function (inputValue) {
+
+            	var transformedInput = inputValue;
+                var negativeSign = '';                
+
+                if (transformedInput && transformedInput.indexOf('-') == 0) {
+                    negativeSign = '-';
+                    transformedInput = inputValue.substr(1);
+                }
+
+                if(transformedInput && transformedInput.indexOf('.') == 0 ){
+                    transformedInput = "0" + transformedInput;
+                }
+
+                if(transformedInput && transformedInput.indexOf('.') > -1){       
+                    var dotIndex = transformedInput.indexOf('.');             
+                    var left = transformedInput.substr(0, dotIndex);
+                    var right = transformedInput.substr(dotIndex+1);
+                    
+                    left = left.replace(/([^0-9])/g, '');
+                    right = right.replace(/([^0-9])/g, '');
+                    transformedInput = negativeSign + left + '.' + right;
+                }
+                else{
+                    transformedInput = negativeSign + transformedInput.replace(/([^0-9])/g, '');
+                }
+
+
+                if (transformedInput != inputValue) {
+                    modelCtrl.$setViewValue(transformedInput);
+                    modelCtrl.$render();
+                }
+
+                return transformedInput;
+            });
+        }
+    };
+});

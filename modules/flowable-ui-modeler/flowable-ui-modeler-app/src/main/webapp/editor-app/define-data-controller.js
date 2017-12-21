@@ -15,7 +15,7 @@
  * Controller for morph shape selection
  */
 
-var KisBpmDefineDataCtrl = [ '$rootScope', '$scope', 'dialog', '$timeout', '$translate', function($rootScope, $scope, dialog, $timeout, $translate) {
+var FlowableDefineDataCtrl = [ '$rootScope', '$scope', 'dialog', '$timeout', '$translate', function($rootScope, $scope, dialog, $timeout, $translate) {
 
     $scope.definedDataItems = [];
     $scope.selectedDataItems = [];

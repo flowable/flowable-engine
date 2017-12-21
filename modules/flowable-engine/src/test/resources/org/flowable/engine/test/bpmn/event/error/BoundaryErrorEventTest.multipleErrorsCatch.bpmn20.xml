@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:flowable="http://flowable.org/bpmn" xmlns:typeLanguage="http://www.w3.org/2001/XMLSchema" xmlns:expressionLanguage="http://www.w3.org/1999/XPath" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.lbswest.de/LWSPlusMaster">
+  <process id="catchError" isExecutable="true">
+    <startEvent id="_7_0_2_2_601020a_1415776951657_459013_5919"></startEvent>
+    <subProcess id="subprocess1" name="Sub Process">
+      <startEvent id="startevent1" name="Start"></startEvent>
+      <endEvent id="endevent2" name="End"></endEvent>
+      <callActivity id="callactivity1" name="Call activity" calledElement="throwError" flowable:inheritVariables="false"></callActivity>
+      <sequenceFlow id="flow3" sourceRef="startevent1" targetRef="callactivity1"></sequenceFlow>
+      <sequenceFlow id="flow4" sourceRef="callactivity1" targetRef="endevent2"></sequenceFlow>
+    </subProcess>
+    <sequenceFlow id="flow1" sourceRef="_7_0_2_2_601020a_1415776951657_459013_5919" targetRef="subprocess1"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow2" sourceRef="subprocess1" targetRef="endevent1"></sequenceFlow>
+    <boundaryEvent id="catchOtherErrors" name="Error" attachedToRef="subprocess1">
+      <errorEventDefinition></errorEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="flow5" sourceRef="catchOtherErrors" targetRef="emptyErrorTask"></sequenceFlow>
+    <boundaryEvent id="catchMyError" name="Error" attachedToRef="subprocess1">
+      <errorEventDefinition errorRef="myError"></errorEventDefinition>
+    </boundaryEvent>
+    <userTask id="emptyErrorTask"/>
+    <userTask id="specificErrorTask"/>
+    <sequenceFlow id="flow6" sourceRef="catchMyError" targetRef="specificErrorTask"></sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="emptyErrorTask" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="specificErrorTask" targetRef="endevent1"></sequenceFlow>
+  </process>
+</definitions>
