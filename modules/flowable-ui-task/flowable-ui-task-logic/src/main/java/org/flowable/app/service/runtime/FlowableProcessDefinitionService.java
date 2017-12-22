@@ -67,10 +67,7 @@ public class FlowableProcessDefinitionService {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    public FormModel getProcessDefinitionStartForm(HttpServletRequest request) {
-
-        String[] requestInfoArray = parseRequest(request);
-        String processDefinitionId = getProcessDefinitionId(requestInfoArray, requestInfoArray.length - 2);
+    public FormModel getProcessDefinitionStartForm(String processDefinitionId) {
 
         ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processDefinitionId);
 
@@ -137,43 +134,6 @@ public class FlowableProcessDefinitionService {
         return formModel;
     }
 
-    protected ProcessDefinition getProcessDefinitionFromRequest(String[] requestInfoArray, boolean isTableRequest) {
-        int paramPosition = requestInfoArray.length - 3;
-        if (isTableRequest) {
-            paramPosition--;
-        }
-        String processDefinitionId = getProcessDefinitionId(requestInfoArray, paramPosition);
-
-        ProcessDefinition processDefinition = repositoryService.getProcessDefinition(processDefinitionId);
-
-        return processDefinition;
-    }
-
-    protected FormField getFormFieldFromRequest(String[] requestInfoArray, ProcessDefinition processDefinition, boolean isTableRequest) {
-        FormModel form = getStartForm(processDefinition);
-        int paramPosition = requestInfoArray.length - 1;
-        if (isTableRequest) {
-            paramPosition--;
-        }
-        String fieldVariable = requestInfoArray[paramPosition];
-
-        List<? extends FormField> allFields = form.listAllFields();
-        FormField selectedField = null;
-        if (CollectionUtils.isNotEmpty(allFields)) {
-            for (FormField formFieldRepresentation : allFields) {
-                if (formFieldRepresentation.getId().equalsIgnoreCase(fieldVariable)) {
-                    selectedField = formFieldRepresentation;
-                }
-            }
-        }
-
-        if (selectedField == null) {
-            throw new NotFoundException("Field could not be found in start form definition " + fieldVariable);
-        }
-
-        return selectedField;
-    }
-
     protected List<ProcessDefinitionRepresentation> convertDefinitionList(List<ProcessDefinition> definitions) {
         List<ProcessDefinitionRepresentation> result = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(definitions)) {
@@ -185,24 +145,4 @@ public class FlowableProcessDefinitionService {
         return result;
     }
 
-    protected String[] parseRequest(HttpServletRequest request) {
-        String requestURI = request.getRequestURI();
-        String[] requestInfoArray = requestURI.split("/");
-        if (requestInfoArray.length < 2) {
-            throw new BadRequestException("Start form request is not valid " + requestURI);
-        }
-        return requestInfoArray;
-    }
-
-    protected String getProcessDefinitionId(String[] requestInfoArray, int position) {
-        String processDefinitionVariable = requestInfoArray[position];
-        String processDefinitionId = null;
-        try {
-            processDefinitionId = URLDecoder.decode(processDefinitionVariable, "UTF-8");
-        } catch (Exception e) {
-            LOGGER.error("Error decoding process definition {}", processDefinitionVariable, e);
-            throw new InternalServerErrorException("Error decoding process definition " + processDefinitionVariable);
-        }
-        return processDefinitionId;
-    }
 }

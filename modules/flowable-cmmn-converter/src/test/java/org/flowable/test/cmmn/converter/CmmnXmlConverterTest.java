@@ -75,6 +75,7 @@ public class CmmnXmlConverterTest {
         assertNotNull(planModel);
         assertEquals("myPlanModel", planModel.getId());
         assertEquals("My CasePlanModel", planModel.getName());
+        assertEquals("casePlanForm", planModel.getFormKey());
 
         // Sentries
         assertEquals(4, planModel.getSentries().size());

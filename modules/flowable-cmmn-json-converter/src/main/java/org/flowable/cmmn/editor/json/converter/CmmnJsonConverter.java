@@ -32,6 +32,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.constants.EditorJsonConstants;
+import org.flowable.cmmn.editor.json.converter.util.CmmnModelJsonConverterUtil;
 import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
 import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.Association;
@@ -185,6 +186,19 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         GraphicInfo planModelGraphicInfo = model.getGraphicInfo(planModelStage.getId());
         ObjectNode planModelNode = CmmnJsonConverterUtil.createChildShape(planModelStage.getId(), STENCIL_PLANMODEL, planModelGraphicInfo.getX() + planModelGraphicInfo.getWidth(),
                         planModelGraphicInfo.getY() + planModelGraphicInfo.getHeight(), planModelGraphicInfo.getX(), planModelGraphicInfo.getY());
+
+        ObjectNode planModelPropertiesNode = objectMapper.createObjectNode();
+        if (StringUtils.isNotEmpty(planModelStage.getName())) {
+            planModelPropertiesNode.put(PROPERTY_NAME, planModelStage.getName());
+        }
+        if (StringUtils.isNotEmpty(planModelStage.getDocumentation())) {
+            planModelPropertiesNode.put(PROPERTY_DOCUMENTATION, planModelStage.getDocumentation());
+        }
+        if (StringUtils.isNotEmpty(planModelStage.getFormKey())) {
+            planModelPropertiesNode.put(PROPERTY_FORMKEY, planModelStage.getFormKey());
+        }
+        planModelNode.set(EDITOR_SHAPE_PROPERTIES, planModelPropertiesNode);
+
         planModelNode.putArray(EDITOR_OUTGOING);
         shapesArrayNode.add(planModelNode);
 
@@ -305,6 +319,8 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         Stage planModelStage = new Stage();
         planModelStage.setId(CmmnJsonConverterUtil.getElementId(planModelShape));
         planModelStage.setName(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_NAME, planModelShape));
+        planModelStage.setDocumentation(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_DOCUMENTATION, planModelShape));
+        planModelStage.setFormKey(CmmnModelJsonConverterUtil.getPropertyFormKey(planModelShape, formKeyMap));
         planModelStage.setPlanModel(true);
 
         caseModel.setPlanModel(planModelStage);
