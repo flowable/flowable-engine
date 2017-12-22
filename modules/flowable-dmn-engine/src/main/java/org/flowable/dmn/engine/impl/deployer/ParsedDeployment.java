@@ -23,7 +23,7 @@ import org.flowable.dmn.model.DmnDefinition;
 import org.flowable.engine.common.api.repository.EngineResource;
 
 /**
- * An intermediate representation of a DeploymentEntity which keeps track of all of the entity's DecisionTableEntities and resources, and BPMN parses, models, and processes associated with each
+ * An intermediate representation of a DeploymentEntity which keeps track of all of the entity's DecisionTableEntities and resources and processes associated with each
  * DecisionTableEntity - all produced by parsing the deployment.
  * 
  * The DecisionTableEntities are expected to be "not fully set-up" - they may be inconsistent with the DeploymentEntity and/or the persisted versions, and if the deployment is new, they will not yet

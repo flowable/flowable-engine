@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -12,19 +12,18 @@
  */
 package org.flowable.editor.language.json.converter;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.ArrayNode;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.IOParameter;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -56,15 +55,19 @@ public class CallActivityJsonConverter extends BaseBpmnJsonConverter {
         if (StringUtils.isNotEmpty(callActivity.getCalledElement())) {
             propertiesNode.put(PROPERTY_CALLACTIVITY_CALLEDELEMENT, callActivity.getCalledElement());
         }
-        
+
         if (callActivity.isInheritVariables()) {
             propertiesNode.put(PROPERTY_CALLACTIVITY_INHERIT_VARIABLES, callActivity.isInheritVariables());
         }
-        
+
+        if (callActivity.isSameDeployment()) {
+            propertiesNode.put(PROPERTY_CALLACTIVITY_SAME_DEPLOYMENT, callActivity.isSameDeployment());
+        }
+
         if (callActivity.isInheritBusinessKey()) {
             propertiesNode.put(PROPERTY_CALLACTIVITY_INHERIT_BUSINESS_KEY, callActivity.isInheritBusinessKey());
         }
-        
+
         if (callActivity.isUseLocalScopeForOutParameters()) {
             propertiesNode.put(PROPERTY_CALLACTIVITY_USE_LOCALSCOPE_FOR_OUTPARAMETERS, callActivity.isUseLocalScopeForOutParameters());
         }
@@ -107,15 +110,19 @@ public class CallActivityJsonConverter extends BaseBpmnJsonConverter {
         if (StringUtils.isNotEmpty(getPropertyValueAsString(PROPERTY_CALLACTIVITY_CALLEDELEMENT, elementNode))) {
             callActivity.setCalledElement(getPropertyValueAsString(PROPERTY_CALLACTIVITY_CALLEDELEMENT, elementNode));
         }
-        
+
         if (getPropertyValueAsBoolean(PROPERTY_CALLACTIVITY_INHERIT_VARIABLES, elementNode)) {
             callActivity.setInheritVariables(true);
         }
-        
+
+        if (getPropertyValueAsBoolean(PROPERTY_CALLACTIVITY_SAME_DEPLOYMENT, elementNode)) {
+            callActivity.setSameDeployment(true);
+        }
+
         if (getPropertyValueAsBoolean(PROPERTY_CALLACTIVITY_INHERIT_BUSINESS_KEY, elementNode)) {
             callActivity.setInheritBusinessKey(true);
         }
-        
+
         if (getPropertyValueAsBoolean(PROPERTY_CALLACTIVITY_USE_LOCALSCOPE_FOR_OUTPARAMETERS, elementNode)) {
             callActivity.setUseLocalScopeForOutParameters(true);
         }

@@ -16,10 +16,11 @@ package org.flowable.dmn.engine.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.flowable.dmn.api.DmnDecisionTableQuery;
 import org.flowable.engine.common.api.query.QueryProperty;
 
 /**
- * Contains the possible properties that can be used in a {@link ProcessDefinitionQuery}.
+ * Contains the possible properties that can be used in a {@link DmnDecisionTableQuery}.
  * 
  * @author Joram Barrez
  */

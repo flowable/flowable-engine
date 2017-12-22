@@ -41,7 +41,7 @@ public class DecisionTableUtil {
             }
             return null;
         } else {
-            // This will check the cache in the findDeployedProcessDefinitionById method
+            // This will check the cache in the findDeployedDecisionById method
             return CommandContextUtil.getDmnEngineConfiguration().getDeploymentManager().findDeployedDecisionById(decisionTableId);
         }
     }
@@ -49,7 +49,7 @@ public class DecisionTableUtil {
     public static Decision getDecision(String decisionTableId) {
         DeploymentManager deploymentManager = CommandContextUtil.getDmnEngineConfiguration().getDeploymentManager();
 
-        // This will check the cache in the findDeployedProcessDefinitionById and resolveProcessDefinition method
+        // This will check the cache in the findDeployedDecisionById and resolveDecisionTable method
         DecisionTableEntity decisionTableEntity = deploymentManager.findDeployedDecisionById(decisionTableId);
         return deploymentManager.resolveDecisionTable(decisionTableEntity).getDecision();
     }
@@ -57,7 +57,7 @@ public class DecisionTableUtil {
     public static DmnDefinition getDmnDefinition(String decisionTableId) {
         DeploymentManager deploymentManager = CommandContextUtil.getDmnEngineConfiguration().getDeploymentManager();
 
-        // This will check the cache in the findDeployedProcessDefinitionById and resolveProcessDefinition method
+        // This will check the cache in the findDeployedDecisionById and resolveDecisionTable method
         DecisionTableEntity decisionTableEntity = deploymentManager.findDeployedDecisionById(decisionTableId);
         return deploymentManager.resolveDecisionTable(decisionTableEntity).getDmnDefinition();
     }

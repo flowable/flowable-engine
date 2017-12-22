@@ -30,6 +30,7 @@ import org.activiti.engine.impl.bpmn.helper.ErrorPropagation;
 import org.activiti.engine.impl.bpmn.helper.ErrorThrowingEventListener;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.cmd.ExecuteJobsCmd;
+import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.deploy.DeploymentManager;
@@ -402,6 +403,31 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
             handleActivitiException(e);
             return null;
         }
+    }
+    
+    @Override
+    public ProcessInstance getProcessInstance(String processInstanceId) {
+        org.activiti.engine.runtime.ProcessInstance processInstance = getProcessEngine().getRuntimeService()
+                .createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        if (processInstance != null) {
+            return new Flowable5ProcessInstanceWrapper(processInstance);
+        } else {
+            CommandContext commandContext = Context.getCommandContext();
+            if (commandContext != null) {
+                ExecutionEntity execution = commandContext
+                        .getExecutionEntityManager()
+                        .findExecutionById(processInstanceId);
+                if (execution != null) {
+                    return new Flowable5ProcessInstanceWrapper(execution);
+                }
+            }
+        }
+        return null;
+    }
+    
+    @Override
+    public void setProcessInstanceName(String processInstanceId, String processInstanceName) {
+        getProcessEngine().getRuntimeService().setProcessInstanceName(processInstanceId, processInstanceName);
     }
 
     @Override

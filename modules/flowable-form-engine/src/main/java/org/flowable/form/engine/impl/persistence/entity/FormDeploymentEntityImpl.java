@@ -40,7 +40,7 @@ public class FormDeploymentEntityImpl extends AbstractEntityNoRevision implement
     protected boolean isNew;
 
     /**
-     * Will only be used during actual deployment to pass deployed artifacts (eg process definitions). Will be null otherwise.
+     * Will only be used during actual deployment to pass deployed artifacts (eg form definitions). Will be null otherwise.
      */
     protected Map<Class<?>, List<Object>> deployedArtifacts;
 

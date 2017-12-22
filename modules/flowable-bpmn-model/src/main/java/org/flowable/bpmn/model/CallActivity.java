@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -22,6 +22,7 @@ public class CallActivity extends Activity {
 
     protected String calledElement;
     protected boolean inheritVariables;
+    protected boolean sameDeployment;
     protected List<IOParameter> inParameters = new ArrayList<>();
     protected List<IOParameter> outParameters = new ArrayList<>();
     protected String businessKey;
@@ -42,6 +43,14 @@ public class CallActivity extends Activity {
 
     public void setInheritVariables(boolean inheritVariables) {
         this.inheritVariables = inheritVariables;
+    }
+
+    public boolean isSameDeployment() {
+        return sameDeployment;
+    }
+
+    public void setSameDeployment(boolean sameDeployment) {
+        this.sameDeployment = sameDeployment;
     }
 
     public List<IOParameter> getInParameters() {
@@ -96,6 +105,7 @@ public class CallActivity extends Activity {
         setCalledElement(otherElement.getCalledElement());
         setBusinessKey(otherElement.getBusinessKey());
         setInheritBusinessKey(otherElement.isInheritBusinessKey());
+        setSameDeployment(otherElement.isSameDeployment());
         setUseLocalScopeForOutParameters(otherElement.isUseLocalScopeForOutParameters());
 
         inParameters = new ArrayList<>();

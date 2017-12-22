@@ -166,7 +166,7 @@ public class DeploymentManager {
             throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.");
         }
 
-        // Remove any process definition from the cache
+        // Remove any dmn definition from the cache
         List<DmnDecisionTable> decisionTables = new DecisionTableQueryImpl().deploymentId(deploymentId).list();
 
         // Delete data

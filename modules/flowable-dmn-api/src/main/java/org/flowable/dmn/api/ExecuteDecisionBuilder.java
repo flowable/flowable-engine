@@ -53,17 +53,17 @@ public interface ExecuteDecisionBuilder {
     ExecuteDecisionBuilder activityId(String activityId);
 
     /**
-     * Set the tenantId of process instance
+     * Set the tenantId
      **/
     ExecuteDecisionBuilder tenantId(String tenantId);
 
     /**
-     * Sets the process variables
+     * Sets the variables
      */
     ExecuteDecisionBuilder variables(Map<String, Object> variables);
 
     /**
-     * Adds a variable to the process instance
+     * Adds a variable
      **/
     ExecuteDecisionBuilder variable(String variableName, Object value);
 

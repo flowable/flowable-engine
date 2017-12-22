@@ -82,6 +82,10 @@ public interface Flowable5CompatibilityHandler {
             String businessKey, String tenantId, String processInstanceName);
 
     ProcessInstance startProcessInstanceByMessage(String messageName, Map<String, Object> variables, Map<String, Object> transientVariables, String businessKey, String tenantId);
+    
+    ProcessInstance getProcessInstance(String processInstanceId);
+    
+    void setProcessInstanceName(String processInstanceId, String processInstanceName);
 
     Object getExecutionVariable(String executionId, String variableName, boolean isLocal);
 
