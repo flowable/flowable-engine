@@ -62,6 +62,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_HTTP_RESPONSE_HANDLER = "httpResponseHandler";
     String ELEMENT_HTTP_REQUEST_HANDLER = "httpRequestHandler";
     
+    String ELEMENT_MANUAL_ACTIVATION_RULE = "manualActivationRule";
     String ELEMENT_REPETITION_RULE = "repetitionRule";
 
     String ELEMENT_PROCESS = "process";

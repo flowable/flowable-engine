@@ -69,6 +69,9 @@ public interface CmmnStencilConstants {
     String PROPERTY_REPETITION_ENABLED = "repetitionenabled";
     String PROPERTY_REPETITION_RULE_CONDITION = "repetitionrulecondition";
     String PROPERTY_REPETITION_RULE_VARIABLE_NAME = "repetitioncountervariablename";
+    
+    String PROPERTY_MANUAL_ACTIVATION_ENABLED = "manualactivationenabled";
+    String PROPERTY_MANUAL_ACTIVATION_RULE_CONDITION = "manualactivationrulecondition";
 
     String PROPERTY_USERTASK_ASSIGNMENT = "usertaskassignment";
     String PROPERTY_USERTASK_PRIORITY = "prioritydefinition";

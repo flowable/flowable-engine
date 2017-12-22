@@ -14,39 +14,36 @@ package org.flowable.cmmn.converter;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CmmnElement;
 import org.flowable.cmmn.model.ManualActivationRule;
-import org.flowable.cmmn.model.RepetitionRule;
-import org.flowable.cmmn.model.SentryIfPart;
+import org.flowable.cmmn.model.PlanItemControl;
 
 /**
  * @author Joram Barrez
  */
-public class ConditionXmlConverter extends CaseElementXmlConverter {
+public class ManualActivationRuleXmlConverter extends CaseElementXmlConverter {
     
     @Override
     public String getXMLElementName() {
-        return CmmnXmlConstants.ELEMENT_CONDITION;
+        return CmmnXmlConstants.ELEMENT_MANUAL_ACTIVATION_RULE;
     }
     
     @Override
     public boolean hasChildElements() {
-        return false;
+        return true;
     }
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        String condition = xtr.getText();
-        if (StringUtils.isNotEmpty(condition)) {
-            CmmnElement currentCmmnElement = conversionHelper.getCurrentCmmnElement();
-            if (currentCmmnElement instanceof SentryIfPart) {
-                ((SentryIfPart) currentCmmnElement).setCondition(condition);
-            } else if (currentCmmnElement instanceof RepetitionRule) {
-                ((RepetitionRule) currentCmmnElement).setCondition(condition);
-            } else if (currentCmmnElement instanceof ManualActivationRule) {
-                ((ManualActivationRule) currentCmmnElement).setCondition(condition);
-            }
+        if (conversionHelper.getCurrentCmmnElement() instanceof PlanItemControl) {
+            
+            ManualActivationRule manualActivationRule = new ManualActivationRule();
+            manualActivationRule.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
+            
+            PlanItemControl planItemControl = (PlanItemControl) conversionHelper.getCurrentCmmnElement();
+            planItemControl.setManualActivationRule(manualActivationRule);
+            
+            return manualActivationRule;
         }
         return null;
     }

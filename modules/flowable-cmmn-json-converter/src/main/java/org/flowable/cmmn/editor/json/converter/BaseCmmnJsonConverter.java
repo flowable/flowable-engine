@@ -28,6 +28,7 @@ import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.GraphicInfo;
+import org.flowable.cmmn.model.ManualActivationRule;
 import org.flowable.cmmn.model.PlanFragment;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemControl;
@@ -117,6 +118,30 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
         if (CollectionUtils.isNotEmpty(planItem.getExitCriteria())) {
             convertCriteria(planItem.getExitCriteria(), model, processor, shapesArrayNode, outgoingArrayNode, subProcessX, subProcessY);
         }
+        
+        if (planItem.getItemControl() != null) {
+            
+            RepetitionRule repetitionRule = planItem.getItemControl().getRepetitionRule(); 
+            if (repetitionRule != null) {
+                propertiesNode.put(PROPERTY_REPETITION_ENABLED, true);
+                
+                if (StringUtils.isNotEmpty(repetitionRule.getCondition())) {
+                    propertiesNode.put(PROPERTY_REPETITION_RULE_CONDITION, repetitionRule.getCondition());
+                }
+                if (!RepetitionRule.DEFAULT_REPETITION_COUNTER_VARIABLE_NAME.equals(repetitionRule.getRepetitionCounterVariableName())) {
+                    propertiesNode.put(PROPERTY_REPETITION_RULE_VARIABLE_NAME, repetitionRule.getRepetitionCounterVariableName());
+                }
+            }
+            
+            ManualActivationRule manualActivationRule = planItem.getItemControl().getManualActivationRule();
+            if (manualActivationRule != null) {
+                propertiesNode.put(PROPERTY_MANUAL_ACTIVATION_ENABLED, true);
+                
+                if (StringUtils.isNotEmpty(manualActivationRule.getCondition())) {
+                    propertiesNode.put(PROPERTY_MANUAL_ACTIVATION_RULE_CONDITION, manualActivationRule.getCondition());
+                }
+            }
+        }
 
         if (CollectionUtils.isNotEmpty(planItem.getOutgoingAssociations())) {
             for (Association association : planItem.getOutgoingAssociations()) {
@@ -139,11 +164,7 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             planItemDefinition.setDocumentation(getPropertyValueAsString(PROPERTY_DOCUMENTATION, elementNode));
 
             if (planItemDefinition instanceof Task) {
-                Task task = (Task) planItemDefinition;
-                task.setBlocking(getPropertyValueAsBoolean(PROPERTY_IS_BLOCKING, elementNode));
-                task.setBlockingExpression(getPropertyValueAsString(PROPERTY_IS_BLOCKING_EXPRESSION, elementNode));
-                task.setAsync(getPropertyValueAsBoolean(PROPERTY_IS_ASYNC, elementNode));
-                task.setExclusive(getPropertyValueAsBoolean(PROPERTY_IS_EXCLUSIVE, elementNode));
+                handleTaskProperties(elementNode, planItemDefinition);
             }
 
             Stage stage = (Stage) parentElement;
@@ -166,28 +187,56 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
                 }
             }
             
-            boolean repetitionEnabled = getPropertyValueAsBoolean(PROPERTY_REPETITION_ENABLED, elementNode);
-            String repetitionCondition = getPropertyValueAsString(PROPERTY_REPETITION_RULE_CONDITION, elementNode);
-            if (repetitionEnabled 
-                    || StringUtils.isNotEmpty(repetitionCondition)) { // Assume checking the checkbox was forgotten
-                RepetitionRule repetitionRule = new RepetitionRule();
-                repetitionRule.setCondition(repetitionCondition);
-                
-                String repetitionCounterVariableName = getPropertyValueAsString(PROPERTY_REPETITION_RULE_VARIABLE_NAME, elementNode);
-                if (StringUtils.isNotEmpty(repetitionCounterVariableName)) {
-                    repetitionRule.setRepetitionCounterVariableName(repetitionCounterVariableName);
-                }
-                
-                PlanItemControl itemControl = new PlanItemControl();
-                itemControl.setRepetitionRule(repetitionRule);
-                
-                planItem.setItemControl(itemControl);
-            }
+            handleRepetitionRule(elementNode, planItem);
+            handleManualActivationRule(elementNode, planItem);
 
             planItemDefinition.setPlanItemRef(planItem.getId());
 
             stage.addPlanItem(planItem);
             planItem.setParent(stage);
+        }
+    }
+
+    protected void handleTaskProperties(JsonNode elementNode, PlanItemDefinition planItemDefinition) {
+        Task task = (Task) planItemDefinition;
+        task.setBlocking(getPropertyValueAsBoolean(PROPERTY_IS_BLOCKING, elementNode));
+        task.setBlockingExpression(getPropertyValueAsString(PROPERTY_IS_BLOCKING_EXPRESSION, elementNode));
+        task.setAsync(getPropertyValueAsBoolean(PROPERTY_IS_ASYNC, elementNode));
+        task.setExclusive(getPropertyValueAsBoolean(PROPERTY_IS_EXCLUSIVE, elementNode));
+    }
+
+    protected void handleRepetitionRule(JsonNode elementNode, PlanItem planItem) {
+        boolean repetitionEnabled = getPropertyValueAsBoolean(PROPERTY_REPETITION_ENABLED, elementNode);
+        String repetitionCondition = getPropertyValueAsString(PROPERTY_REPETITION_RULE_CONDITION, elementNode);
+        if (repetitionEnabled 
+                || StringUtils.isNotEmpty(repetitionCondition)) { // Assume checking the checkbox was forgotten
+            RepetitionRule repetitionRule = new RepetitionRule();
+            repetitionRule.setCondition(repetitionCondition);
+            
+            String repetitionCounterVariableName = getPropertyValueAsString(PROPERTY_REPETITION_RULE_VARIABLE_NAME, elementNode);
+            if (StringUtils.isNotEmpty(repetitionCounterVariableName)) {
+                repetitionRule.setRepetitionCounterVariableName(repetitionCounterVariableName);
+            }
+            
+            if (planItem.getItemControl() == null) {
+                planItem.setItemControl(new PlanItemControl());
+            }
+            planItem.getItemControl().setRepetitionRule(repetitionRule);
+        }
+    }
+
+    protected void handleManualActivationRule(JsonNode elementNode, PlanItem planItem) {
+        boolean manualActivationEnabled = getPropertyValueAsBoolean(PROPERTY_MANUAL_ACTIVATION_ENABLED, elementNode);
+        String manualActivationCondition = getPropertyValueAsString(PROPERTY_MANUAL_ACTIVATION_RULE_CONDITION, elementNode);
+        if (manualActivationEnabled
+                || StringUtils.isNotEmpty(manualActivationCondition)) {
+            ManualActivationRule manualActivationRule = new ManualActivationRule();
+            manualActivationRule.setCondition(manualActivationCondition);
+            
+            if (planItem.getItemControl() == null) {
+                planItem.setItemControl(new PlanItemControl());
+            }
+            planItem.getItemControl().setManualActivationRule(manualActivationRule);
         }
     }
 

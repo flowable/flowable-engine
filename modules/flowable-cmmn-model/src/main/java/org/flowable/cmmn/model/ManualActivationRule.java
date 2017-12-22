@@ -15,25 +15,16 @@ package org.flowable.cmmn.model;
 /**
  * @author Joram Barrez
  */
-public class PlanItemControl extends CaseElement {
+public class ManualActivationRule extends PlanItemRule {
     
-    protected RepetitionRule repetitionRule;
-    protected ManualActivationRule manualActivationRule;
+    protected String condition;
 
-    public RepetitionRule getRepetitionRule() {
-        return repetitionRule;
+    public String getCondition() {
+        return condition;
     }
 
-    public void setRepetitionRule(RepetitionRule repetitionRule) {
-        this.repetitionRule = repetitionRule;
+    public void setCondition(String condition) {
+        this.condition = condition;
     }
 
-    public ManualActivationRule getManualActivationRule() {
-        return manualActivationRule;
-    }
-
-    public void setManualActivationRule(ManualActivationRule manualActivationRule) {
-        this.manualActivationRule = manualActivationRule;
-    }
-    
 }

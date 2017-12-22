@@ -755,6 +755,23 @@
       "popular" : true
     } ]
   }, {
+    "name" : "manualactivationruleconditionpackage",
+    "properties" : [ {
+      "id" : "manualactivationenabled",
+      "type" : "Boolean",
+      "title" : "Manual activation",
+      "value" : "",
+      "description" : "Flag indicating if the task or stage needs to be manually activated. False by default.",
+      "popular" : true
+    }, {
+      "id" : "manualactivationrulecondition",
+      "type" : "String",
+      "title" : "Manual activation Rule",
+      "value" : "",
+      "description" : "An expression that is resolved to determine if the stage or task needs to be manually activated.",
+      "popular" : true
+    }]
+  }, {
     "name" : "transitioneventpackage",
     "properties" : [ {
       "id" : "transitionevent",
@@ -808,7 +825,8 @@
       "overrideidpackage",
       "namepackage",
       "documentationpackage",
-      "repetitionruleconditionpackage" ],
+      "repetitionruleconditionpackage",
+      "manualactivationruleconditionpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "StageActivity", "all", "association_start", "association_end" ]
   }, {
@@ -825,7 +843,8 @@
       "documentationpackage",
       "blockingpackage",
       "asyncpackage",
-      "repetitionruleconditionpackage"],
+      "repetitionruleconditionpackage",
+      "manualactivationruleconditionpackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -847,7 +866,8 @@
       "duedatedefinitionpackage",
       "prioritydefinitionpackage",
       "asyncpackage",
-      "repetitionruleconditionpackage" ],
+      "repetitionruleconditionpackage",
+      "manualactivationruleconditionpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -868,7 +888,8 @@
       "servicetaskfieldspackage",
       "servicetaskresultvariablepackage",
       "asyncpackage",
-      "repetitionruleconditionpackage" ],
+      "repetitionruleconditionpackage",
+      "manualactivationruleconditionpackage" ],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   },
@@ -889,7 +910,8 @@
         "decisiontaskdecisiontablereferencepackage",
         "decisiontaskthrowerroronnohitspackage",
         "asyncpackage",
-        "repetitionruleconditionpackage"
+        "repetitionruleconditionpackage",
+        "manualactivationruleconditionpackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
@@ -928,7 +950,8 @@
         "httptaskresultvariableprefixpackage",
         "servicetaskclasspackage",
         "asyncpackage",
-        "repetitionruleconditionpackage"
+        "repetitionruleconditionpackage",
+        "manualactivationruleconditionpackage"
       ],
       "hiddenPropertyPackages": [],
       "roles": [
@@ -968,7 +991,8 @@
       "blockingpackage",
       "casetaskcasereferencepackage",
       "asyncpackage",
-      "repetitionruleconditionpackage"],
+      "repetitionruleconditionpackage",
+      "manualactivationruleconditionpackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
@@ -986,7 +1010,8 @@
       "blockingpackage",
       "processtaskprocessreferencepackage",
       "asyncpackage",
-      "repetitionruleconditionpackage"],
+      "repetitionruleconditionpackage",
+      "manualactivationruleconditionpackage"],
     "hiddenPropertyPackages" : [ ],
     "roles" : [ "Activity", "association_start", "association_end", "ActivitiesMorph", "all" ]
   }, {
