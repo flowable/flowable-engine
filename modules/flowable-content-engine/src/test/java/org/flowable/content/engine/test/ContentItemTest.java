@@ -91,7 +91,7 @@ public class ContentItemTest extends AbstractFlowableContentTest {
 
     @After
     public void tearDown() {
-
+        contentService.deleteContentItemsByScopeIdAndScopeType("testScopeId", "testScopeType");
     }
 
     @Test
