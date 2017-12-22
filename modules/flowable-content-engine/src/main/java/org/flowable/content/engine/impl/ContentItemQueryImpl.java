@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,6 +43,10 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
     protected String taskIdLike;
     protected String processInstanceId;
     protected String processInstanceIdLike;
+    protected String scopeId;
+    protected String scopeIdLike;
+    protected String scopeType;
+    protected String scopeTypeLike;
     protected String contentStoreId;
     protected String contentStoreIdLike;
     protected String contentStoreName;
@@ -120,6 +124,30 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
     @Override
     public ContentItemQueryImpl taskIdLike(String taskIdLike) {
         this.taskIdLike = taskIdLike;
+        return this;
+    }
+
+    @Override
+    public ContentItemQueryImpl scopeId(String scopeId) {
+        this.scopeId = scopeId;
+        return this;
+    }
+
+    @Override
+    public ContentItemQueryImpl scopeIdLike(String scopeIdLike) {
+        this.scopeIdLike = scopeIdLike;
+        return this;
+    }
+
+    @Override
+    public ContentItemQueryImpl scopeType(String scopeType) {
+        this.scopeType = scopeType;
+        return this;
+    }
+
+    @Override
+    public ContentItemQueryImpl scopeTypeLike(String scopeTypeLike) {
+        this.scopeTypeLike = scopeTypeLike;
         return this;
     }
 
@@ -329,6 +357,22 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
 
     public String getProcessInstanceIdLike() {
         return processInstanceIdLike;
+    }
+
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public String getScopeIdLike() {
+        return scopeIdLike;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public String getScopeTypeLike() {
+        return scopeTypeLike;
     }
 
     public String getContentStoreId() {

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,11 +32,12 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     protected Map<String, Object> variables;
     protected Map<String, Object> transientVariables;
     protected String tenantId;
-    
+    protected String outcome;
+
     public CaseInstanceBuilderImpl() {
-        
+
     }
-    
+
     public CaseInstanceBuilderImpl(CmmnRuntimeServiceImpl cmmnRuntimeService) {
         this.cmmnRuntimeService = cmmnRuntimeService;
     }
@@ -58,7 +59,7 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
         this.name = name;
         return this;
     }
-    
+
     @Override
     public CaseInstanceBuilder businessKey(String businessKey) {
         this.businessKey = businessKey;
@@ -70,7 +71,9 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
         if (this.variables == null) {
             this.variables = new HashMap<>();
         }
-        this.variables.putAll(variables);
+        if (variables != null) {
+            this.variables.putAll(variables);
+        }
         return this;
     }
 
@@ -100,7 +103,7 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
         this.transientVariables.put(variableName, value);
         return this;
     }
-    
+
     @Override
     public CaseInstanceBuilder tenantId(String tenantId) {
         this.tenantId = tenantId;
@@ -108,8 +111,19 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     }
 
     @Override
+    public CaseInstanceBuilder outcome(String outcome) {
+        this.outcome = outcome;
+        return this;
+    }
+
+    @Override
     public CaseInstance start() {
         return cmmnRuntimeService.startCaseInstance(this);
+    }
+
+    @Override
+    public CaseInstance startWithForm() {
+        return cmmnRuntimeService.startCaseInstanceWithForm(this);
     }
 
     @Override
@@ -147,4 +161,8 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
         return tenantId;
     }
 
+    @Override
+    public String getOutcome() {
+        return outcome;
+    }
 }
