@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -31,6 +31,7 @@ import org.flowable.cmmn.engine.impl.cmd.RemoveVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetLocalVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceWithFormCmd;
 import org.flowable.cmmn.engine.impl.cmd.TerminateCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TriggerPlanItemInstanceCmd;
 
@@ -48,6 +49,10 @@ public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeSe
         return commandExecutor.execute(new StartCaseInstanceCmd(caseInstanceBuilder));
     }
 
+    public CaseInstance startCaseInstanceWithForm(CaseInstanceBuilder caseInstanceBuilder) {
+        return commandExecutor.execute(new StartCaseInstanceWithFormCmd(caseInstanceBuilder));
+    }
+
     @Override public void triggerPlanItemInstance(String planItemInstanceId) {
         commandExecutor.execute(new TriggerPlanItemInstanceCmd(planItemInstanceId));
     }
@@ -56,7 +61,7 @@ public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeSe
     public void terminateCaseInstance(String caseInstanceId) {
         commandExecutor.execute(new TerminateCaseInstanceCmd(caseInstanceId));
     }
-    
+
     @Override
     public void evaluateCriteria(String caseInstanceId) {
         commandExecutor.execute(new EvaluateCriteriaCmd(caseInstanceId));
@@ -66,7 +71,7 @@ public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeSe
     public Map<String, Object> getVariables(String caseInstanceId) {
         return commandExecutor.execute(new GetVariablesCmd(caseInstanceId));
     }
-    
+
     @Override
     public Map<String, Object> getLocalVariables(String planItemInstanceId) {
         return commandExecutor.execute(new GetLocalVariablesCmd(planItemInstanceId));
@@ -76,7 +81,7 @@ public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeSe
     public Object getVariable(String caseInstanceId, String variableName) {
         return commandExecutor.execute(new GetVariableCmd(caseInstanceId, variableName));
     }
-    
+
     @Override
     public Object getLocalVariable(String planItemInstanceId, String variableName) {
         return commandExecutor.execute(new GetLocalVariableCmd(planItemInstanceId, variableName));
@@ -86,7 +91,7 @@ public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeSe
     public void setVariables(String caseInstanceId, Map<String, Object> variables) {
         commandExecutor.execute(new SetVariablesCmd(caseInstanceId, variables));
     }
-    
+
     @Override
     public void setLocalVariables(String planItemInstanceId, Map<String, Object> variables) {
         commandExecutor.execute(new SetLocalVariablesCmd(planItemInstanceId, variables));
@@ -96,7 +101,7 @@ public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeSe
     public void removeVariable(String caseInstanceId, String variableName) {
         commandExecutor.execute(new RemoveVariableCmd(caseInstanceId, variableName));
     }
-    
+
     @Override
     public void removeLocalVariable(String planItemInstanceId, String variableName) {
         commandExecutor.execute(new RemoveLocalVariableCmd(planItemInstanceId, variableName));

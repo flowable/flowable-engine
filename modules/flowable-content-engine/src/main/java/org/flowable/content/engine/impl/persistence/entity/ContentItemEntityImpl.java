@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -32,6 +32,8 @@ public class ContentItemEntityImpl extends AbstractEntityNoRevision implements C
     protected String mimeType;
     protected String taskId;
     protected String processInstanceId;
+    protected String scopeId;
+    protected String scopeType;
     protected String contentStoreId;
     protected String contentStoreName;
     protected boolean contentAvailable;
@@ -60,6 +62,8 @@ public class ContentItemEntityImpl extends AbstractEntityNoRevision implements C
         persistentState.put("lastModified", this.lastModified);
         persistentState.put("lastModifiedBy", this.lastModifiedBy);
         persistentState.put("tenantId", this.tenantId);
+        persistentState.put("scopeId", this.scopeId);
+        persistentState.put("scopeType", this.scopeType);
         return persistentState;
     }
 
@@ -204,6 +208,26 @@ public class ContentItemEntityImpl extends AbstractEntityNoRevision implements C
     @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
+    }
+
+    @Override
+    public String getScopeId() {
+        return this.scopeId;
+    }
+
+    @Override
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    @Override
+    public String getScopeType() {
+        return this.scopeType;
+    }
+
+    @Override
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
     }
 
     @Override

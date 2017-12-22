@@ -143,6 +143,7 @@ public class CmmnModelJsonConverterUtil implements EditorJsonConstants, CmmnSten
     public static List<JsonLookupResult> getCmmnModelFormReferences(JsonNode editorJsonNode) {
         List<String> allowedStencilTypes = new ArrayList<>();
         allowedStencilTypes.add(STENCIL_TASK_HUMAN);
+        allowedStencilTypes.add(STENCIL_PLANMODEL);
         return getCmmnModelChildShapesPropertyValues(editorJsonNode, PROPERTY_FORM_REFERENCE, allowedStencilTypes);
     }
 
