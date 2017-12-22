@@ -12,7 +12,9 @@ import org.flowable.spring.SpringProcessEngineConfiguration;
 
 public abstract class SpringCamelBehavior extends CamelBehavior {
     
-    protected void setAppropriateCamelContext(DelegateExecution execution) {
+	private static final long serialVersionUID = 1L;
+
+	protected void setAppropriateCamelContext(DelegateExecution execution) {
         // Get the appropriate String representation of the CamelContext object
         // from ActivityExecution (if available).
         String camelContextValue = getStringFromField(camelContext, execution);

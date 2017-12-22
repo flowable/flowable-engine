@@ -35,7 +35,6 @@ import org.flowable.engine.impl.delegate.ActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
-import org.flowable.variable.service.delegate.Expression;
 
 /**
  * This abstract class takes the place of the now-deprecated CamelBehaviour class (which can still be used for legacy compatibility) and significantly improves on its flexibility. Additional
@@ -137,7 +136,9 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
     }
 
     protected FlowableEndpoint getEndpoint(String key) {
+    	System.out.println("camelContextObj.name:" + camelContextObj.getName());
         for (Endpoint e : camelContextObj.getEndpoints()) {
+        	System.out.println("EndPoint:" + e.getEndpointKey() + " class:" + e.getClass().getName() + " key:" + key);
             if (e.getEndpointKey().equals(key) && (e instanceof FlowableEndpoint)) {
                 return (FlowableEndpoint) e;
             }

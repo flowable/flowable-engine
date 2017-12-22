@@ -13,8 +13,8 @@
 
 package org.flowable.camel.impl;
 
-import org.flowable.camel.FlowableEndpoint;
 import org.flowable.camel.CdiCamelBehavior;
+import org.flowable.camel.FlowableEndpoint;
 
 /**
  * Cdi equivalent of {@link CamelBehaviorBodyAsMapImpl}

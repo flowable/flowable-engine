@@ -10,37 +10,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.camel;
+package org.flowable.camel.cdi.std;
 
 import java.util.List;
+
+import javax.inject.Inject;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
-import org.flowable.engine.RuntimeService;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
-import org.flowable.spring.impl.test.SpringFlowableTestCase;
+import org.junit.After;
 import org.junit.Assert;
-import org.junit.experimental.categories.Category;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.context.ContextConfiguration;
+import org.junit.Test;
 
-/**
- * @author Saeid Mirzaei
- */
-@ContextConfiguration("classpath:generic-camel-flowable-context.xml")
-public class AsyncPingTest extends SpringFlowableTestCase {
+public class CdiAsyncPingTest extends StdCamelCdiFlowableTestCase {
 
-    @Autowired
+    @Inject
     protected CamelContext camelContext;
-
-    @Autowired
-    protected RuntimeService runtimeService;
 
     @Override
     public void setUp() throws Exception {
+    	super.setUp();
         camelContext.addRoutes(new RouteBuilder() {
 
             @Override
@@ -51,7 +44,7 @@ public class AsyncPingTest extends SpringFlowableTestCase {
         });
     }
 
-    @Override
+    @After
     public void tearDown() throws Exception {
         List<Route> routes = camelContext.getRoutes();
         for (Route r : routes) {
@@ -60,6 +53,7 @@ public class AsyncPingTest extends SpringFlowableTestCase {
         }
     }
 
+    @Test
     @Deployment(resources = { "process/asyncPing.bpmn20.xml" })
     public void testRunProcess() throws Exception {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncPingProcess");
