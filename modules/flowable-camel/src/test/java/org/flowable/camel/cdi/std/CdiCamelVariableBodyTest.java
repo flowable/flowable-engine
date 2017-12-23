@@ -25,12 +25,19 @@ import org.apache.camel.LoggingLevel;
 import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
+import org.flowable.camel.CamelVariableBodyTest;
+import org.flowable.camel.impl.CdiCamelBehaviorCamelBodyImpl;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.task.api.Task;
 import org.junit.After;
 import org.junit.Test;
 
+/**
+ * Adapted from {@link CamelVariableBodyTest} to test {@link CdiCamelBehaviorCamelBodyImpl}.
+ * 
+ * @author Zach Visagie
+ */
 public class CdiCamelVariableBodyTest extends StdCamelCdiFlowableTestCase {
 
     @Inject

@@ -1,5 +1,5 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
@@ -23,8 +23,8 @@
     <dependency>
       <groupId>org.flowable</groupId>
       <artifactId>flowable-cdi</artifactId>
-  	  <scope>runtime</scope>
-  	  <optional>true</optional>
+      <scope>runtime</scope>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>org.apache.camel</groupId>
@@ -34,7 +34,7 @@
       <groupId>org.apache.camel</groupId>
       <artifactId>camel-cdi</artifactId>
       <scope>runtime</scope>
-  	  <optional>true</optional>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>com.sun.xml.bind</groupId>
@@ -80,36 +80,35 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-    	<groupId>javax.enterprise</groupId>
-    	<artifactId>cdi-api</artifactId>
-    	<version>1.2</version>
-    	<scope>test</scope>
+      <groupId>javax.enterprise</groupId>
+      <artifactId>cdi-api</artifactId>
+      <scope>test</scope>
     </dependency>
-	<dependency>
-	    <groupId>org.flowable</groupId>
-	    <artifactId>flowable-cdi</artifactId>
-	    <version>${project.version}</version>
-	    <type>test-jar</type>
-	    <scope>test</scope>
-    </dependency>
-	<dependency>
-		<groupId>org.jboss.arquillian.junit</groupId>
-		<artifactId>arquillian-junit-container</artifactId>
-		<scope>test</scope>
-	</dependency>
-	<dependency>
-		<groupId>org.jboss.spec</groupId>
-		<artifactId>jboss-javaee-6.0</artifactId>
-		<version>2.0.0.Final</version>
-		<type>pom</type>
-		<scope>provided</scope>
-		<exclusions>
-			<exclusion>
-				<artifactId>xalan</artifactId>
-				<groupId>org.apache.xalan</groupId>
-			</exclusion>
-		</exclusions>
-	</dependency>
+<!--   <dependency> -->
+<!--       <groupId>org.flowable</groupId> -->
+<!--       <artifactId>flowable-cdi</artifactId> -->
+<!--       <version>${project.version}</version> -->
+<!--       <type>test-jar</type> -->
+<!--       <scope>test</scope> -->
+<!--     </dependency> -->
+  <dependency>
+    <groupId>org.jboss.arquillian.junit</groupId>
+    <artifactId>arquillian-junit-container</artifactId>
+    <scope>test</scope>
+  </dependency>
+  <dependency>
+    <groupId>org.jboss.spec</groupId>
+    <artifactId>jboss-javaee-6.0</artifactId>
+    <version>2.0.0.Final</version>
+    <type>pom</type>
+    <scope>provided</scope>
+    <exclusions>
+      <exclusion>
+        <artifactId>xalan</artifactId>
+        <groupId>org.apache.xalan</groupId>
+      </exclusion>
+    </exclusions>
+  </dependency>
   </dependencies>
 
 
@@ -122,45 +121,45 @@
 
   <profiles>
     <profile>
-  	  <activation>
+      <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
       <id>distro</id>
-		<dependencies>
-			<dependency>
-				<groupId>org.jboss.arquillian.container</groupId>
-				<artifactId>arquillian-weld-ee-embedded-1.1</artifactId>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.jboss.weld</groupId>
-				<artifactId>weld-core</artifactId>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.jboss.weld</groupId>
-				<artifactId>weld-api</artifactId>
-				<scope>test</scope>
-			</dependency>
-			<dependency>
-				<groupId>org.slf4j</groupId>
-				<artifactId>slf4j-simple</artifactId>
-				<version>1.7.6</version>
-				<scope>test</scope>
-			</dependency>
-		</dependencies>
-		
-		<dependencyManagement>
-			<dependencies>
-				<dependency>
-					<groupId>org.jboss.weld</groupId>
-					<artifactId>weld-core-bom</artifactId>
-					<version>1.1.33.Final</version>
-					<type>pom</type>
-					<scope>import</scope>
-				</dependency>
-			</dependencies>
-		</dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jboss.arquillian.container</groupId>
+        <artifactId>arquillian-weld-ee-embedded-1.1</artifactId>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.weld</groupId>
+        <artifactId>weld-core</artifactId>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.weld</groupId>
+        <artifactId>weld-api</artifactId>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-simple</artifactId>
+        <version>1.7.6</version>
+        <scope>test</scope>
+      </dependency>
+    </dependencies>
+    
+    <dependencyManagement>
+      <dependencies>
+        <dependency>
+          <groupId>org.jboss.weld</groupId>
+          <artifactId>weld-core-bom</artifactId>
+          <version>1.1.33.Final</version>
+          <type>pom</type>
+          <scope>import</scope>
+        </dependency>
+      </dependencies>
+    </dependencyManagement>
       <build>
         <plugins>
           <plugin>
@@ -177,17 +176,20 @@
               </execution>
             </executions>
           </plugin>
-	      <plugin>
-	        <groupId>org.apache.maven.plugins</groupId>
-	        <artifactId>maven-surefire-plugin</artifactId>
-	        <configuration>
-<!-- 	                  <forkCount>1</forkCount> -->
-<!-- 	                  <reuseForks>false</reuseForks> -->
-	                  <excludes>
-	                    <exclude>**/cdi/**/*</exclude>
-	                  </excludes>
-			</configuration>
-	      </plugin>          
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+          <forkCount>1</forkCount>
+          <reuseForks>false</reuseForks>
+          <excludes>
+            <exclude>**/revisited/**/*</exclude>
+          </excludes>
+          <includes>
+            <include>**/cdi/**/*</include>
+          </includes>
+          </configuration>
+        </plugin>          
         </plugins>
       </build>
     </profile>

@@ -6,7 +6,7 @@
 
 	<bean id="processEngineConfiguration"
 		class="org.flowable.cdi.CdiStandaloneProcessEngineConfiguration">
-		<property name="engineName" value="cdiCamelEngine"/>
+
 		<property name="jdbcUrl" value="jdbc:h2:mem:flowable" />
 		<property name="databaseSchemaUpdate" value="true" />				
 		<property name="mailServerPort" value="5025" />

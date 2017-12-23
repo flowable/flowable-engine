@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import org.apache.camel.CamelContext;
 import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
+import org.flowable.camel.AsyncPingTest;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -26,6 +27,11 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
 
+/**
+ * Adapted from {@link AsyncPingTest}.
+ * 
+ * @author Zach Visagie
+ */
 public class CdiAsyncPingTest extends StdCamelCdiFlowableTestCase {
 
     @Inject
@@ -33,7 +39,7 @@ public class CdiAsyncPingTest extends StdCamelCdiFlowableTestCase {
 
     @Override
     public void setUp() throws Exception {
-    	super.setUp();
+        super.setUp();
         camelContext.addRoutes(new RouteBuilder() {
 
             @Override

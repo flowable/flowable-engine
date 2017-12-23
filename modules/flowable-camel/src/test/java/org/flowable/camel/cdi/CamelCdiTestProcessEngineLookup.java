@@ -1,16 +1,34 @@
 package org.flowable.camel.cdi;
 
-import org.flowable.cdi.impl.LocalProcessEngineLookup;
+import org.flowable.cdi.spi.ProcessEngineLookup;
+import org.flowable.engine.ProcessEngine;
+import org.flowable.engine.ProcessEngines;
 
-public class CamelCdiTestProcessEngineLookup extends LocalProcessEngineLookup {
+/**
+ * Adapted from ProcessEngineLookupForTestsuite. Having this class here avoids dependency on flowable-cdi test jar. 
+ * 
+ * @author Zach Visagie
+ */
+public class CamelCdiTestProcessEngineLookup implements ProcessEngineLookup {
 
-	public CamelCdiTestProcessEngineLookup() {
-		processEngineName = "cdiCamelEngine";
-	}
-	@Override
-	public int getPrecedence() {
-		return 1000;
-	}
-	
+    public static ProcessEngine processEngine;
+
+    @Override
+    public int getPrecedence() {
+        return 1000;
+    }
+
+    @Override
+    public ProcessEngine getProcessEngine() {
+        if (processEngine == null) {
+            processEngine = ProcessEngines.getDefaultProcessEngine();
+        }
+        return processEngine;
+    }
+
+    @Override
+    public void ungetProcessEngine() {
+        // do nothing
+    }
 	
 }

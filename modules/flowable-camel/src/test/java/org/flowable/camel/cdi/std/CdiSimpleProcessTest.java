@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.camel.cdi.std;
 
 import static org.junit.Assert.assertEquals;
@@ -29,12 +28,18 @@ import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
 import org.flowable.camel.FlowableProducer;
+import org.flowable.camel.SimpleProcessTest;
 import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.junit.After;
 import org.junit.Test;
 
+/**
+ * Adapted from {@link SimpleProcessTest}.
+ * 
+ * @author Zach Visagie
+ */
 public class CdiSimpleProcessTest extends StdCamelCdiFlowableTestCase {
 
     @Inject

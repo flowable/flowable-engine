@@ -10,7 +10,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.flowable.camel.cdi.named;
 
 import static org.junit.Assert.assertEquals;
@@ -29,6 +28,7 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
+import org.flowable.camel.CustomContextTest;
 import org.flowable.camel.FlowableProducer;
 import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -36,6 +36,11 @@ import org.flowable.engine.test.Deployment;
 import org.junit.After;
 import org.junit.Test;
 
+/**
+ * Adapted from {@link CustomContextTest}.
+ * 
+ * @author Zach Visagie
+ */
 public class CdiCustomNonDefaultNamedContextTest extends NamedCamelCdiFlowableTestCase {
 
     @Inject
@@ -48,14 +53,15 @@ public class CdiCustomNonDefaultNamedContextTest extends NamedCamelCdiFlowableTe
 
     @Override
     public void setUp() throws Exception {
-    	super.setUp();
+        super.setUp();
         camelContext.addRoutes(new RouteBuilder() {
 
             @Override
             public void configure() throws Exception {
                 from("direct:start").to("flowable:camelProcess");
 
-                from("flowable:camelProcess:serviceTask1").setBody().exchangeProperty("var1").to("mock:service1").setProperty("var2").constant("var2").setBody().properties();
+                from("flowable:camelProcess:serviceTask1").setBody().exchangeProperty("var1").to("mock:service1").setProperty("var2").constant("var2").setBody()
+                                .properties();
 
                 from("flowable:camelProcess:serviceTask2?copyVariablesToBodyAsMap=true").to("mock:service2");
 
@@ -92,7 +98,7 @@ public class CdiCustomNonDefaultNamedContextTest extends NamedCamelCdiFlowableTe
         String instanceId = (String) exchange.getProperty("PROCESS_ID_PROPERTY");
 
         ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().processInstanceId(instanceId).singleResult();
-        assertEquals(false,processInstance.isEnded());
+        assertEquals(false, processInstance.isEnded());
 
         tpl.sendBodyAndProperty("direct:receive", null, FlowableProducer.PROCESS_ID_PROPERTY, instanceId);
 
