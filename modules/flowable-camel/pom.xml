@@ -114,6 +114,9 @@
 
   <profiles>
     <profile>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
       <id>distro</id>
       <dependencies>
         <dependency>
