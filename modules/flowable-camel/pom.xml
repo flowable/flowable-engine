@@ -172,13 +172,42 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <!-- The CDI tests need to run in a separate process from the Spring ones. For now 
-                just forking all tests as there seems to be no simple way to only fork the CDI ones.
+            <executions>
+              <!-- Spring and CDI tests are separated as they have to 
+                run in separate JVM processes due to the way ProcessEngines 
+                are loaded on startup. 
                -->
-              <forkCount>1</forkCount>
-              <reuseForks>false</reuseForks>
-            </configuration>
+              <execution>
+                <id>default-test</id>
+                <configuration>
+                  <skip>true</skip>
+                </configuration>
+              </execution>
+              <execution>
+                <id>spring-tests</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                  <excludes>
+                    <exclude>**/cdi/**/*.java</exclude>
+                  </excludes>
+                </configuration>
+              </execution>
+              <execution>
+                <id>cdi-tests</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+                <configuration>
+                  <includes>
+                    <include>**/cdi/**/*</include>
+                  </includes>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>          
         </plugins>
       </build>
