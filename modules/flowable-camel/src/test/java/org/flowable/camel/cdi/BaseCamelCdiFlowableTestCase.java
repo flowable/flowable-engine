@@ -16,7 +16,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Base class for camel CDI tests adapted from CdiFlowableTestCase to avoid dependency on floable-cdi test jar.
+ * Base class for camel CDI tests adapted from CdiFlowableTestCase to avoid dependency on flowable-cdi test jar.
  * 
  * @author Zach Visagie
  */
