@@ -44,16 +44,26 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
  * (2) CamelBehaviorBodyAsMapImpl: Works by copying variables into and out of Camel using a Map<String,Object> object in the body. (3) CamelBehaviorCamelBodyImpl: Works by copying a single variable
  * value into Camel as a String body and copying the Camel body into that same variable. The process variable in must be named "camelBody".
  * <p>
- * The chosen implementation should be set within your ProcessEngineConfiguration. To specify the implementation using Spring, include the following line in your configuration file as part of the
- * properties for "org.flowable.spring.SpringProcessEngineConfiguration":
+ * This class has two subclasses one for Spring and one for CDI, and each having the 3 behavioral implementations discussed above. Alternative implementations for Spring or CDI contexts should 
+ * now extend one one or the other. 
  * <p>
- * <property name="camelBehaviorClass" value="org.flowable.camel.impl.CamelBehaviorCamelBodyImpl"/>
+ * The chosen implementation can be set using extension elements:
+ * <p>
+ * <pre>
+ * {@code
+ * <serviceTask id="serviceTask1" flowable:type="camel">
+ *   <extensionElements>
+ *     <flowable:field name="camelBehaviorClass" stringValue="org.flowable.camel.impl.CamelBehaviorCamelBodyImpl" />
+ *   </extensionElements>
+ * </serviceTask>
+ * }
+ * </pre>
  * <p>
  * Note also that the manner in which variables are copied to the process engine from Camel has changed. It will always copy Camel properties to the process variables set; they can safely be ignored,
  * of course, if not required. It will conditionally copy the Camel body to the "camelBody" variable if it is of type java.lang.String, OR it will copy the Camel body to individual variables within
  * the process engine if it is of type Map<String,Object>.
  *
- * @author Ryan Johnston (@rjfsu), Tijs Rademakers, Saeid Mirzaei
+ * @author Ryan Johnston (@rjfsu), Tijs Rademakers, Saeid Mirzaei, Zach Visagie
  * @version 5.12
  */
 public abstract class CamelBehavior extends AbstractBpmnActivityBehavior implements ActivityBehavior {
@@ -136,9 +146,7 @@ public abstract class CamelBehavior extends AbstractBpmnActivityBehavior impleme
     }
 
     protected FlowableEndpoint getEndpoint(String key) {
-    	System.out.println("camelContextObj.name:" + camelContextObj.getName());
         for (Endpoint e : camelContextObj.getEndpoints()) {
-        	System.out.println("EndPoint:" + e.getEndpointKey() + " class:" + e.getClass().getName() + " key:" + key);
             if (e.getEndpointKey().equals(key) && (e instanceof FlowableEndpoint)) {
                 return (FlowableEndpoint) e;
             }

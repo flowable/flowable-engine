@@ -17,7 +17,7 @@ import org.flowable.camel.CdiCamelBehavior;
 import org.flowable.camel.FlowableEndpoint;
 
 /**
- * Cdi equivalent of {@link CdiCamelBehaviorCamelBodyImpl}
+ * CDI equivalent of {@link CdiCamelBehaviorCamelBodyImpl}
  * 
  * @author Zach Visagie
  */

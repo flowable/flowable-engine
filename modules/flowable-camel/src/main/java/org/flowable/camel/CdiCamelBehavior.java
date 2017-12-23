@@ -1,3 +1,15 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.flowable.camel;
 
 import java.util.Set;
@@ -14,12 +26,14 @@ import org.flowable.engine.ProcessEngineConfiguration;
 import org.flowable.engine.delegate.DelegateExecution;
 
 /**
+ * Camel behavior implementation that looks up the camel context in a CDI environment.
+ * 
  * Camel CDI's default context is not named, so if the contextName being asked for is the same as the default and no such bean name is registered it will attempt to look up the default non-named 
  * CamelContext.
  * 
- * Creating a named context can be done by registering a class like this with CDI:
+ * <p>Creating a named context can be done by registering a class like this with CDI:</p>
  * <pre>
- * {@code
+ * {@code  
  * 	import javax.enterprise.context.ApplicationScoped;
  *	import javax.enterprise.inject.Produces;
  *	import javax.inject.Named;
@@ -40,6 +54,7 @@ import org.flowable.engine.delegate.DelegateExecution;
  *  }
  * </pre>
  * 
+ * <p>See test classes for examples of this and having multiple cnamed amel contexts.</p>
  * 
  * @author Zach Visagie
  *
@@ -74,7 +89,8 @@ public abstract class CdiCamelBehavior extends CamelBehavior {
         Set<Bean<?>> beans = beanManager.getBeans(name);
         if(beans.isEmpty())
         	return null;
-		Bean<CamelContext> bean = (Bean<CamelContext>) beans.iterator().next();
+		@SuppressWarnings("unchecked")
+        Bean<CamelContext> bean = (Bean<CamelContext>) beans.iterator().next();
         CreationalContext<CamelContext> ctx = beanManager.createCreationalContext(bean);
         return (CamelContext) beanManager.getReference(bean, CamelContext.class, ctx);
     }

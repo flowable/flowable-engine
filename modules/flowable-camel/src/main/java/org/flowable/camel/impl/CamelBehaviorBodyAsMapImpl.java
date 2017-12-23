@@ -23,7 +23,7 @@ import org.flowable.camel.SpringCamelBehavior;
  */
 public class CamelBehaviorBodyAsMapImpl extends SpringCamelBehavior {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 2L;
 
     @Override
     protected void setPropertTargetVariable(FlowableEndpoint endpoint) {
