@@ -41,4 +41,9 @@ public class OccurPlanItemInstanceOperation extends AbstractDeletePlanItemInstan
         return false;
     }
     
+    @Override
+    protected void internalExecute() {
+        // Nothing extra to do
+    }
+    
 }

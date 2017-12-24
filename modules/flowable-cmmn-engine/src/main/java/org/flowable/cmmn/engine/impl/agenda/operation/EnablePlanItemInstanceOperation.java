@@ -14,39 +14,31 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
  */
-public class CreatePlanItemInstanceOperation extends AbstractChangePlanItemInstanceStateOperation {
-
-    public CreatePlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
+public class EnablePlanItemInstanceOperation extends AbstractChangePlanItemInstanceStateOperation {
+    
+    public EnablePlanItemInstanceOperation(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         super(commandContext, planItemInstanceEntity);
     }
     
     @Override
-    protected void internalExecute() {
-        PlanItem planItem = planItemInstanceEntity.getPlanItem();
-        if (planItem != null
-                && planItem.getItemControl() != null
-                && planItem.getItemControl().getRepetitionRule() != null
-                && !planItem.getEntryCriteria().isEmpty()) {
-            int counter = getRepetitionCounter(planItemInstanceEntity);
-            setRepetitionCounter(planItemInstanceEntity, ++counter);
-        }
+    protected String getLifeCycleTransition() {
+        return PlanItemTransition.ENABLE;
     }
     
     @Override
     protected String getNewState() {
-        return PlanItemInstanceState.AVAILABLE;
+        return PlanItemInstanceState.ENABLED;
     }
     
     @Override
-    protected String getLifeCycleTransition() {
-        return PlanItemTransition.CREATE;
+    protected void internalExecute() {
+        // Nothing extra to do
     }
     
 }

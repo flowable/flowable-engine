@@ -41,7 +41,11 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
 
         planItemInstanceEntity.setState(getNewState());
         CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(planItemInstanceEntity.getCaseInstanceId(), createPlanItemLifeCycleEvent());
+        
+        internalExecute();
     }
+    
+    protected abstract void internalExecute();
 
     protected PlanItemLifeCycleEvent createPlanItemLifeCycleEvent() {
         return new PlanItemLifeCycleEvent(planItemInstanceEntity.getPlanItem(), getLifeCycleTransition());
