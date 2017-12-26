@@ -9,8 +9,6 @@
 
 The engine API is the most common way of interacting with Flowable. The main starting point is the +CmmnEngine+, which can be created in several ways as described in the  <<configuration,configuration section>>. From the CmmnEngine, you can obtain the various services that contain the case/CMMN methods. CmmnEngine and the services objects are thread safe, so you can keep a reference to one of those for a whole server.
 
-image::images/api.services.png[align="center"]
-
 [source,java,linenums]
 ----
 CmmnEngine cmmnEngine = CmmnEngineConfiguration.createStandaloneCmmnEngineConfiguration();
@@ -49,7 +47,7 @@ Tasks that need to be performed by human users of the system are core to a CMMN 
 
 The *CmmnHistoryService* exposes all historical data gathered by the Flowable CMMN engine. When executing cases, a lot of data can be kept by the engine (this is configurable), such as case instance start times, who did which tasks, how long it took to complete the tasks, which path was followed in each case instance, and so on. This service exposes mainly query  capabilities to access this data.
 
-The *CmmnManagementService* is typically not needed when coding custom application using Flowable. It allows the retrieval of information about the database tables and table metadata.
+The *CmmnManagementService* gives access to low-level information about the database tables, allows to query for the different types of jobs and to execute them.
 
 For more detailed information on the service operations and the engine API, see link:$$flowable/index.html$$[the javadocs].
 
@@ -95,31 +93,15 @@ List<Task> tasks = taskService.createTaskQuery()
     .list();
 ----
 
-Sometimes you need more powerful queries, for example, queries using an OR operator or restrictions you cannot express using the Query API. For these cases, we have native queries, which allow you to write your own SQL queries. The return type is defined by the Query object you use and the data is mapped into the correct objects (Task, CaseInstance, ...). Since the query will be fired at the database you have to use table and column names as they are defined in the database; this requires some knowledge about the internal data structure and it is recommended to use native queries with care. The table names can be retrieved through the API to keep the dependency as small as possible.
-
-[source,java,linenums]
-----
-List<Task> tasks = taskService.createNativeTaskQuery()
-  .sql("SELECT count(*) FROM " + managementService.getTableName(Task.class) + 
-      " T WHERE T.NAME_ = #{taskName}")
-  .parameter("taskName", "gonzoTask")
-  .list();
-
-long count = taskService.createNativeTaskQuery()
-  .sql("SELECT count(*) FROM " + managementService.getTableName(Task.class) + " T1, " + 
-      managementService.getTableName(VariableInstanceEntity.class) + " V1 WHERE V1.TASK_ID_ = T1.ID_")
-  .count();
-----
-
 [[apiVariables]]
 
 === Variables
 
-Every case instance needs and uses data to execute the steps it's made up of. In Flowable, this data is called _variables_, which are stored in the database. Variables can be used in expressions (for example, in a condition of a transition), in Java service tasks when calling external services (for example to provide the input or store the result of the service call), and so on.
+Every case instance needs and uses data to execute the steps it's made up of. In Flowable, this data is called _variables_, which are stored in the database. Variables can be used in expressions (for example, in the condition of a sentry), in Java service tasks when calling external services (for example to provide the input or store the result of the service call), and so on.
 
-A case instance can have variables (called _case variables_), but also _plan items_ (which are enabled plan items) and human tasks can have variables. A case instance can have any number of variables. Each variable is stored in a row in the _ACT_RU_VARIABLE_ database table.
+A case instance can have variables (called _case variables_), but also _plan item instances_ and human tasks can have variables. A case instance can have any number of variables. Each variable is stored in a row in the _ACT_RU_VARIABLE_ database table.
 
-The _createCaseInstanceBuilder_ method has optional methods to provide the variables when the case instance is created and started. For example, from the _CmmnRuntimeService_:
+The _createCaseInstanceBuilder_ method has optional methods to provide the variables when the case instance is created and started through the _CmmnRuntimeService_:
 
 [source,java,linenums]
 ----
@@ -211,18 +193,19 @@ On top of all process variables, there are a few default objects available that 
 
 Cases are an integral part of software projects and they should be tested in the same way normal application logic is tested: with unit tests. Since Flowable is an embeddable Java engine, writing unit tests for business processes is as simple as writing regular unit tests.
 
-Flowable supports JUnit versions 4 styles of unit testing. 
+Flowable supports JUnit versions 3/4/5 styles of unit testing. 
 
-The CmmnTestRunner can be used to initialise the CMMN engine and with the FlowableCmmnTestCase test base class you can easily write unit tests against a running CMMN engine.
+The _org.flowable.cmmn.engine.test.FlowableCmmnTestCase_ is available as parent class. It uses a configuration file _flowable.cmmn.cfg.xml_ by default or uses a standard CmmnEngine using an H2 in-memory database if such file is missing.
+Behind the scenes, a CmmnTestRunner is used to initialise the CMMN engine. Note in the example below how the _@CmmnDeployment_ annotation is used to automatically deploy the case definition (it will look for a .cmmn file in the same folder as the test class and expects the file to be named <Test class name>.<test method name>.cmmn.
 
 [source,java,linenums]
 ----
 
-public class MyBusinessProcessTest extends FlowableCmmnTestCase {
+public class MyTest extends FlowableCmmnTestCase {
 
   @Test
   @CmmnDeployment
-  public void ruleUsageExample() {
+  public void testSingleHumanTask() {
     CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                     .caseDefinitionKey("myCase")
                     .start();
@@ -237,4 +220,20 @@ public class MyBusinessProcessTest extends FlowableCmmnTestCase {
   }
 }
 ----
+
+Alernatively, the _FlowableCmmnRule_ is available and allows to set a custom configuration:
+
+[source,java,linenums]
+----
+@Rule
+public FlowableCmmnRule cmmnRule = new FlowableCmmnRule("org/flowable/custom.cfg.xml")
+
+@Test
+@CmmnDeployment
+public void testSomething() {
+    // ...
+    assertThat((String) cmmnRule.getCmmnRuntimeService().getVariable(caseInstance.getId(), "test"), containsString("John"));
+    // ...
+}
+----    
 

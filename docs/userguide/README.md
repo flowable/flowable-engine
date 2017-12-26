@@ -1,12 +1,12 @@
 About
 -------
 
-This project regroup all userguide informations.
+This project regroups all userguide sources
 
 Currently it contains :
 
-* [BPMN](/src/en/bpmn) : Business Process Management Notation User Guide
-* [CMMN](/src/en/cmmn) : Case Management Model Notation User Guide
+* [BPMN](/src/en/bpmn) : Business Process Model and Notation User Guide
+* [CMMN](/src/en/cmmn) : Case Management Model and Notation User Guide
 * [DMN](/src/en/dmn) : Decision Model and Notation User Guide
 * [FORM](/src/en/form) : Form engine User Guide
 * [SINGLE (Beta Version)](/src/en/single) : Unified version of all previous documentation
@@ -27,8 +27,8 @@ Generating the docs
 
 **Using build.xml**
 
-Simply select run the *build.docs.[bpmn|cmmn|dmn|form|single|all]* goal and it will generates both html & pdf version.
-All generated files will be available in root project **target** folder.
+Simply select run the *build.docs.[bpmn|cmmn|dmn|form|single|all]* goal and it will generate both a html & pdf version.
+All generated files will be available in the root project **target** folder.
 
 
 **From scripts folder**
