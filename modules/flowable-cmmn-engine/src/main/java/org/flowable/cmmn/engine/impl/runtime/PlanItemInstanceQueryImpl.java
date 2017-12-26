@@ -140,6 +140,16 @@ public class PlanItemInstanceQueryImpl extends AbstractVariableQueryImpl<PlanIte
     }
     
     @Override
+    public PlanItemInstanceQuery planItemInstanceStateEnabled() {
+        return planItemInstanceState(PlanItemInstanceState.ENABLED);
+    }
+    
+    @Override
+    public PlanItemInstanceQuery planItemInstanceStateDisabled() {
+        return planItemInstanceState(PlanItemInstanceState.DISABLED);
+    }
+    
+    @Override
     public PlanItemInstanceQuery planItemInstanceStateAsyncActive() {
         return planItemInstanceState(PlanItemInstanceState.ASYNC_ACTIVE);
     }

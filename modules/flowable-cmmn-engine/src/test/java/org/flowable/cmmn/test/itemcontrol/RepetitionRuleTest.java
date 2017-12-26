@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.cmmn.test.repetition;
+package org.flowable.cmmn.test.itemcontrol;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -26,7 +26,6 @@ import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
 import org.flowable.cmmn.engine.test.impl.CmmnJobTestHelper;
-import org.flowable.cmmn.model.HumanTask;
 import org.flowable.job.api.Job;
 import org.flowable.task.api.Task;
 import org.junit.Test;
