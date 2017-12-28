@@ -102,7 +102,7 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
         }
         
         if (planItem.getItemControl() != null) {
-            convertPlanItemJson(planItem, propertiesNode);
+            convertPlanItemControlToJson(planItem, propertiesNode);
         }
 
         convertElementToJson(planItemNode, propertiesNode, processor, baseElement, model);
@@ -127,7 +127,7 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
         planItemNode.set("outgoing", outgoingArrayNode);
     }
 
-    protected void convertPlanItemJson(PlanItem planItem, ObjectNode propertiesNode) {
+    protected void convertPlanItemControlToJson(PlanItem planItem, ObjectNode propertiesNode) {
         RepetitionRule repetitionRule = planItem.getItemControl().getRepetitionRule(); 
         if (repetitionRule != null) {
             propertiesNode.put(PROPERTY_REPETITION_ENABLED, true);
