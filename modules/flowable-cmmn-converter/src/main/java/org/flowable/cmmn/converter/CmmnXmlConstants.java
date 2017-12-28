@@ -62,6 +62,7 @@ public interface CmmnXmlConstants {
     String ELEMENT_HTTP_RESPONSE_HANDLER = "httpResponseHandler";
     String ELEMENT_HTTP_REQUEST_HANDLER = "httpRequestHandler";
     
+    String ELEMENT_REQUIRED_RULE = "requiredRule";
     String ELEMENT_MANUAL_ACTIVATION_RULE = "manualActivationRule";
     String ELEMENT_REPETITION_RULE = "repetitionRule";
 
@@ -81,6 +82,9 @@ public interface CmmnXmlConstants {
     String ATTRIBUTE_IS_BLOCKING_EXPRESSION = "isBlockingExpression";
     String ATTRIBUTE_IS_ASYNCHRONOUS = "async";
     String ATTRIBUTE_IS_EXCLUSIVE = "exclusive";
+    
+    String ATTRIBUTE_IS_AUTO_COMPLETE = "autoComplete";
+    String ATTRIBUTE_AUTO_COMPLETE_CONDITION = "autoCompleteCondition";
     
     String ATTRIBUTE_CASE_REF = "caseRef";
     String ATTRIBUTE_PROCESS_REF = "processRef";

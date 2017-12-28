@@ -20,6 +20,7 @@ import org.flowable.cmmn.converter.CmmnXmlConstants;
 import org.flowable.cmmn.model.ManualActivationRule;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.RepetitionRule;
+import org.flowable.cmmn.model.RequiredRule;
 
 /**
  * @author Tijs Rademakers
@@ -47,6 +48,7 @@ public class PlanItemExport implements CmmnXmlConstants {
         }
         if (planItem.getItemControl() != null) {
             xtw.writeStartElement(ELEMENT_ITEM_CONTROL);
+            writeRequiredRule(planItem, xtw);
             writeRepetitionRule(planItem, xtw);
             writeManualActivationRule(planItem, xtw);
             xtw.writeEndElement();
@@ -56,6 +58,19 @@ public class PlanItemExport implements CmmnXmlConstants {
         
         // end plan item element
         xtw.writeEndElement();
+    }
+    
+    public static void writeRequiredRule(PlanItem planItem, XMLStreamWriter xtw) throws XMLStreamException {
+        RequiredRule requiredRule = planItem.getItemControl().getRequiredRule();
+        if (requiredRule != null) {
+            xtw.writeStartElement(ELEMENT_REQUIRED_RULE);
+            if (StringUtils.isNotEmpty(requiredRule.getCondition())) {
+                xtw.writeStartElement(ELEMENT_CONDITION);
+                xtw.writeCData(requiredRule.getCondition());
+                xtw.writeEndElement();
+            }
+            xtw.writeEndElement();
+        }
     }
 
     public static void writeRepetitionRule(PlanItem planItem, XMLStreamWriter xtw) throws XMLStreamException {

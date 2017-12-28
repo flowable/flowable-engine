@@ -63,8 +63,14 @@ public interface CmmnStencilConstants {
     String PROPERTY_IS_BLOCKING = "isblocking";
     String PROPERTY_IS_BLOCKING_EXPRESSION = "isblockingexpression";
     
+    String PROPERTY_IS_AUTOCOMPLETE = "autocompleteenabled";
+    String PROPERTY_AUTOCOMPLETE_CONDITION = "autocompletecondition";
+    
     String PROPERTY_IS_ASYNC = "isasync";
     String PROPERTY_IS_EXCLUSIVE = "isexclusive";
+    
+    String PROPERTY_REQUIRED_ENABLED = "requiredenabled";
+    String PROPERTY_REQUIRED_RULE_CONDITION = "requiredrulecondition";
     
     String PROPERTY_REPETITION_ENABLED = "repetitionenabled";
     String PROPERTY_REPETITION_RULE_CONDITION = "repetitionrulecondition";

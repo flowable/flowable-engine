@@ -19,7 +19,6 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
-import org.flowable.cmmn.editor.json.converter.util.CmmnModelJsonConverterUtil;
 import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
 import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.BaseElement;
@@ -32,8 +31,6 @@ import org.flowable.cmmn.model.PlanItem;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-
-import static org.flowable.cmmn.editor.json.converter.util.CmmnModelJsonConverterUtil.getPropertyFormKey;
 
 /**
  * @author Tijs Rademakers
@@ -243,13 +240,13 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
 
         HumanTask task = new HumanTask();
 
-        task.setPriority(getPropertyValueAsString(PROPERTY_USERTASK_PRIORITY, elementNode));
-        task.setFormKey(getPropertyFormKey(elementNode, formMap));
+        task.setPriority(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_USERTASK_PRIORITY, elementNode));
+        task.setFormKey(CmmnJsonConverterUtil.getPropertyFormKey(elementNode, formMap));
 
-        task.setDueDate(getPropertyValueAsString(PROPERTY_USERTASK_DUEDATE, elementNode));
-        task.setCategory(getPropertyValueAsString(PROPERTY_USERTASK_CATEGORY, elementNode));
+        task.setDueDate(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_USERTASK_DUEDATE, elementNode));
+        task.setCategory(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_USERTASK_CATEGORY, elementNode));
 
-        JsonNode assignmentNode = getProperty(PROPERTY_USERTASK_ASSIGNMENT, elementNode);
+        JsonNode assignmentNode = CmmnJsonConverterUtil.getProperty(PROPERTY_USERTASK_ASSIGNMENT, elementNode);
         if (assignmentNode != null) {
             JsonNode assignmentDefNode = assignmentNode.get("assignment");
             if (assignmentDefNode != null) {

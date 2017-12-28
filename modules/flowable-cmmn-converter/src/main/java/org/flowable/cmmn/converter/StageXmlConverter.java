@@ -35,7 +35,11 @@ public class StageXmlConverter extends PlanItemDefinitiomXmlConverter {
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         Stage stage = new Stage();
+        
         stage.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
+        stage.setAutoComplete(Boolean.valueOf(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_IS_AUTO_COMPLETE)));
+        stage.setAutoCompleteCondition(xtr.getAttributeValue(CmmnXmlConstants.FLOWABLE_EXTENSIONS_NAMESPACE, CmmnXmlConstants.ATTRIBUTE_AUTO_COMPLETE_CONDITION));
+        
         stage.setCase(conversionHelper.getCurrentCase());
         stage.setParent(conversionHelper.getCurrentStage());
         

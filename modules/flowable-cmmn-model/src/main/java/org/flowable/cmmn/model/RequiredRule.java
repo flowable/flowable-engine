@@ -15,22 +15,6 @@ package org.flowable.cmmn.model;
 /**
  * @author Joram Barrez
  */
-public class RepetitionRule extends PlanItemRule {
-    
-    public static String DEFAULT_REPETITION_COUNTER_VARIABLE_NAME = "repetitionCounter";
-    
-    protected String repetitionCounterVariableName;
-
-    public String getRepetitionCounterVariableName() {
-        if (repetitionCounterVariableName != null) {
-            return repetitionCounterVariableName;
-        } else {
-            return DEFAULT_REPETITION_COUNTER_VARIABLE_NAME;
-        }
-    }
-
-    public void setRepetitionCounterVariableName(String repetitionCounterVariableName) {
-        this.repetitionCounterVariableName = repetitionCounterVariableName;
-    }
+public class RequiredRule extends PlanItemRule {
     
 }

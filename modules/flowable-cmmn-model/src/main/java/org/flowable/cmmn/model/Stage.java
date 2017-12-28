@@ -23,9 +23,11 @@ import java.util.Map;
 public class Stage extends PlanFragment implements HasExitCriteria {
 
     protected boolean isPlanModel;
-    protected Map<String, PlanItemDefinition> planItemDefinitionMap = new LinkedHashMap<>();
     protected List<Criterion> exitCriteria = new ArrayList<>();
+    protected boolean autoComplete; 
+    protected String autoCompleteCondition;
     protected String formKey;
+    protected Map<String, PlanItemDefinition> planItemDefinitionMap = new LinkedHashMap<>();
 
     public void addPlanItemDefinition(PlanItemDefinition planItemDefinition) {
         planItemDefinitionMap.put(planItemDefinition.getId(), planItemDefinition);
@@ -84,6 +86,22 @@ public class Stage extends PlanFragment implements HasExitCriteria {
 
     public void setPlanModel(boolean isPlanModel) {
         this.isPlanModel = isPlanModel;
+    }
+    
+    public boolean isAutoComplete() {
+        return autoComplete;
+    }
+
+    public void setAutoComplete(boolean autoComplete) {
+        this.autoComplete = autoComplete;
+    }
+    
+    public String getAutoCompleteCondition() {
+        return autoCompleteCondition;
+    }
+
+    public void setAutoCompleteCondition(String autoCompleteCondition) {
+        this.autoCompleteCondition = autoCompleteCondition;
     }
 
     public String getFormKey() {

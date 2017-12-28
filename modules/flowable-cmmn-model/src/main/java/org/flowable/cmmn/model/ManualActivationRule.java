@@ -17,14 +17,4 @@ package org.flowable.cmmn.model;
  */
 public class ManualActivationRule extends PlanItemRule {
     
-    protected String condition;
-
-    public String getCondition() {
-        return condition;
-    }
-
-    public void setCondition(String condition) {
-        this.condition = condition;
-    }
-
 }

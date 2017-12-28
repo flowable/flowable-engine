@@ -14,36 +14,36 @@ package org.flowable.cmmn.converter;
 
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CmmnElement;
-import org.flowable.cmmn.model.PlanItemRule;
-import org.flowable.cmmn.model.SentryIfPart;
+import org.flowable.cmmn.model.PlanItemControl;
+import org.flowable.cmmn.model.RequiredRule;
 
 /**
  * @author Joram Barrez
  */
-public class ConditionXmlConverter extends CaseElementXmlConverter {
+public class RequiredRuleXmlConverter extends CaseElementXmlConverter {
     
     @Override
     public String getXMLElementName() {
-        return CmmnXmlConstants.ELEMENT_CONDITION;
+        return CmmnXmlConstants.ELEMENT_REQUIRED_RULE;
     }
     
     @Override
     public boolean hasChildElements() {
-        return false;
+        return true;
     }
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        String condition = xtr.getText();
-        if (StringUtils.isNotEmpty(condition)) {
-            CmmnElement currentCmmnElement = conversionHelper.getCurrentCmmnElement();
-            if (currentCmmnElement instanceof SentryIfPart) {
-                ((SentryIfPart) currentCmmnElement).setCondition(condition);
-            } else if (currentCmmnElement instanceof PlanItemRule) {
-                ((PlanItemRule) currentCmmnElement).setCondition(condition);
-            }
+        if (conversionHelper.getCurrentCmmnElement() instanceof PlanItemControl) {
+            
+            RequiredRule requiredRule = new RequiredRule();
+            requiredRule.setName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
+            
+            PlanItemControl planItemControl = (PlanItemControl) conversionHelper.getCurrentCmmnElement();
+            planItemControl.setRequiredRule(requiredRule);
+            
+            return requiredRule;
         }
         return null;
     }

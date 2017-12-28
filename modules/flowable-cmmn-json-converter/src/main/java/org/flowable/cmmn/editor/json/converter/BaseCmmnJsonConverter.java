@@ -20,7 +20,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.constants.EditorJsonConstants;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
-import org.flowable.cmmn.editor.json.converter.util.CmmnModelJsonConverterUtil;
 import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
 import org.flowable.cmmn.model.Association;
 import org.flowable.cmmn.model.BaseElement;
@@ -34,6 +33,7 @@ import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.RepetitionRule;
+import org.flowable.cmmn.model.RequiredRule;
 import org.flowable.cmmn.model.ServiceTask;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.cmmn.model.Task;
@@ -83,19 +83,6 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             propertiesNode.put(PROPERTY_DOCUMENTATION, planItemDefinition.getDocumentation());
         }
         
-        if (planItem.getItemControl() != null) {
-            RepetitionRule repetitionRule = planItem.getItemControl().getRepetitionRule();
-            if (repetitionRule != null) {
-                propertiesNode.put(PROPERTY_REPETITION_ENABLED, true);
-                if (StringUtils.isNotEmpty(repetitionRule.getCondition())) {
-                    propertiesNode.put(PROPERTY_REPETITION_RULE_CONDITION, repetitionRule.getCondition());
-                }
-                if (StringUtils.isNotEmpty(repetitionRule.getRepetitionCounterVariableName())) {
-                    propertiesNode.put(PROPERTY_REPETITION_RULE_VARIABLE_NAME, repetitionRule.getRepetitionCounterVariableName());    
-                }
-            }
-        }
-        
         if (planItemDefinition instanceof Task) {
             Task task = (Task) planItemDefinition;
             if (task.isAsync()) {
@@ -104,6 +91,18 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             if (task.isExclusive()) {
                 propertiesNode.put(PROPERTY_IS_EXCLUSIVE, task.isExclusive());
             }
+        } else if (planItemDefinition instanceof Stage) {
+            Stage stage = (Stage) planItemDefinition;
+            if (stage.isAutoComplete()) {
+                propertiesNode.put(PROPERTY_IS_AUTOCOMPLETE, stage.isAutoComplete());
+            }
+            if (StringUtils.isNotEmpty(stage.getAutoCompleteCondition())) {
+                propertiesNode.put(PROPERTY_AUTOCOMPLETE_CONDITION, stage.getAutoCompleteCondition());
+            }
+        }
+        
+        if (planItem.getItemControl() != null) {
+            convertPlanItemJson(planItem, propertiesNode);
         }
 
         convertElementToJson(planItemNode, propertiesNode, processor, baseElement, model);
@@ -119,30 +118,6 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             convertCriteria(planItem.getExitCriteria(), model, processor, shapesArrayNode, outgoingArrayNode, subProcessX, subProcessY);
         }
         
-        if (planItem.getItemControl() != null) {
-            
-            RepetitionRule repetitionRule = planItem.getItemControl().getRepetitionRule(); 
-            if (repetitionRule != null) {
-                propertiesNode.put(PROPERTY_REPETITION_ENABLED, true);
-                
-                if (StringUtils.isNotEmpty(repetitionRule.getCondition())) {
-                    propertiesNode.put(PROPERTY_REPETITION_RULE_CONDITION, repetitionRule.getCondition());
-                }
-                if (!RepetitionRule.DEFAULT_REPETITION_COUNTER_VARIABLE_NAME.equals(repetitionRule.getRepetitionCounterVariableName())) {
-                    propertiesNode.put(PROPERTY_REPETITION_RULE_VARIABLE_NAME, repetitionRule.getRepetitionCounterVariableName());
-                }
-            }
-            
-            ManualActivationRule manualActivationRule = planItem.getItemControl().getManualActivationRule();
-            if (manualActivationRule != null) {
-                propertiesNode.put(PROPERTY_MANUAL_ACTIVATION_ENABLED, true);
-                
-                if (StringUtils.isNotEmpty(manualActivationRule.getCondition())) {
-                    propertiesNode.put(PROPERTY_MANUAL_ACTIVATION_RULE_CONDITION, manualActivationRule.getCondition());
-                }
-            }
-        }
-
         if (CollectionUtils.isNotEmpty(planItem.getOutgoingAssociations())) {
             for (Association association : planItem.getOutgoingAssociations()) {
                 outgoingArrayNode.add(CmmnJsonConverterUtil.createResourceNode(association.getId()));
@@ -150,6 +125,38 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
         }
 
         planItemNode.set("outgoing", outgoingArrayNode);
+    }
+
+    protected void convertPlanItemJson(PlanItem planItem, ObjectNode propertiesNode) {
+        RepetitionRule repetitionRule = planItem.getItemControl().getRepetitionRule(); 
+        if (repetitionRule != null) {
+            propertiesNode.put(PROPERTY_REPETITION_ENABLED, true);
+            
+            if (StringUtils.isNotEmpty(repetitionRule.getCondition())) {
+                propertiesNode.put(PROPERTY_REPETITION_RULE_CONDITION, repetitionRule.getCondition());
+            }
+            if (!RepetitionRule.DEFAULT_REPETITION_COUNTER_VARIABLE_NAME.equals(repetitionRule.getRepetitionCounterVariableName())) {
+                propertiesNode.put(PROPERTY_REPETITION_RULE_VARIABLE_NAME, repetitionRule.getRepetitionCounterVariableName());
+            }
+        }
+        
+        ManualActivationRule manualActivationRule = planItem.getItemControl().getManualActivationRule();
+        if (manualActivationRule != null) {
+            propertiesNode.put(PROPERTY_MANUAL_ACTIVATION_ENABLED, true);
+            
+            if (StringUtils.isNotEmpty(manualActivationRule.getCondition())) {
+                propertiesNode.put(PROPERTY_MANUAL_ACTIVATION_RULE_CONDITION, manualActivationRule.getCondition());
+            }
+        }
+        
+        RequiredRule requiredRule = planItem.getItemControl().getRequiredRule();
+        if (requiredRule != null) {
+            propertiesNode.put(PROPERTY_REQUIRED_ENABLED, true);
+            
+            if (StringUtils.isNotEmpty(requiredRule.getCondition())) {
+                propertiesNode.put(PROPERTY_REQUIRED_RULE_CONDITION, requiredRule.getCondition());
+            }
+        }
     }
 
     public void convertToCmmnModel(JsonNode elementNode, JsonNode modelNode, ActivityProcessor processor, BaseElement parentElement,
@@ -160,8 +167,8 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
 
         if (baseElement instanceof PlanItemDefinition) {
             PlanItemDefinition planItemDefinition = (PlanItemDefinition) baseElement;
-            planItemDefinition.setName(getPropertyValueAsString(PROPERTY_NAME, elementNode));
-            planItemDefinition.setDocumentation(getPropertyValueAsString(PROPERTY_DOCUMENTATION, elementNode));
+            planItemDefinition.setName(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_NAME, elementNode));
+            planItemDefinition.setDocumentation(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_DOCUMENTATION, elementNode));
 
             if (planItemDefinition instanceof Task) {
                 handleTaskProperties(elementNode, planItemDefinition);
@@ -187,6 +194,7 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
                 }
             }
             
+            handleRequiredRule(elementNode, planItem);
             handleRepetitionRule(elementNode, planItem);
             handleManualActivationRule(elementNode, planItem);
 
@@ -199,21 +207,40 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
 
     protected void handleTaskProperties(JsonNode elementNode, PlanItemDefinition planItemDefinition) {
         Task task = (Task) planItemDefinition;
-        task.setBlocking(getPropertyValueAsBoolean(PROPERTY_IS_BLOCKING, elementNode));
-        task.setBlockingExpression(getPropertyValueAsString(PROPERTY_IS_BLOCKING_EXPRESSION, elementNode));
-        task.setAsync(getPropertyValueAsBoolean(PROPERTY_IS_ASYNC, elementNode));
-        task.setExclusive(getPropertyValueAsBoolean(PROPERTY_IS_EXCLUSIVE, elementNode));
+        task.setBlocking(CmmnJsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_IS_BLOCKING, elementNode));
+        task.setBlockingExpression(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_IS_BLOCKING_EXPRESSION, elementNode));
+        task.setAsync(CmmnJsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_IS_ASYNC, elementNode));
+        task.setExclusive(CmmnJsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_IS_EXCLUSIVE, elementNode));
+    }
+    
+    protected void handleRequiredRule(JsonNode elementNode, PlanItem planItem) {
+        boolean isRequired = CmmnJsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_REQUIRED_ENABLED, elementNode);
+        String requiredCondition = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_REQUIRED_RULE_CONDITION, elementNode);
+        if (isRequired || StringUtils.isNotEmpty(requiredCondition)) {
+            RequiredRule requiredRule = new RequiredRule();
+            
+            if (StringUtils.isNotEmpty(requiredCondition)) {
+                requiredRule.setCondition(requiredCondition);
+            }
+            
+            if (planItem.getItemControl() == null) {
+                planItem.setItemControl(new PlanItemControl());
+            }
+            planItem.getItemControl().setRequiredRule(requiredRule);
+        }
     }
 
     protected void handleRepetitionRule(JsonNode elementNode, PlanItem planItem) {
-        boolean repetitionEnabled = getPropertyValueAsBoolean(PROPERTY_REPETITION_ENABLED, elementNode);
-        String repetitionCondition = getPropertyValueAsString(PROPERTY_REPETITION_RULE_CONDITION, elementNode);
-        if (repetitionEnabled 
-                || StringUtils.isNotEmpty(repetitionCondition)) { // Assume checking the checkbox was forgotten
+        boolean repetitionEnabled = CmmnJsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_REPETITION_ENABLED, elementNode);
+        String repetitionCondition = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_REPETITION_RULE_CONDITION, elementNode);
+        if (repetitionEnabled || StringUtils.isNotEmpty(repetitionCondition)) { // Assume checking the checkbox was forgotten
             RepetitionRule repetitionRule = new RepetitionRule();
-            repetitionRule.setCondition(repetitionCondition);
             
-            String repetitionCounterVariableName = getPropertyValueAsString(PROPERTY_REPETITION_RULE_VARIABLE_NAME, elementNode);
+            if (StringUtils.isNotEmpty(repetitionCondition)) {
+                repetitionRule.setCondition(repetitionCondition);
+            }
+            
+            String repetitionCounterVariableName = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_REPETITION_RULE_VARIABLE_NAME, elementNode);
             if (StringUtils.isNotEmpty(repetitionCounterVariableName)) {
                 repetitionRule.setRepetitionCounterVariableName(repetitionCounterVariableName);
             }
@@ -226,12 +253,14 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
     }
 
     protected void handleManualActivationRule(JsonNode elementNode, PlanItem planItem) {
-        boolean manualActivationEnabled = getPropertyValueAsBoolean(PROPERTY_MANUAL_ACTIVATION_ENABLED, elementNode);
-        String manualActivationCondition = getPropertyValueAsString(PROPERTY_MANUAL_ACTIVATION_RULE_CONDITION, elementNode);
-        if (manualActivationEnabled
-                || StringUtils.isNotEmpty(manualActivationCondition)) {
+        boolean manualActivationEnabled = CmmnJsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_MANUAL_ACTIVATION_ENABLED, elementNode);
+        String manualActivationCondition = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_MANUAL_ACTIVATION_RULE_CONDITION, elementNode);
+        if (manualActivationEnabled || StringUtils.isNotEmpty(manualActivationCondition)) {
             ManualActivationRule manualActivationRule = new ManualActivationRule();
-            manualActivationRule.setCondition(manualActivationCondition);
+            
+            if (StringUtils.isNotEmpty(manualActivationCondition)) {
+                manualActivationRule.setCondition(manualActivationCondition);
+            }
             
             if (planItem.getItemControl() == null) {
                 planItem.setItemControl(new PlanItemControl());
@@ -295,7 +324,7 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
     protected void addField(String name, String propertyName, JsonNode elementNode, ServiceTask task) {
         FieldExtension field = new FieldExtension();
         field.setFieldName(name);
-        String value = getPropertyValueAsString(propertyName, elementNode);
+        String value = CmmnJsonConverterUtil.getPropertyValueAsString(propertyName, elementNode);
         if (StringUtils.isNotEmpty(value)) {
             field.setStringValue(value);
             task.getFieldExtensions().add(field);
@@ -337,22 +366,6 @@ public abstract class BaseCmmnJsonConverter implements EditorJsonConstants, Cmmn
             }
         }
         return resultList;
-    }
-
-    protected String getPropertyValueAsString(String name, JsonNode objectNode) {
-        return CmmnModelJsonConverterUtil.getPropertyValueAsString(name, objectNode);
-    }
-
-    protected boolean getPropertyValueAsBoolean(String name, JsonNode objectNode) {
-        return CmmnModelJsonConverterUtil.getPropertyValueAsBoolean(name, objectNode);
-    }
-
-    protected List<String> getPropertyValueAsList(String name, JsonNode objectNode) {
-        return CmmnModelJsonConverterUtil.getPropertyValueAsList(name, objectNode);
-    }
-
-    protected JsonNode getProperty(String name, JsonNode objectNode) {
-        return CmmnModelJsonConverterUtil.getProperty(name, objectNode);
     }
 
     protected String convertListToCommaSeparatedString(List<String> stringList) {

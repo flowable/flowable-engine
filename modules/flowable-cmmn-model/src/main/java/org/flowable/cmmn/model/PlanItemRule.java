@@ -17,4 +17,14 @@ package org.flowable.cmmn.model;
  */
 public class PlanItemRule extends CaseElement {
     
+    protected String condition;
+
+    public String getCondition() {
+        return condition;
+    }
+
+    public void setCondition(String condition) {
+        this.condition = condition;
+    }   
+    
 }

@@ -12,11 +12,13 @@
  */
 package org.flowable.cmmn.editor.json.converter;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
-import org.flowable.cmmn.editor.constants.EditorJsonConstants;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
-import org.joda.time.format.DateTimeFormatter;
-import org.joda.time.format.ISODateTimeFormat;
+import org.flowable.cmmn.editor.constants.EditorJsonConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +34,6 @@ public class CmmnJsonConverterUtil implements EditorJsonConstants, CmmnStencilCo
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CmmnJsonConverterUtil.class);
 
-    private static DateTimeFormatter dateTimeFormatter = ISODateTimeFormat.dateTimeParser();
     private static ObjectMapper objectMapper = new ObjectMapper();
 
     public static ObjectNode createChildShape(String id, String type, double lowerRightX, double lowerRightY, double upperLeftX, double upperLeftY) {
@@ -144,12 +145,58 @@ public class CmmnJsonConverterUtil implements EditorJsonConstants, CmmnStencilCo
     public static String getPropertyValueAsString(String name, JsonNode objectNode) {
         String propertyValue = null;
         JsonNode propertyNode = getProperty(name, objectNode);
-        if (propertyNode != null && !propertyNode.isNull()) {
+        if (propertyNode != null && !propertyNode.isNull() && !"null".equalsIgnoreCase(propertyNode.asText())) {
             propertyValue = propertyNode.asText();
         }
         return propertyValue;
     }
+    
+    public static boolean getPropertyValueAsBoolean(String name, JsonNode objectNode) {
+        return getPropertyValueAsBoolean(name, objectNode, false);
+    }
 
+    public static boolean getPropertyValueAsBoolean(String name, JsonNode objectNode, boolean defaultValue) {
+        boolean result = defaultValue;
+        String stringValue = getPropertyValueAsString(name, objectNode);
+
+        if (PROPERTY_VALUE_YES.equalsIgnoreCase(stringValue) || "true".equalsIgnoreCase(stringValue)) {
+            result = true;
+        } else if (PROPERTY_VALUE_NO.equalsIgnoreCase(stringValue) || "false".equalsIgnoreCase(stringValue)) {
+            result = false;
+        }
+
+        return result;
+    }
+    
+    public static List<String> getPropertyValueAsList(String name, JsonNode objectNode) {
+        List<String> resultList = new ArrayList<>();
+        JsonNode propertyNode = getProperty(name, objectNode);
+        if (propertyNode != null && !"null".equalsIgnoreCase(propertyNode.asText())) {
+            String propertyValue = propertyNode.asText();
+            String[] valueList = propertyValue.split(",");
+            for (String value : valueList) {
+                resultList.add(value.trim());
+            }
+        }
+        return resultList;
+    }
+    
+    public static String getPropertyFormKey(JsonNode elementNode, Map<String, String> formMap) {
+        String formKey = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_FORMKEY, elementNode);
+        if (StringUtils.isNotEmpty(formKey)) {
+            return (formKey);
+        } else {
+            JsonNode formReferenceNode = CmmnJsonConverterUtil.getProperty(PROPERTY_FORM_REFERENCE, elementNode);
+            if (formReferenceNode != null && formReferenceNode.get("id") != null) {
+
+                if (formMap != null && formMap.containsKey(formReferenceNode.get("id").asText())) {
+                    return formMap.get(formReferenceNode.get("id").asText());
+                }
+            }
+        }
+        return null;
+    }
+    
     public static JsonNode getProperty(String name, JsonNode objectNode) {
         JsonNode propertyNode = null;
         if (objectNode.get(EDITOR_SHAPE_PROPERTIES) != null) {

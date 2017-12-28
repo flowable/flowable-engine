@@ -61,7 +61,7 @@ public class CaseTaskJsonConverter extends BaseCmmnJsonConverter implements Case
         
         CaseTask task = new CaseTask();
         
-        JsonNode caseModelReferenceNode = getProperty(PROPERTY_CASE_REFERENCE, elementNode);
+        JsonNode caseModelReferenceNode = CmmnJsonConverterUtil.getProperty(PROPERTY_CASE_REFERENCE, elementNode);
         if (caseModelReferenceNode != null && caseModelReferenceNode.has("id") && !caseModelReferenceNode.get("id").isNull()) {
 
             String caseModelId = caseModelReferenceNode.get("id").asText();

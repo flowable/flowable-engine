@@ -32,7 +32,6 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
 import org.flowable.cmmn.editor.constants.EditorJsonConstants;
-import org.flowable.cmmn.editor.json.converter.util.CmmnModelJsonConverterUtil;
 import org.flowable.cmmn.editor.json.converter.util.CollectionUtils;
 import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.Association;
@@ -194,6 +193,12 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         if (StringUtils.isNotEmpty(planModelStage.getDocumentation())) {
             planModelPropertiesNode.put(PROPERTY_DOCUMENTATION, planModelStage.getDocumentation());
         }
+        if (planModelStage.isAutoComplete()) {
+            planModelPropertiesNode.put(PROPERTY_IS_AUTOCOMPLETE, planModelStage.isAutoComplete());
+        }
+        if (StringUtils.isNotEmpty(planModelStage.getAutoCompleteCondition())) {
+            planModelPropertiesNode.put(PROPERTY_AUTOCOMPLETE_CONDITION, planModelStage.getAutoCompleteCondition());
+        }
         if (StringUtils.isNotEmpty(planModelStage.getFormKey())) {
             planModelPropertiesNode.put(PROPERTY_FORMKEY, planModelStage.getFormKey());
         }
@@ -283,7 +288,8 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         CmmnModel cmmnModel = new CmmnModel();
         CmmnModelIdHelper cmmnModelIdHelper = new CmmnModelIdHelper();
 
-        cmmnModel.setTargetNamespace("http://flowable.org/test");
+        
+        cmmnModel.setTargetNamespace("http://flowable.org/cmmn"); // will be overriden later with actual value
         Map<String, JsonNode> shapeMap = new HashMap<>();
         Map<String, JsonNode> sourceRefMap = new HashMap<>();
         Map<String, JsonNode> edgeMap = new HashMap<>();
@@ -320,7 +326,13 @@ public class CmmnJsonConverter implements EditorJsonConstants, CmmnStencilConsta
         planModelStage.setId(CmmnJsonConverterUtil.getElementId(planModelShape));
         planModelStage.setName(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_NAME, planModelShape));
         planModelStage.setDocumentation(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_DOCUMENTATION, planModelShape));
-        planModelStage.setFormKey(CmmnModelJsonConverterUtil.getPropertyFormKey(planModelShape, formKeyMap));
+        planModelStage.setAutoComplete(CmmnJsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_IS_AUTOCOMPLETE, planModelShape));
+        
+        String autocompleteCondition = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_AUTOCOMPLETE_CONDITION, planModelShape);
+        if (StringUtils.isNotEmpty(autocompleteCondition)) {
+            planModelStage.setAutoCompleteCondition(autocompleteCondition);
+        }
+        planModelStage.setFormKey(CmmnJsonConverterUtil.getPropertyFormKey(planModelShape, formKeyMap));
         planModelStage.setPlanModel(true);
 
         caseModel.setPlanModel(planModelStage);
