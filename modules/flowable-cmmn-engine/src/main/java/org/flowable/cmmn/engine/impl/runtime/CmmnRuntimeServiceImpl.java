@@ -21,6 +21,7 @@ import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.engine.impl.ServiceImpl;
+import org.flowable.cmmn.engine.impl.cmd.CompleteStagePlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.DisablePlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.EnablePlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.EvaluateCriteriaCmd;
@@ -63,6 +64,11 @@ public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeSe
     @Override
     public void disablePlanItemInstance(String planItemInstanceId) {
         commandExecutor.execute(new DisablePlanItemInstanceCmd(planItemInstanceId));
+    }
+    
+    @Override
+    public void completeStagePlanItemInstance(String planItemInstanceId) {
+        commandExecutor.execute(new CompleteStagePlanItemInstanceCmd(planItemInstanceId));
     }
     
     @Override

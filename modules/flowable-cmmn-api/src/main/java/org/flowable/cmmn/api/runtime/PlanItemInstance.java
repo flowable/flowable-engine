@@ -33,6 +33,7 @@ public interface PlanItemInstance {
     String getStartUserId();
     String getReferenceId();
     String getReferenceType();
+    boolean isCompleteable();
     String getTenantId();
     
 }

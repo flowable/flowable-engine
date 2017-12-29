@@ -38,6 +38,7 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
     protected String startUserId;
     protected String callbackId;
     protected String callbackType;
+    protected boolean completeable;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     
     protected Date lockTime;
@@ -57,6 +58,7 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
         persistentState.put("startUserId", startUserId);
         persistentState.put("callbackId", callbackId);
         persistentState.put("callbackType", callbackType);
+        persistentState.put("completeable", completeable);
         persistentState.put("tenantId", tenantId);
         persistentState.put("lockTime", lockTime);
         return persistentState;
@@ -103,6 +105,12 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
     }
     public void setStartUserId(String startUserId) {
         this.startUserId = startUserId;
+    }
+    public boolean isCompleteable() {
+        return completeable;
+    }
+    public void setCompleteable(boolean completeable) {
+        this.completeable = completeable;
     }
     public String getCallbackId() {
         return callbackId;

@@ -150,14 +150,31 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                     CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity);
 
                 } else if (planItem.getPlanItemDefinition() instanceof Stage) {
+                    
                     boolean criteriaChangeOrActiveChildrenForStage = evaluateStagePlanItemInstance(planItemInstanceEntity);
                     if (criteriaChangeOrActiveChildrenForStage) {
                         activeChildren++;
+                        if (planItemInstanceEntity.isCompleteable()) {
+                            planItemInstanceEntity.setCompleteable(false); // an active child = stage cannot be completed anymore
+                        }
+                        
                     } else if (PlanItemInstanceState.ACTIVE.equals(state)) {
-                        if (isStageCompleteable(planItemInstanceEntity) ) {
+                        
+                        // Whether or not a stage is completeable is only checked if there are no active children,
+                        // which doesn't need to be checked again as this is already done in the evaluation logic above
+                        
+                        Stage stage = (Stage) planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
+                        boolean allRequiredChildrenInEndState = isEndStateReachedForAllRequiredChildPlanItems(planItemInstanceEntity);
+                        if (allRequiredChildrenInEndState) {
+                            planItemInstanceEntity.setCompleteable(true);
+                        }
+                        
+                        if (stage.isAutoComplete()
+                                || (!stage.isAutoComplete() && isEndStateReachedForAllChildPlanItems(planItemInstanceEntity))) {
                             criteriaChanged = true;
                             CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
                         }
+                        
                     }
                     
                 } else if (PlanItemInstanceState.ACTIVE.equals(state)) {
@@ -370,8 +387,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         return true;
     }
     
-    protected boolean isStageCompleteable(PlanItemInstanceEntity stagePlanItemInstanceEntity) {
-        Stage stage = (Stage) stagePlanItemInstanceEntity.getPlanItem().getPlanItemDefinition();
+    protected boolean isStageCompleteable(PlanItemInstanceEntity stagePlanItemInstanceEntity, Stage stage) {
         return (!stage.isAutoComplete() && isEndStateReachedForAllChildPlanItems(stagePlanItemInstanceEntity))
                 || (stage.isAutoComplete() && isEndStateReachedForAllRequiredChildPlanItems(stagePlanItemInstanceEntity));
     }

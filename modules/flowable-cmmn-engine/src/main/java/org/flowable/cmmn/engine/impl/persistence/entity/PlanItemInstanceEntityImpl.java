@@ -45,6 +45,7 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
     protected String startUserId;
     protected String referenceId;
     protected String referenceType;
+    protected boolean completeable;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
     
     // Non-persisted
@@ -68,6 +69,7 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
         persistentState.put("startUserId", startUserId);
         persistentState.put("referenceId", referenceId);
         persistentState.put("referenceType", referenceType);
+        persistentState.put("completeable", completeable);
         persistentState.put("tenantId", tenantId);
         return persistentState;
     }
@@ -158,6 +160,12 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
     }
     public void setReferenceType(String referenceType) {
         this.referenceType = referenceType;
+    }
+    public boolean isCompleteable() {
+        return completeable;
+    }
+    public void setCompleteable(boolean completeable) {
+        this.completeable = completeable;
     }
     public String getTenantId() {
         return tenantId;

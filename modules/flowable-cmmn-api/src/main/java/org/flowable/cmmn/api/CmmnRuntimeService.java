@@ -33,6 +33,8 @@ public interface CmmnRuntimeService {
     void startPlanItemInstance(String planItemInstanceId);
     
     void disablePlanItemInstance(String planItemInstanceId);
+
+    void completeStagePlanItemInstance(String planItemInstanceId);
     
     void terminateCaseInstance(String caseInstanceId);
     

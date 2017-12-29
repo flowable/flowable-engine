@@ -6,7 +6,7 @@
 
     <insert id="insertPlanItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl">
         insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, 
-                                                         NAME_, STATE_, START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_)
+                                                         NAME_, STATE_, START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_)
         values (
             #{id ,jdbcType=VARCHAR},
             1,
@@ -21,15 +21,16 @@
             #{state ,jdbcType=VARCHAR},
             #{startTime ,jdbcType=TIMESTAMP},
             #{startUserId ,jdbcType=VARCHAR},
-            #{referenceId, jdbcType=VARCHAR},
-            #{referenceType, jdbcType=VARCHAR},
+            #{referenceId ,jdbcType=VARCHAR},
+            #{referenceType ,jdbcType=VARCHAR},
+            #{completeable ,jdbcType=BOOLEAN},
             #{tenantId ,jdbcType=VARCHAR}
         )
     </insert>
 
   <insert id="bulkInsertPlanItemInstance" parameterType="java.util.List">
     insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, 
-                                                     NAME_, STATE_, START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_) 
+                                                     NAME_, STATE_, START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_) 
     values 
       <foreach collection="list" item="planItemInstance" index="index" separator=",">
         (
@@ -48,6 +49,7 @@
             #{planItemInstance.startUserId ,jdbcType=VARCHAR},
             #{planItemInstance.referenceId, jdbcType=VARCHAR},
             #{planItemInstance.referenceType, jdbcType=VARCHAR},
+            #{planItemInstance.completeable, jdbcType=BOOLEAN},
             #{planItemInstance.tenantId ,jdbcType=VARCHAR}
         )
       </foreach>
@@ -57,7 +59,7 @@
         INSERT ALL
         <foreach collection="list" item="planItemInstance" index="index">
             into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, 
-                                                      NAME_, STATE_, START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, TENANT_ID_) VALUES
+                                                      NAME_, STATE_, START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_) VALUES
             (
                 #{planItemInstance.id ,jdbcType=VARCHAR},
                 1,
@@ -74,6 +76,7 @@
                 #{planItemInstance.startUserId ,jdbcType=VARCHAR},
                 #{planItemInstance.referenceId, jdbcType=VARCHAR},
                 #{planItemInstance.referenceType, jdbcType=VARCHAR},
+                #{planItemInstance.completeable, jdbcType=BOOLEAN},
                 #{planItemInstance.tenantId ,jdbcType=VARCHAR}
             )
         </foreach>
@@ -123,6 +126,9 @@
         <if test="originalPersistentState.referenceType != referenceType">
             REFERENCE_TYPE_ = #{referenceType, jdbcType=VARCHAR},
         </if>
+        <if test="originalPersistentState.completeable != completeable">
+            IS_COMPLETEABLE_ = #{completeable, jdbcType=BOOLEAN}
+        </if>
         <if test="originalPersistentState.tenantId != tenantId">
             TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
         </if>
@@ -154,6 +160,7 @@
     <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
     <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
     <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
+    <result property="completeable" column="IS_COMPLETEABLE_" jdbcType="BOOLEAN" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
   </resultMap>
   
@@ -206,6 +213,9 @@
         <if test="stageInstanceId != null">
             and RES.STAGE_INST_ID_ = #{stageInstanceId}
         </if>
+        <if test="planItemInstanceId != null">
+            and RES.ID_ = #{planItemInstanceId}        
+        </if>
         <if test="elementId != null">
             and RES.ELEMENT_ID_ = #{elementId}
         </if>
@@ -235,6 +245,9 @@
         </if>
         <if test="referenceType != null">
             and RES.REFERENCE_TYPE_ = #{referenceType}
+        </if>
+        <if test="completeable">
+            and RES.IS_COMPLETEABLE_ = #{completeable, jdbcType=BOOLEAN}
         </if>
         <if test="tenantId != null">
             and RES.TENANT_ID_ = #{tenantId}

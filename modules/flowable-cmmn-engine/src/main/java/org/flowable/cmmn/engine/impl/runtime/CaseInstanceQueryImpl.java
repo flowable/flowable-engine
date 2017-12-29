@@ -49,6 +49,7 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     protected String startedBy;
     protected String callbackId;
     protected String callbackType;
+    protected boolean completeable;
     protected String tenantId;
     protected boolean withoutTenantId;
 
@@ -193,6 +194,12 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
     }
     
     @Override
+    public CaseInstanceQuery caseInstanceIsCompleteable() {
+        this.completeable = true;
+        return this;
+    }
+    
+    @Override
     public CaseInstanceQueryImpl caseInstanceTenantId(String tenantId) {
         if (tenantId == null) {
             throw new FlowableIllegalArgumentException("caseInstance tenant id is null");
@@ -317,6 +324,10 @@ public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanc
 
     public String getCallbackType() {
         return callbackType;
+    }
+    
+    public boolean isCompleteable() {
+        return completeable;
     }
 
     public String getTenantId() {

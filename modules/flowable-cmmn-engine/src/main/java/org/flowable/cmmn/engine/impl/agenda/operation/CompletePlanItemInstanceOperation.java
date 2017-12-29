@@ -43,7 +43,9 @@ public class CompletePlanItemInstanceOperation extends AbstractDeletePlanItemIns
     
     @Override
     protected void internalExecute() {
-        // Nothing extra to do
+        if (isStage(planItemInstanceEntity)) {
+            exitChildPlanItemInstances();
+        }
     }
     
 }
