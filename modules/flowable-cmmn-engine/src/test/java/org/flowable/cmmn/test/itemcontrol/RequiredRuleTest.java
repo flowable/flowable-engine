@@ -204,7 +204,7 @@ public class RequiredRuleTest extends FlowableCmmnTestCase {
             cmmnRuntimeService.completeStagePlanItemInstance(stagePlanItemInstance.getId());
             fail();
         } catch (FlowableIllegalArgumentException e) {
-            assertEquals("Can only complete a stage plan item instance that is marked as completeable (there might still be active children).", e.getMessage());
+            assertEquals("Can only complete a stage plan item instance that is marked as completeable (there might still be active plan item instance).", e.getMessage());
         }
         
         // Completing the one task should mark the stage as completeable 
@@ -222,4 +222,39 @@ public class RequiredRuleTest extends FlowableCmmnTestCase {
         assertCaseInstanceEnded(caseInstance);
     }
     
+    @Test
+    @CmmnDeployment
+    public void testCompleteCaseInstanceManually() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("testCompleteCaseInstanceManually")
+                .variable("required", true)
+                .start();
+        
+        assertFalse(caseInstance.isCompleteable());
+        assertEquals(2, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateActive().count());
+        assertEquals(1, cmmnRuntimeService.createPlanItemInstanceQuery().caseInstanceId(caseInstance.getId()).planItemInstanceStateAvailable().count());
+        
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertEquals("Other task", tasks.get(0).getName());
+        assertEquals("Required task", tasks.get(1).getName());
+        
+        // Case should not be completeale
+        try {
+            cmmnRuntimeService.completeCaseInstance(caseInstance.getId());
+            fail();
+        } catch (FlowableIllegalArgumentException e) {
+            assertEquals("Can only complete a case instance which is marked as completeable. Check if there are active plan item instances.", e.getMessage());
+        }
+        
+        // Completing both tasks should not auto complete the case, as the plan model is not auto complete
+        for (Task task : tasks) {
+            cmmnTaskService.complete(task.getId());
+        }
+        
+        caseInstance = cmmnRuntimeService.createCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertTrue(caseInstance.isCompleteable());
+        cmmnRuntimeService.completeCaseInstance(caseInstance.getId());
+        assertCaseInstanceEnded(caseInstance);
+    }
+      
 }

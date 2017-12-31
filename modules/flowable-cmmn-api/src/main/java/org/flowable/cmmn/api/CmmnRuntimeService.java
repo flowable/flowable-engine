@@ -36,6 +36,8 @@ public interface CmmnRuntimeService {
 
     void completeStagePlanItemInstance(String planItemInstanceId);
     
+    void completeCaseInstance(String caseInstanceId);
+    
     void terminateCaseInstance(String caseInstanceId);
     
     void evaluateCriteria(String caseInstanceId);

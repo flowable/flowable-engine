@@ -77,7 +77,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             boolean criteriaChangeOrActiveChildren = evaluatePlanItemsCriteria(caseInstanceEntity);
             if (evaluateCaseInstanceCompleted 
                     && !criteriaChangeOrActiveChildren
-                    && isPlanModelCompleteable()){
+                    && isPlanModelComplete()){
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("No active plan items found for plan model, completing case instance");
                 }
@@ -169,7 +169,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                             planItemInstanceEntity.setCompleteable(true);
                         }
                         
-                        if (stage.isAutoComplete()
+                        if ( (stage.isAutoComplete() && allRequiredChildrenInEndState)
                                 || (!stage.isAutoComplete() && isEndStateReachedForAllChildPlanItems(planItemInstanceEntity))) {
                             criteriaChanged = true;
                             CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
@@ -392,10 +392,14 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                 || (stage.isAutoComplete() && isEndStateReachedForAllRequiredChildPlanItems(stagePlanItemInstanceEntity));
     }
     
-    protected boolean isPlanModelCompleteable() {
+    protected boolean isPlanModelComplete() {
+        boolean allRequiredChildrenInEndState = isEndStateReachedForAllRequiredChildPlanItems(caseInstanceEntity);
+        if (allRequiredChildrenInEndState) {
+            caseInstanceEntity.setCompleteable(true);
+        }
+        
         boolean isAutoComplete = CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId()).getPlanModel().isAutoComplete();
-        return (isAutoComplete && isEndStateReachedForAllRequiredChildPlanItems(caseInstanceEntity))
-                  || (!isAutoComplete && isEndStateReachedForAllChildPlanItems(caseInstanceEntity));
+        return (isAutoComplete && allRequiredChildrenInEndState) || (!isAutoComplete && isEndStateReachedForAllChildPlanItems(caseInstanceEntity));
     }
 
     @Override
