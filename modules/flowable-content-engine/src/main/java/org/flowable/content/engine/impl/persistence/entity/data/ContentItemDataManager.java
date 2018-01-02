@@ -31,4 +31,6 @@ public interface ContentItemDataManager extends DataManager<ContentItemEntity> {
     void deleteContentItemsByTaskId(String taskId);
 
     void deleteContentItemsByProcessInstanceId(String processInstanceId);
+    
+    void deleteContentItemsByScopeIdAndScopeType(String scopeId, String scopeType);
 }

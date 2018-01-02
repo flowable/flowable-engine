@@ -43,6 +43,10 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
     protected String taskIdLike;
     protected String processInstanceId;
     protected String processInstanceIdLike;
+    protected String scopeId;
+    protected String scopeIdLike;
+    protected String scopeType;
+    protected String scopeTypeLike;
     protected String contentStoreId;
     protected String contentStoreIdLike;
     protected String contentStoreName;
@@ -132,6 +136,30 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
     @Override
     public ContentItemQueryImpl processInstanceIdLike(String processInstanceIdLike) {
         this.processInstanceIdLike = processInstanceIdLike;
+        return this;
+    }
+    
+    @Override
+    public ContentItemQueryImpl scopeId(String scopeId) {
+        this.scopeId = scopeId;
+        return this;
+    }
+
+    @Override
+    public ContentItemQueryImpl scopeIdLike(String scopeIdLike) {
+        this.scopeIdLike = scopeIdLike;
+        return this;
+    }
+
+    @Override
+    public ContentItemQueryImpl scopeType(String scopeType) {
+        this.scopeType = scopeType;
+        return this;
+    }
+
+    @Override
+    public ContentItemQueryImpl scopeTypeLike(String scopeTypeLike) {
+        this.scopeTypeLike = scopeTypeLike;
         return this;
     }
 
@@ -329,6 +357,22 @@ public class ContentItemQueryImpl extends AbstractQuery<ContentItemQuery, Conten
 
     public String getProcessInstanceIdLike() {
         return processInstanceIdLike;
+    }
+    
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public String getScopeIdLike() {
+        return scopeIdLike;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public String getScopeTypeLike() {
+        return scopeTypeLike;
     }
 
     public String getContentStoreId() {

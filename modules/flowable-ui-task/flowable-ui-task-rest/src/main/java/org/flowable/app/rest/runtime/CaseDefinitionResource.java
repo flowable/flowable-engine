@@ -13,7 +13,6 @@
 package org.flowable.app.rest.runtime;
 
 import org.flowable.app.service.runtime.FlowableCaseDefinitionService;
-import org.flowable.app.service.runtime.FlowableProcessDefinitionService;
 import org.flowable.form.model.FormModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,18 +21,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-public class DefinitionResource {
-
-    @Autowired
-    protected FlowableProcessDefinitionService processDefinitionService;
+public class CaseDefinitionResource {
 
     @Autowired
     protected FlowableCaseDefinitionService caseDefinitionService;
-
-    @RequestMapping(value = "/rest/process-definitions/{processDefinitionId}/start-form", method = RequestMethod.GET, produces = "application/json")
-    public FormModel getProcessDefinitionStartForm(@PathVariable String processDefinitionId) {
-        return processDefinitionService.getProcessDefinitionStartForm(processDefinitionId);
-    }
 
     @RequestMapping(value = "/rest/case-definitions/{caseDefinitionId}/start-form", method = RequestMethod.GET, produces = "application/json")
     public FormModel getCaseDefinitionStartForm(@PathVariable String caseDefinitionId) {

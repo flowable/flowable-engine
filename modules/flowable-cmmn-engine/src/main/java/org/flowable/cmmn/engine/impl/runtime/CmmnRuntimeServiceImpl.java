@@ -35,6 +35,7 @@ import org.flowable.cmmn.engine.impl.cmd.RemoveVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetLocalVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceWithFormCmd;
 import org.flowable.cmmn.engine.impl.cmd.StartPlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TerminateCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TriggerPlanItemInstanceCmd;
@@ -51,6 +52,10 @@ public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeSe
 
     public CaseInstance startCaseInstance(CaseInstanceBuilder caseInstanceBuilder) {
         return commandExecutor.execute(new StartCaseInstanceCmd(caseInstanceBuilder));
+    }
+    
+    public CaseInstance startCaseInstanceWithForm(CaseInstanceBuilder caseInstanceBuilder) {
+        return commandExecutor.execute(new StartCaseInstanceWithFormCmd(caseInstanceBuilder));
     }
 
     @Override public void triggerPlanItemInstance(String planItemInstanceId) {

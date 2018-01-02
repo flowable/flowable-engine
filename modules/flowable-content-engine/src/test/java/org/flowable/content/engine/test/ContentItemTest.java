@@ -57,7 +57,7 @@ public class ContentItemTest extends AbstractFlowableContentTest {
         assertEquals(contentItem.getId(), dbContentItem.getId());
 
         InputStream contentStream = contentService.getContentItemData(contentItem.getId());
-        String contentValue = IOUtils.toString(contentStream);
+        String contentValue = IOUtils.toString(contentStream, "utf-8");
         assertEquals("hello", contentValue);
 
         contentService.deleteContentItem(contentItem.getId());
@@ -72,5 +72,53 @@ public class ContentItemTest extends AbstractFlowableContentTest {
         } catch (Exception e) {
             fail("Expected not found exception, not " + e);
         }
+    }
+    
+    @Test
+    public void queryContentItemWithScopeId() {
+        createContentItem();
+        assertEquals("testScopeItem", contentService.createContentItemQuery().scopeId("testScopeId").singleResult().getName());
+        assertEquals("testScopeItem", contentService.createContentItemQuery().scopeIdLike("testScope%").singleResult().getName());
+        contentService.deleteContentItemsByScopeIdAndScopeType("testScopeId", "testScopeType");
+    }
+
+    @Test
+    public void queryContentItemWithScopeType() {
+        createContentItem();
+        assertEquals("testScopeItem", contentService.createContentItemQuery().scopeType("testScopeType").singleResult().getName());
+        assertEquals("testScopeItem", contentService.createContentItemQuery().scopeTypeLike("testScope%").singleResult().getName());
+        contentService.deleteContentItemsByScopeIdAndScopeType("testScopeId", "testScopeType");
+    }
+
+    @Test
+    public void insertAll() {
+        ContentItem contentItem = contentService.newContentItem();
+        contentItem.setName("testScopeItem1");
+        contentItem.setMimeType("application/pdf");
+        contentItem.setScopeType("testScopeType");
+        contentItem.setScopeId("testScopeId");
+        contentService.saveContentItem(contentItem);
+
+        ContentItem contentItem2 = contentService.newContentItem();
+        contentItem2.setName("testScopeItem1");
+        contentItem2.setMimeType("application/pdf");
+        contentItem2.setScopeType("testScopeType");
+        contentItem2.setScopeId("testScopeId");
+        contentService.saveContentItem(contentItem2);
+
+        assertEquals(2, contentService.createContentItemQuery().scopeTypeLike("testScope%").list().size());
+
+        contentService.deleteContentItemsByScopeIdAndScopeType("testScopeId", "testScopeType");
+
+        assertEquals(0, contentService.createContentItemQuery().scopeTypeLike("testScope%").list().size());
+    }
+    
+    protected void createContentItem() {
+        ContentItem contentItem = contentService.newContentItem();
+        contentItem.setName("testScopeItem");
+        contentItem.setMimeType("application/pdf");
+        contentItem.setScopeType("testScopeType");
+        contentItem.setScopeId("testScopeId");
+        contentService.saveContentItem(contentItem);
     }
 }
