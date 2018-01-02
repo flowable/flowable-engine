@@ -133,7 +133,6 @@ com.mchange                     c3p0                        0.9.5.2         Ecli
 com.sun.mail                    javax.mail                  1.5.6           CDDL/GPLv2+CE
 commons-beanutils               commons-beanutils           1.8.3           The Apache Software License, Version 2.0
 commons-codec                   commons-codec               1.10            Apache License, Version 2.0
-commons-dbcp                    commons-dbcp                1.4             The Apache Software License, Version 2.0
 commons-digester                commons-digester            1.8             The Apache Software License, Version 2.0
 commons-logging                 commons-logging             1.2             The Apache Software License, Version 2.0
 commons-collections             commons-collections         3.2.1           The Apache Software License, Version 2.0
