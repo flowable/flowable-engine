@@ -12,7 +12,9 @@
  */
 package org.flowable.app.service.runtime;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.model.common.ResultListDataRepresentation;
 import org.flowable.app.model.runtime.CaseDefinitionRepresentation;
@@ -33,8 +35,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tijs Rademakers
@@ -119,7 +120,6 @@ public class FlowableCaseDefinitionService {
         }
 
         String formKey = caze.getPlanModel().getFormKey();
-        LOGGER.debug("Getting form model by keys without restrictions.");
         return formRepositoryService.getFormModelByKey(formKey);
     }
 

@@ -33,8 +33,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import static org.flowable.cmmn.editor.json.converter.util.CmmnModelJsonConverterUtil.getPropertyFormKey;
-
 /**
  * @author Tijs Rademakers
  */
@@ -222,7 +220,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
     protected int getExtensionElementValueAsInt(String name, HumanTask humanTask) {
         int intValue = 0;
         String value = getExtensionElementValue(name, humanTask);
-        if (value != null && NumberUtils.isNumber(value)) {
+        if (value != null && NumberUtils.isCreatable(value)) {
             intValue = Integer.valueOf(value);
         }
         return intValue;
@@ -244,7 +242,7 @@ public class HumanTaskJsonConverter extends BaseCmmnJsonConverter implements For
         HumanTask task = new HumanTask();
 
         task.setPriority(getPropertyValueAsString(PROPERTY_USERTASK_PRIORITY, elementNode));
-        task.setFormKey(getPropertyFormKey(elementNode, formMap));
+        task.setFormKey(CmmnModelJsonConverterUtil.getPropertyFormKey(elementNode, formMap));
 
         task.setDueDate(getPropertyValueAsString(PROPERTY_USERTASK_DUEDATE, elementNode));
         task.setCategory(getPropertyValueAsString(PROPERTY_USERTASK_CATEGORY, elementNode));

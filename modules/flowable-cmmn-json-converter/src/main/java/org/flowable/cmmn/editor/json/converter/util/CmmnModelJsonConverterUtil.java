@@ -79,7 +79,7 @@ public class CmmnModelJsonConverterUtil implements EditorJsonConstants, CmmnSten
     }
 
     public static String getPropertyFormKey(JsonNode elementNode, Map<String, String> formMap) {
-        String formKey = CmmnModelJsonConverterUtil.getPropertyValueAsString(PROPERTY_FORMKEY, elementNode);
+        String formKey = getPropertyValueAsString(PROPERTY_FORMKEY, elementNode);
         if (StringUtils.isNotEmpty(formKey)) {
             return (formKey);
         } else {
@@ -143,6 +143,7 @@ public class CmmnModelJsonConverterUtil implements EditorJsonConstants, CmmnSten
     public static List<JsonLookupResult> getCmmnModelFormReferences(JsonNode editorJsonNode) {
         List<String> allowedStencilTypes = new ArrayList<>();
         allowedStencilTypes.add(STENCIL_TASK_HUMAN);
+        allowedStencilTypes.add(STENCIL_PLANMODEL);
         return getCmmnModelChildShapesPropertyValues(editorJsonNode, PROPERTY_FORM_REFERENCE, allowedStencilTypes);
     }
 
