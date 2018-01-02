@@ -310,5 +310,18 @@
         </addColumn>        
     
     </changeSet>
+    
+    <!-- Version 6.3.0 -->
+    <changeSet id="3" author="flowable">
+    
+        <addColumn tableName="ACT_CMMN_RU_PLAN_ITEM_INST">
+            <column name="IS_COMPLETEABLE_" type="boolean" />
+        </addColumn>
+        
+        <addColumn tableName="ACT_CMMN_RU_CASE_INST">
+            <column name="IS_COMPLETEABLE_" type="boolean" />
+        </addColumn>
+    
+    </changeSet>
 
 </databaseChangeLog>

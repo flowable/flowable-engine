@@ -28,6 +28,16 @@ public interface CmmnRuntimeService {
     
     void triggerPlanItemInstance(String planItemInstanceId);
     
+    void enablePlanItemInstance(String planItemInstanceId);
+    
+    void startPlanItemInstance(String planItemInstanceId);
+    
+    void disablePlanItemInstance(String planItemInstanceId);
+
+    void completeStagePlanItemInstance(String planItemInstanceId);
+    
+    void completeCaseInstance(String caseInstanceId);
+    
     void terminateCaseInstance(String caseInstanceId);
     
     void evaluateCriteria(String caseInstanceId);

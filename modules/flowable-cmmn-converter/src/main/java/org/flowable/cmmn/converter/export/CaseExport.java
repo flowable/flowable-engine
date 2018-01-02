@@ -21,7 +21,6 @@ import org.flowable.cmmn.model.Case;
 public class CaseExport implements CmmnXmlConstants {
     
     public static void writeCase(Case caseModel, XMLStreamWriter xtw) throws Exception {
-        // start process element
         xtw.writeStartElement(ELEMENT_CASE);
         xtw.writeAttribute(ATTRIBUTE_ID, caseModel.getId());
 

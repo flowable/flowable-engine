@@ -127,15 +127,7 @@ public abstract class CmmnOperation implements Runnable {
                 String repetitionCondition = planItem.getItemControl().getRepetitionRule().getCondition();
                 boolean isRepeating = false;
                 if (StringUtils.isNotEmpty(repetitionCondition)) {
-                    Expression repetitionExpression = CommandContextUtil.getExpressionManager(commandContext).createExpression(repetitionCondition);
-                    Object evaluationResult = repetitionExpression.getValue(planItemInstanceEntity);
-                    if (evaluationResult instanceof Boolean) {
-                        isRepeating = (boolean) evaluationResult;
-                    } else if (evaluationResult instanceof String) {
-                        isRepeating = ((String) evaluationResult).toLowerCase().equals("true");
-                    } else {
-                        throw new FlowableException("Repetition condition " + repetitionCondition + " did not evaluate to a boolean value");
-                    }
+                    isRepeating = evaluateBooleanExpression(commandContext, planItemInstanceEntity, repetitionCondition);
                 } else {
                     isRepeating = true; // no condition set, but a repetition rule defined is assumed to be defaulting to true
                 }
@@ -143,6 +135,18 @@ public abstract class CmmnOperation implements Runnable {
             }
         }
         return false;
+    }
+
+    protected boolean evaluateBooleanExpression(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity, String condition) {
+        Expression expression = CommandContextUtil.getExpressionManager(commandContext).createExpression(condition);
+        Object evaluationResult = expression.getValue(planItemInstanceEntity);
+        if (evaluationResult instanceof Boolean) {
+            return (boolean) evaluationResult;
+        } else if (evaluationResult instanceof String) {
+            return ((String) evaluationResult).toLowerCase().equals("true");
+        } else {
+            throw new FlowableException("Expression condition " + condition + " did not evaluate to a boolean value");
+        }
     }
 
 }

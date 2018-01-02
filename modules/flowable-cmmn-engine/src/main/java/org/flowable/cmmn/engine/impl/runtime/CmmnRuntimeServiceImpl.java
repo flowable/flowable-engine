@@ -21,6 +21,10 @@ import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.engine.impl.ServiceImpl;
+import org.flowable.cmmn.engine.impl.cmd.CompleteCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.CompleteStagePlanItemInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.DisablePlanItemInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.EnablePlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.EvaluateCriteriaCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetLocalVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetLocalVariablesCmd;
@@ -31,6 +35,8 @@ import org.flowable.cmmn.engine.impl.cmd.RemoveVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetLocalVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceWithFormCmd;
+import org.flowable.cmmn.engine.impl.cmd.StartPlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TerminateCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TriggerPlanItemInstanceCmd;
 
@@ -47,9 +53,38 @@ public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeSe
     public CaseInstance startCaseInstance(CaseInstanceBuilder caseInstanceBuilder) {
         return commandExecutor.execute(new StartCaseInstanceCmd(caseInstanceBuilder));
     }
+    
+    public CaseInstance startCaseInstanceWithForm(CaseInstanceBuilder caseInstanceBuilder) {
+        return commandExecutor.execute(new StartCaseInstanceWithFormCmd(caseInstanceBuilder));
+    }
 
     @Override public void triggerPlanItemInstance(String planItemInstanceId) {
         commandExecutor.execute(new TriggerPlanItemInstanceCmd(planItemInstanceId));
+    }
+    
+    @Override
+    public void enablePlanItemInstance(String planItemInstanceId) {
+        commandExecutor.execute(new EnablePlanItemInstanceCmd(planItemInstanceId));
+    }
+    
+    @Override
+    public void disablePlanItemInstance(String planItemInstanceId) {
+        commandExecutor.execute(new DisablePlanItemInstanceCmd(planItemInstanceId));
+    }
+    
+    @Override
+    public void completeStagePlanItemInstance(String planItemInstanceId) {
+        commandExecutor.execute(new CompleteStagePlanItemInstanceCmd(planItemInstanceId));
+    }
+    
+    @Override
+    public void startPlanItemInstance(String planItemInstanceId) {
+        commandExecutor.execute(new StartPlanItemInstanceCmd(planItemInstanceId));
+    }
+    
+    @Override
+    public void completeCaseInstance(String caseInstanceId) {
+        commandExecutor.execute(new CompleteCaseInstanceCmd(caseInstanceId));
     }
 
     @Override

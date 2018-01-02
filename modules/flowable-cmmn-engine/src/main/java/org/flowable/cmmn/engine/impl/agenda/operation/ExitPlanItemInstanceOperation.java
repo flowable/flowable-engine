@@ -14,8 +14,6 @@ package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.cmmn.engine.impl.runtime.StateTransition;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
@@ -39,21 +37,12 @@ public class ExitPlanItemInstanceOperation extends AbstractDeletePlanItemInstanc
     }
     
     @Override
-    public void run() {
+    protected void internalExecute() {
         if (isStage(planItemInstanceEntity)) {
-            completeChildPlanItems();
+            exitChildPlanItemInstances();
         }
-        super.run();
     }
 
-    protected void completeChildPlanItems() {
-        for (PlanItemInstanceEntity child : planItemInstanceEntity.getChildPlanItemInstances()) {
-            if (StateTransition.isPossible(planItemInstanceEntity, PlanItemTransition.EXIT)) {
-                CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(child);
-            }
-        }
-    }
-    
     @Override
     protected boolean isEvaluateRepetitionRule() {
         return false;

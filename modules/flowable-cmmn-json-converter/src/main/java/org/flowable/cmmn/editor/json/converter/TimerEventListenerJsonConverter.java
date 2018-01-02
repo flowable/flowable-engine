@@ -70,10 +70,10 @@ public class TimerEventListenerJsonConverter extends BaseCmmnJsonConverter {
             CmmnModelIdHelper cmmnModelIdHelper) {
         
         TimerEventListener timerEventListener = new TimerEventListener();
-        timerEventListener.setTimerExpression(getPropertyValueAsString(CmmnStencilConstants.PROPERTY_TIMER_EXPRESSION, elementNode));
+        timerEventListener.setTimerExpression(CmmnJsonConverterUtil.getPropertyValueAsString(CmmnStencilConstants.PROPERTY_TIMER_EXPRESSION, elementNode));
         
         String sourceRefId = null;
-        JsonNode sourceRefNode = getProperty(CmmnStencilConstants.PROPERTY_TIMER_START_TRIGGER_SOURCE_REF, elementNode);
+        JsonNode sourceRefNode = CmmnJsonConverterUtil.getProperty(CmmnStencilConstants.PROPERTY_TIMER_START_TRIGGER_SOURCE_REF, elementNode);
         if (sourceRefNode != null && sourceRefNode.has("id")) {
             sourceRefId = sourceRefNode.get("id").asText();
         }
@@ -81,7 +81,7 @@ public class TimerEventListenerJsonConverter extends BaseCmmnJsonConverter {
             JsonNode referencedNode = shapeMap.get(sourceRefId);  // The id is the json id, not the cmmn plan item id yet
             if (referencedNode != null) {
                 timerEventListener.setTimerStartTriggerSourceRef(CmmnJsonConverterUtil.getElementId(referencedNode));
-                timerEventListener.setTimerStartTriggerStandardEvent(getPropertyValueAsString(CmmnStencilConstants.PROPERTY_TIMER_START_TRIGGER_STANDARD_EVENT, elementNode));
+                timerEventListener.setTimerStartTriggerStandardEvent(CmmnJsonConverterUtil.getPropertyValueAsString(CmmnStencilConstants.PROPERTY_TIMER_START_TRIGGER_STANDARD_EVENT, elementNode));
             }
         }
         

@@ -26,10 +26,13 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery caseDefinitionId(String caseDefinitionId);
     PlanItemInstanceQuery caseInstanceId(String caseInstanceId);
     PlanItemInstanceQuery stageInstanceId(String stageInstanceId);
+    PlanItemInstanceQuery planItemInstanceId(String planItemInstanceId);
     PlanItemInstanceQuery planItemInstanceElementId(String elementId);
     PlanItemInstanceQuery planItemInstanceName(String name);
     PlanItemInstanceQuery planItemInstanceState(String state);
     PlanItemInstanceQuery planItemInstanceStateWaitingForRepetition();
+    PlanItemInstanceQuery planItemInstanceStateEnabled();
+    PlanItemInstanceQuery planItemInstanceStateDisabled();
     PlanItemInstanceQuery planItemInstanceStateActive();
     PlanItemInstanceQuery planItemInstanceStateAsyncActive();
     PlanItemInstanceQuery planItemInstanceStateAvailable();
@@ -40,6 +43,7 @@ public interface PlanItemInstanceQuery extends Query<PlanItemInstanceQuery, Plan
     PlanItemInstanceQuery planItemInstanceStartUserId(String startUserId);
     PlanItemInstanceQuery planItemInstanceReferenceId(String referenceId);
     PlanItemInstanceQuery planItemInstanceReferenceType(String referenceType);
+    PlanItemInstanceQuery planItemCompleteable();
     PlanItemInstanceQuery planItemInstanceTenantId(String tenantId);
     PlanItemInstanceQuery planItemInstanceWithoutTenantId();
     

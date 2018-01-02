@@ -16,7 +16,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CmmnElement;
-import org.flowable.cmmn.model.RepetitionRule;
+import org.flowable.cmmn.model.PlanItemRule;
 import org.flowable.cmmn.model.SentryIfPart;
 
 /**
@@ -41,8 +41,8 @@ public class ConditionXmlConverter extends CaseElementXmlConverter {
             CmmnElement currentCmmnElement = conversionHelper.getCurrentCmmnElement();
             if (currentCmmnElement instanceof SentryIfPart) {
                 ((SentryIfPart) currentCmmnElement).setCondition(condition);
-            } else if (currentCmmnElement instanceof RepetitionRule) {
-                ((RepetitionRule) currentCmmnElement).setCondition(condition);
+            } else if (currentCmmnElement instanceof PlanItemRule) {
+                ((PlanItemRule) currentCmmnElement).setCondition(condition);
             }
         }
         return null;

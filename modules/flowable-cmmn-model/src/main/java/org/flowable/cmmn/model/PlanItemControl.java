@@ -17,7 +17,17 @@ package org.flowable.cmmn.model;
  */
 public class PlanItemControl extends CaseElement {
     
+    protected RequiredRule requiredRule;
     protected RepetitionRule repetitionRule;
+    protected ManualActivationRule manualActivationRule;
+    
+    public RequiredRule getRequiredRule() {
+        return requiredRule;
+    }
+
+    public void setRequiredRule(RequiredRule requiredRule) {
+        this.requiredRule = requiredRule;
+    }
 
     public RepetitionRule getRepetitionRule() {
         return repetitionRule;
@@ -25,6 +35,14 @@ public class PlanItemControl extends CaseElement {
 
     public void setRepetitionRule(RepetitionRule repetitionRule) {
         this.repetitionRule = repetitionRule;
+    }
+
+    public ManualActivationRule getManualActivationRule() {
+        return manualActivationRule;
+    }
+
+    public void setManualActivationRule(ManualActivationRule manualActivationRule) {
+        this.manualActivationRule = manualActivationRule;
     }
     
 }

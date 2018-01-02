@@ -12,13 +12,14 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
-import org.flowable.cmmn.engine.impl.behavior.CmmnActivityBehavior;
-import org.flowable.cmmn.engine.impl.behavior.CoreCmmnActivityBehavior;
 import org.flowable.cmmn.engine.impl.job.AsyncActivatePlanItemInstanceJobHandler;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.ManualActivationRule;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.Task;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.job.service.JobService;
@@ -40,29 +41,40 @@ public class ActivatePlanItemInstanceOperation extends AbstractPlanItemInstanceO
     
     @Override
     public void run() {
-        if (!PlanItemInstanceState.ACTIVE.equals(planItemInstanceEntity.getState())) {
-            
-            // When it's an asynchronous task, a new activate operation is planned asynchronously.
-            if (isAsync() && !PlanItemInstanceState.ASYNC_ACTIVE.equals(planItemInstanceEntity.getState())) {
-                LOGGER.debug("Plan item {} is planned for asynchronous activatation", 
-                        planItemInstanceEntity.getPlanItem().getName() != null ? planItemInstanceEntity.getPlanItem().getName() : planItemInstanceEntity.getPlanItem().getId());
-                createAsyncJob((Task) planItemInstanceEntity.getPlanItem().getPlanItemDefinition());
-                planItemInstanceEntity.setState(PlanItemInstanceState.ASYNC_ACTIVE);
-                return;
-            }
-            
-            // Sentries are not needed to be kept around, as the plan item is being activated
-            deleteSentryPartInstances();
-            
-            planItemInstanceEntity.setState(PlanItemInstanceState.ACTIVE);
-            executeActivityBehavior();
-            
-            // For the first instance of a repeatable plan item, the counter variable needs to be set.
-            if (isPlanItemRepeatableOnComplete(planItemInstanceEntity.getPlanItem()) 
-                    && getRepetitionCounter(planItemInstanceEntity) == 0) {
-                setRepetitionCounter(planItemInstanceEntity, 1);
+        // When it's an asynchronous task, a new activate operation is planned asynchronously.
+        if (isAsync() && !PlanItemInstanceState.ASYNC_ACTIVE.equals(planItemInstanceEntity.getState())) {
+            LOGGER.debug("Plan item {} is planned for asynchronous activatation", 
+                    planItemInstanceEntity.getPlanItem().getName() != null ? planItemInstanceEntity.getPlanItem().getName() : planItemInstanceEntity.getPlanItem().getId());
+            createAsyncJob((Task) planItemInstanceEntity.getPlanItem().getPlanItemDefinition());
+            planItemInstanceEntity.setState(PlanItemInstanceState.ASYNC_ACTIVE);
+            return;
+        }
+        
+        // Sentries are not needed to be kept around, as the plan item is being enabled
+        deleteSentryPartInstances();
+        
+        // Evaluate manual activation rule. If one is defined and it evaluates to true, the plan item becomes enabled.
+        // Otherwise, the plan item instance is started and becomes active
+        boolean isManuallyActivated = evaluateManualActivationRule();
+        if (isManuallyActivated) {
+            CommandContextUtil.getAgenda(commandContext).planEnablePlanItemInstanceOperation(planItemInstanceEntity);
+        } else {
+            CommandContextUtil.getAgenda(commandContext).planStartPlanItemInstanceOperation(planItemInstanceEntity);
+        }
+    }
+
+    protected boolean evaluateManualActivationRule() {
+        PlanItemControl planItemControl = planItemInstanceEntity.getPlanItem().getItemControl();
+        if (planItemControl != null && planItemControl.getManualActivationRule() != null) {
+            ManualActivationRule manualActivationRule = planItemControl.getManualActivationRule();
+
+            if (StringUtils.isNotEmpty(manualActivationRule.getCondition())) {
+                return evaluateBooleanExpression(commandContext, planItemInstanceEntity, manualActivationRule.getCondition());
+            } else {
+                return true; // Having a manual activation rule without condition, defaults to true.
             }
         }
+        return false;
     }
     
     protected boolean isAsync() {
@@ -87,15 +99,6 @@ public class ActivatePlanItemInstanceOperation extends AbstractPlanItemInstanceO
         
         jobService.setAsyncJobProperties(job, task.isExclusive());
         jobService.scheduleAsyncJob(job);
-    }
-    
-    protected void executeActivityBehavior() {
-        CmmnActivityBehavior activityBehavior = (CmmnActivityBehavior) planItemInstanceEntity.getPlanItem().getBehavior();
-        if (activityBehavior instanceof CoreCmmnActivityBehavior) {
-            ((CoreCmmnActivityBehavior) activityBehavior).execute(commandContext, planItemInstanceEntity);
-        } else {
-            activityBehavior.execute(planItemInstanceEntity);
-        }
     }
     
     @Override

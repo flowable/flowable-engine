@@ -13,8 +13,10 @@
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
+import org.flowable.cmmn.engine.impl.runtime.StateTransition;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemTransition;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
@@ -65,6 +67,14 @@ public abstract class AbstractDeletePlanItemInstanceOperation extends AbstractCh
         return false;
     }
 
+    protected void exitChildPlanItemInstances() {
+        for (PlanItemInstanceEntity child : planItemInstanceEntity.getChildPlanItemInstances()) {
+            if (StateTransition.isPossible(child, PlanItemTransition.EXIT)) {
+                CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(child);
+            }
+        }
+    }
+    
     protected abstract boolean isEvaluateRepetitionRule();
     
 }

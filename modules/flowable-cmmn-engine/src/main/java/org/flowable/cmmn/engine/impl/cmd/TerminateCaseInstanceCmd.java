@@ -14,35 +14,20 @@ package org.flowable.cmmn.engine.impl.cmd;
 
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
  */
-public class TerminateCaseInstanceCmd implements Command<Void> {
-
-    protected String caseInstanceId;
+public class TerminateCaseInstanceCmd extends AbstractNeedsCaseInstanceCmd {
 
     public TerminateCaseInstanceCmd(String caseInstanceId) {
-        this.caseInstanceId = caseInstanceId;
+        super(caseInstanceId);
     }
-
+    
     @Override
-    public Void execute(CommandContext commandContext) {
-        if (caseInstanceId == null) {
-            throw new FlowableIllegalArgumentException("Case instance id is null");
-        }
-        
-        CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(caseInstanceId);
-        if (caseInstanceEntity == null) {
-            throw new FlowableObjectNotFoundException("Cannot find case instance entity for id " + caseInstanceId, CaseInstanceEntity.class);
-        }
-        
+    protected void internalExecute(CommandContext commandContext, CaseInstanceEntity caseInstanceEntity) {
         CommandContextUtil.getAgenda(commandContext).planTerminateCaseInstanceOperation(caseInstanceEntity.getId(), true);
-        return null;
     }
 
 }

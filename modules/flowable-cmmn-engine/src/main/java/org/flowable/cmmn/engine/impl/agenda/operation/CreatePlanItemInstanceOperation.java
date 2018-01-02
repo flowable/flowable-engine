@@ -28,9 +28,7 @@ public class CreatePlanItemInstanceOperation extends AbstractChangePlanItemInsta
     }
     
     @Override
-    public void run() {
-        super.run();
-        
+    protected void internalExecute() {
         PlanItem planItem = planItemInstanceEntity.getPlanItem();
         if (planItem != null
                 && planItem.getItemControl() != null

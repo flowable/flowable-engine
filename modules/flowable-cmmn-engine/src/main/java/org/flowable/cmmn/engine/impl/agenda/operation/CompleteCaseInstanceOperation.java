@@ -45,5 +45,13 @@ public class CompleteCaseInstanceOperation extends AbstractDeleteCaseInstanceOpe
     protected String getDeleteReason() {
         return "cmmn-state-transition-complete-case";
     }
+    
+    @Override
+    public String toString() {
+        StringBuilder strb = new StringBuilder();
+        strb.append("[Complete case instance] case instance ");
+        strb.append(caseInstanceEntity != null ? caseInstanceEntity.getId() : caseInstanceEntityId);
+        return strb.toString();
+    }
 
 }

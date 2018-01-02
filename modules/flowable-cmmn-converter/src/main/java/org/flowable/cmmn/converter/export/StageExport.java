@@ -49,6 +49,14 @@ public class StageExport implements CmmnXmlConstants {
             xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
                     ATTRIBUTE_FORM_KEY, stage.getFormKey());
         }
+        
+        if (stage.isAutoComplete()) {
+            xtw.writeAttribute(ATTRIBUTE_IS_AUTO_COMPLETE, Boolean.toString(stage.isAutoComplete()));
+        }
+        if (StringUtils.isNotEmpty(stage.getAutoCompleteCondition())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
+                    ATTRIBUTE_AUTO_COMPLETE_CONDITION, stage.getAutoCompleteCondition());
+        }
 
         for (PlanItem planItem : stage.getPlanItems()) {
             PlanItemExport.writePlanItem(planItem, xtw);

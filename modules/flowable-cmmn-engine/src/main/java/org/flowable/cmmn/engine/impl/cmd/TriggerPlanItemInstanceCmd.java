@@ -12,38 +12,22 @@
  */
 package org.flowable.cmmn.engine.impl.cmd;
 
-import java.io.Serializable;
-
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
  * @author Joram Barrez
  */
-public class TriggerPlanItemInstanceCmd implements Command<Void>, Serializable {
-
-    protected String planItemInstanceId;
+public class TriggerPlanItemInstanceCmd extends AbstractNeedsPlanItemInstanceCmd {
 
     public TriggerPlanItemInstanceCmd(String planItemInstanceId) {
-        this.planItemInstanceId = planItemInstanceId;
+        super(planItemInstanceId);
     }
-
+    
     @Override
-    public Void execute(CommandContext commandContext) {
-        if (planItemInstanceId == null) {
-            throw new FlowableIllegalArgumentException("Plan item instance id is null");
-        }
-        PlanItemInstanceEntity planItemInstanceEntity = CommandContextUtil.getPlanItemInstanceEntityManager(commandContext).findById(planItemInstanceId);
-        if (planItemInstanceEntity == null) {
-            throw new FlowableObjectNotFoundException("Cannot find plan item instance for id " + planItemInstanceId, PlanItemInstanceEntity.class);
-        }
-        
+    protected void internalExecute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
         CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
-        return null;
     }
-   
+    
 }

@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
@@ -25,11 +26,13 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceContaine
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityManager;
+import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.EventListener;
 import org.flowable.cmmn.model.HasExitCriteria;
 import org.flowable.cmmn.model.PlanItem;
+import org.flowable.cmmn.model.PlanItemControl;
 import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.SentryIfPart;
 import org.flowable.cmmn.model.SentryOnPart;
@@ -74,7 +77,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             boolean criteriaChangeOrActiveChildren = evaluatePlanItemsCriteria(caseInstanceEntity);
             if (evaluateCaseInstanceCompleted 
                     && !criteriaChangeOrActiveChildren
-                    && isEndStateReachedForAllChildPlanItems(caseInstanceEntity)) {
+                    && isPlanModelComplete()){
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("No active plan items found for plan model, completing case instance");
                 }
@@ -133,6 +136,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                         activatePlanItemInstance = false; // event listeners occur, they don't become active
                     }
                     if (activatePlanItemInstance) {
+                        criteriaChanged = true;
                         CommandContextUtil.getAgenda(commandContext).planActivatePlanItemInstanceOperation(planItemInstanceEntity);
                     }
                 }
@@ -146,14 +150,33 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
                     CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(planItemInstanceEntity);
 
                 } else if (planItem.getPlanItemDefinition() instanceof Stage) {
+                    
                     boolean criteriaChangeOrActiveChildrenForStage = evaluateStagePlanItemInstance(planItemInstanceEntity);
                     if (criteriaChangeOrActiveChildrenForStage) {
                         activeChildren++;
-                    } else if (PlanItemInstanceState.ACTIVE.equals(state) && isEndStateReachedForAllChildPlanItems(planItemInstanceEntity)) {
-                        criteriaChanged = true;
-                        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
+                        if (planItemInstanceEntity.isCompleteable()) {
+                            planItemInstanceEntity.setCompleteable(false); // an active child = stage cannot be completed anymore
+                        }
+                        
+                    } else if (PlanItemInstanceState.ACTIVE.equals(state)) {
+                        
+                        // Whether or not a stage is completeable is only checked if there are no active children,
+                        // which doesn't need to be checked again as this is already done in the evaluation logic above
+                        
+                        Stage stage = (Stage) planItemInstanceEntity.getPlanItem().getPlanItemDefinition();
+                        boolean allRequiredChildrenInEndState = isEndStateReachedForAllRequiredChildPlanItems(planItemInstanceEntity);
+                        if (allRequiredChildrenInEndState) {
+                            planItemInstanceEntity.setCompleteable(true);
+                        }
+                        
+                        if ( (stage.isAutoComplete() && allRequiredChildrenInEndState)
+                                || (!stage.isAutoComplete() && isEndStateReachedForAllChildPlanItems(planItemInstanceEntity))) {
+                            criteriaChanged = true;
+                            CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation(planItemInstanceEntity);
+                        }
+                        
                     }
-
+                    
                 } else if (PlanItemInstanceState.ACTIVE.equals(state)) {
                     activeChildren++;
 
@@ -322,6 +345,33 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
         return false;
     }
     
+    protected boolean isEndStateReachedForAllRequiredChildPlanItems(PlanItemInstanceContainer planItemInstanceContainer) {
+        if (planItemInstanceContainer.getChildPlanItemInstances() != null) {
+            for (PlanItemInstanceEntity childPlanItemInstance : planItemInstanceContainer.getChildPlanItemInstances()) {
+                
+                PlanItemControl planItemControl = childPlanItemInstance.getPlanItem().getItemControl();
+                if (planItemControl != null && planItemControl.getRequiredRule() != null) {
+                    boolean isRequired = true; // Having a required rule means required by default, unless the condition says otherwise
+                    
+                    String requiredCondition = planItemControl.getRequiredRule().getCondition();
+                    if (StringUtils.isNotEmpty(requiredCondition)) {
+                        isRequired = evaluateBooleanExpression(commandContext, childPlanItemInstance, requiredCondition);
+                    }
+                    
+                    if (isRequired && !PlanItemInstanceState.END_STATES.contains(childPlanItemInstance.getState())) {
+                        return false;
+                    }
+                }
+                
+                boolean allRequiredChildChildsEndStateReached = isEndStateReachedForAllRequiredChildPlanItems(childPlanItemInstance);
+                if (!allRequiredChildChildsEndStateReached) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+    
     protected boolean isEndStateReachedForAllChildPlanItems(PlanItemInstanceContainer planItemInstanceContainer) {
         if (planItemInstanceContainer.getChildPlanItemInstances() != null) {
             for (PlanItemInstanceEntity childPlanItemInstance : planItemInstanceContainer.getChildPlanItemInstances()) {
@@ -335,6 +385,21 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             }
         }
         return true;
+    }
+    
+    protected boolean isStageCompleteable(PlanItemInstanceEntity stagePlanItemInstanceEntity, Stage stage) {
+        return (!stage.isAutoComplete() && isEndStateReachedForAllChildPlanItems(stagePlanItemInstanceEntity))
+                || (stage.isAutoComplete() && isEndStateReachedForAllRequiredChildPlanItems(stagePlanItemInstanceEntity));
+    }
+    
+    protected boolean isPlanModelComplete() {
+        boolean allRequiredChildrenInEndState = isEndStateReachedForAllRequiredChildPlanItems(caseInstanceEntity);
+        if (allRequiredChildrenInEndState) {
+            caseInstanceEntity.setCompleteable(true);
+        }
+        
+        boolean isAutoComplete = CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId()).getPlanModel().isAutoComplete();
+        return (isAutoComplete && allRequiredChildrenInEndState) || (!isAutoComplete && isEndStateReachedForAllChildPlanItems(caseInstanceEntity));
     }
 
     @Override

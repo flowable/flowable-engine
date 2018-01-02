@@ -13,12 +13,9 @@
 package org.flowable.cmmn.editor.json.converter.util;
 
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.constants.CmmnStencilConstants;
@@ -100,7 +97,6 @@ public class CmmnModelJsonConverterUtil implements EditorJsonConstants, CmmnSten
      *
      * Returns a map with said json nodes, with the key the name of the childshape.
      */
-
     protected static List<JsonLookupResult> getCmmnModelChildShapesPropertyValues(JsonNode editorJsonNode, String propertyName, List<String> allowedStencilTypes) {
         List<JsonLookupResult> result = new ArrayList<>();
         internalGetCmmnChildShapePropertyValues(editorJsonNode, propertyName, allowedStencilTypes, result);
@@ -171,59 +167,7 @@ public class CmmnModelJsonConverterUtil implements EditorJsonConstants, CmmnSten
         return getCmmnModelChildShapesPropertyValues(editorJsonNode, PROPERTY_DECISIONTABLE_REFERENCE, allowedStencilTypes);
     }
 
-    // APP MODEL
-
-    public static List<JsonNode> getAppModelReferencedProcessModels(JsonNode appModelJson) {
-        List<JsonNode> result = new ArrayList<>();
-        if (appModelJson.has("models")) {
-            ArrayNode modelsArrayNode = (ArrayNode) appModelJson.get("models");
-            Iterator<JsonNode> modelArrayIterator = modelsArrayNode.iterator();
-            while (modelArrayIterator.hasNext()) {
-                result.add(modelArrayIterator.next());
-            }
-        }
-        return result;
-    }
-
-    public static Set<String> getAppModelReferencedModelIds(JsonNode appModelJson) {
-        if (appModelJson.has("models")) {
-            return CmmnModelJsonConverterUtil.gatherStringPropertyFromJsonNodes(appModelJson.get("models"), "id");
-        }
-        return Collections.emptySet();
-    }
-
     // GENERIC
-
-    /**
-     * Loops through a list of {@link JsonNode} instances, and stores the given property with given type in the returned list.
-     *
-     * In Java 8, this probably could be done a lot cooler.
-     */
-    public static Set<Long> gatherLongPropertyFromJsonNodes(Iterable<JsonNode> jsonNodes, String propertyName) {
-        Set<Long> result = new HashSet<>(); // Using a Set to filter out doubles
-        for (JsonNode node : jsonNodes) {
-            if (node.has(propertyName)) {
-                Long propertyValue = node.get(propertyName).asLong();
-                if (propertyValue > 0) { // Just to be safe
-                    result.add(propertyValue);
-                }
-            }
-        }
-        return result;
-    }
-
-    public static Set<String> gatherStringPropertyFromJsonNodes(Iterable<JsonNode> jsonNodes, String propertyName) {
-        Set<String> result = new HashSet<>(); // Using a Set to filter out doubles
-        for (JsonNode node : jsonNodes) {
-            if (node.has(propertyName)) {
-                String propertyValue = node.get(propertyName).asText();
-                if (propertyValue != null) { // Just to be safe
-                    result.add(propertyValue);
-                }
-            }
-        }
-        return result;
-    }
 
     public static List<JsonNode> filterOutJsonNodes(List<JsonLookupResult> lookupResults) {
         List<JsonNode> jsonNodes = new ArrayList<>(lookupResults.size());

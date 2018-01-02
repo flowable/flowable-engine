@@ -19,16 +19,7 @@ public class RepetitionRule extends PlanItemRule {
     
     public static String DEFAULT_REPETITION_COUNTER_VARIABLE_NAME = "repetitionCounter";
     
-    protected String condition;
     protected String repetitionCounterVariableName;
-
-    public String getCondition() {
-        return condition;
-    }
-
-    public void setCondition(String condition) {
-        this.condition = condition;
-    }
 
     public String getRepetitionCounterVariableName() {
         if (repetitionCounterVariableName != null) {
