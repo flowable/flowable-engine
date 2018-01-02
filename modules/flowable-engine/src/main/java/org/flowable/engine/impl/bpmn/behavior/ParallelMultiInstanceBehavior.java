@@ -173,13 +173,25 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
                     sendCompletedEvent(leavingExecution);
                 }
 
-                // Clean up execution that resulted in the mult-instance finishing so that cancelled events aren't sent for it.
                 ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
+
+                // Attempted fix.
+                // Clean up inactive executions so that cancelled events aren't sent for them.
+//                for(DelegateExecution delegateExecution : leavingExecution.getExecutions()) {
+//                    if(! delegateExecution.isActive()) {
+//                        executionEntityManager.deleteChildExecutions((ExecutionEntity) delegateExecution, DELETE_REASON_END, false);
+//                        executionEntityManager.deleteExecutionAndRelatedData((ExecutionEntity) delegateExecution, DELETE_REASON_END);
+//                        leavingExecution.getExecutions().remove(delegateExecution);
+//                    }
+//                }
+
+                // Clean up execution that resulted in the mult-instance finishing so that cancelled events aren't sent for it.
                 executionEntityManager.deleteChildExecutions(executionEntity, DELETE_REASON_END, false);
                 executionEntityManager.deleteExecutionAndRelatedData(executionEntity, DELETE_REASON_END);
 
+
                 super.leave(leavingExecution);
-            }
+              }
 
         } else {
             sendCompletedEvent(execution);
