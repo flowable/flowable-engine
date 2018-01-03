@@ -554,8 +554,19 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         deleteChildExecutions(executionEntity, null, deleteReason, cancel, null);
     }
 
+    public void deleteChildExecutions(ExecutionEntity executionEntity, Collection<String> executionIdsNotToSendCancelledEventsFor, String deleteReason,
+            boolean cancel, boolean inactive) {
+        deleteChildExecutions(executionEntity, null, executionIdsNotToSendCancelledEventsFor, deleteReason, cancel, null, inactive);
+    }
+
     @Override
     public void deleteChildExecutions(ExecutionEntity executionEntity, Collection<String> executionIdsNotToDelete, String deleteReason, boolean cancel, FlowElement cancelActivity) {
+        deleteChildExecutions(executionEntity, executionIdsNotToDelete, Collections.<String>emptyList(), deleteReason, cancel, cancelActivity, true );
+    }
+
+    public void deleteChildExecutions(ExecutionEntity executionEntity, Collection<String> executionIdsNotToDelete, Collection<String>
+            executionIdsNotToSendCancelledEventFor, String deleteReason, boolean cancel,
+                                      FlowElement cancelActivity, boolean inactive) {
 
         // The children of an execution for a tree. For correct deletions
         // (taking care of foreign keys between child-parent)
@@ -573,19 +584,18 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
                                 cancelActivity != null ? cancelActivity.getId() : null, deleteReason, true, cancel, true);
 
                     } else {
-                        deleteExecutionAndRelatedData(childExecutionEntity, deleteReason);
-                        if (cancel) {
+                        if (((cancel && inactive) || (cancel && !inactive && childExecutionEntity.isActive())) && !executionIdsNotToSendCancelledEventFor
+                                .contains(childExecutionEntity.getId())) {
                             dispatchExecutionCancelled(childExecutionEntity,
                                     cancelActivity != null ? cancelActivity : childExecutionEntity.getCurrentFlowElement());
                         }
-
+                        deleteExecutionAndRelatedData(childExecutionEntity, deleteReason);
                     }
 
                 }
             }
         }
     }
-
     @Override
     public List<ExecutionEntity> collectChildren(ExecutionEntity executionEntity) {
         return collectChildren(executionEntity, null);
