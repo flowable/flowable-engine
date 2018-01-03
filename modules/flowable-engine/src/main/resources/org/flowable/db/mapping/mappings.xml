@@ -22,7 +22,13 @@
                  javaType="org.flowable.job.service.impl.persistence.entity.JobByteArrayRef"
                  jdbcType="VARCHAR"/>
   </typeHandlers>
-  <mappers>
+
+
+  <plugins>
+    <plugin interceptor="org.flowable.engine.common.impl.db.DbPlugin"/>
+  </plugins>
+
+    <mappers>
     <mapper resource="org/flowable/db/mapping/common.xml" />
     <mapper resource="org/flowable/db/mapping/entity/Attachment.xml" />
     <mapper resource="org/flowable/db/mapping/entity/ByteArray.xml" />
@@ -56,4 +62,5 @@
     <mapper resource="org/flowable/db/mapping/entity/EventSubscription.xml" />
     <mapper resource="org/flowable/db/mapping/entity/EventLogEntry.xml" />
   </mappers>
+
 </configuration>
