@@ -1251,15 +1251,6 @@ public abstract class AbstractEngineConfiguration {
         return this;
     }
 
-//    public List<TransactionFlowableEventListener> getTransactionEventListeners() {
-//        return transactionDependentEventListeners;
-//    }
-
-//    public AbstractEngineConfiguration setTransactionEventListeners(List<TransactionFlowableEventListener> eventListeners) {
-//        this.transactionDependentEventListeners = eventListeners;
-//        return this;
-//    }
-
     public Map<String, List<FlowableEventListener>> getTypedEventListeners() {
         return typedEventListeners;
     }
