@@ -229,7 +229,7 @@ public abstract class AbstractEngineConfiguration {
     /** 
      * Enables the MyBatis plugin that logs the execution time of sql statements. 
      */
-    protected boolean enableLogSqlExecutionTime = true;
+    protected boolean enableLogSqlExecutionTime;
 
     protected Properties databaseTypeMappings = getDefaultDatabaseTypeMappings();
 
@@ -650,7 +650,7 @@ public abstract class AbstractEngineConfiguration {
         initMybatisTypeHandlers(configuration);
         
         if (isEnableLogSqlExecutionTime()) {
-            configuration.addInterceptor(new LogSqlExecutionTimePlugin());
+            initMyBatisLogSqlExecutionTimePlugin(configuration);
         }
         
         configuration = parseMybatisConfiguration(parser);
@@ -667,6 +667,10 @@ public abstract class AbstractEngineConfiguration {
 
     public void initMybatisTypeHandlers(Configuration configuration) {
         // To be extended
+    }
+    
+    public void initMyBatisLogSqlExecutionTimePlugin(Configuration configuration) {
+        configuration.addInterceptor(new LogSqlExecutionTimePlugin());
     }
 
     public Configuration parseMybatisConfiguration(XMLConfigBuilder parser) {
