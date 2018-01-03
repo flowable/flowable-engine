@@ -14,10 +14,8 @@ package org.flowable.engine.test.api.event;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -1035,8 +1033,13 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
                 }
                 miEventCount++;
 
-            }else {
+            } else if ("subprocess1".equals(activityEvent.getActivityId())) {
+                assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
+                assertEquals("subProcess", activityEvent.getActivityType());
+                
+            } else {
                 fail("Unknown activity id " + activityEvent.getActivityId());
+                
             }
 
         }
@@ -1121,11 +1124,6 @@ public class MultiInstanceUserTaskEventsTest extends PluggableFlowableTestCase {
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.MULTI_INSTANCE_ACTIVITY_COMPLETED, activityEvent.getType());
         assertEquals("usertask1", activityEvent.getActivityId());
-
-        // Should not get this event!
-//        activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
-//        assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());
-//        assertEquals("usertask1", activityEvent.getActivityId());
 
         activityEvent = (FlowableActivityEvent) testListener.getEventsReceived().get(idx++);
         assertEquals(FlowableEngineEventType.ACTIVITY_CANCELLED, activityEvent.getType());

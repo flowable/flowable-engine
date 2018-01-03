@@ -146,10 +146,9 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         ExecutionEntity parentExecution = multiInstanceRootExecution.getParent();
         
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
-        Collection<String> executionIdsNotToSendCancelledEventsFor = execution.isMultiInstanceRoot() ? Collections.<String>emptyList() : Collections
-                .singletonList(execution.getId());
-        executionEntityManager.deleteChildExecutions(multiInstanceRootExecution, executionIdsNotToSendCancelledEventsFor, DELETE_REASON_END, true, false);
-        executionEntityManager.deleteRelatedDataForExecution(multiInstanceRootExecution, null);
+        Collection<String> executionIdsNotToSendCancelledEventsFor = execution.isMultiInstanceRoot() ? null : Collections.singletonList(execution.getId());
+        executionEntityManager.deleteChildExecutions(multiInstanceRootExecution, null, executionIdsNotToSendCancelledEventsFor, DELETE_REASON_END, true, flowElement);
+        executionEntityManager.deleteRelatedDataForExecution(multiInstanceRootExecution, DELETE_REASON_END);
         executionEntityManager.delete(multiInstanceRootExecution);
 
         ExecutionEntity newExecution = executionEntityManager.createChildExecution(parentExecution);
