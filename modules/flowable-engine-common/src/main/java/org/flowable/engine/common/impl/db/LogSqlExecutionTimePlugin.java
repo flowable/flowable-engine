@@ -40,7 +40,6 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.util.StopWatch;
 
 /**
  * @author Robert Hafner
@@ -52,16 +51,12 @@ import org.springframework.util.StopWatch;
                 args = { MappedStatement.class, Object.class, RowBounds.class, ResultHandler.class, CacheKey.class, BoundSql.class }),
         @Signature(type= Executor.class, method = "update", args = { MappedStatement.class, Object.class})
 })
-public class DbPlugin implements Interceptor {
-    private static final Logger LOGGER = LoggerFactory.getLogger(DbPlugin.class);
+public class LogSqlExecutionTimePlugin implements Interceptor {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(LogSqlExecutionTimePlugin.class);
 
     @Override
     public Object intercept(Invocation invocation) throws Throwable {
-        boolean isInfoEnabled = LOGGER.isInfoEnabled();
-        if (!isInfoEnabled) {
-            return invocation.proceed();
-        }
-
         long startTime = System.currentTimeMillis();
         Object retVal = invocation.proceed();
         long endTime = System.currentTimeMillis();
