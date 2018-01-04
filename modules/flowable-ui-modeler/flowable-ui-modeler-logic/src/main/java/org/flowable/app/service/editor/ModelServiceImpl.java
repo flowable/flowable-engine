@@ -894,7 +894,7 @@ public class ModelServiceImpl implements ModelService {
         {
           for (JsonNode parent : parentNodes)
           {
-            if ("rds-asf-modal-form".equalsIgnoreCase(parent.get("type").asText()))
+            if ("rds-asf-modal-form".equalsIgnoreCase(parent.get("type").asText()) || "form-button".equalsIgnoreCase(parent.get("type").asText()))
             {
               String formId = parent.get("formId").asText();
               if (StringUtils.isNotBlank(formId) && !processedForms.containsKey(formId))
