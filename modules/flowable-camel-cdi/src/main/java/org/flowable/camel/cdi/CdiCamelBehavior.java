@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.camel;
+package org.flowable.camel.cdi;
 
 import java.util.Set;
 
@@ -20,6 +20,7 @@ import javax.enterprise.inject.spi.BeanManager;
 
 import org.apache.camel.CamelContext;
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.camel.CamelBehavior;
 import org.flowable.cdi.impl.util.BeanManagerLookup;
 import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;
 import org.flowable.engine.ProcessEngineConfiguration;

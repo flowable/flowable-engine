@@ -28,7 +28,6 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.flowable.camel.CustomContextTest;
 import org.flowable.camel.FlowableProducer;
 import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -41,10 +40,10 @@ import org.junit.Test;
  * 
  * @author Zach Visagie
  */
-public class CdiCustomContextTest extends NamedCamelCdiFlowableTestCase {
+public class CdiCustomNonDefaultNamedContextTest extends NamedCamelCdiFlowableTestCase {
 
     @Inject
-    @Named("camelContext")
+    @Named("myContext")
     protected CamelContext camelContext;
 
     protected MockEndpoint service1;
@@ -59,9 +58,12 @@ public class CdiCustomContextTest extends NamedCamelCdiFlowableTestCase {
             @Override
             public void configure() throws Exception {
                 from("direct:start").to("flowable:camelProcess");
+
                 from("flowable:camelProcess:serviceTask1").setBody().exchangeProperty("var1").to("mock:service1").setProperty("var2").constant("var2").setBody()
                                 .properties();
+
                 from("flowable:camelProcess:serviceTask2?copyVariablesToBodyAsMap=true").to("mock:service2");
+
                 from("direct:receive").to("flowable:camelProcess:receive");
             }
         });
@@ -82,9 +84,9 @@ public class CdiCustomContextTest extends NamedCamelCdiFlowableTestCase {
     }
 
     @Test
-    @Deployment(resources = { "process/custom.bpmn20.xml" })
+    @Deployment(resources = { "process/customNonDefaultName.bpmn20.xml" })
     public void testRunProcess() throws Exception {
-        CamelContext ctx = (CamelContext) ProgrammaticBeanLookup.lookup("camelContext");
+        CamelContext ctx = (CamelContext) ProgrammaticBeanLookup.lookup("myContext");
         ProducerTemplate tpl = ctx.createProducerTemplate();
         service1.expectedBodiesReceived("ala");
 

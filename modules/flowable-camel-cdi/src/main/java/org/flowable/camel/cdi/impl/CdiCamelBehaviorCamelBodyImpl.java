@@ -11,23 +11,22 @@
  * limitations under the License.
  */
 
-package org.flowable.camel.impl;
+package org.flowable.camel.cdi.impl;
 
-import org.flowable.camel.CdiCamelBehavior;
 import org.flowable.camel.FlowableEndpoint;
+import org.flowable.camel.cdi.CdiCamelBehavior;
 
 /**
- * CDI equivalent of {@link CamelBehaviorBodyAsMapImpl}
+ * CDI equivalent of {@link CdiCamelBehaviorCamelBodyImpl}
  * 
  * @author Zach Visagie
  */
-public class CdiCamelBehaviorBodyAsMapImpl extends CdiCamelBehavior {
+public class CdiCamelBehaviorCamelBodyImpl extends CdiCamelBehavior {
 
     private static final long serialVersionUID = 1L;
 
     @Override
     protected void setPropertTargetVariable(FlowableEndpoint endpoint) {
-        toTargetType = TargetType.BODY_AS_MAP;
+        toTargetType = TargetType.BODY;
     }
-
 }

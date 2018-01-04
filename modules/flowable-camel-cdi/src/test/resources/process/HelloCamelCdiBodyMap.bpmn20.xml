@@ -4,7 +4,7 @@
     <startEvent id="startevent1" name="Start"></startEvent>
     <serviceTask id="serviceTask1" name="Camel" activiti:type="camel">
       <extensionElements>
-        <activiti:field name="camelBehaviorClass" stringValue="org.flowable.camel.impl.CdiCamelBehaviorCamelBodyImpl" />
+        <activiti:field name="camelBehaviorClass" stringValue="org.flowable.camel.cdi.impl.CdiCamelBehaviorBodyAsMapImpl" />
       </extensionElements>
     </serviceTask>
     <userTask id="userTask1" name="Hello Task" activiti:assignee="kermit"></userTask>

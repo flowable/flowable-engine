@@ -6,7 +6,7 @@ public class DefaultCdiActivityBehaviorFactory extends DefaultActivityBehaviorFa
 
 	@Override
 	protected String getDefaultCamelBehaviorClassName() {
-		return "org.flowable.camel.impl.CdiCamelBehaviorDefaultImpl";
+		return "org.flowable.camel.cdi.impl.CdiCamelBehaviorDefaultImpl";
 	}
 
 }

@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.camel.cdi.named;
+package org.flowable.camel.cdi.std;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
 import org.apache.camel.CamelContext;
 import org.apache.camel.Exchange;
@@ -28,7 +27,6 @@ import org.apache.camel.ProducerTemplate;
 import org.apache.camel.Route;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.component.mock.MockEndpoint;
-import org.flowable.camel.CustomContextTest;
 import org.flowable.camel.FlowableProducer;
 import org.flowable.cdi.impl.util.ProgrammaticBeanLookup;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -37,14 +35,13 @@ import org.junit.After;
 import org.junit.Test;
 
 /**
- * Adapted from {@link CustomContextTest}.
+ * Adapted from {@link SimpleProcessTest}.
  * 
  * @author Zach Visagie
  */
-public class CdiCustomNonDefaultNamedContextTest extends NamedCamelCdiFlowableTestCase {
+public class CdiSimpleProcessTest extends StdCamelCdiFlowableTestCase {
 
     @Inject
-    @Named("myContext")
     protected CamelContext camelContext;
 
     protected MockEndpoint service1;
@@ -53,26 +50,21 @@ public class CdiCustomNonDefaultNamedContextTest extends NamedCamelCdiFlowableTe
 
     @Override
     public void setUp() throws Exception {
-        super.setUp();
+    	super.setUp();
+        service1 = (MockEndpoint) camelContext.getEndpoint("mock:service1");
+        service1.reset();
+        service2 = (MockEndpoint) camelContext.getEndpoint("mock:service2");
+        service2.reset();
         camelContext.addRoutes(new RouteBuilder() {
 
             @Override
             public void configure() throws Exception {
                 from("direct:start").to("flowable:camelProcess");
-
-                from("flowable:camelProcess:serviceTask1").setBody().exchangeProperty("var1").to("mock:service1").setProperty("var2").constant("var2").setBody()
-                                .properties();
-
-                from("flowable:camelProcess:serviceTask2?copyVariablesToBodyAsMap=true").to("mock:service2");
-
+                from("flowable:camelProcess:serviceTask1").setBody().exchangeProperty("var1").to("mock:service1").setProperty("var2").constant("var2").setBody().properties();
                 from("direct:receive").to("flowable:camelProcess:receive");
+                from("flowable:camelProcess:serviceTask2?copyVariablesToBodyAsMap=true").to("mock:service2");
             }
         });
-
-        service1 = (MockEndpoint) camelContext.getEndpoint("mock:service1");
-        service1.reset();
-        service2 = (MockEndpoint) camelContext.getEndpoint("mock:service2");
-        service2.reset();
     }
 
     @After
@@ -85,20 +77,19 @@ public class CdiCustomNonDefaultNamedContextTest extends NamedCamelCdiFlowableTe
     }
 
     @Test
-    @Deployment(resources = { "process/customNonDefaultName.bpmn20.xml" })
+    @Deployment(resources = { "process/example.bpmn20.xml" })
     public void testRunProcess() throws Exception {
-        CamelContext ctx = (CamelContext) ProgrammaticBeanLookup.lookup("myContext");
+        CamelContext ctx = ProgrammaticBeanLookup.lookup(CamelContext.class);
         ProducerTemplate tpl = ctx.createProducerTemplate();
         service1.expectedBodiesReceived("ala");
 
         Exchange exchange = ctx.getEndpoint("direct:start").createExchange();
         exchange.getIn().setBody(Collections.singletonMap("var1", "ala"));
         tpl.send("direct:start", exchange);
-
         String instanceId = (String) exchange.getProperty("PROCESS_ID_PROPERTY");
 
         ProcessInstance processInstance = processEngine.getRuntimeService().createProcessInstanceQuery().processInstanceId(instanceId).singleResult();
-        assertEquals(false, processInstance.isEnded());
+        assertEquals(false,processInstance.isEnded());
 
         tpl.sendBodyAndProperty("direct:receive", null, FlowableProducer.PROCESS_ID_PROPERTY, instanceId);
 
@@ -107,10 +98,9 @@ public class CdiCustomNonDefaultNamedContextTest extends NamedCamelCdiFlowableTe
         assertNull(processInstance);
 
         service1.assertIsSatisfied();
-
-        @SuppressWarnings("rawtypes")
-        Map m = service2.getExchanges().get(0).getIn().getBody(Map.class);
+        Map<?, ?> m = service2.getExchanges().get(0).getIn().getBody(Map.class);
         assertEquals("ala", m.get("var1"));
         assertEquals("var2", m.get("var2"));
     }
+
 }
