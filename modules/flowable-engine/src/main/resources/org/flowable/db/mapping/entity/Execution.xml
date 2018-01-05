@@ -134,6 +134,50 @@
       </foreach>
     SELECT * FROM dual
   </insert>
+  
+  <insert id="bulkInsertExecution" databaseId="sybase" parameterType="java.util.List">
+       <foreach collection="list" item="execution" index="index" separator="&#x000A;">
+        insert into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_, 
+                                        IS_SCOPE_,IS_EVENT_SCOPE_, IS_MI_ROOT_, PARENT_ID_, SUPER_EXEC_, ROOT_PROC_INST_ID_, SUSPENSION_STATE_,
+                                        TENANT_ID_, NAME_, START_ACT_ID_, START_TIME_, START_USER_ID_, IS_COUNT_ENABLED_, EVT_SUBSCR_COUNT_,
+                                        TASK_COUNT_, JOB_COUNT_, TIMER_JOB_COUNT_, SUSP_JOB_COUNT_, DEADLETTER_JOB_COUNT_, VAR_COUNT_, ID_LINK_COUNT_,
+                                        CALLBACK_ID_, CALLBACK_TYPE_)
+           values 
+        	(
+        	 #{execution.id ,jdbcType=VARCHAR},
+             1,
+             #{execution.processInstanceId, jdbcType=VARCHAR},
+             #{execution.businessKey, jdbcType=VARCHAR},
+             #{execution.processDefinitionId ,jdbcType=VARCHAR},
+             #{execution.activityId ,jdbcType=VARCHAR},
+             #{execution.isActive ,jdbcType=BOOLEAN},
+             #{execution.isConcurrent ,jdbcType=BOOLEAN},
+             #{execution.isScope ,jdbcType=BOOLEAN},
+             #{execution.isEventScope ,jdbcType=BOOLEAN},
+             #{execution.isMultiInstanceRoot, jdbcType=BOOLEAN},
+             #{execution.parentId, jdbcType=VARCHAR},
+             #{execution.superExecutionId, jdbcType=VARCHAR},
+             #{execution.rootProcessInstanceId, jdbcType=VARCHAR},
+             #{execution.suspensionState, jdbcType=INTEGER},
+             #{execution.tenantId, jdbcType=VARCHAR},
+             #{execution.name, jdbcType=VARCHAR},
+             #{execution.startActivityId, jdbcType=VARCHAR},
+             #{execution.startTime, jdbcType=TIMESTAMP},
+             #{execution.startUserId, jdbcType=VARCHAR},
+             #{execution.isCountEnabled, jdbcType=BOOLEAN},
+             #{execution.eventSubscriptionCount, jdbcType=INTEGER},
+             #{execution.taskCount, jdbcType=INTEGER},
+             #{execution.jobCount, jdbcType=INTEGER},
+             #{execution.timerJobCount, jdbcType=INTEGER},
+             #{execution.suspendedJobCount, jdbcType=INTEGER},
+             #{execution.deadLetterJobCount, jdbcType=INTEGER},
+             #{execution.variableCount, jdbcType=INTEGER},
+             #{execution.identityLinkCount, jdbcType=INTEGER},
+             #{execution.callbackId, jdbcType=VARCHAR},
+             #{execution.callbackType, jdbcType=VARCHAR}
+            )
+      </foreach>
+  </insert>
 
   <!-- EXECUTION UPDATE -->
   
@@ -533,6 +577,16 @@
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   
+  <select id="selectExecutionsByQueryCriteria" databaseId="sybase" parameterType="org.flowable.engine.impl.ExecutionQueryImpl" resultMap="executionResultMap">
+    select distinct * from (
+    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>, P.KEY_ as ProcessDefinitionKey, P.ID_ as ProcessDefinitionId
+    <include refid="selectExecutionsByQueryCriteriaSql"/>
+    
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    ) X
+  </select>
+  
   <select id="selectExecutionCountByQueryCriteria" parameterType="org.flowable.engine.impl.ExecutionQueryImpl" resultType="long">
     select distinct count(RES.ID_)
     <include refid="selectExecutionsByQueryCriteriaSql"/>
@@ -545,6 +599,16 @@
     <include refid="selectExecutionsByQueryCriteriaSql"/>
     ${orderBy}
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+  </select>
+  
+  <select id="selectProcessInstanceByQueryCriteria" databaseId="sybase" parameterType="org.flowable.engine.impl.ProcessInstanceQueryImpl" resultMap="processInstanceResultMap">
+    select distinct * from ( 
+       <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>, P.KEY_ as ProcessDefinitionKey, P.ID_ as ProcessDefinitionId, P.NAME_ as ProcessDefinitionName, P.VERSION_ as ProcessDefinitionVersion, P.DEPLOYMENT_ID_ as DeploymentId
+    <include refid="selectExecutionsByQueryCriteriaSql"/>
+    
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    ) X
   </select>
   
   <select id="selectProcessInstanceCountByQueryCriteria" parameterType="org.flowable.engine.impl.ProcessInstanceQueryImpl" resultType="long">
@@ -563,6 +627,20 @@
     <include refid="selectProcessInstanceWithVariablesByQueryCriteriaSql"/> 
     ${orderBy}
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+  </select>
+  
+  <select id="selectProcessInstanceWithVariablesByQueryCriteria" databaseId="sybase" parameterType="org.flowable.engine.impl.ProcessInstanceQueryImpl" resultMap="processInstanceAndVariablesResultMap">
+    select distinct * from (
+    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.*, P.KEY_ as ProcessDefinitionKey, P.ID_ as ProcessDefinitionId, P.NAME_ as ProcessDefinitionName, P.VERSION_ as ProcessDefinitionVersion, P.DEPLOYMENT_ID_ as DeploymentId, 
+    VAR.ID_ as VAR_ID_, VAR.NAME_ as VAR_NAME_, VAR.TYPE_ as VAR_TYPE_, VAR.REV_ as VAR_REV_,
+    VAR.PROC_INST_ID_ as VAR_PROC_INST_ID_, VAR.EXECUTION_ID_ as VAR_EXECUTION_ID_, VAR.TASK_ID_ as VAR_TASK_ID_,
+    VAR.BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_, VAR.DOUBLE_ as VAR_DOUBLE_, 
+    VAR.TEXT_ as VAR_TEXT_, VAR.TEXT2_ as VAR_TEXT2_, VAR.LONG_ as VAR_LONG_
+    <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <include refid="selectProcessInstanceWithVariablesByQueryCriteriaSql"/> 
+    <if test="firstResult != null and firstResult &gt;= 0">${limitOuterJoinBetween}</if>
+    ) RES ${orderBy}
   </select>
   
   <sql id="selectProcessInstanceWithVariablesByQueryCriteriaColumns">

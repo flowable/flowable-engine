@@ -42,6 +42,18 @@
     SELECT * FROM dual
   </insert>
   
+  <insert id="bulkInsertVariableByteArray" databaseId="sybase" parameterType="java.util.List">
+       <foreach collection="list" item="byteArray" index="index" separator="&#x000A;"> 
+       insert into ${prefix}ACT_GE_BYTEARRAY(ID_, REV_, NAME_, BYTES_, DEPLOYMENT_ID_)
+       values
+         (#{byteArray.id, jdbcType=VARCHAR},
+          1, 
+          #{byteArray.name, jdbcType=VARCHAR}, 
+          #{byteArray.bytes, jdbcType=BLOB}, 
+          #{byteArray.deploymentId, jdbcType=VARCHAR})
+      </foreach>
+  </insert>
+  
   <!-- BYTE ARRAY UPDATE -->
 
   <update id="updateVariableByteArray" parameterType="org.flowable.variable.service.impl.persistence.entity.VariableByteArrayEntityImpl">

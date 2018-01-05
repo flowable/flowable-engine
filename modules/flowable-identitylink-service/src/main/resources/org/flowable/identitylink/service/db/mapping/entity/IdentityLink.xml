@@ -50,6 +50,21 @@
     SELECT * FROM dual
   </insert>
   
+  <insert id="bulkInsertIdentityLink" databaseId="sybase" parameterType="org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl">
+       <foreach collection="list" item="identityLink" index="index" separator="&#x000A;"> 
+           insert into ${prefix}ACT_RU_IDENTITYLINK (ID_, REV_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, PROC_DEF_ID_)
+           values 
+      (#{identityLink.id, jdbcType=VARCHAR},
+        1,
+        #{identityLink.type, jdbcType=VARCHAR},
+        #{identityLink.userId, jdbcType=VARCHAR},
+        #{identityLink.groupId, jdbcType=VARCHAR},
+        #{identityLink.taskId, jdbcType=VARCHAR},
+        #{identityLink.processInstanceId, jdbcType=VARCHAR},
+        #{identityLink.processDefId, jdbcType=VARCHAR})
+    </foreach>
+  </insert>
+  
   <!-- IDENTITY LINK DELETE -->
   
   <delete id="deleteIdentityLink" parameterType="string">

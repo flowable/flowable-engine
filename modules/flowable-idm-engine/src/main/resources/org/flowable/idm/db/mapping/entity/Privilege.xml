@@ -34,6 +34,14 @@
       </foreach>
     SELECT * FROM dual
   </insert>
+  
+  <insert id="bulkInsertPrivilege" databaseId="sybase" parameterType="java.util.List">
+       <foreach collection="list" item="property" index="index" separator="&#x000A;">
+       INSERT INTO ${prefix}ACT_ID_PRIV (ID_, NAME_) VALUES 
+        (#{privilege.id ,jdbcType=VARCHAR},
+         #{privilege.name ,jdbcType=VARCHAR}
+      </foreach>
+  </insert>
 
   <delete id="deletePrivilege" parameterType="org.flowable.idm.engine.impl.persistence.entity.PrivilegeEntityImpl">
     delete from ${prefix}ACT_ID_PRIV where ID_ = #{id}

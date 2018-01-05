@@ -137,6 +137,46 @@
       </foreach>
     SELECT * FROM dual
   </insert>
+  
+  <insert id="bulkInsertHistoricActivityInstance" databaseId="sybase" parameterType="java.util.List">
+       <foreach collection="list" item="historicActivityInstance" index="index" separator="&#x000A;">
+        insert into ${prefix}ACT_HI_ACTINST (
+          ID_,
+          REV_,
+          PROC_DEF_ID_,
+          PROC_INST_ID_,
+          EXECUTION_ID_,
+          ACT_ID_,
+          TASK_ID_,
+          CALL_PROC_INST_ID_,
+          ACT_NAME_,
+          ACT_TYPE_,
+          ASSIGNEE_,
+          START_TIME_,
+          END_TIME_,
+          DURATION_,
+          DELETE_REASON_,
+          TENANT_ID_
+        ) values 
+        (
+            #{historicActivityInstance.id ,jdbcType=VARCHAR},
+            1,
+            #{historicActivityInstance.processDefinitionId, jdbcType=VARCHAR},
+            #{historicActivityInstance.processInstanceId, jdbcType=VARCHAR},
+            #{historicActivityInstance.executionId, jdbcType=VARCHAR},
+            #{historicActivityInstance.activityId ,jdbcType=VARCHAR},
+            #{historicActivityInstance.taskId ,jdbcType=VARCHAR},
+            #{historicActivityInstance.calledProcessInstanceId ,jdbcType=VARCHAR},
+            #{historicActivityInstance.activityName ,jdbcType=VARCHAR},
+            #{historicActivityInstance.activityType ,jdbcType=VARCHAR},
+            #{historicActivityInstance.assignee ,jdbcType=VARCHAR},
+            #{historicActivityInstance.startTime, jdbcType=TIMESTAMP},
+            #{historicActivityInstance.endTime, jdbcType=TIMESTAMP},
+            #{historicActivityInstance.durationInMillis ,jdbcType=BIGINT},
+            #{historicActivityInstance.deleteReason ,jdbcType=VARCHAR},
+            #{historicActivityInstance.tenantId, jdbcType=VARCHAR})
+      </foreach>
+  </insert>
 
   <!-- HISTORIC ACTIVITY INSTANCE UPDATE -->
   

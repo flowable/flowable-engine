@@ -43,6 +43,18 @@
       </foreach>
     SELECT * FROM dual
   </insert>
+  
+  <insert id="bulkInsertUser" databaseId="sybase" parameterType="java.util.List">
+       <foreach collection="list" item="user" index="index" separator="&#x000A;">
+    INSERT INTO ${prefix}ACT_ID_USER (ID_, REV_, FIRST_, LAST_, EMAIL_, PWD_) VALUES 
+        (#{user.id ,jdbcType=VARCHAR},
+         1,
+         #{user.firstName ,jdbcType=VARCHAR},
+         #{user.lastName ,jdbcType=VARCHAR},
+         #{user.email ,jdbcType=VARCHAR},
+         #{user.password ,jdbcType=VARCHAR})
+      </foreach>
+  </insert>
 
   <!-- USER UPDATE -->
 
@@ -138,6 +150,69 @@
       </if>
       <if test="fullNameLikeIgnoreCase != null">
         and (lower(CONCAT(CONCAT(RES.FIRST_ , ' '), RES.LAST_)) like #{fullNameLikeIgnoreCase}${wildcardEscapeClause})
+      </if>
+      <if test="email != null">
+        and RES.EMAIL_ = #{email}
+      </if>
+      <if test="emailLike != null">
+        and RES.EMAIL_ like #{emailLike}${wildcardEscapeClause}
+      </if>
+      <if test="groupId != null">
+        and G.ID_ = #{groupId}
+      </if>
+      <if test="groupIds != null &amp;&amp; groupIds.size() &gt; 0">
+        and G.ID_ IN
+        <foreach item="groupId" index="index" collection="groupIds" 
+                 open="(" separator="," close=")">
+          #{groupId}
+        </foreach>
+      </if>
+    </where>
+  </sql>
+  
+  <sql id="selectUserByQueryCriteriaSql" databaseId="sybase">
+    from ${prefix}ACT_ID_USER RES 
+    <if test="groupId != null || (groupIds != null &amp;&amp; groupIds.size() &gt; 0) ">
+      inner join ${prefix}ACT_ID_MEMBERSHIP M on RES.ID_ = M.USER_ID_
+      inner join ${prefix}ACT_ID_GROUP G on M.GROUP_ID_ = G.ID_
+    </if>
+    <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+      <if test="ids != null &amp;&amp; ids.size() &gt; 0">
+        and RES.ID_ IN
+        <foreach item="id" index="index" collection="ids" 
+                 open="(" separator="," close=")">
+          #{id}
+        </foreach>
+      </if>
+      <if test="idIgnoreCase != null">
+        and lower(RES.ID_) = #{idIgnoreCase}
+      </if>
+      <if test="firstName != null">
+        and RES.FIRST_ = #{firstName}
+      </if>
+      <if test="firstNameLike != null">
+        and RES.FIRST_ like #{firstNameLike}${wildcardEscapeClause}
+      </if>
+      <if test="firstNameLikeIgnoreCase != null">
+        and lower(RES.FIRST_) like #{firstNameLikeIgnoreCase}${wildcardEscapeClause}
+      </if>
+      <if test="lastName != null">
+        and RES.LAST_ = #{lastName}
+      </if>
+      <if test="lastNameLike != null">
+        and RES.LAST_ like #{lastNameLike}${wildcardEscapeClause}
+      </if>
+      <if test="lastNameLikeIgnoreCase != null">
+        and lower(RES.LAST_) like #{lastNameLikeIgnoreCase}${wildcardEscapeClause}
+      </if>
+      <if test="fullNameLike != null">
+        and (((RES.FIRST_ + ' ') + RES.LAST_) like #{fullNameLike}${wildcardEscapeClause})
+      </if>
+      <if test="fullNameLikeIgnoreCase != null">
+        and (lower(((RES.FIRST_ + ' ') + RES.LAST_)) like #{fullNameLikeIgnoreCase}${wildcardEscapeClause})
       </if>
       <if test="email != null">
         and RES.EMAIL_ = #{email}

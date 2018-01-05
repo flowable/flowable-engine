@@ -80,6 +80,24 @@
     SELECT * FROM dual
   </insert>
   
+  <insert id="bulkInsertEventLogEntry" databaseId="sybase" parameterType="java.util.List">
+       <foreach collection="list" item="eventLogEntry" index="index" separator="&#x000A;">
+           insert into ${prefix}ACT_EVT_LOG(TYPE_, PROC_DEF_ID_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, TIME_STAMP_, USER_ID_, DATA_, LOCK_OWNER_, LOCK_TIME_, IS_PROCESSED_)
+           values 
+        (#{eventLogEntry.type, jdbcType=VARCHAR}, 
+         #{eventLogEntry.processDefinitionId, jdbcType=VARCHAR}, 
+         #{eventLogEntry.processInstanceId, jdbcType=VARCHAR},
+         #{eventLogEntry.executionId, jdbcType=VARCHAR},
+         #{eventLogEntry.taskId, jdbcType=VARCHAR},   
+         #{eventLogEntry.timeStamp, jdbcType=TIMESTAMP}, 
+         #{eventLogEntry.userId, jdbcType=VARCHAR},
+         #{eventLogEntry.data, jdbcType=BLOB},
+         #{eventLogEntry.lockOwner, jdbcType=VARCHAR},
+         #{eventLogEntry.lockTime, jdbcType=TIMESTAMP},
+         #{eventLogEntry.isProcessed, jdbcType=INTEGER})
+      </foreach>
+  </insert>
+  
   <!-- RESULTMAP -->
   
   <resultMap id="eventLogEntryResultMap" type="org.flowable.engine.impl.persistence.entity.EventLogEntryEntityImpl">

@@ -39,6 +39,17 @@
     SELECT * FROM dual
   </insert>
   
+  <insert id="bulkInsertIdmByteArray" databaseId="sybase" parameterType="java.util.List">
+       <foreach collection="list" item="byteArray" index="index" separator="&#x000A;"> 
+       insert into ${prefix}ACT_GE_BYTEARRAY(ID_, REV_, NAME_, BYTES_)
+       values
+         (#{byteArray.id, jdbcType=VARCHAR},
+          1, 
+          #{byteArray.name, jdbcType=VARCHAR}, 
+          #{byteArray.bytes, jdbcType=BLOB})
+      </foreach>
+  </insert>
+  
   <!-- BYTE ARRAY UPDATE -->
 
   <update id="updateIdmByteArray" parameterType="org.flowable.idm.engine.impl.persistence.entity.IdmByteArrayEntityImpl">

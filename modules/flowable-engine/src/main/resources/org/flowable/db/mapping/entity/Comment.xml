@@ -66,6 +66,22 @@
     SELECT * FROM dual
   </insert>
   
+  <insert id="bulkInsertComment" databaseId="sybase" parameterType="java.util.List">
+       <foreach collection="list" item="comment" index="index" separator="&#x000A;">
+       insert into ${prefix}ACT_HI_COMMENT (ID_, TYPE_, TIME_, USER_ID_, TASK_ID_, PROC_INST_ID_, ACTION_, MESSAGE_, FULL_MSG_)
+       values 
+        (#{comment.id ,jdbcType=VARCHAR},
+         #{comment.type ,jdbcType=VARCHAR},
+         #{comment.time ,jdbcType=TIMESTAMP},
+         #{comment.userId ,jdbcType=VARCHAR},
+         #{comment.taskId ,jdbcType=VARCHAR},
+         #{comment.processInstanceId ,jdbcType=VARCHAR},
+         #{comment.action ,jdbcType=VARCHAR},
+         #{comment.message ,jdbcType=VARCHAR},
+         #{comment.fullMessageBytes ,jdbcType=BLOB})
+      </foreach>
+  </insert>
+  
   <!-- Comment UPDATE -->
 
   <update id="updateComment" parameterType="org.flowable.engine.impl.persistence.entity.CommentEntityImpl">

@@ -187,6 +187,50 @@
     	</foreach>
     	SELECT * FROM dual
   	</insert>
+  	
+  	<insert id="bulkInsertDeadLetterJob" databaseId="sybase" parameterType="java.util.List">
+       <foreach collection="list" item="job" index="index" separator="&#x000A;"> 
+	  INSERT INTO ${prefix}ACT_RU_DEADLETTER_JOB (
+	        ID_,
+      		REV_,
+      		TYPE_,
+      		EXCLUSIVE_,
+      		EXECUTION_ID_,
+      		PROCESS_INSTANCE_ID_,
+      		PROC_DEF_ID_,
+      		SCOPE_ID_, 
+            SUB_SCOPE_ID_, 
+            SCOPE_TYPE_, 
+            SCOPE_DEFINITION_ID_,
+      		EXCEPTION_STACK_ID_,
+      		EXCEPTION_MSG_,
+      		DUEDATE_,
+      		REPEAT_,
+      		HANDLER_TYPE_,
+      		HANDLER_CFG_,
+            CREATE_TIME_,
+      		TENANT_ID_) VALUES 
+	      (#{job.id, jdbcType=VARCHAR},
+       		#{job.revision, jdbcType=INTEGER},
+       		#{job.jobType, jdbcType=VARCHAR},
+       		#{job.exclusive, jdbcType=BOOLEAN},
+       		#{job.executionId, jdbcType=VARCHAR},
+       		#{job.processInstanceId, jdbcType=VARCHAR},
+       		#{job.processDefinitionId, jdbcType=VARCHAR},
+       		#{job.scopeId, jdbcType=VARCHAR},
+            #{job.subScopeId, jdbcType=VARCHAR},
+            #{job.scopeType, jdbcType=VARCHAR},
+            #{job.scopeDefinitionId, jdbcType=VARCHAR},
+       		#{job.exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
+       		#{job.exceptionMessage, jdbcType=VARCHAR},
+       		#{job.duedate, jdbcType=TIMESTAMP},
+       		#{job.repeat, jdbcType=VARCHAR},
+       		#{job.jobHandlerType, jdbcType=VARCHAR},
+       		#{job.jobHandlerConfiguration, jdbcType=VARCHAR},
+            #{job.createTime, jdbcType=TIMESTAMP},
+       		#{job.tenantId, jdbcType=VARCHAR})
+	  </foreach>
+	</insert>
 
     <select id="selectDeadLetterJobByQueryCriteria" parameterType="org.flowable.job.service.impl.JobQueryImpl" resultMap="jobResultMap">
         <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>

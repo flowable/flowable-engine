@@ -267,7 +267,7 @@ public abstract class AbstractJobEntityImpl extends AbstractEntity implements Ab
 
     @Override
     public String getTenantId() {
-        return tenantId;
+    	return (tenantId != null ? tenantId.trim() : null);
     }
 
     @Override

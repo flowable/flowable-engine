@@ -303,6 +303,12 @@ public abstract class AbstractSqlScriptBasedDbSchemaManager implements DbSchemaM
                             jdbcStatement.execute(sqlStatement);
                             jdbcStatement.close();
                             
+                            DbSqlSessionFactory dbSqlSessionFactory = dbSqlSession.getDbSqlSessionFactory();
+                            String databaseType = dbSqlSessionFactory.getDatabaseType();
+                            if ("sybase".equals(databaseType)) {
+                            	connection.commit();
+                            }
+                            
                         } catch (Exception e) {
                             if (exception == null) {
                                 exception = e;

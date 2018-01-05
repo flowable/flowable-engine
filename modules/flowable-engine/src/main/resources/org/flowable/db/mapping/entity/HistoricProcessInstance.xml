@@ -147,6 +147,49 @@
        </foreach>
     SELECT * FROM dual
   </insert>
+  
+  <insert id="bulkInsertHistoricProcessInstance" databaseId="sybase" parameterType="java.util.List">
+               <foreach collection="list" item="historicProcessInstance" index="index" separator="&#x000A;">
+          insert into ${prefix}ACT_HI_PROCINST (
+            ID_,
+            REV_,
+            PROC_INST_ID_,
+            BUSINESS_KEY_,
+            PROC_DEF_ID_,
+            START_TIME_,
+            END_TIME_,
+            DURATION_,
+            START_USER_ID_,
+            START_ACT_ID_,
+            END_ACT_ID_,
+            SUPER_PROCESS_INSTANCE_ID_,
+            DELETE_REASON_,
+            TENANT_ID_,
+            NAME_,
+            CALLBACK_ID_,
+            CALLBACK_TYPE_
+             ) values 
+        
+          (#{historicProcessInstance.id ,jdbcType=VARCHAR},
+               1,
+               #{historicProcessInstance.processInstanceId, jdbcType=VARCHAR},
+               #{historicProcessInstance.businessKey, jdbcType=VARCHAR},
+               #{historicProcessInstance.processDefinitionId, jdbcType=VARCHAR},
+               #{historicProcessInstance.startTime, jdbcType=TIMESTAMP},
+               #{historicProcessInstance.endTime, jdbcType=TIMESTAMP},
+               #{historicProcessInstance.durationInMillis ,jdbcType=BIGINT},
+               #{historicProcessInstance.startUserId, jdbcType=VARCHAR},
+               #{historicProcessInstance.startActivityId, jdbcType=VARCHAR},
+               #{historicProcessInstance.endActivityId, jdbcType=VARCHAR},
+               #{historicProcessInstance.superProcessInstanceId, jdbcType=VARCHAR},
+               #{historicProcessInstance.deleteReason, jdbcType=VARCHAR},
+               #{historicProcessInstance.tenantId, jdbcType=VARCHAR},
+               #{historicProcessInstance.name, jdbcType=VARCHAR},
+               #{historicProcessInstance.callbackId, jdbcType=VARCHAR},
+               #{historicProcessInstance.callbackType, jdbcType=VARCHAR}
+           )
+         </foreach>
+  </insert>
 
   <!-- HISTORIC PROCESS INSTANCE UPDATE -->
   
@@ -293,6 +336,15 @@
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   
+  <select id="selectHistoricProcessInstancesByQueryCriteria" databaseId="sybase" parameterType="org.flowable.engine.impl.HistoricProcessInstanceQueryImpl" resultMap="historicProcessInstanceResultMap">
+    select distinct * from (
+    <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>, DEF.KEY_ as PROC_DEF_KEY_, DEF.NAME_ as PROC_DEF_NAME_, DEF.VERSION_ as PROC_DEF_VERSION_, DEF.DEPLOYMENT_ID_ as DEPLOYMENT_ID_
+    <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    ) RES ${orderBy}
+  </select>
+  
   <select id="selectHistoricProcessInstanceCountByQueryCriteria" parameterType="org.flowable.engine.impl.HistoricProcessInstanceQueryImpl" resultType="long">
     select count(distinct RES.ID_)
     <include refid="selectHistoricProcessInstancesByQueryCriteriaSql"/>
@@ -309,6 +361,29 @@
     <include refid="selectHistoricProcessInstancesWithVariablesByQueryCriteriaSql"/> 
     ${orderBy}
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+  </select>
+  
+  <select id="selectHistoricProcessInstancesWithVariablesByQueryCriteria" databaseId="sybase" parameterType="org.flowable.engine.impl.HistoricProcessInstanceQueryImpl" resultMap="historicProcessInstanceAndVariablesResultMap">
+    select distinct * from (
+    ${limitBefore}
+    select VAR.LAST_UPDATED_TIME_, RES.*, DEF.KEY_ as PROC_DEF_KEY_, DEF.NAME_ as PROC_DEF_NAME_, DEF.VERSION_ as PROC_DEF_VERSION_, DEF.DEPLOYMENT_ID_ as DEPLOYMENT_ID_,
+    VAR.ID_ as VAR_ID_, 
+    VAR.NAME_ as VAR_NAME_, 
+    VAR.VAR_TYPE_ as VAR_TYPE_, 
+    VAR.REV_ as VAR_REV_,
+    VAR.PROC_INST_ID_ as VAR_PROC_INST_ID_, 
+    VAR.EXECUTION_ID_ as VAR_EXECUTION_ID_, 
+    VAR.TASK_ID_ as VAR_TASK_ID_,
+    VAR.BYTEARRAY_ID_ as VAR_BYTEARRAY_ID_, 
+    VAR.DOUBLE_ as VAR_DOUBLE_, 
+    VAR.TEXT_ as VAR_TEXT_, 
+    VAR.TEXT2_ as VAR_TEXT2_, 
+    VAR.LAST_UPDATED_TIME_ as VAR_LAST_UPDATED_TIME_, 
+    VAR.LONG_ as VAR_LONG_
+    ${limitBetween}
+    <include refid="selectHistoricProcessInstancesWithVariablesByQueryCriteriaSql"/> 
+    ${limitAfter}
+    ) X order by X.LAST_UPDATED_TIME_ asc
   </select>
   
   <sql id="selectHistoricProcessInstancesWithVariablesByQueryCriteriaColumns">  

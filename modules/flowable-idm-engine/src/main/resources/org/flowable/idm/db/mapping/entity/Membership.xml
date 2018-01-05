@@ -32,6 +32,15 @@
     </foreach>
     SELECT * FROM dual
   </insert>
+  
+  <insert id="bulkInsertMembership" databaseId="sybase" parameterType="java.util.List">
+       <foreach collection="list" item="membership" index="index" separator="&#x000A;"> 
+           INSERT INTO ${prefix}ACT_ID_MEMBERSHIP (USER_ID_, GROUP_ID_)
+           VALUES 
+      (#{membership.userId ,jdbcType=VARCHAR},
+       #{membership.groupId ,jdbcType=VARCHAR})
+    </foreach>
+  </insert>
 
   <!-- MEMBERSHIP UPDATE -->
   

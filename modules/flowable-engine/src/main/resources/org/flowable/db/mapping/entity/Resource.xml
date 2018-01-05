@@ -37,6 +37,18 @@
     SELECT * FROM dual
   </insert>
   
+  <insert id="bulkInsertResource" databaseId="sybase" parameterType="java.util.List">
+       <foreach collection="list" item="byteArr" index="index" separator="&#x000A;"> 
+       INSERT INTO ${prefix}ACT_GE_BYTEARRAY(ID_, REV_, NAME_, BYTES_, DEPLOYMENT_ID_, GENERATED_) VALUES 
+        (#{byteArr.id, jdbcType=VARCHAR},
+         1,
+         #{byteArr.name, jdbcType=VARCHAR},
+         #{byteArr.bytes, jdbcType=BLOB},
+         #{byteArr.deploymentId, jdbcType=VARCHAR},
+         #{byteArr.generated, jdbcType=BOOLEAN})
+      </foreach>
+  </insert>
+  
   <!-- RESOURCE DELETE -->
 
   <delete id="deleteResourcesByDeploymentId" parameterType="string">

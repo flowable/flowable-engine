@@ -1,0 +1,2 @@
+if exists (select convert(varchar(30),o.name) AS table_name from sysobjects o where type = 'U' and o.name = 'ACT_GE_PROPERTY') drop table ACT_GE_PROPERTY;
+if exists (select convert(varchar(30),o.name) AS table_name from sysobjects o where type = 'U' and o.name = 'ACT_GE_BYTEARRAY') drop table ACT_GE_BYTEARRAY;

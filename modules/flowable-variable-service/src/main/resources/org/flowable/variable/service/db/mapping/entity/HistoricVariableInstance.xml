@@ -98,6 +98,33 @@
         </foreach>
         SELECT * FROM dual
     </insert>
+    
+    <insert id="bulkInsertHistoricVariableInstance" databaseId="sybase" parameterType="java.util.List">
+       <foreach collection="list" item="historicVariable" index="index" separator="&#x000A;">
+           insert into ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, SCOPE_ID_, SUB_SCOPE_ID_, SCOPE_TYPE_, 
+                BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_, CREATE_TIME_, LAST_UPDATED_TIME_)
+           values 
+           (
+        		#{historicVariable.id, jdbcType=VARCHAR},
+                #{historicVariable.processInstanceId, jdbcType=VARCHAR},
+                #{historicVariable.executionId, jdbcType=VARCHAR},
+                #{historicVariable.taskId, jdbcType=VARCHAR},
+                #{historicVariable.variableName, jdbcType=VARCHAR},
+                #{historicVariable.revision, jdbcType=VARCHAR},
+                #{historicVariable.variableType, jdbcType=VARCHAR},
+                #{historicVariable.scopeId, jdbcType=VARCHAR},
+                #{historicVariable.subScopeId, jdbcType=VARCHAR},
+                #{historicVariable.scopeType, jdbcType=VARCHAR},
+                #{historicVariable.byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
+                #{historicVariable.doubleValue, jdbcType=DOUBLE},
+                #{historicVariable.longValue, jdbcType=BIGINT},
+                #{historicVariable.textValue, jdbcType=VARCHAR},
+                #{historicVariable.textValue2, jdbcType=VARCHAR},
+                #{historicVariable.createTime, jdbcType=TIMESTAMP},
+                #{historicVariable.lastUpdatedTime, jdbcType=TIMESTAMP}
+           )
+       </foreach>
+  </insert>
 
     <!-- HISTORIC PROCESS VARIABLE UPDATE -->
 

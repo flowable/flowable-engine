@@ -1035,7 +1035,7 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
 
     @Override
     public String getTenantId() {
-        return tenantId;
+    	return (tenantId != null ? tenantId.trim() : null);
     }
 
     @Override

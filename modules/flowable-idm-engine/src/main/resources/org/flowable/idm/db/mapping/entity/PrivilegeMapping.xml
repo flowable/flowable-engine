@@ -42,6 +42,16 @@
       </foreach>
     SELECT * FROM dual
   </insert>
+  
+  <insert id="bulkInsertPrivilegeMapping" databaseId="sybase" parameterType="java.util.List">
+       <foreach collection="list" item="property" index="index" separator="&#x000A;">
+       INSERT INTO ${prefix}ACT_ID_PRIV_MAPPING (ID_, PRIV_ID_, USER_ID_, GROUP_ID_) VALUES 
+        (#{privilege.id ,jdbcType=VARCHAR},
+         #{privilege.privilegeId ,jdbcType=VARCHAR},
+         #{privilege.userId ,jdbcType=VARCHAR},
+         #{privilege.groupId ,jdbcType=VARCHAR})
+      </foreach>
+  </insert>
 
   <delete id="deletePrivilegeMapping" parameterType="org.flowable.idm.engine.impl.persistence.entity.PrivilegeMappingEntityImpl">
     delete from ${prefix}ACT_ID_PRIV_MAPPING where ID_ = #{id}

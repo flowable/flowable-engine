@@ -40,6 +40,20 @@
     SELECT * FROM dual
   </insert>
 
+  <insert id="bulkInsertDeployment" databaseId="sybase" parameterType="java.util.List">
+       <foreach collection="list" item="deployment" index="index" separator="&#x000A;">
+           insert into ${prefix}ACT_RE_DEPLOYMENT(ID_, NAME_, CATEGORY_, KEY_, TENANT_ID_, DEPLOY_TIME_, ENGINE_VERSION_)
+           values
+          (#{deployment.id, jdbcType=VARCHAR},
+           #{deployment.name, jdbcType=VARCHAR},
+           #{deployment.category, jdbcType=VARCHAR},
+           #{deployment.key, jdbcType=VARCHAR},
+           #{deployment.tenantId, jdbcType=VARCHAR},
+           #{deployment.deploymentTime, jdbcType=TIMESTAMP},
+           #{deployment.engineVersion, jdbcType=VARCHAR})
+      </foreach>
+  </insert>
+
   <!-- DEPLOYMENT UPDATE -->
   
   <update id="updateDeployment" parameterType="org.flowable.engine.impl.persistence.entity.DeploymentEntityImpl">
@@ -86,6 +100,15 @@
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
 
+  <select id="selectDeploymentsByQueryCriteria" databaseId="sybase" parameterType="org.flowable.engine.impl.DeploymentQueryImpl" resultMap="deploymentResultMap">
+    select distinct * from (
+       <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <include refid="selectDeploymentsByQueryCriteriaSql"/>
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    ) RES ${orderBy}
+  </select>
+  
   <select id="selectDeploymentCountByQueryCriteria" parameterType="org.flowable.engine.impl.DeploymentQueryImpl" resultType="long">
     select count(distinct RES.ID_)
     <include refid="selectDeploymentsByQueryCriteriaSql"/>

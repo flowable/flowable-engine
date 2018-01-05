@@ -60,6 +60,20 @@
     SELECT * FROM dual
   </insert>
   
+  <insert id="bulkInsertHistoricIdentityLink" databaseId="sybase" parameterType="java.util.List">
+       <foreach collection="list" item="historicIdentityLink" index="index" separator="&#x000A;">
+         insert into ${prefix}ACT_HI_IDENTITYLINK (ID_, TYPE_, USER_ID_, GROUP_ID_, TASK_ID_, PROC_INST_ID_, CREATE_TIME_)
+           values 
+        (#{historicIdentityLink.id, jdbcType=VARCHAR},
+           #{historicIdentityLink.type, jdbcType=VARCHAR},
+           #{historicIdentityLink.userId, jdbcType=VARCHAR},
+           #{historicIdentityLink.groupId, jdbcType=VARCHAR},
+           #{historicIdentityLink.taskId, jdbcType=VARCHAR},
+           #{historicIdentityLink.processInstanceId, jdbcType=VARCHAR},
+           #{historicIdentityLink.createTime, jdbcType=TIMESTAMP})
+      </foreach>
+  </insert>
+  
   <!-- HISTORIC IDENTITY LINK DELETE -->
   
   <delete id="deleteHistoricIdentityLink" parameterType="string">

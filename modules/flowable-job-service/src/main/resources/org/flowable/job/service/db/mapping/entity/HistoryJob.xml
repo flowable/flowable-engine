@@ -214,6 +214,39 @@
         </foreach>
         SELECT * FROM dual
     </insert>
+    
+    
+    <insert id="bulkInsertHistoryJob" databaseId="sybase" parameterType="java.util.List">
+	     <foreach collection="list" item="job" index="index" separator="&#x000A;"> 
+	  INSERT INTO ${prefix}ACT_RU_HISTORY_JOB (
+	        ID_, 
+	        REV_,
+	        LOCK_OWNER_,
+            LOCK_EXP_TIME_,
+            RETRIES_,
+            EXCEPTION_STACK_ID_,
+            EXCEPTION_MSG_,
+            HANDLER_TYPE_,
+            HANDLER_CFG_,
+            CUSTOM_VALUES_ID_,
+            ADV_HANDLER_CFG_ID_,
+            TENANT_ID_,
+            CREATE_TIME_) VALUES
+            (#{job.id, jdbcType=VARCHAR},
+            #{job.revision, jdbcType=INTEGER},
+            #{job.lockOwner, jdbcType=VARCHAR},
+            #{job.lockExpirationTime, jdbcType=TIMESTAMP},
+            #{job.retries, jdbcType=INTEGER},
+            #{job.exceptionByteArrayRef, typeHandler=org.flowable.job.service.impl.persistence.JobByteArrayRefTypeHandler},
+            #{job.exceptionMessage, jdbcType=VARCHAR},
+            #{job.jobHandlerType, jdbcType=VARCHAR},
+            #{job.jobHandlerConfiguration, jdbcType=VARCHAR},
+            #{job.customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
+            #{job.advancedJobHandlerConfigurationByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
+            #{job.tenantId, jdbcType=VARCHAR},
+            #{job.createTime, jdbcType=TIMESTAMP})
+	  </foreach>
+	</insert>
 
     <!-- HISTORY JOB UPDATE -->
 

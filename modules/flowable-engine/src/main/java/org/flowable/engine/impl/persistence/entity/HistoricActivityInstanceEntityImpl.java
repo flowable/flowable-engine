@@ -128,7 +128,7 @@ public class HistoricActivityInstanceEntityImpl extends HistoricScopeInstanceEnt
 
     @Override
     public String getTenantId() {
-        return tenantId;
+    	return (tenantId != null ? tenantId.trim() : null);
     }
 
     @Override

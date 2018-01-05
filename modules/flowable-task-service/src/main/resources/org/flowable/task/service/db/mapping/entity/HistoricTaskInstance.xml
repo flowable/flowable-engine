@@ -197,6 +197,65 @@
         </foreach>
     SELECT * FROM dual
   </insert>
+  
+  <insert id="bulkInsertHistoricTaskInstance" databaseId="sybase" parameterType="java.util.List">
+       <foreach collection="list" item="historicTask" index="index" separator="&#x000A;">
+             insert into ${prefix}ACT_HI_TASKINST (
+               ID_,
+            REV_,
+            PROC_DEF_ID_,
+            PROC_INST_ID_,
+            EXECUTION_ID_,
+            SCOPE_ID_, 
+            SUB_SCOPE_ID_, 
+            SCOPE_TYPE_, 
+            SCOPE_DEFINITION_ID_,
+            NAME_,
+            PARENT_TASK_ID_,
+            DESCRIPTION_,
+            OWNER_,
+            ASSIGNEE_,
+            START_TIME_,
+            CLAIM_TIME_,
+            END_TIME_,
+            DURATION_,
+            DELETE_REASON_,
+            TASK_DEF_KEY_,
+            FORM_KEY_,
+            PRIORITY_,
+            DUE_DATE_,
+            CATEGORY_,
+            TENANT_ID_,
+            LAST_UPDATED_TIME_
+             ) values 
+            (#{historicTask.id ,jdbcType=VARCHAR},
+             1, 
+             #{historicTask.processDefinitionId, jdbcType=VARCHAR},
+             #{historicTask.processInstanceId, jdbcType=VARCHAR},
+             #{historicTask.executionId, jdbcType=VARCHAR},
+             #{historicTask.scopeId, jdbcType=VARCHAR},
+             #{historicTask.subScopeId, jdbcType=VARCHAR},
+             #{historicTask.scopeType, jdbcType=VARCHAR},
+             #{historicTask.scopeDefinitionId, jdbcType=VARCHAR},
+             #{historicTask.name ,jdbcType=VARCHAR},
+             #{historicTask.parentTaskId ,jdbcType=VARCHAR},
+             #{historicTask.description ,jdbcType=VARCHAR},
+             #{historicTask.owner ,jdbcType=VARCHAR},
+             #{historicTask.assignee ,jdbcType=VARCHAR},
+             #{historicTask.startTime, jdbcType=TIMESTAMP},
+             #{historicTask.claimTime, jdbcType=TIMESTAMP},
+             #{historicTask.endTime, jdbcType=TIMESTAMP},
+             #{historicTask.durationInMillis ,jdbcType=BIGINT},
+             #{historicTask.deleteReason ,jdbcType=VARCHAR},
+             #{historicTask.taskDefinitionKey ,jdbcType=VARCHAR},
+             #{historicTask.formKey ,jdbcType=VARCHAR},
+             #{historicTask.priority, jdbcType=INTEGER},
+             #{historicTask.dueDate, jdbcType=TIMESTAMP},
+             #{historicTask.category, jdbcType=VARCHAR},
+             #{historicTask.tenantId, jdbcType=VARCHAR},
+             #{historicTask.lastUpdateTime, jdbcType=TIMESTAMP})
+        </foreach>
+  </insert>
 
   <!-- HISTORIC TASK INSTANCE UPDATE -->
   
@@ -392,6 +451,15 @@
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   
+  <select id="selectHistoricTaskInstancesByQueryCriteria" databaseId="sybase" parameterType="org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl" resultMap="historicTaskInstanceResultMap">
+       select distinct * from (
+       <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <include refid="selectHistoricTaskInstancesByQueryCriteriaSql"/>
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    ) RES ${orderBy}
+  </select>
+  
   <select id="selectHistoricTaskInstanceCountByQueryCriteria" parameterType="org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl" resultType="long">
     select count(RES.ID_)
     <include refid="selectHistoricTaskInstancesByQueryCriteriaSql"/>
@@ -406,6 +474,12 @@
     <include refid="selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteriaColumns"/>
     <include refid="selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteriaSql"/>
     ${orderBy}
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+  </select>
+  
+  <select id="selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteria" databaseId="sybase" parameterType="org.flowable.task.service.impl.HistoricTaskInstanceQueryImpl" resultMap="historicTaskAndRelatedEntitiesResultMap">
+    <include refid="selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteriaColumns"/>
+    <include refid="selectHistoricTaskInstancesWithRelatedEntitiesByQueryCriteriaSql"/>    
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
   </select>
   

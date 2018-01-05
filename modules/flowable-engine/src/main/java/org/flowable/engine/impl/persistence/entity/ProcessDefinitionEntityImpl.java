@@ -137,7 +137,7 @@ public class ProcessDefinitionEntityImpl extends AbstractEntity implements Proce
 
     @Override
     public String getTenantId() {
-        return tenantId;
+    	return (tenantId != null ? tenantId.trim() : null);
     }
 
     @Override

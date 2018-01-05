@@ -64,6 +64,26 @@
      </foreach>
     SELECT * FROM dual
   </insert>
+  
+  <insert id="bulkInsertModel" databaseId="sybase" parameterType="java.util.List">
+       <foreach collection="list" item="model" index="index" separator="&#x000A;"> 
+           INSERT INTO ${prefix}ACT_RE_MODEL(ID_, REV_, NAME_, KEY_, CATEGORY_, CREATE_TIME_, LAST_UPDATE_TIME_, VERSION_, META_INFO_, DEPLOYMENT_ID_, EDITOR_SOURCE_VALUE_ID_, EDITOR_SOURCE_EXTRA_VALUE_ID_, TENANT_ID_)
+           VALUES 
+        (#{model.id, jdbcType=VARCHAR}, 
+         1,
+         #{model.name, jdbcType=VARCHAR}, 
+         #{model.key, jdbcType=VARCHAR}, 
+         #{model.category, jdbcType=VARCHAR}, 
+         #{model.createTime, jdbcType=TIMESTAMP},
+         #{model.lastUpdateTime, jdbcType=TIMESTAMP},
+         #{model.version, jdbcType=INTEGER}, 
+         #{model.metaInfo, jdbcType=VARCHAR}, 
+         #{model.deploymentId, jdbcType=VARCHAR},
+         #{model.editorSourceValueId, jdbcType=VARCHAR}, 
+         #{model.editorSourceExtraValueId, jdbcType=VARCHAR},
+         #{model.tenantId, jdbcType=VARCHAR})
+     </foreach>
+  </insert>
 
   <!-- MODEL UPDATE -->
   <update id="updateModel" parameterType="org.flowable.engine.impl.persistence.entity.ModelEntityImpl">
@@ -137,6 +157,15 @@
     <include refid="selectModelsByQueryCriteriaSql"/>
     ${orderBy}
     <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+  </select>
+  
+  <select id="selectModelsByQueryCriteria" databaseId="sybase" parameterType="org.flowable.engine.impl.ModelQueryImpl" resultMap="modelResultMap">
+    select distinct * from (
+       <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
+    select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
+    <include refid="selectModelsByQueryCriteriaSql"/>
+    <if test="firstResult != null and firstResult &gt;= 0">${limitAfter}</if>
+    ) RES ${orderBy}
   </select>
 
   <select id="selectModelCountByQueryCriteria" parameterType="org.flowable.engine.impl.ModelQueryImpl" resultType="long">

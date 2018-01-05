@@ -655,7 +655,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
 
     @Override
     public String getTenantId() {
-        return tenantId;
+    	return (tenantId != null ? tenantId.trim() : null);
     }
 
     @Override
