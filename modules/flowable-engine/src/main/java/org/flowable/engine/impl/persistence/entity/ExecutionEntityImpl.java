@@ -1219,15 +1219,14 @@ public class ExecutionEntityImpl extends VariableScopeImpl implements ExecutionE
             return "ProcessInstance[" + getId() + "]";
         } else {
             StringBuilder strb = new StringBuilder();
-            if (isScope) {
-                strb.append("Scoped execution[ id '").append(getId()).append("' ]");
-            } else if (isMultiInstanceRoot) {
-                strb.append("Multi instance root execution[ id '").append(getId()).append("' ]");
-            } else {
-                strb.append("Execution[ id '").append(getId()).append("' ]");
+            String kind = isScope ? "Scoped execution" : isMultiInstanceRoot ? "Multi instance root execution" : "Execution";
+            strb.append(kind).append("[ id '").append(getId()).append("'");
+            if (name != null) {
+                strb.append(" name '").append(name).append("'");
             }
+            strb.append(" ]");
             if (activityId != null) {
-                strb.append(" - activity '").append(activityId);
+                strb.append(" - activity '").append(activityId).append("'");
             }
             if (parentId != null) {
                 strb.append(" - parent '").append(parentId).append("'");

@@ -53,15 +53,7 @@ public class SpringExpressionManager extends ProcessExpressionManager {
     protected ELResolver createElResolver(VariableContainer variableContainer) {
         CompositeELResolver compositeElResolver = new CompositeELResolver();
         compositeElResolver.add(createVariableElResolver(variableContainer));
-
-        if (beans != null) {
-            // Only expose limited set of beans in expressions
-            compositeElResolver.add(new ReadOnlyMapELResolver(beans));
-        } else {
-            // Expose full application-context in expressions
-            compositeElResolver.add(new ApplicationContextElResolver(applicationContext));
-        }
-
+        compositeElResolver.add(createSpringElResolver());
         compositeElResolver.add(new ArrayELResolver());
         compositeElResolver.add(new ListELResolver());
         compositeElResolver.add(new MapELResolver());
@@ -69,5 +61,14 @@ public class SpringExpressionManager extends ProcessExpressionManager {
         compositeElResolver.add(new BeanELResolver());
         return compositeElResolver;
     }
-
+    
+    protected ELResolver createSpringElResolver() {
+        if (beans != null) {
+            // Only expose limited set of beans in expressions
+            return new ReadOnlyMapELResolver(beans);
+        } else {
+            // Expose full application-context in expressions
+            return new ApplicationContextElResolver(applicationContext);
+        }
+    }
 }
