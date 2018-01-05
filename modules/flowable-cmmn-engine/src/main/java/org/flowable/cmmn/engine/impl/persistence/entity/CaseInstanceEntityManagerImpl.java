@@ -126,11 +126,6 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         Collections.reverse(planItemInstanceEntities); // Need to have them in leaf -> root order
         if (planItemInstanceEntities != null) {
             for (PlanItemInstanceEntity planItemInstanceEntity : planItemInstanceEntities) {
-                if (planItemInstanceEntity.getSatisfiedSentryPartInstances() != null) {
-                    for (SentryPartInstanceEntity sentryPartInstanceEntity : planItemInstanceEntity.getSatisfiedSentryPartInstances()) {
-                        sentryPartInstanceEntityManager.delete(sentryPartInstanceEntity);
-                    }
-                }
                 planItemInstanceEntityManager.delete(planItemInstanceEntity);
             }
         }

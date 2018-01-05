@@ -12,16 +12,18 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
-import java.util.List;
-
 /**
  * @author Joram Barrez
  */
-public interface PlanItemInstanceContainer {
+public interface CountingPlanItemInstanceEntity {
+    
+    boolean isCountEnabled();
+    void setCountEnabled(boolean isCountEnabled);
+    
+    int getVariableCount();
+    void setVariableCount(int variableCount);
+    
+    int getSentryPartInstanceCount();
+    void setSentryPartInstanceCount(int sentryPartInstanceCount);
 
-    List<PlanItemInstanceEntity> getChildPlanItemInstances();
-    List<PlanItemInstanceEntity> getChildPlanItemInstancesNoFetch();
-    void setChildPlanItemInstances(List<PlanItemInstanceEntity> childPlanItemInstances);
-    
-    
 }

@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,7 +31,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableScopeImpl;
 /**
  * @author Joram Barrez
  */
-public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements PlanItemInstanceEntity {
+public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements PlanItemInstanceEntity, CountingPlanItemInstanceEntity {
     
     protected String caseDefinitionId;
     protected String caseInstanceId;
@@ -47,6 +48,11 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
     protected String referenceType;
     protected boolean completeable;
     protected String tenantId = CmmnEngineConfiguration.NO_TENANT_ID;
+    
+    // Counts
+    protected boolean countEnabled;
+    protected int variableCount;
+    protected int sentryPartInstanceCount;
     
     // Non-persisted
     protected PlanItem planItem;
@@ -70,6 +76,9 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
         persistentState.put("referenceId", referenceId);
         persistentState.put("referenceType", referenceType);
         persistentState.put("completeable", completeable);
+        persistentState.put("countEnabled", countEnabled);
+        persistentState.put("variableCount", variableCount);
+        persistentState.put("sentryPartInstanceCount", sentryPartInstanceCount);
         persistentState.put("tenantId", tenantId);
         return persistentState;
     }
@@ -188,6 +197,11 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
     }
     
     @Override
+    public List<PlanItemInstanceEntity> getChildPlanItemInstancesNoFetch() {
+        return childPlanItemInstances;
+    }
+    
+    @Override
     public PlanItemInstanceEntity getStagePlanItemInstanceEntity() {
         if (stagePlanItemInstance == null) {
             stagePlanItemInstance = CommandContextUtil.getPlanItemInstanceEntityManager().findById(stageInstanceId);
@@ -198,7 +212,11 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
     @Override
     public List<SentryPartInstanceEntity> getSatisfiedSentryPartInstances() {
         if (satisfiedSentryPartInstances == null) {
-            satisfiedSentryPartInstances = CommandContextUtil.getSentryPartInstanceEntityManager().findSentryPartInstancesByPlanItemInstanceId(id);
+            if (sentryPartInstanceCount == 0) {
+                satisfiedSentryPartInstances = new ArrayList<SentryPartInstanceEntity>(1);
+            } else {
+                satisfiedSentryPartInstances = CommandContextUtil.getSentryPartInstanceEntityManager().findSentryPartInstancesByPlanItemInstanceId(id);
+            }
         }
         return satisfiedSentryPartInstances;
     }
@@ -230,6 +248,12 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
     }
 
     @Override
+    protected void createVariableLocal(String variableName, Object value) {
+        super.createVariableLocal(variableName, value);
+        setVariableCount(variableCount + 1); 
+    }
+
+    @Override
     protected VariableInstanceEntity getSpecificVariable(String variableName) {
         return CommandContextUtil.getVariableService().findVariableInstanceBySubScopeIdAndScopeTypeAndName(id, VariableScopeType.CMMN, variableName);
     }
@@ -244,4 +268,28 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
         return true;
     }
 
+    public boolean isCountEnabled() {
+        return countEnabled;
+    }
+
+    public void setCountEnabled(boolean countEnabled) {
+        this.countEnabled = countEnabled;
+    }
+
+    public int getVariableCount() {
+        return variableCount;
+    }
+
+    public void setVariableCount(int variableCount) {
+        this.variableCount = variableCount;
+    }
+
+    public int getSentryPartInstanceCount() {
+        return sentryPartInstanceCount;
+    }
+
+    public void setSentryPartInstanceCount(int sentryPartInstanceCount) {
+        this.sentryPartInstanceCount = sentryPartInstanceCount;
+    }
+    
 }

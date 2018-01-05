@@ -18,7 +18,6 @@ import java.util.List;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
-import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
@@ -97,7 +96,7 @@ public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager
     }
     
     @Override
-    public List<PlanItemInstanceEntity> findImmediateChildPlanItemInstancesForCaseInstance(String caseInstance) {
+    public List<PlanItemInstanceEntity> findDirectChildPlanItemInstancesForCaseInstance(String caseInstance) {
         return planItemInstanceDataManager.findChildPlanItemInstancesForCaseInstance(caseInstance);
     }
     
@@ -145,19 +144,37 @@ public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager
     public void delete(PlanItemInstanceEntity planItemInstanceEntity, boolean fireEvent) {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         
+        CountingPlanItemInstanceEntity countingPlanItemInstanceEntity = (CountingPlanItemInstanceEntity) planItemInstanceEntity;
+        
         // Variables
-        VariableInstanceEntityManager variableInstanceEntityManager 
-            = CommandContextUtil.getVariableServiceConfiguration(commandContext).getVariableInstanceEntityManager();
-        List<VariableInstanceEntity> variableInstanceEntities = variableInstanceEntityManager
-                .findVariableInstanceBySubScopeIdAndScopeType(planItemInstanceEntity.getId(), VariableScopeType.CMMN);
-        for (VariableInstanceEntity variableInstanceEntity : variableInstanceEntities) {
-            variableInstanceEntityManager.delete(variableInstanceEntity);
+        if (countingPlanItemInstanceEntity.getVariableCount() > 0) {
+            VariableInstanceEntityManager variableInstanceEntityManager 
+                = CommandContextUtil.getVariableServiceConfiguration(commandContext).getVariableInstanceEntityManager();
+            List<VariableInstanceEntity> variableInstanceEntities = variableInstanceEntityManager
+                    .findVariableInstanceBySubScopeIdAndScopeType(planItemInstanceEntity.getId(), VariableScopeType.CMMN);
+            for (VariableInstanceEntity variableInstanceEntity : variableInstanceEntities) {
+                variableInstanceEntityManager.delete(variableInstanceEntity);
+            }
         }
         
-        List<PlanItemInstanceEntity> childPlanItems = findChildPlanItemInstancesForStage(planItemInstanceEntity.getId());
-        if (childPlanItems != null && childPlanItems.size() > 0) {
-            for (PlanItemInstanceEntity childPlanItem : childPlanItems) {
-                delete(childPlanItem, fireEvent);
+        // SentryOnPartInstances
+        if (countingPlanItemInstanceEntity.getSentryPartInstanceCount() > 0) {
+            List<SentryPartInstanceEntity> sentryPartInstanceEntities = planItemInstanceEntity.getSatisfiedSentryPartInstances();
+            if (sentryPartInstanceEntities != null && !sentryPartInstanceEntities.isEmpty()) {
+                SentryPartInstanceEntityManager sentryPartInstanceEntityManager
+                    = CommandContextUtil.getSentryPartInstanceEntityManager(commandContext);
+                for (SentryPartInstanceEntity sentryPartInstanceEntity : sentryPartInstanceEntities) {
+                    sentryPartInstanceEntityManager.delete(sentryPartInstanceEntity);
+                }
+            }
+        }
+        
+        if (planItemInstanceEntity.isStage()) {
+            List<PlanItemInstanceEntity> childPlanItems = findChildPlanItemInstancesForStage(planItemInstanceEntity.getId());
+            if (childPlanItems != null && childPlanItems.size() > 0) {
+                for (PlanItemInstanceEntity childPlanItem : childPlanItems) {
+                    delete(childPlanItem, fireEvent);
+                }
             }
         }
         

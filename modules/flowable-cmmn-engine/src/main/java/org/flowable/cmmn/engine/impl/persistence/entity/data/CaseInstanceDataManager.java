@@ -27,6 +27,8 @@ public interface CaseInstanceDataManager extends DataManager<CaseInstanceEntity>
     
     List<CaseInstanceEntity> findCaseInstancesByCaseDefinitionId(String caseDefinitionId);
     
+    CaseInstanceEntity findCaseInstanceEntityEagerFetchPlanItemInstances(String caseInstanceId, String planItemInstanceId);
+    
     List<CaseInstance> findByCriteria(CaseInstanceQueryImpl query);
     
     long countByCriteria(CaseInstanceQueryImpl query);

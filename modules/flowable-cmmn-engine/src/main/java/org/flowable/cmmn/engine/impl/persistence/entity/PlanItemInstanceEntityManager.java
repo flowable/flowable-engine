@@ -27,7 +27,7 @@ public interface PlanItemInstanceEntityManager extends EntityManager<PlanItemIns
     PlanItemInstanceEntity createChildPlanItemInstance(PlanItem planItem, String caseDefinitionId, 
             String caseInstanceId, String stagePlanItemInstanceId, String tenantId, boolean addToParent);
     
-    List<PlanItemInstanceEntity> findImmediateChildPlanItemInstancesForCaseInstance(String caseInstance);
+    List<PlanItemInstanceEntity> findDirectChildPlanItemInstancesForCaseInstance(String caseInstance);
     
     List<PlanItemInstanceEntity> findAllChildPlanItemInstancesForCaseInstance(String caseInstance);
     

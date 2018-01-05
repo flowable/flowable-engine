@@ -221,7 +221,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected HistoricCaseInstanceDataManager historicCaseInstanceDataManager;
     protected HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager;
 
-    // IDM ENGINE /////////////////////////////////////////////////////
     protected boolean disableIdmEngine;
 
     protected CaseInstanceHelper caseInstanceHelper;
@@ -286,7 +285,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected TaskServiceConfiguration taskServiceConfiguration;
     protected InternalHistoryTaskManager internalHistoryTaskManager;
     protected InternalTaskVariableScopeResolver internalTaskVariableScopeResolver;
-    protected boolean isEnableTaskRelationshipCounts;
+    protected boolean isEnableTaskRelationshipCounts = true;
     protected int taskQueryLimit;
     protected int historicTaskQueryLimit;
 
@@ -518,6 +517,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      */
     protected ExecuteAsyncRunnableFactory asyncExecutorExecuteAsyncRunnableFactory;
 
+    protected boolean enableEagerPlanItemTreeFetching = true;  
+    
     public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResourceDefault() {
         return createCmmnEngineConfigurationFromResource("flowable.cmmn.cfg.xml", "cmmnEngineConfiguration");
     }
@@ -2183,4 +2184,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.httpClientConfig.merge(httpClientConfig);
     }
 
+    public boolean isEnableEagerPlanItemTreeFetching() {
+        return enableEagerPlanItemTreeFetching;
+    }
+
+    public void setEnableEagerPlanItemTreeFetching(boolean enableEagerPlanItemTreeFetching) {
+        this.enableEagerPlanItemTreeFetching = enableEagerPlanItemTreeFetching;
+    }
+    
 }

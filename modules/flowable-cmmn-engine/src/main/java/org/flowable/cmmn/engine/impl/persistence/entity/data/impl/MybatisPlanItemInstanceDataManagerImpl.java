@@ -17,20 +17,25 @@ import java.util.List;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
+import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
+import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 
 /**
  * @author Joram Barrez
  */
 public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataManager<PlanItemInstanceEntity> implements PlanItemInstanceDataManager {
     
+    protected boolean isPlanItemInstanceTreeFetchingEnabled;
+    
     public MybatisPlanItemInstanceDataManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration) {
         super(cmmnEngineConfiguration);
+        this.isPlanItemInstanceTreeFetchingEnabled = cmmnEngineConfiguration.isEnableEagerPlanItemTreeFetching();
     }
 
     @Override
@@ -49,6 +54,24 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
         return planItemInstanceEntityImpl;
     }
     
+    @Override
+    public PlanItemInstanceEntity findById(String planItemInstanceId) {
+        if (isPlanItemInstanceTreeFetchingEnabled) {
+            
+            // Could have been cached before
+            EntityCache entityCache = getEntityCache();
+            PlanItemInstanceEntity cachedPlanItemInstanceEntity = entityCache.findInCache(getManagedEntityClass(), planItemInstanceId);
+            if (cachedPlanItemInstanceEntity != null) {
+                return cachedPlanItemInstanceEntity;
+            }
+            
+            cmmnEngineConfiguration.getCaseInstanceDataManager().findCaseInstanceEntityEagerFetchPlanItemInstances(null, planItemInstanceId);
+            // the plan item instance will be in the cache now due to fetching the case instance,
+            // no need to do anything extra, the findById of the super class will look into the cache
+        } 
+        return super.findById(planItemInstanceId);
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public List<PlanItemInstanceEntity> findChildPlanItemInstancesForCaseInstance(String caseInstanceId) {

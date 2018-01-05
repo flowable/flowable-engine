@@ -28,6 +28,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataMan
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.matcher.CaseInstanceByCaseDefinitionIdMatcher;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
+import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -35,10 +36,13 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<CaseInstanceEntity> implements CaseInstanceDataManager {
     
+    protected boolean enableEagerPlanItemTreeFetching;
+    
     protected CaseInstanceByCaseDefinitionIdMatcher caseInstanceByCaseDefinitionIdMatcher = new CaseInstanceByCaseDefinitionIdMatcher();
 
     public MybatisCaseInstanceDataManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration) {
         super(cmmnEngineConfiguration);
+        this.enableEagerPlanItemTreeFetching = cmmnEngineConfiguration.isEnableEagerPlanItemTreeFetching();
     }
 
     @Override
@@ -53,6 +57,77 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
         caseInstanceEntityImpl.setSatisfiedSentryPartInstances(new ArrayList<SentryPartInstanceEntity>(1));
         caseInstanceEntityImpl.internalSetVariableInstances(new HashMap<String, VariableInstanceEntity>(1));
         return caseInstanceEntityImpl;
+    }
+    
+    @Override
+    public CaseInstanceEntity findById(String caseInstanceId) {
+        if (enableEagerPlanItemTreeFetching) {
+            return findCaseInstanceEntityEagerFetchPlanItemInstances(caseInstanceId, null);
+        }
+        return super.findById(caseInstanceId);
+    }
+    
+    public CaseInstanceEntity findCaseInstanceEntityEagerFetchPlanItemInstances(String caseInstanceId, String planItemInstanceId) {
+        
+        // Could have been fetched before
+        EntityCache entityCache = getEntityCache();
+        CaseInstanceEntity cachedCaseInstanceEntity = entityCache.findInCache(getManagedEntityClass(), caseInstanceId);
+        if (cachedCaseInstanceEntity != null) {
+            return cachedCaseInstanceEntity;
+        }
+
+        // Not in cache
+        HashMap<String, Object> params = new HashMap<>(1);
+        if (caseInstanceId != null) {
+            params.put("caseInstanceId", caseInstanceId);
+        } else if (planItemInstanceId != null) {
+            params.put("planItemInstanceId", planItemInstanceId);
+        }
+        
+        // The case instance will be fetched and will have all plan item instances in the childPlanItemInstances property.
+        // Those children need to be properly moved to the correct parent
+        CaseInstanceEntityImpl caseInstanceEntity = (CaseInstanceEntityImpl) getDbSqlSession().selectOne("selectCaseInstanceEagerFetchPlanItemInstances", params);
+        
+        if (caseInstanceEntity != null) {
+            List<PlanItemInstanceEntity> allPlanItemInstances = caseInstanceEntity.getChildPlanItemInstances();
+            ArrayList<PlanItemInstanceEntity> directPlanItemInstances = new ArrayList<>();
+            HashMap<String, PlanItemInstanceEntity> planItemInstanceMap = new HashMap<>(allPlanItemInstances.size());
+            
+            // Map all plan item instances to its id
+            for (PlanItemInstanceEntity planItemInstanceEntity : allPlanItemInstances) {
+                
+                // Mapping
+                planItemInstanceMap.put(planItemInstanceEntity.getId(), planItemInstanceEntity);
+                
+                // Cache
+                entityCache.put(planItemInstanceEntity, true);
+                
+                // plan items of case plan model
+                if (planItemInstanceEntity.getStageInstanceId() == null) {
+                    directPlanItemInstances.add(planItemInstanceEntity);
+                }
+            }
+            
+            // Add to correct parent
+            if (directPlanItemInstances.size() != planItemInstanceMap.size()) {
+                for (PlanItemInstanceEntity planItemInstanceEntity : allPlanItemInstances) {
+                    if (planItemInstanceEntity.getStageInstanceId() != null) {
+                        PlanItemInstanceEntity parentPlanItemInstanceEntity = planItemInstanceMap.get(planItemInstanceEntity.getStageInstanceId());
+                        if (parentPlanItemInstanceEntity.getChildPlanItemInstancesNoFetch() == null) {
+                            parentPlanItemInstanceEntity.setChildPlanItemInstances(new ArrayList<PlanItemInstanceEntity>());
+                        }
+                        parentPlanItemInstanceEntity.getChildPlanItemInstances().add(planItemInstanceEntity);
+                    }
+                }
+            }
+            
+            caseInstanceEntity.setChildPlanItemInstances(directPlanItemInstances);
+            return caseInstanceEntity;
+            
+        } else {
+            return null;
+            
+        }
     }
     
     @Override

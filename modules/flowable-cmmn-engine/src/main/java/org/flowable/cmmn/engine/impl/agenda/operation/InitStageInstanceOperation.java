@@ -12,11 +12,8 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
-import java.util.List;
-
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
-import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Stage;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
@@ -36,7 +33,7 @@ public class InitStageInstanceOperation extends AbstractPlanItemInstanceOperatio
         planItemInstanceEntity.setState(PlanItemInstanceState.ACTIVE);
         planItemInstanceEntity.setStage(true);
         
-        List<PlanItemInstanceEntity> planItemInstances = createPlanItemInstances(commandContext, 
+        createPlanItemInstances(commandContext, 
                 stage.getPlanItems(), 
                 planItemInstanceEntity.getCaseDefinitionId(), 
                 planItemInstanceEntity.getCaseInstanceId(), 
