@@ -517,8 +517,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
      */
     protected ExecuteAsyncRunnableFactory asyncExecutorExecuteAsyncRunnableFactory;
 
-    protected boolean enableEagerPlanItemTreeFetching = true;  
-    
     public static CmmnEngineConfiguration createCmmnEngineConfigurationFromResourceDefault() {
         return createCmmnEngineConfigurationFromResource("flowable.cmmn.cfg.xml", "cmmnEngineConfiguration");
     }
@@ -2184,12 +2182,4 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.httpClientConfig.merge(httpClientConfig);
     }
 
-    public boolean isEnableEagerPlanItemTreeFetching() {
-        return enableEagerPlanItemTreeFetching;
-    }
-
-    public void setEnableEagerPlanItemTreeFetching(boolean enableEagerPlanItemTreeFetching) {
-        this.enableEagerPlanItemTreeFetching = enableEagerPlanItemTreeFetching;
-    }
-    
 }

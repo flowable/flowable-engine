@@ -36,13 +36,10 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
  */
 public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<CaseInstanceEntity> implements CaseInstanceDataManager {
     
-    protected boolean enableEagerPlanItemTreeFetching;
-    
     protected CaseInstanceByCaseDefinitionIdMatcher caseInstanceByCaseDefinitionIdMatcher = new CaseInstanceByCaseDefinitionIdMatcher();
 
     public MybatisCaseInstanceDataManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration) {
         super(cmmnEngineConfiguration);
-        this.enableEagerPlanItemTreeFetching = cmmnEngineConfiguration.isEnableEagerPlanItemTreeFetching();
     }
 
     @Override
@@ -61,10 +58,7 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
     
     @Override
     public CaseInstanceEntity findById(String caseInstanceId) {
-        if (enableEagerPlanItemTreeFetching) {
-            return findCaseInstanceEntityEagerFetchPlanItemInstances(caseInstanceId, null);
-        }
-        return super.findById(caseInstanceId);
+        return findCaseInstanceEntityEagerFetchPlanItemInstances(caseInstanceId, null);
     }
     
     public CaseInstanceEntity findCaseInstanceEntityEagerFetchPlanItemInstances(String caseInstanceId, String planItemInstanceId) {

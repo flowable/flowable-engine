@@ -30,11 +30,8 @@ import org.flowable.engine.common.impl.persistence.cache.EntityCache;
  */
 public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataManager<PlanItemInstanceEntity> implements PlanItemInstanceDataManager {
     
-    protected boolean isPlanItemInstanceTreeFetchingEnabled;
-    
     public MybatisPlanItemInstanceDataManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration) {
         super(cmmnEngineConfiguration);
-        this.isPlanItemInstanceTreeFetchingEnabled = cmmnEngineConfiguration.isEnableEagerPlanItemTreeFetching();
     }
 
     @Override
@@ -55,19 +52,17 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
     
     @Override
     public PlanItemInstanceEntity findById(String planItemInstanceId) {
-        if (isPlanItemInstanceTreeFetchingEnabled) {
-            
-            // Could have been cached before
-            EntityCache entityCache = getEntityCache();
-            PlanItemInstanceEntity cachedPlanItemInstanceEntity = entityCache.findInCache(getManagedEntityClass(), planItemInstanceId);
-            if (cachedPlanItemInstanceEntity != null) {
-                return cachedPlanItemInstanceEntity;
-            }
-            
-            cmmnEngineConfiguration.getCaseInstanceDataManager().findCaseInstanceEntityEagerFetchPlanItemInstances(null, planItemInstanceId);
-            // the plan item instance will be in the cache now due to fetching the case instance,
-            // no need to do anything extra, the findById of the super class will look into the cache
-        } 
+        // Could have been cached before
+        EntityCache entityCache = getEntityCache();
+        PlanItemInstanceEntity cachedPlanItemInstanceEntity = entityCache.findInCache(getManagedEntityClass(), planItemInstanceId);
+        if (cachedPlanItemInstanceEntity != null) {
+            return cachedPlanItemInstanceEntity;
+        }
+        
+        cmmnEngineConfiguration.getCaseInstanceDataManager().findCaseInstanceEntityEagerFetchPlanItemInstances(null, planItemInstanceId);
+        
+        // the plan item instance will be in the cache now due to fetching the case instance,
+        // no need to do anything extra, the findById of the super class will look into the cache
         return super.findById(planItemInstanceId);
     }
 
