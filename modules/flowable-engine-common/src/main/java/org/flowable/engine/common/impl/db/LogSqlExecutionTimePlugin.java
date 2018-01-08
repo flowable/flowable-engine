@@ -61,7 +61,7 @@ public class LogSqlExecutionTimePlugin implements Interceptor {
         Object retVal = invocation.proceed();
         long endTime = System.currentTimeMillis();
         MappedStatement mappedStatement = (MappedStatement) invocation.getArgs()[0];
-        LOGGER.info("SQL Statement {} took {}ms", mappedStatement.getId(), endTime-startTime);
+        LOGGER.debug("SQL Statement {} took {}ms", mappedStatement.getId(), endTime-startTime);
         return retVal;
     }
 
