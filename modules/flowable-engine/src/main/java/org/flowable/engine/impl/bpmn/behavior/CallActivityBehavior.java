@@ -13,6 +13,11 @@
 
 package org.flowable.engine.impl.bpmn.behavior;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.CallActivity;
 import org.flowable.bpmn.model.FlowElement;
@@ -35,14 +40,10 @@ import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  * Implementation of the BPMN 2.0 call activity (limited currently to calling a subprocess and not (yet) a global task).
@@ -205,10 +206,17 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
 
     // Allow subclass to determine which version of a process to start.
     protected ProcessDefinition findProcessDefinition(String processDefinitionKey, String processDefinitionId, String tenantId, boolean sameDeployment) {
-        if(sameDeployment) {
+        if (sameDeployment) {
             String deploymentId = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId).getDeploymentId();
-            ProcessDefinitionEntity processDefinitionByDeploymentAndKey = Context.getProcessEngineConfiguration().getProcessDefinitionEntityManager().findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitionKey);
-            if(processDefinitionByDeploymentAndKey != null) {
+            ProcessDefinitionEntityManager processDefinitionEntityManager = Context.getProcessEngineConfiguration().getProcessDefinitionEntityManager();
+            ProcessDefinitionEntity processDefinitionByDeploymentAndKey = null;
+            if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+                processDefinitionByDeploymentAndKey = processDefinitionEntityManager.findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitionKey);
+            } else {
+                processDefinitionByDeploymentAndKey = processDefinitionEntityManager.findProcessDefinitionByDeploymentAndKeyAndTenantId(deploymentId, processDefinitionKey, tenantId);
+            }
+            
+            if (processDefinitionByDeploymentAndKey != null) {
                 return processDefinitionByDeploymentAndKey;
             }
         }
