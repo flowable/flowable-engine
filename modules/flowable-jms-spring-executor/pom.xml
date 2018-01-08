@@ -140,11 +140,11 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-      <groupId>org.apache.activemq</groupId>
-      <artifactId>activemq-broker</artifactId>
-      <version>5.13.3</version>
-      <scope>test</scope>
-    </dependency>
+		<groupId>org.apache.activemq</groupId>
+			<artifactId>activemq-broker</artifactId>
+			<version>5.13.3</version>
+			<scope>test</scope>
+		</dependency>
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>

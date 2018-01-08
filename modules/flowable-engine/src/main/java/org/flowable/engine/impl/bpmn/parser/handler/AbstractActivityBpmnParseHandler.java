@@ -42,14 +42,7 @@ public abstract class AbstractActivityBpmnParseHandler<T extends FlowNode> exten
         MultiInstanceLoopCharacteristics loopCharacteristics = modelActivity.getLoopCharacteristics();
 
         // Activity Behavior
-        MultiInstanceActivityBehavior miActivityBehavior = null;
-
-        if (loopCharacteristics.isSequential()) {
-            miActivityBehavior = bpmnParse.getActivityBehaviorFactory().createSequentialMultiInstanceBehavior(modelActivity, (AbstractBpmnActivityBehavior) modelActivity.getBehavior());
-        } else {
-            miActivityBehavior = bpmnParse.getActivityBehaviorFactory().createParallelMultiInstanceBehavior(modelActivity, (AbstractBpmnActivityBehavior) modelActivity.getBehavior());
-        }
-
+        MultiInstanceActivityBehavior miActivityBehavior = createMultiInstanceActivityBehavior(bpmnParse, modelActivity, loopCharacteristics);
         modelActivity.setBehavior(miActivityBehavior);
 
         ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager();
@@ -89,4 +82,13 @@ public abstract class AbstractActivityBpmnParseHandler<T extends FlowNode> exten
             miActivityBehavior.setHandler(loopCharacteristics.getHandler().clone());
         }
     }
+
+	protected MultiInstanceActivityBehavior createMultiInstanceActivityBehavior(BpmnParse bpmnParse, Activity modelActivity, MultiInstanceLoopCharacteristics loopCharacteristics) {
+        AbstractBpmnActivityBehavior innerBehavior = (AbstractBpmnActivityBehavior) modelActivity.getBehavior();
+		if (loopCharacteristics.isSequential()) {
+            return bpmnParse.getActivityBehaviorFactory().createSequentialMultiInstanceBehavior(modelActivity, innerBehavior);
+        } else {
+            return bpmnParse.getActivityBehaviorFactory().createParallelMultiInstanceBehavior(modelActivity, innerBehavior);
+        }
+	}
 }
