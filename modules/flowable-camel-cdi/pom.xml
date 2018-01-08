@@ -3,7 +3,7 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <name>Flowable - Camel</name>
+  <name>Flowable - Camel CDI</name>
   <artifactId>flowable-camel-cdi</artifactId>
   <packaging>bundle</packaging>
 
