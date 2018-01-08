@@ -15,6 +15,7 @@ package org.flowable.cmmn.engine.impl.history;
 import java.util.List;
 
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
+import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.api.runtime.MilestoneInstance;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
@@ -85,8 +86,13 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
             HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
             HistoricCaseInstanceEntity historicCaseInstance = historicCaseInstanceEntityManager.findById(caseInstanceId);
 
-            cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager().deleteByCaseDefinitionId(caseInstanceId);
-           
+            HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager = cmmnEngineConfiguration.getHistoricMilestoneInstanceEntityManager();
+            List<HistoricMilestoneInstance> historicMilestoneInstances = historicMilestoneInstanceEntityManager
+                .findHistoricMilestoneInstancesByQueryCriteria(new HistoricMilestoneInstanceQueryImpl().milestoneInstanceCaseInstanceId(historicCaseInstance.getId()));
+           for (HistoricMilestoneInstance historicMilestoneInstance : historicMilestoneInstances) {
+               historicMilestoneInstanceEntityManager.delete(historicMilestoneInstance.getId());
+           }
+            
             if (historicCaseInstance != null) {
                 historicCaseInstanceEntityManager.delete(historicCaseInstance);
             }

@@ -56,10 +56,6 @@
         delete from ${prefix}ACT_CMMN_RU_MIL_INST where ID_ = #{id}
     </delete>
 
-    <delete id="deleteMilestoneInstanceByCaseDefinitionId" parameterType="string">
-        delete from ${prefix}ACT_CMMN_RU_MIL_INST where CASE_DEF_ID_ = #{value}
-    </delete>
-    
     <delete id="deleteMilestoneInstanceByCaseInstanceId" parameterType="string">
         delete from ${prefix}ACT_CMMN_RU_MIL_INST where CASE_INST_ID_ = #{value}
     </delete>

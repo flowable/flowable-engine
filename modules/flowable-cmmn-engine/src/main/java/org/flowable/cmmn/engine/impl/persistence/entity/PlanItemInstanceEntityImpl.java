@@ -190,14 +190,6 @@ public class PlanItemInstanceEntityImpl extends VariableScopeImpl implements Pla
     
     @Override
     public List<PlanItemInstanceEntity> getChildPlanItemInstances() {
-        if (childPlanItemInstances == null) {
-            childPlanItemInstances = CommandContextUtil.getPlanItemInstanceEntityManager().findChildPlanItemInstancesForStage(id);
-        }
-        return childPlanItemInstances;
-    }
-    
-    @Override
-    public List<PlanItemInstanceEntity> getChildPlanItemInstancesNoFetch() {
         return childPlanItemInstances;
     }
     

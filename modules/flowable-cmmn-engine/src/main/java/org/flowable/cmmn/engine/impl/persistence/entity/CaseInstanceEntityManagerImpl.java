@@ -77,12 +77,7 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
     }
     
     @Override
-    public void deleteByCaseDefinitionId(String caseDefinitionId) {
-        caseInstanceDataManager.deleteByCaseDefinitionId(caseDefinitionId);
-    }
-    
-    @Override
-    public void deleteCaseInstanceAndRelatedData(String caseInstanceId, String deleteReason) {
+    public void delete(String caseInstanceId, String deleteReason) {
         CaseInstanceEntity caseInstanceEntity = caseInstanceDataManager.findById(caseInstanceId);
 
         // Variables

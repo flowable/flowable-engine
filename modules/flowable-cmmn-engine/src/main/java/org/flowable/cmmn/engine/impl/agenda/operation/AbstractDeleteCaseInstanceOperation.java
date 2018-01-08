@@ -56,7 +56,7 @@ public abstract class AbstractDeleteCaseInstanceOperation extends AbstractChange
                 }
             }
         }
-        CommandContextUtil.getCaseInstanceEntityManager(commandContext).deleteCaseInstanceAndRelatedData(caseInstanceEntity.getId(), getDeleteReason());
+        CommandContextUtil.getCaseInstanceEntityManager(commandContext).delete(caseInstanceEntity.getId(), getDeleteReason());
     }
     
     protected abstract String getDeleteReason();

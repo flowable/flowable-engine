@@ -126,10 +126,6 @@
         delete from ${prefix}ACT_CMMN_RU_CASE_INST where ID_ = #{id} and REV_ = #{revision}
     </delete>
 
-    <delete id="deleteCaseInstanceByCaseDefinitionId" parameterType="string">
-        delete from ${prefix}ACT_CMMN_RU_CASE_INST where CASE_DEF_ID_ = #{value}
-    </delete>
-
     <resultMap id="caseInstanceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl">
         <id property="id" column="ID_" jdbcType="VARCHAR" />
         <result property="revision" column="REV_" jdbcType="INTEGER" />
@@ -151,7 +147,7 @@
     </select>
     
     <resultMap id="caseInstanceAndPlanItemInstancesResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl" extends="caseInstanceResultMap">
-        <collection property="childPlanItemInstancesNoFetch" 
+        <collection property="childPlanItemInstances" 
                     resultMap="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl.planItemInstanceResultMap" 
                     columnPrefix="PI_" />
     </resultMap>

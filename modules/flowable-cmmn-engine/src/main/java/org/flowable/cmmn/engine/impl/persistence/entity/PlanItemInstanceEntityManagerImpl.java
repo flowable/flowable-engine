@@ -13,7 +13,6 @@
 
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
@@ -93,32 +92,6 @@ public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager
             CaseInstanceEntity caseInstanceEntity = CommandContextUtil.getCaseInstanceEntityManager(commandContext).findById(planItemInstanceEntity.getCaseInstanceId());
             caseInstanceEntity.getChildPlanItemInstances().add(planItemInstanceEntity);
         }
-    }
-    
-    @Override
-    public List<PlanItemInstanceEntity> findDirectChildPlanItemInstancesForCaseInstance(String caseInstance) {
-        return planItemInstanceDataManager.findChildPlanItemInstancesForCaseInstance(caseInstance);
-    }
-    
-    @Override
-    public List<PlanItemInstanceEntity> findAllChildPlanItemInstancesForCaseInstance(String caseInstanceId) {
-        List<PlanItemInstanceEntity> allChildPlanItemInstances = new ArrayList<>();
-        collectChildPlanItemInstances(getCaseInstanceEntityManager().findById(caseInstanceId), allChildPlanItemInstances);
-        return allChildPlanItemInstances;
-    }
-
-    protected void collectChildPlanItemInstances(PlanItemInstanceContainer planItemInstanceContainer, List<PlanItemInstanceEntity> allChildPlanItemInstances) {
-        for (PlanItemInstanceEntity planItemInstanceEntity : planItemInstanceContainer.getChildPlanItemInstances()) {
-            allChildPlanItemInstances.add(planItemInstanceEntity);
-            if (planItemInstanceEntity.getChildPlanItemInstances() != null) {
-                collectChildPlanItemInstances(planItemInstanceEntity, allChildPlanItemInstances);
-            }
-        }
-    }
-    
-    @Override
-    public List<PlanItemInstanceEntity> findChildPlanItemInstancesForStage(String stagePlanItemInstanceId) {
-        return planItemInstanceDataManager.findChildPlanItemInstancesForStage(stagePlanItemInstanceId);
     }
     
     @Override

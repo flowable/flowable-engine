@@ -33,8 +33,6 @@ public interface CaseInstanceDataManager extends DataManager<CaseInstanceEntity>
     
     long countByCriteria(CaseInstanceQueryImpl query);
     
-    void deleteByCaseDefinitionId(String caseDefinitionId);
-    
     void updateLockTime(String caseInstanceId, Date lockDate, Date expirationTime);
 
     void clearLockTime(String caseInstanceId);

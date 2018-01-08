@@ -20,8 +20,6 @@ import java.util.List;
 public interface PlanItemInstanceContainer {
 
     List<PlanItemInstanceEntity> getChildPlanItemInstances();
-    List<PlanItemInstanceEntity> getChildPlanItemInstancesNoFetch();
     void setChildPlanItemInstances(List<PlanItemInstanceEntity> childPlanItemInstances);
-    
     
 }

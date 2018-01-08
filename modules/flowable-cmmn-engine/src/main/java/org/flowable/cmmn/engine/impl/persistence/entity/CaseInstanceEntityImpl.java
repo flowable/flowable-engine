@@ -139,24 +139,11 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
 
     @Override
     public List<PlanItemInstanceEntity> getChildPlanItemInstances() {
-        if (childPlanItemInstances == null) {
-            childPlanItemInstances = CommandContextUtil.getPlanItemInstanceEntityManager().findDirectChildPlanItemInstancesForCaseInstance(id);
-        }
         return childPlanItemInstances;
     }
     
     @Override
     public void setChildPlanItemInstances(List<PlanItemInstanceEntity> childPlanItemInstances) {
-        this.childPlanItemInstances = childPlanItemInstances;
-    }
-    
-    // Used for planItemInstance tree fetching: this avoids mybatis fetching the plan items another time and creating duplicates
-    public List<PlanItemInstanceEntity> getChildPlanItemInstancesNoFetch() {
-        return childPlanItemInstances;
-    }
-    
-    // Needed for mybatis tree fetching
-    public void setChildPlanItemInstancesNoFetch(List<PlanItemInstanceEntity> childPlanItemInstances) {
         this.childPlanItemInstances = childPlanItemInstances;
     }
     

@@ -198,14 +198,6 @@
       select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where ID_ = #{id, jdbcType=VARCHAR}
   </select>
   
-  <select id="selectChildPlanItemInstancesByCaseInstanceId" parameterType="string" resultMap="planItemInstanceResultMap">
-    select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where CASE_INST_ID_ = #{parameter, jdbcType=VARCHAR} and STAGE_INST_ID_ is null 
-  </select>
-  
-  <select id="selectChildPlanItemInstancesByStagePlanItemInstanceId" parameterType="string" resultMap="planItemInstanceResultMap">
-    select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where STAGE_INST_ID_ = #{parameter, jdbcType=VARCHAR}
-  </select>
-  
    <select id="selectPlanItemInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl" resultMap="planItemInstanceResultMap">
         <if test="firstResult != null and firstResult &gt;= 0">${limitBefore}</if>
         select RES.* <if test="firstResult != null and firstResult &gt;= 0">${limitBetween}</if>
