@@ -59,6 +59,10 @@
     <delete id="deleteMilestoneInstanceByCaseDefinitionId" parameterType="string">
         delete from ${prefix}ACT_CMMN_RU_MIL_INST where CASE_DEF_ID_ = #{value}
     </delete>
+    
+    <delete id="deleteMilestoneInstanceByCaseInstanceId" parameterType="string">
+        delete from ${prefix}ACT_CMMN_RU_MIL_INST where CASE_INST_ID_ = #{value}
+    </delete>
 
     <resultMap id="mileStoneInstanceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.MilestoneInstanceEntityImpl">
         <id property="id" column="ID_" jdbcType="VARCHAR" />

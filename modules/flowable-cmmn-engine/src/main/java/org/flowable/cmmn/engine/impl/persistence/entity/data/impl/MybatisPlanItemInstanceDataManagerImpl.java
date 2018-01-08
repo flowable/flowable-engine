@@ -100,4 +100,26 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
         getDbSqlSession().delete("deletePlanItemInstanceByCaseDefinitionId", caseDefinitionId, getManagedEntityClass());
     }
     
+    @Override
+    public void deleteByStageInstanceId(String stageInstanceId) {
+        List<PlanItemInstanceEntityImpl> planItemInstanceEntities = getEntityCache().findInCache(PlanItemInstanceEntityImpl.class);
+        for (PlanItemInstanceEntityImpl planItemInstanceEntity : planItemInstanceEntities) {
+            if (stageInstanceId.equals(planItemInstanceEntity.getStageInstanceId())) {
+                getDbSqlSession().delete(planItemInstanceEntity);
+            }
+        }
+        getDbSqlSession().delete("deletePlanItemInstancesByStageInstanceId", stageInstanceId, getManagedEntityClass());
+    }
+    
+    @Override
+    public void deleteByCaseInstanceId(String caseInstanceId) {
+        List<PlanItemInstanceEntityImpl> planItemInstanceEntities = getEntityCache().findInCache(PlanItemInstanceEntityImpl.class);
+        for (PlanItemInstanceEntityImpl planItemInstanceEntity : planItemInstanceEntities) {
+            if (caseInstanceId.equals(planItemInstanceEntity.getCaseInstanceId())) {
+                getDbSqlSession().delete(planItemInstanceEntity);
+            }
+        }
+        getDbSqlSession().delete("deletePlanItemInstancesByCaseInstanceId", caseInstanceId, getManagedEntityClass());
+    }
+    
 }

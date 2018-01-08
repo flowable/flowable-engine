@@ -106,6 +106,10 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
                 if (planItemInstanceEntity.getStageInstanceId() == null) {
                     directPlanItemInstances.add(planItemInstanceEntity);
                 }
+                
+                // Always add empty list, so no check is needed later and plan items 
+                // without children have a non-null value, not triggering the fetch
+                planItemInstanceEntity.setChildPlanItemInstances(new ArrayList<PlanItemInstanceEntity>());
             }
             
             // Add to correct parent
@@ -113,9 +117,6 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
                 for (PlanItemInstanceEntity planItemInstanceEntity : allPlanItemInstances) {
                     if (planItemInstanceEntity.getStageInstanceId() != null) {
                         PlanItemInstanceEntity parentPlanItemInstanceEntity = planItemInstanceMap.get(planItemInstanceEntity.getStageInstanceId());
-                        if (parentPlanItemInstanceEntity.getChildPlanItemInstancesNoFetch() == null) {
-                            parentPlanItemInstanceEntity.setChildPlanItemInstances(new ArrayList<PlanItemInstanceEntity>());
-                        }
                         parentPlanItemInstanceEntity.getChildPlanItemInstances().add(planItemInstanceEntity);
                     }
                 }

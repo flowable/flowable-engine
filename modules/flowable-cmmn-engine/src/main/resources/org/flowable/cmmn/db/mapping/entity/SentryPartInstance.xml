@@ -83,6 +83,11 @@
     <delete id="deleteSentryPartInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityImpl">
         delete from ${prefix}ACT_CMMN_RU_SENTRY_PART_INST where ID_ = #{id} and REV_ = #{revision}
     </delete>
+    
+     <delete id="deleteSentryPartInstancesByCaseInstanceId" parameterType="String">
+        delete from ${prefix}ACT_CMMN_RU_SENTRY_PART_INST where CASE_INST_ID_ = #{id}
+    </delete>
+    
 
     <resultMap id="sentryPartInstanceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityImpl">
         <id property="id" column="ID_" jdbcType="VARCHAR" />

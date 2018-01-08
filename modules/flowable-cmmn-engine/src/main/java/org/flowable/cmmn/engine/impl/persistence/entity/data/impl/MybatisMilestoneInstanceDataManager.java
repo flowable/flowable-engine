@@ -66,6 +66,18 @@ public class MybatisMilestoneInstanceDataManager extends AbstractCmmnDataManager
         getDbSqlSession().delete("deleteMilestoneInstanceByCaseDefinitionId", caseDefinitionId, getManagedEntityClass());
     }
     
+    @Override
+    public void deleteByCaseInstanceId(String caseInstanceId) {
+        
+        List<MilestoneInstanceEntityImpl> milestoneInstances = getEntityCache().findInCache(MilestoneInstanceEntityImpl.class);
+        for (MilestoneInstanceEntityImpl milestoneInstance : milestoneInstances) {
+            if (milestoneInstance.isInserted() && caseInstanceId.equals(milestoneInstance.getCaseInstanceId())) {
+                getDbSqlSession().delete(milestoneInstance);
+            }
+        }
+        
+        getDbSqlSession().delete("deleteMilestoneInstanceByCaseInstanceId", caseInstanceId, getManagedEntityClass());
+    }
     
     public static class MilestoneInstanceByCaseInstanceIdCachedEntityMatcher extends CachedEntityMatcherAdapter<MilestoneInstanceEntity> {
 

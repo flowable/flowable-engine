@@ -13,8 +13,8 @@
 
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
+import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -38,8 +38,6 @@ import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntityManager;
 import org.flowable.variable.api.type.VariableScopeType;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
-import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityManager;
 
 /**
  * @author Joram Barrez
@@ -88,12 +86,7 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         CaseInstanceEntity caseInstanceEntity = caseInstanceDataManager.findById(caseInstanceId);
 
         // Variables
-        VariableInstanceEntityManager variableInstanceEntityManager = getVariableInstanceEntityManager();
-        List<VariableInstanceEntity> variableInstanceEntities = variableInstanceEntityManager
-                .findVariableInstanceByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
-        for (VariableInstanceEntity variableInstanceEntity : variableInstanceEntities) {
-            variableInstanceEntityManager.delete(variableInstanceEntity);
-        }
+        getVariableInstanceEntityManager().deleteByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
         
         // Tasks
         TaskEntityManager taskEntityManager = getTaskEntityManager();
@@ -103,32 +96,20 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         }
         
         // Sentry part instances
-        SentryPartInstanceEntityManager sentryPartInstanceEntityManager = getSentryPartInstanceEntityManager();
-        List<SentryPartInstanceEntity> sentryPartInstances = caseInstanceEntity.getSatisfiedSentryPartInstances();
-        for (SentryPartInstanceEntity sentryPartInstanceEntity : sentryPartInstances) {
-            sentryPartInstanceEntityManager.delete(sentryPartInstanceEntity);
-        }
+        getSentryPartInstanceEntityManager().deleteByCaseInstanceId(caseInstanceId);
 
         // Runtime milestones
-        MilestoneInstanceEntityManager milestoneInstanceEntityManager = getMilestoneInstanceEntityManager(); 
-        List<MilestoneInstanceEntity> milestoneInstanceEntities = milestoneInstanceEntityManager
-                .findMilestoneInstancesByCaseInstanceId(caseInstanceId);
-        if (milestoneInstanceEntities != null) {
-            for (MilestoneInstanceEntity milestoneInstanceEntity : milestoneInstanceEntities) {
-                milestoneInstanceEntityManager.delete(milestoneInstanceEntity);
-            }
-        }
+        getMilestoneInstanceEntityManager().deleteByCaseInstanceId(caseInstanceId);
         
         // Plan item instances
         PlanItemInstanceEntityManager planItemInstanceEntityManager = getPlanItemInstanceEntityManager();
-        List<PlanItemInstanceEntity> planItemInstanceEntities = planItemInstanceEntityManager
-                .findAllChildPlanItemInstancesForCaseInstance(caseInstanceId);
-        Collections.reverse(planItemInstanceEntities); // Need to have them in leaf -> root order
-        if (planItemInstanceEntities != null) {
-            for (PlanItemInstanceEntity planItemInstanceEntity : planItemInstanceEntities) {
-                planItemInstanceEntityManager.delete(planItemInstanceEntity);
-            }
+        // Plan item instances are removed per stage, in reversed order
+        ArrayList<PlanItemInstanceEntity> stagePlanItemInstances = new ArrayList<>();
+        collectStagePlanItemInstances(caseInstanceEntity, stagePlanItemInstances);
+        for (int i = stagePlanItemInstances.size() - 1; i>=0; i--) {
+            planItemInstanceEntityManager.deleteByStageInstanceId(stagePlanItemInstances.get(i).getId());
         }
+        planItemInstanceEntityManager.deleteByCaseInstanceId(caseInstanceId); // root plan item instances
         
         // Jobs
         JobEntityManager jobEntityManager = cmmnEngineConfiguration.getJobServiceConfiguration().getJobEntityManager();
@@ -154,6 +135,15 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
 
         // Actual case instance
         delete(caseInstanceEntity);
+    }
+    
+    protected void collectStagePlanItemInstances(PlanItemInstanceContainer planItemInstanceContainer, ArrayList<PlanItemInstanceEntity> stagePlanItemInstanceEntities) {
+        for (PlanItemInstanceEntity planItemInstanceEntity : planItemInstanceContainer.getChildPlanItemInstances()) {
+            if (planItemInstanceEntity.isStage()) {
+                stagePlanItemInstanceEntities.add(planItemInstanceEntity);
+                collectStagePlanItemInstances(planItemInstanceEntity, stagePlanItemInstanceEntities);
+            }
+        }
     }
     
     @Override

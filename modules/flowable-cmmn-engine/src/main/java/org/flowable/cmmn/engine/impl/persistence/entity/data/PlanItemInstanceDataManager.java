@@ -34,4 +34,8 @@ public interface PlanItemInstanceDataManager extends DataManager<PlanItemInstanc
     
     void deleteByCaseDefinitionId(String caseDefinitionId);
     
+    void deleteByStageInstanceId(String stageInstanceId);
+    
+    void deleteByCaseInstanceId(String caseInstanceId);
+    
 }

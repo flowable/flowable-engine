@@ -38,7 +38,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager<PlanItemInstanceEntity> implements PlanItemInstanceEntityManager {
 
     protected PlanItemInstanceDataManager planItemInstanceDataManager;
-
+    
     public PlanItemInstanceEntityManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration, PlanItemInstanceDataManager planItemInstanceDataManager) {
         super(cmmnEngineConfiguration);
         this.planItemInstanceDataManager = planItemInstanceDataManager;
@@ -126,6 +126,16 @@ public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager
         planItemInstanceDataManager.deleteByCaseDefinitionId(caseDefinitionId);
     }
     
+    @Override
+    public void deleteByStageInstanceId(String stageInstanceId) {
+        planItemInstanceDataManager.deleteByStageInstanceId(stageInstanceId);
+    }
+    
+    @Override
+    public void deleteByCaseInstanceId(String caseInstanceId) {
+        planItemInstanceDataManager.deleteByCaseInstanceId(caseInstanceId);
+    }
+    
     public PlanItemInstanceQuery createPlanItemInstanceQuery() {
         return new PlanItemInstanceQueryImpl(cmmnEngineConfiguration.getCommandExecutor());
     }
@@ -157,22 +167,9 @@ public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager
             }
         }
         
-        // SentryOnPartInstances
-        if (countingPlanItemInstanceEntity.getSentryPartInstanceCount() > 0) {
-            List<SentryPartInstanceEntity> sentryPartInstanceEntities = planItemInstanceEntity.getSatisfiedSentryPartInstances();
-            if (sentryPartInstanceEntities != null && !sentryPartInstanceEntities.isEmpty()) {
-                SentryPartInstanceEntityManager sentryPartInstanceEntityManager
-                    = CommandContextUtil.getSentryPartInstanceEntityManager(commandContext);
-                for (SentryPartInstanceEntity sentryPartInstanceEntity : sentryPartInstanceEntities) {
-                    sentryPartInstanceEntityManager.delete(sentryPartInstanceEntity);
-                }
-            }
-        }
-        
         if (planItemInstanceEntity.isStage()) {
-            List<PlanItemInstanceEntity> childPlanItems = findChildPlanItemInstancesForStage(planItemInstanceEntity.getId());
-            if (childPlanItems != null && childPlanItems.size() > 0) {
-                for (PlanItemInstanceEntity childPlanItem : childPlanItems) {
+            if (planItemInstanceEntity.getChildPlanItemInstances() != null && !planItemInstanceEntity.getChildPlanItemInstances().isEmpty()) {
+                for (PlanItemInstanceEntity childPlanItem : planItemInstanceEntity.getChildPlanItemInstances()) {
                     delete(childPlanItem, fireEvent);
                 }
             }

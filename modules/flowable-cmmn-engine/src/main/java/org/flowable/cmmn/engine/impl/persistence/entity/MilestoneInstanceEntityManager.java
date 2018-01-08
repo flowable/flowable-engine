@@ -32,5 +32,7 @@ public interface MilestoneInstanceEntityManager extends EntityManager<MilestoneI
     List<MilestoneInstanceEntity> findMilestoneInstancesByCaseInstanceId(String caseInstanceId);
     
     void deleteByCaseDefinitionId(String caseDefinitionId);
+    
+    void deleteByCaseInstanceId(String caseInstanceId);
 
 }
