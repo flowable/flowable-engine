@@ -5,7 +5,7 @@
 <mapper namespace="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl">
 
     <insert id="insertCaseInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl">
-        insert into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, TENANT_ID_) values (
+        insert into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, IS_COMPLETEABLE_, TENANT_ID_) values (
             #{id ,jdbcType=VARCHAR},
             1,
             #{parentId ,jdbcType=VARCHAR},
@@ -15,15 +15,15 @@
             #{state ,jdbcType=VARCHAR},
             #{startTime ,jdbcType=TIMESTAMP},
             #{startUserId ,jdbcType=VARCHAR},
-            #{callbackId, jdbcType=VARCHAR},
-            #{callbackType,
-            jdbcType=VARCHAR},
+            #{callbackId ,jdbcType=VARCHAR},
+            #{callbackType ,jdbcType=VARCHAR},
+            #{completeable ,jdbcType=BOOLEAN},
             #{tenantId ,jdbcType=VARCHAR}
         )
     </insert>
 
     <insert id="bulkInsertCaseInstance" parameterType="java.util.List">
-        insert into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, TENANT_ID_)
+        insert into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, IS_COMPLETEABLE_, TENANT_ID_)
         values
         <foreach collection="list" item="caseInstance" index="index" separator=",">
             (
@@ -38,6 +38,7 @@
                 #{caseInstance.startUserId ,jdbcType=VARCHAR},
                 #{caseInstance.callbackId, jdbcType=VARCHAR},
                 #{caseInstance.callbackType, jdbcType=VARCHAR},
+                #{caseInstance.completeable, jdbcType=BOOLEAN},
                 #{caseInstance.tenantId ,jdbcType=VARCHAR}
             )
         </foreach>
@@ -46,7 +47,7 @@
     <insert id="bulkInsertCaseInstance" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
         <foreach collection="list" item="caseInstance" index="index">
-            into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, TENANT_ID_) VALUES
+            into ${prefix}ACT_CMMN_RU_CASE_INST (ID_, REV_, PARENT_ID_, CASE_DEF_ID_, BUSINESS_KEY_, NAME_, STATE_, START_TIME_, START_USER_ID_, CALLBACK_ID_, CALLBACK_TYPE_, IS_COMPLETEABLE_, TENANT_ID_) VALUES
             (
                 #{caseInstance.id ,jdbcType=VARCHAR},
                 1,
@@ -59,6 +60,7 @@
                 #{caseInstance.startUserId ,jdbcType=VARCHAR},
                 #{caseInstance.callbackId, jdbcType=VARCHAR},
                 #{caseInstance.callbackType, jdbcType=VARCHAR},
+                #{caseInstance.completeable, jdbcType=BOOLEAN},
                 #{caseInstance.tenantId ,jdbcType=VARCHAR}
             )
         </foreach>
@@ -96,11 +98,28 @@
             <if test="originalPersistentState.callbackType != callbackType">
                 CALLBACK_TYPE_ = #{callbackType, jdbcType=VARCHAR},
             </if>
+            <if test="originalPersistentState.completeable != completeable">
+                IS_COMPLETEABLE_ = #{completeable, jdbcType=VARCHAR}
+            </if> 
             <if test="originalPersistentState.tenantId != tenantId">
                 TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
             </if>
         </set>    
         where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision, jdbcType=INTEGER}
+    </update>
+    
+    <update id="updateCaseInstanceLockTime" parameterType="java.util.Map">
+        update ${prefix}ACT_CMMN_RU_CASE_INST 
+        set
+          LOCK_TIME_ = #{lockTime, jdbcType=TIMESTAMP}
+        where ID_ = #{id}
+          and (LOCK_TIME_ is null OR LOCK_TIME_ &lt; #{expirationTime, jdbcType=TIMESTAMP})
+    </update>
+  
+    <update id="clearCaseInstanceLockTime" parameterType="java.util.Map">
+        update ${prefix}ACT_CMMN_RU_CASE_INST 
+        set LOCK_TIME_ = null
+        where ID_ = #{id}
     </update>
 
     <delete id="deleteCaseInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl">
@@ -123,6 +142,7 @@
         <result property="startUserId" column="START_USER_ID_" jdbcType="VARCHAR" />
         <result property="callbackId" column="CALLBACK_ID_" jdbcType="VARCHAR" />
         <result property="callbackType" column="CALLBACK_TYPE_" jdbcType="VARCHAR" />
+        <result property="completeable" column="IS_COMPLETEABLE_" jdbcType="BOOLEAN" />
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     </resultMap>
 
@@ -146,8 +166,13 @@
     <sql id="selectCaseInstancesByQueryCriteriaSql">
         from ${prefix}ACT_CMMN_RU_CASE_INST RES
         <if test="caseDefinitionKey != null or caseDefinitionKeys != null or caseDefinitionCategory != null or caseDefinitionName != null">
-            inner join ${prefix}ACT_CMMN_RU_CASE_INST CASE_DEF
+            inner join ${prefix}ACT_CMMN_CASEDEF CASE_DEF on RES.CASE_DEF_ID_ = CASE_DEF.ID_
         </if>
+        <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
+            <if test="!queryVariableValue.operator.equals('EXISTS') &amp;&amp; !queryVariableValue.operator.equals('NOT_EXISTS')">
+                inner join ${prefix}ACT_RU_VARIABLE A${index} on RES.ID_ = A${index}.SCOPE_ID_ and SUB_SCOPE_ID_ is null and A${index}.SCOPE_TYPE_ = 'cmmn' 
+            </if>
+        </foreach>
         <where>
             <if test="caseInstanceId != null">
                 and RES.ID_ = #{caseInstanceId}
@@ -203,17 +228,103 @@
             <if test="callbackType != null">
                 and RES.CALLBACK_TYPE_ = #{callbackType}
             </if>
+            <if test="completeable">
+                and RES.IS_COMPLETEABLE_ = #{completeable, jdbcType=BOOLEAN}
+            </if>
             <if test="tenantId != null">
                 and RES.TENANT_ID_ = #{tenantId}
             </if>
             <if test="withoutTenantId">
                 and RES.TENANT_ID_ is null or RES.TENANT_ID_ = ''
             </if>
+            <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
+                <choose>
+                    <when test="queryVariableValue.operator.equals('EXISTS')">
+                      and EXISTS (select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name} and RES.ID_ = SCOPE_ID_ and SUB_SCOPE_ID_ is null and SCOPE_TYPE_ = 'cmmn')
+                    </when>
+                    <when test="queryVariableValue.operator.equals('NOT_EXISTS')">
+                      and NOT EXISTS (select ID_ from ${prefix}ACT_RU_VARIABLE where NAME_ = #{queryVariableValue.name} and RES.ID_ = SCOPE_ID_ and SUB_SCOPE_ID_ is null and SCOPE_TYPE_ = 'cmmn')
+                    </when>
+                    <otherwise>
+                        <if test="queryVariableValue.name != null">
+                          <!-- Match-all variable-names when name is null -->
+                          and A${index}.NAME_= #{queryVariableValue.name}
+                        </if>
+                        <if test="!queryVariableValue.type.equals('null')">
+                        <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
+                          and A${index}.TYPE_ = #{queryVariableValue.type}
+                        </if>
+                        <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+                          <choose>
+                            <when test="queryVariableValue.operator.equals('EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">
+                              and lower(A${index}.TEXT_)
+                            </when>
+                            <otherwise>
+                              and A${index}.TEXT_
+                            </otherwise>
+                          </choose>
+                          <choose>
+                            <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">LIKE</when>
+                            <otherwise><include refid="variableOperator" /></otherwise>
+                          </choose>
+                          #{queryVariableValue.textValue}
+                          <choose>
+                            <when test="queryVariableValue.operator.equals('LIKE') || queryVariableValue.operator.equals('LIKE_IGNORE_CASE')">${wildcardEscapeClause}</when>
+                          </choose>
+                        </if>
+                        <if test="queryVariableValue.textValue2 != null">
+                        and A${index}.TEXT2_
+                        <choose>
+                          <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
+                          <otherwise><include refid="variableOperator" /></otherwise>
+                        </choose>
+                          #{queryVariableValue.textValue2}
+                          <choose>
+                            <when test="queryVariableValue.operator.equals('LIKE')">${wildcardEscapeClause}</when>
+                          </choose>
+                        </if>
+                        <if test="queryVariableValue.longValue != null">
+                            and A${index}.LONG_
+                            <include refid="variableOperator" />
+                            #{queryVariableValue.longValue}
+                        </if>
+                        <if test="queryVariableValue.doubleValue != null">
+                            and A${index}.DOUBLE_
+                            <include refid="variableOperator" />
+                            #{queryVariableValue.doubleValue}
+                        </if>
+                        <!-- Null variable type -->
+                        <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+                          <choose>
+                            <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
+                                and (A${index}.TEXT_ is not null or A${index}.TEXT2_ is not null or A${index}.LONG_ is not null or A${index}.DOUBLE_ is not null or A${index}.BYTEARRAY_ID_ is not null)
+                            </when>
+                            <otherwise>
+                                and A${index}.TEXT_ is null and A${index}.TEXT2_ is null and A${index}.LONG_ is null and A${index}.DOUBLE_ is null and A${index}.BYTEARRAY_ID_ is null
+                            </otherwise>
+                          </choose>
+                        </if>
+                    </otherwise>
+                </choose>
+            </foreach>
         </where>
     </sql>
     
     <select id="selectCaseInstancesByCaseDefinitionId" resultMap="caseInstanceResultMap">
         select * from ${prefix}ACT_CMMN_RU_CASE_INST where CASE_DEF_ID_ = #{parameter}
     </select>
+    
+    <sql id="variableOperator">
+        <choose>
+          <when test="queryVariableValue.operator.equals('EQUALS')">=</when>
+          <when test="queryVariableValue.operator.equals('EQUALS_IGNORE_CASE')">=</when>
+          <when test="queryVariableValue.operator.equals('NOT_EQUALS')">&lt;&gt;</when>
+          <when test="queryVariableValue.operator.equals('NOT_EQUALS_IGNORE_CASE')">&lt;&gt;</when>
+          <when test="queryVariableValue.operator.equals('GREATER_THAN')">&gt;</when>
+          <when test="queryVariableValue.operator.equals('GREATER_THAN_OR_EQUAL')">&gt;=</when>
+          <when test="queryVariableValue.operator.equals('LESS_THAN')">&lt;</when>
+          <when test="queryVariableValue.operator.equals('LESS_THAN_OR_EQUAL')">&lt;=</when>
+       </choose>
+    </sql>
 
 </mapper>

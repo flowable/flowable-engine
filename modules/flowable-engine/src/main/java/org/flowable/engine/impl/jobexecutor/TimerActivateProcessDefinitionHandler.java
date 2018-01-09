@@ -12,10 +12,15 @@
  */
 package org.flowable.engine.impl.jobexecutor;
 
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.cmd.ActivateProcessDefinitionCmd;
-import org.flowable.engine.impl.util.json.JSONObject;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.variable.api.delegate.VariableScope;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author Joram Barrez
@@ -30,11 +35,18 @@ public class TimerActivateProcessDefinitionHandler extends TimerChangeProcessDef
     }
 
     @Override
-    public void execute(JobEntity job, String configuration, Object execution, CommandContext commandContext) {
-        JSONObject cfgJson = new JSONObject(configuration);
-        String processDefinitionId = job.getProcessDefinitionId();
-        boolean activateProcessInstances = getIncludeProcessInstances(cfgJson);
+    public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
+        
+        boolean activateProcessInstances = false;
+        try {
+            JsonNode configNode = processEngineConfiguration.getObjectMapper().readTree(configuration);
+            activateProcessInstances = getIncludeProcessInstances(configNode);
+        } catch (Exception e) {
+            throw new FlowableException("Error reading json value " + configuration, e);
+        }
 
+        String processDefinitionId = job.getProcessDefinitionId();
         ActivateProcessDefinitionCmd activateProcessDefinitionCmd = new ActivateProcessDefinitionCmd(processDefinitionId, null, activateProcessInstances, null, job.getTenantId());
         activateProcessDefinitionCmd.execute(commandContext);
     }

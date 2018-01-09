@@ -245,8 +245,8 @@ Where __db__ is any of the <<supporteddatabases,supported databases>>.
 The database names of the Flowable CMMN Engine all start with *ACT_CMMN_*. The second part is a two-character identification of the use case of the table. This use case will also roughly match the service API.
 
 * *ACT_CMMN_**: Tables without an additional prefix contain 'static' information such as case definitions and case resources (images, rules, etc.).
-* *ACT_RU_**: 'RU' stands for +runtime+. These are the runtime tables that contain the runtime data of case instances, plan items, and so on. Flowable only stores the runtime data during case instance execution and removes the records when a case instance ends. This keeps the runtime tables small and fast.
-* *ACT_HI_**: 'HI' stands for +history+. These are the tables that contain historic data, such as past case instances, plan items, and so on.
+* *ACT_CMMN_RU_**: 'RU' stands for +runtime+. These are the runtime tables that contain the runtime data of case instances, plan items, and so on. Flowable only stores the runtime data during case instance execution and removes the records when a case instance ends. This keeps the runtime tables small and fast.
+* *ACT_CMMN_HI_**: 'HI' stands for +history+. These are the tables that contain historic data, such as past case instances, plan items, and so on.
 
 
 [[databaseUpgrade]]

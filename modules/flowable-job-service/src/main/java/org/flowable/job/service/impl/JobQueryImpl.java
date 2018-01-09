@@ -24,6 +24,7 @@ import org.flowable.engine.common.impl.interceptor.CommandExecutor;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobQuery;
 import org.flowable.job.service.impl.util.CommandContextUtil;
+import org.flowable.variable.api.type.VariableScopeType;
 
 /**
  * @author Joram Barrez
@@ -38,6 +39,10 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     protected String executionId;
     protected String handlerType;
     protected String processDefinitionId;
+    protected String scopeId;
+    protected String subScopeId;
+    protected String scopeType;
+    protected String scopeDefinitionId;
     protected boolean onlyTimers;
     protected boolean onlyMessages;
     protected Date duedateHigherThan;
@@ -49,6 +54,7 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
     protected String tenantId;
     protected String tenantIdLike;
     protected boolean withoutTenantId;
+    
     protected String lockOwner;
     protected boolean onlyLocked;
     protected boolean onlyUnlocked;
@@ -88,6 +94,72 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
             throw new FlowableIllegalArgumentException("Provided process definition id is null");
         }
         this.processDefinitionId = processDefinitionId;
+        return this;
+    }
+    
+    @Override
+    public JobQueryImpl scopeId(String scopeId) {
+        if (scopeId == null) {
+            throw new FlowableIllegalArgumentException("Provided scope id is null");
+        }
+        this.scopeId = scopeId;
+        return this;
+    }
+    
+    @Override
+    public JobQueryImpl subScopeId(String subScopeId) {
+        if (subScopeId == null) {
+            throw new FlowableIllegalArgumentException("Provided sub scope id is null");
+        }
+        this.subScopeId = subScopeId;
+        return this;
+    }
+    
+    @Override
+    public JobQueryImpl scopeType(String scopeType) {
+        if (scopeType == null) {
+            throw new FlowableIllegalArgumentException("Provided scope type is null");
+        }
+        this.scopeType = scopeType;
+        return this;
+    }
+    
+    @Override
+    public JobQueryImpl scopeDefinitionId(String scopeDefinitionId) {
+        if (scopeDefinitionId == null) {
+            throw new FlowableIllegalArgumentException("Provided scope definitionid is null");
+        }
+        this.scopeDefinitionId = scopeDefinitionId;
+        return this;
+    }
+    
+    @Override
+    public JobQueryImpl caseInstanceId(String caseInstanceId) {
+        if (caseInstanceId == null) {
+            throw new FlowableIllegalArgumentException("Provided case instance id is null");
+        }
+        scopeId(caseInstanceId);
+        scopeType(VariableScopeType.CMMN);
+        return this;
+    }
+    
+    @Override
+    public JobQueryImpl caseDefinitionId(String caseDefinitionId) {
+        if (caseDefinitionId == null) {
+            throw new FlowableIllegalArgumentException("Provided case definition id is null");
+        }
+        scopeDefinitionId(caseDefinitionId);
+        scopeType(VariableScopeType.CMMN);
+        return this;
+    }
+    
+    @Override
+    public JobQueryImpl planItemInstanceId(String planItemInstanceId) {
+        if (planItemInstanceId == null) {
+            throw new FlowableIllegalArgumentException("Provided plan item instance id is null");
+        }
+        subScopeId(planItemInstanceId);
+        scopeType(VariableScopeType.CMMN);
         return this;
     }
 
@@ -296,6 +368,22 @@ public class JobQueryImpl extends AbstractQuery<JobQuery, Job> implements JobQue
 
     public String getProcessDefinitionId() {
         return processDefinitionId;
+    }
+    
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
     }
 
     public boolean isOnlyTimers() {

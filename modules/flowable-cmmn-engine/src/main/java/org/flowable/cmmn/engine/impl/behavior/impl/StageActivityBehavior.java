@@ -47,15 +47,15 @@ public class StageActivityBehavior extends CoreCmmnTriggerableActivityBehavior i
     
     @Override
     public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstance) {
-        List<PlanItemInstanceEntity> childPlanItemInstances = planItemInstance.getChildren();
+        List<PlanItemInstanceEntity> childPlanItemInstances = planItemInstance.getChildPlanItemInstances();
         if (childPlanItemInstances != null) {
             for (PlanItemInstanceEntity childPlanItemInstance : childPlanItemInstances) {
                 if (StateTransition.isPossible(planItemInstance, PlanItemTransition.COMPLETE)) {
-                    CommandContextUtil.getAgenda().planCompletePlanItemInstance(childPlanItemInstance);
+                    CommandContextUtil.getAgenda().planCompletePlanItemInstanceOperation(childPlanItemInstance);
                 }
             }
         }
-        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance((PlanItemInstanceEntity) planItemInstance);
+        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation((PlanItemInstanceEntity) planItemInstance);
     }
     
     @Override
@@ -68,14 +68,14 @@ public class StageActivityBehavior extends CoreCmmnTriggerableActivityBehavior i
     protected void handleChildPlanItemInstances(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
         // The stage plan item will be deleted by the regular TerminatePlanItemOperation
         PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) planItemInstance;
-        List<PlanItemInstanceEntity> childPlanItemInstances = planItemInstanceEntity.getChildren();
+        List<PlanItemInstanceEntity> childPlanItemInstances = planItemInstanceEntity.getChildPlanItemInstances();
         if (childPlanItemInstances != null) {
             for (PlanItemInstanceEntity childPlanItemInstance : childPlanItemInstances) {
                 if (StateTransition.isPossible(planItemInstance, transition)) {
                     if (PlanItemTransition.TERMINATE.equals(transition)) {
-                        CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstance(childPlanItemInstance);
+                        CommandContextUtil.getAgenda(commandContext).planTerminatePlanItemInstanceOperation(childPlanItemInstance);
                     } else if (PlanItemTransition.EXIT.equals(transition)) {
-                        CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstance(childPlanItemInstance);
+                        CommandContextUtil.getAgenda(commandContext).planExitPlanItemInstanceOperation(childPlanItemInstance);
                     }
                 }
             }

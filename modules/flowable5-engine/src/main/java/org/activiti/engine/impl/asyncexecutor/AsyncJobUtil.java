@@ -49,7 +49,16 @@ public class AsyncJobUtil {
         }
 
         try {
-            commandExecutor.execute(new ExecuteAsyncJobCmd(job));
+            commandExecutor.execute(new Command<Void>() {
+                @Override
+                public Void execute(CommandContext commandContext) {
+                    new ExecuteAsyncJobCmd(job).execute(commandContext);
+                    if (job.isExclusive()) {
+                        new UnlockExclusiveJobCmd(job).execute(commandContext);
+                    }
+                    return null;
+                }
+            });
 
         } catch (final ActivitiOptimisticLockingException e) {
 
@@ -69,23 +78,6 @@ public class AsyncJobUtil {
             // Finally, Throw the exception to indicate the ExecuteAsyncJobCmd failed
             String message = "Job " + job.getId() + " failed";
             LOGGER.error(message, exception);
-        }
-
-        try {
-            if (job.isExclusive()) {
-                commandExecutor.execute(new UnlockExclusiveJobCmd(job));
-            }
-
-        } catch (ActivitiOptimisticLockingException optimisticLockingException) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Optimistic locking exception while unlocking the job. If you have multiple async executors running against the same database, " +
-                        "this exception means that this thread tried to acquire an exclusive job, which already was changed by another async executor thread." +
-                        "This is expected behavior in a clustered environment. " +
-                        "You can ignore this message if you indeed have multiple job executor acquisition threads running against the same database. " +
-                        "Exception message: {}", optimisticLockingException.getMessage());
-            }
-        } catch (Throwable t) {
-            LOGGER.error("Error while unlocking exclusive job {}", job.getId(), t);
         }
     }
 
@@ -131,5 +123,27 @@ public class AsyncJobUtil {
             }
 
         });
+        
+        unlockJobIsNeeded(job, commandExecutor);
     }
+    
+    protected static void unlockJobIsNeeded(final JobEntity job, final CommandExecutor commandExecutor) {
+        try {
+            if (job.isExclusive()) {
+                commandExecutor.execute(new UnlockExclusiveJobCmd(job));
+            }
+
+        } catch (ActivitiOptimisticLockingException optimisticLockingException) {
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Optimistic locking exception while unlocking the job. If you have multiple async executors running against the same database, " +
+                        "this exception means that this thread tried to acquire an exclusive job, which already was changed by another async executor thread." +
+                        "This is expected behavior in a clustered environment. " +
+                        "You can ignore this message if you indeed have multiple job executor acquisition threads running against the same database. " +
+                        "Exception message: {}", optimisticLockingException.getMessage());
+            }
+        } catch (Throwable t) {
+            LOGGER.error("Error while unlocking exclusive job {}", job.getId(), t);
+        }
+    }
+    
 }

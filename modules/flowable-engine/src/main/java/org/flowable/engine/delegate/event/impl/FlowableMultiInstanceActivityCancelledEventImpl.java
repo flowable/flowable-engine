@@ -15,7 +15,6 @@ package org.flowable.engine.delegate.event.impl;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityCancelledEvent;
-import org.flowable.engine.delegate.event.FlowableMultiInstanceActivityEvent;
 
 /**
  * An {@link FlowableMultiInstanceActivityCancelledEvent} implementation.

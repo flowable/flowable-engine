@@ -24,7 +24,13 @@
             "properties":{
                 "overrideid":"myPlanModel",
                 "name":"My plan model",
-                "documentation":""
+                "documentation":"My plan model documentation",
+                "formkeydefinition": "formKeyDefinition",
+                "formreference": {
+                    "id": "f49c62c2-dfdf-11e7-82bb-d0bf9c184429",
+                    "name": "casePlanForm",
+                    "key": "casePlanForm"
+                }
             },
             "stencil":{
                 "id":"CasePlanModel"
@@ -323,8 +329,8 @@
                     "childShapes":[
 
                     ],
-                    "outgoing":[  
-                        {  
+                    "outgoing":[
+                        {
                             "resourceId":"sid-8108C0A1-2252-4A41-BD74-CA9A2A74C541"
                         }
                     ],

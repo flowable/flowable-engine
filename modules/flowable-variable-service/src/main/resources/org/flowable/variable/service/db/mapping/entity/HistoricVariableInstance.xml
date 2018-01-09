@@ -108,15 +108,6 @@
             <if test="originalPersistentState.name != name">
                 NAME_ = #{name, jdbcType=VARCHAR}
             </if>
-            <if test="originalPersistentState.scopeId != scopeId">
-                SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR},
-            </if>
-            <if test="originalPersistentState.subScopeId != scopeId">
-                SCOPE_ID_ = #{subScopeId, jdbcType=VARCHAR},
-            </if>
-            <if test="originalPersistentState.scopeType != scopeType">
-                SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR},
-            </if>
             <if test="(byteArrayRef != null and originalPersistentState.byteArrayRef == null) or (byteArrayRef == null and originalPersistentState.byteArrayRef != null) or (originalPersistentState.byteArrayRef != byteArrayRef.id)">
                 BYTEARRAY_ID_ = #{byteArrayRef, typeHandler=VariableByteArrayRefTypeHandler},
             </if>

@@ -16,6 +16,7 @@
         <result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
         <result property="jobHandlerType" column="HANDLER_TYPE_" jdbcType="VARCHAR" />
         <result property="jobHandlerConfiguration" column="HANDLER_CFG_" jdbcType="VARCHAR" />
+        <result property="customValuesByteArrayRef" column="CUSTOM_VALUES_ID_" typeHandler="JobByteArrayRefTypeHandler" />
         <result property="advancedJobHandlerConfigurationByteArrayRef" column="ADV_HANDLER_CFG_ID_" typeHandler="JobByteArrayRefTypeHandler" />
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
         <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
@@ -128,6 +129,7 @@
         EXCEPTION_MSG_,
         HANDLER_TYPE_,
         HANDLER_CFG_,
+        CUSTOM_VALUES_ID_,
         ADV_HANDLER_CFG_ID_,
         TENANT_ID_,
         CREATE_TIME_)
@@ -140,6 +142,7 @@
         #{exceptionMessage, jdbcType=VARCHAR},
         #{jobHandlerType, jdbcType=VARCHAR},
         #{jobHandlerConfiguration, jdbcType=VARCHAR},
+        #{customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
         #{advancedJobHandlerConfigurationByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
         #{tenantId, jdbcType=VARCHAR},
         #{createTime, jdbcType=TIMESTAMP}
@@ -157,6 +160,7 @@
         EXCEPTION_MSG_,
         HANDLER_TYPE_,
         HANDLER_CFG_,
+        CUSTOM_VALUES_ID_,
         ADV_HANDLER_CFG_ID_,
         TENANT_ID_,
         CREATE_TIME_) VALUES
@@ -170,6 +174,7 @@
             #{job.exceptionMessage, jdbcType=VARCHAR},
             #{job.jobHandlerType, jdbcType=VARCHAR},
             #{job.jobHandlerConfiguration, jdbcType=VARCHAR},
+            #{job.customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{job.advancedJobHandlerConfigurationByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{job.tenantId, jdbcType=VARCHAR},
             #{job.createTime, jdbcType=TIMESTAMP})
@@ -189,6 +194,7 @@
             EXCEPTION_MSG_,
             HANDLER_TYPE_,
             HANDLER_CFG_,
+            CUSTOM_VALUES_ID_,
             ADV_HANDLER_CFG_ID_,
             TENANT_ID_,
             CREATE_TIME_) VALUES
@@ -201,6 +207,7 @@
             #{job.exceptionMessage, jdbcType=VARCHAR},
             #{job.jobHandlerType, jdbcType=VARCHAR},
             #{job.jobHandlerConfiguration, jdbcType=VARCHAR},
+            #{job.customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{job.advancedJobHandlerConfigurationByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{job.tenantId, jdbcType=VARCHAR},
             #{job.createTime, jdbcType=TIMESTAMP})

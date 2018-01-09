@@ -51,9 +51,9 @@ public class LockExclusiveJobCmd implements Command<Object>, Serializable {
 
         if (job.isExclusive()) {
             if (job.getExecutionId() != null) {
-                InternalJobManager jobScopeInterface = CommandContextUtil.getJobServiceConfiguration().getInternalJobManager();
-                if (jobScopeInterface != null) {
-                    jobScopeInterface.updateJobScopeLockTime(job);
+                InternalJobManager internalJobManager = CommandContextUtil.getJobServiceConfiguration().getInternalJobManager();
+                if (internalJobManager != null) {
+                    internalJobManager.lockJobScope(job);
                 }
             }
         }

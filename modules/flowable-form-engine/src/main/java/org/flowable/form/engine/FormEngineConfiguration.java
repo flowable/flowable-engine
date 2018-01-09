@@ -167,7 +167,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
         return new StandaloneInMemFormEngineConfiguration();
     }
 
-    // buildProcessEngine
+    // buildFormEngine
     // ///////////////////////////////////////////////////////
 
     public FormEngine buildFormEngine() {

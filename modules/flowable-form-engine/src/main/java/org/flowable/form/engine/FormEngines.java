@@ -97,7 +97,7 @@ public abstract class FormEngines {
     protected static void initFormEngineFromSpringResource(URL resource) {
         try {
             Class<?> springConfigurationHelperClass = ReflectUtil.loadClass("org.flowable.form.spring.SpringFormConfigurationHelper");
-            Method method = springConfigurationHelperClass.getDeclaredMethod("buildContentEngine", new Class<?>[] { URL.class });
+            Method method = springConfigurationHelperClass.getDeclaredMethod("buildFormEngine", new Class<?>[] { URL.class });
             FormEngine formEngine = (FormEngine) method.invoke(null, new Object[] { resource });
 
             String formEngineName = formEngine.getName();

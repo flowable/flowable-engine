@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -54,9 +54,9 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Represents a canvas on which CMMN 1.1 constructs can be drawn.
- * 
+ *
  * Some of the icons used are licensed under a Creative Commons Attribution 2.5 License, see http://www.famfamfam.com/lab/icons/silk/
- * 
+ *
  * @see DefaultCaseDiagramGenerator
  * @author Tijs Rademakers
  */
@@ -89,6 +89,7 @@ public class DefaultCaseDiagramCanvas {
     protected static Color LABEL_COLOR = new Color(112, 146, 190);
     protected static Color TASK_BORDER_COLOR = new Color(187, 187, 187);
     protected static Color STAGE_BORDER_COLOR = new Color(0, 0, 0);
+    protected static Color EVENT_BORDER_COLOR = new Color(88, 88, 88);
 
     // Fonts
     protected static Font LABEL_FONT;
@@ -101,10 +102,12 @@ public class DefaultCaseDiagramCanvas {
 
     // icons
     protected static int ICON_PADDING = 5;
+    protected static BufferedImage TIMER_IMAGE;
     protected static BufferedImage USERTASK_IMAGE;
     protected static BufferedImage SERVICETASK_IMAGE;
     protected static BufferedImage CASETASK_IMAGE;
     protected static BufferedImage PROCESSTASK_IMAGE;
+    protected static BufferedImage DECISIONTASK_IMAGE;
 
     protected int canvasWidth = -1;
     protected int canvasHeight = -1;
@@ -121,10 +124,10 @@ public class DefaultCaseDiagramCanvas {
 
     /**
      * Creates an empty canvas with given width and height.
-     * 
+     *
      * Allows to specify minimal boundaries on the left and upper side of the canvas. This is useful for diagrams that have white space there. Everything beneath these minimum values will be cropped.
      * It's also possible to pass a specific font name and a class loader for the icon images.
-     * 
+     *
      */
     public DefaultCaseDiagramCanvas(int width, int height, int minX, int minY, String imageType,
             String activityFontName, String labelFontName, String annotationFontName, ClassLoader customClassLoader) {
@@ -149,10 +152,10 @@ public class DefaultCaseDiagramCanvas {
 
     /**
      * Creates an empty canvas with given width and height.
-     * 
+     *
      * Allows to specify minimal boundaries on the left and upper side of the canvas. This is useful for diagrams that have white space there (eg Signavio). Everything beneath these minimum values
      * will be cropped.
-     * 
+     *
      * @param minX
      *            Hint that will be used when generating the image. Parts that fall below minX on the horizontal scale will be cropped.
      * @param minY
@@ -191,10 +194,12 @@ public class DefaultCaseDiagramCanvas {
         ANNOTATION_FONT = new Font(annotationFontName, Font.PLAIN, FONT_SIZE);
 
         try {
+            TIMER_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/timer.png", customClassLoader));
             USERTASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/userTask.png", customClassLoader));
             SERVICETASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/serviceTask.png", customClassLoader));
             CASETASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/caseTask.png", customClassLoader));
             PROCESSTASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/processTask.png", customClassLoader));
+            DECISIONTASK_IMAGE = ImageIO.read(ReflectUtil.getResource("org/flowable/icons/decisionTask.png", customClassLoader));
 
         } catch (IOException e) {
             LOGGER.warn("Could not load image for case diagram creation: {}", e.getMessage());
@@ -203,7 +208,7 @@ public class DefaultCaseDiagramCanvas {
 
     /**
      * Generates an image of what currently is drawn on the canvas.
-     * 
+     *
      * Throws an {@link FlowableImageException} when {@link #close()} is already called.
      */
     public InputStream generateImage(String imageType) {
@@ -231,7 +236,7 @@ public class DefaultCaseDiagramCanvas {
 
     /**
      * Generates an image of what currently is drawn on the canvas.
-     * 
+     *
      * Throws an {@link FlowableImageException} when {@link #close()} is already called.
      */
     public BufferedImage generateBufferedImage(String imageType) {
@@ -282,7 +287,7 @@ public class DefaultCaseDiagramCanvas {
 
         Line2D.Double line = new Line2D.Double(xPoints[xPoints.length - 2], yPoints[xPoints.length - 2], xPoints[xPoints.length - 1], yPoints[xPoints.length - 1]);
         drawArrowHead(line, scaleFactor);
-        
+
         g.setPaint(originalPaint);
         g.setStroke(originalStroke);
     }
@@ -315,6 +320,29 @@ public class DefaultCaseDiagramCanvas {
         g.setTransform(transformation);
         g.fill(arrowHead);
         g.setTransform(originalTransformation);
+    }
+    
+    public void drawTimerEventListener(GraphicInfo graphicInfo, double scaleFactor) {
+        drawEventListener(graphicInfo, TIMER_IMAGE, scaleFactor);
+    }
+    
+    public void drawEventListener(GraphicInfo graphicInfo, BufferedImage image, double scaleFactor) {
+        Paint originalPaint = g.getPaint();
+        g.setPaint(EVENT_COLOR);
+        Ellipse2D circle = new Ellipse2D.Double(graphicInfo.getX(), graphicInfo.getY(),
+                graphicInfo.getWidth(), graphicInfo.getHeight());
+        g.fill(circle);
+        g.setPaint(EVENT_BORDER_COLOR);
+        g.draw(circle);
+        g.setPaint(originalPaint);
+        if (image != null) {
+            // calculate coordinates to center image
+            int imageX = (int) Math.round(graphicInfo.getX() + (graphicInfo.getWidth() / 2) - (image.getWidth() / (2 * scaleFactor)));
+            int imageY = (int) Math.round(graphicInfo.getY() + (graphicInfo.getHeight() / 2) - (image.getHeight() / (2 * scaleFactor)));
+            g.drawImage(image, imageX, imageY,
+                    (int) (image.getWidth() / scaleFactor), (int) (image.getHeight() / scaleFactor), null);
+        }
+
     }
 
     public void drawTask(BufferedImage icon, String name, GraphicInfo graphicInfo, double scaleFactor) {
@@ -397,7 +425,7 @@ public class DefaultCaseDiagramCanvas {
             drawMultilineCentredText(name, boxX, boxY, boxWidth, boxHeight);
         }
     }
-    
+
     protected void drawMilestone(String name, GraphicInfo graphicInfo, double scaleFactor) {
         Paint originalPaint = g.getPaint();
         int x = (int) graphicInfo.getX();
@@ -520,13 +548,17 @@ public class DefaultCaseDiagramCanvas {
     public void drawServiceTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
         drawTask(SERVICETASK_IMAGE, name, graphicInfo, scaleFactor);
     }
-    
+
     public void drawCaseTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
         drawTask(CASETASK_IMAGE, name, graphicInfo, scaleFactor);
     }
-    
+
     public void drawProcessTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
         drawTask(PROCESSTASK_IMAGE, name, graphicInfo, scaleFactor);
+    }
+
+    public void drawDecisionTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
+        drawTask(DECISIONTASK_IMAGE, name, graphicInfo, scaleFactor);
     }
 
     public void drawCriterion(GraphicInfo graphicInfo, boolean fillShape) {
@@ -541,7 +573,7 @@ public class DefaultCaseDiagramCanvas {
         rhombus.addPoint(x + width, y + (height / 2));
         rhombus.addPoint(x + (width / 2), y);
         g.draw(rhombus);
-        
+
         if (fillShape) {
             g.fill(rhombus);
         }
@@ -550,14 +582,14 @@ public class DefaultCaseDiagramCanvas {
     public void drawEntryCriterion(GraphicInfo graphicInfo) {
         drawCriterion(graphicInfo, false);
     }
-    
+
     public void drawExitCriterion(GraphicInfo graphicInfo) {
         Paint originalPaint = g.getPaint();
         // Create a new gradient paint for every task box, gradient depends on x and y and is not relative
         g.setPaint(Color.BLACK);
-        
+
         drawCriterion(graphicInfo, true);
-        
+
         g.setPaint(originalPaint);
     }
 
@@ -577,13 +609,13 @@ public class DefaultCaseDiagramCanvas {
 
     /**
      * This method makes coordinates of connection flow better.
-     * 
+     *
      * @param sourceShapeType
      * @param targetShapeType
      * @param sourceGraphicInfo
      * @param targetGraphicInfo
      * @param graphicInfoList
-     * 
+     *
      */
     public List<GraphicInfo> connectionPerfectionizer(SHAPE_TYPE sourceShapeType, SHAPE_TYPE targetShapeType, GraphicInfo sourceGraphicInfo, GraphicInfo targetGraphicInfo, List<GraphicInfo> graphicInfoList) {
         Shape shapeFirst = createShape(sourceShapeType, sourceGraphicInfo);
@@ -627,7 +659,7 @@ public class DefaultCaseDiagramCanvas {
 
     /**
      * This method creates shape by type and coordinates.
-     * 
+     *
      * @param shapeType
      * @param graphicInfo
      * @return Shape
@@ -657,7 +689,7 @@ public class DefaultCaseDiagramCanvas {
 
     /**
      * This method returns intersection point of shape border and line.
-     * 
+     *
      * @param shape
      * @param line
      * @return Point
@@ -675,7 +707,7 @@ public class DefaultCaseDiagramCanvas {
 
     /**
      * This method calculates ellipse intersection with line
-     * 
+     *
      * @param shape
      *            Bounds of this shape used to calculate parameters of inscribed into this bounds ellipse.
      * @param line
@@ -692,7 +724,7 @@ public class DefaultCaseDiagramCanvas {
 
     /**
      * This method calculates shape intersection with line.
-     * 
+     *
      * @param shape
      * @param line
      * @return Intersection point
@@ -729,7 +761,7 @@ public class DefaultCaseDiagramCanvas {
 
     /**
      * This method calculates intersections of two lines.
-     * 
+     *
      * @param a
      *            Line 1
      * @param b
@@ -740,7 +772,7 @@ public class DefaultCaseDiagramCanvas {
         double d = (a.getX1() - a.getX2()) * (b.getY2() - b.getY1()) - (a.getY1() - a.getY2()) * (b.getX2() - b.getX1());
         double da = (a.getX1() - b.getX1()) * (b.getY2() - b.getY1()) - (a.getY1() - b.getY1()) * (b.getX2() - b.getX1());
         double ta = da / d;
-        
+
         Point p = new Point();
         p.setLocation(a.getX1() + ta * (a.getX2() - a.getX1()), a.getY1() + ta * (a.getY2() - a.getY1()));
         return p;

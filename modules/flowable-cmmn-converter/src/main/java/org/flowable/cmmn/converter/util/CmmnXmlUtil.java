@@ -147,7 +147,7 @@ public class CmmnXmlUtil implements CmmnXmlConstants {
 
     /**
      * write attributes to xtw (except blacklisted)
-     * 
+     *
      * @param attributes
      * @param xtw
      * @param namespaceMap

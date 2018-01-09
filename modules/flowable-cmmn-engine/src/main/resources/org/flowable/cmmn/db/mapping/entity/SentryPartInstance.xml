@@ -38,7 +38,7 @@
 
     <insert id="bulkInsertSentryPartInstance" databaseId="oracle" parameterType="java.util.List">
         INSERT ALL
-        <foreach collection="list" item="sentryOnPartInstance" index="index">
+        <foreach collection="list" item="sentryPartInstance" index="index">
             into ${prefix}ACT_CMMN_RU_SENTRY_PART_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, PLAN_ITEM_INST_ID_, ON_PART_ID_, IF_PART_ID_, TIME_STAMP_) VALUES
             (
                 #{sentryPartInstance.id ,jdbcType=VARCHAR},

@@ -19,6 +19,9 @@ public class Task extends PlanItemDefinition {
     
     protected boolean blocking = true;
     protected String blockingExpression;
+    
+    protected boolean async;
+    protected boolean exclusive;
 
     public boolean isBlocking() {
         return blocking;
@@ -35,10 +38,28 @@ public class Task extends PlanItemDefinition {
     public void setBlockingExpression(String blockingExpression) {
         this.blockingExpression = blockingExpression;
     }
+    
+    public boolean isAsync() {
+        return async;
+    }
+
+    public void setAsync(boolean async) {
+        this.async = async;
+    }
+
+    public boolean isExclusive() {
+        return exclusive;
+    }
+
+    public void setExclusive(boolean exclusive) {
+        this.exclusive = exclusive;
+    }
 
     public void setValues(Task otherElement) {
         super.setValues(otherElement);
         setBlocking(otherElement.isBlocking());
         setBlockingExpression(otherElement.getBlockingExpression());
+        setAsync(otherElement.isAsync());
+        setExclusive(otherElement.isExclusive());
     }
 }

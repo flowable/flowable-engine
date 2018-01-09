@@ -16,6 +16,7 @@ import java.util.Map;
 
 /**
  * @author Joram Barrez
+ * @author Tijs Rademakers
  */
 public interface CaseInstanceBuilder {
 
@@ -36,8 +37,12 @@ public interface CaseInstanceBuilder {
     CaseInstanceBuilder transientVariable(String variableName, Object value);
 
     CaseInstanceBuilder tenantId(String tenantId);
+    
+    CaseInstanceBuilder outcome(String outcome);
 
     CaseInstance start();
+    
+    CaseInstance startWithForm();
 
     String getCaseDefinitionId();
 
@@ -53,4 +58,5 @@ public interface CaseInstanceBuilder {
 
     String getTenantId();
 
+    String getOutcome();
 }

@@ -32,6 +32,7 @@ import org.flowable.content.api.ContentService;
 import org.flowable.form.api.FormRepositoryService;
 import org.flowable.form.api.FormService;
 import org.flowable.idm.api.User;
+import org.flowable.variable.api.type.VariableScopeType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,7 @@ public class FlowableCaseInstanceService {
 
     @Autowired
     protected CmmnRuntimeService cmmnRuntimeService;
-    
+
     @Autowired
     protected CmmnHistoryService cmmnHistoryService;
 
@@ -102,7 +103,10 @@ public class FlowableCaseInstanceService {
 
         CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
                         .caseDefinitionId(startRequest.getCaseDefinitionId())
-                        .name(startRequest.getName()).start();
+                        .name(startRequest.getName())
+                        .outcome(startRequest.getOutcome())
+                        .variables(startRequest.getValues())
+                        .startWithForm();
 
         User user = null;
         if (caseInstance.getStartUserId() != null) {
@@ -133,8 +137,8 @@ public class FlowableCaseInstanceService {
                 throw new NotFoundException("Process with id: " + processInstanceId + " is already completed and can't be deleted");
             }*/
 
-            // Delete all content related to the process instance
-            //contentService.deleteContentItemsByProcessInstanceId(processInstanceId);
+            // Delete all content related to the case instance
+            contentService.deleteContentItemsByScopeIdAndScopeType(caseInstanceId, VariableScopeType.CMMN);
 
             // Finally, delete all history for this instance in the engine
             cmmnHistoryService.deleteHistoricCaseInstance(caseInstanceId);

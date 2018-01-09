@@ -312,7 +312,7 @@ After you have received a message inside your application, you must decide what 
 ----
 ProcessInstance startProcessInstanceByMessage(String messageName);
 ProcessInstance startProcessInstanceByMessage(String messageName, Map<String, Object> processVariables);
-ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey, 
+ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey,
     Map<String, Object> processVariables);
 ----
 
@@ -544,7 +544,7 @@ When *starting* a process instance, a message start event can be triggered using
 ----
 ProcessInstance startProcessInstanceByMessage(String messageName);
 ProcessInstance startProcessInstanceByMessage(String messageName, Map<String, Object> processVariables);
-ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey, 
+ProcessInstance startProcessInstanceByMessage(String messageName, String businessKey,
     Map<String, Object< processVariables);
 ----
 
@@ -1229,7 +1229,7 @@ A compensation boundary event is defined as a typical <<bpmnBoundaryEvent,bounda
     <compensateEventDefinition />
 </boundaryEvent>
 
-<association associationDirection="One" id="a1" 
+<association associationDirection="One" id="a1"
     sourceRef="compensateBookHotelEvt" targetRef="undoBookHotel" />
 
 <serviceTask id="undoBookHotel" isForCompensation="true" flowable:class="..." />
@@ -2325,7 +2325,7 @@ public Map<String, Set<Expression>> getCustomUserIdentityLinkExpressions() {
 
 public void addCustomUserIdentityLinkExpression(
         String identityLinkType, Set<Expression> idList) {
-        
+
     customUserIdentityLinkExpressions.put(identityLinkType, idList);
 }
 
@@ -2335,7 +2335,7 @@ public Map<String, Set<Expression>> getCustomGroupIdentityLinkExpressions() {
 
 public void addCustomGroupIdentityLinkExpression(
         String identityLinkType, Set<Expression> idList) {
-        
+
     customGroupIdentityLinkExpressions.put(identityLinkType, idList);
 }
 ----
@@ -2349,7 +2349,7 @@ Finally, the _IdentityLinkType_ class must be extended to support the custom ide
 package com.yourco.engine.task;
 
 public class IdentityLinkType extends org.flowable.engine.task.IdentityLinkType {
-    
+
     public static final String ADMINISTRATOR = "administrator";
 
     public static final String EXCLUDED_OWNER = "excludedOwner";
@@ -2928,7 +2928,7 @@ public class SingletonDelegateExpressionBean implements JavaDelegate {
 
     int result = fieldA.intValue() + fieldB.intValue();
 
-    String resultVariableName = DelegateHelper.getFieldExpression(execution, 
+    String resultVariableName = DelegateHelper.getFieldExpression(execution,
         "resultVariableName").getValue(execution).toString();
     execution.setVariable(resultVariableName, result);
   }
@@ -3600,33 +3600,33 @@ Http task is configured by <<serviceTaskFieldInjection,field injection>>. All th
 [options="header"]
 |===============
 |Property|Required?|Description
-|requestMethod|yes|Request method + 
+|requestMethod|yes|Request method +
 (GET,POST,PUT,DELETE).
-|requestUrl|yes|Request URL + 
+|requestUrl|yes|Request URL +
 (Example - http://flowable.org).
-|requestHeaders|no|Line separated Http request headers. + 
-Example - + 
-Content-Type: application/json + 
+|requestHeaders|no|Line separated Http request headers. +
+Example - +
+Content-Type: application/json +
 Authorization: Basic aGFRlc3Q=
-|requestBody|no|Request body + 
+|requestBody|no|Request body +
 Example - ${sampleBody}
-|requestTimeout|no|Timeout in milliseconds for the request + 
+|requestTimeout|no|Timeout in milliseconds for the request +
 (Example - 5000). +
-Default is '0', meaning no timeout. + 
+Default is '0', meaning no timeout. +
 Please refer <<bpmnHttpTaskClientConfiguration>> for connection related timeouts.
 |disallowRedirects|no|Flag to disallow Http redirects. +
 Default is false. +
 (Example - true).
-|failStatusCodes|no|Comma separated list of Http response status codes to fail the request and error thrown as FlowableException. + 
-Example: 400, 404, 500, 503 + 
+|failStatusCodes|no|Comma separated list of Http response status codes to fail the request and error thrown as FlowableException. +
+Example: 400, 404, 500, 503 +
 Example: 400, 5XX
 |handleStatusCodes|no|Comma separated list of status codes for which the task will throw BpmnError. +
 The error code of the BpmnError is 'HTTP<statuscode>'. +
-For example, 404 status code is set with error code 'HTTP404'. + 
-3XX status codes are thrown only if 'disallowRedirects' field is also set. + 
-Status codes in 'handleStatusCodes' override those in 'failStatusCodes' when they are set in both. + 
-Example: 400, 404, 500, 503 + 
-Example: 3XX, 4XX, 5XX + 
+For example, 404 status code is set with error code 'HTTP404'. +
+3XX status codes are thrown only if 'disallowRedirects' field is also set. +
+Status codes in 'handleStatusCodes' override those in 'failStatusCodes' when they are set in both. +
+Example: 400, 404, 500, 503 +
+Example: 3XX, 4XX, 5XX +
 |ignoreException|no|Flag for ignoring the exceptions, catch and save the exception message as '<taskId>.errorMessage'.
 |saveRequestVariables|no|Flag to save request variables. +
 By default, only response related variables are saved in execution.
@@ -3646,9 +3646,9 @@ In addition to the provided fields, following will be set as variables on succes
 |responseProtocol|Yes|Http version
 |responseReason|Yes|Http response reason phrase.
 |responseStatusCode|Yes|Http response status code (Example - 200).
-|responseHeaders|Yes|Line separated Http response headers. + 
-Example - + 
-Content-Type: application/json + 
+|responseHeaders|Yes|Line separated Http response headers. +
+Example - +
+Content-Type: application/json +
 Content-Length: 777
 |responseBody|Yes|Response body as string, if any.
 |errorMessage|Yes|Ignored error message, if any.
@@ -4259,8 +4259,8 @@ The following process definition contains 3 execution listeners:
 <process id="executionListenersProcess">
 
   <extensionElements>
-    <flowable:executionListener 
-      class="org.flowable.examples.bpmn.executionlistener.ExampleExecutionListenerOne" 
+    <flowable:executionListener
+      class="org.flowable.examples.bpmn.executionlistener.ExampleExecutionListenerOne"
       event="start" />
   </extensionElements>
 
@@ -4270,15 +4270,15 @@ The following process definition contains 3 execution listeners:
   <userTask id="firstTask" />
   <sequenceFlow sourceRef="firstTask" targetRef="secondTask">
     <extensionElements>
-      <flowable:executionListener 
+      <flowable:executionListener
         class="org.flowable.examples.bpmn.executionListener.ExampleExecutionListenerTwo" />
     </extensionElements>
   </sequenceFlow>
 
   <userTask id="secondTask" >
     <extensionElements>
-      <flowable:executionListener 
-        expression="${myPojo.myMethod(execution.event)}" 
+      <flowable:executionListener
+        expression="${myPojo.myMethod(execution.event)}"
         event="end" />
     </extensionElements>
   </userTask>
@@ -4331,9 +4331,9 @@ A while back, we also introduced a new type of execution listener, the org.flowa
 
 [source,xml,linenums]
 ----
-<flowable:executionListener event="start" 
+<flowable:executionListener event="start"
     class="org.flowable.engine.impl.bpmn.listener.ScriptExecutionListener">
-    
+
   <flowable:field name="script">
     <flowable:string>
       def bar = "BAR";  // local variable
@@ -4344,7 +4344,7 @@ A while back, we also introduced a new type of execution listener, the org.flowa
   </flowable:field>
   <flowable:field name="language" stringValue="groovy" />
   <flowable:field name="resultVariable" stringValue="myVar" />
-  
+
 </flowable:executionListener>
 ----
 
@@ -4362,13 +4362,13 @@ The fragment below shows a simple example process with an execution listener wit
 ----
 <process id="executionListenersProcess">
   <extensionElements>
-    <flowable:executionListener 
-        class="org.flowable.examples.bpmn.executionListener.ExampleFieldInjectedExecutionListener" 
+    <flowable:executionListener
+        class="org.flowable.examples.bpmn.executionListener.ExampleFieldInjectedExecutionListener"
         event="start">
-        
+
       <flowable:field name="fixedValue" stringValue="Yes, I am " />
       <flowable:field name="dynamicValue" expression="${myVar}" />
-      
+
     </flowable:executionListener>
   </extensionElements>
 
@@ -4391,7 +4391,7 @@ public class ExampleFieldInjectedExecutionListener implements ExecutionListener 
   private Expression dynamicValue;
 
   public void notify(ExecutionListenerExecution execution) throws Exception {
-    execution.setVariable("var", fixedValue.getValue(execution).toString() + 
+    execution.setVariable("var", fixedValue.getValue(execution).toString() +
         dynamicValue.getValue(execution).toString());
   }
 }
@@ -5028,9 +5028,9 @@ You can pass process variables to the sub-process and vice versa. The data is co
 ----
 <callActivity id="callSubProcess" calledElement="checkCreditProcess">
     <extensionElements>
-        <flowable:in source="someVariableInMainProcess" 
+        <flowable:in source="someVariableInMainProcess"
             target="nameOfVariableInSubProcess" />
-        <flowable:out source="someVariableInSubProcess" 
+        <flowable:out source="someVariableInSubProcess"
             target="nameOfVariableInMainProcess" />
     </extensionElements>
 </callActivity>
@@ -5077,6 +5077,23 @@ Defining the 'inheritBusinessKey' attribute with a value of +true+ will set the 
 
 [[bpmnCallActivityExample]]
 
+===== Reference the process from the same deployment
+
+The default behavior is that the latest deployed process definition is taken to start the referenced process. There are use cases where
+you would like to deploy the referenced process from the same deployment as the main process to use the same state of the referenced
+process at the time of the deployment. This requires that you deploy the main and the referenced process within the same deployment unit, such
+that the process definitions have the same reference to the deployment.
+
+To use the referenced process from the same deployment you can set the `sameDeployment` attribute to `true` on the `callActivity` element
+like in the following example:
+
+----
+<callActivity id="callSubProcess" calledElement="checkCreditProcess" flowable:sameDeployment="true">
+...
+</callActivity>
+----
+
+By default the `sameDeployment` attribute is set to false.
 
 ===== Example
 
@@ -5138,8 +5155,8 @@ In order to use this feature, we can use the _flowable:async="true"_ extension. 
 
 [source,xml,linenums]
 ----
-<serviceTask id="service1" name="Generate Invoice" 
-    flowable:class="my.custom.Delegate" 
+<serviceTask id="service1" name="Generate Invoice"
+    flowable:class="my.custom.Delegate"
     flowable:async="true" />
 ----
 
@@ -5164,9 +5181,9 @@ These parameters can be configured by the +flowable:failedJobRetryTimeCycle+ ele
 
 [source,xml,linenums]
 ----
-<serviceTask id="failingServiceTask" flowable:async="true" 
+<serviceTask id="failingServiceTask" flowable:async="true"
     flowable:class="org.flowable.engine.test.jobexecutor.RetryFailingDelegate">
-    
+
     <extensionElements>
         <flowable:failedJobRetryTimeCycle>R5/PT7M</flowable:failedJobRetryTimeCycle>
     </extensionElements>
@@ -5210,7 +5227,7 @@ How can I enable this feature? In recent releases, exclusive jobs are the defaul
 
 [source,xml,linenums]
 ----
-<serviceTask id="service" flowable:expression="${myService.performBooking(hotel, dates)}" 
+<serviceTask id="service" flowable:expression="${myService.performBooking(hotel, dates)}"
     flowable:async="true" flowable:exclusive="false" />
 ----
 

@@ -28,17 +28,35 @@ public interface CmmnRuntimeService {
     
     void triggerPlanItemInstance(String planItemInstanceId);
     
+    void enablePlanItemInstance(String planItemInstanceId);
+    
+    void startPlanItemInstance(String planItemInstanceId);
+    
+    void disablePlanItemInstance(String planItemInstanceId);
+
+    void completeStagePlanItemInstance(String planItemInstanceId);
+    
+    void completeCaseInstance(String caseInstanceId);
+    
     void terminateCaseInstance(String caseInstanceId);
     
     void evaluateCriteria(String caseInstanceId);
     
     Map<String, Object> getVariables(String caseInstanceId);
     
+    Map<String, Object> getLocalVariables(String planItemInstanceId);
+    
     Object getVariable(String caseInstanceId, String variableName);
+    
+    Object getLocalVariable(String planItemInstanceId, String variableName);
     
     void setVariables(String caseInstanceId, Map<String, Object> variables);
     
+    void setLocalVariables(String planItemInstanceId, Map<String, Object> variables);
+    
     void removeVariable(String caseInstanceId, String variableName);
+    
+    void removeLocalVariable(String planItemInstanceId, String variableName);
     
     CaseInstanceQuery createCaseInstanceQuery();
     

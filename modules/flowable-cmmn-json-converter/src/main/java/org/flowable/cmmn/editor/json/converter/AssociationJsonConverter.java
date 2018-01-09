@@ -123,7 +123,7 @@ public class AssociationJsonConverter extends BaseCmmnJsonConverter {
         Association association = new Association();
 
         association.setId(CmmnJsonConverterUtil.getElementId(elementNode));
-        association.setTransitionEvent(getPropertyValueAsString(PROPERTY_TRANSITION_EVENT, elementNode));
+        association.setTransitionEvent(CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_TRANSITION_EVENT, elementNode));
         String sourceRef = CmmnJsonConverterUtil.lookForSourceRef(elementNode.get(EDITOR_SHAPE_ID).asText(), modelNode.get(EDITOR_CHILD_SHAPES));
 
         if (sourceRef != null) {

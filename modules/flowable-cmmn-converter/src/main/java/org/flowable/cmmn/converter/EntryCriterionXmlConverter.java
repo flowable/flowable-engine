@@ -28,7 +28,7 @@ public class EntryCriterionXmlConverter extends CriterionXmlConverter {
     }
     
     @Override
-    public boolean isCmmnElement() {
+    public boolean hasChildElements() {
         return true;
     }
 

@@ -293,7 +293,7 @@ angular.module('flowableApp')
                     if (!field.visibilityCondition) {
                         field.isVisible = true;
                     }
-                    
+
                     if (field.type == 'dropdown' && field.value && field.options && !field.readOnly) {
                         for (var j = 0; j < field.options.length; j++) {
                             if (field.options[j].name == field.value) {
@@ -301,18 +301,18 @@ angular.module('flowableApp')
                                 break;
                             }
                         }
-                        
+
                     } else if (field.type == 'date' && field.value && !field.readOnly) {
                         var dateArray = field.value.split('-');
                         if (dateArray && dateArray.length == 3) {
                             field.value = new Date(dateArray[0],dateArray[1]-1,dateArray[2]);
                         }
-                        
+
                     } else if (field.type == 'people' && field.value) {
                         UserService.getUserInfoForForm(field.value, i).then(function (userInfoFormObject) {
                             fields[userInfoFormObject.index].value = userInfoFormObject.userData;
                         });
-                        
+
                     } else if (field.type == 'functional-group' && field.value) {
                         FunctionalGroupService.getGroupInfoForForm(field.value, i).then(function (groupInfoFormObject) {
                             fields[groupInfoFormObject.index].value = groupInfoFormObject.groupData;
@@ -361,7 +361,7 @@ angular.module('flowableApp')
                     });
                     return found;
                 }
-                
+
                 function findMatchingItem(items, key, value) {
                     var foundItem = undefined;
                     if (items && items.length > 0) {
@@ -496,14 +496,30 @@ angular.module('flowableApp')
 
                         $scope.combineFormVariables();
                     });
+                } else if ($scope.caseDefinitionId) {
+
+                    FormService.getCaseStartForm($scope.caseDefinitionId).then(function (formData) {
+                        $scope.formData = formData;
+                        prepareFormFields($scope.formData); // Prepare the form fields to allow for layouting
+                        $scope.model.loading = false;
+
+                        $scope.combineFormVariables();
+                    });
                 }
             };
 
             // Fetch and show on first usage
             fetchAndRenderForm();
 
-            // Re-render when process definition changes
+            // Re-render when process definition || caseDefinitionId changes
             $scope.$watch('processDefinitionId', function (newValue, oldValue) {
+                if (newValue !== oldValue) {
+                    // Check if actually changed
+                    initModel();
+                    fetchAndRenderForm();
+                }
+            }, true);
+            $scope.$watch('caseDefinitionId', function (newValue, oldValue) {
                 if (newValue !== oldValue) {
                     // Check if actually changed
                     initModel();
@@ -517,6 +533,8 @@ angular.module('flowableApp')
             $scope.getDefaultCompleteButtonText = function () {
                 if ($scope.processDefinitionId) {
                     return $translate.instant('FORM.DEFAULT-OUTCOME.START-PROCESS');
+                } else if ($scope.caseDefinitionId) {
+                    return $translate.instant('FORM.DEFAULT-OUTCOME.START-CASE');
                 } else {
                     return $translate.instant('FORM.DEFAULT-OUTCOME.COMPLETE');
                 }
@@ -551,11 +569,11 @@ angular.module('flowableApp')
 
                 $scope.model.loading = true;
                 $scope.model.completeButtonDisabled = true;
-                
+
                 // Prep data
                 var postData = $scope.createPostData();
                 postData.formId = $scope.formData.id;
-                
+
                 if (outcome) {
                     postData.outcome = outcome.name;
                 }
@@ -568,7 +586,7 @@ angular.module('flowableApp')
                     if ($scope.processName) {
                         postData.name = $scope.processName;
                     }
-                    
+
                     FormService.completeStartForm(postData).then(
                         function (data) {
                             $scope.$emit('process-started', data);
@@ -579,9 +597,34 @@ angular.module('flowableApp')
                             $scope.model.completeButtonDisabled = false;
                             $scope.model.loading = false;
                             $scope.$emit('process-started-error', {
-                            	processDefinitionId: $scope.processDefinitionId, 
+                            	processDefinitionId: $scope.processDefinitionId,
                             	error: errorResponse
                            	});
+                        });
+
+
+                } else if ($scope.caseDefinitionId) {
+
+                    // Add right process-definition for this form
+                    postData.caseDefinitionId = $scope.caseDefinitionId;
+
+                    if ($scope.caseName) {
+                        postData.name = $scope.caseName;
+                    }
+
+                    FormService.completeCaseStartForm(postData).then(
+                        function (data) {
+                            $scope.$emit('case-started', data);
+                            $scope.model.completeButtonDisabled = false;
+                            $scope.model.loading = false;
+                        },
+                        function (errorResponse) {
+                            $scope.model.completeButtonDisabled = false;
+                            $scope.model.loading = false;
+                            $scope.$emit('case-started-error', {
+                                caseDefinitionId: $scope.caseDefinitionId,
+                                error: errorResponse
+                            });
                         });
 
 
@@ -597,7 +640,7 @@ angular.module('flowableApp')
                             $scope.model.completeButtonDisabled = false;
                             $scope.model.loading = false;
                             $scope.$emit('task-completed-error', {
-                            	taskId: $scope.taskId, 
+                            	taskId: $scope.taskId,
                             	error: errorResponse
                             });
                         });
@@ -608,7 +651,7 @@ angular.module('flowableApp')
             $scope.fieldPersonSelected = function (user, field) {
                 field.value = user;
             };
-            
+
             $scope.fieldPersonRemoved = function (user, field) {
                 field.value = undefined;
             };
@@ -616,7 +659,7 @@ angular.module('flowableApp')
             $scope.fieldGroupSelected = function (group, field) {
                 field.value = group;
             };
-            
+
             $scope.fieldGroupRemoved = function (group, field) {
                 field.value = undefined;
             };
@@ -663,11 +706,11 @@ angular.module('flowableApp')
                     $scope.model.uploadInProgress = state;
                 }
             };
-            
+
             $scope.createPostData = function() {
                 var postData = {values: {}};
                 if (!$scope.model.allFormFields) return postData;
-                    
+
                 for (var fieldArrayIndex = 0; fieldArrayIndex < $scope.model.allFormFields.length; fieldArrayIndex++) {
                     var field = $scope.model.allFormFields[fieldArrayIndex];
                     if (!field || !field.isVisible) continue;
@@ -677,7 +720,7 @@ angular.module('flowableApp')
                     }
 
                     if (field && field.type !== 'expression' && !field.readOnly) {
-                        
+
                         if (field.type === 'dropdown' && field.hasEmptyValue !== null && field.hasEmptyValue !== undefined && field.hasEmptyValue === true) {
 
                             // Manually filled dropdown
@@ -688,7 +731,7 @@ angular.module('flowableApp')
                                     postData.values[field.id] = field.value;
                                 }
                             }
-                            
+
                         } else if (field.type === 'date' && field.value) {
                             postData.values[field.id] = field.value.getFullYear() + '-' + (field.value.getMonth() + 1) + '-' + field.value.getDate();
 
@@ -697,7 +740,7 @@ angular.module('flowableApp')
                         }
                     }
                 }
-                
+
                 return postData;
             };
 
@@ -719,7 +762,7 @@ angular.module('flowableApp')
                 selectToday: $scope.selectToday,
                 closeDatePopup: $scope.closeDatePopup
             };
-            
+
             if ($scope.taskId) {
                 $scope.model.isTaskForm = true;
             }

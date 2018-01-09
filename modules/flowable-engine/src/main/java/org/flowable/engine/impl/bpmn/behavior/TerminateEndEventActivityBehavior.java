@@ -210,7 +210,7 @@ public class TerminateEndEventActivityBehavior extends FlowNodeActivityBehavior 
             }
         }
         
-        CommandContextUtil.getExecutionEntityManager().deleteChildExecutions(rootExecutionEntity, null, deleteReason, true, terminateEndEvent);
+        CommandContextUtil.getExecutionEntityManager().deleteChildExecutions(rootExecutionEntity, null, null, deleteReason, true, terminateEndEvent);
         sendProcessInstanceCompletedEvent(rootExecutionEntity, terminateEndEvent);
         executionEntityManager.deleteExecutionAndRelatedData(rootExecutionEntity, deleteReason);
     }

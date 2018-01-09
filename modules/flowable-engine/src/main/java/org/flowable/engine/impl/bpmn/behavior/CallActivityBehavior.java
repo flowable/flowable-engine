@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -35,16 +35,19 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.context.Context;
 import org.flowable.engine.impl.delegate.SubProcessActivityBehavior;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntityManager;
+import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 
 /**
  * Implementation of the BPMN 2.0 call activity (limited currently to calling a subprocess and not (yet) a global task).
- * 
+ *
  * @author Joram Barrez
  * @author Tijs Rademakers
  */
@@ -76,7 +79,10 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
             finalProcessDefinitonKey = processDefinitonKey;
         }
 
-        ProcessDefinition processDefinition = findProcessDefinition(finalProcessDefinitonKey, execution.getTenantId());
+        ExecutionEntity executionEntity = (ExecutionEntity) execution;
+        CallActivity callActivity = (CallActivity) executionEntity.getCurrentFlowElement();
+
+        ProcessDefinition processDefinition = findProcessDefinition(finalProcessDefinitonKey, execution.getProcessDefinitionId(), execution.getTenantId(), callActivity.isSameDeployment());
 
         // Get model from cache
         Process subProcess = ProcessDefinitionUtil.getProcess(processDefinition.getId());
@@ -95,13 +101,10 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         }
 
         CommandContext commandContext = CommandContextUtil.getCommandContext();
-        
+
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
-
-        ExecutionEntity executionEntity = (ExecutionEntity) execution;
-        CallActivity callActivity = (CallActivity) executionEntity.getCurrentFlowElement();
 
         String businessKey = null;
 
@@ -152,7 +155,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         if (!variables.isEmpty()) {
             initializeVariables(subProcessInstance, variables);
         }
-        
+
         if (eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_INITIALIZED, subProcessInstance));
         }
@@ -160,7 +163,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         // Create the first execution that will visit all the process definition elements
         ExecutionEntity subProcessInitialExecution = executionEntityManager.createChildExecution(subProcessInstance);
         subProcessInitialExecution.setCurrentFlowElement(initialFlowElement);
-        
+
         CommandContextUtil.getAgenda().planContinueProcessOperation(subProcessInitialExecution);
 
         if (eventDispatcher.isEnabled()) {
@@ -186,7 +189,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
             } else {
                 value = subProcessInstance.getVariable(ioParameter.getSource());
             }
-            
+
             if (callActivity.isUseLocalScopeForOutParameters()) {
                 execution.setVariableLocal(ioParameter.getTarget(), value);
             } else {
@@ -202,7 +205,22 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
     }
 
     // Allow subclass to determine which version of a process to start.
-    protected ProcessDefinition findProcessDefinition(String processDefinitionKey, String tenantId) {
+    protected ProcessDefinition findProcessDefinition(String processDefinitionKey, String processDefinitionId, String tenantId, boolean sameDeployment) {
+        if (sameDeployment) {
+            String deploymentId = ProcessDefinitionUtil.getProcessDefinition(processDefinitionId).getDeploymentId();
+            ProcessDefinitionEntityManager processDefinitionEntityManager = Context.getProcessEngineConfiguration().getProcessDefinitionEntityManager();
+            ProcessDefinitionEntity processDefinitionByDeploymentAndKey = null;
+            if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
+                processDefinitionByDeploymentAndKey = processDefinitionEntityManager.findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitionKey);
+            } else {
+                processDefinitionByDeploymentAndKey = processDefinitionEntityManager.findProcessDefinitionByDeploymentAndKeyAndTenantId(deploymentId, processDefinitionKey, tenantId);
+            }
+            
+            if (processDefinitionByDeploymentAndKey != null) {
+                return processDefinitionByDeploymentAndKey;
+            }
+        }
+
         if (tenantId == null || ProcessEngineConfiguration.NO_TENANT_ID.equals(tenantId)) {
             return CommandContextUtil.getProcessEngineConfiguration().getDeploymentManager().findDeployedLatestProcessDefinitionByKey(processDefinitionKey);
         } else {

@@ -21,12 +21,22 @@ import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.api.runtime.MilestoneInstanceQuery;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
 import org.flowable.cmmn.engine.impl.ServiceImpl;
+import org.flowable.cmmn.engine.impl.cmd.CompleteCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.CompleteStagePlanItemInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.DisablePlanItemInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.EnablePlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.EvaluateCriteriaCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetLocalVariableCmd;
+import org.flowable.cmmn.engine.impl.cmd.GetLocalVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetVariablesCmd;
+import org.flowable.cmmn.engine.impl.cmd.RemoveLocalVariableCmd;
 import org.flowable.cmmn.engine.impl.cmd.RemoveVariableCmd;
+import org.flowable.cmmn.engine.impl.cmd.SetLocalVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.SetVariablesCmd;
 import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceCmd;
+import org.flowable.cmmn.engine.impl.cmd.StartCaseInstanceWithFormCmd;
+import org.flowable.cmmn.engine.impl.cmd.StartPlanItemInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TerminateCaseInstanceCmd;
 import org.flowable.cmmn.engine.impl.cmd.TriggerPlanItemInstanceCmd;
 
@@ -43,9 +53,38 @@ public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeSe
     public CaseInstance startCaseInstance(CaseInstanceBuilder caseInstanceBuilder) {
         return commandExecutor.execute(new StartCaseInstanceCmd(caseInstanceBuilder));
     }
+    
+    public CaseInstance startCaseInstanceWithForm(CaseInstanceBuilder caseInstanceBuilder) {
+        return commandExecutor.execute(new StartCaseInstanceWithFormCmd(caseInstanceBuilder));
+    }
 
     @Override public void triggerPlanItemInstance(String planItemInstanceId) {
         commandExecutor.execute(new TriggerPlanItemInstanceCmd(planItemInstanceId));
+    }
+    
+    @Override
+    public void enablePlanItemInstance(String planItemInstanceId) {
+        commandExecutor.execute(new EnablePlanItemInstanceCmd(planItemInstanceId));
+    }
+    
+    @Override
+    public void disablePlanItemInstance(String planItemInstanceId) {
+        commandExecutor.execute(new DisablePlanItemInstanceCmd(planItemInstanceId));
+    }
+    
+    @Override
+    public void completeStagePlanItemInstance(String planItemInstanceId) {
+        commandExecutor.execute(new CompleteStagePlanItemInstanceCmd(planItemInstanceId));
+    }
+    
+    @Override
+    public void startPlanItemInstance(String planItemInstanceId) {
+        commandExecutor.execute(new StartPlanItemInstanceCmd(planItemInstanceId));
+    }
+    
+    @Override
+    public void completeCaseInstance(String caseInstanceId) {
+        commandExecutor.execute(new CompleteCaseInstanceCmd(caseInstanceId));
     }
 
     @Override
@@ -62,20 +101,40 @@ public class CmmnRuntimeServiceImpl extends ServiceImpl implements CmmnRuntimeSe
     public Map<String, Object> getVariables(String caseInstanceId) {
         return commandExecutor.execute(new GetVariablesCmd(caseInstanceId));
     }
+    
+    @Override
+    public Map<String, Object> getLocalVariables(String planItemInstanceId) {
+        return commandExecutor.execute(new GetLocalVariablesCmd(planItemInstanceId));
+    }
 
     @Override
     public Object getVariable(String caseInstanceId, String variableName) {
         return commandExecutor.execute(new GetVariableCmd(caseInstanceId, variableName));
+    }
+    
+    @Override
+    public Object getLocalVariable(String planItemInstanceId, String variableName) {
+        return commandExecutor.execute(new GetLocalVariableCmd(planItemInstanceId, variableName));
     }
 
     @Override
     public void setVariables(String caseInstanceId, Map<String, Object> variables) {
         commandExecutor.execute(new SetVariablesCmd(caseInstanceId, variables));
     }
+    
+    @Override
+    public void setLocalVariables(String planItemInstanceId, Map<String, Object> variables) {
+        commandExecutor.execute(new SetLocalVariablesCmd(planItemInstanceId, variables));
+    }
 
     @Override
     public void removeVariable(String caseInstanceId, String variableName) {
         commandExecutor.execute(new RemoveVariableCmd(caseInstanceId, variableName));
+    }
+    
+    @Override
+    public void removeLocalVariable(String planItemInstanceId, String variableName) {
+        commandExecutor.execute(new RemoveLocalVariableCmd(planItemInstanceId, variableName));
     }
 
     @Override

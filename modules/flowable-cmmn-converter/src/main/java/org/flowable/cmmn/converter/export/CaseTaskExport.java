@@ -22,8 +22,7 @@ public class CaseTaskExport extends AbstractPlanItemDefinitionExport {
     public static void writeCaseTask(CaseTask caseTask, XMLStreamWriter xtw) throws Exception {
         // start case task element
         xtw.writeStartElement(ELEMENT_CASE_TASK);
-        writeCommonPlanItemDefinitionAttributes(caseTask, xtw);
-        writeBlockingAttribute(xtw, caseTask);
+        writeCommonTaskAttributes(xtw, caseTask);
         
         if (StringUtils.isNotEmpty(caseTask.getCaseRef())) {
             xtw.writeAttribute(ATTRIBUTE_CASE_REF, caseTask.getCaseRef());

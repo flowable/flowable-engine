@@ -17,13 +17,21 @@ import javax.xml.stream.XMLStreamReader;
 import org.flowable.cmmn.model.BaseElement;
 import org.flowable.cmmn.model.CaseElement;
 import org.flowable.cmmn.model.Stage;
+import org.flowable.engine.common.api.FlowableException;
 
+/**
+ * @author Joram Barrez
+ */
 public abstract class CaseElementXmlConverter extends BaseCmmnXmlConverter {
     
     public abstract String getXMLElementName();
     
     public BaseElement convertToCmmnModel(XMLStreamReader xtr, ConversionHelper conversionHelper) {
-        CaseElement caseElement = (CaseElement) super.convertToCmmnModel(xtr, conversionHelper);
+        BaseElement baseElement = super.convertToCmmnModel(xtr, conversionHelper);
+        if (baseElement != null && !(baseElement instanceof CaseElement)) {
+            throw new FlowableException(this.getClass() + " error: element is not a CaseElement : " + baseElement.getClass());
+        }
+        CaseElement caseElement = (CaseElement) baseElement;
         if (caseElement != null) {
             conversionHelper.addCaseElement(caseElement);
             if (!(caseElement instanceof Stage)) {

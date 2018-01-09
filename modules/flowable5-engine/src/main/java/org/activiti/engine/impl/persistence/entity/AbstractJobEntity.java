@@ -48,6 +48,11 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
     protected String executionId;
     protected String processInstanceId;
     protected String processDefinitionId;
+    
+    protected String scopeId;
+    protected String subScopeId;
+    protected String scopeType;
+    protected String scopeDefinitionId;
 
     protected boolean isExclusive = DEFAULT_EXCLUSIVE;
 
@@ -60,6 +65,7 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
     protected Date endDate;
 
     protected final ByteArrayRef exceptionByteArrayRef = new ByteArrayRef();
+    protected final ByteArrayRef customValuesByteArrayRef = new ByteArrayRef();
 
     protected String exceptionMessage;
 
@@ -88,6 +94,23 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         exceptionByteArrayRef.setValue("stacktrace", getUtf8Bytes(exception));
     }
 
+    @Override
+    public String getCustomValues() {
+        byte[] bytes = customValuesByteArrayRef.getBytes();
+        if (bytes == null) {
+            return null;
+        }
+        try {
+            return new String(bytes, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            throw new ActivitiException("UTF-8 is not a supported encoding");
+        }
+    }
+
+    public void setCustomValues(String customValues) {
+        customValuesByteArrayRef.setValue("jobCustomValues", getUtf8Bytes(customValues));
+    }
+
     private byte[] getUtf8Bytes(String str) {
         if (str == null) {
             return null;
@@ -105,7 +128,8 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
         persistentState.put("retries", retries);
         persistentState.put("duedate", duedate);
         persistentState.put("exceptionMessage", exceptionMessage);
-        persistentState.put("exceptionByteArrayId", exceptionByteArrayRef.getId());
+        persistentState.put("exceptionByteArrayRef", exceptionByteArrayRef.getId());
+        persistentState.put("customValuesByteArrayRef", customValuesByteArrayRef.getId());
         return persistentState;
     }
 
@@ -197,6 +221,38 @@ public abstract class AbstractJobEntity implements Job, PersistentObject, HasRev
 
     public void setProcessDefinitionId(String processDefinitionId) {
         this.processDefinitionId = processDefinitionId;
+    }
+    
+    public String getScopeId() {
+        return scopeId;
+    }
+
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    public String getSubScopeId() {
+        return subScopeId;
+    }
+
+    public void setSubScopeId(String subScopeId) {
+        this.subScopeId = subScopeId;
+    }
+
+    public String getScopeType() {
+        return scopeType;
+    }
+
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
+    }
+
+    public String getScopeDefinitionId() {
+        return scopeDefinitionId;
+    }
+
+    public void setScopeDefinitionId(String scopeDefinitionId) {
+        this.scopeDefinitionId = scopeDefinitionId;
     }
 
     @Override

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -23,7 +23,7 @@ import org.flowable.cmmn.model.Sentry;
 import org.flowable.cmmn.model.Stage;
 
 public class StageExport implements CmmnXmlConstants {
-    
+
     public static void writeStage(Stage stage, XMLStreamWriter xtw) throws Exception {
         // start plan model or stage element
         if (stage.isPlanModel()) {
@@ -31,7 +31,7 @@ public class StageExport implements CmmnXmlConstants {
         } else {
             xtw.writeStartElement(ELEMENT_STAGE);
         }
-        
+
         xtw.writeAttribute(ATTRIBUTE_ID, stage.getId());
 
         if (StringUtils.isNotEmpty(stage.getName())) {
@@ -44,19 +44,32 @@ public class StageExport implements CmmnXmlConstants {
             xtw.writeCharacters(stage.getDocumentation());
             xtw.writeEndElement();
         }
+
+        if (StringUtils.isNotEmpty(stage.getFormKey())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
+                    ATTRIBUTE_FORM_KEY, stage.getFormKey());
+        }
         
+        if (stage.isAutoComplete()) {
+            xtw.writeAttribute(ATTRIBUTE_IS_AUTO_COMPLETE, Boolean.toString(stage.isAutoComplete()));
+        }
+        if (StringUtils.isNotEmpty(stage.getAutoCompleteCondition())) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE,
+                    ATTRIBUTE_AUTO_COMPLETE_CONDITION, stage.getAutoCompleteCondition());
+        }
+
         for (PlanItem planItem : stage.getPlanItems()) {
             PlanItemExport.writePlanItem(planItem, xtw);
         }
-        
+
         for (Sentry sentry : stage.getSentries()) {
             SentryExport.writeSentry(sentry, xtw);
         }
-        
+
         for (PlanItemDefinition planItemDefinition : stage.getPlanItemDefinitions()) {
             PlanItemDefinitionExport.writePlanItemDefinition(planItemDefinition, xtw);
         }
-        
+
         if (stage.isPlanModel() && stage.getExitCriteria() != null && !stage.getExitCriteria().isEmpty()) {
             for (Criterion exitCriterion : stage.getExitCriteria()) {
                 xtw.writeStartElement(ELEMENT_EXIT_CRITERION);
@@ -69,12 +82,12 @@ public class StageExport implements CmmnXmlConstants {
                 if (StringUtils.isNotEmpty(exitCriterion.getSentryRef())) {
                     xtw.writeAttribute(ATTRIBUTE_SENTRY_REF, exitCriterion.getSentryRef());
                 }
-                
+
                 // end entry criterion element
                 xtw.writeEndElement();
             }
         }
-        
+
         // end plan model or stage element
         xtw.writeEndElement();
     }

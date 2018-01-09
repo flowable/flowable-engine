@@ -122,7 +122,7 @@
         and RES.TENANT_ID_ like #{tenantIdLike}
       </if>
       <if test="latest">
-        and RES.DEPLOY_TIME_ = (select max(DEPLOY_TIME_) from ${prefix}ACT_RE_DEPLOYMENT where KEY_ = RES.KEY_ 
+        and RES.DEPLOY_TIME_ = (select max(DEPLOY_TIME_) from ${prefix}ACT_CMMN_DEPLOYMENT where KEY_ = RES.KEY_ 
              <if test="tenantId != null">
                and TENANT_ID_ = #{tenantId}
              </if>

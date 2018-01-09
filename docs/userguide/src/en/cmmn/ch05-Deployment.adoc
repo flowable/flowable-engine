@@ -12,16 +12,12 @@ All custom classes that are used in your case definition (for example, PlanItemJ
 
 During deployment of a case definition however, those classes don't have to be present on the classpath. This means that your delegation classes don't have to be on the classpath when deploying a new case definition, for example.
 
-When you are using the demo setup and you want to add your custom classes, you should add a JAR containing your classes to the flowable-task or flowable-rest webapp lib. Don't forget to include the dependencies of your custom classes (if any) as well. Alternatively, you can include your dependencies in the libraries directory of your Tomcat installation, +${tomcat.home}/lib+.
+When you are using the demo setup and you want to add your custom classes, you should add a JAR containing your classes to the flowable-task or flowable-rest webapp lib. Don't forget to include the dependencies of your custom classes (if any) as well. Alternatively, you can include your dependencies in the libraries directory of your Tomcat installation, +${tomcat.home}/lib+ (or similar place for other web containers).
 
 
-==== Using Spring beans from a process
+==== Using Spring beans from a case instance
 
-When expressions or scripts use Spring beans, those beans have to be available to the engine when executing the process definition. If you are building your own webapp and you configure your CMMN engine in your context as described in <<springintegration,the spring integration section>>, that is straightforward. But bear in mind that you also should update the Flowable task and rest webapps with that context if you use it.
-
-==== Creating a single app
-
-Instead of making sure that all CMMN engines have all the delegation classes on their classpath and use the right Spring configuration, you may consider including the Flowable REST webapp inside your own webapp so that there is only a single +CmmnEngine+.
+When expressions or scripts use Spring beans, those beans have to be available to the engine when executing the case definition. If you are building your own webapp and you configure your CMMN engine in your context as described in <<springintegration,the spring integration section>>, that is straightforward. But bear in mind that you also should update the Flowable task and rest webapps with that context if you use it.
 
 [[versioningOfCaseDefinitions]]
 

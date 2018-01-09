@@ -32,6 +32,8 @@ public interface ContentService {
     void deleteContentItemsByProcessInstanceId(String processInstanceId);
 
     void deleteContentItemsByTaskId(String taskId);
+    
+    void deleteContentItemsByScopeIdAndScopeType(String scopeId, String scopeType);
 
     void deleteContentItemsByCaseId(String caseId);
 

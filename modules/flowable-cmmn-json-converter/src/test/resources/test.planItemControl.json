@@ -1,0 +1,362 @@
+{
+    "modelId": "fe65c940-ebb9-11e7-836c-acde48001122",
+    "bounds": {
+        "lowerRight": {
+            "x": 1200,
+            "y": 1050
+        },
+        "upperLeft": {
+            "x": 0,
+            "y": 0
+        }
+    },
+    "properties": {
+        "case_id": "testPlanItemControlConversion",
+        "name": "testPlanItemControlConversion",
+        "documentation": "",
+        "case_initiatorvariablename": "",
+        "case_author": "",
+        "case_version": "",
+        "case_namespace": "http://www.flowable.org/casedef"
+    },
+    "childShapes": [
+        {
+            "resourceId": "casePlanModel",
+            "properties": {
+                "overrideid": "",
+                "name": "",
+                "documentation": "",
+                "formkeydefinition": "",
+                "formreference": "",
+                "autocompleteenabled": true,
+                "autocompletecondition": ""
+            },
+            "stencil": {
+                "id": "CasePlanModel"
+            },
+            "childShapes": [
+                {
+                    "resourceId": "sid-C36913AC-4D3E-490F-B8E6-E789AA164877",
+                    "properties": {
+                        "overrideid": "",
+                        "name": "Stage A",
+                        "documentation": "",
+                        "autocompleteenabled": "",
+                        "autocompletecondition": "",
+                        "requiredenabled": "",
+                        "requiredrulecondition": "",
+                        "repetitionenabled": "",
+                        "repetitionrulecondition": "",
+                        "repetitioncountervariablename": "",
+                        "manualactivationenabled": "",
+                        "manualactivationrulecondition": ""
+                    },
+                    "stencil": {
+                        "id": "Stage"
+                    },
+                    "childShapes": [
+                        {
+                            "resourceId": "sid-10D10CC6-D084-4DAF-853B-1A9DA033D819",
+                            "properties": {
+                                "overrideid": "",
+                                "name": "A",
+                                "documentation": "",
+                                "isblocking": true,
+                                "isblockingexpression": "",
+                                "usertaskassignment": "",
+                                "formkeydefinition": "",
+                                "formreference": "",
+                                "duedatedefinition": "",
+                                "prioritydefinition": "",
+                                "isasync": "",
+                                "isexclusive": "",
+                                "requiredenabled": "",
+                                "requiredrulecondition": "",
+                                "repetitionenabled": "",
+                                "repetitionrulecondition": "",
+                                "repetitioncountervariablename": "",
+                                "manualactivationenabled": "",
+                                "manualactivationrulecondition": ""
+                            },
+                            "stencil": {
+                                "id": "HumanTask"
+                            },
+                            "childShapes": [],
+                            "outgoing": [],
+                            "bounds": {
+                                "lowerRight": {
+                                    "x": 161.5,
+                                    "y": 124
+                                },
+                                "upperLeft": {
+                                    "x": 61.5,
+                                    "y": 44
+                                }
+                            },
+                            "dockers": []
+                        }
+                    ],
+                    "outgoing": [],
+                    "bounds": {
+                        "lowerRight": {
+                            "x": 274,
+                            "y": 249
+                        },
+                        "upperLeft": {
+                            "x": 50,
+                            "y": 80
+                        }
+                    },
+                    "dockers": []
+                },
+                {
+                    "resourceId": "sid-DB50D81D-1960-4F4A-8303-AA878E9ACC85",
+                    "properties": {
+                        "overrideid": "",
+                        "name": "Stage B",
+                        "documentation": "",
+                        "autocompleteenabled": true,
+                        "autocompletecondition": "",
+                        "requiredenabled": true,
+                        "requiredrulecondition": "",
+                        "repetitionenabled": true,
+                        "repetitionrulecondition": "",
+                        "repetitioncountervariablename": "",
+                        "manualactivationenabled": true,
+                        "manualactivationrulecondition": ""
+                    },
+                    "stencil": {
+                        "id": "Stage"
+                    },
+                    "childShapes": [
+                        {
+                            "resourceId": "sid-C5ABFBAB-68DE-4660-BA8B-392446B60DC3",
+                            "properties": {
+                                "overrideid": "",
+                                "name": "B",
+                                "documentation": "",
+                                "isblocking": true,
+                                "isblockingexpression": "",
+                                "usertaskassignment": "",
+                                "formkeydefinition": "",
+                                "formreference": "",
+                                "duedatedefinition": "",
+                                "prioritydefinition": "",
+                                "isasync": "",
+                                "isexclusive": "",
+                                "requiredenabled": "",
+                                "requiredrulecondition": "",
+                                "repetitionenabled": "",
+                                "repetitionrulecondition": "",
+                                "repetitioncountervariablename": "",
+                                "manualactivationenabled": "",
+                                "manualactivationrulecondition": ""
+                            },
+                            "stencil": {
+                                "id": "HumanTask"
+                            },
+                            "childShapes": [],
+                            "outgoing": [],
+                            "bounds": {
+                                "lowerRight": {
+                                    "x": 206.5,
+                                    "y": 135.5
+                                },
+                                "upperLeft": {
+                                    "x": 106.5,
+                                    "y": 55.5
+                                }
+                            },
+                            "dockers": []
+                        }
+                    ],
+                    "outgoing": [],
+                    "bounds": {
+                        "lowerRight": {
+                            "x": 663,
+                            "y": 260
+                        },
+                        "upperLeft": {
+                            "x": 350,
+                            "y": 69
+                        }
+                    },
+                    "dockers": []
+                },
+                {
+                    "resourceId": "sid-8125747D-D005-4798-8270-D2C10D3D320F",
+                    "properties": {
+                        "overrideid": "",
+                        "name": "C",
+                        "documentation": "",
+                        "isblocking": true,
+                        "isblockingexpression": "",
+                        "usertaskassignment": "",
+                        "formkeydefinition": "",
+                        "formreference": "",
+                        "duedatedefinition": "",
+                        "prioritydefinition": "",
+                        "isasync": "",
+                        "isexclusive": "",
+                        "requiredenabled": true,
+                        "requiredrulecondition": "",
+                        "repetitionenabled": true,
+                        "repetitionrulecondition": "",
+                        "repetitioncountervariablename": "",
+                        "manualactivationenabled": true,
+                        "manualactivationrulecondition": ""
+                    },
+                    "stencil": {
+                        "id": "HumanTask"
+                    },
+                    "childShapes": [],
+                    "outgoing": [],
+                    "bounds": {
+                        "lowerRight": {
+                            "x": 180,
+                            "y": 370
+                        },
+                        "upperLeft": {
+                            "x": 80,
+                            "y": 290
+                        }
+                    },
+                    "dockers": []
+                },
+                {
+                    "resourceId": "sid-F866209F-7F13-4144-9CE6-F9A6EF173999",
+                    "properties": {
+                        "overrideid": "",
+                        "name": "Stage C",
+                        "documentation": "",
+                        "autocompleteenabled": true,
+                        "autocompletecondition": "${someVariable}",
+                        "requiredenabled": "",
+                        "requiredrulecondition": "",
+                        "repetitionenabled": "",
+                        "repetitionrulecondition": "",
+                        "repetitioncountervariablename": "",
+                        "manualactivationenabled": "",
+                        "manualactivationrulecondition": ""
+                    },
+                    "stencil": {
+                        "id": "Stage"
+                    },
+                    "childShapes": [
+                        {
+                            "resourceId": "sid-F7BCF775-CE83-48F1-9331-62A207FB6383",
+                            "properties": {
+                                "overrideid": "",
+                                "name": "D",
+                                "documentation": "",
+                                "isblocking": true,
+                                "isblockingexpression": "",
+                                "usertaskassignment": "",
+                                "formkeydefinition": "",
+                                "formreference": "",
+                                "duedatedefinition": "",
+                                "prioritydefinition": "",
+                                "isasync": "",
+                                "isexclusive": "",
+                                "requiredenabled": "",
+                                "requiredrulecondition": "",
+                                "repetitionenabled": "",
+                                "repetitionrulecondition": "",
+                                "repetitioncountervariablename": "",
+                                "manualactivationenabled": "",
+                                "manualactivationrulecondition": ""
+                            },
+                            "stencil": {
+                                "id": "HumanTask"
+                            },
+                            "childShapes": [],
+                            "outgoing": [],
+                            "bounds": {
+                                "lowerRight": {
+                                    "x": 203,
+                                    "y": 120
+                                },
+                                "upperLeft": {
+                                    "x": 103,
+                                    "y": 40
+                                }
+                            },
+                            "dockers": []
+                        }
+                    ],
+                    "outgoing": [],
+                    "bounds": {
+                        "lowerRight": {
+                            "x": 650.5,
+                            "y": 481
+                        },
+                        "upperLeft": {
+                            "x": 280.5,
+                            "y": 311
+                        }
+                    },
+                    "dockers": []
+                },
+                {
+                    "resourceId": "sid-54F63B85-EFF0-4938-B11F-F7A39CB739DE",
+                    "properties": {
+                        "overrideid": "",
+                        "name": "E",
+                        "documentation": "",
+                        "isblocking": true,
+                        "isblockingexpression": "",
+                        "usertaskassignment": "",
+                        "formkeydefinition": "",
+                        "formreference": "",
+                        "duedatedefinition": "",
+                        "prioritydefinition": "",
+                        "isasync": "",
+                        "isexclusive": "",
+                        "requiredenabled": true,
+                        "requiredrulecondition": "${requiredCondition}",
+                        "repetitionenabled": true,
+                        "repetitionrulecondition": "${repetitionCondition}",
+                        "repetitioncountervariablename": "",
+                        "manualactivationenabled": true,
+                        "manualactivationrulecondition": "${manualActivationCondition}"
+                    },
+                    "stencil": {
+                        "id": "HumanTask"
+                    },
+                    "childShapes": [],
+                    "outgoing": [],
+                    "bounds": {
+                        "lowerRight": {
+                            "x": 168.5,
+                            "y": 511
+                        },
+                        "upperLeft": {
+                            "x": 68.5,
+                            "y": 431
+                        }
+                    },
+                    "dockers": []
+                }
+            ],
+            "outgoing": [],
+            "bounds": {
+                "lowerRight": {
+                    "x": 758,
+                    "y": 760
+                },
+                "upperLeft": {
+                    "x": 40,
+                    "y": 40
+                }
+            },
+            "dockers": []
+        }
+    ],
+    "stencil": {
+        "id": "CMMNDiagram"
+    },
+    "stencilset": {
+        "namespace": "http://b3mn.org/stencilset/cmmn1.1#",
+        "url": "../editor/stencilsets/cmmn1.1/cmmn1.1.json"
+    }
+}

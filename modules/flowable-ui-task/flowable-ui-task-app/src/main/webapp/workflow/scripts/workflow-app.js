@@ -100,6 +100,14 @@ flowableApp
             templateUrl: appResourceRoot + 'views/cases.html',
             controller: 'CasesController'
         })
+        .when('/apps/:deploymentKey/cases', {
+            templateUrl: appResourceRoot + 'views/cases.html',
+            controller: 'CasesController'
+        })
+        .when('/apps/:deploymentKey/case/:caseId', {
+            templateUrl: appResourceRoot + 'views/case.html',
+            controller: 'CaseController'
+        })
         .otherwise({
             redirectTo: FLOWABLE.CONFIG.appDefaultRoute || '/tasks'
         });

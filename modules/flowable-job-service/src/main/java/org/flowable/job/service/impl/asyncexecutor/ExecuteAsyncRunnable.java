@@ -22,6 +22,7 @@ import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.job.api.Job;
 import org.flowable.job.api.JobInfo;
+import org.flowable.job.service.InternalJobCompatibilityManager;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.cmd.ExecuteAsyncJobCmd;
 import org.flowable.job.service.impl.cmd.LockExclusiveJobCmd;
@@ -96,33 +97,46 @@ public class ExecuteAsyncRunnable implements Runnable {
 
         if (job instanceof Job) {
             Job jobObject = (Job) job;
-            if (jobServiceConfiguration.getInternalJobManager() != null &&
-                            jobServiceConfiguration.getInternalJobManager().isFlowable5ProcessDefinitionId(jobObject.getProcessDefinitionId())) {
-
-                jobServiceConfiguration.getInternalJobManager().executeV5JobWithLockAndRetry(jobObject);
+            InternalJobCompatibilityManager internalJobCompatibilityManager = jobServiceConfiguration.getInternalJobCompatibilityManager();
+            if (internalJobCompatibilityManager != null && internalJobCompatibilityManager.isFlowable5Job(jobObject)) {
+                internalJobCompatibilityManager.executeV5JobWithLockAndRetry(jobObject);
                 return;
             }
         }
 
         if (job instanceof AbstractRuntimeJobEntity) {
 
-            boolean lockNotNeededOrSuccess = lockJobIfNeeded();
-
-            if (lockNotNeededOrSuccess) {
-                executeJob();
-                unlockJobIfNeeded();
+            boolean lockingNeeded = ((AbstractRuntimeJobEntity) job).isExclusive();
+            boolean executeJob = true;
+            if (lockingNeeded) {
+                executeJob = lockJob();
+            }
+            if (executeJob) {
+                executeJob(lockingNeeded);
             }
 
         } else { // history jobs
-            executeJob();
+            executeJob(false); // no locking for history jobs needed
 
         }
 
     }
 
-    protected void executeJob() {
+    protected void executeJob(final boolean unlock) {
         try {
-            jobServiceConfiguration.getCommandExecutor().execute(new ExecuteAsyncJobCmd(jobId, jobEntityManager));
+            jobServiceConfiguration.getCommandExecutor().execute(new Command<Void>() {
+                @Override
+                public Void execute(CommandContext commandContext) {
+                    new ExecuteAsyncJobCmd(jobId, jobEntityManager).execute(commandContext);
+                    if (unlock) {
+                        // Part of the same transaction to avoid a race condition with the
+                        // potentially new jobs (wrt process instance locking) that are created 
+                        // during the execution of the original job 
+                        new UnlockExclusiveJobCmd((Job) job).execute(commandContext);
+                    }
+                    return null;
+                }
+            });
 
         } catch (final FlowableOptimisticLockingException e) {
 
@@ -160,15 +174,10 @@ public class ExecuteAsyncRunnable implements Runnable {
         }
     }
 
-    /**
-     * Returns true if lock succeeded, or no lock was needed. Returns false if locking was unsuccessful.
-     */
-    protected boolean lockJobIfNeeded() {
+    protected boolean lockJob() {
         Job job = (Job) this.job; // This method is only called for a regular Job
         try {
-            if (job.isExclusive()) {
-                jobServiceConfiguration.getCommandExecutor().execute(new LockExclusiveJobCmd(job));
-            }
+            jobServiceConfiguration.getCommandExecutor().execute(new LockExclusiveJobCmd(job));
 
         } catch (Throwable lockException) {
             if (LOGGER.isDebugEnabled()) {
@@ -200,12 +209,16 @@ public class ExecuteAsyncRunnable implements Runnable {
     }
 
     protected void handleFailedJob(final Throwable exception) {
-
         for (AsyncRunnableExecutionExceptionHandler asyncRunnableExecutionExceptionHandler : asyncRunnableExecutionExceptionHandlers) {
             if (asyncRunnableExecutionExceptionHandler.handleException(this.jobServiceConfiguration, this.job, exception)) {
+                
+                // Needs to run in a separate transaction as the original transaction has been marked for rollback
+                unlockJobIfNeeded();
+                
                 return;
             }
         }
+        
         LOGGER.error("Unable to handle exception {} for job {}.", exception, job);
         throw new FlowableException("Unable to handle exception " + exception.getMessage() + " for job " + job.getId() + ".", exception);
     }

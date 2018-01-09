@@ -12,15 +12,18 @@
  */
 package org.flowable.cmmn.engine.impl.delegate;
 
-import java.util.List;
-
 import org.flowable.cmmn.model.FieldExtension;
+import org.flowable.cmmn.model.ServiceTask;
+
+import java.util.List;
 
 /**
  * @author Joram Barrez
  */
 public interface CmmnClassDelegateFactory {
-    
+
     CmmnClassDelegate create(String className, List<FieldExtension> fieldExtensions);
+
+    Object defaultInstantiateDelegate(Class<?> clazz, ServiceTask serviceTask);
 
 }

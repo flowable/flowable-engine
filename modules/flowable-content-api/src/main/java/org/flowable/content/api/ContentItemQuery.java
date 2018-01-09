@@ -64,6 +64,26 @@ public interface ContentItemQuery extends Query<ContentItemQuery, ContentItem> {
      * Only select content items with a task id like the given string.
      */
     ContentItemQuery taskIdLike(String taskIdLike);
+    
+    /**
+     * Only select content items with the scope type as given string.
+     */
+    ContentItemQuery scopeType(String scopeType);
+
+    /**
+     * Only select content items with the scope type like given string.
+     */
+    ContentItemQuery scopeTypeLike(String scopeTypeLike);
+
+    /**
+     * Only select content items with the given scopeId.
+     */
+    ContentItemQuery scopeId(String scopeId);
+
+    /**
+     * Only select content items with the scope id like given string.
+     */
+    ContentItemQuery scopeIdLike(String scopeIdLike);
 
     /**
      * Only select content items with the given process instance id.

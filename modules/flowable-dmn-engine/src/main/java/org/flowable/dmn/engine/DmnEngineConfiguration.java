@@ -207,7 +207,7 @@ public class DmnEngineConfiguration extends AbstractEngineConfiguration implemen
         return new StandaloneInMemDmnEngineConfiguration();
     }
 
-    // buildProcessEngine
+    // buildDmnEngine
     // ///////////////////////////////////////////////////////
 
     public DmnEngine buildDmnEngine() {

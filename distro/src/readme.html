@@ -26,6 +26,38 @@
 
 <h1>Flowable Release Notes</h1>
 
+<h3>Release Notes - Flowable - 6.2.1</h3>
+
+<h4>Highlights</h4>
+
+<ul>
+    <li>Lots of additions to the CMMN 1.1 Engine, including timer support, repetition support, DMN and HTTP task support and variable query support.</li>
+    <li>Rest documentation is now also generated based on the Swagger definitions to ensure it's always in sync with the REST controller code</li>
+    <li>Improved support of ChangeActivityStateBuilder to move an execution in a process instance to another activity that's part of the process definition</li>
+    <li>Enhanced the CMMN Modeler palette with timer event listeners, DMN and HTTP tasks and additional properties like timer expressions and repetition expressions.</li>
+    <li>Improved support of CMMN in the Flowable Task app.</li>
+    <li>Various small bugfixes all around.</li>
+</ul>
+
+<h4>Community contributors</h4>
+
+<ul>
+    <li>Pascal Schumacher (PascalSchumacher)</li>
+    <li>Stijn de Pestel (stijndepestel)</li>
+    <li>Robert Hafner (roberthafner)</li>
+    <li>Xin Wang (dram)</li>
+    <li>David Malkovsky (dbmalkovsky)</li>
+    <li>Michael Lippens (mlippens)</li>
+    <li>Marco van Zwetselaar (zwets)</li>
+    <li>Yanming Zhou (quaff)</li>
+    <li>Christophe Deneux (cdeneux)</li>
+</ul>
+
+<h4>Upgrade notes</h4>
+
+<p>To harmonize the deployers between the BPMN and CMMN engine the ProcessEngineConfigurator interface has been renamed to EngineConfigurator and moved to the flowable-engine-common module.
+In addition a new flowable-spring-common module has been added to shared common Spring classes between the BPMN and CMMN spring modules.</p>
+
 <h3>Release Notes - Flowable - 6.2.0</h3>
 
 <h4>Highlights</h4>

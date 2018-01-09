@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,8 +16,10 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.model.CmmnElement;
+import org.flowable.cmmn.model.DecisionTask;
 import org.flowable.cmmn.model.FieldExtension;
 import org.flowable.cmmn.model.ServiceTask;
+import org.flowable.cmmn.model.TaskWithFieldExtensions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,28 +27,28 @@ import org.slf4j.LoggerFactory;
  * @author Joram Barrez
  */
 public class FieldExtensionXmlConverter extends BaseCmmnXmlConverter {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(FieldExtensionXmlConverter.class);
-    
+
     @Override
     public String getXMLElementName() {
         return CmmnXmlConstants.ELEMENT_FIELD;
     }
-    
+
     @Override
-    public boolean isCmmnElement() {
+    public boolean hasChildElements() {
         return false;
     }
 
     @Override
     protected CmmnElement convert(XMLStreamReader xtr, ConversionHelper conversionHelper) {
         CmmnElement cmmnElement = conversionHelper.getCurrentCmmnElement();
-        if (!(cmmnElement instanceof ServiceTask)) {
+        if (!(cmmnElement instanceof ServiceTask || cmmnElement instanceof DecisionTask)) {
             return null;
         }
-        
-        ServiceTask serviceTask = (ServiceTask) cmmnElement;
-        
+
+        TaskWithFieldExtensions serviceTask = (TaskWithFieldExtensions) cmmnElement;
+
         FieldExtension extension = new FieldExtension();
         extension.setFieldName(xtr.getAttributeValue(null, CmmnXmlConstants.ATTRIBUTE_NAME));
 
@@ -77,10 +79,10 @@ public class FieldExtensionXmlConverter extends BaseCmmnXmlConverter {
                 LOGGER.warn("Error parsing field extension child elements", e);
             }
         }
-        
+
         serviceTask.getFieldExtensions().add(extension);
-        
+
         return null;
     }
-    
+
 }

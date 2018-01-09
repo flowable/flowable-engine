@@ -21,8 +21,7 @@ public class TaskExport extends AbstractPlanItemDefinitionExport {
     public static void writeTask(Task task, XMLStreamWriter xtw) throws Exception {
         // start task element
         xtw.writeStartElement(ELEMENT_TASK);
-        writeCommonPlanItemDefinitionAttributes(task, xtw);
-        writeBlockingAttribute(xtw, task);
+        writeCommonTaskAttributes(xtw, task);
         
         // end task element
         xtw.writeEndElement();

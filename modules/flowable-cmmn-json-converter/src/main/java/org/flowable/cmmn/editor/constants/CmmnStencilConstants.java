@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -19,13 +19,14 @@ package org.flowable.cmmn.editor.constants;
 public interface CmmnStencilConstants {
 
     // stencil items
-    
+
     String STENCIL_PLANMODEL = "CasePlanModel";
     String STENCIL_STAGE = "Stage";
     String STENCIL_TASK = "Task";
     String STENCIL_TASK_HUMAN = "HumanTask";
     String STENCIL_TASK_SERVICE = "ServiceTask";
     String STENCIL_TASK_DECISION = "DecisionTask";
+    String STENCIL_TASK_HTTP = "HttpTask";
     String STENCIL_TASK_CASE = "CaseTask";
     String STENCIL_TASK_PROCESS = "ProcessTask";
     String STENCIL_MILESTONE = "Milestone";
@@ -33,14 +34,14 @@ public interface CmmnStencilConstants {
 
     String STENCIL_ENTRY_CRITERION = "EntryCriterion";
     String STENCIL_EXIT_CRITERION = "ExitCriterion";
-    
+
     String STENCIL_ASSOCIATION = "Association";
-    
+
     String PROPERTY_VALUE_YES = "Yes";
     String PROPERTY_VALUE_NO = "No";
-    
+
     // stencil properties
-    
+
     String PROPERTY_OVERRIDE_ID = "overrideid";
     String PROPERTY_NAME = "name";
     String PROPERTY_DOCUMENTATION = "documentation";
@@ -50,7 +51,7 @@ public interface CmmnStencilConstants {
     String PROPERTY_CASE_VERSION = "case_version";
     String PROPERTY_CASE_AUTHOR = "case_author";
     String PROPERTY_CASE_NAMESPACE = "case_namespace";
-    
+
     String PROPERTY_TIMER_DURATON = "timerdurationdefinition";
     String PROPERTY_TIMER_DATE = "timerdatedefinition";
     String PROPERTY_TIMER_CYCLE = "timercycledefinition";
@@ -62,6 +63,22 @@ public interface CmmnStencilConstants {
     String PROPERTY_IS_BLOCKING = "isblocking";
     String PROPERTY_IS_BLOCKING_EXPRESSION = "isblockingexpression";
     
+    String PROPERTY_IS_AUTOCOMPLETE = "autocompleteenabled";
+    String PROPERTY_AUTOCOMPLETE_CONDITION = "autocompletecondition";
+    
+    String PROPERTY_IS_ASYNC = "isasync";
+    String PROPERTY_IS_EXCLUSIVE = "isexclusive";
+    
+    String PROPERTY_REQUIRED_ENABLED = "requiredenabled";
+    String PROPERTY_REQUIRED_RULE_CONDITION = "requiredrulecondition";
+    
+    String PROPERTY_REPETITION_ENABLED = "repetitionenabled";
+    String PROPERTY_REPETITION_RULE_CONDITION = "repetitionrulecondition";
+    String PROPERTY_REPETITION_RULE_VARIABLE_NAME = "repetitioncountervariablename";
+    
+    String PROPERTY_MANUAL_ACTIVATION_ENABLED = "manualactivationenabled";
+    String PROPERTY_MANUAL_ACTIVATION_RULE_CONDITION = "manualactivationrulecondition";
+
     String PROPERTY_USERTASK_ASSIGNMENT = "usertaskassignment";
     String PROPERTY_USERTASK_PRIORITY = "prioritydefinition";
     String PROPERTY_USERTASK_DUEDATE = "duedatedefinition";
@@ -90,15 +107,15 @@ public interface CmmnStencilConstants {
     String PROPERTY_DECISIONTABLE_REFERENCE_KEY = "decisionTableReferenceKey";
     String PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS = "decisiontaskthrowerroronnohits";
     String PROPERTY_DECISIONTABLE_THROW_ERROR_NO_HITS_KEY = "decisionTaskThrowErrorOnNoHits";
-    
+
     String PROPERTY_CASE_REFERENCE = "casetaskcasereference";
-    
+
     String PROPERTY_PROCESS_REFERENCE = "processtaskprocessreference";
-    
+
     String PROPERTY_IF_PART_CONDITION = "ifpartcondition";
-    
+
     String PROPERTY_TRANSITION_EVENT = "transitionevent";
-    
+
     String PROPERTY_HTTPTASK_REQ_METHOD = "httptaskrequestmethod";
     String PROPERTY_HTTPTASK_REQ_URL = "httptaskrequesturl";
     String PROPERTY_HTTPTASK_REQ_HEADERS = "httptaskrequestheaders";
@@ -112,9 +129,9 @@ public interface CmmnStencilConstants {
     String PROPERTY_HTTPTASK_SAVE_REQUEST_VARIABLES = "httptasksaverequestvariables";
     String PROPERTY_HTTPTASK_SAVE_RESPONSE_PARAMETERS = "httptasksaveresponseparameters";
     String PROPERTY_HTTPTASK_RESULT_VARIABLE_PREFIX = "httptaskresultvariableprefix";
-    
+
     String PROPERTY_TIMER_EXPRESSION = "timerexpression";
     String PROPERTY_TIMER_START_TRIGGER_SOURCE_REF = "timerstarttriggersourceref";
     String PROPERTY_TIMER_START_TRIGGER_STANDARD_EVENT = "transitionevent";
-    
+
 }

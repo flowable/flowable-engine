@@ -42,14 +42,7 @@ public abstract class AbstractActivityBpmnParseHandler<T extends FlowNode> exten
         MultiInstanceLoopCharacteristics loopCharacteristics = modelActivity.getLoopCharacteristics();
 
         // Activity Behavior
-        MultiInstanceActivityBehavior miActivityBehavior = null;
-
-        if (loopCharacteristics.isSequential()) {
-            miActivityBehavior = bpmnParse.getActivityBehaviorFactory().createSequentialMultiInstanceBehavior(modelActivity, (AbstractBpmnActivityBehavior) modelActivity.getBehavior());
-        } else {
-            miActivityBehavior = bpmnParse.getActivityBehaviorFactory().createParallelMultiInstanceBehavior(modelActivity, (AbstractBpmnActivityBehavior) modelActivity.getBehavior());
-        }
-
+        MultiInstanceActivityBehavior miActivityBehavior = createMultiInstanceActivityBehavior(modelActivity, loopCharacteristics, bpmnParse);
         modelActivity.setBehavior(miActivityBehavior);
 
         ExpressionManager expressionManager = CommandContextUtil.getProcessEngineConfiguration().getExpressionManager();
@@ -88,5 +81,18 @@ public abstract class AbstractActivityBpmnParseHandler<T extends FlowNode> exten
         if (loopCharacteristics.getHandler() != null) {
             miActivityBehavior.setHandler(loopCharacteristics.getHandler().clone());
         }
+    }
+    
+    protected MultiInstanceActivityBehavior createMultiInstanceActivityBehavior(Activity modelActivity, MultiInstanceLoopCharacteristics loopCharacteristics, BpmnParse bpmnParse) {
+        MultiInstanceActivityBehavior miActivityBehavior = null;
+
+        AbstractBpmnActivityBehavior modelActivityBehavior = (AbstractBpmnActivityBehavior) modelActivity.getBehavior();
+        if (loopCharacteristics.isSequential()) {
+            miActivityBehavior = bpmnParse.getActivityBehaviorFactory().createSequentialMultiInstanceBehavior(modelActivity, modelActivityBehavior);
+        } else {
+            miActivityBehavior = bpmnParse.getActivityBehaviorFactory().createParallelMultiInstanceBehavior(modelActivity, modelActivityBehavior);
+        }
+        
+        return miActivityBehavior;
     }
 }

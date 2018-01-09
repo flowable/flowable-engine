@@ -26,6 +26,7 @@ import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
 import org.flowable.cmmn.model.GraphicInfo;
+import org.flowable.cmmn.model.HttpServiceTask;
 import org.flowable.cmmn.model.PlanItem;
 import org.flowable.cmmn.model.PlanItemDefinition;
 import org.flowable.cmmn.model.ServiceTask;
@@ -85,12 +86,12 @@ public class CmmnDisplayJsonConverter {
 
             elementNode.put("type", "PlanModel");
             elementArray.add(elementNode);
-            
+
             processCriteria(caseObject.getPlanModel().getExitCriteria(), "ExitCriterion", pojoModel, elementArray);
-            
+
             processElements(caseObject.getPlanModel().getPlanItems(), pojoModel, elementArray, flowArray, diagramInfo);
         }
-        
+
         for (Association association : pojoModel.getAssociations()) {
             ObjectNode elementNode = objectMapper.createObjectNode();
             elementNode.put("id", association.getId());
@@ -107,7 +108,7 @@ public class CmmnDisplayJsonConverter {
                     fillDiagramInfo(graphicInfo, diagramInfo);
                 }
                 elementNode.set("waypoints", waypointArray);
-    
+
                 flowArray.add(elementNode);
             }
         }
@@ -140,13 +141,13 @@ public class CmmnDisplayJsonConverter {
 
             if (planItemDefinition instanceof ServiceTask) {
                 ServiceTask serviceTask = (ServiceTask) planItemDefinition;
-                if (ServiceTask.HTTP_TASK.equals(serviceTask.getType())) {
+                if (HttpServiceTask.HTTP_TASK.equals(serviceTask.getType())) {
                     elementNode.put("taskType", "http");
-                }
+                } 
             }
-            
+
             elementArray.add(elementNode);
-            
+
             processCriteria(planItem.getEntryCriteria(), "EntryCriterion", model, elementArray);
             processCriteria(planItem.getExitCriteria(), "ExitCriterion", model, elementArray);
 
@@ -157,19 +158,19 @@ public class CmmnDisplayJsonConverter {
             }
         }
     }
-    
+
     protected void processCriteria(List<Criterion> criteria, String type, CmmnModel model, ArrayNode elementArray) {
         for (Criterion criterion : criteria) {
             ObjectNode criterionNode = objectMapper.createObjectNode();
             criterionNode.put("id", criterion.getId());
             criterionNode.put("name", criterion.getName());
             criterionNode.put("type", type);
-            
+
             GraphicInfo criterionGraphicInfo = model.getGraphicInfo(criterion.getId());
             if (criterionGraphicInfo != null) {
                 fillGraphicInfo(criterionNode, criterionGraphicInfo, true);
             }
-            
+
             elementArray.add(criterionNode);
         }
     }

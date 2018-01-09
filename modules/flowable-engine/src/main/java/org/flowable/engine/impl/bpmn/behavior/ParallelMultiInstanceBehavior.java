@@ -172,9 +172,9 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
                 else {
                     sendCompletedEvent(leavingExecution);
                 }
-                
+
                 super.leave(leavingExecution);
-            }
+              }
 
         } else {
             sendCompletedEvent(execution);
@@ -260,21 +260,4 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
 
         parentScopeExecution.forceUpdate();
     }
-
-    // TODO: can the ExecutionManager.deleteChildExecution not be used?
-    protected void deleteChildExecutions(ExecutionEntity parentExecution, boolean deleteExecution, CommandContext commandContext) {
-        // Delete all child executions
-        ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
-        Collection<ExecutionEntity> childExecutions = executionEntityManager.findChildExecutionsByParentExecutionId(parentExecution.getId());
-        if (CollectionUtil.isNotEmpty(childExecutions)) {
-            for (ExecutionEntity childExecution : childExecutions) {
-                deleteChildExecutions(childExecution, true, commandContext);
-            }
-        }
-
-        if (deleteExecution) {
-            executionEntityManager.deleteExecutionAndRelatedData(parentExecution, null);
-        }
-    }
-
 }

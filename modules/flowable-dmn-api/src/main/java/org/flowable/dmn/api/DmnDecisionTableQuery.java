@@ -94,7 +94,7 @@ public interface DmnDecisionTableQuery extends Query<DmnDecisionTableQuery, DmnD
     DmnDecisionTableQuery decisionTableKeyLike(String decisionTableKeyLike);
 
     /**
-     * Only select process definition with a certain version. Particularly useful when used in combination with {@link #processDefinitionKey(String)}
+     * Only select decision tables with a certain version. Particularly useful when used in combination with {@link #decisionTableKey(String)}
      */
     DmnDecisionTableQuery decisionTableVersion(Integer decisionTableVersion);
 
@@ -160,7 +160,7 @@ public interface DmnDecisionTableQuery extends Query<DmnDecisionTableQuery, DmnD
     DmnDecisionTableQuery orderByDecisionTableCategory();
 
     /**
-     * Order by process definition key (needs to be followed by {@link #asc()} or {@link #desc()}).
+     * Order by decision table key (needs to be followed by {@link #asc()} or {@link #desc()}).
      */
     DmnDecisionTableQuery orderByDecisionTableKey();
 

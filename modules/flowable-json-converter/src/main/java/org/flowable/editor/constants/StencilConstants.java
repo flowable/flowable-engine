@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -91,9 +91,9 @@ public interface StencilConstants {
     final String PROPERTY_PROCESS_VERSION = "process_version";
     final String PROPERTY_PROCESS_AUTHOR = "process_author";
     final String PROPERTY_PROCESS_NAMESPACE = "process_namespace";
-    
+
     final String PROPERTY_IS_EXECUTABLE = "isexecutable";
-    
+
     final String PROPERTY_PROCESS_POTENTIALSTARTERUSER = "process_potentialstarteruser";
     final String PROPERTY_PROCESS_POTENTIALSTARTERGROUP = "process_potentialstartergroup";
 
@@ -218,6 +218,7 @@ public interface StencilConstants {
     final String PROPERTY_CALLACTIVITY_IN = "callactivityinparameters";
     final String PROPERTY_CALLACTIVITY_OUT = "callactivityoutparameters";
     final String PROPERTY_CALLACTIVITY_INHERIT_VARIABLES = "callactivityinheritvariables";
+    final String PROPERTY_CALLACTIVITY_SAME_DEPLOYMENT = "callactivitysamedeployment";
     final String PROPERTY_CALLACTIVITY_INHERIT_BUSINESS_KEY = "callactivityinheritbusinesskey";
     final String PROPERTY_CALLACTIVITY_USE_LOCALSCOPE_FOR_OUTPARAMETERS = "callactivityuselocalscopeforoutparameters";
     final String PROPERTY_IOPARAMETER_SOURCE = "source";
@@ -269,4 +270,19 @@ public interface StencilConstants {
     final String PROPERTY_HTTPTASK_SAVE_REQUEST_VARIABLES = "httptasksaverequestvariables";
     final String PROPERTY_HTTPTASK_SAVE_RESPONSE_PARAMETERS = "httptasksaveresponseparameters";
     final String PROPERTY_HTTPTASK_RESULT_VARIABLE_PREFIX = "httptaskresultvariableprefix";
+
+    final String PROPERTY_SKIP_EXPRESSION = "skipexpression";
+
+    final String PROPERTY_SHELLTASK_COMMAND = "shellcommand";
+    final String PROPERTY_SHELLTASK_ARG1 = "shellarg1";
+    final String PROPERTY_SHELLTASK_ARG2 = "shellarg2";
+    final String PROPERTY_SHELLTASK_ARG3 = "shellarg3";
+    final String PROPERTY_SHELLTASK_ARG4 = "shellarg4";
+    final String PROPERTY_SHELLTASK_ARG5 = "shellarg5";
+    final String PROPERTY_SHELLTASK_WAIT = "shellwait";
+    final String PROPERTY_SHELLTASK_OUTPUT_VARIABLE = "shelloutputvariable";
+    final String PROPERTY_SHELLTASK_ERROR_CODE_VARIABLE = "shellerrorcodevariable";
+    final String PROPERTY_SHELLTASK_ERROR_REDIRECT = "shellerrorredirect";
+    final String PROPERTY_SHELLTASK_CLEAN_ENV = "shellcleanenv";
+    final String PROPERTY_SHELLTASK_DIRECTORY = "shelldirectory";
 }

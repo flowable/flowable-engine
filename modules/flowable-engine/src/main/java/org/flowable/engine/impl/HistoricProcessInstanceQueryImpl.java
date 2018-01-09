@@ -44,6 +44,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<HistoricProcessInstanceQuery, HistoricProcessInstance> implements HistoricProcessInstanceQuery {
 
     private static final long serialVersionUID = 1L;
+    
     protected String processInstanceId;
     protected String processDefinitionId;
     protected String businessKey;

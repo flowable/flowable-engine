@@ -24,6 +24,7 @@ import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.variable.api.delegate.VariableScope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,7 @@ public class TimerStartEventJobHandler extends TimerEventHandler implements JobH
     }
 
     @Override
-    public void execute(JobEntity job, String configuration, Object execution, CommandContext commandContext) {
+    public void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext) {
 
         ProcessDefinitionEntity processDefinitionEntity = ProcessDefinitionUtil
                 .getProcessDefinitionFromDatabase(job.getProcessDefinitionId()); // From DB -> need to get latest suspended state

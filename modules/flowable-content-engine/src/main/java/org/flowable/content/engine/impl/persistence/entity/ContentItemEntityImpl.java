@@ -32,7 +32,8 @@ public class ContentItemEntityImpl extends AbstractEntityNoRevision implements C
     protected String mimeType;
     protected String taskId;
     protected String processInstanceId;
-    protected String caseId;
+    protected String scopeId;
+    protected String scopeType;
     protected String contentStoreId;
     protected String contentStoreName;
     protected boolean contentAvailable;
@@ -51,7 +52,6 @@ public class ContentItemEntityImpl extends AbstractEntityNoRevision implements C
         persistentState.put("mimeType", this.mimeType);
         persistentState.put("taskId", this.taskId);
         persistentState.put("processInstanceId", this.processInstanceId);
-        persistentState.put("caseId", this.caseId);
         persistentState.put("contentStoreId", this.contentStoreId);
         persistentState.put("contentStoreName", this.contentStoreName);
         persistentState.put("contentAvailable", this.contentAvailable);
@@ -62,6 +62,8 @@ public class ContentItemEntityImpl extends AbstractEntityNoRevision implements C
         persistentState.put("lastModified", this.lastModified);
         persistentState.put("lastModifiedBy", this.lastModifiedBy);
         persistentState.put("tenantId", this.tenantId);
+        persistentState.put("scopeId", this.scopeId);
+        persistentState.put("scopeType", this.scopeType);
         return persistentState;
     }
 
@@ -106,16 +108,6 @@ public class ContentItemEntityImpl extends AbstractEntityNoRevision implements C
     @Override
     public void setProcessInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
-    }
-
-    @Override
-    public String getCaseId() {
-        return this.caseId;
-    }
-
-    @Override
-    public void setCaseId(String caseId) {
-        this.caseId = caseId;
     }
 
     @Override
@@ -216,6 +208,26 @@ public class ContentItemEntityImpl extends AbstractEntityNoRevision implements C
     @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
+    }
+
+    @Override
+    public String getScopeId() {
+        return this.scopeId;
+    }
+
+    @Override
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    @Override
+    public String getScopeType() {
+        return this.scopeType;
+    }
+
+    @Override
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
     }
 
     @Override

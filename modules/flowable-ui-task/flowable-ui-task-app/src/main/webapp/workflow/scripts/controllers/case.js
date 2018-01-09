@@ -237,10 +237,9 @@ angular.module('flowableApp')
     });
 
     $scope.openTask = function(task) {
-        // TODO: use URL instead
         $rootScope.root.selectedTaskId = task.id;
         var path='';
-        if($rootScope.activeAppDefinition && !FLOWABLE.CONFIG.integrationProfile) {
+        if ($rootScope.activeAppDefinition && !FLOWABLE.CONFIG.integrationProfile) {
             path = "/apps/" + $rootScope.activeAppDefinition.id;
         }
         $location.path(path + "/tasks");

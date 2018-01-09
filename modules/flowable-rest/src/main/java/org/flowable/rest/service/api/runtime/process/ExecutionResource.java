@@ -13,23 +13,25 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.runtime.Execution;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.runtime.Execution;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * @author Frederik Heremans
@@ -101,5 +103,22 @@ public class ExecutionResource extends ExecutionBaseResource {
         } else {
             return restResponseFactory.createExecutionResponse(execution);
         }
+    }
+    
+    @ApiOperation(value = "Change the state of an execution", tags = { "Executions" },
+            notes = "")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Indicates the execution was found and the action is performed."),
+            @ApiResponse(code = 404, message = "Indicates the execution was not found.")
+    })
+    @PostMapping(value = "/runtime/executions/{executionId}/change-state", produces = "application/json")
+    public void changeActivityState(@ApiParam(name = "executionId") @PathVariable String executionId,
+            @RequestBody ExecutionChangeActivityStateRequest activityStateRequest, HttpServletRequest request) {
+
+        runtimeService.createChangeActivityStateBuilder()
+                .executionId(executionId)
+                .cancelActivityId(activityStateRequest.getCancelActivityId())
+                .startActivityId(activityStateRequest.getStartActivityId())
+                .changeState();
     }
 }

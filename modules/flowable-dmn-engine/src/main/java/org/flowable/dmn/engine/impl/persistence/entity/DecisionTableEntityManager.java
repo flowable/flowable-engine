@@ -41,7 +41,7 @@ public interface DecisionTableEntityManager extends EntityManager<DecisionTableE
 
     DecisionTableEntity findDecisionTableByDeploymentAndKeyAndTenantId(String deploymentId, String decisionTableKey, String tenantId);
 
-    DecisionTableEntity findDecisionTableByKeyAndVersionAndTenantId(String decisionTableKey, Integer processDefinitionVersion, String tenantId);
+    DecisionTableEntity findDecisionTableByKeyAndVersionAndTenantId(String decisionTableKey, Integer decisionTableVersion, String tenantId);
 
     List<DmnDecisionTable> findDecisionTablesByNativeQuery(Map<String, Object> parameterMap);
 

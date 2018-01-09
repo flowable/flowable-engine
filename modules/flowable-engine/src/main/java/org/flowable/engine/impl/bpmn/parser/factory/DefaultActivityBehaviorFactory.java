@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -108,7 +108,7 @@ import org.flowable.engine.impl.scripting.ScriptingEngines;
 
 /**
  * Default implementation of the {@link ActivityBehaviorFactory}. Used when no custom {@link ActivityBehaviorFactory} is injected on the {@link ProcessEngineConfigurationImpl}.
- * 
+ *
  * @author Joram Barrez
  */
 public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory implements ActivityBehaviorFactory {
@@ -275,7 +275,7 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
 
             if (theClass == null) {
                 // Default Camel behavior class
-                theClass = Class.forName("org.flowable.camel.impl.CamelBehaviorDefaultImpl");
+                theClass = Class.forName(getDefaultCamelBehaviorClassName());
             }
 
             List<FieldDeclaration> fieldDeclarations = createFieldDeclarations(fieldExtensions);
@@ -287,6 +287,10 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
             throw new FlowableException("Could not find org.flowable.camel.CamelBehavior: ", e);
         }
     }
+
+	protected String getDefaultCamelBehaviorClassName() {
+		return "org.flowable.camel.impl.CamelBehaviorDefaultImpl";
+	}
 
     private void addExceptionMapAsFieldDeclaration(List<FieldDeclaration> fieldDeclarations, List<MapExceptionEntry> mapExceptions) {
         FieldDeclaration exceptionMapsFieldDeclaration = new FieldDeclaration(EXCEPTION_MAP_FIELD, mapExceptions.getClass().toString(), mapExceptions);
@@ -320,7 +324,7 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
 
             if (theClass == null) {
                 // Default Http behavior class
-                theClass = Class.forName("org.flowable.http.impl.HttpActivityBehaviorImpl");
+                theClass = Class.forName("org.flowable.http.bpmn.impl.HttpActivityBehaviorImpl");
             }
 
             List<FieldDeclaration> fieldDeclarations = createFieldDeclarations(serviceTask.getFieldExtensions());
@@ -417,7 +421,7 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
     public SubProcessActivityBehavior createSubprocessActivityBehavior(SubProcess subProcess) {
         return new SubProcessActivityBehavior();
     }
-    
+
     @Override
     public EventSubProcessActivityBehavior createEventSubprocessActivityBehavior(EventSubProcess eventSubProcess) {
         return new EventSubProcessActivityBehavior();

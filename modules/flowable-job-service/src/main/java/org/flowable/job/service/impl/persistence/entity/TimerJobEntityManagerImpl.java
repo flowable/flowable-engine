@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,6 +18,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
+import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.calendar.BusinessCalendar;
 import org.flowable.job.api.Job;
@@ -125,7 +126,7 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
         if (!handledJob) {
             return false;
         }
-        
+
         jobEntity.setCreateTime(getJobServiceConfiguration().getClock().getCurrentTime());
         super.insert(jobEntity, fireCreateEvent);
         return true;
@@ -135,29 +136,22 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
     public void delete(TimerJobEntity jobEntity) {
         super.delete(jobEntity);
 
-        deleteExceptionByteArrayRef(jobEntity);
-        
+        deleteByteArrayRef(jobEntity.getExceptionByteArrayRef());
+        deleteByteArrayRef(jobEntity.getCustomValuesByteArrayRef());
+
         getJobServiceConfiguration().getInternalJobManager().handleJobDelete(jobEntity);
 
         // Send event
-        if (getEventDispatcher().isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
-        }
-    }
-
-    /**
-     * Deletes a the byte array used to store the exception information. Subclasses may override to provide custom implementations.
-     */
-    protected void deleteExceptionByteArrayRef(TimerJobEntity jobEntity) {
-        JobByteArrayRef exceptionByteArrayRef = jobEntity.getExceptionByteArrayRef();
-        if (exceptionByteArrayRef != null) {
-            exceptionByteArrayRef.delete();
+        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
+        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
+            eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
         }
     }
 
     protected TimerJobEntity createTimer(JobEntity te) {
         TimerJobEntity newTimerEntity = create();
         newTimerEntity.setJobHandlerConfiguration(te.getJobHandlerConfiguration());
+        newTimerEntity.setCustomValues(te.getCustomValues());
         newTimerEntity.setJobHandlerType(te.getJobHandlerType());
         newTimerEntity.setExclusive(te.isExclusive());
         newTimerEntity.setRepeat(te.getRepeat());
@@ -166,6 +160,10 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
         newTimerEntity.setExecutionId(te.getExecutionId());
         newTimerEntity.setProcessInstanceId(te.getProcessInstanceId());
         newTimerEntity.setProcessDefinitionId(te.getProcessDefinitionId());
+        newTimerEntity.setScopeId(te.getScopeId());
+        newTimerEntity.setSubScopeId(te.getSubScopeId());
+        newTimerEntity.setScopeDefinitionId(te.getScopeDefinitionId());
+        newTimerEntity.setScopeType(te.getScopeType());
 
         // Inherit tenant
         newTimerEntity.setTenantId(te.getTenantId());

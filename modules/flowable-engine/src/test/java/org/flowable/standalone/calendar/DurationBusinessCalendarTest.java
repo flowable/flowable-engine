@@ -16,9 +16,9 @@ package org.flowable.standalone.calendar;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.flowable.engine.common.impl.calendar.DurationBusinessCalendar;
 import org.flowable.engine.common.impl.util.DefaultClockImpl;
 import org.flowable.engine.common.runtime.Clock;
-import org.flowable.engine.impl.calendar.DurationBusinessCalendar;
 import org.flowable.engine.impl.test.AbstractTestCase;
 
 /**

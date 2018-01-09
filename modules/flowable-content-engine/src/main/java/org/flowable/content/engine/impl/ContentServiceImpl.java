@@ -19,6 +19,7 @@ import org.flowable.content.api.ContentItemQuery;
 import org.flowable.content.api.ContentService;
 import org.flowable.content.engine.impl.cmd.CreateContentItemCmd;
 import org.flowable.content.engine.impl.cmd.DeleteContentItemCmd;
+import org.flowable.content.engine.impl.cmd.DeleteContentItemsByScopeCmd;
 import org.flowable.content.engine.impl.cmd.DeleteContentItemsCmd;
 import org.flowable.content.engine.impl.cmd.GetContentItemStreamCmd;
 import org.flowable.content.engine.impl.cmd.SaveContentItemCmd;
@@ -66,6 +67,11 @@ public class ContentServiceImpl extends ServiceImpl implements ContentService {
     @Override
     public void deleteContentItemsByCaseId(String caseId) {
         commandExecutor.execute(new DeleteContentItemsCmd(null, null, caseId));
+    }
+    
+    @Override
+    public void deleteContentItemsByScopeIdAndScopeType(String scopeId, String scopeType) {
+        commandExecutor.execute(new DeleteContentItemsByScopeCmd(scopeId, scopeType));
     }
 
     @Override

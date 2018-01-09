@@ -37,16 +37,16 @@ public class EditorDisplayJsonClientResource {
 
     @Autowired
     protected BpmnDisplayJsonConverter bpmnDisplayJsonConverter;
-    
+
     @Autowired
     protected CmmnDisplayJsonConverter cmmnDisplayJsonConverter;
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
-    @RequestMapping(value = "/rest/models/{processModelId}/model-json", method = RequestMethod.GET, produces = "application/json")
-    public JsonNode getModelJSON(@PathVariable String processModelId) {
+    @RequestMapping(value = "/rest/models/{modelId}/model-json", method = RequestMethod.GET, produces = "application/json")
+    public JsonNode getModelJSON(@PathVariable String modelId) {
         ObjectNode displayNode = objectMapper.createObjectNode();
-        Model model = modelService.getModel(processModelId);
+        Model model = modelService.getModel(modelId);
         if (model.getModelType() != null && AbstractModel.MODEL_TYPE_CMMN == model.getModelType()) {
             cmmnDisplayJsonConverter.processCaseElements(model, displayNode, new org.flowable.cmmn.model.GraphicInfo());
         } else {

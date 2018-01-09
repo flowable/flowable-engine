@@ -29,7 +29,7 @@ public class ELExecutionContext {
     protected Map<Integer, Map<String, Object>> ruleResults = new LinkedHashMap<>();
     protected Map<String, Object> stackVariables;
     protected DecisionExecutionAuditContainer auditContainer;
-    protected Map<String, List<Object>> outputValues = new HashMap<>();
+    protected Map<String, List<Object>> outputValues = new LinkedHashMap<>();
     protected BuiltinAggregator aggregator;
 
     public void checkExecutionContext(String variableId) {

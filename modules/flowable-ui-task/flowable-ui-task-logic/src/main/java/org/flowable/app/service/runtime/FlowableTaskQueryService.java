@@ -35,6 +35,7 @@ import org.flowable.cmmn.api.CmmnRepositoryService;
 import org.flowable.cmmn.api.CmmnRuntimeService;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.repository.CaseDefinition;
+import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.HistoryService;
@@ -121,13 +122,20 @@ public class FlowableTaskQueryService {
         JsonNode deploymentKeyNode = requestNode.get("deploymentKey");
         if (deploymentKeyNode != null && !deploymentKeyNode.isNull()) {
             List<Deployment> deployments = repositoryService.createDeploymentQuery().deploymentKey(deploymentKeyNode.asText()).list();
-            List<String> deploymentIds = new ArrayList<>(deployments.size());
+            List<String> deploymentIds = new ArrayList<>();
             for (Deployment deployment : deployments) {
                 deploymentIds.add(deployment.getId());
+            }
+            
+            List<CmmnDeployment> cmmnDeployments = cmmnRepositoryService.createDeploymentQuery().deploymentKey(deploymentKeyNode.asText()).list();
+            List<String> cmmnDeploymentIds = new ArrayList<>();
+            for (CmmnDeployment deployment : cmmnDeployments) {
+                cmmnDeploymentIds.add(deployment.getId());
             }
 
             taskInfoQueryWrapper.getTaskInfoQuery().or()
                     .deploymentIdIn(deploymentIds)
+                    .cmmnDeploymentIdIn(cmmnDeploymentIds)
                     .taskCategory(deploymentKeyNode.asText())
                     .endOr();
         }

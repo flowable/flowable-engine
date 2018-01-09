@@ -1,4 +1,4 @@
-= Flowable CMMN DOCS (v 6.2.1-SNAPSHOT)
+= Flowable CMMN DOCS (v 6.3.0-SNAPSHOT)
 :doctype: book
 :toc: left
 :toclevels: 4

@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.flowable</groupId>
         <artifactId>flowable-ui-task</artifactId>
-        <version>6.2.1-SNAPSHOT</version>
+        <version>6.3.0-SNAPSHOT</version>
     </parent>
     <artifactId>flowable-ui-task-app</artifactId>
     <packaging>war</packaging>
@@ -249,8 +249,8 @@
 
         <!-- EMAIL -->
         <dependency>
-        	<groupId>javax.mail</groupId>
-        	<artifactId>mail</artifactId>
+            <groupId>com.sun.mail</groupId>
+            <artifactId>javax.mail</artifactId>
         </dependency>
         <dependency>
 			<groupId>commons-validator</groupId>

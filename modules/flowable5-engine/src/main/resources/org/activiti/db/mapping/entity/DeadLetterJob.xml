@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8" ?> 
+<?xml version="1.0" encoding="UTF-8" ?>
 
-<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="org.activiti.engine.impl.persistence.entity.DeadLetterJobEntity">
 
@@ -13,6 +13,7 @@
         <result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
         <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
         <result property="exceptionByteArrayRef" column="EXCEPTION_STACK_ID_" typeHandler="ByteArrayRefTypeHandler" />
+        <result property="customValuesByteArrayRef" column="CUSTOM_VALUES_ID_" typeHandler="ByteArrayRefTypeHandler" />
         <result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
         <result property="jobHandlerType" column="HANDLER_TYPE_" jdbcType="VARCHAR" />
         <result property="jobHandlerConfiguration" column="HANDLER_CFG_" jdbcType="VARCHAR" />
@@ -41,7 +42,7 @@
         from ${prefix}ACT_RU_DEADLETTER_JOB J
         where J.EXECUTION_ID_ = #{parameter}
     </select>
-    
+
     <select id="selectDeadLetterJobsByProcessInstanceId" parameterType="org.activiti.engine.impl.db.ListQueryParameterObject" resultMap="jobResultMap">
         select *
         from ${prefix}ACT_RU_DEADLETTER_JOB J
@@ -49,17 +50,18 @@
     </select>
 
     <!-- TIMER INSERT -->
-  
+
   	<insert id="insertDeadLetterJob" parameterType="org.activiti.engine.impl.persistence.entity.DeadLetterJobEntity">
     insert into ${prefix}ACT_RU_DEADLETTER_JOB (
-            ID_, 
+            ID_,
             REV_,
             TYPE_,
             EXCLUSIVE_,
-            EXECUTION_ID_, 
+            EXECUTION_ID_,
             PROCESS_INSTANCE_ID_,
             PROC_DEF_ID_,
             EXCEPTION_STACK_ID_,
+            CUSTOM_VALUES_ID_,
             EXCEPTION_MSG_,
             DUEDATE_,
             REPEAT_,
@@ -74,6 +76,7 @@
             #{processInstanceId, jdbcType=VARCHAR},
             #{processDefinitionId, jdbcType=VARCHAR},
             #{exceptionByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
+            #{customValuesByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
             #{exceptionMessage, jdbcType=VARCHAR},
             #{duedate, jdbcType=TIMESTAMP},
             #{repeat, jdbcType=VARCHAR},
@@ -89,17 +92,18 @@
             REV_,
             TYPE_,
             EXCLUSIVE_,
-            EXECUTION_ID_, 
+            EXECUTION_ID_,
             PROCESS_INSTANCE_ID_,
             PROC_DEF_ID_,
             EXCEPTION_STACK_ID_,
+            CUSTOM_VALUES_ID_,
             EXCEPTION_MSG_,
             DUEDATE_,
             REPEAT_,
             HANDLER_TYPE_,
             HANDLER_CFG_,
-            TENANT_ID_) VALUES 
-	    <foreach collection="list" item="job" index="index" separator=","> 
+            TENANT_ID_) VALUES
+	    <foreach collection="list" item="job" index="index" separator=",">
 	        (#{job.id, jdbcType=VARCHAR},
 	         #{job.revision, jdbcType=INTEGER},
 	         #{job.jobType, jdbcType=VARCHAR},
@@ -108,6 +112,7 @@
 	         #{job.processInstanceId, jdbcType=VARCHAR},
 	         #{job.processDefinitionId, jdbcType=VARCHAR},
 	         #{job.exceptionByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
+	         #{job.customValuesByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
 	         #{job.exceptionMessage, jdbcType=VARCHAR},
 	         #{job.duedate, jdbcType=TIMESTAMP},
 	         #{job.repeat, jdbcType=VARCHAR},
@@ -116,7 +121,7 @@
 	         #{job.tenantId, jdbcType=VARCHAR})
 	    </foreach>
   	</insert>
-  	
+
   	<insert id="bulkInsertDeadLetterJob_oracle" parameterType="java.util.List">
     INSERT ALL
     <foreach collection="list" item="job" index="index">
@@ -125,16 +130,17 @@
       REV_,
       TYPE_,
       EXCLUSIVE_,
-      EXECUTION_ID_, 
+      EXECUTION_ID_,
       PROCESS_INSTANCE_ID_,
       PROC_DEF_ID_,
       EXCEPTION_STACK_ID_,
+      CUSTOM_VALUES_ID_,
       EXCEPTION_MSG_,
       DUEDATE_,
       REPEAT_,
       HANDLER_TYPE_,
       HANDLER_CFG_,
-      TENANT_ID_) VALUES 
+      TENANT_ID_) VALUES
       (#{job.id, jdbcType=VARCHAR},
        #{job.revision, jdbcType=INTEGER},
        #{job.jobType, jdbcType=VARCHAR},
@@ -143,6 +149,7 @@
        #{job.processInstanceId, jdbcType=VARCHAR},
        #{job.processDefinitionId, jdbcType=VARCHAR},
        #{job.exceptionByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
+       #{job.customValuesByteArrayRef, typeHandler=ByteArrayRefTypeHandler},
        #{job.exceptionMessage, jdbcType=VARCHAR},
        #{job.duedate, jdbcType=TIMESTAMP},
        #{job.repeat, jdbcType=VARCHAR},

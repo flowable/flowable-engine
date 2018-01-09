@@ -120,7 +120,7 @@ public class CompleteTaskWithFormCmd extends NeedsActiveTaskCmd<Void> {
             }
         }
         
-        CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstance(planItemInstanceEntity);
+        CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
     }
 
     /**
