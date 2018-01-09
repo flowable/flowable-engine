@@ -225,6 +225,7 @@
         <enumeration value="mail"/>
         <enumeration value="mule"/>
         <enumeration value="shell"/>
+        <enumeration value="dmn"/>
       </restriction>
     </simpleType>
   </attribute>
@@ -323,7 +324,7 @@
       </documentation>
     </annotation>
   </attribute>
-  
+
   <attribute name="businessCalendarName" type="tns:tExpression">
  	<annotation>
  		<documentation>
@@ -394,7 +395,7 @@
   </complexType>
 
   <element name="potentialStarter" type="string" />
-  
+
   <element name="businessCalendarName" type="string" />
 
   <element name="taskListener">

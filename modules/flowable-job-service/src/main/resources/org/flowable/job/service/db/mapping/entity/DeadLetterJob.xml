@@ -12,10 +12,15 @@
         <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
         <result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
         <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+        <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR"/>
+        <result property="subScopeId" column="SUB_SCOPE_ID_" jdbcType="VARCHAR"/>
+        <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR"/>
+        <result property="scopeDefinitionId" column="SCOPE_DEFINITION_ID_" jdbcType="VARCHAR"/>
         <result property="exceptionByteArrayRef" column="EXCEPTION_STACK_ID_" typeHandler="JobByteArrayRefTypeHandler" />
         <result property="exceptionMessage" column="EXCEPTION_MSG_" jdbcType="VARCHAR" />
         <result property="jobHandlerType" column="HANDLER_TYPE_" jdbcType="VARCHAR" />
         <result property="jobHandlerConfiguration" column="HANDLER_CFG_" jdbcType="VARCHAR" />
+        <result property="customValuesByteArrayRef" column="CUSTOM_VALUES_ID_" typeHandler="JobByteArrayRefTypeHandler" />
         <result property="createTime" column="CREATE_TIME_" jdbcType="TIMESTAMP" />
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
         <result property="duedate" column="DUEDATE_" jdbcType="TIMESTAMP" />
@@ -53,12 +58,17 @@
             EXECUTION_ID_,
             PROCESS_INSTANCE_ID_,
             PROC_DEF_ID_,
+            SCOPE_ID_, 
+            SUB_SCOPE_ID_, 
+            SCOPE_TYPE_, 
+            SCOPE_DEFINITION_ID_,
             EXCEPTION_STACK_ID_,
             EXCEPTION_MSG_,
             DUEDATE_,
             REPEAT_,
             HANDLER_TYPE_,
             HANDLER_CFG_,
+            CUSTOM_VALUES_ID_,
             CREATE_TIME_,
             TENANT_ID_)
     values (#{id, jdbcType=VARCHAR},
@@ -68,12 +78,17 @@
             #{executionId, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
             #{processDefinitionId, jdbcType=VARCHAR},
+            #{scopeId, jdbcType=VARCHAR},
+            #{subScopeId, jdbcType=VARCHAR},
+            #{scopeType, jdbcType=VARCHAR},
+            #{scopeDefinitionId, jdbcType=VARCHAR},
             #{exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{exceptionMessage, jdbcType=VARCHAR},
             #{duedate, jdbcType=TIMESTAMP},
             #{repeat, jdbcType=VARCHAR},
             #{jobHandlerType, jdbcType=VARCHAR},
             #{jobHandlerConfiguration, jdbcType=VARCHAR},
+            #{customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{createTime, jdbcType=TIMESTAMP},
             #{tenantId, jdbcType=VARCHAR}
     )
@@ -88,15 +103,20 @@
             EXECUTION_ID_,
             PROCESS_INSTANCE_ID_,
             PROC_DEF_ID_,
+            SCOPE_ID_, 
+            SUB_SCOPE_ID_, 
+            SCOPE_TYPE_, 
+            SCOPE_DEFINITION_ID_,
             EXCEPTION_STACK_ID_,
             EXCEPTION_MSG_,
             DUEDATE_,
             REPEAT_,
             HANDLER_TYPE_,
             HANDLER_CFG_,
+            CUSTOM_VALUES_ID_,
             CREATE_TIME_,
-            TENANT_ID_) VALUES 
-	    <foreach collection="list" item="job" index="index" separator=","> 
+            TENANT_ID_) VALUES
+	    <foreach collection="list" item="job" index="index" separator=",">
 	        (#{job.id, jdbcType=VARCHAR},
 	         #{job.revision, jdbcType=INTEGER},
 	         #{job.jobType, jdbcType=VARCHAR},
@@ -104,12 +124,17 @@
 	         #{job.executionId, jdbcType=VARCHAR},
 	         #{job.processInstanceId, jdbcType=VARCHAR},
 	         #{job.processDefinitionId, jdbcType=VARCHAR},
+             #{job.scopeId, jdbcType=VARCHAR},
+             #{job.subScopeId, jdbcType=VARCHAR},
+             #{job.scopeType, jdbcType=VARCHAR},
+             #{job.scopeDefinitionId, jdbcType=VARCHAR},
 	         #{job.exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
 	         #{job.exceptionMessage, jdbcType=VARCHAR},
 	         #{job.duedate, jdbcType=TIMESTAMP},
 	         #{job.repeat, jdbcType=VARCHAR},
 	         #{job.jobHandlerType, jdbcType=VARCHAR},
 	         #{job.jobHandlerConfiguration, jdbcType=VARCHAR},
+	         #{job.customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
              #{job.createTime, jdbcType=TIMESTAMP},
 	         #{job.tenantId, jdbcType=VARCHAR})
 	    </foreach>
@@ -126,14 +151,19 @@
       		EXECUTION_ID_,
       		PROCESS_INSTANCE_ID_,
       		PROC_DEF_ID_,
+            SCOPE_ID_, 
+            SUB_SCOPE_ID_, 
+            SCOPE_TYPE_, 
+            SCOPE_DEFINITION_ID_,
       		EXCEPTION_STACK_ID_,
       		EXCEPTION_MSG_,
       		DUEDATE_,
       		REPEAT_,
       		HANDLER_TYPE_,
       		HANDLER_CFG_,
+            CUSTOM_VALUES_ID_,
             CREATE_TIME_,
-      		TENANT_ID_) VALUES 
+      		TENANT_ID_) VALUES
       		(#{job.id, jdbcType=VARCHAR},
        		#{job.revision, jdbcType=INTEGER},
        		#{job.jobType, jdbcType=VARCHAR},
@@ -141,12 +171,17 @@
        		#{job.executionId, jdbcType=VARCHAR},
        		#{job.processInstanceId, jdbcType=VARCHAR},
        		#{job.processDefinitionId, jdbcType=VARCHAR},
+            #{job.scopeId, jdbcType=VARCHAR},
+            #{job.subScopeId, jdbcType=VARCHAR},
+            #{job.scopeType, jdbcType=VARCHAR},
+            #{job.scopeDefinitionId, jdbcType=VARCHAR},
        		#{job.exceptionByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
        		#{job.exceptionMessage, jdbcType=VARCHAR},
        		#{job.duedate, jdbcType=TIMESTAMP},
        		#{job.repeat, jdbcType=VARCHAR},
        		#{job.jobHandlerType, jdbcType=VARCHAR},
        		#{job.jobHandlerConfiguration, jdbcType=VARCHAR},
+       		#{job.customValuesByteArrayRef, typeHandler=JobByteArrayRefTypeHandler},
             #{job.createTime, jdbcType=TIMESTAMP},
        		#{job.tenantId, jdbcType=VARCHAR})
     	</foreach>
@@ -183,6 +218,18 @@
             </if>
             <if test="processDefinitionId != null">
                 and RES.PROC_DEF_ID_ = #{processDefinitionId}
+            </if>
+            <if test="scopeId != null">
+                and RES.SCOPE_ID_ = #{scopeId}
+            </if>
+            <if test="subScopeId != null">
+                and RES.SUB_SCOPE_ID_ = #{subScopeId}
+            </if>
+            <if test="scopeType != null">
+                and RES.SCOPE_TYPE_ = #{scopeType}
+            </if>
+            <if test="scopeDefinitionId != null">
+                and RES.SCOPE_DEFINITION_ID_ = #{scopeDefinitionId}
             </if>
             <if test="executable">
                 and (RES.DUEDATE_ is null or RES.DUEDATE_ &lt;= #{now, jdbcType=TIMESTAMP})

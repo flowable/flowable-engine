@@ -1,16 +1,16 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
- 
+
 function _drawHumanTaskIcon(paper, startX, startY)
 {
 	var path1 = paper.path("m 1,17 16,0 0,-1.7778 -5.333332,-3.5555 0,-1.7778 c 1.244444,0 1.244444,-2.3111 1.244444,-2.3111 l 0,-3.0222 C 12.555557,0.8221 9.0000001,1.0001 9.0000001,1.0001 c 0,0 -3.5555556,-0.178 -3.9111111,3.5555 l 0,3.0222 c 0,0 0,2.3111 1.2444443,2.3111 l 0,1.7778 L 1,15.2222 1,17 17,17");
@@ -19,7 +19,7 @@ function _drawHumanTaskIcon(paper, startX, startY)
 		"stroke": "none",
 		"fill": "#d1b575"
  	});
-	
+
 	var userTaskIcon = paper.set();
 	userTaskIcon.push(path1);
 
@@ -34,7 +34,7 @@ function _drawServiceTaskIcon(paper, startX, startY)
 		"stroke": "none",
 		"fill": "#72a7d0"
  	});
-	
+
 	var serviceTaskIcon = paper.set();
 	serviceTaskIcon.push(path1);
 
@@ -49,14 +49,14 @@ function _drawCaseTaskIcon(paper, startX, startY)
         "stroke": "#000000",
         "fill": "#000000"
     });
-    
+
     var path2 = paper.path("M1 23 L1 4 L30 4 L30 23z");
     path2.attr({
         "opacity": 1,
         "stroke": "#000000",
         "fill": "#F4F6F7"
     });
-    
+
     var caseTaskIcon = paper.set();
     caseTaskIcon.push(path1);
     caseTaskIcon.push(path2);
@@ -73,12 +73,28 @@ function _drawProcessTaskIcon(paper, startX, startY)
         "stroke": "#000000",
         "fill": "#F4F6F7"
     });
-    
+
     var processTaskIcon = paper.set();
     processTaskIcon.push(path1);
 
     processTaskIcon.translate(startX, startY);
     processTaskIcon.scale(0.7, 0.7);
+}
+
+function _drawDecisionTaskIcon(paper, startX, startY)
+{
+    var path1 = paper.path("m 1,2 0,14 16,0 0,-14 z m 1.9,2.4000386 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m -8.67364,3.9 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m -8.67364,3.9 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z m 4.36364,0 3.7,0 0,2.7999224 -3.7,0 z");
+    path1.attr({
+        "opacity": 1,
+        "stroke": "#000000",
+        "fill": "#F4F6F7"
+    });
+
+    var decisionTaskIcon = paper.set();
+    decisionTaskIcon.push(path1);
+
+    decisionTaskIcon.translate(startX, startY);
+    decisionTaskIcon.scale(0.7, 0.7);
 }
 
 function _drawHttpTaskIcon(paper, startX, startY)
@@ -97,6 +113,19 @@ function _drawHttpTaskIcon(paper, startX, startY)
 
 }
 
+function _drawBusinessRuleTaskIcon(paper, startX, startY) {
+    var path1 = paper.path("m 1,2 0,14 16,0 0,-14 z m 1.45458,5.6000386 2.90906,0 0,2.7999224 -2.90906,0 z m 4.36364,0 8.72718,0 0,2.7999224 -8.72718,0 z m -4.36364,4.1998844 2.90906,0 0,2.800116 -2.90906,0 z m 4.36364,0 8.72718,0 0,2.800116 -8.72718,0 z");
+    path1.attr({
+        "stroke": "none",
+        "fill": "#72a7d0"
+    });
+
+    var businessRuleTaskIcon = paper.set();
+    businessRuleTaskIcon.push(path1);
+
+    businessRuleTaskIcon.transform("T" + startX + "," + startY);
+}
+
 function _drawTimerEventListenerIcon(paper, element)
 {
 	var x = element.x + (element.width / 2);
@@ -108,7 +137,7 @@ function _drawTimerEventListenerIcon(paper, element)
 		"stroke": "black",
 		"fill": "none"
  	});
-	
+
 	var path = paper.path("M 10 0 C 4.4771525 0 0 4.4771525 0 10 C 0 15.522847 4.4771525 20 10 20 C 15.522847 20 20 15.522847 20 10 C 20 4.4771525 15.522847 1.1842379e-15 10 0 z M 9.09375 1.03125 C 9.2292164 1.0174926 9.362825 1.0389311 9.5 1.03125 L 9.5 3.5 L 10.5 3.5 L 10.5 1.03125 C 15.063526 1.2867831 18.713217 4.9364738 18.96875 9.5 L 16.5 9.5 L 16.5 10.5 L 18.96875 10.5 C 18.713217 15.063526 15.063526 18.713217 10.5 18.96875 L 10.5 16.5 L 9.5 16.5 L 9.5 18.96875 C 4.9364738 18.713217 1.2867831 15.063526 1.03125 10.5 L 3.5 10.5 L 3.5 9.5 L 1.03125 9.5 C 1.279102 5.0736488 4.7225326 1.4751713 9.09375 1.03125 z M 9.5 5 L 9.5 8.0625 C 8.6373007 8.2844627 8 9.0680195 8 10 C 8 11.104569 8.8954305 12 10 12 C 10.931981 12 11.715537 11.362699 11.9375 10.5 L 14 10.5 L 14 9.5 L 11.9375 9.5 C 11.756642 8.7970599 11.20294 8.2433585 10.5 8.0625 L 10.5 5 L 9.5 5 z");
 	path.attr({
 		"stroke": "none",

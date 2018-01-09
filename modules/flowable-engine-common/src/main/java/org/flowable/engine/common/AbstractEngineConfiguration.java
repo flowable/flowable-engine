@@ -51,6 +51,7 @@ import org.flowable.engine.common.impl.db.CustomMyBatisTypeHandlerConfig;
 import org.flowable.engine.common.impl.db.CustomMybatisTypeAliasConfig;
 import org.flowable.engine.common.impl.db.DbSchemaManager;
 import org.flowable.engine.common.impl.db.DbSqlSessionFactory;
+import org.flowable.engine.common.impl.db.LogSqlExecutionTimePlugin;
 import org.flowable.engine.common.impl.event.EventDispatchAction;
 import org.flowable.engine.common.impl.interceptor.CommandConfig;
 import org.flowable.engine.common.impl.interceptor.CommandContextFactory;
@@ -224,6 +225,11 @@ public abstract class AbstractEngineConfiguration {
      * will not be used here - since the schema is taken into account already, adding a prefix for the table-check will result in wrong table-names.
      */
     protected boolean tablePrefixIsSchema;
+    
+    /** 
+     * Enables the MyBatis plugin that logs the execution time of sql statements. 
+     */
+    protected boolean enableLogSqlExecutionTime;
 
     protected Properties databaseTypeMappings = getDefaultDatabaseTypeMappings();
 
@@ -642,7 +648,11 @@ public abstract class AbstractEngineConfiguration {
 
         initCustomMybatisMappers(configuration);
         initMybatisTypeHandlers(configuration);
-
+        
+        if (isEnableLogSqlExecutionTime()) {
+            initMyBatisLogSqlExecutionTimePlugin(configuration);
+        }
+        
         configuration = parseMybatisConfiguration(parser);
         return configuration;
     }
@@ -657,6 +667,10 @@ public abstract class AbstractEngineConfiguration {
 
     public void initMybatisTypeHandlers(Configuration configuration) {
         // To be extended
+    }
+    
+    public void initMyBatisLogSqlExecutionTimePlugin(Configuration configuration) {
+        configuration.addInterceptor(new LogSqlExecutionTimePlugin());
     }
 
     public Configuration parseMybatisConfiguration(XMLConfigBuilder parser) {
@@ -1200,6 +1214,14 @@ public abstract class AbstractEngineConfiguration {
     public AbstractEngineConfiguration setTablePrefixIsSchema(boolean tablePrefixIsSchema) {
         this.tablePrefixIsSchema = tablePrefixIsSchema;
         return this;
+    }
+    
+    public boolean isEnableLogSqlExecutionTime() {
+        return enableLogSqlExecutionTime;
+    }
+
+    public void setEnableLogSqlExecutionTime(boolean enableLogSqlExecutionTime) {
+        this.enableLogSqlExecutionTime = enableLogSqlExecutionTime;
     }
 
     public Map<Class<?>, SessionFactory> getSessionFactories() {

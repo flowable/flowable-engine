@@ -92,7 +92,8 @@ public interface ExecutionEntityManager extends EntityManager<ExecutionEntity> {
     void deleteProcessInstanceExecutionEntity(String processInstanceId, String currentFlowElementId,
             String deleteReason, boolean cascade, boolean cancel, boolean fireEvents);
 
-    void deleteChildExecutions(ExecutionEntity executionEntity, Collection<String> executionIdsNotToDelete,String deleteReason, boolean cancel, FlowElement cancelActivity);
+    void deleteChildExecutions(ExecutionEntity executionEntity, Collection<String> executionIdsNotToDelete, 
+            Collection<String> executionIdsNotToSendCancelledEventsFor, String deleteReason, boolean cancel, FlowElement cancelActivity);
     
     void deleteChildExecutions(ExecutionEntity executionEntity, String deleteReason, boolean cancel);
 

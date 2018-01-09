@@ -64,14 +64,14 @@ public class HistoricVariableServiceImpl extends ServiceImpl implements Historic
     
     @Override
     public void recordVariableUpdate(VariableInstanceEntity variableInstanceEntity) {
-        HistoricVariableInstanceEntity historicProcessVariable = getEntityCache().findInCache(HistoricVariableInstanceEntity.class, variableInstanceEntity.getId());
+        HistoricVariableInstanceEntity historicVariable = getEntityCache().findInCache(HistoricVariableInstanceEntity.class, variableInstanceEntity.getId());
         HistoricVariableInstanceEntityManager historicVariableInstanceEntityManager = getHistoricVariableInstanceEntityManager();
-        if (historicProcessVariable == null) {
-            historicProcessVariable = historicVariableInstanceEntityManager.findById(variableInstanceEntity.getId());
+        if (historicVariable == null) {
+            historicVariable = historicVariableInstanceEntityManager.findById(variableInstanceEntity.getId());
         }
 
-        if (historicProcessVariable != null) {
-            historicVariableInstanceEntityManager.copyVariableValue(historicProcessVariable, variableInstanceEntity);
+        if (historicVariable != null) {
+            historicVariableInstanceEntityManager.copyVariableValue(historicVariable, variableInstanceEntity);
         } else {
             historicVariableInstanceEntityManager.createAndInsert(variableInstanceEntity);
         }

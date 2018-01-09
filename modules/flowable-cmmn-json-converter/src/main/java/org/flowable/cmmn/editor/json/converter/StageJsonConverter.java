@@ -14,6 +14,7 @@ package org.flowable.cmmn.editor.json.converter;
 
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.editor.json.converter.CmmnJsonConverter.CmmnModelIdHelper;
 import org.flowable.cmmn.editor.json.model.CmmnModelInfo;
 import org.flowable.cmmn.model.BaseElement;
@@ -76,6 +77,12 @@ public class StageJsonConverter extends BaseCmmnJsonConverter implements FormAwa
                     BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
         
         Stage stage = new Stage();
+        
+        stage.setAutoComplete(CmmnJsonConverterUtil.getPropertyValueAsBoolean(PROPERTY_IS_AUTOCOMPLETE, elementNode));
+        String autoCompleteCondition = CmmnJsonConverterUtil.getPropertyValueAsString(PROPERTY_AUTOCOMPLETE_CONDITION, elementNode);
+        if (StringUtils.isNotEmpty(autoCompleteCondition)) {
+            stage.setAutoCompleteCondition(autoCompleteCondition);
+        }
 
         JsonNode childShapesArray = elementNode.get(EDITOR_CHILD_SHAPES);
         processor.processJsonElements(childShapesArray, modelNode, stage, shapeMap, formMap, decisionTableMap, 

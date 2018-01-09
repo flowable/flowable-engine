@@ -14,6 +14,7 @@ package org.flowable.job.service;
 
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.variable.api.delegate.VariableScope;
 
 /**
  * @author Tom Baeyens
@@ -22,5 +23,5 @@ public interface JobHandler {
 
     String getType();
 
-    void execute(JobEntity job, String configuration, Object scopeObject, CommandContext commandContext);
+    void execute(JobEntity job, String configuration, VariableScope variableScope, CommandContext commandContext);
 }

@@ -43,7 +43,7 @@ public class AsyncProcessRevisitedTest extends SpringFlowableTestCase {
                 from("flowable:asyncCamelProcessRevisited:serviceTaskAsync1").to("bean:sleepBean?method=sleep").to("seda:continueAsync1");
                 from("seda:continueAsync1").to("flowable:asyncCamelProcessRevisited:receive1");
 
-                from("flowable:asyncCamelProcessRevisited:serviceTaskAsync2").to("bean:sleepBean?method=sleep").to("bean:sleepBean?method=sleep").to("seda:continueAsync2");
+                from("flowable:asyncCamelProcessRevisited:serviceTaskAsync2").to("bean:sleepBean?method=sleep").to("seda:continueAsync2");
                 from("seda:continueAsync2").to("flowable:asyncCamelProcessRevisited:receive2");
             }
         });
@@ -54,7 +54,8 @@ public class AsyncProcessRevisitedTest extends SpringFlowableTestCase {
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncCamelProcessRevisited");
         List<Execution> executionList = runtimeService.createExecutionQuery().list();
         assertEquals(3, executionList.size());
-        waitForJobExecutorToProcessAllJobs(5000, 200);
+        waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(5000, 200);
+        
         assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
     }
 }

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -82,6 +82,10 @@ public interface Flowable5CompatibilityHandler {
             String businessKey, String tenantId, String processInstanceName);
 
     ProcessInstance startProcessInstanceByMessage(String messageName, Map<String, Object> variables, Map<String, Object> transientVariables, String businessKey, String tenantId);
+    
+    ProcessInstance getProcessInstance(String processInstanceId);
+    
+    void setProcessInstanceName(String processInstanceId, String processInstanceName);
 
     Object getExecutionVariable(String executionId, String variableName, boolean isLocal);
 
@@ -190,10 +194,13 @@ public interface Flowable5CompatibilityHandler {
     Object getRawProcessConfiguration();
 
     Object getRawCommandExecutor();
-    
+
     ProcessEngineConfiguration getFlowable6ProcessEngineConfiguration();
-    
+
     void setFlowable6ProcessEngineConfiguration(ProcessEngineConfiguration processEngineConfiguration);
 
     Object getCamelContextObject(String camelContextValue);
+
+    void setJobProcessor(List<Object> flowable5JobProcessors);
+
 }

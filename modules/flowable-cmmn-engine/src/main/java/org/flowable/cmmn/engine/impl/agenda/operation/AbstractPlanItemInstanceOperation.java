@@ -16,6 +16,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntityManager;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
+import org.flowable.cmmn.model.PlanItem;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 
 /**
@@ -40,11 +41,22 @@ public abstract class AbstractPlanItemInstanceOperation extends CmmnOperation {
     
     protected void deleteSentryPartInstances() {
         SentryPartInstanceEntityManager sentryPartInstanceEntityManager = CommandContextUtil.getSentryPartInstanceEntityManager(commandContext);
-        if (planItemInstanceEntity.getSatisfiedSentryPartInstances() != null) {
-            for (SentryPartInstanceEntity sentryPartInstanceEntity : planItemInstanceEntity.getSatisfiedSentryPartInstances()) {
-                sentryPartInstanceEntityManager.delete(sentryPartInstanceEntity);
+        if (planItemInstanceEntity.getPlanItem() != null 
+                && (!planItemInstanceEntity.getPlanItem().getEntryCriteria().isEmpty()
+                        || !planItemInstanceEntity.getPlanItem().getExitCriteria().isEmpty())) {
+            if (planItemInstanceEntity.getSatisfiedSentryPartInstances() != null) {
+                for (SentryPartInstanceEntity sentryPartInstanceEntity : planItemInstanceEntity.getSatisfiedSentryPartInstances()) {
+                    sentryPartInstanceEntityManager.delete(sentryPartInstanceEntity);
+                }
             }
         }
+    }
+    
+    protected boolean isPlanItemRepeatableOnComplete(PlanItem planItem) {
+        return  planItem != null
+                && planItem.getEntryCriteria().isEmpty()
+                && planItem.getItemControl() != null
+                && planItem.getItemControl().getRepetitionRule() != null;
     }
     
 }

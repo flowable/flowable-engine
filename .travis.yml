@@ -20,7 +20,7 @@ before_script:
   - echo MAVEN_OPTS=\"-Xmx2048m -Xms1024m -XX:MaxPermSize=512m -Djava.awt.headless=true\" > ~/.mavenrc
 
 script:
-  mvn test -PerrorLogging
+  mvn test -Pcheck,errorLogging
 
 after_failure:
   - cat /home/travis/build/flowable/flowable-engine/modules/*/target/surefire-reports/*.txt

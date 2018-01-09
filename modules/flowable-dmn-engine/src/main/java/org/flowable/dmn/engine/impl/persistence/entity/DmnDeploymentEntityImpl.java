@@ -41,7 +41,7 @@ public class DmnDeploymentEntityImpl extends AbstractEntityNoRevision implements
     protected boolean isNew;
 
     /**
-     * Will only be used during actual deployment to pass deployed artifacts (eg process definitions). Will be null otherwise.
+     * Will only be used during actual deployment to pass deployed artifacts (eg decision tables). Will be null otherwise.
      */
     protected Map<Class<?>, List<Object>> deployedArtifacts;
 

@@ -39,6 +39,27 @@ public interface SuspendedJobQuery extends Query<SuspendedJobQuery, Job> {
 
     /** Only select jobs which exist for the given process definition id */
     SuspendedJobQuery processDefinitionId(String processDefinitionid);
+    
+    /** Only select jobs for the given scope identifier. */
+    SuspendedJobQuery scopeId(String scopeId);
+
+    /** Only select jobs for the given sub scope identifier. */
+    SuspendedJobQuery subScopeId(String subScopeId);
+    
+    /** Only select jobs for the given scope type. */
+    SuspendedJobQuery scopeType(String scopeType);
+    
+    /** Only select jobs for the given scope definition identifier. */
+    SuspendedJobQuery scopeDefinitionId(String scopeDefinitionId);
+    
+    /** Only select jobs for the given case instance. */
+    SuspendedJobQuery caseInstanceId(String caseInstanceId);
+    
+    /** Only select jobs for the given case definition. */
+    SuspendedJobQuery caseDefinitionId(String caseDefinitionId);
+    
+    /** Only select jobs for the given plan item instance.  */
+    SuspendedJobQuery planItemInstanceId(String planItemInstanceId);
 
     /** Only select jobs which have retries left */
     SuspendedJobQuery withRetriesLeft();

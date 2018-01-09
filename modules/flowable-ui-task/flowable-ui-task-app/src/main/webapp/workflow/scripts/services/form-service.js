@@ -50,7 +50,7 @@ angular.module('flowableApp').service('FormService', ['$http', '$q',
 
             return promise;
         };
-        
+
         this.saveTaskForm = function(taskId, data) {
 
             var promise = httpAsPromise(
@@ -80,6 +80,29 @@ angular.module('flowableApp').service('FormService', ['$http', '$q',
                 {
                     method: 'POST',
                     url: FLOWABLE.CONFIG.contextRoot + '/app/rest/process-instances/',
+                    data: data
+                }
+            );
+
+            return promise;
+        };
+
+        this.getCaseStartForm = function(caseDefinitionId) {
+
+            return httpAsPromise(
+                {
+                    method: 'GET',
+                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/case-definitions/' + caseDefinitionId + "/start-form"
+                }
+            );
+        };
+
+        this.completeCaseStartForm = function(data) {
+
+            var promise = httpAsPromise(
+                {
+                    method: 'POST',
+                    url: FLOWABLE.CONFIG.contextRoot + '/app/rest/case-instances/',
                     data: data
                 }
             );

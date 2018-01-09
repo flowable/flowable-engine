@@ -30,8 +30,8 @@ public class DecisionTableEntityManagerImpl extends AbstractEntityManager<Decisi
 
     protected DecisionTableDataManager decisionTableDataManager;
 
-    public DecisionTableEntityManagerImpl(DmnEngineConfiguration processEngineConfiguration, DecisionTableDataManager decisionTableDataManager) {
-        super(processEngineConfiguration);
+    public DecisionTableEntityManagerImpl(DmnEngineConfiguration dmnEngineConfiguration, DecisionTableDataManager decisionTableDataManager) {
+        super(dmnEngineConfiguration);
         this.decisionTableDataManager = decisionTableDataManager;
     }
 

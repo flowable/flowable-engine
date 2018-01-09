@@ -17,7 +17,7 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 
 /**
  * REST representation of a case definition.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class CaseDefinitionRepresentation extends AbstractRepresentation {
@@ -30,6 +30,7 @@ public class CaseDefinitionRepresentation extends AbstractRepresentation {
     protected int version;
     protected String deploymentId;
     protected String tenantId;
+    protected boolean hasStartForm;
 
     public CaseDefinitionRepresentation(CaseDefinition caseDefinition) {
         this.id = caseDefinition.getId();
@@ -40,6 +41,7 @@ public class CaseDefinitionRepresentation extends AbstractRepresentation {
         this.version = caseDefinition.getVersion();
         this.deploymentId = caseDefinition.getDeploymentId();
         this.tenantId = caseDefinition.getTenantId();
+        this.hasStartForm = caseDefinition.hasStartFormKey();
     }
 
     public CaseDefinitionRepresentation() {
@@ -107,5 +109,13 @@ public class CaseDefinitionRepresentation extends AbstractRepresentation {
 
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
+    }
+
+    public boolean isHasStartForm() {
+        return hasStartForm;
+    }
+
+    public void setHasStartForm(boolean hasStartForm) {
+        this.hasStartForm = hasStartForm;
     }
 }

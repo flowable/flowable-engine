@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.flowable.engine.DynamicBpmnConstants;
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.db.SuspensionState;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -87,7 +88,10 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     protected String nameLikeIgnoreCase;
     protected String deploymentId;
     protected List<String> deploymentIds;
+    
     protected List<ExecutionQueryImpl> orQueryObjects = new ArrayList<>();
+    protected ExecutionQueryImpl currentOrQueryObject;
+    protected boolean inOrStatement;
 
     public ExecutionQueryImpl() {
     }
@@ -109,7 +113,11 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         if (processDefinitionId == null) {
             throw new FlowableIllegalArgumentException("Process definition id is null");
         }
-        this.processDefinitionId = processDefinitionId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.processDefinitionId = processDefinitionId;
+        } else {
+            this.processDefinitionId = processDefinitionId;
+        }
         return this;
     }
 
@@ -118,7 +126,11 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         if (processDefinitionKey == null) {
             throw new FlowableIllegalArgumentException("Process definition key is null");
         }
-        this.processDefinitionKey = processDefinitionKey;
+        if (inOrStatement) {
+            this.currentOrQueryObject.processDefinitionKey = processDefinitionKey;
+        } else {
+            this.processDefinitionKey = processDefinitionKey;
+        }
         return this;
     }
 
@@ -127,7 +139,11 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         if (processDefinitionCategory == null) {
             throw new FlowableIllegalArgumentException("Process definition category is null");
         }
-        this.processDefinitionCategory = processDefinitionCategory;
+        if (inOrStatement) {
+            this.currentOrQueryObject.processDefinitionCategory = processDefinitionCategory;
+        } else {
+            this.processDefinitionCategory = processDefinitionCategory;
+        }
         return this;
     }
 
@@ -136,7 +152,11 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         if (processDefinitionName == null) {
             throw new FlowableIllegalArgumentException("Process definition name is null");
         }
-        this.processDefinitionName = processDefinitionName;
+        if (inOrStatement) {
+            this.currentOrQueryObject.processDefinitionName = processDefinitionName;
+        } else {
+            this.processDefinitionName = processDefinitionName;
+        }
         return this;
     }
 
@@ -145,7 +165,11 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         if (processDefinitionVersion == null) {
             throw new FlowableIllegalArgumentException("Process definition version is null");
         }
-        this.processDefinitionVersion = processDefinitionVersion;
+        if (inOrStatement) {
+            this.currentOrQueryObject.processDefinitionVersion = processDefinitionVersion;
+        } else {
+            this.processDefinitionVersion = processDefinitionVersion;
+        }
         return this;
     }
 
@@ -154,7 +178,11 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         if (processDefinitionEngineVersion == null) {
             throw new FlowableIllegalArgumentException("Process definition engine version is null");
         }
-        this.processDefinitionEngineVersion = processDefinitionEngineVersion;
+        if (inOrStatement) {
+            this.currentOrQueryObject.processDefinitionEngineVersion = processDefinitionEngineVersion;
+        } else {
+            this.processDefinitionEngineVersion = processDefinitionEngineVersion;
+        }
         return this;
     }
 
@@ -163,7 +191,11 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         if (processInstanceId == null) {
             throw new FlowableIllegalArgumentException("Process instance id is null");
         }
-        this.processInstanceId = processInstanceId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.processInstanceId = processInstanceId;
+        } else {
+            this.processInstanceId = processInstanceId;
+        }
         return this;
     }
 
@@ -172,7 +204,11 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         if (rootProcessInstanceId == null) {
             throw new FlowableIllegalArgumentException("Root process instance id is null");
         }
-        this.rootProcessInstanceId = rootProcessInstanceId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.rootProcessInstanceId = rootProcessInstanceId;
+        } else {
+            this.rootProcessInstanceId = rootProcessInstanceId;
+        }
         return this;
     }
 
@@ -181,7 +217,11 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         if (businessKey == null) {
             throw new FlowableIllegalArgumentException("Business key is null");
         }
-        this.businessKey = businessKey;
+        if (inOrStatement) {
+            this.currentOrQueryObject.businessKey = businessKey;
+        } else {
+            this.businessKey = businessKey;
+        }
         return this;
     }
 
@@ -193,8 +233,15 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
             if (processInstanceBusinessKey == null) {
                 throw new FlowableIllegalArgumentException("Business key is null");
             }
-            this.businessKey = processInstanceBusinessKey;
-            this.includeChildExecutionsWithBusinessKeyQuery = includeChildExecutions;
+            
+            if (inOrStatement) {
+                this.currentOrQueryObject.businessKey = processInstanceBusinessKey;
+                this.currentOrQueryObject.includeChildExecutionsWithBusinessKeyQuery = includeChildExecutions;
+            } else {
+                this.businessKey = processInstanceBusinessKey;
+                this.includeChildExecutionsWithBusinessKeyQuery = includeChildExecutions;
+            }
+            
             return this;
         }
     }
@@ -204,7 +251,11 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         if (processDefinitionKeys == null) {
             throw new FlowableIllegalArgumentException("Process definition keys is null");
         }
-        this.processDefinitionKeys = processDefinitionKeys;
+        if (inOrStatement) {
+            this.currentOrQueryObject.processDefinitionKeys = processDefinitionKeys;
+        } else {
+            this.processDefinitionKeys = processDefinitionKeys;
+        }
         return this;
     }
 
@@ -213,17 +264,30 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         if (executionId == null) {
             throw new FlowableIllegalArgumentException("Execution id is null");
         }
-        this.executionId = executionId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.executionId = executionId;
+        } else {
+            this.executionId = executionId;
+        }
         return this;
     }
 
     @Override
     public ExecutionQueryImpl activityId(String activityId) {
-        this.activityId = activityId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.activityId = activityId;
+            if (activityId != null) {
+                this.currentOrQueryObject.isActive = true;
+            }
+            
+        } else {
+            this.activityId = activityId;
 
-        if (activityId != null) {
-            isActive = true;
+            if (activityId != null) {
+                this.isActive = true;
+            }
         }
+        
         return this;
     }
 
@@ -232,25 +296,41 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         if (parentId == null) {
             throw new FlowableIllegalArgumentException("Parent id is null");
         }
-        this.parentId = parentId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.parentId = parentId;
+        } else {
+            this.parentId = parentId;
+        }
         return this;
     }
 
     @Override
     public ExecutionQuery onlyChildExecutions() {
-        this.onlyChildExecutions = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.onlyChildExecutions = true;
+        } else {
+            this.onlyChildExecutions = true;
+        }
         return this;
     }
 
     @Override
     public ExecutionQuery onlySubProcessExecutions() {
-        this.onlySubProcessExecutions = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.onlySubProcessExecutions = true;
+        } else {
+            this.onlySubProcessExecutions = true;
+        }
         return this;
     }
 
     @Override
     public ExecutionQuery onlyProcessInstanceExecutions() {
-        this.onlyProcessInstanceExecutions = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.onlyProcessInstanceExecutions = true;
+        } else {
+            this.onlyProcessInstanceExecutions = true;
+        }
         return this;
     }
 
@@ -259,7 +339,11 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         if (tenantId == null) {
             throw new FlowableIllegalArgumentException("execution tenant id is null");
         }
-        this.tenantId = tenantId;
+        if (inOrStatement) {
+            this.currentOrQueryObject.tenantId = tenantId;
+        } else {
+            this.tenantId = tenantId;
+        }
         return this;
     }
 
@@ -268,13 +352,22 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         if (tenantIdLike == null) {
             throw new FlowableIllegalArgumentException("execution tenant id is null");
         }
-        this.tenantIdLike = tenantIdLike;
+        if (inOrStatement) {
+            this.currentOrQueryObject.tenantIdLike = tenantIdLike;
+        } else {
+            this.tenantIdLike = tenantIdLike;
+        }
         return this;
     }
 
     @Override
     public ExecutionQueryImpl executionWithoutTenantId() {
-        this.withoutTenantId = true;
+        if (inOrStatement) {
+            this.currentOrQueryObject.withoutTenantId = true;
+        } else {
+            this.withoutTenantId = true;
+        }
+        
         return this;
     }
 
@@ -299,57 +392,302 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         if (eventType == null) {
             throw new FlowableIllegalArgumentException("event type is null");
         }
-        if (eventSubscriptions == null) {
-            eventSubscriptions = new ArrayList<>();
+        
+        if (inOrStatement) {
+            if (this.currentOrQueryObject.eventSubscriptions == null) {
+                this.currentOrQueryObject.eventSubscriptions = new ArrayList<>();
+            }
+            this.currentOrQueryObject.eventSubscriptions.add(new EventSubscriptionQueryValue(eventName, eventType));
+           
+        } else {
+            if (eventSubscriptions == null) {
+                eventSubscriptions = new ArrayList<>();
+            }
+            eventSubscriptions.add(new EventSubscriptionQueryValue(eventName, eventType));
         }
-        eventSubscriptions.add(new EventSubscriptionQueryValue(eventName, eventType));
+        
         return this;
     }
 
     @Override
     public ExecutionQuery processVariableValueEquals(String variableName, Object variableValue) {
-        return variableValueEquals(variableName, variableValue, false);
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueEquals(variableName, variableValue, false);
+            return this;
+        } else {
+            return variableValueEquals(variableName, variableValue, false);
+        }
     }
 
     @Override
     public ExecutionQuery processVariableValueEquals(Object variableValue) {
-        return variableValueEquals(variableValue, false);
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueEquals(variableValue, false);
+            return this;
+        } else {
+            return variableValueEquals(variableValue, false);
+        }
     }
 
     @Override
     public ExecutionQuery processVariableValueNotEquals(String variableName, Object variableValue) {
-        return variableValueNotEquals(variableName, variableValue, false);
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueNotEquals(variableName, variableValue, false);
+            return this;
+        } else {
+            return variableValueNotEquals(variableName, variableValue, false);
+        }
     }
 
     @Override
     public ExecutionQuery processVariableValueEqualsIgnoreCase(String name, String value) {
-        return variableValueEqualsIgnoreCase(name, value, false);
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueEqualsIgnoreCase(name, value, false);
+            return this;
+        } else {
+            return variableValueEqualsIgnoreCase(name, value, false);
+        }
     }
 
     @Override
     public ExecutionQuery processVariableValueNotEqualsIgnoreCase(String name, String value) {
-        return variableValueNotEqualsIgnoreCase(name, value, false);
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueNotEqualsIgnoreCase(name, value, false);
+            return this;
+        } else {
+            return variableValueNotEqualsIgnoreCase(name, value, false);
+        } 
     }
 
     @Override
     public ExecutionQuery processVariableValueLike(String name, String value) {
-        return variableValueLike(name, value, false);
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueLike(name, value, false);
+            return this;
+        } else {
+            return variableValueLike(name, value, false);
+        }
     }
 
     @Override
     public ExecutionQuery processVariableValueLikeIgnoreCase(String name, String value) {
-        return variableValueLikeIgnoreCase(name, value, false);
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueLikeIgnoreCase(name, value, false);
+            return this;
+        } else {
+            return variableValueLikeIgnoreCase(name, value, false);
+        }
+    }
+    
+    @Override
+    public ExecutionQuery processVariableValueGreaterThan(String name, Object value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueGreaterThan(name, value, false);
+        } else {
+            this.variableValueGreaterThan(name, value, false);
+        }
+        return this;
+    }
+
+    @Override
+    public ExecutionQuery processVariableValueGreaterThanOrEqual(String name, Object value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueGreaterThanOrEqual(name, value, false);
+        } else {
+            this.variableValueGreaterThanOrEqual(name, value, false);
+        }
+        return this;
+    }
+
+    @Override
+    public ExecutionQuery processVariableValueLessThan(String name, Object value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueLessThan(name, value, false);
+        } else {
+            this.variableValueLessThan(name, value, false);
+        }
+        return this;
+    }
+
+    @Override
+    public ExecutionQuery processVariableValueLessThanOrEqual(String name, Object value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueLessThanOrEqual(name, value, false);
+        } else {
+            this.variableValueLessThanOrEqual(name, value, false);
+        }
+        return this;
+    }
+
+    @Override
+    public ExecutionQuery processVariableExists(String name) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableExists(name, false);
+            return this;
+        } else {
+            return variableExists(name, false);
+        }
+    }
+
+    @Override
+    public ExecutionQuery processVariableNotExists(String name) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableNotExists(name, false);
+            return this;
+        } else {
+            return variableNotExists(name, false);
+        }
+    }
+    
+    @Override
+    public ExecutionQuery variableValueEquals(String variableName, Object variableValue) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueEquals(variableName, variableValue, true);
+            return this;
+        } else {
+            return variableValueEquals(variableName, variableValue, true);
+        }
+    }
+
+    @Override
+    public ExecutionQuery variableValueEquals(Object variableValue) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueEquals(variableValue, true);
+            return this;
+        } else {
+            return variableValueEquals(variableValue, true);
+        }
+    }
+
+    @Override
+    public ExecutionQuery variableValueNotEquals(String variableName, Object variableValue) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueNotEquals(variableName, variableValue, true);
+            return this;
+        } else {
+            return variableValueNotEquals(variableName, variableValue, true);
+        }
+    }
+
+    @Override
+    public ExecutionQuery variableValueEqualsIgnoreCase(String name, String value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueEqualsIgnoreCase(name, value, true);
+            return this;
+        } else {
+            return variableValueEqualsIgnoreCase(name, value, true);
+        }
+    }
+
+    @Override
+    public ExecutionQuery variableValueNotEqualsIgnoreCase(String name, String value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueNotEqualsIgnoreCase(name, value, true);
+            return this;
+        } else {
+            return variableValueNotEqualsIgnoreCase(name, value, true);
+        } 
+    }
+
+    @Override
+    public ExecutionQuery variableValueLike(String name, String value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueLike(name, value, true);
+            return this;
+        } else {
+            return variableValueLike(name, value, true);
+        }
+    }
+
+    @Override
+    public ExecutionQuery variableValueLikeIgnoreCase(String name, String value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueLikeIgnoreCase(name, value, true);
+            return this;
+        } else {
+            return variableValueLikeIgnoreCase(name, value, true);
+        }
+    }
+    
+    @Override
+    public ExecutionQuery variableValueGreaterThan(String name, Object value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueGreaterThan(name, value, true);
+            return this;
+        } else {
+            return variableValueGreaterThan(name, value, true);
+        }
+    }
+
+    @Override
+    public ExecutionQuery variableValueGreaterThanOrEqual(String name, Object value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueGreaterThanOrEqual(name, value, true);
+            return this;
+        } else {
+            return variableValueGreaterThanOrEqual(name, value, true);
+        }
+    }
+
+    @Override
+    public ExecutionQuery variableValueLessThan(String name, Object value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueLessThan(name, value, true);
+            return this;
+        } else {
+            return variableValueLessThan(name, value, true);
+        }
+    }
+
+    @Override
+    public ExecutionQuery variableValueLessThanOrEqual(String name, Object value) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableValueLessThanOrEqual(name, value, true);
+            return this;
+        } else {
+            return variableValueLessThanOrEqual(name, value, true);
+        }
+    }
+
+    @Override
+    public ExecutionQuery variableExists(String name) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableExists(name, true);
+            return this;
+        } else {
+            return variableExists(name, true);
+        }
+    }
+
+    @Override
+    public ExecutionQuery variableNotExists(String name) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableNotExists(name, true);
+            return this;
+        } else {
+            return variableNotExists(name, true);
+        }
     }
 
     @Override
     public ExecutionQuery locale(String locale) {
-        this.locale = locale;
+        if (inOrStatement) {
+            currentOrQueryObject.locale = locale;
+        } else {
+            this.locale = locale;
+        }
+        
         return this;
     }
 
     @Override
     public ExecutionQuery withLocalizationFallback() {
-        withLocalizationFallback = true;
+        if (inOrStatement) {
+            currentOrQueryObject.withLocalizationFallback = true;
+        } else {
+            this.withLocalizationFallback = true;
+        }
+        
         return this;
     }
 
@@ -358,8 +696,13 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         if (beforeTime == null) {
             throw new FlowableIllegalArgumentException("before time is null");
         }
-        this.startedBefore = beforeTime;
-
+        
+        if (inOrStatement) {
+            currentOrQueryObject.startedBefore = beforeTime;
+        } else {
+            this.startedBefore = beforeTime;
+        }
+        
         return this;
     }
 
@@ -368,7 +711,12 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         if (afterTime == null) {
             throw new FlowableIllegalArgumentException("after time is null");
         }
-        this.startedAfter = afterTime;
+        
+        if (inOrStatement) {
+            currentOrQueryObject.startedAfter = afterTime;
+        } else {
+            this.startedAfter = afterTime;
+        }
 
         return this;
     }
@@ -378,8 +726,36 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
         if (userId == null) {
             throw new FlowableIllegalArgumentException("user id is null");
         }
-        this.startedBy = userId;
+        
+        if (inOrStatement) {
+            currentOrQueryObject.startedBy = userId;
+        } else {
+            this.startedBy = userId;
+        }
 
+        return this;
+    }
+    
+    @Override
+    public ExecutionQuery or() {
+        if (inOrStatement) {
+            throw new FlowableException("the query is already in an or statement");
+        }
+
+        inOrStatement = true;
+        currentOrQueryObject = new ExecutionQueryImpl();
+        orQueryObjects.add(currentOrQueryObject);
+        return this;
+    }
+
+    @Override
+    public ExecutionQuery endOr() {
+        if (!inOrStatement) {
+            throw new FlowableException("endOr() can only be called after calling or()");
+        }
+
+        inOrStatement = false;
+        currentOrQueryObject = null;
         return this;
     }
 
@@ -468,6 +844,15 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
                     executionEntity.setLocalizedDescription(languageDescriptionNode.asText());
                 }
             }
+        }
+    }
+    
+    @Override
+    protected void ensureVariablesInitialized() {
+        super.ensureVariablesInitialized();
+
+        for (ExecutionQueryImpl orQueryObject : orQueryObjects) {
+            orQueryObject.ensureVariablesInitialized();
         }
     }
 
@@ -627,6 +1012,22 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
 
     public void setNameLikeIgnoreCase(String nameLikeIgnoreCase) {
         this.nameLikeIgnoreCase = nameLikeIgnoreCase;
+    }
+
+    public String getDeploymentId() {
+        return deploymentId;
+    }
+
+    public void setDeploymentId(String deploymentId) {
+        this.deploymentId = deploymentId;
+    }
+
+    public List<String> getDeploymentIds() {
+        return deploymentIds;
+    }
+
+    public void setDeploymentIds(List<String> deploymentIds) {
+        this.deploymentIds = deploymentIds;
     }
 
     public Date getStartedBefore() {

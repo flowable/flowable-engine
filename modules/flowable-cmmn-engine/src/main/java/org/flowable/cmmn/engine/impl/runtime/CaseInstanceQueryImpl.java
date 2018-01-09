@@ -20,15 +20,18 @@ import org.flowable.cmmn.api.runtime.CaseInstance;
 import org.flowable.cmmn.api.runtime.CaseInstanceQuery;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
-import org.flowable.engine.common.impl.AbstractQuery;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.interceptor.CommandExecutor;
+import org.flowable.variable.service.impl.AbstractVariableQueryImpl;
 
 /**
  * @author Joram Barrez
+ * @author Tijs Rademakers
  */
-public class CaseInstanceQueryImpl extends AbstractQuery<CaseInstanceQuery, CaseInstance> implements CaseInstanceQuery {
+public class CaseInstanceQueryImpl extends AbstractVariableQueryImpl<CaseInstanceQuery, CaseInstance> implements CaseInstanceQuery {
 
+    private static final long serialVersionUID = 1L;
+    
     protected String caseDefinitionId;
     protected String caseDefinitionKey;
     protected Set<String> caseDefinitionKeys;
@@ -46,6 +49,7 @@ public class CaseInstanceQueryImpl extends AbstractQuery<CaseInstanceQuery, Case
     protected String startedBy;
     protected String callbackId;
     protected String callbackType;
+    protected boolean completeable;
     protected String tenantId;
     protected boolean withoutTenantId;
 
@@ -190,6 +194,12 @@ public class CaseInstanceQueryImpl extends AbstractQuery<CaseInstanceQuery, Case
     }
     
     @Override
+    public CaseInstanceQuery caseInstanceIsCompleteable() {
+        this.completeable = true;
+        return this;
+    }
+    
+    @Override
     public CaseInstanceQueryImpl caseInstanceTenantId(String tenantId) {
         if (tenantId == null) {
             throw new FlowableIllegalArgumentException("caseInstance tenant id is null");
@@ -239,10 +249,12 @@ public class CaseInstanceQueryImpl extends AbstractQuery<CaseInstanceQuery, Case
     // results ////////////////////////////////////////////////////
 
     public long executeCount(CommandContext commandContext) {
+        ensureVariablesInitialized();
         return CommandContextUtil.getCaseInstanceEntityManager(commandContext).countByCriteria(this);
     }
 
     public List<CaseInstance> executeList(CommandContext commandContext) {
+        ensureVariablesInitialized();
         return CommandContextUtil.getCaseInstanceEntityManager(commandContext).findByCriteria(this);
     }
 
@@ -312,6 +324,10 @@ public class CaseInstanceQueryImpl extends AbstractQuery<CaseInstanceQuery, Case
 
     public String getCallbackType() {
         return callbackType;
+    }
+    
+    public boolean isCompleteable() {
+        return completeable;
     }
 
     public String getTenantId() {

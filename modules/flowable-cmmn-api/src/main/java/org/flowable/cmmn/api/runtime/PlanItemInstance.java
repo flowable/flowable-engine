@@ -27,10 +27,13 @@ public interface PlanItemInstance {
     String getStageInstanceId();
     boolean isStage();
     String getElementId();
+    String getPlanItemDefinitionId();
+    String getPlanItemDefinitionType();
     Date getStartTime();
     String getStartUserId();
     String getReferenceId();
     String getReferenceType();
+    boolean isCompleteable();
     String getTenantId();
     
 }

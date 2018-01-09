@@ -31,7 +31,6 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
 
     @Override
     public void run() {
-
         if (planItemInstanceEntity.getPlanItem() != null) { // can be null for the plan model
             Object behavior = planItemInstanceEntity.getPlanItem().getBehavior();
             if (behavior instanceof PlanItemActivityBehavior
@@ -41,8 +40,12 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
         }
 
         planItemInstanceEntity.setState(getNewState());
-        CommandContextUtil.getAgenda(commandContext).planEvaluateCriteria(planItemInstanceEntity.getCaseInstanceId(), createPlanItemLifeCycleEvent());
+        CommandContextUtil.getAgenda(commandContext).planEvaluateCriteriaOperation(planItemInstanceEntity.getCaseInstanceId(), createPlanItemLifeCycleEvent());
+        
+        internalExecute();
     }
+    
+    protected abstract void internalExecute();
 
     protected PlanItemLifeCycleEvent createPlanItemLifeCycleEvent() {
         return new PlanItemLifeCycleEvent(planItemInstanceEntity.getPlanItem(), getLifeCycleTransition());
@@ -60,7 +63,7 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
         if (planItem != null) {
             if (planItem.getName() != null) {
                 stringBuilder.append(planItem.getName());
-                stringBuilder.append("(");
+                stringBuilder.append(" (id: ");
                 stringBuilder.append(planItem.getId());
                 stringBuilder.append(")");
             } else {
@@ -69,8 +72,11 @@ public abstract class AbstractChangePlanItemInstanceStateOperation extends Abstr
         } else {
             stringBuilder.append("(plan item instance with id ").append(planItemInstanceEntity.getId()).append(")");
         }
-        stringBuilder.append(": ");
+        stringBuilder.append(", ");
         stringBuilder.append("new state: [").append(getNewState()).append("]");
+        stringBuilder.append(" with transition [");
+        stringBuilder.append(getLifeCycleTransition());
+        stringBuilder.append("]");
         return stringBuilder.toString();
     }
 

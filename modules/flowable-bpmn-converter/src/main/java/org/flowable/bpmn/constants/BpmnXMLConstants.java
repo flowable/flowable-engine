@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -97,7 +97,7 @@ public interface BpmnXMLConstants {
 
     public static final String ELEMENT_HTTP_REQUEST_HANDLER = "httpRequestHandler";
     public static final String ELEMENT_HTTP_RESPONSE_HANDLER = "httpResponseHandler";
-    
+
     public static final String ATTRIBUTE_LISTENER_THROW_EVENT_TYPE_SIGNAL = "signal";
     public static final String ATTRIBUTE_LISTENER_THROW_EVENT_TYPE_GLOBAL_SIGNAL = "globalSignal";
     public static final String ATTRIBUTE_LISTENER_THROW_EVENT_TYPE_MESSAGE = "message";
@@ -212,6 +212,7 @@ public interface BpmnXMLConstants {
     public static final String ATTRIBUTE_CALL_ACTIVITY_BUSINESS_KEY = "businessKey";
     public static final String ATTRIBUTE_CALL_ACTIVITY_INHERIT_BUSINESS_KEY = "inheritBusinessKey";
     public static final String ATTRIBUTE_CALL_ACTIVITY_INHERITVARIABLES = "inheritVariables";
+    public static final String ATTRIBUTE_CALL_ACTIVITY_SAME_DEPLOYMENT = "sameDeployment";
     public static final String ATTRIBUTE_CALL_ACTIVITY_USE_LOCALSCOPE_FOR_OUTPARAMETERS = "useLocalScopeForOutParameters";
     public static final String ELEMENT_CALL_ACTIVITY_IN_PARAMETERS = "in";
     public static final String ELEMENT_CALL_ACTIVITY_OUT_PARAMETERS = "out";

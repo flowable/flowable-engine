@@ -95,7 +95,7 @@ public class DmnDeploymentBuilderImpl implements DmnDeploymentBuilder, Serializa
         try {
             resource.setBytes(text.getBytes(DEFAULT_ENCODING));
         } catch (UnsupportedEncodingException e) {
-            throw new FlowableException("Unable to get process bytes.", e);
+            throw new FlowableException("Unable to get decision table bytes.", e);
         }
         deployment.addResource(resource);
         return this;

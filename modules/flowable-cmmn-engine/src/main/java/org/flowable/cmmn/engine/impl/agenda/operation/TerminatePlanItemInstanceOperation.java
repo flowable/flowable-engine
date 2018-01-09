@@ -36,4 +36,14 @@ public class TerminatePlanItemInstanceOperation extends AbstractDeletePlanItemIn
         return PlanItemTransition.TERMINATE;
     }
     
+    @Override
+    protected boolean isEvaluateRepetitionRule() {
+        return false;
+    }
+    
+    @Override
+    protected void internalExecute() {
+        // Nothing extra to do
+    }
+    
 }

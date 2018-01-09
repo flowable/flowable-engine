@@ -28,7 +28,7 @@ public class CmmnDiShapeXmlConverter extends BaseCmmnXmlConverter {
     }
     
     @Override
-    public boolean isCmmnElement() {
+    public boolean hasChildElements() {
         return false;
     }
 

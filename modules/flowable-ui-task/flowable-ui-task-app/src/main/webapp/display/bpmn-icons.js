@@ -1,11 +1,11 @@
 /* Copyright 2005-2015 Alfresco Software, Ltd.
- * 
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,7 +20,7 @@ function _drawUserTaskIcon(paper, startX, startY)
 		"stroke": "none",
 		"fill": "#d1b575"
  	});
-	
+
 	var userTaskIcon = paper.set();
 	userTaskIcon.push(path1);
 
@@ -35,7 +35,7 @@ function _drawServiceTaskIcon(paper, startX, startY)
 		"stroke": "none",
 		"fill": "#72a7d0"
  	});
-	
+
 	var serviceTaskIcon = paper.set();
 	serviceTaskIcon.push(path1);
 
@@ -50,7 +50,7 @@ function _drawScriptTaskIcon(paper, startX, startY)
 		"stroke": "none",
 		"fill": "#72a7d0"
  	});
-	
+
 	var scriptTaskIcon = paper.set();
 	scriptTaskIcon.push(path1);
 
@@ -64,7 +64,7 @@ function _drawBusinessRuleTaskIcon(paper, startX, startY)
 		"stroke": "none",
 		"fill": "#72a7d0"
  	});
-	
+
 	var businessRuleTaskIcon = paper.set();
 	businessRuleTaskIcon.push(path1);
 
@@ -78,7 +78,7 @@ function _drawSendTaskIcon(paper, startX, startY)
 		"stroke": "none",
 		"fill": "#16964d"
  	});
-	
+
 	var sendTaskIcon = paper.set();
 	sendTaskIcon.push(path1);
 
@@ -93,7 +93,7 @@ function _drawManualTaskIcon(paper, startX, startY)
 		"stroke": "none",
 		"fill": "#d1b575"
  	});
-	
+
 	var manualTaskIcon = paper.set();
 	manualTaskIcon.push(path1);
 
@@ -108,12 +108,12 @@ function _drawReceiveTaskIcon(paper, startX, startY)
 		"stroke": "none",
 		"fill": "#16964d"
  	});
-	
+
 	startX += 4;
 	startY += 2;
-	
+
 	path.transform("T" + startX + "," + startY);
-	
+
 }
 
 function _drawCamelTaskIcon(paper, startX, startY)
@@ -124,12 +124,12 @@ function _drawCamelTaskIcon(paper, startX, startY)
 		"stroke": "none",
 		"fill": "#bd4848"
  	});
-	
+
 	startX += 4;
 	startY += 2;
-	
+
 	path.transform("T" + startX + "," + startY);
-	
+
 }
 
 function _drawMuleTaskIcon(paper, startX, startY)
@@ -140,12 +140,12 @@ function _drawMuleTaskIcon(paper, startX, startY)
 		"stroke": "none",
 		"fill": "#bd4848"
  	});
-	
+
 	startX += 4;
 	startY += 2;
 
 	path.transform("T" + startX + "," + startY);
-	
+
 }
 
 function _drawAlfrescoPublishTaskIcon(paper, startX, startY)
@@ -206,6 +206,37 @@ function _drawHttpTaskIcon(paper, startX, startY)
 
 }
 
+function _drawShellTaskIcon(paper, startX, startY) {
+    var path = paper.path("m 1,2 0,14 16,0 0,-14 z m 1.4,3 12.7,0 0,10 -12.7,0 z");
+    path.attr({
+        "opacity": 1,
+        "stroke": "none",
+        "fill": "#16964d"
+    });
+    var text = paper.text(3, 9, ">_").attr({
+        "font-size": "5px",
+        "fill": "#16964d"
+    });
+
+    startY += -2;
+    text.transform("T" + startX + "," + startY);
+    startX += -2;
+    path.transform("T" + startX + "," + startY);
+}
+
+function _drawBusinessRuleTaskIcon(paper, startX, startY) {
+    var path1 = paper.path("m 1,2 0,14 16,0 0,-14 z m 1.45458,5.6000386 2.90906,0 0,2.7999224 -2.90906,0 z m 4.36364,0 8.72718,0 0,2.7999224 -8.72718,0 z m -4.36364,4.1998844 2.90906,0 0,2.800116 -2.90906,0 z m 4.36364,0 8.72718,0 0,2.800116 -8.72718,0 z");
+    path1.attr({
+        "stroke": "none",
+        "fill": "#72a7d0"
+    });
+
+    var businessRuleTaskIcon = paper.set();
+    businessRuleTaskIcon.push(path1);
+
+    businessRuleTaskIcon.transform("T" + startX + "," + startY);
+}
+
 function _drawEventIcon(paper, element)
 {
 	if (element.eventDefinition && element.eventDefinition.type)
@@ -233,14 +264,14 @@ function _drawTimerIcon(paper, element)
 {
 	var x = element.x + (element.width / 2);
 	var y = element.y + (element.height / 2);
-	
+
 	var circle = paper.circle(x, y, 10);
 
 	circle.attr({"stroke-width": 1,
 		"stroke": "black",
 		"fill": "none"
  	});
-	
+
 	var path = paper.path("M 10 0 C 4.4771525 0 0 4.4771525 0 10 C 0 15.522847 4.4771525 20 10 20 C 15.522847 20 20 15.522847 20 10 C 20 4.4771525 15.522847 1.1842379e-15 10 0 z M 9.09375 1.03125 C 9.2292164 1.0174926 9.362825 1.0389311 9.5 1.03125 L 9.5 3.5 L 10.5 3.5 L 10.5 1.03125 C 15.063526 1.2867831 18.713217 4.9364738 18.96875 9.5 L 16.5 9.5 L 16.5 10.5 L 18.96875 10.5 C 18.713217 15.063526 15.063526 18.713217 10.5 18.96875 L 10.5 16.5 L 9.5 16.5 L 9.5 18.96875 C 4.9364738 18.713217 1.2867831 15.063526 1.03125 10.5 L 3.5 10.5 L 3.5 9.5 L 1.03125 9.5 C 1.279102 5.0736488 4.7225326 1.4751713 9.09375 1.03125 z M 9.5 5 L 9.5 8.0625 C 8.6373007 8.2844627 8 9.0680195 8 10 C 8 11.104569 8.8954305 12 10 12 C 10.931981 12 11.715537 11.362699 11.9375 10.5 L 14 10.5 L 14 9.5 L 11.9375 9.5 C 11.756642 8.7970599 11.20294 8.2433585 10.5 8.0625 L 10.5 5 L 9.5 5 z");
 	path.attr({
 		"stroke": "none",
@@ -253,7 +284,7 @@ function _drawTimerIcon(paper, element)
 function _drawErrorIcon(paper, element)
 {
 	var path = paper.path("M 22.820839,11.171502 L 19.36734,24.58992 L 13.54138,14.281819 L 9.3386512,20.071607 L 13.048949,6.8323057 L 18.996148,16.132659 L 22.820839,11.171502 z");
-	
+
 	var fill = "none";
 	var x = element.x - 1;
 	var y = element.y - 1;
@@ -263,13 +294,13 @@ function _drawErrorIcon(paper, element)
 		x -= 1;
 		y -= 1;
 	}
-	
+
 	path.attr({
 		"stroke": "black",
 		"stroke-width": 1,
 		"fill": fill
  	});
-	
+
 	path.transform("T" + x + "," + y);
 	return path;
 }
@@ -281,7 +312,7 @@ function _drawSignalIcon(paper, element)
 	{
 		fill = "black";
 	}
-	
+
 	var path = paper.path("M 8.7124971,21.247342 L 23.333334,21.247342 L 16.022915,8.5759512 L 8.7124971,21.247342 z");
 	path.attr({
 		"stroke": "black",

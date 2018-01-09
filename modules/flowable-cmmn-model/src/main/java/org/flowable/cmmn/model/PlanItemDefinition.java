@@ -18,6 +18,7 @@ package org.flowable.cmmn.model;
 public class PlanItemDefinition extends CaseElement {
     
     protected String planItemRef;
+    protected PlanItemControl defaultControl;
 
     public String getPlanItemRef() {
         return planItemRef;
@@ -26,10 +27,19 @@ public class PlanItemDefinition extends CaseElement {
     public void setPlanItemRef(String planItemRef) {
         this.planItemRef = planItemRef;
     }
+    
+    public PlanItemControl getDefaultControl() {
+        return defaultControl;
+    }
+
+    public void setDefaultControl(PlanItemControl defaultControl) {
+        this.defaultControl = defaultControl;
+    }
 
     public void setValues(PlanItemDefinition otherElement) {
         super.setValues(otherElement);
         setPlanItemRef(otherElement.getPlanItemRef());
+        setDefaultControl(otherElement.getDefaultControl());
     }
     
     @Override

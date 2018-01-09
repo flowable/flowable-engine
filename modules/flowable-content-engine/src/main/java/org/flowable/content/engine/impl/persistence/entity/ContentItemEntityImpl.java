@@ -32,6 +32,8 @@ public class ContentItemEntityImpl extends AbstractEntityNoRevision implements C
     protected String mimeType;
     protected String taskId;
     protected String processInstanceId;
+    protected String scopeId;
+    protected String scopeType;
     protected String contentStoreId;
     protected String contentStoreName;
     protected boolean contentAvailable;
@@ -60,6 +62,8 @@ public class ContentItemEntityImpl extends AbstractEntityNoRevision implements C
         persistentState.put("lastModified", this.lastModified);
         persistentState.put("lastModifiedBy", this.lastModifiedBy);
         persistentState.put("tenantId", this.tenantId);
+        persistentState.put("scopeId", this.scopeId);
+        persistentState.put("scopeType", this.scopeType);
         return persistentState;
     }
 
@@ -204,6 +208,26 @@ public class ContentItemEntityImpl extends AbstractEntityNoRevision implements C
     @Override
     public void setTenantId(String tenantId) {
         this.tenantId = tenantId;
+    }
+    
+    @Override
+    public String getScopeId() {
+        return this.scopeId;
+    }
+
+    @Override
+    public void setScopeId(String scopeId) {
+        this.scopeId = scopeId;
+    }
+
+    @Override
+    public String getScopeType() {
+        return this.scopeType;
+    }
+
+    @Override
+    public void setScopeType(String scopeType) {
+        this.scopeType = scopeType;
     }
 
     @Override

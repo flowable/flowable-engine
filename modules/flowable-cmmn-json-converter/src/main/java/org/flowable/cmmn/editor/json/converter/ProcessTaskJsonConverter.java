@@ -61,7 +61,7 @@ public class ProcessTaskJsonConverter extends BaseCmmnJsonConverter implements P
             BaseElement parentElement, Map<String, JsonNode> shapeMap, CmmnModel cmmnModel, CmmnModelIdHelper cmmnModelIdHelper) {
         ProcessTask task = new ProcessTask();
         
-        JsonNode processModelReferenceNode = getProperty(PROPERTY_PROCESS_REFERENCE, elementNode);
+        JsonNode processModelReferenceNode = CmmnJsonConverterUtil.getProperty(PROPERTY_PROCESS_REFERENCE, elementNode);
         if (processModelReferenceNode != null && processModelReferenceNode.has("id") && !processModelReferenceNode.get("id").isNull()) {
 
             String processModelId = processModelReferenceNode.get("id").asText();

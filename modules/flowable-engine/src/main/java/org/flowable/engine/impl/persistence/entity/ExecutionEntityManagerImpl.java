@@ -551,37 +551,35 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
 
     @Override
     public void deleteChildExecutions(ExecutionEntity executionEntity, String deleteReason, boolean cancel) {
-        deleteChildExecutions(executionEntity, null, deleteReason, cancel, null);
+        deleteChildExecutions(executionEntity, null, null, deleteReason, cancel, null);
     }
 
     @Override
-    public void deleteChildExecutions(ExecutionEntity executionEntity, Collection<String> executionIdsNotToDelete, String deleteReason, boolean cancel, FlowElement cancelActivity) {
+    public void deleteChildExecutions(ExecutionEntity executionEntity, Collection<String> executionIdsNotToDelete,
+            Collection<String> executionIdsNotToSendCancelledEventFor, String deleteReason, boolean cancel, FlowElement cancelActivity) {
 
-        // The children of an execution for a tree. For correct deletions
-        // (taking care of foreign keys between child-parent)
+        // The children of an execution for a tree. For correct deletions (taking care of foreign keys between child-parent)
         // the leafs of this tree must be deleted first before the parents elements.
 
         List<ExecutionEntity> childExecutions = collectChildren(executionEntity, executionIdsNotToDelete);
         for (int i = childExecutions.size() - 1; i >= 0; i--) {
             ExecutionEntity childExecutionEntity = childExecutions.get(i);
             if (!childExecutionEntity.isEnded()) {
-                if (executionIdsNotToDelete == null || (executionIdsNotToDelete != null
-                        && !executionIdsNotToDelete.contains(childExecutionEntity.getId()))) {
+                if (executionIdsNotToDelete == null || (executionIdsNotToDelete != null && !executionIdsNotToDelete.contains(childExecutionEntity.getId()))) {
 
                     if (childExecutionEntity.isProcessInstanceType()) {
                         deleteProcessInstanceExecutionEntity(childExecutionEntity.getId(),
                                 cancelActivity != null ? cancelActivity.getId() : null, deleteReason, true, cancel, true);
 
                     } else {
-                        deleteExecutionAndRelatedData(childExecutionEntity, deleteReason);
-                        if (cancel) {
-                            dispatchExecutionCancelled(childExecutionEntity,
+                        if (cancel && (childExecutionEntity.isActive() || childExecutionEntity.isMultiInstanceRoot()) 
+                                && (executionIdsNotToSendCancelledEventFor == null || !executionIdsNotToSendCancelledEventFor.contains(childExecutionEntity.getId())))
+                            dispatchExecutionCancelled(childExecutionEntity, 
                                     cancelActivity != null ? cancelActivity : childExecutionEntity.getCurrentFlowElement());
-                        }
-
                     }
-
+                    deleteExecutionAndRelatedData(childExecutionEntity, deleteReason);
                 }
+
             }
         }
     }

@@ -276,7 +276,7 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
 
             if (theClass == null) {
                 // Default Camel behavior class
-                theClass = Class.forName("org.flowable.camel.impl.CamelBehaviorDefaultImpl");
+                theClass = Class.forName(getDefaultCamelBehaviorClassName());
             }
 
             List<FieldDeclaration> fieldDeclarations = createFieldDeclarations(fieldExtensions);
@@ -288,6 +288,10 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
             throw new FlowableException("Could not find org.flowable.camel.CamelBehavior: ", e);
         }
     }
+
+	protected String getDefaultCamelBehaviorClassName() {
+		return "org.flowable.camel.impl.CamelBehaviorDefaultImpl";
+	}
 
     private void addExceptionMapAsFieldDeclaration(List<FieldDeclaration> fieldDeclarations, List<MapExceptionEntry> mapExceptions) {
         FieldDeclaration exceptionMapsFieldDeclaration = new FieldDeclaration(EXCEPTION_MAP_FIELD, mapExceptions.getClass().toString(), mapExceptions);
@@ -321,7 +325,7 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
 
             if (theClass == null) {
                 // Default Http behavior class
-                theClass = Class.forName("org.flowable.http.impl.HttpActivityBehaviorImpl");
+                theClass = Class.forName("org.flowable.http.bpmn.impl.HttpActivityBehaviorImpl");
             }
 
             List<FieldDeclaration> fieldDeclarations = createFieldDeclarations(serviceTask.getFieldExtensions());

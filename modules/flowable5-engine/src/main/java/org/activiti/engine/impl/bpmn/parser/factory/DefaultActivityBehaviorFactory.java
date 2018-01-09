@@ -83,12 +83,14 @@ import org.flowable.bpmn.model.TaskWithFieldExtensions;
 import org.flowable.bpmn.model.ThrowEvent;
 import org.flowable.bpmn.model.Transaction;
 import org.flowable.bpmn.model.UserTask;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.delegate.BusinessRuleTaskDelegate;
 import org.flowable.engine.impl.bpmn.behavior.SimulationSubProcessActivityBehavior;
 import org.flowable.engine.impl.bpmn.data.SimpleDataInputAssociation;
 import org.flowable.engine.impl.bpmn.webservice.MessageImplicitDataOutputAssociation;
 import org.flowable.engine.impl.delegate.ActivityBehavior;
-import org.flowable.engine.common.api.delegate.Expression;
+
+import java.util.List;
 
 import java.util.List;
 
@@ -382,6 +384,7 @@ public class DefaultActivityBehaviorFactory extends AbstractBehaviorFactory impl
         }
 
         callActivityBehaviour.setInheritVariables(callActivity.isInheritVariables());
+        callActivityBehaviour.setSameDeployment(callActivity.isSameDeployment());
 
         for (IOParameter ioParameter : callActivity.getInParameters()) {
             if (StringUtils.isNotEmpty(ioParameter.getSourceExpression())) {

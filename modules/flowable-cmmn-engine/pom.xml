@@ -11,7 +11,7 @@
         <groupId>org.flowable</groupId>
         <artifactId>flowable-root</artifactId>
         <relativePath>../..</relativePath>
-        <version>6.2.1-SNAPSHOT</version>
+        <version>6.3.0-SNAPSHOT</version>
     </parent>
 
     <dependencies>
@@ -46,6 +46,10 @@
         <dependency>
             <groupId>org.flowable</groupId>
             <artifactId>flowable-task-service</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-job-service</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
@@ -115,6 +119,10 @@
             <artifactId>hsqldb</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.flowable</groupId>
+            <artifactId>flowable-dmn-api</artifactId>
+        </dependency>
     </dependencies>
 
     <properties>
@@ -172,7 +180,7 @@
         </plugins>
         <pluginManagement>
             <plugins>
-                <!--This plugin's configuration is used to store Eclipse 
+                <!--This plugin's configuration is used to store Eclipse
                     m2e settings only. It has no influence on the Maven build itself. -->
                 <plugin>
                     <groupId>org.eclipse.m2e</groupId>
@@ -214,7 +222,7 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be 
+                        <!-- only worked with this version, there might be
                             a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
                         <version>1.4</version>
                         <executions>
@@ -253,7 +261,7 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be 
+                        <!-- only worked with this version, there might be
                             a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
                         <version>1.4</version>
                         <executions>
@@ -310,7 +318,7 @@
                 <plugins>
                     <plugin>
                         <artifactId>maven-antrun-plugin</artifactId>
-                        <!-- only worked with this version, there might be 
+                        <!-- only worked with this version, there might be
                             a bug with antrun see http://jira.codehaus.org/browse/MANTRUN-109 -->
                         <version>1.4</version>
                         <executions>

@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -14,6 +14,7 @@
 package org.flowable.compatibility;
 
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -22,19 +23,24 @@ import java.util.Map;
 
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.impl.JobProcessorContextImpl;
 import org.activiti.engine.impl.asyncexecutor.AsyncJobUtil;
 import org.activiti.engine.impl.bpmn.behavior.BpmnActivityBehavior;
 import org.activiti.engine.impl.bpmn.helper.ErrorPropagation;
 import org.activiti.engine.impl.bpmn.helper.ErrorThrowingEventListener;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.cmd.ExecuteJobsCmd;
+import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.deploy.DeploymentManager;
+import org.activiti.engine.impl.persistence.entity.AbstractJobEntity;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
 import org.activiti.engine.impl.scripting.ScriptingEngines;
 import org.activiti.engine.repository.DeploymentBuilder;
+import org.activiti.engine.runtime.JobProcessor;
+import org.activiti.engine.runtime.JobProcessorContext;
 import org.activiti.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.MapExceptionEntry;
@@ -397,6 +403,31 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
             handleActivitiException(e);
             return null;
         }
+    }
+    
+    @Override
+    public ProcessInstance getProcessInstance(String processInstanceId) {
+        org.activiti.engine.runtime.ProcessInstance processInstance = getProcessEngine().getRuntimeService()
+                .createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+        if (processInstance != null) {
+            return new Flowable5ProcessInstanceWrapper(processInstance);
+        } else {
+            CommandContext commandContext = Context.getCommandContext();
+            if (commandContext != null) {
+                ExecutionEntity execution = commandContext
+                        .getExecutionEntityManager()
+                        .findExecutionById(processInstanceId);
+                if (execution != null) {
+                    return new Flowable5ProcessInstanceWrapper(execution);
+                }
+            }
+        }
+        return null;
+    }
+    
+    @Override
+    public void setProcessInstanceName(String processInstanceId, String processInstanceName) {
+        getProcessEngine().getRuntimeService().setProcessInstanceName(processInstanceId, processInstanceName);
     }
 
     @Override
@@ -879,7 +910,9 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         if (job == null)
             return;
         final ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
-        final org.activiti.engine.impl.persistence.entity.JobEntity activiti5Job = convertToActiviti5JobEntity((JobEntity) job, processEngineConfig);
+        final org.activiti.engine.impl.persistence.entity.JobEntity activiti5Job = convertToActiviti5JobEntity((JobEntity) job);
+
+        callJobProcessors(JobProcessorContext.Phase.BEFORE_EXECUTE, activiti5Job, processEngineConfig);
         processEngineConfig.getCommandExecutor().execute(new ExecuteJobsCmd(activiti5Job));
     }
 
@@ -888,13 +921,15 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         if (job == null)
             return;
         final ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
-        org.activiti.engine.impl.persistence.entity.JobEntity activity5Job = null;
+        org.activiti.engine.impl.persistence.entity.JobEntity activiti5Job;
         if (job instanceof org.activiti.engine.impl.persistence.entity.JobEntity) {
-            activity5Job = (org.activiti.engine.impl.persistence.entity.JobEntity) job;
+            activiti5Job = (org.activiti.engine.impl.persistence.entity.JobEntity) job;
         } else {
-            activity5Job = convertToActiviti5JobEntity((JobEntity) job, processEngineConfig);
+            activiti5Job = convertToActiviti5JobEntity((JobEntity) job);
         }
-        AsyncJobUtil.executeJob(activity5Job, processEngineConfig.getCommandExecutor());
+
+        callJobProcessors(JobProcessorContext.Phase.BEFORE_EXECUTE, activiti5Job, processEngineConfig);
+        AsyncJobUtil.executeJob(activiti5Job, processEngineConfig.getCommandExecutor());
     }
 
     @Override
@@ -902,7 +937,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         if (job == null)
             return;
         final ProcessEngineConfigurationImpl processEngineConfig = (ProcessEngineConfigurationImpl) getProcessEngine().getProcessEngineConfiguration();
-        final org.activiti.engine.impl.persistence.entity.JobEntity activity5Job = convertToActiviti5JobEntity((JobEntity) job, processEngineConfig);
+        final org.activiti.engine.impl.persistence.entity.JobEntity activity5Job = convertToActiviti5JobEntity((JobEntity) job);
         AsyncJobUtil.handleFailedJob(activity5Job, exception, processEngineConfig.getCommandExecutor());
     }
 
@@ -1010,6 +1045,19 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         throw new FlowableException("Getting the Camel context is not support in this engine configuration");
     }
 
+    @Override
+    public void setJobProcessor(List<Object> flowable5JobProcessors) {
+        getProcessEngine().getProcessEngineConfiguration().setJobProcessors(convertToFlowable5JobProcessors(flowable5JobProcessors));
+    }
+
+    private List<JobProcessor> convertToFlowable5JobProcessors(List<Object> jobProcessors) {
+        ArrayList<JobProcessor> flowable5JobProcessors = new ArrayList<>();
+        for (Object jobProcessor : jobProcessors) {
+            flowable5JobProcessors.add((org.activiti.engine.runtime.JobProcessor) jobProcessor);
+        }
+        return flowable5JobProcessors;
+    }
+
     protected ProcessEngine getProcessEngine() {
         if (processEngine == null) {
             synchronized (this) {
@@ -1066,7 +1114,7 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
         return activiti5Task;
     }
 
-    protected org.activiti.engine.impl.persistence.entity.JobEntity convertToActiviti5JobEntity(final JobEntity job, final ProcessEngineConfigurationImpl processEngineConfiguration) {
+    protected org.activiti.engine.impl.persistence.entity.JobEntity convertToActiviti5JobEntity(final JobEntity job) {
         org.activiti.engine.impl.persistence.entity.JobEntity activity5Job = new org.activiti.engine.impl.persistence.entity.JobEntity();
         activity5Job.setJobType(job.getJobType());
         activity5Job.setDuedate(job.getDuedate());
@@ -1115,6 +1163,13 @@ public class DefaultFlowable5CompatibilityHandler implements Flowable5Compatibil
             } else {
                 throw new FlowableException(e.getMessage(), e.getCause());
             }
+        }
+    }
+
+    protected void callJobProcessors(JobProcessorContext.Phase processorType, AbstractJobEntity abstractJobEntity, ProcessEngineConfigurationImpl processEngineConfiguration) {
+        JobProcessorContextImpl jobProcessorContext = new JobProcessorContextImpl(processorType, abstractJobEntity);
+        for (JobProcessor jobProcessor : processEngineConfiguration.getJobProcessors()) {
+            jobProcessor.process(jobProcessorContext);
         }
     }
 

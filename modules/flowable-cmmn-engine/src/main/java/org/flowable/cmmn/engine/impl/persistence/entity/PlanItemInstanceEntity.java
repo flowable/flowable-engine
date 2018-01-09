@@ -12,17 +12,14 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
-import java.util.List;
-
 import org.flowable.cmmn.api.delegate.DelegatePlanItemInstance;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
 
 /**
  * @author Joram Barrez
  */
-public interface PlanItemInstanceEntity extends Entity, DelegatePlanItemInstance, EntityWithSentryPartInstances {
+public interface PlanItemInstanceEntity extends Entity, DelegatePlanItemInstance, EntityWithSentryPartInstances, PlanItemInstanceContainer {
     
-    void setChildren(List<PlanItemInstanceEntity> children);
-    List<PlanItemInstanceEntity> getChildren();
+    PlanItemInstanceEntity getStagePlanItemInstanceEntity();
     
 }

@@ -172,7 +172,7 @@ public class BpmnDisplayJsonConverter {
             // ignore data objects in visual representation
             if (DataObject.class.isInstance(element)) {
                 continue;
-                
+
             } else if (element instanceof SequenceFlow) {
                 ObjectNode elementNode = objectMapper.createObjectNode();
                 SequenceFlow flow = (SequenceFlow) element;
@@ -228,6 +228,8 @@ public class BpmnDisplayJsonConverter {
 
                     } else if (ServiceTask.HTTP_TASK.equals(serviceTask.getType())) {
                         elementNode.put("taskType", "http");
+                    } else if (ServiceTask.SHELL_TASK.equals(serviceTask.getType())) {
+                        elementNode.put("taskType", "shell");
                     }
 
                 } else if (element instanceof BoundaryEvent) {

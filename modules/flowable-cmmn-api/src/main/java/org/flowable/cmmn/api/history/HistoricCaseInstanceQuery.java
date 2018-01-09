@@ -12,6 +12,7 @@
  */
 package org.flowable.cmmn.api.history;
 
+import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -138,6 +139,120 @@ public interface HistoricCaseInstanceQuery extends Query<HistoricCaseInstanceQue
      * Only select historic case instances that have no tenant identifier.
      */
     HistoricCaseInstanceQuery caseInstanceWithoutTenantId();
+    
+    /**
+     * Only select case instances which had a global variable with the given value when they ended. 
+     * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
+     * 
+     * @param name
+     *            of the variable, cannot be null.
+     */
+    HistoricCaseInstanceQuery variableValueEquals(String name, Object value);
+
+    /**
+     * Only select case instances which had at least one global variable with the given value when they ended. 
+     * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
+     */
+    HistoricCaseInstanceQuery variableValueEquals(Object value);
+
+    /**
+     * Only select historic case instances which have a string variable with the given value, case insensitive.
+     * 
+     * @param name
+     *            name of the variable, cannot be null.
+     * @param value
+     *            value of the variable, cannot be null.
+     */
+    HistoricCaseInstanceQuery variableValueEqualsIgnoreCase(String name, String value);
+
+    /**
+     * Only select case instances which had a global variable with the given name, but with a different value than the passed value when they ended. 
+     * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
+     * 
+     * @param name
+     *            of the variable, cannot be null.
+     */
+    HistoricCaseInstanceQuery variableValueNotEquals(String name, Object value);
+
+    /**
+     * Only select case instances which had a global variable value greater than the passed value when they ended. Booleans, 
+     * Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
+     * 
+     * @param name
+     *            cannot be null.
+     * @param value
+     *            cannot be null.
+     */
+    HistoricCaseInstanceQuery variableValueGreaterThan(String name, Object value);
+
+    /**
+     * Only select case instances which had a global variable value greater than or equal to the passed value when they ended. Booleans, Byte-arrays and {@link Serializable} objects (which are not
+     * primitive type wrappers) are not supported.
+     * 
+     * @param name
+     *            cannot be null.
+     * @param value
+     *            cannot be null.
+     */
+    HistoricCaseInstanceQuery variableValueGreaterThanOrEqual(String name, Object value);
+
+    /**
+     * Only select case instances which had a global variable value less than the passed value when the ended. 
+     * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
+     * 
+     * @param name
+     *            cannot be null.
+     * @param value
+     *            cannot be null.
+     */
+    HistoricCaseInstanceQuery variableValueLessThan(String name, Object value);
+
+    /**
+     * Only select case instances which has a global variable value less than or equal to the passed value when they ended. 
+     * Booleans, Byte-arrays and {@link Serializable} objects (which are not primitive type wrappers) are not supported.
+     * 
+     * @param name
+     *            cannot be null.
+     * @param value
+     *            cannot be null.
+     */
+    HistoricCaseInstanceQuery variableValueLessThanOrEqual(String name, Object value);
+
+    /**
+     * Only select case instances which had global variable value like the given value when they ended. This can be used on string variables only.
+     * 
+     * @param name
+     *            cannot be null.
+     * @param value
+     *            cannot be null. The string can include the wildcard character '%' to express like-strategy: starts with (string%), ends with (%string) or contains (%string%).
+     */
+    HistoricCaseInstanceQuery variableValueLike(String name, String value);
+
+    /**
+     * Only select case instances which had global variable value like (case insensitive) the given value when they ended. This can be used on string variables only.
+     * 
+     * @param name
+     *            cannot be null.
+     * @param value
+     *            cannot be null. The string can include the wildcard character '%' to express like-strategy: starts with (string%), ends with (%string) or contains (%string%).
+     */
+    HistoricCaseInstanceQuery variableValueLikeIgnoreCase(String name, String value);
+    
+    /**
+     * Only select case instances which have a variable with the given name.
+     * 
+     * @param name
+     *            cannot be null.
+     */
+    HistoricCaseInstanceQuery variableExists(String name);
+    
+    /**
+     * Only select case instances which does not have a variable with the given name.
+     * 
+     * @param name
+     *            cannot be null.
+     */
+    HistoricCaseInstanceQuery variableNotExists(String name);
     
     HistoricCaseInstanceQuery orderByCaseInstanceId();
     HistoricCaseInstanceQuery orderByCaseDefinitionKey();

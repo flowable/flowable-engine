@@ -36,4 +36,16 @@ public class CompletePlanItemInstanceOperation extends AbstractDeletePlanItemIns
         return PlanItemTransition.COMPLETE;
     }
     
+    @Override
+    protected boolean isEvaluateRepetitionRule() {
+        return true;
+    }
+    
+    @Override
+    protected void internalExecute() {
+        if (isStage(planItemInstanceEntity)) {
+            exitChildPlanItemInstances();
+        }
+    }
+    
 }

@@ -26,7 +26,7 @@ public interface DmnEngine {
     public static String VERSION = FlowableVersions.CURRENT_VERSION;
 
     /**
-     * The name as specified in 'dmn-engine-name' in the flowable.dmn.cfg.xml configuration file. The default name for a process engine is 'default
+     * The name as specified in 'dmn-engine-name' in the flowable.dmn.cfg.xml configuration file. The default name for a dmn engine is 'default
      */
     String getName();
 

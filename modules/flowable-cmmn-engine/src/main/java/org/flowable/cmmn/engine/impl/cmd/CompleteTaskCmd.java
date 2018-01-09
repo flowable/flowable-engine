@@ -63,7 +63,7 @@ public class CompleteTaskCmd implements Command<Void> {
             taskEntity.setTransientVariables(transientVariables);
         }
         
-        CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstance(planItemInstanceEntity);
+        CommandContextUtil.getAgenda(commandContext).planTriggerPlanItemInstanceOperation(planItemInstanceEntity);
         
         return null;
     }

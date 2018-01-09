@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -43,30 +43,30 @@ import org.joda.time.Period;
  * @author Joram Barrez
  */
 public class HumanTaskActivityBehavior extends TaskActivityBehavior implements PlanItemActivityBehavior {
-    
+
     protected HumanTask humanTask;
-    
+
     public HumanTaskActivityBehavior(HumanTask humanTask) {
-        super(humanTask);
+        super(humanTask.isBlocking(), humanTask.getBlockingExpression());
         this.humanTask = humanTask;
     }
 
     @Override
     public void execute(CommandContext commandContext, PlanItemInstanceEntity planItemInstanceEntity) {
-        if (evaluateIsBlocking(planItemInstanceEntity)) { 
-            
+        if (evaluateIsBlocking(planItemInstanceEntity)) {
+
             TaskService taskService = CommandContextUtil.getTaskService(commandContext);
             ExpressionManager expressionManager = CommandContextUtil.getExpressionManager(commandContext);
-            
+
             TaskEntity taskEntity = taskService.createTask();
-            
+
             taskEntity.setScopeId(planItemInstanceEntity.getCaseInstanceId());
             taskEntity.setSubScopeId(planItemInstanceEntity.getId());
             taskEntity.setScopeDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
             taskEntity.setScopeType(VariableScopeType.CMMN);
-            
+
             taskEntity.setTaskDefinitionKey(humanTask.getId());
-            
+
             handleTaskName(planItemInstanceEntity, expressionManager, taskEntity);
             handleTaskDescription(planItemInstanceEntity, expressionManager, taskEntity);
             handleAssignee(planItemInstanceEntity, taskService, expressionManager, taskEntity);
@@ -75,21 +75,21 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             handleFormKey(planItemInstanceEntity, expressionManager, taskEntity);
             handleDueDate(commandContext, planItemInstanceEntity, expressionManager, taskEntity);
             handleCategory(planItemInstanceEntity, expressionManager, taskEntity);
-            
+
             taskService.insertTask(taskEntity, true);
-            
+
             handleCandidateUsers(commandContext, planItemInstanceEntity, expressionManager, taskEntity);
             handleCandidateGroups(commandContext, planItemInstanceEntity, expressionManager, taskEntity);
-            
+
             CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskCreated(taskEntity);
-            
+
         } else {
             // if not blocking, treat as a manual task. No need to create a task entry.
-            CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance((PlanItemInstanceEntity) planItemInstanceEntity);
-            
+            CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation((PlanItemInstanceEntity) planItemInstanceEntity);
+
         }
     }
-    
+
     protected void handleTaskName(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager, TaskEntity taskEntity) {
         if (StringUtils.isNotEmpty(humanTask.getName())) {
             Object name = expressionManager.createExpression(humanTask.getName()).getValue(planItemInstanceEntity);
@@ -102,7 +102,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             }
         }
     }
-    
+
     protected void handleTaskDescription(PlanItemInstanceEntity planItemInstanceEntity, ExpressionManager expressionManager, TaskEntity taskEntity) {
         if (StringUtils.isNotEmpty(humanTask.getDocumentation())) {
             Object description = expressionManager.createExpression(humanTask.getDocumentation()).getValue(planItemInstanceEntity);
@@ -183,7 +183,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
                 if (dueDate instanceof Date) {
                     taskEntity.setDueDate((Date) dueDate);
                 } else if (dueDate instanceof String) {
-                    
+
                     String dueDateString = (String) dueDate;
                     if (dueDateString.startsWith("P")) {
                         taskEntity.setDueDate(new DateTime(CommandContextUtil.getCmmnEngineConfiguration(commandContext).getClock().getCurrentTime())
@@ -191,7 +191,7 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
                     } else {
                         taskEntity.setDueDate(DateTime.parse(dueDateString).toDate());
                     }
-                    
+
                 } else {
                     throw new FlowableIllegalArgumentException("Due date expression does not resolve to a Date or Date string: " + humanTask.getDueDate());
                 }
@@ -223,10 +223,10 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
                 if (value instanceof String) {
                     List<String> candidates = extractCandidates((String) value);
                     handleIdentityLinks(commandContext, taskEntity, CommandContextUtil.getIdentityLinkService().addCandidateUsers(taskEntity.getId(), candidates));
-                    
+
                 } else if (value instanceof Collection) {
                     handleIdentityLinks(commandContext, taskEntity, CommandContextUtil.getIdentityLinkService().addCandidateUsers(taskEntity.getId(), (Collection) value));
-                    
+
                 } else {
                     throw new FlowableException("Expression did not resolve to a string or collection of strings");
                 }
@@ -244,17 +244,17 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
                 if (value instanceof String) {
                     List<String> candidates = extractCandidates((String) value);
                     handleIdentityLinks(commandContext, taskEntity, CommandContextUtil.getIdentityLinkService().addCandidateGroups(taskEntity.getId(), candidates));
-                    
+
                 } else if (value instanceof Collection) {
                     handleIdentityLinks(commandContext, taskEntity, CommandContextUtil.getIdentityLinkService().addCandidateGroups(taskEntity.getId(), (Collection) value));
-                    
+
                 } else {
                     throw new FlowableIllegalArgumentException("Expression did not resolve to a string or collection of strings");
                 }
             }
         }
     }
-    
+
     protected void handleIdentityLinks(CommandContext commandContext, TaskEntity taskEntity, List<IdentityLinkEntity> identityLinkEntities) {
         for (IdentityLinkEntity identityLinkEntity : identityLinkEntities) {
             if (CommandContextUtil.getCmmnEngineConfiguration().isEnableTaskRelationshipCounts()) {
@@ -266,33 +266,33 @@ public class HumanTaskActivityBehavior extends TaskActivityBehavior implements P
             taskEntity.getIdentityLinks().add(identityLinkEntity);
         }
     }
-    
+
     protected List<String> extractCandidates(String str) {
         return Arrays.asList(str.split("[\\s]*,[\\s]*"));
     }
-    
+
     @Override
     public void trigger(CommandContext commandContext, PlanItemInstanceEntity planItemInstance) {
         if (!PlanItemInstanceState.ACTIVE.equals(planItemInstance.getState())) {
             throw new FlowableException("Can only trigger a human task plan item that is in the ACTIVE state");
         }
-        
+
         TaskService taskService = CommandContextUtil.getTaskService(commandContext);
         List<TaskEntity> taskEntities = taskService.findTasksBySubScopeIdScopeType(planItemInstance.getId(), VariableScopeType.CMMN);
         if (taskEntities == null || taskEntities.isEmpty()) {
             throw new FlowableException("No task entity found for plan item instance " + planItemInstance.getId());
         }
-        
+
         // Should be only one
         for (TaskEntity taskEntity : taskEntities) {
             if (!taskEntity.isDeleted()) {
                 TaskHelper.deleteTask(taskEntity, null, false, true);
             }
         }
-        
-        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstance((PlanItemInstanceEntity) planItemInstance);
+
+        CommandContextUtil.getAgenda(commandContext).planCompletePlanItemInstanceOperation((PlanItemInstanceEntity) planItemInstance);
     }
-    
+
     @Override
     public void onStateTransition(CommandContext commandContext, DelegatePlanItemInstance planItemInstance, String transition) {
         if (PlanItemTransition.TERMINATE.equals(transition) || PlanItemTransition.EXIT.equals(transition)) {

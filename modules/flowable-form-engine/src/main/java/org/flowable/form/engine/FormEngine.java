@@ -25,7 +25,7 @@ public interface FormEngine {
     public static String VERSION = FlowableVersions.CURRENT_VERSION;
 
     /**
-     * The name as specified in 'form-engine-name' in the flowable.form.cfg.xml configuration file. The default name for a process engine is 'default
+     * The name as specified in 'form-engine-name' in the flowable.form.cfg.xml configuration file. The default name for a form engine is 'default
      */
     String getName();
 

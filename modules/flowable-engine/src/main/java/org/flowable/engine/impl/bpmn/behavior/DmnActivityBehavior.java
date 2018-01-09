@@ -15,6 +15,7 @@ package org.flowable.engine.impl.bpmn.behavior;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.FieldExtension;
 import org.flowable.bpmn.model.Task;
 import org.flowable.dmn.api.DecisionExecutionAuditContainer;
@@ -22,6 +23,7 @@ import org.flowable.dmn.api.DmnRuleService;
 import org.flowable.engine.DynamicBpmnConstants;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
+import org.flowable.engine.common.api.delegate.Expression;
 import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.DelegateHelper;
@@ -108,12 +110,29 @@ public class DmnActivityBehavior extends TaskActivityBehavior {
 
         /*Throw error if there were no rules hit when the flag indicates to do this.*/
         FieldExtension throwErrorFieldExtension = DelegateHelper.getFlowElementField(execution, EXPRESSION_DECISION_TABLE_THROW_ERROR_FLAG);
-        if (decisionExecutionAuditContainer.getDecisionResult().isEmpty() && 
-                        throwErrorFieldExtension != null && "true".equalsIgnoreCase(throwErrorFieldExtension.getStringValue())) {
+        if (throwErrorFieldExtension != null) {
+            String throwErrorString = null;
+            if (StringUtils.isNotEmpty(throwErrorFieldExtension.getStringValue())) {
+                throwErrorString = throwErrorFieldExtension.getStringValue();
+                
+            } else if (StringUtils.isNotEmpty(throwErrorFieldExtension.getExpression())) {
+                throwErrorString = throwErrorFieldExtension.getExpression();
+            }
             
-            throw new FlowableException("DMN decision table with key " + finaldecisionTableKeyValue + " did not hit any rules for the provided input.");
+            if (decisionExecutionAuditContainer.getDecisionResult().isEmpty() && throwErrorString != null) {
+                if ("true".equalsIgnoreCase(throwErrorString)) {
+                    throw new FlowableException("DMN decision table with key " + finaldecisionTableKeyValue + " did not hit any rules for the provided input.");
+                    
+                } else if (!"false".equalsIgnoreCase(throwErrorString)) {
+                    Expression expression = expressionManager.createExpression(throwErrorString);
+                    Object expressionValue = expression.getValue(execution);
+                    
+                    if (expressionValue != null && expressionValue instanceof Boolean && ((Boolean) expressionValue)) {
+                        throw new FlowableException("DMN decision table with key " + finaldecisionTableKeyValue + " did not hit any rules for the provided input.");
+                    }
+                }
+            }
         }
-
 
         setVariablesOnExecution(decisionExecutionAuditContainer.getDecisionResult(), finaldecisionTableKeyValue, execution, processEngineConfiguration.getObjectMapper());
 

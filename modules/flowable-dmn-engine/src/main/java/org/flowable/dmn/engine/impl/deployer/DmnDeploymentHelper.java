@@ -98,13 +98,13 @@ public class DmnDeploymentHelper {
     }
 
     /**
-     * Gets the persisted version of the already-deployed process definition. Note that this is different from {@link #getMostRecentVersionOfDecisionTable} as it looks specifically for a process
-     * definition that is already persisted and attached to a particular deployment, rather than the latest version across all deployments.
+     * Gets the persisted version of the already-deployed decision table. Note that this is different from {@link #getMostRecentVersionOfDecisionTable} as it looks specifically for a decision
+     * table that is already persisted and attached to a particular deployment, rather than the latest version across all deployments.
      */
     public DecisionTableEntity getPersistedInstanceOfDecisionTable(DecisionTableEntity decisionTable) {
         String deploymentId = decisionTable.getDeploymentId();
         if (StringUtils.isEmpty(decisionTable.getDeploymentId())) {
-            throw new FlowableIllegalArgumentException("Provided process definition must have a deployment id.");
+            throw new FlowableIllegalArgumentException("Provided decision table must have a deployment id.");
         }
 
         DecisionTableEntityManager decisionTableEntityManager = CommandContextUtil.getDmnEngineConfiguration().getDecisionTableEntityManager();

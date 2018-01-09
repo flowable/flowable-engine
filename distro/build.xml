@@ -4,7 +4,7 @@
 
 	<property file="${user.home}/.flowable/build.properties" />
 
-	<property name="flowable.version" value="6.2.1-SNAPSHOT" />
+	<property name="flowable.version" value="6.3.0-SNAPSHOT" />
 	<property name="target.distro.root" value="target/zip/flowable-${flowable.version}" />
 	<property name="flowable.website" value="../../flowable-website" />
 
@@ -85,6 +85,9 @@
 			<fileset dir="../modules/flowable-engine-common/target">
 				<include name="flowable-engine-common-*.jar" />
 			</fileset>
+			<fileset dir="../modules/flowable-spring-common/target">
+                <include name="flowable-spring-common-*.jar" />
+            </fileset>
 			<fileset dir="../modules/flowable-spring/target">
 				<include name="flowable-spring-*.jar" />
 			</fileset>
@@ -256,6 +259,9 @@
 			<fileset dir="../modules/flowable-cdi/target">
 				<include name="flowable-cdi*.jar" />
 			</fileset>
+			<fileset dir="../modules/flowable-camel-cdi/target">
+                <include name="flowable-camel-cdi-*.jar" />
+            </fileset>
 			<fileset dir="../modules/flowable-cxf/target">
 				<include name="flowable-cxf-*.jar" />
 			</fileset>
@@ -286,6 +292,15 @@
 			<fileset dir="../modules/flowable-ui-common/target">
 				<include name="flowable-ui-common-*.jar" />
 			</fileset>
+			<fileset dir="../modules/flowable-ui-admin/flowable-ui-admin-conf/target">
+                <include name="flowable-ui-admin-conf-*.jar" />
+            </fileset>
+            <fileset dir="../modules/flowable-ui-admin/flowable-ui-admin-logic/target">
+                <include name="flowable-ui-admin-logic-*.jar" />
+            </fileset>
+            <fileset dir="../modules/flowable-ui-admin/flowable-ui-admin-rest/target">
+                <include name="flowable-ui-admin-rest-*.jar" />
+            </fileset>
 			<fileset dir="../modules/flowable-ui-idm/flowable-ui-idm-conf/target">
 				<include name="flowable-ui-idm-conf-*.jar" />
 			</fileset>
@@ -338,7 +353,7 @@
 			<fileset dir="../modules/flowable-ui-task/flowable-ui-task-app/target">
 				<include name="flowable-task.war" />
 			</fileset>
-			<fileset dir="../modules/flowable-ui-admin/target">
+			<fileset dir="../modules/flowable-ui-admin/flowable-ui-admin-app/target">
 				<include name="flowable-admin.war" />
 			</fileset>
 			<fileset dir="../modules/flowable-app-rest/target">

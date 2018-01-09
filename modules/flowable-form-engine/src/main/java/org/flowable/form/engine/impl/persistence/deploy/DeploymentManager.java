@@ -156,7 +156,7 @@ public class DeploymentManager {
             throw new FlowableObjectNotFoundException("Could not find a deployment with id '" + deploymentId + "'.");
         }
 
-        // Remove any process definition from the cache
+        // Remove any form definition from the cache
         List<FormDefinition> forms = new FormDefinitionQueryImpl().deploymentId(deploymentId).list();
 
         // Delete data

@@ -20,7 +20,7 @@ A *case model* is always visualized as some sort of _folder_ that contains all t
 
 The elements of a plan model are called *plan items*. Each _plan item_ has a *plan item definition* that gives its type and possible configuration options at runtime. For example, in the figure above, there are three *human task* plan items and one *milestone*. Other examples of plan items are _process tasks, case tasks and stages_.
 
-After having deployed a case model to the Flowable CMMN engine, it's possible to start *case instances* based on this case model. The plan items defined in the case model similarly have *plan item instance* runtime representations that are exposed by, and can be queried using, the Flowable API.
+After having deployed a case model to the Flowable CMMN engine, it's possible to start *case instances* based on this case model. The plan items defined in the case model similarly have *plan item instance* runtime representations that are exposed by, and can be queried using, the Flowable API. Plan item instances have a state lifecycle that is defined in the CMMN 1.1 specification and is core to how the engine works. Please check out section 8.4.2 of the CMMN 1.1 specification for all the details.
 
 Plan items can have _sentries_: a plan item is said to have _entry criteria_ when a sentry "guards" its activation. These criteria specify conditions that must be satisfied to _trigger the sentry_. For example, in the figure above, the "Milestone One" plan item is _available_ after a case instance is started, but it is _activated_ (in CMMN 1.1 specification terminology: it moves from the _available_ state to the _active_ state) when both human task A and B are completed. Note that sentries can have complex expression in their _if part_, which are not visualized, allowing for much more complex functionality. Also note that there can be multiple sentries, although only one needs to be satisfied to trigger a state transition.
 
@@ -540,6 +540,30 @@ A service task is visualized as a rounded rectangle with a cog icon in the top l
 
 image::images/cmmn.servicetask.png[align="center"]
 
+==== Decision task
+
+A _Decision task_ allows to call out to a DMN decision table and store the resulting variable in the case instance.
+
+Properties:
+
+* *Decision table reference*: the referenced DMN decision table that needs to be invoked.
+
+It is also possible to throw an error when no rule is hit during the evaluation of the DMN decision table, by setting the '_Throw error if no rules were hit_' property. 
+
+A decision task is visualized as a _task_ with a table icon in the top left corner:
+
+image::images/cmmn.decisiontask.png[align="center"]
+
+==== Http Task
+
+The Http task is an out-of-the-box implementation of a _service task_. It is used when a REST service needs to be called over HTTP.
+
+The Http task has various options to customize the request and response. See the BPMN http task documentation for details on all the configuration options. 
+
+A http task is visualized as a _task_ with a rocket icon in the top left corner:
+
+image::images/cmmn.httptask.png[align="center"]
+
 ==== Milestone
 
 A milestone is used to mark arriving at a certain point in the case instance. At runtime, they are represented as *MilestoneInstances* and they can be queried through the *MilestoneInstanceQuery* via the _CmmnRuntimeService_. There is also a historical counterpart via the _CmmnHistoryService_.
@@ -589,7 +613,9 @@ A process task is visualized as a rounded rectangle with an arrow icon in the to
 
 image::images/cmmn.processtask.png[align="center"]
 
-==== Entry criterion
+==== Criteria
+
+===== Entry criterion
 
 Entry criteria form a sentry for a given plan item instance. They consist of two parts:
 
@@ -604,7 +630,7 @@ An entry criteria is visualized as a diamond shape (white color inside) on the b
 
 image::images/cmmn.entrycriteria.png[align="center"]
 
-==== Exit criterion
+===== Exit criterion
 
 Exit criteria form a sentry for a given plan item instance. They consist of two parts:
 
@@ -618,3 +644,87 @@ Multiple sentries are possible on a plan item. However, when one is satisfied, t
 An exit criteria is visualized as a diamond shape (white color inside) on the border of a plan item:
 
 image::images/cmmn.exitcriteria.png[align="center"]
+
+==== Event Listeners
+
+===== Timer Event Listener
+
+A timer event listener is used when the passing of time needs to be captured in a case model.
+
+A timer event listener is not a task and has a simpler plan item lifecycle compared to a _task_: the timer will simply move from _available_ to _completed_ when the event (in this case, the time passing) occurs.
+
+Properties:
+
+* *Timer expression*: an expression that defines when the timer should occur. Following options are possible:
+** An expression resolving to a java.util.Date or org.joda.time.DateTime instance (for example _${someBean.calculateNextDate(someCaseInstanceVariable)})
+** An ISO8601 date 
+** An ISO8601 duration String (for example _PT5H_, indicating the timer should fire in 5 hours from instantiation)
+** AN ISO8601 repetition String (for example R5/PT2H, indicating the timer should fire 5 times, each time waiting 2 hours)  
+** A String containing a cron expression
+* *Start trigger plan item/event*: allows to reference a plan item in the case model that triggers the start of the timer event listener.
+
+Note that setting a _start trigger_ for the timer event listener does not have a visual indication in the case model, as entry/exit criteria on sentries do have.
+
+A timer event listener is visualized as circle with a clock icon inside:
+
+image::images/cmmn.timereventlistener.png[align="center"]
+
+==== Item control: Repetition Rule
+
+Plan items on the case model can have a _repetition rule_, an expression that can be used to indicate a certain plan item needs to be repeated.
+When no expression is set, but the repetition is enabled (e.g. the checkbox is checked in the Flowable Modeler) or the expression is empty, a _true_ value is assumed by default.
+
+An optional _repetition counter variable_ can be set, that holds the index (one-based) of the instance. If not set, the default variable name is _repeitionCounter_.
+
+If the plan item does not have any entry criteria, the repetition rule expression is evaluated when the plan item is completed or terminated. If the expression resolved to _true_, a new instance is created. For example, a human task with a repetition rule expression _${repetitionCounter < 3}_, will create three sequential human tasks.
+
+If the plan item does have entry criteria, the behavior is different. The repetition rule is not evaluated on completion or termination, but when a sentry of the plan item is satisfied. If both the sentry is satisfied and the repetition rule evaluates to true, a new instance is created. 
+
+Take for example the following timer event listener followed by a human task. The sentry has one entry criteria for the _occur_ event of the timer event listener. Note that enabling and setting the repetition rule on the task has a visual indication at the bottom of the rectangle.  
+
+image::images/cmmn.repeatingtimereventlistener.png[align="center"]
+
+If the timer event listener is repeating (for example _R/PT1H_), the _occur_ event will be fired every hour. When the repetition rule expression of the human task evaluates to true, a new human task instance will be created each hour.
+
+==== Item control: Manual Activation Rule
+
+Plan items on the case model can have a _manual activation rule_, an expression that can be used to indicate a certain plan item needs need to be _manually activated by an end-user_.
+When no expression is set, but the manual activation is enabled (e.g. the checkbox is checked in the Flowable Modeler) or the expression is empty, a _true_ value is assumed by default.
+
+Stages and all task types can be marked for manual activation. Visually, the task or stage will get a 'play' icon (small triangle pointing to the right) to indicate an end-user will have to manually activate it: 
+
+image::images/cmmn.manual-activation.png[align="center"]
+
+Normally, when a sentry for a plan item is satisfied (or the plan item doesn't have any sentries) the plan item instance is automatically moved to the _ACTIVE_ state. When a manual activation is set though, and it evaluates to true, the plan item instance now becomes _ENABLED_ instead of _ACTIVE_. As the name implies, the idea behind this is that end-users manually have to activate the plan item instance. A typical use case is for example showing a list of buttons of potential plan item instances that can currently be started by the end user.
+
+To start an enabled plan item instance, the _startPlanItemInstance_ method of the _CmmnRuntimeService_ can be used:
+
+[source,java,linenums]
+----
+List<PlanItemInstance> enabledPlanItemInstances = cmmnRuntimeService.createPlanItemInstanceQuery()
+    .caseInstanceId(caseInstance.getId())
+    .planItemInstanceStateEnabled()
+    .list();
+    
+// ...
+        
+cmmnRuntimeService.startPlanItemInstance(planItemInstance.getId());
+----
+
+Note that the behaviour of a task only is executed when the plan item instance moves into the _ACTIVE_ state. For example, for a human task, the user task will only be created after calling the _startPlanItemInstance_ method.
+
+Plan item instances that are enabled, can be moved into the _DISABLED_ state:
+
+[source,java,linenums]
+----
+cmmnRuntimeService.disablePlanItemInstance(planItemInstance.getId());
+----
+
+Disabled plan item instances can be enabled again:
+[source,java,linenums]
+----
+cmmnRuntimeService.enablePlanItemInstance(planItemInstance.getId());
+----
+
+Note that with regards to determining stage or case instance termination, the _DISABLED_ state is seen as a 'terminal' state. This means that the case instance will terminate when only disabled plan item instances would remain.
+

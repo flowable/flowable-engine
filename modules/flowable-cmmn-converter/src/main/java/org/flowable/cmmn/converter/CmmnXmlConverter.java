@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -11,30 +11,6 @@
  * limitations under the License.
  */
 package org.flowable.cmmn.converter;
-
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.xml.XMLConstants;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLOutputFactory;
-import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
-import javax.xml.stream.XMLStreamWriter;
-import javax.xml.transform.stax.StAXSource;
-import javax.xml.transform.stream.StreamSource;
-import javax.xml.validation.Schema;
-import javax.xml.validation.SchemaFactory;
-import javax.xml.validation.Validator;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.converter.exception.XMLException;
@@ -50,6 +26,7 @@ import org.flowable.cmmn.model.CmmnDiEdge;
 import org.flowable.cmmn.model.CmmnDiShape;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.cmmn.model.Criterion;
+import org.flowable.cmmn.model.DecisionTask;
 import org.flowable.cmmn.model.HasEntryCriteria;
 import org.flowable.cmmn.model.HasExitCriteria;
 import org.flowable.cmmn.model.PlanFragment;
@@ -66,6 +43,28 @@ import org.flowable.engine.common.api.io.InputStreamProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
+
+import javax.xml.XMLConstants;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLOutputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.stream.XMLStreamWriter;
+import javax.xml.transform.stax.StAXSource;
+import javax.xml.transform.stream.StreamSource;
+import javax.xml.validation.Schema;
+import javax.xml.validation.SchemaFactory;
+import javax.xml.validation.Validator;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * @author Joram Barrez
@@ -91,6 +90,11 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new TaskXmlConverter());
         addElementConverter(new HumanTaskXmlConverter());
         addElementConverter(new PlanItemXmlConverter());
+        addElementConverter(new ItemControlXmlConverter());
+        addElementConverter(new DefaultControlXmlConverter());
+        addElementConverter(new RequiredRuleXmlConverter());
+        addElementConverter(new RepetitionRuleXmlConverter());
+        addElementConverter(new ManualActivationRuleXmlConverter());
         addElementConverter(new SentryXmlConverter());
         addElementConverter(new EntryCriterionXmlConverter());
         addElementConverter(new ExitCriterionXmlConverter());
@@ -99,17 +103,22 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
         addElementConverter(new CaseTaskXmlConverter());
         addElementConverter(new ProcessXmlConverter());
         addElementConverter(new ProcessTaskXmlConverter());
+        addElementConverter(new DecisionXmlConverter());
+        addElementConverter(new DecisionTaskXmlConverter());
         addElementConverter(new TimerEventListenerXmlConverter());
         addElementConverter(new PlanItemStartTriggerXmlConverter());
         addElementConverter(new CmmnDiShapeXmlConverter());
         addElementConverter(new CmmnDiEdgeXmlConverter());
         addElementConverter(new CmmnDiBoundsXmlConverter());
         addElementConverter(new CmmnDiWaypointXmlConverter());
-        
+
         addElementConverter(new FieldExtensionXmlConverter());
+        addElementConverter(new FlowableHttpResponseHandlerXmlConverter());
+        addElementConverter(new FlowableHttpRequestHandlerXmlConverter());
 
         addTextConverter(new StandardEventXmlConverter());
         addTextConverter(new ProcessRefExpressionXmlConverter());
+        addTextConverter(new DecisionRefExpressionXmlConverter());
         addTextConverter(new ConditionXmlConverter());
         addTextConverter(new TimerExpressionXmlConverter());
     }
@@ -313,7 +322,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             processPlanFragment(cmmnModel, caze.getPlanModel());
         }
 
-        // CMMN doesn't mandate ids on many elements ... adding generated ids 
+        // CMMN doesn't mandate ids on many elements ... adding generated ids
         // to those elements as this makes the logic much easier
         ensureIds(conversionHelper.getPlanFragments(), "planFragment_");
         ensureIds(conversionHelper.getStages(), "stage_");
@@ -342,7 +351,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             association.setId(diEdge.getId());
             association.setSourceRef(diEdge.getCmmnElementRef());
             association.setTargetRef(diEdge.getTargetCmmnElementRef());
-            
+
             String planItemSourceRef = null;
             PlanItem planItem = cmmnModel.findPlanItem(association.getSourceRef());
             if (planItem == null) {
@@ -351,7 +360,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
             } else {
                 planItemSourceRef = association.getSourceRef();
             }
-            
+
             if (planItem != null) {
                 for (Criterion criterion : planItem.getEntryCriteria()) {
                     Sentry sentry = criterion.getSentry();
@@ -363,7 +372,7 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     }
                 }
             }
-            
+
             cmmnModel.addAssociation(association);
 
             cmmnModel.addFlowGraphicInfoList(association.getId(), diEdge.getWaypoints());
@@ -413,9 +422,10 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                 }
 
                 if (exitCriteriaAllowed) {
-                    resolveExitCriteriaSentry((HasExitCriteria) planItem);
+                    resolveExitCriteriaSentry(planItem);
                 } else {
                     LOGGER.warn("Ignoring exit criteria on plan item {}", planItem.getId());
+                    planItem.getExitCriteria().clear();
                 }
             }
 
@@ -431,17 +441,44 @@ public class CmmnXmlConverter implements CmmnXmlConstants {
                     }
                 }
 
+            } else if (planItemDefinition instanceof DecisionTask) {
+                DecisionTask decisionTask = (DecisionTask) planItemDefinition;
+                if (decisionTask.getDecisionRef() != null) {
+                    org.flowable.cmmn.model.Decision decision = cmmnModel.getDecisionById(decisionTask.getDecisionRef());
+                    if (decision != null) {
+                        decisionTask.setDecision(decision);
+                    }
+                }
+
             } else if (planItemDefinition instanceof TimerEventListener) {
                 TimerEventListener timerEventListener = (TimerEventListener) planItemDefinition;
                 String sourceRef = timerEventListener.getTimerStartTriggerSourceRef();
                 PlanItem startTriggerPlanItem = timerEventListener.getParentStage().findPlanItemInPlanFragmentOrUpwards(sourceRef);
                 if (startTriggerPlanItem != null) {
                     timerEventListener.setTimerStartTriggerPlanItem(startTriggerPlanItem);
+                    
+                    // Although the CMMN spec does not categorize the timer start trigger as an entry criterion,
+                    // it is exposed as such to the engine as there is no difference in handling it vs a real criterion
+                    // which means no special care will need to be taken in the core engine operations
+                    
+                    Criterion criterion = new Criterion();
+                    criterion.setEntryCriterion(true);
+                    
+                    SentryOnPart sentryOnPart = new SentryOnPart();
+                    sentryOnPart.setSourceRef(startTriggerPlanItem.getId());
+                    sentryOnPart.setSource(startTriggerPlanItem);
+                    sentryOnPart.setStandardEvent(timerEventListener.getTimerStartTriggerStandardEvent());
+                    
+                    Sentry sentry = new Sentry();
+                    sentry.addSentryOnPart(sentryOnPart);
+                    
+                    criterion.setSentry(sentry);
+                    planItem.addEntryCriterion(criterion);
                 }
             }
 
         }
-        
+
     }
 
     protected void resolveEntryCriteria(HasEntryCriteria hasEntryCriteria) {

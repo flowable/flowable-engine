@@ -40,6 +40,14 @@ public interface ContentItem {
     String getProcessInstanceId();
 
     void setProcessInstanceId(String processInstanceId);
+    
+    String getScopeId();
+
+    void setScopeId(String scopeId);
+
+    String getScopeType();
+
+    void setScopeType(String scopeType);
 
     String getContentStoreId();
 

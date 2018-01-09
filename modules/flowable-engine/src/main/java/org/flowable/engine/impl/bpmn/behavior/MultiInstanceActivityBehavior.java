@@ -15,6 +15,7 @@ package org.flowable.engine.impl.bpmn.behavior;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -72,6 +73,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     private static final long serialVersionUID = 1L;
 
     protected static final Logger LOGGER = LoggerFactory.getLogger(MultiInstanceActivityBehavior.class);
+    protected static final String DELETE_REASON_END = "MI_END";
 
     // Variable names for outer instance(as described in spec)
     protected final String NUMBER_OF_INSTANCES = "nrOfInstances";
@@ -144,8 +146,9 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
         ExecutionEntity parentExecution = multiInstanceRootExecution.getParent();
         
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager();
-        executionEntityManager.deleteChildExecutions(multiInstanceRootExecution, "MI_END", false);
-        executionEntityManager.deleteRelatedDataForExecution(multiInstanceRootExecution, null);
+        Collection<String> executionIdsNotToSendCancelledEventsFor = execution.isMultiInstanceRoot() ? null : Collections.singletonList(execution.getId());
+        executionEntityManager.deleteChildExecutions(multiInstanceRootExecution, null, executionIdsNotToSendCancelledEventsFor, DELETE_REASON_END, true, flowElement);
+        executionEntityManager.deleteRelatedDataForExecution(multiInstanceRootExecution, DELETE_REASON_END);
         executionEntityManager.delete(multiInstanceRootExecution);
 
         ExecutionEntity newExecution = executionEntityManager.createChildExecution(parentExecution);

@@ -241,7 +241,7 @@ public class ModelServiceImpl implements ModelService {
                 throw new InternalServerErrorException("Error creating app definition");
             }
 
-        } else if (Integer.valueOf(AbstractModel.MODEL_TYPE_CMMN).equals(modelRepresentation.getModelType())) {
+        } else if (Integer.valueOf(AbstractModel.MODEL_TYPE_CMMN).equals(model.getModelType())) {
             ObjectNode editorNode = objectMapper.createObjectNode();
             editorNode.put("id", "canvas");
             editorNode.put("resourceId", "canvas");
@@ -1091,6 +1091,7 @@ public class ModelServiceImpl implements ModelService {
 
                 // Relations
                 handleCmmnFormModelRelations(model, jsonNode);
+                handleCmmnDecisionModelRelations(model, jsonNode);
                 handleCmmnCaseModelRelations(model, jsonNode);
                 handleCmmnProcessModelRelations(model, jsonNode);
 
@@ -1134,6 +1135,13 @@ public class ModelServiceImpl implements ModelService {
         Set<String> formIds = JsonConverterUtil.gatherStringPropertyFromJsonNodes(formReferenceNodes, "id");
 
         handleModelRelations(caseModel, formIds, ModelRelationTypes.TYPE_FORM_MODEL_CHILD);
+    }
+
+    protected void handleCmmnDecisionModelRelations(AbstractModel caseModel, ObjectNode editorJsonNode) {
+        List<JsonNode> processReferenceNodes = CmmnModelJsonConverterUtil.filterOutJsonNodes(CmmnModelJsonConverterUtil.getCmmnModelDecisionTableReferences(editorJsonNode));
+        Set<String> processModelIds = JsonConverterUtil.gatherStringPropertyFromJsonNodes(processReferenceNodes, "id");
+
+        handleModelRelations(caseModel, processModelIds, ModelRelationTypes.TYPE_DECISION_TABLE_MODEL_CHILD);
     }
 
     protected void handleCmmnCaseModelRelations(AbstractModel caseModel, ObjectNode editorJsonNode) {

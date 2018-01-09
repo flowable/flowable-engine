@@ -31,23 +31,12 @@ import static org.junit.Assert.assertThat;
 
 public class SentryConverterTest extends AbstractConverterTest {
 
-    @Test
-    public void convertJsonToModel() throws Exception {
-        CmmnModel cmmnModel = readJsonFile();
-        validateModel(cmmnModel);
-    }
-
-    @Test
-    public void doubleConversionValidation() throws Exception {
-        CmmnModel cmmnModel = readJsonFile();
-        cmmnModel = convertToJsonAndBack(cmmnModel);
-        validateModel(cmmnModel);
-    }
-
+    @Override
     protected String getResource() {
         return "test.sentryIfpartmodel.json";
     }
 
+    @Override
     protected void validateModel(CmmnModel model) {
         Case caseModel = model.getPrimaryCase();
         Stage planModelStage = caseModel.getPlanModel();

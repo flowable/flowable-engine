@@ -23,11 +23,13 @@ import org.flowable.engine.common.api.FlowableException;
  */
 public class FlowableVersions {
     
-    public static final String CURRENT_VERSION = "6.2.1.0"; // Note the extra .x at the end. To cater for snapshot releases with different database changes
+    public static final String CURRENT_VERSION = "6.3.0.0"; // Note the extra .x at the end. To cater for snapshot releases with different database changes
     
     public static final List<FlowableVersion> FLOWABLE_VERSIONS = new ArrayList<>();
     
     public static final String LAST_V5_VERSION = "5.99.0.0";
+    
+    public static final String LAST_V6_VERSION_BEFORE_SERVICES = "6.1.2.0";
     
     static {
 
@@ -88,8 +90,9 @@ public class FlowableVersions {
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.0.1.0"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.1.0.0"));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.1.1.0"));
-        FLOWABLE_VERSIONS.add(new FlowableVersion("6.1.2.0"));
+        FLOWABLE_VERSIONS.add(new FlowableVersion(LAST_V6_VERSION_BEFORE_SERVICES));
         FLOWABLE_VERSIONS.add(new FlowableVersion("6.2.0.0"));
+        FLOWABLE_VERSIONS.add(new FlowableVersion("6.2.1.0"));
 
         /* Current */
         FLOWABLE_VERSIONS.add(new FlowableVersion(CURRENT_VERSION));
@@ -123,7 +126,7 @@ public class FlowableVersions {
         return null;
     }
     
-    public static int getFlowableVersionForDbVersion(String dbVersion) {
+    public static int getFlowableVersionIndexForDbVersion(String dbVersion) {
         int matchingVersionIndex;
         // Determine index in the sequence of Flowable releases
         matchingVersionIndex = findMatchingVersionIndex(dbVersion);

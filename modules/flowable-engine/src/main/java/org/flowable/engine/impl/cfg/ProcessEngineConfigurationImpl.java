@@ -60,6 +60,10 @@ import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
+import org.flowable.engine.common.impl.calendar.CycleBusinessCalendar;
+import org.flowable.engine.common.impl.calendar.DueDateBusinessCalendar;
+import org.flowable.engine.common.impl.calendar.DurationBusinessCalendar;
+import org.flowable.engine.common.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
 import org.flowable.engine.common.impl.db.DbSchemaManager;
@@ -84,6 +88,7 @@ import org.flowable.engine.compatibility.DefaultFlowable5CompatibilityHandlerFac
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandlerFactory;
 import org.flowable.engine.delegate.event.impl.BpmnModelEventDispatchAction;
+import org.flowable.engine.dynamic.DynamicStateManager;
 import org.flowable.engine.form.AbstractFormType;
 import org.flowable.engine.impl.DynamicBpmnServiceImpl;
 import org.flowable.engine.impl.FormServiceImpl;
@@ -148,10 +153,6 @@ import org.flowable.engine.impl.bpmn.parser.handler.TimerEventDefinitionParseHan
 import org.flowable.engine.impl.bpmn.parser.handler.TransactionParseHandler;
 import org.flowable.engine.impl.bpmn.parser.handler.UserTaskParseHandler;
 import org.flowable.engine.impl.bpmn.webservice.MessageInstance;
-import org.flowable.engine.impl.calendar.CycleBusinessCalendar;
-import org.flowable.engine.impl.calendar.DueDateBusinessCalendar;
-import org.flowable.engine.impl.calendar.DurationBusinessCalendar;
-import org.flowable.engine.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.engine.impl.cmd.RedeployV5ProcessDefinitionsCmd;
 import org.flowable.engine.impl.cmd.ValidateExecutionRelatedEntityCountCfgCmd;
 import org.flowable.engine.impl.cmd.ValidateTaskRelatedEntityCountCfgCmd;
@@ -160,6 +161,7 @@ import org.flowable.engine.impl.db.DbIdGenerator;
 import org.flowable.engine.impl.db.EntityDependencyOrder;
 import org.flowable.engine.impl.db.ProcessDbSchemaManager;
 import org.flowable.engine.impl.delegate.invocation.DefaultDelegateInterceptor;
+import org.flowable.engine.impl.dynamic.DefaultDynamicStateManager;
 import org.flowable.engine.impl.el.FlowableDateFunctionDelegate;
 import org.flowable.engine.impl.el.ProcessExpressionManager;
 import org.flowable.engine.impl.event.CompensationEventHandler;
@@ -276,8 +278,11 @@ import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.flowable.job.service.HistoryJobHandler;
+import org.flowable.job.service.InternalJobCompatibilityManager;
+import org.flowable.job.service.HistoryJobProcessor;
 import org.flowable.job.service.InternalJobManager;
 import org.flowable.job.service.JobHandler;
+import org.flowable.job.service.JobProcessor;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.impl.asyncexecutor.AsyncExecutor;
 import org.flowable.job.service.impl.asyncexecutor.AsyncRunnableExecutionExceptionHandler;
@@ -408,6 +413,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // Job Manager
 
     protected JobManager jobManager;
+
+    // Dynamic state manager
+
+    protected DynamicStateManager dynamicStateManager;
 
     // CONFIGURATORS ////////////////////////////////////////////////////////////
 
@@ -657,6 +666,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     protected InternalHistoryTaskManager internalHistoryTaskManager;
     protected InternalTaskLocalizationManager internalTaskLocalizationManager;
     protected InternalJobManager internalJobManager;
+    protected InternalJobCompatibilityManager internalJobCompatibilityManager;
 
     protected Map<String, List<RuntimeInstanceStateChangeCallback>> processInstanceStateChangedCallbacks;
 
@@ -727,6 +737,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
+    protected List<Object> flowable5JobProcessors = Collections.emptyList();
+    protected List<JobProcessor> jobProcessors = Collections.emptyList();
+    protected List<HistoryJobProcessor> historyJobProcessors = Collections.emptyList();
+
     /**
      * Enabled a very verbose debug output of the execution tree whilst executing operations. Most useful for core engine developers or people fiddling around with the execution tree.
      */
@@ -736,6 +750,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // agenda factory
     protected FlowableEngineAgendaFactory agendaFactory;
+
     protected DbSchemaManager identityLinkDbSchemaManager;
     protected DbSchemaManager variableDbSchemaManager;
     protected DbSchemaManager taskDbSchemaManager;
@@ -835,6 +850,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         initEntityManagers();
         initCandidateManager();
         initHistoryManager();
+        initDynamicStateManager();
         initJpa();
         initDeployers();
         initEventHandlers();
@@ -1097,6 +1113,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
     }
 
+    // Dynamic state manager ////////////////////////////////////////////////////
+
+    public void initDynamicStateManager() {
+        if (dynamicStateManager == null) {
+            dynamicStateManager = new DefaultDynamicStateManager();
+        }
+    }
+
     // session factories ////////////////////////////////////////////////////////
 
     public void initSessionFactories() {
@@ -1330,8 +1354,18 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (this.internalJobManager != null) {
             this.jobServiceConfiguration.setInternalJobManager(this.internalJobManager);
         } else {
-            this.jobServiceConfiguration.setInternalJobManager(new DefaultJobScopeManager(this));
+            this.jobServiceConfiguration.setInternalJobManager(new DefaultInternalJobManager(this));
         }
+
+        if (this.internalJobCompatibilityManager != null) {
+            this.jobServiceConfiguration.setInternalJobCompatibilityManager(internalJobCompatibilityManager);
+        } else {
+            this.jobServiceConfiguration.setInternalJobCompatibilityManager(new DefaultInternalJobCompatibilityManager(this));
+        }
+
+        // set the job processors
+        this.jobServiceConfiguration.setJobProcessors(this.jobProcessors);
+        this.jobServiceConfiguration.setHistoryJobProcessors(this.historyJobProcessors);
 
         this.jobServiceConfiguration.init();
 
@@ -2060,6 +2094,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (performanceSettings.isValidateTaskRelationshipCountConfigOnBoot()) {
             commandExecutor.execute(new ValidateTaskRelatedEntityCountCfgCmd());
         }
+
+        // if Flowable 5 support is needed configure the Flowable 5 job processors via the compatibility handler
+        if (flowable5CompatibilityEnabled) {
+            flowable5CompatibilityHandler.setJobProcessor(this.flowable5JobProcessors);
+        }
     }
 
     public Runnable getProcessEngineCloseRunnable() {
@@ -2462,6 +2501,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setInternalJobManager(InternalJobManager internalJobManager) {
         this.internalJobManager = internalJobManager;
+        return this;
+    }
+
+    public InternalJobCompatibilityManager getInternalJobCompatibilityManager() {
+        return internalJobCompatibilityManager;
+    }
+
+    public ProcessEngineConfigurationImpl setInternalJobCompatibilityManager(InternalJobCompatibilityManager internalJobCompatibilityManager) {
+        this.internalJobCompatibilityManager = internalJobCompatibilityManager;
         return this;
     }
 
@@ -3353,6 +3401,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         return this;
     }
 
+    public DynamicStateManager getDynamicStateManager() {
+        return dynamicStateManager;
+    }
+
+    public ProcessEngineConfigurationImpl setDynamicStateManager(DynamicStateManager dynamicStateManager) {
+        this.dynamicStateManager = dynamicStateManager;
+        return this;
+    }
+
     @Override
     public ProcessEngineConfigurationImpl setClock(Clock clock) {
         if (this.clock == null) {
@@ -3391,6 +3448,33 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+        return this;
+    }
+
+    public List<Object> getFlowable5JobProcessors() {
+        return flowable5JobProcessors;
+    }
+
+    public ProcessEngineConfigurationImpl setFlowable5JobProcessors(List<Object> jobProcessors) {
+        this.flowable5JobProcessors = jobProcessors;
+        return this;
+    }
+
+    public List<JobProcessor> getJobProcessors() {
+        return jobProcessors;
+    }
+
+    public ProcessEngineConfigurationImpl setJobProcessors(List<JobProcessor> jobProcessors) {
+        this.jobProcessors = jobProcessors;
+        return this;
+    }
+
+    public List<HistoryJobProcessor> getHistoryJobProcessors() {
+        return historyJobProcessors;
+    }
+
+    public ProcessEngineConfigurationImpl setHistoryJobProcessors(List<HistoryJobProcessor> historyJobProcessors) {
+        this.historyJobProcessors = historyJobProcessors;
         return this;
     }
 

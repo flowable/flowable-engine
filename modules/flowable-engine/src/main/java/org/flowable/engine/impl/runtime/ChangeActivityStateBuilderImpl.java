@@ -23,6 +23,7 @@ public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilde
     protected RuntimeServiceImpl runtimeService;
 
     protected String processInstanceId;
+    protected String executionId;
     protected String cancelActivityId;
     protected String startActivityId;
 
@@ -33,6 +34,12 @@ public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilde
     @Override
     public ChangeActivityStateBuilder processInstanceId(String processInstanceId) {
         this.processInstanceId = processInstanceId;
+        return this;
+    }
+    
+    @Override
+    public ChangeActivityStateBuilder executionId(String executionId) {
+        this.executionId = executionId;
         return this;
     }
 
@@ -55,6 +62,10 @@ public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilde
 
     public String getProcessInstanceId() {
         return processInstanceId;
+    }
+    
+    public String getExecutionId() {
+        return executionId;
     }
 
     public String getCancelActivityId() {

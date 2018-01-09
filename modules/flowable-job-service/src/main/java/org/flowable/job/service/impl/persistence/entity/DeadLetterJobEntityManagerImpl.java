@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -75,7 +75,8 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
     public void delete(DeadLetterJobEntity jobEntity) {
         super.delete(jobEntity);
 
-        deleteExceptionByteArrayRef(jobEntity);
+        deleteByteArrayRef(jobEntity.getExceptionByteArrayRef());
+        deleteByteArrayRef(jobEntity.getCustomValuesByteArrayRef());
 
         getJobServiceConfiguration().getInternalJobManager().handleJobDelete(jobEntity);
 
@@ -85,19 +86,10 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
         }
     }
 
-    /**
-     * Deletes a the byte array used to store the exception information. Subclasses may override to provide custom implementations.
-     */
-    protected void deleteExceptionByteArrayRef(DeadLetterJobEntity jobEntity) {
-        JobByteArrayRef exceptionByteArrayRef = jobEntity.getExceptionByteArrayRef();
-        if (exceptionByteArrayRef != null) {
-            exceptionByteArrayRef.delete();
-        }
-    }
-
     protected DeadLetterJobEntity createDeadLetterJob(AbstractRuntimeJobEntity job) {
         DeadLetterJobEntity newJobEntity = create();
         newJobEntity.setJobHandlerConfiguration(job.getJobHandlerConfiguration());
+        newJobEntity.setCustomValues(job.getCustomValues());
         newJobEntity.setJobHandlerType(job.getJobHandlerType());
         newJobEntity.setExclusive(job.isExclusive());
         newJobEntity.setRepeat(job.getRepeat());
@@ -106,6 +98,10 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
         newJobEntity.setExecutionId(job.getExecutionId());
         newJobEntity.setProcessInstanceId(job.getProcessInstanceId());
         newJobEntity.setProcessDefinitionId(job.getProcessDefinitionId());
+        newJobEntity.setScopeId(job.getScopeId());
+        newJobEntity.setSubScopeId(job.getSubScopeId());
+        newJobEntity.setScopeType(job.getScopeType());
+        newJobEntity.setScopeDefinitionId(job.getScopeDefinitionId());
 
         // Inherit tenant
         newJobEntity.setTenantId(job.getTenantId());

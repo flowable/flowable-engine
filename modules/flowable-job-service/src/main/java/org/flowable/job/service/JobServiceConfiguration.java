@@ -12,9 +12,7 @@
  */
 package org.flowable.job.service;
 
-import java.util.List;
-import java.util.Map;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.flowable.engine.common.AbstractServiceConfiguration;
 import org.flowable.engine.common.impl.calendar.BusinessCalendarManager;
 import org.flowable.engine.common.impl.el.ExpressionManager;
@@ -55,7 +53,9 @@ import org.flowable.job.service.impl.persistence.entity.data.impl.MybatisTimerJo
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author Tijs Rademakers
@@ -99,6 +99,7 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     protected HistoryLevel historyLevel;
 
     protected InternalJobManager internalJobManager;
+    protected InternalJobCompatibilityManager internalJobCompatibilityManager;
 
     protected AsyncExecutor asyncExecutor;
 
@@ -112,6 +113,9 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     protected int asyncExecutorResetExpiredJobsMaxTimeout;
 
     protected ObjectMapper objectMapper;
+
+    protected List<JobProcessor> jobProcessors;
+    protected List<HistoryJobProcessor> historyJobProcessors;
 
     // init
     // /////////////////////////////////////////////////////////////////////
@@ -370,6 +374,14 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
     public void setInternalJobManager(InternalJobManager internalJobManager) {
         this.internalJobManager = internalJobManager;
     }
+    
+    public InternalJobCompatibilityManager getInternalJobCompatibilityManager() {
+        return internalJobCompatibilityManager;
+    }
+
+    public void setInternalJobCompatibilityManager(InternalJobCompatibilityManager internalJobCompatibilityManager) {
+        this.internalJobCompatibilityManager = internalJobCompatibilityManager;
+    }
 
     public AsyncExecutor getAsyncExecutor() {
         return asyncExecutor;
@@ -462,4 +474,23 @@ public class JobServiceConfiguration extends AbstractServiceConfiguration {
         this.objectMapper = objectMapper;
         return this;
     }
+
+    public List<JobProcessor> getJobProcessors() {
+        return jobProcessors;
+    }
+
+    public JobServiceConfiguration setJobProcessors(List<JobProcessor> jobProcessors) {
+        this.jobProcessors = Collections.unmodifiableList(jobProcessors);
+        return this;
+    }
+
+    public List<HistoryJobProcessor> getHistoryJobProcessors() {
+        return historyJobProcessors;
+    }
+
+    public JobServiceConfiguration setHistoryJobProcessors(List<HistoryJobProcessor> historyJobProcessors) {
+        this.historyJobProcessors = Collections.unmodifiableList(historyJobProcessors);
+        return this;
+    }
+
 }

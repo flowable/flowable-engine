@@ -14,17 +14,16 @@
 	</parent>
 
 	<packaging>pom</packaging>
-	<version>6.2.1-SNAPSHOT</version>
+	<version>6.3.0-SNAPSHOT</version>
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jdk.version>1.7</jdk.version>
 		<spring.framework.version>4.3.9.RELEASE</spring.framework.version>
 		<spring.security.version>4.2.3.RELEASE</spring.security.version>
-		<jackson.version>2.7.5</jackson.version>
+		<jackson.version>2.9.3</jackson.version>
 		<mule.version>3.8.0</mule.version>
 		<camel.version>2.17.1</camel.version>
 		<cxf.version>3.1.6</cxf.version>
-		<batik.version>1.7</batik.version>
 		<slf4j.version>1.7.25</slf4j.version>
 		<flink.version>1.4.0</flink.version>
 		<flink.scala.binary.version>2.11</flink.scala.binary.version>
@@ -76,11 +75,6 @@
 	<dependencyManagement>
 		<dependencies>
 			<dependency>
-				<groupId>cglib</groupId>
-				<artifactId>cglib</artifactId>
-				<version>2.2</version>
-			</dependency>
-			<dependency>
 				<groupId>com.h2database</groupId>
 				<artifactId>h2</artifactId>
 				<version>1.4.196</version>
@@ -114,7 +108,7 @@
 			<dependency>
 				<groupId>org.apache.commons</groupId>
 				<artifactId>commons-lang3</artifactId>
-				<version>3.3.2</version>
+				<version>3.7</version>
 			</dependency>
 			<dependency>
 				<groupId>commons-io</groupId>
@@ -163,9 +157,9 @@
 				<version>3.0.1</version>
 			</dependency>
 			<dependency>
-				<groupId>javax.mail</groupId>
-				<artifactId>mail</artifactId>
-				<version>1.4.1</version>
+				<groupId>com.sun.mail</groupId>
+				<artifactId>javax.mail</artifactId>
+				<version>1.5.6</version>
 			</dependency>
 			<dependency>
 				<groupId>javax.persistence</groupId>
@@ -210,6 +204,16 @@
 			<dependency>
 				<groupId>org.flowable</groupId>
 				<artifactId>flowable-spring</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.flowable</groupId>
+				<artifactId>flowable-cdi</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.flowable</groupId>
+				<artifactId>flowable-camel-cdi</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			<dependency>
@@ -615,7 +619,7 @@
 			<dependency>
 				<groupId>org.codehaus.groovy</groupId>
 				<artifactId>groovy-all</artifactId>
-				<version>2.4.8</version>
+				<version>2.4.13</version>
 			</dependency>
 			<dependency>
 				<groupId>org.drools</groupId>
@@ -819,7 +823,7 @@
 			<dependency>
 				<groupId>joda-time</groupId>
 				<artifactId>joda-time</artifactId>
-				<version>2.6</version>
+				<version>2.9.9</version>
 			</dependency>
 			<dependency>
 				<groupId>com.google.guava</groupId>
@@ -858,55 +862,9 @@
 				<version>${jackson.version}</version>
 			</dependency>
 			<dependency>
-				<groupId>org.apache.xmlgraphics</groupId>
-				<artifactId>batik-parser</artifactId>
-				<version>${batik.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.xmlgraphics</groupId>
-				<artifactId>batik-transcoder</artifactId>
-				<version>${batik.version}</version>
-				<exclusions>
-					<exclusion>
-						<artifactId>commons-logging</artifactId>
-						<groupId>commons-logging</groupId>
-					</exclusion>
-				</exclusions>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.xmlgraphics</groupId>
-				<artifactId>batik-bridge</artifactId>
-				<version>${batik.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.xmlgraphics</groupId>
-				<artifactId>batik-codec</artifactId>
-				<version>${batik.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.xmlgraphics</groupId>
-				<artifactId>batik-css</artifactId>
-				<version>${batik.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.xmlgraphics</groupId>
-				<artifactId>batik-svg-dom</artifactId>
-				<version>${batik.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.apache.xmlgraphics</groupId>
-				<artifactId>batik-svggen</artifactId>
-				<version>${batik.version}</version>
-			</dependency>
-			<dependency>
 				<groupId>org.imgscalr</groupId>
 				<artifactId>imgscalr-lib</artifactId>
 				<version>4.2</version>
-			</dependency>
-			<dependency>
-				<groupId>math.geom2d</groupId>
-				<artifactId>javaGeom</artifactId>
-				<version>0.11.1</version>
 			</dependency>
 			<!-- Camel integration -->
 			<dependency>
@@ -917,6 +875,11 @@
 			<dependency>
 				<groupId>org.apache.camel</groupId>
 				<artifactId>camel-mvel</artifactId>
+				<version>${camel.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.camel</groupId>
+				<artifactId>camel-cdi</artifactId>
 				<version>${camel.version}</version>
 			</dependency>
 			<!-- Mule integration -->
@@ -991,7 +954,7 @@
 			</plugin>
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>2.20</version>
+				<version>2.20.1</version>
 				<configuration>
 					<failIfNoTests>false</failIfNoTests>
 					<trimStackTrace>false</trimStackTrace>
@@ -1000,6 +963,7 @@
 						<exclude>**/*TestCase.java</exclude>
 					</excludes>
 					<runOrder>alphabetical</runOrder>
+					<rerunFailingTestsCount>2</rerunFailingTestsCount>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -1142,6 +1106,7 @@
 				<module>modules/flowable-mule</module>
 				<module>modules/flowable-http</module>
 				<module>modules/flowable-camel</module>
+				<module>modules/flowable-camel-cdi</module>
 				<module>modules/flowable-cdi</module>
 				<module>modules/flowable-osgi</module>
 				<module>modules/flowable-ldap</module>
@@ -1243,27 +1208,7 @@
 				<module>modules/flowable-content-rest</module>
 				<module>modules/flowable-jms-spring-executor</module>
 				<module>modules/flowable-ui-common</module>
-			</modules>
-		</profile>
-		<profile>
-			<!-- A profile dedicated to JDK 6. SpringBoot module is disabled as it
-				needs JDK7+. -->
-			<id>checkJdk6</id>
-			<modules>
-				<module>modules/flowable-bpmn-model</module>
-				<module>modules/flowable-process-validation</module>
-				<module>modules/flowable-image-generator</module>
-				<module>modules/flowable-bpmn-converter</module>
-				<module>modules/flowable-bpmn-layout</module>
-				<module>modules/flowable-json-converter</module>
-                <module>modules/flowable-spring-common</module>
-				<module>modules/flowable-idm-spring</module>
-				<module>modules/flowable-spring</module>
-				<module>modules/flowable-common-rest</module>
-				<module>modules/flowable-rest</module>
-				<module>modules/flowable-app-rest</module>
-				<module>modules/flowable-cxf</module>
-				<module>modules/flowable-secure-javascript</module>
+				<module>modules/flowable-http</module>
 			</modules>
 		</profile>
 		<profile>
@@ -1361,6 +1306,7 @@
 				<module>modules/flowable-mule</module>
 				<module>modules/flowable-http</module>
 				<module>modules/flowable-cdi</module>
+				<module>modules/flowable-camel-cdi</module>
 				<module>modules/flowable-ldap</module>
 				<module>modules/flowable-ldap-configurator</module>
 				<module>modules/flowable-jmx</module>

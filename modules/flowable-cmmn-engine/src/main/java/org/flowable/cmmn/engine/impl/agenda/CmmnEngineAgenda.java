@@ -25,25 +25,35 @@ public interface CmmnEngineAgenda extends Agenda {
     void planInitPlanModelOperation(CaseInstanceEntity caseInstanceEntity);
 
     void planInitStageOperation(PlanItemInstanceEntity planItemInstanceEntity);
+    
+    void planCreatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
-    void planActivatePlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity);
+    void planActivatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+    
+    void planStartPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+    
+    void planEnablePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
+    
+    void planDisablePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
-    void planCompletePlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity);
+    void planCompletePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
-    void planOccurPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity);
+    void planOccurPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
-    void planExitPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity);
+    void planExitPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
-    void planTerminatePlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity);
+    void planTerminatePlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
-    void planTriggerPlanItemInstance(PlanItemInstanceEntity planItemInstanceEntity);
+    void planTriggerPlanItemInstanceOperation(PlanItemInstanceEntity planItemInstanceEntity);
 
-    void planCompleteCaseInstance(CaseInstanceEntity caseInstanceEntity);
+    void planCompleteCaseInstanceOperation(CaseInstanceEntity caseInstanceEntity);
 
-    void planTerminateCaseInstance(String caseInstanceEntityId, boolean manualTermination);
+    void planTerminateCaseInstanceOperation(String caseInstanceEntityId, boolean manualTermination);
 
-    void planEvaluateCriteria(String caseInstanceEntityId);
+    void planEvaluateCriteriaOperation(String caseInstanceEntityId);
+    
+    void planEvaluateCriteriaOperation(String caseInstanceEntityId, boolean evaluateCaseInstanceComplete);
 
-    void planEvaluateCriteria(String caseInstanceEntityId, PlanItemLifeCycleEvent lifeCycleEvent);
+    void planEvaluateCriteriaOperation(String caseInstanceEntityId, PlanItemLifeCycleEvent lifeCycleEvent);
 
 }

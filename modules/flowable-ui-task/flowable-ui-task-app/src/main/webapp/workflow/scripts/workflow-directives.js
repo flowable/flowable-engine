@@ -34,6 +34,8 @@ angular.module('flowableApp').directive('activitiForm', ['$rootScope', 'appResou
             formDefinition: '=formDefinition',
             processName: '=processName',
             processDefinitionId: '=processDefinitionId',
+            caseName: '=caseName',
+            caseDefinitionId: '=caseDefinitionId',
             outcomesOnly: '=outcomesOnly',
             disableForm: '=disableForm',
             disableFormText: '=disableFormText',
@@ -300,7 +302,7 @@ angular.module('flowableApp').
 								newUserPic.text = user.substring(0, 1).toUpperCase();
 							}
 							newUserPic.userName = user;
-							
+
 						} else {
 							newUserPic.text ='??';
 							newUserPic.userName = '';
@@ -354,7 +356,7 @@ angular.module('flowableApp')
                 $scope.fieldPersonSelected = function(user, field){
                     return $scope.controlCallbacks.fieldPersonSelected(user, field);
                 };
-                
+
                 $scope.fieldPersonRemoved = function(user, field){
                     return $scope.controlCallbacks.fieldPersonRemoved(user, field);
                 };
@@ -362,7 +364,7 @@ angular.module('flowableApp')
                 $scope.fieldGroupSelected = function(group, field){
                     return $scope.controlCallbacks.fieldGroupSelected(group, field);
                 };
-                
+
                 $scope.fieldGroupRemoved = function(group, field){
                     return $scope.controlCallbacks.fieldGroupRemoved(group, field);
                 };

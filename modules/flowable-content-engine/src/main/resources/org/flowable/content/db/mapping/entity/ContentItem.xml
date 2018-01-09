@@ -10,6 +10,8 @@
 		<result property="mimeType" column="MIME_TYPE_" jdbcType="VARCHAR" />
 		<result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
 		<result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
+        <result property="scopeId" column="SCOPE_ID_" jdbcType="VARCHAR" />
+        <result property="scopeType" column="SCOPE_TYPE_" jdbcType="VARCHAR" />
 		<result property="contentStoreId" column="CONTENT_STORE_ID_" jdbcType="VARCHAR" />
 		<result property="contentStoreName" column="CONTENT_STORE_NAME_" jdbcType="VARCHAR" />
 		<result property="field" column="FIELD_" jdbcType="VARCHAR" />
@@ -30,6 +32,8 @@
             MIME_TYPE_,
             TASK_ID_,
             PROC_INST_ID_,
+            SCOPE_ID_,
+            SCOPE_TYPE_,
             CONTENT_STORE_ID_,
             CONTENT_STORE_NAME_,
             FIELD_,
@@ -46,6 +50,8 @@
             #{mimeType, jdbcType=VARCHAR},
             #{taskId, jdbcType=VARCHAR},
             #{processInstanceId, jdbcType=VARCHAR},
+            #{scopeId, jdbcType=VARCHAR},
+            #{scopeType, jdbcType=VARCHAR},
             #{contentStoreId, jdbcType=VARCHAR},
             #{contentStoreName, jdbcType=VARCHAR},
             #{field, jdbcType=VARCHAR},
@@ -66,6 +72,8 @@
             MIME_TYPE_,
             TASK_ID_,
             PROC_INST_ID_,
+            SCOPE_ID_,
+            SCOPE_TYPE_,
             CONTENT_STORE_ID_,
             CONTENT_STORE_NAME_,
             FIELD_,
@@ -84,6 +92,8 @@
             #{contentItem.mimeType, jdbcType=VARCHAR},
             #{contentItem.taskId, jdbcType=VARCHAR},
             #{contentItem.processInstanceId, jdbcType=VARCHAR},
+            #{contentItem.scopeId, jdbcType=VARCHAR},
+            #{contentItem.scopeType, jdbcType=VARCHAR},
             #{contentItem.contentStoreId, jdbcType=VARCHAR},
             #{contentItem.contentStoreName, jdbcType=VARCHAR},
             #{contentItem.field, jdbcType=VARCHAR},
@@ -107,6 +117,8 @@
                 MIME_TYPE_,
                 TASK_ID_,
                 PROC_INST_ID_,
+                SCOPE_ID_,
+                SCOPE_TYPE_,
                 CONTENT_STORE_ID_,
                 CONTENT_STORE_NAME_,
                 FIELD_,
@@ -124,6 +136,8 @@
             #{contentItem.mimeType, jdbcType=VARCHAR},
             #{contentItem.taskId, jdbcType=VARCHAR},
             #{contentItem.processInstanceId, jdbcType=VARCHAR},
+            #{contentItem.scopeId, jdbcType=VARCHAR},
+            #{contentItem.scopeType, jdbcType=VARCHAR},
             #{contentItem.contentStoreId, jdbcType=VARCHAR},
             #{contentItem.contentStoreName, jdbcType=VARCHAR},
             #{contentItem.field, jdbcType=VARCHAR},
@@ -146,6 +160,8 @@
             MIME_TYPE_=#{mimeType, jdbcType=VARCHAR},
             TASK_ID_=#{taskId, jdbcType=VARCHAR},
             PROC_INST_ID_=#{processInstanceId, jdbcType=VARCHAR},
+            SCOPE_ID_=#{scopeId, jdbcType=VARCHAR},
+            SCOPE_TYPE_=#{scopeType, jdbcType=VARCHAR},
             CONTENT_STORE_ID_=#{contentStoreId, jdbcType=VARCHAR},
             CONTENT_STORE_NAME_=#{contentStoreName, jdbcType=VARCHAR},
             FIELD_=#{field, jdbcType=VARCHAR},
@@ -213,6 +229,18 @@
 	      <if test="processInstanceIdLike != null">
 	        and RES.PROC_INST_ID_ like #{processInstanceIdLike}
 	      </if>
+          <if test="scopeId != null">
+            and RES.SCOPE_ID_ = #{scopeId}
+          </if>
+          <if test="scopeIdLike != null">
+            and RES.SCOPE_ID_ like #{scopeIdLike}
+          </if>
+          <if test="scopeType != null">
+            and RES.SCOPE_TYPE_ = #{scopeType}
+          </if>
+          <if test="scopeTypeLike != null">
+            and RES.SCOPE_TYPE_ like #{scopeTypeLike}
+          </if>
 	      <if test="contentStoreId != null">
 	        and RES.CONTENT_STORE_ID_ = #{contentStoreId}
 	      </if>
@@ -311,5 +339,9 @@
 	<delete id="deleteContentItemsByTaskId" parameterType="string">
 	   delete from ${prefix}ACT_CO_CONTENT_ITEM where TASK_ID_ = #{taskId, jdbcType=VARCHAR}
 	</delete>
+    
+    <delete id="deleteContentItemsByScopeIdAndScopeType" parameterType="map">
+       delete from ${prefix}ACT_CO_CONTENT_ITEM where SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR} AND SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR}
+    </delete>
 	
 </mapper>

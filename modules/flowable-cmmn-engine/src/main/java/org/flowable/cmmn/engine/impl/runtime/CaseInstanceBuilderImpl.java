@@ -32,6 +32,7 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     protected Map<String, Object> variables;
     protected Map<String, Object> transientVariables;
     protected String tenantId;
+    protected String outcome;
     
     public CaseInstanceBuilderImpl() {
         
@@ -70,7 +71,11 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
         if (this.variables == null) {
             this.variables = new HashMap<>();
         }
-        this.variables.putAll(variables);
+        
+        if (variables != null) {
+            this.variables.putAll(variables);
+        }
+        
         return this;
     }
 
@@ -106,10 +111,21 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
         this.tenantId = tenantId;
         return this;
     }
+    
+    @Override
+    public CaseInstanceBuilder outcome(String outcome) {
+        this.outcome = outcome;
+        return this;
+    }
 
     @Override
     public CaseInstance start() {
         return cmmnRuntimeService.startCaseInstance(this);
+    }
+    
+    @Override
+    public CaseInstance startWithForm() {
+        return cmmnRuntimeService.startCaseInstanceWithForm(this);
     }
 
     @Override
@@ -146,5 +162,9 @@ public class CaseInstanceBuilderImpl implements CaseInstanceBuilder {
     public String getTenantId() {
         return tenantId;
     }
-
+    
+    @Override
+    public String getOutcome() {
+        return outcome;
+    }
 }

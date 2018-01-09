@@ -38,6 +38,7 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
 
     protected String jobHandlerType;
     protected String jobHandlerConfiguration;
+    protected JobByteArrayRef customValuesByteArrayRef;
     protected JobByteArrayRef advancedJobHandlerConfigurationByteArrayRef;
 
     protected JobByteArrayRef exceptionByteArrayRef;
@@ -56,18 +57,20 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
         persistentState.put("exceptionMessage", exceptionMessage);
         persistentState.put("jobHandlerType", jobHandlerType);
 
-        if (exceptionByteArrayRef != null) {
-            persistentState.put("exceptionByteArrayId", exceptionByteArrayRef.getId());
-        }
+        putByteArrayRefIdToMap("exceptionByteArrayId", exceptionByteArrayRef, persistentState);
+        putByteArrayRefIdToMap("customValuesByteArrayRef", customValuesByteArrayRef, persistentState);
+        putByteArrayRefIdToMap("advancedJobHandlerConfigurationByteArrayRef", advancedJobHandlerConfigurationByteArrayRef, persistentState);
 
-        if (advancedJobHandlerConfigurationByteArrayRef != null) {
-            persistentState.put("advancedJobHandlerConfigurationByteArrayRef",
-                    advancedJobHandlerConfigurationByteArrayRef.getId());
-        }
         persistentState.put("lockOwner", lockOwner);
         persistentState.put("lockExpirationTime", lockExpirationTime);
 
         return persistentState;
+    }
+
+    private void putByteArrayRefIdToMap(String key, JobByteArrayRef jobByteArrayRef, Map<String, Object> map) {
+        if(jobByteArrayRef != null) {
+            map.put(key, jobByteArrayRef.getId());
+        }
     }
 
     // getters and setters
@@ -104,28 +107,38 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
     }
 
     @Override
+    public String getCustomValues() {
+        return getJobByteArrayRefAsString(customValuesByteArrayRef);
+    }
+
+    @Override
+    public void setCustomValues(String customValues) {
+        if (customValuesByteArrayRef == null) {
+            customValuesByteArrayRef = new JobByteArrayRef();
+        }
+        customValuesByteArrayRef.setValue("jobCustomValues", customValues);
+    }
+
+    @Override
+    public JobByteArrayRef getCustomValuesByteArrayRef() {
+        return customValuesByteArrayRef;
+    }
+
+    @Override
+    public void setCustomValuesByteArrayRef(JobByteArrayRef customValuesByteArrayRef) {
+        this.customValuesByteArrayRef = customValuesByteArrayRef;
+    }
+
+    @Override
     public JobByteArrayRef getAdvancedJobHandlerConfigurationByteArrayRef() {
         return advancedJobHandlerConfigurationByteArrayRef;
     }
 
     @Override
     public String getAdvancedJobHandlerConfiguration() {
-        if (advancedJobHandlerConfigurationByteArrayRef == null) {
-            return null;
-        }
-
-        byte[] bytes = advancedJobHandlerConfigurationByteArrayRef.getBytes();
-        if (bytes == null) {
-            return null;
-        }
-
-        try {
-            return new String(bytes, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new FlowableException("UTF-8 is not a supported encoding");
-        }
+        return getJobByteArrayRefAsString(advancedJobHandlerConfigurationByteArrayRef);
     }
-    
+
     @Override
     public void setAdvancedJobHandlerConfigurationByteArrayRef(JobByteArrayRef configurationByteArrayRef) {
          this.advancedJobHandlerConfigurationByteArrayRef = configurationByteArrayRef;
@@ -136,7 +149,7 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
         if (advancedJobHandlerConfigurationByteArrayRef == null) {
             advancedJobHandlerConfigurationByteArrayRef = new JobByteArrayRef();
         }
-        advancedJobHandlerConfigurationByteArrayRef.setValue("cfg", getUtf8Bytes(jobHandlerConfiguration));
+        advancedJobHandlerConfigurationByteArrayRef.setValue("cfg", jobHandlerConfiguration);
     }
 
     @Override
@@ -146,7 +159,7 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
         }
         advancedJobHandlerConfigurationByteArrayRef.setValue("cfg", bytes);
     }
-    
+
     @Override
     public void setExceptionByteArrayRef(JobByteArrayRef exceptionByteArrayRef) {
         this.exceptionByteArrayRef = exceptionByteArrayRef;
@@ -159,20 +172,7 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
 
     @Override
     public String getExceptionStacktrace() {
-        if (exceptionByteArrayRef == null) {
-            return null;
-        }
-
-        byte[] bytes = exceptionByteArrayRef.getBytes();
-        if (bytes == null) {
-            return null;
-        }
-
-        try {
-            return new String(bytes, "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new FlowableException("UTF-8 is not a supported encoding");
-        }
+        return getJobByteArrayRefAsString(exceptionByteArrayRef);
     }
 
     @Override
@@ -180,7 +180,7 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
         if (exceptionByteArrayRef == null) {
             exceptionByteArrayRef = new JobByteArrayRef();
         }
-        exceptionByteArrayRef.setValue("stacktrace", getUtf8Bytes(exception));
+        exceptionByteArrayRef.setValue("stacktrace", exception);
     }
 
     @Override
@@ -233,15 +233,11 @@ public class HistoryJobEntityImpl extends AbstractEntity implements HistoryJobEn
         this.lockExpirationTime = claimedUntil;
     }
 
-    protected byte[] getUtf8Bytes(String str) {
-        if (str == null) {
+    private String getJobByteArrayRefAsString(JobByteArrayRef jobByteArrayRef) {
+        if (jobByteArrayRef == null) {
             return null;
         }
-        try {
-            return str.getBytes("UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            throw new FlowableException("UTF-8 is not a supported encoding");
-        }
+        return jobByteArrayRef.asString();
     }
 
     @Override

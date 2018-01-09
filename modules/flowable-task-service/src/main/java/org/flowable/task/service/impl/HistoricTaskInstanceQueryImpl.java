@@ -847,6 +847,26 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
             return variableValueLikeIgnoreCase(name, value, true);
         }
     }
+    
+    @Override
+    public HistoricTaskInstanceQuery taskVariableExists(String name) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableExists(name, true);
+            return this;
+        } else {
+            return variableExists(name, true);
+        }
+    }
+    
+    @Override
+    public HistoricTaskInstanceQuery taskVariableNotExists(String name) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableNotExists(name, true);
+            return this;
+        } else {
+            return variableNotExists(name, true);
+        }
+    }
 
     @Override
     public HistoricTaskInstanceQuery processVariableValueEquals(String variableName, Object variableValue) {
@@ -955,6 +975,26 @@ public class HistoricTaskInstanceQueryImpl extends AbstractVariableQueryImpl<His
             return this;
         } else {
             return variableValueLikeIgnoreCase(name, value, false);
+        }
+    }
+    
+    @Override
+    public HistoricTaskInstanceQuery processVariableExists(String name) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableExists(name, false);
+            return this;
+        } else {
+            return variableExists(name, false);
+        }
+    }
+    
+    @Override
+    public HistoricTaskInstanceQuery processVariableNotExists(String name) {
+        if (inOrStatement) {
+            currentOrQueryObject.variableNotExists(name, false);
+            return this;
+        } else {
+            return variableNotExists(name, false);
         }
     }
 

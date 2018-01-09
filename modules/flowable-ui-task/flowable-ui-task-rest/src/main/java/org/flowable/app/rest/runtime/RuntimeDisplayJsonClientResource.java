@@ -402,6 +402,8 @@ public class RuntimeDisplayJsonClientResource {
 
                     } else if (ServiceTask.HTTP_TASK.equals(serviceTask.getType())) {
                         elementNode.put("taskType", "http");
+                    } else if (ServiceTask.SHELL_TASK.equals(serviceTask.getType())) {
+                        elementNode.put("taskType", "shell");
                     }
                 }
 

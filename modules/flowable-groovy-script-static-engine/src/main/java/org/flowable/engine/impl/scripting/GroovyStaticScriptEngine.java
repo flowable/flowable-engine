@@ -80,7 +80,7 @@ public class GroovyStaticScriptEngine extends GroovyScriptEngineImpl {
         ClassLoader ctxtLoader = Thread.currentThread().getContextClassLoader();
         try {
             Class<?> scriptClass = ctxtLoader.loadClass(Script.class.getName());
-            clazz = ctxtLoader.loadClass("org.flowable.engine.delegate.VariableScope");
+            clazz = ctxtLoader.loadClass("org.flowable.variable.api.delegate.VariableScope");
 
             if (scriptClass == Script.class) {
                 return ctxtLoader;

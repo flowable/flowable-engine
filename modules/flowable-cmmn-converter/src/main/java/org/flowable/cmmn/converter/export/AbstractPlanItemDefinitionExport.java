@@ -12,7 +12,6 @@
  */
 package org.flowable.cmmn.converter.export;
 
-import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang3.StringUtils;
@@ -37,13 +36,24 @@ public class AbstractPlanItemDefinitionExport implements CmmnXmlConstants {
         }
     }
 
-    public static void writeBlockingAttribute(XMLStreamWriter xtw, Task task) throws XMLStreamException {
+    public static void writeCommonTaskAttributes(XMLStreamWriter xtw, Task task) throws Exception {
+        writeCommonPlanItemDefinitionAttributes(task, xtw);
+        
+        // Blocking
         if (StringUtils.isEmpty(task.getBlockingExpression())) {
             if (!task.isBlocking()) { // if omitted, by default assumed true
                 xtw.writeAttribute(ATTRIBUTE_IS_BLOCKING, "false");
             }
         } else {
-            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_IS_BLOCKING_EXPRESSION, task.getBlockingExpression());
+            xtw.writeAttribute(ATTRIBUTE_IS_BLOCKING, "true");
+        }
+        
+        // Async
+        if (task.isAsync()) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_IS_ASYNCHRONOUS, String.valueOf(task.isAsync()));
+        }
+        if (task.isExclusive()) {
+            xtw.writeAttribute(FLOWABLE_EXTENSIONS_PREFIX, FLOWABLE_EXTENSIONS_NAMESPACE, ATTRIBUTE_IS_EXCLUSIVE, String.valueOf(task.isAsync()));
         }
     }
 
