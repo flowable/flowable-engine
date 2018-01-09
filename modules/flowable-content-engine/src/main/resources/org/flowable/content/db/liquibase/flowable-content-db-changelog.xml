@@ -48,7 +48,7 @@
         </createIndex>
 
 	</changeSet>
-    
+
     <changeSet id="2" author="flowable">
         <addColumn tableName="ACT_CO_CONTENT_ITEM">
             <column name="SCOPE_ID_" type="varchar(255)">
@@ -61,17 +61,6 @@
         <createIndex tableName="ACT_CO_CONTENT_ITEM" indexName="idx_contitem_scope">
             <column name="SCOPE_ID_"/>
             <column name="SCOPE_TYPE_"/>
-        </createIndex>
-    </changeSet>
-
-    <changeSet id="2" author="flowable">
-        <addColumn tableName="ACT_CO_CONTENT_ITEM">
-            <column name="CASE_ID_" type="varchar(255)">
-                <constraints nullable="true"/>
-            </column>
-        </addColumn>
-        <createIndex tableName="ACT_CO_CONTENT_ITEM" indexName="idx_contitem_caseid">
-            <column name="CASE_ID_"/>
         </createIndex>
     </changeSet>
 

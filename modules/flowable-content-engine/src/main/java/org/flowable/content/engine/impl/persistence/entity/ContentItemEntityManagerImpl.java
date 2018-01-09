@@ -50,15 +50,10 @@ public class ContentItemEntityManagerImpl extends AbstractEntityManager<ContentI
     }
 
     @Override
-    public void deleteContentItemsByCaseId(String caseId) {
-        contentItemDataManager.deleteContentItemsByCaseId(caseId);
-    }
-
-    @Override
     public void deleteContentItemsByProcessInstanceId(String processInstanceId) {
         contentItemDataManager.deleteContentItemsByProcessInstanceId(processInstanceId);
     }
-    
+
     @Override
     public void deleteContentItemsByScopeIdAndScopeType(String scopeId, String scopeType) {
         contentItemDataManager.deleteContentItemsByScopeIdAndScopeType(scopeId, scopeType);

@@ -47,7 +47,7 @@ public class DeleteContentItemsCmd implements Command<Void>, Serializable {
             CommandContextUtil.getContentItemEntityManager().deleteContentItemsByProcessInstanceId(processInstanceId);
 
         } else if (StringUtils.hasText(caseId)) {
-            CommandContextUtil.getContentItemEntityManager().deleteContentItemsByCaseId(caseId);
+            CommandContextUtil.getContentItemEntityManager().deleteContentItemsByScopeIdAndScopeType(caseId, "cmmn");
         } else {
             CommandContextUtil.getContentItemEntityManager().deleteContentItemsByTaskId(taskId);
         }

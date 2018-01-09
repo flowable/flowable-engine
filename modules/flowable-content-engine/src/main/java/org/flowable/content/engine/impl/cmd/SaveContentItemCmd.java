@@ -17,6 +17,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.content.api.ContentItem;
 import org.flowable.content.api.ContentMetaDataKeys;
 import org.flowable.content.api.ContentObject;
@@ -69,9 +70,13 @@ public class SaveContentItemCmd implements Command<Void>, Serializable {
             } else {
                 if (contentItem.getProcessInstanceId() != null) {
                     metaData.put(ContentMetaDataKeys.PROCESS_INSTANCE_ID, contentItem.getProcessInstanceId());
-                }
-                if (contentItem.getCaseId() != null) {
-                    metaData.put(ContentMetaDataKeys.CASE_ID, contentItem.getCaseId());
+                } else {
+                    if (StringUtils.isNotEmpty(contentItem.getScopeType())) {
+                        metaData.put(ContentMetaDataKeys.SCOPE_TYPE, contentItem.getScopeType());
+                    }
+                    if (StringUtils.isNotEmpty(contentItem.getScopeId())) {
+                        metaData.put(ContentMetaDataKeys.SCOPE_ID, contentItem.getScopeId());
+                    }
                 }
             }
 

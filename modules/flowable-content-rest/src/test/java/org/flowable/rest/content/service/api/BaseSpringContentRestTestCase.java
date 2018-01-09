@@ -345,7 +345,10 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
         contentItem.setMimeType(mimeType);
         contentItem.setTaskId(taskId);
         contentItem.setProcessInstanceId(processInstanceId);
-        contentItem.setCaseId(caseId);
+        if (StringUtils.isNotEmpty(caseId)) {
+            contentItem.setScopeType("cmmn");
+            contentItem.setScopeId(caseId);
+        }
         contentItem.setTenantId(tenantId);
         contentItem.setCreatedBy(createdBy);
         contentItem.setLastModifiedBy(lastModifiedBy);

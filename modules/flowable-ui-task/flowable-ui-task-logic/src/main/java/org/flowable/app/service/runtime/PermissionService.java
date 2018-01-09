@@ -279,8 +279,8 @@ public class PermissionService {
             return true;
         } else if (content.getProcessInstanceId() != null) {
             return hasReadPermissionOnProcessInstance(currentUserObject, content.getProcessInstanceId());
-        } else if (content.getCaseId() != null) {
-            return hasReadPermissionOnCase(currentUserObject, content.getCaseId());
+        } else if ("cmmn".equals(content.getScopeType())) {
+            return hasReadPermissionOnCase(currentUserObject, content.getScopeId());
         } else {
             return false;
         }

@@ -51,7 +51,7 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
 
     public static final String TYPE_TASK = "task-content";
     public static final String TYPE_PROCESS_INSTANCE = "process-instance-content";
-    public static final String TYPE_CASE_INSTANCE = "case-content";
+    public static final String TYPE_CASE_INSTANCE = "cmmn";
     public static final String TYPE_UNCATEGORIZED = "uncategorized";
 
     public static final String TASK_PREFIX = "task";
@@ -117,7 +117,7 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
             break;
 
         case TYPE_CASE_INSTANCE:
-            String caseId = (String) metaData.get(ContentMetaDataKeys.CASE_ID);
+            String caseId = (String) metaData.get(ContentMetaDataKeys.SCOPE_ID);
             contentId = CASE_PREFIX + "." + caseId;
             break;
 
@@ -253,9 +253,9 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
             return TYPE_TASK;
         }
 
-        String caseId = (String) metaData.get(ContentMetaDataKeys.CASE_ID);
-        if (StringUtils.isNotEmpty(caseId)) {
-            return TYPE_CASE_INSTANCE;
+        String scopeType = (String) metaData.get(ContentMetaDataKeys.SCOPE_TYPE);
+        if (StringUtils.isNotEmpty(scopeType)) {
+            return scopeType;
         }
 
         return TYPE_UNCATEGORIZED;
@@ -272,7 +272,7 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
             return internalCreateOrGetFolder(taskFolder, taskId);
 
         case TYPE_CASE_INSTANCE:
-            String caseId = (String) metaData.get(ContentMetaDataKeys.CASE_ID);
+            String caseId = (String) metaData.get(ContentMetaDataKeys.SCOPE_ID);
             return internalCreateOrGetFolder(caseFolder, caseId);
 
         default:

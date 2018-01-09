@@ -40,7 +40,7 @@ public interface ContentItem {
     String getProcessInstanceId();
 
     void setProcessInstanceId(String processInstanceId);
-    
+
     String getScopeId();
 
     void setScopeId(String scopeId);
@@ -48,10 +48,6 @@ public interface ContentItem {
     String getScopeType();
 
     void setScopeType(String scopeType);
-
-    String getCaseId();
-
-    void setCaseId(String caseId);
 
     String getContentStoreId();
 

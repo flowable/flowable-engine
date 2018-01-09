@@ -23,7 +23,8 @@ public interface ContentMetaDataKeys {
 
     String PROCESS_INSTANCE_ID = "processInstanceId";
 
-    String CASE_ID = "caseId";
+    String SCOPE_TYPE = "scopeType";
+    String SCOPE_ID = "scopeId";
 
     String FIELD_ID = "fieldId";
 
