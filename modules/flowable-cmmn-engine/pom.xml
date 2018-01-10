@@ -92,7 +92,8 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>provided</scope>
+            <scope>compile</scope>
+            <optional>true</optional>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
@@ -133,8 +134,6 @@
             org.flowable.cmmn.db.mapping.entity
         </flowable.osgi.export.additional>
         <flowable.osgi.import.additional>
-            junit*;resolution:=optional,
-            org.junit*;resolution:=optional,
             com.sun*;resolution:=optional,
             javax.activation*;resolution:=optional,
             javax.persistence*;resolution:=optional,

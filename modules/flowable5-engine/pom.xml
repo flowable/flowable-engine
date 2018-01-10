@@ -50,7 +50,6 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
@@ -164,8 +163,6 @@
 			org.activiti.db.mapping.entity
 		</flowable.osgi.export.additional>
 		<flowable.osgi.import.additional>
-			junit*;resolution:=optional,
-			org.junit*;resolution:=optional,
 			com.sun*;resolution:=optional,
 			javax.persistence*;resolution:=optional,
 			org.apache.commons.mail*;resolution:=optional,
