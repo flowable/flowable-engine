@@ -30,6 +30,7 @@ public class DecisionTableDefinitionRepresentation {
     protected String key;
     protected String description;
     protected String hitIndicator;
+    protected String collectOperator;
     protected String completenessIndicator;
     protected List<DecisionTableExpressionRepresentation> inputExpressions;
     protected List<DecisionTableExpressionRepresentation> outputExpressions;
@@ -83,6 +84,14 @@ public class DecisionTableDefinitionRepresentation {
         this.hitIndicator = hitIndicator;
     }
 
+    public String getCollectOperator() {
+        return collectOperator;
+    }
+
+    public void setCollectOperator(String collectOperator) {
+        this.collectOperator = collectOperator;
+    }
+
     public String getCompletenessIndicator() {
         return completenessIndicator;
     }
@@ -98,6 +107,7 @@ public class DecisionTableDefinitionRepresentation {
     public void setInputExpressions(List<DecisionTableExpressionRepresentation> inputExpressions) {
         this.inputExpressions = inputExpressions;
     }
+
 
     public List<DecisionTableExpressionRepresentation> getOutputExpressions() {
         return outputExpressions;

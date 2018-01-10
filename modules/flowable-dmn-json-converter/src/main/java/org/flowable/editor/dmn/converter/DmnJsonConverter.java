@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.dmn.model.BuiltinAggregator;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.DecisionTable;
@@ -79,6 +80,10 @@ public class DmnJsonConverter {
             decisionTable.setHitPolicy(HitPolicy.FIRST);
         }
 
+        if (modelNode.has("collectOperator")) {
+            decisionTable.setAggregation(BuiltinAggregator.get(DmnJsonConverterUtil.getValueAsString("collectOperator", modelNode)));
+        }
+
         // default orientation
         decisionTable.setPreferredOrientation(DecisionTableOrientation.RULE_AS_ROW);
 
@@ -102,6 +107,7 @@ public class DmnJsonConverter {
         modelNode.put("name", definition.getName());
         modelNode.put("description", definition.getDescription());
         modelNode.put("hitIndicator", decisionTable.getHitPolicy().name());
+        modelNode.put("collectOperator", decisionTable.getAggregation().name());
 
         // input expressions
         ArrayNode inputExpressionsNode = objectMapper.createArrayNode();
