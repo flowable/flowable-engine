@@ -28,8 +28,6 @@ public interface MilestoneInstanceDataManager extends DataManager<MilestoneInsta
 
     long findMilestoneInstancesCountByQueryCriteria(MilestoneInstanceQueryImpl query);
     
-    List<MilestoneInstanceEntity> findMilestoneInstancesByCaseInstanceId(String caseInstanceId);
-    
     void deleteByCaseDefinitionId(String caseDefinitionId);
     
     void deleteByCaseInstanceId(String caseInstanceId);

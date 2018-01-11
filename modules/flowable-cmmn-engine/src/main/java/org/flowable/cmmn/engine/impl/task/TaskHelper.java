@@ -38,10 +38,10 @@ public class TaskHelper {
             }
 
             CountingTaskEntity countingTaskEntity = (CountingTaskEntity) task;
-            if (countingTaskEntity.getIdentityLinkCount() > 0) {    
+            if (countingTaskEntity.isCountEnabled() && countingTaskEntity.getIdentityLinkCount() > 0) {    
                 CommandContextUtil.getIdentityLinkService(commandContext).deleteIdentityLinksByTaskId(task.getId());
             }
-            if (countingTaskEntity.getVariableCount() > 0) {
+            if (countingTaskEntity.isCountEnabled() && countingTaskEntity.getVariableCount() > 0) {
                 CommandContextUtil.getVariableService(commandContext).deleteVariableInstanceMap(task.getVariableInstanceEntities());
             }
             CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskEnd(task, deleteReason);

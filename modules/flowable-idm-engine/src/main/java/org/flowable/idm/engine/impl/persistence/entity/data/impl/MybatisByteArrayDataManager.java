@@ -47,7 +47,7 @@ public class MybatisByteArrayDataManager extends AbstractIdmDataManager<IdmByteA
 
     @Override
     public void deleteByteArrayNoRevisionCheck(String byteArrayEntityId) {
-        getDbSqlSession().delete("deleteIdmByteArrayNoRevisionCheck", byteArrayEntityId);
+        getDbSqlSession().delete("deleteIdmByteArrayNoRevisionCheck", byteArrayEntityId, getManagedEntityClass());
     }
 
 }

@@ -177,20 +177,10 @@ public class MybatisVariableInstanceDataManager extends AbstractDataManager<Vari
     
     @Override
     public void deleteByScopeIdAndScopeType(String scopeId, String scopeType) {
-        
-        List<VariableInstanceEntityImpl> variableInstanceEntities = getEntityCache().findInCache(VariableInstanceEntityImpl.class);
-        for (VariableInstanceEntityImpl variableInstanceEntity : variableInstanceEntities) {
-            if (variableInstanceEntity.isInserted() 
-                    && scopeId.equals(variableInstanceEntity.getScopeId()) 
-                    && scopeType.equals(variableInstanceEntity.getScopeType())) {
-                getDbSqlSession().delete(variableInstanceEntity);
-            }
-        }
-        
         Map<String, Object> params = new HashMap<>(3);
         params.put("scopeId", scopeId);
         params.put("scopeType", scopeType);
-        getDbSqlSession().delete("deleteVariablesByScopeIdAndScopeType", params, getManagedEntityClass());
+        bulkDelete("deleteVariablesByScopeIdAndScopeType", params, getManagedEntityClass(), variableInstanceByScopeIdAndScopeTypeMatcher);
     }
 
 }

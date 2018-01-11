@@ -23,12 +23,16 @@ import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
+import org.flowable.engine.common.impl.db.CachedEntityMatcherAdapter;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 
 /**
  * @author Joram Barrez
  */
 public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataManager<PlanItemInstanceEntity> implements PlanItemInstanceDataManager {
+    
+    protected PlanItemInstanceByCaseInstanceIdCachedEntityMatcher planItemInstanceByCaseInstanceIdCachedEntityMatcher =
+            new PlanItemInstanceByCaseInstanceIdCachedEntityMatcher();
     
     public MybatisPlanItemInstanceDataManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration) {
         super(cmmnEngineConfiguration);
@@ -95,13 +99,17 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
     
     @Override
     public void deleteByCaseInstanceId(String caseInstanceId) {
-        List<PlanItemInstanceEntityImpl> planItemInstanceEntities = getEntityCache().findInCache(PlanItemInstanceEntityImpl.class);
-        for (PlanItemInstanceEntityImpl planItemInstanceEntity : planItemInstanceEntities) {
-            if (caseInstanceId.equals(planItemInstanceEntity.getCaseInstanceId())) {
-                getDbSqlSession().delete(planItemInstanceEntity);
-            }
+        bulkDelete("deletePlanItemInstancesByCaseInstanceId", caseInstanceId, getManagedEntityClass(), planItemInstanceByCaseInstanceIdCachedEntityMatcher);
+    }
+    
+    public static class PlanItemInstanceByCaseInstanceIdCachedEntityMatcher extends CachedEntityMatcherAdapter<PlanItemInstanceEntity> {
+
+        @Override
+        public boolean isRetained(PlanItemInstanceEntity entity, Object param) {
+            String caseInstanceId = (String) param;
+            return caseInstanceId.equals(entity.getCaseInstanceId());
         }
-        getDbSqlSession().delete("deletePlanItemInstancesByCaseInstanceId", caseInstanceId, getManagedEntityClass());
+        
     }
     
 }
