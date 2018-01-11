@@ -13,12 +13,22 @@
 
 package org.flowable.engine.impl.cmd;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.flowable.bpmn.model.FlowElement;
+import org.flowable.bpmn.model.SubProcess;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.dynamic.DynamicStateManager;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
+import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl.MoveActivityIdContainer;
+import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl.MoveExecutionIdContainer;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
@@ -26,40 +36,119 @@ import org.flowable.engine.impl.util.CommandContextUtil;
  */
 public class ChangeActivityStateCmd implements Command<Void> {
 
-    protected final String processInstanceId;
-    protected final String executionId;
-    protected final String cancelActivityId;
-    protected final String startActivityId;
+    protected ChangeActivityStateBuilderImpl changeActivityStateBuilder;
 
     public ChangeActivityStateCmd(ChangeActivityStateBuilderImpl changeActivityStateBuilder) {
-        this.processInstanceId = changeActivityStateBuilder.getProcessInstanceId();
-        this.executionId = changeActivityStateBuilder.getExecutionId();
-        this.cancelActivityId = changeActivityStateBuilder.getCancelActivityId();
-        this.startActivityId = changeActivityStateBuilder.getStartActivityId();
+        this.changeActivityStateBuilder = changeActivityStateBuilder;
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
-        if (processInstanceId == null && executionId == null) {
-            throw new FlowableIllegalArgumentException("Process instance id or execution id is required");
+        if (changeActivityStateBuilder.getMoveExecutionIdList().size() == 0 && changeActivityStateBuilder.getMoveActivityIdList().size() == 0) {
+            throw new FlowableIllegalArgumentException("No move execution or activity ids provided");
+            
+        } else if (changeActivityStateBuilder.getMoveActivityIdList().size() > 0 && changeActivityStateBuilder.getProcessInstanceId() == null) {
+            throw new FlowableIllegalArgumentException("Process instance id is required");
         }
         
         DynamicStateManager dynamicStateManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDynamicStateManager();
 
-        String fromActivityId = null;
-        ExecutionEntity execution = null;
-        if (executionId != null) {
-            execution = dynamicStateManager.resolveActiveExecution(executionId, commandContext);
-            fromActivityId = execution.getCurrentFlowElement().getId();
+        List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = new ArrayList<>();
+        if (changeActivityStateBuilder.getMoveExecutionIdList().size() > 0) {
+            for (MoveExecutionIdContainer executionContainer : changeActivityStateBuilder.getMoveExecutionIdList()) {
+                List<ExecutionEntity> executions = new ArrayList<>();
+                for (String executionId : executionContainer.getExecutionIds()) {
+                    ExecutionEntity execution = dynamicStateManager.resolveActiveExecution(executionId, commandContext);
+                    executions.add(execution);
+                }
+                
+                moveExecutionEntityContainerList.add(new MoveExecutionEntityContainer(executions, executionContainer.getMoveToActivityIds()));
+            }
+        }
             
-        } else {
-            execution = dynamicStateManager.resolveActiveExecution(processInstanceId, cancelActivityId, commandContext);
-            fromActivityId = cancelActivityId;
+        if (changeActivityStateBuilder.getMoveActivityIdList().size() > 0) {
+            for (MoveActivityIdContainer activityContainer : changeActivityStateBuilder.getMoveActivityIdList()) {
+                List<ExecutionEntity> executions = new ArrayList<>();
+                for (String activityId : activityContainer.getActivityIds()) {
+                    ExecutionEntity execution = dynamicStateManager.resolveActiveExecution(changeActivityStateBuilder.getProcessInstanceId(), activityId, commandContext);
+                    executions.add(execution);
+                }
+                
+                moveExecutionEntityContainerList.add(new MoveExecutionEntityContainer(executions, activityContainer.getMoveToActivityIds()));
+            }
         }
 
-        dynamicStateManager.moveExecutionState(execution, fromActivityId, startActivityId, commandContext);
+        dynamicStateManager.moveExecutionState(moveExecutionEntityContainerList, changeActivityStateBuilder.getProcessVariables(), 
+                        changeActivityStateBuilder.getLocalVariables(), commandContext);
 
         return null;
+    }
+    
+    public class MoveExecutionEntityContainer {
+        
+        protected List<ExecutionEntity> executions;
+        protected List<String> moveToActivityIds;
+        protected Map<String, ExecutionEntity> continueParentExecutionMap = new HashMap<>();
+        protected Map<String, FlowElement> moveToFlowElementMap = new HashMap<>();
+        protected Map<String, List<SubProcess>> subProcessesToCreateMap = new HashMap<>();
+        protected Map<String, ExecutionEntity> newSubProcessChildExecutionMap = new HashMap<>();
+        
+        public MoveExecutionEntityContainer(List<ExecutionEntity> executions, List<String> moveToActivityIds) {
+            this.executions = executions;
+            this.moveToActivityIds = moveToActivityIds;
+        }
+        
+        public List<ExecutionEntity> getExecutions() {
+            return executions;    
+        }
+        
+        public List<String> getMoveToActivityIds() {
+            return moveToActivityIds;
+        }
+        
+        public void addContinueParentExecution(String executionId, ExecutionEntity continueParentExecution) {
+            continueParentExecutionMap.put(executionId, continueParentExecution);
+        }
+        
+        public ExecutionEntity getContinueParentExecution(String executionId) {
+            return continueParentExecutionMap.get(executionId);
+        }
+        
+        public void addMoveToFlowElement(String activityId, FlowElement flowElement) {
+            moveToFlowElementMap.put(activityId, flowElement);
+        }
+        
+        public FlowElement getMoveToFlowElement(String activityId) {
+            return moveToFlowElementMap.get(activityId);
+        }
+        
+        public Collection<FlowElement> getMoveToFlowElements() {
+            return moveToFlowElementMap.values();
+        }
+        
+        public void addSubProcessToCreate(String activityId, SubProcess subProcess) {
+            List<SubProcess> subProcesses = null;
+            if (subProcessesToCreateMap.containsKey(activityId)) {
+                subProcesses = subProcessesToCreateMap.get(activityId);
+            } else {
+                subProcesses = new ArrayList<>();
+            }
+            
+            subProcesses.add(0, subProcess);
+            subProcessesToCreateMap.put(activityId, subProcesses);
+        }
+        
+        public Map<String, List<SubProcess>> getSubProcessesToCreateMap() {
+            return subProcessesToCreateMap;
+        }
+        
+        public void addNewSubProcessChildExecution(String subProcessId, ExecutionEntity childExecution) {
+            newSubProcessChildExecutionMap.put(subProcessId, childExecution);
+        }
+        
+        public ExecutionEntity getNewSubProcessChildExecution(String subProcessId) {
+            return newSubProcessChildExecutionMap.get(subProcessId);
+        }
     }
 
 }

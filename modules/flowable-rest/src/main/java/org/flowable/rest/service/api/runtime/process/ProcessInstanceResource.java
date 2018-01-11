@@ -13,12 +13,9 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.rest.exception.FlowableConflictException;
@@ -32,8 +29,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Frederik Heremans
@@ -100,8 +101,7 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
 
         runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(processInstanceId)
-                .cancelActivityId(activityStateRequest.getCancelActivityId())
-                .startActivityId(activityStateRequest.getStartActivityId())
+                .moveActivityIdTo(activityStateRequest.getCancelActivityId(), activityStateRequest.getStartActivityId())
                 .changeState();
     }
 
