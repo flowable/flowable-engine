@@ -43,7 +43,7 @@
 		<dependency>
       		<groupId>junit</groupId>
       		<artifactId>junit</artifactId>
-      		<scope>provided</scope>
+      		<scope>compile</scope>
     	</dependency>
 		<dependency>
 			<groupId>org.codehaus.groovy</groupId>
