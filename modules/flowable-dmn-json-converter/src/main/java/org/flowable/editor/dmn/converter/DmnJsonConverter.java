@@ -339,7 +339,9 @@ public class DmnJsonConverter {
 
                     // add quotes for string
                     if ("string".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
-                        && !"-".equals(expressionValue)) {
+                        && !"-".equals(expressionValue)
+                        && !expressionValue.startsWith("\"")
+                        && !expressionValue.endsWith("\"")) { // add quotes for string (with no surrounding quotes)
                         
                         stringBuilder.append("\"");
                         stringBuilder.append(expressionValue);
@@ -381,7 +383,9 @@ public class DmnJsonConverter {
                         if (complexExpressionIds.contains(id)) {
                             outputEntry.setText(expressionValue);
                         } else {
-                            if ("string".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())) { // add quotes for string
+                            if ("string".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())
+                                && !expressionValue.startsWith("\"")
+                                && !expressionValue.endsWith("\"")) { // add quotes for string (with no surrounding quotes)
                                 outputEntry.setText("\"" + expressionValue + "\"");
                             } else if ("date".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())
                                 && StringUtils.isNotEmpty(expressionValue)) { // wrap in built in toDate function

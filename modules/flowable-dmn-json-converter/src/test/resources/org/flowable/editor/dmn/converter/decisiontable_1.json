@@ -7,9 +7,8 @@
             "entries": null,
             "id": "input1",
             "label": "Order Size",
-            "type": "number",
-            "variableId": "ordersize",
-            "variableType": "formfield"
+            "type": "string",
+            "variableId": "input1",
         },
         {
             "entries": null,
