@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.runtime;
 
+import java.util.List;
+import java.util.Map;
+
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 
@@ -32,17 +35,56 @@ public interface ChangeActivityStateBuilder {
     /**
      * Set the id of the execution for which the activity should be changed
      **/
-    ChangeActivityStateBuilder executionId(String executionId);
+    ChangeActivityStateBuilder moveExecutionToActivityId(String executionId, String activityId);
+    
+    /**
+     * Set the ids of the executions which should be changed to a single execution with the provided activity id.
+     * This can be used for parallel execution like parallel/inclusive gateways, multiinstance, event sub processes etc.
+     **/
+    ChangeActivityStateBuilder moveExecutionsToSingleActivityId(List<String> executionIds, String activityId);
+    
+    /**
+     * Set the id of an execution which should be changed to multiple executions with the provided activity ids.
+     * This can be used for parallel execution like parallel/inclusive gateways, multiinstance, event sub processes etc.
+     **/
+    ChangeActivityStateBuilder moveSingleExecutionToActivityIds(String executionId, List<String> activityId);
 
     /**
      * Set the activity that should be cancelled.
      */
-    ChangeActivityStateBuilder cancelActivityId(String cancelActivityId);
-
+    ChangeActivityStateBuilder moveActivityIdTo(String currentActivityId, String newActivityId);
+    
     /**
-     * Set the activity that should be started
-     **/
-    ChangeActivityStateBuilder startActivityId(String startActivityId);
+     * Set the activity ids that should be changed to a single activity id.
+     * This can be used for parallel execution like parallel/inclusive gateways, multiinstance, event sub processes etc.
+     */
+    ChangeActivityStateBuilder moveActivityIdsToSingleActivityId(List<String> currentActivityIds, String newActivityId);
+    
+    /**
+     * Set the activity id that should be changed to multiple activity ids.
+     * This can be used for parallel execution like parallel/inclusive gateways, multiinstance, event sub processes etc.
+     */
+    ChangeActivityStateBuilder moveSingleActivityIdToActivityIds(String currentActivityId, List<String> newActivityIds);
+    
+    /**
+     * Sets a process scope variable 
+     */
+    ChangeActivityStateBuilder processVariable(String processVariableName, Object processVariableValue);
+    
+    /**
+     * Sets multiple process scope variables 
+     */
+    ChangeActivityStateBuilder processVariables(Map<String, Object> processVariables);
+    
+    /**
+     * Sets a local scope variable for a start activity id
+     */
+    ChangeActivityStateBuilder localVariable(String startActivityId, String localVariableName, Object localVariableValue);
+    
+    /**
+     * Sets multiple local scope variables for a start activity id
+     */
+    ChangeActivityStateBuilder localVariables(String startActivityId, Map<String, Object> localVariables);
 
     /**
      * Start the process instance

@@ -19,6 +19,8 @@
 			org.flowable.idm.engine
 		</flowable.artifact>
 		<flowable.osgi.import.additional>
+            junit*;resolution:=optional,
+            org.junit*;resolution:=optional,
 			org.springframework*;resolution:=optional,
             org.apache.commons.codec*;resolution:=optional,
 		</flowable.osgi.import.additional>
@@ -91,8 +93,6 @@
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
-			<version>1.10</version>
-			<scope>compile</scope>
 		</dependency>
 		<!-- https://mvnrepository.com/artifact/org.jasypt/jasypt -->
 		<dependency>

@@ -13,6 +13,11 @@
 
 package org.flowable.engine.test.bpmn.subprocess;
 
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.flowable.bpmn.converter.BpmnXMLConverter;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.common.api.FlowableException;
@@ -27,11 +32,6 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.task.api.Task;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.flowable.variable.api.history.HistoricVariableInstanceQuery;
-
-import java.io.InputStream;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class CallActivityTest extends ResourceFlowableTestCase {
 
@@ -219,6 +219,35 @@ public class CallActivityTest extends ResourceFlowableTestCase {
         Task task = list.get(0);
         assertEquals("The child process must have the name of the child process within the same deployment", "User Task", task.getName());
     }
+    
+    public void testSameDeploymentSubprocessWithTenant() throws Exception {
+        BpmnModel mainBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_MAIN_PROCESS_RESOURCE);
+        BpmnModel childBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_PROCESS_RESOURCE);
+        BpmnModel childV2BpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_V2_PROCESS_RESOURCE);
+
+        // deploy the main and child process within one deployment
+        Deployment deployment = processEngine.getRepositoryService()
+                .createDeployment()
+                .name("mainProcessDeployment")
+                .tenantId("myTenant")
+                .addBpmnModel("mainProcess.bpmn20.xml", mainBpmnModel)
+                .addBpmnModel("childProcess.bpmn20.xml", childBpmnModel).deploy();
+
+        // deploy a new version of the child process in which the user task has an updated name
+        processEngine.getRepositoryService()
+                .createDeployment()
+                .name("childProcessDeployment")
+                .tenantId("myTenant")
+                .addBpmnModel("childProcessV2.bpmn20.xml", childV2BpmnModel).deploy();
+
+        runtimeService.startProcessInstanceByKeyAndTenantId("mainProcess", "myTenant");
+
+        List<Task> list = taskService.createTaskQuery().list();
+        assertEquals("There must be one task from the child process", 1, list.size());
+
+        Task task = list.get(0);
+        assertEquals("The child process must have the name of the child process within the same deployment", "User Task", task.getName());
+    }
 
     public void testNotSameDeploymentSubprocess() throws Exception {
         BpmnModel mainBpmnModel = loadBPMNModel(NOT_SAME_DEPLOYMENT_MAIN_PROCESS_RESOURCE);
@@ -239,6 +268,35 @@ public class CallActivityTest extends ResourceFlowableTestCase {
                 .addBpmnModel("childProcessV2.bpmn20.xml", childV2BpmnModel).deploy();
 
         runtimeService.startProcessInstanceByKey("mainProcess");
+
+        List<Task> list = taskService.createTaskQuery().list();
+        assertEquals("There must be one task from the child process", 1, list.size());
+
+        Task task = list.get(0);
+        assertEquals("The child process must have the name of the newest child process deployment", "User Task V2", task.getName());
+    }
+    
+    public void testNotSameDeploymentSubprocessWithTenant() throws Exception {
+        BpmnModel mainBpmnModel = loadBPMNModel(NOT_SAME_DEPLOYMENT_MAIN_PROCESS_RESOURCE);
+        BpmnModel childBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_PROCESS_RESOURCE);
+        BpmnModel childV2BpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_V2_PROCESS_RESOURCE);
+
+        // deploy the main and child process within one deployment
+        Deployment deployment = processEngine.getRepositoryService()
+                .createDeployment()
+                .name("mainProcessDeployment")
+                .tenantId("myTenant")
+                .addBpmnModel("mainProcess.bpmn20.xml", mainBpmnModel)
+                .addBpmnModel("childProcess.bpmn20.xml", childBpmnModel).deploy();
+
+        // deploy a new version of the child process in which the user task has an updated name
+        processEngine.getRepositoryService()
+                .createDeployment()
+                .name("childProcessDeployment")
+                .tenantId("myTenant")
+                .addBpmnModel("childProcessV2.bpmn20.xml", childV2BpmnModel).deploy();
+
+        runtimeService.startProcessInstanceByKeyAndTenantId("mainProcess", "myTenant");
 
         List<Task> list = taskService.createTaskQuery().list();
         assertEquals("There must be one task from the child process", 1, list.size());
@@ -270,6 +328,41 @@ public class CallActivityTest extends ResourceFlowableTestCase {
                 .addBpmnModel("childProcessV2.bpmn20.xml", childV2BpmnModel).deploy();
 
         runtimeService.startProcessInstanceByKey("mainProcess");
+
+        List<Task> list = taskService.createTaskQuery().list();
+        assertEquals("There must be one task from the child process", 1, list.size());
+
+        Task task = list.get(0);
+        assertEquals("The child process must have the name of the newest child process deployment as it there " +
+                "is no deployed child process in the same deployment", "User Task V2", task.getName());
+    }
+    
+    public void testSameDeploymentSubprocessNotInSameDeploymentWithTenant() throws Exception {
+        BpmnModel mainBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_MAIN_PROCESS_RESOURCE);
+        BpmnModel childBpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_PROCESS_RESOURCE);
+        BpmnModel childV2BpmnModel = loadBPMNModel(SAME_DEPLOYMENT_CHILD_V2_PROCESS_RESOURCE);
+
+        // deploy the main and child process within one deployment
+        Deployment deployment = processEngine.getRepositoryService()
+                .createDeployment()
+                .name("mainProcessDeployment")
+                .tenantId("myTenant")
+                .addBpmnModel("mainProcess.bpmn20.xml", mainBpmnModel).deploy();
+
+        processEngine.getRepositoryService()
+                .createDeployment()
+                .name("mainProcessDeployment")
+                .tenantId("myTenant")
+                .addBpmnModel("childProcess.bpmn20.xml", childBpmnModel).deploy();
+
+        // deploy a new version of the child process in which the user task has an updated name
+        processEngine.getRepositoryService()
+                .createDeployment()
+                .name("childProcessDeployment")
+                .tenantId("myTenant")
+                .addBpmnModel("childProcessV2.bpmn20.xml", childV2BpmnModel).deploy();
+
+        runtimeService.startProcessInstanceByKeyAndTenantId("mainProcess", "myTenant");
 
         List<Task> list = taskService.createTaskQuery().list();
         assertEquals("There must be one task from the child process", 1, list.size());
