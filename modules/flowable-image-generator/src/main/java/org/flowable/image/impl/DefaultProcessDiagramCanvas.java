@@ -851,6 +851,10 @@ public class DefaultProcessDiagramCanvas {
         drawTask(BUSINESS_RULE_TASK_IMAGE, name, graphicInfo, scaleFactor);
     }
 
+    public void drawShellTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
+        drawTask(SHELL_TASK_IMAGE, name, graphicInfo, scaleFactor);
+    }
+
     public void drawDMNTask(String name, GraphicInfo graphicInfo, double scaleFactor) {
         drawTask(DMN_TASK_IMAGE, name, graphicInfo, scaleFactor);
     }

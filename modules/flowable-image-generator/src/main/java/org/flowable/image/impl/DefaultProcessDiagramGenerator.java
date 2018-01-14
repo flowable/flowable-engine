@@ -218,6 +218,8 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                     processDiagramCanvas.drawHttpTask(serviceTask.getName(), graphicInfo, scaleFactor);
                 } else if ("dmn".equalsIgnoreCase(serviceTask.getType())) {
                     processDiagramCanvas.drawDMNTask(serviceTask.getName(), graphicInfo, scaleFactor);
+                } else if ("shell".equalsIgnoreCase(serviceTask.getType())) {
+                    processDiagramCanvas.drawShellTask(serviceTask.getName(), graphicInfo, scaleFactor);
                 } else {
                     processDiagramCanvas.drawServiceTask(serviceTask.getName(), graphicInfo, scaleFactor);
                 }
