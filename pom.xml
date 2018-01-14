@@ -826,7 +826,7 @@
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
-				<version>17.0</version>
+				<version>23.6-android</version>
 			</dependency>
 			<!-- Flowable Modeler -->
 			<dependency>
