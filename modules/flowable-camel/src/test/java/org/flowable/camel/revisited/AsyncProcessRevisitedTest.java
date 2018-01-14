@@ -16,6 +16,7 @@ package org.flowable.camel.revisited;
 import java.util.List;
 
 import org.apache.camel.CamelContext;
+import org.apache.camel.builder.NotifyBuilder;
 import org.apache.camel.builder.RouteBuilder;
 import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
@@ -51,11 +52,15 @@ public class AsyncProcessRevisitedTest extends SpringFlowableTestCase {
 
     @Deployment(resources = { "process/revisited/async-revisited.bpmn20.xml" })
     public void testRunProcess() throws Exception {
+        NotifyBuilder oneExchangeSendToFlowable = new NotifyBuilder(camelContext).from("seda:continueAsync2").whenDone(1).create();
+
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncCamelProcessRevisited");
+
         List<Execution> executionList = runtimeService.createExecutionQuery().list();
         assertEquals(3, executionList.size());
         waitForJobExecutorToProcessAllJobsAndExecutableTimerJobs(5000, 200);
-        
+
+        assertTrue(oneExchangeSendToFlowable.matchesMockWaitTime());
         assertEquals(0, runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count());
     }
 }
