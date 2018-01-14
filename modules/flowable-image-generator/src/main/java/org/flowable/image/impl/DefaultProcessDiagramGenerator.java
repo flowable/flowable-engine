@@ -214,11 +214,11 @@ public class DefaultProcessDiagramGenerator implements ProcessDiagramGenerator {
                     processDiagramCanvas.drawCamelTask(serviceTask.getName(), graphicInfo, scaleFactor);
                 } else if ("mule".equalsIgnoreCase(serviceTask.getType())) {
                     processDiagramCanvas.drawMuleTask(serviceTask.getName(), graphicInfo, scaleFactor);
-                } else if ("http".equalsIgnoreCase(serviceTask.getType())) {
+                } else if (ServiceTask.HTTP_TASK.equalsIgnoreCase(serviceTask.getType())) {
                     processDiagramCanvas.drawHttpTask(serviceTask.getName(), graphicInfo, scaleFactor);
-                } else if ("dmn".equalsIgnoreCase(serviceTask.getType())) {
+                } else if (ServiceTask.DMN_TASK.equalsIgnoreCase(serviceTask.getType())) {
                     processDiagramCanvas.drawDMNTask(serviceTask.getName(), graphicInfo, scaleFactor);
-                } else if ("shell".equalsIgnoreCase(serviceTask.getType())) {
+                } else if (ServiceTask.SHELL_TASK.equalsIgnoreCase(serviceTask.getType())) {
                     processDiagramCanvas.drawShellTask(serviceTask.getName(), graphicInfo, scaleFactor);
                 } else {
                     processDiagramCanvas.drawServiceTask(serviceTask.getName(), graphicInfo, scaleFactor);
