@@ -352,10 +352,10 @@ public class DmnJsonConverterTest {
         DecisionRule rule1 = decisionTable.getRules().get(0);
         DecisionRule rule2 = decisionTable.getRules().get(1);
 
-        assertEquals("\"TEST\"", rule1.getInputEntries().get(0).getInputEntry().getText());
-        assertEquals("100", rule1.getInputEntries().get(1).getInputEntry().getText());
-        assertEquals("true", rule1.getInputEntries().get(2).getInputEntry().getText());
-        assertEquals("date:toDate('2017-06-01')", rule1.getInputEntries().get(3).getInputEntry().getText());
+        assertEquals("== \"TEST\"", rule1.getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("== 100", rule1.getInputEntries().get(1).getInputEntry().getText());
+        assertEquals("== true", rule1.getInputEntries().get(2).getInputEntry().getText());
+        assertEquals("== date:toDate('2017-06-01')", rule1.getInputEntries().get(3).getInputEntry().getText());
 
         assertEquals("\"WAS TEST\"", rule1.getOutputEntries().get(0).getOutputEntry().getText());
         assertEquals("100", rule1.getOutputEntries().get(1).getOutputEntry().getText());
@@ -364,7 +364,7 @@ public class DmnJsonConverterTest {
 
         assertEquals("!= \"TEST\"", rule2.getInputEntries().get(0).getInputEntry().getText());
         assertEquals("!= 100", rule2.getInputEntries().get(1).getInputEntry().getText());
-        assertEquals("false", rule2.getInputEntries().get(2).getInputEntry().getText());
+        assertEquals("== false", rule2.getInputEntries().get(2).getInputEntry().getText());
         assertEquals("!= date:toDate('2017-06-01')", rule2.getInputEntries().get(3).getInputEntry().getText());
 
         assertEquals("\"WASN'T TEST\"", rule2.getOutputEntries().get(0).getOutputEntry().getText());
