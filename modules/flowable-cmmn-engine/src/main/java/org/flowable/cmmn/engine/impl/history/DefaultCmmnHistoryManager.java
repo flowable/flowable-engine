@@ -58,11 +58,12 @@ public class DefaultCmmnHistoryManager implements CmmnHistoryManager {
     }
     
     @Override
-    public void recordCaseInstanceEnd(String caseInstanceId) {
+    public void recordCaseInstanceEnd(String caseInstanceId, String state) {
         if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
             HistoricCaseInstanceEntityManager historicCaseInstanceEntityManager = cmmnEngineConfiguration.getHistoricCaseInstanceEntityManager();
             HistoricCaseInstanceEntity historicCaseInstanceEntity = historicCaseInstanceEntityManager.findById(caseInstanceId);
             historicCaseInstanceEntity.setEndTime(cmmnEngineConfiguration.getClock().getCurrentTime());
+            historicCaseInstanceEntity.setState(state);
         }
     }
     

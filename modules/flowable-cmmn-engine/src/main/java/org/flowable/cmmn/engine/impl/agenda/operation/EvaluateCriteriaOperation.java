@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
@@ -78,6 +79,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             boolean criteriaChangeOrActiveChildren = evaluatePlanItemsCriteria(caseInstanceEntity);
             if (evaluateCaseInstanceCompleted 
                     && !criteriaChangeOrActiveChildren
+                    && !CaseInstanceState.END_STATES.contains(caseInstanceEntity.getState())
                     && isPlanModelComplete()){
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("No active plan items found for plan model, completing case instance");
