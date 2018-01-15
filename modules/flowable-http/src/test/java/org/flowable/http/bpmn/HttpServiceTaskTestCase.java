@@ -20,6 +20,11 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
  * @author Harsha Teja Kanna
  */
 public abstract class HttpServiceTaskTestCase extends PluggableFlowableTestCase {
+    
+    static {
+        TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_CMMN_DATABASECHANGELOG");
+        TABLENAMES_EXCLUDED_FROM_DB_CLEAN_CHECK.add("ACT_CMMN_DATABASECHANGELOGLOCK");
+    }
 
     @Override
     protected void setUp() throws Exception {
