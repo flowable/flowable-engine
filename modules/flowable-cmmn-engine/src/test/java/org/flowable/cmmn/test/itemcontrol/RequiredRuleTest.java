@@ -256,5 +256,78 @@ public class RequiredRuleTest extends FlowableCmmnTestCase {
         cmmnRuntimeService.completeCaseInstance(caseInstance.getId());
         assertCaseInstanceEnded(caseInstance);
     }
+
+    @Test
+    @CmmnDeployment
+    public void testComplexCase() {
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .variable("dRequired", false)
+                .variable("enableSubStage", true)
+                .start();
+        
+        Task taskA = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertNotNull(taskA);
+        cmmnTaskService.complete(taskA.getId());
+        
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertEquals(1, tasks.size());
+        assertEquals("D", tasks.get(0).getName());
+        
+        // D is required. So completing D will auto complete the stage
+        cmmnTaskService.complete(tasks.get(0).getId());
+        assertEquals(2, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count()); // M1 is never reached. M2 and M3 are
+        
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertEquals(1, tasks.size());
+        assertEquals("G", tasks.get(0).getName());
+        
+        // G is the only required task. Completing it should complete the stage and case instance
+        cmmnTaskService.complete(tasks.get(0).getId());
+        assertCaseInstanceEnded(caseInstance);
+    }
+    
+    @Test
+    @CmmnDeployment
+    public void testComplexCase02() {
+        
+        // Same as testComplexCase, but now B and E are manually enabled
+        
+        CaseInstance caseInstance = cmmnRuntimeService.createCaseInstanceBuilder()
+                .caseDefinitionKey("myCase")
+                .variable("dRequired", false)
+                .variable("enableSubStage", false)
+                .variable("booleanVar", true)
+                .variable("subStageRequired", false)
+                .start();
+        
+        Task taskA = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).singleResult();
+        assertNotNull(taskA);
+        cmmnTaskService.complete(taskA.getId());
+        
+        PlanItemInstance planItemInstanceB = cmmnRuntimeService.createPlanItemInstanceQuery().planItemInstanceName("B").singleResult();
+        assertEquals(PlanItemInstanceState.ENABLED, planItemInstanceB.getState());
+        cmmnRuntimeService.startPlanItemInstance(planItemInstanceB.getId());
+        
+        List<Task> tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertEquals(2, tasks.size());
+        assertEquals("B", tasks.get(0).getName());
+        assertEquals("D", tasks.get(1).getName());
+        
+        // D is required. But B is still active
+        cmmnTaskService.complete(tasks.get(1).getId());
+        assertEquals(0, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+        cmmnTaskService.complete(tasks.get(0).getId());
+        assertEquals(1, cmmnRuntimeService.createMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+        
+        tasks = cmmnTaskService.createTaskQuery().caseInstanceId(caseInstance.getId()).orderByTaskName().asc().list();
+        assertEquals(1, tasks.size());
+        assertEquals("C", tasks.get(0).getName());
+        
+        // There are no active tasks in the second stage (as the nested stage is not active and not required).
+        // Stage should autocomplete immediately after task completion
+        cmmnTaskService.complete(tasks.get(0).getId());
+        assertCaseInstanceEnded(caseInstance);
+    }
       
 }

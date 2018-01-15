@@ -106,7 +106,7 @@ public class CaseInstanceEntityManagerImpl extends AbstractCmmnEntityManager<Cas
         }
         planItemInstanceEntityManager.deleteByCaseInstanceId(caseInstanceId); // root plan item instances
         
-        // Jobs
+        // Jobs have dependencies (byte array refs that need to be deleted, so no immediate delete for the moment)
         JobEntityManager jobEntityManager = cmmnEngineConfiguration.getJobServiceConfiguration().getJobEntityManager();
         List<Job> jobs = jobEntityManager.findJobsByQueryCriteria(new JobQueryImpl().scopeId(caseInstanceId).scopeType(VariableScopeType.CMMN));
         for (Job job : jobs) {
