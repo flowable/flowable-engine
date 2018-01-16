@@ -28,6 +28,4 @@ public interface HistoricMilestoneInstanceDataManager extends DataManager<Histor
 
     long findHistoricMilestoneInstancesCountByQueryCriteria(HistoricMilestoneInstanceQueryImpl query);
     
-    void deleteByCaseDefinitionId(String caseDefinitionId);
-
 }

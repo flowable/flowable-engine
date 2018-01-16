@@ -13,12 +13,10 @@
 
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceQuery;
-import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
@@ -39,7 +37,7 @@ import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEnt
 public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager<PlanItemInstanceEntity> implements PlanItemInstanceEntityManager {
 
     protected PlanItemInstanceDataManager planItemInstanceDataManager;
-
+    
     public PlanItemInstanceEntityManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration, PlanItemInstanceDataManager planItemInstanceDataManager) {
         super(cmmnEngineConfiguration);
         this.planItemInstanceDataManager = planItemInstanceDataManager;
@@ -97,34 +95,18 @@ public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager
     }
     
     @Override
-    public List<PlanItemInstanceEntity> findImmediateChildPlanItemInstancesForCaseInstance(String caseInstance) {
-        return planItemInstanceDataManager.findChildPlanItemInstancesForCaseInstance(caseInstance);
-    }
-    
-    @Override
-    public List<PlanItemInstanceEntity> findAllChildPlanItemInstancesForCaseInstance(String caseInstanceId) {
-        List<PlanItemInstanceEntity> allChildPlanItemInstances = new ArrayList<>();
-        collectChildPlanItemInstances(getCaseInstanceEntityManager().findById(caseInstanceId), allChildPlanItemInstances);
-        return allChildPlanItemInstances;
-    }
-
-    protected void collectChildPlanItemInstances(PlanItemInstanceContainer planItemInstanceContainer, List<PlanItemInstanceEntity> allChildPlanItemInstances) {
-        for (PlanItemInstanceEntity planItemInstanceEntity : planItemInstanceContainer.getChildPlanItemInstances()) {
-            allChildPlanItemInstances.add(planItemInstanceEntity);
-            if (planItemInstanceEntity.getChildPlanItemInstances() != null) {
-                collectChildPlanItemInstances(planItemInstanceEntity, allChildPlanItemInstances);
-            }
-        }
-    }
-    
-    @Override
-    public List<PlanItemInstanceEntity> findChildPlanItemInstancesForStage(String stagePlanItemInstanceId) {
-        return planItemInstanceDataManager.findChildPlanItemInstancesForStage(stagePlanItemInstanceId);
-    }
-    
-    @Override
     public void deleteByCaseDefinitionId(String caseDefinitionId) {
         planItemInstanceDataManager.deleteByCaseDefinitionId(caseDefinitionId);
+    }
+    
+    @Override
+    public void deleteByStageInstanceId(String stageInstanceId) {
+        planItemInstanceDataManager.deleteByStageInstanceId(stageInstanceId);
+    }
+    
+    @Override
+    public void deleteByCaseInstanceId(String caseInstanceId) {
+        planItemInstanceDataManager.deleteByCaseInstanceId(caseInstanceId);
     }
     
     public PlanItemInstanceQuery createPlanItemInstanceQuery() {
@@ -145,19 +127,24 @@ public class PlanItemInstanceEntityManagerImpl extends AbstractCmmnEntityManager
     public void delete(PlanItemInstanceEntity planItemInstanceEntity, boolean fireEvent) {
         CommandContext commandContext = CommandContextUtil.getCommandContext();
         
+        CountingPlanItemInstanceEntity countingPlanItemInstanceEntity = (CountingPlanItemInstanceEntity) planItemInstanceEntity;
+        
         // Variables
-        VariableInstanceEntityManager variableInstanceEntityManager 
-            = CommandContextUtil.getVariableServiceConfiguration(commandContext).getVariableInstanceEntityManager();
-        List<VariableInstanceEntity> variableInstanceEntities = variableInstanceEntityManager
-                .findVariableInstanceBySubScopeIdAndScopeType(planItemInstanceEntity.getId(), VariableScopeType.CMMN);
-        for (VariableInstanceEntity variableInstanceEntity : variableInstanceEntities) {
-            variableInstanceEntityManager.delete(variableInstanceEntity);
+        if (countingPlanItemInstanceEntity.getVariableCount() > 0) {
+            VariableInstanceEntityManager variableInstanceEntityManager 
+                = CommandContextUtil.getVariableServiceConfiguration(commandContext).getVariableInstanceEntityManager();
+            List<VariableInstanceEntity> variableInstanceEntities = variableInstanceEntityManager
+                    .findVariableInstanceBySubScopeIdAndScopeType(planItemInstanceEntity.getId(), VariableScopeType.CMMN);
+            for (VariableInstanceEntity variableInstanceEntity : variableInstanceEntities) {
+                variableInstanceEntityManager.delete(variableInstanceEntity);
+            }
         }
         
-        List<PlanItemInstanceEntity> childPlanItems = findChildPlanItemInstancesForStage(planItemInstanceEntity.getId());
-        if (childPlanItems != null && childPlanItems.size() > 0) {
-            for (PlanItemInstanceEntity childPlanItem : childPlanItems) {
-                delete(childPlanItem, fireEvent);
+        if (planItemInstanceEntity.isStage()) {
+            if (planItemInstanceEntity.getChildPlanItemInstances() != null && !planItemInstanceEntity.getChildPlanItemInstances().isEmpty()) {
+                for (PlanItemInstanceEntity childPlanItem : planItemInstanceEntity.getChildPlanItemInstances()) {
+                    delete(childPlanItem, fireEvent);
+                }
             }
         }
         

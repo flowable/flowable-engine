@@ -140,6 +140,11 @@ public class VariableInstanceEntityManagerImpl extends AbstractEntityManager<Var
             }
         }
     }
+    
+    @Override
+    public void deleteByScopeIdAndScopeType(String scopeId, String scopeType) {
+        variableInstanceDataManager.deleteByScopeIdAndScopeType(scopeId, scopeType);
+    }
 
     public VariableInstanceDataManager getVariableInstanceDataManager() {
         return variableInstanceDataManager;

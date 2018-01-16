@@ -54,11 +54,6 @@ public class HistoricMilestoneInstanceEntityManagerImpl extends AbstractCmmnEnti
         return historicMilestoneInstanceDataManager.findHistoricMilestoneInstancesCountByQueryCriteria((HistoricMilestoneInstanceQueryImpl) query);
     }
     
-    @Override
-    public void deleteByCaseDefinitionId(String caseDefinitionId) {
-        historicMilestoneInstanceDataManager.deleteByCaseDefinitionId(caseDefinitionId);
-    }
-    
     public HistoricMilestoneInstanceDataManager getHistoricMilestoneInstanceDataManager() {
         return historicMilestoneInstanceDataManager;
     }

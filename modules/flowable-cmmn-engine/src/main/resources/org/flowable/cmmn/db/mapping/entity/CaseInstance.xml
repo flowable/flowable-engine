@@ -126,10 +126,6 @@
         delete from ${prefix}ACT_CMMN_RU_CASE_INST where ID_ = #{id} and REV_ = #{revision}
     </delete>
 
-    <delete id="deleteCaseInstanceByCaseDefinitionId" parameterType="string">
-        delete from ${prefix}ACT_CMMN_RU_CASE_INST where CASE_DEF_ID_ = #{value}
-    </delete>
-
     <resultMap id="caseInstanceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl">
         <id property="id" column="ID_" jdbcType="VARCHAR" />
         <result property="revision" column="REV_" jdbcType="INTEGER" />
@@ -145,9 +141,49 @@
         <result property="completeable" column="IS_COMPLETEABLE_" jdbcType="BOOLEAN" />
         <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
     </resultMap>
-
+    
     <select id="selectCaseInstance" parameterType="string" resultMap="caseInstanceResultMap">
         select * from ${prefix}ACT_CMMN_RU_CASE_INST where ID_ = #{id, jdbcType=VARCHAR}
+    </select>
+    
+    <resultMap id="caseInstanceAndPlanItemInstancesResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntityImpl" extends="caseInstanceResultMap">
+        <collection property="childPlanItemInstances" 
+                    resultMap="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl.planItemInstanceResultMap" 
+                    columnPrefix="PI_" />
+    </resultMap>
+    
+    <select id="selectCaseInstanceEagerFetchPlanItemInstances" parameterType="java.util.Map" resultMap="caseInstanceAndPlanItemInstancesResultMap">
+        select 
+        C.*,
+        P.ID_ as PI_ID_,
+        P.REV_ as PI_REV_,
+        P.CASE_DEF_ID_ as PI_CASE_DEF_ID_,
+        P.CASE_INST_ID_ as PI_CASE_INST_ID_,
+        P.STAGE_INST_ID_ as PI_STAGE_INST_ID_,
+        P.IS_STAGE_ as PI_IS_STAGE_,
+        P.ELEMENT_ID_ as PI_ELEMENT_ID_,
+        P.ITEM_DEFINITION_ID_ as PI_ITEM_DEFINITION_ID_,
+        P.ITEM_DEFINITION_TYPE_ as PI_ITEM_DEFINITION_TYPE_,
+        P.NAME_ as PI_NAME_,
+        P.STATE_ as PI_STATE_,
+        P.START_TIME_ as PI_START_TIME_,
+        P.START_USER_ID_ as PI_USER_ID_,
+        P.REFERENCE_ID_ as PI_REFERENCE_ID_,
+        P.REFERENCE_TYPE_ as PI_REFERENCE_TYPE_,
+        P.IS_COMPLETEABLE_ as PI_IS_COMPLETEABLE_,
+        P.IS_COUNT_ENABLED_ as PI_IS_COUNT_ENABLED_,
+        P.VAR_COUNT_ as PI_VAR_COUNT_,
+        P.SENTRY_PART_INST_COUNT_ as PI_SENTRY_PART_INST_COUNT_,
+        P.TENANT_ID_ as PI_TENANT_ID_
+        from ${prefix}ACT_CMMN_RU_CASE_INST C
+        inner join ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST P on C.ID_ = CASE_INST_ID_
+        where 
+        <if test="caseInstanceId != null">
+            C.ID_ = #{caseInstanceId, jdbcType=VARCHAR}
+        </if>
+         <if test="planItemInstanceId != null">
+            C.ID_ = (select CASE_INST_ID_ from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where ID_ = #{planItemInstanceId, jdbcType=VARCHAR})
+        </if>
     </select>
 
     <select id="selectCaseInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl" resultMap="caseInstanceResultMap">

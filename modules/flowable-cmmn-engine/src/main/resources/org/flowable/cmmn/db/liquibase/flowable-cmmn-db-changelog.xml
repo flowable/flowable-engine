@@ -321,6 +321,22 @@
         <addColumn tableName="ACT_CMMN_RU_CASE_INST">
             <column name="IS_COMPLETEABLE_" type="boolean" />
         </addColumn>
+        
+        <createIndex tableName="ACT_CMMN_RU_PLAN_ITEM_INST" indexName="ACT_IDX_PLAN_ITEM_STAGE_INST">
+            <column name="STAGE_INST_ID_" />
+        </createIndex>  
+        
+        <addColumn tableName="ACT_CMMN_RU_PLAN_ITEM_INST">
+            <column name="IS_COUNT_ENABLED_" type="boolean" />
+        </addColumn>
+        
+        <addColumn tableName="ACT_CMMN_RU_PLAN_ITEM_INST">
+            <column name="VAR_COUNT_" type="integer" />
+        </addColumn>
+        
+        <addColumn tableName="ACT_CMMN_RU_PLAN_ITEM_INST">
+            <column name="SENTRY_PART_INST_COUNT_" type="integer" />
+        </addColumn>
     
     </changeSet>
 

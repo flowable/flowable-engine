@@ -23,11 +23,16 @@ import org.flowable.cmmn.engine.impl.persistence.entity.SentryPartInstanceEntity
 import org.flowable.cmmn.engine.impl.persistence.entity.data.AbstractCmmnDataManager;
 import org.flowable.cmmn.engine.impl.persistence.entity.data.PlanItemInstanceDataManager;
 import org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl;
+import org.flowable.engine.common.impl.db.CachedEntityMatcherAdapter;
+import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 
 /**
  * @author Joram Barrez
  */
 public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataManager<PlanItemInstanceEntity> implements PlanItemInstanceDataManager {
+    
+    protected PlanItemInstanceByCaseInstanceIdCachedEntityMatcher planItemInstanceByCaseInstanceIdCachedEntityMatcher =
+            new PlanItemInstanceByCaseInstanceIdCachedEntityMatcher();
     
     public MybatisPlanItemInstanceDataManagerImpl(CmmnEngineConfiguration cmmnEngineConfiguration) {
         super(cmmnEngineConfiguration);
@@ -49,18 +54,22 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
         return planItemInstanceEntityImpl;
     }
     
-    @SuppressWarnings("unchecked")
     @Override
-    public List<PlanItemInstanceEntity> findChildPlanItemInstancesForCaseInstance(String caseInstanceId) {
-        return getDbSqlSession().selectList("selectChildPlanItemInstancesByCaseInstanceId", caseInstanceId);
+    public PlanItemInstanceEntity findById(String planItemInstanceId) {
+        // Could have been cached before
+        EntityCache entityCache = getEntityCache();
+        PlanItemInstanceEntity cachedPlanItemInstanceEntity = entityCache.findInCache(getManagedEntityClass(), planItemInstanceId);
+        if (cachedPlanItemInstanceEntity != null) {
+            return cachedPlanItemInstanceEntity;
+        }
+        
+        cmmnEngineConfiguration.getCaseInstanceDataManager().findCaseInstanceEntityEagerFetchPlanItemInstances(null, planItemInstanceId);
+        
+        // the plan item instance will be in the cache now due to fetching the case instance,
+        // no need to do anything extra, the findById of the super class will look into the cache
+        return super.findById(planItemInstanceId);
     }
-    
-    @SuppressWarnings("unchecked")
-    @Override
-    public List<PlanItemInstanceEntity> findChildPlanItemInstancesForStage(String stagePlanItemInstanceId) {
-        return getDbSqlSession().selectList("selectChildPlanItemInstancesByStagePlanItemInstanceId", stagePlanItemInstanceId);
-    }
-    
+
     @Override
     public long countByCriteria(PlanItemInstanceQueryImpl planItemInstanceQuery) {
         return (Long) getDbSqlSession().selectOne("selectPlanItemInstanceCountByQueryCriteria", planItemInstanceQuery);
@@ -75,6 +84,32 @@ public class MybatisPlanItemInstanceDataManagerImpl extends AbstractCmmnDataMana
     @Override
     public void deleteByCaseDefinitionId(String caseDefinitionId) {
         getDbSqlSession().delete("deletePlanItemInstanceByCaseDefinitionId", caseDefinitionId, getManagedEntityClass());
+    }
+    
+    @Override
+    public void deleteByStageInstanceId(String stageInstanceId) {
+        List<PlanItemInstanceEntityImpl> planItemInstanceEntities = getEntityCache().findInCache(PlanItemInstanceEntityImpl.class);
+        for (PlanItemInstanceEntityImpl planItemInstanceEntity : planItemInstanceEntities) {
+            if (stageInstanceId.equals(planItemInstanceEntity.getStageInstanceId())) {
+                getDbSqlSession().delete(planItemInstanceEntity);
+            }
+        }
+        getDbSqlSession().delete("deletePlanItemInstancesByStageInstanceId", stageInstanceId, getManagedEntityClass());
+    }
+    
+    @Override
+    public void deleteByCaseInstanceId(String caseInstanceId) {
+        bulkDelete("deletePlanItemInstancesByCaseInstanceId", caseInstanceId, getManagedEntityClass(), planItemInstanceByCaseInstanceIdCachedEntityMatcher);
+    }
+    
+    public static class PlanItemInstanceByCaseInstanceIdCachedEntityMatcher extends CachedEntityMatcherAdapter<PlanItemInstanceEntity> {
+
+        @Override
+        public boolean isRetained(PlanItemInstanceEntity entity, Object param) {
+            String caseInstanceId = (String) param;
+            return caseInstanceId.equals(entity.getCaseInstanceId());
+        }
+        
     }
     
 }

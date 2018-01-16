@@ -40,13 +40,16 @@ public abstract class AbstractDeleteCaseInstanceOperation extends AbstractChange
     }
     
     protected void deleteCaseInstance() {
-        deleteRuntimeData();
+        updateChildPlanItemInstancesState();
+        CommandContextUtil.getCaseInstanceEntityManager(commandContext).delete(caseInstanceEntity.getId(), getDeleteReason());
+        
+        String newState = getNewState();
         CommandContextUtil.getCaseInstanceHelper(commandContext).callCaseInstanceStateChangeCallbacks(commandContext, 
-                caseInstanceEntity, caseInstanceEntity.getState(), getNewState());
-        CommandContextUtil.getCmmnHistoryManager(commandContext).recordCaseInstanceEnd(caseInstanceEntityId);
+                caseInstanceEntity, caseInstanceEntity.getState(), newState);
+        CommandContextUtil.getCmmnHistoryManager(commandContext).recordCaseInstanceEnd(caseInstanceEntityId, newState);
     }
 
-    protected void deleteRuntimeData() {
+    protected void updateChildPlanItemInstancesState() {
         List<PlanItemInstanceEntity> childPlanItemInstances = caseInstanceEntity.getChildPlanItemInstances();
         if (childPlanItemInstances != null) {
             for (PlanItemInstanceEntity childPlanItemInstance : childPlanItemInstances) {
@@ -56,7 +59,6 @@ public abstract class AbstractDeleteCaseInstanceOperation extends AbstractChange
                 }
             }
         }
-        CommandContextUtil.getCaseInstanceEntityManager(commandContext).deleteCaseInstanceAndRelatedData(caseInstanceEntity.getId(), getDeleteReason());
     }
     
     protected abstract String getDeleteReason();
