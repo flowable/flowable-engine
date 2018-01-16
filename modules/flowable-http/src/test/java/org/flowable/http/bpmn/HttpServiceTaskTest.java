@@ -29,6 +29,10 @@ import org.flowable.variable.api.history.HistoricVariableInstance;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import static org.hamcrest.CoreMatchers.notNullValue;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.core.Is.is;
+
 /**
  * @author Harsha Teja Kanna
  */
@@ -122,6 +126,26 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
             assertTrue(e instanceof FlowableException);
             assertTrue(e.getCause() instanceof SocketException);
         }
+    }
+
+    @Deployment(resources = "org/flowable/http/bpmn/HttpServiceTaskTest.testRequestTimeout7.bpmn20.xml" )
+    public void testRequestTimeoutFromProcessModelHasPrecedence() {
+        // set up timeout for test
+        int defaultSocketTimeout = this.processEngineConfiguration.getHttpClientConfig().getSocketTimeout();
+        int defaultConnectTimeOut = this.processEngineConfiguration.getHttpClientConfig().getConnectTimeout();
+        int defaultRequestTimeOut = this.processEngineConfiguration.getHttpClientConfig().getConnectionRequestTimeout();
+
+        this.processEngineConfiguration.getHttpClientConfig().setSocketTimeout(15000);
+        this.processEngineConfiguration.getHttpClientConfig().setConnectTimeout(15000);
+        this.processEngineConfiguration.getHttpClientConfig().setConnectionRequestTimeout(5000);
+
+        // execute test
+        assertThat("Model request timeout must be applied.", runtimeService.startProcessInstanceByKey("requestTimeout"), is(notNullValue()));
+
+        // restore timeouts
+        this.processEngineConfiguration.getHttpClientConfig().setSocketTimeout(defaultSocketTimeout);
+        this.processEngineConfiguration.getHttpClientConfig().setConnectTimeout(defaultConnectTimeOut);
+        this.processEngineConfiguration.getHttpClientConfig().setConnectionRequestTimeout(defaultRequestTimeOut);
     }
 
     @Deployment
