@@ -1,12 +1,12 @@
 create table ACT_RU_IDENTITYLINK (
     ID_ varchar(64) not null,
-    REV_ int,
-    GROUP_ID_ varchar(255),
-    TYPE_ varchar(255),
-    USER_ID_ varchar(255),
-    TASK_ID_ varchar(64),
-    PROC_INST_ID_ varchar(64),
-    PROC_DEF_ID_ varchar(64),
+    REV_ int null,
+    GROUP_ID_ varchar(255) null,
+    TYPE_ varchar(255) null,
+    USER_ID_ varchar(255) null,
+    TASK_ID_ varchar(64) null,
+    PROC_INST_ID_ varchar(64) null,
+    PROC_DEF_ID_ varchar(64) null,
     primary key (ID_)
 );
 

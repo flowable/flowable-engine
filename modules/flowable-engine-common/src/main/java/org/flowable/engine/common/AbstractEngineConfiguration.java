@@ -276,6 +276,7 @@ public abstract class AbstractEngineConfiguration {
         databaseTypeMappings.setProperty("DB2/2", DATABASE_TYPE_DB2);
         databaseTypeMappings.setProperty("DB2 UDB AS400", DATABASE_TYPE_DB2);
         databaseTypeMappings.setProperty("Adaptive Server Enterprise", DATABASE_TYPE_SYBASE);
+        databaseTypeMappings.setProperty("ASE", DATABASE_TYPE_SYBASE);
         return databaseTypeMappings;
     }
 

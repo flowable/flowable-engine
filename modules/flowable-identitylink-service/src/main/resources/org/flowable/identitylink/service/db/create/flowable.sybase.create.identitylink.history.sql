@@ -1,11 +1,11 @@
 create table ACT_HI_IDENTITYLINK (
     ID_ varchar(64) not null,
-    GROUP_ID_ varchar(255),
-    TYPE_ varchar(255),
-    USER_ID_ varchar(255),
-    TASK_ID_ varchar(64),
-    CREATE_TIME_ datetime,
-    PROC_INST_ID_ varchar(64),
+    GROUP_ID_ varchar(255) null,
+    TYPE_ varchar(255) null,
+    USER_ID_ varchar(255) null,
+    TASK_ID_ varchar(64) null,
+    CREATE_TIME_ datetime null,
+    PROC_INST_ID_ varchar(64) null,
     primary key (ID_)
 );
 

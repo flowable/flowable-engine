@@ -1,7 +1,7 @@
 create table ACT_ID_PROPERTY (
     NAME_ varchar(64) not null,
-    VALUE_ varchar(300),
-    REV_ int,
+    VALUE_ varchar(300) null,
+    REV_ int null,
     primary key (NAME_)
 );
 
@@ -10,17 +10,17 @@ values ('schema.version', '6.3.0.0', 1);
 
 create table ACT_ID_BYTEARRAY (
     ID_ varchar(64) not null,
-    REV_ int,
-    NAME_ varchar(255),
-    BYTES_ IMAGE,
+    REV_ int null,
+    NAME_ varchar(255) null,
+    BYTES_ IMAGE null,
     primary key (ID_)
 );
 
 create table ACT_ID_GROUP (
     ID_ varchar(64) not null,
-    REV_ int,
-    NAME_ varchar(255),
-    TYPE_ varchar(255),
+    REV_ int null,
+    NAME_ varchar(255) null,
+    TYPE_ varchar(255) null,
     primary key (ID_)
 );
 
@@ -32,50 +32,50 @@ create table ACT_ID_MEMBERSHIP (
 
 create table ACT_ID_USER (
     ID_ varchar(64) not null,
-    REV_ int,
-    FIRST_ varchar(255),
-    LAST_ varchar(255),
-    EMAIL_ varchar(255),
-    PWD_ varchar(255),
-    PICTURE_ID_ varchar(64),
+    REV_ int null,
+    FIRST_ varchar(255) null,
+    LAST_ varchar(255) null,
+    EMAIL_ varchar(255) null,
+    PWD_ varchar(255) null,
+    PICTURE_ID_ varchar(64) null,
     primary key (ID_)
 );
 
 create table ACT_ID_INFO (
     ID_ varchar(64) not null,
-    REV_ int,
-    USER_ID_ varchar(64),
-    TYPE_ varchar(64),
-    KEY_ varchar(255),
-    VALUE_ varchar(255),
-    PASSWORD_ IMAGE,
-    PARENT_ID_ varchar(255),
+    REV_ int null,
+    USER_ID_ varchar(64) null,
+    TYPE_ varchar(64) null,
+    KEY_ varchar(255) null,
+    VALUE_ varchar(255) null,
+    PASSWORD_ IMAGE null,
+    PARENT_ID_ varchar(255) null,
     primary key (ID_)
 );
 
 create table ACT_ID_TOKEN (
     ID_ varchar(64) not null,
     REV_ int,
-    TOKEN_VALUE_ varchar(255),
-    TOKEN_DATE_ timestamp,
-    IP_ADDRESS_ varchar(255),
-    USER_AGENT_ varchar(255),
-    USER_ID_ varchar(255),
-    TOKEN_DATA_ varchar(2000),
+    TOKEN_VALUE_ varchar(255) null,
+    TOKEN_DATE_ timestamp null,
+    IP_ADDRESS_ varchar(255) null,
+    USER_AGENT_ varchar(255) null,
+    USER_ID_ varchar(255) null,
+    TOKEN_DATA_ varchar(2000) null,
     primary key (ID_)
 );
 
 create table ACT_ID_PRIV (
     ID_ varchar(64) not null,
-    NAME_ varchar(255),
+    NAME_ varchar(255) null,
     primary key (ID_)
 );
 
 create table ACT_ID_PRIV_MAPPING (
     ID_ varchar(64) not null,
     PRIV_ID_ varchar(64) not null,
-    USER_ID_ varchar(255),
-    GROUP_ID_ varchar(255),
+    USER_ID_ varchar(255) null,
+    GROUP_ID_ varchar(255) null,
     primary key (ID_)
 );
 
