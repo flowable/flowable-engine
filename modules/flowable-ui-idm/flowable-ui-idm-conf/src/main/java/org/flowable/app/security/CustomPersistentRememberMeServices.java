@@ -75,6 +75,7 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
     @Autowired
     private IdmIdentityService identityService;
 
+    private final String tokenDomain;
     private final int tokenMaxAgeInSeconds;
     private final long tokenMaxAgeInMilliseconds;
     private final long tokenRefreshDurationInMilliseconds;
@@ -93,6 +94,12 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
         }
         tokenMaxAgeInSeconds = tokenMaxAgeSeconds;
         tokenMaxAgeInMilliseconds = tokenMaxAgeSeconds.longValue() * 1000L;
+
+        String domain = env.getProperty("security.cookie.domain", String.class);
+        if (domain != null) {
+            LOGGER.info("Cookie domain set to {}", domain);
+        }
+        tokenDomain = domain;
 
         Integer tokenRefreshSeconds = env.getProperty("security.cookie.refresh-age", Integer.class);
         if (tokenRefreshSeconds != null) {
@@ -217,6 +224,9 @@ public class CustomPersistentRememberMeServices extends AbstractRememberMeServic
         Cookie cookie = new Cookie(getCookieName(), cookieValue);
         cookie.setMaxAge(maxAge);
         cookie.setPath("/");
+        if (tokenDomain != null) {
+            cookie.setDomain(tokenDomain);
+        }
 
         cookie.setSecure(request.isSecure());
 
