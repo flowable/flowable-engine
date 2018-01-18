@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.cmd.ChangeActivityStateCmd.MoveExecutionEntityContainer;
+import org.flowable.engine.impl.dynamic.MoveExecutionEntityContainer;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 /**

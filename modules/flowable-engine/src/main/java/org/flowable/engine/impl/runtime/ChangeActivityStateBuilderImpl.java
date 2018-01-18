@@ -79,6 +79,23 @@ public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilde
         moveActivityIdList.add(new MoveActivityIdContainer(currentActivityId, newActivityIds));
         return this;
     }
+    
+    @Override
+    public ChangeActivityStateBuilder moveActivityIdToParentActivityId(String currentActivityId, String newActivityId) {
+        MoveActivityIdContainer moveActivityIdContainer = new MoveActivityIdContainer(currentActivityId, newActivityId);
+        moveActivityIdContainer.setMoveToParentProcess(true);
+        moveActivityIdList.add(moveActivityIdContainer);
+        return this;
+    }
+    
+    @Override
+    public ChangeActivityStateBuilder moveActivityIdToSubProcessInstanceActivityId(String currentActivityId, String newActivityId, String callActivityId) {
+        MoveActivityIdContainer moveActivityIdContainer = new MoveActivityIdContainer(currentActivityId, newActivityId);
+        moveActivityIdContainer.setMoveToSubProcessInstance(true);
+        moveActivityIdContainer.setCallActivityId(callActivityId);
+        moveActivityIdList.add(moveActivityIdContainer);
+        return this;
+    }
 
     @Override
     public ChangeActivityStateBuilder processVariable(String processVariableName, Object processVariableValue) {
@@ -201,6 +218,9 @@ public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilde
         protected String singleActivityId;
         protected String moveToActivityId;
         protected List<String> moveToActivityIds;
+        protected boolean moveToParentProcess;
+        protected boolean moveToSubProcessInstance;
+        protected String callActivityId;
         
         public MoveActivityIdContainer(String singleActivityId, String moveToActivityId) {
             this.singleActivityId = singleActivityId;
@@ -235,6 +255,30 @@ public class ChangeActivityStateBuilderImpl implements ChangeActivityStateBuilde
             } else {
                 return new ArrayList<>();
             }
+        }
+
+        public boolean isMoveToParentProcess() {
+            return moveToParentProcess;
+        }
+
+        public void setMoveToParentProcess(boolean moveToParentProcess) {
+            this.moveToParentProcess = moveToParentProcess;
+        }
+
+        public boolean isMoveToSubProcessInstance() {
+            return moveToSubProcessInstance;
+        }
+
+        public void setMoveToSubProcessInstance(boolean moveToSubProcessInstance) {
+            this.moveToSubProcessInstance = moveToSubProcessInstance;
+        }
+
+        public String getCallActivityId() {
+            return callActivityId;
+        }
+
+        public void setCallActivityId(String callActivityId) {
+            this.callActivityId = callActivityId;
         }
     }
 }
