@@ -28,6 +28,7 @@ import org.flowable.cmmn.engine.impl.persistence.entity.data.CaseInstanceDataMan
 import org.flowable.cmmn.engine.impl.persistence.entity.data.impl.matcher.CaseInstanceByCaseDefinitionIdMatcher;
 import org.flowable.cmmn.engine.impl.runtime.CaseInstanceQueryImpl;
 import org.flowable.engine.common.api.FlowableOptimisticLockingException;
+import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
@@ -56,6 +57,75 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
     }
     
     @Override
+    public CaseInstanceEntity findById(String caseInstanceId) {
+        return findCaseInstanceEntityEagerFetchPlanItemInstances(caseInstanceId, null);
+    }
+    
+    public CaseInstanceEntity findCaseInstanceEntityEagerFetchPlanItemInstances(String caseInstanceId, String planItemInstanceId) {
+        
+        // Could have been fetched before
+        EntityCache entityCache = getEntityCache();
+        CaseInstanceEntity cachedCaseInstanceEntity = entityCache.findInCache(getManagedEntityClass(), caseInstanceId);
+        if (cachedCaseInstanceEntity != null) {
+            return cachedCaseInstanceEntity;
+        }
+
+        // Not in cache
+        HashMap<String, Object> params = new HashMap<>(1);
+        if (caseInstanceId != null) {
+            params.put("caseInstanceId", caseInstanceId);
+        } else if (planItemInstanceId != null) {
+            params.put("planItemInstanceId", planItemInstanceId);
+        }
+        
+        // The case instance will be fetched and will have all plan item instances in the childPlanItemInstances property.
+        // Those children need to be properly moved to the correct parent
+        CaseInstanceEntityImpl caseInstanceEntity = (CaseInstanceEntityImpl) getDbSqlSession().selectOne("selectCaseInstanceEagerFetchPlanItemInstances", params);
+        
+        if (caseInstanceEntity != null) {
+            List<PlanItemInstanceEntity> allPlanItemInstances = caseInstanceEntity.getChildPlanItemInstances();
+            ArrayList<PlanItemInstanceEntity> directPlanItemInstances = new ArrayList<>();
+            HashMap<String, PlanItemInstanceEntity> planItemInstanceMap = new HashMap<>(allPlanItemInstances.size());
+            
+            // Map all plan item instances to its id
+            for (PlanItemInstanceEntity planItemInstanceEntity : allPlanItemInstances) {
+                
+                // Mapping
+                planItemInstanceMap.put(planItemInstanceEntity.getId(), planItemInstanceEntity);
+                
+                // Cache
+                entityCache.put(planItemInstanceEntity, true);
+                
+                // plan items of case plan model
+                if (planItemInstanceEntity.getStageInstanceId() == null) {
+                    directPlanItemInstances.add(planItemInstanceEntity);
+                }
+                
+                // Always add empty list, so no check is needed later and plan items 
+                // without children have a non-null value, not triggering the fetch
+                planItemInstanceEntity.setChildPlanItemInstances(new ArrayList<PlanItemInstanceEntity>());
+            }
+            
+            // Add to correct parent
+            if (directPlanItemInstances.size() != planItemInstanceMap.size()) {
+                for (PlanItemInstanceEntity planItemInstanceEntity : allPlanItemInstances) {
+                    if (planItemInstanceEntity.getStageInstanceId() != null) {
+                        PlanItemInstanceEntity parentPlanItemInstanceEntity = planItemInstanceMap.get(planItemInstanceEntity.getStageInstanceId());
+                        parentPlanItemInstanceEntity.getChildPlanItemInstances().add(planItemInstanceEntity);
+                    }
+                }
+            }
+            
+            caseInstanceEntity.setChildPlanItemInstances(directPlanItemInstances);
+            return caseInstanceEntity;
+            
+        } else {
+            return null;
+            
+        }
+    }
+    
+    @Override
     public List<CaseInstanceEntity> findCaseInstancesByCaseDefinitionId(String caseDefinitionId) {
         return getList("selectCaseInstancesByCaseDefinitionId", caseDefinitionId, caseInstanceByCaseDefinitionIdMatcher, true);
     }
@@ -63,17 +133,14 @@ public class MybatisCaseInstanceDataManagerImpl extends AbstractCmmnDataManager<
     @Override
     @SuppressWarnings("unchecked")
     public List<CaseInstance> findByCriteria(CaseInstanceQueryImpl query) {
-        return getDbSqlSession().selectList("selectCaseInstancesByQueryCriteria", query);
+        // Not going through cache as the case instance should always be loaded with all related plan item instances
+        // when not doing a query call
+        return getDbSqlSession().selectListNoCacheCheck("selectCaseInstancesByQueryCriteria", query);
     }
 
     @Override
     public long countByCriteria(CaseInstanceQueryImpl query) {
         return (Long) getDbSqlSession().selectOne("selectCaseInstanceCountByQueryCriteria", query);
-    }
-    
-    @Override
-    public void deleteByCaseDefinitionId(String caseDefinitionId) {
-        getDbSqlSession().delete("deleteCaseInstanceByCaseDefinitionId", caseDefinitionId, getManagedEntityClass());
     }
     
     @Override

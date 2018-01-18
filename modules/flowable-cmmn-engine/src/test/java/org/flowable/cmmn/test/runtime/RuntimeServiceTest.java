@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.flowable.cmmn.api.history.HistoricCaseInstance;
 import org.flowable.cmmn.api.history.HistoricMilestoneInstance;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.runtime.CaseInstance;
@@ -30,6 +31,7 @@ import org.flowable.cmmn.api.runtime.PlanItemInstance;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.test.CmmnDeployment;
 import org.flowable.cmmn.engine.test.FlowableCmmnTestCase;
+import org.flowable.engine.common.impl.history.HistoryLevel;
 import org.junit.Test;
 
 /**
@@ -108,6 +110,14 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
         assertEquals(0, cmmnHistoryService.createHistoricCaseInstanceQuery().unfinished().count());
         assertEquals(1, cmmnHistoryService.createHistoricCaseInstanceQuery().finished().count());
         assertEquals(2, cmmnHistoryService.createHistoricMilestoneInstanceQuery().milestoneInstanceCaseInstanceId(caseInstance.getId()).count());
+        
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertNotNull(historicCaseInstance);
+            assertNotNull(historicCaseInstance.getStartTime());
+            assertNotNull(historicCaseInstance.getEndTime());
+            assertEquals(CaseInstanceState.COMPLETED, historicCaseInstance.getState());
+        }
     }
     
     @Test
@@ -350,6 +360,14 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
                 .caseInstanceId(caseInstance.getId()).planItemInstanceState(PlanItemInstanceState.ACTIVE).singleResult().getId());
         cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
         assertCaseInstanceEnded(caseInstance, 1);
+        
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertNotNull(historicCaseInstance);
+            assertNotNull(historicCaseInstance.getStartTime());
+            assertNotNull(historicCaseInstance.getEndTime());
+            assertEquals(CaseInstanceState.TERMINATED, historicCaseInstance.getState());
+        }
     }
     
     @Test
@@ -360,6 +378,14 @@ public class RuntimeServiceTest extends FlowableCmmnTestCase {
                 .caseInstanceId(caseInstance.getId()).count());
         cmmnRuntimeService.terminateCaseInstance(caseInstance.getId());
         assertCaseInstanceEnded(caseInstance, 0);
+        
+        if (cmmnEngineConfiguration.getHistoryLevel().isAtLeast(HistoryLevel.ACTIVITY)) {
+            HistoricCaseInstance historicCaseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstance.getId()).singleResult();
+            assertNotNull(historicCaseInstance);
+            assertNotNull(historicCaseInstance.getStartTime());
+            assertNotNull(historicCaseInstance.getEndTime());
+            assertEquals(CaseInstanceState.TERMINATED, historicCaseInstance.getState());
+        }
     }
 
     @Test

@@ -139,9 +139,6 @@ public class CaseInstanceEntityImpl extends VariableScopeImpl implements CaseIns
 
     @Override
     public List<PlanItemInstanceEntity> getChildPlanItemInstances() {
-        if (childPlanItemInstances == null) {
-            childPlanItemInstances = CommandContextUtil.getPlanItemInstanceEntityManager().findImmediateChildPlanItemInstancesForCaseInstance(id);
-        }
         return childPlanItemInstances;
     }
     

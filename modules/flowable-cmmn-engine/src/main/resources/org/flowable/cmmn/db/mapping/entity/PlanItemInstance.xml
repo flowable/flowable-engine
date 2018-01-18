@@ -6,7 +6,7 @@
 
     <insert id="insertPlanItemInstance" parameterType="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl">
         insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, 
-                                                         NAME_, STATE_, START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_)
+                                                         NAME_, STATE_, START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_)
         values (
             #{id ,jdbcType=VARCHAR},
             1,
@@ -24,13 +24,16 @@
             #{referenceId ,jdbcType=VARCHAR},
             #{referenceType ,jdbcType=VARCHAR},
             #{completeable ,jdbcType=BOOLEAN},
+            #{countEnabled, jdbcType=BOOLEAN},
+            #{variableCount, jdbcType=INTEGER},
+            #{sentryPartInstanceCount, jdbcType=INTEGER},
             #{tenantId ,jdbcType=VARCHAR}
         )
     </insert>
 
   <insert id="bulkInsertPlanItemInstance" parameterType="java.util.List">
     insert into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, 
-                                                     NAME_, STATE_, START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_) 
+                                                     NAME_, STATE_, START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_) 
     values 
       <foreach collection="list" item="planItemInstance" index="index" separator=",">
         (
@@ -50,6 +53,9 @@
             #{planItemInstance.referenceId, jdbcType=VARCHAR},
             #{planItemInstance.referenceType, jdbcType=VARCHAR},
             #{planItemInstance.completeable, jdbcType=BOOLEAN},
+            #{planItemInstance.countEnabled, jdbcType=BOOLEAN},
+            #{planItemInstance.variableCount, jdbcType=INTEGER},
+            #{planItemInstance.sentryPartInstanceCount, jdbcType=INTEGER},
             #{planItemInstance.tenantId ,jdbcType=VARCHAR}
         )
       </foreach>
@@ -59,7 +65,7 @@
         INSERT ALL
         <foreach collection="list" item="planItemInstance" index="index">
             into ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST (ID_, REV_, CASE_DEF_ID_, CASE_INST_ID_, STAGE_INST_ID_, IS_STAGE_, ELEMENT_ID_, ITEM_DEFINITION_ID_, ITEM_DEFINITION_TYPE_, 
-                                                      NAME_, STATE_, START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, TENANT_ID_) VALUES
+                                                      NAME_, STATE_, START_TIME_, START_USER_ID_, REFERENCE_ID_, REFERENCE_TYPE_, IS_COMPLETEABLE_, IS_COUNT_ENABLED_, VAR_COUNT_, SENTRY_PART_INST_COUNT_, TENANT_ID_) VALUES
             (
                 #{planItemInstance.id ,jdbcType=VARCHAR},
                 1,
@@ -77,6 +83,9 @@
                 #{planItemInstance.referenceId, jdbcType=VARCHAR},
                 #{planItemInstance.referenceType, jdbcType=VARCHAR},
                 #{planItemInstance.completeable, jdbcType=BOOLEAN},
+                #{planItemInstance.countEnabled, jdbcType=BOOLEAN},
+                #{planItemInstance.variableCount, jdbcType=INTEGER},
+                #{planItemInstance.sentryPartInstanceCount, jdbcType=INTEGER},
                 #{planItemInstance.tenantId ,jdbcType=VARCHAR}
             )
         </foreach>
@@ -129,6 +138,15 @@
         <if test="originalPersistentState.completeable != completeable">
             IS_COMPLETEABLE_ = #{completeable, jdbcType=BOOLEAN}
         </if>
+        <if test="originalPersistentState.countEnabled != countEnabled">
+            IS_COUNT_ENABLED_ = #{countEnabled, jdbcType=BOOLEAN}
+        </if>
+        <if test="originalPersistentState.variableCount != variableCount">
+            VAR_COUNT_ = #{variableCount, jdbcType=INTEGER}
+        </if>
+        <if test="originalPersistentState.sentryPartInstanceCount != sentryPartInstanceCount">
+            SENTRY_PART_INST_COUNT_ = #{sentryPartInstanceCount, jdbcType=INTEGER}
+        </if>
         <if test="originalPersistentState.tenantId != tenantId">
             TENANT_ID_ = #{tenantId, jdbcType=VARCHAR}
         </if>
@@ -140,8 +158,16 @@
     delete from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where ID_ = #{id} and REV_ = #{revision}
   </delete>
   
-  <delete id="deletePlanItemInstanceByCaseDefinitionId" parameterType="string">
+  <delete id="deletePlanItemInstancesByCaseDefinitionId" parameterType="string">
     delete from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where CASE_DEF_ID_ = #{value}
+  </delete>
+  
+  <delete id="deletePlanItemInstancesByStageInstanceId" parameterType="string">
+    delete from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where STAGE_INST_ID_ = #{value}
+  </delete>
+  
+  <delete id="deletePlanItemInstancesByCaseInstanceId" parameterType="string">
+    delete from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where CASE_INST_ID_ = #{value}
   </delete>
   
   <resultMap id="planItemInstanceResultMap" type="org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntityImpl">
@@ -161,19 +187,15 @@
     <result property="referenceId" column="REFERENCE_ID_" jdbcType="VARCHAR" />
     <result property="referenceType" column="REFERENCE_TYPE_" jdbcType="VARCHAR" />
     <result property="completeable" column="IS_COMPLETEABLE_" jdbcType="BOOLEAN" />
+    <result property="countEnabled" column="IS_COUNT_ENABLED_" jdbcType="BOOLEAN" />
+    <result property="variableCount" column="VAR_COUNT_" jdbcType="INTEGER" />
+    <result property="sentryPartInstanceCount" column="SENTRY_PART_INST_COUNT_" jdbcType="INTEGER" />
     <result property="tenantId" column="TENANT_ID_" jdbcType="VARCHAR" />
+    <!-- Do not forget to update selectCaseInstanceAndAllPlanItemInstances select when adding/changing columns of planItemInstance -->
   </resultMap>
   
   <select id="selectPlanItemInstance" parameterType="string" resultMap="planItemInstanceResultMap">
       select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where ID_ = #{id, jdbcType=VARCHAR}
-  </select>
-  
-  <select id="selectChildPlanItemInstancesByCaseInstanceId" parameterType="string" resultMap="planItemInstanceResultMap">
-    select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where CASE_INST_ID_ = #{parameter, jdbcType=VARCHAR} and STAGE_INST_ID_ is null 
-  </select>
-  
-  <select id="selectChildPlanItemInstancesByStagePlanItemInstanceId" parameterType="string" resultMap="planItemInstanceResultMap">
-    select * from ${prefix}ACT_CMMN_RU_PLAN_ITEM_INST where STAGE_INST_ID_ = #{parameter, jdbcType=VARCHAR}
   </select>
   
    <select id="selectPlanItemInstancesByQueryCriteria" parameterType="org.flowable.cmmn.engine.impl.runtime.PlanItemInstanceQueryImpl" resultMap="planItemInstanceResultMap">

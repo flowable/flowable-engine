@@ -76,7 +76,7 @@ public class MybatisFormDefinitionDataManager extends AbstractFormDataManager<Fo
 
     @Override
     public void deleteFormDefinitionsByDeploymentId(String deploymentId) {
-        getDbSqlSession().delete("deleteFormDefinitionsByDeploymentId", deploymentId);
+        getDbSqlSession().delete("deleteFormDefinitionsByDeploymentId", deploymentId, getManagedEntityClass());
     }
 
     @Override

@@ -106,13 +106,9 @@ public class DbSqlSession implements Session {
     // delete
     // ///////////////////////////////////////////////////////////////////
     
-    public void delete(String statement, Object parameter) {
-        sqlSession.delete(statement, parameter);
-    }
-
     /**
-     * Executes a {@link BulkDeleteOperation}, with the sql in the statement parameter. The passed class determines when this operation will be executed: it will be executed when the particular class
-     * has passed in the {@link EntityDependencyOrder}.
+     * Executes a {@link BulkDeleteOperation}, with the sql in the statement parameter. 
+     * The passed class determines when this operation will be executed: it will be executed depending on the place of the class in the {@link EntityDependencyOrder}.
      */
     public void delete(String statement, Object parameter, Class<? extends Entity> entityClass) {
         if (!bulkDeleteOperations.containsKey(entityClass)) {
@@ -120,7 +116,7 @@ public class DbSqlSession implements Session {
         }
         bulkDeleteOperations.get(entityClass).add(new BulkDeleteOperation(dbSqlSessionFactory.mapStatement(statement), parameter));
     }
-
+    
     public void delete(Entity entity) {
         Class<? extends Entity> clazz = entity.getClass();
         if (!deletedObjects.containsKey(clazz)) {

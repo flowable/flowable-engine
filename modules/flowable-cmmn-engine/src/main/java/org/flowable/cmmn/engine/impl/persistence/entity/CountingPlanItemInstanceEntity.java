@@ -12,23 +12,18 @@
  */
 package org.flowable.cmmn.engine.impl.persistence.entity;
 
-import java.util.List;
-
-import org.flowable.cmmn.api.history.HistoricCaseInstance;
-import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
-import org.flowable.engine.common.impl.persistence.entity.EntityManager;
-
 /**
  * @author Joram Barrez
  */
-public interface HistoricCaseInstanceEntityManager extends EntityManager<HistoricCaseInstanceEntity> {
+public interface CountingPlanItemInstanceEntity {
     
-    HistoricCaseInstanceQuery createHistoricCaseInstanceQuery();
+    boolean isCountEnabled();
+    void setCountEnabled(boolean isCountEnabled);
     
-    List<HistoricCaseInstanceEntity> findHistoricCaseInstancesByCaseDefinitionId(String caseDefinitionId);
+    int getVariableCount();
+    void setVariableCount(int variableCount);
     
-    List<HistoricCaseInstance> findByCriteria(HistoricCaseInstanceQuery query);
-    
-    long countByCriteria(HistoricCaseInstanceQuery query);
-    
+    int getSentryPartInstanceCount();
+    void setSentryPartInstanceCount(int sentryPartInstanceCount);
+
 }

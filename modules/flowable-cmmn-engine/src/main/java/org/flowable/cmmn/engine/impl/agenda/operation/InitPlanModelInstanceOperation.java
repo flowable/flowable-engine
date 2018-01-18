@@ -12,10 +12,7 @@
  */
 package org.flowable.cmmn.engine.impl.agenda.operation;
 
-import java.util.List;
-
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
-import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.repository.CaseDefinitionUtil;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.cmmn.model.Stage;
@@ -38,7 +35,7 @@ public class InitPlanModelInstanceOperation extends AbstractCaseInstanceOperatio
         super.run();
         
         Stage stage = CaseDefinitionUtil.getCase(caseInstanceEntity.getCaseDefinitionId()).getPlanModel();
-        List<PlanItemInstanceEntity> planItemInstances = createPlanItemInstances(commandContext, 
+        createPlanItemInstances(commandContext, 
                 stage.getPlanItems(), 
                 caseInstanceEntity.getCaseDefinitionId(), 
                 caseInstanceEntity.getId(), 

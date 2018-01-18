@@ -52,4 +52,6 @@ public interface VariableInstanceDataManager extends DataManager<VariableInstanc
     
     List<VariableInstanceEntity> findVariableInstancesBySubScopeIdAndScopeTypeAndNames(String subScopeId, String scopeType, Collection<String> variableNames);
 
+    void deleteByScopeIdAndScopeType(String scopeId, String scopeType);
+    
 }
