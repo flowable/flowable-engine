@@ -22,8 +22,9 @@
 		<spring.security.version>4.2.4.RELEASE</spring.security.version>
 		<jackson.version>2.9.3</jackson.version>
 		<mule.version>3.8.0</mule.version>
-		<camel.version>2.17.1</camel.version>
-		<cxf.version>3.2.0</cxf.version>		<slf4j.version>1.7.25</slf4j.version>
+		<camel.version>2.20.1</camel.version>
+		<cxf.version>3.2.1</cxf.version>
+		<slf4j.version>1.7.25</slf4j.version>
 
         <checkstyle.config.location>checkstyle/flowable-checkstyle.xml</checkstyle.config.location>
         <checkstyle.suppressions.location>/checkstyle/flowable-suppressions.xml</checkstyle.suppressions.location>
