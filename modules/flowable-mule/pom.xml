@@ -237,6 +237,16 @@
         </plugins>
       </build>
     </profile>
+     <profile>
+        <id>java9</id>
+        <activation>
+            <jdk>9</jdk>
+        </activation>
+        <properties>
+            <!-- mule does not work on java 9 yet, see: https://forums.mulesoft.com/questions/76918/mule-java-9-any-issues.html !-->
+            <maven.test.skip>true</maven.test.skip>
+        </properties>
+    </profile>
   </profiles>
 
   <reporting>
