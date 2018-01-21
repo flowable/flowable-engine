@@ -25,4 +25,6 @@ public interface SentryPartInstanceEntityManager extends EntityManager<SentryPar
     
     List<SentryPartInstanceEntity> findSentryPartInstancesByPlanItemInstanceId(String planItemInstanceId);
     
+    void deleteByCaseInstanceId(String caseInstanceId);
+    
 }

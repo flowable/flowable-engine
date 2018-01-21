@@ -221,7 +221,7 @@ angular.module('flowableModeler')
 
         $scope.model.loading = true;
 
-        $http({method: 'POST', url: FLOWABLE.APP_URL.getCloneModelsUrl(), data: $scope.model.process}).
+        $http({method: 'POST', url: FLOWABLE.APP_URL.getCloneModelsUrl($scope.model.process.id), data: $scope.model.process}).
             success(function(data) {
                 $scope.$hide();
 

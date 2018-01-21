@@ -18,6 +18,7 @@ import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.TaskService;
+import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
@@ -36,8 +37,13 @@ public class TaskHelper {
                 deleteTask((TaskEntity) subTask, deleteReason, cascade, fireEvents);
             }
 
-            CommandContextUtil.getIdentityLinkService(commandContext).deleteIdentityLinksByTaskId(task.getId());
-            CommandContextUtil.getVariableService(commandContext).deleteVariableInstanceMap(task.getVariableInstanceEntities());
+            CountingTaskEntity countingTaskEntity = (CountingTaskEntity) task;
+            if (countingTaskEntity.isCountEnabled() && countingTaskEntity.getIdentityLinkCount() > 0) {    
+                CommandContextUtil.getIdentityLinkService(commandContext).deleteIdentityLinksByTaskId(task.getId());
+            }
+            if (countingTaskEntity.isCountEnabled() && countingTaskEntity.getVariableCount() > 0) {
+                CommandContextUtil.getVariableService(commandContext).deleteVariableInstanceMap(task.getVariableInstanceEntities());
+            }
             CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskEnd(task, deleteReason);
             CommandContextUtil.getTaskService().deleteTask(task, fireEvents);
         }

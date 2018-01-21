@@ -56,6 +56,10 @@ public class MybatisSentryPartInstanceDataManagerImpl extends AbstractCmmnDataMa
         return getList("selectSentryPartInstanceByPlanItemInstanceId", planItemInstanceId, sentryPartByPlanItemInstanceIdEntityMatched);
     }
 
+    @Override
+    public void deleteByCaseInstanceId(String caseInstanceId) {
+        bulkDelete("deleteSentryPartInstancesByCaseInstanceId", caseInstanceId, getManagedEntityClass(), sentryPartByCaseInstanceIdEntityMatched);
+    }
     
     
     public static class SentryPartByCaseInstanceIdEntityMatcher extends CachedEntityMatcherAdapter<SentryPartInstanceEntity> {

@@ -13,12 +13,19 @@
 
 package org.flowable.engine.impl.cmd;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.dynamic.DynamicStateManager;
+import org.flowable.engine.impl.dynamic.MoveExecutionEntityContainer;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
+import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl.MoveActivityIdContainer;
+import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl.MoveExecutionIdContainer;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
 /**
@@ -26,38 +33,67 @@ import org.flowable.engine.impl.util.CommandContextUtil;
  */
 public class ChangeActivityStateCmd implements Command<Void> {
 
-    protected final String processInstanceId;
-    protected final String executionId;
-    protected final String cancelActivityId;
-    protected final String startActivityId;
+    protected ChangeActivityStateBuilderImpl changeActivityStateBuilder;
 
     public ChangeActivityStateCmd(ChangeActivityStateBuilderImpl changeActivityStateBuilder) {
-        this.processInstanceId = changeActivityStateBuilder.getProcessInstanceId();
-        this.executionId = changeActivityStateBuilder.getExecutionId();
-        this.cancelActivityId = changeActivityStateBuilder.getCancelActivityId();
-        this.startActivityId = changeActivityStateBuilder.getStartActivityId();
+        this.changeActivityStateBuilder = changeActivityStateBuilder;
     }
 
     @Override
     public Void execute(CommandContext commandContext) {
-        if (processInstanceId == null && executionId == null) {
-            throw new FlowableIllegalArgumentException("Process instance id or execution id is required");
+        if (changeActivityStateBuilder.getMoveExecutionIdList().size() == 0 && changeActivityStateBuilder.getMoveActivityIdList().size() == 0) {
+            throw new FlowableIllegalArgumentException("No move execution or activity ids provided");
+            
+        } else if (changeActivityStateBuilder.getMoveActivityIdList().size() > 0 && changeActivityStateBuilder.getProcessInstanceId() == null) {
+            throw new FlowableIllegalArgumentException("Process instance id is required");
         }
         
         DynamicStateManager dynamicStateManager = CommandContextUtil.getProcessEngineConfiguration(commandContext).getDynamicStateManager();
 
-        String fromActivityId = null;
-        ExecutionEntity execution = null;
-        if (executionId != null) {
-            execution = dynamicStateManager.resolveActiveExecution(executionId, commandContext);
-            fromActivityId = execution.getCurrentFlowElement().getId();
+        List<MoveExecutionEntityContainer> moveExecutionEntityContainerList = new ArrayList<>();
+        if (changeActivityStateBuilder.getMoveExecutionIdList().size() > 0) {
+            for (MoveExecutionIdContainer executionContainer : changeActivityStateBuilder.getMoveExecutionIdList()) {
+                List<ExecutionEntity> executions = new ArrayList<>();
+                for (String executionId : executionContainer.getExecutionIds()) {
+                    ExecutionEntity execution = dynamicStateManager.resolveActiveExecution(executionId, commandContext);
+                    executions.add(execution);
+                }
+                
+                moveExecutionEntityContainerList.add(new MoveExecutionEntityContainer(executions, executionContainer.getMoveToActivityIds()));
+            }
+        }
             
-        } else {
-            execution = dynamicStateManager.resolveActiveExecution(processInstanceId, cancelActivityId, commandContext);
-            fromActivityId = cancelActivityId;
+        if (changeActivityStateBuilder.getMoveActivityIdList().size() > 0) {
+            for (MoveActivityIdContainer activityContainer : changeActivityStateBuilder.getMoveActivityIdList()) {
+                List<ExecutionEntity> executions = new ArrayList<>();
+                for (String activityId : activityContainer.getActivityIds()) {
+                    ExecutionEntity execution = dynamicStateManager.resolveActiveExecution(changeActivityStateBuilder.getProcessInstanceId(), activityId, commandContext);
+                    executions.add(execution);
+                }
+                
+                MoveExecutionEntityContainer moveExecutionEntityContainer = new MoveExecutionEntityContainer(executions, activityContainer.getMoveToActivityIds());
+                
+                if (activityContainer.isMoveToParentProcess()) {
+                    ExecutionEntity processInstanceExecution = executions.get(0).getProcessInstance();
+                    ExecutionEntity superExecution = processInstanceExecution.getSuperExecution();
+                    if (superExecution == null) {
+                        throw new FlowableException("No parent process found for execution with activity id " + executions.get(0).getCurrentActivityId());
+                    }
+                    
+                    moveExecutionEntityContainer.setMoveToParentProcess(true);
+                    moveExecutionEntityContainer.setSuperExecution(superExecution);
+                
+                } else if (activityContainer.isMoveToSubProcessInstance()) {
+                    moveExecutionEntityContainer.setMoveToSubProcessInstance(true);
+                    moveExecutionEntityContainer.setCallActivityId(activityContainer.getCallActivityId());
+                }
+                
+                moveExecutionEntityContainerList.add(moveExecutionEntityContainer);
+            }
         }
 
-        dynamicStateManager.moveExecutionState(execution, fromActivityId, startActivityId, commandContext);
+        dynamicStateManager.moveExecutionState(moveExecutionEntityContainerList, changeActivityStateBuilder.getProcessVariables(), 
+                        changeActivityStateBuilder.getLocalVariables(), commandContext);
 
         return null;
     }

@@ -728,3 +728,39 @@ cmmnRuntimeService.enablePlanItemInstance(planItemInstance.getId());
 
 Note that with regards to determining stage or case instance termination, the _DISABLED_ state is seen as a 'terminal' state. This means that the case instance will terminate when only disabled plan item instances would remain.
 
+==== Item control: Required Rule
+
+Plan items on the case model can have a _required rule_, an expression that can be used to indicate a certain plan item is _required by the enclosing stage (or plan model)_. This can be used to indicate which plan items of the case model are required to be executed and which are optional.
+
+When no expression is set, but the required rule is enabled (e.g. the checkbox is checked in the Flowable Modeler) or the expression is empty, a _true_ value is assumed by default.
+
+The _required rule_ works in conjunction with the _autoComplete_ attribute on the parent stage:
+
+* If _autoComplete_ resolves to _false_ for the stage, which is also the default when nothing is set, *all* child plan item instances must be in an end state (completed, terminated, etc.) for the stage plan item instance to completed by the engine.
+* If _autoComplete_ resolves to _true_ for the stage, all child plan item instances for *which the required rule evaluates to true* need to be in an end state. If there are also no other active child plan item instances, the stage completes automatically.
+
+A _stage plan item instance_ has a *completeable* property that can be used to see whether or not the conditions for completion are satisfied.
+Take for example the following simple stage and assume that the sentry for the _required task_ evaluates to true and the other one to false. This means that the left plan item instance will be active while the right one will be in the _available_ state.
+
+image::images/cmmn.completeable-stage.png[align="center"]
+
+Calling _cmmnRuntimeService.completeStagePlanItemInstance(String stagePlanItemInstanceId)_ will not be possible for the stage (an exception will be thrown) as it has one active child plan item instance. When this user task on the left is completed, the _completeStagePlanItemInstance_ can now be called, as no child plan item instances are currently active. However, by itself the stage will not automatically complete as the right user task is in the available state.
+
+If the previous stage is changed to be *autoCompleteable* (this is visualised by a black rectangle at the bottom of the stage) and the plan item on the left is changed to be required (this is visualised using an exclamation mark), the behavior will be different:
+
+image::images/cmmn.completeable-stage02.png[align="center"]
+
+* If the left plan item instance is active (sentry is true) and the right is not (sentry is false). In this case, when the left user task is completed, the stage instance will auto complete as it has no active child plan item instances and all required plan item instances are in an end state 
+* If both the left and right user tasks are active (sentries are true). 
+** When the left user task is completed, the stage will not autocomplete as there is still a child plan item instance active.
+** When the right user task is completed, the stage will not autocomplete as the required left child plan item instance is not in an end state.
+* If the left plan item instance is not active and the right is active. In this case, when the right user task is completed the stage will not autocomplete, as the required left user task is not in an end state. It will need to become active and be completed to complete the stage. 
+
+Note that the manual activation rule works independently from the required rule. For example, given the following stage: 
+
+image::images/cmmn.completeable-stage03.png[align="center"]
+
+Here, user task D is required, and user task B is manually activated. 
+
+* If D is completed, the stage will automatically complete, as B is not required and it is not active.
+* If B would be required too, it would need to be manually started (using _cmmnRuntimeService.startPlanItemInstance(String planItemInstanceId)_) before the stage would automatically complete, even if D would be completed before the manual start of B.

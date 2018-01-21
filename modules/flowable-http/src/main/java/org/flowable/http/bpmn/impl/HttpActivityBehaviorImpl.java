@@ -12,6 +12,19 @@
  */
 package org.flowable.http.bpmn.impl;
 
+import static org.flowable.bpmn.model.ImplementationType.IMPLEMENTATION_TYPE_CLASS;
+import static org.flowable.bpmn.model.ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION;
+import static org.flowable.http.ExpressionUtils.getBooleanFromField;
+import static org.flowable.http.ExpressionUtils.getIntFromField;
+import static org.flowable.http.ExpressionUtils.getStringFromField;
+import static org.flowable.http.ExpressionUtils.getStringSetFromField;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
@@ -42,18 +55,6 @@ import org.flowable.http.delegate.HttpRequestHandler;
 import org.flowable.http.delegate.HttpResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSession;
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.flowable.bpmn.model.ImplementationType.IMPLEMENTATION_TYPE_CLASS;
-import static org.flowable.bpmn.model.ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION;
-import static org.flowable.http.ExpressionUtils.getBooleanFromField;
-import static org.flowable.http.ExpressionUtils.getIntFromField;
-import static org.flowable.http.ExpressionUtils.getStringFromField;
-import static org.flowable.http.ExpressionUtils.getStringSetFromField;
 
 /**
  * Implementation of HttpActivityBehavior using Apache HTTP Client
@@ -164,17 +165,17 @@ public class HttpActivityBehaviorImpl extends AbstractBpmnActivityBehavior {
 
             // Save request fields
             if (request.isSaveRequest()) {
-                execution.setVariable(request.getPrefix() + ".requestMethod", request.getMethod());
-                execution.setVariable(request.getPrefix() + ".requestUrl", request.getUrl());
-                execution.setVariable(request.getPrefix() + ".requestHeaders", request.getHeaders());
-                execution.setVariable(request.getPrefix() + ".requestBody", request.getBody());
-                execution.setVariable(request.getPrefix() + ".requestTimeout", request.getTimeout());
-                execution.setVariable(request.getPrefix() + ".disallowRedirects", request.isNoRedirects());
-                execution.setVariable(request.getPrefix() + ".failStatusCodes", failCodes);
-                execution.setVariable(request.getPrefix() + ".handleStatusCodes", handleCodes);
-                execution.setVariable(request.getPrefix() + ".ignoreException", request.isIgnoreErrors());
-                execution.setVariable(request.getPrefix() + ".saveRequestVariables", request.isSaveRequest());
-                execution.setVariable(request.getPrefix() + ".saveResponseParameters", request.isSaveResponse());
+                execution.setVariable(request.getPrefix() + "RequestMethod", request.getMethod());
+                execution.setVariable(request.getPrefix() + "RequestUrl", request.getUrl());
+                execution.setVariable(request.getPrefix() + "RequestHeaders", request.getHeaders());
+                execution.setVariable(request.getPrefix() + "RequestBody", request.getBody());
+                execution.setVariable(request.getPrefix() + "RequestTimeout", request.getTimeout());
+                execution.setVariable(request.getPrefix() + "DisallowRedirects", request.isNoRedirects());
+                execution.setVariable(request.getPrefix() + "FailStatusCodes", failCodes);
+                execution.setVariable(request.getPrefix() + "HandleStatusCodes", handleCodes);
+                execution.setVariable(request.getPrefix() + "IgnoreException", request.isIgnoreErrors());
+                execution.setVariable(request.getPrefix() + "SaveRequestVariables", request.isSaveRequest());
+                execution.setVariable(request.getPrefix() + "SaveResponseParameters", request.isSaveResponse());
             }
 
         } catch (Exception e) {

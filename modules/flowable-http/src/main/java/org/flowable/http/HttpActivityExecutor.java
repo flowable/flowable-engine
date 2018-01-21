@@ -12,6 +12,15 @@
  */
 package org.flowable.http;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.StringReader;
+import java.net.URISyntaxException;
+import java.util.List;
+import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpMessage;
@@ -36,15 +45,6 @@ import org.flowable.http.delegate.HttpResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
-import java.net.URISyntaxException;
-import java.util.List;
-import java.util.Set;
-import java.util.Timer;
-import java.util.TimerTask;
-
 /**
  * An executor behavior for HTTP requests.
  *
@@ -54,8 +54,6 @@ import java.util.TimerTask;
 public class HttpActivityExecutor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpActivityExecutor.class);
-
-    private static final long serialVersionUID = 1L;
 
     // Validation constants
     public static final String HTTP_TASK_REQUEST_METHOD_REQUIRED = "requestMethod is required";
@@ -92,17 +90,17 @@ public class HttpActivityExecutor {
             if (response != null) {
                 // Save response body only by default
                 if (request.isSaveResponse()) {
-                    execution.setVariable(request.getPrefix() + ".responseProtocol", response.getProtocol());
-                    execution.setVariable(request.getPrefix() + ".responseStatusCode", response.getStatusCode());
-                    execution.setVariable(request.getPrefix() + ".responseReason", response.getReason());
-                    execution.setVariable(request.getPrefix() + ".responseHeaders", response.getHeaders());
+                    execution.setVariable(request.getPrefix() + "ResponseProtocol", response.getProtocol());
+                    execution.setVariable(request.getPrefix() + "ResponseStatusCode", response.getStatusCode());
+                    execution.setVariable(request.getPrefix() + "ResponseReason", response.getReason());
+                    execution.setVariable(request.getPrefix() + "ResponseHeaders", response.getHeaders());
                 }
 
                 if (!response.isBodyResponseHandled()) {
                     if (StringUtils.isNotEmpty(responseVariableName)) {
                         execution.setVariable(responseVariableName, response.getBody());
                     } else {
-                        execution.setVariable(request.getPrefix() + ".responseBody", response.getBody());
+                        execution.setVariable(request.getPrefix() + "ResponseBody", response.getBody());
                     }
                 }
 
@@ -139,7 +137,7 @@ public class HttpActivityExecutor {
         } catch (Exception e) {
             if (request.isIgnoreErrors()) {
                 LOGGER.info("Error ignored while processing http task in execution {}", executionId, e);
-                execution.setVariable(request.getPrefix() + ".errorMessage", e.getMessage());
+                execution.setVariable(request.getPrefix() + "ErrorMessage", e.getMessage());
             } else {
                 if (!errorPropagator.mapException(e, execution, mapExceptions)) {
                     if (e instanceof FlowableException) {

@@ -322,13 +322,10 @@ public class DmnJsonConverter {
                         expressionValue = expressionValueNode.asText();
                     }
 
-                    // don't add operator if it's ==
                     StringBuilder stringBuilder = new StringBuilder();
                     if (StringUtils.isNotEmpty(operatorValue)) {
-                        if (!"==".equals(operatorValue)) {
-                            stringBuilder = new StringBuilder(operatorValue);
-                            stringBuilder.append(" ");
-                        }
+                        stringBuilder = new StringBuilder(operatorValue);
+                        stringBuilder.append(" ");
                     }
 
                     // add quotes for string

@@ -43,7 +43,7 @@ public class MybatisFormResourceDataManager extends AbstractFormDataManager<Form
 
     @Override
     public void deleteResourcesByDeploymentId(String deploymentId) {
-        getDbSqlSession().delete("deleteFormResourcesByDeploymentId", deploymentId);
+        getDbSqlSession().delete("deleteFormResourcesByDeploymentId", deploymentId, getManagedEntityClass());
     }
 
     @Override

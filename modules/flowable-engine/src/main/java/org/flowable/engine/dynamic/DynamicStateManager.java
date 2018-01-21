@@ -13,7 +13,11 @@
 
 package org.flowable.engine.dynamic;
 
+import java.util.List;
+import java.util.Map;
+
 import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.impl.dynamic.MoveExecutionEntityContainer;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
@@ -25,6 +29,7 @@ public interface DynamicStateManager {
     
     ExecutionEntity resolveActiveExecution(String processInstanceId, String activityId, CommandContext commandContext);
     
-    void moveExecutionState(ExecutionEntity processExecution, String fromActivityId, String toActivityId, CommandContext commandContext);
+    void moveExecutionState(List<MoveExecutionEntityContainer> moveExecutionEntityContainerList, Map<String, Object> processVariables, 
+                    Map<String, Map<String, Object>> localVariables, CommandContext commandContext);
 
 }

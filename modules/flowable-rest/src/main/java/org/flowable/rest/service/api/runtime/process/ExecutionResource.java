@@ -116,9 +116,7 @@ public class ExecutionResource extends ExecutionBaseResource {
             @RequestBody ExecutionChangeActivityStateRequest activityStateRequest, HttpServletRequest request) {
 
         runtimeService.createChangeActivityStateBuilder()
-                .executionId(executionId)
-                .cancelActivityId(activityStateRequest.getCancelActivityId())
-                .startActivityId(activityStateRequest.getStartActivityId())
+                .moveExecutionToActivityId(executionId, activityStateRequest.getStartActivityId())
                 .changeState();
     }
 }

@@ -134,6 +134,10 @@
             ID_ = #{variable.id, jdbcType=VARCHAR}
         </foreach>
     </delete>
+    
+    <delete id="deleteVariablesByScopeIdAndScopeType" parameterType="java.util.Map">
+        delete from ${prefix}ACT_RU_VARIABLE where SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR} and SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR}
+    </delete>
 
     <!-- VARIABLE INSTANCE RESULTMAP -->
     <resultMap id="variableInstanceResultMap" type="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">

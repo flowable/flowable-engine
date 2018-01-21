@@ -56,5 +56,7 @@ public interface VariableInstanceEntityManager extends EntityManager<VariableIns
     List<VariableInstanceEntity> findVariableInstancesBySubScopeIdAndScopeTypeAndNames(String subScopeId, String scopeType, Collection<String> variableNames);
 
     void deleteVariableInstanceMap(Map<String, VariableInstanceEntity> variableInstances);
+    
+    void deleteByScopeIdAndScopeType(String scopeId, String scopeType);
 
 }

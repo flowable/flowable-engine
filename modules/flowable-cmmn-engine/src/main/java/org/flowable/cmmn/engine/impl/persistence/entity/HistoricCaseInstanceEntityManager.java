@@ -31,6 +31,4 @@ public interface HistoricCaseInstanceEntityManager extends EntityManager<Histori
     
     long countByCriteria(HistoricCaseInstanceQuery query);
     
-    void deleteByCaseDefinitionId(String caseDefinitionId);
-    
 }

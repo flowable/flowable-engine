@@ -57,12 +57,12 @@ public class MybatisContentItemDataManager extends AbstractContentDataManager<Co
 
     @Override
     public void deleteContentItemsByTaskId(String taskId) {
-        getDbSqlSession().delete("deleteContentItemsByTaskId", taskId);
+        getDbSqlSession().delete("deleteContentItemsByTaskId", taskId, getManagedEntityClass());
     }
 
     @Override
     public void deleteContentItemsByProcessInstanceId(String processInstanceId) {
-        getDbSqlSession().delete("deleteContentItemsByProcessInstanceId", processInstanceId);
+        getDbSqlSession().delete("deleteContentItemsByProcessInstanceId", processInstanceId, getManagedEntityClass());
     }
 
     @Override
@@ -70,6 +70,6 @@ public class MybatisContentItemDataManager extends AbstractContentDataManager<Co
         Map<String, String> params = new HashMap<>(2);
         params.put("scopeId", scopeId);
         params.put("scopeType", scopeType);
-        getDbSqlSession().delete("deleteContentItemsByScopeIdAndScopeType", params);
+        getDbSqlSession().delete("deleteContentItemsByScopeIdAndScopeType", params, getManagedEntityClass());
     }
 }
