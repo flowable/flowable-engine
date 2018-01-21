@@ -14,11 +14,11 @@ package org.flowable.content.engine.impl.cmd;
 
 import java.io.Serializable;
 
+import org.apache.commons.lang3.StringUtils;
 import org.flowable.content.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.springframework.util.StringUtils;
 
 /**
  * @author Tijs Rademakers
@@ -46,7 +46,7 @@ public class DeleteContentItemsCmd implements Command<Void>, Serializable {
         if (processInstanceId != null) {
             CommandContextUtil.getContentItemEntityManager().deleteContentItemsByProcessInstanceId(processInstanceId);
 
-        } else if (StringUtils.hasText(caseId)) {
+        } else if (StringUtils.isNotEmpty(caseId)) {
             CommandContextUtil.getContentItemEntityManager().deleteContentItemsByScopeIdAndScopeType(caseId, "cmmn");
         } else {
             CommandContextUtil.getContentItemEntityManager().deleteContentItemsByTaskId(taskId);

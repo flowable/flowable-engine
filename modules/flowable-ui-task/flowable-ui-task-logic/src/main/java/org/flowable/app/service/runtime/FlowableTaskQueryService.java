@@ -126,7 +126,7 @@ public class FlowableTaskQueryService {
             for (Deployment deployment : deployments) {
                 deploymentIds.add(deployment.getId());
             }
-            
+
             List<CmmnDeployment> cmmnDeployments = cmmnRepositoryService.createDeploymentQuery().deploymentKey(deploymentKeyNode.asText()).list();
             List<String> cmmnDeploymentIds = new ArrayList<>();
             for (CmmnDeployment deployment : cmmnDeployments) {
@@ -221,10 +221,7 @@ public class FlowableTaskQueryService {
 
     protected void handleCaseInstanceFiltering(User currentUser, TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode caseInstanceIdNode) {
         String caseInstanceId = caseInstanceIdNode.asText();
-        taskInfoQueryWrapper.getTaskInfoQuery()
-                .scopeId(caseInstanceId).or()
-                .taskCategory(caseInstanceId)
-                .endOr();
+        taskInfoQueryWrapper.getTaskInfoQuery().scopeId(caseInstanceId).scopeType("cmmn");
     }
 
     protected void handleTextFiltering(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode textNode) {

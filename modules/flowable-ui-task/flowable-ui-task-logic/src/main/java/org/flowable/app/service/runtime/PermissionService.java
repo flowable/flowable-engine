@@ -12,9 +12,6 @@
  */
 package org.flowable.app.service.runtime;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.model.common.RemoteUser;
 import org.flowable.app.service.exception.NotFoundException;
@@ -26,7 +23,6 @@ import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.cmmn.api.CmmnHistoryService;
 import org.flowable.cmmn.api.history.HistoricCaseInstance;
-import org.flowable.cmmn.api.history.HistoricCaseInstanceQuery;
 import org.flowable.content.api.ContentItem;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.HistoryService;
@@ -45,6 +41,9 @@ import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Centralized service for all permission-checks.

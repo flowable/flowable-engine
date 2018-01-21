@@ -71,7 +71,7 @@ public abstract class AbstractRelatedContentResource {
 
     public ResultListDataRepresentation getContentItemsForCase(String caseInstanceId) {
         permissionService.hasReadPermissionOnCase(SecurityUtils.getCurrentUserObject(), caseInstanceId);
-        return createResultRepresentation(contentService.createContentItemQuery().caseId(caseInstanceId).list());
+        return createResultRepresentation(contentService.createContentItemQuery().scopeType("cmmn").scopeId(caseInstanceId).list());
     }
 
     public ResultListDataRepresentation getContentItemsForProcessInstance(String processInstanceId) {
@@ -229,7 +229,10 @@ public abstract class AbstractRelatedContentResource {
                 contentItem.setName(getFileName(file));
                 contentItem.setProcessInstanceId(processInstanceId);
                 contentItem.setTaskId(taskId);
-                contentItem.setCaseId(caseId);
+                if (StringUtils.isNotEmpty(caseId)) {
+                    contentItem.setScopeType("cmmn");
+                    contentItem.setScopeId(caseId);
+                }
                 contentItem.setMimeType(contentType);
                 contentItem.setCreatedBy(user.getId());
                 contentItem.setLastModifiedBy(user.getId());
