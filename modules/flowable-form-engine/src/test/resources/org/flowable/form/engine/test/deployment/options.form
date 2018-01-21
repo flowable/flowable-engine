@@ -1,0 +1,20 @@
+{
+    "key": "optionsForm",
+    "name": "Options Forn",
+    "fields": [
+        {
+            "fieldType": "OptionFormField",
+            "id": "dynamicDropDown",
+            "name": "Dynamic Dropdown",
+            "type": "dropdown",
+            "required": false,
+            "placeholder": null,
+            "readOnly":false,
+            "overrideId":false,
+            "layout":null,
+            "optionType":null,
+            "hasEmptyValue":true,
+            "optionsExpression":"${optionsVariable}"
+        }
+    ]
+}

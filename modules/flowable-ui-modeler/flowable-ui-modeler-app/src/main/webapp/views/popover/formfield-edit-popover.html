@@ -95,6 +95,13 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <div class="form-group">
+                        <label translate="FORM-BUILDER.COMPONENT.DROPDOWN-EXPRESSION"></label>
+                        <textarea rows="3" ng-model="formElement.optionsExpression" class="form-control" id="readonly-text-value"></textarea>
+                        <div class="subtle" translate="FORM-BUILDER.MESSAGE.DROPDOWN-EXPRESSION-HELP" style="padding: 5px 0 5px 1px;"></div>
+                    </div>
+                    
                 </div>
 
                 <div ng-if="activeTab.id == 'upload' && formElement.type === 'upload'">

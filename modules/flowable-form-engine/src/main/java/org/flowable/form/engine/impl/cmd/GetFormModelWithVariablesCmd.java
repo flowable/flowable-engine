@@ -38,10 +38,13 @@ import org.flowable.form.model.ExpressionFormField;
 import org.flowable.form.model.FormField;
 import org.flowable.form.model.FormFieldTypes;
 import org.flowable.form.model.FormModel;
+import org.flowable.form.model.Option;
+import org.flowable.form.model.OptionFormField;
 import org.joda.time.LocalDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -114,7 +117,36 @@ public class GetFormModelWithVariablesCmd implements Command<FormModel>, Seriali
             }
 
             for (FormField field : allFields) {
-                if (field instanceof ExpressionFormField) {
+                if (field instanceof OptionFormField) {
+                    // Drop down options to be populated from an expression
+                    OptionFormField optionFormField = (OptionFormField) field;
+                    if(optionFormField.getOptionsExpression() != null) {
+                        Expression optionsExpression = formEngineConfiguration.getExpressionManager().createExpression(optionFormField.getOptionsExpression());
+                        Object value = null;
+                        try {
+                            value = optionsExpression.getValue(new VariableContainerWrapper(variables));
+                        } catch (Exception e) {
+                            throw new FlowableException("Error getting value for optionsExpression: " + optionFormField.getOptionsExpression(), e);
+                        }
+                        if(value instanceof List) {
+                            @SuppressWarnings("unchecked")
+                            List<Option> options = (List<Option>) value;
+                            optionFormField.setOptions(options);
+                        } else if(value instanceof String) {
+                            String json = (String) value;
+                            try {
+                                List<Option> options = formEngineConfiguration.getObjectMapper().readValue(json, new TypeReference<List<Option>>(){});
+                                optionFormField.setOptions(options);
+                            } catch (Exception e) {
+                                throw new FlowableException("Error parsing optionsExpression json value: " + json, e);
+                            }
+                        } else {
+                            throw new FlowableException("Invalid type from evaluated expression for optionsExpression: " + optionFormField.getOptionsExpression() + ", resulting type:" + value.getClass().getName());
+                        }
+                    }
+                    Object variableValue = variables.get(field.getId());
+                    optionFormField.setValue(variableValue);
+                } else if (field instanceof ExpressionFormField) {
                     ExpressionFormField expressionField = (ExpressionFormField) field;
                     Expression formExpression = formEngineConfiguration.getExpressionManager().createExpression(expressionField.getExpression());
                     try {
