@@ -99,10 +99,19 @@ public class ProcessInstanceResource extends BaseProcessInstanceResource {
     public void changeActivityState(@ApiParam(name = "processInstanceId") @PathVariable String processInstanceId,
             @RequestBody ExecutionChangeActivityStateRequest activityStateRequest, HttpServletRequest request) {
 
-        runtimeService.createChangeActivityStateBuilder()
+        if (activityStateRequest.getCancelActivityIds() != null && activityStateRequest.getCancelActivityIds().size() == 1) {
+            runtimeService.createChangeActivityStateBuilder()
                 .processInstanceId(processInstanceId)
-                .moveActivityIdTo(activityStateRequest.getCancelActivityId(), activityStateRequest.getStartActivityId())
+                .moveSingleActivityIdToActivityIds(activityStateRequest.getCancelActivityIds().get(0), activityStateRequest.getStartActivityIds())
                 .changeState();
+        
+        } else if (activityStateRequest.getStartActivityIds() != null && activityStateRequest.getStartActivityIds().size() == 1) {
+            runtimeService.createChangeActivityStateBuilder()
+                .processInstanceId(processInstanceId)
+                .moveActivityIdsToSingleActivityId(activityStateRequest.getCancelActivityIds(), activityStateRequest.getStartActivityIds().get(0))
+                .changeState();
+        }
+        
     }
 
     protected ProcessInstanceResponse activateProcessInstance(ProcessInstance processInstance) {
