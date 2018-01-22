@@ -49,7 +49,7 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
         return super.getContentItemsForProcessInstance(processInstanceId);
     }
 
-    @RequestMapping(value = "/rest/cases/{caseInstanceId}/content", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/content", method = RequestMethod.GET)
     public ResultListDataRepresentation getContentItemsForCase(@PathVariable("caseInstanceId") String caseInstanceId) {
         return super.getContentItemsForCase(caseInstanceId);
     }
@@ -109,7 +109,7 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
         return contentItemJson;
     }
 
-    @RequestMapping(value = "/rest/cases/{caseId}/raw-content", method = RequestMethod.POST)
+    @RequestMapping(value = "/rest/case-instances/{caseId}/raw-content", method = RequestMethod.POST)
     public ContentItemRepresentation createContentItemOnCase(@PathVariable("caseId") String caseId, @RequestParam("file") MultipartFile file) {
         return super.createContentItemOnCase(caseId, file);
     }
@@ -117,7 +117,7 @@ public class RelatedContentResource extends AbstractRelatedContentResource {
     /*
      * specific endpoint for IE9 flash upload component
      */
-    @RequestMapping(value = "/rest/cases/{caseId}/raw-content/text", method = RequestMethod.POST)
+    @RequestMapping(value = "/rest/case-instances/{caseId}/raw-content/text", method = RequestMethod.POST)
     public String createContentItemOnCaseText(@PathVariable("caseId") String caseId, @RequestParam("file") MultipartFile file) {
         ContentItemRepresentation contentItem = super.createContentItemOnCase(caseId, file);
 

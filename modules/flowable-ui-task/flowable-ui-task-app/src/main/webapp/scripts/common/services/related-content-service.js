@@ -68,9 +68,9 @@ flowableModule.service('RelatedContentService', ['$http', '$q', '$rootScope', '$
                 });
             } else if (caseInstanceId) {
                 if (isIE) {
-                    url = FLOWABLE.CONFIG.contextRoot + '/app/rest/cases/' + caseInstanceId + '/raw-content/text';
+                    url = FLOWABLE.CONFIG.contextRoot + '/app/rest/case-instances/' + caseInstanceId + '/raw-content/text';
                 } else {
-                    url = FLOWABLE.CONFIG.contextRoot + '/app/rest/cases/' + caseInstanceId + '/raw-content';
+                    url = FLOWABLE.CONFIG.contextRoot + '/app/rest/case-instances/' + caseInstanceId + '/raw-content';
                 }
                 uploadPromise = Upload.upload({
                     url: url,

@@ -45,7 +45,7 @@ angular.module('flowableApp').service('CaseService', ['$http', '$q', '$rootScope
         var deferred = $q.defer();
         $http({
             method: 'GET',
-            url: FLOWABLE.CONFIG.contextRoot + '/app/rest/cases/' + caseId + '/content'
+            url: FLOWABLE.CONFIG.contextRoot + '/app/rest/case-instances/' + caseId + '/content'
         }).success(function (response, status, headers, config) {
             // Add raw URL property to all content
             if (response && response.data) {
