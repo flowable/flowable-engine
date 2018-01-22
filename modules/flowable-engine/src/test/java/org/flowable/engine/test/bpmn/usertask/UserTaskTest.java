@@ -23,6 +23,7 @@ import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.identitylink.api.IdentityLink;
+import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.task.api.Task;
 import org.flowable.task.api.history.HistoricTaskInstance;
 
@@ -172,6 +173,43 @@ public class UserTaskTest extends PluggableFlowableTestCase {
         assertNull(task.getAssignee());
         identityLinks = taskService.getIdentityLinksForTask(task.getId());
         assertEquals(0, identityLinks.size());
+    }
+    
+    @Deployment
+    public void testNonStringProperties() {
+        Map<String, Object> vars = new HashMap<>();
+        vars.put("taskName", 1);
+        vars.put("taskDescription", 2);
+        vars.put("taskCategory", 3);
+        vars.put("taskFormKey", 4);
+        vars.put("taskAssignee", 5);
+        vars.put("taskOwner", 6);
+        vars.put("taskCandidateGroups", 7);
+        vars.put("taskCandidateUsers", 8);
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nonStringProperties", vars);
+        
+        Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+        assertEquals("1", task.getName());
+        assertEquals("2", task.getDescription());
+        assertEquals("3", task.getCategory());
+        assertEquals("4", task.getFormKey());
+        assertEquals("5", task.getAssignee());
+        assertEquals("6", task.getOwner());
+        
+        List<IdentityLink> identityLinks = taskService.getIdentityLinksForTask(task.getId());
+        assertEquals(4, identityLinks.size());
+        int candidateIdentityLinkCount = 0;
+        for (IdentityLink identityLink : identityLinks) {
+            if (identityLink.getType().equals(IdentityLinkType.CANDIDATE)) {
+                candidateIdentityLinkCount++;
+                if (identityLink.getGroupId() != null) {
+                    assertEquals("7", identityLink.getGroupId());
+                } else {
+                    assertEquals("8", identityLink.getUserId());
+                }
+            }
+        }
+        assertEquals(candidateIdentityLinkCount, 2);
     }
 
 }

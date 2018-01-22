@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="taskAssigneeExample" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:flowable="http://flowable.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="nonStringProperties">
+  
+    <startEvent id="start"/>
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="theTask" />
+    <userTask id="theTask" name="${taskName}" 
+                           flowable:category="${taskCategory}" 
+                           flowable:formKey="${taskFormKey}"
+                           flowable:assignee="${taskAssignee}"
+                           flowable:owner="${taskOwner}"
+                           flowable:candidateGroups="${taskCandidateGroups}"
+                           flowable:candidateUsers="${taskCandidateUsers}">
+      <documentation><![CDATA[${taskDescription}]]></documentation>
+    </userTask>            
+    <sequenceFlow id="flow2" sourceRef="theTask" targetRef="theEnd" />
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>
