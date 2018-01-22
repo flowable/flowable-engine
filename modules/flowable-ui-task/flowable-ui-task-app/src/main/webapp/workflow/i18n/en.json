@@ -152,6 +152,7 @@
         "FIELD": {
             "NAME": "Name",
             "DESCRIPTION": "Description",
+            "SUBTASK": "Is subTask",
             "ASSIGNEE": "Assignee",
             "DUE": "Due",
             "PROCESS-INSTANCE": "Part of process",

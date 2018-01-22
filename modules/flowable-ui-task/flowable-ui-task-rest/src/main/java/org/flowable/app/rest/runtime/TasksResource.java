@@ -45,6 +45,7 @@ public class TasksResource {
         TaskEntity task = (TaskEntity) taskService.newTask();
         task.setName(taskRepresentation.getName());
         task.setDescription(taskRepresentation.getDescription());
+        task.setParentTaskId(taskRepresentation.getParentTaskId());
         if (StringUtils.isNotEmpty(taskRepresentation.getCategory())) {
             task.setCategory(taskRepresentation.getCategory());
         }

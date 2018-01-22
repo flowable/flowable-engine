@@ -25,6 +25,7 @@ public class CreateTaskRepresentation extends AbstractRepresentation {
     protected String description;
     protected String category;
     protected String assignee;
+    protected String parentTaskId;
     protected Map<String, Object> variables;
 
     public String getName() {
@@ -65,5 +66,13 @@ public class CreateTaskRepresentation extends AbstractRepresentation {
 
     public void setVariables(Map<String, Object> variables) {
         this.variables = variables;
+    }
+
+    public String getParentTaskId() {
+        return parentTaskId;
+    }
+
+    public void setParentTaskId(String parentTaskId) {
+        this.parentTaskId = parentTaskId;
     }
 }
