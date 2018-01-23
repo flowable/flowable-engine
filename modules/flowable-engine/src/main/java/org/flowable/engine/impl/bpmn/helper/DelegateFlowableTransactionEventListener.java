@@ -75,7 +75,7 @@ public class DelegateFlowableTransactionEventListener extends BaseDelegateTransa
                 // Force failing of the listener invocation, since the delegate
                 // cannot be created
                 failOnException = true;
-                throw new FlowableIllegalArgumentException("Class " + className + " does not implement " + FlowableEventListener.class.getName());
+                throw new FlowableIllegalArgumentException("Class " + className + " does not implement " + TransactionFlowableEventListener.class.getName());
             }
         }
         return delegateInstance;
