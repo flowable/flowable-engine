@@ -496,10 +496,10 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
 
     @Override
     public void deleteProcessInstanceExecutionEntity(String processInstanceId,
-                                                     String currentFlowElementId,
-                                                     String deleteReason,
-                                                     boolean cascade,
-                                                     boolean cancel,
+                                                     String currentFlowElementId, 
+                                                     String deleteReason, 
+                                                     boolean cascade, 
+                                                     boolean cancel, 
                                                      boolean fireEvents) {
 
         ExecutionEntity processInstanceEntity = findById(processInstanceId);
