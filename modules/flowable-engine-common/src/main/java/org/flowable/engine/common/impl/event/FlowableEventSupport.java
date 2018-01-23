@@ -154,8 +154,6 @@ public class FlowableEventSupport {
         } else {
             LOGGER.warn("Unrecognised TransactionState {}", listener.getOnTransaction());
         }
-
-
     }
 
     protected synchronized void addTypedEventListener(FlowableEventListener listener, FlowableEventType type) {

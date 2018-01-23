@@ -46,5 +46,4 @@ public abstract class BaseDelegateTransactionEventListener implements Transactio
         }
         return valid;
     }
-
 }

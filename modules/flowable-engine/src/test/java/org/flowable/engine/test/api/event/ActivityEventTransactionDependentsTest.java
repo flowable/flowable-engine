@@ -110,7 +110,7 @@ public class ActivityEventTransactionDependentsTest extends PluggableFlowableTes
             Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
             taskService.complete(task.getId());
         } catch (Exception e) {
-
+            //NPE triggered from service task
         }
         assertEquals(28, listener.getEventsReceived().size());
         assertEquals(27, committedTransactionDependentListener.getEventsReceived().size());
@@ -165,7 +165,7 @@ public class ActivityEventTransactionDependentsTest extends PluggableFlowableTes
                 //throwing NPE
                 exception.equals("THROW EXCEPTION");
             } else if (event.getType() == FlowableEngineEventType.TASK_CREATED) {
-                System.out.println("TASK CREATED");
+                LOGGER.debug("TASK CREATED");
             }
         }
 

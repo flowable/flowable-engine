@@ -32,8 +32,7 @@ public class ExecuteEventListenerTransactionListener implements TransactionListe
     protected TransactionFlowableEventListener listener;
     protected FlowableEvent flowableEvent;
 
-    public ExecuteEventListenerTransactionListener(TransactionFlowableEventListener listener,
-                                                   FlowableEvent flowableEvent) {
+    public ExecuteEventListenerTransactionListener(TransactionFlowableEventListener listener, FlowableEvent flowableEvent) {
         this.listener = listener;
         this.flowableEvent = flowableEvent;
     }
@@ -52,5 +51,4 @@ public class ExecuteEventListenerTransactionListener implements TransactionListe
             }
         }
     }
-
 }

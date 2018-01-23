@@ -40,8 +40,7 @@ public class DelegateFlowableTransactionEventListener extends BaseDelegateTransa
         this.onTransaction = transaction;
         setEntityClass(entityClass);
     }
-
-
+    
     @Override
     public void onEvent(FlowableEvent event) {
         if (isValidEvent(event)) {

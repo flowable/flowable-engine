@@ -2,7 +2,6 @@
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
              targetNamespace="Examples">
 
-
     <process id="activityProcess">
 
         <startEvent id="theStart"/>
@@ -13,6 +12,5 @@
         <endEvent id="theEnd"/>
 
     </process>
-
 
 </definitions>

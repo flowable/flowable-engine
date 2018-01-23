@@ -35,8 +35,7 @@ public class DelegateExecutableTransactionEventListener extends BaseDelegateTran
     public DelegateExecutableTransactionEventListener(TransactionFlowableEventListener listener) {
         this.delegateInstance = listener;
     }
-
-
+    
     @Override
     public void onEvent(FlowableEvent event) {
         delegateInstance.onEvent(event);
@@ -59,6 +58,4 @@ public class DelegateExecutableTransactionEventListener extends BaseDelegateTran
         }
         return failOnException;
     }
-
-
 }

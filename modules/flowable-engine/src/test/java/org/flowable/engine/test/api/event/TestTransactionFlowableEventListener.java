@@ -26,8 +26,7 @@ public class TestTransactionFlowableEventListener implements TransactionFlowable
     private static final Logger LOGGER = LoggerFactory.getLogger(TestTransactionFlowableEventListener.class);
     private List<FlowableEvent> eventsReceived;
     private String onTransaction = "";
-
-
+    
     public TestTransactionFlowableEventListener() {
         eventsReceived = new ArrayList<>();
     }

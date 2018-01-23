@@ -2028,7 +2028,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (this.transactionDependentFactory == null) {
             this.transactionDependentFactory = new DefaultTransactionDependentEventListenerFactory();
         }
-
     }
 
     public void initProcessValidator() {

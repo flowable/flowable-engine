@@ -47,8 +47,7 @@ public class ProcessDefinitionScopedTransactionEventListenerTest extends Pluggab
         listener.setOnTransaction(TransactionState.COMMITTING.name());
         BpmnModel bpmnModel = repositoryService.getBpmnModel(firstDefinition.getId());
         assertNotNull(bpmnModel);
-
-
+        
         ((FlowableEventSupport) bpmnModel.getEventSupport()).addEventListener(listener);
 
         // Start a process for the first definition, events should be received

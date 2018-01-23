@@ -61,13 +61,11 @@ public class DelegateExpressionTransactionFlowableEventListener extends BaseDele
                 // Call the delegate
                 ((TransactionFlowableEventListener) delegate).onEvent(event);
             } else {
-
                 // Force failing, since the exception we're about to throw
                 // cannot be ignored, because it did not originate from the listener itself
                 failOnException = true;
                 throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did not resolve to an implementation of " + TransactionFlowableEventListener.class.getName());
             }
-
         }
     }
 

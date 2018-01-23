@@ -19,8 +19,7 @@ import org.flowable.engine.common.impl.transaction.TransactionDependentFactory;
 import org.flowable.engine.impl.bpmn.helper.DelegateExecutableTransactionEventListener;
 
 public class DefaultTransactionDependentEventListenerFactory implements TransactionDependentFactory {
-
-
+    
     @Override
     public TransactionListener createFlowableTransactionEventListener(TransactionFlowableEventListener listener, FlowableEvent event) {
         TransactionFlowableEventListener executionListener = new DelegateExecutableTransactionEventListener(listener);
