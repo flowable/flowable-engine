@@ -13,8 +13,7 @@
 package org.flowable.engine.common.api.delegate.event;
 
 /**
- * Dispatcher which allows for adding and removing {@link FlowableEventListener} s to the Flowable
- * Engine as well as dispatching {@link FlowableEvent} to all the listeners registered.
+ * Dispatcher which allows for adding and removing {@link FlowableEventListener} s to the Flowable Engine as well as dispatching {@link FlowableEvent} to all the listeners registered.
  *
  * @author Frederik Heremans
  */
