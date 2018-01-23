@@ -42,6 +42,8 @@
 
     <div class="header" ng-if="!newCaseInstance && model.caseInstance">
         <div class="btn-group pull-right" ng-show="model.caseInstance.startedBy.id == ('' + account.id)">
+            <button id="toggle-create-subtask"
+                    ng-if="!model.caseInstance.ended" class="btn" ng-click="createNextTask()" translate="CASE.ACTION.CREATE-CASE-TASK"/>
             <button ng-if="!model.caseInstance.ended" class="btn" ng-click="cancelCase()" translate="CASE.ACTION.CANCEL"></button>
             <button ng-if="model.caseInstance.ended" class="btn" ng-click="deleteCase()" translate="CASE.ACTION.DELETE"></button>
         </div>
