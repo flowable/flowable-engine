@@ -15,8 +15,6 @@ package org.flowable.app.rest.editor;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-
 import java.net.URLEncoder;
 
 import javax.servlet.ServletOutputStream;
@@ -64,10 +62,21 @@ public class AbstractModelBpmnResource {
         generateBpmn20Xml(response, historicModel);
     }
 
-    protected void generateBpmn20Xml(HttpServletResponse response, AbstractModel model) throws UnsupportedEncodingException {
+    protected void generateBpmn20Xml(HttpServletResponse response, AbstractModel model) {
         String name = model.getName().replaceAll(" ", "_") + ".bpmn20.xml";
-        String encodedName = "UTF-8''" + URLEncoder.encode(name, "UTF-8");
-        response.setHeader("Content-Disposition", "attachment; filename=" + name + "; filename*=" + encodedName);
+        String encodedName = null;
+        try {
+            encodedName = "UTF-8''" + URLEncoder.encode(name, "UTF-8");
+        } catch (Exception e) {
+            LOGGER.warn("Failed to encode name " + name);
+        }
+        
+        String contentDispositionValue = "attachment; filename=" + name;
+        if (encodedName != null) {
+            contentDispositionValue += "; filename*=" + encodedName;
+        }
+        
+        response.setHeader("Content-Disposition", contentDispositionValue);
         if (model.getModelEditorJson() != null) {
             try {
                 ServletOutputStream servletOutputStream = response.getOutputStream();
