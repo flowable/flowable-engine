@@ -13,6 +13,8 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
+import java.util.List;
+
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
@@ -21,8 +23,6 @@ import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.flowable.engine.impl.persistence.entity.data.CommentDataManager;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
-
-import java.util.List;
 
 /**
  * @author Tom Baeyens

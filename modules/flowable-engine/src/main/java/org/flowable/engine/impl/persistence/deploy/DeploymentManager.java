@@ -13,6 +13,9 @@
 
 package org.flowable.engine.impl.persistence.deploy;
 
+import java.util.List;
+import java.util.Map;
+
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.app.AppModel;
 import org.flowable.engine.common.EngineDeployer;
@@ -32,9 +35,6 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntityManage
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
 import org.flowable.engine.repository.ProcessDefinition;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Tom Baeyens

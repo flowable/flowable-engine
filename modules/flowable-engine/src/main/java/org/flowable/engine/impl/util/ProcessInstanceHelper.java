@@ -12,6 +12,12 @@
  */
 package org.flowable.engine.impl.util;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.EventSubProcess;
@@ -43,12 +49,6 @@ import org.flowable.engine.impl.runtime.callback.ProcessInstanceState;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Tijs Rademakers

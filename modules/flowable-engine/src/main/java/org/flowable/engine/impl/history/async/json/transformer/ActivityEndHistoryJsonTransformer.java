@@ -12,7 +12,7 @@
  */
 package org.flowable.engine.impl.history.async.json.transformer;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Date;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -21,7 +21,7 @@ import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.job.service.impl.persistence.entity.HistoryJobEntity;
 
-import java.util.Date;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public class ActivityEndHistoryJsonTransformer extends AbstractNeedsUnfinishedHistoricActivityHistoryJsonTransformer {
 

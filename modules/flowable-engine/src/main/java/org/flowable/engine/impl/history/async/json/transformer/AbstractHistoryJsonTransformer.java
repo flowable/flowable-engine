@@ -12,7 +12,8 @@
  */
 package org.flowable.engine.impl.history.async.json.transformer;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
@@ -23,8 +24,7 @@ import org.flowable.engine.impl.history.async.HistoryJsonConstants;
 import org.flowable.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 
-import java.util.Date;
-import java.util.List;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 public abstract class AbstractHistoryJsonTransformer implements HistoryJsonTransformer {
 

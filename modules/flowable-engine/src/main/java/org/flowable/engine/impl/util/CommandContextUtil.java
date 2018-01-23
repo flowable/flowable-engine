@@ -12,6 +12,9 @@
  */
 package org.flowable.engine.impl.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.flowable.content.api.ContentEngineConfigurationApi;
 import org.flowable.content.api.ContentService;
 import org.flowable.dmn.api.DmnEngineConfigurationApi;
@@ -65,9 +68,6 @@ import org.flowable.task.service.TaskServiceConfiguration;
 import org.flowable.variable.service.HistoricVariableService;
 import org.flowable.variable.service.VariableService;
 import org.flowable.variable.service.VariableServiceConfiguration;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class CommandContextUtil {
     

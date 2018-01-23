@@ -13,6 +13,9 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
+import java.util.List;
+import java.util.Map;
+
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventDefinition;
 import org.flowable.bpmn.model.Message;
@@ -42,9 +45,6 @@ import org.flowable.engine.repository.Model;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.job.service.TimerJobService;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-
-import java.util.List;
-import java.util.Map;
 
 /**
  * @author Tom Baeyens

@@ -13,6 +13,8 @@
 
 package org.flowable.engine.impl.bpmn.behavior;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.Signal;
 import org.flowable.bpmn.model.SignalEventDefinition;
@@ -29,8 +31,6 @@ import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
-
-import java.util.List;
 
 /**
  * @author Tijs Rademakers

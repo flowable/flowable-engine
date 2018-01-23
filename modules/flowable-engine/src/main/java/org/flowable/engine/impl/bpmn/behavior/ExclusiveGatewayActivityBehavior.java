@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.bpmn.behavior;
 
+import java.util.Iterator;
+
 import org.flowable.bpmn.model.ExclusiveGateway;
 import org.flowable.bpmn.model.SequenceFlow;
 import org.flowable.engine.common.api.FlowableException;
@@ -24,8 +26,6 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.condition.ConditionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Iterator;
 
 /**
  * Implementation of the Exclusive Gateway/XOR gateway/exclusive data-based gateway as defined in the BPMN specification.

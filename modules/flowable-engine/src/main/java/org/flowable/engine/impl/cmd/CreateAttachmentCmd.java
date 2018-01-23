@@ -13,6 +13,8 @@
 
 package org.flowable.engine.impl.cmd;
 
+import java.io.InputStream;
+
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
@@ -31,8 +33,6 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.task.Attachment;
 import org.flowable.task.api.Task;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
-
-import java.io.InputStream;
 
 /**
  * @author Tom Baeyens

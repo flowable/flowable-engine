@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.bpmn.parser.handler;
 
+import java.util.List;
+
 import org.flowable.bpmn.model.BaseElement;
 import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.bpmn.model.EventListener;
@@ -24,8 +26,6 @@ import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.List;
 
 /**
  * @author Joram Barrez

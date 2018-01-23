@@ -12,7 +12,11 @@
  */
 package org.flowable.engine.impl.bpmn.behavior;
 
-import com.fasterxml.jackson.databind.node.ObjectNode;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.UserTask;
@@ -40,12 +44,7 @@ import org.flowable.task.service.event.impl.FlowableTaskEventBuilder;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
  * @author Joram Barrez
@@ -219,7 +218,6 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                 CommandContextUtil.getTaskServiceConfiguration(commandContext).getEventDispatcher().dispatchEvent(
                         FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
             }
-
         } else {
             TaskHelper.deleteTask(task, null, false, false);
             leave(execution);

@@ -13,6 +13,8 @@
 
 package org.flowable.engine.impl.event;
 
+import java.util.List;
+
 import org.flowable.bpmn.model.FlowElement;
 import org.flowable.bpmn.model.Process;
 import org.flowable.bpmn.model.SubProcess;
@@ -26,8 +28,6 @@ import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
-
-import java.util.List;
 
 /**
  * @author Tijs Rademakers

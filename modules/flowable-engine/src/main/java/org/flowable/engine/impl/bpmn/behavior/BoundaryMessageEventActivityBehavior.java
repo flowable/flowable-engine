@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.impl.bpmn.behavior;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.MessageEventDefinition;
@@ -26,8 +28,6 @@ import org.flowable.engine.impl.persistence.entity.EventSubscriptionEntityManage
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.MessageEventSubscriptionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
-
-import java.util.List;
 
 /**
  * @author Tijs Rademakers

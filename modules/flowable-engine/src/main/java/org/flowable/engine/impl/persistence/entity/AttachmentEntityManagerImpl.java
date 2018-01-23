@@ -13,6 +13,8 @@
 
 package org.flowable.engine.impl.persistence.entity;
 
+import java.util.List;
+
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
@@ -22,8 +24,6 @@ import org.flowable.engine.impl.persistence.entity.data.AttachmentDataManager;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.task.Attachment;
 import org.flowable.task.api.Task;
-
-import java.util.List;
 
 /**
  * @author Tom Baeyens

@@ -667,7 +667,7 @@
       </attribute>
     </complexType>
   </element>
-    <element name="in">
+  <element name="in">
     <annotation>
       <documentation>
         Element to specify Data Input in Flowable Shortcuts
