@@ -413,9 +413,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // Job Manager
 
     protected JobManager jobManager;
-
+    
     // Dynamic state manager
-
+    
     protected DynamicStateManager dynamicStateManager;
 
     // CONFIGURATORS ////////////////////////////////////////////////////////////
@@ -1110,9 +1110,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             }
         }
     }
-
+    
     // Dynamic state manager ////////////////////////////////////////////////////
-
+    
     public void initDynamicStateManager() {
         if (dynamicStateManager == null) {
             dynamicStateManager = new DefaultDynamicStateManager();
@@ -1354,7 +1354,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         } else {
             this.jobServiceConfiguration.setInternalJobManager(new DefaultInternalJobManager(this));
         }
-
+        
         if (this.internalJobCompatibilityManager != null) {
             this.jobServiceConfiguration.setInternalJobCompatibilityManager(internalJobCompatibilityManager);
         } else {
@@ -2507,7 +2507,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         this.internalJobManager = internalJobManager;
         return this;
     }
-
+    
     public InternalJobCompatibilityManager getInternalJobCompatibilityManager() {
         return internalJobCompatibilityManager;
     }

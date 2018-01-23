@@ -181,9 +181,9 @@ public class ErrorPropagation {
                             .dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.PROCESS_COMPLETED_WITH_ERROR_END_EVENT, processInstanceEntity));
                 }
             }
-
+            
             executeEventHandler(matchingEvent, parentExecution, currentExecution, errorId);
-
+            
         } else {
             throw new FlowableException("No matching parent execution for error code " + errorId + " found");
         }

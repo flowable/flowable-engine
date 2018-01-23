@@ -219,7 +219,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                 CommandContextUtil.getTaskServiceConfiguration(commandContext).getEventDispatcher().dispatchEvent(
                         FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
             }
-
+            
         } else {
             TaskHelper.deleteTask(task, null, false, false);
             leave(execution);

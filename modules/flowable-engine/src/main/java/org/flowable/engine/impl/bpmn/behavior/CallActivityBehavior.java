@@ -95,7 +95,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         }
 
         CommandContext commandContext = CommandContextUtil.getCommandContext();
-
+        
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
@@ -160,7 +160,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         // Create the first execution that will visit all the process definition elements
         ExecutionEntity subProcessInitialExecution = executionEntityManager.createChildExecution(subProcessInstance);
         subProcessInitialExecution.setCurrentFlowElement(initialFlowElement);
-
+        
         CommandContextUtil.getAgenda().planContinueProcessOperation(subProcessInitialExecution);
 
         if (eventDispatcher.isEnabled()) {

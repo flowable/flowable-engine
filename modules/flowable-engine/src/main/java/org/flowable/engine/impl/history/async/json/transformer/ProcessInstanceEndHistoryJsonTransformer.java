@@ -57,7 +57,7 @@ public class ProcessInstanceEndHistoryJsonTransformer extends AbstractHistoryJso
             }
     
             dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_ENDED, historicProcessInstance));
-
+        
         } else {
             historicProcessInstance = historicProcessInstanceEntityManager.create();
             historicProcessInstance.setId(getStringFromJson(historicalData, HistoryJsonConstants.ID));
@@ -80,7 +80,7 @@ public class ProcessInstanceEndHistoryJsonTransformer extends AbstractHistoryJso
             historicProcessInstanceEntityManager.insert(historicProcessInstance, false);
     
             dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
-
+            
             historicProcessInstance.setEndActivityId(getStringFromJson(historicalData, HistoryJsonConstants.ACTIVITY_ID));
             
             Date endTime = getDateFromJson(historicalData, HistoryJsonConstants.END_TIME);

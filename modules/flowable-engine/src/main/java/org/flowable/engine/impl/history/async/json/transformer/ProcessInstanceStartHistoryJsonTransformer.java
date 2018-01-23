@@ -64,7 +64,7 @@ public class ProcessInstanceStartHistoryJsonTransformer extends AbstractHistoryJ
             historicProcessInstanceEntityManager.insert(historicProcessInstance, false);
     
             dispatchEvent(commandContext, FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.HISTORIC_PROCESS_INSTANCE_CREATED, historicProcessInstance));
-
+            
         } else {
             historicProcessInstance.setStartActivityId(getStringFromJson(historicalData, HistoryJsonConstants.START_ACTIVITY_ID));
             historicProcessInstanceEntityManager.update(historicProcessInstance, false);
