@@ -566,12 +566,4 @@ public class BpmnModel {
         this.eventSupport = eventSupport;
     }
 
-//    @JsonIgnore
-//    public Object getTransactionEventSupport() {
-//        return transactionEventSupport;
-//    }
-
-//    public void setTransactionEventSupport(Object eventSupport) {
-//        this.transactionEventSupport = eventSupport;
-//    }
 }

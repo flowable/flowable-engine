@@ -28,8 +28,6 @@ import org.slf4j.LoggerFactory;
  */
 public class DelegateExpressionTransactionFlowableEventListener extends BaseDelegateTransactionEventListener {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DelegateExpressionTransactionFlowableEventListener.class);
-
     protected Expression expression;
     protected String state;
     protected boolean failOnException = false;
@@ -70,25 +68,6 @@ public class DelegateExpressionTransactionFlowableEventListener extends BaseDele
                 throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did not resolve to an implementation of " + TransactionFlowableEventListener.class.getName());
             }
 
-        }
-    }
-
-    private void triggerExpression(FlowableEvent event) {
-        Object delegate = DelegateExpressionUtil.resolveDelegateExpression(expression, new NoExecutionVariableScope());
-        if (delegate instanceof FlowableEventListener) {
-            // Cache result of isFailOnException() from delegate-instance
-            // until next event is received. This prevents us from having to resolve
-            // the expression twice when an error occurs.
-            failOnException = ((FlowableEventListener) delegate).isFailOnException();
-
-            // Call the delegate
-            ((FlowableEventListener) delegate).onEvent(event);
-        } else {
-
-            // Force failing, since the exception we're about to throw
-            // cannot be ignored, because it did not originate from the listener itself
-            failOnException = true;
-            throw new FlowableIllegalArgumentException("Delegate expression " + expression + " did not resolve to an implementation of " + FlowableEventListener.class.getName());
         }
     }
 

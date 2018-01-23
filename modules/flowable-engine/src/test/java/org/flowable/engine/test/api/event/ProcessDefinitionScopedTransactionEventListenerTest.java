@@ -30,15 +30,12 @@ import java.util.Map;
  */
 public class ProcessDefinitionScopedTransactionEventListenerTest extends PluggableFlowableTestCase {
 
-    protected TestFlowableEventListener testListenerAsBean;
-    protected Map<Object, Object> oldBeans;
-
     /**
      * Test to verify listeners on a process-definition are only called for events related to that
      * definition.
      */
     @Deployment(resources = {"org/flowable/engine/test/api/runtime/oneTaskProcess.bpmn20.xml", "org/flowable/engine/test/api/event/simpleProcess.bpmn20.xml"})
-    public void testProcessDefinitionScopedListener() throws Exception {
+    public void testProcessDefinitionScopedListener() {
         ProcessDefinition firstDefinition = repositoryService.createProcessDefinitionQuery().deploymentId(deploymentIdFromDeploymentAnnotation).processDefinitionKey("oneTaskProcess").singleResult();
         assertNotNull(firstDefinition);
 

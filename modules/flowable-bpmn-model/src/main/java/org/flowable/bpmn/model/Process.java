@@ -292,14 +292,6 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
         this.eventListeners = eventListeners;
     }
 
-//    public List<TransactionEventListener> getTransactionEventListeners() {
-//        return transactionEventListeners;
-//    }
-
-//    public void setTransactionEventListeners(List<TransactionEventListener> transactionEventListeners) {
-//        this.transactionEventListeners = transactionEventListeners;
-//    }
-
     public <FlowElementType extends FlowElement> List<FlowElementType> findFlowElementsOfType(Class<FlowElementType> type) {
         return findFlowElementsOfType(type, true);
     }

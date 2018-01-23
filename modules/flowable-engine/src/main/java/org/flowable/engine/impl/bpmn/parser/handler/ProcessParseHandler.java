@@ -111,5 +111,4 @@ public class ProcessParseHandler extends AbstractBpmnParseHandler<Process> {
         return (FlowableEventSupport) bpmnModel.getEventSupport();
     }
 
-
 }

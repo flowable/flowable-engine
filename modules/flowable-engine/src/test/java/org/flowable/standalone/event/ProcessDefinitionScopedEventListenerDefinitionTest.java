@@ -90,10 +90,6 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
         assertNotNull(processInstance);
         repositoryService.deleteDeployment(deployment.getId(), true);
 
-        // Deploy process with listener which references an unexisting class
-//        deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/standalone/event/invalidEventListenerClass.bpmn20.xml").deploy();
-//        processInstance = runtimeService.startProcessInstan/ceByKey("testInvalidEventClass");
-//        repositoryService.deleteDeployment(deployment.getId(), true);
     }
 
     /**

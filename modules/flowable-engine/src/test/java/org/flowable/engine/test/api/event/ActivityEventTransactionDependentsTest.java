@@ -95,7 +95,7 @@ public class ActivityEventTransactionDependentsTest extends PluggableFlowableTes
      * (tasks, gateways, events, subprocesses).
      */
     @Deployment
-    public void testFailedTransaction() throws Exception {
+    public void testFailedTransaction() {
         // We're interested in the raw events, alter the listener to keep those as well
 
         exceptionListener = new ThrowingExceptionFlowableEventListener();
@@ -120,7 +120,7 @@ public class ActivityEventTransactionDependentsTest extends PluggableFlowableTes
     }
 
     @Deployment
-    public void testSuccessTransaction() throws Exception {
+    public void testSuccessTransaction()  {
         // We're interested in the raw events, alter the listener to keep those as well
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("activityProcess");
@@ -139,7 +139,7 @@ public class ActivityEventTransactionDependentsTest extends PluggableFlowableTes
     }
 
     @Deployment
-    public void testElement() throws Exception {
+    public void testElement() {
         // We're interested in the raw events, alter the listener to keep those as well
 
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("activityProcess");
@@ -153,19 +153,6 @@ public class ActivityEventTransactionDependentsTest extends PluggableFlowableTes
 
         assertEquals(42, listener.getEventsReceived().size());
         assertEquals(42, committedTransactionDependentListener.getEventsReceived().size());
-    }
-
-
-    protected void assertDatabaseEventPresent(FlowableEngineEventType eventType) {
-        String eventTypeString = eventType.name();
-        List<EventLogEntry> eventLogEntries = managementService.getEventLogEntries(0L, 100000L);
-        boolean found = false;
-        for (EventLogEntry entry : eventLogEntries) {
-            if (entry.getType().equals(eventTypeString)) {
-                found = true;
-            }
-        }
-        assertTrue(found);
     }
 
     private class ThrowingExceptionFlowableEventListener implements FlowableEventListener {
