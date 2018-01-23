@@ -12,6 +12,11 @@
  */
 package org.flowable.engine.test.api.event;
 
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.List;
+
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.MessageEventDefinition;
 import org.flowable.bpmn.model.SignalEventDefinition;
@@ -33,11 +38,6 @@ import org.flowable.engine.runtime.Execution;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.job.api.Job;
-
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * Test case for all {@link FlowableEvent}s related to activities.

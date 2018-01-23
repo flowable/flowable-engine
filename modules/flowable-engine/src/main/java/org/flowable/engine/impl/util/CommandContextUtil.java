@@ -548,7 +548,7 @@ public class CommandContextUtil {
     public static FlowableEventDispatcher getEventDispatcher(CommandContext commandContext) {
         return getProcessEngineConfiguration(commandContext).getEventDispatcher();
     }
-
+    
     public static FailedJobCommandFactory getFailedJobCommandFactory() {
         return getFailedJobCommandFactory(getCommandContext());
     }

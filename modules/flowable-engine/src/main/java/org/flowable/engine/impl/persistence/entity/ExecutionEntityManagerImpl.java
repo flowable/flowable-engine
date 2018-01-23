@@ -475,7 +475,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         if (cancel) {
             dispatchActivityCancelled(executionEntity, cancelActivity != null ? cancelActivity : executionEntity.getCurrentFlowElement());
         }
-
+        
         if (executionEntity.isProcessInstanceType() && executionEntity.getCallbackId() != null) {
             CommandContext commandContext = CommandContextUtil.getCommandContext();
             ProcessInstanceHelper processInstanceHelper = CommandContextUtil.getProcessInstanceHelper(commandContext);
@@ -729,7 +729,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         if (executionEntity.getId().equals(executionEntity.getProcessInstanceId())
                 && (!enableExecutionRelationshipCounts
                         || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getIdentityLinkCount() > 0))) {
-
+            
             IdentityLinkService identityLinkService = CommandContextUtil.getIdentityLinkService();
             Collection<IdentityLinkEntity> identityLinks = identityLinkService.findIdentityLinksByProcessInstanceId(executionEntity.getProcessInstanceId());
 
@@ -741,7 +741,7 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         // Get variables related to execution and delete them
         if (!enableExecutionRelationshipCounts ||
                 (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getVariableCount() > 0)) {
-
+            
             Collection<VariableInstance> executionVariables = executionEntity.getVariableInstancesLocal().values();
             for (VariableInstance variableInstance : executionVariables) {
 

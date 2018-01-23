@@ -12,6 +12,8 @@
  */
 package org.flowable.standalone.event;
 
+import java.util.List;
+
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
@@ -22,8 +24,6 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
 import org.flowable.engine.test.api.event.StaticTestFlowableEventListener;
 import org.flowable.engine.test.api.event.TestFlowableEventListener;
-
-import java.util.List;
 
 /**
  * Test for event-listeners that are registered on a process-definition scope, rather than on the global engine-wide scope, declared in the BPMN XML.
@@ -90,6 +90,10 @@ public class ProcessDefinitionScopedEventListenerDefinitionTest extends Resource
         assertNotNull(processInstance);
         repositoryService.deleteDeployment(deployment.getId(), true);
 
+        // Deploy process with listener which references an unexisting class
+        deployment = repositoryService.createDeployment().addClasspathResource("org/flowable/standalone/event/invalidEventListenerClass.bpmn20.xml").deploy();
+        processInstance = runtimeService.startProcessInstanceByKey("testInvalidEventClass");
+        repositoryService.deleteDeployment(deployment.getId(), true);
     }
 
     /**
