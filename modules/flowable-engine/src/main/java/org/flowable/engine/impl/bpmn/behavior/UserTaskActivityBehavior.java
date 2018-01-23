@@ -44,6 +44,7 @@ import org.flowable.task.service.event.impl.FlowableTaskEventBuilder;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 /**
@@ -218,6 +219,7 @@ public class UserTaskActivityBehavior extends TaskActivityBehavior {
                 CommandContextUtil.getTaskServiceConfiguration(commandContext).getEventDispatcher().dispatchEvent(
                         FlowableTaskEventBuilder.createEntityEvent(FlowableEngineEventType.TASK_CREATED, task));
             }
+
         } else {
             TaskHelper.deleteTask(task, null, false, false);
             leave(execution);

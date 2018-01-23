@@ -95,6 +95,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
         }
 
         CommandContext commandContext = CommandContextUtil.getCommandContext();
+
         ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration(commandContext);
         ExecutionEntityManager executionEntityManager = CommandContextUtil.getExecutionEntityManager(commandContext);
         ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();

@@ -12,6 +12,11 @@
  */
 package org.flowable.engine.common.impl.event;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
+
 import org.flowable.engine.common.AbstractEngineConfiguration;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -27,11 +32,6 @@ import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.common.impl.transaction.TransactionDependentFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Class that allows adding and removing event listeners and dispatching events to the appropriate listeners.

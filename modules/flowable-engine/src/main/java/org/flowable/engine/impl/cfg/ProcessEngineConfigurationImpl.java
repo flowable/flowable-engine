@@ -32,8 +32,6 @@ import java.util.concurrent.ConcurrentMap;
 
 import javax.xml.namespace.QName;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.transaction.TransactionFactory;
@@ -280,8 +278,8 @@ import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.flowable.job.service.HistoryJobHandler;
-import org.flowable.job.service.HistoryJobProcessor;
 import org.flowable.job.service.InternalJobCompatibilityManager;
+import org.flowable.job.service.HistoryJobProcessor;
 import org.flowable.job.service.InternalJobManager;
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.JobProcessor;
@@ -332,6 +330,8 @@ import org.flowable.variable.service.impl.types.StringType;
 import org.flowable.variable.service.impl.types.UUIDType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * @author Tom Baeyens
