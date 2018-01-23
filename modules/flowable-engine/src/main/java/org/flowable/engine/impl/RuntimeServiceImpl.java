@@ -12,6 +12,13 @@
  */
 package org.flowable.engine.impl;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import org.flowable.bpmn.model.FlowNode;
 import org.flowable.engine.RuntimeService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
@@ -74,13 +81,6 @@ import org.flowable.form.model.FormModel;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * @author Tom Baeyens

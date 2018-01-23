@@ -12,6 +12,10 @@
  */
 package org.flowable.engine.impl.agenda;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import org.flowable.bpmn.model.Activity;
 import org.flowable.bpmn.model.BoundaryEvent;
 import org.flowable.bpmn.model.CompensateEventDefinition;
@@ -39,10 +43,6 @@ import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 /**
  * This operations ends an execution and follows the typical BPMN rules to continue the process (if possible).

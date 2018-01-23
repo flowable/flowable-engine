@@ -41,7 +41,6 @@ import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
 
-
 /**
  * 
  * @author Tom Baeyens

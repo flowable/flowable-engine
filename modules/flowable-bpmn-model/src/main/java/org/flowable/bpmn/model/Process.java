@@ -12,13 +12,13 @@
  */
 package org.flowable.bpmn.model;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * @author Tijs Rademakers
@@ -38,7 +38,6 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
     protected List<String> candidateStarterUsers = new ArrayList<>();
     protected List<String> candidateStarterGroups = new ArrayList<>();
     protected List<EventListener> eventListeners = new ArrayList<>();
-//    protected List<TransactionEventListener> transactionEventListeners = new ArrayList<>();
     protected Map<String, FlowElement> flowElementMap = new LinkedHashMap<>();
 
     // Added during process definition parsing
@@ -394,13 +393,6 @@ public class Process extends BaseElement implements FlowElementsContainer, HasEx
                 eventListeners.add(listener.clone());
             }
         }
-
-//        transactionEventListeners = new ArrayList<>();
-//        if (otherElement.getTransactionEventListeners() != null && !otherElement.getTransactionEventListeners().isEmpty()) {
-//            for (TransactionEventListener listener : otherElement.getTransactionEventListeners()) {
-//                transactionEventListeners.add(listener.clone());
-//            }
-//        }
 
         /*
          * This is required because data objects in Designer have no DI info and are added as properties, not flow elements
