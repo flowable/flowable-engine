@@ -173,6 +173,7 @@ import org.flowable.engine.impl.form.BooleanFormType;
 import org.flowable.engine.impl.form.DateFormType;
 import org.flowable.engine.impl.form.DoubleFormType;
 import org.flowable.engine.impl.form.FormEngine;
+import org.flowable.engine.impl.form.FormHandlerHelper;
 import org.flowable.engine.impl.form.FormTypes;
 import org.flowable.engine.impl.form.JuelFormEngine;
 import org.flowable.engine.impl.form.LongFormType;
@@ -469,6 +470,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // HELPERS //////////////////////////////////////////////////////////////////
     protected ProcessInstanceHelper processInstanceHelper;
     protected ListenerNotificationHelper listenerNotificationHelper;
+    protected FormHandlerHelper formHandlerHelper;
 
     // ASYNC EXECUTOR ///////////////////////////////////////////////////////////
 
@@ -1834,6 +1836,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (listenerNotificationHelper == null) {
             listenerNotificationHelper = new ListenerNotificationHelper();
         }
+        if (formHandlerHelper == null) {
+            formHandlerHelper = new FormHandlerHelper();
+        }
     }
 
     public void initVariableTypes() {
@@ -2615,6 +2620,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setListenerNotificationHelper(ListenerNotificationHelper listenerNotificationHelper) {
         this.listenerNotificationHelper = listenerNotificationHelper;
+        return this;
+    }
+    
+    public FormHandlerHelper getFormHandlerHelper() {
+        return formHandlerHelper;
+    }
+
+    public ProcessEngineConfigurationImpl setFormHandlerHelper(FormHandlerHelper formHandlerHelper) {
+        this.formHandlerHelper = formHandlerHelper;
         return this;
     }
 
