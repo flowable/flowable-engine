@@ -65,11 +65,6 @@ public class ContentServiceImpl extends ServiceImpl implements ContentService {
     }
 
     @Override
-    public void deleteContentItemsByCaseId(String caseId) {
-        commandExecutor.execute(new DeleteContentItemsCmd(null, null, caseId));
-    }
-    
-    @Override
     public void deleteContentItemsByScopeIdAndScopeType(String scopeId, String scopeType) {
         commandExecutor.execute(new DeleteContentItemsByScopeCmd(scopeId, scopeType));
     }
