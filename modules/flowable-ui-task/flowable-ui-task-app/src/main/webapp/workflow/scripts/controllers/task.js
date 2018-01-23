@@ -483,8 +483,7 @@ angular.module('flowableApp')
                 // Create popover
                 if (!$scope.createTaskPopover) {
                     $scope.newTask = {
-                        name: 'New task',
-                        taskScope: true
+                        name: 'New task'
                     };
 
                     $scope.createTaskPopover = $popover(angular.element('#toggle-create-subtask'), {
@@ -516,13 +515,7 @@ angular.module('flowableApp')
                         assignee: newTask.assignee ? newTask.assignee.id : null
                     };
 
-                    if (!newTask.isSubTask) {
-                        taskData.variables = {
-                            _previousTaskId: $scope.model.task.id
-                        }
-                    } else {
-                        taskData.parentTaskId = '' + $scope.model.task.id
-                    }
+                    taskData.parentTaskId = '' + $scope.model.task.id
 
                     if ($rootScope.activeAppDefinition) {
                         taskData.category = '' + $rootScope.activeAppDefinition.id;
