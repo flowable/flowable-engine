@@ -38,6 +38,7 @@
     </div>
     <div class="popover-footer">
         <div class="btn-group pull-right">
+        <button class="btn btn-default" ng-click="$hide();" ng-disabled="newTask.loading" translate="GENERAL.ACTION.CLOSE" ></button>
         <button class="btn btn-default" ng-click="confirmTaskCreation();" ng-disabled="!newTask.name || newTask.name.length == 0 || newTask.loading" translate="TASK.ACTION.CREATE-CONFIRM" ></button>
     </div>
         <div loading="newTask.loading"></div>
