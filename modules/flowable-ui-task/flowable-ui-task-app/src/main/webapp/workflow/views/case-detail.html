@@ -85,9 +85,40 @@
         </div>
         <div class="split-left">
             <div class="section pack">
-                <h3 translate="PROCESS.SECTION.ACTIVE-TASKS"></h3>
+                <h3 translate="CASE.SECTION.ACTIVE-TASKS"></h3>
                 <ul class="simple-list checklist">
                     <li ng-repeat="task in model.caseTasks" ng-click="openTask(task)">
+                        <div class="clearfix">
+                            <div class="pull-right">
+                                <span class="badge" ng-if="task.dueDate">
+                                    {{'TASK.MESSAGE.DUE-ON' | translate}} {{(task.dueDate | dateformat:'fromNow')}}
+                                </span>
+                                <span class="badge" ng-if="!task.dueDate">
+                                    {{'TASK.MESSAGE.CREATED-ON' | translate}} {{(task.created | dateformat:'fromNow')}}
+                                </span>
+                            </div>
+                            <div>
+                                <div user-picture="task.assignee"></div>
+                                {{task.name && task.name || ('TASK.MESSAGE.NO-NAME' | translate)}}
+                            </div>
+                            <div class="subtle">
+                                <span ng-if="task.assignee.id">
+                                    {{'TASK.MESSAGE.ASSIGNEE' | translate}} {{task.assignee.firstName && task.assignee.firstName != 'null' ? task.assignee.firstName : ''}} {{task.assignee.lastName && task.assignee.lastName != 'null' ? task.assignee.lastName : ''}}
+                                </span>
+                                <span ng-if="!task.assignee.id" translate="TASK.MESSAGE.NO-ASSIGNEE">
+                                </span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="nothing-to-see" ng-show="!model.caseTasks || model.caseTasks.length == 0">
+                    <span translate="PROCESS.MESSAGE.NO-TASKS"></span>
+                </div>
+             </div>
+            <div class="section pack">
+                <h3 translate="CASE.SECTION.ADHOC-TASKS"></h3>
+                <ul class="simple-list checklist">
+                    <li ng-repeat="task in model.caseAdhocTasks" ng-click="openTask(task)">
                         <div class="clearfix">
                             <div class="pull-right">
                                 <span class="badge" ng-if="task.dueDate">
@@ -162,8 +193,37 @@
                 <div class="nothing-to-see" ng-show="model.completedCaseTasks.length == 0">
                     <span translate="PROCESS.MESSAGE.NO-COMPLETED-TASKS"></span>
                 </div>
-
             </div>
+            <div class="section pack">
+                <h3 translate="CASE.SECTION.COMPLETED-ADHOC-TASKS" id="completedAdhocTasks"></h3>
+                <ul class="simple-list checklist">
+                    <li ng-repeat="task in model.completedCaseAdhocTasks" ng-click="openTask(task)" class="complete">
+                        <div class="clearfix">
+                            <div class="pull-right">
+                                <span class="badge">
+                                    {{'TASK.MESSAGE.DURATION' | translate:task}}
+                                </span>
+                            </div>
+                            <div>
+                                <div user-picture="task.assignee"></div>
+                                {{task.name && task.name || ('TASK.MESSAGE.NO-NAME' | translate)}}
+                            </div>
+                            <div class="subtle">
+                                <span ng-if="task.assignee.id">
+                                	{{'TASK.MESSAGE.COMPLETED-BY' | translate}} {{task.assignee.firstName && task.assignee.firstName != 'null' ? task.assignee.firstName : ''}} {{task.assignee.lastName && task.assignee.lastName != 'null' ? task.assignee.lastName : ''}}
+                                    {{task.endDate | dateformat:'fromNow'}}
+                                </span>
+                                <span ng-if="!task.assignee.id" translate="TASK.MESSAGE.NO-ASSIGNEE">
+                                </span>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+                <div class="nothing-to-see" ng-show="model.completedCaseTasks.length == 0">
+                    <span translate="PROCESS.MESSAGE.NO-COMPLETED-TASKS"></span>
+                </div>
+            </div>
+
         </div>
 
     </div>

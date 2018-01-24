@@ -517,9 +517,8 @@ angular.module('flowableApp')
                     };
 
                     if (!newTask.isSubTask) {
-                        taskData.variables = {
-                            _previousTaskId: $scope.model.task.id
-                        }
+                        taskData.scopeId = $scope.model.task.id;
+                        taskData.scopeType = 'taskAdhoc';
                     } else {
                         taskData.parentTaskId = '' + $scope.model.task.id
                     }

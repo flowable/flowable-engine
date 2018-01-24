@@ -46,6 +46,8 @@ public class TasksResource {
         task.setName(taskRepresentation.getName());
         task.setDescription(taskRepresentation.getDescription());
         task.setParentTaskId(taskRepresentation.getParentTaskId());
+        task.setScopeId(taskRepresentation.getScopeId());
+        task.setScopeType(taskRepresentation.getScopeType());
         if (StringUtils.isNotEmpty(taskRepresentation.getCategory())) {
             task.setCategory(taskRepresentation.getCategory());
         }

@@ -77,11 +77,11 @@ angular.module('flowableApp')
     $rootScope.loadCaseTasks = function() {
 
         // Runtime tasks
-        TaskService.getCaseInstanceTasks($scope.model.caseInstance.id, false).then(function(response) {
+        TaskService.getCaseInstanceTasks($scope.model.caseInstance.id, false, false).then(function(response) {
             $scope.model.caseTasks = response.data;
         });
 
-        TaskService.getCaseInstanceTasks($scope.model.caseInstance.id, true).then(function(response) {
+        TaskService.getCaseInstanceTasks($scope.model.caseInstance.id, true, false).then(function(response) {
             if(response.data && response.data.length > 0) {
                 $scope.model.completedCaseTasks = response.data;
             } else {
@@ -92,6 +92,25 @@ angular.module('flowableApp')
             for(var i=0; i<response.data.length; i++) {
                 var task = response.data[i];
                 if(task.duration) {
+                    task.duration = moment.duration(task.duration).humanize();
+                }
+            }
+        });
+
+        TaskService.getCaseInstanceTasks($scope.model.caseInstance.id, false, true).then(function (response) {
+            $scope.model.caseAdhocTasks = response.data;
+        });
+        TaskService.getCaseInstanceTasks($scope.model.caseInstance.id, true, true).then(function (response) {
+            if (response.data && response.data.length > 0) {
+                $scope.model.completedCaseAdhocTasks = response.data;
+            } else {
+                $scope.model.completedCaseAdhocTasks = [];
+            }
+
+            // Calculate duration
+            for (var i = 0; i < response.data.length; i++) {
+                var task = response.data[i];
+                if (task.duration) {
                     task.duration = moment.duration(task.duration).humanize();
                 }
             }
@@ -158,10 +177,7 @@ angular.module('flowableApp')
                 // Create popover
                 if (!$scope.createTaskPopover) {
                     $scope.newTask = {
-                        name: 'New task',
-                        variables: {
-                            _previousCaseId: $scope.model.caseInstance.id
-                        }
+                        name: 'New task'
                     };
 
                     $scope.createTaskPopover = $popover(angular.element('#toggle-create-subtask'), {
@@ -190,9 +206,8 @@ angular.module('flowableApp')
                         name: newTask.name,
                         description: newTask.description,
                         assignee: newTask.assignee ? newTask.assignee.id : null,
-                        variables: {
-                            _previousCaseId: $scope.model.caseInstance.id
-                        }
+                        scopeId: $scope.model.caseInstance.id,
+                        scopeType: 'cmmnAdhoc'
                     };
 
                     if ($rootScope.activeAppDefinition) {
@@ -212,6 +227,8 @@ angular.module('flowableApp')
                         $rootScope.addAlertPromise($translate('TASK.ALERT.CREATED', task));
                     });
                 }
+
+                $scope.loadCaseTasks();
             };
 
             $scope.cancelCase = function(final) {

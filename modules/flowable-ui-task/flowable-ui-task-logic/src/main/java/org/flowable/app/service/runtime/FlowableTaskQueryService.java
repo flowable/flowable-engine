@@ -147,7 +147,7 @@ public class FlowableTaskQueryService {
 
         JsonNode caseInstanceIdNode = requestNode.get("caseInstanceId");
         if (caseInstanceIdNode != null && !caseInstanceIdNode.isNull()) {
-            handleCaseInstanceFiltering(currentUser, taskInfoQueryWrapper, caseInstanceIdNode);
+            handleCaseInstanceFiltering(currentUser, taskInfoQueryWrapper, caseInstanceIdNode, requestNode.get("isAdhoc"));
         }
 
         JsonNode textNode = requestNode.get("text");
@@ -219,9 +219,13 @@ public class FlowableTaskQueryService {
         taskInfoQueryWrapper.getTaskInfoQuery().processInstanceId(processInstanceId);
     }
 
-    protected void handleCaseInstanceFiltering(User currentUser, TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode caseInstanceIdNode) {
+    protected void handleCaseInstanceFiltering(User currentUser, TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode caseInstanceIdNode, JsonNode isAdhoc) {
         String caseInstanceId = caseInstanceIdNode.asText();
-        taskInfoQueryWrapper.getTaskInfoQuery().scopeId(caseInstanceId).scopeType("cmmn");
+        if (isAdhoc != null && isAdhoc.booleanValue()) {
+            taskInfoQueryWrapper.getTaskInfoQuery().scopeType("cmmnAdhoc").scopeId(caseInstanceId);
+        } else {
+            taskInfoQueryWrapper.getTaskInfoQuery().scopeType("cmmn").scopeId(caseInstanceId);
+        }
     }
 
     protected void handleTextFiltering(TaskInfoQueryWrapper taskInfoQueryWrapper, JsonNode textNode) {

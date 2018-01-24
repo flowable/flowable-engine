@@ -46,8 +46,8 @@ angular.module('flowableApp').service('TaskService', ['$http', '$q', '$rootScope
                 }
             );
         };
-        
-        this.getCaseInstanceTasks = function(caseInstanceId, isCompleted) {
+
+        this.getCaseInstanceTasks = function(caseInstanceId, isCompleted, isAdhoc) {
 
             var data = {
                 caseInstanceId: caseInstanceId
@@ -56,6 +56,8 @@ angular.module('flowableApp').service('TaskService', ['$http', '$q', '$rootScope
             if (isCompleted) {
                 data.state = 'completed'
             }
+
+            data.isAdhoc = isAdhoc
 
             return httpAsPromise(
                 {
@@ -241,5 +243,5 @@ angular.module('flowableApp').service('TaskService', ['$http', '$q', '$rootScope
             var promise = deferred.promise;
             return promise;
         };
-        
+
     }]);

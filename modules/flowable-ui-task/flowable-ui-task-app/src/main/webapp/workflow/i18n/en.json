@@ -327,7 +327,9 @@
         "SECTION": {
             "ACTIVE-TASKS": "Active tasks",
             "COMPLETED-TASKS": "Completed tasks",
-            "CONTENT" : "Content"
+            "CONTENT" : "Content",
+            "ADHOC-TASKS": "Adhoc tasks",
+            "COMPLETED-ADHOC-TASKS": "Completed adhoc tasks"
         },
         "POPUP": {
             "CANCEL-TITLE": "Cancel the case?",
