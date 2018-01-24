@@ -157,6 +157,7 @@
             "DUE": "Due",
             "PROCESS-INSTANCE": "Part of process",
             "CASE-INSTANCE": "Part of case",
+            "PARENT-TASK": "Part of task",
             "ENDED": "Ended",
             "DURATION": "Duration"
         },

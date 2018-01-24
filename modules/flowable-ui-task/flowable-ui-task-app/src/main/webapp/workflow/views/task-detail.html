@@ -104,6 +104,10 @@
             <span ng-if="model.caseInstance">
                 <a ng-click="openCaseInstance(model.caseInstance.id)">{{model.caseInstance.name && model.caseInstance.name || model.caseInstance.caseDefinitionName}}</a>
             </span>
+            <span ng-if="model.task.parentTaskId" class="label">{{'TASK.FIELD.PARENT-TASK' | translate}}: </span>
+            <span ng-if="model.task.parentTaskId">
+                <a ng-click="openTaskInstance(model.task.parentTaskId)">{{model.task.parentTaskName}}</a>
+            </span>
 
             <span class="label" ng-if="model.task.endDate != null && model.task.endDate != undefined">{{'TASK.FIELD.ENDED' | translate}}: </span>
             <span ng-if="model.task.endDate != null && model.task.endDate != undefined">{{model.task.endDate | dateformat:'fromNow'}}</span>

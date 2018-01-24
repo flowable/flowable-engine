@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 /**
  * REST representation of a task.
- * 
+ *
  * @author Tijs Rademakers
  */
 public class TaskRepresentation extends AbstractRepresentation {
@@ -46,7 +46,7 @@ public class TaskRepresentation extends AbstractRepresentation {
     protected Integer priority;
     protected String processInstanceId;
     protected String processInstanceName;
-    
+
     protected String processDefinitionId;
     protected String processDefinitionName;
     protected String processDefinitionDescription;
@@ -54,11 +54,11 @@ public class TaskRepresentation extends AbstractRepresentation {
     protected String processDefinitionCategory;
     protected int processDefinitionVersion;
     protected String processDefinitionDeploymentId;
-    
+
     protected String scopeId;
     protected String scopeType;
     protected String caseInstanceName;
-    
+
     protected String scopeDefinitionId;
     protected String caseDefinitionName;
     protected String caseDefinitionDescription;
@@ -66,7 +66,10 @@ public class TaskRepresentation extends AbstractRepresentation {
     protected String caseDefinitionCategory;
     protected int caseDefinitionVersion;
     protected String caseDefinitionDeploymentId;
-    
+
+    protected String parentTaskId;
+    protected String parentTaskName;
+
     protected String formKey;
     protected String processInstanceStartUserId;
     protected boolean initiatorCanCompleteTask;
@@ -101,7 +104,7 @@ public class TaskRepresentation extends AbstractRepresentation {
             this.processDefinitionDeploymentId = processDefinition.getDeploymentId();
         }
     }
-    
+
     public TaskRepresentation(TaskInfo taskInfo, CaseDefinition caseDefinition) {
         initializeTaskDetails(taskInfo);
 
@@ -115,16 +118,25 @@ public class TaskRepresentation extends AbstractRepresentation {
         }
     }
 
+    public TaskRepresentation(TaskInfo taskInfo, TaskInfo parentTaskInfo) {
+        initializeTaskDetails(taskInfo);
+
+        if (parentTaskInfo != null) {
+            this.parentTaskId = parentTaskInfo.getId();
+            this.parentTaskName = parentTaskInfo.getName();
+        }
+    }
+
     public TaskRepresentation(TaskInfo taskInfo, ProcessDefinition processDefinition, String processInstanceName) {
         this(taskInfo, processDefinition);
         this.processInstanceName = processInstanceName;
     }
-    
+
     public TaskRepresentation(TaskInfo taskInfo, CaseDefinition caseDefinition, String caseInstanceName) {
         this(taskInfo, caseDefinition);
         this.caseInstanceName = caseInstanceName;
     }
-    
+
     public void initializeTaskDetails(TaskInfo taskInfo) {
         this.id = taskInfo.getId();
         this.name = taskInfo.getName();
@@ -297,7 +309,7 @@ public class TaskRepresentation extends AbstractRepresentation {
     public void setProcessDefinitionDeploymentId(String processDefinitionDeploymentId) {
         this.processDefinitionDeploymentId = processDefinitionDeploymentId;
     }
-    
+
     public String getScopeId() {
         return scopeId;
     }
@@ -376,6 +388,22 @@ public class TaskRepresentation extends AbstractRepresentation {
 
     public void setCaseDefinitionDeploymentId(String caseDefinitionDeploymentId) {
         this.caseDefinitionDeploymentId = caseDefinitionDeploymentId;
+    }
+
+    public String getParentTaskId() {
+        return parentTaskId;
+    }
+
+    public void setParentTaskId(String parentTaskId) {
+        this.parentTaskId = parentTaskId;
+    }
+
+    public String getParentTaskName() {
+        return parentTaskName;
+    }
+
+    public void setParentTaskName(String parentTaskName) {
+        this.parentTaskName = parentTaskName;
     }
 
     public String getFormKey() {

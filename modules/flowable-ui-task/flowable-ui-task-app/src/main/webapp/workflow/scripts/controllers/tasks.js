@@ -270,9 +270,12 @@ angular.module('flowableApp')
                 if (newTask && newTask.name) {
                     var taskData = {
                         name: newTask.name,
-                        description: newTask.description,
-                        assignee: newTask.assignee.id
+                        description: newTask.description
                     };
+
+                    if (newTask.assignee && newTask.assignee.id) {
+                        taskData.assignee= newTask.assignee.id;
+                    }
 
                     if ($rootScope.activeAppDefinition) {
                         taskData.category = '' + $rootScope.activeAppDefinition.id;
