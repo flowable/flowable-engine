@@ -589,6 +589,11 @@ angular.module('flowableApp')
         $location.path(path + "/cases");
     };
 
+    $scope.openTaskInstance = function(taskId) {
+        $rootScope.root.selectedTaskId = taskId;
+        $scope.refreshFilter();
+    };
+
     $scope.returnToTaskList = function() {
         var path='';
         if($rootScope.activeAppDefinition && !FLOWABLE.CONFIG.integrationProfile) {

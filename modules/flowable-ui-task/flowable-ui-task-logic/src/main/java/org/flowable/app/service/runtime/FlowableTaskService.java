@@ -56,19 +56,22 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
             try {
                 ProcessDefinition processDefinition = repositoryService.getProcessDefinition(task.getProcessDefinitionId());
                 rep = new TaskRepresentation(task, processDefinition);
-                
+
             } catch (FlowableException e) {
                 LOGGER.error("Error getting process definition {}", task.getProcessDefinitionId(), e);
             }
-            
+
         } else if (StringUtils.isNotEmpty(task.getScopeDefinitionId())) {
             try {
                 CaseDefinition caseDefinition = cmmnRepositoryService.getCaseDefinition(task.getScopeDefinitionId());
                 rep = new TaskRepresentation(task, caseDefinition);
-                
+
             } catch (FlowableException e) {
                 LOGGER.error("Error getting case definition {}", task.getScopeDefinitionId(), e);
             }
+        } else if(StringUtils.isNotEmpty(task.getParentTaskId())) {
+            HistoricTaskInstance parentTask = permissionService.validateReadPermissionOnTask(currentUser, task.getParentTaskId());
+            rep = new TaskRepresentation(task, parentTask);
         } else {
             rep = new TaskRepresentation(task);
         }

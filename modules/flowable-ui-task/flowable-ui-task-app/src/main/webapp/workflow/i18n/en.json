@@ -119,6 +119,7 @@
             "ASSIGN": "Assign",
             "REASSIGN": "Reassign",
             "CREATE": "+ Create Task",
+            "CREATE-SUB-TASK": "Create sub task",
             "CREATE-CONFIRM": "Create",
             "INVOLVE": "+ Involve people",
             "ADD-COMMENT": "+ Add comment",
@@ -156,6 +157,7 @@
             "DUE": "Due",
             "PROCESS-INSTANCE": "Part of process",
             "CASE-INSTANCE": "Part of case",
+            "PARENT-TASK": "Part of task",
             "ENDED": "Ended",
             "DURATION": "Duration"
         },
