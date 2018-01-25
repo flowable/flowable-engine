@@ -216,7 +216,7 @@ angular.module('flowableModeler').controller('FlowableProcessFormsReferencePopup
                 }
                 $scope.$parent.property.value = $scope.viewProcessForms;
             } else {
-                $scope.$parent.property.value = null;
+                $scope.$parent.property.value = [];
             }
 
             $scope.$parent.updatePropertyInModel($scope.$parent.property);
