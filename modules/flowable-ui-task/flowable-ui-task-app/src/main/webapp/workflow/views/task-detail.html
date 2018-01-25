@@ -108,6 +108,10 @@
             <span ng-if="model.task.parentTaskId">
                 <a ng-click="openTaskInstance(model.task.parentTaskId)">{{model.task.parentTaskName}}</a>
             </span>
+            <span ng-if="model.task.scopeId && model.task.scopeType && model.task.scopeType == 'taskAdhoc'" class="label">{{'TASK.FIELD.PREVIOUS-TASK' | translate}}: </span>
+            <span ng-if="model.task.scopeId && model.task.scopeType && model.task.scopeType == 'taskAdhoc'">
+                <a ng-click="openTaskInstance(model.task.scopeId)">{{model.task.parentTaskName}}</a>
+            </span>
 
             <span class="label" ng-if="model.task.endDate != null && model.task.endDate != undefined">{{'TASK.FIELD.ENDED' | translate}}: </span>
             <span ng-if="model.task.endDate != null && model.task.endDate != undefined">{{model.task.endDate | dateformat:'fromNow'}}</span>

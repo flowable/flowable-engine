@@ -158,6 +158,7 @@
             "PROCESS-INSTANCE": "Part of process",
             "CASE-INSTANCE": "Part of case",
             "PARENT-TASK": "Part of task",
+            "PREVIOUS-TASK": "Previous task",
             "ENDED": "Ended",
             "DURATION": "Duration"
         },

@@ -142,7 +142,7 @@
                         </div>
                     </li>
                 </ul>
-                <div class="nothing-to-see" ng-show="!model.caseTasks || model.caseTasks.length == 0">
+                <div class="nothing-to-see" ng-show="!model.caseAdhocTasks || model.caseAdhocTasks.length == 0">
                     <span translate="PROCESS.MESSAGE.NO-TASKS"></span>
                 </div>
              </div>
@@ -219,7 +219,7 @@
                         </div>
                     </li>
                 </ul>
-                <div class="nothing-to-see" ng-show="model.completedCaseTasks.length == 0">
+                <div class="nothing-to-see" ng-show="model.completedCaseAdhocTasks.length == 0">
                     <span translate="PROCESS.MESSAGE.NO-COMPLETED-TASKS"></span>
                 </div>
             </div>

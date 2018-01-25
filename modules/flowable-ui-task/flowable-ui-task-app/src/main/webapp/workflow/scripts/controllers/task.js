@@ -238,13 +238,13 @@ angular.module('flowableApp')
                 if ($scope.model.task.processInstanceId) {
                     $scope.loadProcessInstance();
                 } else {
-                    $scope.model.processInstance = null;
+                    $scope.model.processInstance = undefined;
                 }
 
-                if ($scope.model.task.scopeId) {
+                if ($scope.model.task.scopeId && ($scope.model.task.scopeType === 'cmmn' || $scope.model.task.scopeType === 'cmmnAdhoc')) {
                     $scope.loadCaseInstance();
                 } else {
-                    $scope.model.caseInstance = null;
+                    $scope.model.caseInstance = undefined;
                 }
 
                 $scope.refreshInvolvmentSummary();

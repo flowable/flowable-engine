@@ -72,6 +72,11 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
         } else if(StringUtils.isNotEmpty(task.getParentTaskId())) {
             HistoricTaskInstance parentTask = permissionService.validateReadPermissionOnTask(currentUser, task.getParentTaskId());
             rep = new TaskRepresentation(task, parentTask);
+        } else if (StringUtils.isNotEmpty(task.getScopeId()) && "taskAdhoc".equals(task.getScopeType())) {
+            HistoricTaskInstance previousTask = permissionService.validateReadPermissionOnTask(currentUser, task.getScopeId());
+            rep = new TaskRepresentation(task);
+            rep.setParentTaskId(null);
+            rep.setParentTaskName(previousTask.getName());
         } else {
             rep = new TaskRepresentation(task);
         }

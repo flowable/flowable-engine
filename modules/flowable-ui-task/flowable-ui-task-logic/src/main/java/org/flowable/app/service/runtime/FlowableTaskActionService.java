@@ -61,12 +61,12 @@ public class FlowableTaskActionService extends FlowableAbstractTaskService {
         }
 
         try {
-            if (StringUtils.isEmpty(task.getScopeType())) {
+            if (StringUtils.isEmpty(task.getScopeType()) || task.getScopeType().contains("Adhoc")) {
                 taskService.complete(task.getId());
             } else {
                 cmmnTaskService.complete(task.getId());
             }
-            
+
         } catch (FlowableException e) {
             LOGGER.error("Error completing task {}", taskId, e);
             throw new BadRequestException("Task " + taskId + " can't be completed", e);

@@ -227,8 +227,6 @@ angular.module('flowableApp')
                         $rootScope.addAlertPromise($translate('TASK.ALERT.CREATED', task));
                     });
                 }
-
-                $scope.loadCaseTasks();
             };
 
             $scope.cancelCase = function(final) {
@@ -253,7 +251,28 @@ angular.module('flowableApp')
         $route.reload();
     });
 
-    $scope.openTask = function(task) {
+    // Refreshing list when new task is created
+    $scope.$on("new-task-created", function (event, task) {
+        // New tasks should always be on top, hence the sorting is set to last created
+        TaskService.getCaseInstanceTasks($scope.model.caseInstance.id, false, true).then(function (response) {
+            if (response.data && response.data.length > 0) {
+                $scope.model.caseAdhocTasks = response.data;
+            } else {
+                $scope.model.caseAdhocTasks = [];
+            }
+
+            // Calculate duration
+            for (var i = 0; i < response.data.length; i++) {
+                var task = response.data[i];
+                if (task.duration) {
+                    task.duration = moment.duration(task.duration).humanize();
+                }
+            }
+        });
+    });
+
+
+            $scope.openTask = function(task) {
         $rootScope.root.selectedTaskId = task.id;
         var path='';
         if ($rootScope.activeAppDefinition && !FLOWABLE.CONFIG.integrationProfile) {

@@ -50,7 +50,8 @@ angular.module('flowableApp').service('TaskService', ['$http', '$q', '$rootScope
         this.getCaseInstanceTasks = function(caseInstanceId, isCompleted, isAdhoc) {
 
             var data = {
-                caseInstanceId: caseInstanceId
+                caseInstanceId: caseInstanceId,
+                sort: 'created-desc'
             };
 
             if (isCompleted) {
