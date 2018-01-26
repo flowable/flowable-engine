@@ -118,7 +118,7 @@ public class CountingEntityUtil {
         return isTaskRelatedEntityCountEnabledGlobally() && taskEntity.isCountEnabled();
     }
     
-    protected static FlowableVariableEvent createVariableDeleteEvent(VariableInstanceEntity variableInstance) {
+    public static FlowableVariableEvent createVariableDeleteEvent(VariableInstanceEntity variableInstance) {
 
         String processDefinitionId = null;
         if (variableInstance.getProcessInstanceId() != null) {

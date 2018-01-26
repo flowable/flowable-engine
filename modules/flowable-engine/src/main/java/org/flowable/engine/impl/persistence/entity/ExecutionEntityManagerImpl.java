@@ -64,6 +64,7 @@ import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
+import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayRef;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -767,22 +768,31 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         if (!enableExecutionRelationshipCounts ||
                 (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getVariableCount() > 0)) {
             
+            ArrayList<VariableByteArrayRef> variableByteArrayRefs = new ArrayList<>();
             Collection<VariableInstance> executionVariables = executionEntity.getVariableInstancesLocal().values();
             for (VariableInstance variableInstance : executionVariables) {
-
                 if (variableInstance instanceof VariableInstanceEntity) {
-
                     VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
-    
-                    CommandContextUtil.getVariableService(commandContext).deleteVariableInstance(variableInstanceEntity);
-                    CountingEntityUtil.handleDeleteVariableInstanceEntityCount(variableInstanceEntity, true);
-    
+                    
                     if (variableInstanceEntity.getByteArrayRef() != null && variableInstanceEntity.getByteArrayRef().getId() != null) {
-                        getByteArrayEntityManager().deleteByteArrayById(variableInstanceEntity.getByteArrayRef().getId());
+                        variableByteArrayRefs.add(variableInstanceEntity.getByteArrayRef());
                     }
                     
+                    if (eventDispatchedEnabled) {
+                        FlowableEventDispatcher eventDispatcher = CommandContextUtil.getEventDispatcher(commandContext);
+                        if (eventDispatcher != null) {
+                            eventDispatcher.dispatchEvent(CountingEntityUtil.createVariableDeleteEvent(variableInstanceEntity));
+                            eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, variableInstance));
+                        }
+                    }
                 }
             }
+            
+            // First byte arrays that reference variable, then variables in bulk
+            for (VariableByteArrayRef variableByteArrayRef : variableByteArrayRefs) {
+                getByteArrayEntityManager().deleteByteArrayById(variableByteArrayRef.getId());
+            }
+            CommandContextUtil.getVariableService(commandContext).deleteVariablesByExecutionId(executionEntity.getId());
         }
     }
 

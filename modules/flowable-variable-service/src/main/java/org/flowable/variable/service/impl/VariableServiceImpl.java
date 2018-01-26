@@ -127,6 +127,11 @@ public class VariableServiceImpl extends ServiceImpl implements VariableService 
     }
     
     @Override
+    public void deleteVariablesByExecutionId(String executionId) {
+        getVariableInstanceEntityManager().deleteVariablesByExecutionId(executionId);
+    }
+    
+    @Override
     public void deleteVariableInstanceMap(Map<String, VariableInstanceEntity> variableInstances) {
         getVariableInstanceEntityManager().deleteVariableInstanceMap(variableInstances);
     }

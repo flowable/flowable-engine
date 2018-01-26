@@ -64,6 +64,8 @@ public interface VariableService {
     
     void deleteVariableInstance(VariableInstanceEntity variable);
     
+    void deleteVariablesByExecutionId(String executionId);
+    
     void deleteVariableInstanceMap(Map<String, VariableInstanceEntity> variableInstances);
     
 }

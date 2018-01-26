@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.flowable.engine.common.impl.db.AbstractDataManager;
+import org.flowable.engine.common.impl.db.DbSqlSession;
 import org.flowable.engine.common.impl.db.SingleCachedEntityMatcher;
 import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
@@ -173,6 +174,16 @@ public class MybatisVariableInstanceDataManager extends AbstractDataManager<Vari
         params.put("scopeType", scopeType);
         params.put("variableNames", variableNames);
         return getList("selectVariableInstanceBySubScopeIdAndScopeTypeAndNames", params, variableInstanceBySubScopeIdAndScopeTypeAndVariableNamesMatcher, true);
+    }
+    
+    @Override
+    public void deleteVariablesByExecutionId(String executionId) {
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        if (isEntityInserted(dbSqlSession, "execution", executionId)) {
+            deleteCachedEntities(dbSqlSession, variableInstanceByExecutionIdMatcher, executionId);
+        } else {
+            bulkDelete("deleteVariableInstancesByExecutionId", variableInstanceByExecutionIdMatcher, executionId);
+        }
     }
     
     @Override

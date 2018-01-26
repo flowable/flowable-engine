@@ -127,14 +127,11 @@
     <delete id="deleteVariableInstance" parameterType="org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntityImpl">
         delete from ${prefix}ACT_RU_VARIABLE where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision}
     </delete>
-
-    <delete id="bulkDeleteVariableInstance" parameterType="java.util.Collection">
-        delete from ${prefix}ACT_RU_VARIABLE where
-        <foreach item="variable" collection="list" index="index" separator=" or ">
-            ID_ = #{variable.id, jdbcType=VARCHAR}
-        </foreach>
-    </delete>
     
+     <delete id="deleteVariableInstancesByExecutionId" parameterType="string">
+        delete from ${prefix}ACT_RU_VARIABLE where EXECUTION_ID_ = #{id, jdbcType=VARCHAR}
+    </delete>
+
     <delete id="deleteVariablesByScopeIdAndScopeType" parameterType="java.util.Map">
         delete from ${prefix}ACT_RU_VARIABLE where SCOPE_ID_ = #{scopeId, jdbcType=VARCHAR} and SCOPE_TYPE_ = #{scopeType, jdbcType=VARCHAR}
     </delete>
