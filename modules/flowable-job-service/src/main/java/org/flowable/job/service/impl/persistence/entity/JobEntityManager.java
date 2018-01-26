@@ -41,9 +41,4 @@ public interface JobEntityManager extends EntityManager<JobEntity>, JobInfoEntit
      */
     long findJobCountByQueryCriteria(JobQueryImpl jobQuery);
     
-    /**
-     * Deletes all jobs related to the given execution id.
-     */
-    void deleteJobsByExecutionId(String executionId);
-
 }

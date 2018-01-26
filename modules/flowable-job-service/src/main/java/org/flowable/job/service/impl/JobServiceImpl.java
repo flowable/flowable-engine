@@ -12,15 +12,21 @@
  */
 package org.flowable.job.service.impl;
 
+import java.util.Collection;
 import java.util.List;
 
+import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.job.api.JobInfo;
 import org.flowable.job.service.JobService;
 import org.flowable.job.service.JobServiceConfiguration;
+import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
+import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobEntityManager;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
+import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntityManager;
 
 /**
  * @author Tijs Rademakers
@@ -140,16 +146,38 @@ public class JobServiceImpl extends ServiceImpl implements JobService {
 
     @Override
     public void deleteJobsByExecutionId(String executionId) {
-        getJobEntityManager().deleteJobsByExecutionId(executionId);
+        JobEntityManager jobEntityManager = getJobEntityManager();
+        Collection<JobEntity> jobsForExecution = jobEntityManager.findJobsByExecutionId(executionId);
+        for (JobEntity job : jobsForExecution) {
+            getJobEntityManager().delete(job);
+            if (getEventDispatcher().isEnabled()) {
+                getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
+            }
+        }
     }
     
     @Override
     public void deleteSuspendedJobsByExecutionId(String executionId) {
-        getSuspendedJobEntityManager().deleteJobsByExecutionId(executionId);
+        SuspendedJobEntityManager suspendedJobEntityManager = getSuspendedJobEntityManager();
+        Collection<SuspendedJobEntity> suspendedJobsForExecution = suspendedJobEntityManager.findJobsByExecutionId(executionId);
+        for (SuspendedJobEntity job : suspendedJobsForExecution) {
+            suspendedJobEntityManager.delete(job);
+            if (getEventDispatcher().isEnabled()) {
+                getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
+            }
+        }
     }
     
     @Override
     public void deleteDeadLetterJobsByExecutionId(String executionId) {
-        getDeadLetterJobEntityManager().deleteJobsByExecutionId(executionId);
+        DeadLetterJobEntityManager deadLetterJobEntityManager = getDeadLetterJobEntityManager();
+        Collection<DeadLetterJobEntity> deadLetterJobsForExecution = deadLetterJobEntityManager.findJobsByExecutionId(executionId);
+        for (DeadLetterJobEntity job : deadLetterJobsForExecution) {
+            deadLetterJobEntityManager.delete(job);
+            if (getEventDispatcher().isEnabled()) {
+                getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
+            }
+        }
     }
+    
 }

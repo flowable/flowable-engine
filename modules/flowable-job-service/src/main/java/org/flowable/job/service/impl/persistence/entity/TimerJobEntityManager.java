@@ -89,9 +89,4 @@ public interface TimerJobEntityManager extends EntityManager<TimerJobEntity> {
      */
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
     
-    /**
-     * Deletes all timer jobs by execution id.
-     */
-    void deleteJobsByExecutionId(String executionId);
-
 }

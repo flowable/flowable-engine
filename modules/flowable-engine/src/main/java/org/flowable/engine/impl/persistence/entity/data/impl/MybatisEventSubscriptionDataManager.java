@@ -181,8 +181,7 @@ public class MybatisEventSubscriptionDataManager extends AbstractProcessDataMana
         DbSqlSession dbSqlSession = getDbSqlSession();
         
         // If the execution has been inserted in the same command execution as this query, there can't be any in the database 
-        Class<?> executionEntityClass = dbSqlSession.getDbSqlSessionFactory().getLogicalNameToClassMapping().get("execution");
-        if (executionEntityClass != null && dbSqlSession.isEntityInserted(executionEntityClass, executionId)) {
+        if (isEntityInserted(dbSqlSession, "execution", executionId)) {
             return getListFromCache(eventSubscritionsByExecutionIdMatcher, executionId);
         }
         return getList(dbSqlSession, "selectEventSubscriptionsByExecution", executionId, eventSubscritionsByExecutionIdMatcher, true);

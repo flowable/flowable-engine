@@ -121,14 +121,4 @@ public class MybatisTimerJobDataManager extends AbstractDataManager<TimerJobEnti
         getDbSqlSession().update("updateTimerJobTenantIdForDeployment", params);
     }
     
-    @Override
-    public void deleteJobsByExecutionId(String executionId) {
-        DbSqlSession dbSqlSession = getDbSqlSession();
-        if (isEntityInserted(dbSqlSession, "execution", executionId)) {
-            deleteCachedEntities(dbSqlSession, timerJobsByExecutionIdMatcher, executionId);
-        } else {
-            bulkDelete("deleteTimerJobsByExecutionId", timerJobsByExecutionIdMatcher, executionId);
-        }
-    }
-
 }

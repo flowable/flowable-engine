@@ -74,14 +74,4 @@ public class MybatisDeadLetterJobDataManager extends AbstractDataManager<DeadLet
         getDbSqlSession().update("updateDeadLetterJobTenantIdForDeployment", params);
     }
     
-    @Override
-    public void deleteJobsByExecutionId(String executionId) {
-        DbSqlSession dbSqlSession = getDbSqlSession();
-        if (isEntityInserted(dbSqlSession, "execution", executionId)) {
-            deleteCachedEntities(dbSqlSession, deadLetterByExecutionIdMatcher, executionId);
-        } else {
-            bulkDelete("deleteDeadLetterJobsByExecutionId", deadLetterByExecutionIdMatcher, executionId);
-        }
-    }
-
 }

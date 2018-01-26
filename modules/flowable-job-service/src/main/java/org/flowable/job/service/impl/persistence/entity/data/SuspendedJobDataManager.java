@@ -34,5 +34,4 @@ public interface SuspendedJobDataManager extends DataManager<SuspendedJobEntity>
 
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
     
-    void deleteJobsByExecutionId(String executionId);
 }

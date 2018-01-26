@@ -80,14 +80,4 @@ public class MybatisSuspendedJobDataManager extends AbstractDataManager<Suspende
         getDbSqlSession().update("updateSuspendedJobTenantIdForDeployment", params);
     }
     
-    @Override
-    public void deleteJobsByExecutionId(String executionId) {
-        DbSqlSession dbSqlSession = getDbSqlSession();
-        if (isEntityInserted(dbSqlSession, "execution", executionId)) {
-            deleteCachedEntities(dbSqlSession, suspendedJobsByExecutionIdMatcher, executionId);
-        } else {
-            bulkDelete("deleteSuspendedJobsByExecutionId", suspendedJobsByExecutionIdMatcher, executionId);
-        }
-    }
-
 }

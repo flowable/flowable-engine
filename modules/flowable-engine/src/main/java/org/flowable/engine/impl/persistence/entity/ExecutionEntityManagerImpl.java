@@ -770,17 +770,17 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
             Collection<VariableInstance> executionVariables = executionEntity.getVariableInstancesLocal().values();
             for (VariableInstance variableInstance : executionVariables) {
 
-                if (!(variableInstance instanceof VariableInstanceEntity)) {
-                    continue;
-                }
+                if (variableInstance instanceof VariableInstanceEntity) {
 
-                VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
-
-                CommandContextUtil.getVariableService(commandContext).deleteVariableInstance(variableInstanceEntity);
-                CountingEntityUtil.handleDeleteVariableInstanceEntityCount(variableInstanceEntity, true);
-
-                if (variableInstanceEntity.getByteArrayRef() != null && variableInstanceEntity.getByteArrayRef().getId() != null) {
-                    getByteArrayEntityManager().deleteByteArrayById(variableInstanceEntity.getByteArrayRef().getId());
+                    VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
+    
+                    CommandContextUtil.getVariableService(commandContext).deleteVariableInstance(variableInstanceEntity);
+                    CountingEntityUtil.handleDeleteVariableInstanceEntityCount(variableInstanceEntity, true);
+    
+                    if (variableInstanceEntity.getByteArrayRef() != null && variableInstanceEntity.getByteArrayRef().getId() != null) {
+                        getByteArrayEntityManager().deleteByteArrayById(variableInstanceEntity.getByteArrayRef().getId());
+                    }
+                    
                 }
             }
         }
@@ -798,59 +798,28 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
     }
     
     protected void deleteJobs(ExecutionEntity executionEntity, CommandContext commandContext, boolean enableExecutionRelationshipCounts, boolean eventDispatchedEnabled) {
+        
+        // Jobs have byte array references that don't store the execution id. 
+        // This means a bulk delete is not done for jobs. Generally there are many jobs / execution either.
+        
         if (!enableExecutionRelationshipCounts
                 || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getTimerJobCount() > 0)) {
-            
-            TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
-            if (eventDispatchedEnabled) {
-                List<TimerJobEntity> timerJobEntities = timerJobService.findTimerJobsByExecutionId(executionEntity.getId());
-                for (TimerJobEntity timerJobEntity : timerJobEntities) {
-                    fireEntityDeletedEvent(timerJobEntity);
-                    getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timerJobEntity));
-                }
-            }
-            
-            timerJobService.deleteTimerJobsByExecutionId(executionEntity.getId());
+            CommandContextUtil.getTimerJobService().deleteTimerJobsByExecutionId(executionEntity.getId());
         }
 
-        JobService jobService = CommandContextUtil.getJobService(commandContext);
+        JobService jobService = CommandContextUtil.getJobService();
         if (!enableExecutionRelationshipCounts
                 || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getJobCount() > 0)) {
-            
-            if (eventDispatchedEnabled) {
-                List<JobEntity> jobEntities = jobService.findJobsByExecutionId(executionEntity.getId());
-                for (JobEntity jobEntity : jobEntities) {
-                    fireEntityDeletedEvent(jobEntity);
-                    getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobEntity));
-                }
-            }
-            
             jobService.deleteJobsByExecutionId(executionEntity.getId());
         }
 
         if (!enableExecutionRelationshipCounts
                 || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getSuspendedJobCount() > 0)) {
-            
-            if (eventDispatchedEnabled) {
-                List<SuspendedJobEntity> jobEntities = jobService.findSuspendedJobsByExecutionId(executionEntity.getId());
-                for (SuspendedJobEntity jobEntity : jobEntities) {
-                    fireEntityDeletedEvent(jobEntity);
-                    getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobEntity));
-                }
-            }
-            
             jobService.deleteSuspendedJobsByExecutionId(executionEntity.getId());
         }
 
         if (!enableExecutionRelationshipCounts
                 || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getDeadLetterJobCount() > 0)) {
-            
-            List<DeadLetterJobEntity> jobEntities = jobService.findDeadLetterJobsByExecutionId(executionEntity.getId());
-            for (DeadLetterJobEntity jobEntity : jobEntities) {
-                fireEntityDeletedEvent(jobEntity);
-                getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobEntity));
-            }
-            
             jobService.deleteDeadLetterJobsByExecutionId(executionEntity.getId());
         }
     }

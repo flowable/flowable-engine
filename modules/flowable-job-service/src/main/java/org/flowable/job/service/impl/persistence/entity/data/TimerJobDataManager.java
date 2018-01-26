@@ -44,5 +44,4 @@ public interface TimerJobDataManager extends DataManager<TimerJobEntity> {
 
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
     
-    void deleteJobsByExecutionId(String executionId);
 }

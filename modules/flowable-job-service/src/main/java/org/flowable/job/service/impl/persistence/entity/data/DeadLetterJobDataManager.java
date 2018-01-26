@@ -32,5 +32,4 @@ public interface DeadLetterJobDataManager extends DataManager<DeadLetterJobEntit
 
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
     
-    void deleteJobsByExecutionId(String executionId);
 }

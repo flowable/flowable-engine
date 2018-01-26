@@ -148,11 +148,6 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
         }
     }
     
-    @Override
-    public void deleteJobsByExecutionId(String executionId) {
-        jobDataManager.deleteJobsByExecutionId(executionId);
-    }
-
     protected TimerJobEntity createTimer(JobEntity te) {
         TimerJobEntity newTimerEntity = create();
         newTimerEntity.setJobHandlerConfiguration(te.getJobHandlerConfiguration());
