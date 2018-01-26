@@ -19,7 +19,8 @@ import java.util.Map;
 
 import org.flowable.engine.common.impl.Page;
 import org.flowable.engine.common.impl.db.AbstractDataManager;
-import org.flowable.engine.common.impl.db.CachedEntityMatcher;
+import org.flowable.engine.common.impl.db.DbSqlSession;
+import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.JobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
@@ -54,7 +55,15 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
 
     @Override
     public List<JobEntity> findJobsByExecutionId(final String executionId) {
-        return getList("selectJobsByExecutionId", executionId, jobsByExecutionIdMatcher, true);
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        
+        // If the execution has been inserted in the same command execution as this query, there can't be any in the database 
+        Class<?> executionEntityClass = dbSqlSession.getDbSqlSessionFactory().getLogicalNameToClassMapping().get("execution");
+        if (executionEntityClass != null && dbSqlSession.isEntityInserted(executionEntityClass, executionId)) {
+            return getListFromCache(jobsByExecutionIdMatcher, executionId);
+        }
+        
+        return getList(dbSqlSession, "selectJobsByExecutionId", executionId, jobsByExecutionIdMatcher, true);
     }
 
     @Override
@@ -100,6 +109,16 @@ public class MybatisJobDataManager extends AbstractDataManager<JobEntity> implem
         params.put("id", jobId);
         params.put("now", CommandContextUtil.getJobServiceConfiguration().getClock().getCurrentTime());
         getDbSqlSession().update("resetExpiredJob", params);
+    }
+    
+    @Override
+    public void deleteJobsByExecutionId(String executionId) {
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        if (isEntityInserted(dbSqlSession, "execution", executionId)) {
+            deleteCachedEntities(dbSqlSession, jobsByExecutionIdMatcher, executionId);
+        } else {
+            bulkDelete("deleteJobsByExecutionId", jobsByExecutionIdMatcher, executionId);
+        }
     }
 
 }

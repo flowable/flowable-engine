@@ -147,6 +147,11 @@ public class TimerJobEntityManagerImpl extends AbstractEntityManager<TimerJobEnt
             eventDispatcher.dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
         }
     }
+    
+    @Override
+    public void deleteJobsByExecutionId(String executionId) {
+        jobDataManager.deleteJobsByExecutionId(executionId);
+    }
 
     protected TimerJobEntity createTimer(JobEntity te) {
         TimerJobEntity newTimerEntity = create();

@@ -43,4 +43,6 @@ public interface TimerJobDataManager extends DataManager<TimerJobEntity> {
     long findJobCountByQueryCriteria(TimerJobQueryImpl jobQuery);
 
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
+    
+    void deleteJobsByExecutionId(String executionId);
 }

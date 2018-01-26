@@ -377,8 +377,12 @@ public class DbSqlSession implements Session {
     }
 
     public boolean isEntityInserted(Entity entity) {
-        return insertedObjects.containsKey(entity.getClass())
-                && insertedObjects.get(entity.getClass()).containsKey(entity.getId());
+        return isEntityInserted(entity.getClass(), entity.getId());
+    }
+    
+    public boolean isEntityInserted(Class<?> entityClass, String entityId) {
+        return insertedObjects.containsKey(entityClass)
+                && insertedObjects.get(entityClass).containsKey(entityId);
     }
 
     public boolean isEntityToBeDeleted(Entity entity) {

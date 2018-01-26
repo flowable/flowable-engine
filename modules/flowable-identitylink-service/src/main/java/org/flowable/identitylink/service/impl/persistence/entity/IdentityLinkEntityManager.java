@@ -48,8 +48,6 @@ public interface IdentityLinkEntityManager extends EntityManager<IdentityLinkEnt
 
     List<IdentityLinkEntity> addCandidateGroups(String taskId, Collection<String> candidateGroups);
 
-    void deleteIdentityLink(IdentityLinkEntity identityLink);
-
     List<IdentityLinkEntity> deleteProcessInstanceIdentityLink(String processInstanceId, String userId, String groupId, String type);
 
     List<IdentityLinkEntity> deleteTaskIdentityLink(String taskId, List<IdentityLinkEntity> currentIdentityLinks, String userId, String groupId, String type);
@@ -59,5 +57,7 @@ public interface IdentityLinkEntityManager extends EntityManager<IdentityLinkEnt
     List<IdentityLinkEntity> deleteIdentityLinksByTaskId(String taskId);
 
     void deleteIdentityLinksByProcDef(String processDefId);
+    
+    void deleteIdentityLinksByProcessInstanceId(String processInstanceId);
 
 }

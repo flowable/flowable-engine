@@ -85,6 +85,11 @@ public class DeadLetterJobEntityManagerImpl extends AbstractEntityManager<DeadLe
             getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
         }
     }
+    
+    @Override
+    public void deleteJobsByExecutionId(String executionId) {
+        jobDataManager.deleteJobsByExecutionId(executionId);
+    }
 
     protected DeadLetterJobEntity createDeadLetterJob(AbstractRuntimeJobEntity job) {
         DeadLetterJobEntity newJobEntity = create();

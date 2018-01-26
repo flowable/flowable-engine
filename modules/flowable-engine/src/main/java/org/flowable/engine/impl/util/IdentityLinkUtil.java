@@ -14,7 +14,6 @@ package org.flowable.engine.impl.util;
 
 import java.util.List;
 
-import org.flowable.engine.impl.persistence.CountingExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
@@ -23,6 +22,7 @@ import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Tijs Rademakers
+ * @author Joram Barrez
  */
 public class IdentityLinkUtil {
     
@@ -31,14 +31,6 @@ public class IdentityLinkUtil {
                         processInstanceExecution.getId(), userId, groupId, type);
         
         CommandContextUtil.getHistoryManager().recordIdentityLinkCreated(identityLinkEntity);
-        
-        if (CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
-            CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) processInstanceExecution;
-            if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(countingExecutionEntity)) {
-                countingExecutionEntity.setIdentityLinkCount(countingExecutionEntity.getIdentityLinkCount() + 1);
-            }
-        }
-        
         processInstanceExecution.getIdentityLinks().add(identityLinkEntity);
         
         return identityLinkEntity;
@@ -54,10 +46,8 @@ public class IdentityLinkUtil {
     public static void deleteProcessInstanceIdentityLinks(ExecutionEntity processInstanceEntity, String userId, String groupId, String type) {
         List<IdentityLinkEntity> removedIdentityLinkEntities = CommandContextUtil.getIdentityLinkService().deleteProcessInstanceIdentityLink(
                         processInstanceEntity.getId(), userId, groupId, type);
-        
         for (IdentityLinkEntity identityLinkEntity : removedIdentityLinkEntities) {
             CommandContextUtil.getHistoryManager().recordIdentityLinkDeleted(identityLinkEntity.getId());
-            handleProcessInstanceIdentityLinkDeletion(processInstanceEntity, identityLinkEntity);
         }
         processInstanceEntity.getIdentityLinks().removeAll(removedIdentityLinkEntities);
     }
@@ -111,12 +101,4 @@ public class IdentityLinkUtil {
         }
     }
     
-    protected static void handleProcessInstanceIdentityLinkDeletion(ExecutionEntity processInstanceEntity, IdentityLinkEntity identityLink) {
-        if (CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
-            CountingExecutionEntity executionEntity = (CountingExecutionEntity) processInstanceEntity;
-            if (CountingEntityUtil.isExecutionRelatedEntityCountEnabled(executionEntity)) {
-                executionEntity.setIdentityLinkCount(executionEntity.getIdentityLinkCount() - 1);
-            }
-        }
-    }
 }

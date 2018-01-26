@@ -72,7 +72,7 @@ public class DefaultJobManager implements JobManager {
     }
 
     @Override
-    public void setAsyncJobProperties(JobEntity jobEntity, boolean exclusive) {
+    public void createAsyncJob(JobEntity jobEntity, boolean exclusive) {
         // When the async executor is activated, the job is directly passed on to the async executor thread
         if (isAsyncExecutorActive()) {
             internalCreateLockedAsyncJob(jobEntity, exclusive);

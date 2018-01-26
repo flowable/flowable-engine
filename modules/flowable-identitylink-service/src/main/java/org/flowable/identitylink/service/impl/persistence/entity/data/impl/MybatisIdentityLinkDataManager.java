@@ -17,18 +17,19 @@ import java.util.List;
 import java.util.Map;
 
 import org.flowable.engine.common.impl.db.AbstractDataManager;
-import org.flowable.engine.common.impl.db.CachedEntityMatcher;
+import org.flowable.engine.common.impl.db.DbSqlSession;
+import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.data.IdentityLinkDataManager;
-import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.IdentityLinksByProcInstMatcher;
+import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.IdentityLinksByProcessInstanceMatcher;
 
 /**
  * @author Joram Barrez
  */
 public class MybatisIdentityLinkDataManager extends AbstractDataManager<IdentityLinkEntity> implements IdentityLinkDataManager {
 
-    protected CachedEntityMatcher<IdentityLinkEntity> identityLinkByProcessInstanceMatcher = new IdentityLinksByProcInstMatcher();
+    protected CachedEntityMatcher<IdentityLinkEntity> identityLinkByProcessInstanceMatcher = new IdentityLinksByProcessInstanceMatcher();
 
     @Override
     public Class<? extends IdentityLinkEntity> getManagedEntityClass() {
@@ -47,8 +48,14 @@ public class MybatisIdentityLinkDataManager extends AbstractDataManager<Identity
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<IdentityLinkEntity> findIdentityLinksByProcessInstanceId(String processInstanceId) {
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        
+        // If the process instance has been inserted in the same command execution as this query, there can't be any in the database 
+        if (isEntityInserted(dbSqlSession, "execution", processInstanceId)) {
+            return getListFromCache(identityLinkByProcessInstanceMatcher, processInstanceId);
+        }
+        
         return getList("selectIdentityLinksByProcessInstance", processInstanceId, identityLinkByProcessInstanceMatcher, true);
     }
 
@@ -93,6 +100,16 @@ public class MybatisIdentityLinkDataManager extends AbstractDataManager<Identity
     @Override
     public void deleteIdentityLinksByProcDef(String processDefId) {
         getDbSqlSession().delete("deleteIdentityLinkByProcDef", processDefId, IdentityLinkEntityImpl.class);
+    }
+    
+    @Override
+    public void deleteIdentityLinksByProcessInstanceId(String processInstanceId) {
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        if (isEntityInserted(dbSqlSession, "execution", processInstanceId)) {
+            deleteCachedEntities(dbSqlSession, identityLinkByProcessInstanceMatcher, processInstanceId);
+        } else {
+            bulkDelete("deleteIdentityLinkByProcessInstanceId", identityLinkByProcessInstanceMatcher, processInstanceId);
+        }
     }
 
 }

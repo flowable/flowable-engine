@@ -16,7 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.flowable.engine.common.impl.db.AbstractDataManager;
-import org.flowable.engine.common.impl.db.CachedEntityMatcher;
+import org.flowable.engine.common.impl.db.DbSqlSession;
+import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.job.api.Job;
 import org.flowable.job.service.impl.SuspendedJobQueryImpl;
 import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
@@ -54,8 +55,15 @@ public class MybatisSuspendedJobDataManager extends AbstractDataManager<Suspende
     }
 
     @Override
-    public List<SuspendedJobEntity> findJobsByExecutionId(final String executionId) {
-        return getList("selectSuspendedJobsByExecutionId", executionId, suspendedJobsByExecutionIdMatcher, true);
+    public List<SuspendedJobEntity> findJobsByExecutionId(String executionId) {
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        
+        // If the execution has been inserted in the same command execution as this query, there can't be any in the database 
+        if (isEntityInserted(dbSqlSession, "execution", executionId)) {
+            return getListFromCache(suspendedJobsByExecutionIdMatcher, executionId);
+        }
+        
+        return getList(dbSqlSession, "selectSuspendedJobsByExecutionId", executionId, suspendedJobsByExecutionIdMatcher, true);
     }
 
     @Override
@@ -70,6 +78,16 @@ public class MybatisSuspendedJobDataManager extends AbstractDataManager<Suspende
         params.put("deploymentId", deploymentId);
         params.put("tenantId", newTenantId);
         getDbSqlSession().update("updateSuspendedJobTenantIdForDeployment", params);
+    }
+    
+    @Override
+    public void deleteJobsByExecutionId(String executionId) {
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        if (isEntityInserted(dbSqlSession, "execution", executionId)) {
+            deleteCachedEntities(dbSqlSession, suspendedJobsByExecutionIdMatcher, executionId);
+        } else {
+            bulkDelete("deleteSuspendedJobsByExecutionId", suspendedJobsByExecutionIdMatcher, executionId);
+        }
     }
 
 }

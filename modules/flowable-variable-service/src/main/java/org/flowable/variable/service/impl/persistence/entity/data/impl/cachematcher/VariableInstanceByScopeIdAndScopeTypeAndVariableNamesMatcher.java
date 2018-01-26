@@ -15,7 +15,7 @@ package org.flowable.variable.service.impl.persistence.entity.data.impl.cachemat
 import java.util.Collection;
 import java.util.Map;
 
-import org.flowable.engine.common.impl.db.CachedEntityMatcherAdapter;
+import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcherAdapter;
 import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**

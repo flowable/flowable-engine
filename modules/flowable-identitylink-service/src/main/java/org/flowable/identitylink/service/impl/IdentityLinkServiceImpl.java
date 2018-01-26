@@ -126,4 +126,9 @@ public class IdentityLinkServiceImpl extends ServiceImpl implements IdentityLink
     public void deleteIdentityLinksByProcessDefinitionId(String processDefinitionId) {
         getIdentityLinkEntityManager().deleteIdentityLinksByProcDef(processDefinitionId);
     }
+    
+    @Override
+    public void deleteIdentityLinksByProcessInstanceId(String processInstanceId) {
+        getIdentityLinkEntityManager().deleteIdentityLinksByProcessInstanceId(processInstanceId);
+    }
 }

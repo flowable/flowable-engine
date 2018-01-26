@@ -67,6 +67,10 @@
     delete from ${prefix}ACT_RU_IDENTITYLINK where PROC_DEF_ID_ = #{id}
   </delete>
   
+  <delete id="deleteIdentityLinkByProcessInstanceId" parameterType="string">
+    delete from ${prefix}ACT_RU_IDENTITYLINK where PROC_INST_ID_ = #{id}
+  </delete>
+  
 
   <!-- IDENTITY LINK RESULTMAP -->
 

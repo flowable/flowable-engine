@@ -17,12 +17,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
-import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.IdentityLinkType;
-import org.flowable.identitylink.service.event.impl.FlowableIdentityLinkEventBuilder;
 import org.flowable.identitylink.service.impl.persistence.entity.data.IdentityLinkDataManager;
 
 /**
@@ -42,16 +39,6 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
     @Override
     protected DataManager<IdentityLinkEntity> getDataManager() {
         return identityLinkDataManager;
-    }
-
-    @Override
-    public void deleteIdentityLink(IdentityLinkEntity identityLink) {
-        delete(identityLink, false);
-        
-        FlowableEventDispatcher eventDispatcher = getEventDispatcher();
-        if (eventDispatcher != null && eventDispatcher.isEnabled()) {
-            getEventDispatcher().dispatchEvent(FlowableIdentityLinkEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, identityLink));
-        }
     }
 
     @Override
@@ -152,7 +139,7 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
         List<IdentityLinkEntity> identityLinks = findIdentityLinkByProcessInstanceUserGroupAndType(processInstanceId, userId, groupId, type);
 
         for (IdentityLinkEntity identityLink : identityLinks) {
-            deleteIdentityLink(identityLink);
+            delete(identityLink);
         }
 
         return identityLinks;
@@ -165,7 +152,7 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
         List<IdentityLinkEntity> removedIdentityLinkEntities = new ArrayList<>();
         List<String> identityLinkIds = new ArrayList<>();
         for (IdentityLinkEntity identityLink : identityLinks) {
-            deleteIdentityLink(identityLink);
+            delete(identityLink);
             identityLinkIds.add(identityLink.getId());
             removedIdentityLinkEntities.add(identityLink);
         }
@@ -179,7 +166,7 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
                     if ((userId != null && userId.equals(identityLinkEntity.getUserId()))
                             || (groupId != null && groupId.equals(identityLinkEntity.getGroupId()))) {
     
-                        deleteIdentityLink(identityLinkEntity);
+                        delete(identityLinkEntity);
                         removedIdentityLinkEntities.add(identityLinkEntity);
     
                     }
@@ -194,7 +181,7 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
     public List<IdentityLinkEntity> deleteProcessDefinitionIdentityLink(String processDefinitionId, String userId, String groupId) {
         List<IdentityLinkEntity> identityLinks = findIdentityLinkByProcessDefinitionUserAndGroup(processDefinitionId, userId, groupId);
         for (IdentityLinkEntity identityLink : identityLinks) {
-            deleteIdentityLink(identityLink);
+            delete(identityLink);
         }
         
         return identityLinks;
@@ -204,7 +191,7 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
     public List<IdentityLinkEntity> deleteIdentityLinksByTaskId(String taskId) {
         List<IdentityLinkEntity> identityLinks = findIdentityLinksByTaskId(taskId);
         for (IdentityLinkEntity identityLink : identityLinks) {
-            deleteIdentityLink(identityLink);
+            delete(identityLink);
         }
         
         return identityLinks;
@@ -213,6 +200,11 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
     @Override
     public void deleteIdentityLinksByProcDef(String processDefId) {
         identityLinkDataManager.deleteIdentityLinksByProcDef(processDefId);
+    }
+    
+    @Override
+    public void deleteIdentityLinksByProcessInstanceId(String processInstanceId) {
+        identityLinkDataManager.deleteIdentityLinksByProcessInstanceId(processInstanceId);
     }
 
     public IdentityLinkDataManager getIdentityLinkDataManager() {

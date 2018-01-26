@@ -40,5 +40,10 @@ public interface JobEntityManager extends EntityManager<JobEntity>, JobInfoEntit
      * Same as {@link #findJobsByQueryCriteria(JobQueryImpl)}, but only returns a count and not the instances itself.
      */
     long findJobCountByQueryCriteria(JobQueryImpl jobQuery);
+    
+    /**
+     * Deletes all jobs related to the given execution id.
+     */
+    void deleteJobsByExecutionId(String executionId);
 
 }

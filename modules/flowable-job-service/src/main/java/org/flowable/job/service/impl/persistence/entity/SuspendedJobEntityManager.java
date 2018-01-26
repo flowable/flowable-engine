@@ -48,5 +48,10 @@ public interface SuspendedJobEntityManager extends EntityManager<SuspendedJobEnt
      * Changes the tenantId for all jobs related to a given {@link DeploymentEntity}.
      */
     void updateJobTenantIdForDeployment(String deploymentId, String newTenantId);
+    
+    /**
+     * Deletes all jobs related to the given execution id.
+     */
+    void deleteJobsByExecutionId(String executionId);
 
 }

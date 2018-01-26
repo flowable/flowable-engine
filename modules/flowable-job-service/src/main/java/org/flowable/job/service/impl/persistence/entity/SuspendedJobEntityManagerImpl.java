@@ -90,6 +90,11 @@ public class SuspendedJobEntityManagerImpl extends AbstractEntityManager<Suspend
             getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, this));
         }
     }
+    
+    @Override
+    public void deleteJobsByExecutionId(String executionId) {
+        jobDataManager.deleteJobsByExecutionId(executionId);
+    }
 
     protected SuspendedJobEntity createSuspendedJob(AbstractRuntimeJobEntity job) {
         SuspendedJobEntity newSuspendedJobEntity = create();

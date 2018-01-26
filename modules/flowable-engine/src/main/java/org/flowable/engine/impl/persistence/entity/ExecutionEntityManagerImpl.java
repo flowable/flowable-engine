@@ -32,6 +32,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEventDispatcher;
 import org.flowable.engine.common.impl.identity.Authentication;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.engine.common.impl.persistence.cache.CachedEntityMatcher;
 import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
 import org.flowable.engine.delegate.event.impl.FlowableEventBuilder;
 import org.flowable.engine.history.DeleteReason;
@@ -52,7 +53,14 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.identitylink.service.IdentityLinkService;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntity;
+import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.IdentityLinksByProcessInstanceMatcher;
 import org.flowable.job.service.JobService;
+import org.flowable.job.service.TimerJobService;
+import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
+import org.flowable.job.service.impl.persistence.entity.DeadLetterJobEntity;
+import org.flowable.job.service.impl.persistence.entity.JobEntity;
+import org.flowable.job.service.impl.persistence.entity.SuspendedJobEntity;
+import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
@@ -714,42 +722,61 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
         }
         return null;
     }
-
+    
+    protected CachedEntityMatcher<IdentityLinkEntity> identityLinkByProcessInstanceMatcher = new IdentityLinksByProcessInstanceMatcher();
+    
     @Override
     public void deleteRelatedDataForExecution(ExecutionEntity executionEntity, String deleteReason) {
 
         // To start, deactivate the current incoming execution
         executionEntity.setEnded(true);
         executionEntity.setActive(false);
-
+        
+        CommandContext commandContext = CommandContextUtil.getCommandContext();
         boolean enableExecutionRelationshipCounts = CountingEntityUtil.isExecutionRelatedEntityCountEnabled(executionEntity);
+        
+        // If event dispatching is disabled, related entities can be deleted in bulk. Otherwise, they need to be fetched
+        // and events need to be sent for each of them separately (the bulk delete still happens).
+        boolean eventDispatcherEnabled = CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher() != null
+                && CommandContextUtil.getProcessEngineConfiguration(commandContext).getEventDispatcher().isEnabled();
+        
+        deleteIdentityLinks(executionEntity, commandContext, eventDispatcherEnabled);
+        deleteVariables(executionEntity, commandContext, enableExecutionRelationshipCounts, eventDispatcherEnabled);
+        deleteUserTasks(executionEntity, deleteReason, commandContext, enableExecutionRelationshipCounts, eventDispatcherEnabled);
+        deleteJobs(executionEntity, commandContext, enableExecutionRelationshipCounts, eventDispatcherEnabled);
+        deleteEventSubScriptions(executionEntity, enableExecutionRelationshipCounts, eventDispatcherEnabled);
 
-        if (executionEntity.getId().equals(executionEntity.getProcessInstanceId())
-                && (!enableExecutionRelationshipCounts
-                        || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getIdentityLinkCount() > 0))) {
+    }
+
+    protected void deleteIdentityLinks(ExecutionEntity executionEntity, CommandContext commandContext, boolean eventDispatchedEnabled) {
+        if (executionEntity.isProcessInstanceType()) {
             
-            IdentityLinkService identityLinkService = CommandContextUtil.getIdentityLinkService();
-            Collection<IdentityLinkEntity> identityLinks = identityLinkService.findIdentityLinksByProcessInstanceId(executionEntity.getProcessInstanceId());
-
-            for (IdentityLinkEntity identityLink : identityLinks) {
-                identityLinkService.deleteIdentityLink(identityLink);
+            IdentityLinkService identityLinkService = CommandContextUtil.getIdentityLinkService(commandContext);
+            if (eventDispatchedEnabled) {
+                Collection<IdentityLinkEntity> identityLinks = identityLinkService.findIdentityLinksByProcessInstanceId(executionEntity.getId());
+                for (IdentityLinkEntity identityLink : identityLinks) {
+                    fireEntityDeletedEvent(identityLink);
+                }
             }
+            
+            identityLinkService.deleteIdentityLinksByProcessInstanceId(executionEntity.getId());
         }
+    }
 
-        // Get variables related to execution and delete them
+    protected void deleteVariables(ExecutionEntity executionEntity, CommandContext commandContext, boolean enableExecutionRelationshipCounts, boolean eventDispatchedEnabled) {
         if (!enableExecutionRelationshipCounts ||
                 (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getVariableCount() > 0)) {
             
             Collection<VariableInstance> executionVariables = executionEntity.getVariableInstancesLocal().values();
             for (VariableInstance variableInstance : executionVariables) {
 
-                if (variableInstance instanceof VariableInstanceEntity == false) {
+                if (!(variableInstance instanceof VariableInstanceEntity)) {
                     continue;
                 }
 
                 VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
 
-                CommandContextUtil.getVariableService().deleteVariableInstance(variableInstanceEntity);
+                CommandContextUtil.getVariableService(commandContext).deleteVariableInstance(variableInstanceEntity);
                 CountingEntityUtil.handleDeleteVariableInstanceEntityCount(variableInstanceEntity, true);
 
                 if (variableInstanceEntity.getByteArrayRef() != null && variableInstanceEntity.getByteArrayRef().getId() != null) {
@@ -757,40 +784,78 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
                 }
             }
         }
+    }
 
-        // Delete current user tasks
+    protected void deleteUserTasks(ExecutionEntity executionEntity, String deleteReason, CommandContext commandContext, boolean enableExecutionRelationshipCounts, boolean eventDispatchedEnabled) {
         if (!enableExecutionRelationshipCounts ||
                 (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getTaskCount() > 0)) {
-            TaskService taskService = CommandContextUtil.getTaskService();
+            TaskService taskService = CommandContextUtil.getTaskService(commandContext);
             Collection<TaskEntity> tasksForExecution = taskService.findTasksByExecutionId(executionEntity.getId());
             for (TaskEntity taskEntity : tasksForExecution) {
                 TaskHelper.deleteTask(taskEntity, deleteReason, false, true);
             }
         }
-
-        // Delete jobs
+    }
+    
+    protected void deleteJobs(ExecutionEntity executionEntity, CommandContext commandContext, boolean enableExecutionRelationshipCounts, boolean eventDispatchedEnabled) {
         if (!enableExecutionRelationshipCounts
                 || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getTimerJobCount() > 0)) {
-            CommandContextUtil.getTimerJobService().deleteTimerJobsByExecutionId(executionEntity.getId());
+            
+            TimerJobService timerJobService = CommandContextUtil.getTimerJobService(commandContext);
+            if (eventDispatchedEnabled) {
+                List<TimerJobEntity> timerJobEntities = timerJobService.findTimerJobsByExecutionId(executionEntity.getId());
+                for (TimerJobEntity timerJobEntity : timerJobEntities) {
+                    fireEntityDeletedEvent(timerJobEntity);
+                    getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, timerJobEntity));
+                }
+            }
+            
+            timerJobService.deleteTimerJobsByExecutionId(executionEntity.getId());
         }
 
-        JobService jobService = CommandContextUtil.getJobService();
+        JobService jobService = CommandContextUtil.getJobService(commandContext);
         if (!enableExecutionRelationshipCounts
                 || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getJobCount() > 0)) {
+            
+            if (eventDispatchedEnabled) {
+                List<JobEntity> jobEntities = jobService.findJobsByExecutionId(executionEntity.getId());
+                for (JobEntity jobEntity : jobEntities) {
+                    fireEntityDeletedEvent(jobEntity);
+                    getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobEntity));
+                }
+            }
+            
             jobService.deleteJobsByExecutionId(executionEntity.getId());
         }
 
         if (!enableExecutionRelationshipCounts
                 || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getSuspendedJobCount() > 0)) {
+            
+            if (eventDispatchedEnabled) {
+                List<SuspendedJobEntity> jobEntities = jobService.findSuspendedJobsByExecutionId(executionEntity.getId());
+                for (SuspendedJobEntity jobEntity : jobEntities) {
+                    fireEntityDeletedEvent(jobEntity);
+                    getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobEntity));
+                }
+            }
+            
             jobService.deleteSuspendedJobsByExecutionId(executionEntity.getId());
         }
 
         if (!enableExecutionRelationshipCounts
                 || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getDeadLetterJobCount() > 0)) {
+            
+            List<DeadLetterJobEntity> jobEntities = jobService.findDeadLetterJobsByExecutionId(executionEntity.getId());
+            for (DeadLetterJobEntity jobEntity : jobEntities) {
+                fireEntityDeletedEvent(jobEntity);
+                getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, jobEntity));
+            }
+            
             jobService.deleteDeadLetterJobsByExecutionId(executionEntity.getId());
         }
+    }
 
-        // Delete event subscriptions
+    protected void deleteEventSubScriptions(ExecutionEntity executionEntity, boolean enableExecutionRelationshipCounts, boolean eventDispatchedEnabled) {
         if (!enableExecutionRelationshipCounts
                 || (enableExecutionRelationshipCounts && ((CountingExecutionEntity) executionEntity).getEventSubscriptionCount() > 0)) {
             EventSubscriptionEntityManager eventSubscriptionEntityManager = getEventSubscriptionEntityManager();
@@ -807,7 +872,6 @@ public class ExecutionEntityManagerImpl extends AbstractEntityManager<ExecutionE
                 }
             }
         }
-
     }
 
     // OTHER METHODS

@@ -97,7 +97,7 @@ public class ActivatePlanItemInstanceOperation extends AbstractPlanItemInstanceO
         job.setTenantId(planItemInstanceEntity.getTenantId());
         job.setJobHandlerType(AsyncActivatePlanItemInstanceJobHandler.TYPE);
         
-        jobService.setAsyncJobProperties(job, task.isExclusive());
+        jobService.createAsyncJob(job, task.isExclusive());
         jobService.scheduleAsyncJob(job);
     }
     

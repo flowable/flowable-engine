@@ -12,17 +12,13 @@
  */
 package org.flowable.job.service.impl;
 
-import java.util.Collection;
 import java.util.List;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.job.service.JobServiceConfiguration;
 import org.flowable.job.service.TimerJobService;
-import org.flowable.job.service.event.impl.FlowableJobEventBuilder;
 import org.flowable.job.service.impl.persistence.entity.AbstractRuntimeJobEntity;
 import org.flowable.job.service.impl.persistence.entity.JobEntity;
 import org.flowable.job.service.impl.persistence.entity.TimerJobEntity;
-import org.flowable.job.service.impl.persistence.entity.TimerJobEntityManager;
 
 /**
  * @author Tijs Rademakers
@@ -94,13 +90,6 @@ public class TimerJobServiceImpl extends ServiceImpl implements TimerJobService 
 
     @Override
     public void deleteTimerJobsByExecutionId(String executionId) {
-        TimerJobEntityManager timerJobEntityManager = getTimerJobEntityManager();
-        Collection<TimerJobEntity> timerJobsForExecution = timerJobEntityManager.findJobsByExecutionId(executionId);
-        for (TimerJobEntity job : timerJobsForExecution) {
-            timerJobEntityManager.delete(job);
-            if (getEventDispatcher().isEnabled()) {
-                getEventDispatcher().dispatchEvent(FlowableJobEventBuilder.createEntityEvent(FlowableEngineEventType.JOB_CANCELED, job));
-            }
-        }
+        getTimerJobEntityManager().deleteJobsByExecutionId(executionId);
     }
 }

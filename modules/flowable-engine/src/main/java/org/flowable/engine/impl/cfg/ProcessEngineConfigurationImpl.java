@@ -66,6 +66,7 @@ import org.flowable.engine.common.impl.calendar.DurationBusinessCalendar;
 import org.flowable.engine.common.impl.calendar.MapBusinessCalendarManager;
 import org.flowable.engine.common.impl.callback.RuntimeInstanceStateChangeCallback;
 import org.flowable.engine.common.impl.cfg.IdGenerator;
+import org.flowable.engine.common.impl.db.AbstractDataManager;
 import org.flowable.engine.common.impl.db.DbSchemaManager;
 import org.flowable.engine.common.impl.el.ExpressionManager;
 import org.flowable.engine.common.impl.event.FlowableEventDispatcherImpl;
@@ -991,6 +992,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     // Data managers ///////////////////////////////////////////////////////////
 
+    @SuppressWarnings("rawtypes")
     public void initDataManagers() {
         if (attachmentDataManager == null) {
             attachmentDataManager = new MybatisAttachmentDataManager(this);
@@ -1012,6 +1014,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         }
         if (executionDataManager == null) {
             executionDataManager = new MybatisExecutionDataManager(this);
+        }
+        if (dbSqlSessionFactory != null && executionDataManager instanceof AbstractDataManager) {
+            dbSqlSessionFactory.addLogicalEntityClassMapping("execution", ((AbstractDataManager) executionDataManager).getManagedEntityClass());
         }
         if (historicActivityInstanceDataManager == null) {
             historicActivityInstanceDataManager = new MybatisHistoricActivityInstanceDataManager(this);
