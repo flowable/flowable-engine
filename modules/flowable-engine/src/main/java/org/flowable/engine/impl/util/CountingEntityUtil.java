@@ -46,7 +46,7 @@ public class CountingEntityUtil {
         if (fireDeleteEvent && eventDispatcher.isEnabled()) {
             eventDispatcher.dispatchEvent(FlowableEventBuilder.createEntityEvent(FlowableEngineEventType.ENTITY_DELETED, variableInstance));
     
-            eventDispatcher.dispatchEvent(createVariableDeleteEvent(variableInstance));
+            eventDispatcher.dispatchEvent(EventUtil.createVariableDeleteEvent(variableInstance));
         }
     }
     
@@ -118,24 +118,4 @@ public class CountingEntityUtil {
         return isTaskRelatedEntityCountEnabledGlobally() && taskEntity.isCountEnabled();
     }
     
-    public static FlowableVariableEvent createVariableDeleteEvent(VariableInstanceEntity variableInstance) {
-
-        String processDefinitionId = null;
-        if (variableInstance.getProcessInstanceId() != null) {
-            ExecutionEntity executionEntity = CommandContextUtil.getExecutionEntityManager().findById(variableInstance.getProcessInstanceId());
-            if (executionEntity != null) {
-                processDefinitionId = executionEntity.getProcessDefinitionId();
-            }
-        }
-
-        return FlowableEventBuilder.createVariableEvent(FlowableEngineEventType.VARIABLE_DELETED,
-                variableInstance.getName(),
-                null,
-                variableInstance.getType(),
-                variableInstance.getTaskId(),
-                variableInstance.getExecutionId(),
-                variableInstance.getProcessInstanceId(),
-                processDefinitionId);
-    }
-
 }

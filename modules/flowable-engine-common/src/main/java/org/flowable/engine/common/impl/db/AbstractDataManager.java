@@ -271,9 +271,12 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
         if (cachedObjects != null && cachedEntityMatcher != null) {
             for (CachedEntity cachedObject : cachedObjects) {
                 EntityImpl cachedEntity = (EntityImpl) cachedObject.getEntity();
-                if (cachedEntity.isInserted() && cachedEntityMatcher.isRetained(null, cachedObjects, cachedEntity, parameter)) {
-                    cachedEntity.setDeleted(true);
+                boolean entityMatches = cachedEntityMatcher.isRetained(null, cachedObjects, cachedEntity, parameter);
+                if (cachedEntity.isInserted() && entityMatches) {
                     dbSqlSession.delete(cachedEntity);
+                }
+                if (entityMatches) {
+                    cachedEntity.setDeleted(true);
                 }
             }
         }

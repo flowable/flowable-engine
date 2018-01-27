@@ -47,6 +47,8 @@ public interface EventSubscriptionEntityManager extends EntityManager<EventSubsc
     /* Delete */
 
     void deleteEventSubscriptionsForProcessDefinition(String processDefinitionId);
+    
+    void deleteEventSubscriptionsByExecutionId(String executionId);
 
     /* Event receival */
 

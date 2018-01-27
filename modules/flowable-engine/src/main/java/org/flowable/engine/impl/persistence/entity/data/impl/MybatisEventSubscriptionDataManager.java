@@ -57,7 +57,7 @@ public class MybatisEventSubscriptionDataManager extends AbstractProcessDataMana
 
     protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByNameMatcher = new EventSubscriptionsByNameMatcher();
 
-    protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscritionsByExecutionIdMatcher = new EventSubscriptionsByExecutionIdMatcher();
+    protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByExecutionIdMatcher = new EventSubscriptionsByExecutionIdMatcher();
 
     protected CachedEntityMatcher<EventSubscriptionEntity> eventSubscriptionsByProcInstTypeAndActivityMatcher = new EventSubscriptionsByProcInstTypeAndActivityMatcher();
 
@@ -182,9 +182,10 @@ public class MybatisEventSubscriptionDataManager extends AbstractProcessDataMana
         
         // If the execution has been inserted in the same command execution as this query, there can't be any in the database 
         if (isEntityInserted(dbSqlSession, "execution", executionId)) {
-            return getListFromCache(eventSubscritionsByExecutionIdMatcher, executionId);
+            return getListFromCache(eventSubscriptionsByExecutionIdMatcher, executionId);
         }
-        return getList(dbSqlSession, "selectEventSubscriptionsByExecution", executionId, eventSubscritionsByExecutionIdMatcher, true);
+        
+        return getList(dbSqlSession, "selectEventSubscriptionsByExecution", executionId, eventSubscriptionsByExecutionIdMatcher, true);
     }
 
     @Override
@@ -248,6 +249,16 @@ public class MybatisEventSubscriptionDataManager extends AbstractProcessDataMana
     @Override
     public void deleteEventSubscriptionsForProcessDefinition(String processDefinitionId) {
         getDbSqlSession().delete("deleteEventSubscriptionsForProcessDefinition", processDefinitionId, EventSubscriptionEntityImpl.class);
+    }
+    
+    @Override
+    public void deleteEventSubscriptionsByExecutionId(String executionId) {
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        if (isEntityInserted(dbSqlSession, "execution", executionId)) {
+            deleteCachedEntities(dbSqlSession, eventSubscriptionsByExecutionIdMatcher, executionId);
+        } else {
+            bulkDelete("deleteEventSubscriptionsByExecutionId", eventSubscriptionsByExecutionIdMatcher, executionId);
+        }
     }
 
     protected List<SignalEventSubscriptionEntity> toSignalEventSubscriptionEntityList(List<EventSubscriptionEntity> result) {

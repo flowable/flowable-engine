@@ -276,9 +276,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             
             assertDatabaseDeletes("org.flowable.job.service.impl.cmd.ExecuteJobCmd",
                             "JobEntityImpl", 1L,
-                            "ExecutionEntityImpl", 2L,
-                            "Bulk-delete-deleteIdentityLinkByProcessInstanceId", 1L,
-                            "Bulk-delete-deleteVariableInstancesByExecutionId", 1L);
+                            "ExecutionEntityImpl", 2L);
             
             Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().count());
             Assert.assertEquals(1, historyService.createHistoricProcessInstanceQuery().finished().count());
@@ -337,9 +335,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
     
             assertDatabaseDeletes("CompleteTaskCmd", 
                     "TaskEntityImpl", 1L, 
-                    "ExecutionEntityImpl", 2L,
-                    "Bulk-delete-deleteIdentityLinkByProcessInstanceId", 1L,
-                    "Bulk-delete-deleteVariableInstancesByExecutionId", 1L);
+                    "ExecutionEntityImpl", 2L);
         }
     }
     
@@ -368,9 +364,7 @@ public class VerifyDatabaseOperationsTest extends PluggableFlowableTestCase {
             assertDatabaseDeletes("CompleteTaskCmd", 
                             "TaskEntityImpl", 1L, 
                             "TimerJobEntityImpl", 1L,
-                            "ExecutionEntityImpl", 3L,
-                            "Bulk-delete-deleteIdentityLinkByProcessInstanceId", 1L,
-                            "Bulk-delete-deleteVariableInstancesByExecutionId", 1L); 
+                            "ExecutionEntityImpl", 3L); 
         }
     }
 
