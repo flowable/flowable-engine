@@ -156,6 +156,17 @@
                     {{'TASK.TITLE.NO-COMMENTS' | translate}}
                 </div>
             </div>
+            <div class="clearfix" ng-click="showSubTasks()">
+                <div class="title title-lg" ng-show="model.subTaskSummary.count == 1">
+                   1 {{'TASK.TITLE.SUBTASK-COUNT' | translate}}
+                </div>
+                <div class="title title-lg" ng-show="model.subTaskSummary.count > 1">
+                    <span>{{model.subTaskSummary.count}}</span> {{'TASK.TITLE.SUBTASKS-COUNT' | translate}}
+                </div>
+                <div class="title title-lg" ng-show="model.subTaskSummary.count == 0">
+                    {{'TASK.TITLE.NO-SUBTASKS' | translate}}
+                </div>
+            </div>
             <div ng-show="model.task.formKey" ng-click="toggleForm()">
                 <button class="btn btn-xs">
                     <span ng-show="activeTab == 'form'">
@@ -269,6 +280,44 @@
                         </li>
                     </ul>
                 </div>
+            </div>
+            <div class="section pack" ng-if="!$scope.model.subTaskSummary.loading">
+                <h3 class="toggle-content-select">{{'TASK.TITLE.SUBTASK' | translate}}
+                </h3>
+
+                <div class="form-group">
+                    <ul id="related-subtask-list" class="full-list">
+                        <li ng-repeat="task in model.subTasks" title="{{task.name}}" ng-click="openTaskInstance(task.id)">
+                            <div>
+                                <div class="pull-right">
+                        <span class="badge" ng-if="task.dueDate">
+                            {{'TASK.MESSAGE.DUE-ON' | translate}} {{(task.dueDate | dateformat:'fromNow')}}
+                        </span>
+                                    <span class="badge" ng-if="!task.dueDate">
+                            {{'TASK.MESSAGE.CREATED-ON' | translate}} {{(task.created | dateformat:'fromNow')}}
+                        </span>
+                                </div>
+                                <div class="title">
+                                    {{task.name && task.name || ('TASK.MESSAGE.NO-NAME' | translate)}}
+                                </div>
+                                <div class="summary">
+                                    {{task.description && task.description || ('TASK.MESSAGE.NO-DESCRIPTION' |
+                                    translate)}}
+                                </div>
+                                <div class="detail">
+                        <span ng-if="task.assignee.id">
+                            {{'TASK.MESSAGE.ASSIGNEE' | translate}} {{task.assignee.firstName && task.assignee.firstName != 'null' ? task.assignee.firstName : ''}} {{task.assignee.lastName && task.assignee.lastName != 'null' ? task.assignee.lastName : ''}}
+                        </span>
+                                    <span ng-if="!task.assignee.id" translate="TASK.MESSAGE.NO-ASSIGNEE">
+                        </span>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+
+
+            </div>
             </div>
          </div>
 
