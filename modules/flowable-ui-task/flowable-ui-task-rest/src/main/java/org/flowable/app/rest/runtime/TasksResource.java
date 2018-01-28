@@ -51,7 +51,6 @@ public class TasksResource {
         }
         task.setAssignee(taskRepresentation.getAssignee() != null ? taskRepresentation.getAssignee() : SecurityUtils.getCurrentUserId());
         taskService.saveTask(task);
-        taskService.setVariablesLocal(task.getId(), taskRepresentation.getVariables());
         return new TaskRepresentation(taskService.createTaskQuery().taskId(task.getId()).singleResult());
     }
 

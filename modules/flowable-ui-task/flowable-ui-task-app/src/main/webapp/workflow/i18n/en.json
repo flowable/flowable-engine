@@ -152,8 +152,8 @@
         "FIELD": {
             "NAME": "Name",
             "DESCRIPTION": "Description",
-            "SUBTASK": "Is subTask",
             "ASSIGNEE": "Assignee",
+
             "DUE": "Due",
             "PROCESS-INSTANCE": "Part of process",
             "CASE-INSTANCE": "Part of case",
@@ -310,7 +310,6 @@
             "CREATE": "+ Start a case",
             "BACK-TO-LIST": "Back to case instances",
             "SHOW-DIAGRAM": "Show diagram",
-            "CREATE-CASE-TASK": "Create Task",
             "CANCEL": "Cancel case",
             "DELETE": "Delete case",
             "AUDIT-LOG": "Audit Log"
