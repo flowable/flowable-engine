@@ -49,7 +49,12 @@
     </div>
     <div class="header" ng-show="model.task && !noSuchTask">
         <div class=" pull-right">
-        
+            <button ng-if="!model.task.formKey && !model.task.endDate && (model.task.assignee.id == account.id || (model.task.initiatorCanCompleteTask && model.task.processInstanceStartUserId == ('' + account.id)))"
+                    id="toggle-create-subtask"
+                    class="btn dropdown-toggle toggle-create-task"
+                    translate="TASK.ACTION.CREATE-SUB-TASK" ng-click="createSubTask()">&nbsp;
+            </button>
+
             <button class="btn" ng-if="!model.task.formKey && !model.task.endDate && (model.task.assignee.id == account.id || (model.task.initiatorCanCompleteTask && model.task.processInstanceStartUserId == ('' + account.id)))"
                     translate="TASK.ACTION.COMPLETE"
                     ng-disabled="model.completeButtonDisabled || model.uploadInProgress"
@@ -98,6 +103,10 @@
             <span ng-if="model.task.scopeId && model.caseInstance" class="label">{{'TASK.FIELD.CASE-INSTANCE' | translate}}: </span>
             <span ng-if="model.caseInstance">
                 <a ng-click="openCaseInstance(model.caseInstance.id)">{{model.caseInstance.name && model.caseInstance.name || model.caseInstance.caseDefinitionName}}</a>
+            </span>
+            <span ng-if="model.task.parentTaskId" class="label">{{'TASK.FIELD.PARENT-TASK' | translate}}: </span>
+            <span ng-if="model.task.parentTaskId">
+                <a ng-click="openTaskInstance(model.task.parentTaskId)">{{model.task.parentTaskName}}</a>
             </span>
 
             <span class="label" ng-if="model.task.endDate != null && model.task.endDate != undefined">{{'TASK.FIELD.ENDED' | translate}}: </span>

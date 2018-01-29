@@ -13,7 +13,8 @@
 'use strict';
 
 // Task service
-angular.module('flowableApp').service('CaseService', ['$http', '$q', '$rootScope', function ($http, $q, $rootScope) {
+angular.module('flowableApp').service('CaseService', ['$http', '$q', '$rootScope', 'RelatedContentService',
+    function ($http, $q, $rootScope, RelatedContentService) {
 
         var httpAsPromise = function(options) {
             var deferred = $q.defer();
@@ -40,7 +41,28 @@ angular.module('flowableApp').service('CaseService', ['$http', '$q', '$rootScope
             );
         };
 
-        this.createCase = function(caseData) {
+    this.getRelatedContent = function (caseId) {
+        var deferred = $q.defer();
+        $http({
+            method: 'GET',
+            url: FLOWABLE.CONFIG.contextRoot + '/app/rest/case-instances/' + caseId + '/content'
+        }).success(function (response, status, headers, config) {
+            // Add raw URL property to all content
+            if (response && response.data) {
+                for (var i = 0; i < response.data.length; i++) {
+                    RelatedContentService.addUrlToContent(response.data[i]);
+                }
+            }
+            deferred.resolve(response);
+        })
+            .error(function (response, status, headers, config) {
+                deferred.reject(response);
+            });
+        return deferred.promise;
+    };
+
+
+    this.createCase = function(caseData) {
             var deferred = $q.defer();
             $http({
                 method: 'POST',

@@ -240,7 +240,7 @@ angular.module('flowableApp')
                 } else {
                     $scope.model.processInstance = null;
                 }
-                
+
                 if ($scope.model.task.scopeId) {
                     $scope.loadCaseInstance();
                 } else {
@@ -475,7 +475,69 @@ angular.module('flowableApp')
         $event.stopPropagation();
     };
 
-    $scope.completeTask = function() {
+            $scope.setTaskAssignee = function (user) {
+                $scope.newTask.assignee = user;
+            };
+
+            $scope.createSubTask = function () {
+                // Create popover
+                if (!$scope.createTaskPopover) {
+                    $scope.newTask = {
+                        name: 'New task'
+                    };
+
+                    $scope.createTaskPopover = $popover(angular.element('#toggle-create-subtask'), {
+                        template: appResourceRoot + 'views/popover/create-task-popover.html',
+                        placement: 'bottom-right',
+                        show: true,
+                        scope: $scope
+                    });
+
+                    $scope.createTaskPopover.$scope.$on('tooltip.hide', function () {
+                        $scope.createTaskPopover.$scope.$destroy();
+                        $scope.createTaskPopover.destroy();
+                        $scope.createTaskPopover = undefined;
+
+                        $scope.newTask = undefined;
+                    });
+                }
+            };
+
+
+            $scope.confirmTaskCreation = function (newTask) {
+                if (!newTask) {
+                    newTask = $scope.newTask;
+                }
+                if (newTask && newTask.name) {
+                    var taskData = {
+                        name: newTask.name,
+                        description: newTask.description,
+                        assignee: newTask.assignee ? newTask.assignee.id : null
+                    };
+
+                    taskData.parentTaskId = '' + $scope.model.task.id
+
+                    if ($rootScope.activeAppDefinition) {
+                        taskData.category = '' + $rootScope.activeAppDefinition.id;
+                    }
+
+                    newTask.loading = true;
+                    TaskService.createTask(taskData).then(function (task) {
+                        newTask.loading = false;
+
+                        if ($scope.createTaskPopover) {
+                            $scope.createTaskPopover.$scope.$destroy();
+                            $scope.createTaskPopover.destroy();
+                            $scope.createTaskPopover = undefined;
+                        }
+
+                        $rootScope.addAlertPromise($translate('TASK.ALERT.CREATED', task));
+                    });
+                }
+            };
+
+
+            $scope.completeTask = function() {
         $scope.model.completeButtonDisabled = true;
         TaskService.completeTask($scope.model.task.id);
     };
@@ -507,7 +569,7 @@ angular.module('flowableApp')
         }
         $location.path(path + "/processes");
     };
-    
+
     $scope.loadCaseInstance = function() {
         $http({method: 'GET', url: FLOWABLE.CONFIG.contextRoot + '/app/rest/case-instances/' + $scope.model.task.scopeId}).
             success(function(response, status, headers, config) {
@@ -525,6 +587,11 @@ angular.module('flowableApp')
             path = "/apps/" + $rootScope.activeAppDefinition.id;
         }
         $location.path(path + "/cases");
+    };
+
+    $scope.openTaskInstance = function(taskId) {
+        $rootScope.root.selectedTaskId = taskId;
+        $scope.refreshFilter();
     };
 
     $scope.returnToTaskList = function() {

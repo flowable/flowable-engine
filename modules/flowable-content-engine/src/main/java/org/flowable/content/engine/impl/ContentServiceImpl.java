@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -56,14 +56,14 @@ public class ContentServiceImpl extends ServiceImpl implements ContentService {
 
     @Override
     public void deleteContentItemsByProcessInstanceId(String processInstanceId) {
-        commandExecutor.execute(new DeleteContentItemsCmd(processInstanceId, null));
+        commandExecutor.execute(new DeleteContentItemsCmd(processInstanceId, null, null));
     }
 
     @Override
     public void deleteContentItemsByTaskId(String taskId) {
-        commandExecutor.execute(new DeleteContentItemsCmd(null, taskId));
+        commandExecutor.execute(new DeleteContentItemsCmd(null, taskId, null));
     }
-    
+
     @Override
     public void deleteContentItemsByScopeIdAndScopeType(String scopeId, String scopeType) {
         commandExecutor.execute(new DeleteContentItemsByScopeCmd(scopeId, scopeType));

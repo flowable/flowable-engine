@@ -321,30 +321,34 @@ public abstract class BaseSpringContentRestTestCase extends AbstractContentTestC
         return ISO_DATE_FORMAT.format(time);
     }
 
-    protected String createContentItem(String name, String mimeType, String taskId, String processInstanceId,
+    protected String createContentItem(String name, String mimeType, String taskId, String processInstanceId, String caseId,
             String tenantId, String createdBy, String lastModifiedBy) {
 
-        ContentItem contentItem = fillAndCreateContentItem(name, mimeType, taskId, processInstanceId, tenantId, createdBy, lastModifiedBy);
+        ContentItem contentItem = fillAndCreateContentItem(name, mimeType, taskId, processInstanceId, caseId, tenantId, createdBy, lastModifiedBy);
         contentService.saveContentItem(contentItem);
         return contentItem.getId();
     }
 
-    protected String createContentItem(String name, String mimeType, String taskId, String processInstanceId,
+    protected String createContentItem(String name, String mimeType, String taskId, String processInstanceId, String caseId,
             String tenantId, String createdBy, String lastModifiedBy, InputStream fileStream) {
 
-        ContentItem contentItem = fillAndCreateContentItem(name, mimeType, taskId, processInstanceId, tenantId, createdBy, lastModifiedBy);
+        ContentItem contentItem = fillAndCreateContentItem(name, mimeType, taskId, processInstanceId, caseId, tenantId, createdBy, lastModifiedBy);
         contentService.saveContentItem(contentItem, fileStream);
         return contentItem.getId();
     }
 
     protected ContentItem fillAndCreateContentItem(String name, String mimeType, String taskId, String processInstanceId,
-            String tenantId, String createdBy, String lastModifiedBy) {
+            String caseId, String tenantId, String createdBy, String lastModifiedBy) {
 
         ContentItem contentItem = contentService.newContentItem();
         contentItem.setName(name);
         contentItem.setMimeType(mimeType);
         contentItem.setTaskId(taskId);
         contentItem.setProcessInstanceId(processInstanceId);
+        if (StringUtils.isNotEmpty(caseId)) {
+            contentItem.setScopeType("cmmn");
+            contentItem.setScopeId(caseId);
+        }
         contentItem.setTenantId(tenantId);
         contentItem.setCreatedBy(createdBy);
         contentItem.setLastModifiedBy(lastModifiedBy);

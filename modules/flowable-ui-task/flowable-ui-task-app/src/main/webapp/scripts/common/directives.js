@@ -593,6 +593,7 @@ flowableModule.directive('externalContent', ['$parse', '$timeout', 'appResourceR
     directive.scope = {
         taskId : '=taskId',
         processInstanceId: '=formDefinition',
+        caseInstanceId: '=caseId',
         folderSelect: '=folderSelect',
         linkOnly: '=linkOnly',
         preSelectedAlfrescoAccount: '=account',
@@ -645,7 +646,7 @@ flowableModule.directive('externalContent', ['$parse', '$timeout', 'appResourceR
                     var file = $files[0];
 
                     $scope.clearPopupError();
-                    RelatedContentService.addRelatedContent($scope.taskId, $scope.processInstanceId, file, isIE).progress(function (evt) {
+                    RelatedContentService.addRelatedContent($scope.taskId, $scope.processInstanceId, $scope.caseInstanceId, file, isIE).progress(function (evt) {
                         $scope.uploadModel.uploadProgress = parseInt(100.0 * evt.loaded / evt.total);
                     }).then(function (data) {
                         if ($scope.uploadInProgressCallback) {
@@ -750,7 +751,7 @@ flowableModule.
                 userField: {},
                 userFieldFilter: ['people']
             };
-            
+
             if ($scope.selectPeopleFormFields) {
                 popoverScope.popupModel.formFields = $scope.selectPeopleFormFields;
             }
@@ -758,29 +759,29 @@ flowableModule.
             popoverScope.setSearchType = function() {
                 popoverScope.popupModel.userSourceType = 'search';
             };
-            
+
             popoverScope.setFormFieldType = function() {
                 popoverScope.popupModel.userSourceType = 'field';
             };
-            
+
             popoverScope.$watch('popupModel.userField', function() {
                 if (popoverScope.popupModel.userField && popoverScope.popupModel.userField.id) {
                     if (selectedCallback) {
                         // Run callback in parent scope of directive
                         var simpleUserField = {
-                                id: popoverScope.popupModel.userField.id, 
+                                id: popoverScope.popupModel.userField.id,
                                 name: popoverScope.popupModel.userField.name,
                                 type: popoverScope.popupModel.userField.type
                         }
-       
+
                         selectedCallback($scope.$parent, {'userField': simpleUserField});
                         popoverScope.popupModel.userField = {};
                     }
-                    
+
                     if (closeOnSelect || closeOnSelect === 'true') {
                         popoverScope.$hide();
                     }
-                }           
+                }
             });
 
             popoverScope.$watch('popupModel.filter', function() {
@@ -1318,7 +1319,7 @@ directive('decimalNumberInputCheck', function() {
             modelCtrl.$parsers.push(function (inputValue) {
 
             	var transformedInput = inputValue;
-                var negativeSign = '';                
+                var negativeSign = '';
 
                 if (transformedInput && transformedInput.indexOf('-') == 0) {
                     negativeSign = '-';
@@ -1329,11 +1330,11 @@ directive('decimalNumberInputCheck', function() {
                     transformedInput = "0" + transformedInput;
                 }
 
-                if(transformedInput && transformedInput.indexOf('.') > -1){       
-                    var dotIndex = transformedInput.indexOf('.');             
+                if(transformedInput && transformedInput.indexOf('.') > -1){
+                    var dotIndex = transformedInput.indexOf('.');
                     var left = transformedInput.substr(0, dotIndex);
                     var right = transformedInput.substr(dotIndex+1);
-                    
+
                     left = left.replace(/([^0-9])/g, '');
                     right = right.replace(/([^0-9])/g, '');
                     transformedInput = negativeSign + left + '.' + right;
