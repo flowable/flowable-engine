@@ -188,13 +188,8 @@ public class IdentityLinkEntityManagerImpl extends AbstractEntityManager<Identit
     }
 
     @Override
-    public List<IdentityLinkEntity> deleteIdentityLinksByTaskId(String taskId) {
-        List<IdentityLinkEntity> identityLinks = findIdentityLinksByTaskId(taskId);
-        for (IdentityLinkEntity identityLink : identityLinks) {
-            delete(identityLink);
-        }
-        
-        return identityLinks;
+    public void deleteIdentityLinksByTaskId(String taskId) {
+        identityLinkDataManager.deleteIdentityLinksByTaskId(taskId);
     }
 
     @Override

@@ -58,7 +58,7 @@ public interface IdentityLinkService {
     
     List<IdentityLinkEntity> deleteProcessDefinitionIdentityLink(String processDefinitionId, String userId, String groupId);
     
-    List<IdentityLinkEntity> deleteIdentityLinksByTaskId(String taskId);
+    void deleteIdentityLinksByTaskId(String taskId);
     
     void deleteIdentityLinksByProcessDefinitionId(String processDefinitionId);
     

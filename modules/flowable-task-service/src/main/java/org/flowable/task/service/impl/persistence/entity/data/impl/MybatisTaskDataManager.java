@@ -162,5 +162,15 @@ public class MybatisTaskDataManager extends AbstractDataManager<TaskEntity> impl
     public void updateAllTaskRelatedEntityCountFlags(boolean newValue) {
         getDbSqlSession().update("updateTaskRelatedEntityCountEnabled", newValue);
     }
+    
+    @Override
+    public void deleteTasksByExecutionId(String executionId) {
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        if (isEntityInserted(dbSqlSession, "execution", executionId)) {
+            deleteCachedEntities(dbSqlSession, tasksByExecutionIdMatcher, executionId);
+        } else {
+            bulkDelete("deleteTasksByExecutionId", tasksByExecutionIdMatcher, executionId);
+        }
+    }
 
 }

@@ -54,7 +54,7 @@ public interface IdentityLinkEntityManager extends EntityManager<IdentityLinkEnt
 
     List<IdentityLinkEntity> deleteProcessDefinitionIdentityLink(String processDefinitionId, String userId, String groupId);
 
-    List<IdentityLinkEntity> deleteIdentityLinksByTaskId(String taskId);
+    void deleteIdentityLinksByTaskId(String taskId);
 
     void deleteIdentityLinksByProcDef(String processDefId);
     

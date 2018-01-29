@@ -250,6 +250,10 @@
     delete from ${prefix}ACT_RU_TASK where ID_ = #{id} and REV_ = #{revision}
   </delete>
   
+  <delete id="deleteTasksByExecutionId" parameterType="string">
+    delete from ${prefix}ACT_RU_TASK where EXECUTION_ID_ = #{id}
+  </delete>
+  
   <delete id="bulkDeleteTask" parameterType="java.util.Collection">
     delete from ${prefix}ACT_RU_TASK where 
     <foreach item="task" collection="list" index="index" separator=" or ">

@@ -139,6 +139,11 @@ public class TaskEntityManagerImpl extends AbstractEntityManager<TaskEntity> imp
     public void updateAllTaskRelatedEntityCountFlags(boolean configProperty) {
         taskDataManager.updateAllTaskRelatedEntityCountFlags(configProperty);
     }
+    
+    @Override
+    public void deleteTasksByExecutionId(String executionId) {
+        taskDataManager.deleteTasksByExecutionId(executionId);
+    }
 
     public TaskDataManager getTaskDataManager() {
         return taskDataManager;

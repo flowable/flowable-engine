@@ -23,6 +23,7 @@ import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEnt
 import org.flowable.identitylink.service.impl.persistence.entity.IdentityLinkEntityImpl;
 import org.flowable.identitylink.service.impl.persistence.entity.data.IdentityLinkDataManager;
 import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.IdentityLinksByProcessInstanceMatcher;
+import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cachematcher.IdentityLinksByTaskIdMatcher;
 
 /**
  * @author Joram Barrez
@@ -30,6 +31,8 @@ import org.flowable.identitylink.service.impl.persistence.entity.data.impl.cache
 public class MybatisIdentityLinkDataManager extends AbstractDataManager<IdentityLinkEntity> implements IdentityLinkDataManager {
 
     protected CachedEntityMatcher<IdentityLinkEntity> identityLinkByProcessInstanceMatcher = new IdentityLinksByProcessInstanceMatcher();
+    
+    protected CachedEntityMatcher<IdentityLinkEntity> identityLinksByTaskIdMatcher = new IdentityLinksByTaskIdMatcher();
 
     @Override
     public Class<? extends IdentityLinkEntity> getManagedEntityClass() {
@@ -42,9 +45,14 @@ public class MybatisIdentityLinkDataManager extends AbstractDataManager<Identity
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<IdentityLinkEntity> findIdentityLinksByTaskId(String taskId) {
-        return getDbSqlSession().selectList("selectIdentityLinksByTask", taskId);
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        
+        if (isEntityInserted(dbSqlSession, "task", taskId)) {
+            return getListFromCache(identityLinksByTaskIdMatcher, taskId);
+        }
+        
+        return getList("selectIdentityLinksByTaskId", taskId, identityLinkByProcessInstanceMatcher, true);
     }
 
     @Override
@@ -96,10 +104,20 @@ public class MybatisIdentityLinkDataManager extends AbstractDataManager<Identity
         parameters.put("groupId", groupId);
         return getDbSqlSession().selectList("selectIdentityLinkByProcessDefinitionUserAndGroup", parameters);
     }
+    
+    @Override
+    public void deleteIdentityLinksByTaskId(String taskId) {
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        if (isEntityInserted(dbSqlSession, "task", taskId)) {
+            deleteCachedEntities(dbSqlSession, identityLinksByTaskIdMatcher, taskId);
+        } else {
+            bulkDelete("deleteIdentityLinksByTaskId", identityLinksByTaskIdMatcher, taskId);
+        }
+    }
 
     @Override
     public void deleteIdentityLinksByProcDef(String processDefId) {
-        getDbSqlSession().delete("deleteIdentityLinkByProcDef", processDefId, IdentityLinkEntityImpl.class);
+        getDbSqlSession().delete("deleteIdentityLinksByProcDef", processDefId, IdentityLinkEntityImpl.class);
     }
     
     @Override
@@ -108,7 +126,7 @@ public class MybatisIdentityLinkDataManager extends AbstractDataManager<Identity
         if (isEntityInserted(dbSqlSession, "execution", processInstanceId)) {
             deleteCachedEntities(dbSqlSession, identityLinkByProcessInstanceMatcher, processInstanceId);
         } else {
-            bulkDelete("deleteIdentityLinkByProcessInstanceId", identityLinkByProcessInstanceMatcher, processInstanceId);
+            bulkDelete("deleteIdentityLinksByProcessInstanceId", identityLinkByProcessInstanceMatcher, processInstanceId);
         }
     }
 

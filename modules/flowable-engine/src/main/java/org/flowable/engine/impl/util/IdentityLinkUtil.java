@@ -40,7 +40,7 @@ public class IdentityLinkUtil {
         List<IdentityLinkEntity> removedIdentityLinkEntities = CommandContextUtil.getIdentityLinkService().deleteTaskIdentityLink(
                         taskEntity.getId(), taskEntity.getIdentityLinks(), userId, groupId, type);
         
-        handleTaskIdentityLinkDeletions(taskEntity, removedIdentityLinkEntities, true);
+        handleTaskIdentityLinkDeletions(taskEntity, removedIdentityLinkEntities, true, true);
     }
 
     public static void deleteProcessInstanceIdentityLinks(ExecutionEntity processInstanceEntity, String userId, String groupId, String type) {
@@ -81,18 +81,20 @@ public class IdentityLinkUtil {
         }
     }
     
-    public static void handleTaskIdentityLinkDeletions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinks, boolean cascaseHistory) {
+    public static void handleTaskIdentityLinkDeletions(TaskEntity taskEntity, List<IdentityLinkEntity> identityLinks, boolean cascadeHistory, boolean updateTaskCounts) {
         for (IdentityLinkEntity identityLinkEntity : identityLinks) {
-            if (cascaseHistory) {
+            if (cascadeHistory) {
                 CommandContextUtil.getHistoryManager().recordIdentityLinkDeleted(identityLinkEntity.getId());
             }
-            handleTaskIdentityLinkDeletion(taskEntity, identityLinkEntity);
+            if (updateTaskCounts) {
+                handleTaskCountsForIdentityLinkDeletion(taskEntity, identityLinkEntity);
+            }
         }
         
         taskEntity.getIdentityLinks().removeAll(identityLinks);
     }
 
-    protected static void handleTaskIdentityLinkDeletion(TaskEntity taskEntity, IdentityLinkEntity identityLink) {
+    protected static void handleTaskCountsForIdentityLinkDeletion(TaskEntity taskEntity, IdentityLinkEntity identityLink) {
         if (CountingEntityUtil.isTaskRelatedEntityCountEnabledGlobally()) {
             CountingTaskEntity countingTaskEntity = (CountingTaskEntity) taskEntity;
             if (CountingEntityUtil.isTaskRelatedEntityCountEnabled(countingTaskEntity)) {
