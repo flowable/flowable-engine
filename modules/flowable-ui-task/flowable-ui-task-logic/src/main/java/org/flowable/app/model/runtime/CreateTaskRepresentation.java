@@ -28,7 +28,6 @@ public class CreateTaskRepresentation extends AbstractRepresentation {
     protected String parentTaskId;
     protected String scopeType;
     protected String scopeId;
-    protected Map<String, Object> variables;
 
     public String getName() {
         return name;
@@ -60,14 +59,6 @@ public class CreateTaskRepresentation extends AbstractRepresentation {
 
     public void setAssignee(String assignee) {
         this.assignee = assignee;
-    }
-
-    public Map<String, Object> getVariables() {
-        return variables;
-    }
-
-    public void setVariables(Map<String, Object> variables) {
-        this.variables = variables;
     }
 
     public String getParentTaskId() {

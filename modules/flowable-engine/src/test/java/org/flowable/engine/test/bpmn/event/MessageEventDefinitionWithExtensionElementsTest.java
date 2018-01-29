@@ -12,6 +12,8 @@
  */
 package org.flowable.engine.test.bpmn.event;
 
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -32,20 +34,36 @@ public class MessageEventDefinitionWithExtensionElementsTest {
         MessageEventDefinition messageEventDefinitionMock = Mockito.mock(MessageEventDefinition.class);
         BpmnModel bpmnModelMock = Mockito.mock(BpmnModel.class);
         Message messageMock = Mockito.mock(Message.class);
+
         @SuppressWarnings("unchecked")
-        Map<String, List<ExtensionElement>> extensionElementMap = Mockito.mock(Map.class);
+        Map<String, List<ExtensionElement>> messageExtensionElementMapMock = Mockito.mock(Map.class);
+        Collection<List<ExtensionElement>> messageExtensionElementListCollectionMock = Mockito.mock(List.class);
+        Map<String, List<ExtensionElement>> messageDefinitionExtensionElementMapMock = Mockito.mock(Map.class);
+        Iterator<List<ExtensionElement>> collectionIteratorMock = Mockito.mock(Iterator.class);
+        List<ExtensionElement> messageExtensionElementListMock = Mockito.mock(List.class);
+        Iterator<ExtensionElement> extensionElementIteratorMock = Mockito.mock(Iterator.class);
+        ExtensionElement extensionElementMock = Mockito.mock(ExtensionElement.class);
 
         Mockito.when(bpmnParseMock.getBpmnModel()).thenReturn(bpmnModelMock);
         Mockito.when(messageEventDefinitionMock.getMessageRef()).thenReturn("messageId");
         Mockito.when(bpmnModelMock.containsMessageId("messageId")).thenReturn(true);
         Mockito.when(bpmnModelMock.getMessage("messageId")).thenReturn(messageMock);
         Mockito.when(messageMock.getName()).thenReturn("MessageWithExtensionElements");
-        Mockito.when(messageMock.getExtensionElements()).thenReturn(extensionElementMap);
+        Mockito.when(messageMock.getExtensionElements()).thenReturn(messageExtensionElementMapMock);
+        Mockito.when(messageExtensionElementMapMock.values()).thenReturn(messageExtensionElementListCollectionMock);
+
+        Mockito.when(messageExtensionElementListCollectionMock.iterator()).thenReturn(collectionIteratorMock);
+        Mockito.when(collectionIteratorMock.hasNext()).thenReturn(true, false);
+        Mockito.when(collectionIteratorMock.next()).thenReturn(messageExtensionElementListMock);
+        Mockito.when(collectionIteratorMock.next()).thenReturn(messageExtensionElementListMock);
+        Mockito.when(messageExtensionElementListMock.iterator()).thenReturn(extensionElementIteratorMock);
+        Mockito.when(extensionElementIteratorMock.hasNext()).thenReturn(true,false);
+        Mockito.when(extensionElementIteratorMock.next()).thenReturn(extensionElementMock);
 
         MessageEventDefinitionParseHandler handler = new MessageEventDefinitionParseHandler();
         handler.parse(bpmnParseMock, messageEventDefinitionMock);
 
         Mockito.verify(messageEventDefinitionMock).setMessageRef("MessageWithExtensionElements");
-        Mockito.verify(messageEventDefinitionMock).setExtensionElements(extensionElementMap);
+        Mockito.verify(messageEventDefinitionMock).addExtensionElement(extensionElementMock);
     }
 }

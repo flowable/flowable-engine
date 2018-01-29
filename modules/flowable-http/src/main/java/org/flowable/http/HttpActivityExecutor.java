@@ -289,7 +289,7 @@ public class HttpActivityExecutor {
                 .setRedirectsEnabled(!requestInfo.isNoRedirects())
                 .setSocketTimeout(socketTimeout)
                 .setConnectTimeout(connectTimeout)
-                .setConnectionRequestTimeout(connectionRequestTimeout)
+                .setConnectionRequestTimeout(requestInfo.getTimeout() == 0 ? connectionRequestTimeout : requestInfo.getTimeout())
                 .build());
     }
 

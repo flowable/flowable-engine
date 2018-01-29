@@ -240,8 +240,7 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
         assertEquals(0, runtimeService.createProcessInstanceQuery().processDefinitionKey("oneTaskProcess").count());
 
         // test that the delete reason of the process instance shows up as
-        // delete reason of the task in history
-        // ACT-848
+        // delete reason of the task in history ACT-848
         if (HistoryTestHelper.isHistoryLevelAtLeast(HistoryLevel.ACTIVITY, processEngineConfiguration)) {
 
             HistoricTaskInstance historicTaskInstance = historyService.createHistoricTaskInstanceQuery().processInstanceId(processInstance.getId()).singleResult();
@@ -2083,6 +2082,9 @@ public class RuntimeServiceTest extends PluggableFlowableTestCase {
 
         assertEquals(0, taskService.createTaskQuery().processInstanceId(processInstance.getId()).count());
         assertEquals(1, taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).count());
+        
+        assertEquals(1, runtimeService.createExecutionQuery().processInstanceId(processInstance.getId()).onlyChildExecutions().count());
+        assertEquals(1, runtimeService.createExecutionQuery().processInstanceId(subProcessInstance.getId()).onlyChildExecutions().count());
         
         task = taskService.createTaskQuery().processInstanceId(subProcessInstance.getId()).singleResult();
         assertEquals("theTask", task.getTaskDefinitionKey());

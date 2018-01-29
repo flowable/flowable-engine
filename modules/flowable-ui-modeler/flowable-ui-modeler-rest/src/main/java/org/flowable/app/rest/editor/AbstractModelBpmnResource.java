@@ -15,6 +15,7 @@ package org.flowable.app.rest.editor;
 import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URLEncoder;
 
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -62,8 +63,20 @@ public class AbstractModelBpmnResource {
     }
 
     protected void generateBpmn20Xml(HttpServletResponse response, AbstractModel model) {
-        String name = model.getName().replaceAll(" ", "_");
-        response.setHeader("Content-Disposition", "attachment; filename=" + name + ".bpmn20.xml");
+        String name = model.getName().replaceAll(" ", "_") + ".bpmn20.xml";
+        String encodedName = null;
+        try {
+            encodedName = "UTF-8''" + URLEncoder.encode(name, "UTF-8");
+        } catch (Exception e) {
+            LOGGER.warn("Failed to encode name " + name);
+        }
+        
+        String contentDispositionValue = "attachment; filename=" + name;
+        if (encodedName != null) {
+            contentDispositionValue += "; filename*=" + encodedName;
+        }
+        
+        response.setHeader("Content-Disposition", contentDispositionValue);
         if (model.getModelEditorJson() != null) {
             try {
                 ServletOutputStream servletOutputStream = response.getOutputStream();

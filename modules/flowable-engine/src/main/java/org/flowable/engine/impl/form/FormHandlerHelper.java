@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.util;
+package org.flowable.engine.impl.form;
 
 import java.util.List;
 
@@ -19,20 +19,18 @@ import org.flowable.bpmn.model.FormProperty;
 import org.flowable.bpmn.model.StartEvent;
 import org.flowable.bpmn.model.UserTask;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
-import org.flowable.engine.impl.form.DefaultStartFormHandler;
-import org.flowable.engine.impl.form.DefaultTaskFormHandler;
-import org.flowable.engine.impl.form.StartFormHandler;
-import org.flowable.engine.impl.form.TaskFormHandler;
 import org.flowable.engine.impl.persistence.entity.DeploymentEntity;
+import org.flowable.engine.impl.util.CommandContextUtil;
+import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 
 /**
  * @author Joram Barrez
  */
-public class FormHandlerUtil {
+public class FormHandlerHelper {
 
-    public static StartFormHandler getStartFormHandler(CommandContext commandContext, ProcessDefinition processDefinition) {
+    public StartFormHandler getStartFormHandler(CommandContext commandContext, ProcessDefinition processDefinition) {
         StartFormHandler startFormHandler = new DefaultStartFormHandler();
         org.flowable.bpmn.model.Process process = ProcessDefinitionUtil.getProcess(processDefinition.getId());
 
@@ -53,7 +51,7 @@ public class FormHandlerUtil {
 
     }
 
-    public static TaskFormHandler getTaskFormHandlder(String processDefinitionId, String taskId) {
+    public TaskFormHandler getTaskFormHandlder(String processDefinitionId, String taskId) {
         org.flowable.bpmn.model.Process process = ProcessDefinitionUtil.getProcess(processDefinitionId);
         FlowElement flowElement = process.getFlowElement(taskId, true);
         if (flowElement instanceof UserTask) {
@@ -72,7 +70,7 @@ public class FormHandlerUtil {
         return null;
     }
 
-    public static TaskFormHandler getTaskFormHandlder(TaskEntity taskEntity) {
+    public TaskFormHandler getTaskFormHandlder(TaskEntity taskEntity) {
         if (taskEntity.getProcessDefinitionId() != null) {
             return getTaskFormHandlder(taskEntity.getProcessDefinitionId(), taskEntity.getTaskDefinitionKey());
         }

@@ -517,7 +517,7 @@ angular.module('flowableApp')
                 $scope.newTask.assignee = user;
             };
 
-            $scope.createNextTask = function () {
+            $scope.createSubTask = function () {
                 // Create popover
                 if (!$scope.createTaskPopover) {
                     $scope.newTask = {

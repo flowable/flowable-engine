@@ -252,7 +252,7 @@ function _drawTask(element)
 
 
 	var strokeColor = _bpmnGetColor(element, ACTIVITY_STROKE_COLOR);
-  var strokeWidth = element.current ? CURRENT_ACTIVITY_STROKE : TASK_STROKE;
+    var strokeWidth = element.current ? CURRENT_ACTIVITY_STROKE : TASK_STROKE;
 	rect.attr({"stroke-width": strokeWidth,
 		"stroke": strokeColor,
 		"fill": ACTIVITY_FILL_COLOR

@@ -124,6 +124,52 @@ public class HttpServiceTaskTest extends HttpServiceTaskTestCase {
         }
     }
 
+    @Deployment(resources = "org/flowable/http/bpmn/HttpServiceTaskTest.testRequestTimeout2.bpmn20.xml" )
+    public void testRequestTimeoutFromProcessModelHasPrecedence() {
+        // set up timeout for test
+        int defaultSocketTimeout = this.processEngineConfiguration.getHttpClientConfig().getSocketTimeout();
+        int defaultConnectTimeOut = this.processEngineConfiguration.getHttpClientConfig().getConnectTimeout();
+        int defaultRequestTimeOut = this.processEngineConfiguration.getHttpClientConfig().getConnectionRequestTimeout();
+
+        this.processEngineConfiguration.getHttpClientConfig().setSocketTimeout(15000);
+        this.processEngineConfiguration.getHttpClientConfig().setConnectTimeout(15000);
+        this.processEngineConfiguration.getHttpClientConfig().setConnectionRequestTimeout(5000);
+
+        // execute test
+        try {
+            runtimeService.startProcessInstanceByKey("requestTimeout");
+            fail("Expected timeout exception");
+        } catch(Exception e) {
+            // timeout exception expected
+        }
+        
+        // restore timeouts
+        this.processEngineConfiguration.getHttpClientConfig().setSocketTimeout(defaultSocketTimeout);
+        this.processEngineConfiguration.getHttpClientConfig().setConnectTimeout(defaultConnectTimeOut);
+        this.processEngineConfiguration.getHttpClientConfig().setConnectionRequestTimeout(defaultRequestTimeOut);
+    }
+    
+    @Deployment(resources = "org/flowable/http/bpmn/HttpServiceTaskTest.testRequestTimeout3.bpmn20.xml" )
+    public void testRequestTimeoutFromProcessModelHasPrecedenceSuccess() {
+        // set up timeout for test
+        int defaultSocketTimeout = this.processEngineConfiguration.getHttpClientConfig().getSocketTimeout();
+        int defaultConnectTimeOut = this.processEngineConfiguration.getHttpClientConfig().getConnectTimeout();
+        int defaultRequestTimeOut = this.processEngineConfiguration.getHttpClientConfig().getConnectionRequestTimeout();
+
+        this.processEngineConfiguration.getHttpClientConfig().setSocketTimeout(15000);
+        this.processEngineConfiguration.getHttpClientConfig().setConnectTimeout(15000);
+        this.processEngineConfiguration.getHttpClientConfig().setConnectionRequestTimeout(5000);
+
+        // execute test
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("requestTimeout");
+        assertProcessEnded(processInstance.getId());
+        
+        // restore timeouts
+        this.processEngineConfiguration.getHttpClientConfig().setSocketTimeout(defaultSocketTimeout);
+        this.processEngineConfiguration.getHttpClientConfig().setConnectTimeout(defaultConnectTimeOut);
+        this.processEngineConfiguration.getHttpClientConfig().setConnectionRequestTimeout(defaultRequestTimeOut);
+    }
+
     @Deployment
     public void testDisallowRedirects() {
         try {
