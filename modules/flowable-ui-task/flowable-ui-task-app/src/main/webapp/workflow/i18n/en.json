@@ -119,7 +119,7 @@
             "ASSIGN": "Assign",
             "REASSIGN": "Reassign",
             "CREATE": "+ Create Task",
-            "CREATE-NEXT-TASK": "Create Next Task",
+            "CREATE-ADHOC-TASK": "Create AdHoc Task",
             "CREATE-CONFIRM": "Create",
             "INVOLVE": "+ Involve people",
             "ADD-COMMENT": "+ Add comment",
