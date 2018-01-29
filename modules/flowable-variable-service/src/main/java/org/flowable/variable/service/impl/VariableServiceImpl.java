@@ -14,7 +14,6 @@ package org.flowable.variable.service.impl;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.flowable.variable.api.types.VariableType;
@@ -132,8 +131,8 @@ public class VariableServiceImpl extends ServiceImpl implements VariableService 
     }
     
     @Override
-    public void deleteVariableInstanceMap(Map<String, VariableInstanceEntity> variableInstances) {
-        getVariableInstanceEntityManager().deleteVariableInstanceMap(variableInstances);
+    public void deleteVariablesByTaskId(String taskId) {
+        getVariableInstanceEntityManager().deleteVariablesByTaskId(taskId);
     }
 
 }

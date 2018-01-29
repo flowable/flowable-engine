@@ -32,6 +32,7 @@ import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematc
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceBySubScopeIdAndScopeTypeAndVariableNameMatcher;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceBySubScopeIdAndScopeTypeAndVariableNamesMatcher;
 import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceBySubScopeIdAndScopeTypeMatcher;
+import org.flowable.variable.service.impl.persistence.entity.data.impl.cachematcher.VariableInstanceByTaskIdMatcher;
 
 /**
  * @author Joram Barrez
@@ -40,6 +41,9 @@ public class MybatisVariableInstanceDataManager extends AbstractDataManager<Vari
 
     protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceByExecutionIdMatcher 
         = new VariableInstanceByExecutionIdMatcher();
+    
+    protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceByTaskIdMatcher
+        = new VariableInstanceByTaskIdMatcher();
     
     protected CachedEntityMatcher<VariableInstanceEntity> variableInstanceByScopeIdAndScopeTypeMatcher 
         = new VariableInstanceByScopeIdAndScopeTypeMatcher();
@@ -68,9 +72,8 @@ public class MybatisVariableInstanceDataManager extends AbstractDataManager<Vari
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public List<VariableInstanceEntity> findVariableInstancesByTaskId(String taskId) {
-        return getDbSqlSession().selectList("selectVariablesByTaskId", taskId);
+        return getList("selectVariablesByTaskId", taskId, variableInstanceByTaskIdMatcher, true);
     }
 
     @Override
@@ -174,6 +177,16 @@ public class MybatisVariableInstanceDataManager extends AbstractDataManager<Vari
         params.put("scopeType", scopeType);
         params.put("variableNames", variableNames);
         return getList("selectVariableInstanceBySubScopeIdAndScopeTypeAndNames", params, variableInstanceBySubScopeIdAndScopeTypeAndVariableNamesMatcher, true);
+    }
+    
+    @Override
+    public void deleteVariablesByTaskId(String taskId) {
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        if (isEntityInserted(dbSqlSession, "task", taskId)) {
+            deleteCachedEntities(dbSqlSession, variableInstanceByTaskIdMatcher, taskId);
+        } else {
+            bulkDelete("deleteVariableInstancesByTaskId", variableInstanceByTaskIdMatcher, taskId);
+        }
     }
     
     @Override

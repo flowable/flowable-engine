@@ -128,7 +128,11 @@
         delete from ${prefix}ACT_RU_VARIABLE where ID_ = #{id, jdbcType=VARCHAR} and REV_ = #{revision}
     </delete>
     
-     <delete id="deleteVariableInstancesByExecutionId" parameterType="string">
+    <delete id="deleteVariableInstancesByTaskId" parameterType="string">
+        delete from ${prefix}ACT_RU_VARIABLE where TASK_ID_ = #{id, jdbcType=VARCHAR}
+    </delete>
+    
+    <delete id="deleteVariableInstancesByExecutionId" parameterType="string">
         delete from ${prefix}ACT_RU_VARIABLE where EXECUTION_ID_ = #{id, jdbcType=VARCHAR}
     </delete>
 

@@ -14,7 +14,6 @@ package org.flowable.variable.service;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import org.flowable.variable.api.types.VariableType;
@@ -66,6 +65,6 @@ public interface VariableService {
     
     void deleteVariablesByExecutionId(String executionId);
     
-    void deleteVariableInstanceMap(Map<String, VariableInstanceEntity> variableInstances);
+    void deleteVariablesByTaskId(String taskId);
     
 }

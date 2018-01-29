@@ -12,7 +12,9 @@
  */
 package org.flowable.cmmn.engine.impl.task;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
@@ -20,6 +22,8 @@ import org.flowable.task.api.Task;
 import org.flowable.task.service.TaskService;
 import org.flowable.task.service.impl.persistence.CountingTaskEntity;
 import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+import org.flowable.variable.service.impl.persistence.entity.VariableByteArrayRef;
+import org.flowable.variable.service.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * @author Joram Barrez
@@ -42,7 +46,24 @@ public class TaskHelper {
                 CommandContextUtil.getIdentityLinkService(commandContext).deleteIdentityLinksByTaskId(task.getId());
             }
             if (countingTaskEntity.isCountEnabled() && countingTaskEntity.getVariableCount() > 0) {
-                CommandContextUtil.getVariableService(commandContext).deleteVariableInstanceMap(task.getVariableInstanceEntities());
+                
+                Map<String, VariableInstanceEntity> taskVariables = task.getVariableInstanceEntities();
+                ArrayList<VariableByteArrayRef> variableByteArrayRefs = new ArrayList<>();
+                for (VariableInstanceEntity variableInstanceEntity : taskVariables.values()) {
+                    if (variableInstanceEntity.getByteArrayRef() != null && variableInstanceEntity.getByteArrayRef().getId() != null) {
+                        variableByteArrayRefs.add(variableInstanceEntity.getByteArrayRef());
+                    }
+                }
+                
+                for (VariableByteArrayRef variableByteArrayRef : variableByteArrayRefs) {
+                    CommandContextUtil.getVariableServiceConfiguration(commandContext).getByteArrayEntityManager().deleteByteArrayById(variableByteArrayRef.getId());
+                }
+                
+                if (!taskVariables.isEmpty()) {
+                    CommandContextUtil.getVariableService(commandContext).deleteVariablesByTaskId(task.getId());
+                }
+                
+                CommandContextUtil.getVariableService(commandContext).deleteVariablesByTaskId(task.getId());
             }
             CommandContextUtil.getCmmnHistoryManager(commandContext).recordTaskEnd(task, deleteReason);
             CommandContextUtil.getTaskService().deleteTask(task, fireEvents);
