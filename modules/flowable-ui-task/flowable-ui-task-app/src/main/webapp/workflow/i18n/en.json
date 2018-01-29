@@ -157,7 +157,7 @@
             "NAME": "Name",
             "DESCRIPTION": "Description",
             "ASSIGNEE": "Assignee",
-
+            "SUBTASK": "Is subTask",
             "DUE": "Due",
             "PROCESS-INSTANCE": "Part of process",
             "CASE-INSTANCE": "Part of case",
