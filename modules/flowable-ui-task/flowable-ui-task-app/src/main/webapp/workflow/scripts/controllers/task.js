@@ -728,7 +728,8 @@ angular.module('flowableApp')
         if ($scope.model.loading == true
             || ($scope.model.involvementSummary === null || $scope.model.involvementSummary === undefined || $scope.model.involvementSummary.loading === true)
             || ($scope.model.contentSummary === null || $scope.model.contentSummary === undefined || $scope.model.contentSummary.loading === true)
-            || ($scope.model.commentSummary === null || $scope.model.commentSummary === undefined || $scope.model.commentSummary.loading === true) ) {
+            || ($scope.model.commentSummary === null || $scope.model.commentSummary === undefined || $scope.model.commentSummary.loading === true)
+            || ($scope.model.subTaskSummary === null || $scope.model.subTaskSummary === undefined || $scope.model.subTaskSummary.loading === true) ) {
             return false;
         }
 
@@ -738,6 +739,7 @@ angular.module('flowableApp')
             var hasPeople = false;
             var hasContent = false;
             var hasComments = false;
+            var hasSubTasks = false;
 
             // Involved people
             if ($scope.model.task.involvedPeople !== null
@@ -760,7 +762,14 @@ angular.module('flowableApp')
                 hasComments = true;
             }
 
-            return hasPeople || hasContent || hasComments;
+            // SubTasks
+            if ($scope.model.subTasks !== null
+                && $scope.model.subTasks !==undefined
+                && $scope.model.subTasks.length > 0) {
+                hasSubTasks = true;
+            }
+
+            return hasPeople || hasContent || hasComments || hasSubTasks;
 
         }
         return false;
