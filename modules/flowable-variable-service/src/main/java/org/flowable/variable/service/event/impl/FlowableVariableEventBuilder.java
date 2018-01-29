@@ -41,8 +41,8 @@ public class FlowableVariableEventBuilder {
     }
 
     public static FlowableVariableEvent createVariableEvent(FlowableEngineEventType type, String variableName, Object variableValue, VariableType variableType, String taskId, String executionId,
-            String processInstanceId, String processDefinitionId) {
-        
+            String processInstanceId, String processDefinitionId, String scopeId, String scopeType) {
+
         FlowableVariableEventImpl newEvent = new FlowableVariableEventImpl(type);
         newEvent.setVariableName(variableName);
         newEvent.setVariableValue(variableValue);
@@ -51,6 +51,8 @@ public class FlowableVariableEventBuilder {
         newEvent.setExecutionId(executionId);
         newEvent.setProcessDefinitionId(processDefinitionId);
         newEvent.setProcessInstanceId(processInstanceId);
+        newEvent.setScopeId(scopeId);
+        newEvent.setScopeType(scopeType);
         return newEvent;
     }
 }
