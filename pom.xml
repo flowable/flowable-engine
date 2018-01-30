@@ -19,7 +19,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<jdk.version>1.7</jdk.version>
 		<spring.framework.version>4.3.9.RELEASE</spring.framework.version>
-		<spring.security.version>4.2.3.RELEASE</spring.security.version>
+		<spring.security.version>4.2.4.RELEASE</spring.security.version>
 		<jackson.version>2.9.3</jackson.version>
 		<mule.version>3.8.0</mule.version>
 		<camel.version>2.17.1</camel.version>
