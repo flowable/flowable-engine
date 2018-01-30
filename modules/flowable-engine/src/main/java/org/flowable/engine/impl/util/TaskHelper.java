@@ -263,13 +263,16 @@ public class TaskHelper {
     protected static void handleRelatedEntities(CommandContext commandContext, TaskEntity task, String deleteReason, boolean cascade,
             boolean fireTaskListener, boolean fireEvents, FlowableEventDispatcher eventDispatcher) {
         
-        TaskService taskService = CommandContextUtil.getTaskService(commandContext);
-        List<Task> subTasks = taskService.findTasksByParentTaskId(task.getId());
-        for (Task subTask : subTasks) {
-            deleteTask((TaskEntity) subTask, deleteReason, cascade, fireTaskListener, fireEvents);
-        }
-
         boolean isTaskRelatedEntityCountEnabled = CountingEntityUtil.isTaskRelatedEntityCountEnabled(task);
+        
+        if (!isTaskRelatedEntityCountEnabled
+                || (isTaskRelatedEntityCountEnabled && ((CountingTaskEntity) task).getSubTaskCount() > 0)) {
+            TaskService taskService = CommandContextUtil.getTaskService(commandContext);
+            List<Task> subTasks = taskService.findTasksByParentTaskId(task.getId());
+            for (Task subTask : subTasks) {
+                internalDeleteTask((TaskEntity) subTask, deleteReason, cascade, true, fireTaskListener, fireEvents); // Sub tasks are always immediately deleted
+            }
+        }
         
         if (!isTaskRelatedEntityCountEnabled
                 || (isTaskRelatedEntityCountEnabled && ((CountingTaskEntity) task).getIdentityLinkCount() > 0)) {
@@ -326,7 +329,7 @@ public class TaskHelper {
     }
 
     protected static void executeTaskDelete(TaskEntity task, CommandContext commandContext) {
-        CommandContextUtil.getTaskService(commandContext).deleteTask(task, false); // false: event will be sent out later in this piece of code
+        CommandContextUtil.getTaskService(commandContext).deleteTask(task, false); // false: event will be sent out later
    
         if (task.getExecutionId() != null && CountingEntityUtil.isExecutionRelatedEntityCountEnabledGlobally()) {
             CountingExecutionEntity countingExecutionEntity = (CountingExecutionEntity) CommandContextUtil

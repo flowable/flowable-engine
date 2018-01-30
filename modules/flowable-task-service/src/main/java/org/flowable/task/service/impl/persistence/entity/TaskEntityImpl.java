@@ -90,9 +90,9 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
     protected boolean isCanceled;
 
     private boolean isCountEnabled;
-    private int variableCount;
-    private int identityLinkCount;
-    
+    protected int variableCount;
+    protected int identityLinkCount;
+    protected int subTaskCount;
 
     protected Date claimTime;
 
@@ -170,6 +170,7 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         persistentState.put("isCountEnabled", this.isCountEnabled);
         persistentState.put("variableCount", this.variableCount);
         persistentState.put("identityLinkCount", this.identityLinkCount);
+        persistentState.put("subTaskCount", this.subTaskCount);
 
         return persistentState;
     }
@@ -730,4 +731,12 @@ public class TaskEntityImpl extends VariableScopeImpl implements TaskEntity, Cou
         return identityLinkCount;
     }
 
+    public int getSubTaskCount() {
+        return subTaskCount;
+    }
+
+    public void setSubTaskCount(int subTaskCount) {
+        this.subTaskCount = subTaskCount;
+    }
+    
 }
