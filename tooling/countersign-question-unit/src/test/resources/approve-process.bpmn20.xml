@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
+  <process id="approve-process" name="approve-process-definition" isExecutable="true">
+    <startEvent id="sid-40C387C8-BAC7-4ABE-9838-B0EAADDC78E4" name="start"></startEvent>
+    <endEvent id="step4" name="end"></endEvent>
+    <userTask id="step1" name="AUDIT" flowable:assignee="${csAssignee}">
+      <extensionElements>
+        <flowable:executionListener event="end" class="countersign.ExecutionListener"></flowable:executionListener>
+        <flowable:taskListener event="complete" class="countersign.TaskCompleteListener"></flowable:taskListener>
+        <modeler:initiator-can-complete xmlns:modeler="http://flowable.org/modeler"><![CDATA[false]]></modeler:initiator-can-complete>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false" flowable:collection="${countersignAssigneeList}" flowable:elementVariable="csAssignee">
+        <completionCondition>${nrOfCompletedInstances == nrOfInstances}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+    <userTask id="step3" name="Im not pass"></userTask>
+    <exclusiveGateway id="step2"></exclusiveGateway>
+    <sequenceFlow id="line1" sourceRef="sid-40C387C8-BAC7-4ABE-9838-B0EAADDC78E4" targetRef="step1"></sequenceFlow>
+    <sequenceFlow id="line5" sourceRef="step3" targetRef="step4"></sequenceFlow>
+    <sequenceFlow id="line3" name="notpass" sourceRef="step2" targetRef="step3">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approveResult == "notpass"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="line4" name="pass" sourceRef="step2" targetRef="step4">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${approveResult == "pass"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="line2" sourceRef="step1" targetRef="step2"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_approve-process">
+    <bpmndi:BPMNPlane bpmnElement="approve-process" id="BPMNPlane_approve-process">
+      <bpmndi:BPMNShape bpmnElement="sid-40C387C8-BAC7-4ABE-9838-B0EAADDC78E4" id="BPMNShape_sid-40C387C8-BAC7-4ABE-9838-B0EAADDC78E4">
+        <omgdc:Bounds height="30.0" width="30.0" x="105.0" y="195.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="step4" id="BPMNShape_step4">
+        <omgdc:Bounds height="28.0" width="28.0" x="780.0" y="191.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="step1" id="BPMNShape_step1">
+        <omgdc:Bounds height="80.0" width="100.0" x="285.0" y="165.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="step3" id="BPMNShape_step3">
+        <omgdc:Bounds height="80.0" width="100.0" x="744.0" y="300.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="step2" id="BPMNShape_step2">
+        <omgdc:Bounds height="40.0" width="40.0" x="540.0" y="185.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="line5" id="BPMNEdge_line5">
+        <omgdi:waypoint x="794.0" y="300.0"></omgdi:waypoint>
+        <omgdi:waypoint x="794.0" y="218.9499294320249"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="line4" id="BPMNEdge_line4">
+        <omgdi:waypoint x="579.9457390004271" y="205.0"></omgdi:waypoint>
+        <omgdi:waypoint x="780.0" y="205.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="line3" id="BPMNEdge_line3">
+        <omgdi:waypoint x="560.0" y="224.94261658031093"></omgdi:waypoint>
+        <omgdi:waypoint x="560.0" y="340.0"></omgdi:waypoint>
+        <omgdi:waypoint x="743.9999999999529" y="340.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="line2" id="BPMNEdge_line2">
+        <omgdi:waypoint x="384.94999999996566" y="205.0"></omgdi:waypoint>
+        <omgdi:waypoint x="540.0" y="205.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="line1" id="BPMNEdge_line1">
+        <omgdi:waypoint x="134.94999962741122" y="210.0"></omgdi:waypoint>
+        <omgdi:waypoint x="284.9999999999602" y="210.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
