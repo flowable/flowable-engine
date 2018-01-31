@@ -377,18 +377,69 @@ The response body is a JSON representation of the +org.flowable.dmn.model.DmnDef
 ----
 
 
-=== Decision Executor
+=== DMN Rule Service
 
 
 ==== Execute a decision
 
 ----
-POST dmn-rule/decision-executor
+POST dmn-rule/execute
 ----
 
 *Request body:*
 
-The request body should contain data of type _multipart/form-data_. The decisionKey is required. The tenantId and a map of inputVariables (restVariables) are optional.
+The request body should contain data of type _multipart/form-data_. The decisionKey is required. The tenantId, parentDeploymentId and a map of inputVariables (restVariables) are optional.
+
+*Response body:*
+
+[source,json,linenums]
+----
+{
+  "resultVariables": [
+    [
+      {
+        "name": "output1",
+        "type": "string",
+        "value": "result 1"
+      }
+    ],
+    [
+      {
+        "name": "output1",
+        "type": "string",
+        "value": "result 2"
+      }
+    ],
+    [
+      {
+        "name": "output1",
+        "type": "string",
+        "value": "result 3"
+      }
+    ]
+  ],
+  "url": "http://localhost:8080/flowable-rest/dmn-api/dmn-rule/execute"
+}
+----
+.Execute a decision - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|201|Indicates the Decision has been executed.
+|===============
+
+==== Execute a single result decision
+
+----
+POST dmn-rule/execute/single-result
+----
+
+*Request body:*
+
+The request body should contain data of type _multipart/form-data_. The decisionKey is required. The tenantId, parentDeploymentId and a map of inputVariables (restVariables) are optional.
+
+When multiple rules are valid the service will respond with a 500 code. 
+*Note: a single hit with a compound output is valid (see response below)*
 
 
 *Response body:*
@@ -400,12 +451,25 @@ The request body should contain data of type _multipart/form-data_. The decision
     {
       "name": "output1",
       "type": "string",
-      "value": "was option two"
+      "value": "compound 1"
+    },
+    {
+      "name": "output2",
+      "type": "string",
+      "value": "compound 2"
     }
   ],
-  "url": "http://localhost:8080/flowable-rest/dmn-api/rules/decision-executor"
+  "url": "http://localhost:8080/flowable-rest/dmn-api/dmn-rule/execute/single-result"
 }
 ----
+.Execute a single resultdecision - Response codes
+[options="header"]
+|===============
+|Response code|Description
+|201|Indicates the Decision has been executed.
+|500|Indicates the Decision returned multiple results.
+|===============
+
 
 
 === Engine
