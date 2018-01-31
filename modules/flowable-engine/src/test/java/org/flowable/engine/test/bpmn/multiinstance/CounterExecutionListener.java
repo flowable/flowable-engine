@@ -17,6 +17,8 @@ import java.util.List;
 
 import org.flowable.engine.delegate.DelegateExecution;
 import org.flowable.engine.delegate.ExecutionListener;
+import org.flowable.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.flowable.engine.impl.test.HistoryTestHelper;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 import org.slf4j.Logger;
@@ -37,7 +39,8 @@ public class CounterExecutionListener implements ExecutionListener {
         LOGGER.debug("Invoke into executionEnd method and execution is " + execution.getVariables());
         
         if (nrOfCompletedInstances != null && nrOfInstances.equals(nrOfCompletedInstances)) {
-            List<HistoricVariableInstance> vars = CommandContextUtil.getProcessEngineConfiguration().getHistoryService().createHistoricVariableInstanceQuery()
+            ProcessEngineConfigurationImpl processEngineConfiguration = CommandContextUtil.getProcessEngineConfiguration();
+            List<HistoricVariableInstance> vars = processEngineConfiguration.getHistoryService().createHistoricVariableInstanceQuery()
                     .processInstanceId(execution.getProcessInstanceId())
                     .variableName("csApproveResult")
                     .list();

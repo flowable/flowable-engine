@@ -396,12 +396,18 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         vars.put("approveResult", "notpass");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("approve-process", vars);
         assertNotNull(processInstance);
+        
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, 
+                        processEngineConfiguration.getManagementService(), 5000, 200);
 
         List<Task> tasks = taskService.createTaskQuery().list();
         for (Task task : tasks){
             assertEquals(task.getAssignee(), taskService.getVariable(task.getId(), "csAssignee"));
             taskService.setVariableLocal(task.getId(), "csApproveResult", "pass");
             taskService.complete(task.getId());
+            
+            HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, 
+                            processEngineConfiguration.getManagementService(), 5000, 200);
         }
         
         assertProcessEnded(processInstance.getId());
@@ -418,21 +424,33 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         vars.put("approveResult", "notpass");
         ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("approve-process", vars);
         assertNotNull(processInstance);
+        
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, 
+                        processEngineConfiguration.getManagementService(), 5000, 200);
 
         Task task = taskService.createTaskQuery().singleResult();
         assertEquals(task.getAssignee(), taskService.getVariable(task.getId(), "csAssignee"));
         taskService.setVariableLocal(task.getId(), "csApproveResult", "pass");
         taskService.complete(task.getId());
         
-        task = taskService.createTaskQuery().singleResult();
-        assertEquals(task.getAssignee(), taskService.getVariable(task.getId(), "csAssignee"));
-        taskService.setVariableLocal(task.getId(), "csApproveResult", "pass");
-        taskService.complete(task.getId());
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, 
+                        processEngineConfiguration.getManagementService(), 5000, 200);
         
         task = taskService.createTaskQuery().singleResult();
         assertEquals(task.getAssignee(), taskService.getVariable(task.getId(), "csAssignee"));
         taskService.setVariableLocal(task.getId(), "csApproveResult", "pass");
         taskService.complete(task.getId());
+        
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, 
+                        processEngineConfiguration.getManagementService(), 5000, 200);
+        
+        task = taskService.createTaskQuery().singleResult();
+        assertEquals(task.getAssignee(), taskService.getVariable(task.getId(), "csAssignee"));
+        taskService.setVariableLocal(task.getId(), "csApproveResult", "pass");
+        taskService.complete(task.getId());
+        
+        HistoryTestHelper.waitForJobExecutorToProcessAllHistoryJobs(processEngineConfiguration, 
+                        processEngineConfiguration.getManagementService(), 5000, 200);
         
         assertProcessEnded(processInstance.getId());
     }
