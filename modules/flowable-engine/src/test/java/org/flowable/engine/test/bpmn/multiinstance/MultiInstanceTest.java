@@ -384,6 +384,58 @@ public class MultiInstanceTest extends PluggableFlowableTestCase {
         runtimeService.trigger(waitState.getId());
         assertProcessEnded(processInstance.getId());
     }
+    
+    @Deployment
+    public void testExecutionListener() {
+        Map<String, Object> vars = new HashMap<>();
+        List<String> countersigns = new ArrayList<>();
+        countersigns.add("zjl0");
+        countersigns.add("zjl1");
+        countersigns.add("zjl3");
+        vars.put("countersignAssigneeList", countersigns);
+        vars.put("approveResult", "notpass");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("approve-process", vars);
+        assertNotNull(processInstance);
+
+        List<Task> tasks = taskService.createTaskQuery().list();
+        for (Task task : tasks){
+            assertEquals(task.getAssignee(), taskService.getVariable(task.getId(), "csAssignee"));
+            taskService.setVariableLocal(task.getId(), "csApproveResult", "pass");
+            taskService.complete(task.getId());
+        }
+        
+        assertProcessEnded(processInstance.getId());
+    }
+    
+    @Deployment
+    public void testSequentialExecutionListener() {
+        Map<String, Object> vars = new HashMap<>();
+        List<String> countersigns = new ArrayList<>();
+        countersigns.add("zjl0");
+        countersigns.add("zjl1");
+        countersigns.add("zjl3");
+        vars.put("countersignAssigneeList", countersigns);
+        vars.put("approveResult", "notpass");
+        ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("approve-process", vars);
+        assertNotNull(processInstance);
+
+        Task task = taskService.createTaskQuery().singleResult();
+        assertEquals(task.getAssignee(), taskService.getVariable(task.getId(), "csAssignee"));
+        taskService.setVariableLocal(task.getId(), "csApproveResult", "pass");
+        taskService.complete(task.getId());
+        
+        task = taskService.createTaskQuery().singleResult();
+        assertEquals(task.getAssignee(), taskService.getVariable(task.getId(), "csAssignee"));
+        taskService.setVariableLocal(task.getId(), "csApproveResult", "pass");
+        taskService.complete(task.getId());
+        
+        task = taskService.createTaskQuery().singleResult();
+        assertEquals(task.getAssignee(), taskService.getVariable(task.getId(), "csAssignee"));
+        taskService.setVariableLocal(task.getId(), "csApproveResult", "pass");
+        taskService.complete(task.getId());
+        
+        assertProcessEnded(processInstance.getId());
+    }
 
     @Deployment
     public void testNestedParallelUserTasks() {
