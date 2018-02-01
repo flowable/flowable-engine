@@ -24,6 +24,7 @@ import org.flowable.app.model.runtime.TaskUpdateRepresentation;
 import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.api.UserCache.CachedUser;
 import org.flowable.app.service.exception.NotFoundException;
+import org.flowable.app.service.exception.NotPermittedException;
 import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.repository.ProcessDefinition;
@@ -47,7 +48,7 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowableTaskService.class);
 
-    public TaskRepresentation getTask(String taskId, HttpServletResponse response) {
+    public TaskRepresentation getTask(String taskId) {
         User currentUser = SecurityUtils.getCurrentUserObject();
         HistoricTaskInstance task = permissionService.validateReadPermissionOnTask(currentUser, taskId);
 
@@ -83,6 +84,21 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
         rep.setInvolvedPeople(getInvolvedUsers(taskId));
 
         return rep;
+    }
+
+    public List<TaskRepresentation> getSubTasks(String taskId) {
+        List<Task> subTasks = this.taskService.getSubTasks(taskId);
+        List<TaskRepresentation> subTasksRepresentations = new ArrayList<>(subTasks.size());
+        for (Task subTask : subTasks) {
+            try {
+                subTasksRepresentations.add(getTask(subTask.getId()));
+            } catch (NotPermittedException e) {
+                // omit not permitted subtasks
+                LOGGER.debug("Subtask {} is not permitted.", subTask.getId());
+            }
+        }
+        return subTasksRepresentations;
+
     }
 
     protected void populateAssignee(TaskInfo task, TaskRepresentation rep) {

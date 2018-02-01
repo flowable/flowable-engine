@@ -135,6 +135,7 @@
             "ASSIGN": "Select assignee",
             "ASSIGNEE": "Assignee",
             "CONTENT": "Related content",
+            "SUBTASK": "Sub tasks",
             "CREATE-NEW": "New Task",
             "FORM": "Form",
             "DETAILS": "Details",
@@ -146,6 +147,9 @@
             "NO-COMMENTS": "No comments",
             "COMMENT-COUNT": "comment",
             "COMMENTS-COUNT": "comments",
+            "NO-SUBTASKS": "No sub tasks",
+            "SUBTASK-COUNT": "sub task ",
+            "SUBTASKS-COUNT": "sub tasks",
             "SHOW-DETAILS": "Show details",
             "SHOW-FORM": "Show form"
         },
