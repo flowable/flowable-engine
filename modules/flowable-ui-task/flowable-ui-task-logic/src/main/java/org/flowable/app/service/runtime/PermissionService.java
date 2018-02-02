@@ -12,6 +12,9 @@
  */
 package org.flowable.app.service.runtime;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.model.common.RemoteUser;
 import org.flowable.app.service.exception.NotFoundException;
@@ -41,9 +44,6 @@ import org.flowable.task.api.history.HistoricTaskInstanceQuery;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Centralized service for all permission-checks.
@@ -97,7 +97,7 @@ public class PermissionService {
             return tasks.get(0);
         }
 
-        // Last resort: user has access to proc inst -> can see task
+        // Last resort: user has access to process instance or parent task -> can see task
         tasks = historyService.createHistoricTaskInstanceQuery().taskId(taskId).list();
         if (CollectionUtils.isNotEmpty(tasks)) {
             HistoricTaskInstance task = tasks.get(0);
@@ -106,6 +106,10 @@ public class PermissionService {
                 if (hasReadPermissionOnProcessInstance) {
                     return task;
                 }
+                
+            } else if (task != null && task.getParentTaskId() != null) {
+                validateReadPermissionOnTask(user, task.getParentTaskId());
+                return task;
             }
         }
         throw new NotPermittedException("User is not allowed to work with task " + taskId);
