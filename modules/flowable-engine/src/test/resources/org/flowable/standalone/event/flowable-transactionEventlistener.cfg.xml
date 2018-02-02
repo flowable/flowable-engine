@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+
+    <bean id="processEngineConfiguration"
+          class="org.flowable.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+
+        <property name="jdbcUrl" value="jdbc:h2:mem:flowable;DB_CLOSE_DELAY=1000"/>
+        <property name="jdbcDriver" value="org.h2.Driver"/>
+        <property name="jdbcUsername" value="sa"/>
+        <property name="jdbcPassword" value=""/>
+
+        <!-- Database configurations -->
+        <property name="databaseSchemaUpdate" value="true"/>
+
+        <!-- job executor configurations -->
+        <property name="asyncExecutorActivate" value="false"/>
+
+        <!-- Add transaction-event listener -->
+        <property name="eventListeners">
+            <list>
+                <ref bean="transactionEventListener"/>
+            </list>
+        </property>
+
+        <!-- Also register the eventlistener as bean, to be able to access it from the tests -->
+        <property name="beans">
+            <map>
+                <entry key="transactionEventListener" value-ref="transactionEventListener"/>
+                <entry key="testTransactionEventListener" value-ref="testTransactionEventListener"/>
+                <entry key="testAttachmentTransactionEventListener"
+                       value-ref="testAttachmentTransactionEventListener"/>
+                <entry key="testCommentTransactionEventListener"
+                       value-ref="testCommentTransactionEventListener"/>
+                <entry key="testExecutionTransactionEventListener"
+                       value-ref="testExecutionTransactionEventListener"/>
+                <entry key="testIdentityLinkTransactionEventListener"
+                       value-ref="testIdentityLinkTransactionEventListener"/>
+                <entry key="testJobTransactionEventListener"
+                       value-ref="testJobTransactionEventListener"/>
+                <entry key="testProcessDefinitionTransactionEventListener"
+                       value-ref="testProcessDefinitionTransactionEventListener"/>
+                <entry key="testProcessInstanceTransactionEventListener"
+                       value-ref="testProcessInstanceTransactionEventListener"/>
+                <entry key="testTaskTransactionEventListener"
+                       value-ref="testTaskTransactionEventListener"/>
+            </map>
+        </property>
+    </bean>
+
+    <!-- The actual transaction-event-listener instance -->
+    <bean id="transactionEventListener"
+          class="org.flowable.engine.test.api.event.TestFlowableTransactionEventListener">
+        <property name="onTransaction" value="COMMITTED"/>
+    </bean>
+
+    <!-- An transaction event-listener instance used from within an expression in BPMN XML-->
+    <bean id="testTransactionEventListener"
+          class="org.flowable.engine.test.api.event.TestFlowableTransactionEventListener">
+        <property name="onTransaction" value="COMMITTED"/>
+    </bean>
+
+    <bean id="testAttachmentTransactionEventListener"
+          class="org.flowable.engine.test.api.event.TestFlowableTransactionEventListener"/>
+    <bean id="testCommentTransactionEventListener"
+          class="org.flowable.engine.test.api.event.TestFlowableTransactionEventListener"/>
+    <bean id="testExecutionTransactionEventListener"
+          class="org.flowable.engine.test.api.event.TestFlowableTransactionEventListener"/>
+    <bean id="testIdentityLinkTransactionEventListener"
+          class="org.flowable.engine.test.api.event.TestFlowableTransactionEventListener"/>
+    <bean id="testJobTransactionEventListener"
+          class="org.flowable.engine.test.api.event.TestFlowableTransactionEventListener"/>
+    <bean id="testProcessDefinitionTransactionEventListener"
+          class="org.flowable.engine.test.api.event.TestFlowableTransactionEventListener"/>
+    <bean id="testProcessInstanceTransactionEventListener"
+          class="org.flowable.engine.test.api.event.TestFlowableTransactionEventListener"/>
+    <bean id="testTaskTransactionEventListener"
+          class="org.flowable.engine.test.api.event.TestFlowableTransactionEventListener"/>
+</beans>

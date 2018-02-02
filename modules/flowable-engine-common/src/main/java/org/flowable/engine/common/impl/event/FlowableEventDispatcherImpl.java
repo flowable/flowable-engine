@@ -29,6 +29,7 @@ public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
 
     protected FlowableEventSupport eventSupport;
     protected boolean enabled = true;
+    protected boolean enableTransactionEvent = true;
 
     public FlowableEventDispatcherImpl() {
         eventSupport = new FlowableEventSupport();
@@ -42,6 +43,14 @@ public class FlowableEventDispatcherImpl implements FlowableEventDispatcher {
     @Override
     public boolean isEnabled() {
         return enabled;
+    }
+
+    public boolean isTransactionEnabled() {
+        return enableTransactionEvent;
+    }
+
+    public void setTransactionEnabled(boolean enabled) {
+        this.enableTransactionEvent = enabled;
     }
 
     @Override

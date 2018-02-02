@@ -14,7 +14,9 @@ package org.flowable.engine.impl.bpmn.parser.factory;
 
 import org.flowable.bpmn.model.EventListener;
 import org.flowable.bpmn.model.FlowableListener;
+import org.flowable.bpmn.model.TransactionEventListener;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
 import org.flowable.engine.delegate.CustomPropertiesResolver;
 import org.flowable.engine.delegate.ExecutionListener;
 import org.flowable.engine.delegate.TaskListener;
@@ -53,6 +55,10 @@ public interface ListenerFactory {
     public abstract TransactionDependentExecutionListener createTransactionDependentDelegateExpressionExecutionListener(FlowableListener listener);
 
     public abstract FlowableEventListener createClassDelegateEventListener(EventListener eventListener);
+
+    public abstract TransactionFlowableEventListener createClassDelegateTransactionDependentEventListener(TransactionEventListener eventListener);
+
+    public abstract TransactionFlowableEventListener createDelegateExpressionTransactionDependentEventListener(TransactionEventListener eventListener);
 
     public abstract FlowableEventListener createDelegateExpressionEventListener(EventListener eventListener);
 

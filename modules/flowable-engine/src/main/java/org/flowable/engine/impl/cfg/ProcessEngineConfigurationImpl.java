@@ -113,6 +113,7 @@ import org.flowable.engine.impl.bpmn.deployer.EventSubscriptionManager;
 import org.flowable.engine.impl.bpmn.deployer.ParsedDeploymentBuilderFactory;
 import org.flowable.engine.impl.bpmn.deployer.ProcessDefinitionDiagramHelper;
 import org.flowable.engine.impl.bpmn.deployer.TimerManager;
+import org.flowable.engine.impl.bpmn.listener.DefaultTransactionDependentEventListenerFactory;
 import org.flowable.engine.impl.bpmn.listener.ListenerNotificationHelper;
 import org.flowable.engine.impl.bpmn.parser.BpmnParseHandlers;
 import org.flowable.engine.impl.bpmn.parser.BpmnParser;
@@ -2028,6 +2029,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
             }
         }
 
+        //transaction listeners
+        if (this.transactionDependentFactory == null) {
+            this.transactionDependentFactory = new DefaultTransactionDependentEventListenerFactory();
+        }
     }
 
     public void initProcessValidator() {

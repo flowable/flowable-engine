@@ -36,7 +36,6 @@ import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.common.impl.persistence.GenericManagerFactory;
 import org.flowable.engine.common.impl.persistence.cache.EntityCache;
 import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
-import org.flowable.engine.common.impl.persistence.entity.Entity;
 import org.flowable.engine.common.runtime.Clock;
 import org.flowable.idm.api.IdmIdentityService;
 import org.flowable.idm.api.IdmManagementService;
@@ -161,6 +160,10 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
 
     public static IdmEngineConfiguration createStandaloneInMemIdmEngineConfiguration() {
         return new StandaloneInMemIdmEngineConfiguration();
+    }
+
+    public IdmEngineConfiguration() {
+        this.enableTransactionEventDispatcher = false;
     }
 
     // buildProcessEngine
@@ -397,6 +400,7 @@ public class IdmEngineConfiguration extends AbstractEngineConfiguration {
         }
 
         this.eventDispatcher.setEnabled(enableEventDispatcher);
+        this.eventDispatcher.setTransactionEnabled(enableTransactionEventDispatcher);
 
         if (eventListeners != null) {
             for (FlowableEventListener listenerToAdd : eventListeners) {
