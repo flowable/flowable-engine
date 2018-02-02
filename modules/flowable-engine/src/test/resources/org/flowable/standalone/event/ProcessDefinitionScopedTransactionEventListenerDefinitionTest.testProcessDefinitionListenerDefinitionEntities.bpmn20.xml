@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:flowable="http://flowable.org/bpmn"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" targetNamespace="Examples">
+
+    <process id="testTransactionEventListeners">
+        <extensionElements>
+            <flowable:eventListener
+                    delegateExpression="${testAttachmentTransactionEventListener}"
+                    entityType="attachment" onTransaction="COMMITTING"/>
+            <flowable:eventListener
+                    delegateExpression="${testCommentTransactionEventListener}" entityType="comment"
+                    onTransaction="COMMITTING"/>
+            <flowable:eventListener
+                    delegateExpression="${testExecutionTransactionEventListener}"
+                    entityType="execution" onTransaction="COMMITTING"/>
+            <flowable:eventListener
+                    delegateExpression="${testIdentityLinkTransactionEventListener}"
+                    entityType="identity-link" onTransaction="COMMITTING"/>
+            <flowable:eventListener
+                    delegateExpression="${testJobTransactionEventListener}" entityType="job"
+                    onTransaction="COMMITTING"/>
+            <flowable:eventListener
+                    delegateExpression="${testProcessDefinitionTransactionEventListener}"
+                    entityType="process-definition" onTransaction="COMMITTING"/>
+            <flowable:eventListener
+                    delegateExpression="${testProcessInstanceTransactionEventListener}"
+                    entityType="process-instance" onTransaction="COMMITTING"/>
+            <flowable:eventListener
+                    delegateExpression="${testTaskTransactionEventListener}" entityType="task"
+                    onTransaction="COMMITTING"/>
+        </extensionElements>
+        <startEvent id="theStart"/>
+        <sequenceFlow sourceRef="theStart" targetRef="task"/>
+        <userTask id="task"/>
+        <sequenceFlow sourceRef="task" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

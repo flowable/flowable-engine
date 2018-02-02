@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:activiti="http://activiti.org/bpmn"
+             xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" targetNamespace="Examples">
+
+    <process id="testTransactionEventListeners">
+        <extensionElements>
+            <activiti:eventListener
+                    class="org.flowable.engine.test.api.event.StaticTestFlowableTransactionEventListener"
+                    onTransaction="COMMITTING"/>
+            <activiti:eventListener delegateExpression="${testTransactionEventListener}"
+                                               events="ENTITY_CREATED" onTransaction="COMMITTING"/>
+        </extensionElements>
+
+        <startEvent id="theStart"/>
+        <sequenceFlow sourceRef="theStart" targetRef="task"/>
+        <userTask id="task"/>
+        <sequenceFlow sourceRef="task" targetRef="theEnd"/>
+        <endEvent id="theEnd"/>
+
+    </process>
+
+</definitions>

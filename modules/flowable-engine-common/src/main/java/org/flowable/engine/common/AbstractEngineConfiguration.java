@@ -64,6 +64,7 @@ import org.flowable.engine.common.impl.interceptor.SessionFactory;
 import org.flowable.engine.common.impl.interceptor.TransactionContextInterceptor;
 import org.flowable.engine.common.impl.persistence.StrongUuidGenerator;
 import org.flowable.engine.common.impl.persistence.entity.Entity;
+import org.flowable.engine.common.impl.transaction.TransactionDependentFactory;
 import org.flowable.engine.common.impl.util.DefaultClockImpl;
 import org.flowable.engine.common.impl.util.IoUtil;
 import org.flowable.engine.common.runtime.Clock;
@@ -174,10 +175,13 @@ public abstract class AbstractEngineConfiguration {
     protected Map<Class<?>, SessionFactory> sessionFactories;
 
     protected boolean enableEventDispatcher = true;
+    protected boolean enableTransactionEventDispatcher = true;
     protected FlowableEventDispatcher eventDispatcher;
     protected List<FlowableEventListener> eventListeners;
     protected Map<String, List<FlowableEventListener>> typedEventListeners;
     protected List<EventDispatchAction> additionalEventDispatchActions;
+
+    protected TransactionDependentFactory transactionDependentFactory;
 
     protected boolean transactionsExternallyManaged;
 
@@ -1276,6 +1280,14 @@ public abstract class AbstractEngineConfiguration {
     public AbstractEngineConfiguration setTypedEventListeners(Map<String, List<FlowableEventListener>> typedEventListeners) {
         this.typedEventListeners = typedEventListeners;
         return this;
+    }
+
+    public TransactionDependentFactory getTransactionDependentFactory() {
+        return transactionDependentFactory;
+    }
+
+    public void setTransactionDependentFactory(TransactionDependentFactory transactionDependentFactory) {
+        this.transactionDependentFactory = transactionDependentFactory;
     }
 
     public List<EventDispatchAction> getAdditionalEventDispatchActions() {
