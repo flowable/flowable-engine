@@ -66,6 +66,10 @@ angular.module('flowableApp')
         loading: false
     };
 
+    $scope.model.subTaskSummary = {
+        loading: false
+    };
+
     $scope.resetModel = function() {
         // Reset tabs
         $scope.taskTabs = [];
@@ -99,6 +103,10 @@ angular.module('flowableApp')
             loading: true
         };
 
+        $scope.model.subTaskSummary = {
+            loading: true
+        };
+
         $scope.model.content = undefined;
         $scope.model.comments = undefined;
 
@@ -118,6 +126,9 @@ angular.module('flowableApp')
         $scope.activeTab = 'details';
     };
     $scope.showComments= function() {
+        $scope.activeTab = 'details';
+    };
+    $scope.showSubTasks= function() {
         $scope.activeTab = 'details';
     };
     $scope.toggleForm= function() {
@@ -234,17 +245,18 @@ angular.module('flowableApp')
 
                 $scope.loadComments();
                 $scope.loadRelatedContent();
+                $scope.loadSubTasks();
 
                 if ($scope.model.task.processInstanceId) {
                     $scope.loadProcessInstance();
                 } else {
-                    $scope.model.processInstance = null;
+                    $scope.model.processInstance = undefined;
                 }
 
                 if ($scope.model.task.scopeId) {
                     $scope.loadCaseInstance();
                 } else {
-                    $scope.model.caseInstance = null;
+                    $scope.model.caseInstance = undefined;
                 }
 
                 $scope.refreshInvolvmentSummary();
@@ -322,6 +334,10 @@ angular.module('flowableApp')
        $scope.refreshCommentSummary();
     }, true);
 
+    $scope.$watch('model.subTasks.data', function(newValue) {
+       $scope.refreshSubTaskSummary();
+    }, true);
+
     $scope.refreshCommentSummary = function() {
         if ($scope.model.task) {
             var newValue = $scope.model.comments ? $scope.model.comments.data : undefined;
@@ -332,6 +348,20 @@ angular.module('flowableApp')
             } else {
                 $scope.model.commentSummary.loading = true;
                 $scope.model.commentSummary.count = undefined;
+            }
+        }
+    };
+
+    $scope.refreshSubTaskSummary = function() {
+        if ($scope.model.task) {
+            var newValue = $scope.model.subTasks ? $scope.model.subTasks : undefined;
+            $scope.model.subTaskSummary.loading = false;
+
+            if(newValue) {
+                $scope.model.subTaskSummary.count = newValue.length;
+            } else {
+                $scope.model.subTaskSummary.loading = true;
+                $scope.model.subTaskSummary.count = undefined;
             }
         }
     };
@@ -352,6 +382,14 @@ angular.module('flowableApp')
             $scope.model.comments = data;
 
             $scope.refreshCommentSummary();
+        });
+    };
+
+    $scope.loadSubTasks = function() {
+        TaskService.getSubTasks($scope.model.task.id).then(function (data) {
+            $scope.model.subTasks = data;
+
+            $scope.refreshSubTaskSummary();
         });
     };
 
@@ -684,7 +722,8 @@ angular.module('flowableApp')
         if ($scope.model.loading == true
             || ($scope.model.involvementSummary === null || $scope.model.involvementSummary === undefined || $scope.model.involvementSummary.loading === true)
             || ($scope.model.contentSummary === null || $scope.model.contentSummary === undefined || $scope.model.contentSummary.loading === true)
-            || ($scope.model.commentSummary === null || $scope.model.commentSummary === undefined || $scope.model.commentSummary.loading === true) ) {
+            || ($scope.model.commentSummary === null || $scope.model.commentSummary === undefined || $scope.model.commentSummary.loading === true)
+            || ($scope.model.subTaskSummary === null || $scope.model.subTaskSummary === undefined || $scope.model.subTaskSummary.loading === true) ) {
             return false;
         }
 
@@ -694,6 +733,7 @@ angular.module('flowableApp')
             var hasPeople = false;
             var hasContent = false;
             var hasComments = false;
+            var hasSubTasks = false;
 
             // Involved people
             if ($scope.model.task.involvedPeople !== null
@@ -716,7 +756,14 @@ angular.module('flowableApp')
                 hasComments = true;
             }
 
-            return hasPeople || hasContent || hasComments;
+            // SubTasks
+            if ($scope.model.subTasks !== null
+                && $scope.model.subTasks !==undefined
+                && $scope.model.subTasks.length > 0) {
+                hasSubTasks = true;
+            }
+
+            return hasPeople || hasContent || hasComments || hasSubTasks;
 
         }
         return false;
