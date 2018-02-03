@@ -79,7 +79,6 @@ public interface BpmnXMLConstants {
 
     public static final String ELEMENT_EXECUTION_LISTENER = "executionListener";
     public static final String ELEMENT_EVENT_LISTENER = "eventListener";
-    public static final String ELEMENT_TRANSACTION_EVENT_LISTENER = "transactionEventListener";
     public static final String ELEMENT_TASK_LISTENER = "taskListener";
     public static final String ATTRIBUTE_LISTENER_EVENT = "event";
     public static final String ATTRIBUTE_LISTENER_EVENTS = "events";

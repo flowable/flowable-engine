@@ -12,6 +12,7 @@
  */
 package org.flowable.engine.delegate.event;
 
+import org.flowable.engine.common.api.delegate.event.AbstractFlowableEventListener;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
@@ -25,7 +26,7 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
  * @author Frederik Heremans
  * 
  */
-public class BaseEntityEventListener implements FlowableEventListener {
+public class BaseEntityEventListener extends AbstractFlowableEventListener {
 
     protected boolean failOnException;
     protected Class<?> entityClass;

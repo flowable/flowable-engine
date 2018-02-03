@@ -113,7 +113,6 @@ import org.flowable.engine.impl.bpmn.deployer.EventSubscriptionManager;
 import org.flowable.engine.impl.bpmn.deployer.ParsedDeploymentBuilderFactory;
 import org.flowable.engine.impl.bpmn.deployer.ProcessDefinitionDiagramHelper;
 import org.flowable.engine.impl.bpmn.deployer.TimerManager;
-import org.flowable.engine.impl.bpmn.listener.DefaultTransactionDependentEventListenerFactory;
 import org.flowable.engine.impl.bpmn.listener.ListenerNotificationHelper;
 import org.flowable.engine.impl.bpmn.parser.BpmnParseHandlers;
 import org.flowable.engine.impl.bpmn.parser.BpmnParser;
@@ -279,8 +278,8 @@ import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.flowable.job.service.HistoryJobHandler;
-import org.flowable.job.service.InternalJobCompatibilityManager;
 import org.flowable.job.service.HistoryJobProcessor;
+import org.flowable.job.service.InternalJobCompatibilityManager;
 import org.flowable.job.service.InternalJobManager;
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.JobProcessor;
@@ -2027,11 +2026,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                     this.eventDispatcher.addEventListener(listenerToAdd, types);
                 }
             }
-        }
-
-        //transaction listeners
-        if (this.transactionDependentFactory == null) {
-            this.transactionDependentFactory = new DefaultTransactionDependentEventListenerFactory();
         }
     }
 

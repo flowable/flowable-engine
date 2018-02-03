@@ -10,14 +10,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.common.impl.transaction;
+package org.flowable.engine.common.api.delegate.event;
 
-import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.TransactionFlowableEventListener;
-import org.flowable.engine.common.impl.cfg.TransactionListener;
+/**
+ * @author Joram Barrez
+ */
+public abstract class AbstractFlowableEventListener implements FlowableEventListener {
 
-public interface TransactionDependentFactory {
+    protected String onTransaction;
+    
+    @Override
+    public boolean isFireOnTransactionLifecycleEvent() {
+        return onTransaction != null;
+    }
 
-    TransactionListener createFlowableTransactionEventListener(TransactionFlowableEventListener listener, FlowableEvent event);
+    @Override
+    public String getOnTransaction() {
+        return onTransaction;
+    }
+
+    public void setOnTransaction(String onTransaction) {
+        this.onTransaction = onTransaction;
+    }
 
 }

@@ -25,7 +25,6 @@ import org.flowable.bpmn.model.FlowableListener;
 import org.flowable.bpmn.model.HasExecutionListeners;
 import org.flowable.bpmn.model.ImplementationType;
 import org.flowable.bpmn.model.Process;
-import org.flowable.bpmn.model.TransactionEventListener;
 import org.flowable.bpmn.model.UserTask;
 
 public class FlowableListenerExport implements BpmnXMLConstants {
@@ -59,18 +58,16 @@ public class FlowableListenerExport implements BpmnXMLConstants {
                 xtw.writeStartElement(FLOWABLE_EXTENSIONS_PREFIX, ELEMENT_EVENT_LISTENER, FLOWABLE_EXTENSIONS_NAMESPACE);
                 BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_EVENTS, eventListener.getEvents(), xtw);
                 BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_ENTITY_TYPE, eventListener.getEntityType(), xtw);
+                
+                if (StringUtils.isNotEmpty(eventListener.getOnTransaction())) {
+                    BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_ON_TRANSACTION, eventListener.getOnTransaction(), xtw);
+                }
 
                 if (ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(eventListener.getImplementationType())) {
                     BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_CLASS, eventListener.getImplementation(), xtw);
-                    if (eventListener instanceof TransactionEventListener){
-                        BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_ON_TRANSACTION, ((TransactionEventListener)eventListener).getTransaction(), xtw);
-                    }
 
                 } else if (ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION.equals(eventListener.getImplementationType())) {
                     BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_DELEGATEEXPRESSION, eventListener.getImplementation(), xtw);
-                    if (eventListener instanceof TransactionEventListener){
-                        BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_ON_TRANSACTION, ((TransactionEventListener)eventListener).getTransaction(), xtw);
-                    }
 
                 } else if (ImplementationType.IMPLEMENTATION_TYPE_THROW_SIGNAL_EVENT.equals(eventListener.getImplementationType())) {
                     BpmnXMLUtil.writeDefaultAttribute(ATTRIBUTE_LISTENER_THROW_SIGNAL_EVENT_NAME, eventListener.getImplementation(), xtw);
