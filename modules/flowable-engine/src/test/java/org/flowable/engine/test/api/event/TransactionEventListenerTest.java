@@ -20,7 +20,6 @@ import java.util.Map;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
-import org.flowable.engine.common.api.delegate.event.FlowableEventType;
 import org.flowable.engine.common.impl.cfg.TransactionState;
 import org.flowable.engine.common.impl.util.CollectionUtil;
 import org.flowable.engine.delegate.DelegateExecution;
@@ -77,12 +76,12 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
     public void testProcessExecutionWithRollback() {
         
         assertEquals(0, TestTransactionEventListener.eventsReceived.size());
-        assertEquals(0, historyService.createHistoricProcessInstanceQuery().count());
+        assertEquals(0, runtimeService.createProcessInstanceQuery().count());
         
         // Regular execution, no exception
         runtimeService.startProcessInstanceByKey("testProcessExecutionWithRollback", CollectionUtil.singletonMap("throwException", false));
         assertTrue(TestTransactionEventListener.eventsReceived.size() > 0);
-        assertEquals(1, historyService.createHistoricProcessInstanceQuery().count());
+        assertEquals(1, runtimeService.createProcessInstanceQuery().count());
         
         TestTransactionEventListener.eventsReceived.clear();
         
@@ -92,7 +91,7 @@ public class TransactionEventListenerTest extends PluggableFlowableTestCase {
             fail();
         } catch (Exception e) {}
         assertEquals(0, TestTransactionEventListener.eventsReceived.size());
-        assertEquals(1, historyService.createHistoricProcessInstanceQuery().count());
+        assertEquals(1, runtimeService.createProcessInstanceQuery().count());
     }
     
     @Deployment

@@ -6,6 +6,9 @@
         <startEvent id="theStart" />
         <sequenceFlow id="flow1" sourceRef="theStart" targetRef="service" />
         <serviceTask id="service" flowable:class="org.flowable.engine.test.api.event.TransactionEventListenerTest$ThrowExceptionDelegate" />
+        
+        <sequenceFlow id="flow2" sourceRef="service" targetRef="theTask" />
+        <userTask id="theTask" />
 
     </process>
 
