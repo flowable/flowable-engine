@@ -85,6 +85,7 @@ public abstract class AbstractProcessEngineAutoConfiguration
         conf.setDatabaseSchemaUpdate(defaultText(flowableProperties.getDatabaseSchemaUpdate(), conf.getDatabaseSchemaUpdate()));
 
         conf.setDbHistoryUsed(flowableProperties.isDbHistoryUsed());
+        conf.setDisableIdmEngine(!flowableProperties.isDbIdentityUsed());
 
         conf.setAsyncExecutorActivate(flowableProperties.isAsyncExecutorActivate());
 
