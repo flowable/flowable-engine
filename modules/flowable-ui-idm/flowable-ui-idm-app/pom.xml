@@ -339,39 +339,25 @@
                     </plugin>
                     <plugin>
                         <groupId>com.spotify</groupId>
-                        <artifactId>docker-maven-plugin</artifactId>
-                        <version>0.4.13</version>
-                        <configuration>
-                            <imageName>flowable/${project.build.finalName}</imageName>
-                            <baseImage>flowable/java8_server</baseImage>
-                            <entryPoint>["java", "-jar", "/${project.build.finalName}.jar", "-httpPort=8080", "-httpProtocol=org.apache.coyote.http11.Http11NioProtocol"]</entryPoint>
-                            <forceTags>true</forceTags>
-                            <imageTags>
-                                <imageTag>${project.version}</imageTag>
-                                <imageTag>latest</imageTag>
-                            </imageTags>
-                            <resources>
-                                <resource>
-                                    <targetPath>/</targetPath>
-                                    <directory>${project.build.directory}</directory>
-                                    <include>${project.build.finalName}.jar</include>
-                                </resource>
-                                <resource>
-                                    <targetPath>/</targetPath>
-                                    <directory>${project.basedir}/src/main/docker</directory>
-                                    <include>wait-for-something.sh</include>
-                                </resource>
-                            </resources>
-                        </configuration>
+                        <artifactId>dockerfile-maven-plugin</artifactId>
+                        <version>1.3.7</version>
                         <executions>
                             <execution>
-                                <id>build-image</id>
-                                <phase>package</phase>
+                                <id>default</id>
                                 <goals>
                                     <goal>build</goal>
+                                    <goal>push</goal>
                                 </goals>
                             </execution>
                         </executions>
+                        <configuration>
+                            <repository>rds/${project.build.finalName}</repository>
+                            <tag>${project.version}</tag>
+                            <tag>latest</tag>
+                            <buildArgs>
+                                <JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
+                            </buildArgs>
+                        </configuration>
                     </plugin>
                 </plugins>
             </build>
