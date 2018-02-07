@@ -597,6 +597,20 @@
           </documentation>
         </annotation>
       </attribute>
+      <attribute name="onTransaction">
+        <annotation>
+          <documentation>
+            Execute executionListener after a successful commit or after a rollback.
+          </documentation>
+        </annotation>
+        <simpleType>
+          <restriction base="string">
+            <enumeration value="before-commit"/>
+            <enumeration value="committed"/>
+            <enumeration value="rolled-back"/>
+          </restriction>
+        </simpleType>
+      </attribute>
       <attribute name="entityType">
         <annotation>
           <documentation>

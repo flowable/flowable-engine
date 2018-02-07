@@ -27,10 +27,28 @@ public class AppDefinition {
 
     protected List<AppModelDefinition> models;
     protected List<AppModelDefinition> cmmnModels;
+    protected String name;
+    protected String key;
     protected String theme;
     protected String icon;
     protected String groupsAccess;
     protected String usersAccess;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getKey() {
+        return key;
+    }
+
+    public void setKey(String key) {
+        this.key = key;
+    }
 
     public String getTheme() {
         return theme;

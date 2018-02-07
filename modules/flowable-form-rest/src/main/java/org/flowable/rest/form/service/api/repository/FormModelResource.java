@@ -12,20 +12,23 @@
  */
 package org.flowable.rest.form.service.api.repository;
 
+import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.form.api.FormInfo;
+import org.flowable.form.api.FormRepositoryService;
+import org.flowable.form.api.FormService;
+import org.flowable.rest.form.FormRestResponseFactory;
+import org.flowable.rest.form.service.api.form.FormModelResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
+
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
 import io.swagger.annotations.Authorization;
-import org.flowable.engine.common.api.FlowableObjectNotFoundException;
-import org.flowable.form.api.FormRepositoryService;
-import org.flowable.form.api.FormService;
-import org.flowable.form.model.FormModel;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @author Yvo Swillens
@@ -33,6 +36,9 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @Api(tags = { "Form Definitions" }, description = "Manage Form Definitions", authorizations = { @Authorization(value = "basicAuth") })
 public class FormModelResource {
+    
+    @Autowired
+    protected FormRestResponseFactory formRestResponseFactory;
 
     @Autowired
     protected FormService formService;
@@ -46,13 +52,13 @@ public class FormModelResource {
             @ApiResponse(code = 404, message = "Indicates the form definition Form model was not found.")
     })
     @GetMapping(value = "/form-repository/form-definitions/{formDefinitionId}/model", produces = "application/json")
-    public FormModel getModelResource(@ApiParam(name = "formDefinitionId") @PathVariable String formDefinitionId) {
-        FormModel formDefinition = formRepositoryService.getFormModelById(formDefinitionId);
+    public FormModelResponse getModelResource(@ApiParam(name = "formDefinitionId") @PathVariable String formDefinitionId) {
+        FormInfo formInfo = formRepositoryService.getFormModelById(formDefinitionId);
 
-        if (formDefinition == null) {
-            throw new FlowableObjectNotFoundException("Could not find a form definition with id '" + formDefinitionId);
+        if (formInfo == null) {
+            throw new FlowableObjectNotFoundException("Could not find a form model with id '" + formDefinitionId);
         }
 
-        return formDefinition;
+        return formRestResponseFactory.createFormModelResponse(formInfo);
     }
 }

@@ -16,14 +16,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 
 /**
  * Event listener that keeps a static list of all events received.
  * 
  * @author Frederik Heremans
  */
-public class StaticTestFlowableEventListener implements FlowableEventListener {
+public class StaticTestFlowableEventListener extends AbstractFlowableEngineEventListener {
 
     private static List<FlowableEvent> eventsReceived = new ArrayList<>();
 

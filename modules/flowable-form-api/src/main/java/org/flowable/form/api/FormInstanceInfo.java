@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.form.model;
+package org.flowable.form.api;
 
 import java.util.Date;
 
@@ -21,7 +21,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include;
  * @author Tijs Rademakers
  */
 @JsonInclude(Include.NON_NULL)
-public class FormInstanceModel extends FormModel {
+public class FormInstanceInfo extends FormInfo {
 
     private static final long serialVersionUID = 1L;
 
@@ -33,17 +33,6 @@ public class FormInstanceModel extends FormModel {
     protected String processInstanceId;
     protected String processDefinitionId;
     protected String tenantId;
-
-    public FormInstanceModel(FormModel formModel) {
-        this.description = formModel.getDescription();
-        this.fields = formModel.getFields();
-        this.id = formModel.getId();
-        this.key = formModel.getKey();
-        this.name = formModel.getName();
-        this.outcomes = formModel.getOutcomes();
-        this.outcomeVariableName = formModel.getOutcomeVariableName();
-        this.version = formModel.getVersion();
-    }
 
     public String getFormInstanceId() {
         return formInstanceId;

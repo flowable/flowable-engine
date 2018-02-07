@@ -77,7 +77,7 @@ import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.runtime.ProcessInstanceBuilder;
 import org.flowable.engine.runtime.ProcessInstanceQuery;
 import org.flowable.engine.task.Event;
-import org.flowable.form.model.FormModel;
+import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.variable.api.persistence.entity.VariableInstance;
@@ -154,7 +154,7 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     }
 
     @Override
-    public FormModel getStartFormModel(String processDefinitionId, String processInstanceId) {
+    public FormInfo getStartFormModel(String processDefinitionId, String processInstanceId) {
         return commandExecutor.execute(new GetStartFormModelCmd(processDefinitionId, processInstanceId));
     }
 
