@@ -44,7 +44,7 @@ public class MybatisHistoricDecisionExecutionDataManager extends AbstractDmnData
     
     @Override
     public void deleteHistoricDecisionExecutionsByDeploymentId(String deploymentId) {
-        getDbSqlSession().delete("deleteHistoricDecisionExecutionsByDeploymentId", deploymentId);
+        getDbSqlSession().delete("deleteHistoricDecisionExecutionsByDeploymentId", deploymentId, getManagedEntityClass());
     }
 
     @Override

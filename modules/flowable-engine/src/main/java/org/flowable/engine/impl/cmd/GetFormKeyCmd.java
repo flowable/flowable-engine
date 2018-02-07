@@ -17,8 +17,9 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.impl.form.DefaultFormHandler;
+import org.flowable.engine.impl.form.FormHandlerHelper;
+import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
-import org.flowable.engine.impl.util.FormHandlerUtil;
 import org.flowable.engine.impl.util.ProcessDefinitionUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 
@@ -65,13 +66,14 @@ public class GetFormKeyCmd implements Command<String> {
             return Flowable5Util.getFlowable5CompatibilityHandler().getFormKey(processDefinitionId, taskDefinitionKey);
         }
 
+        FormHandlerHelper formHandlerHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getFormHandlerHelper();
         DefaultFormHandler formHandler;
         if (taskDefinitionKey == null) {
             // TODO: Maybe add getFormKey() to FormHandler interface to avoid the following cast
-            formHandler = (DefaultFormHandler) FormHandlerUtil.getStartFormHandler(commandContext, processDefinition);
+            formHandler = (DefaultFormHandler) formHandlerHelper.getStartFormHandler(commandContext, processDefinition);
         } else {
             // TODO: Maybe add getFormKey() to FormHandler interface to avoid the following cast
-            formHandler = (DefaultFormHandler) FormHandlerUtil.getTaskFormHandlder(processDefinitionId, taskDefinitionKey);
+            formHandler = (DefaultFormHandler) formHandlerHelper.getTaskFormHandlder(processDefinitionId, taskDefinitionKey);
         }
         String formKey = null;
         if (formHandler.getFormKey() != null) {

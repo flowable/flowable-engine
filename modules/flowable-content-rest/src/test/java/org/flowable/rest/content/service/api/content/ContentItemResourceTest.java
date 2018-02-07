@@ -13,6 +13,7 @@
 package org.flowable.rest.content.service.api.content;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import org.apache.commons.io.IOUtils;
@@ -36,7 +37,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class ContentItemResourceTest extends BaseSpringContentRestTestCase {
 
     public void testGetContentItem() throws Exception {
-        String contentItemId = createContentItem("test.pdf", "application/pdf", null, "12345", null, "test", "test2");
+        String contentItemId = createContentItem("test.pdf", "application/pdf", null, "12345",
+                null, null, "test", "test2");
 
         ContentItem contentItem = contentService.createContentItemQuery().singleResult();
 
@@ -75,7 +77,8 @@ public class ContentItemResourceTest extends BaseSpringContentRestTestCase {
 
     public void testGetContentItemData() throws Exception {
         InputStream binaryContent = new ByteArrayInputStream("This is binary content".getBytes());
-        String contentItemId = createContentItem("test.pdf", "application/pdf", null, "12345", null, "test", "test2", binaryContent);
+        String contentItemId = createContentItem("test.pdf", "application/pdf", null,
+                "12345", null, null, "test", "test2", binaryContent);
 
         try {
             // Get content item data
@@ -93,7 +96,8 @@ public class ContentItemResourceTest extends BaseSpringContentRestTestCase {
     }
 
     public void testUpdateContentItem() throws Exception {
-        String contentItemId = createContentItem("test.pdf", "application/pdf", null, "12345", null, "test", "test2");
+        String contentItemId = createContentItem("test.pdf", "application/pdf", null,
+                "12345", null, null, "test", "test2");
 
         ContentItem contentItem = contentService.createContentItemQuery().singleResult();
 
@@ -128,11 +132,24 @@ public class ContentItemResourceTest extends BaseSpringContentRestTestCase {
     }
 
     public void testSaveContentItemData() throws Exception {
-        String contentItemId = createContentItem("test.pdf", "application/pdf", null, "12345", null, "test", "test2");
+        String contentItemId = createContentItem("test.pdf", "application/pdf", null,
+                "12345", null, null, "test", "test2");
 
-        InputStream binaryContent = new ByteArrayInputStream("This is binary content".getBytes());
+        executePostAndAssert(contentItemId);
+    }
 
+    public void testSaveContentItemDataForCase() throws Exception {
+        String contentItemId = createContentItem("test.pdf", "application/pdf", null,
+                null, "12345", null, "test", "test2");
+
+        executePostAndAssert(contentItemId);
+    }
+
+    protected void executePostAndAssert(String contentItemId) throws IOException {
+        InputStream binaryContent = null;
         try {
+            binaryContent = new ByteArrayInputStream("This is binary content".getBytes());
+
             // Get content item data
             HttpPost httpPost = new HttpPost(SERVER_URL_PREFIX + ContentRestUrls.createRelativeResourceUrl(
                     ContentRestUrls.URL_CONTENT_ITEM_DATA, contentItemId));
@@ -150,6 +167,9 @@ public class ContentItemResourceTest extends BaseSpringContentRestTestCase {
 
         } finally {
             contentService.deleteContentItem(contentItemId);
+            if (binaryContent != null) {
+                binaryContent.close();
+            }
         }
     }
 

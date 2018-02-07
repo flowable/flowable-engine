@@ -12,8 +12,6 @@
  */
 package org.flowable.app.service.runtime;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.model.runtime.CaseInstanceRepresentation;
 import org.flowable.app.model.runtime.CreateCaseInstanceRepresentation;
@@ -75,7 +73,7 @@ public class FlowableCaseInstanceService {
     @Autowired
     protected UserCache userCache;
 
-    public CaseInstanceRepresentation getCaseInstance(String caseInstanceId, HttpServletResponse response) {
+    public CaseInstanceRepresentation getCaseInstance(String caseInstanceId) {
 
         HistoricCaseInstance caseInstance = cmmnHistoryService.createHistoricCaseInstanceQuery().caseInstanceId(caseInstanceId).singleResult();
 

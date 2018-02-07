@@ -173,6 +173,7 @@ import org.flowable.engine.impl.form.BooleanFormType;
 import org.flowable.engine.impl.form.DateFormType;
 import org.flowable.engine.impl.form.DoubleFormType;
 import org.flowable.engine.impl.form.FormEngine;
+import org.flowable.engine.impl.form.FormHandlerHelper;
 import org.flowable.engine.impl.form.FormTypes;
 import org.flowable.engine.impl.form.JuelFormEngine;
 import org.flowable.engine.impl.form.LongFormType;
@@ -277,8 +278,8 @@ import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.idm.engine.IdmEngineConfiguration;
 import org.flowable.image.impl.DefaultProcessDiagramGenerator;
 import org.flowable.job.service.HistoryJobHandler;
-import org.flowable.job.service.InternalJobCompatibilityManager;
 import org.flowable.job.service.HistoryJobProcessor;
+import org.flowable.job.service.InternalJobCompatibilityManager;
 import org.flowable.job.service.InternalJobManager;
 import org.flowable.job.service.JobHandler;
 import org.flowable.job.service.JobProcessor;
@@ -469,6 +470,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     // HELPERS //////////////////////////////////////////////////////////////////
     protected ProcessInstanceHelper processInstanceHelper;
     protected ListenerNotificationHelper listenerNotificationHelper;
+    protected FormHandlerHelper formHandlerHelper;
 
     // ASYNC EXECUTOR ///////////////////////////////////////////////////////////
 
@@ -1834,6 +1836,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
         if (listenerNotificationHelper == null) {
             listenerNotificationHelper = new ListenerNotificationHelper();
         }
+        if (formHandlerHelper == null) {
+            formHandlerHelper = new FormHandlerHelper();
+        }
     }
 
     public void initVariableTypes() {
@@ -2022,7 +2027,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 }
             }
         }
-
     }
 
     public void initProcessValidator() {
@@ -2615,6 +2619,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
     public ProcessEngineConfigurationImpl setListenerNotificationHelper(ListenerNotificationHelper listenerNotificationHelper) {
         this.listenerNotificationHelper = listenerNotificationHelper;
+        return this;
+    }
+    
+    public FormHandlerHelper getFormHandlerHelper() {
+        return formHandlerHelper;
+    }
+
+    public ProcessEngineConfigurationImpl setFormHandlerHelper(FormHandlerHelper formHandlerHelper) {
+        this.formHandlerHelper = formHandlerHelper;
         return this;
     }
 

@@ -12,6 +12,14 @@
  */
 package org.flowable.http.cmmn.impl;
 
+import static org.flowable.http.ExpressionUtils.getStringSetFromField;
+import static org.flowable.http.HttpActivityExecutor.HTTP_TASK_REQUEST_FIELD_INVALID;
+
+import java.util.Collections;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
@@ -40,13 +48,6 @@ import org.flowable.http.delegate.HttpRequestHandler;
 import org.flowable.http.delegate.HttpResponseHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSession;
-import java.util.Collections;
-
-import static org.flowable.http.ExpressionUtils.getStringSetFromField;
-import static org.flowable.http.HttpActivityExecutor.HTTP_TASK_REQUEST_FIELD_INVALID;
 
 /**
  * This class provides http task for cmmn models
@@ -152,17 +153,17 @@ public class CmmnHttpActivityBehaviorImpl extends CoreCmmnActivityBehavior {
 
             // Save request fields
             if (request.isSaveRequest()) {
-                planItemInstanceEntity.setVariable(request.getPrefix() + ".requestMethod", request.getMethod());
-                planItemInstanceEntity.setVariable(request.getPrefix() + ".requestUrl", request.getUrl());
-                planItemInstanceEntity.setVariable(request.getPrefix() + ".requestHeaders", request.getHeaders());
-                planItemInstanceEntity.setVariable(request.getPrefix() + ".requestBody", request.getBody());
-                planItemInstanceEntity.setVariable(request.getPrefix() + ".requestTimeout", request.getTimeout());
-                planItemInstanceEntity.setVariable(request.getPrefix() + ".disallowRedirects", request.isNoRedirects());
-                planItemInstanceEntity.setVariable(request.getPrefix() + ".failStatusCodes", failCodes);
-                planItemInstanceEntity.setVariable(request.getPrefix() + ".handleStatusCodes", handleCodes);
-                planItemInstanceEntity.setVariable(request.getPrefix() + ".ignoreException", request.isIgnoreErrors());
-                planItemInstanceEntity.setVariable(request.getPrefix() + ".saveRequestVariables", request.isSaveRequest());
-                planItemInstanceEntity.setVariable(request.getPrefix() + ".saveResponseParameters", request.isSaveResponse());
+                planItemInstanceEntity.setVariable(request.getPrefix() + "RequestMethod", request.getMethod());
+                planItemInstanceEntity.setVariable(request.getPrefix() + "RequestUrl", request.getUrl());
+                planItemInstanceEntity.setVariable(request.getPrefix() + "RequestHeaders", request.getHeaders());
+                planItemInstanceEntity.setVariable(request.getPrefix() + "RequestBody", request.getBody());
+                planItemInstanceEntity.setVariable(request.getPrefix() + "RequestTimeout", request.getTimeout());
+                planItemInstanceEntity.setVariable(request.getPrefix() + "DisallowRedirects", request.isNoRedirects());
+                planItemInstanceEntity.setVariable(request.getPrefix() + "FailStatusCodes", failCodes);
+                planItemInstanceEntity.setVariable(request.getPrefix() + "HandleStatusCodes", handleCodes);
+                planItemInstanceEntity.setVariable(request.getPrefix() + "IgnoreException", request.isIgnoreErrors());
+                planItemInstanceEntity.setVariable(request.getPrefix() + "SaveRequestVariables", request.isSaveRequest());
+                planItemInstanceEntity.setVariable(request.getPrefix() + "SaveResponseParameters", request.isSaveResponse());
             }
 
         } catch (Exception e) {

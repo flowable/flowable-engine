@@ -21,6 +21,3 @@ before_script:
 
 script:
   mvn test -Pcheck,errorLogging
-
-after_failure:
-  - cat /home/travis/build/flowable/flowable-engine/modules/*/target/surefire-reports/*.txt

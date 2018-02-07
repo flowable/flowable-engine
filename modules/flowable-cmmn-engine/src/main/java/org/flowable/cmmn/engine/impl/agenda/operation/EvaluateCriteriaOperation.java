@@ -18,9 +18,11 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.cmmn.api.runtime.CaseInstanceState;
 import org.flowable.cmmn.api.runtime.PlanItemInstanceState;
 import org.flowable.cmmn.engine.impl.criteria.PlanItemLifeCycleEvent;
 import org.flowable.cmmn.engine.impl.persistence.entity.CaseInstanceEntity;
+import org.flowable.cmmn.engine.impl.persistence.entity.CountingPlanItemInstanceEntity;
 import org.flowable.cmmn.engine.impl.persistence.entity.EntityWithSentryPartInstances;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceContainer;
 import org.flowable.cmmn.engine.impl.persistence.entity.PlanItemInstanceEntity;
@@ -77,6 +79,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             boolean criteriaChangeOrActiveChildren = evaluatePlanItemsCriteria(caseInstanceEntity);
             if (evaluateCaseInstanceCompleted 
                     && !criteriaChangeOrActiveChildren
+                    && !CaseInstanceState.END_STATES.contains(caseInstanceEntity.getState())
                     && isPlanModelComplete()){
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("No active plan items found for plan model, completing case instance");
@@ -260,7 +263,7 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             } else {
 
                 boolean sentryIfPartSatisfied = false;
-                Set<String> satisfiedSentryOnPartIds = new HashSet<>(1); // can maxmimum be one for a given sentry
+                Set<String> satisfiedSentryOnPartIds = new HashSet<>(1); // can maximum be one for a given sentry
                 for (SentryPartInstanceEntity sentryPartInstanceEntity : entityWithSentryPartInstances.getSatisfiedSentryPartInstances()) {
                     if (sentryPartInstanceEntity.getOnPartId() != null) {
                         satisfiedSentryOnPartIds.add(sentryPartInstanceEntity.getOnPartId());
@@ -326,9 +329,16 @@ public class EvaluateCriteriaOperation extends AbstractCaseInstanceOperation {
             sentryPartInstanceEntity.setCaseInstanceId(((CaseInstanceEntity) entityWithSentryPartInstances).getId());
             sentryPartInstanceEntity.setCaseDefinitionId(((CaseInstanceEntity) entityWithSentryPartInstances).getCaseDefinitionId());
         } else if (entityWithSentryPartInstances instanceof PlanItemInstanceEntity) {
-            sentryPartInstanceEntity.setCaseInstanceId(((PlanItemInstanceEntity) entityWithSentryPartInstances).getCaseInstanceId());
-            sentryPartInstanceEntity.setCaseDefinitionId(((PlanItemInstanceEntity) entityWithSentryPartInstances).getCaseDefinitionId());
-            sentryPartInstanceEntity.setPlanItemInstanceId(((PlanItemInstanceEntity) entityWithSentryPartInstances).getId());
+            PlanItemInstanceEntity planItemInstanceEntity = (PlanItemInstanceEntity) entityWithSentryPartInstances;
+            sentryPartInstanceEntity.setCaseInstanceId(planItemInstanceEntity.getCaseInstanceId());
+            sentryPartInstanceEntity.setCaseDefinitionId(planItemInstanceEntity.getCaseDefinitionId());
+            sentryPartInstanceEntity.setPlanItemInstanceId(planItemInstanceEntity.getId());
+            
+            // Update relationship count
+            if (entityWithSentryPartInstances instanceof CountingPlanItemInstanceEntity) {
+                CountingPlanItemInstanceEntity countingPlanItemInstanceEntity = (CountingPlanItemInstanceEntity) planItemInstanceEntity;
+                countingPlanItemInstanceEntity.setSentryPartInstanceCount(countingPlanItemInstanceEntity.getSentryPartInstanceCount() + 1);
+            }
         }
 
         sentryPartInstanceEntityManager.insert(sentryPartInstanceEntity);

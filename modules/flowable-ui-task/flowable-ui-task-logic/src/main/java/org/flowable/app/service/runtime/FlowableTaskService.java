@@ -15,8 +15,6 @@ package org.flowable.app.service.runtime;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.model.common.UserRepresentation;
 import org.flowable.app.model.runtime.TaskRepresentation;
@@ -47,7 +45,7 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(FlowableTaskService.class);
 
-    public TaskRepresentation getTask(String taskId, HttpServletResponse response) {
+    public TaskRepresentation getTask(String taskId) {
         User currentUser = SecurityUtils.getCurrentUserObject();
         HistoricTaskInstance task = permissionService.validateReadPermissionOnTask(currentUser, taskId);
 
@@ -56,19 +54,23 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
             try {
                 ProcessDefinition processDefinition = repositoryService.getProcessDefinition(task.getProcessDefinitionId());
                 rep = new TaskRepresentation(task, processDefinition);
-                
+
             } catch (FlowableException e) {
                 LOGGER.error("Error getting process definition {}", task.getProcessDefinitionId(), e);
             }
-            
+
         } else if (StringUtils.isNotEmpty(task.getScopeDefinitionId())) {
             try {
                 CaseDefinition caseDefinition = cmmnRepositoryService.getCaseDefinition(task.getScopeDefinitionId());
                 rep = new TaskRepresentation(task, caseDefinition);
-                
+
             } catch (FlowableException e) {
                 LOGGER.error("Error getting case definition {}", task.getScopeDefinitionId(), e);
             }
+            
+        } else if (StringUtils.isNotEmpty(task.getParentTaskId())) {
+            HistoricTaskInstance parentTask = permissionService.validateReadPermissionOnTask(currentUser, task.getParentTaskId());
+            rep = new TaskRepresentation(task, parentTask);
         } else {
             rep = new TaskRepresentation(task);
         }
@@ -80,6 +82,19 @@ public class FlowableTaskService extends FlowableAbstractTaskService {
         rep.setInvolvedPeople(getInvolvedUsers(taskId));
 
         return rep;
+    }
+
+    public List<TaskRepresentation> getSubTasks(String taskId) {
+        User currentUser = SecurityUtils.getCurrentUserObject();
+        HistoricTaskInstance parentTask = permissionService.validateReadPermissionOnTask(currentUser, taskId);
+        
+        List<Task> subTasks = this.taskService.getSubTasks(taskId);
+        List<TaskRepresentation> subTasksRepresentations = new ArrayList<>(subTasks.size());
+        for (Task subTask : subTasks) {
+            subTasksRepresentations.add(new TaskRepresentation(subTask, parentTask));
+        }
+        
+        return subTasksRepresentations;
     }
 
     protected void populateAssignee(TaskInfo task, TaskRepresentation rep) {

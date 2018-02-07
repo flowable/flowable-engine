@@ -18,12 +18,12 @@ import java.util.Map;
 
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.compatibility.Flowable5CompatibilityHandler;
+import org.flowable.engine.impl.form.FormHandlerHelper;
 import org.flowable.engine.impl.form.StartFormHandler;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
-import org.flowable.engine.impl.util.FormHandlerUtil;
 import org.flowable.engine.impl.util.ProcessInstanceHelper;
 import org.flowable.engine.runtime.ProcessInstance;
 
@@ -63,7 +63,8 @@ public class SubmitStartFormCmd extends NeedsActiveProcessDefinitionCmd<ProcessI
 
         CommandContextUtil.getHistoryManager(commandContext).recordFormPropertiesSubmitted(processInstance.getExecutions().get(0), properties, null);
 
-        StartFormHandler startFormHandler = FormHandlerUtil.getStartFormHandler(commandContext, processDefinition);
+        FormHandlerHelper formHandlerHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getFormHandlerHelper();
+        StartFormHandler startFormHandler = formHandlerHelper.getStartFormHandler(commandContext, processDefinition);
         startFormHandler.submitFormProperties(properties, processInstance);
 
         processInstanceHelper.startProcessInstance(processInstance, commandContext, convertPropertiesToVariablesMap());

@@ -13,6 +13,8 @@
 
 package org.flowable.rest.service.api.runtime.process;
 
+import java.util.List;
+
 import io.swagger.annotations.ApiModelProperty;
 
 /**
@@ -20,24 +22,24 @@ import io.swagger.annotations.ApiModelProperty;
  */
 public class ExecutionChangeActivityStateRequest {
 
-    protected String cancelActivityId;
-    protected String startActivityId;
+    protected List<String> cancelActivityIds;
+    protected List<String> startActivityIds;
 
-    public String getCancelActivityId() {
-        return cancelActivityId;
+    public List<String> getCancelActivityIds() {
+        return cancelActivityIds;
     }
 
-    @ApiModelProperty(value = "activityId to be canceled")
-    public void setCancelActivityId(String cancelActivityId) {
-        this.cancelActivityId = cancelActivityId;
+    @ApiModelProperty(value = "activityIds to be canceled")
+    public void setCancelActivityIds(List<String> cancelActivityIds) {
+        this.cancelActivityIds = cancelActivityIds;
     }
 
-    public String getStartActivityId() {
-        return startActivityId;
+    public List<String> getStartActivityIds() {
+        return startActivityIds;
     }
 
-    @ApiModelProperty(value = "activityId to be started")
-    public void setStartActivityId(String startActivityId) {
-        this.startActivityId = startActivityId;
+    @ApiModelProperty(value = "activityIds to be started")
+    public void setStartActivityIds(List<String> startActivityIds) {
+        this.startActivityIds = startActivityIds;
     }
 }

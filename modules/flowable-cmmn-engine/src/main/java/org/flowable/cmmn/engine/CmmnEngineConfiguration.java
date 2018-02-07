@@ -221,7 +221,6 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected HistoricCaseInstanceDataManager historicCaseInstanceDataManager;
     protected HistoricMilestoneInstanceEntityManager historicMilestoneInstanceEntityManager;
 
-    // IDM ENGINE /////////////////////////////////////////////////////
     protected boolean disableIdmEngine;
 
     protected CaseInstanceHelper caseInstanceHelper;
@@ -286,7 +285,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected TaskServiceConfiguration taskServiceConfiguration;
     protected InternalHistoryTaskManager internalHistoryTaskManager;
     protected InternalTaskVariableScopeResolver internalTaskVariableScopeResolver;
-    protected boolean isEnableTaskRelationshipCounts;
+    protected boolean isEnableTaskRelationshipCounts = true;
     protected int taskQueryLimit;
     protected int historicTaskQueryLimit;
 

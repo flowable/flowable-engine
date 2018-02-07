@@ -109,7 +109,7 @@ public class GetDataObjectCmd implements Command<DataObject>, Serializable {
                 }
 
             } else {
-                SubProcess subProcess = (SubProcess) bpmnModel.getFlowElement(execution.getActivityId());
+                SubProcess subProcess = (SubProcess) bpmnModel.getFlowElement(executionEntity.getActivityId());
                 for (ValuedDataObject dataObjectDefinition : subProcess.getDataObjects()) {
                     if (dataObjectDefinition.getName().equals(variableEntity.getName())) {
                         foundDataObject = dataObjectDefinition;

@@ -14,17 +14,14 @@
 package org.flowable.engine.impl.cmd;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.flowable.bpmn.model.FlowElement;
-import org.flowable.bpmn.model.SubProcess;
+import org.flowable.engine.common.api.FlowableException;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.dynamic.DynamicStateManager;
+import org.flowable.engine.impl.dynamic.MoveExecutionEntityContainer;
 import org.flowable.engine.impl.persistence.entity.ExecutionEntity;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl;
 import org.flowable.engine.impl.runtime.ChangeActivityStateBuilderImpl.MoveActivityIdContainer;
@@ -74,7 +71,24 @@ public class ChangeActivityStateCmd implements Command<Void> {
                     executions.add(execution);
                 }
                 
-                moveExecutionEntityContainerList.add(new MoveExecutionEntityContainer(executions, activityContainer.getMoveToActivityIds()));
+                MoveExecutionEntityContainer moveExecutionEntityContainer = new MoveExecutionEntityContainer(executions, activityContainer.getMoveToActivityIds());
+                
+                if (activityContainer.isMoveToParentProcess()) {
+                    ExecutionEntity processInstanceExecution = executions.get(0).getProcessInstance();
+                    ExecutionEntity superExecution = processInstanceExecution.getSuperExecution();
+                    if (superExecution == null) {
+                        throw new FlowableException("No parent process found for execution with activity id " + executions.get(0).getCurrentActivityId());
+                    }
+                    
+                    moveExecutionEntityContainer.setMoveToParentProcess(true);
+                    moveExecutionEntityContainer.setSuperExecution(superExecution);
+                
+                } else if (activityContainer.isMoveToSubProcessInstance()) {
+                    moveExecutionEntityContainer.setMoveToSubProcessInstance(true);
+                    moveExecutionEntityContainer.setCallActivityId(activityContainer.getCallActivityId());
+                }
+                
+                moveExecutionEntityContainerList.add(moveExecutionEntityContainer);
             }
         }
 
@@ -82,73 +96,6 @@ public class ChangeActivityStateCmd implements Command<Void> {
                         changeActivityStateBuilder.getLocalVariables(), commandContext);
 
         return null;
-    }
-    
-    public class MoveExecutionEntityContainer {
-        
-        protected List<ExecutionEntity> executions;
-        protected List<String> moveToActivityIds;
-        protected Map<String, ExecutionEntity> continueParentExecutionMap = new HashMap<>();
-        protected Map<String, FlowElement> moveToFlowElementMap = new HashMap<>();
-        protected Map<String, List<SubProcess>> subProcessesToCreateMap = new HashMap<>();
-        protected Map<String, ExecutionEntity> newSubProcessChildExecutionMap = new HashMap<>();
-        
-        public MoveExecutionEntityContainer(List<ExecutionEntity> executions, List<String> moveToActivityIds) {
-            this.executions = executions;
-            this.moveToActivityIds = moveToActivityIds;
-        }
-        
-        public List<ExecutionEntity> getExecutions() {
-            return executions;    
-        }
-        
-        public List<String> getMoveToActivityIds() {
-            return moveToActivityIds;
-        }
-        
-        public void addContinueParentExecution(String executionId, ExecutionEntity continueParentExecution) {
-            continueParentExecutionMap.put(executionId, continueParentExecution);
-        }
-        
-        public ExecutionEntity getContinueParentExecution(String executionId) {
-            return continueParentExecutionMap.get(executionId);
-        }
-        
-        public void addMoveToFlowElement(String activityId, FlowElement flowElement) {
-            moveToFlowElementMap.put(activityId, flowElement);
-        }
-        
-        public FlowElement getMoveToFlowElement(String activityId) {
-            return moveToFlowElementMap.get(activityId);
-        }
-        
-        public Collection<FlowElement> getMoveToFlowElements() {
-            return moveToFlowElementMap.values();
-        }
-        
-        public void addSubProcessToCreate(String activityId, SubProcess subProcess) {
-            List<SubProcess> subProcesses = null;
-            if (subProcessesToCreateMap.containsKey(activityId)) {
-                subProcesses = subProcessesToCreateMap.get(activityId);
-            } else {
-                subProcesses = new ArrayList<>();
-            }
-            
-            subProcesses.add(0, subProcess);
-            subProcessesToCreateMap.put(activityId, subProcesses);
-        }
-        
-        public Map<String, List<SubProcess>> getSubProcessesToCreateMap() {
-            return subProcessesToCreateMap;
-        }
-        
-        public void addNewSubProcessChildExecution(String subProcessId, ExecutionEntity childExecution) {
-            newSubProcessChildExecutionMap.put(subProcessId, childExecution);
-        }
-        
-        public ExecutionEntity getNewSubProcessChildExecution(String subProcessId) {
-            return newSubProcessChildExecutionMap.get(subProcessId);
-        }
     }
 
 }

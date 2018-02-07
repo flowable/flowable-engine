@@ -124,7 +124,6 @@ public class MybatisVariableInstanceDataManager extends AbstractDataManager<Vari
     }
     
     @Override
-    @SuppressWarnings("unchecked")
     public List<VariableInstanceEntity> findVariableInstanceByScopeIdAndScopeType(String scopeId, String scopeType) {
         Map<String, Object> params = new HashMap<>(2);
         params.put("scopeId", scopeId);
@@ -174,6 +173,14 @@ public class MybatisVariableInstanceDataManager extends AbstractDataManager<Vari
         params.put("scopeType", scopeType);
         params.put("variableNames", variableNames);
         return getList("selectVariableInstanceBySubScopeIdAndScopeTypeAndNames", params, variableInstanceBySubScopeIdAndScopeTypeAndVariableNamesMatcher, true);
+    }
+    
+    @Override
+    public void deleteByScopeIdAndScopeType(String scopeId, String scopeType) {
+        Map<String, Object> params = new HashMap<>(3);
+        params.put("scopeId", scopeId);
+        params.put("scopeType", scopeType);
+        bulkDelete("deleteVariablesByScopeIdAndScopeType", params, getManagedEntityClass(), variableInstanceByScopeIdAndScopeTypeMatcher);
     }
 
 }

@@ -230,5 +230,43 @@ public abstract class AbstractDataManager<EntityImpl extends Entity> implements 
 
         return result;
     }
+    
+    /**
+     * Does a bulk delete, but also uses the provided {@link CachedEntityMatcher}
+     * to look in the cache to mark the cached entities as deleted. 
+     * (This is necessary if entities are inserted and deleted in the same operation). 
+     */
+    public void bulkDelete(String statement, Object parameter, Class<? extends EntityImpl> entityClass, CachedEntityMatcher<EntityImpl> cachedEntityMatcher) {
+        DbSqlSession dbSqlSession = getDbSqlSession();
+        
+        // Regular bulk delete
+        dbSqlSession.delete(statement, parameter, entityClass);
+        
+        // Special care needs to be taken for entities that have been in inserted in the same transaction
+        // as when this bulk delete is issued: the entities needs to be added to the deleted list. 
+        // This will not trigger an actual delete in the database, but will have as result that the entity will be
+        // a) marked as deleted
+        // b) the insert and the delete will cancel out each other, leaving only the bulk delete.
+        
+        verifyBulkDeleteForCachedEntities(dbSqlSession, getEntityCache().findInCacheAsCachedObjects(getManagedEntityClass()), parameter, cachedEntityMatcher);
+        if (getManagedEntitySubClasses() != null && cachedEntityMatcher != null) {
+            for (Class<? extends EntityImpl> entitySubClass : getManagedEntitySubClasses()) {
+                verifyBulkDeleteForCachedEntities(dbSqlSession, getEntityCache().findInCacheAsCachedObjects(entitySubClass), parameter, cachedEntityMatcher);
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    protected void verifyBulkDeleteForCachedEntities(DbSqlSession dbSqlSession, Collection<CachedEntity> cachedObjects, Object parameter, CachedEntityMatcher<EntityImpl> cachedEntityMatcher) {
+        if (cachedObjects != null && cachedEntityMatcher != null) {
+            for (CachedEntity cachedObject : cachedObjects) {
+                EntityImpl cachedEntity = (EntityImpl) cachedObject.getEntity();
+                if (cachedEntity.isInserted() && cachedEntityMatcher.isRetained(null, cachedObjects, cachedEntity, parameter)) {
+                    cachedEntity.setDeleted(true);
+                    dbSqlSession.delete(cachedEntity);
+                }
+            }
+        }
+    }
 
 }

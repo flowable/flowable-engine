@@ -10,28 +10,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.flowable.engine.impl.form;
-
-import org.flowable.engine.common.impl.javax.el.ValueExpression;
-import org.flowable.engine.common.impl.javax.el.VariableMapper;
-import org.flowable.task.service.impl.persistence.entity.TaskEntity;
+package org.flowable.engine.common.api.delegate.event;
 
 /**
- * @author Tom Baeyens
+ * @author Joram Barrez
  */
-public class TaskVariableMapper extends VariableMapper {
+public abstract class AbstractFlowableEventListener implements FlowableEventListener {
 
-    public TaskVariableMapper(TaskEntity task) {
+    protected String onTransaction;
+    
+    @Override
+    public boolean isFireOnTransactionLifecycleEvent() {
+        return onTransaction != null;
     }
 
     @Override
-    public ValueExpression resolveVariable(String variableName) {
-        return null;
+    public String getOnTransaction() {
+        return onTransaction;
     }
 
-    @Override
-    public ValueExpression setVariable(String variableName, ValueExpression arg1) {
-        return null;
+    public void setOnTransaction(String onTransaction) {
+        this.onTransaction = onTransaction;
     }
 
 }

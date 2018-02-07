@@ -76,7 +76,7 @@ public class MybatisDecisionTableDataManager extends AbstractDmnDataManager<Deci
 
     @Override
     public void deleteDecisionTablesByDeploymentId(String deploymentId) {
-        getDbSqlSession().delete("deleteDecisionTablesByDeploymentId", deploymentId);
+        getDbSqlSession().delete("deleteDecisionTablesByDeploymentId", deploymentId, getManagedEntityClass());
     }
 
     @Override

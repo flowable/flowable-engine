@@ -45,5 +45,10 @@ public class SentryPartInstanceEntityManagerImpl extends AbstractCmmnEntityManag
     public List<SentryPartInstanceEntity> findSentryPartInstancesByPlanItemInstanceId(String planItemId) {
         return sentryPartInstanceDataManager.findSentryPartInstancesByPlanItemInstanceId(planItemId);
     }
+    
+    @Override
+    public void deleteByCaseInstanceId(String caseInstanceId) {
+        sentryPartInstanceDataManager.deleteByCaseInstanceId(caseInstanceId);
+    }
 
 }

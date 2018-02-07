@@ -46,7 +46,7 @@ angular.module('flowableApp').service('TaskService', ['$http', '$q', '$rootScope
                 }
             );
         };
-        
+
         this.getCaseInstanceTasks = function(caseInstanceId, isCompleted) {
 
             var data = {
@@ -184,6 +184,27 @@ angular.module('flowableApp').service('TaskService', ['$http', '$q', '$rootScope
             return deferred.promise;
         };
 
+        /*
+         * Get all subTasks for a task
+         */
+        this.getSubTasks = function (taskId) {
+
+            var deferred = $q.defer();
+
+            $http({
+                method: 'GET',
+                url: FLOWABLE.CONFIG.contextRoot + '/app/rest/tasks/' + taskId + '/subtasks',
+                params: {latestFirst: true}
+            }).success(function (response, status, headers, config) {
+                deferred.resolve(response);
+            })
+                .error(function (response, status, headers, config) {
+                    deferred.reject(response);
+                });
+
+            return deferred.promise;
+        };
+
         this.assignTask = function(taskId, userId) {
             var assignData = {
                 assignee: userId
@@ -241,5 +262,5 @@ angular.module('flowableApp').service('TaskService', ['$http', '$q', '$rootScope
             var promise = deferred.promise;
             return promise;
         };
-        
+
     }]);

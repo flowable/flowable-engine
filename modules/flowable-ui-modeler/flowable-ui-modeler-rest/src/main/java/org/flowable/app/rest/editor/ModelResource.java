@@ -102,10 +102,20 @@ public class ModelResource {
         try {
             updatedModel.updateModel(model);
             
-            if (model.getModelType() != null && (Model.MODEL_TYPE_DECISION_TABLE == model.getModelType() || Model.MODEL_TYPE_FORM == model.getModelType())) {
+            if (model.getModelType() != null) {
                 ObjectNode modelNode = (ObjectNode) objectMapper.readTree(model.getModelEditorJson());
                 modelNode.put("name", model.getName());
                 modelNode.put("key", model.getKey());
+
+                if (Model.MODEL_TYPE_BPMN == model.getModelType()) {
+                    ObjectNode propertiesNode = (ObjectNode) modelNode.get("properties");
+                    propertiesNode.put("process_id", model.getKey());
+                    propertiesNode.put("name", model.getName());
+                    if (StringUtils.isNotEmpty(model.getDescription())) {
+                        propertiesNode.put("documentation", model.getDescription());
+                    }
+                    modelNode.set("properties", propertiesNode);
+                }
                 model.setModelEditorJson(modelNode.toString());
             }
             

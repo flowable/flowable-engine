@@ -20,10 +20,10 @@ import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
 import org.flowable.engine.form.StartFormData;
+import org.flowable.engine.impl.form.FormHandlerHelper;
 import org.flowable.engine.impl.form.StartFormHandler;
 import org.flowable.engine.impl.util.CommandContextUtil;
 import org.flowable.engine.impl.util.Flowable5Util;
-import org.flowable.engine.impl.util.FormHandlerUtil;
 import org.flowable.engine.repository.ProcessDefinition;
 
 /**
@@ -49,7 +49,8 @@ public class GetStartFormCmd implements Command<StartFormData>, Serializable {
             return Flowable5Util.getFlowable5CompatibilityHandler().getStartFormData(processDefinitionId);
         }
 
-        StartFormHandler startFormHandler = FormHandlerUtil.getStartFormHandler(commandContext, processDefinition);
+        FormHandlerHelper formHandlerHelper = CommandContextUtil.getProcessEngineConfiguration(commandContext).getFormHandlerHelper();
+        StartFormHandler startFormHandler = formHandlerHelper.getStartFormHandler(commandContext, processDefinition);
         if (startFormHandler == null) {
             throw new FlowableException("No startFormHandler defined in process '" + processDefinitionId + "'");
         }

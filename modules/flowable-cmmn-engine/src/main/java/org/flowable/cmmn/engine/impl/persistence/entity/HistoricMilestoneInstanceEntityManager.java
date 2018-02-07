@@ -29,6 +29,4 @@ public interface HistoricMilestoneInstanceEntityManager extends EntityManager<Hi
 
     long findHistoricMilestoneInstanceCountByQueryCriteria(HistoricMilestoneInstanceQuery query);
     
-    void deleteByCaseDefinitionId(String caseDefinitionId);
-
 }

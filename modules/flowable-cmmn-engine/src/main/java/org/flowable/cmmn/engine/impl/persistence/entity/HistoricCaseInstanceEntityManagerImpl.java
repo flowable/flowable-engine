@@ -59,9 +59,4 @@ public class HistoricCaseInstanceEntityManagerImpl extends AbstractCmmnEntityMan
         return historicCaseInstanceDataManager.countByCriteria((HistoricCaseInstanceQueryImpl) query);
     }
     
-    @Override
-    public void deleteByCaseDefinitionId(String caseDefinitionId) {
-        historicCaseInstanceDataManager.deleteByCaseDefinitionId(caseDefinitionId);
-    }
-
 }

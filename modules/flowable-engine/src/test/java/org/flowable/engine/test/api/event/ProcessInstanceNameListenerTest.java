@@ -22,9 +22,9 @@ import org.flowable.bpmn.model.BpmnModel;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.impl.util.io.InputStreamSource;
 import org.flowable.engine.common.impl.util.io.StreamSource;
+import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.impl.test.PluggableFlowableTestCase;
 import org.flowable.engine.runtime.ProcessInstance;
 import org.flowable.engine.test.Deployment;
@@ -85,7 +85,7 @@ public class ProcessInstanceNameListenerTest extends PluggableFlowableTestCase {
         }
     }
 
-    private class TestInitializedEntityEventListener implements FlowableEventListener {
+    private class TestInitializedEntityEventListener extends AbstractFlowableEngineEventListener {
 
         protected String processName = null;
         protected String processDefinitionName = null;

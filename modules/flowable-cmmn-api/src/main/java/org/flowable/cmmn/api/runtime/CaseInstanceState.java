@@ -12,6 +12,10 @@
  */
 package org.flowable.cmmn.api.runtime;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+
 /**
  * @author Joram Barrez
  */
@@ -27,5 +31,7 @@ public interface CaseInstanceState {
     String SUSPENDED = "suspended";
     String CLOSED = "closed";
     String TERMINATED = "terminated";
+    
+    Set<String> END_STATES = new HashSet<>(Arrays.asList(COMPLETED, FAILED, SUSPENDED, CLOSED, TERMINATED));
 
 }

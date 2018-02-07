@@ -16,6 +16,7 @@ package org.flowable.bpmn.model;
  * Element for defining an event listener to hook in to the global event-mechanism.
  * 
  * @author Frederik Heremans
+ * @author Joram Barrez
  */
 public class EventListener extends BaseElement {
 
@@ -23,6 +24,7 @@ public class EventListener extends BaseElement {
     protected String implementationType;
     protected String implementation;
     protected String entityType;
+    protected String onTransaction;
 
     public String getEvents() {
         return events;
@@ -55,6 +57,14 @@ public class EventListener extends BaseElement {
     public String getEntityType() {
         return entityType;
     }
+    
+    public String getOnTransaction() {
+        return onTransaction;
+    }
+
+    public void setOnTransaction(String onTransaction) {
+        this.onTransaction = onTransaction;
+    }
 
     @Override
     public EventListener clone() {
@@ -68,5 +78,6 @@ public class EventListener extends BaseElement {
         setImplementation(otherListener.getImplementation());
         setImplementationType(otherListener.getImplementationType());
         setEntityType(otherListener.getEntityType());
+        setOnTransaction(otherListener.getOnTransaction());
     }
 }

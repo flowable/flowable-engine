@@ -12,6 +12,7 @@
  */
 package org.activiti.engine.impl.bpmn.helper;
 
+import org.flowable.engine.common.api.delegate.event.AbstractFlowableEventListener;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
@@ -21,14 +22,14 @@ import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
  * 
  * @author Frederik Heremans
  */
-public abstract class BaseDelegateEventListener implements FlowableEventListener {
+public abstract class BaseDelegateEventListener extends AbstractFlowableEventListener {
 
     protected Class<?> entityClass;
 
     public void setEntityClass(Class<?> entityClass) {
         this.entityClass = entityClass;
     }
-
+    
     protected boolean isValidEvent(FlowableEvent event) {
         boolean valid = false;
         if (entityClass != null) {

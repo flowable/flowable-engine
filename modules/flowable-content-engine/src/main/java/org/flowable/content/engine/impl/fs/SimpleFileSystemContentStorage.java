@@ -12,12 +12,9 @@
  */
 package org.flowable.content.engine.impl.fs;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Map;
-
+import com.fasterxml.uuid.EthernetAddress;
+import com.fasterxml.uuid.Generators;
+import com.fasterxml.uuid.impl.TimeBasedGenerator;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.content.api.ContentMetaDataKeys;
@@ -28,17 +25,19 @@ import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.uuid.EthernetAddress;
-import com.fasterxml.uuid.Generators;
-import com.fasterxml.uuid.impl.TimeBasedGenerator;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Map;
 
 /**
  * (Very) simple implementation of the {@link ContentStorage} that relies on the passed metadata to store content.
- * 
+ *
  * Under a root folder, a division between 'task' and 'process-instance' content is made. New content gets a new UUID assigned and is placed in one of these folders.
- * 
+ *
  * The id of the returned {@link ContentObject} indicates in which folder it is stored.
- * 
+ *
  * @author Joram Barrez
  */
 public class SimpleFileSystemContentStorage implements ContentStorage {
@@ -52,15 +51,18 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
 
     public static final String TYPE_TASK = "task-content";
     public static final String TYPE_PROCESS_INSTANCE = "process-instance-content";
+    public static final String TYPE_CASE_INSTANCE = "cmmn";
     public static final String TYPE_UNCATEGORIZED = "uncategorized";
 
     public static final String TASK_PREFIX = "task";
     public static final String PROCESS_INSTANCE_PREFIX = "proc";
+    public static final String CASE_PREFIX = "case";
     public static final String UNCATEGORIZED_PREFIX = "uncategorized";
 
     protected File contentFolderRoot;
     protected File taskFolder;
     protected File processInstanceFolder;
+    protected File caseFolder;
     protected File uncategorizedFolder;
 
     public SimpleFileSystemContentStorage(File contentFolderRoot) {
@@ -71,6 +73,7 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
     protected void validateOrCreateSubfolders() {
         taskFolder = validateOrCreateFolder(TYPE_TASK);
         processInstanceFolder = validateOrCreateFolder(TYPE_PROCESS_INSTANCE);
+        caseFolder = validateOrCreateFolder(TYPE_CASE_INSTANCE);
         uncategorizedFolder = validateOrCreateFolder(TYPE_UNCATEGORIZED);
     }
 
@@ -111,6 +114,11 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
         case TYPE_TASK:
             String taskId = (String) metaData.get(ContentMetaDataKeys.TASK_ID);
             contentId = TASK_PREFIX + "." + taskId;
+            break;
+
+        case TYPE_CASE_INSTANCE:
+            String caseId = (String) metaData.get(ContentMetaDataKeys.SCOPE_ID);
+            contentId = CASE_PREFIX + "." + caseId;
             break;
 
         default:
@@ -183,8 +191,15 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
     protected File getContentFile(String id) {
         String[] ids = id.split("\\.");
         String type = ids[0];
-        if (PROCESS_INSTANCE_PREFIX.equals(type) || TASK_PREFIX.equals(type)) {
-            File subFolder = PROCESS_INSTANCE_PREFIX.equals(type) ? processInstanceFolder : taskFolder;
+        if (PROCESS_INSTANCE_PREFIX.equals(type) || TASK_PREFIX.equals(type) || CASE_PREFIX.equals(type)) {
+            File subFolder=null;
+            if (PROCESS_INSTANCE_PREFIX.equals(type)) {
+                subFolder = processInstanceFolder;
+            } else if(TASK_PREFIX.equals(type)) {
+                subFolder = taskFolder;
+            } else if (CASE_PREFIX.equals(type)) {
+                subFolder = caseFolder;
+            }
             File idFolder = new File(subFolder, ids[1]);
             File contentFile = new File(idFolder, ids[2]);
             return contentFile;
@@ -238,6 +253,11 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
             return TYPE_TASK;
         }
 
+        String scopeType = (String) metaData.get(ContentMetaDataKeys.SCOPE_TYPE);
+        if (StringUtils.isNotEmpty(scopeType)) {
+            return scopeType;
+        }
+
         return TYPE_UNCATEGORIZED;
     }
 
@@ -250,6 +270,10 @@ public class SimpleFileSystemContentStorage implements ContentStorage {
         case TYPE_TASK:
             String taskId = (String) metaData.get(ContentMetaDataKeys.TASK_ID);
             return internalCreateOrGetFolder(taskFolder, taskId);
+
+        case TYPE_CASE_INSTANCE:
+            String caseId = (String) metaData.get(ContentMetaDataKeys.SCOPE_ID);
+            return internalCreateOrGetFolder(caseFolder, caseId);
 
         default:
             return uncategorizedFolder;

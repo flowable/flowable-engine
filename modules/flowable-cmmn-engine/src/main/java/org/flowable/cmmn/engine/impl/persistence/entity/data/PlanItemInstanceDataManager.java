@@ -24,14 +24,14 @@ import org.flowable.engine.common.impl.persistence.entity.data.DataManager;
  */
 public interface PlanItemInstanceDataManager extends DataManager<PlanItemInstanceEntity> {
     
-    List<PlanItemInstanceEntity> findChildPlanItemInstancesForCaseInstance(String caseInstanceId);
-    
-    List<PlanItemInstanceEntity> findChildPlanItemInstancesForStage(String stagePlanItemInstanceId);
+    List<PlanItemInstance> findByCriteria(PlanItemInstanceQueryImpl planItemInstanceQuery);
     
     long countByCriteria(PlanItemInstanceQueryImpl planItemInstanceQuery);
     
-    List<PlanItemInstance> findByCriteria(PlanItemInstanceQueryImpl planItemInstanceQuery);
-    
     void deleteByCaseDefinitionId(String caseDefinitionId);
+    
+    void deleteByStageInstanceId(String stageInstanceId);
+    
+    void deleteByCaseInstanceId(String caseInstanceId);
     
 }

@@ -35,8 +35,8 @@ public class CaseInstanceResource {
     protected FlowableCaseInstanceService caseInstanceService;
 
     @RequestMapping(value = "/rest/case-instances/{caseInstanceId}", method = RequestMethod.GET, produces = "application/json")
-    public CaseInstanceRepresentation getCaseInstance(@PathVariable String caseInstanceId, HttpServletResponse response) {
-        return caseInstanceService.getCaseInstance(caseInstanceId, response);
+    public CaseInstanceRepresentation getCaseInstance(@PathVariable String caseInstanceId) {
+        return caseInstanceService.getCaseInstance(caseInstanceId);
     }
 
     @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/start-form", method = RequestMethod.GET, produces = "application/json")

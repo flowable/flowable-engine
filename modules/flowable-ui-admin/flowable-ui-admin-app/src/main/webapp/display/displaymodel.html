@@ -56,10 +56,12 @@
          
             var elementsAdded = new Array();
             var elementsRemoved = new Array();
-            var startElement;
-            var startGlowElement;
-            var endElement;
-            var endGlowElement;
+            var changeStateStartElementIds = new Array();
+            var changeStateStartElements = new Array();
+            var changeStateStartGlowElements = new Array();
+            var changeStateEndElementIds = new Array();
+            var changeStateEndElements = new Array();
+            var changeStateEndGlowElements = new Array();
         	
         	function _showTip(htmlNode, element)
           	{
@@ -149,65 +151,45 @@
           		});
           		
           		topBodyRect.click(function() {
-          			if (startElement == element) {
-          				startGlowElement.remove();
-          				startElement = undefined;
+          		    var startElementIndex = $.inArray(element.id, changeStateStartElementIds);
+          		    var endElementIndex = $.inArray(element.id, changeStateEndElementIds);
+          		    if (startElementIndex >= 0) {
+          		        
+          		        var glowElement = changeStateStartGlowElements[startElementIndex];
+          				glowElement.remove();
           				
-          			} else if (endElement == element) {
-          				endGlowElement.remove();
-          				endElement = undefined;
+          				changeStateStartGlowElements.splice(startElementIndex, 1);
+          				changeStateStartElementIds.splice(startElementIndex, 1);
+                        changeStateStartElements.splice(startElementIndex, 1);
+          				
+          			} else if (endElementIndex >= 0) {
+          			
+          			    var glowElement = changeStateEndGlowElements[endElementIndex];
+                        glowElement.remove();
+                        
+                        changeStateEndGlowElements.splice(endElementIndex, 1);
+                        changeStateEndElementIds.splice(endElementIndex, 1);
+                        changeStateEndElements.splice(endElementIndex, 1);
           				
           			} else {
-          				if (startElement && !endElement) {
-							endGlowElement = topBodyRect.glow({'color': 'red'});
-							endElement = element;
-							
-							$.confirm({
-							    title: 'Change current activity?',
-							    content: 'Are you sure you want to move the current activity from ' + 
-							    	startElement.name + ' to ' + endElement.name,
-							    buttons: {
-							        confirm: function () {
-							            $.ajax({
-										    type: 'post',
-										    url: './app/rest/admin/process-instances/' + instanceId + '/change-state',
-										    contentType: 'application/json; charset=utf-8',
-										    data: JSON.stringify({
-										    	cancelActivityId: startElement.id,
-										    	startActivityId: endElement.id
-										    }),
-										    success: function() {
-										    	paper.clear();
-												_showProcessDiagram();
-										    }
-										});
-							        },
-							        cancel: function () {
-							            
-							        }
-							    }
-							});
-							
-							
-						} else {
-							if (startElement) {
-								startGlowElement.remove();
-	          					startElement = undefined;
-	          				}
-          					
-          					if (endElement) {
-	          					endGlowElement.remove();
-	          					endElement = undefined;
-	          				}
-          					
-          					if (element.current) {
-	          					startGlowElement = topBodyRect.glow({'color': 'blue'});
-								startElement = element;
-								
-							} else {
-								$.growl.warning({ message: 'You can only select an active activity as start element', location: 'tc', size: 'large' });
-							}
-						}
+          			    if (element.current) {
+          			       var startGlowElement = topBodyRect.glow({'color': 'blue'});
+          			       changeStateStartGlowElements.push(startGlowElement);
+          			       changeStateStartElementIds.push(element.id);
+          			       changeStateStartElements.push(element);
+                           
+          			    } else {
+          			       var endGlowElement = topBodyRect.glow({'color': 'red'});
+          			       changeStateEndGlowElements.push(endGlowElement);
+                           changeStateEndElementIds.push(element.id);
+                           changeStateEndElements.push(element);
+          			    }
+					}
+					
+					if (changeStateStartElements.length > 0 && changeStateEndElements.length > 0) {
+					   $('#changeStateButton').show();
+					} else {
+					   $('#changeStateButton').hide();
 					}
           		});
         	}
@@ -312,6 +294,56 @@
 				    alert("error");
 				});
 			}
+			
+			$(document).ready(function () {
+			 
+			     $(document).on('click', '#changeStateButton', function(e) {
+                    e.preventDefault();
+                    
+                    var startElementText = '';
+                    for (var i = 0; i < changeStateStartElements.length; i++) {
+                        if (startElementText.length > 0) {
+                            startElementText += ', ';
+                        }
+                        startElementText += changeStateStartElements[i].name
+                    }
+                    
+                    var endElementText = '';
+                    for (var i = 0; i < changeStateEndElements.length; i++) {
+                        if (endElementText.length > 0) {
+                            endElementText += ', ';
+                        }
+                        endElementText += changeStateEndElements[i].name
+                    }
+                    
+                    $.confirm({
+                        title: 'Change current activity?',
+                        content: 'Are you sure you want to move the current state from (' + 
+                            startElementText + ') to (' + endElementText + ')',
+                        buttons: {
+                            confirm: function () {
+                                $.ajax({
+                                    type: 'post',
+                                    url: './app/rest/admin/process-instances/' + instanceId + '/change-state',
+                                    contentType: 'application/json; charset=utf-8',
+                                    data: JSON.stringify({
+                                        cancelActivityIds: changeStateStartElementIds,
+                                        startActivityIds: changeStateEndElementIds
+                                    }),
+                                    success: function() {
+                                        paper.clear();
+                                        _showProcessDiagram();
+                                    }
+                                });
+                            },
+                            cancel: function () {
+                                
+                            }
+                        }
+                    });
+                 });
+			     
+			});
 			
 			_showProcessDiagram();
 			

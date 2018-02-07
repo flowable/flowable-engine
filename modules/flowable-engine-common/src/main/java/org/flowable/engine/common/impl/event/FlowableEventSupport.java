@@ -22,6 +22,9 @@ import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.api.delegate.event.FlowableEventType;
+import org.flowable.engine.common.impl.cfg.TransactionContext;
+import org.flowable.engine.common.impl.cfg.TransactionState;
+import org.flowable.engine.common.impl.context.Context;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,6 +103,14 @@ public class FlowableEventSupport {
     }
 
     protected void dispatchEvent(FlowableEvent event, FlowableEventListener listener) {
+        if (listener.isFireOnTransactionLifecycleEvent()) {
+            dispatchTransactionEventListener(event, listener);
+        } else {
+            dispatchNormalEventListener(event, listener);
+        }
+    }
+
+    protected void dispatchNormalEventListener(FlowableEvent event, FlowableEventListener listener) {
         try {
             listener.onEvent(event);
         } catch (Throwable t) {
@@ -110,6 +121,30 @@ public class FlowableEventSupport {
                 // explicitly states that the exception should not bubble up
                 LOGGER.warn("Exception while executing event-listener, which was ignored", t);
             }
+        }
+    }
+
+    protected void dispatchTransactionEventListener(FlowableEvent event, FlowableEventListener listener) {
+        TransactionContext transactionContext = Context.getTransactionContext();
+        if (transactionContext == null) {
+            return;
+        }
+        
+        ExecuteEventListenerTransactionListener transactionListener = new ExecuteEventListenerTransactionListener(listener, event); 
+        if (listener.getOnTransaction().equalsIgnoreCase(TransactionState.COMMITTING.name())) {
+            transactionContext.addTransactionListener(TransactionState.COMMITTING, transactionListener);
+            
+        } else if (listener.getOnTransaction().equalsIgnoreCase(TransactionState.COMMITTED.name())) {
+            transactionContext.addTransactionListener(TransactionState.COMMITTED, transactionListener);
+            
+        } else if (listener.getOnTransaction().equalsIgnoreCase(TransactionState.ROLLINGBACK.name())) {
+            transactionContext.addTransactionListener(TransactionState.ROLLINGBACK, transactionListener);
+            
+        } else if (listener.getOnTransaction().equalsIgnoreCase(TransactionState.ROLLED_BACK.name())) {
+            transactionContext.addTransactionListener(TransactionState.ROLLED_BACK, transactionListener);
+            
+        } else {
+            LOGGER.warn("Unrecognised TransactionState {}", listener.getOnTransaction());
         }
     }
 
