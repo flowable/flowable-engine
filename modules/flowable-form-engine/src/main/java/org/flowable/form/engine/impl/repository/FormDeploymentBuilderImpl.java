@@ -17,7 +17,6 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 
 import org.apache.commons.io.IOUtils;
-import org.flowable.editor.form.converter.FormJsonConverter;
 import org.flowable.engine.common.api.FlowableException;
 import org.flowable.form.api.FormDeployment;
 import org.flowable.form.api.FormDeploymentBuilder;
@@ -27,7 +26,6 @@ import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntity;
 import org.flowable.form.engine.impl.persistence.entity.FormResourceEntity;
 import org.flowable.form.engine.impl.persistence.entity.FormResourceEntityManager;
 import org.flowable.form.engine.impl.util.CommandContextUtil;
-import org.flowable.form.model.FormModel;
 
 /**
  * @author Tijs Rademakers
@@ -114,11 +112,8 @@ public class FormDeploymentBuilderImpl implements FormDeploymentBuilder, Seriali
     }
 
     @Override
-    public FormDeploymentBuilder addFormDefinition(String resourceName, FormModel formDefinition) {
-        FormJsonConverter formConverter = new FormJsonConverter();
-        String formJson = formConverter.convertToJson(formDefinition);
-        addString(resourceName, formJson);
-
+    public FormDeploymentBuilder addFormDefinition(String resourceName, String formDefinition) {
+        addString(resourceName, formDefinition);
         return this;
     }
 

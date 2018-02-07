@@ -15,8 +15,6 @@ package org.flowable.form.api;
 import java.io.InputStream;
 import java.util.List;
 
-import org.flowable.form.model.FormModel;
-
 /**
  * Service providing access to the repository of forms.
  *
@@ -46,15 +44,15 @@ public interface FormRepositoryService {
 
     FormDefinition getFormDefinition(String formDefinitionId);
 
-    FormModel getFormModelById(String formDefinitionId);
+    FormInfo getFormModelById(String formDefinitionId);
 
-    FormModel getFormModelByKey(String formDefinitionKey);
+    FormInfo getFormModelByKey(String formDefinitionKey);
 
-    FormModel getFormModelByKey(String formDefinitionKey, String tenantId);
+    FormInfo getFormModelByKey(String formDefinitionKey, String tenantId);
 
-    FormModel getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId);
+    FormInfo getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId);
 
-    FormModel getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String tenantId);
+    FormInfo getFormModelByKeyAndParentDeploymentId(String formDefinitionKey, String parentDeploymentId, String tenantId);
 
     InputStream getFormDefinitionResource(String formDefinitionId);
 

@@ -12,23 +12,24 @@
  */
 package org.flowable.rest.form.service.api.form;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
-import io.swagger.annotations.ApiResponse;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.Authorization;
+import javax.servlet.http.HttpServletRequest;
+
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.form.api.FormInstanceInfo;
 import org.flowable.form.api.FormService;
-import org.flowable.form.model.FormInstanceModel;
 import org.flowable.rest.form.FormRestResponseFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.Authorization;
 
 /**
  * @author Yvo Swillens
@@ -51,7 +52,7 @@ public class FormInstanceModelResource {
     @PostMapping(value = "/form/form-instance-model", produces = "application/json")
     public FormInstanceModelResponse getFormInstanceModel(@ApiParam(name = "formInstanceModelRequest") @RequestBody FormRequest formRequest, HttpServletRequest request) {
 
-        FormInstanceModel formInstanceModel;
+        FormInstanceInfo formInstanceModel;
 
         if (formRequest.getFormInstanceId() != null) {
             formInstanceModel = formService.getFormInstanceModelById(

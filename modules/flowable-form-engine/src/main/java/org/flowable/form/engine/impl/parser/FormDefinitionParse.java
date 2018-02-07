@@ -31,7 +31,7 @@ import org.flowable.form.engine.impl.io.ResourceStreamSource;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
 import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntity;
 import org.flowable.form.engine.impl.util.CommandContextUtil;
-import org.flowable.form.model.FormModel;
+import org.flowable.form.model.SimpleFormModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +52,7 @@ public class FormDefinitionParse {
     protected StreamSource streamSource;
     protected String sourceSystemId;
 
-    protected FormModel formModel;
+    protected SimpleFormModel formModel;
 
     protected String targetNamespace;
 
@@ -80,7 +80,7 @@ public class FormDefinitionParse {
             }
 
             String formJson = IOUtils.toString(in);
-            formModel = converter.convertToFormModel(formJson, null, 1);
+            formModel = converter.convertToFormModel(formJson);
 
             if (formModel != null && formModel.getFields() != null) {
                 FormDefinitionEntity formDefinitionEntity = CommandContextUtil.getFormEngineConfiguration().getFormDefinitionEntityManager().create();
@@ -179,11 +179,11 @@ public class FormDefinitionParse {
         this.deployment = deployment;
     }
 
-    public FormModel getFormModel() {
+    public SimpleFormModel getFormModel() {
         return formModel;
     }
 
-    public void setFormModel(FormModel formModel) {
+    public void setFormModel(SimpleFormModel formModel) {
         this.formModel = formModel;
     }
 }

@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.flowable.app.model.runtime.CaseInstanceRepresentation;
 import org.flowable.app.service.runtime.FlowableCaseInstanceService;
-import org.flowable.form.model.FormModel;
+import org.flowable.form.model.SimpleFormModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,7 +40,7 @@ public class CaseInstanceResource {
     }
 
     @RequestMapping(value = "/rest/case-instances/{caseInstanceId}/start-form", method = RequestMethod.GET, produces = "application/json")
-    public FormModel getCaseInstanceStartForm(@PathVariable String caseInstanceId, HttpServletResponse response) {
+    public SimpleFormModel getCaseInstanceStartForm(@PathVariable String caseInstanceId, HttpServletResponse response) {
         //return caseInstanceService.getProcessInstanceStartForm(caseInstanceId, response);
         return null;
     }
