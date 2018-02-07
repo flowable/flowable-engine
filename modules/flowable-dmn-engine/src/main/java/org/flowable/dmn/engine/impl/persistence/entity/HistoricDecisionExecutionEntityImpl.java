@@ -37,6 +37,9 @@ public class HistoricDecisionExecutionEntityImpl extends AbstractEntityNoRevisio
     protected boolean failed;
     protected String tenantId = DmnEngineConfiguration.NO_TENANT_ID;
     protected String executionJson;
+    protected String decisionKey;
+    protected String decisionName;
+    protected String decisionVersion;
 
     @Override
     public Object getPersistentState() {
@@ -152,7 +155,34 @@ public class HistoricDecisionExecutionEntityImpl extends AbstractEntityNoRevisio
     public void setExecutionJson(String executionJson) {
         this.executionJson = executionJson;
     }
-    
+
+    @Override
+    public String getDecisionKey() {
+        return decisionKey;
+    }
+
+    public void setDecisionKey(String decisionKey) {
+        this.decisionKey = decisionKey;
+    }
+
+    @Override
+    public String getDecisionName() {
+        return decisionName;
+    }
+
+    public void setDecisionName(String decisionName) {
+        this.decisionName = decisionName;
+    }
+
+    @Override
+    public String getDecisionVersion() {
+        return decisionVersion;
+    }
+
+    public void setDecisionVersion(String decisionVersion) {
+        this.decisionVersion = decisionVersion;
+    }
+
     @Override
     public String toString() {
         return "HistoricDecisionExecutionEntity[" + id + "]";
