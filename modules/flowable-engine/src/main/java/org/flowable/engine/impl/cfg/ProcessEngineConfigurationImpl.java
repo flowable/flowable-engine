@@ -2032,7 +2032,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
                 }
             }
         }
-
     }
 
     public void initProcessValidator() {

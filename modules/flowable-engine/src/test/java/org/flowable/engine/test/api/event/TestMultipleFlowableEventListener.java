@@ -19,9 +19,9 @@ import java.util.List;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 
-public class TestMultipleFlowableEventListener implements FlowableEventListener {
+public class TestMultipleFlowableEventListener extends AbstractFlowableEngineEventListener {
 
     private List<FlowableEvent> eventsReceived;
     private List<Class<?>> entityClasses;

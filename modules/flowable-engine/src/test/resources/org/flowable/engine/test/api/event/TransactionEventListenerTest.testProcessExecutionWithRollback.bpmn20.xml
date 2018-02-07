@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:flowable="http://flowable.org/bpmn" targetNamespace="Examples">
+
+    <process id="testProcessExecutionWithRollback" isExecutable="true">
+
+        <startEvent id="theStart" />
+        <sequenceFlow id="flow1" sourceRef="theStart" targetRef="service" />
+        <serviceTask id="service" flowable:class="org.flowable.engine.test.api.event.TransactionEventListenerTest$ThrowExceptionDelegate" />
+        
+        <sequenceFlow id="flow2" sourceRef="service" targetRef="theTask" />
+        <userTask id="theTask" />
+
+    </process>
+
+</definitions>

@@ -12,8 +12,6 @@
  */
 package org.activiti.engine.impl.event.logger;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,18 +37,20 @@ import org.activiti.engine.impl.event.logger.handler.VariableUpdatedEventHandler
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandContextCloseListener;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.flowable.engine.common.api.delegate.event.AbstractFlowableEventListener;
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEntityEvent;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
 import org.flowable.engine.common.runtime.Clock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 /**
  * @author Joram Barrez
  */
-public class EventLogger implements FlowableEventListener {
+public class EventLogger extends AbstractFlowableEventListener {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(EventLogger.class);
 
@@ -231,5 +231,5 @@ public class EventLogger implements FlowableEventListener {
     public void setListeners(List<EventLoggerListener> listeners) {
         this.listeners = listeners;
     }
-
+    
 }
