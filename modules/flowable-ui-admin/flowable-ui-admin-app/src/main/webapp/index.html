@@ -74,7 +74,7 @@
                         <ul class="nav navbar-nav" ng-if="navigation.main == 'dmn-engine'">
                             <li ng-class="{active: navigation.sub == 'deployments'}"><a href="#decision-table-deployments" translate="GENERAL.MENU.DEPLOYMENTS"></a></li>
                             <li ng-class="{active: navigation.sub == 'decision-tables'}"><a href="#decision-tables" translate="GENERAL.MENU.DECISION-TABLES"></a></li>
-                            <!--TODO: <li ng-class="{active: navigation.sub == 'instances'}"><a href="#process-instances" translate="GENERAL.MENU.INSTANCES"></a></li>-->
+                            <li ng-class="{active: navigation.sub == 'executions'}"><a href="#decision-table-executions" translate="GENERAL.MENU.DECISION-TABLE-EXECUTIONS"></a></li>
                         </ul>
                         <ul class="nav navbar-nav" ng-if="navigation.main == 'content-engine'">
                             <li ng-class="{active: navigation.sub == 'content-items'}"><a href="#content-items" translate="GENERAL.MENU.CONTENT-ITEMS"></a></li>
@@ -160,6 +160,8 @@
         <script src="scripts/decision-table-deployment-controllers.js"></script>
         <script src="scripts/decision-tables-controllers.js"></script>
         <script src="scripts/decision-table-controllers.js"></script>
+        <script src="scripts/decision-table-executions-controllers.js"></script>
+        <script src="scripts/decision-table-execution-controllers.js"></script>
         <script src="scripts/form-deployments-controllers.js"></script>
         <script src="scripts/form-deployment-controllers.js"></script>
         <script src="scripts/form-definitions-controllers.js"></script>

@@ -150,6 +150,16 @@ flowableAdminApp
                     controller: 'DecisionTableController',
                     reloadOnSearch: true
                 })
+                .when('/decision-table-executions', {
+                    templateUrl: 'views/decision-table-executions.html',
+                    controller: 'DecisionTableExecutionsController',
+                    reloadOnSearch: true
+                })
+                .when('/decision-table-execution/:executionId', {
+                    templateUrl: 'views/decision-table-execution.html',
+                    controller: 'DecisionTableExecutionController',
+                    reloadOnSearch: true
+                })
                 .when('/form-deployments', {
                     templateUrl: 'views/form-deployments.html',
                     controller: 'FormDeploymentsController',

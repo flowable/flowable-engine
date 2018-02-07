@@ -1,0 +1,89 @@
+<div class="container" id="detail-container">
+	<div class="row">
+		<div class="col-md-9">
+			<div class="component" ng-show="execution">
+				<div class="title">
+					<div class="pull-right">
+						<a ng-click="returnToList()" class="action">&larr; {{'GENERAL.ACTION.RETURN-TO-LIST' | translate}}</a>
+					</div>
+					<h2>{{execution.id}}</h2>
+				</div>
+
+				<div class="property-wrapper">
+					<table>
+						<tr class="property">
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.DEFINITION-ID"></td>
+							<td><a ng-href="#/decision-table/{{execution.decisionDefinitionId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{execution.decisionDefinitionId}}</a></td>
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.DEPLOYMENT-ID"></td>
+							<td><a ng-href="#/decision-table-deployment/{{execution.deploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{execution.deploymentId}}</a></td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.DEFINITION-KEY"></td>
+							<td>{{execution.decisionKey}}</td>
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.DEFINITION-VERSION"></td>
+							<td>{{execution.decisionVersion}}</td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.DEFINITION-NAME"></td>
+							<td>{{execution.decisionName}}</td>
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.PROCESS-INSTANCE-ID"></td>
+							<td><a ng-href="#/process-instance/{{execution.instanceId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{execution.instanceId}}</a></td>
+						</tr>
+					</table>
+				</div>
+				<div class="seperator"></div>
+				<div class="property-wrapper">
+					<table>
+						<tr class="property" >
+							<td class="property-name"><span class="glyphicon glyphicon-time"></span> {{'DECISION-TABLE-EXECUTION.EXECUTION-START-TIME' | translate}}</td>
+							<td>{{execution.startTime | dateformat | empty}}</td>
+							<td class="property-name"><span class="glyphicon glyphicon-time"></span> {{'DECISION-TABLE-EXECUTION.EXECUTION-END-TIME' | translate}}</td>
+							<td>{{execution.endTime| dateformat}}</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	    <div class="col-md-3">
+			<div class="component tip-left">
+				<div class="title">
+					<h2 translate="GENERAL.TITLE.ACTIONS"></h2>
+				</div>
+				<ul class="list-group">
+
+				</ul>
+			</div>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-9">
+			<div class="component">
+				<div class="title">
+					<h2 translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.HEADER"></h2>
+				</div>
+				<div class="property-wrapper">
+					<table>
+						<tr class="property">
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.HIT-POLICY"></td>
+							<td>{{auditData.hitPolicy}}</td>
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.DEPLOYMENT-ID"></td>
+							<td><a ng-href="#/decision-table-deployment/{{execution.deploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{execution.deploymentId}}</a></td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.DEFINITION-KEY"></td>
+							<td>{{execution.decisionKey}}</td>
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.DEFINITION-VERSION"></td>
+							<td>{{execution.decisionVersion}}</td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.DEFINITION-NAME"></td>
+							<td>{{execution.decisionName}}</td>
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.PROCESS-INSTANCE-ID"></td>
+							<td><a ng-href="#/process-instance/{{execution.instanceId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{execution.instanceId}}</a></td>
+						</tr>
+					</table>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
