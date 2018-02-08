@@ -1,7 +1,7 @@
 <div class="container" id="detail-container">
 	<div class="row">
 		<div class="col-md-9">
-			<div class="component" ng-show="execution">
+			<div class="component" ng-show="execution" style="min-height: 210px;">
 				<div class="title">
 					<div class="pull-right">
 						<a ng-click="returnToList()" class="action">&larr; {{'GENERAL.ACTION.RETURN-TO-LIST' | translate}}</a>
@@ -66,22 +66,30 @@
 						<tr class="property">
 							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.HIT-POLICY"></td>
 							<td>{{auditData.hitPolicy}}</td>
-							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.DEPLOYMENT-ID"></td>
-							<td><a ng-href="#/decision-table-deployment/{{execution.deploymentId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{execution.deploymentId}}</a></td>
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.RESULT"></td>
+							<td><json-formatter json="auditData.decisionResult" open="2"></json-formatter></td>
 						</tr>
 						<tr class="property">
-							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.DEFINITION-KEY"></td>
-							<td>{{execution.decisionKey}}</td>
-							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.DEFINITION-VERSION"></td>
-							<td>{{execution.decisionVersion}}</td>
-						</tr>
-						<tr class="property">
-							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.DEFINITION-NAME"></td>
-							<td>{{execution.decisionName}}</td>
-							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.PROCESS-INSTANCE-ID"></td>
-							<td><a ng-href="#/process-instance/{{execution.instanceId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{execution.instanceId}}</a></td>
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.RULE-EXECUTIONS"></td>
+							<td colspan="3"><json-formatter json="auditData.ruleExecutions"></json-formatter></td>
 						</tr>
 					</table>
+				</div>
+				<div ng-if="auditData.inputVariables">
+					<div class="seperator"></div>
+					<div class="property-wrapper">
+						<table>
+							<tr class="property">
+								<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.INPUT-VARIABLES" colspan="4"></td>
+							</tr>
+							<tr class="property" data-ng-repeat="row in formattedInputVariables">
+								<td class="property-name">{{row[0].key}} <i>({{row[0].type}})</i></td>
+								<td>{{row[0].value}}</td>
+								<td class="property-name">{{row[1].key}} <i>({{row[0].type}})</i></td>
+								<td>{{row[1].value}}</td>
+							</tr>
+						</table>
+					</div>
 				</div>
 			</div>
 		</div>

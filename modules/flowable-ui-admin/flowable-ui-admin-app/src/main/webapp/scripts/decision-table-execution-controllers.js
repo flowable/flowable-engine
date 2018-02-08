@@ -12,64 +12,99 @@
  */
 'use strict';
 
-flowableAdminApp.controller('DecisionTableExecutionController', ['$scope', '$rootScope', '$http', '$timeout','$location','$routeParams', '$modal', '$translate', '$q',
+flowableAdminApp.controller('DecisionTableExecutionController', ['$scope', '$rootScope', '$http', '$timeout', '$location', '$routeParams', '$modal', '$translate', '$q',
     function ($scope, $rootScope, $http, $timeout, $location, $routeParams, $modal, $translate, $q) {
 
         $rootScope.navigation = {main: 'dmn-engine', sub: 'executions'};
-        
-		$scope.returnToList = function() {
-			$location.path("/decision-table-executions");
-		};
-		
-		$scope.openDecisionTable = function(definition) {
-			if (definition && definition.getProperty('id')) {
-				$location.path("/decision-table/" + definition.getProperty('id'));
-			}
-		};
 
-		$q.all([$translate('DECISION-TABLE-EXECUTION.HEADER.ID'),
+        $scope.returnToList = function () {
+            $location.path("/decision-table-executions");
+        };
+
+        $scope.openDecisionTable = function (definition) {
+            if (definition && definition.getProperty('id')) {
+                $location.path("/decision-table/" + definition.getProperty('id'));
+            }
+        };
+
+        $q.all([$translate('DECISION-TABLE-EXECUTION.HEADER.ID'),
             $translate('DECISION-TABLE-EXECUTION.HEADER.NAME'),
             $translate('DECISION-TABLE-EXECUTION.HEADER.VERSION'),
             $translate('DECISION-TABLE-EXECUTION.HEADER.KEY')])
-            .then(function(headers) { 
-        
+            .then(function (headers) {
+
                 $scope.gridDecisionTables = {
                     data: 'decisionTables.data',
                     enableRowReordering: false,
                     multiSelect: false,
-                    keepLastSelected : false,
+                    keepLastSelected: false,
                     enableSorting: false,
                     rowHeight: 36,
                     afterSelectionChange: $scope.openDecisionTable,
                     columnDefs: [
-                          { field: 'id', displayName: headers[0]},
-                          { field: 'name', displayName: headers[1]},
-                          { field: 'version', displayName: headers[2]},
-                          { field: 'key', displayName: headers[3]}
+                        {field: 'id', displayName: headers[0]},
+                        {field: 'name', displayName: headers[1]},
+                        {field: 'version', displayName: headers[2]},
+                        {field: 'key', displayName: headers[3]}
                     ]
                 };
-        });
-        
-		$scope.executeWhenReady(function() {
-		    // Load historic execution
-		    $http({method: 'GET', url: '/app/rest/admin/decision-tables/history/' + $routeParams.executionId}).
-  	    	    success(function(data, status, headers, config) {
-  	    	        $scope.execution = data;
-  	    	    }).
-  	    	    error(function(data, status, headers, config) {
-                    if (data && data.message) {
-                        // Extract error-message
-                        $rootScope.addAlert(data.message, 'error');
-                    } else {
-                        // Use default error-message
-                        $rootScope.addAlert($translate.instant('ALERT.GENERAL.HTTP-ERROR'), 'error');
+            });
+
+        var formatInputVariablesInRows = function (inputVariables, inputVariableTypes) {
+            var result = [];
+            var columnCounter = 1;
+            var noColumns = 2;
+            var tmpRow = [];
+
+            for (var key in inputVariables) {
+                if (inputVariables.hasOwnProperty(key)) {
+
+                    tmpRow.push({
+                        key: key,
+                        value: inputVariables[key],
+                        type: inputVariableTypes[key]
+                    });
+
+                    if (columnCounter === noColumns) {
+                        result.push(tmpRow);
                     }
-  	    	    });
+
+                    columnCounter++;
+                    if (columnCounter > noColumns) {
+                        tmpRow = [];
+                        columnCounter = 0;
+                    }
+                }
+            }
+            return result;
+        };
+
+        $scope.executeWhenReady(function () {
+            // Load historic execution
+            $http({
+                method: 'GET',
+                url: '/app/rest/admin/decision-tables/history/' + $routeParams.executionId
+            }).success(function (data, status, headers, config) {
+                $scope.execution = data;
+            }).error(function (data, status, headers, config) {
+                if (data && data.message) {
+                    // Extract error-message
+                    $rootScope.addAlert(data.message, 'error');
+                } else {
+                    // Use default error-message
+                    $rootScope.addAlert($translate.instant('ALERT.GENERAL.HTTP-ERROR'), 'error');
+                }
+            });
 
             // Load historic execution audit data
-            $http({method: 'GET', url: '/app/rest/admin/decision-tables/history/' + $routeParams.executionId + '/auditdata'}).
-                success(function(data, status, headers, config) {
-                    $scope.auditData = data;
-                });
-  	     });
-}]);
+            $http({
+                method: 'GET',
+                url: '/app/rest/admin/decision-tables/history/' + $routeParams.executionId + '/auditdata'
+            }).success(function (data, status, headers, config) {
+                $scope.auditData = data;
+                $scope.formattedInputVariables = formatInputVariablesInRows(
+                    data.inputVariables,
+                    data.inputVariableTypes);
+            });
+        });
+    }]);

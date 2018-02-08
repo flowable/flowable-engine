@@ -918,7 +918,12 @@
         },
         "AUDIT-DATA": {
             "HEADER": "Audit Data",
-            "HIT-POLICY": "Hit Policy"
+            "HIT-POLICY": "Hit Policy",
+            "RESULT": "Result",
+            "RULE-EXECUTIONS": "Rule Executions",
+            "INPUT-VARIABLES": "Input Variables",
+            "VARIABLE-KEY": "Key",
+            "VARIABLE-VALUE": "Value"
         }
     },
     "FORM-DEFINITIONS": {
