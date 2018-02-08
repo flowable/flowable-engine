@@ -190,6 +190,14 @@ public class DecisionExecutionAuditContainer {
         this.exceptionMessage = exceptionMessage;
     }
 
+    public Boolean isStrictMode() {
+        return strictMode;
+    }
+
+    public void setStrictMode(Boolean strictMode) {
+        this.strictMode = strictMode;
+    }
+
     public Map<String, String> getInputVariableTypes() {
         return inputVariableTypes;
     }
