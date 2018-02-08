@@ -10,7 +10,7 @@ FLOWABLE.CONFIG = {
     'formType': 9,
     'deployUrls': [{
         "name": "gasp-public",
-        "url": "http://localhost:9998/gasp-public/workflow/deploy"
+        "url": "http://localhost:9001/gasp-public/workflow/deploy"
     }],
     'appTitle': 'RDS System Builder'
 };

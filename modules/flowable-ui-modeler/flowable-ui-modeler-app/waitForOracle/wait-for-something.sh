@@ -1,15 +1,13 @@
 #!/bin/bash
 set -e
 
-host="$1"
-port="$2"
-description="$3"
-shift 3
+description="$1"
+shift 1
 cmd="$@"
 
-until nc -z "$host" "$port"; do
+until java -classpath /waitForOracle/ojdbc7-12.1.0.1.jar:/waitForOracle WaitForOracle; do
     echo "$description is unavailable - sleeping"
-    sleep 1
+    sleep 10
 done
 
 >&2 echo "$description is up - executing command"
