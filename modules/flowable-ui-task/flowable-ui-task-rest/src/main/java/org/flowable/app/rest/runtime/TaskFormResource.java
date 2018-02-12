@@ -13,9 +13,11 @@
 package org.flowable.app.rest.runtime;
 
 import org.flowable.app.model.runtime.CompleteFormRepresentation;
+import org.flowable.app.model.runtime.FormModelRepresentation;
 import org.flowable.app.model.runtime.SaveFormRepresentation;
 import org.flowable.app.service.runtime.FlowableTaskFormService;
-import org.flowable.form.model.FormModel;
+import org.flowable.form.api.FormInfo;
+import org.flowable.form.model.SimpleFormModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,8 +38,10 @@ public class TaskFormResource {
     protected FlowableTaskFormService taskFormService;
 
     @RequestMapping(value = "/{taskId}", method = RequestMethod.GET, produces = "application/json")
-    public FormModel getTaskForm(@PathVariable String taskId) {
-        return taskFormService.getTaskForm(taskId);
+    public FormModelRepresentation getTaskForm(@PathVariable String taskId) {
+        FormInfo formInfo = taskFormService.getTaskForm(taskId);
+        SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
+        return new FormModelRepresentation(formInfo, formModel);
     }
 
     @ResponseStatus(value = HttpStatus.OK)

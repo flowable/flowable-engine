@@ -12,8 +12,6 @@
  */
 package org.flowable.app.rest.runtime;
 
-import javax.servlet.http.HttpServletResponse;
-
 import org.flowable.app.model.runtime.TaskRepresentation;
 import org.flowable.app.model.runtime.TaskUpdateRepresentation;
 import org.flowable.app.service.runtime.FlowableTaskService;
@@ -24,6 +22,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 public class TaskResource {
 
@@ -31,13 +31,18 @@ public class TaskResource {
     protected FlowableTaskService taskService;
 
     @RequestMapping(value = "/rest/tasks/{taskId}", method = RequestMethod.GET, produces = "application/json")
-    public TaskRepresentation getTask(@PathVariable String taskId, HttpServletResponse response) {
-        return taskService.getTask(taskId, response);
+    public TaskRepresentation getTask(@PathVariable String taskId   ) {
+        return taskService.getTask(taskId);
     }
 
     @RequestMapping(value = "/rest/tasks/{taskId}", method = RequestMethod.PUT, produces = "application/json")
     public TaskRepresentation updateTask(@PathVariable("taskId") String taskId, @RequestBody TaskUpdateRepresentation updated) {
         return taskService.updateTask(taskId, updated);
+    }
+
+    @RequestMapping(value = "/rest/tasks/{taskId}/subtasks", method = RequestMethod.GET, produces = "application/json")
+    public List<TaskRepresentation> getSubTasks(@PathVariable String taskId) {
+        return taskService.getSubTasks(taskId);
     }
 
 }

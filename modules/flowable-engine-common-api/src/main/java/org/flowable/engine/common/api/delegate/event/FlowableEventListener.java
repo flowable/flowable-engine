@@ -16,14 +16,14 @@ package org.flowable.engine.common.api.delegate.event;
  * Describes a class that listens for {@link FlowableEvent}s dispatched by the engine.
  * 
  * @author Frederik Heremans
+ * @author Joram Barrez
  */
 public interface FlowableEventListener {
 
     /**
      * Called when an event has been fired
      * 
-     * @param event
-     *            the event
+     * @param event the event
      */
     void onEvent(FlowableEvent event);
 
@@ -31,4 +31,16 @@ public interface FlowableEventListener {
      * @return whether or not the current operation should fail when this listeners execution throws an exception.
      */
     boolean isFailOnException();
+    
+    /**
+     * @return Returns whether this event listener fires immediately when the event occurs or 
+     *         on a transaction lifecycle event (before/after commit or rollback).
+     */
+    boolean isFireOnTransactionLifecycleEvent();
+    
+    /**
+     * @return if non-null, indicates the point in the lifecycle of the current transaction when the event should be fired.
+     */
+    String getOnTransaction();
+    
 }

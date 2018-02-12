@@ -27,8 +27,8 @@ import org.flowable.cmmn.model.Case;
 import org.flowable.cmmn.model.CmmnModel;
 import org.flowable.editor.language.json.converter.util.CollectionUtils;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
+import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormRepositoryService;
-import org.flowable.form.model.FormModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,7 +84,7 @@ public class FlowableCaseDefinitionService {
         return result;
     }
 
-    public FormModel getCaseDefinitionStartForm(String caseDefinitionId) {
+    public FormInfo getCaseDefinitionStartForm(String caseDefinitionId) {
 
         CaseDefinition caseDefinition = cmmnRepositoryService.getCaseDefinition(caseDefinitionId);
 
@@ -107,7 +107,7 @@ public class FlowableCaseDefinitionService {
         return result;
     }
 
-    protected FormModel getStartForm(CaseDefinition caseDefinition) {
+    protected FormInfo getStartForm(CaseDefinition caseDefinition) {
         CmmnModel cmmnModel = this.cmmnRepositoryService.getCmmnModel(caseDefinition.getId());
         List<Case> cases = cmmnModel.getCases();
         if (cases == null || cases.size() != 1) {

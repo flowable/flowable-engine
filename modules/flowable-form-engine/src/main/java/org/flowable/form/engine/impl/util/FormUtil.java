@@ -18,10 +18,10 @@ import org.flowable.form.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.form.engine.impl.persistence.deploy.FormDefinitionCacheEntry;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntityManager;
-import org.flowable.form.model.FormModel;
+import org.flowable.form.model.SimpleFormModel;
 
 /**
- * A utility class that hides the complexity of {@link FormDefinitionEntity} and {@link FormModel} lookup. Use this class rather than accessing the decision table cache or {@link DeploymentManager}
+ * A utility class that hides the complexity of {@link FormDefinitionEntity} and {@link SimpleFormModel} lookup. Use this class rather than accessing the decision table cache or {@link DeploymentManager}
  * directly.
  * 
  * @author Joram Barrez
@@ -46,23 +46,21 @@ public class FormUtil {
         }
     }
 
-    public static FormModel getFormDefinition(String formDefinitionId) {
+    public static SimpleFormModel getFormDefinition(String formDefinitionId) {
         FormEngineConfiguration formEngineConfiguration = CommandContextUtil.getFormEngineConfiguration();
         DeploymentManager deploymentManager = formEngineConfiguration.getDeploymentManager();
 
         // This will check the cache in the findDeployedFormDefinitionById and resolveFormDefinition method
         FormDefinitionEntity formDefinitionEntity = deploymentManager.findDeployedFormDefinitionById(formDefinitionId);
         FormDefinitionCacheEntry cacheEntry = deploymentManager.resolveFormDefinition(formDefinitionEntity);
-        return formEngineConfiguration.getFormJsonConverter().convertToFormModel(cacheEntry.getFormDefinitionJson(),
-                cacheEntry.getFormDefinitionEntity().getId(), cacheEntry.getFormDefinitionEntity().getVersion());
+        return formEngineConfiguration.getFormJsonConverter().convertToFormModel(cacheEntry.getFormDefinitionJson());
     }
 
-    public static FormModel getFormDefinitionFromCache(String formId) {
+    public static SimpleFormModel getFormDefinitionFromCache(String formId) {
         FormEngineConfiguration formEngineConfiguration = CommandContextUtil.getFormEngineConfiguration();
         FormDefinitionCacheEntry cacheEntry = formEngineConfiguration.getFormDefinitionCache().get(formId);
         if (cacheEntry != null) {
-            return formEngineConfiguration.getFormJsonConverter().convertToFormModel(cacheEntry.getFormDefinitionJson(),
-                    cacheEntry.getFormDefinitionEntity().getId(), cacheEntry.getFormDefinitionEntity().getVersion());
+            return formEngineConfiguration.getFormJsonConverter().convertToFormModel(cacheEntry.getFormDefinitionJson());
         }
         return null;
     }

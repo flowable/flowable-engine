@@ -53,11 +53,11 @@
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
-            <artifactId>flowable-form-model</artifactId>
+            <artifactId>flowable-form-api</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>
-            <artifactId>flowable-form-api</artifactId>
+            <artifactId>flowable-form-model</artifactId>
         </dependency>
         <dependency>
             <groupId>org.flowable</groupId>

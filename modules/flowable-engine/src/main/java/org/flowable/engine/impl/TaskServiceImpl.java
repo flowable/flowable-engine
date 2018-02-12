@@ -71,7 +71,7 @@ import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
-import org.flowable.form.model.FormModel;
+import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.task.api.NativeTaskQuery;
@@ -245,7 +245,7 @@ public class TaskServiceImpl extends ServiceImpl implements TaskService {
     }
 
     @Override
-    public FormModel getTaskFormModel(String taskId) {
+    public FormInfo getTaskFormModel(String taskId) {
         return commandExecutor.execute(new GetTaskFormModelCmd(taskId));
     }
 

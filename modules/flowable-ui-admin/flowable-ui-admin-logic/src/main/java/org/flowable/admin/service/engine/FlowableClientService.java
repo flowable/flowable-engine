@@ -16,6 +16,8 @@ import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLSession;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
@@ -33,12 +35,12 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContextBuilder;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.ssl.SSLContextBuilder;
 import org.flowable.admin.domain.ServerConfig;
 import org.flowable.admin.service.AttachmentResponseInfo;
 import org.flowable.admin.service.ResponseInfo;
@@ -84,7 +86,12 @@ public class FlowableClientService {
         try {
             SSLContextBuilder builder = new SSLContextBuilder();
             builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-            sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+            sslsf = new SSLConnectionSocketFactory(builder.build(), new HostnameVerifier() {
+                @Override
+                public boolean verify(String s, SSLSession sslSession) {
+                    return true;
+                }
+            });
         } catch (Exception e) {
             LOGGER.warn("Could not configure HTTP client to use SSL", e);
         }
@@ -126,7 +133,7 @@ public class FlowableClientService {
         try {
             try (CloseableHttpResponse response = client.execute(request)) {
                 InputStream responseContent = response.getEntity().getContent();
-                String strResponse = IOUtils.toString(responseContent);
+                String strResponse = IOUtils.toString(responseContent, "utf-8");
 
                 boolean success = response.getStatusLine() != null && response.getStatusLine().getStatusCode() == expectedStatusCode;
                 if (success) {
@@ -186,7 +193,7 @@ public class FlowableClientService {
 
                 } else {
                     JsonNode bodyNode = null;
-                    String strResponse = IOUtils.toString(response.getEntity().getContent());
+                    String strResponse = IOUtils.toString(response.getEntity().getContent(), "utf-8");
                     try {
                         bodyNode = objectMapper.readTree(strResponse);
                     } catch (Exception e) {
@@ -371,7 +378,7 @@ public class FlowableClientService {
             CloseableHttpResponse response = client.execute(request);
             boolean success = response.getStatusLine() != null && response.getStatusLine().getStatusCode() == expectedStatusCode;
             if (success) {
-                result = IOUtils.toString(response.getEntity().getContent());
+                result = IOUtils.toString(response.getEntity().getContent(), "utf-8");
             } else {
                 String errorMessage = null;
                 try {
@@ -563,7 +570,11 @@ public class FlowableClientService {
             finalUrl += "/" + actualRestRoot;
         }
 
-        URIBuilder builder = createUriBuilder(finalUrl + (uri.startsWith("/") ? "": "/") + uri);
+        if (StringUtils.isNotEmpty(uri) && !uri.startsWith("/")) {
+            uri = "/" + uri;
+        }
+
+        URIBuilder builder = createUriBuilder(finalUrl + uri);
 
         return builder.toString();
     }
@@ -622,7 +633,7 @@ public class FlowableClientService {
 
     protected JsonNode readJsonContent(InputStream requestContent) {
         try {
-            return objectMapper.readTree(IOUtils.toString(requestContent));
+            return objectMapper.readTree(IOUtils.toString(requestContent, "utf-8"));
         } catch (Exception e) {
             LOGGER.debug("Error parsing error message", e);
         }

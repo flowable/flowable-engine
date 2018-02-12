@@ -26,7 +26,7 @@ import org.flowable.engine.runtime.DataObject;
 import org.flowable.engine.task.Attachment;
 import org.flowable.engine.task.Comment;
 import org.flowable.engine.task.Event;
-import org.flowable.form.model.FormModel;
+import org.flowable.form.api.FormInfo;
 import org.flowable.identitylink.api.IdentityLink;
 import org.flowable.identitylink.service.IdentityLinkType;
 import org.flowable.task.api.DelegationState;
@@ -312,7 +312,7 @@ public interface TaskService {
      * @throws FlowableObjectNotFoundException
      *             when the task or form definition doesn't exist.
      */
-    FormModel getTaskFormModel(String taskId);
+    FormInfo getTaskFormModel(String taskId);
 
     /**
      * Changes the assignee of the given task to the given userId. No check is done whether the user is known by the identity component.

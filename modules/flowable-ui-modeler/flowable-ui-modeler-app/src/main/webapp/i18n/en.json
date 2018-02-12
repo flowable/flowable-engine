@@ -418,6 +418,12 @@
             "OUTPUT ORDER": "Output Order",
             "COLLECT": "Collect"
         },
+        "COLLECT-OPERATORS": {
+            "SUM": "Sum",
+            "MIN": "Min",
+            "MAX": "Max",
+            "COUNT": "Count"
+        },
         "POPUP": {
             "CREATE-TITLE": "Create a new decision table",
             "CREATE-DESCRIPTION": "You need to give a name for the new decision table and you may want to add a description at the same time.",
