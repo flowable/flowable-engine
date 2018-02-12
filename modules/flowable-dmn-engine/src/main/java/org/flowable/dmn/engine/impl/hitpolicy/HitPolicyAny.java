@@ -46,14 +46,14 @@ public class HitPolicyAny extends AbstractHitPolicy implements ComposeDecisionRe
                         if (!ruleResults.getValue().containsKey(outputValues.getKey()) ||
                             (ruleResults.getValue().containsKey(outputValues.getKey()) && !outputValues.getValue().equals(ruleResults.getValue().get(outputValues.getKey())))) {
 
-                            String hitPolicyViolatedMessage = String.format("HitPolicy: %s violated; both rule %d and %d are valid but output %s has different values.",
+                            String hitPolicyViolatedMessage = String.format("HitPolicy %s violated; both rule %d and %d are valid but output %s has different values.",
                                 getHitPolicyName(), otherRuleResults.getKey(), ruleResults.getKey(), outputValues.getKey());
 
                             if (CommandContextUtil.getDmnEngineConfiguration().isStrictMode()) {
                                 executionContext.getAuditContainer().getRuleExecutions().get(otherRuleResults.getKey()).setExceptionMessage(hitPolicyViolatedMessage);
                                 executionContext.getAuditContainer().getRuleExecutions().get(ruleResults.getKey()).setExceptionMessage(hitPolicyViolatedMessage);
 
-                                throw new FlowableException("HitPolicy ANY violated.");
+                                throw new FlowableException(String.format("HitPolicy %s violated.", getHitPolicyName()));
                             } else {
                                 validationFailed = true;
 
@@ -71,7 +71,7 @@ public class HitPolicyAny extends AbstractHitPolicy implements ComposeDecisionRe
         List<Map<String, Object>> ruleResults = new ArrayList<>(executionContext.getRuleResults().values());
         if (!ruleResults.isEmpty()) {
             if (CommandContextUtil.getDmnEngineConfiguration().isStrictMode() == false && validationFailed) {
-                executionContext.getAuditContainer().setValidationMessage("HitPolicy ANY violated. Setting last valid rule result as final result.");
+                executionContext.getAuditContainer().setValidationMessage(String.format("HitPolicy %s violated; multiple valid rules with different outcomes. Setting last valid rule result as final result.", getHitPolicyName()));
             }
             executionContext.getAuditContainer().addDecisionResultObject(ruleResults.get(ruleResults.size() - 1));
         }

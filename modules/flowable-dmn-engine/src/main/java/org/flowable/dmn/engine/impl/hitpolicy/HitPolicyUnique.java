@@ -40,7 +40,7 @@ public class HitPolicyUnique extends AbstractHitPolicy implements EvaluateRuleVa
         //TODO: not on audit container
         for (Map.Entry<Integer, RuleExecutionAuditContainer> entry : executionContext.getAuditContainer().getRuleExecutions().entrySet()) {
             if (entry.getKey().equals(ruleNumber) == false && entry.getValue().isValid()) {
-                String hitPolicyViolatedMessage = String.format("HitPolicy UNIQUE violated: both rule %d and rule %d are valid.", ruleNumber, entry.getKey());
+                String hitPolicyViolatedMessage = String.format("HitPolicy %s violated; at least rule %d and rule %d are valid.", getHitPolicyName(), ruleNumber, entry.getKey());
 
                 if (CommandContextUtil.getDmnEngineConfiguration().isStrictMode()) {
                     executionContext.getAuditContainer().getRuleExecutions().get(ruleNumber).setExceptionMessage(hitPolicyViolatedMessage);
@@ -71,7 +71,7 @@ public class HitPolicyUnique extends AbstractHitPolicy implements EvaluateRuleVa
                 }
             }
 
-            executionContext.getAuditContainer().setValidationMessage("HitPolicy UNIQUE violated. Setting last valid rule result as final result.");
+            executionContext.getAuditContainer().setValidationMessage(String.format("HitPolicy %s violated; multiple valid rules. Setting last valid rule result as final result.", getHitPolicyName()));
             decisionResult = Collections.singletonList(lastResult);
         } else {
             decisionResult = ruleResults;

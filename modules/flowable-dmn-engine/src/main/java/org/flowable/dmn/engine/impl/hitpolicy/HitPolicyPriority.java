@@ -61,9 +61,9 @@ public class HitPolicyPriority extends AbstractHitPolicy implements ComposeDecis
                     return compareToBuilder.toComparison();
                 } else {
                     if (CommandContextUtil.getDmnEngineConfiguration().isStrictMode()) {
-                        throw new FlowableException(String.format("HitPolicy: %s violated; no output values present.", getHitPolicyName()));
+                        throw new FlowableException(String.format("HitPolicy %s violated; no output values present.", getHitPolicyName()));
                     } else {
-                        executionContext.getAuditContainer().setValidationMessage(String.format("HitPolicy: %s violated; no output values present. Setting first valid result as final result.", getHitPolicyName()));
+                        executionContext.getAuditContainer().setValidationMessage(String.format("HitPolicy %s violated; no output values present. Setting first valid result as final result.", getHitPolicyName()));
                     }
                     
                     return 0;
