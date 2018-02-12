@@ -919,6 +919,8 @@
         "AUDIT-DATA": {
             "HEADER": "Audit Data",
             "HIT-POLICY": "Hit Policy",
+            "FAILED": "Failed",
+            "STRICT-MODE": "Strict Mode enabled",
             "RESULT": "Result",
             "RULE-EXECUTIONS": "Rule Executions",
             "INPUT-VARIABLES": "Input Variables",

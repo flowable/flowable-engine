@@ -66,8 +66,17 @@
 						<tr class="property">
 							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.HIT-POLICY"></td>
 							<td>{{auditData.hitPolicy}}</td>
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.FAILED"></td>
+							<td>{{auditData.failed}}</td>
+						</tr>
+						<tr class="property">
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.STRICT-MODE"></td>
+							<td colspan="3">{{auditData.strictMode == null ? 'true' : auditData.strictMode}}</td>
+						</tr>
+						<tr class="property">
 							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.RESULT"></td>
-							<td><json-formatter json="auditData.decisionResult" open="2"></json-formatter></td>
+							<td ng-if="auditData.decisionResult.length > 0"><json-formatter json="auditData.decisionResult" open="2"></json-formatter></td>
+							<td ng-if="auditData.decisionResult.length === 0">no result</td>
 						</tr>
 						<tr class="property">
 							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.RULE-EXECUTIONS"></td>
@@ -82,11 +91,14 @@
 							<tr class="property">
 								<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.INPUT-VARIABLES" colspan="4"></td>
 							</tr>
-							<tr class="property" data-ng-repeat="row in formattedInputVariables">
+							<tr class="property" ng-if="formattedInputVariables.length > 0" data-ng-repeat="row in formattedInputVariables">
 								<td class="property-name">{{row[0].key}} <i>({{row[0].type}})</i></td>
 								<td>{{row[0].value}}</td>
 								<td class="property-name">{{row[1].key}} <i>({{row[0].type}})</i></td>
 								<td>{{row[1].value}}</td>
+							</tr>
+							<tr class="property" ng-if="formattedInputVariables.length === 0">
+								<td colspan="4" class="property-name">no input variables</td>
 							</tr>
 						</table>
 					</div>

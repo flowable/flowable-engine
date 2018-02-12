@@ -51,6 +51,10 @@ flowableAdminApp.controller('DecisionTableExecutionController', ['$scope', '$roo
             });
 
         var formatInputVariablesInRows = function (inputVariables, inputVariableTypes) {
+            if (inputVariables === null || inputVariableTypes === null) {
+                return;
+            }
+
             var result = [];
             var columnCounter = 1;
             var noColumns = 2;
