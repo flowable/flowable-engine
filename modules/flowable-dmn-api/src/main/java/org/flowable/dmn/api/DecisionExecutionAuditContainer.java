@@ -46,6 +46,7 @@ public class DecisionExecutionAuditContainer {
     protected Map<Integer, RuleExecutionAuditContainer> ruleExecutions = new HashMap<>();
     protected Boolean failed = Boolean.FALSE;
     protected String exceptionMessage;
+    protected String validationMessage;
     protected Boolean strictMode;
 
     public DecisionExecutionAuditContainer() {
@@ -188,6 +189,14 @@ public class DecisionExecutionAuditContainer {
 
     public void setExceptionMessage(String exceptionMessage) {
         this.exceptionMessage = exceptionMessage;
+    }
+
+    public String getValidationMessage() {
+        return validationMessage;
+    }
+
+    public void setValidationMessage(String validationMessage) {
+        this.validationMessage = validationMessage;
     }
 
     public Boolean isStrictMode() {
