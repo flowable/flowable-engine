@@ -640,11 +640,6 @@
 				<version>5.5.0.Final</version>
 			</dependency>
 			<dependency>
-				<groupId>org.json</groupId>
-				<artifactId>json</artifactId>
-				<version>20070829</version>
-			</dependency>
-			<dependency>
 				<groupId>org.mule.modules</groupId>
 				<artifactId>mule-module-cxf</artifactId>
 				<version>${mule.version}</version>
