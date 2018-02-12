@@ -65,19 +65,15 @@ public class DatabaseConfiguration {
             String dataSourcePassword = env.getProperty("datasource.password", "");
 
             Integer minPoolSize = env.getProperty("datasource.min-pool-size", Integer.class, 10);
-
             Integer maxPoolSize = env.getProperty("datasource.max-pool-size", Integer.class, 100);
 
             Integer acquireIncrement = env.getProperty("datasource.acquire-increment", Integer.class, 5);
 
             String preferredTestQuery = env.getProperty("datasource.preferred-test-query");
-
             Boolean testConnectionOnCheckin = env.getProperty("datasource.test-connection-on-checkin", Boolean.class, true);
-
             Boolean testConnectionOnCheckOut = env.getProperty("datasource.test-connection-on-checkout", Boolean.class, true);
 
             Integer maxIdleTime = env.getProperty("datasource.max-idle-time", Integer.class, 1800);
-
             Integer maxIdleTimeExcessConnections = env.getProperty("datasource.max-idle-time-excess-connections", Integer.class, 1800);
 
             if (LOGGER.isInfoEnabled()) {
