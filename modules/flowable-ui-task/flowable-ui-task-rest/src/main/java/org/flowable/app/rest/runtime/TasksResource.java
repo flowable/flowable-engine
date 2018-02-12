@@ -12,20 +12,20 @@
  */
 package org.flowable.app.rest.runtime;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.app.model.runtime.CreateTaskRepresentation;
 import org.flowable.app.model.runtime.TaskRepresentation;
 import org.flowable.app.security.SecurityUtils;
 import org.flowable.app.service.exception.BadRequestException;
 import org.flowable.engine.TaskService;
-import org.flowable.task.api.Task;
+import org.flowable.task.service.impl.persistence.entity.TaskEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * REST controller for managing the current user's account.
@@ -42,13 +42,14 @@ public class TasksResource {
             throw new BadRequestException("Task name is required");
         }
 
-        Task task = taskService.newTask();
+        TaskEntity task = (TaskEntity) taskService.newTask();
         task.setName(taskRepresentation.getName());
         task.setDescription(taskRepresentation.getDescription());
+        task.setParentTaskId(taskRepresentation.getParentTaskId());
         if (StringUtils.isNotEmpty(taskRepresentation.getCategory())) {
             task.setCategory(taskRepresentation.getCategory());
         }
-        task.setAssignee(SecurityUtils.getCurrentUserId());
+        task.setAssignee(taskRepresentation.getAssignee() != null ? taskRepresentation.getAssignee() : SecurityUtils.getCurrentUserId());
         taskService.saveTask(task);
         return new TaskRepresentation(taskService.createTaskQuery().taskId(task.getId()).singleResult());
     }

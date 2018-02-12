@@ -69,6 +69,11 @@ public abstract class AbstractRelatedContentResource {
         return createResultRepresentation(contentService.createContentItemQuery().taskId(taskId).list());
     }
 
+    public ResultListDataRepresentation getContentItemsForCase(String caseInstanceId) {
+        permissionService.hasReadPermissionOnCase(SecurityUtils.getCurrentUserObject(), caseInstanceId);
+        return createResultRepresentation(contentService.createContentItemQuery().scopeType("cmmn").scopeId(caseInstanceId).list());
+    }
+
     public ResultListDataRepresentation getContentItemsForProcessInstance(String processInstanceId) {
         // TODO: check if process exists
         if (!permissionService.hasReadPermissionOnProcessInstance(SecurityUtils.getCurrentUserObject(), processInstanceId)) {
@@ -88,7 +93,7 @@ public abstract class AbstractRelatedContentResource {
         if (!permissionService.canAddRelatedContentToTask(user, taskId)) {
             throw new NotPermittedException("You are not allowed to read the task with id: " + taskId);
         }
-        return uploadFile(user, file, taskId, task.getProcessInstanceId());
+        return uploadFile(user, file, taskId, task.getProcessInstanceId(), null);
     }
 
     public ContentItemRepresentation createContentItemOnTask(String taskId, ContentItemRepresentation contentItem) {
@@ -122,12 +127,21 @@ public abstract class AbstractRelatedContentResource {
         if (!permissionService.canAddRelatedContentToProcessInstance(user, processInstanceId)) {
             throw new NotPermittedException("You are not allowed to read the process with id: " + processInstanceId);
         }
-        return uploadFile(user, file, null, processInstanceId);
+        return uploadFile(user, file, null, processInstanceId, null);
+    }
+
+    public ContentItemRepresentation createContentItemOnCase(String caseId, MultipartFile file) {
+        User user = SecurityUtils.getCurrentUserObject();
+
+        if (!permissionService.canAddRelatedContentToCase(user, caseId)) {
+            throw new NotPermittedException("You are not allowed to read the case with id: " + caseId);
+        }
+        return uploadFile(user, file, null, null, caseId);
     }
 
     public ContentItemRepresentation createTemporaryRawContentItem(MultipartFile file) {
         User user = SecurityUtils.getCurrentUserObject();
-        return uploadFile(user, file, null, null);
+        return uploadFile(user, file, null, null, null);
     }
 
     public ContentItemRepresentation createTemporaryContentItem(ContentItemRepresentation contentItem) {
@@ -201,7 +215,7 @@ public abstract class AbstractRelatedContentResource {
         }
     }
 
-    protected ContentItemRepresentation uploadFile(User user, MultipartFile file, String taskId, String processInstanceId) {
+    protected ContentItemRepresentation uploadFile(User user, MultipartFile file, String taskId, String processInstanceId, String caseId) {
         if (file != null && file.getName() != null) {
             try {
                 String contentType = file.getContentType();
@@ -215,6 +229,10 @@ public abstract class AbstractRelatedContentResource {
                 contentItem.setName(getFileName(file));
                 contentItem.setProcessInstanceId(processInstanceId);
                 contentItem.setTaskId(taskId);
+                if (StringUtils.isNotEmpty(caseId)) {
+                    contentItem.setScopeType("cmmn");
+                    contentItem.setScopeId(caseId);
+                }
                 contentItem.setMimeType(contentType);
                 contentItem.setCreatedBy(user.getId());
                 contentItem.setLastModifiedBy(user.getId());

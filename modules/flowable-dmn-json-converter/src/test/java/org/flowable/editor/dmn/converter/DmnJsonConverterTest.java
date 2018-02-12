@@ -63,11 +63,13 @@ public class DmnJsonConverterTest {
     private static final String JSON_RESOURCE_12 = "org/flowable/editor/dmn/converter/decisiontable_regression_model_v1_no_type2.json";
     private static final String JSON_RESOURCE_13 = "org/flowable/editor/dmn/converter/decisiontable_regression_model_v1_no_type3.json";
     private static final String JSON_RESOURCE_14 = "org/flowable/editor/dmn/converter/decisiontable_regression_model_v1_no_type4.json";
+    private static final String JSON_RESOURCE_15 = "org/flowable/editor/dmn/converter/decisiontable_aggregation.json";
+    private static final String JSON_RESOURCE_16 = "org/flowable/editor/dmn/converter/decisiontable_special_characters.json";
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     @Test
-    public void testConvertJsonToDmn_OK() throws Exception {
+    public void testConvertJsonToDmnOK() {
 
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_1);
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
@@ -183,7 +185,7 @@ public class DmnJsonConverterTest {
     }
 
     @Test
-    public void testConvertJsonToDmn_no_rules() throws Exception {
+    public void testConvertJsonToDmnNoRules() {
 
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_2);
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
@@ -240,7 +242,7 @@ public class DmnJsonConverterTest {
     }
 
     @Test
-    public void testConvertJsonToDmn2_OK() throws Exception {
+    public void testConvertJsonToDmn2OK() {
 
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_3);
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
@@ -249,7 +251,7 @@ public class DmnJsonConverterTest {
     }
 
     @Test
-    public void testConvertJsonToDmn_empty_expressions() throws Exception {
+    public void testConvertJsonToDmnEmptyExpressions() {
 
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_4);
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
@@ -258,7 +260,7 @@ public class DmnJsonConverterTest {
     }
 
     @Test
-    public void testConvertJsonToDmn_Condition_order() throws Exception {
+    public void testConvertJsonToDmnConditionOrder() {
         // Test that editor json, which contains the rules in the incorrect order in
         // the rule object,
         // is converted to a dmn model where the rule columns are in the same order
@@ -281,7 +283,7 @@ public class DmnJsonConverterTest {
     }
 
     @Test
-    public void testConvertJsonToDmn_Entries() throws Exception {
+    public void testConvertJsonToDmnEntries() {
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_6);
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
 
@@ -300,7 +302,7 @@ public class DmnJsonConverterTest {
     }
 
     @Test
-    public void testConvertJsonToDmn_Dates() throws Exception {
+    public void testConvertJsonToDmnDates() {
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_7);
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
 
@@ -308,7 +310,7 @@ public class DmnJsonConverterTest {
     }
 
     @Test
-    public void testConvertJsonToDmn_Empty_Operator() throws Exception {
+    public void testConvertJsonToDmnEmptyOperator() {
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_8);
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
 
@@ -330,7 +332,7 @@ public class DmnJsonConverterTest {
     }
 
     @Test
-    public void testConvertJsonToDmn_Complex_Output_Expression() throws Exception {
+    public void testConvertJsonToDmnComplexOutputExpression() {
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_9);
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
 
@@ -339,7 +341,7 @@ public class DmnJsonConverterTest {
     }
 
     @Test
-    public void testConvertJsonToDmn_Regression_model_v1() throws Exception {
+    public void testConvertJsonToDmnRegressionModelv1() {
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_10);
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
 
@@ -374,7 +376,7 @@ public class DmnJsonConverterTest {
     }
 
     @Test
-    public void testConvertJsonToDmn_Regression_model_v1_no_type() throws Exception {
+    public void testConvertJsonToDmnRegressionModelv1NoType() {
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_11);
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
         DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
@@ -387,7 +389,7 @@ public class DmnJsonConverterTest {
     }
 
     @Test
-    public void testConvertJsonToDmn_Regression_model_v1_no_type2() throws Exception {
+    public void testConvertJsonToDmnRegressionModelv1NoType2() {
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_12);
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
         DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
@@ -400,7 +402,7 @@ public class DmnJsonConverterTest {
     }
 
     @Test
-    public void testConvertJsonToDmn_Regression_model_v1_no_type3() throws Exception {
+    public void testConvertJsonToDmnRegressionModelv1NoType3() {
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_13);
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
         DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
@@ -410,13 +412,32 @@ public class DmnJsonConverterTest {
     }
 
     @Test
-    public void testConvertJsonToDmn_Regression_model_v1_no_type4() throws Exception {
+    public void testConvertJsonToDmnRegressionModelv1NoType4() {
         JsonNode testJsonResource = parseJson(JSON_RESOURCE_14);
         DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
         DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
 
         assertEquals("number", decisionTable.getInputs().get(0).getInputExpression().getTypeRef());
         assertEquals("boolean", decisionTable.getOutputs().get(0).getTypeRef());
+    }
+
+    @Test
+    public void testConvertJsonToDmnCollectOperator() {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_15);
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
+        DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
+
+        assertEquals("SUM", decisionTable.getAggregation().getValue());
+    }
+
+    @Test
+    public void testConvertJsonToDmnStringSpecialCharacters() {
+        JsonNode testJsonResource = parseJson(JSON_RESOURCE_16);
+        DmnDefinition dmnDefinition = new DmnJsonConverter().convertToDmn(testJsonResource, "abc", 1, new Date());
+        DecisionTable decisionTable = (DecisionTable) dmnDefinition.getDecisions().get(0).getExpression();
+
+        assertEquals("== \"TEST\"",  decisionTable.getRules().get(0).getInputEntries().get(0).getInputEntry().getText());
+        assertEquals("== \"TEST\"",  decisionTable.getRules().get(1).getInputEntries().get(0).getInputEntry().getText());
     }
 
     /* Helper methods */

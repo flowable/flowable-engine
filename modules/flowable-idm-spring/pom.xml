@@ -109,7 +109,6 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
-            <version>${spring.security.version}</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

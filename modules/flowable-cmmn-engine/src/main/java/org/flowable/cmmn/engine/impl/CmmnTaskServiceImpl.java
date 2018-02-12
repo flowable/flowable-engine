@@ -18,7 +18,7 @@ import org.flowable.cmmn.api.CmmnTaskService;
 import org.flowable.cmmn.engine.impl.cmd.CompleteTaskCmd;
 import org.flowable.cmmn.engine.impl.cmd.CompleteTaskWithFormCmd;
 import org.flowable.cmmn.engine.impl.cmd.GetTaskFormModelCmd;
-import org.flowable.form.model.FormModel;
+import org.flowable.form.api.FormInfo;
 import org.flowable.task.api.TaskQuery;
 import org.flowable.task.service.impl.TaskQueryImpl;
 
@@ -62,7 +62,7 @@ public class CmmnTaskServiceImpl extends ServiceImpl implements CmmnTaskService 
     }
 
     @Override
-    public FormModel getTaskFormModel(String taskId) {
+    public FormInfo getTaskFormModel(String taskId) {
         return commandExecutor.execute(new GetTaskFormModelCmd(taskId));
     }
     

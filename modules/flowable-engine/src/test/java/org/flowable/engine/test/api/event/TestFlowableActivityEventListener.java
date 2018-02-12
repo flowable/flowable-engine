@@ -17,7 +17,7 @@ import java.util.List;
 
 import org.flowable.engine.common.api.delegate.event.FlowableEngineEventType;
 import org.flowable.engine.common.api.delegate.event.FlowableEvent;
-import org.flowable.engine.common.api.delegate.event.FlowableEventListener;
+import org.flowable.engine.delegate.event.AbstractFlowableEngineEventListener;
 import org.flowable.engine.delegate.event.FlowableActivityEvent;
 
 /**
@@ -25,7 +25,7 @@ import org.flowable.engine.delegate.event.FlowableActivityEvent;
  * 
  * @author Frederik Heremans
  */
-public class TestFlowableActivityEventListener implements FlowableEventListener {
+public class TestFlowableActivityEventListener extends AbstractFlowableEngineEventListener {
 
     private List<FlowableEvent> eventsReceived;
     private boolean ignoreRawActivityEvents;

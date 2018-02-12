@@ -19,7 +19,7 @@ import org.flowable.form.engine.impl.parser.FormDefinitionParse;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
 import org.flowable.form.engine.impl.persistence.entity.FormDeploymentEntity;
 import org.flowable.form.engine.impl.persistence.entity.FormResourceEntity;
-import org.flowable.form.model.FormModel;
+import org.flowable.form.model.SimpleFormModel;
 
 /**
  * An intermediate representation of a DeploymentEntity which keeps track of all of the entity's and resources.
@@ -62,7 +62,7 @@ public class ParsedDeployment {
         return mapFormDefinitionsToParses.get(formDefinition);
     }
 
-    public FormModel getFormModelForFormDefinition(FormDefinitionEntity formDefinition) {
+    public SimpleFormModel getFormModelForFormDefinition(FormDefinitionEntity formDefinition) {
         FormDefinitionParse parse = getFormDefinitionParseForFormDefinition(formDefinition);
 
         return (parse == null ? null : parse.getFormModel());

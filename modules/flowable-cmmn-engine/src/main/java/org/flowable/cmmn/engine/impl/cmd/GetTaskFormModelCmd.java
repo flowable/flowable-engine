@@ -13,13 +13,9 @@
 package org.flowable.cmmn.engine.impl.cmd;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.flowable.cmmn.api.CmmnRepositoryService;
@@ -27,23 +23,20 @@ import org.flowable.cmmn.api.repository.CaseDefinition;
 import org.flowable.cmmn.api.repository.CmmnDeployment;
 import org.flowable.cmmn.engine.CmmnEngineConfiguration;
 import org.flowable.cmmn.engine.impl.util.CommandContextUtil;
-import org.flowable.content.api.ContentItem;
-import org.flowable.content.api.ContentService;
 import org.flowable.engine.common.api.FlowableIllegalArgumentException;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.form.api.FormFieldHandler;
+import org.flowable.form.api.FormInfo;
 import org.flowable.form.api.FormService;
-import org.flowable.form.model.FormField;
-import org.flowable.form.model.FormFieldTypes;
-import org.flowable.form.model.FormModel;
 import org.flowable.task.api.history.HistoricTaskInstance;
 import org.flowable.variable.api.history.HistoricVariableInstance;
 
 /**
  * @author Tijs Rademakers
  */
-public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
+public class GetTaskFormModelCmd implements Command<FormInfo>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -54,7 +47,7 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
     }
 
     @Override
-    public FormModel execute(CommandContext commandContext) {
+    public FormInfo execute(CommandContext commandContext) {
         CmmnEngineConfiguration cmmnEngineConfiguration = CommandContextUtil.getCmmnEngineConfiguration(commandContext);
         FormService formService = CommandContextUtil.getFormService();
         if (formService == null) {
@@ -90,58 +83,25 @@ public class GetTaskFormModelCmd implements Command<FormModel>, Serializable {
             }
         }
 
-        FormModel formModel = null;
+        FormInfo formInfo = null;
         if (task.getEndTime() != null) {
-            formModel = formService.getFormInstanceModelByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId,
+            formInfo = formService.getFormInstanceModelByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId,
                             taskId, task.getProcessInstanceId(), variables, task.getTenantId());
 
         } else {
-            formModel = formService.getFormModelWithVariablesByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId,
+            formInfo = formService.getFormModelWithVariablesByKeyAndParentDeploymentId(task.getFormKey(), parentDeploymentId,
                             taskId, variables, task.getTenantId());
         }
 
         // If form does not exists, we don't want to leak out this info to just anyone
-        if (formModel == null) {
+        if (formInfo == null) {
             throw new FlowableObjectNotFoundException("Form model for task " + task.getTaskDefinitionKey() + " cannot be found for form key " + task.getFormKey());
         }
 
-        fetchRelatedContentInfoIfNeeded(formModel);
+        FormFieldHandler formFieldHandler = CommandContextUtil.getCmmnEngineConfiguration(commandContext).getFormFieldHandler();
+        formFieldHandler.enrichFormFields(formInfo);
 
-        return formModel;
-    }
-
-    protected void fetchRelatedContentInfoIfNeeded(FormModel formModel) {
-        ContentService contentService = CommandContextUtil.getContentService();
-        if (contentService == null) {
-            return;
-        }
-
-        if (formModel.getFields() != null) {
-            for (FormField formField : formModel.getFields()) {
-                if (FormFieldTypes.UPLOAD.equals(formField.getType())) {
-
-                    List<String> contentItemIds = null;
-                    if (formField.getValue() instanceof List) {
-                        contentItemIds = (List<String>) formField.getValue();
-
-                    } else if (formField.getValue() instanceof String) {
-                        String[] splittedString = ((String) formField.getValue()).split(",");
-                        contentItemIds = new ArrayList<>();
-                        Collections.addAll(contentItemIds, splittedString);
-                    }
-
-                    if (contentItemIds != null) {
-                        Set<String> contentItemIdSet = new HashSet<>(contentItemIds);
-
-                        List<ContentItem> contentItems = contentService.createContentItemQuery()
-                                .ids(contentItemIdSet)
-                                .list();
-
-                        formField.setValue(contentItems);
-                    }
-                }
-            }
-        }
+        return formInfo;
     }
 
 }

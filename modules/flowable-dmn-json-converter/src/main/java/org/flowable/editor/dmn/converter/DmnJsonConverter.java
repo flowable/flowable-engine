@@ -19,6 +19,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
+import org.flowable.dmn.model.BuiltinAggregator;
 import org.flowable.dmn.model.Decision;
 import org.flowable.dmn.model.DecisionRule;
 import org.flowable.dmn.model.DecisionTable;
@@ -79,6 +80,10 @@ public class DmnJsonConverter {
             decisionTable.setHitPolicy(HitPolicy.FIRST);
         }
 
+        if (modelNode.has("collectOperator")) {
+            decisionTable.setAggregation(BuiltinAggregator.get(DmnJsonConverterUtil.getValueAsString("collectOperator", modelNode)));
+        }
+
         // default orientation
         decisionTable.setPreferredOrientation(DecisionTableOrientation.RULE_AS_ROW);
 
@@ -102,6 +107,7 @@ public class DmnJsonConverter {
         modelNode.put("name", definition.getName());
         modelNode.put("description", definition.getDescription());
         modelNode.put("hitIndicator", decisionTable.getHitPolicy().name());
+        modelNode.put("collectOperator", decisionTable.getAggregation().name());
 
         // input expressions
         ArrayNode inputExpressionsNode = objectMapper.createArrayNode();
@@ -330,7 +336,9 @@ public class DmnJsonConverter {
 
                     // add quotes for string
                     if ("string".equals(ruleInputClauseContainer.getInputClause().getInputExpression().getTypeRef())
-                        && !"-".equals(expressionValue)) {
+                        && !"-".equals(expressionValue)
+                        && !expressionValue.startsWith("\"")
+                        && !expressionValue.endsWith("\"")) { // add quotes for string (with no surrounding quotes)
                         
                         stringBuilder.append("\"");
                         stringBuilder.append(expressionValue);
@@ -372,7 +380,9 @@ public class DmnJsonConverter {
                         if (complexExpressionIds.contains(id)) {
                             outputEntry.setText(expressionValue);
                         } else {
-                            if ("string".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())) { // add quotes for string
+                            if ("string".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())
+                                && !expressionValue.startsWith("\"")
+                                && !expressionValue.endsWith("\"")) { // add quotes for string (with no surrounding quotes)
                                 outputEntry.setText("\"" + expressionValue + "\"");
                             } else if ("date".equals(ruleOutputClauseContainer.getOutputClause().getTypeRef())
                                 && StringUtils.isNotEmpty(expressionValue)) { // wrap in built in toDate function

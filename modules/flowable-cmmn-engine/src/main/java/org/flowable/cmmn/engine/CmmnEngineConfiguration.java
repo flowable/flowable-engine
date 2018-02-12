@@ -58,6 +58,7 @@ import org.flowable.cmmn.engine.impl.deployer.CaseDefinitionDiagramHelper;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeployer;
 import org.flowable.cmmn.engine.impl.deployer.CmmnDeploymentManager;
 import org.flowable.cmmn.engine.impl.el.CmmnExpressionManager;
+import org.flowable.cmmn.engine.impl.form.DefaultFormFieldHandler;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryTaskManager;
 import org.flowable.cmmn.engine.impl.history.CmmnHistoryVariableManager;
@@ -140,6 +141,7 @@ import org.flowable.engine.common.impl.persistence.cache.EntityCacheImpl;
 import org.flowable.engine.common.impl.persistence.deploy.DefaultDeploymentCache;
 import org.flowable.engine.common.impl.persistence.deploy.DeploymentCache;
 import org.flowable.engine.common.impl.util.ReflectUtil;
+import org.flowable.form.api.FormFieldHandler;
 import org.flowable.identitylink.service.IdentityLinkServiceConfiguration;
 import org.flowable.identitylink.service.impl.db.IdentityLinkDbSchemaManager;
 import org.flowable.job.service.InternalJobManager;
@@ -313,6 +315,8 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
     protected List<AsyncRunnableExecutionExceptionHandler> customAsyncRunnableExecutionExceptionHandlers;
     protected boolean addDefaultExceptionHandler = true;
     protected FailedJobCommandFactory failedJobCommandFactory;
+    
+    protected FormFieldHandler formFieldHandler;
     
     /**
      * Boolean flag to be set to activate the {@link AsyncExecutor} automatically after the engine has booted up.
@@ -587,6 +591,7 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         initCaseInstanceHelper();
         initHistoryManager();
         initCaseInstanceCallbacks();
+        initFormFieldHandler();
         initClock();
         initIdentityLinkServiceConfiguration();
         initVariableServiceConfiguration();
@@ -877,6 +882,12 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
             this.caseInstanceStateChangeCallbacks = new HashMap<>();
         }
         initDefaultCaseInstanceCallbacks();
+    }
+    
+    public void initFormFieldHandler() {
+        if (this.formFieldHandler == null) {
+            this.formFieldHandler = new DefaultFormFieldHandler();
+        }
     }
 
     protected void initDefaultCaseInstanceCallbacks() {
@@ -2187,4 +2198,11 @@ public class CmmnEngineConfiguration extends AbstractEngineConfiguration impleme
         this.httpClientConfig.merge(httpClientConfig);
     }
 
+    public FormFieldHandler getFormFieldHandler() {
+        return formFieldHandler;
+    }
+
+    public void setFormFieldHandler(FormFieldHandler formFieldHandler) {
+        this.formFieldHandler = formFieldHandler;
+    }
 }

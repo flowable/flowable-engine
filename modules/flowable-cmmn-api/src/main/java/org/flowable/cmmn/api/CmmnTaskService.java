@@ -14,7 +14,7 @@ package org.flowable.cmmn.api;
 
 import java.util.Map;
 
-import org.flowable.form.model.FormModel;
+import org.flowable.form.api.FormInfo;
 import org.flowable.task.api.TaskQuery;
 
 /**
@@ -36,7 +36,7 @@ public interface CmmnTaskService {
     void completeTaskWithForm(String taskId, String formDefinitionId, String outcome,
             Map<String, Object> variables, boolean localScope);
 
-    FormModel getTaskFormModel(String taskId);
+    FormInfo getTaskFormModel(String taskId);
     
     TaskQuery createTaskQuery();
     

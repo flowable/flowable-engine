@@ -12,7 +12,7 @@
  */
 package org.flowable.editor.form.converter;
 
-import org.flowable.form.model.FormModel;
+import org.flowable.form.model.SimpleFormModel;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -23,11 +23,9 @@ public class FormJsonConverter {
 
     protected ObjectMapper objectMapper = new ObjectMapper();
 
-    public FormModel convertToFormModel(String modelJson, String modelId, int modelVersion) {
+    public SimpleFormModel convertToFormModel(String modelJson) {
         try {
-            FormModel definition = objectMapper.readValue(modelJson, FormModel.class);
-            definition.setId(modelId);
-            definition.setVersion(modelVersion);
+            SimpleFormModel definition = objectMapper.readValue(modelJson, SimpleFormModel.class);
 
             return definition;
         } catch (Exception e) {
@@ -35,7 +33,7 @@ public class FormJsonConverter {
         }
     }
 
-    public String convertToJson(FormModel definition) {
+    public String convertToJson(SimpleFormModel definition) {
         try {
             return objectMapper.writeValueAsString(definition);
         } catch (Exception e) {

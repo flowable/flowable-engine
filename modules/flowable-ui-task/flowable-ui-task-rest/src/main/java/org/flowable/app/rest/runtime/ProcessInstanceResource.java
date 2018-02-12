@@ -14,9 +14,11 @@ package org.flowable.app.rest.runtime;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.flowable.app.model.runtime.FormModelRepresentation;
 import org.flowable.app.model.runtime.ProcessInstanceRepresentation;
 import org.flowable.app.service.runtime.FlowableProcessInstanceService;
-import org.flowable.form.model.FormModel;
+import org.flowable.form.api.FormInfo;
+import org.flowable.form.model.SimpleFormModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -40,8 +42,10 @@ public class ProcessInstanceResource {
     }
 
     @RequestMapping(value = "/rest/process-instances/{processInstanceId}/start-form", method = RequestMethod.GET, produces = "application/json")
-    public FormModel getProcessInstanceStartForm(@PathVariable String processInstanceId, HttpServletResponse response) {
-        return processInstanceService.getProcessInstanceStartForm(processInstanceId, response);
+    public FormModelRepresentation getProcessInstanceStartForm(@PathVariable String processInstanceId, HttpServletResponse response) {
+        FormInfo formInfo = processInstanceService.getProcessInstanceStartForm(processInstanceId, response);
+        SimpleFormModel formModel = (SimpleFormModel) formInfo.getFormModel();
+        return new FormModelRepresentation(formInfo, formModel);
     }
 
     @RequestMapping(value = "/rest/process-instances/{processInstanceId}", method = RequestMethod.DELETE)

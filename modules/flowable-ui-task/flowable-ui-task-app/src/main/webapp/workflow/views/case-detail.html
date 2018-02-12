@@ -59,6 +59,27 @@
 
     <div class="content clearfix split" auto-height offset="6" ng-if="!newCaseInstance && model.caseInstance">
         <div class="split-right">
+            <div class="section pack" toggle-dragover="dragOverContent(over)"
+                 ng-if="!$scope.model.contentSummary.loading">
+                <h3 class="toggle-content-select" ng-click="toggleCreateContent()"
+                    title="{{'TASK.ACTION.ADD-CONTENT' | translate}}">{{'TASK.TITLE.CONTENT' | translate}}
+                    <span class="action" ng-if="!model.caseInstance.endDate"><a>+</a></span>
+                </h3>
+
+                <div external-content on-content-upload="onContentUploaded(content)"
+                     on-upload-in-progress="uploadInProgress(status)" case-id="model.caseInstance.id"
+                     ng-if="model.contentSummary.addContent"></div>
+
+                <div class="form-group">
+                    <ul id="related-content-list" class="clearfix simple-list selectable content-list">
+                        <li ng-repeat="content in model.content.data" title="{{content.name}}">
+                            <document-preview content="content" editable="true" read-only="false"
+                                              on-delete="onContentDeleted(content)"></document-preview>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
         </div>
         <div class="split-left">
             <div class="section pack">

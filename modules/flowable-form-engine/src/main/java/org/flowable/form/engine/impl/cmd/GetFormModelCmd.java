@@ -14,21 +14,21 @@ package org.flowable.form.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.flowable.editor.form.converter.FormJsonConverter;
 import org.flowable.engine.common.api.FlowableObjectNotFoundException;
 import org.flowable.engine.common.impl.interceptor.Command;
 import org.flowable.engine.common.impl.interceptor.CommandContext;
+import org.flowable.form.api.FormInfo;
 import org.flowable.form.engine.FormEngineConfiguration;
 import org.flowable.form.engine.impl.persistence.deploy.DeploymentManager;
 import org.flowable.form.engine.impl.persistence.deploy.FormDefinitionCacheEntry;
 import org.flowable.form.engine.impl.persistence.entity.FormDefinitionEntity;
 import org.flowable.form.engine.impl.util.CommandContextUtil;
-import org.flowable.form.model.FormModel;
+import org.flowable.form.model.SimpleFormModel;
 
 /**
  * @author Tijs Rademakers
  */
-public class GetFormModelCmd implements Command<FormModel>, Serializable {
+public class GetFormModelCmd implements Command<FormInfo>, Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -53,7 +53,7 @@ public class GetFormModelCmd implements Command<FormModel>, Serializable {
     }
 
     @Override
-    public FormModel execute(CommandContext commandContext) {
+    public FormInfo execute(CommandContext commandContext) {
         DeploymentManager deploymentManager = CommandContextUtil.getFormEngineConfiguration().getDeploymentManager();
 
         // Find the form definition
@@ -100,8 +100,13 @@ public class GetFormModelCmd implements Command<FormModel>, Serializable {
         }
 
         FormDefinitionCacheEntry formDefinitionCacheEntry = deploymentManager.resolveFormDefinition(formDefinitionEntity);
-        FormJsonConverter formJsonConverter = CommandContextUtil.getFormEngineConfiguration().getFormJsonConverter();
-        return formJsonConverter.convertToFormModel(formDefinitionCacheEntry.getFormDefinitionJson(),
-                formDefinitionEntity.getId(), formDefinitionEntity.getVersion());
+        SimpleFormModel formModel = CommandContextUtil.getFormEngineConfiguration(commandContext).getFormJsonConverter().convertToFormModel(formDefinitionCacheEntry.getFormDefinitionJson());
+        FormInfo formInfo = new FormInfo();
+        formInfo.setId(formDefinitionEntity.getId());
+        formInfo.setName(formDefinitionEntity.getName());
+        formInfo.setKey(formDefinitionEntity.getKey());
+        formInfo.setVersion(formDefinitionEntity.getVersion());
+        formInfo.setFormModel(formModel);
+        return formInfo;
     }
 }

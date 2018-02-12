@@ -72,6 +72,10 @@ public class AssociationJsonConverter extends BaseCmmnJsonConverter {
         }
 
         PlanItem planItem = model.findPlanItem(association.getTargetRef());
+        if (planItem == null) {
+            // Invalid reference, ignoring
+            return;
+        }
         GraphicInfo targetGraphicInfo = model.getGraphicInfo(planItem.getId());
         GraphicInfo flowGraphicInfo = graphicInfoList.get(graphicInfoList.size() - 1);
 

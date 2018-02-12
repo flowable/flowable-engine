@@ -236,7 +236,11 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
                 
                 MoveExecutionEntityContainer subProcessMoveExecutionEntityContainer = new MoveExecutionEntityContainer(currentSubProcessExecutions, moveExecutionContainer.getMoveToActivityIds());
                 subProcessMoveExecutionEntityContainer.addMoveToFlowElement(callActivity.getId(), callActivity);
-                subProcessMoveExecutionEntityContainer.addContinueParentExecution(subProcessChildExecution.getId(), subProcessChildExecution);
+                
+                ExecutionEntity continueParentExecution = deleteParentExecutions(subProcessChildExecution.getParentId(), moveExecutionContainer.getMoveToFlowElements(), commandContext);
+                subProcessMoveExecutionEntityContainer.addContinueParentExecution(subProcessChildExecution.getId(), continueParentExecution);
+                
+                executionEntityManager.deleteExecutionAndRelatedData(subProcessChildExecution, "Change activity to " + printFlowElementIds(moveToFlowElements));
                 
                 newChildExecutions = createEmbeddedSubProcessExecutions(moveExecutionContainer.getMoveToFlowElements(), 
                                 currentSubProcessExecutions, subProcessMoveExecutionEntityContainer, commandContext);
@@ -334,6 +338,11 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
             }
             
             newChildExecution.setCurrentFlowElement(newFlowElement);
+            
+            if (newFlowElement instanceof CallActivity) {
+                CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(newChildExecution);
+            }
+            
             newChildExecutions.add(newChildExecution);
         }
         
@@ -477,6 +486,8 @@ public class DefaultDynamicStateManager implements DynamicStateManager {
         // Create the first execution that will visit all the process definition elements
         ExecutionEntity subProcessInitialExecution = executionEntityManager.createChildExecution(subProcessInstance);
         subProcessInitialExecution.setCurrentFlowElement(initialFlowElement);
+        
+        CommandContextUtil.getHistoryManager(commandContext).recordActivityStart(subProcessInitialExecution);
         
         return subProcessInitialExecution;
     }
