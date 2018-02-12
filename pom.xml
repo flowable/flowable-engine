@@ -869,11 +869,6 @@
 				<artifactId>jackson-datatype-joda</artifactId>
 				<version>${jackson.version}</version>
 			</dependency>
-			<dependency>
-				<groupId>org.imgscalr</groupId>
-				<artifactId>imgscalr-lib</artifactId>
-				<version>4.2</version>
-			</dependency>
 			<!-- Camel integration -->
 			<dependency>
 				<groupId>org.apache.camel</groupId>
