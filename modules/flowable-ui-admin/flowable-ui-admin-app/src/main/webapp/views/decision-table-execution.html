@@ -29,6 +29,10 @@
 							<td class="property-name" translate="DECISION-TABLE-EXECUTION.PROCESS-INSTANCE-ID"></td>
 							<td><a ng-href="#/process-instance/{{execution.instanceId}}"><i class="glyphicon glyphicon-zoom-in"></i> {{execution.instanceId}}</a></td>
 						</tr>
+						<tr class="property">
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.FAILED"></td>
+							<td>{{execution.failed}}</td>
+						</tr>
 					</table>
 				</div>
 				<div class="seperator"></div>
@@ -66,12 +70,8 @@
 						<tr class="property">
 							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.HIT-POLICY"></td>
 							<td>{{auditData.hitPolicy}}</td>
-							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.FAILED"></td>
-							<td>{{auditData.failed}}</td>
-						</tr>
-						<tr class="property">
 							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.STRICT-MODE"></td>
-							<td colspan="3">{{auditData.strictMode == null ? 'true' : auditData.strictMode}}</td>
+							<td>{{auditData.strictMode == null ? 'true' : auditData.strictMode}}</td>
 						</tr>
 						<tr class="property">
 							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.RESULT"></td>
@@ -81,6 +81,14 @@
 						<tr class="property">
 							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.RULE-EXECUTIONS"></td>
 							<td colspan="3"><json-formatter json="auditData.ruleExecutions"></json-formatter></td>
+						</tr>
+						<tr class="property" ng-if="auditData.failed">
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.EXCEPTION-MESSAGE"></td>
+							<td colspan="3">{{auditData.exception}}</td>
+						</tr>
+						<tr class="property" ng-if="!auditData.failed">
+							<td class="property-name" translate="DECISION-TABLE-EXECUTION.AUDIT-DATA.VALIDATION-MESSAGE"></td>
+							<td colspan="3">{{auditData.validationMessage}}</td>
 						</tr>
 					</table>
 				</div>

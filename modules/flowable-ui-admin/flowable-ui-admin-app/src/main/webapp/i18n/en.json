@@ -888,7 +888,7 @@
         "TITLE": "Decision table execution",
         "LIST-MESSAGE": "Showing {{size}} results, from a total of {{total}} matching decision tables.",
         "LIST-MESSAGE-EMPTY": "No matching decision tables.",
-        "DEFINITION-ID": "Decision ID",
+        "DEFINITION-ID": "Decision Definition ID",
         "DEPLOYMENT-ID": "Deployment ID",
         "DEFINITION-KEY": "Decision Key",
         "DEFINITION-NAME": "Decision Name",
@@ -896,6 +896,7 @@
         "PROCESS-INSTANCE-ID": "Process Instance ID",
         "EXECUTION-START-TIME": "Start Time",
         "EXECUTION-END-TIME": "End Time",
+        "FAILED": "Failed",
         "FILTER": {
             "DEFINITION-ID": "Definition ID",
             "PROCESS-INSTANCE-ID": "Process Instance ID",
@@ -919,8 +920,9 @@
         "AUDIT-DATA": {
             "HEADER": "Audit Data",
             "HIT-POLICY": "Hit Policy",
-            "FAILED": "Failed",
             "STRICT-MODE": "Strict Mode enabled",
+            "EXCEPTION-MESSAGE": "Exception message",
+            "VALIDATION-MESSAGE": "Validation message",
             "RESULT": "Result",
             "RULE-EXECUTIONS": "Rule Executions",
             "INPUT-VARIABLES": "Input Variables",
