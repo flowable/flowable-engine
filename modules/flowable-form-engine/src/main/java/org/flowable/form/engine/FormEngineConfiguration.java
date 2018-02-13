@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -193,11 +193,11 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
 
         initBeans();
         initTransactionFactory();
-        
+
         if (usingRelationalDatabase) {
             initSqlSessionFactory();
         }
-        
+
         initSessionFactories();
         initServices();
         initDataManagers();
@@ -270,7 +270,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
             this.dbSchemaManager = new FormDbSchemaManager();
         }
     }
-    
+
     public void initDbSchema() {
         try {
             DatabaseConnection connection = new JdbcConnection(dataSource.getConnection());
@@ -280,7 +280,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
 
             if (StringUtils.isNotEmpty(databaseSchema)) {
                 database.setDefaultSchemaName(databaseSchema);
-                database.setLiquibaseSchemaName(databaseSchema);   
+                database.setLiquibaseSchemaName(databaseSchema);
             }
 
             if (StringUtils.isNotEmpty(databaseCatalog)) {
@@ -315,9 +315,9 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
             if (usingRelationalDatabase) {
                 initDbSqlSessionFactory();
             }
-            
+
             addSessionFactory(new GenericManagerFactory(EntityCache.class, EntityCacheImpl.class));
-            
+
             commandContextFactory.setSessionFactories(sessionFactories);
         }
 
@@ -334,7 +334,6 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
             dbSqlSessionFactory = createDbSqlSessionFactory();
             dbSqlSessionFactory.setDatabaseType(databaseType);
             dbSqlSessionFactory.setSqlSessionFactory(sqlSessionFactory);
-            dbSqlSessionFactory.setIdGenerator(idGenerator);
             dbSqlSessionFactory.setDatabaseTablePrefix(databaseTablePrefix);
             dbSqlSessionFactory.setTablePrefixIsSchema(tablePrefixIsSchema);
             dbSqlSessionFactory.setDatabaseCatalog(databaseCatalog);
@@ -343,7 +342,7 @@ public class FormEngineConfiguration extends AbstractEngineConfiguration impleme
         }
         initDbSqlSessionFactoryEntitySettings();
     }
-    
+
     @Override
     protected void initDbSqlSessionFactoryEntitySettings() {
         defaultInitDbSqlSessionFactoryEntitySettings(EntityDependencyOrder.INSERT_ORDER, EntityDependencyOrder.DELETE_ORDER);
