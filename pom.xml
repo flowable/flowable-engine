@@ -640,11 +640,6 @@
 				<version>5.5.0.Final</version>
 			</dependency>
 			<dependency>
-				<groupId>org.json</groupId>
-				<artifactId>json</artifactId>
-				<version>20070829</version>
-			</dependency>
-			<dependency>
 				<groupId>org.mule.modules</groupId>
 				<artifactId>mule-module-cxf</artifactId>
 				<version>${mule.version}</version>
@@ -868,11 +863,6 @@
 				<groupId>com.fasterxml.jackson.datatype</groupId>
 				<artifactId>jackson-datatype-joda</artifactId>
 				<version>${jackson.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>org.imgscalr</groupId>
-				<artifactId>imgscalr-lib</artifactId>
-				<version>4.2</version>
 			</dependency>
 			<!-- Camel integration -->
 			<dependency>

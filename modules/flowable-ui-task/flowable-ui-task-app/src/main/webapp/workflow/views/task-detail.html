@@ -83,8 +83,8 @@
             <a ng-if="!model.task.endDate && model.task.assignee && (model.task.assignee.id == account.id || (model.task.initiatorCanCompleteTask && model.task.processInstanceStartUserId == ('' + account.id)))" class="subtle-select"
                     select-people-popover
                     exclude-user-id="model.task.assignee.id"
-                    on-people-selected="setTaskAssignee(user)"
-                    on-email-selected="setTaskAssigneeByEmail(email)"
+                    on-people-selected="setTaskAssigneeValue(user)"
+                    on-email-selected="setTaskAssigneeValueByEmail(email)"
                     close-on-select="true"
                     placement="bottom-left">
                 <span ng-if="model.task.assignee" user-name="model.task.assignee"></span>
