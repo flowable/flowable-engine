@@ -73,7 +73,10 @@ public class FlowableIdmEngineConfiguration {
         idmEngineConfiguration.setDataSource(dataSource);
         idmEngineConfiguration.setDatabaseSchemaUpdate(IdmEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
         idmEngineConfiguration.setTransactionManager(transactionManager);
-
+        if (idService != null) {
+            idmEngineConfiguration.setIdmIdentityService(idService);
+        }
+        
         if (environment.getProperty("ldap.enabled", Boolean.class, false)) {
             initializeLdap(idmEngineConfiguration);
         } else {
@@ -130,11 +133,6 @@ public class FlowableIdmEngineConfiguration {
 
     @Bean(name = "defaultIdmIdentityService")
     public IdmIdentityService idmIdentityService() {
-        IdmIdentityService defaultIdmService = idmEngine().getIdmIdentityService();
-        if (idService != null) {
-            ((ServiceImpl) idService).setCommandExecutor(((ServiceImpl) defaultIdmService).getCommandExecutor());
-            return idService;
-        }
         return idmEngine().getIdmIdentityService();
     }
 
