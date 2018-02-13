@@ -12,13 +12,13 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 @Configuration
 @PropertySources({
     
-        @PropertySource("classpath:/META-INF/flowable-app/flowable-app.properties"),
-        @PropertySource(value = "classpath:flowable-app.properties", ignoreResourceNotFound = true),
-        @PropertySource(value = "file:flowable-app.properties", ignoreResourceNotFound = true),
+    @PropertySource("classpath:/META-INF/flowable-app/flowable-app.properties"),
+    @PropertySource(value = "classpath:flowable-app.properties", ignoreResourceNotFound = true),
+    @PropertySource(value = "file:flowable-app.properties", ignoreResourceNotFound = true),
     
-        // Following property files are read for backwards compatibility.
-        @PropertySource(value = "classpath:db.properties", ignoreResourceNotFound = true),
-        @PropertySource(value = "classpath:engine.properties", ignoreResourceNotFound = true)
+    // For backwards compatibility (pre 6.3.0)
+    @PropertySource(value = "classpath:db.properties", ignoreResourceNotFound = true),
+    @PropertySource(value = "classpath:engine.properties", ignoreResourceNotFound = true)
         
 })
 @ComponentScan(basePackages = { "org.flowable.rest.conf" })
