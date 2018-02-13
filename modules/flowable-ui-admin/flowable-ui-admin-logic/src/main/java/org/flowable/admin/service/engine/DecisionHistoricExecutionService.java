@@ -28,15 +28,15 @@ import org.springframework.stereotype.Service;
  * Service for invoking Flowable REST services.
  */
 @Service
-public class DecisionAuditService {
+public class DecisionHistoricExecutionService {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DecisionAuditService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DecisionHistoricExecutionService.class);
 
     @Autowired
     protected FlowableClientService clientUtil;
 
-    public JsonNode listDecisionAudits(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
-        URIBuilder builder = clientUtil.createUriBuilder("/enterprise/decisions/audits");
+    public JsonNode listHistoricDecisionExecutions(ServerConfig serverConfig, Map<String, String[]> parameterMap) {
+        URIBuilder builder = clientUtil.createUriBuilder("dmn-history/historic-decision-executions");
 
         for (String name : parameterMap.keySet()) {
             builder.addParameter(name, parameterMap.get(name)[0]);
@@ -45,13 +45,13 @@ public class DecisionAuditService {
         return clientUtil.executeRequest(get, serverConfig);
     }
 
-    public JsonNode getDecisionAudit(ServerConfig serverConfig, String decisionAuditId) {
-        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "/enterprise/decisions/audits/" + decisionAuditId));
+    public JsonNode getHistoricDecisionExecution(ServerConfig serverConfig, String executionId) {
+        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "dmn-history/historic-decision-executions/" + executionId));
         return clientUtil.executeRequest(get, serverConfig);
     }
 
-    public JsonNode getProcessInstanceDecisionAudit(ServerConfig serverConfig, String processInstanceId) {
-        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "/enterprise/process-instances/" + processInstanceId + "/decision-tasks"));
+    public JsonNode getHistoricDecisionExecutionAuditData(ServerConfig serverConfig, String executionId) {
+        HttpGet get = new HttpGet(clientUtil.getServerUrl(serverConfig, "dmn-history/historic-decision-executions/" + executionId + "/auditdata"));
         return clientUtil.executeRequest(get, serverConfig);
     }
 }

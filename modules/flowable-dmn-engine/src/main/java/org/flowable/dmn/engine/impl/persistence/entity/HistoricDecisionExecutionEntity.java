@@ -41,5 +41,4 @@ public interface HistoricDecisionExecutionEntity extends DmnHistoricDecisionExec
     void setTenantId(String tenantId);
 
     void setExecutionJson(String executionJson);
-
 }
